@@ -229,7 +229,7 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
     : verifyAndConsumeEffect(store, state, { def: effectDef(intent), gate, approvalRequestId, callerKey: principal.key, regulated: isRegulated(state, signedA4Floor(store.workspace)) });
   // Signing keys first: every later step signs, and none may run when the record of it could not be written.
   try {
-    getPrivateKeyPem(store.workspace, "auditor");
+    for (const purpose of ["artifact-seal", "revocation-list"] as const) getPrivateKeyPem(store.workspace, purpose); // P1-08: grant, freeze, restore and receipt; lease revocations
   } catch {
     throw fail(423, "A4_VAULT_LOCKED", "Unlock the vault to roll back: every step signs a receipt.");
   }

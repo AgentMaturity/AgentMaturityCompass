@@ -26,6 +26,7 @@ import { runAssurance } from "../../src/assurance/assuranceRunner.js";
 import { initAssurancePolicy, loadAssurancePolicy, saveAssurancePolicy } from "../../src/assurance/assurancePolicyStore.js";
 import { issueAssuranceCertificate } from "../../src/assurance/assuranceCertificates.js";
 import { handleBomRoute } from "../../src/api/bomRouter.js";
+import { API_RESULT_ROUTES, labelResult, matchResultRoute } from "../../src/api/resultRouteRegistry.js";
 import { handleCryptoRoute } from "../../src/api/cryptoRouter.js";
 import { handleAssuranceRoute } from "../../src/api/assuranceRouter.js";
 import { handleToolsRoute } from "../../src/api/toolsRouter.js";
@@ -130,14 +131,21 @@ function expectRow(row: {
   /** Pins that are not the issuer key, kept with --allow-unpinned (the monitor pin for ledger anchoring). */
   anchor?: () => string[];
 }) {
+  // A copy that fails verification makes no evidence-sufficiency claim: its claim line, if any, reads untrusted.
+  const noSufficiencyClaim = (output: string) => {
+    expect(output).not.toContain("Evidence: sufficient");
+    if (output.includes("Claim: ")) expect(output).toContain("Evidence: untrusted");
+  };
   test("a forged copy re-signed with an embedded key fails as not-pinned by default", () => {
     const result = row.verify(row.forged(), []);
     expect(result.status, result.output).toBe(1);
     expect(result.output).toContain("not-pinned");
+    noSufficiencyClaim(result.output);
   });
   test("a forged copy still fails when the legitimate key is pinned", () => {
     const result = row.verify(row.forged(), row.pin());
     expect(result.status, result.output).toBe(1);
+    noSufficiencyClaim(result.output);
   });
   test("the untouched artifact with its key pinned is trusted", () => {
     const result = row.verify(row.genuine(), row.pin());
@@ -147,6 +155,7 @@ function expectRow(row: {
     const result = row.verify(row.genuine(), [...(row.anchor?.() ?? []), "--allow-unpinned"]);
     expect(result.status, result.output).toBe(2);
     expect(result.stderr.trimStart().startsWith("UNTRUSTED:"), result.stderr).toBe(true);
+    noSufficiencyClaim(result.output);
   });
 }
 
@@ -613,6 +622,10 @@ describe("API verify routes use the server's trust context and refuse request-su
       expect(out.json.data?.ok).toBe(false);
       expect(out.json.data?.report?.trusted).toBe(false);
       expect(out.json.data?.report?.issuerAdmission.status).toBe("fail");
+      // The claim the API dispatcher attaches to a result route (src/api/index.ts), if any, claims no sufficient evidence.
+      const resultRoute = matchResultRoute(API_RESULT_ROUTES, "POST", pathname);
+      const claim = resultRoute ? labelResult(resultRoute, out.json.data, evidence.workspace).claim : undefined;
+      if (claim) expect(claim.statusDimensions).toMatchObject({ evidence: expect.not.stringMatching(/^sufficient$/), result: "not_evaluated" });
     });
   }
 

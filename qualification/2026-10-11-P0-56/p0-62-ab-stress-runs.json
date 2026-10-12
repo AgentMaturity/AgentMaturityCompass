@@ -1,0 +1,211 @@
+{
+ "label": "Interleaved int vs branch under VM CPU stress (4 busy loops); loop stopped after int-3/branch-3 to diagnose",
+ "environment": "local colima amc-s7f (Ubuntu 24.04, 6.8.0-117-generic, 4 vCPU) on macOS arm64; not CI",
+ "image": "node:24-bookworm@sha256:3d27e5c11e5786e309ec3e03f93ae536eb36e6e5eb3714d5eb3300a36157add0 + baked bubblewrap, python3-venv, Playwright 1.62.1, Chromium (local tag amc-p062-studio:arm64)",
+ "tarballSha256": "int 55f34832\u2026 / branch b6a15334\u2026",
+ "sourceCommit": "int 3f241d5b6 / branch 9239cb96f",
+ "runs": [
+  {
+   "run": "branch-1",
+   "loadavgBefore": "6.18",
+   "studioStepExit": 0,
+   "studioStepSeconds": 214,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "branch-2",
+   "loadavgBefore": "6.12",
+   "studioStepExit": 1,
+   "studioStepSeconds": 275,
+   "ok": false,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 2,
+    "failed": 1,
+    "notExercised": 10
+   },
+   "coldVerifiersValid": 2,
+   "upDemoOutput": "AMC Studio local demo mode is running\nNo vault passphrase required; outputs are not verifier-ready.\nLocal demo data is mutable and the no-login session is restricted to loopback.\nWorkspace: /work/out/studio/demo\nHost data: /work/out/studio/demo/.amc/studio-demo-host\nDefault workspace: demo\nStudio API: http://127.0.0.1:31576\nCompass Console: http://127.0.0.1:31576/w/demo/console/\nAPI examples: Compass Console home > API Quickstart.\nAuto-open disabled (--no-open). Use the Compass Console URL above.\nVerifier boundary: use `amc up` with vault setup for signed artifacts.",
+   "downOutput": "{\"ok\":false,\"qualification\":\"failed-or-incomplete\",\"counts\":{\"planned\":13,\"passed\":2,\"failed\":1,\"notExercised\":10},\"receipt\":\"/work/out/studio/browser/receipt.json\"}",
+   "demoDaemonLog": null,
+   "demoDaemonCleanup": [
+    {
+     "resource": "owned demo daemon",
+     "signalCommandExit": 0,
+     "knownPid": 148,
+     "groupId": 148,
+     "processGroupReaped": true,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "run": "branch-3",
+   "loadavgBefore": "5.41",
+   "studioStepExit": 1,
+   "studioStepSeconds": 165,
+   "ok": false,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 2,
+    "failed": 1,
+    "notExercised": 10
+   },
+   "coldVerifiersValid": 0,
+   "upDemoOutput": "AMC Studio local demo mode is running\nNo vault passphrase required; outputs are not verifier-ready.\nLocal demo data is mutable and the no-login session is restricted to loopback.\nWorkspace: /work/out/studio/demo\nHost data: /work/out/studio/demo/.amc/studio-demo-host\nDefault workspace: demo\nStudio API: http://127.0.0.1:23654\nCompass Console: http://127.0.0.1:23654/w/demo/console/\nAPI examples: Compass Console home > API Quickstart.\nAuto-open disabled (--no-open). Use the Compass Console URL above.\nVerifier boundary: use `amc up` with vault setup for signed artifacts.",
+   "downOutput": "{\"ok\":false,\"qualification\":\"failed-or-incomplete\",\"counts\":{\"planned\":13,\"passed\":2,\"failed\":1,\"notExercised\":10},\"receipt\":\"/work/out/studio/browser/receipt.json\"}",
+   "demoDaemonLog": null,
+   "demoDaemonCleanup": [
+    {
+     "resource": "owned demo daemon",
+     "signalCommandExit": 0,
+     "knownPid": 148,
+     "groupId": 148,
+     "processGroupReaped": true,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "run": "int-1",
+   "loadavgBefore": "2.38",
+   "studioStepExit": 0,
+   "studioStepSeconds": 146,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "int-2",
+   "loadavgBefore": "5.85",
+   "studioStepExit": 1,
+   "studioStepSeconds": 222,
+   "ok": false,
+   "error": "RuntimeError: Public command 6 failed or cleanup incomplete, see /work/out/studio/command-06.log",
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   "coldVerifiersValid": 0,
+   "upDemoOutput": "Studio daemon failed to start in time. Check `amc logs`.",
+   "downOutput": "Sent SIGTERM to studio pid 148",
+   "demoDaemonLog": "",
+   "demoDaemonCleanup": [
+    {
+     "resource": "owned demo daemon",
+     "ok": false,
+     "error": "'NoneType' object cannot be interpreted as an integer"
+    }
+   ]
+  },
+  {
+   "run": "int-3",
+   "loadavgBefore": "5.20",
+   "studioStepExit": 1,
+   "studioStepSeconds": 125,
+   "ok": false,
+   "error": "RuntimeError: Public command 6 failed or cleanup incomplete, see /work/out/studio/command-06.log",
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   "coldVerifiersValid": 0,
+   "upDemoOutput": "Studio daemon failed to start in time. Check `amc logs`.",
+   "downOutput": "Sent SIGTERM to studio pid 148",
+   "demoDaemonLog": "",
+   "demoDaemonCleanup": [
+    {
+     "resource": "owned demo daemon",
+     "ok": false,
+     "error": "'NoneType' object cannot be interpreted as an integer"
+    }
+   ]
+  }
+ ],
+ "passed": 2,
+ "failed": 4
+}

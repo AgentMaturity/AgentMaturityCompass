@@ -107,7 +107,7 @@ import { exportFindingProofs, listFindingProofs, loadFindingProof, writeFindingP
 import { exportLifecycleChangeReceipts, listLifecycleChangeReceipts, loadLifecycleChangeReceipt, writeLifecycleChangeReceipts } from "./lifecycle/changeReceipt.js";
 import { exportLifecycleRunArtifact, listLifecycleRunArtifacts, loadLifecycleRunArtifact, writeLifecycleRunArtifact } from "./lifecycle/lifecycleRunArtifact.js";
 import { listObservabilityLaneRecords, loadObservabilityLaneRecord, writeObservabilityLaneRecord } from "./lifecycle/observabilityLane.js";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest } from "./crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest } from "./crypto/keys.js";
 import { computeIncidentHash, createIncidentStore } from "./incidents/incidentStore.js";
 import {
   RECORDABLE_TRIGGERS,
@@ -211,7 +211,7 @@ import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js
 import { registerMirofishCommands } from "./mirofish/cli.js";
 import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
-import { registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
+import { registerKeysCommands, registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
 import {
   exitIfUntrusted, finishVerify, ledgerExitCode, trustFromFlags, unsignedArtifactReport, verifyAllExit, withTrustFlags, type TrustFlags
@@ -286,6 +286,7 @@ import { assertOwnerMode, getMode, setMode, type AMCMode } from "./mode/mode.js"
 import { initVaultInteractive, lockVaultNow, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase } from "./vault/passphraseStore.js";
 import { ensureUpVaultPassphrase, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
+import { agentRunFiles, latestRunSummary } from "./diagnostic/runReportResolution.js";
 import { buildConnectInstructions } from "./studio/connectWizard.js";
 import { registerHookIntegrationCommands } from "./adapters/hookIntegrationCli.js";
 import { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
@@ -1201,36 +1202,6 @@ function findImmediatePackDirectories(parentDir: string): string[] {
   return out.sort((a, b) => a.localeCompare(b));
 }
 
-function latestRunSummary(workspace: string, agentId: string): { runId: string; integrityIndex: number; trustLabel: string } | null {
-  const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(runsDir)) {
-    return null;
-  }
-  const files = readdirSync(runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) {
-    return null;
-  }
-  try {
-    const parsed = JSON.parse(readUtf8(join(runsDir, files[files.length - 1]!))) as {
-      runId?: string;
-      integrityIndex?: number;
-      trustLabel?: string;
-    };
-    if (!parsed.runId) {
-      return null;
-    }
-    return {
-      runId: parsed.runId,
-      integrityIndex: Number(parsed.integrityIndex ?? 0),
-      trustLabel: String(parsed.trustLabel ?? "UNKNOWN")
-    };
-  } catch {
-    return null;
-  }
-}
-
 function readCurrentAgentScore(workspace: string, agentId: string): { score0to1: number; source: string } | null {
   const latest = latestRunSummary(workspace, agentId);
   if (!latest) {
@@ -1354,19 +1325,13 @@ function renderAssuranceRemediationPriority(report: AssuranceReport, opts: {
 }
 
 function loadTemporalDecayRuns(workspace: string, agentId: string, lookbackDays: number, nowTs: number): TemporalDecaySourceRun[] {
-  const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(runsDir)) {
-    return [];
-  }
   const minTs = nowTs - Math.max(1, lookbackDays) * 24 * 60 * 60 * 1000;
-  const files = readdirSync(runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
+  const files = agentRunFiles(workspace, agentId);
 
   const rows: TemporalDecaySourceRun[] = [];
   for (const file of files) {
     try {
-      const parsed = JSON.parse(readUtf8(join(runsDir, file))) as {
+      const parsed = JSON.parse(readUtf8(file)) as {
         runId?: string;
         ts?: number;
         integrityIndex?: number;
@@ -8033,7 +7998,7 @@ incident
 
       const incidentHash = computeIncidentHash(incidentBase as unknown as Parameters<typeof computeIncidentHash>[0]);
       const signatureDigest = sha256Hex(canonicalize({ ...incidentBase, incident_hash: incidentHash }));
-      const signature = signHexDigest(signatureDigest, getPrivateKeyPem(workspace, "monitor"));
+      const signature = signHexDigest(signatureDigest, getSigningKey(workspace, "ledger-row"));
 
       store.insertIncident({
         ...incidentBase,
@@ -8089,7 +8054,7 @@ incident
         evidence: [opts.evidence],
         addedTs: now,
         addedBy: "OWNER",
-        signature: signHexDigest(edgeDigest, getPrivateKeyPem(workspace, "monitor"))
+        signature: signHexDigest(edgeDigest, getSigningKey(workspace, "ledger-row"))
       });
 
       console.log(chalk.green(`Linked evidence ${opts.evidence} to incident ${incidentId}`));
@@ -8141,7 +8106,7 @@ incident
         toState: "RESOLVED",
         reason: opts.resolution,
         ts: now,
-        signature: signHexDigest(transitionDigest, getPrivateKeyPem(workspace, "monitor"))
+        signature: signHexDigest(transitionDigest, getSigningKey(workspace, "ledger-row"))
       });
 
       console.log(chalk.green(`Incident closed: ${id}`));
@@ -8182,7 +8147,7 @@ incident
           triggerOrClockId: (opts.trigger ?? opts.notified)!,
           ts: parseIsoTimestamp(opts.at!, "--at"),
           recordedBy: "cli",
-          privateKeyPem: getPrivateKeyPem(workspace, "monitor"),
+          privateKeyPem: getSigningKey(workspace, "ledger-row"),
           publicKeys
         });
         if (!opts.json) console.log(chalk.green(`Recorded ${event.kind} ${event.triggerOrClockId}: ${event.eventId}`));
@@ -8229,7 +8194,7 @@ incident
       }
       const record = recordWorkspaceOversight({
         workspace, incident: found, reviewerId: opts.reviewer, decision: opts.decision, rationale: opts.rationale,
-        clockIds: opts.clock ?? [], reviewedTs: Date.now(), privateKeyPem: getPrivateKeyPem(workspace, "auditor"),
+        clockIds: opts.clock ?? [], reviewedTs: Date.now(), privateKeyPem: getSigningKey(workspace, "artifact-seal"),
         publicKeys: getPublicKeyHistory(workspace, "auditor")
       });
       console.log(chalk.green(`Oversight record ${record.recordId} appended (${record.decision})`));
@@ -9083,7 +9048,7 @@ standard
     console.log(JSON.stringify(standardListCli(process.cwd()), null, 2));
   });
 
-const diagnosticBank = diagnostic.command("bank").description("Signed diagnostic 126-question bank operations");
+const diagnosticBank = diagnostic.command("bank").description("Signed default diagnostic question bank operations");
 
 diagnosticBank
   .command("init")
@@ -9114,7 +9079,7 @@ diagnosticBank
 
 diagnostic
   .command("render")
-  .description("Render contextualized 126-question diagnostic for an agent")
+  .description("Render the contextualized default diagnostic question bank for an agent")
   .requiredOption("--agent <agentId>", "agent id")
   .option("--format <format>", "md|json", "json")
   .option("--out <file>", "output file")
@@ -11569,7 +11534,7 @@ cert
     const certPath = resolve(process.cwd(), file);
     const envelope = readTrustCertificateEnvelope(certPath);
     if (envelope) {
-      console.log(JSON.stringify(withClaimFields(envelope, artifactClaim("trust-certificate")), null, 2));
+      console.log(JSON.stringify(withClaimFields(envelope, artifactClaim("trust-certificate", { sealVerified: false /* inspect checks no signature */ })), null, 2));
       return;
     }
     const inspected = inspectCertificate(certPath);
@@ -11658,7 +11623,7 @@ vault
     }
   });
 
-registerVaultRotationCommand(vault);
+registerVaultRotationCommand(vault); registerKeysCommands(program); // P1-08 freeze exception: amc keys list|rotate|revoke|export-public
 
 notary
   .command("init")
@@ -18520,13 +18485,17 @@ release
   .requiredOption("--out <file>", "output .amcrelease file")
   .option("--private-key <path>", "release signing private key path override")
   .option("--skip-install-build", "use current built artifacts without frozen source install/build", false)
-  .action((opts: { out: string; privateKey?: string; skipInstallBuild?: boolean }) => {
+  .option("--npm-tarball <file>", "embed this gated npm tarball as is; nothing is installed, built or packed")
+  .option("--sbom <file>", "embed this gated CycloneDX SBOM instead of regenerating it")
+  .option("--licenses <file>", "embed this gated licence inventory instead of regenerating it")
+  .action((opts: { out: string; privateKey?: string; skipInstallBuild?: boolean; npmTarball?: string; sbom?: string; licenses?: string }) => {
     assertOwnerMode(process.cwd(), "release pack");
     const out = releasePackCli({
       workspace: process.cwd(),
       outFile: resolve(process.cwd(), opts.out),
       privateKeyPath: opts.privateKey,
-      skipInstallBuild: opts.skipInstallBuild
+      skipInstallBuild: opts.skipInstallBuild,
+      npmTarball: opts.npmTarball, sbomFile: opts.sbom, licensesFile: opts.licenses
     });
     console.log(chalk.green("Release bundle created"));
     console.log(`File: ${out.outFile}`);
@@ -24270,7 +24239,7 @@ program
     for (const line of result.roadmap) { console.log(chalk.hex('#4AEF79')(`  ${line}`)); }
 
     console.log(chalk.bold.hex('#4AEF79')("\n📋  Next Steps:"));
-    console.log("  amc score tier --tier standard   Full 126-question assessment");
+    console.log("  amc score tier --tier standard   Full default diagnostic question bank assessment");
     console.log("  amc scan --local .               Scan your codebase");
     console.log("  amc dashboard open               Open web dashboard");
     console.log("  amc playground run               Run scenario tests");

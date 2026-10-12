@@ -1,3 +1,4 @@
+import { cliInitiator } from "../approvals/approvalEngine.js";
 /**
  * assuranceRouter.ts — Assurance API routes backed by the unified assurance runner.
  *
@@ -104,7 +105,8 @@ export async function handleAssuranceRoute(
   method: string,
   req: IncomingMessage,
   res: ServerResponse,
-  workspace = process.cwd()
+  workspace = process.cwd(),
+  principal?: string
 ): Promise<boolean> {
 
   /* ── GET /api/v1/assurance/packs — list packs ────────────────── */
@@ -362,6 +364,8 @@ export async function handleAssuranceRoute(
       }
       const out = assuranceWaiverRequestForApi({
         workspace,
+        // P1-78: the authenticated API caller; a local dashboard call has none, so the process's owner, self-reported.
+        initiator: principal ?? cliInitiator(),
         agentId: body.agentId ?? "default",
         reason: body.reason,
         hours: body.hours

@@ -1,0 +1,9 @@
+     × refuses a symlinked parent (.amc) of the keys directory 120ms
+     × refuses a symlinked key file and a dangling symlink in place of the key set 70ms
+     × refuses a key file hard-linked to a file outside the keys directory 72ms
+     × catches a symlink swapped in between the check and the open 161ms
+     × refuses a symlinked lease revocations directory 89ms
+     × writes never go through an existing symlinked staging name 147ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  6 failed | 1 passed (7)
+(swap case: passes on HEAD once the memo is bypassed, because the read already uses O_NOFOLLOW; kept as a regression guard)

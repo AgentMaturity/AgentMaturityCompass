@@ -14,7 +14,7 @@ describe("combined Studio/API deployment contracts", () => {
     const overlay = YAML.parse(readFileSync("deploy/compose/docker-compose.studio-api.yml", "utf8"));
     expect(Object.keys(overlay.services)).toEqual(["amc-api", "caddy"]);
     expect(overlay.services["amc-api"]).toMatchObject({ build: { target: "api" },
-      expose: ["3220"], read_only: true, cap_drop: ["ALL"], volumes: ["amc_data:/data/amc:ro"] });
+      expose: ["3220"], read_only: true, cap_drop: ["ALL"], volumes: ["amc_data:/data/amc:ro", "amc_api_state:/home/amc/.config/amc/state"] });
     expect(overlay.services["amc-api"].ports).toBeUndefined();
     expect(overlay.services.caddy.depends_on).toEqual(["amc-studio", "amc-api"]);
   });

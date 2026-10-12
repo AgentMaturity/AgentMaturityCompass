@@ -485,7 +485,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           additionalCapabilities: [...(mcpReview?.capabilities ?? []), ...(wantsDelegation ? [{ name: "delegate", actionClass: "READ_ONLY" as const }] : [])],
           // Fork chooses a different ID; resume chooses the existing writer.
           get sessionId() { return actualSession().sessionId; },
-          recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row) },
+          recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable() },
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {}),
           ...shellOptIn
         });

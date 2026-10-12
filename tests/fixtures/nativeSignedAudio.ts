@@ -95,7 +95,7 @@ export function audioHarness(workspace: string, options: { provider?: string; tr
       session = { sessionId, readEvents: () => writer.readEvents(), prompt: (text, images) => run(() => { driver.followup(text, images); }),
         promptParts: parts => run(() => { driver.followupParts(parts); }), promptAudioParts: parts => run(() => { driver.followupAudioParts(parts); }),
         cancel: (cause, by) => driver.cancel(cause, { by, keepInbox: true }), close: () => { writer.close({ reason: "fixture-completed" }); } };
-    } else session = await prepareAcpNativeSession({ session: init, signal, onApprovalRaised: () => {},
+    } else session = await prepareAcpNativeSession({ session: init, signal, onApprovalRaised: () => {}, initiator: "test-operator",
       ...(resume ? { claimant: { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Date.now() } } : {}) });
     sessions.set(sessionId, session); return session;
   };

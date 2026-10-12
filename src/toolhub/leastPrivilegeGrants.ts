@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -254,7 +254,7 @@ export function createSignedLeastPrivilegeToolGrant(input: {
   return {
     ...payload,
     grantDigestSha256: digest,
-    grantSignature: signHexDigest(digest, getPrivateKeyPem(input.workspace, "auditor")),
+    grantSignature: signHexDigest(digest, getSigningKey(input.workspace, "config-signature")),
     signer: "auditor",
     signedTs: Date.now(),
     metadataOnlyAccepted: false

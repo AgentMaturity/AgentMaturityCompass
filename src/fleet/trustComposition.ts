@@ -17,7 +17,7 @@ import { parseEvidenceEvent } from "../diagnostic/gates.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
-import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import type { DiagnosticReport, TrustLabel, RiskTier } from "../types.js";
 
 // ---------------------------------------------------------------------------
@@ -626,7 +626,7 @@ export function computeTrustComposition(
   let reportSealSig = "unsigned";
   if (!options.noSign) {
     try {
-      reportSealSig = signHexDigest(reportJsonSha256, getPrivateKeyPem(workspace, "auditor"));
+      reportSealSig = signHexDigest(reportJsonSha256, getSigningKey(workspace, "artifact-seal"));
     } catch {
       reportSealSig = "unsigned";
     }

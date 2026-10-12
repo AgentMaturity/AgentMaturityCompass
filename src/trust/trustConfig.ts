@@ -378,7 +378,10 @@ export async function enableNotaryTrust(params: {
   // trust set permanently widened for a notary that was never enabled. There
   // is no revocation path, so that widening would have been silent and final.
   const saved = saveTrustConfig(params.workspace, next);
-  addPublicKeyToHistory(params.workspace, "auditor", pubPem, "notary");
+  // Not logged: with the config saved, the transparency seal is signed by this very notary, which would make enabling it
+  // depend on the notary answering mid-enable. An admission only adds a key, so an older history without it narrows
+  // trust; the revision is still marked on this machine.
+  addPublicKeyToHistory(params.workspace, "auditor", pubPem, "notary", { logRevision: false });
   return {
     path: saved.path,
     sigPath: saved.sigPath,

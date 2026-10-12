@@ -4,7 +4,7 @@ import { join } from "node:path";
 import inquirer from "inquirer";
 import YAML from "yaml";
 import { z } from "zod";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { createSignedTargetProfile, defaultTargetMapping, saveTargetProfile } from "../targets/targetProfile.js";
 import type { RiskTier, TrustTier } from "../types.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
@@ -79,7 +79,7 @@ const signatureSchema = z.object({
 });
 
 function signDigest(workspace: string, digest: string): string {
-  return signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  return signHexDigest(digest, getSigningKey(workspace, "config-signature"));
 }
 
 function writeSignedFile(workspace: string, filePath: string, content: string): string {

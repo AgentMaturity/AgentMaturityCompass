@@ -1,7 +1,7 @@
 import { canonicalize } from "../utils/json.js";
 import { z } from "zod";
 import YAML from "yaml";
-import { getPublicKeyHistory } from "../crypto/keys.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import {
   loadApprovalPolicy,
@@ -20,28 +20,28 @@ import {
   validateToolRequest,
   verifyToolsConfigSignature,
 } from "../toolhub/toolhubValidators.js";
-import type { ActionClass, RiskTier, RuntimeName } from "../types.js";
+import type { ActionClass, RiskTier } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { redactBridgeText } from "./bridgeRedaction.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { resolveProviderHookRequestIdentity } from "./hookActionIdentity.js";
+import type { ShellCommandConnector, ShellCommandPlan } from "../enforce/shellCommandPlan.js";
 import {
-  parseShellCommandPlan,
-  type ShellCommandConnector,
-  type ShellCommandPlan,
-  type ShellCommandSegment,
-} from "../enforce/shellCommandPlan.js";
+  canonicalToolRequests, CONTROL_HOOK_EVENTS, controlDecisionSchema, HookControlError, materializeProviderDecision,
+  parseProvider, piControlContext, piRefusal, providerSchema, runtimeFor, serializeProviderControlResponse, validateProviderControlResponse,
+  type CanonicalToolRequest, type HookControlDecision, type HookControlOutcome, type HookControlProviderMapping,
+  type HookProvider, type PiControlContext, type ProviderControlResponse,
+} from "./hookProviders.js";
+// Still exported here for importers of hookControl.js, the archived HTTP parity module among them.
+export { HookControlError } from "./hookProviders.js";
+import { authorizeHookDecision, hookDecisionReceipt, type AuthorizationTarget, type HookLease } from "./hookAuthorization.js";
+import { piActionId } from "../adapters/pi/piIdentity.js";
 
 export const CONTROL_HOOK_PATH = "/bridge/hooks/control/v1";
 export const CONTROL_HOOK_ROUTE = "/hooks/control/v1";
 export const MAX_CONTROL_HOOK_BODY_BYTES = 262_144;
 
-export type HookProvider = "claude-code" | "gemini-cli";
-export type HookControlDecision = "allow" | "deny" | "ask";
-export type HookControlOutcome = HookControlDecision | "steer";
-export type HookControlProviderMapping = "native" | "corrective_deny" | "fail_closed_deny";
-export type ProviderControlResponse = Record<string, unknown>;
 
 export type CompoundCommandBlastRadiusReasonCode =
   | "SIGNED_AUTHORITY_UNTRUSTED"
@@ -80,25 +80,6 @@ export interface CompoundCommandBlastRadiusReview {
   argumentValuesStored: false;
 }
 
-export type HookControlErrorCode =
-  | "HOOK_CONTROL_INPUT_INVALID"
-  | "HOOK_CONTROL_INPUT_AMBIGUOUS"
-  | "HOOK_CONTROL_INPUT_TOO_LARGE"
-  | "HOOK_CONTROL_PROVIDER_UNSUPPORTED"
-  | "HOOK_CONTROL_REPLAY_CONFLICT"
-  | "HOOK_CONTROL_LEDGER_UNAVAILABLE";
-
-export class HookControlError extends Error {
-  readonly code: HookControlErrorCode;
-  readonly statusCode: number;
-
-  constructor(code: HookControlErrorCode, statusCode: number, message: string) {
-    super(message);
-    this.name = "HookControlError";
-    this.code = code;
-    this.statusCode = statusCode;
-  }
-}
 
 export interface ProviderHookControlResult {
   controlled: true;
@@ -130,18 +111,11 @@ interface NormalizedProviderToolRequest {
   canonicalRequests: CanonicalToolRequest[];
   commandPlan: ShellCommandPlan | null;
   rawInputSha256: string;
-}
-
-interface CanonicalToolRequest {
-  name: string;
-  args: Record<string, unknown>;
-  segment: ShellCommandSegment | null;
-  argumentsReviewable: boolean;
+  pi: PiControlContext | null;
+  toolInput: Record<string, unknown>;
 }
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]*$/;
-const providerSchema = z.enum(["claude-code", "gemini-cli"]);
-const controlDecisionSchema = z.enum(["allow", "deny", "ask"]);
 const controlOutcomeSchema = z.enum(["allow", "deny", "ask", "steer"]);
 const controlProviderMappingSchema = z.enum(["native", "corrective_deny", "fail_closed_deny"]);
 const actionClassSchema = z.enum(ACTION_CLASSES as [ActionClass, ...ActionClass[]]);
@@ -197,31 +171,6 @@ const providerHookInputSchema = z.object({
   timestamp: z.string().max(128).optional(),
 }).passthrough();
 
-const claudeControlResponseSchema = z.object({
-  hookSpecificOutput: z.object({
-    hookEventName: z.literal("PreToolUse"),
-    permissionDecision: controlDecisionSchema,
-    permissionDecisionReason: z.string().min(1).max(1_024),
-    additionalContext: z.string().min(1).max(1_024).optional(),
-  }).strict(),
-}).strict().superRefine((value, ctx) => {
-  if (value.hookSpecificOutput.additionalContext
-    && value.hookSpecificOutput.permissionDecision !== "deny") {
-    ctx.addIssue({
-      code: "custom",
-      path: ["hookSpecificOutput", "additionalContext"],
-      message: "corrective context requires a blocking deny decision",
-    });
-  }
-});
-
-const geminiControlResponseSchema = z.union([
-  z.object({ decision: z.literal("allow") }).strict(),
-  z.object({
-    decision: z.literal("deny"),
-    reason: z.string().min(1).max(1_024),
-  }).strict(),
-]);
 
 const storedControlMetaV1Schema = z.object({
   trustTier: z.literal("OBSERVED"),
@@ -330,7 +279,7 @@ function controlMappingValid(value: ControlMappingFields): boolean {
       && value.effectiveOutcome === "steer"
       && !value.capabilityLossy;
   }
-  return value.provider === "gemini-cli"
+  return value.provider !== "claude-code"
     && (value.requestedDecision === "ask" || value.requestedDecision === "steer")
     && value.decision === "deny"
     && value.effectiveOutcome === "deny"
@@ -368,17 +317,6 @@ function normalizeControlResult(
   };
 }
 
-function parseProvider(provider: unknown): HookProvider {
-  const parsed = providerSchema.safeParse(provider);
-  if (!parsed.success) {
-    throw new HookControlError(
-      "HOOK_CONTROL_PROVIDER_UNSUPPORTED",
-      400,
-      "hook control provider is unsupported",
-    );
-  }
-  return parsed.data;
-}
 
 function parseProviderInput(rawInput: string): z.infer<typeof providerHookInputSchema> {
   if (Buffer.byteLength(rawInput, "utf8") > MAX_CONTROL_HOOK_BODY_BYTES) {
@@ -401,165 +339,6 @@ function parseProviderInput(rawInput: string): z.infer<typeof providerHookInputS
   return parsed.data;
 }
 
-function cleanReason(reason: string): string {
-  const cleaned = redactBridgeText(reason).replace(/\s+/g, " ").trim().slice(0, 1_024);
-  return cleaned || "AMC denied the provider tool request.";
-}
-
-export function renderProviderControlResponse(
-  providerInput: HookProvider,
-  decision: HookControlDecision,
-  reasonInput: string,
-  additionalContextInput?: string,
-): ProviderControlResponse {
-  const provider = parseProvider(providerInput);
-  const reason = cleanReason(reasonInput);
-  if (provider === "claude-code") {
-    const additionalContext = decision === "deny" && additionalContextInput
-      ? cleanReason(additionalContextInput)
-      : null;
-    return {
-      hookSpecificOutput: {
-        hookEventName: "PreToolUse",
-        permissionDecision: decision,
-        permissionDecisionReason: reason,
-        ...(additionalContext ? { additionalContext } : {}),
-      },
-    };
-  }
-  if (decision === "allow") {
-    return { decision: "allow" };
-  }
-  if (decision === "ask") {
-    return {
-      decision: "deny",
-      reason: cleanReason(
-        `${reason} Gemini CLI BeforeTool does not support ask; use an AMC-approved ToolHub execution path or a provider with native ask support.`,
-      ),
-    };
-  }
-  return { decision: "deny", reason };
-}
-
-export function serializeProviderControlResponse(response: ProviderControlResponse): string {
-  return canonicalize(response);
-}
-
-export function validateProviderControlResponse(
-  providerInput: HookProvider,
-  response: unknown,
-): response is ProviderControlResponse {
-  const provider = parseProvider(providerInput);
-  return (provider === "claude-code" ? claudeControlResponseSchema : geminiControlResponseSchema)
-    .safeParse(response).success;
-}
-
-function firstString(input: Record<string, unknown>, keys: string[]): string | null {
-  for (const key of keys) {
-    const value = input[key];
-    if (typeof value === "string" && value.trim()) return value.trim();
-  }
-  return null;
-}
-
-function canonicalShellToolRequest(
-  segment: ShellCommandSegment,
-  workspace: string,
-): CanonicalToolRequest {
-  if (segment.binary === "git") {
-    const firstArgument = segment.argv[0] ?? "";
-    const subcommands = new Set(segment.argv);
-    const name = subcommands.has("push")
-      ? "git.push"
-      : subcommands.has("commit")
-        ? "git.commit"
-        : subcommands.has("status")
-          ? "git.status"
-          : "git.push";
-    return {
-      name,
-      args: { cwd: workspace },
-      segment,
-      argumentsReviewable: !firstArgument.startsWith("-"),
-    };
-  }
-  return {
-    name: "process.spawn",
-    args: { binary: segment.binary, argv: segment.argv },
-    segment,
-    argumentsReviewable: true,
-  };
-}
-
-function shellCommandForProviderTool(
-  provider: HookProvider,
-  toolName: string,
-  toolInput: Record<string, unknown>,
-): string | null {
-  if (provider === "claude-code" && toolName === "Bash") {
-    return firstString(toolInput, ["command"]) ?? "";
-  }
-  if (provider === "gemini-cli" && toolName === "run_shell_command") {
-    return firstString(toolInput, ["command"]) ?? "";
-  }
-  return null;
-}
-
-function canonicalToolRequests(
-  provider: HookProvider,
-  toolName: string,
-  toolInput: Record<string, unknown>,
-  workspace: string,
-): { requests: CanonicalToolRequest[]; commandPlan: ShellCommandPlan | null } {
-  const command = shellCommandForProviderTool(provider, toolName, toolInput);
-  if (command !== null) {
-    const commandPlan = parseShellCommandPlan(command);
-    return {
-      commandPlan,
-      requests: commandPlan.status === "parsed"
-        ? commandPlan.segments.map((segment) => canonicalShellToolRequest(segment, workspace))
-        : [],
-    };
-  }
-
-  let request: Omit<CanonicalToolRequest, "segment"> | null = null;
-  if (provider === "claude-code") {
-    if (["Read", "Glob", "Grep"].includes(toolName)) {
-      request = {
-        name: "fs.read",
-        args: { path: firstString(toolInput, ["file_path", "path"]) ?? workspace },
-        argumentsReviewable: true,
-      };
-    } else if (["Write", "Edit", "MultiEdit", "NotebookEdit"].includes(toolName)) {
-      const path = firstString(toolInput, ["file_path", "notebook_path", "path"]);
-      request = path ? { name: "fs.write", args: { path }, argumentsReviewable: true } : null;
-    } else if (toolName === "WebFetch") {
-      const url = firstString(toolInput, ["url"]);
-      request = url
-        ? { name: "http.fetch", args: { url, method: "GET" }, argumentsReviewable: true }
-        : null;
-    }
-  } else if (["read_file", "list_directory", "glob", "search_file_content"].includes(toolName)) {
-    request = {
-      name: "fs.read",
-      args: { path: firstString(toolInput, ["file_path", "path", "dir_path"]) ?? workspace },
-      argumentsReviewable: true,
-    };
-  } else if (["write_file", "replace"].includes(toolName)) {
-    const path = firstString(toolInput, ["file_path", "path"]);
-    request = path ? { name: "fs.write", args: { path }, argumentsReviewable: true } : null;
-  } else if (toolName === "web_fetch") {
-    const url = firstString(toolInput, ["url"]);
-    request = url
-      ? { name: "http.fetch", args: { url, method: "GET" }, argumentsReviewable: true }
-      : null;
-  }
-
-  return {
-    commandPlan: null,
-    requests: request ? [{ ...request, segment: null }] : [],
-  };
-}
 
 function normalizeProviderRequest(input: {
   workspace: string;
@@ -567,25 +346,21 @@ function normalizeProviderRequest(input: {
   rawInput: string;
 }): NormalizedProviderToolRequest {
   const parsed = parseProviderInput(input.rawInput);
-  const expectedEvent = input.provider === "claude-code" ? "PreToolUse" : "BeforeTool";
-  if (parsed.hook_event_name !== expectedEvent) {
-    throw new HookControlError(
-      "HOOK_CONTROL_INPUT_INVALID",
-      400,
-      `hook control accepts only ${expectedEvent} events`,
-    );
-  }
+  const expectedEvent = CONTROL_HOOK_EVENTS[input.provider];
+  if (parsed.hook_event_name !== expectedEvent) throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, `hook control accepts only ${expectedEvent} events`);
   const rawInputSha256 = sha256Hex(Buffer.from(input.rawInput, "utf8"));
+  const pi = piControlContext(input.provider, parsed);
   const identity = resolveProviderHookRequestIdentity({
     provider: input.provider,
-    providerActionId: parsed.tool_use_id ?? parsed.tool_call_id,
+    // A Pi action id is AMC's own derivation from Pi's session and call id, never an id the payload names.
+    providerActionId: pi ? piActionId(pi.sessionId, pi.toolCallId) : parsed.tool_use_id ?? parsed.tool_call_id,
     sessionId: parsed.session_id,
     timestamp: parsed.timestamp,
     toolName: parsed.tool_name,
     toolInput: parsed.tool_input,
     rawInputSha256,
   });
-  const mapped = canonicalToolRequests(input.provider, parsed.tool_name, parsed.tool_input, input.workspace);
+  const mapped = canonicalToolRequests(input.provider, parsed.tool_name, parsed.tool_input, input.workspace, pi);
   const canonicalToolName = mapped.requests.length === 1 ? mapped.requests[0]?.name ?? null : null;
   return {
     provider: input.provider,
@@ -595,6 +370,8 @@ function normalizeProviderRequest(input: {
     canonicalRequests: mapped.requests,
     commandPlan: mapped.commandPlan,
     rawInputSha256,
+    pi,
+    toolInput: parsed.tool_input,
   };
 }
 
@@ -675,6 +452,11 @@ function evaluateCanonicalRequest(input: {
       reason: `Canonical tool ${input.request.name} is not allowed by signed ToolHub config.`,
       reasonCode: "TOOL_NOT_ALLOWED",
     };
+  }
+  const minimum = input.request.minimumActionClass;
+  if (minimum && ACTION_CLASS_RANK[tool.actionClass] < ACTION_CLASS_RANK[minimum]) {
+    return { request: input.request, actionClass: tool.actionClass, outcome: "deny", reasonCode: "TOOL_NOT_ALLOWED",
+      reason: `Signed ToolHub config gives ${tool.name} ${tool.actionClass}, below the ${minimum} the Pi mapping requires.` };
   }
   if (!input.request.argumentsReviewable) {
     return {
@@ -798,15 +580,21 @@ function completeCommandReview(
   };
 }
 
+interface RequestedControlDecision {
+  decision: HookControlOutcome;
+  reason: string;
+  commandBlastRadius: CompoundCommandBlastRadiusReview | null;
+  /** The highest-class canonical tool evaluated: what an authorization record for this call names. */
+  target?: AuthorizationTarget | null;
+}
+
 function requestedControlDecision(input: {
   workspace: string;
   agentId: string;
   request: NormalizedProviderToolRequest;
-}): {
-  decision: HookControlOutcome;
-  reason: string;
-  commandBlastRadius: CompoundCommandBlastRadiusReview | null;
-} {
+}): RequestedControlDecision {
+  const versionRefusal = input.request.pi ? piRefusal(input.request.pi, input.workspace, input.request.providerToolName) : null;
+  if (versionRefusal) return { decision: "deny", reason: versionRefusal, commandBlastRadius: null };
   const signatureChecks = [
     ["action policy", verifyActionPolicySignature(input.workspace)],
     ["approval policy", verifyApprovalPolicySignature(input.workspace)],
@@ -843,7 +631,7 @@ function requestedControlDecision(input: {
   if (input.request.canonicalRequests.length === 0) {
     return {
       decision: "deny",
-      reason: `Provider tool ${input.request.providerToolName} is not mapped to an allowed ToolHub tool.`,
+      reason: `${input.request.provider === "pi" ? "Pi" : "Provider"} tool ${input.request.providerToolName} is not mapped to an allowed ToolHub tool.`,
       commandBlastRadius: null,
     };
   }
@@ -865,6 +653,7 @@ function requestedControlDecision(input: {
         decision: evaluation.outcome,
         reason: evaluation.reason,
         commandBlastRadius: null,
+        target: evaluation.actionClass ? { toolName: evaluation.request.name, actionClass: evaluation.actionClass } : null,
       };
     }
     const review = completeCommandReview(input.request.commandPlan, evaluations);
@@ -874,7 +663,9 @@ function requestedControlDecision(input: {
     const reason = review.compound
       ? `Compound command review: ${review.segmentCount} steps; highest action class ${review.highestActionClass ?? "UNKNOWN"}; step ${(review.decisiveStepIndex ?? 0) + 1} requires ${review.aggregateOutcome}.`
       : decisive?.reason ?? "AMC control evaluation failed closed.";
-    return { decision: review.aggregateOutcome, reason, commandBlastRadius: review };
+    const top = evaluations.find((evaluation) => evaluation.actionClass === review.highestActionClass);
+    const target = top?.actionClass ? { toolName: top.request.name, actionClass: top.actionClass } : null;
+    return { decision: review.aggregateOutcome, reason, commandBlastRadius: review, target };
   } catch {
     return {
       decision: "deny",
@@ -890,85 +681,12 @@ function requestedControlDecision(input: {
   }
 }
 
-function materializeProviderDecision(input: {
-  provider: HookProvider;
-  requestedDecision: HookControlOutcome;
-  reason: string;
-}): {
-  decision: HookControlDecision;
-  effectiveOutcome: HookControlOutcome;
-  providerMapping: HookControlProviderMapping;
-  capabilityLossy: boolean;
-  reason: string;
-  providerResponse: ProviderControlResponse;
-  providerResponseSha256: string;
-} {
-  let decision: HookControlDecision;
-  let effectiveOutcome: HookControlOutcome;
-  let providerMapping: HookControlProviderMapping;
-  let capabilityLossy: boolean;
-  let reason: string;
-  let providerResponse: ProviderControlResponse;
-
-  if (input.requestedDecision === "steer") {
-    decision = "deny";
-    if (input.provider === "claude-code") {
-      effectiveOutcome = "steer";
-      providerMapping = "corrective_deny";
-      capabilityLossy = false;
-      reason = cleanReason(input.reason);
-      providerResponse = renderProviderControlResponse(
-        input.provider,
-        "deny",
-        reason,
-        "Correct the tool arguments to satisfy the signed ToolHub constraints, then retry as a new action. AMC did not rewrite the input and will re-evaluate every control on the retry.",
-      );
-    } else {
-      effectiveOutcome = "deny";
-      providerMapping = "fail_closed_deny";
-      capabilityLossy = true;
-      reason = cleanReason(
-        `${input.reason} Gemini CLI BeforeTool does not support a verified corrective retry outcome, so AMC denied the action.`,
-      );
-      providerResponse = renderProviderControlResponse(input.provider, "deny", reason);
-    }
-  } else if (input.provider === "gemini-cli" && input.requestedDecision === "ask") {
-    decision = "deny";
-    effectiveOutcome = "deny";
-    providerMapping = "fail_closed_deny";
-    capabilityLossy = true;
-    providerResponse = renderProviderControlResponse(input.provider, "ask", input.reason);
-    reason = cleanReason(`${input.reason} Gemini CLI BeforeTool does not support ask, so AMC denied the action.`);
-  } else {
-    decision = input.requestedDecision;
-    effectiveOutcome = input.requestedDecision;
-    providerMapping = "native";
-    capabilityLossy = false;
-    reason = cleanReason(input.reason);
-    providerResponse = renderProviderControlResponse(input.provider, decision, reason);
-  }
-
-  return {
-    decision,
-    effectiveOutcome,
-    providerMapping,
-    capabilityLossy,
-    reason,
-    providerResponse,
-    providerResponseSha256: sha256Hex(Buffer.from(serializeProviderControlResponse(providerResponse), "utf8")),
-  };
-}
-
 function deterministicEventId(agentId: string, provider: HookProvider, actionId: string): string {
   return `hook_control_${sha256Hex(canonicalize({ agentId, provider, actionId })).slice(0, 44)}`;
 }
 
 function deterministicSessionId(agentId: string, provider: HookProvider, actionId: string): string {
   return `hook-control-session-${sha256Hex(canonicalize({ agentId, provider, actionId })).slice(0, 36)}`;
-}
-
-function runtimeFor(provider: HookProvider): RuntimeName {
-  return provider === "claude-code" ? "claude" : "gemini";
 }
 
 function sealSession(ledger: ReturnType<typeof openLedger>, sessionId: string): void {
@@ -1100,7 +818,8 @@ function recoverControlResult(input: {
     requireReceipt: true,
     requireSealedSession: true,
   });
-  const receipt = verifyReceipt(stored.receipt, getPublicKeyHistory(input.ledger.workspace, "monitor"));
+  const receipt = verifyReceipt(stored.receipt, getPurposeKeyHistory(input.ledger.workspace, "receipt"));
+  const receiptKind = input.request.pi ? "action_state" : "guard_check";
   const responseSha256 = sha256Hex(Buffer.from(
     serializeProviderControlResponse(stored.providerResponse),
     "utf8",
@@ -1109,7 +828,7 @@ function recoverControlResult(input: {
     !integrity.ok
     || !validateProviderControlResponse(stored.provider, stored.providerResponse)
     || !receipt.ok
-    || receipt.payload?.kind !== "guard_check"
+    || receipt.payload?.kind !== receiptKind
     || receipt.payload.agentId !== input.agentId
     || receipt.payload.providerId !== `hook-control:${input.request.provider}`
     || receipt.payload.body_sha256 !== stored.providerResponseSha256
@@ -1119,7 +838,7 @@ function recoverControlResult(input: {
       ...integrity.errors,
       !validateProviderControlResponse(stored.provider, stored.providerResponse) ? "provider response shape invalid" : null,
       receipt.error ?? null,
-      receipt.payload?.kind !== "guard_check" ? "receipt kind mismatch" : null,
+      receipt.payload?.kind !== receiptKind ? "receipt kind mismatch" : null,
       receipt.payload?.agentId !== input.agentId ? "receipt agent mismatch" : null,
       receipt.payload?.providerId !== `hook-control:${input.request.provider}` ? "receipt provider mismatch" : null,
       receipt.payload?.body_sha256 !== stored.providerResponseSha256 ? "receipt response hash mismatch" : null,
@@ -1222,6 +941,8 @@ export function evaluateProviderHookControl(input: {
   authenticatedAgentId: string;
   provider: HookProvider;
   rawInput: string;
+  /** The hook lease the Bridge verified; it names the principal of a bound authorization record. */
+  lease?: HookLease;
   now?: number;
 }): ProviderHookControlResult {
   const provider = parseProvider(input.provider);
@@ -1264,16 +985,21 @@ export function evaluateProviderHookControl(input: {
         "existing hook control session contains an unrelated event",
       );
     }
-    const requested = requestedControlDecision({
-      workspace: input.workspace,
-      agentId: input.authenticatedAgentId,
-      request,
+    // Pi decisions that let an effect proceed bind P1-02's authorization record; P1-23 extends this to Claude Code.
+    const { requested, authorization, enforced } = authorizeHookDecision({
+      workspace: input.workspace, agentId: input.authenticatedAgentId, lease: input.lease, provider, actionId: request.actionId,
+      pi: request.pi, toolInput: request.toolInput, ledger,
+      requested: requestedControlDecision({ workspace: input.workspace, agentId: input.authenticatedAgentId, request }),
     });
     const materialized = materializeProviderDecision({
       provider,
+      requestSha256: request.rawInputSha256,
       requestedDecision: requested.decision,
       reason: requested.reason,
     });
+    const bound = request.pi
+      ? { piVersion: request.pi.version, authorizationRecordDigest: authorization?.ok ? authorization.digest : null }
+      : {};
     const payload = {
       kind: "hook_control_decision",
       version: 2,
@@ -1290,6 +1016,8 @@ export function evaluateProviderHookControl(input: {
       reason: materialized.reason,
       providerResponseSha256: materialized.providerResponseSha256,
       rawPayloadStored: false,
+      ...bound,
+      ...(request.pi ? { authorizationRecord: authorization?.ok ? authorization.record : null } : {}),
     };
     const appended = ledger.appendEvidenceWithReceipt({
       id: eventId,
@@ -1320,13 +1048,18 @@ export function evaluateProviderHookControl(input: {
         providerResponse: materialized.providerResponse,
         providerResponseSha256: materialized.providerResponseSha256,
         bodySha256: materialized.providerResponseSha256,
+        ...bound,
       },
       receipt: {
-        kind: "guard_check",
+        kind: request.pi ? "action_state" : "guard_check",
         agentId: input.authenticatedAgentId,
         providerId: `hook-control:${provider}`,
         model: null,
         bodySha256: materialized.providerResponseSha256,
+        ...(request.pi ? {
+          action: hookDecisionReceipt({ provider, actionId: request.actionId, idempotencyKey: request.pi.toolCallId,
+            decision: materialized.decision, reason: materialized.reason, authorization, enforced }),
+        } : {}),
       },
     });
     sealSession(ledger, sessionId);

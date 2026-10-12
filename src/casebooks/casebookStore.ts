@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import YAML from "yaml";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -42,7 +42,7 @@ function signFile(workspace: string, file: string): string {
   const digest = sha256Hex(readFileSync(file));
   const payload: SignedDigest = {
     digestSha256: digest,
-    signature: signHexDigest(digest, getPrivateKeyPem(workspace, "auditor")),
+    signature: signHexDigest(digest, getSigningKey(workspace, "config-signature")),
     signedTs: Date.now(),
     signer: "auditor"
   };

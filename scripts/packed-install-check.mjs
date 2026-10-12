@@ -22,7 +22,7 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { verifyPackedRun } from "./packed-evidence-verification.mjs";
 
@@ -64,7 +64,8 @@ export function verifyPackedComposition(result, source) {
   } catch { return false; }
 }
 
-export function packedInstallCheck({ root = process.cwd(), build = true, keep = false } = {}) {
+/** `tarball` (or AMC_PACKED_INSTALL_TARBALL) checks that exact file instead of building and packing (P0-34). */
+export function packedInstallCheck({ root = process.cwd(), build = true, keep = false, tarball: given = process.env.AMC_PACKED_INSTALL_TARBALL } = {}) {
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
   const work = mkdtempSync(join(tmpdir(), "amc-packed-install-"));
   const home = join(work, "home"); const consumer = join(work, "consumer"); const workspace = join(work, "workspace");
@@ -91,8 +92,13 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
 
   let tarball = null;
   const steps = [
-    () => !build || run("pnpm run build", "pnpm", ["run", "build"], { cwd: root, env }).ok,
+    () => Boolean(given) || !build || run("pnpm run build", "pnpm", ["run", "build"], { cwd: root, env }).ok,
     () => {
+      if (given) {
+        tarball = resolve(given);
+        console.log(`note: checking the given tarball ${tarball}; nothing is built or packed`);
+        return existsSync(tarball) || (console.error(`FAIL tarball not found at ${tarball}`), false);
+      }
       // --ignore-scripts: the package's `prepack` hook is the RELEASE gate (full
       // test suite, dependency audit, smoke) and measures the working tree. This
       // check measures the artifact; the release gate stays its own explicit
@@ -139,6 +145,24 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
       return valid;
     },
     () => {
+      // D-20: every A4 surface stays off in the installed package unless the process sets AMC_A4_PREVIEW=1.
+      const a4Tools = (env) => {
+        const r = run(`amc mcp list-tools --json (AMC_A4_PREVIEW ${env.AMC_A4_PREVIEW ?? "unset"})`, amc, ["mcp", "list-tools", "--json"], { cwd: workspace, env });
+        try { return r.ok ? JSON.stringify(JSON.parse(r.stdout)).match(/amc_a4_[a-z_]+/g) ?? [] : null; } catch { return null; }
+      };
+      const closed = a4Tools(isolated);
+      const open = a4Tools({ ...isolated, AMC_A4_PREVIEW: "1" });
+      const router = pathToFileURL(join(consumer, "node_modules", pkg.name, "dist", "a4", "a4Router.js")).href;
+      const script = `const { handleA4Route } = await import(${JSON.stringify(router)}); let status = 0; let body = "";`
+        + " const res = { writeHead: (s) => { status = s; }, setHeader() {}, end: (b) => { body = String(b); } };"
+        + ` await handleA4Route("/api/v1/a4/projects", "GET", { headers: {} }, res, { workspace: ${JSON.stringify(workspace)}, nativeTasks: { demo: false } });`
+        + " if (status !== 404 || JSON.parse(body).code !== \"A4_PREVIEW_DISABLED\") { console.error(status, body); process.exit(1); }";
+      const route = run("installed /api/v1/a4 answers 404 A4_PREVIEW_DISABLED without the preview", "node", ["--input-type=module", "-e", script], { cwd: workspace, env: isolated }).ok;
+      const gated = Array.isArray(closed) && closed.length === 0 && Array.isArray(open) && open.length > 0 && route;
+      console.log(`${gated ? "ok  " : "FAIL"} A4 preview gate: ${closed?.length ?? "?"} amc_a4_* tools without it, ${open?.length ?? "?"} with it`);
+      return gated;
+    },
+    () => {
       const r = run("amc agent-loop run (stub provider, keyless)", amc,
         ["agent-loop", "run", "--provider", "stub", "--json", "say hello"], { cwd: workspace, env: isolated });
       return verifyRun(r);
@@ -159,5 +183,7 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  process.exit(packedInstallCheck({ build: !process.argv.includes("--no-build"), keep: process.argv.includes("--keep") }) ? 0 : 1);
+  const at = process.argv.indexOf("--tarball");
+  process.exit(packedInstallCheck({ build: !process.argv.includes("--no-build"), keep: process.argv.includes("--keep"),
+    ...(at > 0 ? { tarball: process.argv[at + 1] } : {}) }) ? 0 : 1);
 }

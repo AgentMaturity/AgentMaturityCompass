@@ -1,13 +1,31 @@
 import { sign, verify, type KeyObject } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { AntiRollbackError, checkHighWater, keyHistoryMarkKey, nextKeyHistoryRevision, recordHighWater } from "../keys/highWater.js";
+import { logHistoryRevisions } from "../keys/anchors.js";
+import { assertBoundPublicKey, assertNoPendingKeyset } from "../keys/keyset.js";
+import { getSigningKey } from "../keys/signingKeys.js";
+import { isLocalPurpose, ROLE_PRIMARY_PURPOSE, type LocalPurpose } from "../vault/vaultPayload.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import { ensureVaultAndPublicKeys, getVaultPrivateKeyPem, vaultPaths } from "../vault/vault.js";
+
+/** P1-08: signing call sites take their key per purpose; re-exported here so callers keep one import. */
+export { getSigningKey, getSigningPublicKeyPem } from "../keys/signingKeys.js";
 import {
   buildKeyHistoryEntry
 } from "./keyHistoryChain.js";
-import { publicKeyFromPrivate, sealKeyHistory, validHistoryEntry, verifyKeyHistoryEnvelope, type KeyHistoryEnvelope, type KeyHistoryRole } from "./keyHistoryEnvelope.js";
+import { publicKeyFromPrivate, sealKeyHistory, validHistoryEntry, verifyKeyHistoryEnvelope, type KeyHistoryEnvelope, type KeyHistoryRole, type KeyHistorySubject } from "./keyHistoryEnvelope.js";
+
+/** Refuses an authenticated history older than the revision this machine accepted (ROLLBACK_DETECTED) or forked from it. */
+function checkKeyHistoryMark(workspace: string, subject: KeyHistorySubject, envelope: KeyHistoryEnvelope): void {
+  checkHighWater(keyHistoryMarkKey(workspace, subject), envelope.revision, sha256Hex(canonicalize(envelope)));
+}
+
+function recordKeyHistoryMark(workspace: string, subject: KeyHistorySubject, envelope: KeyHistoryEnvelope): void {
+  recordHighWater(keyHistoryMarkKey(workspace, subject), envelope.revision, sha256Hex(canonicalize(envelope)));
+}
 
 /** Admission verification is independent of an unlocked vault. */
 export function verifyKeyHistoryChain(
@@ -19,8 +37,10 @@ export function verifyKeyHistoryChain(
   try {
     const value: unknown = JSON.parse(readFileSync(file, "utf8"));
     const result = verifyKeyHistoryEnvelope(value, kind, getPublicKeyPem(workspace, kind));
+    if (result.envelope) checkKeyHistoryMark(workspace, kind, result.envelope);
     return { ok: result.valid, brokenAtIndex: result.valid ? null : 0, legacyEntries: Array.isArray(value) ? value.length : 0, reason: result.reason };
-  } catch {
+  } catch (error) {
+    if (error instanceof AntiRollbackError) return { ok: false, brokenAtIndex: 0, legacyEntries: 0, reason: error.message };
     return { ok: false, brokenAtIndex: 0, legacyEntries: 0, reason: "history or current key could not be read" };
   }
 }
@@ -37,10 +57,13 @@ function publicPath(workspace: string, kind: "monitor" | "auditor" | "lease" | "
   return join(keyDir(workspace), `${kind}_ed25519.pub`);
 }
 
+/** The history, when its envelope verifies under the current key and is not older than this machine accepted. */
 export function getAuthenticatedKeyHistory(workspace: string, kind: KeyHistoryRole): KeyHistoryEnvelope | null {
   try {
     const value: unknown = JSON.parse(readFileSync(historyPath(workspace, kind), "utf8"));
-    return verifyKeyHistoryEnvelope(value, kind, getPublicKeyPem(workspace, kind)).envelope;
+    const envelope = verifyKeyHistoryEnvelope(value, kind, getPublicKeyPem(workspace, kind)).envelope;
+    if (envelope) checkKeyHistoryMark(workspace, kind, envelope);
+    return envelope;
   } catch {
     return null;
   }
@@ -50,7 +73,9 @@ export function addPublicKeyToHistory(
   workspace: string,
   kind: KeyHistoryRole,
   publicPem: string,
-  source: "local" | "notary" | "imported" = "local"
+  source: "local" | "notary" | "imported" = "local",
+  /** false only where the transparency seal's signer is the key being admitted (enabling notary trust). */
+  opts: { logRevision?: boolean } = {}
 ): void {
   if (process.env.AMC_NO_SIGN === "1") throw new Error("Key admission is unavailable in no-sign mode");
   const current = getPublicKeyPem(workspace, kind);
@@ -64,6 +89,8 @@ export function addPublicKeyToHistory(
   const next = [...prior.entries, buildKeyHistoryEntry(publicPem, prior.entries, source)];
   const envelope = sealKeyHistory(kind, next, privateKey, prior.revision + 1);
   writeFileAtomic(historyPath(workspace, kind), JSON.stringify(envelope, null, 2), 0o600);
+  recordKeyHistoryMark(workspace, kind, envelope);
+  if (opts.logRevision !== false) logHistoryRevisions(workspace, [{ subject: kind, envelope }]);
   if (source !== "local") console.warn(`[amc] Explicit ${source} admission expanded the ${kind} signing role (${next[next.length - 1]!.fingerprint}).`);
 }
 
@@ -98,28 +125,46 @@ export function migratePublicKeyHistory(params: {
     if (matching.length !== 1 || !validHistoryEntry(matching[0])) throw new Error(`Approved fingerprint is missing, invalid or duplicated: ${fingerprint}`);
     entries.push(buildKeyHistoryEntry(matching[0].publicKeyPem, entries, "imported"));
   }
-  const envelope = sealKeyHistory(params.kind, entries, privateKey);
+  // A reviewed migration starts a new history above any revision this machine accepted.
+  const envelope = sealKeyHistory(params.kind, entries, privateKey, nextKeyHistoryRevision(params.workspace, params.kind));
   const backupPath = `${file}.untrusted-${digest}`;
   writeFileAtomic(backupPath, original, 0o600);
   writeFileAtomic(file, JSON.stringify(envelope, null, 2), 0o600);
+  recordKeyHistoryMark(params.workspace, params.kind, envelope);
+  logHistoryRevisions(params.workspace, [{ subject: params.kind, envelope }]);
   return { path: file, backupPath, admittedFingerprints: entries.map((entry) => entry.fingerprint) };
 }
+
 
 export function ensureSigningKeys(workspace: string): void {
   ensureDir(keyDir(workspace));
   ensureVaultAndPublicKeys(workspace);
 }
 
-export function getPrivateKeyPem(workspace: string, kind: "monitor" | "auditor" | "lease" | "session"): string {
+/**
+ * A role's private key (key modules only), or, given a local purpose, that purpose's key exactly as getSigningKey
+ * resolves it, so a fail-early probe can check the very key its later signer uses.
+ */
+export function getPrivateKeyPem(workspace: string, kind: "monitor" | "auditor" | "lease" | "session" | LocalPurpose): string {
+  if (isLocalPurpose(kind)) {
+    // The probe form must fail closed: never an ephemeral no-sign key where the caller is about to need a real signer.
+    if (process.env.AMC_NO_SIGN === "1") throw new Error(`no-sign mode holds no ${kind} signing key`);
+    return getSigningKey(workspace, kind);
+  }
   return getVaultPrivateKeyPem(workspace, kind);
 }
 
+/** The role's current public key; refused while a key change is pending (P1-08 key set). */
 export function getPublicKeyPem(workspace: string, kind: "monitor" | "auditor" | "lease" | "session"): string {
+  assertNoPendingKeyset(workspace);
   const p = publicPath(workspace, kind);
   if (!pathExists(p)) {
     throw new Error(`Missing public key: ${p}`);
   }
-  return readFileSync(p, "utf8");
+  const pem = readFileSync(p, "utf8");
+  // P1-08: a role's file names its primary purpose's key, which the mark-bound key set names.
+  assertBoundPublicKey(workspace, ROLE_PRIMARY_PURPOSE[kind], pem);
+  return pem;
 }
 
 export function getPublicKeyHistory(workspace: string, kind: KeyHistoryRole): string[] {

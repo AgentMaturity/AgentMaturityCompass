@@ -1,8 +1,9 @@
-# Layer 0: controls every agent deployment needs in every station (P1-14 adds the rest).
+# Layer 0 Agent Control Baseline v0.1 (P1-14): every control is experimental, agent-drafted and not independently
+# reviewed. Expert sign-off waits for D-08 (docs/catalog/review-packets/).
 id: amc.l0.baseline
 version: 0.1.0
 layer: 0
-title: Layer 0 baseline
+title: Layer 0 Agent Control Baseline
 stations: [education, environment, health, wealth, technology, mobility, governance]
 jurisdictions: []
 compilerCompat: ^0.1.0
@@ -11,7 +12,20 @@ maintainers:
   - { name: Sid, role: maintainer }
 licence: MIT
 support: experimental
-controls: [L0-IDN-01]
+controls: [
+  L0-INV-01, L0-INV-02, L0-INV-03, L0-INV-04,
+  L0-IDN-01, L0-IDN-02, L0-IDN-03, L0-IDN-04,
+  L0-TOOL-01, L0-TOOL-02, L0-TOOL-03, L0-TOOL-04,
+  L0-DAT-01, L0-DAT-02, L0-DAT-03, L0-DAT-04,
+  L0-OVS-01, L0-OVS-02, L0-OVS-03, L0-OVS-04,
+  L0-ADV-01, L0-ADV-02, L0-ADV-03, L0-ADV-04,
+  L0-TRN-01, L0-TRN-02, L0-TRN-03,
+  L0-EXP-01, L0-EXP-02, L0-EXP-03,
+  L0-FAI-01, L0-FAI-02, L0-FAI-03, L0-FAI-04,
+  L0-LOG-01, L0-LOG-02, L0-LOG-03, L0-LOG-04,
+  L0-CHG-01, L0-CHG-02, L0-CHG-03, L0-CHG-04,
+  L0-MON-01, L0-MON-02, L0-MON-03, L0-MON-04, L0-MON-05
+]
 stewardship:
   partner: null
   updatePlan: null

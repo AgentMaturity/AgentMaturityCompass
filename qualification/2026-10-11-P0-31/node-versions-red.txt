@@ -1,0 +1,39 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-31b
+
+ ❯ tests/qualificationNodeVersions.test.ts (22 tests | 4 failed) 14ms
+     × accepts v24.21.0 3ms
+     × accepts v24.0.0 0ms
+     × accepts v24.21.0 1ms
+     × accepts v24.0.0 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/qualificationNodeVersions.test.ts > scripts/installed-crash-recovery-check.mjs Node version pattern > accepts v24.21.0
+ FAIL  tests/qualificationNodeVersions.test.ts > scripts/installed-crash-recovery-check.mjs Node version pattern > accepts v24.0.0
+ FAIL  tests/qualificationNodeVersions.test.ts > scripts/installed-studio-browser-check.py Node version pattern > accepts v24.21.0
+ FAIL  tests/qualificationNodeVersions.test.ts > scripts/installed-studio-browser-check.py Node version pattern > accepts v24.0.0
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/qualificationNodeVersions.test.ts:24:37
+     22| ])("%s Node version pattern", (_name, pattern) => {
+     23|   test.each(["v22.22.0", "v22.0.0", "v24.21.0", "v24.0.0"])("accepts %…
+     24|     expect(pattern().test(version)).toBe(true);
+       |                                     ^
+     25|   });
+     26|   test.each(["v20.19.5", "v25.5.0", "v23.11.0", "v26.0.0", "v224.0.0",…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 18 passed (22)
+   Start at  12:51:21
+   Duration  285ms (transform 39ms, setup 67ms, import 8ms, tests 14ms, environment 0ms)
+

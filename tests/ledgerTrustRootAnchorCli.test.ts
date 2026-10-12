@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { forgeKeysetKey } from "./helpers/forgeKeyset.js";
 import { generateKeyPairSync, sign, type KeyObject } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -70,6 +71,8 @@ function forge(workspace: string): void {
   }
   db.close();
   writeFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub"), publicKey.export({ format: "pem", type: "spki" }).toString());
+  // The verifying CLI runs with a fresh AMC home (no mark), so the attacker also re-points the unsigned key set (P1-08).
+  forgeKeysetKey(workspace, "ledger-row", publicKey.export({ format: "pem", type: "spki" }).toString());
 }
 
 function amcVerify(cwd: string, args: string[] = []) {
@@ -89,6 +92,8 @@ describe("amc verify and the ledger trust root", () => {
     expect(result.status, result.output).toBe(1);
     expect(result.output).toContain("UNANCHORED");
     expect(result.output).not.toContain("Ledger verification PASSED");
+    // A machine that never committed the key set says it adopted it on trust (P1-08 review round 2).
+    expect(result.output).toContain("adopted unanchored (trust on first use)");
   });
 
   it("names the substituted trust root when the pre-attack fingerprint is pinned with --expect-monitor", () => {

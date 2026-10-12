@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { join } from "node:path";
 import { readFileSync } from "node:fs";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../../crypto/keys.js";
 import { getVaultSecretReadOnly, setVaultSecret } from "../../vault/vault.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
@@ -43,7 +43,7 @@ function blobKeySecretName(version: number): string {
 export function signBlobCurrentKey(workspace: string): string {
   const currentPath = blobCurrentKeyPath(workspace);
   const digest = sha256Hex(readFileSync(currentPath));
-  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  const signature = signHexDigest(digest, getSigningKey(workspace, "config-signature"));
   const sig: BlobKeyCurrentSig = blobKeyCurrentSigSchema.parse({
     digestSha256: digest,
     signature,

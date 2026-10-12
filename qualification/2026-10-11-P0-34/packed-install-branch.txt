@@ -1,0 +1,19 @@
+ok   pnpm run build (39.8s)
+note: packing with --ignore-scripts; the prepack release gate is a separate gate, not exercised here
+ok   npm pack --ignore-scripts (same files as publish) (3.2s)
+ok   npm install <tarball> (fresh dir, empty HOME) (8.8s)
+ok   @amc/core is not resolvable from the consumer directory
+ok   installed standalone production API (no dev dependencies) (1.4s)
+ok   installed control catalog loads with loadCatalog() and validates (0.2s)
+ok   amc doctor (2.7s)
+ok   amc init (isolated workspace) (1.0s)
+ok   amc composition (installed kernel, no private packages) (0.7s)
+ok   amc mcp list-tools --json (AMC_A4_PREVIEW unset) (0.7s)
+ok   amc mcp list-tools --json (AMC_A4_PREVIEW 1) (0.7s)
+ok   installed /api/v1/a4 answers 404 A4_PREVIEW_DISABLED without the preview (0.6s)
+ok   A4 preview gate: 0 amc_a4_* tools without it, 5 with it
+ok   amc agent-loop run (stub provider, keyless) (1.1s)
+ok   amc session verify --json (1.0s)
+ok   amc agent-loop verify --json (1.0s)
+ok   installed evidence and request reconstruction
+skip real-provider smoke: AMC_PACKED_SMOKE_PROVIDER not set (keyless run only)

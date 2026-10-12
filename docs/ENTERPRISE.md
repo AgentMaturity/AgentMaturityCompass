@@ -14,9 +14,9 @@ The full AMC trust stack is free and MIT licensed. Enterprise adds:
 Everything else:
 - Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport
 - All 14 framework adapters
-- 1,260 CLI command paths
+- 1,255 CLI command paths
 - 244 default diagnostic questions plus the free, opt-in 20-question lifecycle expansion
-- 142 adversarial assurance packs
+- <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered adversarial assurance packs
 - Browser playground
 - CI trust gates
 - GitHub Action

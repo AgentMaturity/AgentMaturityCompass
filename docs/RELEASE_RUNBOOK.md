@@ -6,12 +6,105 @@ Use it for every production release.
 
 ---
 
+## Phase B gates (B0–B4)
+
+These steps follow `plans/2026-09-09-amc-execution-brief.md` §6. Phase B starts
+only after the Phase A queue is Done and the full release gate is green at a
+single pinned commit. **B3 and B4 are owner-confirmation gates.** Nothing past
+them runs until Sid has said yes in the conversation, and the yes covers only
+the exact version, SHA256 or digest that was shown to him.
+
+### B0 — Blocking security gate
+
+A hard blocker on any public exposure. Record the disposition of every B0 item
+in the brief: key-rotation proof, trust-root findings, passphrases and
+public-repo hygiene. If there is no in-repo proof that the flagged keys were
+rotated, **stop and ask Sid**.
+
+### B1 — Credentials check, up front
+
+```bash
+node scripts/credentials-presence-check.mjs                      # every credential; exit 1 if any is absent
+node scripts/credentials-presence-check.mjs --for publish,sign-release
+node scripts/credentials-presence-check.mjs --for deploy-railway  # or deploy-vercel, push-image
+gh secret list --repo AgentMaturity/AgentMaturityCompass          # names only; GitHub never returns values
+```
+
+The script reports `present`/`absent` for each name, what needs it and where
+it is configured, and never a value. `--json` prints
+`{ NAME: { present, requiredFor, configureAt } }`. `NPMRC_AUTH_TOKEN_LINE` is
+whether `$HOME/.npmrc` has an `_authToken` line; the line is never printed. It
+exits 1 and prints `missing for <action>: <names>` when a required credential
+is absent. It reads the shell it runs in. CI secrets live in the repository
+settings, so check those with `gh secret list`. **If any credential is absent:
+stop, list what is needed and where it goes (the script prints both), and
+wait.**
+
+### B2 — Release candidate
+
+```bash
+npm run release:prepare -- <version>    # version, notes, CHANGELOG, version files; packs once and gates that tarball; never publishes
+git rev-parse HEAD                      # the pinned candidate commit, after committing what release:prepare wrote
+pnpm release:gate -- --json --out tmp/release-gate/candidate.json
+pnpm release:prepack-check
+pnpm check:packed-install               # in a fresh clone of the candidate commit
+pnpm check:clean-source                 # in a fresh clone of the candidate commit
+pnpm release:verify-version
+```
+
+Name every skipped gate check with its reason. Produce the signed artifact and
+record its SHA256 (`shasum -a 256 dist/amc-<version>.amcrelease`).
+
+### B3 — Publish — **CONFIRM WITH SID FIRST**
+
+Publishing is pushing the `v<version>` tag (section 3 below). It runs `release.yml`, the only publisher, whose
+`release` job then waits for a required reviewer of the `release` environment. `pnpm release` no longer publishes.
+**Do not run it until you have shown Sid the version, the artifact SHA256, the gate result, and the B0 disposition, and he has said yes in this conversation.**
+Publishing is irreversible and outward-facing. The tag push and the environment approval are both B3 actions.
+
+### B4 — Live deployment — **CONFIRM WITH SID FIRST**
+
+Before deploying:
+
+```bash
+docker build -t amc-studio:<version> .
+docker image inspect amc-studio:<version> --format '{{.Id}}'   # record; RepoDigests after push
+```
+
+- Record the image digests (`Dockerfile`, `docker/docker-compose.yml`,
+  `docker/Dockerfile.quickstart`).
+- Prove that no default or demo passphrase is present in the deployed
+  configuration.
+- Have a tested rollback (section 5).
+- **Then show Sid the target, the digest, the rollback, and wait for an explicit yes.**
+
+After deploying, the deploy counts as verified only when a governed turn passes
+against it:
+
+```bash
+node scripts/credentials-presence-check.mjs --for deploy-verify
+node scripts/deploy-verify.mjs --target <studio-url> --gateway <gateway-url> \
+  --monitor-pubkey <pinned monitor_ed25519.pub> --out tmp/deploy-verify/<version>.json
+```
+
+See [`DEPLOYMENT_CONFIRMATION_RUNBOOK.md`](./DEPLOYMENT_CONFIRMATION_RUNBOOK.md) for what this
+proves and what it does not. The `railway.json` and `vercel.json` targets serve
+only the lightweight scoring API, which cannot pass this check. Live
+deployment health has been an explicitly skipped gate in every prior receipt,
+so do not report it as previously qualified. Record the live URL, the deployed
+commit, the image digest and the verifier result JSON.
+
+---
+
 ## 0) Preconditions
 
-- Release PR merged to `main`
+- `npm run release:prepare -- <version>` passed and its result is merged to `main`: no pending changesets, one
+  CHANGELOG heading for the version, `docs/releases/<version>.md` present (`node scripts/check-release-candidate.mjs`)
 - CI green on the exact release commit (frozen pnpm install, build and tests)
-- At least one approved changeset in `.changeset/`
-- Release signing key available in CI (`AMC_RELEASE_SIGNING_KEY` or `AMC_RELEASE_SIGNING_KEY_FILE`)
+- The `release` environment holds `AMC_RELEASE_SIGNING_KEY` and, for token publishing, `NPM_TOKEN` (P0-38); without them
+  the release job fails
+- The release public key is committed at `trust/amc-release-signing.pub` (P0-37); the job verifies the bundle only
+  against it
 - Rollback owner on-call and aware of release window
 
 ---
@@ -91,7 +184,8 @@ At minimum:
 
 ## 3) Cut release
 
-1. Confirm `package.json` version is final
+1. Confirm `package.json` version is final, and that the B3 owner confirmation
+   (above) has been given for this exact version
 2. Create and push tag:
 
 ```bash
@@ -99,7 +193,13 @@ git tag v<version>
 git push origin v<version>
 ```
 
-3. GitHub Actions `Release` workflow runs automatically
+3. GitHub Actions `Release` workflow runs automatically, and only for a tag push. Its `approve` job, then its `sign`
+   job and then its `release` job each wait in the `release` environment: approve all three only for the version Sid
+   confirmed. `approve` refuses to continue when the environment has no required reviewers or no tag rule
+   ([environment setup](PUBLISHING.md#needs-sid-the-release-environment-p0-38)). To retry, re-run the tag's jobs;
+   a re-run of `sign` or `release` waits for approval again. It publishes only the tarball the `gate` job packed and gated at the
+   commit the tag named (`tmp/npm-release/record.json`), and refuses when the tag moved during the run. Without the
+   signing key, the committed release public key or an npm credential the job fails; it never skips publishing silently.
 
 ---
 
@@ -116,11 +216,16 @@ Validate published assets:
 - npm package published successfully
 - GHCR image published with expected tag
 
-Offline verification:
+Offline verification, pinned to the release key committed at the tag (check its fingerprint against the copies
+P0-37 publishes outside the repository first). Never verify against a key the bundle carries:
 
 ```bash
-amc release verify dist/amc-<version>.amcrelease --pubkey <published-release-signing.pub>
+git show v<version>:trust/amc-release-signing.pub > amc-release-signing.pub
+amc release verify amc-<version>.amcrelease --pubkey amc-release-signing.pub
 ```
+
+Then record the new npm version in `website/publication-status.json` (with the evidence of the check):
+`release:prepare` plans the next version from it.
 
 ---
 

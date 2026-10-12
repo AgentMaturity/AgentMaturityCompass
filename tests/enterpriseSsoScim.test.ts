@@ -3,7 +3,7 @@ import { generateKeyPairSync, randomUUID, sign } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { canonicalize } from "../src/utils/json.js";
 import { createHostUser, createWorkspaceRecord, findHostUserById, initHostDb, rolesForUserIdInWorkspace } from "../src/workspaces/hostDb.js";
@@ -29,6 +29,7 @@ function newDir(prefix: string): string {
 }
 
 afterEach(() => {
+  vi.unstubAllEnvs();
   while (roots.length > 0) {
     const dir = roots.pop();
     if (dir) {
@@ -121,20 +122,20 @@ function initHostWorkspace(prefix: string): { hostDir: string; workspaceDir: str
   return { hostDir, workspaceDir };
 }
 
-function jwtSignEdDsa(params: {
+function jwtSignRs256(params: {
   privateKeyPem: string;
   kid: string;
   payload: Record<string, unknown>;
 }): string {
   const header = {
-    alg: "EdDSA",
+    alg: "RS256",
     typ: "JWT",
     kid: params.kid
   };
   const encodedHeader = b64url(JSON.stringify(header));
   const encodedPayload = b64url(JSON.stringify(params.payload));
   const input = `${encodedHeader}.${encodedPayload}`;
-  const signature = sign(null, Buffer.from(input, "utf8"), params.privateKeyPem);
+  const signature = sign("sha256", Buffer.from(input, "utf8"), params.privateKeyPem);
   return `${input}.${b64url(signature)}`;
 }
 
@@ -149,7 +150,8 @@ function createFakeOidcProvider(params: {
   close: () => Promise<void>;
 } {
   const kid = params.kid ?? "oidc-test-kid";
-  const keyPair = generateKeyPairSync("ed25519");
+  // P2-07 admits RS256, PS256 and ES256 only; EdDSA is refused.
+  const keyPair = generateKeyPairSync("rsa", { modulusLength: 2048 });
   const privateKeyPem = keyPair.privateKey.export({ format: "pem", type: "pkcs8" }).toString();
   const publicJwk = keyPair.publicKey.export({ format: "jwk" }) as Record<string, unknown>;
   const codeNonce = new Map<string, string>();
@@ -178,7 +180,7 @@ function createFakeOidcProvider(params: {
             {
               ...publicJwk,
               kid,
-              alg: "EdDSA",
+              alg: "RS256",
               use: "sig"
             }
           ]
@@ -234,7 +236,7 @@ function createFakeOidcProvider(params: {
       if (code !== "noemail") {
         payload.email = "sso-user@example.com";
       }
-      const idToken = jwtSignEdDsa({
+      const idToken = jwtSignRs256({
         privateKeyPem,
         kid,
         payload
@@ -361,6 +363,16 @@ describe("enterprise identity (OIDC/SAML/SCIM)", () => {
     });
 
     try {
+      // P2-07: an HTTP identity provider is refused unless the loopback development opt-in is set.
+      const refused = await httpCall({
+        url: `http://127.0.0.1:${routerPort}/host/api/auth/oidc/testoidc/login`,
+        method: "GET"
+      });
+      expect(refused.status).toBe(400);
+      expect(refused.headers.location).toBeUndefined();
+
+      // This fake IdP is the test's subject and listens on literal 127.0.0.1 over HTTP.
+      vi.stubEnv("AMC_IDENTITY_ALLOW_INSECURE_LOOPBACK", "1");
       const login = await httpCall({
         url: `http://127.0.0.1:${routerPort}/host/api/auth/oidc/testoidc/login`,
         method: "GET"
@@ -447,6 +459,8 @@ describe("enterprise identity (OIDC/SAML/SCIM)", () => {
     });
 
     try {
+      // This fake IdP is the test's subject and listens on literal 127.0.0.1 over HTTP.
+      vi.stubEnv("AMC_IDENTITY_ALLOW_INSECURE_LOOPBACK", "1");
       const login = await httpCall({
         url: `http://127.0.0.1:${routerPort}/host/api/auth/oidc/oidcemailproof/login`,
         method: "GET"
@@ -461,7 +475,9 @@ describe("enterprise identity (OIDC/SAML/SCIM)", () => {
         url: String(authorize.headers.location ?? ""),
         method: "GET"
       });
-      expect(callback.status).toBe(401);
+      // P2-07 reports "OIDC email not verified", which the router answers 403 like a missing email.
+      expect(callback.status).toBe(403);
+      expect(callback.body).toContain("email not verified");
       expect(parseSetCookie(callback.headers)).not.toContain("amc_session=");
     } finally {
       await host.close();
@@ -502,6 +518,8 @@ describe("enterprise identity (OIDC/SAML/SCIM)", () => {
     });
 
     try {
+      // This fake IdP is the test's subject and listens on literal 127.0.0.1 over HTTP.
+      vi.stubEnv("AMC_IDENTITY_ALLOW_INSECURE_LOOPBACK", "1");
       const login = await httpCall({
         url: `http://127.0.0.1:${routerPort}/host/api/auth/oidc/oidcsec/login`,
         method: "GET"

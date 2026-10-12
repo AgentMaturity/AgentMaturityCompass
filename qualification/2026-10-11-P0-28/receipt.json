@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-28",
+  "date": "2026-10-11",
+  "commit": "7804800e24995cf971d40f0ffc53ac5dc22c6884",
+  "branch": "rtd/p0-28-docs-truth-reset",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2), local, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "amc up --no-open --no-remember (fresh clone at 7804800e2, temp HOME and workspace)",
+      "exit": 0,
+      "durationMs": 10655
+    },
+    {
+      "cmd": "amc down (fresh clone at 7804800e2, temp HOME and workspace)",
+      "exit": 0,
+      "durationMs": 3586
+    },
+    {
+      "cmd": "amc up --no-open --no-remember (fresh clone at 7804800e2, temp HOME and workspace)",
+      "exit": 0,
+      "durationMs": 8828
+    },
+    {
+      "cmd": "amc down (fresh clone at 7804800e2, temp HOME and workspace)",
+      "exit": 0,
+      "durationMs": 3232
+    },
+    {
+      "cmd": "amc compliance report --framework iso-42001 (fresh clone at 7804800e2, temp HOME and workspace)",
+      "exit": 0,
+      "durationMs": 3008
+    },
+    {
+      "cmd": "amc domain conformance --station health --agent default --max-evidence-age 30d (fresh clone at 7804800e2, temp HOME and workspace)",
+      "exit": 0,
+      "durationMs": 4150
+    },
+    {
+      "cmd": "amc domain conformance --station wealth --agent default --max-evidence-age 30d (fresh clone at 7804800e2, temp HOME and workspace)",
+      "exit": 0,
+      "durationMs": 3116
+    },
+    {
+      "cmd": "amc domain assess --agent default --domain health (fresh clone at 7804800e2, temp HOME and workspace)",
+      "exit": 1,
+      "durationMs": 3870
+    },
+    {
+      "cmd": "amc audit binder create --scope workspace --out binder.amcaudit (fresh clone at 7804800e2, temp HOME and workspace)",
+      "exit": 0,
+      "durationMs": 3844
+    },
+    {
+      "cmd": "npx vitest run (full suite, 4 workers)",
+      "exit": 1,
+      "durationMs": 799695
+    },
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:freeze",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:no-fabrication",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s build:pages",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": {
+    "total": 23297,
+    "passed": 23262,
+    "failed": 25,
+    "skipped": 10
+  },
+  "artifacts": [
+    {
+      "path": "docs-drift-final.txt",
+      "sha256": "f9903a227c8a1f7679cc5a6b3a5203e389374c479ad1aa41c4a8f7bc4254f08d"
+    },
+    {
+      "path": "docs-drift-initial.txt",
+      "sha256": "007aae81b95db58b28930c29d6fa4fd54fcc42a560ee9f4bc1ab8875c12b4943"
+    },
+    {
+      "path": "moved-files.txt",
+      "sha256": "d5cdf70a0d8e8f48b2ae3f19c966cbdbac0b3ff00271b9c5887fbed434106f5d"
+    },
+    {
+      "path": "mutations.txt",
+      "sha256": "e7ecb2932e28b497d94e08aac746c09f50d8411717f6843f0df163b0b0602960"
+    },
+    {
+      "path": "readme-before-after.diff",
+      "sha256": "a7905b6c9214a509926097cc4226bdad0628f55e74bed8cbac815ed1de3efe5a"
+    },
+    {
+      "path": "runs/audit-binder-create.txt",
+      "sha256": "e24732fafd755baafe2fc3eb42cb287b7033612082ef3de9c9a04ca823aa66f5"
+    },
+    {
+      "path": "runs/commands.json",
+      "sha256": "6d1f515652f05d80e18982bba7dc98b845bea96aa88bc2cbafd808b4887d849b"
+    },
+    {
+      "path": "runs/compliance-report-iso-42001.txt",
+      "sha256": "fcda129c8477c8f50fd914ad9903e273fbe7ed35aa03d78efc93bcce5db0c259"
+    },
+    {
+      "path": "runs/domain-assess-health.txt",
+      "sha256": "6d6cf6c04edb5d4c8f7785054157da20e71c7b8d9ed6591abdc33f31eec63335"
+    },
+    {
+      "path": "runs/domain-conformance-health.txt",
+      "sha256": "7a6fb2b08746166ac1de022af929855edc81075113e555b1a3b75382916a5946"
+    },
+    {
+      "path": "runs/domain-conformance-wealth.txt",
+      "sha256": "e2f25fabeb2aa80c0275aae1b0ef625152dcf9879bfbb8f275d061785161ddc0"
+    },
+    {
+      "path": "runs/down-1.txt",
+      "sha256": "a032151c439d66c5fe4ba2357f329d010753349ecb0fbf1dea459c73356176d9"
+    },
+    {
+      "path": "runs/down-2.txt",
+      "sha256": "61fb667691f108eac5e4b755e8e414fa5aa32116865cb430d2c944cb83cc233a"
+    },
+    {
+      "path": "runs/probes.json",
+      "sha256": "0daa8700fef0bcd9dcdf05171b601507cff57c74011637ba1b91c99fd61a119b"
+    },
+    {
+      "path": "runs/up-1.txt",
+      "sha256": "7e83c662787d3977b3d5c61df0ab56c03d23054d71409ee40e7f8d127f38440e"
+    },
+    {
+      "path": "runs/up-2.txt",
+      "sha256": "83db216a7b4ceddb55ff8bddb502f9a3c5b02a608e144b719a0ca3f7b76de79b"
+    }
+  ],
+  "notes": "Recorded amc up/down, compliance and domain runs in a fresh local clone with a temporary HOME and workspace; the vault passphrase was random and is not recorded. amc domain assess exited 1 by design: Industry Packs are locked without a license. The full suite exited 1: 23 failures are in the int baseline for this environment (jsonlWriterResume 19, dataResidencyPersistence, llmResponsesCapabilities, privateModuleHelperVisibility, publicDocsArtifact needing .git as a directory), and amc1473SignedControlLifecycle and performance/sessionSpine.performance passed when rerun alone (13 of 13) after failing under the concurrent clone build and recorded runs. Check durations were not timed (0). build:pages built 199 public guides."
+}

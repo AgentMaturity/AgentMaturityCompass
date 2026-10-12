@@ -116,16 +116,13 @@ describe("cross-surface AMC brand identity", () => {
     expect(read("website/docs/compliance.html")).toContain("grid-template-columns: minmax(0, 1fr)");
   });
 
-  test("public surfaces advertise the compiled 142-pack registry consistently", () => {
-    const publicSources = [
-      read("README.md"),
-      read("website/index.html"),
-      read("website/playground.html"),
-      read("website/executive.html"),
-      read("src/console/assets/app.js")
-    ].join("\n");
+  test("public surfaces advertise the compiled pack registry consistently", () => {
+    const sources = ["README.md", "website/index.html", "website/playground.html", "website/executive.html", "src/console/assets/app.js"];
+    const publicSources = sources.map(read).join("\n");
 
-    expect(publicSources).toContain("142 assurance packs");
+    // P0-28: the registered count is a gen-counts marker (check:counts verifies its value), never a typed literal.
+    for (const source of sources) expect(read(source), source).toContain("<!-- amc:count:assurancePacksRegistered -->");
+    expect(publicSources).not.toMatch(/\b142(?:-pack|\s+(?:adversarial\s+)?(?:attack\s+)?(?:assurance\s+)?packs)\b/i);
     expect(publicSources).not.toMatch(/147\s+(?:adversarial\s+)?(?:attack\s+simulations|assurance packs|test suites)/i);
   });
 });

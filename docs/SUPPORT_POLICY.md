@@ -14,8 +14,8 @@ AMC is an OSS trust/security tool. That means users need:
 
 ### Stable
 - Intended for most users
-- Published through independently verified GitHub Release assets
-- npm and Homebrew are not stable channels until the publication manifest marks them live
+- Published to npm and as verified GitHub Release assets, both from `release.yml` only; npm is live with 1.1.1
+- Homebrew is not a stable channel until the publication manifest marks it live
 - Receives bug fixes and documentation updates
 
 ### Main / Development
@@ -41,11 +41,15 @@ Example:
 - `1.7.x` may receive critical fixes for a limited window
 - anything older is best-effort only
 
+Current lines:
+- `2.0.x` is the supported line once 2.0.0 is on npm. 1.2.0 was prepared but never published; its changes are in 2.0.0.
+- `1.1.1` is deprecated once 2.0.0 is published (P0-39 runs `npm deprecate`). Known security issues in 1.1.1 are fixed in
+  2.0.0; see its security advisory.
+
 ## Node Runtime Support
 
-AMC currently targets:
-- Node 20 LTS
-- Node 22 LTS
+AMC is qualified on Node 22 and 24 LTS. `engines.node` still accepts Node 20, which reached end of life upstream on
+30 April 2026 and is not qualified.
 
 Support for non-LTS Node versions is best-effort only.
 
@@ -86,6 +90,6 @@ Historical docs and research handoff files may intentionally preserve older snap
 
 For most teams, the safest path is:
 1. use the latest stable release
-2. stay on Node 20/22 LTS
+2. use Node 22 or 24 LTS
 3. read the changelog before upgrading
 4. test upgrades in CI before production rollout

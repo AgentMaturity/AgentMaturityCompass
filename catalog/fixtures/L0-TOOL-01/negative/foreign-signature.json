@@ -1,0 +1,19 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-TOOL-01",
+  "polarity": "negative",
+  "evidenceClass": "cross_tenant",
+  "setup": {
+    "harness": "tool_allowlist",
+    "tool": "fixture.listed",
+    "actionClass": "WRITE_HIGH",
+    "listed": [
+      "fixture.listed"
+    ],
+    "config": "signed_by_other_workspace"
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "guard_denied:tool-allowlist"
+  }
+}

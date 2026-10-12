@@ -1,10 +1,10 @@
 // "amc" is a session AMC ran natively through its own agent loop (SessionService)
-// — as opposed to "claude"/"gemini"/"openclaw", which mean AMC observed an
-// external agent of that kind, or "gateway"/"sandbox", the observation mechanism.
-// A native session labelled anything else would misreport how its evidence was
-// produced, which is exactly the provenance the trust plane exists to keep
-// honest.
-export type RuntimeName = "amc" | "claude" | "gemini" | "openclaw" | "unknown" | "mock" | "any" | "gateway" | "sandbox";
+// — as opposed to "claude"/"gemini"/"openclaw"/"pi", which mean AMC observed or
+// controlled an external agent of that kind, or "gateway"/"sandbox", the
+// observation mechanism. A native session labelled anything else would misreport
+// how its evidence was produced, which is exactly the provenance the trust plane
+// exists to keep honest.
+export type RuntimeName = "amc" | "claude" | "gemini" | "openclaw" | "pi" | "unknown" | "mock" | "any" | "gateway" | "sandbox";
 
 export type EvidenceEventType =
   | "stdin"

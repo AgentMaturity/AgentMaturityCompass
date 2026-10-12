@@ -26,6 +26,8 @@ console.log(result, receipt.ok, receipt.remaining);
 bridge.capture.close();
 ```
 
+This bridge is passive and cannot stop a tool call. To have AMC allow or deny Pi's tool calls, use the Pi extension: [Pi tool_call control](adapters/pi.md).
+
 The example is an explicit source report, not independently observed execution. `onEvent` is the passive listener for a supplied Pi event bus. `bindWatch(handle)` attaches to an implemented handle and returns explicit unsubscribe/cleanup state. At the pinned revision, Pi's experimental `watchSession()` still throws `SliceNotImplemented`; the bridge does not make that stub operational. Use a working event bus or implemented handle. Unsubscribe before closing capture, and inspect `cleanupPending` if unsubscribe fails.
 
 Source times and durations remain null unless provided. A callback's fulfilled promise is recorded as fulfilled callback settlement, not inferred task success. Rejections, explicit error statuses and cancellation retain separate fields. Parent span IDs remain explicit; parents flushed in earlier batches are disclosed as absent rather than reconstructed. Final usage remains attributed to its source event; overlapping parent/event totals are not summed.

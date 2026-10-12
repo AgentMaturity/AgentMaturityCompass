@@ -1,0 +1,79 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-LOG-02
+version: "0.1.0"
+support: experimental
+layer: 0
+family: logging-and-retention
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Tamper evidence
+statement: >-
+  Ledger verification detects any rewritten, deleted or reordered event, and checkpoints are signed,
+  then timestamped and anchored once those producers exist.
+riskRationale: >-
+  A log that can be edited without detection proves nothing about what happened.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations: []
+binding:
+  kind: manual
+  points: []
+  mechanism: >-
+    Ledger verification recomputes every event hash, writer signature and chain link; signed checkpoints
+    bind the head.
+  parameters: []
+  manualDuty:
+    duty: >-
+      Run ledger verification before every export and on the profile's cadence.
+    ownerRole: ciso
+    cadence: daily and before every export
+    evidenceOfPerformance: The verification result.
+tests:
+  - id: L0-LOG-02-T1
+    type: runtime_enforced
+    oracle: { kind: ledger_state, observes: The verification result over a ledger altered in place. }
+    fixtures:
+      positive: [L0-LOG-02/positive/evidence-valid.json, L0-LOG-02/positive/intact-ledger.json]
+      negative:
+        - L0-LOG-02/negative/deleted-event.json
+        - L0-LOG-02/negative/evidence-contradictory.json
+        - L0-LOG-02/negative/evidence-cross-tenant.json
+        - L0-LOG-02/negative/evidence-empty.json
+        - L0-LOG-02/negative/evidence-replayed.json
+        - L0-LOG-02/negative/evidence-stale.json
+        - L0-LOG-02/negative/evidence-violation.json
+        - L0-LOG-02/negative/reordered-events.json
+        - L0-LOG-02/negative/rewritten-event.json
+    passCriteria: >-
+      An intact ledger verifies; a rewritten, a deleted and a reordered event each fail verification.
+      Today the tail of an open session can be deleted undetected and checkpoints are not verified (P1-25,
+      P1-26).
+    attempts: 1
+evidence:
+  - id: L0-LOG-02-E1
+    producer: amc.ledger
+    bindingFields: [workspaceId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [deployment_version]
+owner: { role: ciso }
+clock: null
+levels: [L2, L3]
+crosswalk:
+  - framework: amc-audit-map-v1
+    clause: LOGGING_MONITORING.LEDGER_CHAIN
+    relation: partial
+    rationale: >-
+      Hash-chain continuity is part of tamper evidence; the audit map does not check signed checkpoints.
+  - framework: amc-audit-map-v1
+    clause: LOGGING_MONITORING.MERKLE_ROOT
+    relation: partial
+    rationale: >-
+      Merkle proofs are related; they do not cover per-event rewriting by themselves.
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

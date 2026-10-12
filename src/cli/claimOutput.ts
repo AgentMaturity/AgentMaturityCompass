@@ -5,8 +5,8 @@
  */
 import { envelopeForLegacyResult, envelopeForPathPresence, envelopeForSelfAssessment } from "../claims/eligibility/adapters.js";
 import {
-  envelopeForAggregate, envelopeForAssuranceReport, envelopeForExecutedTest, envelopeForStoredRun, envelopeForUnverifiedResult,
-  isLegacyAmcVersion
+  envelopeForAggregate, envelopeForAssuranceReport, envelopeForExecutedTest, envelopeForFailedVerification, envelopeForStoredRun,
+  envelopeForUnverifiedResult, isLegacyAmcVersion
 } from "../claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel } from "../claims/eligibility/render.js";
 import type { ClaimEnvelope, ClaimKind, StatusDimensions } from "../claims/eligibility/types.js";
@@ -164,17 +164,18 @@ export function latestRunsClaim(producer: string, agentIds: readonly string[], w
 /**
  * A certificate, passport, bundle or attestation: the claim of the run it carries (seal-checked, legacy below AMC
  * 1.2.0), else a legacy envelope when it records an AMC version below 1.2.0, else self-reported. Verifying the
- * artifact's signature proves integrity only; it never raises the kind.
+ * artifact's signature proves integrity only; it never raises the kind. `sealVerified: false` (a failed check, or no
+ * check, as in `cert inspect`) makes its evidence untrusted.
  */
 export function artifactClaim(producer: string, artifact: { run?: DiagnosticReport | null; sealVerified?: boolean;
   amcVersion?: string | null; recordCount?: number } = {}): ClaimEnvelope {
   const now = Date.now();
   if (artifact.run) return envelopeForStoredRun(artifact.run, { sealVerified: artifact.sealVerified === true, now });
-  if (artifact.amcVersion !== undefined && isLegacyAmcVersion(artifact.amcVersion)) {
-    return envelopeForLegacyResult({ producer, version: artifact.amcVersion ?? "none", method: "runtime_observation",
-      status: "NOT_EVALUATED", level: null, eventCount: artifact.recordCount ?? 1, now });
-  }
-  return unverifiedClaim(producer, artifact.recordCount ?? 1);
+  const claim = artifact.amcVersion !== undefined && isLegacyAmcVersion(artifact.amcVersion)
+    ? envelopeForLegacyResult({ producer, version: artifact.amcVersion ?? "none", method: "runtime_observation",
+      status: "NOT_EVALUATED", level: null, eventCount: artifact.recordCount ?? 1, now })
+    : unverifiedClaim(producer, artifact.recordCount ?? 1);
+  return artifact.sealVerified === false ? envelopeForFailedVerification(claim, true) : claim;
 }
 
 /**

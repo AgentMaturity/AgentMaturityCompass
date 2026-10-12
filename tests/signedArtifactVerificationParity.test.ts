@@ -36,12 +36,30 @@ function fixture(): string {
   return root;
 }
 
+/**
+ * P1-26 (def0955fa): a proof's tree and tree size come from the merkle root the artifact carries, never from the proof,
+ * and a bundle without a root is checked as amc-legacy-v1 only. Both archived verifiers predate carried roots and pass
+ * none, so under the live proof checker they refuse every RFC 9162 proof a workspace now writes. The archive's
+ * restoration-map.json records one forward edit per verifier that hands it its artifact's proofs/merkle.root.json; it
+ * must apply exactly once, every other archived byte runs unchanged, and the unedited archive's refusal is asserted
+ * below. Root signatures stay P0-09's checks.
+ */
+const forwardEdits = (JSON.parse(readFileSync(resolve(archive, "restoration-map.json"), "utf8")) as {
+  forwardEdits: Array<{ issue: string; path: string; before: string; after: string }>;
+}).forwardEdits;
+
 // Execute each entire archived module with its actual unchanged imported modules.
-// Only TS compilation/module loading is adapted; no verifier body is reconstructed.
-async function originalModule<T>(path: keyof typeof sourceHashes): Promise<T> {
+// Only TS compilation/module loading and the P1-26 forward edit above are adapted; no verifier body is reconstructed.
+async function originalModule<T>(path: keyof typeof sourceHashes, applyForwardEdit = true): Promise<T> {
   const bytes = readFileSync(resolve(archive, "originals", path));
   expect(createHash("sha256").update(bytes).digest("hex")).toBe(sourceHashes[path]);
-  const source = bytes.toString("utf8");
+  let source = bytes.toString("utf8");
+  const edits = forwardEdits.filter(edit => edit.path === path);
+  expect(edits.map(edit => edit.issue)).toEqual(["P1-26"]);
+  for (const edit of edits) {
+    expect(source.split(edit.before)).toHaveLength(2);
+    if (applyForwardEdit) source = source.replace(edit.before, edit.after);
+  }
   const ast = ts.createSourceFile(path, source, ts.ScriptTarget.ES2022, true);
   const dependencies = new Map<string, unknown>();
   for (const node of ast.statements) {
@@ -81,6 +99,8 @@ interface Domain {
 let workspace: string;
 let originalBinder: typeof binderVerifier;
 let originalPassport: typeof passportVerifier;
+let uneditedBinder: typeof binderVerifier;
+let uneditedPassport: typeof passportVerifier;
 let domains: Domain[];
 let operatorTrust: TrustContext;
 
@@ -105,6 +125,8 @@ const withTrust = (name: Domain["name"], params: VerifyParams, trust?: TrustCont
 beforeAll(async () => {
   originalBinder = await originalModule<typeof binderVerifier>("src/audit/binderVerifier.ts");
   originalPassport = await originalModule<typeof passportVerifier>("src/passport/passportVerifier.ts");
+  uneditedBinder = await originalModule<typeof binderVerifier>("src/audit/binderVerifier.ts", false);
+  uneditedPassport = await originalModule<typeof passportVerifier>("src/passport/passportVerifier.ts", false);
   workspace = fixture();
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   operatorTrust = workspaceKeyTrust(workspace);
@@ -177,6 +199,26 @@ describe("entire archived signed artifact workflows against real local signature
         for (const params of [{ file: d.file }, { file: d.file, workspace }, { file: d.file, publicKeyPath: join(document, "signer.pub") }]) {
           expect(compare(d, params).ok).toBe(true);
         }
+      });
+
+      test("P1-26: the unedited archive refuses the RFC 9162 proofs it gets no root for; a proof naming another tree refuses", () => {
+        const d = domain(), { root, document } = unpack(d);
+        const dir = join(document, "proofs", "inclusion");
+        const proofs = readdirSync(dir).filter(file => file.endsWith(".json")).sort()
+          .map(file => ({ file, proof: JSON.parse(readFileSync(join(dir, file), "utf8")) as { proofId: string; algorithm?: string } }));
+        expect(proofs.length).toBeGreaterThan(0);
+        expect(proofs.every(row => row.proof.algorithm === "rfc9162-sha256")).toBe(true);
+        const verifyUnedited = (name === "binder" ? uneditedBinder.verifyAuditBinderFile : uneditedPassport.verifyPassportArtifactFile) as Domain["original"];
+        const unedited = verifyUnedited({ file: d.file, workspace });
+        expect(unedited.ok).toBe(false);
+        expect(unedited.errors).toContainEqual({ code: "PROOF_INVALID",
+          message: `inclusion proof ${proofs[0].proof.proofId} names rfc9162-sha256, but the signed merkle root is amc-legacy-v1` });
+        expect(compare(d, { file: d.file, workspace }).ok).toBe(true);
+        writeFileSync(join(dir, proofs[0].file), JSON.stringify({ ...proofs[0].proof, algorithm: "amc-legacy-v1" }));
+        const refused = withTrust(name, { file: pack(root) });
+        expect(refused.ok).toBe(false);
+        expect(refused.errors.map(row => row.message))
+          .toContain(`inclusion proof ${proofs[0].proof.proofId} names amc-legacy-v1, but the signed merkle root is rfc9162-sha256`);
       });
 
       test("public argument getters keep the original access order", () => {

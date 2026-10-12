@@ -1,0 +1,61 @@
+{
+  "environment": "local colima on macOS arm64, not CI",
+  "commit": "886bc5762cfeed73fdf5d1f7f004f78f1c9c8210",
+  "docker": {
+    "client": "29.8.0",
+    "server": "29.5.2",
+    "serverOsArch": "linux/arm64"
+  },
+  "buildx": "github.com/docker/buildx v0.37.0 Homebrew",
+  "colima": "colima version 0.10.3",
+  "vm": "colima profile amc-s7f: vz, 4 CPU, 6 GiB, rosetta: true (linux/amd64 runs through Rosetta)",
+  "imageStore": "containerd snapshotter: an image ID is the OCI index digest of the loaded image (manifest plus BuildKit attestation), not a config digest; GitHub-hosted runners with the classic store report a config digest",
+  "images": {
+    "linux/arm64": {
+      "studio": {
+        "tag": "amc-p035-studio:arm64",
+        "id": "sha256:d73e66e20c7f76ee6877a0868d9cf566a8d7a43a99e2ad1eae0fac6df82ef770",
+        "os": "linux",
+        "architecture": "arm64",
+        "sizeBytes": 99660449
+      },
+      "runner": {
+        "tag": "amc-p035-runner:arm64",
+        "id": "sha256:b1740027b79493cf16f9ee236f14e72139b069efcc9fe0eb5e1c6ac1428416e6",
+        "os": "linux",
+        "architecture": "arm64",
+        "sizeBytes": 155547604
+      },
+      "quickstart": {
+        "tag": "amc-p035-quickstart:arm64",
+        "id": "sha256:999c0818b96e8d9323f1eca67b7cd34e00ba2b5fd00efdabac1a74a4c4c537e9",
+        "os": "linux",
+        "architecture": "arm64",
+        "sizeBytes": 100442368
+      }
+    },
+    "linux/amd64": {
+      "studio": {
+        "tag": "amc-p035-studio:amd64",
+        "id": "sha256:46acdf938b501c1cad4e122120c736a7e7033a06a37ed457e43bdb6fd80ae41d",
+        "os": "linux",
+        "architecture": "amd64",
+        "sizeBytes": 99837581
+      },
+      "runner": {
+        "tag": "amc-p035-runner:amd64",
+        "id": "sha256:170c211bc27eae56d43f369ceba98f5d19c36b267ef2864c43e3bd75921766d7",
+        "os": "linux",
+        "architecture": "amd64",
+        "sizeBytes": 155587679
+      },
+      "quickstart": {
+        "tag": "amc-p035-quickstart:amd64",
+        "id": "sha256:42fa6a4b244c7459a861ca18573418f8badc325f76d8926eaca9714348328209",
+        "os": "linux",
+        "architecture": "amd64",
+        "sizeBytes": 100625865
+      }
+    }
+  }
+}

@@ -8,7 +8,7 @@ import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import Database from "better-sqlite3";
-import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { computeIncidentHash, createIncidentStore } from "../incidents/incidentStore.js";
 import type { Incident } from "../incidents/incidentTypes.js";
 import { openLedger } from "../ledger/ledger.js";
@@ -119,7 +119,7 @@ export function recordActionIncidents(workspace: string, agentIds: readonly stri
   try {
     const store = createIncidentStore(ledger.db);
     store.initTables();
-    const key = getPrivateKeyPem(workspace, "monitor");
+    const key = getSigningKey(workspace, "ledger-row");
     return agentIds.map((agentId) => {
       const now = Date.now();
       // ASSURANCE_FAILURE is the nearest trigger the incident table accepts; the cause itself is named in the text.

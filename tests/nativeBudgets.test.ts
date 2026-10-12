@@ -1,6 +1,9 @@
+import { fork, type ChildProcess } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+import type { Writable } from "node:stream";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import YAML from "yaml";
 import { initWorkspace } from "../src/workspace.js";
@@ -21,6 +24,7 @@ import { budgetGuard } from "../src/tools/guards/policyGuards.js";
 import { toolEvidenceFor } from "../src/tools/toolEvidence.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
+import { liveNativeFailureGuidance, projectNativeRunDiagnostics } from "../src/agent/nativeFailureGuidance.js";
 
 let workspace: string;
 const sessions: SessionService[] = [];
@@ -118,6 +122,27 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
     await drain(llm.stream(spec)); await expect(drain(llm.stream(spec))).rejects.toThrow("request budget exhausted");
     expect(upstream.sent).toHaveLength(1);
     expect(budgetUsageSnapshot(workspace, "default").daily.llmRequests).toBe(1);
+  });
+
+  test("labels AMC's own budget refusals AMC_NATIVE_BUDGET_REFUSED, never provider QUOTA (P0-59)", async () => {
+    const refusalCode = (value: SessionService) => value.readEvents().filter(row => row.event_type === "request/failure")
+      .map(row => JSON.parse(row.meta_json) as { failure: { code: string }; dispatchAttempted?: boolean }).at(-1)!;
+    // The daily request budget.
+    limits(config => { config.budgets.perAgent.default!.daily.maxLlmRequests = 1; });
+    const exhausted = session(); const upstream = stubUpstream([response]); const llm = runtime(exhausted.value, upstream);
+    await drain(llm.stream(exhausted.spec));
+    const refused = await drain(llm.stream(exhausted.spec)).then(() => null, (error: unknown) => error);
+    expect(liveNativeFailureGuidance(refused).code).toBe("AMC_NATIVE_BUDGET_REFUSED");
+    expect(refusalCode(exhausted.value)).toMatchObject({ failure: { code: "AMC_NATIVE_BUDGET_REFUSED" }, dispatchAttempted: false });
+    const diagnostics = projectNativeRunDiagnostics(exhausted.value.readEvents(), exhausted.value.sessionId);
+    expect(diagnostics.map(row => row.guidance.code)).toEqual(["AMC_NATIVE_BUDGET_REFUSED"]);
+    expect(diagnostics[0]!.guidance.summary).not.toMatch(/provider/i);
+    // Unknown token usage from an earlier failed dispatch.
+    limits(config => { config.budgets.perAgent.default!.daily.maxLlmRequests = 100; });
+    const unknown = session(); const failing = runtime(unknown.value, refusingUpstream(new Error("socket failed")));
+    await expect(drain(failing.stream(unknown.spec))).rejects.toThrow();
+    await expect(drain(failing.stream(unknown.spec))).rejects.toThrow("token usage is unknown");
+    expect(refusalCode(unknown.value)).toMatchObject({ failure: { code: "AMC_NATIVE_BUDGET_REFUSED" }, dispatchAttempted: false });
   });
 
   test("blocks the next provider dispatch at the known token threshold and leaves unpriced cost explicit", async () => {
@@ -319,4 +344,31 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
       expect(ledger.db.inTransaction).toBe(false);
     } finally { ledger.close(); }
   });
+
+  test("two reservations released together by a barrier at the last budget unit admit exactly one", async () => {
+    limits(config => { config.budgets.perAgent.default!.daily.maxToolExecutes.READ_ONLY = 1; });
+    // Reservation is synchronous, so the race needs real processes. Each worker pauses at
+    // its write-lock acquisition (see the fixture) and both are released by one barrier.
+    const worker = fileURLToPath(new URL("./fixtures/nativeBudgetReserveWorker.ts", import.meta.url));
+    const children = ["race-a", "race-b"].map(callId => fork(worker, [workspace, "race-native-session", callId],
+      { execArgv: ["--import", "tsx"], stdio: ["ignore", "ignore", "inherit", "ipc", "pipe"] }));
+    const next = (child: ChildProcess, kind: string) => new Promise<Record<string, unknown>>((resolve, reject) => {
+      const onMessage = (message: Record<string, unknown>) => { if (message.kind === kind) { child.off("close", onClose); child.off("message", onMessage); resolve(message); } };
+      const onClose = (code: unknown) => { child.off("message", onMessage); reject(new Error(`reservation worker closed before ${kind}: ${code}`)); };
+      child.on("message", onMessage); child.once("close", onClose);
+    });
+    try {
+      const results = children.map(child => next(child, "result"));
+      for (const result of results) result.catch(() => undefined); // surfaced by the await below, not as unhandled
+      await Promise.all(children.map(child => next(child, "paused")));
+      for (const child of children) (child.stdio[4] as Writable).write("g");
+      const refusals = (await Promise.all(results)).map(message => message.refusal);
+      expect(refusals.filter(refusal => refusal === null)).toHaveLength(1);
+      expect(refusals.filter(refusal => refusal !== null)).toEqual(["daily tool budget exhausted for READ_ONLY"]);
+      const ledger = openLedger(workspace);
+      try {
+        expect(ledger.getAllEvents().filter(row => JSON.parse(row.meta_json).auditType === NATIVE_BUDGET_RESERVATION)).toHaveLength(1);
+      } finally { ledger.close(); }
+    } finally { for (const child of children) child.kill("SIGKILL"); }
+  }, 60_000);
 });

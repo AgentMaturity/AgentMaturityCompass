@@ -62,7 +62,7 @@ Statuses follow the rule above. Owners are plan keys that own the open gaps; a c
 | `extensions` | Extensions | `src/extensions/nativeExtensionRuntime.ts` `loadNativeExtensions`; `src/plugins/nativeExecutableRunner.ts` `NativeExecutableRunner` (Bubblewrap only) | Extension load receipts | enforced; executables refused outside Linux | Installed acceptance (P0-31) |
 | `managed-hooks` | Managed hooks | `src/adapters/managedHookLease.ts` `verifyManagedLease`; `src/bridge/hookControl.ts` `evaluateProviderHookControl` | Hook control results | enforced at the hook | Security mutation batch (P0-30) |
 | `notary` | Notary | `src/notary/notaryAuth.ts` `verifyNotaryRequestAuth` (HMAC over time, method, path and body hash); `src/notary/notaryServer.ts` `startNotaryServer`; `src/notary/notaryLog.ts` `appendNotaryLogEntry` | Notary log | enforced | P0-30; key providers (P2-08) |
-| `helm-compose` | Helm and Compose | `deploy/helm/amc/templates/secret.yaml` (`change-me` values); `deploy/compose/docker-compose.yml` (file secrets) | None at deploy on main | none | Helm passphrase (P0-14); base images (P0-35) |
+| `helm-compose` | Helm and Compose | `deploy/helm/amc/templates/secret.yaml` (`createSecret` guard, off by default); `deploy/helm/amc/templates/_helpers.tpl` `amc.bootstrapValue` (required, `change-me` refused); `deploy/compose/docker-compose.yml` (file secrets) | Render refusals; `helm test` and `deploy-verify` results the operator keeps | advisory: enforced at Helm render since P0-14; Compose secret files are unchecked | Chart 0.1.0 workspaces keep a published passphrase (P0-37); base images (P0-35) |
 
 ## STRIDE per channel
 
@@ -70,7 +70,7 @@ Each block names the threat, the control today and the gap. "Not applicable" car
 
 ### Tool pipeline
 
-- Spoofing: a model or sub-call claims another agent's identity. Control: the pipeline takes `agentId` from the composed session and Code Mode sub-calls carry a parent token. Under a compiled plan whose `identity-binding` requires a lease (`L0-IDN-01`), a Studio native task's calls bind the lease Studio minted for that runtime alone (agent, task id, the pinned tools' action classes, at most one hour), verified per call by the pipeline's lease verifier and revoked at stop, after a resumed runtime claims the session, and at archive; a session without one is still denied by `identity-binding` (P1-67). Gap: no workload identity or delegation chain (P2-25); lease v1 cannot carry the signed-config digests (the authorization record binds them) and a delegated child gets no lease, so its calls are denied under a plan; the signed lease revocation list has no signed anchor, so a same-user process outside the sandbox that deletes both `revocations.json` and its signature un-revokes every lease until it expires.
+- Spoofing: a model or sub-call claims another agent's identity. Control: the pipeline takes `agentId` from the composed session and Code Mode sub-calls carry a parent token. Under a compiled plan whose `identity-binding` requires a lease (`L0-IDN-01`), a Studio native task's calls bind the lease Studio minted for that runtime alone (agent, task id, the pinned tools' action classes, at most one hour), verified per call by the pipeline's lease verifier and revoked at stop, after a resumed runtime claims the session, and at archive; a session without one is still denied by `identity-binding` (P1-67). Gap: no workload identity or delegation chain (P2-25); lease v1 cannot carry the signed-config digests (the authorization record binds them) and a delegated child gets no lease, so its calls are denied under a plan; since P1-08 the lease revocation list is one signed, sequenced file anchored in the workspace transparency log and this machine's high-water file, so deleting it or restoring an older copy refuses every lease instead of un-revoking; a same-user process that also rewrites the transparency log and AMC home can still roll it back on this machine, which public log anchoring (P1-26) closes.
 - Tampering: a filter or guard launders a denial into an allow. Control: stage order is fixed (approval, then guards, then body, then filters) and filters rewrite output only. A compiled plan is enforced by the `compiled-policy` guard, which runs first, fails closed on any rule it does not implement and on any change to the active plan during the session, and loads the plan from a signed control journal verified whole, with the plan's own digest and signature checked in the same read (P1-12). Gap: other guard and policy files are trusted once loaded.
 - Repudiation: a call happens with no record. Control: `toolEvidenceFor` writes audit and metric rows for every call. Gap: a recorder that throws after the body ran is swallowed, so the effect stands without its row (P1-03, P1-04).
 - Information disclosure: tool output carries secrets into the model or the ledger. Control: evidence rows hold an output hash, not the output; provider keys are scrubbed from the shell environment. Gap: no redaction of protected data before the model (P2-02).
@@ -137,7 +137,7 @@ Each block names the threat, the control today and the gap. "Not applicable" car
 - Tampering: usage or cost figures are edited after the fact. Control: signed request and settlement rows; budget reservations are chained. Gap: none known.
 - Repudiation: a model call with no record. Control: the signed `request/header` row precedes dispatch. Gap: none known.
 - Information disclosure: protected data sent to a provider in a region it may not leave. Control: none at the route. Gap: residency (P2-01); `bridgeResidencyHook` is unused.
-- Denial of service: spend exhaustion. Control: `reserveNativeModelBudget` refuses before dispatch when the budget or its ledger cannot be read; a ledger that fails verification is reported as `AMC_EVIDENCE_INTEGRITY`, not QUOTA (P0-27). Gap: none known.
+- Denial of service: spend exhaustion. Control: `reserveNativeModelBudget` refuses before dispatch when the budget or its ledger cannot be read; a ledger that fails verification is reported as `AMC_EVIDENCE_INTEGRITY`, not QUOTA (P0-27), and a budget refusal as `AMC_NATIVE_BUDGET_REFUSED`, never provider QUOTA (P0-59). Gap: none known.
 - Elevation of privilege: a request uses a capability the provider route was not admitted for. Control: `assertRequestCapabilities`. Gap: none known.
 
 ### Imports
@@ -208,10 +208,10 @@ Each block names the threat, the control today and the gap. "Not applicable" car
 
 - Spoofing: not applicable at deploy time; identity is set by the secrets below.
 - Tampering: an unpinned base image changes underneath a deployment. Control: none on main. Gap: digest pins (P0-35).
-- Repudiation: not applicable; deployment manifests produce no evidence on main.
-- Information disclosure: default secrets. Control: Compose reads operator-created secret files. Gap: the Helm secret template ships `change-me` values for the vault, owner and notary secrets (P0-14).
+- Repudiation: the manifests produce no evidence. `helm test` and `scripts/deploy-verify.mjs` write results the operator keeps; a workspace-key result is a local audit trail.
+- Information disclosure: default secrets. Control: chart 0.2.0 renders no Secret by default and refuses `change-me` values at render (template and `values.schema.json`); Compose reads operator-created secret files. Gap: a workspace bootstrapped by chart 0.1.0 used the published `change-me` values (P0-37); Compose secret files are unchecked.
 - Denial of service: not evaluated at deploy time in this review.
-- Elevation of privilege: a deployment that keeps the `change-me` vault passphrase gives anyone with the chart its signing authority. Control: none. Gap: P0-14.
+- Elevation of privilege: a deployment that keeps the `change-me` vault passphrase gives anyone with the chart its signing authority. Control: chart 0.2.0 refuses the placeholders. Gap: workspaces bootstrapped by chart 0.1.0 keep that passphrase, and no `amc vault` command changes it (P0-37).
 
 ## Verified bypasses
 

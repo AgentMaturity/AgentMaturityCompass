@@ -214,7 +214,7 @@ Input:  { packId: string, responses: Record<questionId, integer 1-5> }
 Output: self-reported score and level, "Self-assessment: complete (self-reported; not a certification)", complianceGaps
 ```
 
-Responses are self-declared Likert answers; a value that is not an integer 1-5 fails the call. A complete self-assessment is not a certification and caps at L1 (see [CLAIM_KINDS.md](CLAIM_KINDS.md)). Its claim line reads `Claim: Self-reported · Result: not evaluated (self-reported answers cannot pass a regulated control) · …`. Only a pack's own id is accepted: inherited names such as `__proto__` or `constructor` return "Unknown sector pack".
+Responses are self-declared Likert answers; a value that is not an integer 1-5 fails the call. A complete self-assessment is not a certification and caps at L1 (see [CLAIM_KINDS.md](CLAIM_KINDS.md)). Its claim line reads `Claim: Self-reported · Result: not evaluated (self-reported answers or records cannot satisfy a regulated control) · …`. Only a pack's own id is accepted: inherited names such as `__proto__` or `constructor` return "Unknown sector pack".
 
 Available pack IDs (40 total across 7 stations):
 
@@ -243,7 +243,7 @@ Output: { incidentId, station, now, clocks[], events[], notes[] } — the same l
         `amc incident clocks <id> --station <station> --json`
 ```
 
-Each clock shows its instrument, article, trigger, due date, status (`NOT_STARTED`, `PENDING`, `DUE_SOON`, `OVERDUE`, `SATISFIED`, `SATISFIED_LATE`), source and review status. Trigger and notice times come from the signed clock events recorded with `amc incident clocks --trigger|--notified` or `POST /api/v1/incidents/:id/clock-events`; a row whose signature fails is refused by its event id. The tool records nothing. Durations are agent-drafted and experimental until an expert signs off; they are not legal advice, and AMC does not file notices. See [REGULATORY_INCIDENT_CLOCKS.md](REGULATORY_INCIDENT_CLOCKS.md).
+Each clock shows its instrument, article, trigger, due date, status (`NOT_STARTED`, `PENDING`, `DUE_SOON`, `OVERDUE`, `SATISFIED`, `SATISFIED_LATE`), source and review status. Trigger and notice times come from the signed clock events recorded with `amc incident clocks --trigger|--notified` or `POST /api/v1/incidents/:id/clock-events`; a row whose signature fails is refused by its event id. The tool records nothing. Durations are agent-drafted and experimental until an expert signs off; they are not legal advice, and AMC does not file notices. See [REGULATORY_INCIDENT_CLOCKS.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/REGULATORY_INCIDENT_CLOCKS.md).
 
 **Example prompt:** *"Which regulatory deadlines are open on incident_… for the wealth station?"*
 
@@ -340,7 +340,7 @@ No network ports are opened. No data leaves your machine. The server reads from 
 Run `amc init` in your project to register an agent first.
 
 **"Could not load agent"**
-Run `amc quickscore` or `amc score run` to generate the first assessment before using MCP tools.
+Run `amc quickscore` or `amc run` to generate the first assessment before using MCP tools.
 
 **IDE not showing AMC tools**
 1. Verify `amc` is in your PATH: `which amc`

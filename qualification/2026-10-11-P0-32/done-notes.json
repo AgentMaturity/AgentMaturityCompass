@@ -1,0 +1,578 @@
+{
+  "key": "P0-32",
+  "baseCommit": "60d0255c43f7a54bae88e665e38d326b3232fcd5",
+  "originMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "note": "Done means the code is on origin/main, the focused tests pass at the base commit, and the remaining item named by P0-32 has tracked evidence. Linear and Obsidian mirroring is Sid's.",
+  "issues": [
+    {
+      "id": "AMC-1506",
+      "title": "Neutral imports stay self-reported and unevaluated",
+      "verdict": "Done",
+      "mergedShas": [
+        "5eec4d9d6099201078fc864afbeea0ef50dbbeaf"
+      ],
+      "tests": {
+        "runs": [
+          {
+            "command": "npx vitest run tests/importProvenance.test.ts tests/neutralImporter.test.ts",
+            "exit": 0,
+            "files": [
+              {
+                "path": "tests/importProvenance.test.ts",
+                "tests": 3,
+                "passed": 3,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/neutralImporter.test.ts",
+                "tests": 10,
+                "passed": 10,
+                "failed": 0,
+                "skipped": 0
+              }
+            ]
+          }
+        ],
+        "total": 13,
+        "passed": 13,
+        "failed": 0,
+        "skipped": 0
+      },
+      "evidence": [
+        "Installed run: the P0-31 RC tarball (sha256 21190c7d…0340) installed into a new prefix; installed dist/cli.js sha256 8b9ec221…9165 equals P0-31's. Under Node 22.23.3, amc import of a Pi v3 session with a failed tool call and a model error returned claimKind self_reported, result not_evaluated, report UNSIGNED, verificationPassed false, integrityIndex 0, coverage observed 0 / attested 0 / selfReported 1, and empty layer and question scores.",
+        "The config-file import printed 'Imported as SELF_REPORTED evidence. No maturity evaluation was performed.'",
+        "No commit touches the importer, readiness, lifecycle or claim-output paths between the RC 756bd697 and the base 60d0255c."
+      ],
+      "receipts": [
+        "qualification/2026-10-11-P0-32/AMC-1506/README.md",
+        "qualification/2026-10-11-P0-32/AMC-1506/installed-import/environment.json",
+        "qualification/2026-10-11-P0-32/AMC-1506/installed-import/import-pi.json",
+        "qualification/2026-10-11-P0-32/AMC-1506/installed-import/import-config.txt",
+        "qualification/2026-10-11-P0-32/AMC-1506/reconciliation-summary.json"
+      ],
+      "residualRisks": [
+        {
+          "risk": "Installed import ran on macOS arm64 under Node 22 only, from the 1.2.0-labelled RC. The versioned 2.0.0 tarball is qualified in P0-39.",
+          "owner": "P0-39"
+        }
+      ]
+    },
+    {
+      "id": "AMC-1507",
+      "title": "Pi v3 sessions keep failures, ancestry and unknown timing",
+      "verdict": "Done",
+      "mergedShas": [
+        "c050244abedfe9cf208a77d4763d425019bfc66e",
+        "8defa0708b17421067a93794e3fc96697dcace1a",
+        "1b89a57372273796197882325091a2f1d44d2a3d",
+        "8baae594bf45b4f4009509032312cb3e3dbcfcb8"
+      ],
+      "tests": {
+        "runs": [
+          {
+            "command": "npx vitest run tests/piSessionImport.test.ts tests/piSessionImportBoundaries.test.ts tests/traceFailureUnknownTime.test.ts tests/traceIngestionTiming.test.ts",
+            "exit": 0,
+            "files": [
+              {
+                "path": "tests/piSessionImport.test.ts",
+                "tests": 11,
+                "passed": 11,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/piSessionImportBoundaries.test.ts",
+                "tests": 15,
+                "passed": 15,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/traceFailureUnknownTime.test.ts",
+                "tests": 2,
+                "passed": 2,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/traceIngestionTiming.test.ts",
+                "tests": 3,
+                "passed": 3,
+                "failed": 0,
+                "skipped": 0
+              }
+            ]
+          }
+        ],
+        "total": 31,
+        "passed": 31,
+        "failed": 0,
+        "skipped": 0
+      },
+      "evidence": [
+        "This receipt is attributable to a merged commit: the four commits are ancestors of origin/main 5ea5e866 and of the base 60d0255c, where the focused tests ran.",
+        "The installed AMC-1506 run imported a Pi v3 session and kept its 2 failures ('Pi v3 session: 4 conversation entries, 0 structural, 2 failure(s)').",
+        "The September reconciliation's one defect (negative numeric timestamps) is fixed by 8baae594 (src/importers/piSessionImport.ts:277)."
+      ],
+      "receipts": [
+        "qualification/2026-10-11-P0-32/AMC-1507/README.md",
+        "qualification/2026-10-11-P0-32/AMC-1507/reconciliation-summary.json",
+        "qualification/2026-10-11-P0-32/focused-tests.json"
+      ],
+      "residualRisks": [
+        {
+          "risk": "Fixtures are synthetic; no session written by a real Pi CLI was imported. The old acceptance did not require one.",
+          "owner": null
+        }
+      ]
+    },
+    {
+      "id": "AMC-1509",
+      "title": "pnpm source install works on a clean clone",
+      "verdict": "Done",
+      "mergedShas": [
+        "2b737b3c4a02f9d8ef995b4f474ccce40ab80798",
+        "3749e1a2ff47497af45fb90d15d91005bf2d0523",
+        "79f36cfd4d0d33af34ce4a07979c5195b149ba99"
+      ],
+      "tests": {
+        "runs": [
+          {
+            "command": "npx vitest run tests/cleanSourceDocs.test.ts",
+            "exit": 0,
+            "files": [
+              {
+                "path": "tests/cleanSourceDocs.test.ts",
+                "tests": 8,
+                "passed": 8,
+                "failed": 0,
+                "skipped": 0
+              }
+            ]
+          }
+        ],
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0
+      },
+      "evidence": [
+        "npm run check:clean-source at 60d0255c: exit 0, 15 of 15 helper steps ok (clone, frozen install, build, doctor, init, keyless turn, verifiers, cross-process resume).",
+        "Hosted: run 38132701944, job 114450140347 'clean-source' concluded success on main 5ea5e866 (https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944/job/114450140347). The run as a whole failed, at build-test (22) step 'Full suite and coverage thresholds'; clean-source is a separate job.",
+        "No kernel-missing message in src names build:workspace any more (3749e1a2)."
+      ],
+      "receipts": [
+        "qualification/2026-10-11-P0-32/AMC-1509/README.md",
+        "qualification/2026-10-11-P0-32/AMC-1509/clean-source.txt",
+        "qualification/2026-10-11-P0-32/AMC-1509/hosted-clean-source.json",
+        "qualification/2026-10-11-P0-32/AMC-1509/reconciliation-summary.json"
+      ],
+      "residualRisks": [
+        {
+          "risk": "Public npm install of the released package is not part of this issue.",
+          "owner": "P0-40"
+        }
+      ]
+    },
+    {
+      "id": "AMC-1514",
+      "title": "Provider capability and tool-name admission",
+      "verdict": "Done",
+      "mergedShas": [
+        "e79002210e23bb60742c048cbf9fffb9c031d108",
+        "9b60d86fd74a7bd3b294c893b506f6da32373623"
+      ],
+      "tests": {
+        "runs": [
+          {
+            "command": "npx vitest run tests/agentLoopRetry.test.ts tests/providerToolNameBinding.test.ts tests/providerToolNames.test.ts",
+            "exit": 0,
+            "files": [
+              {
+                "path": "tests/agentLoopRetry.test.ts",
+                "tests": 13,
+                "passed": 13,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/providerToolNameBinding.test.ts",
+                "tests": 16,
+                "passed": 16,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/providerToolNames.test.ts",
+                "tests": 25,
+                "passed": 25,
+                "failed": 0,
+                "skipped": 0
+              }
+            ]
+          }
+        ],
+        "total": 54,
+        "passed": 54,
+        "failed": 0,
+        "skipped": 0
+      },
+      "evidence": [
+        "The focused run left git status --porcelain empty, so these tests no longer rewrite tracked .amc/keys. P0-07 landed as PR #37 (df89603b, on origin/main).",
+        "Installed (P0-30, qualification/2026-10-11-P0-30/installed-subset.json): the packed CLI advertised amc_fs_read_<digest>, glob and grep; the model's call to the unadvertised name fs_write ended the turn with no tool call and no file; agent-loop verify returned ok.",
+        "Since that run (910a63ba) only 200e6647d (P0-59, the budget-refusal code in llmRuntime.ts) touched the provider path; tool-name binding is unchanged."
+      ],
+      "receipts": [
+        "qualification/2026-10-11-P0-32/AMC-1514/README.md",
+        "qualification/2026-10-11-P0-30/installed-subset.json"
+      ],
+      "residualRisks": []
+    },
+    {
+      "id": "AMC-1521",
+      "title": "Test TypeScript gate in CI and the release gate",
+      "verdict": "Done",
+      "mergedShas": [
+        "f6c4853511d27a386be630cb0dce8f92a3b4451d",
+        "d1f2ee8423446303f397f28aafdd886fd7b4a961",
+        "c49b3ef306940e5e046e3f33f1377895eb30050f"
+      ],
+      "tests": {
+        "runs": [
+          {
+            "command": "npx vitest run tests/reconciliationDefectsReleaseGate.test.ts tests/releaseGateExecution.test.ts",
+            "exit": 0,
+            "files": [
+              {
+                "path": "tests/reconciliationDefectsReleaseGate.test.ts",
+                "tests": 3,
+                "passed": 3,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/releaseGateExecution.test.ts",
+                "tests": 22,
+                "passed": 22,
+                "failed": 0,
+                "skipped": 0
+              }
+            ]
+          }
+        ],
+        "total": 25,
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0
+      },
+      "evidence": [
+        "The step-id assertion is on main: c49b3ef3 (tests/reconciliationDefectsReleaseGate.test.ts) is an ancestor of origin/main 5ea5e866.",
+        "Quick release gate at 60d0255c: step typecheck-tests passed.",
+        "Hosted run 38132701944 at main 5ea5e866: build-test (22) step 'Typecheck tests' concluded success.",
+        "P0-30 recorded 4 of 4 AMC-1521 guard mutations killed (qualification/2026-10-11-P0-30/outcomes.json)."
+      ],
+      "receipts": [
+        "qualification/2026-10-11-P0-32/AMC-1521/README.md",
+        "qualification/2026-10-11-P0-32/release-gate-quick.json",
+        "qualification/2026-10-11-P0-32/AMC-1509/hosted-clean-source.json"
+      ],
+      "residualRisks": []
+    },
+    {
+      "id": "AMC-1522",
+      "title": "Origin-addressed compaction",
+      "verdict": "Done",
+      "mergedShas": [
+        "e79002210e23bb60742c048cbf9fffb9c031d108",
+        "609269ed3d92018bdde9b63a8acf763671dac148"
+      ],
+      "tests": {
+        "runs": [
+          {
+            "command": "npx vitest run tests/surfaceHistoryCompaction.test.ts",
+            "exit": 0,
+            "files": [
+              {
+                "path": "tests/surfaceHistoryCompaction.test.ts",
+                "tests": 14,
+                "passed": 14,
+                "failed": 0,
+                "skipped": 0
+              }
+            ]
+          },
+          {
+            "command": "npx vitest run tests/bundleSpill.test.ts tests/cliSpillCommands.test.ts tests/retentionSpill.test.ts tests/sessionSpillCommitment.test.ts tests/sessionSpillRead.test.ts tests/spillEncryption.test.ts tests/spillLifecycle.test.ts",
+            "exit": 0,
+            "files": [
+              {
+                "path": "tests/bundleSpill.test.ts",
+                "tests": 4,
+                "passed": 4,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/cliSpillCommands.test.ts",
+                "tests": 65,
+                "passed": 65,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/retentionSpill.test.ts",
+                "tests": 5,
+                "passed": 5,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/sessionSpillCommitment.test.ts",
+                "tests": 15,
+                "passed": 15,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/sessionSpillRead.test.ts",
+                "tests": 11,
+                "passed": 11,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/spillEncryption.test.ts",
+                "tests": 25,
+                "passed": 25,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/spillLifecycle.test.ts",
+                "tests": 19,
+                "passed": 19,
+                "failed": 0,
+                "skipped": 0
+              }
+            ]
+          }
+        ],
+        "total": 158,
+        "passed": 158,
+        "failed": 0,
+        "skipped": 0
+      },
+      "evidence": [
+        "Blocker AMC-1547 qualified in P0-30: 7 of 7 guard mutations killed, 1 equivalent, 0 survived, 0 errors at 91678253 and e46bd29d (qualification/2026-10-11-P0-30/outcomes.json).",
+        "No commit touches src/session between e46bd29d and the base 60d0255c."
+      ],
+      "receipts": [
+        "qualification/2026-10-11-P0-32/AMC-1522/README.md",
+        "qualification/2026-10-11-P0-30/outcomes.json",
+        "qualification/2026-10-11-P0-30/mutations.rerun.json"
+      ],
+      "residualRisks": [
+        {
+          "risk": "P0-30's receipt is on int, not yet on origin/main. It reaches main in the same merge as this note.",
+          "owner": "integrator"
+        }
+      ]
+    },
+    {
+      "id": "AMC-1531",
+      "title": "Standalone native parity umbrella",
+      "verdict": "Done",
+      "mergedShas": [
+        "d8d658532dbf532e447f65af6e64eb6fb15e2e0b"
+      ],
+      "tests": {
+        "runs": [
+          {
+            "command": "npx vitest run tests/nativeDelegationInheritance.test.ts tests/subagentHookInheritance.test.ts",
+            "exit": 0,
+            "files": [
+              {
+                "path": "tests/nativeDelegationInheritance.test.ts",
+                "tests": 9,
+                "passed": 9,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/subagentHookInheritance.test.ts",
+                "tests": 11,
+                "passed": 11,
+                "failed": 0,
+                "skipped": 0
+              }
+            ]
+          }
+        ],
+        "total": 20,
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0
+      },
+      "evidence": [
+        "Blocker AMC-1545: P0-31 ran the installed delegated runs on the RC and they passed in 4 of 4 cells; the row was marked failed only because 2 of its 3 guard mutations survived (P0-61).",
+        "P0-61 (f4b4a038, tests only) killed all 3 AMC-1545 mutants with a green baseline (qualification/2026-10-11-P0-56/p0-61-mutations.json).",
+        "src/agent/subagentRunner.ts is unchanged between the RC 756bd697 and the base 60d0255c.",
+        "Quick release gate at 60d0255c: 16 of 16 executed checks passed; packed-install and the full suite were skipped by quick mode, and installed acceptance is P0-31's."
+      ],
+      "receipts": [
+        "qualification/2026-10-11-P0-32/AMC-1531/README.md",
+        "qualification/2026-10-11-P0-31/outcomes.json",
+        "qualification/2026-10-11-P0-56/p0-61-mutations.json",
+        "qualification/2026-10-11-P0-32/release-gate-quick.json"
+      ],
+      "residualRisks": [
+        {
+          "risk": "P0-31 itself recorded AMC-1545 as failed; Done relies on P0-61, its follow-up. If Sid reads the acceptance criterion as 'P0-31's own row', reopen and point to P0-39's installed re-run.",
+          "owner": "Sid"
+        },
+        {
+          "risk": "Linux confined-shell cancellation (AMC-1513) is a recorded exception until the VM's AppArmor userns setting changes.",
+          "owner": "P0-60"
+        },
+        {
+          "risk": "AMC-1511 resume guards have 3 surviving mutants.",
+          "owner": "P2-12"
+        },
+        {
+          "risk": "The installed AMC-1545 runs predate P0-58 (JSONL second writer refused) and P0-59 (budget refusal code); the 2.0.0 tarball re-runs them.",
+          "owner": "P0-39"
+        }
+      ]
+    },
+    {
+      "id": "AMC-484",
+      "title": "CLI/API/Studio decomposition boundary",
+      "verdict": "Done",
+      "mergedShas": [
+        "a0f3644d66c97294a6a602cbda53d8e729afd6f9",
+        "07660bddf8fcfff52165b6f8750acf787986c390"
+      ],
+      "tests": {
+        "runs": [
+          {
+            "command": "npx vitest run tests/architectureBoundaries.test.ts",
+            "exit": 0,
+            "files": [
+              {
+                "path": "tests/architectureBoundaries.test.ts",
+                "tests": 4,
+                "passed": 4,
+                "failed": 0,
+                "skipped": 0
+              }
+            ]
+          }
+        ],
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      "checks": [
+        {
+          "cmd": "npm run -s check:architecture-boundaries",
+          "exit": 0,
+          "failures": 0
+        }
+      ],
+      "evidence": [
+        "PR #22 is 'Complete AMC lifecycle readiness', MERGED 2026-06-12T19:46:46Z from codex/amc-install-persona-readiness (head 220887d2) as squash commit 2b4e35ff, whose tree equals the head's. Its 11 commits include 2a42d6b3, a0f3644d and 07660bdd. gh pr checks: 9 of 9 pass.",
+        "git merge-base --is-ancestor exits 0 for 2a42d6b3, a0f3644d and 07660bdd against origin/main 5ea5e866.",
+        "check:architecture-boundaries exits 0 at 60d0255c with no failures; CI runs it at .github/workflows/ci.yml:134-135, the gate at scripts/release-gate.mjs:263; both passed (quick gate here, hosted run 38132701944)."
+      ],
+      "receipts": [
+        "qualification/2026-10-11-P0-32/AMC-484/README.md",
+        "qualification/2026-10-11-P0-32/pr-22.json",
+        "qualification/2026-10-11-P0-32/release-gate-quick.json"
+      ],
+      "residualRisks": [
+        {
+          "risk": "Broader CLI decomposition (AMC-1500) is paused.",
+          "owner": "P2-29"
+        }
+      ]
+    },
+    {
+      "id": "AMC-482",
+      "title": "Safe API errors",
+      "verdict": "Reopen",
+      "mergedShas": [
+        "2a42d6b31064236db59b2391b543626839d925d7"
+      ],
+      "tests": {
+        "runs": [
+          {
+            "command": "npx vitest run tests/apiRouters.test.ts tests/guardrailControlState.test.ts",
+            "exit": 0,
+            "files": [
+              {
+                "path": "tests/apiRouters.test.ts",
+                "tests": 31,
+                "passed": 31,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/guardrailControlState.test.ts",
+                "tests": 12,
+                "passed": 12,
+                "failed": 0,
+                "skipped": 0
+              }
+            ]
+          },
+          {
+            "command": "npx vitest run tests/apiRequestErrorRoutes.test.ts tests/apiRouterResponseParity.test.ts",
+            "exit": 0,
+            "files": [
+              {
+                "path": "tests/apiRequestErrorRoutes.test.ts",
+                "tests": 64,
+                "passed": 64,
+                "failed": 0,
+                "skipped": 0
+              },
+              {
+                "path": "tests/apiRouterResponseParity.test.ts",
+                "tests": 145,
+                "passed": 145,
+                "failed": 0,
+                "skipped": 0
+              }
+            ]
+          }
+        ],
+        "total": 252,
+        "passed": 252,
+        "failed": 0,
+        "skipped": 0
+      },
+      "evidence": [
+        "Shipped and tested: safe 400s on score routes (tests/apiRouters.test.ts:1272, no SQLite or stack text at :1308-1309); 413 at tests/guardrailControlState.test.ts:486, tests/apiRequestErrorRoutes.test.ts:64 (16 routes) and tests/apiRouterResponseParity.test.ts:231.",
+        "Missing: request-id logging (src/api has only bridgeRequestId and approvalRequestId); a 500 test proving no exception text reaches the body. tests/apiRequestErrorRoutes.test.ts:78 pins the opposite (an Error's message is returned in the 500 body), and no test reaches scoreRouteError's 500 fallback (src/api/scoreRouter.ts:111)."
+      ],
+      "receipts": [
+        "qualification/2026-10-11-P0-32/AMC-482/README.md",
+        "qualification/2026-10-11-P0-32/focused-tests.json"
+      ],
+      "remainingScope": [
+        "Request-id resolution, an X-Request-Id header and a requestId in every apiError body, with one log line per error.",
+        "Generic 500 bodies with the detail logged server-side; change tests/apiRequestErrorRoutes.test.ts:78 in the same PR (contract 5.5), since it encodes the old echo.",
+        "A 500 test for scoreRouteError's fallback, and the compliance-router 413 fix P1-55 already names."
+      ],
+      "owner": "P1-55",
+      "residualRisks": [
+        {
+          "risk": "Until P1-55 lands, a failed /api/v1 call leaves no id and no log line, and some 500 bodies carry exception text.",
+          "owner": "P1-55"
+        }
+      ]
+    }
+  ]
+}

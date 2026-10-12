@@ -1,7 +1,7 @@
-import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { DiagnosticReport, LayerScore } from "../types.js";
 import { readUtf8, pathExists } from "../utils/fs.js";
+import { agentRunFiles } from "../diagnostic/runReportResolution.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
@@ -64,17 +64,10 @@ function normalizedScope(scopeType: "WORKSPACE" | "NODE" | "AGENT", scopeId?: st
 }
 
 function readLatestDiagnosticRun(workspace: string, agentId: string): DiagnosticReport | null {
-  const dir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(dir)) {
-    return null;
-  }
   let best: DiagnosticReport | null = null;
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (!entry.isFile() || !entry.name.endsWith(".json")) {
-      continue;
-    }
+  for (const file of agentRunFiles(workspace, agentId)) {
     try {
-      const parsed = JSON.parse(readUtf8(join(dir, entry.name))) as DiagnosticReport;
+      const parsed = JSON.parse(readUtf8(file)) as DiagnosticReport;
       if (!best || parsed.ts > best.ts) {
         best = parsed;
       }

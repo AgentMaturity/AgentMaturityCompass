@@ -14,7 +14,7 @@ Official references checked on 2026-06-16:
 cd deploy/pulumi/helm-release
 npm install
 pulumi stack init dev
-pulumi config set imageRepository ghcr.io/your-org/amc-studio
+pulumi config set imageRepository ghcr.io/agentmaturity/amc-studio
 pulumi config set imageTag latest
 pulumi preview
 pulumi up
@@ -54,8 +54,9 @@ Common stack config keys:
 | `releaseName` | `amc` | Helm release name |
 | `namespace` | `amc-system` | Kubernetes namespace |
 | `chartPath` | `../../helm/amc` | Local AMC Helm chart path |
-| `imageRepository` | `ghcr.io/your-org/amc-studio` | AMC image repository |
+| `imageRepository` | `ghcr.io/agentmaturity/amc-studio` | AMC image repository |
 | `imageTag` | `latest` | AMC image tag |
+| `imageDigest` | empty | `sha256:<64 hex>`; when set the chart deploys `repository@digest` and ignores `imageTag` |
 | `bootstrapSecretName` | `amc-bootstrap` | Existing Kubernetes Secret with bootstrap keys |
 | `ingressEnabled` | `false` | Enable chart ingress |
 | `ingressHost` | `amc.example.com` | Hostname for ingress |
@@ -73,9 +74,9 @@ pulumi config set --path 'valuesFiles[0]' ../../helm/amc/examples/values-ingress
 ## Verify
 
 ```bash
-kubectl -n amc-system rollout status deploy/amc
+kubectl -n amc-system rollout status deploy/amc-amc
 kubectl -n amc-system get pods,svc,ingress,pvc
-kubectl -n amc-system port-forward svc/amc 3212:3212
+kubectl -n amc-system port-forward svc/amc-amc 3212:3212
 ```
 
 Then open `http://127.0.0.1:3212/console`.

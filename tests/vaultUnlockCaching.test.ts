@@ -1,3 +1,4 @@
+import { legacyV1Payload } from "./helpers/legacyVault.js";
 import { spawnSync } from "node:child_process";
 import { copyFileSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -5,9 +6,10 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
-import { lockVault, unlockVault, vaultPaths, vaultStatus, getVaultSecret, setVaultSecret } from "../src/vault/vault.js";
+import { getVaultPrivateKeyPem, lockVault, unlockVault, vaultPaths, vaultStatus, getVaultSecret, setVaultSecret } from "../src/vault/vault.js";
 import * as vaultCrypto from "../src/vault/vaultCrypto.js";
 import { readBlobKeyMaterial } from "../src/storage/blobs/blobKeys.js";
+import { publicKeyFromPrivate } from "../src/crypto/keyHistoryEnvelope.js";
 
 /**
  * Unlocking an already-unlocked vault must not re-run the passphrase KDF.
@@ -22,6 +24,22 @@ import { readBlobKeyMaterial } from "../src/storage/blobs/blobKeys.js";
  * disk. Keying it on the passphrase alone would be faster and wrong: a vault
  * replaced underneath a running process would keep serving the old keys.
  */
+/**
+ * Turns a P1-08 workspace back into the 1.x layout these legacy cases model: no key set, no purpose files, no key
+ * revocation list, and a machine that never committed a key set for it (a fresh AMC home). On the machine that did, a
+ * replaced vault or a deleted key set is refused by the key-set binding (tests/keys/workspaceWriter.test.ts).
+ */
+function asLegacyWorkspace(dir: string): void {
+  const keys = vaultPaths(dir).keysDir;
+  for (const name of readdirSync(keys)) {
+    if (name === "keyset.json" || name === "revocations.signed.json" || name === "rotations" || name === "statements"
+      || (/^[a-z-]+(\.pub|_history\.json)$/.test(name) && !/^(monitor|auditor|lease|session)(_ed25519\.pub|_history\.json)$/.test(name))) {
+      rmSync(join(keys, name), { recursive: true, force: true });
+    }
+  }
+  vi.stubEnv("AMC_HOME", mkdtempSync(join(tmpdir(), "amc-legacy-home-")));
+}
+
 const PASS = "vault-unlock-caching-pass";
 const OTHER_PASS = "vault-unlock-caching-other";
 const roots: string[] = [];
@@ -48,7 +66,8 @@ function diskState(dir: string): Record<string, { bytes: string; mtimeMs: number
   return Object.fromEntries([
     paths.vaultFile,
     paths.metaFile,
-    ...readdirSync(paths.keysDir).sort().map((name) => join(paths.keysDir, name))
+    // Every file under keys/, recursively: each key-set generation keeps its recovery manifest in keys/rotations/ (P1-08).
+    ...readdirSync(paths.keysDir, { recursive: true }).map(String).sort().map((name) => join(paths.keysDir, name)).filter((path) => statSync(path).isFile())
   ].map((path) => {
     const stat = statSync(path);
     return [path, { bytes: readFileSync(path).toString("hex"), mtimeMs: stat.mtimeMs, mode: stat.mode }];
@@ -156,7 +175,7 @@ describe("unlocking an already-unlocked vault", () => {
   it("refreshes legacy secrets in memory without upgrading missing lease or session keys", () => {
     const dir = workspace(PASS);
     const paths = vaultPaths(dir);
-    const payload = JSON.parse(vaultCrypto.decryptVaultPayload(JSON.parse(readFileSync(paths.vaultFile, "utf8")), PASS).toString("utf8"));
+    const payload = legacyV1Payload(paths.vaultFile, PASS);
     delete payload.leasePrivateKeyPem;
     delete payload.sessionPrivateKeyPem;
     payload.secrets["legacy-token"] = "legacy-value";
@@ -216,4 +235,77 @@ describe("unlocking an already-unlocked vault", () => {
       else expect(vaultStatus(dir).exists).toBe(false);
     }
   );
+
+  it.each(["locked", "unlocked"] as const)("a legacy key upgrade that throws leaves a previously %s vault locked with no payload (P0-30)", (prior) => {
+    const dir = workspace(PASS);
+    if (prior === "locked") lockVault(dir);
+    else unlockVault(dir, PASS);
+    // A legacy payload without lease and session keys, beside an existing lease.pub: unlock's upgrade refuses
+    // to replace that public key without an authenticated rotation, and throws after decryption succeeded.
+    const path = vaultPaths(dir).vaultFile;
+    const payload = legacyV1Payload(path, PASS);
+    delete payload.leasePrivateKeyPem;
+    delete payload.sessionPrivateKeyPem;
+    writeFileSync(path, JSON.stringify(vaultCrypto.encryptVaultPayload(Buffer.from(JSON.stringify(payload)), PASS)));
+    asLegacyWorkspace(dir);
+    const before = diskState(dir);
+    // A lease.pub with no lease key behind it cannot be checked, and a new lease key would silently replace it.
+    expect(() => unlockVault(dir, PASS)).toThrow(/lease_ed25519\.pub exists, but this older vault holds no lease private key[\s\S]*move/);
+    expect(vaultStatus(dir).unlocked).toBe(false);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    expect(() => getVaultPrivateKeyPem(dir, "monitor")).toThrow(/Vault locked/);
+    expect(diskState(dir)).toEqual(before);
+  });
+
+  it.each(["wrong-passphrase", "replaced", "corrupt"] as const)("a failed unlock (%s) drops the session it found open (P0-30 review)", (failure) => {
+    const dir = workspace(PASS);
+    unlockVault(dir, PASS);
+    const path = vaultPaths(dir).vaultFile;
+    if (failure === "replaced") copyFileSync(vaultPaths(workspace(OTHER_PASS)).vaultFile, path);
+    if (failure === "corrupt") writeFileSync(path, "not a vault");
+    expect(() => unlockVault(dir, failure === "wrong-passphrase" ? OTHER_PASS : PASS)).toThrow(/Vault unlock failed/);
+    expect(vaultStatus(dir).unlocked).toBe(false);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    expect(() => getVaultPrivateKeyPem(dir, "monitor"), "the old session's keys must not be served").toThrow(/Vault locked/);
+  });
+
+  it("a legacy vault missing only its session key keeps its lease key and unlocks (P0-30 review)", () => {
+    const dir = workspace(PASS);
+    lockVault(dir);
+    const paths = vaultPaths(dir);
+    const payload = legacyV1Payload(paths.vaultFile, PASS);
+    delete payload.sessionPrivateKeyPem;
+    writeFileSync(paths.vaultFile, JSON.stringify(vaultCrypto.encryptVaultPayload(Buffer.from(JSON.stringify(payload)), PASS)));
+    rmSync(paths.sessionPublic);
+    rmSync(paths.sessionHistory);
+    // P1-08 files a 1.x workspace never had, on a machine that never committed a key set for it.
+    asLegacyWorkspace(dir);
+    const leasePublic = readFileSync(paths.leasePublic, "utf8");
+    const leaseHistory = readFileSync(paths.leaseHistory, "utf8");
+
+    unlockVault(dir, PASS);
+    expect(vaultStatus(dir).unlocked).toBe(true);
+    expect(getVaultPrivateKeyPem(dir, "lease")).toBe(payload.leasePrivateKeyPem);
+    expect(readFileSync(paths.leasePublic, "utf8")).toBe(leasePublic);
+    expect(readFileSync(paths.leaseHistory, "utf8")).toBe(leaseHistory);
+    expect(publicKeyFromPrivate(getVaultPrivateKeyPem(dir, "session"))).toBe(readFileSync(paths.sessionPublic, "utf8"));
+    lockVault(dir);
+    unlockVault(dir, PASS);
+    expect(vaultStatus(dir).unlocked).toBe(true);
+  });
+
+  it.each(["missing", "mismatched"] as const)("unlock refuses a vault whose published auditor key is %s, as an interrupted key write leaves it (P0-30 review)", (state) => {
+    const dir = workspace(PASS);
+    lockVault(dir);
+    const paths = vaultPaths(dir);
+    if (state === "missing") rmSync(paths.auditorPublic);
+    else writeFileSync(paths.auditorPublic, readFileSync(vaultPaths(workspace(OTHER_PASS)).auditorPublic));
+    const before = diskState(dir);
+    expect(() => unlockVault(dir, PASS)).toThrow(state === "missing"
+      ? /auditor_ed25519\.pub is missing\. A key write was interrupted/ : /auditor_ed25519\.pub does not match the vault's auditor key/);
+    expect(vaultStatus(dir).unlocked).toBe(false);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    expect(() => getVaultPrivateKeyPem(dir, "auditor")).toThrow(/Vault locked/);
+    expect(diskState(dir)).toEqual(before);
+  });
 });

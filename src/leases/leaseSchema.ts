@@ -37,7 +37,10 @@ export const leasePayloadSchema = z.object({
   maxTokensPerMinute: z.number().int().positive(),
   maxRequestsPerMinute: z.number().int().positive(),
   maxCostUsdPerDay: z.number().positive().nullable(),
-  nonce: z.string().min(8)
+  nonce: z.string().min(8),
+  // The users.yaml user the lease is issued for (P1-78). Only a pointer: the bind resolves it against the signed users.yaml
+  // and refuses one that is not an active user there. Absent on leases issued before P1-78 and by the CLI.
+  principal: z.strictObject({ userId: z.string().min(1) }).optional()
 });
 
 export type LeaseScope = z.infer<typeof leaseScopeSchema>;

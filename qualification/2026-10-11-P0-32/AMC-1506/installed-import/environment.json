@@ -1,0 +1,86 @@
+{
+  "rcCommit": "756bd6977dce19f4ef781bdb492c38d6777964f7",
+  "tarball": "agent-maturity-compass-1.2.0.tgz (P0-31 RC)",
+  "tarballSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+  "installedCliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165",
+  "install": "npm install --offline --no-audit --no-fund <tarball> into a new empty prefix (npm 10.9.9); exit 0, 170 packages, about 8 s",
+  "node": "v22.23.3",
+  "os": "macOS 26.6.2 arm64 (this host); local run, not CI",
+  "workspace": "new temporary directory with an empty .amc/, HOME pointed at a new empty directory",
+  "commands": [
+    {
+      "cmd": "amc import <fixture-pi> --agent default --no-retain-original --json (installed RC, Node 22)",
+      "exit": 0,
+      "durationMs": 1595
+    },
+    {
+      "cmd": "amc import <fixture-config> --agent default --no-retain-original (installed RC, Node 22)",
+      "exit": 0,
+      "durationMs": 1130
+    },
+    {
+      "cmd": "amc imports show <importId> --json (installed RC, Node 22)",
+      "exit": 0,
+      "durationMs": 926
+    }
+  ],
+  "observed": {
+    "claimKind": "self_reported",
+    "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable",
+    "statusDimensions": {
+      "applicability": {
+        "state": "applicable"
+      },
+      "evidence": "incomplete",
+      "result": "not_evaluated",
+      "enforcement": {
+        "state": "none"
+      },
+      "review": "pending"
+    },
+    "normalization": {
+      "sourceTrust": "SELF_REPORTED",
+      "evaluation": "NOT_EVALUATED",
+      "confidenceMeaning": "format-classification-only"
+    },
+    "report": {
+      "status": "UNSIGNED",
+      "verificationPassed": false,
+      "integrityIndex": 0,
+      "trustLabel": "UNRELIABLE — DO NOT USE FOR CLAIMS",
+      "correlationRatio": 0,
+      "evidenceCoverage": 0,
+      "evidenceTrustCoverage": {
+        "observed": 0,
+        "attested": 0,
+        "selfReported": 1
+      },
+      "importProvenance": {
+        "evaluationPerformed": false,
+        "sourceTrustTier": "SELF_REPORTED",
+        "artifactCount": 1,
+        "recordCount": 5,
+        "evidenceRefs": [
+          "import:pi-session.jsonl:f485025150b3"
+        ]
+      },
+      "layerScores": [],
+      "questionScores": []
+    },
+    "evidenceReadiness": {
+      "schemaVersion": "2026-07-10",
+      "status": "UNVERIFIED",
+      "claimEligible": false,
+      "label": "External import — not evaluated",
+      "reasonCodes": [
+        "NO_ACCEPTED_EVIDENCE"
+      ],
+      "claimBoundary": "Imported content is SELF_REPORTED. Importing or signing an artifact does not verify source claims or perform a maturity evaluation.",
+      "nextStep": "Capture observed evidence or obtain a named attestation, then run a full AMC assessment.",
+      "thresholds": {
+        "readyIntegrity": 0.6,
+        "insufficientIntegrityBelow": 0.4
+      }
+    }
+  }
+}

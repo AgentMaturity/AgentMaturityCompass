@@ -15,6 +15,7 @@ import { listAgents } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { onboardingRunForApi, onboardingStatusForApi } from "./onboardingApi.js";
 import { runDiagnostic, generateReport, loadRunReport } from "../diagnostic/runner.js";
+import { agentRunFiles } from "../diagnostic/runReportResolution.js";
 import { evaluateDiagnosticEvidenceReadiness, summarizeDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
@@ -90,6 +91,7 @@ import { exportEvidenceBundle } from "../bundles/bundle.js";
 import { exportPolicyPack } from "../exports/policyExport.js";
 import { verifyReceipt } from "../receipts/receipt.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import {
   AgentTokenGrantError,
   ensureAgentToken,
@@ -104,7 +106,7 @@ import { normalizeActionClass } from "../tickets/execTicketCli.js";
 import type { ActionClass } from "../types.js";
 import { runGovernorCheck } from "../governor/governorCli.js";
 import { issueLeaseForCli } from "../leases/leaseCli.js";
-import { loadLeaseRevocations, revokeLease, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
+import { readRevokedLeaseIds, readVerifiedLeaseRevocations, revokeLease } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { serveConsolePath } from "../console/consoleServer.js";
@@ -200,7 +202,7 @@ import {
   verifyTransparencyMerkle
 } from "../transparency/merkleIndexStore.js";
 import { verifyWorkspaceProofBundle } from "../transparency/workspaceProofBundle.js";
-import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { appendHumanActionEvent } from "../auth/humanLog.js";
 import { frameworkChoices, type ComplianceFramework } from "../compliance/frameworks.js";
 import { generateComplianceReport, verifyComplianceMapsSignature } from "../compliance/complianceEngine.js";
@@ -1146,15 +1148,15 @@ function verifyLeaseForScope(params: {
       error: "missing lease token"
     };
   }
-  const revocationSig = verifyLeaseRevocationsSignature(params.workspace);
-  if (!revocationSig.valid) {
+  const revocations = readRevokedLeaseIds(params.workspace);
+  if (!revocations.ok) {
     return {
       ok: false,
       status: 401,
-      error: `lease revocation signature invalid: ${revocationSig.reason ?? "unknown"}`
+      error: `lease revocation signature invalid: ${revocations.reason}`
     };
   }
-  const revoked = new Set(loadLeaseRevocations(params.workspace).revocations.map((row) => row.leaseId));
+  const revoked = revocations.ids;
   const expectedWorkspaceId = workspaceIdFromDirectory(params.workspace);
   const verification = verifyLeaseToken({
     workspace: params.workspace,
@@ -1298,17 +1300,11 @@ function parseComplianceFramework(raw: string | null): ComplianceFramework | nul
 }
 
 function agentLastStatus(workspace: string, agentId: string): AgentStatusResponse {
-  const runDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(runDir)) {
+  const latest = agentRunFiles(workspace, agentId).at(-1);
+  if (!latest) {
     return { agentId, latestRun: null };
   }
-  const files = readdirSync(runDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) {
-    return { agentId, latestRun: null };
-  }
-  const last = JSON.parse(readUtf8(join(runDir, files[files.length - 1]!))) as Record<string, unknown>;
+  const last = JSON.parse(readUtf8(latest)) as Record<string, unknown>;
   return {
     agentId,
     latestRun: {
@@ -1455,7 +1451,7 @@ function writeConsoleSnapshot(workspace: string): {
     const digest = sha256Hex(Buffer.from(JSON.stringify(payload), "utf8"));
     const sig = {
       digestSha256: digest,
-      signature: signHexDigest(digest, getPrivateKeyPem(workspace, "auditor")),
+      signature: signHexDigest(digest, getSigningKey(workspace, "artifact-seal")),
       signedTs: Date.now(),
       signer: "auditor"
     };
@@ -2251,7 +2247,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         allowedOrigins: nativeAllowedBrowserOrigins(options.host, (server.address() as { port?: number } | null)?.port ?? options.port,
           [...(options.corsAllowedOrigins ?? []), ...(options.nativeAllowedOrigins ?? [])]), readOnly: requiresReadOnlyMode(options.workspace) })) return;
 
-      // Bind the authenticated request context once; each route retains its role list.
+      // Bind the authenticated request context once; each route retains its role list. P1-78: approvals record who raised them.
+      const initiator = auth.userId ?? (auth.agentId ? `agent:${auth.agentId}` : "unknown");
       const requireRouteRoles = (roles: UserRole[]): boolean =>
         requireRoles({ auth, res, workspace: options.workspace, roles });
 
@@ -4191,7 +4188,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const out = assuranceWaiverRequestForApi({
-          workspace: options.workspace,
+          workspace: options.workspace, initiator,
           agentId: resolveAgentId(options.workspace),
           reason: parsed.reason.trim(),
           hours: Number.isFinite(Number(parsed.hours)) ? Number(parsed.hours) : 24
@@ -4479,7 +4476,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         if (externalShare) {
           const requested = auditBinderExportRequestForApi({
-            workspace: options.workspace,
+            workspace: options.workspace, initiator,
             agentId: resolveAgentId(options.workspace, auth.agentId ?? "default"),
             scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
             scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
@@ -5181,7 +5178,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         if (parsed.externalShare === true) {
           const requested = passportExportRequestForApi({
-            workspace: options.workspace,
+            workspace: options.workspace, initiator,
             agentId: resolveAgentId(options.workspace, auth.agentId ?? "default"),
             scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
             scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
@@ -5550,13 +5547,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
-        const verify = verifyLeaseRevocationsSignature(options.workspace);
-        const revocations = loadLeaseRevocations(options.workspace);
+        // One verified read: the count never comes from bytes other than those whose signature verified.
+        const read = readVerifiedLeaseRevocations(options.workspace);
         json(res, 200, {
-          revocationSignatureValid: verify.valid,
-          revocationSignatureReason: verify.reason,
-          revokedLeaseCount: revocations.revocations.length,
-          updatedTs: revocations.updatedTs
+          revocationSignatureValid: read.ok,
+          revocationSignatureReason: read.ok ? null : read.reason,
+          revokedLeaseCount: read.ok ? read.store.revocations.length : null,
+          updatedTs: read.ok ? read.store.updatedTs : null
         });
         return;
       }
@@ -6266,7 +6263,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = JSON.parse(body) as { receipt?: string };
         const receipt = parsed.receipt ?? "";
-        const verification = verifyReceipt(receipt, getPublicKeyHistory(options.workspace, "monitor"));
+        const verification = verifyReceipt(receipt, getPurposeKeyHistory(options.workspace, "receipt"));
         json(res, verification.ok ? 200 : 400, verification);
         return;
       }
@@ -6346,7 +6343,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const response = toolhub.createIntent({
-          agentId,
+          agentId, initiator,
           workOrderId: parsed.workOrderId,
           toolName: parsed.toolName,
           args: parsed.args ?? {},
@@ -7659,7 +7656,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const requested = benchPublishRequestForApi({
-          workspace: options.workspace,
+          workspace: options.workspace, initiator,
           agentId: parsed.agentId ? resolveAgentId(options.workspace, parsed.agentId) : "default",
           file: parsed.file,
           registryDir: parsed.registryDir,
@@ -8334,7 +8331,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const agentId = resolveAgentId(options.workspace, parsed.agentId ?? "default");
         const requested = await requestPluginInstall({
-          workspace: options.workspace,
+          workspace: options.workspace, initiator,
           agentId,
           registryId: parsed.registryId,
           pluginRef: parsed.pluginRef,
@@ -8374,7 +8371,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const agentId = resolveAgentId(options.workspace, parsed.agentId ?? "default");
         const requested = await requestPluginInstall({
-          workspace: options.workspace,
+          workspace: options.workspace, initiator,
           agentId,
           registryId: parsed.registryId,
           pluginRef: `${parsed.pluginId}@${parsed.to ?? "latest"}`,
@@ -8413,7 +8410,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const agentId = resolveAgentId(options.workspace, parsed.agentId ?? "default");
         const requested = requestPluginRemove({
-          workspace: options.workspace,
+          workspace: options.workspace, initiator,
           agentId,
           pluginId: parsed.pluginId
         });

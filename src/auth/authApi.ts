@@ -3,7 +3,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import YAML from "yaml";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { parseCookieHeader, issueSessionToken, verifySessionToken, type SessionPayload } from "./sessionTokens.js";
@@ -104,7 +104,7 @@ function signUsersConfig(workspace: string): string {
     throw new Error(`users config not found: ${path}`);
   }
   const digest = sha256Hex(readFileSync(path));
-  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  const signature = signHexDigest(digest, getSigningKey(workspace, "config-signature"));
   const payload: UsersSignature = {
     digestSha256: digest,
     signature,
@@ -172,6 +172,15 @@ export function listUsers(workspace: string): UserRecord[] {
 export function listVerifiedUsers(workspace: string): { users: UserRecord[]; signerFingerprint: string } {
   const { config, signerPem } = loadSignedUsersConfig(workspace);
   return { users: config.users.slice().sort((a, b) => a.username.localeCompare(b.username)), signerFingerprint: sha256Hex(Buffer.from(signerPem!, "utf8")) };
+}
+
+/**
+ * The active user `userId` of the signed users.yaml, from one verified read, or null when no active user has that id
+ * (P1-78: a lease's principal and a native task's lease issuer resolve through this). Throws when users.yaml is missing
+ * or does not verify.
+ */
+export function activeUserRecord(workspace: string, userId: string): UserRecord | null {
+  return listVerifiedUsers(workspace).users.find((user) => user.userId === userId && user.status === "ACTIVE") ?? null;
 }
 
 export function addUser(params: {

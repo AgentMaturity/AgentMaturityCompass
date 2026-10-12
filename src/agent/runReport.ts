@@ -22,7 +22,7 @@
  * happened, `verify` says whether the log can prove it.
  */
 import { openLedger } from "../ledger/ledger.js";
-import { LEDGER_UNANCHORED_MESSAGE, verifyLedgerIntegrity } from "../ledger/ledgerVerification.js";
+import { LEDGER_UNANCHORED_MESSAGE, verifyLedgerIntegrity, verifyNativeSessionContinuation } from "../ledger/ledgerVerification.js";
 import type { TrustContext } from "../trust/trustContext.js";
 import type { IssuerAdmission } from "../trust/admission.js";
 import { isKeyRefused } from "../trust/signatureCheck.js";
@@ -170,8 +170,13 @@ export interface RequestDerivationRow {
 
 export interface AgentRunVerification {
   readonly sessionId: string;
-  /** Every check below, conjoined; with a trust context (P0-09) it also needs the monitor key admitted (anchored). */
+  /**
+   * Every check below, conjoined, over the complete ledger; with a trust context (P0-09) it also needs the monitor
+   * key admitted (anchored). Always false for a verified prefix, which is `prefixVerified`, never `ok`.
+   */
   readonly ok: boolean;
+  /** The same conjunction over a verified prefix (P0-14): a distinct, weaker state that never sets `ok`. */
+  readonly prefixVerified?: boolean;
   /** The integrity checks alone: chains, signatures, unsigned rows and request derivation. */
   readonly integrityOk: boolean;
   /** The workspace-wide chain verdict, which a session cannot be sound without. */
@@ -182,6 +187,21 @@ export interface AgentRunVerification {
   /** Rows whose signature is the literal "unsigned". */
   readonly unsignedRowIds: readonly string[];
   readonly requests: readonly RequestDerivationRow[];
+  /**
+   * "complete-ledger": every session in the workspace verified, finalized ones sealed. "verified-prefix": the same
+   * row checks, but the unended, unsealed legacy sessions in `unfinalizedSessions` (a running gateway's) were named
+   * instead of failed, so nothing is claimed about how they end (verifyNativeSessionContinuation). Absent from
+   * reports written before P0-14.
+   */
+  readonly scope?: "complete-ledger" | "verified-prefix";
+  readonly unfinalizedSessions?: readonly string[];
+  /**
+   * P0-57, live scope only: whether the target session is closed with a valid seal, and whether every check other than
+   * that one passed, both from the same read as the chain verdict, so a caller decides finalization and integrity on
+   * one snapshot.
+   */
+  readonly targetFinalized?: boolean;
+  readonly intactUnlessUnfinalized?: boolean;
   /**
    * What the verdict above rests on.
    *
@@ -209,9 +229,27 @@ export interface AgentRunVerification {
  * what it sent. An operator asking "can this run be reconstructed" deserves
  * "no, lawfully" rather than a green tick.
  */
-export async function verifyAgentRun(workspace: string, sessionId: string, trust?: TrustContext): Promise<AgentRunVerification> {
-  const result = await verifyLedgerIntegrity(workspace, trust ? { trust } : {});
+export interface AgentRunVerifyOptions {
+  /** A running Studio's own gateway session is never sealed while it serves: name such sessions instead of failing (SQLite only). */
+  readonly allowLiveLegacySessions?: boolean;
+}
+
+export async function verifyAgentRun(workspace: string, sessionId: string, trust?: TrustContext, options: AgentRunVerifyOptions = {}): Promise<AgentRunVerification> {
+  // Only a positively SQLite workspace gets the live scope; an unknown or missing marker keeps the strict verifier.
+  const live = options.allowLiveLegacySessions === true && readSessionStoreMarker(workspace) === "sqlite"
+    ? verifyNativeSessionContinuation(workspace, sessionId, trust ? { trust } : {}) : null;
+  const result = live ?? verifyLedgerIntegrity(workspace, trust ? { trust } : {});
+  // Another native session that is open or interrupted is unfinalized too: a cut session/close leaves that shape.
+  const otherLive = [...result.sessions.open, ...result.sessions.interrupted].filter((id) => id !== sessionId);
+  const unfinalizedSessions = [...new Set([...(live?.incompleteLegacySessions ?? []), ...otherLive])];
   const sessionChainErrors: string[] = [];
+  if (!live) {
+    for (const id of otherLive) sessionChainErrors.push(`Session ${id} is not finalized; a complete-ledger verdict needs every other session closed and sealed`);
+  }
+  // A prefix verdict covers a finalized target only: its own session must be closed with a valid seal.
+  if (live && !live.sessions.closed.includes(sessionId)) {
+    sessionChainErrors.push(`Session ${sessionId} is not closed and sealed; a verified prefix needs a finalized target`);
+  }
   let unsignedRowIds: string[];
   if (readSessionStoreMarker(workspace) === "jsonl") {
     // The operations SQLite ledger is not the JSONL session lifecycle.
@@ -252,15 +290,26 @@ export async function verifyAgentRun(workspace: string, sessionId: string, trust
   }));
   const integrityOk = result.chain.ok && sessionChainErrors.length === 0 && unsignedRowIds.length === 0
     && requests.every((request) => request.status === "reconstructed");
+  const targetFinalized = result.sessions.closed.includes(sessionId);
+  const finalizationErrors = live && !targetFinalized ? 1 : 0; // the one pushed above for an unfinalized live target
+  const intactUnlessUnfinalized = result.chain.ok && sessionChainErrors.length === finalizationErrors && unsignedRowIds.length === 0
+    && requests.every((request) => request.status === "reconstructed");
+  const anchoredOk = trust === undefined || result.trustRoot.anchored;
+  const scope = live && unfinalizedSessions.length > 0 ? "verified-prefix" : "complete-ledger";
   return {
     sessionId,
-    ok: integrityOk && (trust === undefined || result.trustRoot.anchored),
+    ok: integrityOk && anchoredOk && scope === "complete-ledger",
+    prefixVerified: live !== null && integrityOk && anchoredOk && scope === "verified-prefix",
     integrityOk,
     ledgerOk: result.chain.ok,
     ledgerErrors: result.chain.errors,
     sessionChainErrors,
     unsignedRowIds,
     requests,
+    scope,
+    unfinalizedSessions,
+    // Only the live scope requires a finalized target (P0-14); the strict verifier keeps its own rules.
+    ...(live ? { targetFinalized, intactUnlessUnfinalized } : {}),
     trustRoot: result.trustRoot
   };
 }
@@ -304,11 +353,15 @@ export function renderRunSummary(summary: AgentRunSummary): string {
 /** Render a verification report for a terminal. */
 export function renderVerifyReport(report: AgentRunVerification): string {
   const lines = [
-    `session ${report.sessionId}: ${report.ok ? "VERIFIED" : report.integrityOk ? "NOT VERIFIED: UNANCHORED (integrity verified, authorship not)" : "NOT VERIFIED"}`,
+    `session ${report.sessionId}: ${report.scope === "verified-prefix"
+      ? report.prefixVerified ? `VERIFIED PREFIX (not finalized: ${(report.unfinalizedSessions ?? []).join(", ")})`
+        : report.integrityOk ? "NOT VERIFIED: UNANCHORED PREFIX (prefix integrity verified, authorship not)" : "NOT VERIFIED"
+      : report.ok ? "VERIFIED" : report.integrityOk ? "NOT VERIFIED: UNANCHORED (integrity verified, authorship not)" : "NOT VERIFIED"}`,
     `  ledger chain        ${report.ledgerOk ? "ok" : `${report.ledgerErrors.length} error(s)`}`,
     `  session chain       ${report.sessionChainErrors.length === 0 ? "ok" : `${report.sessionChainErrors.length} error(s)`}`,
     `  unsigned rows       ${report.unsignedRowIds.length}`,
     `  requests derived    ${report.requests.filter((request) => request.status === "reconstructed").length}/${report.requests.length}`,
+    ...(report.scope ? [`  scope               ${report.scope}${report.unfinalizedSessions?.length ? ` (not finalized: ${report.unfinalizedSessions.join(", ")})` : ""}`] : []),
     // Say what the verdict rests on. VERIFIED over an unanchored run means the
     // rows are internally consistent, not that this workspace wrote them: the
     // key they were checked against lives inside the workspace being checked.

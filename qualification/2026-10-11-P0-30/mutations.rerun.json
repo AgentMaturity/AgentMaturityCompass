@@ -1,0 +1,758 @@
+{
+  "schema": "amc.mutation-batch.result.v1",
+  "commit": "e46bd29d9cd0e1e4018a1a5ae7f323f0bd8143f4",
+  "startedAt": "2026-10-11T00:47:48.710Z",
+  "finishedAt": "2026-10-11T00:52:40.553Z",
+  "node": "v25.5.0",
+  "platform": "darwin arm64",
+  "summary": {
+    "entries": 19,
+    "killed": 17,
+    "survived": 0,
+    "equivalent": 2,
+    "equivalentKilled": 0,
+    "errors": 0,
+    "byIssue": {
+      "AMC-1525": {
+        "entries": 7,
+        "killed": 6,
+        "survived": 0,
+        "equivalent": 1,
+        "other": 0
+      },
+      "AMC-1542": {
+        "entries": 9,
+        "killed": 9,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1547": {
+        "entries": 3,
+        "killed": 2,
+        "survived": 0,
+        "equivalent": 1,
+        "other": 0
+      }
+    }
+  },
+  "baselines": [
+    {
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/crypto/keyHistoryAdmission.test.ts",
+        "tests/crypto/keyHistoryForgery.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 6267,
+      "totals": {
+        "total": 30,
+        "passed": 30,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/crypto/keyHistoryAdmission.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 6837,
+      "totals": {
+        "total": 26,
+        "passed": 26,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/keyHistoryBundleCertificate.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 11029,
+      "totals": {
+        "total": 19,
+        "passed": 19,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/ledgerVerificationReadOnly.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 10198,
+      "totals": {
+        "total": 14,
+        "passed": 14,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/leaseRevocationFailClosed.test.ts",
+        "tests/leaseRevocationWriterIntegrity.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 10227,
+      "totals": {
+        "total": 53,
+        "passed": 53,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/leaseRevocationWriterIntegrity.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 6267,
+      "totals": {
+        "total": 14,
+        "passed": 14,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/leaseRevocationFailClosed.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 12375,
+      "totals": {
+        "total": 39,
+        "passed": 39,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 9623,
+      "totals": {
+        "total": 14,
+        "passed": 14,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/wireDispatcher.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 14237,
+      "totals": {
+        "total": 34,
+        "passed": 34,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/spillLifecycle.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 8973,
+      "totals": {
+        "total": 19,
+        "passed": 19,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/vaultUnlockCaching.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 8354,
+      "totals": {
+        "total": 13,
+        "passed": 13,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/spillLifecycle.test.ts",
+        "tests/sessionSpill.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 9611,
+      "totals": {
+        "total": 34,
+        "passed": 34,
+        "failed": 0
+      }
+    }
+  ],
+  "results": [
+    {
+      "id": "P30-1525-envelope-signature",
+      "oldIssue": "AMC-1525",
+      "file": "src/crypto/keyHistoryEnvelope.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/crypto/keyHistoryAdmission.test.ts",
+        "tests/crypto/keyHistoryForgery.test.ts"
+      ],
+      "note": "Skip the envelope signature check.",
+      "line": 102,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 5552,
+      "totals": {
+        "total": 30,
+        "passed": 23,
+        "failed": 7
+      },
+      "failingTests": [
+        "tests/crypto/keyHistoryAdmission.test.ts > authenticated history admission rejects source tampering even when chain hashes remain unchanged",
+        "tests/crypto/keyHistoryAdmission.test.ts > authenticated history admission rejects revision tampering even when chain hashes remain unchanged",
+        "tests/crypto/keyHistoryAdmission.test.ts > authenticated history admission ordinary digest signatures cannot authorize a history envelope",
+        "tests/crypto/keyHistoryAdmission.test.ts > authenticated history admission does not launder tampered-envelope history through unlock, initialization or secret changes",
+        "tests/crypto/keyHistoryForgery.test.ts > key history forgery rejects a correctly hash-chained attacker key while the live key stays unchanged",
+        "tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations refuses an attacker key appended with a valid hash chain but no valid envelope signature",
+        "tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations bundle and certificate refuse a signer admitted only by a tampered raw history file"
+      ],
+      "failingTestCount": 7,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1525-unsigned-migration",
+      "oldIssue": "AMC-1525",
+      "file": "src/vault/vault.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/crypto/keyHistoryAdmission.test.ts"
+      ],
+      "note": "Accept unsigned migration: restores the pre-fix vault behaviour that sealed a planted bare-array history on any vault create or rewrite.",
+      "line": 201,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 6154,
+      "totals": {
+        "total": 26,
+        "passed": 23,
+        "failed": 3
+      },
+      "failingTests": [
+        "tests/crypto/keyHistoryAdmission.test.ts > authenticated history admission does not launder legacy history through unlock, initialization or secret changes",
+        "tests/crypto/keyHistoryAdmission.test.ts > authenticated history admission does not seed a new vault from an existing planted history list",
+        "tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations never admits an unsigned legacy history without explicit migration"
+      ],
+      "failingTestCount": 3,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1525-bundle-raw-history",
+      "oldIssue": "AMC-1525",
+      "file": "src/bundles/bundle.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/keyHistoryBundleCertificate.test.ts"
+      ],
+      "note": "Read the raw history file in bundle verification. Issuer admission refuses independently, so the kill is the manifest-signature error, not ok:false.",
+      "line": 578,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 8715,
+      "totals": {
+        "total": 19,
+        "passed": 15,
+        "failed": 4
+      },
+      "failingTests": [
+        "tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history bundle rejects an attacker signer admitted by unsigned hash chain",
+        "tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history bundle rejects an attacker signer admitted by rehashed signed envelope",
+        "tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history bundle rejects an attacker signer admitted by transplanted signed envelope",
+        "tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations bundle and certificate refuse a signer admitted only by a tampered raw history file"
+      ],
+      "failingTestCount": 4,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1525-certificate-raw-history",
+      "oldIssue": "AMC-1525",
+      "file": "src/assurance/certificate.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/keyHistoryBundleCertificate.test.ts"
+      ],
+      "note": "Read the raw history file in certificate verification (same caveat as the bundle entry).",
+      "line": 638,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 9115,
+      "totals": {
+        "total": 19,
+        "passed": 15,
+        "failed": 4
+      },
+      "failingTests": [
+        "tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history certificate rejects an attacker signer admitted by unsigned hash chain",
+        "tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history certificate rejects an attacker signer admitted by rehashed signed envelope",
+        "tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history certificate rejects an attacker signer admitted by transplanted signed envelope",
+        "tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations bundle and certificate refuse a signer admitted only by a tampered raw history file"
+      ],
+      "failingTestCount": 4,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1525-cold-vault-initializes",
+      "oldIssue": "AMC-1525",
+      "file": "src/ledger/ledgerVerification.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/ledgerVerificationReadOnly.test.ts"
+      ],
+      "note": "Let a cold vault initialize trust: verification opens the ledger writable, which mints a vault and keys.",
+      "line": 702,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 9737,
+      "totals": {
+        "total": 14,
+        "passed": 9,
+        "failed": 5
+      },
+      "failingTests": [
+        "tests/ledgerVerificationReadOnly.test.ts > cold-process encrypted evidence fails closed for missing-passphrase without modifying disk",
+        "tests/ledgerVerificationReadOnly.test.ts > cold-process encrypted evidence fails closed for missing-vault without modifying disk",
+        "tests/ledgerVerificationReadOnly.test.ts > public-only ledger verification preserves the supplied trust anchors without creating a vault",
+        "tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations bundle and certificate refuse a signer admitted only by a tampered raw history file",
+        "tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations cold verification without a vault refuses and leaves the workspace listing unchanged"
+      ],
+      "failingTestCount": 5,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-empty-set",
+      "oldIssue": "AMC-1542",
+      "file": "src/leases/leaseStore.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/leaseRevocationFailClosed.test.ts",
+        "tests/leaseRevocationWriterIntegrity.test.ts"
+      ],
+      "note": "Return an empty set from revokedLeaseIdSet.",
+      "line": 195,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 11131,
+      "totals": {
+        "total": 53,
+        "passed": 31,
+        "failed": 22
+      },
+      "failingTests": [
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list 'managedHookLease'",
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list 'agentCredentialAuth'",
+        "tests/leaseRevocationFailClosed.test.ts > revokedLeaseIdSet fails closed throws on a tampered store instead of answering an empty set",
+        "tests/leaseRevocationFailClosed.test.ts > revokedLeaseIdSet fails closed refuses a deleted list while preserving its surviving signature",
+        "tests/leaseRevocationFailClosed.test.ts > verifyLeaseForCli checks the store it trusts refuses to verify anything against a tampered revocation store",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store claude-code observe refuses a 'tampered list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store claude-code observe refuses a 'deleted list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store claude-code control refuses a 'tampered list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store claude-code control refuses a 'deleted list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store gemini-cli observe refuses a 'tampered list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store gemini-cli observe refuses a 'deleted list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store gemini-cli control refuses a 'tampered list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store gemini-cli control refuses a 'deleted list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store reports signed malformed store data as an invalid lease rather than throwing from status",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'tampered list'",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'deleted list'",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature"
+      ],
+      "failingTestCount": 22,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-revoke-snapshot",
+      "oldIssue": "AMC-1542",
+      "file": "src/leases/leaseStore.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationWriterIntegrity.test.ts"
+      ],
+      "note": "Skip the snapshot check in revokeLease.",
+      "line": 151,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 5865,
+      "totals": {
+        "total": 14,
+        "passed": 9,
+        "failed": 5
+      },
+      "failingTests": [
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation"
+      ],
+      "failingTestCount": 5,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-publish-verify",
+      "oldIssue": "AMC-1542",
+      "file": "src/leases/leaseStore.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationWriterIntegrity.test.ts"
+      ],
+      "note": "Publish a revocation pair without verifying the prepared signature (the P0-30 publish fix).",
+      "line": 56,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 6233,
+      "totals": {
+        "total": 14,
+        "passed": 11,
+        "failed": 3
+      },
+      "failingTests": [
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot revoke refuses to publish a pair that would not verify (P0-30)",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot resign refuses to publish a pair that would not verify (P0-30)",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot bootstrap refuses to publish a pair that would not verify (P0-30)"
+      ],
+      "failingTestCount": 3,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-consumer-bridge",
+      "oldIssue": "AMC-1542",
+      "file": "src/bridge/bridgeAuth.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/leaseRevocationFailClosed.test.ts"
+      ],
+      "note": "bridgeAuth treats an unverifiable list as empty (fail open).",
+      "line": 204,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 10445,
+      "totals": {
+        "total": 39,
+        "passed": 36,
+        "failed": 3
+      },
+      "failingTests": [
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list 'bridgeAuth'",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'tampered list'",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'deleted list'"
+      ],
+      "failingTestCount": 3,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-consumer-gateway",
+      "oldIssue": "AMC-1542",
+      "file": "src/gateway/server.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/leaseRevocationFailClosed.test.ts"
+      ],
+      "note": "gateway treats an unverifiable list as empty (fail open).",
+      "line": 463,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 11680,
+      "totals": {
+        "total": 39,
+        "passed": 36,
+        "failed": 3
+      },
+      "failingTests": [
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list 'gateway'",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'tampered list' without reaching its upstream",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'deleted list' without reaching its upstream"
+      ],
+      "failingTestCount": 3,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-consumer-router",
+      "oldIssue": "AMC-1542",
+      "file": "src/workspaces/workspaceRouter.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/leaseRevocationFailClosed.test.ts"
+      ],
+      "note": "workspaceRouter treats an unverifiable list as empty (fail open) (the workspace's own agent auth still refuses: defence in depth).",
+      "line": 662,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 11377,
+      "totals": {
+        "total": 39,
+        "passed": 36,
+        "failed": 3
+      },
+      "failingTests": [
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list 'workspaceRouter'",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'tampered list'",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'deleted list'"
+      ],
+      "failingTestCount": 3,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-consumer-studio",
+      "oldIssue": "AMC-1542",
+      "file": "src/studio/studioServer.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts"
+      ],
+      "note": "studioServer verifyLeaseForScope treats an unverifiable list as empty (fail open).",
+      "line": 1149,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 12635,
+      "totals": {
+        "total": 14,
+        "passed": 13,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list 'studioServer verifyLeaseForScope'"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-consumer-wire",
+      "oldIssue": "AMC-1542",
+      "file": "src/wire/wireDispatcher.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/wireDispatcher.test.ts"
+      ],
+      "note": "wireDispatcher treats an unverifiable list as empty (fail open).",
+      "line": 201,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 11366,
+      "totals": {
+        "total": 34,
+        "passed": 32,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list 'wireDispatcher'",
+        "tests/wireDispatcher.test.ts > what a lease must say refuses EVERY lease when the revocation list will not verify"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1547-export-unauthenticated",
+      "oldIssue": "AMC-1547",
+      "file": "src/session/spill/spillLifecycle.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/spillLifecycle.test.ts"
+      ],
+      "note": "Export without the authenticated inventory.",
+      "line": 241,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 8954,
+      "totals": {
+        "total": 19,
+        "passed": 17,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/spillLifecycle.test.ts > authenticated spill inventory distinguishes missing encrypted objects from modified ciphertext",
+        "tests/spillLifecycle.test.ts > P0-30 spill guard coverage export refuses conflicting or unauthentic rows instead of writing an empty index"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-reread-after-verify",
+      "oldIssue": "AMC-1542",
+      "file": "src/leases/leaseStore.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts"
+      ],
+      "note": "Verify the list, then build the revoked set from a second read of the file (the TOCTOU fixed in 8d9077a4).",
+      "line": 178,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 10403,
+      "totals": {
+        "total": 14,
+        "passed": 7,
+        "failed": 7
+      },
+      "failingTests": [
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 a list swapped after its signature check is never used 'managedHookLease' decides on the verified bytes only (P0-30)",
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 a list swapped after its signature check is never used 'bridgeAuth' decides on the verified bytes only (P0-30)",
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 a list swapped after its signature check is never used 'gateway' decides on the verified bytes only (P0-30)",
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 a list swapped after its signature check is never used 'workspaceRouter' decides on the verified bytes only (P0-30)",
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 a list swapped after its signature check is never used 'wireDispatcher' decides on the verified bytes only (P0-30)",
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 a list swapped after its signature check is never used 'agentCredentialAuth' decides on the verified bytes only (P0-30)",
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 a list swapped after its signature check is never used 'studioServer verifyLeaseForScope' decides on the verified bytes only (P0-30)"
+      ],
+      "failingTestCount": 7,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1525-vault-unlock-partial",
+      "oldIssue": "AMC-1525",
+      "file": "src/vault/vault.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/vaultUnlockCaching.test.ts"
+      ],
+      "note": "A failed legacy key upgrade in unlockVault leaves the session unlocked (fixed in 34e7dbb7).",
+      "line": 363,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 8236,
+      "totals": {
+        "total": 13,
+        "passed": 12,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/vaultUnlockCaching.test.ts > unlocking an already-unlocked vault a legacy key upgrade that throws leaves a previously unlocked vault locked with no payload (P0-30)"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1525-vault-unlock-publish-early",
+      "oldIssue": "AMC-1525",
+      "file": "src/vault/vault.ts",
+      "expect": "equivalent",
+      "tests": [
+        "tests/vaultUnlockCaching.test.ts"
+      ],
+      "note": "Publish the session before the upgrade. Equivalent: the upgrade's catch locks the vault, so a throw still leaves it locked; the late publish is defence in depth.",
+      "line": 339,
+      "outcome": "equivalent",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 7796,
+      "totals": {
+        "total": 13,
+        "passed": 13,
+        "failed": 0
+      },
+      "failingTests": [],
+      "failingTestCount": 0,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1547-store-root",
+      "oldIssue": "AMC-1547",
+      "file": "src/session/spill/spillStore.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/spillLifecycle.test.ts"
+      ],
+      "note": "Allow a spill root outside the workspace (spillStore.ts storageRoot).",
+      "line": 82,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 9165,
+      "totals": {
+        "total": 19,
+        "passed": 17,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/spillLifecycle.test.ts > P0-30 spill guard coverage a spill root that is the parent of the workspace is refused",
+        "tests/spillLifecycle.test.ts > P0-30 spill guard coverage a spill root that is the sibling of the workspace is refused"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1547-transport-dotdot",
+      "oldIssue": "AMC-1547",
+      "file": "src/session/spill/spillLifecycle.ts",
+      "expect": "equivalent",
+      "tests": [
+        "tests/spillLifecycle.test.ts",
+        "tests/sessionSpill.test.ts"
+      ],
+      "note": "Drop the transport `..` check in spillLifecycle.ts transportDirectory. Equivalent through the public API: parseIndex pins every exported object file to objects/<sha256>.blob before any transport read, and the root is the realpath of the selected directory.",
+      "line": 206,
+      "outcome": "equivalent",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 10542,
+      "totals": {
+        "total": 34,
+        "passed": 34,
+        "failed": 0
+      },
+      "failingTests": [],
+      "failingTestCount": 0,
+      "failedFiles": []
+    }
+  ]
+}

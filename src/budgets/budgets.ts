@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { openLedger } from "../ledger/ledger.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -119,7 +119,7 @@ export function signBudgetsConfig(workspace: string): string {
   const bytes = readFileSync(path);
   budgetsSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
   const digest = sha256Hex(bytes);
-  const sig = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  const sig = signHexDigest(digest, getSigningKey(workspace, "config-signature"));
   const payload: SignedDigest = {
     digestSha256: digest,
     signature: sig,

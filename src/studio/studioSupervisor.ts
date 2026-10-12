@@ -570,6 +570,9 @@ export async function runStudioForeground(params: {
   };
 }
 
+/** How long a live Studio daemon may take to write its state file. */
+const STUDIO_DAEMON_START_MS = 60_000;
+
 export async function startStudioDaemon(workspace: string, options: StartStudioDaemonOptions = {}): Promise<StudioState> {
   if (!options.hostDir) {
     ensureWorkspace(workspace);
@@ -608,19 +611,23 @@ export async function startStudioDaemon(workspace: string, options: StartStudioD
     stdio: ["ignore", outFd, errFd],
     env: process.env
   });
+  // P0-62: a daemon that dies during startup is reported at once with its exit, and a live one is given
+  // STUDIO_DAEMON_START_MS, not a fixed 6 s that a loaded host can outlast while the daemon is still booting.
+  let exited: string | null = null;
+  child.once("exit", (code, signal) => { exited = signal ? `signal ${signal}` : `exit code ${code}`; });
   child.unref();
 
-  // wait for state file
   const started = Date.now();
-  while (Date.now() - started < 6000) {
+  while (Date.now() - started < STUDIO_DAEMON_START_MS) {
     const state = readStudioState(workspace);
     if (state && state.pid > 0 && processRunning(state.pid)) {
       return state;
     }
+    if (exited !== null) throw new Error(`Studio daemon exited during startup (${exited}). See ${logFile}.`);
     await new Promise((resolvePromise) => setTimeout(resolvePromise, 100));
   }
 
-  throw new Error("Studio daemon failed to start in time. Check `amc logs`.");
+  throw new Error(`Studio daemon did not start within ${STUDIO_DAEMON_START_MS / 1000} s. See ${logFile}.`);
 }
 
 export function stopStudioDaemon(workspace: string): { stopped: boolean; message: string } {

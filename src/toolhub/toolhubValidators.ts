@@ -10,7 +10,7 @@ import {
 } from "./toolArgumentRoles.js";
 import { isAbsolute, join, normalize, relative, resolve } from "node:path";
 import YAML from "yaml";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { defaultToolsConfig, toolsConfigSchema, type ToolDefinition, type ToolsConfig } from "./toolsSchema.js";
@@ -72,7 +72,7 @@ export function signToolsConfig(workspace: string, explicitPath?: string): strin
   // Validate and sign the same snapshot; never endorse malformed edited grants.
   toolsConfigSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
   const digest = sha256Hex(bytes);
-  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  const signature = signHexDigest(digest, getSigningKey(workspace, "config-signature"));
   const payload: SignedDigest = {
     digestSha256: digest,
     signature,

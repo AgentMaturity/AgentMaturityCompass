@@ -1,116 +1,105 @@
 name: Release
 
+# P0-34: a v*.*.* tag push is the only trigger. No dispatch input, pull_request or pull_request_target trigger can
+# choose what is released or reach the release environment; to retry, re-run the jobs of the tag's run.
 on:
   push:
     tags:
       - "v*.*.*"
-  workflow_dispatch:
-    inputs:
-      release_tag:
-        description: "Existing vX.Y.Z tag to release"
-        required: true
-        type: string
 
 env:
-  AMC_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+  AMC_RELEASE_TAG: ${{ github.ref_name }}
+  # The npm CLI the publish job runs, pinned by exact version and integrity; trusted publishing needs 11.5.1 or later.
+  # TODO(P0-34 follow-up): Sid confirms with `npm view npm@11.10.1 dist.integrity`. The value below is the integrity of
+  # npm-11.10.1.tgz as recorded by a local npm cache entry of a registry fetch (bytes re-hashed 2026-10-11).
+  NPM_CLI_VERSION: 11.10.1
+  NPM_CLI_INTEGRITY: sha512-woavuY2OgDFQ1K/tB9QHsUuW989nKfvsKTN/h5qGyS+3+BhvXN/DA2TNzx569JaFfTqrET5bEQNHwVhFk+U1gg==
 
 permissions:
-  contents: write
-  packages: write
-  id-token: write
+  contents: read
 
 concurrency:
-  group: release-${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref }}
+  group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  desktop-assets:
-    runs-on: macos-15
-    timeout-minutes: 45
+  # P0-34: a person approves the release first. This job and every job that signs or publishes run in the protected
+  # `release` environment (P0-38: required reviewers, tag rule v*.*.*), so a re-run of a signing or publishing job
+  # waits for approval again. It fails closed when the environment has no required reviewers or no tag rule.
+  approve:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      actions: read
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: ${{ env.AMC_RELEASE_TAG }}
-
-      - name: Validate release tag input
+      - name: Refuse anything but a v*.*.* tag push
         run: |
-          printf '%s\n' "$AMC_RELEASE_TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$' || {
-            echo "Release tag must match vX.Y.Z; got $AMC_RELEASE_TAG"
+          [ "$GITHUB_EVENT_NAME" = push ] && [ "$GITHUB_REF_TYPE" = tag ] && printf '%s\n' "$AMC_RELEASE_TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$' || {
+            echo "::error::Only a vX.Y.Z tag push releases; got $GITHUB_EVENT_NAME on $GITHUB_REF"
             exit 1
           }
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
+      - name: Refuse to continue unless the release environment has required reviewers and a tag rule
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh api "repos/${GITHUB_REPOSITORY}/environments/release" > "$RUNNER_TEMP/environment.json"
+          node -e '
+            const env = JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8"));
+            const reviewers = (env.protection_rules ?? []).filter((rule) => rule.type === "required_reviewers").flatMap((rule) => rule.reviewers ?? []);
+            if (reviewers.length === 0) { console.error("::error::The release environment has no required reviewers (P0-38)."); process.exit(1); }
+            if (!env.deployment_branch_policy) { console.error("::error::The release environment has no deployment branch or tag rule (P0-38)."); process.exit(1); }
+            console.log(`release environment: ${reviewers.length} required reviewer(s), deployment rule set`);
+          ' "$RUNNER_TEMP/environment.json"
 
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build desktop release archives
-        run: env -u GITHUB_REF_NAME AMC_RELEASE_TAG="$AMC_RELEASE_TAG" npm run package:desktop
-
-      - name: Verify desktop release archives
-        run: npm run package:desktop:verify
-
-      - name: Prepare checksummed public release assets
-        run: npm run release:prepare-assets
-
-      - name: Upload public release assets
-        uses: actions/upload-artifact@v7
-        with:
-          name: amc-public-release-assets
-          path: |
-            dist/release-assets/SHA256SUMS
-            dist/release-assets/amc-release-manifest.json
-            dist/release-assets/*.tgz
-            dist/release-assets/*.tar.gz
-            dist/release-assets/*.zip
-          if-no-files-found: error
-
-  release:
-    needs: desktop-assets
+  # P0-34: the gate packs the npm tarball once, at the commit the tag names, and gates that file. Later jobs check
+  # out the same commit, refuse a moved tag, and use only the files this job recorded in record.json.
+  gate:
+    needs: approve
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    permissions:
+      contents: read
+    # Measured 2026-10-11 (local macOS arm64, load about 20; qualification/2026-10-11-P0-34): the release gate took
+    # 1,242 s with its full suite stopped at the gate's own 900 s cap. The gate's per-step caps sum to 6,195 s;
+    # install, build, prepack guardrails, packing, SBOM and SEA add about 15 minutes. 150 minutes covers both.
+    timeout-minutes: 150
+    outputs:
+      commit: ${{ steps.commit.outputs.sha }}
+      tarball: ${{ steps.pack.outputs.tarball }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6 # TODO(P0-34 follow-up): pin actions/checkout@v6 by full commit SHA
         with:
           fetch-depth: 0
-          ref: ${{ env.AMC_RELEASE_TAG }}
+          ref: ${{ github.sha }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v4 # TODO(P0-34 follow-up): pin pnpm/action-setup@v4 by full commit SHA
         with:
           version: 10.33.0
 
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6 # TODO(P0-34 follow-up): pin actions/setup-node@v6 by full commit SHA
         with:
           node-version: "24"
-          registry-url: "https://registry.npmjs.org"
           cache: pnpm
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-
-      - name: Login to GHCR
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Resolve the tag to the commit this run gates
+        id: commit
+        run: |
+          set -euo pipefail
+          SHA=$(git rev-parse HEAD)
+          node scripts/release-record.mjs tag "$AMC_RELEASE_TAG" "$SHA"
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Test
-        run: npm test
+      # Version, one CHANGELOG heading, release notes, no pending changesets.
+      - name: Check the release candidate
+        run: node scripts/check-release-candidate.mjs
 
       - name: Build
         run: npm run build
@@ -121,25 +110,160 @@ jobs:
       - name: Prepack release guardrails
         run: npm run release:prepack-check
 
-      - name: Validate tag version matches package.json
+      - name: Pack the npm tarball once, with its SBOM, licence inventory and SEA binary
+        id: pack
+        env:
+          AMC_RELEASE_COMMIT: ${{ steps.commit.outputs.sha }}
         run: |
-          TAG="${AMC_RELEASE_TAG#v}"
-          PKG_VERSION=$(node -e 'const pkg=require("./package.json");process.stdout.write(pkg.version)')
-          if [ "$TAG" != "$PKG_VERSION" ]; then
-            echo "Tag version ($TAG) does not match package.json ($PKG_VERSION)"
-            exit 1
-          fi
+          set -euo pipefail
+          mkdir -p tmp/npm-release
+          TARBALL=$(npm pack --ignore-scripts --json --pack-destination tmp/npm-release | node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(0, "utf8"))[0].filename)')
+          node dist/cli.js release sbom --out tmp/npm-release/sbom.cdx.json
+          node dist/cli.js release licenses --out tmp/npm-release/licenses.json
+          npm run build:sea
+          cp dist/sea/amc "tmp/npm-release/amc-linux-x64-sea-${AMC_RELEASE_TAG#v}"
+          cp dist/sea/manifest.json "tmp/npm-release/amc-linux-x64-sea-${AMC_RELEASE_TAG#v}.manifest.json"
+          node scripts/release-record.mjs write tmp/npm-release --tag "$AMC_RELEASE_TAG" --commit "$AMC_RELEASE_COMMIT" --tarball "$TARBALL"
+          cat tmp/npm-release/record.json
+          echo "tarball=$TARBALL" >> "$GITHUB_OUTPUT"
 
-      - name: Download checksummed public release assets
-        uses: actions/download-artifact@v8
+      # The gate's packed-install and install-persona steps install this tarball; nothing else is packed.
+      - name: Release gate on the packed tarball
+        env:
+          AMC_PACKED_INSTALL_TARBALL: tmp/npm-release/${{ steps.pack.outputs.tarball }}
+        run: npm run release:gate -- --json --out tmp/release-gate/release.json
+
+      - name: Check the packed tarball's contents and secret-scan it
+        env:
+          TARBALL: tmp/npm-release/${{ steps.pack.outputs.tarball }}
+        run: node scripts/check-pack-contents.mjs --tarball "$TARBALL"
+
+      - name: Dry-run publishing the packed tarball
+        env:
+          TARBALL: tmp/npm-release/${{ steps.pack.outputs.tarball }}
+        run: npm publish "$TARBALL" --dry-run
+
+      - name: Confirm the gated files did not change during the gate
+        env:
+          AMC_RELEASE_COMMIT: ${{ steps.commit.outputs.sha }}
+        run: node scripts/release-record.mjs verify tmp/npm-release --tag "$AMC_RELEASE_TAG" --commit "$AMC_RELEASE_COMMIT"
+
+      - name: Upload the gated release files
+        uses: actions/upload-artifact@v7 # TODO(P0-34 follow-up): pin actions/upload-artifact@v7 by full commit SHA
+        with:
+          name: amc-gated-release
+          path: tmp/npm-release/
+          if-no-files-found: error
+
+      - name: Upload the release gate receipt
+        if: always()
+        uses: actions/upload-artifact@v7 # TODO(P0-34 follow-up): pin actions/upload-artifact@v7 by full commit SHA
+        with:
+          name: release-gate-receipt
+          path: tmp/release-gate/release.json
+
+  desktop-assets:
+    needs: gate
+    runs-on: macos-15
+    permissions:
+      contents: read
+    timeout-minutes: 45
+    env:
+      AMC_RELEASE_COMMIT: ${{ needs.gate.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v6 # TODO(P0-34 follow-up): pin actions/checkout@v6 by full commit SHA
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4 # TODO(P0-34 follow-up): pin pnpm/action-setup@v4 by full commit SHA
+        with:
+          version: 10.33.0
+
+      - name: Set up Node
+        uses: actions/setup-node@v6 # TODO(P0-34 follow-up): pin actions/setup-node@v6 by full commit SHA
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      - name: Refuse a tag that moved since the gate
+        run: node scripts/release-record.mjs tag "$AMC_RELEASE_TAG" "$AMC_RELEASE_COMMIT"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download the gated release files
+        uses: actions/download-artifact@v8 # TODO(P0-34 follow-up): pin actions/download-artifact@v8 by full commit SHA
+        with:
+          name: amc-gated-release
+          path: tmp/npm-release
+
+      - name: Verify the gated release files
+        run: node scripts/release-record.mjs verify tmp/npm-release --tag "$AMC_RELEASE_TAG" --commit "$AMC_RELEASE_COMMIT"
+
+      - name: Build desktop release archives around the gated tarball
+        env:
+          AMC_DESKTOP_NPM_TARBALL: tmp/npm-release/${{ needs.gate.outputs.tarball }}
+        run: env -u GITHUB_REF_NAME AMC_RELEASE_TAG="$AMC_RELEASE_TAG" npm run package:desktop
+
+      - name: Verify desktop release archives
+        run: npm run package:desktop:verify
+
+      - name: Prepare checksummed public release assets
+        run: npm run release:prepare-assets
+
+      - name: Upload public release assets
+        uses: actions/upload-artifact@v7 # TODO(P0-34 follow-up): pin actions/upload-artifact@v7 by full commit SHA
         with:
           name: amc-public-release-assets
-          path: dist/release-assets
+          path: |
+            dist/release-assets/SHA256SUMS
+            dist/release-assets/amc-release-manifest.json
+            dist/release-assets/*.tgz
+            dist/release-assets/*.tar.gz
+            dist/release-assets/*.zip
+          if-no-files-found: error
 
-      - name: Verify downloaded public release assets
-        run: |
-          cd dist/release-assets
-          sha256sum -c SHA256SUMS
+  # P0-35: build, qualify and push the Studio image natively per architecture.
+  # Only the per-architecture tags are pushed here; the image-tags job creates the
+  # public multi-platform tags from these digests after the gate passed.
+  image:
+    needs: [approve, gate, desktop-assets]
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      packages: write
+    timeout-minutes: 60
+    env:
+      AMC_RELEASE_COMMIT: ${{ needs.gate.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v6 # TODO(P0-34 follow-up): pin actions/checkout@v6 by full commit SHA
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+
+      - name: Set up Node
+        uses: actions/setup-node@v6 # TODO(P0-34 follow-up): pin actions/setup-node@v6 by full commit SHA
+        with:
+          node-version: "24"
+
+      - name: Refuse a tag that moved since the gate
+        run: node scripts/release-record.mjs tag "$AMC_RELEASE_TAG" "$AMC_RELEASE_COMMIT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4 # TODO(P0-34 follow-up): pin docker/setup-buildx-action@v4 by full commit SHA
+
+      - name: Login to GHCR
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
 
       - name: Resolve lowercase GHCR image repository
         id: image
@@ -149,17 +273,15 @@ jobs:
 
       - name: Build Docker image for qualification
         id: runtime_image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@v7 # TODO(P0-34 follow-up): pin docker/build-push-action@v7 by full commit SHA
         with:
           context: .
           file: ./Dockerfile
           target: studio
           load: true
           push: false
-          platforms: linux/amd64
-          tags: |
-            ${{ steps.image.outputs.repository }}:${{ env.AMC_RELEASE_TAG }}
-            ${{ steps.image.outputs.repository }}:latest
+          platforms: linux/${{ matrix.arch }}
+          tags: ${{ steps.image.outputs.repository }}:${{ env.AMC_RELEASE_TAG }}-${{ matrix.arch }}
 
       - name: Qualify exact loaded Studio image
         env:
@@ -168,125 +290,431 @@ jobs:
 
       - name: Upload container qualification receipt
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7 # TODO(P0-34 follow-up): pin actions/upload-artifact@v7 by full commit SHA
         with:
-          name: release-container-smoke
+          name: release-container-smoke-${{ matrix.arch }}
           path: tmp/container-smoke.json
 
-      - name: Push qualified Docker image to GHCR
-        id: docker
+      - name: Push qualified per-architecture image to GHCR
         env:
           AMC_STUDIO_IMAGE: ${{ steps.runtime_image.outputs.imageid }}
           AMC_REPOSITORY: ${{ steps.image.outputs.repository }}
+          AMC_ARCH: ${{ matrix.arch }}
         run: |
-          for tag in "$AMC_REPOSITORY:$AMC_RELEASE_TAG" "$AMC_REPOSITORY:latest"; do
-            [ "$(docker image inspect --format '{{.Id}}' "$tag")" = "$AMC_STUDIO_IMAGE" ]
-            docker push "$tag"
-          done
-          docker image inspect "$AMC_REPOSITORY:$AMC_RELEASE_TAG" | node -e '
+          tag="$AMC_REPOSITORY:$AMC_RELEASE_TAG-$AMC_ARCH"
+          [ "$(docker image inspect --format '{{.Id}}' "$tag")" = "$AMC_STUDIO_IMAGE" ]
+          docker push "$tag"
+          mkdir -p tmp/image-digest
+          docker image inspect "$tag" | node -e '
             const image = JSON.parse(require("node:fs").readFileSync(0, "utf8"))[0];
             const digest = image.RepoDigests.find(value => value.startsWith(process.argv[1] + "@"))?.split("@")[1];
             if (!/^sha256:[a-f0-9]{64}$/.test(digest ?? "")) throw Error("pushed image digest missing");
-            console.log("digest=" + digest);
-          ' "$AMC_REPOSITORY" >> "$GITHUB_OUTPUT"
+            if (image.Id !== process.env.AMC_STUDIO_IMAGE || image.Architecture !== process.env.AMC_ARCH) throw Error("pushed image is not the qualified image");
+            const receipt = require("node:crypto").createHash("sha256").update(require("node:fs").readFileSync("tmp/container-smoke.json")).digest("hex");
+            console.log(JSON.stringify({ arch: process.env.AMC_ARCH, platform: "linux/" + process.env.AMC_ARCH, imageId: image.Id, digest, containerSmokeSha256: receipt }));
+          ' "$AMC_REPOSITORY" > "tmp/image-digest/$AMC_ARCH.json"
+          cat "tmp/image-digest/$AMC_ARCH.json"
 
-      - name: Build signed release bundle when signing is configured
+      - name: Upload per-architecture digest
+        uses: actions/upload-artifact@v7 # TODO(P0-34 follow-up): pin actions/upload-artifact@v7 by full commit SHA
+        with:
+          name: image-digest-${{ matrix.arch }}
+          path: tmp/image-digest/${{ matrix.arch }}.json
+          if-no-files-found: error
+
+  # Public image tags only from the per-architecture digests the image job qualified and pushed (P0-35).
+  image-tags:
+    needs: [approve, gate, image]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    timeout-minutes: 15
+    env:
+      AMC_RELEASE_COMMIT: ${{ needs.gate.outputs.commit }}
+    outputs:
+      repository: ${{ steps.docker.outputs.repository }}
+      digest: ${{ steps.docker.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v6 # TODO(P0-34 follow-up): pin actions/checkout@v6 by full commit SHA
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+
+      - name: Set up Node
+        uses: actions/setup-node@v6 # TODO(P0-34 follow-up): pin actions/setup-node@v6 by full commit SHA
+        with:
+          node-version: "24"
+
+      - name: Refuse a tag that moved since the gate
+        run: node scripts/release-record.mjs tag "$AMC_RELEASE_TAG" "$AMC_RELEASE_COMMIT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4 # TODO(P0-34 follow-up): pin docker/setup-buildx-action@v4 by full commit SHA
+
+      - name: Login to GHCR
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+
+      - name: Resolve lowercase GHCR image repository
+        id: image
+        run: |
+          OWNER=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+          echo "repository=ghcr.io/${OWNER}/amc-studio" >> "$GITHUB_OUTPUT"
+
+      - name: Download qualified per-architecture digests
+        uses: actions/download-artifact@v8 # TODO(P0-34 follow-up): pin actions/download-artifact@v8 by full commit SHA
+        with:
+          pattern: image-digest-*
+          path: tmp/image-digests
+          merge-multiple: true
+
+      # The public tags reference only the digests the image job qualified and pushed.
+      - name: Create multi-platform release tags from the qualified digests
+        id: docker
+        env:
+          AMC_REPOSITORY: ${{ steps.image.outputs.repository }}
+        run: |
+          set -euo pipefail
+          mkdir -p tmp/image-index
+          digest() { jq -er --arg arch "$1" 'select(.arch == $arch) | .digest | select(test("^sha256:[a-f0-9]{64}$"))' "tmp/image-digests/$1.json"; }
+          AMD64=$(digest amd64)
+          ARM64=$(digest arm64)
+          docker buildx imagetools create -t "$AMC_REPOSITORY:$AMC_RELEASE_TAG" -t "$AMC_REPOSITORY:latest" \
+            "$AMC_REPOSITORY@$AMD64" "$AMC_REPOSITORY@$ARM64"
+          RAW=$(docker buildx imagetools inspect --raw "$AMC_REPOSITORY:$AMC_RELEASE_TAG")
+          LISTED=$(jq -r '[.manifests[] | select(.platform.os == "linux") | "\(.platform.architecture)=\(.digest)"] | sort | join(",")' <<<"$RAW")
+          [ "$LISTED" = "amd64=$AMD64,arm64=$ARM64" ] || { echo "index lists $LISTED"; exit 1; }
+          INDEX=$(docker buildx imagetools inspect "$AMC_REPOSITORY:$AMC_RELEASE_TAG" --format '{{json .Manifest}}' | jq -er '.digest')
+          jq -s --arg repository "$AMC_REPOSITORY" --arg tag "$AMC_RELEASE_TAG" --arg index "$INDEX" \
+            '{repository: $repository, tags: [$tag, "latest"], indexDigest: $index, platforms: sort_by(.arch)}' \
+            tmp/image-digests/amd64.json tmp/image-digests/arm64.json > tmp/image-index/image-digests.json
+          {
+            echo "### Studio image digests"
+            echo
+            echo '```json'
+            cat tmp/image-index/image-digests.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "digest=$INDEX" >> "$GITHUB_OUTPUT"
+          echo "repository=$AMC_REPOSITORY" >> "$GITHUB_OUTPUT"
+
+      - name: Upload the image index record
+        uses: actions/upload-artifact@v7 # TODO(P0-34 follow-up): pin actions/upload-artifact@v7 by full commit SHA
+        with:
+          name: image-index
+          path: tmp/image-index/image-digests.json
+          if-no-files-found: error
+
+  # The publish job installs nothing: this unprivileged job fetches the exact npm CLI tarball and checks it against
+  # the pinned integrity. Trusted publishing needs npm 11.5.1 or later.
+  npm-cli:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 5
+    steps:
+      - name: Fetch the pinned npm CLI tarball and check its integrity
+        run: |
+          set -euo pipefail
+          mkdir -p tmp/npm-cli
+          curl -fsSL --proto '=https' -o tmp/npm-cli/npm.tgz "https://registry.npmjs.org/npm/-/npm-${NPM_CLI_VERSION}.tgz"
+          node -e 'const c=require("node:crypto");const d="sha512-"+c.createHash("sha512").update(require("node:fs").readFileSync(process.argv[1])).digest("base64");if(d!==process.argv[2]){console.error("npm CLI integrity "+d+" is not the pinned "+process.argv[2]);process.exit(1)}' tmp/npm-cli/npm.tgz "$NPM_CLI_INTEGRITY"
+
+      - name: Upload the checked npm CLI tarball
+        uses: actions/upload-artifact@v7 # TODO(P0-34 follow-up): pin actions/upload-artifact@v7 by full commit SHA
+        with:
+          name: npm-cli
+          path: tmp/npm-cli/npm.tgz
+          if-no-files-found: error
+
+  # Signs a bundle around the gated files. It holds only the signing key (in the signing step), never an npm
+  # credential or id-token, so it may install the frozen lockfile to build the signing tool. A release tag never
+  # ships unsigned, and the bundle is verified only against the release key P0-37 commits.
+  sign:
+    needs: [approve, gate, image-tags]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    environment: release
+    timeout-minutes: 20
+    env:
+      AMC_RELEASE_COMMIT: ${{ needs.gate.outputs.commit }}
+      AMC_NPM_TARBALL: tmp/npm-release/${{ needs.gate.outputs.tarball }}
+    outputs:
+      sums: ${{ steps.bundle.outputs.sums }}
+    steps:
+      - uses: actions/checkout@v6 # TODO(P0-34 follow-up): pin actions/checkout@v6 by full commit SHA
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.gate.outputs.commit }}
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4 # TODO(P0-34 follow-up): pin pnpm/action-setup@v4 by full commit SHA
+        with:
+          version: 10.33.0
+
+      - name: Set up Node
+        uses: actions/setup-node@v6 # TODO(P0-34 follow-up): pin actions/setup-node@v6 by full commit SHA
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      - name: Refuse a tag that moved since the gate
+        run: node scripts/release-record.mjs tag "$AMC_RELEASE_TAG" "$AMC_RELEASE_COMMIT"
+
+      - name: Install dependencies from the committed lockfile
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the signing tool
+        run: npm run build
+
+      - name: Download the gated release files
+        uses: actions/download-artifact@v8 # TODO(P0-34 follow-up): pin actions/download-artifact@v8 by full commit SHA
+        with:
+          name: amc-gated-release
+          path: tmp/npm-release
+
+      - name: Verify the gated release files
+        run: node scripts/release-record.mjs verify tmp/npm-release --tag "$AMC_RELEASE_TAG" --commit "$AMC_RELEASE_COMMIT"
+
+      - name: Build and verify the signed release bundle
+        id: bundle
         env:
           AMC_RELEASE_SIGNING_KEY: ${{ secrets.AMC_RELEASE_SIGNING_KEY }}
-          AMC_DOCKER_IMAGE: ${{ steps.image.outputs.repository }}:${{ env.AMC_RELEASE_TAG }}
-          AMC_DOCKER_DIGEST: ${{ steps.docker.outputs.digest }}
-          AMC_DOCKER_PLATFORMS: linux/amd64
+          AMC_DOCKER_IMAGE: ${{ needs.image-tags.outputs.repository }}:${{ env.AMC_RELEASE_TAG }}
+          AMC_DOCKER_DIGEST: ${{ needs.image-tags.outputs.digest }}
+          AMC_DOCKER_PLATFORMS: linux/amd64,linux/arm64
         run: |
-          mkdir -p dist
-          VERSION=$(node -e 'const pkg=require("./package.json");process.stdout.write(pkg.version)')
+          set -euo pipefail
+          VERSION="${AMC_RELEASE_TAG#v}"
           if [ -z "$AMC_RELEASE_SIGNING_KEY" ]; then
-            echo "Signed AMC release bundle not produced: AMC_RELEASE_SIGNING_KEY is not configured." | tee dist/release-verify.txt
-            exit 0
+            echo "::error::AMC_RELEASE_SIGNING_KEY is not set in the release environment (P0-38). A release is never published unsigned."
+            exit 1
           fi
-          node dist/cli.js release pack --out "dist/amc-${VERSION}.amcrelease"
-          # P0-09: release verify admits only a pinned release key. Until P0-37/P0-38 publish its fingerprint, the
-          # job pins the public half of the signing secret it holds, never the key the bundle carries.
-          node -e 'const c=require("node:crypto");process.stdout.write(c.createPublicKey(Buffer.from(process.env.AMC_RELEASE_SIGNING_KEY.trim(),"base64").toString("utf8")).export({format:"pem",type:"spki"}))' > "$RUNNER_TEMP/release-signing.pub"
-          node dist/cli.js release verify "dist/amc-${VERSION}.amcrelease" --pubkey "$RUNNER_TEMP/release-signing.pub" | tee dist/release-verify.txt
-          tar -xzf "dist/amc-${VERSION}.amcrelease" -C dist
-          cp dist/amc-release/artifacts/sbom/sbom.cdx.json dist/sbom.cdx.json
-          cp dist/amc-release/artifacts/licenses/licenses.json dist/licenses.json
-          cp dist/amc-release/artifacts/provenance/provenance.json dist/provenance.json
+          if [ ! -f trust/amc-release-signing.pub ]; then
+            echo "::error::trust/amc-release-signing.pub is missing (P0-37 commits the release public key). The bundle cannot be verified against a pinned key."
+            exit 1
+          fi
+          mkdir -p tmp/signed
+          node dist/cli.js release pack --npm-tarball "$AMC_NPM_TARBALL" --sbom tmp/npm-release/sbom.cdx.json --licenses tmp/npm-release/licenses.json --out "tmp/signed/amc-${VERSION}.amcrelease"
+          node dist/cli.js release verify "tmp/signed/amc-${VERSION}.amcrelease" --pubkey trust/amc-release-signing.pub | tee tmp/signed/release-verify.txt
+          mkdir -p tmp/bundle && tar -xzf "tmp/signed/amc-${VERSION}.amcrelease" -C tmp/bundle
+          cmp "tmp/bundle/amc-release/artifacts/npm/$(basename "$AMC_NPM_TARBALL")" "$AMC_NPM_TARBALL"
+          cp tmp/bundle/amc-release/artifacts/sbom/sbom.cdx.json tmp/bundle/amc-release/artifacts/licenses/licenses.json tmp/bundle/amc-release/artifacts/provenance/provenance.json tmp/signed/
+          (cd tmp/signed && sha256sum -- * > SHA256SUMS)
+          echo "sums=$(sha256sum tmp/signed/SHA256SUMS | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
 
-      - name: Build experimental SEA binary artifact
-        run: |
-          npm run build:sea
-          VERSION=$(node -e 'const pkg=require("./package.json");process.stdout.write(pkg.version)')
-          mkdir -p dist/release-binaries
-          cp dist/sea/amc "dist/release-binaries/amc-linux-x64-sea-${VERSION}"
-          cp dist/sea/manifest.json "dist/release-binaries/amc-linux-x64-sea-${VERSION}.manifest.json"
+      - name: Upload the signed release files
+        uses: actions/upload-artifact@v7 # TODO(P0-34 follow-up): pin actions/upload-artifact@v7 by full commit SHA
+        with:
+          name: amc-signed-release
+          path: tmp/signed/
+          if-no-files-found: error
 
-      - name: Publish npm package when registry credentials are configured
+  # The only job that publishes, and the only one with id-token: write. It installs nothing and builds nothing: it
+  # checks the tag and the gated record, then runs the integrity-checked npm CLI on the gated tarball.
+  release:
+    needs: [approve, gate, npm-cli, sign]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    # P0-34: its secrets live in the protected `release` environment (P0-38).
+    environment: release
+    timeout-minutes: 15
+    env:
+      AMC_RELEASE_COMMIT: ${{ needs.gate.outputs.commit }}
+      AMC_NPM_TARBALL: tmp/npm-release/${{ needs.gate.outputs.tarball }}
+    steps:
+      - uses: actions/checkout@v6 # TODO(P0-34 follow-up): pin actions/checkout@v6 by full commit SHA
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+
+      - name: Refuse a tag that moved since the gate
+        run: node scripts/release-record.mjs tag "$AMC_RELEASE_TAG" "$AMC_RELEASE_COMMIT"
+
+      - name: Download the gated release files
+        uses: actions/download-artifact@v8 # TODO(P0-34 follow-up): pin actions/download-artifact@v8 by full commit SHA
+        with:
+          name: amc-gated-release
+          path: tmp/npm-release
+
+      - name: Verify the gated release files
+        run: node scripts/release-record.mjs verify tmp/npm-release --tag "$AMC_RELEASE_TAG" --commit "$AMC_RELEASE_COMMIT"
+
+      - name: Download the checked npm CLI
+        uses: actions/download-artifact@v8 # TODO(P0-34 follow-up): pin actions/download-artifact@v8 by full commit SHA
+        with:
+          name: npm-cli
+          path: tmp/npm-cli
+
+      # P0-38 chooses trusted publishing (no token; this job's id-token: write) or a granular NPM_TOKEN in the release
+      # environment. Without either, npm publish fails and so does the job: nothing is skipped silently.
+      - name: Publish the gated npm tarball
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
         run: |
+          set -euo pipefail
+          node -e 'const c=require("node:crypto");const d="sha512-"+c.createHash("sha512").update(require("node:fs").readFileSync(process.argv[1])).digest("base64");if(d!==process.argv[2]){console.error("npm CLI integrity "+d+" is not the pinned "+process.argv[2]);process.exit(1)}' tmp/npm-cli/npm.tgz "$NPM_CLI_INTEGRITY"
+          tar -xzf tmp/npm-cli/npm.tgz -C "$RUNNER_TEMP"
+          npm_cli() { node "$RUNNER_TEMP/package/bin/npm-cli.js" "$@"; }
+          echo "node $(node --version) (the runner's), npm $(npm_cli --version)"
+          node scripts/release-record.mjs tag "$AMC_RELEASE_TAG" "$AMC_RELEASE_COMMIT"
+          node scripts/release-record.mjs verify tmp/npm-release --tag "$AMC_RELEASE_TAG" --commit "$AMC_RELEASE_COMMIT"
           PACKAGE_NAME=$(node -e 'process.stdout.write(require("./package.json").name)')
-          VERSION=$(node -e 'process.stdout.write(require("./package.json").version)')
-          if npm view "${PACKAGE_NAME}@${VERSION}" version >/dev/null 2>&1; then
-            echo "${PACKAGE_NAME}@${VERSION} already exists on npm; skipping duplicate publish."
+          VERSION="${AMC_RELEASE_TAG#v}"
+          if npm_cli view "${PACKAGE_NAME}@${VERSION}" version >/dev/null 2>&1; then
+            echo "${PACKAGE_NAME}@${VERSION} is already on npm; not publishing it again."
             exit 0
           fi
-          if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "::notice::Skipping npm publish because NPM_TOKEN is not configured. GitHub release assets remain available."
-            exit 0
+          if [ -n "$NPM_TOKEN" ]; then
+            echo "Publishing with the NPM_TOKEN of the release environment."
+            export NODE_AUTH_TOKEN="$NPM_TOKEN"
+            printf '%s\n' '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}' > "$RUNNER_TEMP/publish.npmrc"
+            export NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/publish.npmrc"
+          else
+            echo "No NPM_TOKEN: publishing through npm trusted publishing (OIDC)."
+            unset NODE_AUTH_TOKEN
           fi
-          npm publish --provenance --access public
+          npm_cli publish "$AMC_NPM_TARBALL" --provenance --access public
+
+  # Creates the GitHub Release from verified files only, after npm has the package. No npm credential or id-token.
+  github-release:
+    needs: [approve, gate, desktop-assets, image-tags, sign, release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 15
+    env:
+      AMC_RELEASE_COMMIT: ${{ needs.gate.outputs.commit }}
+      AMC_NPM_TARBALL: tmp/npm-release/${{ needs.gate.outputs.tarball }}
+      AMC_SIGNED_SUMS: ${{ needs.sign.outputs.sums }}
+    steps:
+      - uses: actions/checkout@v6 # TODO(P0-34 follow-up): pin actions/checkout@v6 by full commit SHA
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+
+      - name: Set up Node
+        uses: actions/setup-node@v6 # TODO(P0-34 follow-up): pin actions/setup-node@v6 by full commit SHA
+        with:
+          node-version: "24"
+
+      - name: Refuse a tag that moved since the gate
+        run: node scripts/release-record.mjs tag "$AMC_RELEASE_TAG" "$AMC_RELEASE_COMMIT"
+
+      - name: Download the gated release files
+        uses: actions/download-artifact@v8 # TODO(P0-34 follow-up): pin actions/download-artifact@v8 by full commit SHA
+        with:
+          name: amc-gated-release
+          path: tmp/npm-release
+
+      - name: Verify the gated release files
+        run: node scripts/release-record.mjs verify tmp/npm-release --tag "$AMC_RELEASE_TAG" --commit "$AMC_RELEASE_COMMIT"
+
+      - name: Download checksummed public release assets
+        uses: actions/download-artifact@v8 # TODO(P0-34 follow-up): pin actions/download-artifact@v8 by full commit SHA
+        with:
+          name: amc-public-release-assets
+          path: dist/release-assets
+
+      - name: Verify the public release assets carry the gated tarball
+        run: |
+          set -euo pipefail
+          (cd dist/release-assets && sha256sum -c SHA256SUMS)
+          cmp "dist/release-assets/$(basename "$AMC_NPM_TARBALL")" "$AMC_NPM_TARBALL"
+
+      - name: Download the signed release files
+        uses: actions/download-artifact@v8 # TODO(P0-34 follow-up): pin actions/download-artifact@v8 by full commit SHA
+        with:
+          name: amc-signed-release
+          path: tmp/signed
+
+      - name: Verify the signed release files against the sign job's record
+        run: |
+          set -euo pipefail
+          [ "$(sha256sum tmp/signed/SHA256SUMS | cut -d' ' -f1)" = "$AMC_SIGNED_SUMS" ]
+          (cd tmp/signed && sha256sum -c SHA256SUMS)
+
+      - name: Download the image index record
+        uses: actions/download-artifact@v8 # TODO(P0-34 follow-up): pin actions/download-artifact@v8 by full commit SHA
+        with:
+          name: image-index
+          path: tmp/image-index
 
       - name: Build release notes
         run: |
+          set -euo pipefail
           VERSION=$(node -e 'const pkg=require("./package.json");process.stdout.write(pkg.version)')
+          NOTES="docs/releases/${VERSION}.md"
+          [ -f "$NOTES" ] || { echo "::error::$NOTES is missing; run npm run release:prepare -- ${VERSION}"; exit 1; }
           {
-            echo "# AMC ${VERSION}"
+            cat "$NOTES"
             echo
-            echo "## Verified public downloads"
-            echo
-            echo "macOS, Linux, and Windows archives plus the npm-format tarball are attached with SHA256SUMS and amc-release-manifest.json."
-            echo
-            echo "## Signed bundle status"
+            echo "## Signed bundle verification"
             echo
             echo '```text'
-            cat dist/release-verify.txt
+            cat tmp/signed/release-verify.txt
             echo '```'
-          } > dist/release-notes.md
+          } > tmp/release-notes.md
 
-      - name: Update Homebrew formula when its release credentials are configured
+      - name: Create the GitHub Release from the verified files
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s failglob
+          gh release create "$AMC_RELEASE_TAG" --verify-tag --title "AMC $AMC_RELEASE_TAG" --notes-file tmp/release-notes.md \
+            dist/release-assets/* tmp/image-index/image-digests.json tmp/signed/*.amcrelease tmp/signed/sbom.cdx.json \
+            tmp/signed/licenses.json tmp/signed/provenance.json tmp/signed/release-verify.txt tmp/npm-release/amc-linux-x64-sea-*
+
+  # Homebrew stays off until the tap exists (P0-39): set the repository variable AMC_HOMEBREW_TAP=enabled and the
+  # release environment secret HOMEBREW_TAP_TOKEN. Then a missing token fails this job. The token reaches git only
+  # through a credential helper that reads it from this step's environment, never through a URL or argument.
+  homebrew:
+    needs: [approve, gate, github-release]
+    if: vars.AMC_HOMEBREW_TAP == 'enabled'
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    env:
+      AMC_RELEASE_COMMIT: ${{ needs.gate.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v6 # TODO(P0-34 follow-up): pin actions/checkout@v6 by full commit SHA
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+
+      - name: Refuse a tag that moved since the gate
+        run: node scripts/release-record.mjs tag "$AMC_RELEASE_TAG" "$AMC_RELEASE_COMMIT"
+
+      - name: Download checksummed public release assets
+        uses: actions/download-artifact@v8 # TODO(P0-34 follow-up): pin actions/download-artifact@v8 by full commit SHA
+        with:
+          name: amc-public-release-assets
+          path: dist/release-assets
+
+      - name: Verify the public release assets
+        run: cd dist/release-assets && sha256sum -c SHA256SUMS
+
+      - name: Update the Homebrew formula
         env:
           HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
         run: |
+          set -euo pipefail
           if [ -z "$HOMEBREW_TAP_TOKEN" ]; then
-            echo "Homebrew tap credentials are not configured; leaving the channel unavailable."
-            exit 0
+            echo "::error::AMC_HOMEBREW_TAP is enabled but HOMEBREW_TAP_TOKEN is not set in the release environment."
+            exit 1
           fi
-          VERSION=$(node -e 'process.stdout.write(require("./package.json").version)')
+          VERSION="${AMC_RELEASE_TAG#v}"
           TARBALL="https://github.com/${GITHUB_REPOSITORY}/releases/download/v${VERSION}/agent-maturity-compass-${VERSION}.tgz"
           SHA256=$(awk -v asset="agent-maturity-compass-${VERSION}.tgz" '$2 == asset { print $1 }' dist/release-assets/SHA256SUMS)
-          git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/AgentMaturity/homebrew-tap.git" /tmp/homebrew-tap
-          sed -i "s|url \".*\"|url \"${TARBALL}\"|" /tmp/homebrew-tap/Formula/amc.rb
-          sed -i "s|sha256 \".*\"|sha256 \"${SHA256}\"|" /tmp/homebrew-tap/Formula/amc.rb
-          cd /tmp/homebrew-tap
-          git config user.name "AMC Release Bot"
-          git config user.email "releases@agentmaturity.co"
-          git add Formula/amc.rb
-          git diff --staged --quiet || git commit -m "chore: bump amc formula to v${VERSION}"
-          git push
-
-      - name: Create GitHub release and upload assets
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.AMC_RELEASE_TAG }}
-          body_path: dist/release-notes.md
-          fail_on_unmatched_files: false
-          files: |
-            dist/release-assets/*
-            dist/*.amcrelease
-            dist/sbom.cdx.json
-            dist/licenses.json
-            dist/provenance.json
-            dist/release-verify.txt
-            dist/release-binaries/*
+          TAP="$RUNNER_TEMP/homebrew-tap"
+          git -c credential.helper='!f() { echo username=x-access-token; echo "password=${HOMEBREW_TAP_TOKEN}"; }; f' clone https://github.com/AgentMaturity/homebrew-tap.git "$TAP"
+          sed -i "s|url \".*\"|url \"${TARBALL}\"|" "$TAP/Formula/amc.rb"
+          sed -i "s|sha256 \".*\"|sha256 \"${SHA256}\"|" "$TAP/Formula/amc.rb"
+          git -C "$TAP" -c user.name="AMC Release Bot" -c user.email="releases@agentmaturity.co" add Formula/amc.rb
+          git -C "$TAP" diff --staged --quiet || git -C "$TAP" -c user.name="AMC Release Bot" -c user.email="releases@agentmaturity.co" commit -m "chore: bump amc formula to v${VERSION}"
+          git -C "$TAP" -c credential.helper='!f() { echo username=x-access-token; echo "password=${HOMEBREW_TAP_TOKEN}"; }; f' push

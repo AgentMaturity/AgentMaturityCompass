@@ -222,7 +222,7 @@ function stagingLeasesOf(chain: readonly A4ChainLink[], gateId: string): string[
 export function assertStagingRevocable(store: A4Store, projectId: string, gateId: string): void {
   if ((stagingLeasesOf(store.readChain(projectId), gateId) ?? []).length === 0) return;
   try {
-    getPrivateKeyPem(store.workspace, "auditor");
+    getPrivateKeyPem(store.workspace, "revocation-list"); // P1-08: the key revokeLease signs the lease revocation list with
   } catch {
     throw new A4StoreError(423, "A4_VAULT_LOCKED", "Unlock the vault: denying the deployment approval revokes the release's staging lease, which signs with the auditor key.");
   }

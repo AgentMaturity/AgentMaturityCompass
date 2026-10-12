@@ -36,7 +36,8 @@ describe("evidenceProducer", () => {
     [{ source: "dogfood-maturity" }, "synthetic"],
     ...["eval_import", "import", "watch", "attested_ingest", "chatgpt", "claude_console", "gemini_ui", "generic_json", "generic_text"]
       .map((source): [Record<string, unknown>, string] => [{ source }, "import"]),
-    ...["manual", "operator", "feedback.ingest"].map((source): [Record<string, unknown>, string] => [{ source }, "manual"]),
+    ...["manual", "operator", "feedback.ingest", "user", "inferred", "carried", "numeric_self_answer", "default"]
+      .map((source): [Record<string, unknown>, string] => [{ source }, "manual"]),
     [{ source: "webhook" }, "external-report"],
     [{ source: "stdin_pipe" }, "amc-runtime"],
     [{ source: "constructor" }, "amc-runtime"],
@@ -68,7 +69,19 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "redteam", "registry", "release", "replay-benchmark-corpus", "reports", "request-failure", "retention.auto",
   "risk-cost-latency-slo", "roles", "sdk", "settings", "shield.exploit_confirmation", "stdin_pipe", "studio",
   "studio-audit", "support-observation", "toolhub", "tools", "trace", "transform", "transparency", "trust", "trust-list",
-  "trust-list-history", "turn-error", "turn-events", "undeclared-runner", "user-env", "users", "validators"
+  "trust-list-history", "turn-error", "turn-events", "undeclared-runner", "user-env", "users", "validators",
+  // Never an evidence event's meta.source (reviewed 2026-10-11): claim-route labels that pick an HTTP result envelope
+  // (P0-23, P1-11); catalog applicability exclusion kinds (P1-10); legal-hold registry row kinds, which write no ledger
+  // rows (P2-01). The self-report-shaped literals (user, inferred, numeric_self_answer, default) are mapped to manual
+  // in PRODUCER_BY_SOURCE instead, so they can never count as AMC runtime evidence.
+  "compliance_report", "diagnostic_report", "path_presence", "predicate", "reviewer_exception", "record", "legacy",
+  "legacy-unverified",
+  // A trust-context distrust entry's source (P1-08, src/trust/trustContext.ts): the workspace's own key revocation list,
+  // never an evidence event's meta.source.
+  "workspace-key-revocations",
+  // A4 Activate record labels (P1-62, reviewed 2026-10-12 at the 442cd919 merge): a monitor record field no source could
+  // fill (src/a4/a4Monitor.ts) and a value claim's recommended lane (src/a4/a4Value.ts). Neither is a ledger meta.source.
+  "source_unavailable", "value_contract"
 ]);
 
 function sourceFiles(dir: string): string[] {

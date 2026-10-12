@@ -159,7 +159,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc backup print` | Print backup manifest summary | - | - |
 | `amc backup restore` | Restore a verified backup into target directory | `--to <dir>`<br>`--force`<br>`--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned` | - |
 | `amc backup verify` | Verify signed backup bundle offline | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
-| `amc badge` | Generate maturity badge for README/docs (markdown, HTML, or URL) | `--agent <agentId>`<br>`--level <0-5>`<br>`--score <0-100>`<br>`--format <format>` | - |
+| `amc badge` | Print the agent's passport badge line, from what AMC recorded (no level or score override) | `--agent <agentId>` | - |
 | `amc bench` | Public benchmark registry + ecosystem comparative view | - | - |
 | `amc bench compare` | Compute local vs imported ecosystem comparison | `--scope <scope>`<br>`--id <id>`<br>`--against <mode>` | - |
 | `amc bench comparison-latest` | Read latest bench comparison artifact | - | - |
@@ -305,7 +305,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc connect` | Connect an agent runtime and track first action, decision, and proof | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--token-file <path>`<br>`--bridge-url <url>`<br>`--mode <mode>`<br>`--status`<br>`--json`<br>`--print-env`<br>`--print-cmd` | - |
 | `amc connect hooks` | Install, inspect, or remove provider-native AMC observation and control hooks | - | - |
 | `amc connect hooks health` | Verify signed hook setup and show the latest verified provider event | `--provider <provider>`<br>`--json` | - |
-| `amc connect hooks install` | Install a reversible project hook for Claude Code or Gemini CLI | `--provider <provider>`<br>`--mode <mode>`<br>`--agent <agentId>`<br>`--bridge-url <url>`<br>`--ttl <ttl>`<br>`--rpm <rpm>`<br>`--dry-run`<br>`--json` | - |
+| `amc connect hooks install` | Install a reversible project hook for Claude Code, Gemini CLI or Pi | `--provider <provider>`<br>`--mode <mode>`<br>`--agent <agentId>`<br>`--bridge-url <url>`<br>`--ttl <ttl>`<br>`--rpm <rpm>`<br>`--dry-run`<br>`--json` | - |
 | `amc connect hooks lifecycle` | Verify one requested, controlled, and terminal provider action lifecycle | `--agent <agentId>`<br>`--action <actionId>`<br>`--json` | - |
 | `amc connect hooks remove` | Remove only the signed AMC-owned hook and revoke its lease | `--provider <provider>`<br>`--dry-run`<br>`--json` | - |
 | `amc connect hooks status` | Verify provider config ownership, mode, signed manifest, and hook lease | `--provider <provider>`<br>`--json` | - |
@@ -348,10 +348,10 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc demo run` | Send scripted demo traffic through the AMC gateway; output is a synthetic example, not evidence (~30s) | `--gateway <url>`<br>`--no-vault`<br>`--demo`<br>`--json` | - |
 | `amc demo share` | Generate a static client-facing prospect demo bundle | `--out <dir>`<br>`--slug <slug>`<br>`--public-base-url <url>`<br>`--live`<br>`--json` | - |
 | `amc diagnostic` | Diagnostic bank/render operations | - | - |
-| `amc diagnostic bank` | Signed diagnostic 126-question bank operations | - | - |
+| `amc diagnostic bank` | Signed default diagnostic question bank operations | - | - |
 | `amc diagnostic bank init` | Create and sign .amc/diagnostic/bank/bank.yaml | - | - |
 | `amc diagnostic bank verify` | Verify diagnostic bank signature | - | - |
-| `amc diagnostic render` | Render contextualized 126-question diagnostic for an agent | `--agent <agentId>`<br>`--format <format>`<br>`--out <file>` | - |
+| `amc diagnostic render` | Render the contextualized default diagnostic question bank for an agent | `--agent <agentId>`<br>`--format <format>`<br>`--out <file>` | - |
 | `amc dlp` | DLP scanner for PII and secrets | - | - |
 | `amc dlp scan` | Scan text for PII and secrets | `--json`<br>`--redact` | - |
 | `amc doctor` | Check runtime availability and wrap readiness | `--json`<br>`--strict`<br>`--live-probes` | - |
@@ -635,6 +635,11 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc inventory list` | List AI assets (alias for 'inventory scan') | `--deep`<br>`--json` | - |
 | `amc inventory scan` | Scan workspace for AI assets (agents, models, configs, API keys) | `--deep`<br>`--json` | - |
 | `amc key-custody-modes` | List available key custody modes and their configurations | - | - |
+| `amc keys` | Purpose signing keys: list, rotate, revoke and export public keys | - | - |
+| `amc keys export-public` | Print a purpose's public key, key id and proof of possession, for an organisation's trust list | `--purpose <purpose>` | - |
+| `amc keys list` | List each signing purpose's key id, shared keys, history size and rotations (public files only) | `--json` | - |
+| `amc keys revoke` | Record a retired key's revocation in the workspace's signed, anchored key revocation list | `--purpose <purpose>`<br>`--key-id <id>`<br>`--reason <reason>` | - |
+| `amc keys rotate` | Rotate one purpose's key with a signed, chained statement; --resume completes or rolls back an interrupted change | `--purpose <purpose>`<br>`--reason <reason>`<br>`--overlap-days <n>`<br>`--root-key <file...>`<br>`--resume`<br>`--restore`<br>`--accept <generation>`<br>`--digest <sha256>`<br>`--allow-gap <reason>`<br>`--quarantine-unbound-pub` | - |
 | `amc lab-compare` | Compare two lab experiments | `--baseline <id>`<br>`--candidate <id>` | - |
 | `amc lab-create` | Create a new lab experiment | `--kind <kind>`<br>`--name <name>`<br>`--model <modelId>`<br>`--description <desc>` | - |
 | `amc lab-list` | List all lab experiments | `--kind <kind>` | - |
@@ -648,8 +653,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc learn` | Education flow for a specific maturity question | `--question <qid>`<br>`--agent <agentId>` | - |
 | `amc lease` | Issue/verify/revoke short-lived agent leases | - | - |
 | `amc lease issue` | - | `--agent <agentId>`<br>`--ttl <ttl>`<br>`--scopes <scopes>`<br>`--routes <routes>`<br>`--models <models>`<br>`--rpm <rpm>`<br>`--tpm <tpm>`<br>`--max-cost-usd-per-day <usd>`<br>`--workorder <workOrderId>` | - |
-| `amc lease resign-revocations` | Re-sign the lease revocation store, vouching for its CURRENT content as owner | - | - |
-| `amc lease revoke` | - | `--lease-id <id>`<br>`--reason <reason>` | - |
+| `amc lease resign-revocations` | Re-sign the lease revocation store as owner, only if its sha256 is the reviewed digest | `--expect-digest <sha256>` | - |
+| `amc lease revoke` | - | `--lease-id <id>`<br>`--reason <reason>`<br>`--token <lease>` | - |
 | `amc lease verify` | - | - | - |
 | `amc legal-hold` | Issue or manage legal holds | `--issue`<br>`--release <holdId>`<br>`--list`<br>`--init`<br>`--rebind`<br>`--accept-unverified-legacy`<br>`--tenant <id>`<br>`--reason <text>`<br>`--issued-by <name>` | - |
 | `amc lessons-list` | List lessons learned from corrections | `--scope <scope>`<br>`--agent <agentId>` | - |
@@ -759,16 +764,6 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc native-extension inspect` | Read manifest/content hashes and workspace signature status without loading or writing | `--expect-digest <sha256>`<br>`--json` | - |
 | `amc native-extension install` | Copy an already signed extension into the local plugin store without activation | `--expect-digest <sha256>`<br>`--json` | - |
 | `amc native-extension sign` | Sign the exact reviewed manifest with existing AMC workspace BUNDLE signing policy | `--expect-digest <sha256>`<br>`--json` | - |
-| `amc native-schedule` | Manage signed native goals and explicitly own one due pass or a foreground polling lifecycle | - | - |
-| `amc native-schedule disable` | Prevent future claims; does not pretend to cancel an already running owner | `--expect-digest <digest>` | - |
-| `amc native-schedule enable` | Explicitly enable a schedule without discarding its cadence or claim history | `--expect-digest <digest>` | - |
-| `amc native-schedule inspect-file` | Preview an operator JSON definition and hash its exact bytes; does not sign or activate it | - | - |
-| `amc native-schedule list` | Read signed configuration, its digest and operational due/in-flight status without running jobs | - | - |
-| `amc native-schedule put` | Add or replace one reviewed definition using the existing workspace signer; does not start a runner | `--expect-input-sha256 <digest>`<br>`--expect-digest <digest>` | - |
-| `amc native-schedule remove` | Explicitly remove a schedule without discarding its cadence or claim history | `--expect-digest <digest>` | - |
-| `amc native-schedule reset-failures` | Explicitly reset-failures a schedule without discarding its cadence or claim history | `--expect-digest <digest>` | - |
-| `amc native-schedule run-due` | Execute the currently due signed goals once through the native composed runtime | `--agent <id>`<br>`--provider <id>`<br>`--model <model>`<br>`--base-url <origin>`<br>`--credential <ref>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--expect-digest <digest>`<br>`--expect-tools-digest <digest>`<br>`--approve-tools <actionClass>`<br>`--approve-risk <tier>`<br>`--max-tokens <n>`<br>`--thinking <mode>`<br>`--reasoning-effort <effort>`<br>`--max-steps <n>` | - |
-| `amc native-schedule watch` | Own foreground serial due passes until Ctrl-C/SIGTERM; never daemonizes or installs OS tasks | `--agent <id>`<br>`--provider <id>`<br>`--model <model>`<br>`--base-url <origin>`<br>`--credential <ref>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--expect-digest <digest>`<br>`--expect-tools-digest <digest>`<br>`--approve-tools <actionClass>`<br>`--approve-risk <tier>`<br>`--max-tokens <n>`<br>`--thinking <mode>`<br>`--reasoning-effort <effort>`<br>`--max-steps <n>`<br>`--poll-ms <ms>` | - |
 | `amc notary` | AMC Notary signing boundary operations | - | - |
 | `amc notary attest` | Generate signed notary runtime attestation bundle (.amcattest) | `--out <file>`<br>`--notary-dir <dir>`<br>`--workspace <dir>` | - |
 | `amc notary init` | Initialize AMC Notary config and signing backend | `--notary-dir <dir>`<br>`--external-command <cmd>`<br>`--external-args <args...>` | - |
@@ -959,7 +954,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc release` | Deterministic release engineering and offline verification | - | - |
 | `amc release init` | Initialize AMC release signing keypair | `--write-private-to <path>` | - |
 | `amc release licenses` | Generate dependency license inventory | `--out <file>` | - |
-| `amc release pack` | Build a signed .amcrelease bundle | `--out <file>`<br>`--private-key <path>`<br>`--skip-install-build` | - |
+| `amc release pack` | Build a signed .amcrelease bundle | `--out <file>`<br>`--private-key <path>`<br>`--skip-install-build`<br>`--npm-tarball <file>`<br>`--sbom <file>`<br>`--licenses <file>` | - |
 | `amc release print` | Print release bundle manifest summary | - | - |
 | `amc release provenance` | Generate AMC provenance record | `--out <file>` | - |
 | `amc release sbom` | Generate deterministic CycloneDX SBOM | `--out <file>` | - |
@@ -1227,7 +1222,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc vault lock` | Lock vault and clear in-memory private keys | - | - |
 | `amc vault privacy-budget` | Check privacy budget for an agent | `--json` | - |
 | `amc vault rag-guard` | Guard RAG chunks against injection | `--json` | - |
-| `amc vault rotate-keys` | Rotate monitor signing key and append to public key history | - | - |
+| `amc vault rotate-keys` | Rotate the monitor key (ledger-row and receipt purposes) with a signed rotation statement; alias of amc keys rotate | - | - |
 | `amc vault scrub` | Scrub metadata from a file | `--json` | - |
 | `amc vault secret-share` | Split a secret into shares using Shamir's Secret Sharing | `--secret <value>`<br>`--shares <n>`<br>`--threshold <k>` | - |
 | `amc vault status` | Show vault status | - | - |

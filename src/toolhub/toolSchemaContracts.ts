@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { validateSchema, type SchemaDefinition, type SchemaValidation } from "../enforce/schemaGate.js";
 import type { ActionClass, RiskTier } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -343,7 +343,7 @@ export function createSignedToolSchemaContract(input: {
   return {
     ...payload,
     contractDigestSha256: digest,
-    contractSignature: signHexDigest(digest, getPrivateKeyPem(input.workspace, "auditor")),
+    contractSignature: signHexDigest(digest, getSigningKey(input.workspace, "config-signature")),
     signer: "auditor",
     signedTs: Date.now()
   };

@@ -1,0 +1,402 @@
+{
+  "sourceCommit": "756bd6977dce19f4ef781bdb492c38d6777964f7",
+  "artifactSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+  "artifactPath": "/stage/rc.tgz",
+  "root": "/work/out/studio",
+  "startedAt": "2026-10-11T08:39:02.231908+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "--version"
+      ],
+      "cwd": "/work/out/studio",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-01.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/usr/local/lib/node_modules/npm/bin/npm-cli.js",
+        "install",
+        "--prefix",
+        "/work/out/studio/installation",
+        "--no-audit",
+        "--no-fund",
+        "/stage/rc.tgz"
+      ],
+      "cwd": "/work/out/studio/installation",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-02.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "bootstrap"
+      ],
+      "cwd": "/work/out/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-03.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "--json"
+      ],
+      "cwd": "/work/out/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-04.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "firewall",
+        "enable",
+        "--mode",
+        "block",
+        "--json"
+      ],
+      "cwd": "/work/out/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-05.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "up",
+        "--demo",
+        "--no-open",
+        "--no-baseline"
+      ],
+      "cwd": "/work/out/studio/demo",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-06.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/src/scripts/studio-native-browser-check.mjs",
+        "--fixture",
+        "/work/out/studio/fixture.json",
+        "--out",
+        "/work/out/studio/browser",
+        "--dependency-root",
+        "/work/pw",
+        "--browser-executable",
+        "/ms-playwright/chromium_headless_shell-1234/chrome-linux/headless_shell"
+      ],
+      "cwd": "/work/out/studio",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-07.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "down"
+      ],
+      "cwd": "/work/out/studio/demo",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-08.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "agent-loop",
+        "verify",
+        "e7902b84-c947-4f4a-9cdc-17df97590210",
+        "--json"
+      ],
+      "cwd": "/work/out/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-09.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "agent-loop",
+        "verify",
+        "3c83c641-41da-4e02-b3ce-2ecc47591477",
+        "--json"
+      ],
+      "cwd": "/work/out/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-10.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "agent-loop",
+        "verify",
+        "099c8375-1794-4556-89e3-59afe7dcb941",
+        "--json"
+      ],
+      "cwd": "/work/out/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-11.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "agent-loop",
+        "verify",
+        "a7aa5346-10ef-42ff-b343-0b422eb34721",
+        "--json"
+      ],
+      "cwd": "/work/out/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-12.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "agent-loop",
+        "verify",
+        "2d1e3d37-45a1-4763-8de5-980db4557a55",
+        "--json"
+      ],
+      "cwd": "/work/out/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-13.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "agent-loop",
+        "verify",
+        "f96b0c99-15a1-4185-9911-25a3529c2aeb",
+        "--json"
+      ],
+      "cwd": "/work/out/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-14.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "agent-loop",
+        "verify",
+        "d18a8d83-16cc-4886-88e2-3a9ad18b3a46",
+        "--json"
+      ],
+      "cwd": "/work/out/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-15.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "session",
+        "verify",
+        "--json"
+      ],
+      "cwd": "/work/out/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-16.log"
+    }
+  ],
+  "cleanup": [
+    {
+      "resource": "owned demo daemon",
+      "signalCommandExit": 0,
+      "knownPid": 1600,
+      "groupId": 1600,
+      "processGroupReaped": true,
+      "ok": true
+    },
+    {
+      "resource": "owned foreground Studio",
+      "exitCode": 0,
+      "processGroupReaped": true,
+      "ok": true
+    },
+    {
+      "resource": "private fixture credentials/workspaces/raw log",
+      "ok": true
+    }
+  ],
+  "ok": true,
+  "harnessHashes": {
+    "scripts/studio-native-browser-check.mjs": "ff835c580a58c0d08220abd14aecffebbd1dba2a758fe1aa3890e5b4f09abf0e",
+    "tests/e2e/native-tasks-page.mjs": "22ed3520cb14b5bb45b489200e2051e8bc6ecf47b22f8240f20e0550ee720fb3",
+    "scripts/lib/nativeStudioBrowserReceipt.mjs": "2624565f6d09c28f66ce750ac53e6b12f2e92a1f3997db47035aa10ab54bce5e",
+    "scripts/installed-studio-browser-check.py": "10d8a28b8dec29fdb0dde5cb75ef581f424a6f064623dbb037cbdf955315e3c4"
+  },
+  "nodeSha256": "d09e299258c24f7cdf6f5d5ec185e3a56512b27a697113735dac909f1cac7b8d",
+  "nodeVersion": "v22.23.3",
+  "browserExecutableSha256": "e8b500712730fd4cbd0261f675a27c5a79b2375276876f1e3f69db10ee080a72",
+  "helperSha256": "10d8a28b8dec29fdb0dde5cb75ef581f424a6f064623dbb037cbdf955315e3c4",
+  "trustBoundary": "Local pre-execution workspace key consistency; not independent external anchoring",
+  "installedCliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165",
+  "preExecutionMonitorSha256": "03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b",
+  "browserExitCode": 0,
+  "fixtureFile": "/work/out/studio/fixture.json",
+  "sentinelPreserved": true,
+  "browserReceiptComplete": true,
+  "coldVerifiers": [
+    {
+      "sessionId": "e7902b84-c947-4f4a-9cdc-17df97590210",
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"sessionId\": \"e7902b84-c947-4f4a-9cdc-17df97590210\",\n  \"ok\": true,\n  \"prefixVerified\": false,\n  \"integrityOk\": true,\n  \"ledgerOk\": true,\n  \"ledgerErrors\": [],\n  \"sessionChainErrors\": [],\n  \"unsignedRowIds\": [],\n  \"requests\": [\n    {\n      \"headerEventId\": \"6ba8e496-b06b-4391-a737-03ee6a80794c\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    },\n    {\n      \"headerEventId\": \"d8104eb0-d7c3-466f-8f07-bb6f2be4b345\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    }\n  ],\n  \"scope\": \"complete-ledger\",\n  \"unfinalizedSessions\": [],\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"expectedFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  }\n}\n",
+      "kind": "native request reconstruction"
+    },
+    {
+      "sessionId": "3c83c641-41da-4e02-b3ce-2ecc47591477",
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"sessionId\": \"3c83c641-41da-4e02-b3ce-2ecc47591477\",\n  \"ok\": true,\n  \"prefixVerified\": false,\n  \"integrityOk\": true,\n  \"ledgerOk\": true,\n  \"ledgerErrors\": [],\n  \"sessionChainErrors\": [],\n  \"unsignedRowIds\": [],\n  \"requests\": [\n    {\n      \"headerEventId\": \"c84d6e4d-b08e-4413-9a9b-f4404db88d54\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    }\n  ],\n  \"scope\": \"complete-ledger\",\n  \"unfinalizedSessions\": [],\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"expectedFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  }\n}\n",
+      "kind": "native request reconstruction"
+    },
+    {
+      "sessionId": "099c8375-1794-4556-89e3-59afe7dcb941",
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"sessionId\": \"099c8375-1794-4556-89e3-59afe7dcb941\",\n  \"ok\": true,\n  \"prefixVerified\": false,\n  \"integrityOk\": true,\n  \"ledgerOk\": true,\n  \"ledgerErrors\": [],\n  \"sessionChainErrors\": [],\n  \"unsignedRowIds\": [],\n  \"requests\": [\n    {\n      \"headerEventId\": \"a9a10509-8add-4794-a046-493ac46e209b\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    }\n  ],\n  \"scope\": \"complete-ledger\",\n  \"unfinalizedSessions\": [],\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"expectedFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  }\n}\n",
+      "kind": "native request reconstruction"
+    },
+    {
+      "sessionId": "a7aa5346-10ef-42ff-b343-0b422eb34721",
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"sessionId\": \"a7aa5346-10ef-42ff-b343-0b422eb34721\",\n  \"ok\": true,\n  \"prefixVerified\": false,\n  \"integrityOk\": true,\n  \"ledgerOk\": true,\n  \"ledgerErrors\": [],\n  \"sessionChainErrors\": [],\n  \"unsignedRowIds\": [],\n  \"requests\": [\n    {\n      \"headerEventId\": \"108e6e0d-f8c3-447d-9d3c-758e14e6df8c\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    },\n    {\n      \"headerEventId\": \"102065f2-3f61-4724-91e6-6077ce54a9f8\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    }\n  ],\n  \"scope\": \"complete-ledger\",\n  \"unfinalizedSessions\": [],\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"expectedFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  }\n}\n",
+      "kind": "native request reconstruction"
+    },
+    {
+      "sessionId": "2d1e3d37-45a1-4763-8de5-980db4557a55",
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"sessionId\": \"2d1e3d37-45a1-4763-8de5-980db4557a55\",\n  \"ok\": true,\n  \"prefixVerified\": false,\n  \"integrityOk\": true,\n  \"ledgerOk\": true,\n  \"ledgerErrors\": [],\n  \"sessionChainErrors\": [],\n  \"unsignedRowIds\": [],\n  \"requests\": [\n    {\n      \"headerEventId\": \"f19b3a5c-5256-4bec-a8f7-7c43c36b4d28\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    },\n    {\n      \"headerEventId\": \"d9a474a4-8ff5-4a31-b114-4047897bc667\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    }\n  ],\n  \"scope\": \"complete-ledger\",\n  \"unfinalizedSessions\": [],\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"expectedFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  }\n}\n",
+      "kind": "native request reconstruction"
+    },
+    {
+      "sessionId": "f96b0c99-15a1-4185-9911-25a3529c2aeb",
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"sessionId\": \"f96b0c99-15a1-4185-9911-25a3529c2aeb\",\n  \"ok\": true,\n  \"prefixVerified\": false,\n  \"integrityOk\": true,\n  \"ledgerOk\": true,\n  \"ledgerErrors\": [],\n  \"sessionChainErrors\": [],\n  \"unsignedRowIds\": [],\n  \"requests\": [\n    {\n      \"headerEventId\": \"c77e8696-3c27-487c-b2b7-be0398235aa0\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    }\n  ],\n  \"scope\": \"complete-ledger\",\n  \"unfinalizedSessions\": [],\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"expectedFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  }\n}\n",
+      "kind": "native request reconstruction"
+    },
+    {
+      "sessionId": "d18a8d83-16cc-4886-88e2-3a9ad18b3a46",
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"sessionId\": \"d18a8d83-16cc-4886-88e2-3a9ad18b3a46\",\n  \"ok\": true,\n  \"prefixVerified\": false,\n  \"integrityOk\": true,\n  \"ledgerOk\": true,\n  \"ledgerErrors\": [],\n  \"sessionChainErrors\": [],\n  \"unsignedRowIds\": [],\n  \"requests\": [\n    {\n      \"headerEventId\": \"1c0ebe5f-325c-42d6-bf31-d9e2617d2459\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    }\n  ],\n  \"scope\": \"complete-ledger\",\n  \"unfinalizedSessions\": [],\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"expectedFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  }\n}\n",
+      "kind": "native request reconstruction"
+    },
+    {
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"ok\": true,\n  \"errors\": [],\n  \"chain\": {\n    \"ok\": true,\n    \"errors\": []\n  },\n  \"governance\": {\n    \"ok\": true,\n    \"errors\": []\n  },\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"expectedFingerprint\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"03d5eb53e9b26aae3630b5c40bd1767b02a6199b1f4f5d243c2fb2a8e149d44b\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  },\n  \"sessions\": {\n    \"open\": [],\n    \"released\": [\n      \"e7902b84-c947-4f4a-9cdc-17df97590210\",\n      \"3c83c641-41da-4e02-b3ce-2ecc47591477\",\n      \"099c8375-1794-4556-89e3-59afe7dcb941\",\n      \"a7aa5346-10ef-42ff-b343-0b422eb34721\",\n      \"2d1e3d37-45a1-4763-8de5-980db4557a55\",\n      \"f96b0c99-15a1-4185-9911-25a3529c2aeb\"\n    ],\n    \"interrupted\": [],\n    \"closed\": [\n      \"d18a8d83-16cc-4886-88e2-3a9ad18b3a46\"\n    ]\n  },\n  \"claimKind\": \"self_reported\",\n  \"statusDimensions\": {\n    \"applicability\": {\n      \"state\": \"applicable\"\n    },\n    \"evidence\": \"incomplete\",\n    \"result\": \"not_evaluated\",\n    \"enforcement\": {\n      \"state\": \"none\"\n    },\n    \"review\": \"pending\"\n  },\n  \"claimLabel\": \"Claim: Self-reported \u00b7 Result: not evaluated \u00b7 Evidence: incomplete \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: applicable\"\n}\n",
+      "kind": "ledger"
+    }
+  ],
+  "finishedAt": "2026-10-11T08:40:19.935759+00:00"
+}

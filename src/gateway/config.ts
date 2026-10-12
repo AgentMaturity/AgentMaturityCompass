@@ -3,7 +3,7 @@ import { isIP } from "node:net";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { isCredentialValuePresent } from "../credentials/credentialValue.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -384,7 +384,7 @@ export function signGatewayConfig(workspace: string, explicitPath?: string): str
 
   const raw = readFileSync(targetPath);
   const digest = sha256Hex(raw);
-  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  const signature = signHexDigest(digest, getSigningKey(workspace, "config-signature"));
   const sigPayload = {
     configSha256: digest,
     signature,

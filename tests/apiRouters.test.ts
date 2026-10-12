@@ -285,7 +285,7 @@ const m = vi.hoisted(() => ({
 
   boundedModelCheck: vi.fn(() => ({ verified: true })),
   generateTLASpec: vi.fn(() => "---- MODULE Spec ----"),
-  verifyFormalCertificate: vi.fn(() => ({ valid: true })),
+  verifyFormalCertificate: vi.fn(() => ({ valid: true, issues: [] as string[] })),
 
   collectVerifierEvidence: vi.fn(async () => ({ rows: [1] })),
   renderVerifierEvidenceJson: vi.fn(() => ({ exported: true })),
@@ -693,10 +693,10 @@ vi.mock("../src/vault/vault.js", () => ({
   vaultStatus: m.vaultStatus,
   unlockVault: m.unlockVault,
   lockVault: m.lockVault,
-  rotateMonitorKeyInVault: m.rotateMonitorKeyInVault,
   setVaultSecret: m.setVaultSecret,
   getVaultSecret: m.getVaultSecret
 }));
+vi.mock("../src/keys/purposeKeys.js", () => ({ rotateMonitorKeyInVault: m.rotateMonitorKeyInVault }));
 vi.mock("../src/fleet/registry.js", () => ({ loadFleetConfig: m.loadFleetConfig }));
 
 vi.mock("../src/drift/driftCli.js", () => ({
@@ -1259,7 +1259,7 @@ describe("AMC API routers", () => {
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/industry/models", method: "GET", workspace: ws });
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/industry/model/finance", method: "GET", workspace: ws });
     expect((await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/trust/verify-claim", method: "POST", body: { claim: { issuedAt: new Date().toISOString(), expiresAt: new Date().toISOString() }, policy: { minimumTrust: 0.5 } }, workspace: ws })).status).toBe("not_evaluated");
-    await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/trust/create-claim", method: "POST", body: { agentId: "agent-1", publicKeyHash: "hash", issuingWorkspace: "ws", sharedSecret: "secret" }, workspace: ws }, 201);
+    await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/trust/create-claim", method: "POST", body: { agentId: "agent-1", publicKeyHash: "hash", issuingWorkspace: "ws", audience: "agent-2", sharedSecret: "secret" }, workspace: ws }, 201);
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/trust/transitive", method: "POST", body: { graph: { nodes: [] }, sourceAgent: "a", targetAgent: "b" }, workspace: ws });
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/trust/decay", method: "POST", body: { originalScore: 0.9, establishedAt: Date.now() - 1000, config: { halfLifeDays: 30 } }, workspace: ws });
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/trust/inherited", method: "POST", body: { delegatorTrust: { valid: true }, delegateScore: 0.8, policy: { maxDepth: 3 } }, workspace: ws });
@@ -1670,7 +1670,9 @@ describe("AMC API routers", () => {
     await assertJsonRoute(handleEnforceRoute as any, { pathname: "/api/v1/enforce/evaluate", method: "POST", body: { action: "deploy", tool: "kubectl", agentId: "agent-1", context: { env: "prod" } } });
     await assertJsonRoute(handleEnforceRoute as any, { pathname: "/api/v1/enforce/formal/verify", method: "POST", body: { property: { id: "p1", name: "Safe", description: "desc", formula: "G safe", kind: "safety", severity: "high" }, agentState: { ok: true } } });
     await assertJsonRoute(handleEnforceRoute as any, { pathname: "/api/v1/enforce/formal/tla-spec", method: "POST" });
-    await assertJsonRoute(handleEnforceRoute as any, { pathname: "/api/v1/enforce/formal/certificate", method: "POST", body: { certificate: { proof: true } } });
+    const certificate = await assertJsonRoute(handleEnforceRoute as any, { pathname: "/api/v1/enforce/formal/certificate", method: "POST", body: { certificate: { proof: true } } });
+    // P0-51: an unkeyed proof certificate is never an authentic artifact, even when its hash checks out.
+    expect(certificate).toMatchObject({ valid: false, integrityValid: true, status: "UNTRUSTED" });
   });
 
   test("evidence router covers status, list, gaps, ingest, collect, export, attest, and bundle routes", async () => {

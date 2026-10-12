@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { basename, extname, relative, resolve } from "node:path";
 import { z } from "zod";
 import {
-  getPrivateKeyPem,
+  getSigningKey,
   getPublicKeyHistory,
   getPublicKeyPem,
   signHexDigest,
@@ -498,7 +498,7 @@ export function signArtifactProvenance(
     signedTs: Date.now(),
     manifestSha256,
     keyFingerprint: sha256Hex(Buffer.from(monitorPublicKey, "utf8")),
-    signature: signHexDigest(manifestSha256, getPrivateKeyPem(workspace, "monitor"))
+    signature: signHexDigest(manifestSha256, getSigningKey(workspace, "receipt"))
   });
 
   writeFileAtomic(manifestPath, `${canonicalize(manifest)}\n`, 0o644);

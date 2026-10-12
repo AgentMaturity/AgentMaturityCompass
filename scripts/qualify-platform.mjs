@@ -5,8 +5,8 @@ import { spawnSync } from "node:child_process";
 import { closeSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir, release } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { verifyPackedRun } from "./packed-evidence-verification.mjs";
+import { isEntrypoint } from "./lib/entrypoint.mjs";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 export function qualifyPlatform({ root = process.cwd(), out = join(root, "tmp/platform-qualification/report.json"), keep = false } = {}) {
@@ -107,7 +107,7 @@ function qualifyPlatformInOwnedDirectory({ root, out, keep, reportFd }) {
   return report;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isEntrypoint(import.meta.url)) {
   const outIndex = process.argv.indexOf("--out");
   const report = qualifyPlatform({ out: outIndex < 0 ? undefined : resolve(process.argv[outIndex + 1] ?? "tmp/platform-qualification/report.json"), keep: process.argv.includes("--keep") });
   console.log(`Platform qualification: ${report.status}`);

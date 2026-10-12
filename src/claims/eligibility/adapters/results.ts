@@ -75,6 +75,21 @@ export function envelopeForUnverifiedResult(input: {
 }
 
 /**
+ * The claim of an artifact whose verification did not pass: FAILED (`signatureInvalid`), or integrity-only UNTRUSTED
+ * because its issuer is not pinned. The artifact then vouches for nothing it carries: its evidence is untrusted, it
+ * carries no pass and it is never more than self-reported. Rule 6 of evaluateClaimEligibility, applied to an envelope
+ * that was decided before the verdict was known.
+ */
+export function envelopeForFailedVerification(envelope: ClaimEnvelope, signatureInvalid: boolean): ClaimEnvelope {
+  const dimensions = envelope.statusDimensions;
+  const claimKind = CLAIM_KINDS.indexOf(envelope.claimKind) > CLAIM_KINDS.indexOf("self_reported") ? "self_reported" : envelope.claimKind;
+  const reasons: ClaimReasonCode[] = signatureInvalid && !envelope.reasons.includes("SIGNATURE_INVALID")
+    ? [...envelope.reasons, "SIGNATURE_INVALID"] : envelope.reasons;
+  return { ...envelope, claimKind, reasons, statusDimensions: { ...dimensions, evidence: "untrusted",
+    result: dimensions.result === "pass" ? "not_evaluated" : dimensions.result } };
+}
+
+/**
  * An executed test AMC ran against the agent (assurance packs, red-team plugins, benchmarks): observed when at
  * least one scenario reached the agent. A result read back from disk whose seal does not verify is untrusted and
  * self-reported; `sealVerified` is null for a result produced in this process.
@@ -141,17 +156,25 @@ export function envelopeFromDimensions(producer: string, claimKind: ClaimKind, s
 
 const EVIDENCE_ORDER: readonly EvidenceState[] = ["sufficient", "incomplete", "stale", "contradictory", "untrusted"];
 
+const isVerified = (member: ClaimEnvelope): boolean => member.claimKind === "observed" || member.claimKind === "independently_reviewed";
+
 /**
  * A fleet, organisation or report total claims no more than its weakest member: the weakest kind, the worst
- * evidence, the lowest eligible level, a pass only when every member passes and a fail when any fails.
+ * evidence, the lowest eligible level, a pass only when every member passes and a fail when any fails. A self-reported
+ * member's sufficient evidence (a D-03 pass) counts as incomplete, and its pass satisfies no total: D-03 lets a result
+ * show a self-reported pass, never lift a total to sufficient evidence or a pass.
  */
 export function envelopeForAggregate(producer: string, members: readonly ClaimEnvelope[], now: number): ClaimEnvelope {
   if (members.length === 0) return envelopeForUnverifiedResult({ producer, recordCount: 0, now });
   const weakest = members.reduce((a, b) => (CLAIM_KINDS.indexOf(b.claimKind) < CLAIM_KINDS.indexOf(a.claimKind) ? b : a));
+  const selfReportedPass = members.some((member) => !isVerified(member) && member.statusDimensions.result === "pass"
+    && member.statusDimensions.evidence === "sufficient");
   const results = members.map((member) => member.statusDimensions.result);
-  const result: ResultState = results.includes("fail") ? "fail" : results.every((value) => value === "pass") ? "pass" : "not_evaluated";
-  const evidence = members.map((member) => member.statusDimensions.evidence)
-    .reduce((a, b) => (EVIDENCE_ORDER.indexOf(b) > EVIDENCE_ORDER.indexOf(a) ? b : a));
+  const result: ResultState = results.includes("fail") ? "fail"
+    : results.every((value) => value === "pass") && !selfReportedPass ? "pass" : "not_evaluated";
+  const evidence = members.map((member) => (member.statusDimensions.evidence === "sufficient" && !isVerified(member) ? "incomplete"
+    : member.statusDimensions.evidence)).reduce((a, b) => (EVIDENCE_ORDER.indexOf(b) > EVIDENCE_ORDER.indexOf(a) ? b : a));
+  const memberReasons = members.flatMap((member) => member.reasons);
   const levels = members.map((member) => member.eligibleLevel);
   return {
     claimKind: weakest.claimKind,
@@ -159,6 +182,6 @@ export function envelopeForAggregate(producer: string, members: readonly ClaimEn
     provenance: { producer, method: weakest.provenance.method,
       evidenceRefs: [...new Set(members.flatMap((member) => member.provenance.evidenceRefs))] },
     eligibleLevel: levels.includes(null) ? null : Math.min(...(levels as number[])),
-    reasons: [...new Set(members.flatMap((member) => member.reasons))] as ClaimReasonCode[]
+    reasons: [...new Set(selfReportedPass ? [...memberReasons, "SELF_REPORTED_NO_POSITIVE_STATUS"] : memberReasons)] as ClaimReasonCode[]
   };
 }

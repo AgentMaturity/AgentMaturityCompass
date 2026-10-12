@@ -14,7 +14,7 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
+import { signHexDigest, getSigningKey } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { join } from "node:path";
 import { addDebtEntry, loadAllDebt } from "./policyDebt.js";
@@ -378,7 +378,7 @@ export function registerPolicyDebt(
   let signature = "unsigned";
   if (workspace) {
     try {
-      signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+      signature = signHexDigest(digest, getSigningKey(workspace, "artifact-seal"));
     } catch { /* no key */ }
   }
 

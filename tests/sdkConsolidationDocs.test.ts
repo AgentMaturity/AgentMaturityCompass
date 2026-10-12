@@ -67,7 +67,7 @@ describe("SDK consolidation documentation", () => {
   });
 
   test("marks Roberto SDK consolidation resolved without overclaiming package publication", () => {
-    const audit = read("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = read("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
     expect(audit).toContain("SDK consolidation inventory** — ✅ Resolved 2026-06-16");
     expect(audit).toContain("Node/TypeScript, Python, and Go SDK assets are repo-visible");
     expect(audit).toContain("packaged SDK publication remains open");

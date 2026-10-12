@@ -133,12 +133,13 @@ AMC tracks four outcomes: connected agent, first observed action, first control 
 
 The status command is pure inspection. It does not mint a lease, call a provider, run a sample task, generate traffic, append evidence, or create a second onboarding record. Run your own agent action through AMC, then refresh the command or the Studio Activation path.
 
-**Add a badge to your README:**
+**Passport badge line:**
 
 ```bash
-amc badge
-# ![AMC L3](https://img.shields.io/badge/AMC-L3%20Defined-blue)
+amc badge    # one line from the agent's passport; the claim line goes to stderr
 ```
+
+`amc badge` shows only what AMC recorded for the agent: it takes no level or score. It is not a certification mark; badges for a README will only come from a public registry (Gate G3).
 
 **Telemetry: there is none.**
 

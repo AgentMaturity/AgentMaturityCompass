@@ -1,8 +1,10 @@
 # SSO OIDC (Auth Code + PKCE)
 
-AMC supports host-level OIDC login for multi-workspace deployments.
+AMC has host-level OIDC login for multi-workspace deployments. It is unqualified: login CSRF and session fixation are still open (see [Current boundaries](#current-boundaries)), and no interoperability with Okta, Entra or any other identity provider has been recorded.
 
 ## Add an OIDC Provider
+
+The example is illustrative: `okta` and the URLs are placeholders, not a tested integration.
 
 ```bash
 amc identity provider add oidc \

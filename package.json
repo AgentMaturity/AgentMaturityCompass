@@ -49,8 +49,12 @@
     "accessibility:release-evidence": "node scripts/write-accessibility-release-evidence.mjs --report tmp/accessibility-playwright.json --out docs/runbooks/accessibility-release-evidence-latest.md",
     "test:watch": "vitest",
     "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "changeset publish",
+    "version-packages": "node scripts/release-prepare.mjs --version-only",
+    "release": "node -e \"console.error('Not published from a shell: push the v<version> tag; release.yml is the only publisher (docs/RELEASE_RUNBOOK.md).');process.exit(1)\"",
+    "release:prepare": "node scripts/release-prepare.mjs",
+    "release:notes": "node scripts/release-notes.mjs",
+    "check:release-candidate": "node scripts/check-release-candidate.mjs",
+    "check:pack-contents": "node scripts/check-pack-contents.mjs",
     "release:gate": "node scripts/release-gate.mjs",
     "release:prepack-check": "node scripts/prepack-release-check.mjs",
     "qa:install-personas": "node scripts/install-persona-qa.mjs",
@@ -68,6 +72,7 @@
     "postinstall": "node scripts/postinstall.js || true",
     "gen-counts": "node scripts/gen-counts.mjs --write",
     "check:counts": "node scripts/gen-counts.mjs --check",
+    "mutation:batch": "node scripts/mutation-batch.mjs",
     "check:freeze": "node scripts/check-freeze.mjs",
     "check:no-fabrication": "node scripts/check-no-fabrication.mjs",
     "check:threat-model": "node scripts/check-threat-model.mjs",
@@ -81,6 +86,7 @@
     "check:api-ref": "node scripts/gen-api-ref.cjs --check",
     "gen:schemas": "node scripts/gen-spec-schemas.mjs --write",
     "check:schemas": "node scripts/gen-spec-schemas.mjs --check",
+    "gen:pi-conformance-matrix": "node scripts/gen-pi-conformance-matrix.mjs --write",
     "check:question-bank-export": "node scripts/gen-question-bank-export.mjs --check",
     "check:gates": "node scripts/check-gate-reachability.mjs",
     "test:coverage": "vitest run --coverage",
@@ -100,7 +106,12 @@
     "check:package": "node scripts/package-lint.mjs",
     "check:duplicates": "node scripts/source-quality.mjs duplicates",
     "check:dead-code": "node scripts/source-quality.mjs dead-code",
-    "check:coverage": "node scripts/per-file-coverage.mjs"
+    "quality:baseline": "node scripts/source-quality.mjs",
+    "check:coverage": "node scripts/per-file-coverage.mjs",
+    "check:deploy-pack": "node scripts/deploy/deploy-pack-check.mjs",
+    "deploy:rollback-drill": "node scripts/deploy/rollback-drill.mjs",
+    "deploy:verify": "node scripts/deploy-verify.mjs",
+    "check:credentials-presence": "node scripts/credentials-presence-check.mjs"
   },
   "keywords": [
     "ai-agent",
@@ -149,6 +160,10 @@
     "./sdk/native": {
       "types": "./dist/sdk/nativeAgentClient.d.ts",
       "import": "./dist/sdk/nativeAgentClient.js"
+    },
+    "./pi": {
+      "types": "./dist/adapters/pi/amcPiExtension.d.ts",
+      "import": "./dist/adapters/pi/amcPiExtension.js"
     },
     "./standard/external-evidence": {
       "types": "./dist/standard/externalEvidenceProfile.d.ts",

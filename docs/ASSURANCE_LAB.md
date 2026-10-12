@@ -80,8 +80,8 @@ amc assurance run --scope workspace --pack all
 amc assurance runs
 amc assurance show --run <runId>
 
-amc assurance cert issue --run <runId>
-amc assurance cert verify .amc/assurance/certificates/latest.amccert
+amc assurance cert-issue --run <runId>
+amc assurance cert-verify .amc/assurance/certificates/latest.amccert --pubkey <recorded-auditor.pub>
 
 amc assurance scheduler status
 amc assurance scheduler run-now
@@ -110,14 +110,14 @@ amc assurance verify-policy
 amc assurance run --demo
 amc assurance runs
 amc assurance show --run <runId>
-amc assurance cert issue --run <runId>
-amc assurance cert verify .amc/assurance/certificates/latest.amccert
+amc assurance cert-issue --run <runId>
+amc assurance cert-verify .amc/assurance/certificates/latest.amccert --pubkey <recorded-auditor.pub>
 ```
 
 What to check before sharing a certificate:
 - The run is signed, not `UNSIGNED`.
 - `amc assurance verify-policy` passes against `.amc/assurance/policy.yaml.sig`.
-- `amc assurance cert verify .amc/assurance/certificates/latest.amccert` passes locally.
+- `amc assurance cert-verify .amc/assurance/certificates/latest.amccert --pubkey <recorded-auditor.pub>` passes locally.
 - The remediation-priority section has no unresolved CRITICAL items unless the exception is explicitly approved and documented.
 
 ## Policy Threshold Tuning

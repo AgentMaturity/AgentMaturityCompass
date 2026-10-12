@@ -14,6 +14,7 @@ import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { afterEach, describe, expect, test } from "vitest";
+import { findTruthClaims, findUnknownCommands, loadKnownCommands } from "../scripts/docs-drift-check.mjs";
 
 const root = resolve(process.cwd());
 const temporaryDirectories: string[] = [];
@@ -237,6 +238,33 @@ describe("truthful public distribution and brand contract", () => {
     expect(docsDriftCheck).toContain("if (!existsSync(full)) return [];");
   });
 
+  test("docs-drift fails a banned claim word used as a status and passes a negation, a quote or code (P0-28)", () => {
+    const claims = (text: string) => findTruthClaims("docs/FIXTURE.md", text).map((claim) => claim.match);
+    expect(claims("AMC is certified.")).toEqual(["certified"]);
+    expect(claims("Every agent run here is fully certified.")).toEqual(["certified"]);
+    expect(claims("The agent is EU AI Act compliant.")).toEqual(["compliant"]);
+    expect(claims("Delivery is guaranteed.")).toEqual(["guaranteed"]);
+    expect(claims("AMC does not certify legal compliance.")).toEqual([]);
+    expect(claims("A signed bundle is not certified by anyone.")).toEqual([]);
+    expect(claims("Never print the phrase \"certification ready\".")).toEqual([]);
+    expect(claims("Run `amc certified-thing` in code.")).toEqual([]);
+    expect(findTruthClaims("website/fixture.html", "<p>Fully <b>certified</b> agents.</p>").map((c) => c.match)).toEqual(["certified"]);
+    expect(findTruthClaims("website/fixture.html", "<script>/certified/.test(x)</script>")).toEqual([]);
+  });
+
+  test("docs-drift fails an amc command the CLI inventory does not register (P0-28)", () => {
+    const known = loadKnownCommands(read("docs/CLI_COMMAND_INVENTORY.md"));
+    const unknown = (text: string) => findUnknownCommands("docs/FIXTURE.md", text, known).map((found) => found.command);
+    expect(unknown("```bash\namc trust decay --preset healthcare\n```")).toEqual(["amc trust decay"]);
+    expect(unknown("Run `amc trust graph --show`.")).toEqual(["amc trust graph"]);
+    expect(unknown("Run `amc telemetry on`.")).toEqual(["amc telemetry"]);
+    expect(unknown("```bash\namc fleet trust-graph --format mermaid\n```")).toEqual([]);
+    expect(unknown("Run `amc start` or `amc sector list`.")).toEqual([]);
+    expect(unknown("There is no `amc trust decay` command.")).toEqual([]);
+    expect(findUnknownCommands("website/fixture.html", "<code>amc trust transitive</code>", known).map((f) => f.command))
+      .toEqual(["amc trust transitive"]);
+  });
+
   test("pins and verifies release assets before either hosted installer executes them", () => {
     const repositoryUnix = read("install.sh");
     const unix = read("website/install.sh");
@@ -259,14 +287,16 @@ describe("truthful public distribution and brand contract", () => {
     expect(workflow).toContain("actions/download-artifact@v8");
     expect(workflow).not.toContain("actions/upload-artifact@v4");
     expect(workflow).not.toContain("actions/download-artifact@v4");
-    expect(workflow).toContain("workflow_dispatch:");
-    expect(workflow).toContain('AMC_RELEASE_TAG: ${{ github.event_name');
+    // P0-34: a tag push is the only trigger; no dispatch input may choose what is released.
+    expect(workflow).not.toContain("workflow_dispatch:");
+    expect(workflow).toContain("AMC_RELEASE_TAG: ${{ github.ref_name }}");
     expect(workflow.match(/env -u GITHUB_REF_NAME/g)).toHaveLength(2);
     expect(workflow).toContain("tr '[:upper:]' '[:lower:]'");
-    expect(workflow).toContain("tag_name: ${{ env.AMC_RELEASE_TAG }}");
+    expect(workflow).toContain('gh release create "$AMC_RELEASE_TAG" --verify-tag');
     expect(workflow).not.toContain("ghcr.io/${{ github.repository_owner }}/amc-studio");
     expect(workflow).toContain("secrets.NPM_TOKEN");
-    expect(workflow).toMatch(/if \[ -z "\$NODE_AUTH_TOKEN" \]/);
+    // P0-34: a missing credential fails the publish; tests/releaseWorkflowContract.test.ts owns that contract.
+    expect(workflow).not.toContain("Skipping npm publish");
   });
 
   test("keeps every pending changeset on the canonical package name", () => {

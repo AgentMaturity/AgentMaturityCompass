@@ -5,7 +5,7 @@ import { writeFileSync } from "node:fs";
 import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { EgressBlocked } from "../residency/checkEgress.js";
 import {
-  getPrivateKeyPem,
+  getSigningKey,
   getPublicKeyHistory,
   signHexDigest,
   verifyHexDigestAny
@@ -451,7 +451,7 @@ export function enqueueIntegrationDeliveries(params: {
         });
         const bindingSignature = signHexDigest(
           bindingDigest,
-          getPrivateKeyPem(params.workspace, "auditor")
+          getSigningKey(params.workspace, "artifact-seal")
         );
         const result = insert.run(
           queueId,

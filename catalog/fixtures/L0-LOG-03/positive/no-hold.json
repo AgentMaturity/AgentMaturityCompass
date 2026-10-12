@@ -1,0 +1,16 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-LOG-03",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "deletion_gate",
+    "executor": "layer0-fixture",
+    "target": "logs",
+    "holds": "none"
+  },
+  "expected": {
+    "result": "allow",
+    "reasonCode": null
+  }
+}

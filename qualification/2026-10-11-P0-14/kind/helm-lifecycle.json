@@ -1,0 +1,59 @@
+{
+  "kind": "amc.helm-lifecycle/1",
+  "commit": "1916ed65ec47a5c23b2a4e4a90e781439687c94e",
+  "cluster": "kind",
+  "builtImageId": "sha256:eaeabd293ae99fd68aee66d941422e13692291b1d2decb7c49701eed24c95078",
+  "monitorPinSource": "trust-on-first-use: read from the pod workspace volume",
+  "status": "passed",
+  "steps": {
+    "install": 0,
+    "pin": 0,
+    "pair-1": 0,
+    "test-1": 0,
+    "upgrade": 0,
+    "rollback": 0,
+    "pair-2": 0,
+    "test-2": 0
+  },
+  "probeStatuses": [
+    "verified-prefix",
+    "verified-prefix"
+  ],
+  "revisions": [
+    {
+      "revision": 1,
+      "status": "superseded",
+      "chart": "amc-0.2.0",
+      "appVersion": "1.2.0",
+      "description": "Install complete"
+    },
+    {
+      "revision": 2,
+      "status": "superseded",
+      "chart": "amc-0.2.0",
+      "appVersion": "1.2.0",
+      "description": "Upgrade complete"
+    },
+    {
+      "revision": 3,
+      "status": "superseded",
+      "chart": "amc-0.2.0",
+      "appVersion": "1.2.0",
+      "description": "Upgrade complete"
+    },
+    {
+      "revision": 4,
+      "status": "deployed",
+      "chart": "amc-0.2.0",
+      "appVersion": "1.2.0",
+      "description": "Rollback to 2"
+    }
+  ],
+  "images": [
+    {
+      "pod": "amc-amc-6bdbcdb797-2tz8l",
+      "image": "docker.io/library/amc-studio:ci",
+      "imageID": "docker.io/library/import-2026-10-10@sha256:f2fab92ce7108a3f9eb5c0ffe617b94b0bf2116bbdf54b4ceafaae18777f19b2"
+    }
+  ]
+}

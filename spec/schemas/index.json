@@ -23,7 +23,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-gate.schema.json",
       "name": "a4-gate.schema.json",
-      "sha256": "8b4bebab787e3b58d3abf770746f7b2652bd43158950b1819abd227975276bd0"
+      "sha256": "ad8466afdb87b4f0d3160feb0f876c0a043cff59a6b48eaacad8ecf3de298da8"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-integration-claim.schema.json",
@@ -183,7 +183,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/trust-list.schema.json",
       "name": "trust-list.schema.json",
-      "sha256": "2b6af58b33879b08373990e9fc3d0b9144d81758557df2641d8a626c7be165d5"
+      "sha256": "f0f90a6be05e3ffea31bcece22c025bf547d94e7ffbc199fa616df94599f078e"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/verifier-report.schema.json",

@@ -62,6 +62,44 @@ describe("release engineering pack", () => {
     }
   });
 
+  it("embeds the gated npm tarball, SBOM and licence files byte for byte instead of packing (P0-34)", () => {
+    const dir = tmp("amc-release-gated-");
+    try {
+      const source = join(dir, "source");
+      mkdirSync(join(source, "dist"), { recursive: true });
+      writeFileSync(join(source, "package.json"), JSON.stringify({ name: "agent-maturity-compass", version: "1.0.0", license: "MIT", files: ["dist"] }));
+      writeFileSync(join(source, "package-lock.json"), JSON.stringify({ lockfileVersion: 3, packages: {} }));
+      const gated = join(dir, "gated");
+      mkdirSync(join(gated, "package"), { recursive: true });
+      writeFileSync(join(gated, "package", "package.json"), JSON.stringify({ name: "agent-maturity-compass", version: "1.0.0", gated: true }));
+      const tarball = join(dir, "agent-maturity-compass-1.0.0.tgz");
+      repackFromDir(gated, tarball);
+      const sbomFile = join(dir, "sbom.cdx.json");
+      const licensesFile = join(dir, "licenses.json");
+      writeFileSync(sbomFile, '{"gated":"sbom"}\n');
+      writeFileSync(licensesFile, '{"gated":"licenses"}\n');
+      const privateKeyPath = join(dir, "release-signing.pem");
+      writeFileSync(privateKeyPath, makePrivateKeyPem(), { mode: 0o600 });
+      const outFile = join(dir, "bundle.amcrelease");
+      createReleaseBundle({ workspace: source, outFile, privateKeyPath, npmTarball: tarball, sbomFile, licensesFile });
+      expect(verifyReleaseBundle(outFile, releaseTrust(privateKeyPath)).ok).toBe(true);
+      const extracted = join(dir, "extracted");
+      mkdirSync(extracted);
+      expect(spawnSync("tar", ["-xzf", outFile, "-C", extracted]).status).toBe(0);
+      const artifacts = join(extracted, "amc-release", "artifacts");
+      expect(readFileSync(join(artifacts, "npm", "agent-maturity-compass-1.0.0.tgz")).equals(readFileSync(tarball))).toBe(true);
+      expect(readFileSync(join(artifacts, "sbom", "sbom.cdx.json"), "utf8")).toBe('{"gated":"sbom"}\n');
+      expect(readFileSync(join(artifacts, "licenses", "licenses.json"), "utf8")).toBe('{"gated":"licenses"}\n');
+      expect(readFileSync(tarball).length).toBeGreaterThan(0);
+      const renamed = join(dir, "other.tgz");
+      cpSync(tarball, renamed);
+      expect(() => createReleaseBundle({ workspace: source, outFile: join(dir, "b2.amcrelease"), privateKeyPath, npmTarball: renamed }))
+        .toThrow("npm tarball other.tgz is not agent-maturity-compass-1.0.0.tgz");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it("fails verify on tampered manifest and artifact and wrong pubkey", () => {
     const dir = tmp("amc-release-tamper-");
     const extracted = join(dir, "extract");

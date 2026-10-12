@@ -1,0 +1,59 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-MON-04
+version: "0.1.0"
+support: experimental
+layer: 0
+family: monitoring-incidents-and-resilience
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Safe state on provider outage
+statement: >-
+  When the model or provider is unavailable, new effects stop or a safe state with a recorded hazard
+  analysis applies, and an incident is recorded.
+riskRationale: >-
+  An agent that improvises when its provider fails can leave half-finished effects nobody tracks.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations: []
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline]
+  mechanism: >-
+    A provider failure stops new protected calls or switches to the documented safe state and records an
+    incident.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L0-MON-04-T1
+    type: drill
+    oracle: { kind: system_of_record, observes: Effects and incident records during a simulated outage. }
+    fixtures:
+      positive: [L0-MON-04/positive/evidence-valid.json]
+      negative:
+        - L0-MON-04/negative/evidence-contradictory.json
+        - L0-MON-04/negative/evidence-cross-tenant.json
+        - L0-MON-04/negative/evidence-empty.json
+        - L0-MON-04/negative/evidence-replayed.json
+        - L0-MON-04/negative/evidence-stale.json
+        - L0-MON-04/negative/evidence-violation.json
+    passCriteria: >-
+      During the outage no new protected effect starts outside the safe state and an incident is recorded.
+    attempts: 1
+evidence:
+  - id: L0-MON-04-E1
+    producer: amc.providerOutage.safeState
+    bindingFields: [deploymentId, controlId]
+    freshness: { maxAgeDays: 180 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [model_version, deployment_version]
+owner: { role: ciso }
+clock: null
+levels: [L2]
+crosswalk: []
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

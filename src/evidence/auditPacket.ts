@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { openLedger, verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -206,7 +206,7 @@ export async function generateAuditPacket(params: GenerateAuditPacketParams): Pr
     signer: "auditor" as const,
     signedTs: nowTs,
     manifestSha256,
-    signature: signHexDigest(manifestSha256, getPrivateKeyPem(params.workspace, "auditor"))
+    signature: signHexDigest(manifestSha256, getSigningKey(params.workspace, "artifact-seal"))
   };
 
   entries.push({

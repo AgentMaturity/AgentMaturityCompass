@@ -358,4 +358,4 @@ See [`DOMAIN_PROOF_LANE.md`](./DOMAIN_PROOF_LANE.md) for the proof taxonomy and 
 - Domain packs are additive and never replace base AMC.
 - Aliases are routing aids, not duplicate domains; reports and JSON output use the canonical domain ID.
 - Compliance gaps include regulatory references and remediation text.
-- Certification readiness is domain-threshold aware and sensitive to critical L1 gaps.
+- There is no certification readiness verdict; the one earlier versions printed was fabricated and is removed (see [Results Without Evidence](#results-without-evidence-not-evaluated)).

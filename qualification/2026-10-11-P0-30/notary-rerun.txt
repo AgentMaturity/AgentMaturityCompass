@@ -1,0 +1,30 @@
+# AMC-1529 notary stack rerun (P0-30 step 8)
+environment: local colima profile amc-s7f (Docker 29.5.2, linux/arm64 VM) on macOS arm64; not CI
+source: git clone of rtd/p0-30-security-mutations at 885bd72cb9364f4250a5ee351737ca8a563c0aef
+image: amc-studio:p030 sha256:c33365b5a6503ed103dbaba8c46e72abada80c2d195d93393aaac12432ac64ce arm64, built with: docker buildx build --target studio -t amc-studio:p030 --load . (exit 0, 5m03s)
+compose: the docker compose plugin is not installed on this host, so the docker-compose.tls.yml services amc-notary and amc-studio were started with docker run using the same image, command, environment, read-only root, tmpfs, cap-drop ALL, volumes and file secrets (secrets copied into a volume at /run/secrets). Caddy was not started. Network: an internal (no egress) bridge with alias amc-notary.
+notary /readyz: 200 READY
+studio /readyz: 200 trustMode="trustMode":"NOTARY" trustOk="trustOk":true
+notary signing log entries after Studio bootstrap: 8
+secret-absence probe (grep -c -F of each synthetic secret value in docker logs; must be 0):
+  amc_vault_passphrase: notary=0 studio=0
+  amc_notary_passphrase: notary=0 studio=0
+  amc_notary_auth_secret: notary=0 studio=0
+  amc_owner_password: notary=0 studio=0
+  common prefix synthetic-p030-: 0
+log line counts: notary=       1 studio=      14
+studio log (no secrets):
+  [amc] Explicit notary admission expanded the auditor signing role (99a1eb6a6571573f952f96b35c242f965ef7764b0b3700ea8f2e4ed508f50ecc).
+  Bootstrap completed
+  Workspace: /data/amc
+  Report: /data/amc/.amc/bootstrap/bootstrap_1791675070537.json
+  Signature: /data/amc/.amc/bootstrap/bootstrap_1791675070537.json.sig
+  Transparency entry: fa783a8b8b8941c9691e8d6b9afd52d3d9594f517fe96eafa96ae83b07289fbf
+  AMC gateway listening on http://0.0.0.0:3210
+  AMC gateway proxy listening on http://0.0.0.0:3211
+  Studio started
+  Studio API: http://0.0.0.0:3212
+  Gateway: http://0.0.0.0:3210
+  Proxy: http://0.0.0.0:3211
+  Dashboard: http://0.0.0.0:4173
+  Metrics: http://127.0.0.1:9464/metrics

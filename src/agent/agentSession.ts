@@ -89,7 +89,12 @@ export type AgentPromptResult =
       readonly turnEndReason?: TurnEndReason;
       readonly validation: NativeValidationResult;
     }
-  | { readonly ok: false; readonly reason: string };
+  | {
+      readonly ok: false;
+      readonly reason: string;
+      /** Recorded failure codes of the failed turn (e.g. AMC_NATIVE_BUDGET_REFUSED), so a client can tell AMC's refusal from a provider's. */
+      readonly failureCodes?: readonly string[];
+    };
 
 export interface AgentSession {
   readonly sessionId: string;
@@ -262,7 +267,11 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
           const knownEndings: readonly TurnEndReason[] = ["complete", "cancelled", "max_tokens", "max_steps", "blocked", "error", "interrupted"];
           const failed = endings.find(ending => ending.reason === "error" || ending.reason === "interrupted"
             || !knownEndings.some(reason => reason === ending.reason));
-          if (failed) return { ok: false, reason: `signed turn ${failed.turn} ended ${failed.reason}; idle is not successful completion` };
+          if (failed) {
+            const failureCodes = (summary.diagnostics ?? []).filter(row => row.turn === failed.turn).map(row => row.guidance.code);
+            return { ok: false, reason: `signed turn ${failed.turn} ended ${failed.reason}; idle is not successful completion`,
+              ...(failureCodes.length === 0 ? {} : { failureCodes }) };
+          }
           const turnEndReason = knownEndings.find(reason => reason === endings.at(-1)?.reason);
           if (turnEndReason === undefined) return { ok: false, reason: "the prompt produced no recorded turn ending" };
           return { ok: true, text: fresh.join("\n"), status, turnEndReason, validation: summary.validation };

@@ -12,10 +12,14 @@ function workspace(): string {
   return dir;
 }
 
+/** A first-run user has no vault passphrase: the suite's own (tests/setup/vaultPassphrase.ts) is removed. */
 function runCli(cwd: string, args: string[]) {
+  const env: NodeJS.ProcessEnv = { ...process.env, NO_COLOR: "1" };
+  delete env.AMC_VAULT_PASSPHRASE;
+  delete env.AMC_VAULT_PASSPHRASE_FILE;
   return spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), ...args], {
     cwd,
-    env: { ...process.env, NO_COLOR: "1" },
+    env,
     encoding: "utf8"
   });
 }
@@ -105,7 +109,7 @@ describe("first-run evidence capture", () => {
   test("keeps onboarding docs and UX audit aligned with the first-run capture path", () => {
     const gettingStarted = readFileSync(resolve(process.cwd(), "docs/GETTING_STARTED.md"), "utf8");
     const startupGuidance = readFileSync(resolve(process.cwd(), "src/startup/startupGuidance.ts"), "utf8");
-    const uxAudit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const uxAudit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(gettingStarted).toContain("amc evidence collect --first-run --runtime any -- node agent.js");
     expect(gettingStarted).not.toContain("amc score collect-evidence my-agent");

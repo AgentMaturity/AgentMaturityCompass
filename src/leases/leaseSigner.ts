@@ -1,5 +1,5 @@
 import { randomUUID, sign } from "node:crypto";
-import { getPrivateKeyPem } from "../crypto/keys.js";
+import { getSigningKey } from "../crypto/keys.js";
 import { canonicalize } from "../utils/json.js";
 import type { ActionClass } from "../types.js";
 import { leasePayloadSchema, type LeasePayload, type LeaseScope } from "./leaseSchema.js";
@@ -22,6 +22,8 @@ export interface IssueLeaseInput {
   workOrderId?: string | null;
   /** Narrows toolhub:execute to these classes; omitted, the lease covers every class policy allows. */
   executeActionClasses?: ActionClass[];
+  /** The users.yaml user the lease is issued for (P1-78); see `LeasePayload.principal`. */
+  principal?: LeasePayload["principal"];
 }
 
 export function issueLeaseToken(input: IssueLeaseInput): { token: string; payload: LeasePayload } {
@@ -41,11 +43,12 @@ export function issueLeaseToken(input: IssueLeaseInput): { token: string; payloa
     maxTokensPerMinute: input.maxTokensPerMinute,
     maxRequestsPerMinute: input.maxRequestsPerMinute,
     maxCostUsdPerDay: input.maxCostUsdPerDay,
-    nonce: randomUUID().replace(/-/g, "")
+    nonce: randomUUID().replace(/-/g, ""),
+    ...(input.principal === undefined ? {} : { principal: input.principal })
   });
 
   const payloadBytes = Buffer.from(canonicalize(payload), "utf8");
-  const signature = sign(null, payloadBytes, getPrivateKeyPem(input.workspace, "lease"));
+  const signature = sign(null, payloadBytes, getSigningKey(input.workspace, "lease"));
   return {
     token: `${toBase64Url(payloadBytes)}.${toBase64Url(signature)}`,
     payload

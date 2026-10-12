@@ -9,7 +9,7 @@ Policy packs are deterministic golden governance bundles keyed by archetype/risk
 - `alerts.yaml`
 - `approval-policy.yaml`
 - recommended `gatePolicy.json`
-- recommended 126-question equalizer adjustments
+- recommended equalizer adjustments over the default diagnostic question bank
 
 All applied files are signed and auditable.
 

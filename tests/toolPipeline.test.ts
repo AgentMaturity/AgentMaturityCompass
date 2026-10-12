@@ -88,6 +88,46 @@ describe("a call traverses the full pipeline", () => {
     expect(outcome.denied?.stage).toBe("visibility");
     expect(outcome.denied?.guardLabel).toBeNull();
   });
+
+  it("records the visibility refusal of an unknown tool, with no class, exactly once (P1-78)", async () => {
+    const recorded: Array<{ name: string; actionClass: string | null; callId: string; stage: string | undefined }> = [];
+    const pipeline = new ToolPipeline({ registry: new ToolRegistry(), workspace: WORKSPACE,
+      record: (execution, outcome) => recorded.push({ name: execution.name, actionClass: execution.actionClass, callId: execution.callId, stage: outcome.denied?.stage }) });
+    const outcome = await pipeline.execute({ name: "nope", agentId: "a", arguments: { x: 1 }, requestedMode: "EXECUTE", callId: "call-1" });
+    expect(outcome.denied?.stage).toBe("visibility");
+    expect(recorded).toEqual([{ name: "nope", actionClass: null, callId: "call-1", stage: "visibility" }]);
+  });
+
+  it("refuses every later call, before its body, once a recorder write failed (P1-78)", async () => {
+    let bodies = 0;
+    let failing = true;
+    const registry = new ToolRegistry();
+    registry.define(echoTool({ body: () => { bodies += 1; return { output: "ran" }; } }));
+    const recorded: string[] = [];
+    const pipeline = new ToolPipeline({ registry, workspace: WORKSPACE, record: (execution, outcome) => {
+      if (failing) throw new Error("ledger down");
+      recorded.push(`${execution.name}:${outcome.denied?.reason ?? "ok"}`);
+    } });
+    const first = await pipeline.execute({ name: "echo", agentId: "a", arguments: {}, requestedMode: "EXECUTE" });
+    expect(first.ok, "the in-flight call keeps its real outcome").toBe(true);
+    failing = false;
+    const later = await pipeline.execute({ name: "echo", agentId: "a", arguments: {}, requestedMode: "EXECUTE" });
+    expect(later.ok).toBe(false);
+    expect(later.denied?.reason).toContain("EVIDENCE_RECORDER_FAILED");
+    expect(bodies, "no body ran after the lost row").toBe(1);
+    expect(recorded, "the refusal itself is recorded once the recorder answers again").toEqual([`echo:${later.denied?.reason}`]);
+    // A refusal whose own record fails latches too: nothing can be dispatched without its evidence.
+    const refusing = new ToolPipeline({ registry: new ToolRegistry(), workspace: WORKSPACE, record: () => { throw new Error("ledger down"); } });
+    await refusing.execute({ name: "nope", agentId: "a", arguments: {}, requestedMode: "EXECUTE" });
+    const after = await refusing.execute({ name: "nope", agentId: "a", arguments: {}, requestedMode: "EXECUTE" });
+    expect(after.denied?.reason).toContain("EVIDENCE_RECORDER_FAILED");
+  });
+
+  it("returns the visibility refusal unchanged when the recorder throws", async () => {
+    const pipeline = new ToolPipeline({ registry: new ToolRegistry(), workspace: WORKSPACE, record: () => { throw new Error("ledger down"); } });
+    const outcome = await pipeline.execute({ name: "nope", agentId: "a", arguments: {}, requestedMode: "EXECUTE" });
+    expect(outcome.denied).toEqual({ stage: "visibility", reason: 'unknown tool "nope"', guardLabel: null });
+  });
 });
 
 describe("a guard cannot launder a denial by ordering", () => {

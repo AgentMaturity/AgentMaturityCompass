@@ -1,0 +1,33 @@
+{
+  "key": "P1-14",
+  "commit": "1d04929017c12a2b09b786b6a6c649bde268f254",
+  "controlsTotal": 47,
+  "controlsWithExecutedTests": 17,
+  "controlsAwaitingProducer": 30,
+  "executedControlIds": [
+    "L0-DAT-01",
+    "L0-DAT-03",
+    "L0-DAT-04",
+    "L0-IDN-01",
+    "L0-IDN-02",
+    "L0-IDN-04",
+    "L0-INV-01",
+    "L0-LOG-01",
+    "L0-LOG-02",
+    "L0-LOG-03",
+    "L0-MON-01",
+    "L0-MON-02",
+    "L0-OVS-01",
+    "L0-OVS-02",
+    "L0-OVS-03",
+    "L0-TOOL-01",
+    "L0-TOOL-04"
+  ],
+  "negativeFixturesRun": {
+    "throughEvaluateControl": 288,
+    "againstEnforcementPoints": 50,
+    "total": 338,
+    "passed": 0
+  },
+  "note": "Executed tests mostly cover part of each control statement; docs/catalog/LAYER0.md says which part. Every control is experimental, agent-drafted and not independently reviewed."
+}

@@ -8,7 +8,7 @@ AMC compliance reports are **evidence-linked signals**, not legal certifications
   - required evidence event types with minimum OBSERVED ratio
   - required assurance pack score thresholds
   - required absence of denylisted audit events
-- Produces, per category, the five status dimensions (`dimensions`: applicability, evidence, result, enforcement, review), a derived `claimKind`, the `admitted` and `rejected` evidence refs with reasons, `notEvaluatedReasons`, and `result` and `evidence` copied from the dimensions. The decision table is in [catalog/CONTROL_RECORD.md](catalog/CONTROL_RECORD.md#status-dimensions).
+- Produces, per category, the five status dimensions (`dimensions`: applicability, evidence, result, enforcement, review), a derived `claimKind`, the `admitted` and `rejected` evidence refs with reasons, `notEvaluatedReasons`, and `result` and `evidence` copied from the dimensions. The decision table is in [catalog/CONTROL_RECORD.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/catalog/CONTROL_RECORD.md#status-dimensions).
 - Keeps a derived `status` for one more minor release: `SATISFIED` (result `pass`), `MISSING` (`fail`) or `NOT_EVALUATED` (`not_evaluated`). It never emits `PARTIAL` or `UNKNOWN`; those appear only in reports written by earlier versions.
 - Includes exact evidence references (event IDs/hashes, run context) and a "what to collect next" checklist.
 
@@ -30,7 +30,7 @@ Per category: any failed requirement fails it (`MISSING`); a pass needs every re
 
 Applicability: no compiled plan records yet whether a control applies to this deployment (P1-10), so applicability is `unresolved` and a category with sufficient evidence is still `NOT_EVALUATED`. Only a failure is evaluated until then.
 
-Coverage: only a pass earns credit; `PARTIAL` and `UNKNOWN` earn nothing, and `NOT_EVALUATED` earns 0 and stays in the denominator. `coverage.score` is `null` when no category was evaluated, and the CLI prints `Coverage: not evaluated (0 of N categories passed or failed)`. A report is evidence of conformity, not a certification.
+Coverage: only an observed or independently reviewed pass earns credit (a self-reported pass counts as not evaluated); `PARTIAL` and `UNKNOWN` earn nothing, and `NOT_EVALUATED` earns 0 and stays in the denominator. `coverage.score` is `null` when no category was evaluated, and the CLI prints `Coverage: not evaluated (0 of N categories passed or failed)`. A report is evidence of conformity, not a certification.
 
 ## Built-in Framework Families
 - `SOC2` (Trust Services categories)

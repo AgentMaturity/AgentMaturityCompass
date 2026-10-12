@@ -42,7 +42,7 @@ import type { EvidenceEvent, SessionRecord } from "../../types.js";
 import { assertSessionWriteAllowed } from "../../session/sessionOwnership.js";
 import { verifyStoredSessionEventMetadata } from "../sessionStoreVerification.js";
 import { canonicalMetadataForHash } from "../../ledger/eventHash.js";
-import { ensureSigningKeys, getPrivateKeyPem, signHexDigestWith } from "../../crypto/keys.js";
+import { ensureSigningKeys, getSigningKey, signHexDigestWith } from "../../crypto/keys.js";
 import { loadOpsPolicy } from "../../ops/policy.js";
 import { queueEvidenceEventSpan } from "../../observability/otelExporter.js";
 import { storeEncryptedBlob } from "../../storage/blobs/blobStore.js";
@@ -435,7 +435,7 @@ export class JsonlSessionEventStore implements SessionEventStore {
 
   private monitorSigningKey(): KeyObject {
     if (this.monitorKeyObjectCache === null) {
-      this.monitorKeyObjectCache = createPrivateKey(getPrivateKeyPem(this.workspace, "monitor"));
+      this.monitorKeyObjectCache = createPrivateKey(getSigningKey(this.workspace, "ledger-row"));
     }
     return this.monitorKeyObjectCache;
   }

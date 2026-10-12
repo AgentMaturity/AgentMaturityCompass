@@ -15,7 +15,7 @@ import {
   beginAuditReceiptVerification,
   finalizeAuditEvidenceExport
 } from "../audit/auditEvidenceAccounting.js";
-import { signHexDigest, verifyHexDigestAny, getPrivateKeyPem, getPublicKeyHistory } from "../crypto/keys.js";
+import { signHexDigest, verifyHexDigestAny, getSigningKey, getPublicKeyHistory } from "../crypto/keys.js";
 import type { FleetEnvironment } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadBundleRunAndTrustMap, verifyEvidenceBundle } from "../bundles/bundle.js";
@@ -179,7 +179,7 @@ function signPolicyContent(workspace: string, bytes: Buffer): SignaturePayload {
   const digestSha256 = sha256Hex(bytes);
   return {
     digestSha256,
-    signature: signHexDigest(digestSha256, getPrivateKeyPem(workspace, "auditor")),
+    signature: signHexDigest(digestSha256, getSigningKey(workspace, "config-signature")),
     signedTs: Date.now(),
     signer: "auditor"
   };

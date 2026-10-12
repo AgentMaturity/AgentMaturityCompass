@@ -286,7 +286,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleAssuranceRoute)
+    handler: (pathname, method, req, res, context) => handleAssuranceRoute(pathname, method, req, res, context.workspace, context.principal)
   },
   {
     id: 'shield',

@@ -1,0 +1,5 @@
+baseline green ["tests/subagentHookInheritance.test.ts","tests/nativeDelegationInheritance.test.ts"]
+ok   1545-narrower-turns killed (9146 ms)
+ok   1545-narrower-timeout killed (9470 ms)
+ok   1545-narrower-parent-only killed (8423 ms)
+3 killed, 0 survived, 0 equivalent, 0 equivalent-killed, 0 errors

@@ -6,6 +6,7 @@ import { lstat, open, readFile, realpath, stat } from "node:fs/promises";
 import { arch, platform } from "node:os";
 import { isAbsolute, join, relative, resolve, sep, win32 } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isEntrypoint } from "./lib/entrypoint.mjs";
 
 export const SCHEMA_VERSION = "2026-09-09";
 // Opt-in additive schema. Never silently relabel legacy evidence as this version.
@@ -717,6 +718,6 @@ export async function runCli(args = process.argv.slice(2), io = process) {
   }
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isEntrypoint(import.meta.url)) {
   process.exitCode = await runCli();
 }

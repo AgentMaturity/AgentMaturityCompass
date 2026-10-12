@@ -1,13 +1,23 @@
 # Terms that predicates, citations, packs, owners and crosswalks may use. A term outside this file is CAT_VOCAB.
-# Seeded with the seven stations and the terms the L0-IDN-01 example uses; add terms with the content that needs them.
+# Seeded by P1-09 for L0-IDN-01 and extended by P1-14 for the Layer 0 baseline; add terms with the content that needs them.
 stations: [education, environment, health, wealth, technology, mobility, governance]
-jurisdictions: [US]
-roles: []
-entityTypes: [hipaa_covered_entity, hipaa_business_associate, non_bank_financial_institution]
+jurisdictions: [US, US-CA, US-CO, US-NYC, EU]
+# EU AI Act roles.
+roles: [provider, deployer]
+entityTypes: [hipaa_covered_entity, hipaa_business_associate, non_bank_financial_institution, eu_financial_entity]
 riskClasses: []
-useCases: []
+useCases:
+  - consequential_decision_about_people
+  - reconciliation
+  - interacts_with_natural_persons
+  - acts_for_principal_towards_third_parties
+  - publishes_synthetic_content
+  - credit_decision
+  - employment_decision
 dataClasses: []
 domains: []
-ownerRoles: [ciso]
+ownerRoles: [ciso, dpo, senior_manager, head_of_qa]
 # amc-audit-map-v1: the built-in audit map amc.audit.map.builtin.v1 (src/audit/auditMapBuiltin.ts).
-frameworks: [amc-audit-map-v1]
+# atlas: MITRE ATLAS technique ids (src/compliance/citations/reference/atlas.json holds the release they are checked against).
+# owasp-asi-2026: OWASP Top 10 for Agentic Applications 2026, ASI01 to ASI10 (docs/security/THREAT_MODEL.md).
+frameworks: [amc-audit-map-v1, atlas, owasp-asi-2026]

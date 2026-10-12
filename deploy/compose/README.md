@@ -1,6 +1,6 @@
 # AMC Compose Deployment
 
-Both HTTP and TLS builds use the root Dockerfile `studio` target. The old `deploy/compose/Dockerfile` was removed. See the [source container guide](../../docker/README.md) for build, non-root volume ownership, and Linux qualification requirements.
+Both HTTP and TLS builds use the root Dockerfile `studio` target. Every AMC service mounts a named volume at `/home/amc/.config/amc/state` (`<AMC home>/state`), next to the workspace volume, so this machine's anti-rollback marks and key-set recovery copies survive a restart (P1-08, `docs/KEY_LIFECYCLE.md`). Keep it with the workspace volume when you back up or roll back, and never mount it into the workspace. The old `deploy/compose/Dockerfile` was removed. See the [source container guide](../../docker/README.md) for build, non-root volume ownership, and Linux qualification requirements.
 
 ## Prerequisites
 
@@ -57,7 +57,7 @@ The TLS stack explicitly starts notary with `--bind 0.0.0.0` so Studio can reach
 
 Studio waits for the notary's bounded `/readyz` healthcheck to report `READY`, including signer, log and auth-secret initialization. Readiness alone does not prove Studio holds the matching secret or can obtain a valid signature. The shared image smoke runs Studio with notary disabled.
 
-The separate [2026-09-08 optional-stack acceptance](../../AMC_OS/RESEARCH/2026-09-08-dsh-pi/optional-notary-tls-acceptance/README.md) exercised the actual Linux ARM containers with notary enabled: policy-bound `MERKLE_ROOT` signing, independent signature verification, missing/wrong authentication and checksum/replay refusal, identity persistence and fresh signing after restart, and trusted TLS Studio access with anonymous refusal. Its exact source, immutable images and configuration hashes are recorded. The probe used an isolated internal network, unique disposable volumes, and the local `localhost` CA; it does not claim public deployment, other platforms, hardware attestation or external-provider connectivity.
+The separate [2026-09-08 optional-stack acceptance](../../docs/OPTIONAL_NOTARY_TLS_ACCEPTANCE.md) exercised the actual Linux ARM containers with notary enabled: policy-bound `MERKLE_ROOT` signing, independent signature verification, missing/wrong authentication and checksum/replay refusal, identity persistence and fresh signing after restart, and trusted TLS Studio access with anonymous refusal. Its exact source, immutable images and configuration hashes are recorded. The probe used an isolated internal network, unique disposable volumes, and the local `localhost` CA; it does not claim public deployment, other platforms, hardware attestation or external-provider connectivity.
 
 ## Notary Mode (Fail-Closed Signing Boundary)
 

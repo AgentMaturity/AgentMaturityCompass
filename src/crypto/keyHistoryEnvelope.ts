@@ -1,15 +1,19 @@
 import { createPrivateKey, createPublicKey, sign, verify } from "node:crypto";
 import { z } from "zod";
-import { canonicalize } from "../utils/json.js";
+import { KEY_PURPOSES, type KeyPurpose } from "../trust/keyPurposes.js";
+import { canonicalize, isCanonicalSignatureBase64 } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { verifyKeyHistoryEntries, type KeyHistoryEntry } from "./keyHistoryChain.js";
 
 export type KeyHistoryRole = "monitor" | "auditor" | "lease" | "session";
+/** v1 histories name a vault role; v2 (P1-08) name a signing purpose. "lease" and "session" are both, and stay v1. */
+export type KeyHistorySubject = KeyHistoryRole | KeyPurpose;
+const ROLES: readonly string[] = ["monitor", "auditor", "lease", "session"];
 
 export interface KeyHistoryEnvelope {
-  v: 1;
+  v: 1 | 2;
   purpose: "amc.key-history";
-  role: KeyHistoryRole;
+  role: KeyHistorySubject;
   anchorFingerprint: string;
   revision: number;
   entries: KeyHistoryEntry[];
@@ -34,14 +38,21 @@ const envelopeSchema = z.object({
   entries: z.array(entrySchema).min(1).max(10000),
   signature: z.string().regex(/^[A-Za-z0-9+/]{86}==$/)
 }).strict();
+const envelopeV2Schema = envelopeSchema.extend({
+  v: z.literal(2),
+  role: z.enum(KEY_PURPOSES),
+  signature: z.string().refine(isCanonicalSignatureBase64, "signature must be canonical base64 of 64 bytes")
+}).strict();
 
 // Sign the tagged payload itself, never a digest through signHexDigest or the
 // policy/notary signer. Ordinary artifact-digest signatures cannot authorize
 // changes to which keys are trusted to sign those artifacts.
-const DOMAIN = "AMC_KEY_HISTORY_ADMISSION_V1\0";
+const DOMAINS = { 1: "AMC_KEY_HISTORY_ADMISSION_V1\0", 2: "AMC_KEY_HISTORY_ADMISSION_V2\0" } as const;
 function payloadBytes(envelope: Omit<KeyHistoryEnvelope, "signature">): Buffer {
-  return Buffer.from(DOMAIN + canonicalize(envelope), "utf8");
+  return Buffer.from(DOMAINS[envelope.v] + canonicalize(envelope), "utf8");
 }
+
+const versionOf = (subject: KeyHistorySubject): 1 | 2 => ROLES.includes(subject) ? 1 : 2;
 
 export function publicKeyFromPrivate(privateKeyPem: string): string {
   const key = createPrivateKey(privateKeyPem);
@@ -61,14 +72,14 @@ export function validHistoryEntry(entry: unknown): entry is KeyHistoryEntry {
 }
 
 export function sealKeyHistory(
-  role: KeyHistoryRole,
+  role: KeyHistorySubject,
   entries: KeyHistoryEntry[],
   privateKeyPem: string,
   revision: number = 1
 ): KeyHistoryEnvelope {
   const anchor = publicKeyFromPrivate(privateKeyPem);
   const base: Omit<KeyHistoryEnvelope, "signature"> = {
-    v: 1,
+    v: versionOf(role),
     purpose: "amc.key-history",
     role,
     anchorFingerprint: sha256Hex(Buffer.from(anchor, "utf8")),
@@ -83,11 +94,11 @@ export function sealKeyHistory(
 
 export function verifyKeyHistoryEnvelope(
   value: unknown,
-  role: KeyHistoryRole,
+  role: KeyHistorySubject,
   currentPublicKeyPem: string
 ): { valid: boolean; reason: string | null; envelope: KeyHistoryEnvelope | null } {
   const fail = (reason: string) => ({ valid: false, reason, envelope: null });
-  const parsed = envelopeSchema.safeParse(value);
+  const parsed = versionOf(role) === 1 ? envelopeSchema.safeParse(value) : envelopeV2Schema.safeParse(value);
   if (!parsed.success) return fail(Array.isArray(value) ? "legacy history has no admission signature" : "invalid history envelope");
   const envelope = parsed.data;
   if (envelope.role !== role) return fail("history role mismatch");

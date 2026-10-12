@@ -7,7 +7,7 @@ AMC has five distribution channels with explicit availability:
 | Channel | Status | Command |
 |---------|--------|---------|
 | **Verified GitHub release installer** | Available | `curl -fsSL https://agentmaturity.co/install.sh \| sh` or Windows PowerShell installer |
-| **npm** | Unavailable until the first registry publish is verified | Do not advertise `npx` or global registry installs |
+| **npm** | Live with 1.1.1; 2.0.0 is prepared, not published | Publishes only from `release.yml` on a `v*.*.*` tag |
 | **Docker / GHCR** | Release workflow ready; public visibility must be verified | local build first; GHCR after anonymous-pull verification |
 | **Single-binary (SEA)** | Experimental | host-built `amc` binary artifact |
 | **Homebrew** | Unavailable until the tap exists and formula is verified | Do not advertise a tap command |
@@ -16,67 +16,88 @@ AMC has five distribution channels with explicit availability:
 
 ## 1. npm publication - `agent-maturity-compass`
 
-The package name currently returns 404 from the public npm registry. npm remains a conditional release output, not a user-facing install channel. The tag workflow skips npm without failing GitHub asset publication when `NPM_TOKEN` is absent.
+npm serves 1.1.1 (published 15 July 2026). Version 1.2.0 was prepared in the repository but never published; its changes ship in 2.0.0 (D-12).
 
-### Pre-publish checklist
+### One publish path
+
+Only the `release` job of `.github/workflows/release.yml` publishes. The workflow runs only on a `v*.*.*` tag push: no `workflow_dispatch` input, `pull_request` or `pull_request_target` trigger can choose what is released or reach a secret. The released ref is the tag that triggered the run, and every job checks that the tag still names the commit the gate ran on. To retry, re-run the jobs of that tag's run.
+
+A person approves before anything runs: the first job, `approve`, runs in the protected GitHub environment `release` and fails closed unless that environment has required reviewers and a deployment rule. The `sign`, `release` and (when enabled) `homebrew` jobs run in the same environment too, so re-running any one of them waits for approval again, and every other job that pushes or publishes needs `approve`. Expect three approvals per release: `approve`, `sign` and `release`.
+
+It publishes exactly the bytes that passed the gate. The `gate` job checks out the tag, records the commit it names, builds and packs the npm tarball once into `tmp/npm-release/`, generates the SBOM, licence inventory and SEA binary there, and writes `record.json` with the tag, the commit and every file's SHA-256 (`scripts/release-record.mjs`). The full release gate, the packed-install and install-persona checks, `check-pack-contents` and `npm publish <tarball> --dry-run` then run against that tarball file, and the files are passed on as the `amc-gated-release` artifact. Every later job checks out that commit by SHA, refuses a tag that moved or was re-pointed, and verifies the record before using a file. The desktop archives wrap the gated tarball, the `image-tags` job makes the Studio image tags only from the per-architecture digests the image job qualified, and the `sign` job (which holds only the signing key, in its signing step) builds the signing tool from the frozen lockfile and signs a bundle that embeds the gated tarball, SBOM and licence inventory byte for byte.
+
+Secrets appear only in the `env:` of the one step that uses them: `NPM_TOKEN` in the publish step, `AMC_RELEASE_SIGNING_KEY` in the signing step, `HOMEBREW_TAP_TOKEN` in the Homebrew step and `GITHUB_TOKEN` in the GHCR login (piped to `--password-stdin`), the environment check and `gh release create` steps. None is set at workflow or job level, passed to an action input, written into a command line or URL, printed or uploaded.
+
+The `release` job is the only job with `id-token: write` or an npm credential. It installs, builds and downloads nothing and uses no action but checkout and artifact download. It checks the tag and the record, unpacks the npm CLI that the unprivileged `npm-cli` job fetched and checked against the pinned version and integrity (`NPM_CLI_VERSION`, `NPM_CLI_INTEGRITY` at the top of `release.yml`), checks that integrity, the tag and the record again, and runs `npm publish <gated tarball>` with the runner's Node. The `github-release` job, which holds only `contents: write`, then creates the release with `gh release create --verify-tag` from the verified files. Homebrew is off until the tap exists: setting the repository variable `AMC_HOMEBREW_TAP=enabled` turns on the `homebrew` job, which then fails without `HOMEBREW_TAP_TOKEN`. Every job declares least-privilege `permissions:`; the workflow default is `contents: read`. Actions stay at `@version` with a TODO for Sid to pin each by full commit SHA, as in `deploy-pack.yml`.
+
+The `release` job fails instead of skipping:
+
+- no `AMC_RELEASE_SIGNING_KEY` in the environment, or no committed release public key at `trust/amc-release-signing.pub` (P0-37): the job fails before anything is published;
+- no npm credential: `npm publish` fails, and so does the job. The only skip left is "this version is already on npm".
+
+`npm-publish.yml` only opens version PRs (when `CHANGESETS_GITHUB_TOKEN` is set), through `release-prepare.mjs --version-only`; it never publishes, tags or creates a release. The changesets CLI itself cannot version this repository: `pnpm-workspace.yaml` lists only `vendor/*` and `packages/*`, so `changeset version` and `changeset status` never see the root package (since the 2026-08-22 vendoring). `pnpm release` no longer publishes from a shell: it exits 1 and points here.
+
+### Needs Sid: the `release` environment (P0-38)
+
+The workflow cannot create this protection itself: GitHub creates an unprotected environment when a workflow names a missing one, which is why the `approve` job refuses to continue without it. Before the first release tag:
+
+1. GitHub → AgentMaturity/AgentMaturityCompass → Settings → Environments → New environment `release`.
+2. Required reviewers: Sid and the D-10 backup.
+3. Deployment branches and tags: "Selected branches and tags", with only the tag rule `v*.*.*`.
+4. Environment secrets: `AMC_RELEASE_SIGNING_KEY` (P0-37's new key, base64 PEM); `NPM_TOKEN` only for token publishing; `HOMEBREW_TAP_TOKEN` only after the tap exists, together with the repository variable `AMC_HOMEBREW_TAP=enabled`. No npm credential at repository level.
+5. On npmjs.com, the trusted publisher names workflow `release.yml` and environment `release`.
+6. A tag ruleset that lets only Sid create, move or delete `v*` tags (P0-38 step 6).
+
+On the first tag, check that the `approve` job logs the number of required reviewers. Not verified: whether the workflow's `GITHUB_TOKEN` (with `actions: read`) may read the environment's protection rules. If that call is refused, the release stops there, by design; grant the read or ask for a change, but do not remove the check.
+
+### npm credentials (P0-38 picks one)
+
+- **Trusted publishing (preferred, no token):** on npmjs.com, add a GitHub Actions trusted publisher for `AgentMaturity/AgentMaturityCompass`, workflow `release.yml`, environment `release`. The `release` job grants `id-token: write`. Trusted publishing needs npm 11.5.1 or later; the workflow pins npm 11.10.1 by integrity and logs the Node and npm versions it publishes with.
+- **Granular token:** an npm granular access token limited to `agent-maturity-compass`, stored as the `release` environment secret `NPM_TOKEN` (`gh secret set NPM_TOKEN --env release`), never at repository level.
+
+Both publish with `--provenance --access public`.
+
+### Prepare a release
+
+One command, run on a clean checkout of the release commit:
+
 ```bash
-# 1. Bump version in package.json
-npm version patch   # or minor / major
-
-# 2. Run full checks
-npx tsc --noEmit
-npx vitest run
-npm run build
-
-# 3. Dry run (inspect what gets published)
-npm pack --dry-run
-
-# 4. Publish
-npm publish
+npm run release:prepare -- 2.0.0
 ```
 
-### First-time setup
-1. Create account at [npmjs.com](https://www.npmjs.com)
-2. `npm login` — authenticates your session
-3. `npm publish` — first publish claims the package name
-4. Enable 2FA on npm account (Settings → Security)
-5. For CI: create an **Automation** token in npm Settings → Access Tokens
+It refuses unless the pending changesets give that version from the last published one (`website/publication-status.json`), regenerates `docs/releases/<version>.md` (`npm run release:notes` regenerates its two generated blocks on their own), applies the version from the published one (package.json, a CHANGELOG section in changesets' format, the consumed changesets removed) so it never versions on top of the unpublished 1.2.0, folds 1.2.0 into the release's single CHANGELOG heading, syncs the version-coupled files and runs `check-release-candidate`. It then packs the tarball once into `tmp/npm-release/` and runs the full release gate, `check-pack-contents`, the packed-install check and `npm publish <tarball> --dry-run` against that file, as the `gate` job does, and prints its SHA-256. It never publishes, tags or commits; the tag's own run packs and gates its tarball again at the tagged commit. Rerunning it is safe: once versioned, nothing is pending, and it repeats the checks and dry runs. Review and commit the result, then follow the [release runbook](RELEASE_RUNBOOK.md).
 
-### npm CI token (GitHub Actions)
-```
-GitHub repo → Settings → Secrets → Actions
-Add secret: NPM_TOKEN = <your automation token>
-```
-The `release.yml` workflow uses this automatically on `git push v*.*.*`. Until the package URL returns a real version, keep `website/install-channel.json` set to `unavailable` for npm.
+### Package metadata
 
-### Package metadata (already in package.json)
-- `name: "agent-maturity-compass"` — the install name
-- `bin: { amc: "dist/cli.js" }` — makes `amc` command available globally
-- `files: ["dist/**", "README.md", "LICENSE"]` — only these ship in the package
-- `engines: { node: ">=20" }` — minimum Node version enforced
+- `name: "agent-maturity-compass"`, `bin: { amc: "dist/cli.js" }`, `engines: { node: ">=20" }` (Node 22 and 24 are the qualified runtimes).
+- `files` in `package.json` is the publish file set. `node scripts/check-pack-contents.mjs` packs it, refuses `AMC_OS/`, `.amc/`, `tests/`, `src/`, `research/`, `plans/`, key files, vault data and env files, secret-scans the tarball and reports its size, file count and SHA-256.
 
 ---
 
 ## 2. Verified GitHub Releases
 
-Automatic on every `git tag v*.*.*` push:
+A `v*.*.*` tag push runs `release.yml`:
 
 ```bash
-# Apply pending Changesets, review the version/changelog, then tag the exact commit
-npm run version-packages
-git commit -am "Release AMC <version>"
+# After release:prepare, commit, PR and merge, tag the exact release commit
 git tag -a v<version> -m "AMC v<version>"
-git push origin main
 git push origin v<version>
 
 # What CI does:
-# 1. Run tests, build, and prepack guardrails
-# 2. Build native macOS plus Linux and Windows desktop archives on macOS CI
-# 3. Verify archives and emit SHA256SUMS + amc-release-manifest.json
-# 4. Build + push the Docker image to GHCR
-# 5. Build a signed .amcrelease only when AMC_RELEASE_SIGNING_KEY exists
-# 6. Publish npm only when NPM_TOKEN exists and the version is not already live
-# 7. Create the GitHub Release even when npm/signing credentials are absent
+# 0. approve, in the release environment after approval: refuse anything but a tag push and an unprotected environment
+# 1. gate: resolve the tag to a commit, check the release candidate, build, pack the npm tarball once, record it,
+#    run the full release gate, the content check and the publish dry run on that file, upload it
+# 2. desktop-assets: wrap the gated tarball in the macOS, Linux and Windows archives; emit SHA256SUMS + manifest
+# 3. image: build, qualify and push the Studio image per architecture at the gated commit (P0-35)
+# 4. image-tags: create the multi-platform tags from the qualified digests (packages: write)
+# 5. npm-cli: fetch the pinned npm CLI tarball and check its integrity (unprivileged)
+# 6. sign, in the release environment after approval: sign the bundle around the gated files and verify it with
+#    --pubkey trust/amc-release-signing.pub; fail without the key
+# 7. release, in the release environment after approval: verify the tag, the record and the npm CLI, publish the
+#    gated tarball; fail without a credential
+# 8. github-release: create the GitHub Release from verified files with docs/releases/<version>.md as its body,
+#    failing if an asset is missing
+# 9. homebrew, only with AMC_HOMEBREW_TAP=enabled, in the release environment: update the tap formula
 ```
 
 ---
@@ -238,9 +259,9 @@ Users run `curl -fsSL https://agentmaturity.co/install.sh | sh` on macOS/Linux o
 ## Release Checklist
 
 ```
-[ ] Apply pending Changesets and review the resulting version/changelog
-[ ] Commit the release version and push `main`
-[ ] Create and push the matching annotated tag
+[ ] npm run release:prepare -- <version> passes; review and commit its result
+[ ] Merge to `main`, then create and push the matching annotated tag
+[ ] Approve the `release` environment run only for that version
 [ ] Release CI passes tests, builds, package verification, and checksums
 [ ] GitHub Release contains all three platform archives, npm-format tarball, manifest, and `SHA256SUMS`
 [ ] Run both checksum-negative and clean-install verification
@@ -253,12 +274,12 @@ Users run `curl -fsSL https://agentmaturity.co/install.sh | sh` on macOS/Linux o
 
 ---
 
-## Secrets Required (GitHub → Settings → Secrets → Actions)
+## Secrets (environment `release`, set by P0-38; names only)
 
 | Secret | Purpose |
 |--------|---------|
-| `NPM_TOKEN` | npm publish (Automation type) |
-| `HOMEBREW_TAP_TOKEN` | Push formula updates to homebrew-tap repo |
-| `DOCKERHUB_USERNAME` | Docker Hub push (optional) |
-| `DOCKERHUB_TOKEN` | Docker Hub push (optional) |
-| `AMC_RELEASE_SIGNING_KEY` | Signs .amcrelease bundles |
+| `AMC_RELEASE_SIGNING_KEY` | Signs the .amcrelease bundle (base64 PEM); the release fails without it |
+| `NPM_TOKEN` | Only for token publishing; trusted publishing needs no secret |
+| `HOMEBREW_TAP_TOKEN` | Pushes formula updates once the tap exists and `AMC_HOMEBREW_TAP=enabled`; the job fails without it then |
+| `CHANGESETS_GITHUB_TOKEN` | Repository secret for `npm-publish.yml` version PRs only |
+| `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` | Docker Hub push (optional; not wired) |

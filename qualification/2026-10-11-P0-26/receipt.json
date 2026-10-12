@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-26",
+  "date": "2026-10-11",
+  "commit": "3fb5385dadff72ebcbb04db85bb896506a23dd31",
+  "branch": "rtd/p0-26-f5-drop-review",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2), local worktree, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build (at 19c023175)",
+      "exit": 0,
+      "durationMs": 45369
+    },
+    {
+      "cmd": "npm run -s typecheck (at 19c023175)",
+      "exit": 0,
+      "durationMs": 30529
+    },
+    {
+      "cmd": "npm run -s typecheck:tests (at 19c023175)",
+      "exit": 0,
+      "durationMs": 52545
+    },
+    {
+      "cmd": "npm run -s lint (at 19c023175)",
+      "exit": 0,
+      "durationMs": 3465
+    },
+    {
+      "cmd": "npm run -s check:counts (at 19c023175)",
+      "exit": 0,
+      "durationMs": 618
+    },
+    {
+      "cmd": "npm run -s check:docs-drift (at 19c023175)",
+      "exit": 0,
+      "durationMs": 481
+    },
+    {
+      "cmd": "npm run -s check:freeze (at 19c023175)",
+      "exit": 0,
+      "durationMs": 1770
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries (at 19c023175)",
+      "exit": 0,
+      "durationMs": 2043
+    },
+    {
+      "cmd": "npm run -s check:gates (at 19c023175)",
+      "exit": 0,
+      "durationMs": 479
+    },
+    {
+      "cmd": "npm run -s check:schemas (at 19c023175)",
+      "exit": 0,
+      "durationMs": 883
+    },
+    {
+      "cmd": "npm run -s check:api-ref (at 19c023175)",
+      "exit": 0,
+      "durationMs": 295
+    },
+    {
+      "cmd": "npm run -s check:threat-model (at 19c023175)",
+      "exit": 0,
+      "durationMs": 338
+    },
+    {
+      "cmd": "npm run -s check:duplicates (at 19c023175)",
+      "exit": 0,
+      "durationMs": 921
+    },
+    {
+      "cmd": "npm run -s check:dead-code (at 19c023175)",
+      "exit": 0,
+      "durationMs": 3933
+    },
+    {
+      "cmd": "npx vitest run tests/f5DropDecisions.test.ts tests/industryPackDepthFloor.test.ts tests/publicQuestionCountDrift.test.ts tests/logisticsIndustryPack.test.ts tests/freezeGuard.test.ts tests/programLandingSliceMap.test.ts (at 19c023175)",
+      "exit": 0,
+      "durationMs": 1781
+    },
+    {
+      "cmd": "node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs int (at 19c023175)",
+      "exit": 0,
+      "durationMs": 363
+    },
+    {
+      "cmd": "node scripts/program/f5-drop-review.mjs && git diff --exit-code docs/program/f5-drop-review.md (packet is reproducible)",
+      "exit": 0,
+      "durationMs": 5552
+    },
+    {
+      "cmd": "npm run -s lint (at 3fb5385d, after the one-line pathspec fix)",
+      "exit": 0,
+      "durationMs": 4144
+    },
+    {
+      "cmd": "npm run -s check:dead-code (at 3fb5385d)",
+      "exit": 0,
+      "durationMs": 3979
+    },
+    {
+      "cmd": "npx vitest run tests/f5DropDecisions.test.ts before docs/program/f5/*.json existed (RED: ENOENT)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "4 mutation runs of npx vitest run tests/f5DropDecisions.test.ts (each expected to fail; see mutations.txt) and 1 control run (passes)",
+      "exit": 1,
+      "durationMs": 0
+    }
+  ],
+  "tests": {
+    "total": 39,
+    "passed": 39,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "decisions.json",
+      "sha256": "e77e25ab90891505cf8f251d8fed403af635fae2e299a8d46306f30496d7e261"
+    },
+    {
+      "path": "mutations.txt",
+      "sha256": "f4dbea5be7350a40dc599d4dbc208ad7dc01f1a66a1aa9affe25b1d103bf8f33"
+    }
+  ],
+  "notes": "Review packet only: Sid has not decided, so all 30 items are deferred: awaiting Sid, floorPolicy is null (proposed retire-floor), and no question, floor check or count test changed (41 packs, 632 questions). The full check list ran at 19c023175; 3fb5385d changes one pathspec in scripts/program/f5-drop-review.mjs, after which the packet, lint and dead-code were re-run. Test totals are the six focused files (f5DropDecisions, industryPackDepthFloor, publicQuestionCountDrift, logisticsIndustryPack, freezeGuard, programLandingSliceMap); the full suite was not run because no source module changed. Non-zero exits are the expected RED run and the mutation runs."
+}

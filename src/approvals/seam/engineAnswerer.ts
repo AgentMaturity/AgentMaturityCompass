@@ -55,6 +55,8 @@ export interface EngineApprovalInput {
   readonly poll?: ApprovalPollSchedule;
   /** Called once the engine request exists, so a UI can render the pending prompt. */
   readonly onRaised?: (approvalRequestId: string) => void;
+  /** Who started the session asking (P1-78); recorded on the engine request. */
+  readonly initiator?: string;
 }
 
 /** What the engine decided, in the seam's vocabulary. */
@@ -133,7 +135,8 @@ export async function decideThroughApprovalsEngine(input: EngineApprovalInput): 
       effectiveMode: mode,
       riskTier: ask.riskTier,
       intentPayload: ask.intentPayload,
-      ...(ask.workOrderId === undefined ? {} : { workOrderId: ask.workOrderId })
+      ...(ask.workOrderId === undefined ? {} : { workOrderId: ask.workOrderId }),
+      ...(input.initiator === undefined ? {} : { initiator: input.initiator })
     });
   } catch (error) {
     // FAIL CLOSED, and say so in the row. The engine refuses to raise a question

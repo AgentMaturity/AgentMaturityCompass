@@ -9,7 +9,7 @@ import { canonicalize } from "../../utils/json.js";
 import { decodeBlobV1, decryptBlobV1, encodeBlobV1, encryptBlobV1 } from "./blobEncryptor.js";
 import { blobV1Dir, ensureBlobKey, readBlobKeyMaterial, blobsRoot } from "./blobKeys.js";
 import { blobIndexRowSchema, blobIndexSignatureSchema, type BlobIndexRow, type BlobIndexSignature } from "./blobSchema.js";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../../crypto/keys.js";
 
 const blobIdRegex = /^blob_[a-z2-7]{26}$/;
 
@@ -62,7 +62,7 @@ function writeBlobIndexSig(workspace: string, lastHash: string): void {
   // so this is O(1) per append — the whole-file read that made appends O(n) is
   // gone. lastHash is always a real row hash here (this is only called after a
   // row is appended).
-  const signature = signHexDigest(lastHash, getPrivateKeyPem(workspace, "auditor"));
+  const signature = signHexDigest(lastHash, getSigningKey(workspace, "artifact-seal"));
   const payload: BlobIndexSignature = blobIndexSignatureSchema.parse({
     v: 1,
     ts: Date.now(),

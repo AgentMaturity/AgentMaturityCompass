@@ -37,7 +37,7 @@ export function registerLeaseCliCommands(program: Command): void {
     }) => {
       const ensured = ensureLeaseRevocationStore(process.cwd());
       if (!ensured.signatureValid) {
-        throw new Error("Lease revocation signature invalid. Review .amc/studio/leases/revocations.json, then run `amc lease resign-revocations` as owner.");
+        throw new Error("Lease revocation signature invalid. Review .amc/studio/leases/revocations.signed.json (or a 1.x revocations.json not yet migrated), then run `amc lease resign-revocations --expect-digest <sha256 of the reviewed file>` as owner.");
       }
       const issued = issueLeaseForCli({
         workspace: process.cwd(),
@@ -73,29 +73,32 @@ export function registerLeaseCliCommands(program: Command): void {
 
   leases
     .command("resign-revocations")
-    .description("Re-sign the lease revocation store, vouching for its CURRENT content as owner")
-    .action(async () => {
+    .description("Re-sign the lease revocation store as owner, only if its sha256 is the reviewed digest")
+    .requiredOption("--expect-digest <sha256>", "sha256 of the revocations.signed.json (or 1.x revocations.json) bytes you reviewed; anything else is refused")
+    .action(async (opts: { expectDigest: string }) => {
       const { resignLeaseRevocationsForCli } = await import("./leases/leaseCli.js");
-      const result = resignLeaseRevocationsForCli(process.cwd());
+      const result = resignLeaseRevocationsForCli(process.cwd(), opts.expectDigest);
       if (result.wasValid) {
         console.log(chalk.green("Revocation store signature already valid; re-signed."));
         return;
       }
-      // The consequence is stated, not hidden: this certifies whatever the file
-      // now says, so an operator who did not review it first is signing blind.
+      // The consequence is stated, not hidden: this certifies the reviewed bytes,
+      // so an operator who did not review them is signing blind.
       console.log(chalk.yellow(`Previous signature did NOT verify (${result.previousReason ?? "unknown"}).`));
-      console.log(chalk.yellow(`Re-signed ${result.revocationCount} revocation(s) as owner. You are vouching for the current content.`));
+      console.log(chalk.yellow(`Re-signed ${result.revocationCount} revocation(s) as owner. You are vouching for the reviewed content.`));
     });
 
   leases
     .command("revoke")
     .requiredOption("--lease-id <id>", "lease ID to revoke")
     .requiredOption("--reason <reason>", "revocation reason")
-    .action((opts: { leaseId: string; reason: string }) => {
+    .option("--token <lease>", "the lease token, so the revocation records its expiry and is pruned once it lapses")
+    .action((opts: { leaseId: string; reason: string; token?: string }) => {
       const revoked = revokeLeaseForCli({
         workspace: process.cwd(),
         leaseId: opts.leaseId,
-        reason: opts.reason
+        reason: opts.reason,
+        token: opts.token
       });
       console.log(chalk.green(`Revoked lease: ${revoked.leaseId}`));
     });

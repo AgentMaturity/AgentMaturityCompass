@@ -1,0 +1,26 @@
+Full suite at ff625ca4eb60e083b660a61886f96eae8e596dd7, local macOS arm64, Node v22.23.0, load average 11-16 during the run (not CI).
+ Test Files  19 failed | 1623 passed (1642)
+      Tests  43 failed | 23337 passed | 71 skipped (23451)
+   Duration  1738.38s (transform 187.64s, setup 57.22s, import 1104.36s, tests 17699.85s, environment 143ms)
+
+Failing files and tests:
+  19  FAIL  tests/jsonlWriterResume.test.ts
+   8  FAIL  tests/sessionStoreConformance.test.ts
+   3  FAIL  tests/releaseSecretScanCoverage.test.ts
+   2  FAIL  tests/keys/atomicRotation.test.ts
+   1  FAIL  tests/watch/continuousMonitor.test.ts
+   1  FAIL  tests/studioNativeTaskService.test.ts [ tests/studioNativeTaskService.test.ts ]
+   1  FAIL  tests/signedControlJournal.test.ts
+   1  FAIL  tests/signedArtifactVerificationParity.test.ts [ tests/signedArtifactVerificationParity.test.ts ]
+   1  FAIL  tests/releaseEngineeringPack.test.ts
+   1  FAIL  tests/publicDocsGraph.test.ts
+   1  FAIL  tests/publicDocsArtifact.test.ts
+   1  FAIL  tests/privateModuleHelperVisibility.test.ts
+   1  FAIL  tests/performance/sessionSpine.performance.test.ts
+   1  FAIL  tests/nativeValidationOutcomeSurfaces.test.ts
+   1  FAIL  tests/llmResponsesCapabilities.test.ts
+   1  FAIL  tests/keys/atomicRotation.test.ts [ tests/keys/atomicRotation.test.ts ]
+   1  FAIL  tests/dogfoodMaturityEvidence.test.ts
+   1  FAIL  tests/compliance/evidenceBinding.test.ts
+   1  FAIL  tests/compliance/dataResidencyPersistence.test.ts
+   1  FAIL  tests/assuranceRunNoSign.test.ts

@@ -27,7 +27,7 @@ describe("deployment pack assets", () => {
   it("does not advertise unverified GHCR quickstart images as published", () => {
     const readme = read("README.md");
     const publishing = read("docs/PUBLISHING.md");
-    const audit = read("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = read("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
 
     expect(readme).not.toContain("ghcr.io/agentmaturity/amc-quickstart");
     expect(readme).toContain("docker build -t amc-quickstart");
@@ -50,6 +50,25 @@ describe("deployment pack assets", () => {
     const tls = read("deploy/compose/docker-compose.tls.yml");
     expect(tls).toContain("caddy");
     expect(tls).toContain("AMC_TRUSTED_PROXY_HOPS");
+  });
+
+  it("persists <AMC home>/state, where anti-rollback marks live, in compose and the Helm chart (P1-08 review M4)", () => {
+    const statePath = "/home/amc/.config/amc/state";
+    for (const file of ["docker/docker-compose.yml", "deploy/compose/docker-compose.yml", "deploy/compose/docker-compose.tls.yml", "deploy/compose/docker-compose.studio-api.yml"]) {
+      expect(read(file), file).toMatch(new RegExp(`- [a-z_-]+:${statePath.replace(/\//g, "\\/")}`));
+    }
+    expect(read("Dockerfile")).toContain(statePath);
+    const values = read("deploy/helm/amc/values.yaml");
+    expect(values).toContain(`mountPath: ${statePath}`);
+    expect(values).toMatch(/amcHomeState:\n  mountPath: [^\n]+\n  persistence:\n    enabled: true/);
+    expect(read("deploy/helm/amc/templates/pvc-state.yaml")).toContain("name: {{ include \"amc.fullname\" . }}-state");
+    const deployment = read("deploy/helm/amc/templates/deployment.yaml");
+    expect(deployment).toContain("- name: amc-home-state\n              mountPath: {{ .Values.amcHomeState.mountPath }}");
+    expect(deployment).toContain("claimName: {{ include \"amc.fullname\" . }}-state");
+    // The raw manifests match chart 0.3.0.
+    expect(read("deploy/k8s/pvc.yaml")).toContain("name: amc-home-state");
+    expect(read("deploy/k8s/deployment.yaml")).toContain("- name: amc-home-state\n              mountPath: /home/amc/.config/amc/state");
+    expect(read("deploy/k8s/deployment.yaml")).toContain("claimName: amc-home-state");
   });
 
   it("includes helm chart templates", () => {
@@ -105,7 +124,7 @@ describe("deployment pack assets", () => {
     expect(terraformVars).not.toContain("password");
     expect(terraformReadme).toContain("Do not put vault passphrases or owner passwords in `terraform.tfvars`");
 
-    const audit = read("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = read("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
     expect(audit).toContain("Kubernetes/Helm deployment guide** — ✅ Resolved 2026-06-16");
     expect(audit).toContain("Terraform Helm-release example exists at `deploy/terraform/helm-release/`");
     expect(audit).not.toContain("No Kubernetes Helm chart or k8s manifests.");

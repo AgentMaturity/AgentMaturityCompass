@@ -1,0 +1,40 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-OVS-02",
+  "polarity": "negative",
+  "evidenceClass": "replayed",
+  "setup": {
+    "harness": "bound_approval",
+    "tool": "fixture.pay",
+    "actionClass": "FINANCIAL",
+    "approved": {
+      "amount": "100.00",
+      "currency": "USD",
+      "recipient": "acct-123"
+    },
+    "call": {
+      "amount": "100.00",
+      "currency": "USD",
+      "recipient": "acct-123"
+    },
+    "approvers": [
+      {
+        "userId": "approver-1",
+        "roles": [
+          "OWNER"
+        ]
+      },
+      {
+        "userId": "approver-2",
+        "roles": [
+          "OWNER"
+        ]
+      }
+    ],
+    "scenario": "second_use"
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "recheck_failed:approval_consumed"
+  }
+}

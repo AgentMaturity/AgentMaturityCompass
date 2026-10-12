@@ -7,7 +7,7 @@
 
 ## 1. Purpose
 
-This document defines the initial AI Management System (AIMS) structure for AMC aligned to ISO/IEC 42001 clause families (4-10), using available repo evidence and identifying mandatory gaps to close before certification-readiness.
+This document defines the initial AI Management System (AIMS) structure for AMC aligned to ISO/IEC 42001 clause families (4-10), using available repo evidence and identifying mandatory gaps to close before AMC could seek an ISO/IEC 42001 certification audit.
 
 ## 2. Scope and Boundary
 
@@ -141,11 +141,11 @@ Action:
 
 These controls are strong technical foundations and should be wrapped with formal management-system governance artifacts.
 
-## 7. Certification Readiness Assessment
+## 7. Readiness for an ISO/IEC 42001 Certification Audit (self-assessed)
 
-Current readiness: **Low-to-Moderate (technical controls strong, management system weakly formalized)**.
+Current readiness (self-assessed, not independently reviewed): **Low-to-Moderate (technical controls strong, management system weakly formalized)**.
 
-Blocking items before ISO/IEC 42001 certification-readiness claim:
+Blocking items before AMC could seek an ISO/IEC 42001 certification audit:
 - Missing formal AIMS policy and scope package.
 - Missing documented internal audit and management review process.
 - Missing controlled nonconformity/CAPA governance records.
@@ -168,7 +168,7 @@ Blocking items before ISO/IEC 42001 certification-readiness claim:
 ### Days 61-90
 
 1. Stand up CAPA register with effectiveness verification.
-2. Run end-to-end certification-readiness rehearsal and evidence walk-through.
+2. Run an end-to-end rehearsal of a certification audit and an evidence walk-through.
 3. Freeze document baseline and enforce change-control signatures.
 
 ## Reference

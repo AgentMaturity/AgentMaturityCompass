@@ -86,7 +86,7 @@ describe("desktop app packaging and visual identity", () => {
     expect(styles).toContain("nav.mobile-nav-open a");
     expect(app).toContain("Desktop app");
     expect(app).toContain("native WebKit");
-    expect(app).toContain("142 assurance packs");
+    expect(app).toMatch(/<!-- amc:count:assurancePacksRegistered -->[\d,]+<!-- \/amc:count --> registered assurance packs/);
     const commandCount = [...read("docs/CLI_COMMAND_INVENTORY.md").matchAll(/^\| `amc /gm)].length;
     expect(commandCount).toBeGreaterThan(0);
     expect(app).toContain(`${commandCount.toLocaleString("en-US")} CLI paths`);

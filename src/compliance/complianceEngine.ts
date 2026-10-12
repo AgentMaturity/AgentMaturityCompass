@@ -205,7 +205,8 @@ function evaluateMapping(mapping: ComplianceMapping, evaluations: RequirementEva
   const dimensions = claim.statusDimensions;
   const reasons = [...new Set(evaluations.flatMap((row) => [...row.notes, ...row.result.reasons]))];
   const needed = evaluations
-    .filter((row) => row.result.dimensions.result === "fail" || row.result.dimensions.evidence !== "sufficient")
+    .filter((row) => row.result.dimensions.result === "fail" || row.result.dimensions.evidence !== "sufficient"
+      || (row.result.claimKind !== "observed" && row.result.claimKind !== "independently_reviewed"))
     .map((row) => row.needed);
   if (dimensions.applicability.state !== "applicable") needed.push(APPLICABILITY_NEEDED);
   return {

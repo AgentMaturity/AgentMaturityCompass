@@ -42,7 +42,7 @@ Fleet report includes:
 - overall score + IntegrityIndex per agent
 - top target gaps
 - model/provider usage summary
-- 126-question cross-agent heatmap
+- cross-agent heatmap over the default diagnostic question bank
 - governance/honesty hotspots
 - OBSERVED evidence gaps
 

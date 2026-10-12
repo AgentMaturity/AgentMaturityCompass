@@ -45,6 +45,15 @@ export type ActionReceiptMembers = WithoutV1Members<ReceiptV2>;
 /** A receipt payload as AMC's contracts accept it: legacy v1, or one action state (v2). */
 export type ReceiptPayload = ReceiptPayloadV1 | ReceiptV2;
 
+/** The kinds a v2 receipt carries; every other kind is v1 only. Minting and parsing both use this one list. */
+const V2_RECEIPT_KINDS: ReadonlySet<ReceiptKind> = new Set(["action_state"]);
+
+/** Why `kind` may not be minted or accepted as a v`version` receipt, or null when it may. */
+function receiptVersionRefusal(version: 1 | 2, kind: ReceiptKind): string | null {
+  if (version === 2) return V2_RECEIPT_KINDS.has(kind) ? null : "a v2 receipt must be an action_state receipt";
+  return V2_RECEIPT_KINDS.has(kind) ? "an action_state receipt needs its v2 members" : null;
+}
+
 function toBase64Url(bytes: Buffer): string {
   return bytes
     .toString("base64")
@@ -75,9 +84,11 @@ export function mintReceipt(input: MintReceiptInput): {
     body_sha256: input.bodySha256,
     session_id: input.sessionId
   };
+  // Refused here exactly when parseReceipt would refuse it, so AMC never signs a receipt its own verifier rejects.
+  const refusal = receiptVersionRefusal(input.action === undefined ? 1 : 2, input.kind);
+  if (refusal) throw new Error(refusal);
   // An action state is signed only in the shape the contract accepts; a v1 payload stays exactly as minted before.
   const payload: ReceiptPayload = input.action === undefined ? { v: 1, ...base } : receiptV2Schema.parse({ v: 2, ...base, ...input.action });
-  if (payload.v === 1 && input.kind === "action_state") throw new Error("an action_state receipt needs its v2 members");
   const payloadBytes = Buffer.from(canonicalize(payload), "utf8");
   const signatureBytes = sign(null, payloadBytes, input.privateKeyPem);
   const receipt = `${toBase64Url(payloadBytes)}.${toBase64Url(signatureBytes)}`;
@@ -112,7 +123,8 @@ export function parseReceipt(receipt: string): {
     throw new Error(`receipt payload violates the v${String(decoded.v)} contract: ${issue ? `${issue.path.join(".") || "(root)"} ${issue.message}` : "invalid"}`);
   }
   const payload: ReceiptPayload = parsed.data;
-  if (payload.v === 2 && payload.kind !== "action_state") throw new Error("a v2 receipt must be an action_state receipt");
+  const refusal = receiptVersionRefusal(payload.v, payload.kind);
+  if (refusal) throw new Error(refusal);
   return {
     payload,
     payloadB64,

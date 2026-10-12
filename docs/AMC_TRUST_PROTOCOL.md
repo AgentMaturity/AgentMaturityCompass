@@ -7,6 +7,8 @@
 **Depends on:** AMC Standard RFC v1.0  
 **Repository:** https://github.com/AgentMaturity/AgentMaturityCompass  
 
+> **Implementation status (2026-10-11):** this is a design proposal, and only parts of it exist. `issueTrustToken` and `verifyTrustToken` (`src/passport/trustInterchange.ts`, exported from the `agent-maturity-compass` package root) sign and check an HMAC-SHA256 under a shared secret. A shared-secret HMAC proves only that a holder of the secret wrote the token and names no signer, so `amc passport verify-token` never reports a token as trusted. The trust-graph math (`src/score/crossAgentTrust.ts`) is served at `POST /api/v1/score/trust/transitive` and `POST /api/v1/score/trust/decay`, and `amc fleet trust-graph` renders a fleet's delegation graph. Passages marked *design, not implemented* describe code that does not exist.
+
 ---
 
 ## Abstract
@@ -120,8 +122,17 @@ const policy: TrustPolicyRule = {
   requireFreshness: true,   // claim must be < 24h old
   allowedWorkspaces: ['prod-workspace'],
 };
-const result = verifyAgentClaim(agentBClaim, policy, sharedSecret);
+const result = verifyAgentClaim(agentBClaim, policy, sharedSecret, {
+  audience: 'agent-a',              // this verifier: the claim must name it
+  issuer: 'agent-b',                // the peer expected; read from the verified claim, never from the caller
+  requestedScope: 'read',           // what agent B asks to do
+  grants: { 'agent-b': ['read'] },  // the verifier's own policy: unknown issuer or scope refuses
+  issuerKeyIds: { 'agent-b': [claimHmacKeyId(sharedSecret)] }, // keys bound to each issuer; any other key refuses
+  replay: claimReplayCache,         // a ClaimReplayCache shared by this verifier
+});
 ```
+
+Since P1-08 a claim proved by a shared secret carries `integrity: "shared-secret"` and `trustTier: "SELF_REPORTED"`: every holder of the secret, every verifier included, can mint one. A `SELF_REPORTED` claim (a shared secret, or an Ed25519 key issuer admission does not vouch for) is reported but never trusted: `trusted: false`, `trustLevel` at most `limited`, no granted scope. An Ed25519 claim (`createSignedAgentClaim`, `verifySignedAgentClaim`) by a session key that issuer admission admits for `session` is `ATTESTED`, and only such a claim can be trusted. The claim's key must be one `issuerKeyIds` binds to the issuer it names, so a key admitted for agent A never speaks for agent B. A claim that fails any binding, expiry, replay or grant check is refused with score 0.
 
 **Step 5 — Trust Assignment**  
 Based on the composite trust score, Agent A assigns a trust level:
@@ -152,7 +163,7 @@ The `verifyAgentClaim` function computes a composite trust score from six checks
 
 | Check | Weight | Condition |
 |-------|--------|-----------|
-| Signature validity | 0.30 | HMAC-SHA256 of `agentId:publicKeyHash:workspace:issuedAt` |
+| Signature validity | 0.30 | HMAC-SHA256 (purpose-derived key) or Ed25519 over every bound field (see 3.3) |
 | Freshness | 0.15 | `ageHours < 24` and not explicitly expired |
 | AMC Score | 0.20 | `claim.amcScore >= policy.minAmcScore` |
 | AMC Level | 0.15 | `levelToNum(claim.amcLevel) >= levelToNum(policy.minAmcLevel)` |
@@ -207,19 +218,25 @@ The lighter-weight identity claim used in direct agent-to-agent verification:
 
 ```typescript
 interface AgentIdentityClaim {
-  agentId: string;
+  agentId: string;            // the issuing agent
   publicKeyHash: string;      // SHA-256 of agent's public signing key
   amcPassportId?: string;     // AMC Passport ID
   amcScore?: number;          // Display-scale AMC score
   amcLevel?: string;          // e.g. "L3"
   issuingWorkspace: string;   // AMC workspace ID
   issuedAt: Date;
-  expiresAt?: Date;
-  signature: string;          // HMAC-SHA256 of canonical payload
+  expiresAt?: Date;           // required for verification; at most 24 hours after issuedAt
+  audience?: string;          // the agent or workspace the claim is for (required)
+  nonce?: string;             // 128-bit hex, single use
+  keyId?: string;             // the HMAC key id or the session key id
+  keyPurpose?: 'agent-claim-hmac' | 'session';
+  signature: string;          // HMAC-SHA256 hex, or Ed25519 base64
 }
 ```
 
-**Signature payload:** `"${agentId}:${publicKeyHash}:${issuingWorkspace}:${issuedAt.toISOString()}"`
+**Signed payload (P1-08):** the tag `AMC_AGENT_CLAIM_HMAC_V2` (HMAC) or `AMC_AGENT_CLAIM_V2` (Ed25519), a NUL byte, then the canonical JSON of every field above except `signature`. The HMAC key is derived from the shared secret under a purpose label (the secret keys nothing else) and must be at least 16 bytes; a PEM private key is refused as a secret. Claims from before P1-08, which covered only `agentId:publicKeyHash:workspace:issuedAt`, are refused.
+
+**Verification (P1-08):** the verifier supplies its expectation. The issuer read from the verified claim must equal the expected peer, the audience must name the verifier, the verifier's grants must allow the issuer the requested scope, the key must be the expected one and not revoked, the claim must be inside its lifetime (60 seconds of clock skew), and the nonce must be new to the replay cache, which also caps uses per key. Granted scopes are the trust level's scopes that the grants allow.
 
 ### 3.4 Issuance
 
@@ -240,7 +257,7 @@ const claim = createAgentClaim(
   publicKeyHash,
   issuingWorkspace,
   sharedSecret,
-  { amcScore: 72, amcLevel: 'L3', ttlHours: 24 }
+  { audience: 'agent-a', amcScore: 72, amcLevel: 'L3', ttlHours: 24 }
 );
 ```
 
@@ -553,6 +570,8 @@ INDUSTRY_DECAY_PRESETS.general = {
 
 **Node.js (TypeScript)**
 
+*Design, not implemented as shown:* `verifyTrustToken` is exported from the package root (`import { verifyTrustToken } from 'agent-maturity-compass'`), but `amc/score/crossAgentTrust` and `amc/passport/trustInterchange` are not package paths, and a shared secret cannot establish trust between separate organizations.
+
 ```typescript
 import { createAgentClaim, verifyAgentClaim } from 'amc/score/crossAgentTrust';
 import { issueTrustToken, verifyTrustToken } from 'amc/passport/trustInterchange';
@@ -580,6 +599,8 @@ async function delegateToSubAgent(subAgentId: string, task: string) {
 ```
 
 **Python (via AMC Python SDK)**
+
+*Design, not implemented:* the Python SDK (`sdk/python`, package `amc_sdk`) has no `TrustClient` or `TrustPolicy`. The same holds for the CrewAI and AutoGen examples below.
 
 ```python
 from amc import TrustClient, TrustPolicy
@@ -659,6 +680,8 @@ worker = create_trust_checked_agent("worker", "...", min_level="L2")
 
 ### 7.4 Direct AMC SDK Usage
 
+These functions exist in `src/score/crossAgentTrust.ts`. They are not exported from the package, so the import below works only inside the AMC repository; outside it, call `POST /api/v1/score/trust/transitive` and `POST /api/v1/score/trust/decay`.
+
 ```typescript
 import {
   createAgentClaim,
@@ -712,27 +735,20 @@ const decayedScore = applyTemporalDecay(
 ### 7.5 CLI Reference
 
 ```bash
-# Issue a trust token for an agent
-amc passport create --agent my-agent --ttl 24h
+# Issue a trust token for an agent. The CLI prints token metadata only, and it signs with a
+# fixed demo secret over zero-score claims, so its tokens are examples, never evidence.
+amc passport issue-token --agent my-agent --ttl 24
 
-# Verify another agent's trust token
-amc passport verify --token ./agent-b-token.json
+# Check a token's HMAC, expiry and claim bounds; the report never marks a token trusted
+amc passport verify-token '<token JSON>'
 
-# Check agent identity claim
-amc identity verify --agent agent-b --workspace prod-workspace
-
-# Refresh an expiring identity claim
-amc identity refresh --agent my-agent
-
-# View trust graph
-amc trust graph --show
-
-# Compute transitive trust
-amc trust transitive --from agent-a --to agent-c --max-hops 3
-
-# Apply industry preset
-amc trust decay --preset healthcare --score 80 --age 6h
+# Render the fleet's delegation trust graph
+amc fleet trust-graph --format mermaid
 ```
+
+Transitive trust and temporal decay are API routes, not CLI commands: `POST /api/v1/score/trust/transitive` and `POST /api/v1/score/trust/decay`.
+
+*Design, not implemented:* agent identity claims (verifying or refreshing another agent's identity claim from the CLI). `amc identity verify` checks only the signature of the host's `identity.yaml`, and there is no `amc identity refresh`.
 
 ---
 

@@ -158,7 +158,7 @@ export async function buildAssemble(ctx: A4ProducerContext): Promise<A4ProducerR
   const { spec, answers } = assembleSpecOf(ctx.state);
   if (!proposedFor(spec, answers)) throw fail(409, "A4_NOT_READY", "Build runs the proposed plan; propose it again first.", { reasonCodes: ["PLAN_STALE"] });
   const native = spec.path === "native";
-  getPrivateKeyPem(workspace, "auditor");
+  getPrivateKeyPem(workspace, "artifact-seal"); // P1-08: the key savePresets signs with (BUNDLE)
   const preview = enforcePreview(workspace, agentId);
   const presets = native ? readPresets(workspace) : null;
   if (presets !== null && !presets.ok) throw fail(409, "A4_NOT_READY", "The workspace presets file does not verify; restore it or re-sign it.", { reasonCodes: ["PRESETS_UNTRUSTED"] });

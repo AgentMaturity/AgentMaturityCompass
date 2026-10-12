@@ -11,7 +11,7 @@
 import { randomUUID } from "node:crypto";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
+import { signHexDigest, getSigningKey } from "../crypto/keys.js";
 import { BreakGlassSigningError, signOverrideDigest, verifyOverrideDigest } from "./overrideSignature.js";
 import { saveWorkspaceRecord, loadWorkspaceRecords } from "../storage/workspaceRecordStore.js";
 // Type-only, so it is erased at compile time and creates no runtime cycle with
@@ -57,7 +57,7 @@ export function createRollbackPack(
   let signature = "unsigned";
   if (workspace) {
     try {
-      signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+      signature = signHexDigest(digest, getSigningKey(workspace, "artifact-seal"));
     } catch { /* no key */ }
   }
 

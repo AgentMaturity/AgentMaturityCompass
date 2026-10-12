@@ -28,25 +28,55 @@ Signed with Studio lease signing key (Ed25519, vault-backed).
 amc lease issue --agent <id> --ttl 60m --scopes gateway:llm,toolhub:intent --routes /openai --models "gpt-*" --rpm 60 --tpm 200000
 amc lease issue --agent hook-agent --ttl 30m --scopes hook:observe --routes /hooks --models "*" --rpm 60
 amc lease verify <token>
-amc lease revoke <leaseId>
+amc lease revoke --lease-id <leaseId> --reason <reason> [--token <lease>]
+amc lease resign-revocations --expect-digest <sha256>
 ```
 
-Revocations are stored at:
-- `.amc/studio/leases/revocations.json`
-- `.amc/studio/leases/revocations.json.sig`
+Since P1-08 revocations are one signed, sequenced file:
+- `.amc/studio/leases/revocations.signed.json` (an `amc.revocation-list`, listId `leases:<workspaceId>`; see `docs/KEY_LIFECYCLE.md`)
 
-Ordinary `amc lease revoke` authenticates the exact existing revocation snapshot
-before appending an ID. A tampered, unsigned, malformed or partially missing store
-is refused without rewriting its evidence; revoking another lease is not a
-repair operation and must not certify altered older revocations. Only a genuinely
-absent list **and** signature use first-store bootstrap behavior.
+Its signature (revocation-list purpose) covers the whole list, including a strictly increasing `sequence` and the
+previous list's digest. Each write is also appended to the workspace transparency log and recorded in this machine's
+high-water file (`<AMC home>/state/high-water.json`). Every consumer refuses every lease when the list is older than an
+accepted sequence (`ROLLBACK_DETECTED`), differs from the accepted list at the same sequence (`FORK_DETECTED`), or is
+missing after a list was anchored: restoring an old copy or deleting the store never un-revokes a lease, and the next
+revoke cannot make such a rollback permanent.
 
-Review and restore the approved history before using a deliberate repair command.
-The signer prepares the next list's signature before publishing either file, so
-an unavailable signer does not replace the old list with an unsigned update. The
-two-file publication is not represented as a cross-process transactional lock:
-an interrupted or inconsistent pair must still be rejected by consumers. Keep
-the original bytes and operator evidence when diagnosing such a failure.
+Upgrading from 1.x: a workspace with `revocations.json` and `revocations.json.sig` keeps working until the first write.
+That write signs the pair's content as sequence 1 with `previousSha256` set to the old list's digest, replaces the old
+signature with a tombstone and removes the old list, so a 1.x binary that reads the workspace afterwards finds a
+signature without its list and refuses every lease instead of reading an empty store. A 1.x pair restored beside the new
+file is ignored for every decision and named in the reason of the store's signature check
+(`verifyLeaseRevocationsSignature`). A half pair (the
+list or the signature missing) with no new file refuses every lease. Downgrading is unsupported.
+
+Ordinary `amc lease revoke` authenticates the exact existing list before appending an ID. A tampered, unsigned,
+malformed, rolled-back or partially missing store is refused without rewriting its evidence; revoking another lease is
+not a repair. `revokeLease` takes an optional `expiresTs` from the verified lease payload, and `amc lease revoke --token`
+passes the lease's own signed expiry; the next write prunes rows whose lease expired more than five minutes ago, so the
+list stays below its 64 MiB cap. Rows without an expiry are kept.
+
+Store files are reached only through real directories below the workspace, without following a symbolic link, and must
+be regular files with one link (at most 64 MiB for a list). A symlink, FIFO, device, hard link or oversized file in their
+place is an unverifiable store: every lease is refused, and no reader blocks on it.
+
+`amc lease resign-revocations --expect-digest <sha256>` is the deliberate repair. It signs only the reviewed bytes and,
+under the revocations lock, refuses when the digest differs, the list is missing, or it fails the revocation schema.
+For the signed file it re-signs, as the next sequence, only the content the transparency log last anchored: it can mend a
+broken signature (for example after a key rotation dropped the old key) but never un-revoke. For a 1.x list it signs the
+reviewed content as sequence 1, and only while nothing was anchored. If only an older copy survives, every lease stays
+refused; restore the newest list.
+
+The first-store bootstrap (`amc lease issue`, managed hooks, the demo) publishes an empty sequence 1, only while no store
+file exists when checked under the lock, and never once a list was anchored.
+
+How a list is published (revoke, resign and bootstrap share one path, serialized by one lock):
+
+1. The next list is signed, and the signature is verified against the revocation-list key history (the auditor key history before the workspace migrated) before anything is written.
+   A locked vault, `AMC_NO_SIGN=1` or a key that does not match the history refuses here.
+2. The signed list is staged as `revocations.signed.json.pending`, appended to the transparency log, then written in
+   place with its anchor and recorded in the high-water file; the stage is removed.
+3. A crash after the log entry rolls forward on the next read or write; a crash before it discards the stage.
 
 ## Enforcement
 

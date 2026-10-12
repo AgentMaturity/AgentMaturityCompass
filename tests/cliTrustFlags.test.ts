@@ -10,6 +10,8 @@ import {
 import {
   buildVerifierReport, ed25519KeyId, signTrustList, type IssuerAdmission, type KeyPurpose, type TrustContext, type VerifierReportV1
 } from "../src/trust/index.js";
+import { renderClaimLabel } from "../src/claims/eligibility/render.js";
+import { artifactClaim } from "../src/cli/claimOutput.js";
 import { operatorTrustHome } from "./helpers/trustContext.js";
 import { context, distrustEntry, listEntry, testKey, trustList, type TestKey } from "./trust/trustFixtures.js";
 
@@ -309,6 +311,34 @@ describe("finishVerify", () => {
     const result = capture(() => finishVerify("Release", distrusted, {}));
     expect(result.exit).toBe(1);
     expect(result.err).toEqual([]);
+  });
+
+  // A forged certificate printed "Evidence: sufficient" in its claim line: the claim of an artifact that did not verify.
+  it.each([
+    ["FAILED", () => report({ signatures: [admission("not-pinned")] }), 1, /^Claim: Self-reported · Result: not evaluated \(the signature does not verify\) · Evidence: untrusted · /],
+    ["UNTRUSTED", () => report({ signatures: [admission("unpinned-allowed")], trust: { allowUnpinned: true } }), 2,
+      /^Claim: Self-reported · Result: not evaluated · Evidence: untrusted · /]
+  ] as const)("a %s verdict prints the artifact's claim with untrusted evidence, never sufficient, in text and JSON", (_, verdict, exit, line) => {
+    for (const producer of ["trust-certificate", "assurance:certificate", "passport"]) {
+      const text = capture(() => finishVerify("Certificate", verdict(), { claim: artifactClaim(producer) }));
+      expect(text.exit).toBe(exit);
+      expect(text.out[1]).toMatch(line);
+      const json = capture(() => finishVerify("Certificate", verdict(), { json: true, result: { ok: false }, claim: artifactClaim(producer) }));
+      const fields = JSON.parse(json.out.join("\n")) as { claimLabel: string; statusDimensions: { evidence: string; result: string } };
+      expect(fields.statusDimensions).toMatchObject({ evidence: "untrusted", result: "not_evaluated" });
+      expect(fields.claimLabel).toMatch(line);
+    }
+  });
+
+  it("an artifact whose seal was not checked, as in cert inspect, claims untrusted evidence", () => {
+    expect(artifactClaim("trust-certificate", { sealVerified: false }).statusDimensions.evidence).toBe("untrusted");
+    expect(artifactClaim("trust-certificate", { sealVerified: false, amcVersion: "1.1.1" }).statusDimensions.evidence).toBe("untrusted");
+  });
+
+  it("a PASSED verdict prints the artifact's claim unchanged", () => {
+    const claim = artifactClaim("trust-certificate");
+    const result = capture(() => finishVerify("Certificate", report(), { claim }));
+    expect(result.out).toEqual(["Certificate verification PASSED", renderClaimLabel(claim).line]);
   });
 });
 

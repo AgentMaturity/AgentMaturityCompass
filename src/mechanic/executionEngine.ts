@@ -1,12 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { readdirSync } from "node:fs";
-import { join } from "node:path";
 import YAML from "yaml";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { loadBudgetsConfig, budgetsPath, signBudgetsConfig } from "../budgets/budgets.js";
 import { loadToolsConfig, signToolsConfig, toolsConfigPath } from "../toolhub/toolhubValidators.js";
 import { loadApprovalPolicy, approvalPolicyPath, signApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
-import { createApprovalForIntent, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
+import { cliInitiator, createApprovalForIntent, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
 import { policyPackApplyCli, policyPackListCli } from "../policyPacks/packCli.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
 import { createAgentTransformPlanForApi } from "../transformation/transformApi.js";
@@ -15,25 +13,12 @@ import { benchCreateForApi } from "../bench/benchApi.js";
 import { refreshForecastForApi } from "../forecast/forecastApi.js";
 import { executePluginRequest, requestPluginInstall } from "../plugins/pluginApi.js";
 import { bridgeConfigPath, loadBridgeConfig, signBridgeConfig } from "../bridge/bridgeConfigStore.js";
-import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
+import { ensureDir, writeFileAtomic } from "../utils/fs.js";
+import { latestRunId } from "../diagnostic/runReportResolution.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { MechanicUpgradePlan } from "./upgradePlanSchema.js";
 import { loadMechanicTuning } from "./tuningStore.js";
 import { loadMechanicPlanById, saveMechanicPlan } from "./planStore.js";
-
-function latestRunId(workspace: string, agentId: string): string | null {
-  const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(runsDir)) {
-    return null;
-  }
-  const files = readdirSync(runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) {
-    return null;
-  }
-  return files[files.length - 1]!.replace(/\.json$/, "");
-}
 
 function selectAgentId(plan: MechanicUpgradePlan): string {
   return plan.scope.type === "AGENT" ? plan.scope.id : "default";
@@ -172,6 +157,7 @@ async function executeAction(params: {
       }
       const request = await requestPluginInstall({
         workspace: params.workspace,
+        initiator: cliInitiator(),
         agentId,
         registryId,
         pluginRef
@@ -276,6 +262,7 @@ export function requestPlanApprovals(params: {
       const intentId = `mechanic-${plan.planId}-${action.id}`;
       const approval = createApprovalForIntent({
         workspace: params.workspace,
+        initiator: params.actor,
         agentId: selectAgentId(plan),
         intentId,
         toolName: "mechanic.plan.execute",

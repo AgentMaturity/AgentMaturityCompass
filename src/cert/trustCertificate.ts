@@ -4,7 +4,7 @@ import { readdirSync } from "node:fs";
 import { extname, join, resolve } from "node:path";
 import {
   ensureSigningKeys,
-  getPrivateKeyPem,
+  getSigningKey,
   getPublicKeyPem,
   signHexDigest
 } from "../crypto/keys.js";
@@ -368,7 +368,7 @@ export function generateTrustCertificate(input: GenerateTrustCertificateInput): 
   const payloadSha256 = sha256Hex(Buffer.from(canonicalize(payload), "utf8"));
   const signature = input.preview
     ? PREVIEW_SIGNATURE
-    : signHexDigest(payloadSha256, getPrivateKeyPem(workspace, "auditor"));
+    : signHexDigest(payloadSha256, getSigningKey(workspace, "artifact-seal"));
   const envelope: TrustCertificateEnvelope = {
     type: "amc-trust-certificate",
     signatureAlgorithm: input.preview ? "unsigned-preview" : "ed25519",

@@ -1,0 +1,82 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-IDN-04
+version: "0.1.0"
+support: experimental
+layer: 0
+family: identity-and-delegation
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Revocation takes effect
+statement: >-
+  Revoking an agent credential stops new protected actions within the profile's time bound, and a
+  drill records the time to effect.
+riskRationale: >-
+  A revocation that takes effect late leaves a compromised agent acting after the operator believes it
+  is stopped.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations: []
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline]
+  mechanism: >-
+    The signed revocation list is read again at every bind and recheck; a revoked lease is refused on
+    the next call.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L0-IDN-04-T1
+    type: drill
+    oracle:
+      kind: enforcement_receipt
+      observes: >-
+        The first refused call after revocation, its denied receipt and the measured time from revocation to
+        refusal.
+    fixtures:
+      positive: [L0-IDN-04/positive/evidence-valid.json, L0-IDN-04/positive/revoke-then-call.json]
+      negative:
+        - L0-IDN-04/negative/evidence-contradictory.json
+        - L0-IDN-04/negative/evidence-cross-tenant.json
+        - L0-IDN-04/negative/evidence-empty.json
+        - L0-IDN-04/negative/evidence-replayed.json
+        - L0-IDN-04/negative/evidence-stale.json
+        - L0-IDN-04/negative/evidence-violation.json
+        - L0-IDN-04/negative/principal-deactivated-in-flight.json
+        - L0-IDN-04/negative/principal-demoted-in-flight.json
+        - L0-IDN-04/negative/revoked-in-flight.json
+        - L0-IDN-04/negative/unverifiable-revocations.json
+    passCriteria: >-
+      A call allowed before revocation is refused on the next call after it, with lease_revoked; the drill
+      records the time to effect. A lease's principal deactivated or demoted in the signed users.yaml while the
+      call waits for approval is refused at the recheck before the body (principal_unresolved).
+    attempts: 1
+evidence:
+  - id: L0-IDN-04-E1
+    producer: amc.leases.issuer
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 180 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+  - id: L0-IDN-04-E2
+    producer: amc.toolPipeline.receipt
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 180 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [tool_version, policy_version, deployment_version]
+owner: { role: ciso }
+clock: null
+levels: [L2, L3]
+crosswalk:
+  - framework: amc-audit-map-v1
+    clause: ACCESS_CONTROL.LEASE_SCOPING
+    relation: partial
+    rationale: >-
+      The audit map checks lease scoping; it does not measure revocation time to effect.
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

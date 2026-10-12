@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest } from "../crypto/keys.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadAgentConfig } from "../fleet/registry.js";
 import { loadRunReport } from "../diagnostic/runner.js";
@@ -123,7 +123,7 @@ export function exportBenchmarkArtifact(params: {
     const digest = sha256Hex(readFileSync(benchPath));
     const signature: BenchSignature = {
       digestSha256: digest,
-      signature: signHexDigest(digest, getPrivateKeyPem(workspace, "auditor")),
+      signature: signHexDigest(digest, getSigningKey(workspace, "artifact-seal")),
       signedTs: Date.now(),
       signer: "auditor"
     };
