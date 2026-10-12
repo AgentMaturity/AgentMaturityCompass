@@ -142,9 +142,10 @@ function activateFacts(spec: Record<string, unknown>, answers: readonly A4Answer
       practitioner: "Staging lease: WRITE_LOW at most, the staging routes, 24 hours, minted inside the consumed release effect. Production lease: the answered scopes, routes and caps, "
         + "minted by the deployment approval. Tokens are answered once and never stored; a DENY of the deployment approval revokes the staging lease. Each lease names the owner "
         + "who ran its effect when they are an active users.yaml user. Under a plan whose identity-binding requires a principal (L0-IDN-01), every tool call under a lease naming "
-        + "no one is refused, so the effect refuses anyone else, a workspace-router session included, with PRINCIPAL_UNRESOLVED before anything is minted (readiness item lease.principal).",
+        + "no one is refused, so complete, Release and a retry refuse anyone else, a workspace-router session included, with PRINCIPAL_UNRESOLVED before the gate is consumed (readiness item lease.principal).",
       expert: "issueLeaseForPrincipal({ workspaceId, agentId, workOrderId: releaseId, executeActionClasses ⊆ {READ_ONLY, WRITE_LOW}, ttlMs ≤ 24 h, principalKey: the effect's caller }); "
-        + "resolveLeasePrincipal runs in the pre-flight beside the lease and revocation-list key reads, and again at mint; a4_requests keeps the attempt id only; a replay answers "
+        + "readiness refuses progress and retryEffect (PRINCIPAL_UNRESOLVED) to a caller who is not an active local user; resolveLeasePrincipal runs in the effect's preflight "
+        + "inside the consuming transaction, again beside the lease and revocation-list key reads, and again at mint; a4_requests keeps the attempt id only; a replay answers "
         + "token: null, TOKEN_ALREADY_DELIVERED once that attempt finished, its failure code otherwise." },
     { id: "lifecycle", sources: ["LIFECYCLE_BRIDGE", "requiredControlsForStage"], dataStatus: null,
       novice: `The agent's lifecycle stage is ${String(lifecycle.currentStage ?? "unknown")}. AMC only moves it when A4 evidence backs each control; otherwise the control stays not evaluated.`,

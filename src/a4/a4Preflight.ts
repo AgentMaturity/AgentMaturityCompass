@@ -4,7 +4,7 @@
  */
 import { KeyRevokedError } from "../keys/keyRevocations.js";
 import { getSigningKey } from "../keys/signingKeys.js";
-import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
+import { LeasePrincipalRefused, resolveLeasePrincipal } from "../leases/leasePrincipal.js";
 import type { LocalPurpose } from "../vault/vaultPayload.js";
 import type { A4Principal } from "./a4Schema.js";
 import { fail } from "./stages/common.js";
@@ -47,4 +47,13 @@ export function asLeasePrincipal<T>(principal: Pick<A4Principal, "key" | "userna
     throw fail(409, "PRINCIPAL_UNRESOLVED", `${principal.username} (${principal.key}) runs this effect, but ${error.message.replace(/^PRINCIPAL_UNRESOLVED: /, "")}. `
       + "An owner signed in as an active local users.yaml user runs it.");
   }
+}
+
+/**
+ * The release's and the production lease's `preflight` (A4EffectDef): the principal the lease will name, resolved inside
+ * the transaction that would consume the gate (`complete`, POST …/releases) or start a retry, so a caller no lease could
+ * name is refused 409 PRINCIPAL_UNRESOLVED with nothing consumed: no GATE_CONSUMED, no EFFECT_STARTED, no engine grant.
+ */
+export function leasePrincipalPreflight(workspace: string, principal: A4Principal): void {
+  asLeasePrincipal(principal, (principalKey) => resolveLeasePrincipal(workspace, principalKey));
 }

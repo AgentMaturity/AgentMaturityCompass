@@ -82,6 +82,12 @@ export interface A4EffectDef {
    * null with TOKEN_ALREADY_DELIVERED once it finished, its failure code otherwise. Every other effect runs after the response.
    */
   readonly inline?: boolean;
+  /**
+   * A caller-specific refusal known before anything is consumed (Activate's lease principal, P1-78): run inside the
+   * transaction that would write GATE_CONSUMED or EFFECT_STARTED, before either and before the engine grant is verified,
+   * so a throw writes and consumes nothing. The executor checks again (a TOCTOU backstop).
+   */
+  readonly preflight?: (workspace: string, principal: A4Principal) => void;
   /** Deterministic from the rows, e.g. `a4-apply-<manifestId>`. */
   readonly executionId: (state: A4ReadinessState, gate: A4GateRow) => string;
   /** The engine intent; the default binds the documentary gate's binding digest and the execution id. */
@@ -446,6 +452,7 @@ function completeWithEffect(store: A4Store, projectId: string, input: A4Call & {
   const def = effectDef(input.effectId);
   const attemptId = randomId("a4e");
   const result = consumeGate(store, projectId, { ...input, response: { attemptId } }, ({ state, row, principal, regulated, ts, approverKeys }) => {
+    def.preflight?.(store.workspace, principal);
     const executionId = def.executionId(state, row);
     // A gate-quorum effect is authorized by the GATE_CONSUMED this transaction writes; it has no engine request.
     if (def.consumes === "gate") {
@@ -483,6 +490,7 @@ function rerunExecutorEffect(store: A4Store, projectId: string, def: A4EffectDef
     const state = load(now);
     const row = gateRowOf(state, input.gateId);
     if (row.stage !== input.stage) throw fail(409, "A4_STEP_ORDER", "That gate does not complete this stage.");
+    def.preflight?.(store.workspace, principal);
     const opened = latestOpened(state, row.gate_id, def.id);
     const attempts = state.chain.filter((link) => link.kind === "EFFECT_STARTED" && link.body.gateId === row.gate_id && link.body.effect === def.id);
     const outcomes = state.chain.filter((link) => (link.kind === "EFFECT_FINISHED" || link.kind === "EFFECT_FAILED")
@@ -669,6 +677,7 @@ export function retryEffect(store: A4Store, projectId: string, input: A4Call & {
     const state = load(now);
     const started = startedLink(state.chain, input.attemptId);
     const def = effectDef(String(started.body.effect));
+    def.preflight?.(store.workspace, principal);
     const executionId = String(started.body.executionId);
     const approvalRequestId = String(started.body.approvalRequestId);
     if (def.consumes === "executor") throw fail(409, "EFFECT_NOT_RETRYABLE", "This executor consumes its own grant; re-open the effect gate, then complete runs it again.");

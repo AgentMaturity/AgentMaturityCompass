@@ -133,6 +133,11 @@ export interface A4LiveFacts {
    * L0-IDN-01; a plan that does not verify reads true), so the release's leases must name an active users.yaml user (P1-78).
    */
   readonly leasePrincipalRequired?: boolean;
+  /**
+   * Activate only: how many active users.yaml users hold the workspace role OWNER, the role the release and the
+   * production-lease effects take (null: users.yaml does not read); absent when not read.
+   */
+  readonly activeLocalOwners?: number | null;
 }
 export interface A4ReadinessQuery {
   readonly stage: A4Stage;
@@ -556,6 +561,8 @@ export function roleRefusals(state: A4ReadinessState, stage: A4Stage, action: A4
  * PRINCIPAL_ROLE_INSUFFICIENT), a vote already cast (A4_DUPLICATE_DECISION) and the expiry guard (GATE_EXPIRING). It
  * leaves out the gate's SoD exclusions: an excluded requester, author or builder may still deny, and recordDecision
  * refuses their approval at write (400 SOD_VIOLATION; `selfApprovalAllowed` says whether self-approval is open).
+ * At Activate under a plan that requires a principal, `progress` and `retryEffect` refuse a caller who is not an active
+ * local users.yaml user (PRINCIPAL_UNRESOLVED, P1-78), since the effect they run mints a lease that must name them.
  */
 function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: readonly A4ReadinessItem[],
   gates: { direction: A4GateStatus | null; completion: A4GateStatus | null }, regulated: boolean): A4ReadinessV1["allowed"] {
@@ -569,6 +576,10 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
   const gateList = [gates.direction, gates.completion];
   const pending = gateList.filter((gate): gate is A4GateStatus => gate?.status === "PENDING");
   const everyPending = (refuses: (gate: A4GateStatus) => boolean): boolean => pending.length > 0 && pending.every(refuses);
+  // P1-78: Activate's progress and retries run the release or the production-lease effect, whose lease must name an active
+  // users.yaml user under a plan that requires a principal; any other caller is refused before the gate or grant is consumed.
+  const principalUnresolved = query.stage === "activate" && live.leasePrincipalRequired === true
+    && (principal?.authSource !== "LOCAL_USER" || !(live.activeLocal ?? []).includes(principal.userId)) ? ["PRINCIPAL_UNRESOLVED"] : [];
   const specific: Partial<Record<A4Action, string[]>> = {
     requestGate: [...blocked, ...transient],
     decide: [
@@ -586,8 +597,10 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
     // project's own stage: one at any other stage would not count there and would stale the current stage's gates.
     acknowledge: state.project.stage !== "retired" && query.stage !== state.project.stage ? ["A4_STEP_ORDER"] : [],
     // A retry that cannot sign fails at once and spends the attempt the stage has left before a new revision.
-    retryEffect: ids((candidate) => (candidate.id === "signing.available" || candidate.id === "signing.notary_reachable") && candidate.status !== "READY"),
+    retryEffect: [...ids((candidate) => (candidate.id === "signing.available" || candidate.id === "signing.notary_reachable") && candidate.status !== "READY"),
+      ...principalUnresolved],
     progress: [
+      ...principalUnresolved,
       ...(gateList.some((gate) => gate?.status === "QUORUM_MET") ? [] : ["GATE_PENDING"]),
       ...ids((candidate) => (nonGate(candidate) || candidate.id === "sod" || candidate.id === "gate.required_reviews") && candidate.status !== "READY"
         && candidate.status !== "COMPLETE" && candidate.acknowledged === null)

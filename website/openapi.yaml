@@ -11531,8 +11531,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -11594,8 +11593,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -11657,8 +11655,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -11746,8 +11743,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -11817,8 +11813,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -11899,8 +11894,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -11981,8 +11975,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -12050,8 +12043,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -12133,8 +12125,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -12208,8 +12199,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -12284,8 +12274,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -12353,8 +12342,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -12422,8 +12410,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -12516,8 +12503,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -12591,8 +12577,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -12685,8 +12670,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -12780,8 +12764,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -12856,8 +12839,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -12951,8 +12933,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -13026,8 +13007,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -13099,8 +13079,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -13186,8 +13165,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -13257,8 +13235,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -13352,8 +13329,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -13449,8 +13425,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -13562,8 +13537,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -13663,8 +13637,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -13685,8 +13658,7 @@ paths:
         (a replay answers token: null, TOKEN_ALREADY_DELIVERED once the attempt finished, or the attempt's
         failure code) or its failure code. Each lease names the caller when they are an active users.yaml user;
         under a plan whose identity-binding requires a principal (L0-IDN-01) any other caller, a
-        workspace-router session included, fails the effect with 409 PRINCIPAL_UNRESOLVED before anything is
-        minted"
+        workspace-router session included, is refused 409 PRINCIPAL_UNRESOLVED before the gate is consumed"
       tags:
         - Studio
         - A4 Forge
@@ -13777,8 +13749,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -13846,8 +13817,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -13865,7 +13835,8 @@ paths:
         user), whose token this response carries once; a replay answers token: null, TOKEN_ALREADY_DELIVERED
         once the attempt finished, or the attempt's failure code. Under a plan whose identity-binding requires a
         principal (L0-IDN-01) a caller who is not an active local users.yaml user, a workspace-router session
-        included, fails the effect with 409 PRINCIPAL_UNRESOLVED before anything is written, minted or signed"
+        included, is refused 409 PRINCIPAL_UNRESOLVED before the release approval or its engine grant is
+        consumed"
       tags:
         - Studio
         - A4 Forge
@@ -13946,8 +13917,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -14028,8 +13998,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -14104,8 +14073,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -14219,8 +14187,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -14325,8 +14292,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -14430,8 +14396,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -14541,8 +14506,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -14654,8 +14618,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -14754,8 +14717,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -14855,8 +14817,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -14958,8 +14919,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -15055,8 +15015,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -15153,8 +15112,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -15250,8 +15208,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -15349,8 +15306,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -15451,8 +15407,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -15553,8 +15508,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -15654,8 +15608,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -15760,8 +15713,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -15870,8 +15822,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -15885,7 +15836,9 @@ paths:
   /v1/a4/projects/{projectId}/stages/{stage}/effects/{effectId}/retry:
     post:
       summary: Retry a failed effect under the liveness rule (owner; 409 SOD_VIOLATION for an approver its consumed
-        grant or gate quorum counted)
+        grant or gate quorum counted; at Activate, under a plan whose identity-binding requires a principal, 409
+        PRINCIPAL_UNRESOLVED for a caller who is not an active local users.yaml user, before a new attempt
+        starts or the grant is consumed)
       tags:
         - Studio
         - A4 Forge
@@ -15981,8 +15934,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -16086,8 +16038,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -16191,8 +16142,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -16296,8 +16246,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -16401,8 +16350,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -16506,8 +16454,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -16615,8 +16562,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -16721,8 +16667,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -16816,8 +16761,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -16911,8 +16855,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -17006,8 +16949,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -17101,8 +17043,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:
@@ -17196,8 +17137,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "423":
-          description: "A4_VAULT_LOCKED: unlock the vault to record this (a revoked signing key is 409 A4_KEY_REVOKED,
-            naming the purpose to rotate)."
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
           content:
             application/json:
               schema:

@@ -21,7 +21,6 @@ import type { SignKind } from "../crypto/signing/signerTypes.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { resolveSessionStoreBackend } from "../persistence/openSessionEventStore.js";
 import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
-import { planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
 import { loadTrustContext } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -30,7 +29,7 @@ import { controlResultsNow } from "./a4Conformance.js";
 import { releaseEntries } from "./a4Transparency.js";
 import { blockingExecutionsIn, engineRequestStatusesIn, unrecordedResolutionsIn } from "./assembleLockout.js";
 import { resolveRefs } from "./a4Evidence.js";
-import { hostSessionsSince, liveRolesFor, usersCreatedSince } from "./a4Identity.js";
+import { hostSessionsSince, leasePrincipalFacts, liveRolesFor, usersCreatedSince } from "./a4Identity.js";
 import { verifyA4Chain } from "./a4Verify.js";
 import {
   A4_BOUND_ITEMS, acknowledgeable, ACKNOWLEDGEABLE_ITEMS, acknowledgedRecords, ACKNOWLEDGEMENT_TTL_MS, evaluateA4Readiness, gateStatus, isRegulated, pendingReviews, PLAN_ACTIVATION_DEFERRED,
@@ -197,7 +196,7 @@ function unrecordedResolutionsOf(store: A4Store, chain: A4ReadinessState["chain"
 /**
  * Everything readiness reads that is not a row; each unreadable source is null. `approvalPolicy` is the verdict of the
  * read evaluateFor used; the action journal and the engine requests the chain names are read only for an evaluation at `stage` Assemble,
- * the signed control results Adapt's Review recorded and the session store backend only at Adapt, the package route, the releases' transparency entries and the lease-principal rule only at Activate.
+ * the signed control results Adapt's Review recorded and the session store backend only at Adapt, the package route, the releases' transparency entries, the lease-principal rule and the active local owners only at Activate.
  */
 function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage): A4LiveFacts {
   const workspace = store.workspace;
@@ -223,7 +222,7 @@ function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, appr
     unrecordedResolutions: stage === "assemble" ? unrecordedResolutionsOf(store, state.chain, blocking) : null,
     engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain, blocking ?? []) : null,
     ...(stage === "adapt" ? { controlResults: controlResultsNow(workspace, state), sessionStore: resolveSessionStoreBackend(workspace) } : {}),
-    ...(stage === "activate" ? { packageSigningRoute: collectRoute(workspace, "A4_PACKAGE"), packageTransparency: releaseEntries(workspace, state.chain), leasePrincipalRequired: planRequiresPrincipal(workspace) } : {})
+    ...(stage === "activate" ? { packageSigningRoute: collectRoute(workspace, "A4_PACKAGE"), packageTransparency: releaseEntries(workspace, state.chain), ...leasePrincipalFacts(workspace) } : {})
   };
 }
 
@@ -270,6 +269,7 @@ export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore
   }
   if (codes.includes("FREEZE_ACTIVE")) throw fail(409, "FREEZE_ACTIVE", "An incident freeze is active for this agent.", codes);
   if (codes.includes("A4_STEP_ORDER")) throw fail(409, "A4_STEP_ORDER", "The project is not at that stage; reload it.", { reasonCodes: codes });
+  if (codes.includes("PRINCIPAL_UNRESOLVED")) throw fail(409, "PRINCIPAL_UNRESOLVED", "The active plan requires a principal: an active local users.yaml user runs this effect. Nothing was consumed.", { reasonCodes: codes });
   throw fail(409, "A4_NOT_READY", `not ready: ${codes.join(", ")}`, { reasonCodes: codes, items: readiness.items.filter((entry) => codes.includes(entry.id)) });
 }
 

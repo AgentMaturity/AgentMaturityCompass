@@ -126,7 +126,11 @@ and re-approve.
 
 An activated compiled plan whose identity binding requires a lease used to deny every native tool call from Studio
 tasks, which carry none. P1-67 has Studio mint a lease per native task runtime; Adapt (P1-61) models the remaining
-cases as the readiness item `adapt.plan.nativeSessionsAllowed` (`PLAN_DENIES_NATIVE_SESSION`) rather than hiding them.
+cases as the readiness item `adapt.plan.nativeSessionsAllowed` (`PLAN_DENIES_NATIVE_SESSION`) rather than hiding them:
+tasks started before activation, CLI agent sessions and delegated children carry no lease and are denied every call.
+`L0-IDN-01` also requires a principal, and since P1-78 the lease names the task's signed-in principal, so Studio refuses
+at start (409 `PRINCIPAL_UNRESOLVED`) a task whose principal is not an active local `users.yaml` user, a workspace-router
+session or the admin token included; the item lists `PRINCIPAL_REQUIRED` and `NON_LOCAL_USER_SESSIONS_DENIED` and says so.
 Every revision now binds `plan.journalEntrySha256` (the active compiled-plan journal's head; any activation, in A4 or
 from the CLI, makes an open gate `RESOURCE_DRIFTED`) and `plan.lockDigest` (the shipped catalog's lock, digested without
 `generatedBy`, the AMC version that built it, which `verifyCatalogLock` ignores too: an AMC upgrade with an unchanged
@@ -180,11 +184,13 @@ framework through a scaffold, connect instructions and a trace import.
   tasks page as the session's owner; the Build card loads the owner's build log with the same cursor contract. Build
   refuses, before any write, a session start Studio's native tasks would refuse (`ANSWER_INVALID:validation` or
   `ANSWER_INVALID:capabilities`): a check missing from the operator's config, checks without the signed workspace
-  `bash`, or more than 8 or duplicate check ids. It also refuses, before any write, a workspace-tools session whose lease
-  Studio could not mint (P1-78): under a plan whose identity binding requires an agent lease and a principal
-  (`L0-IDN-01`), Studio's native service names the session's own `users.yaml` user in that lease and refuses anyone who
-  is not an active local user, a workspace-router session included, so Build answers 409 `PRINCIPAL_UNRESOLVED` first
-  instead of journaling a session that could never start. Propose already leaves such checks out of the plan and lists them as
+  `bash`, or more than 8 or duplicate check ids. It also refuses, before any write, a native workspace-tools session
+  whose lease would name no active `users.yaml` user under a plan that requires one (P1-78): under a plan whose identity
+  binding requires an agent lease and a principal (`L0-IDN-01`), Studio's native service names the session's own
+  `users.yaml` user in that lease and refuses anyone who is not an active local user, a workspace-router session
+  included, so Build answers 409 `PRINCIPAL_UNRESOLVED` first instead of journaling a session that could never start.
+  Other lease-mint failures, a revoked or unreadable `lease` key (`LEASE_UNAVAILABLE`) or a plan that does not verify
+  (`POLICY_UNVERIFIED`), still surface as the session's start error after the step is recorded. Propose already leaves such checks out of the plan and lists them as
   unsupported (`NOT_IN_VALIDATION_CONFIG`, `VALIDATION_SCOPE_REQUIRED`), and builds the prompt from the capabilities with
   control characters removed, cut by code point.
 - **External path.** After Build and before Review, an owner can write the path's scaffold, the bridge contract tests
@@ -447,14 +453,20 @@ Any other failure to read those keys (an unreadable or unverifiable key revocati
 The same pre-flight resolves the principal each lease names (P1-78): the owner who ran the effect, keyed as A4 keys
 its principals and never read from a body. Layer 0's mandatory `L0-IDN-01` makes every plan Adapt activates require a
 principal for every tool call, and a call under a lease that names no active `users.yaml` user is refused; so under
-such a plan (or one that does not verify) the release and the production-lease effects refuse anyone else, a
-workspace-router session included, with 409 `PRINCIPAL_UNRESOLVED` before anything is revoked, written, minted or
-signed, and the lease is minted through `issueLeaseForPrincipal`, which resolves the principal again. Under any other
-plan the lease names that user when they resolve, and no one otherwise. Readiness item `lease.principal` shows this
-before anyone approves: READY (`PRINCIPAL_NOT_REQUIRED`) when the plan requires no principal; otherwise WAITING
-(`PRINCIPAL_REQUIRED`, never mandatory) with the rule as its next action, and BLOCKED, mandatory, while no
-`users.yaml` user is active or `users.yaml` does not read (`NO_ACTIVE_LOCAL_USER`, `USERS_UNREADABLE`), so neither
-approval is requested for an effect no one could run.
+such a plan (or one that does not verify) `complete`, `POST …/releases` and a retry refuse anyone else, a
+workspace-router session included, with 409 `PRINCIPAL_UNRESOLVED` before the gate or the engine grant is consumed:
+readiness lists `PRINCIPAL_UNRESOLVED` under that caller's `progress` and `retryEffect` at Activate, and the effect's
+pre-flight resolves the principal again inside the transaction that would consume the gate or start the retry, so
+neither `GATE_CONSUMED` nor `EFFECT_STARTED` is written and step 0 never runs. The effect resolves the principal once
+more beside the key reads, before anything is revoked, written, minted or signed, and the lease is minted through
+`issueLeaseForPrincipal`, which resolves it again; a refusal inside the effect happens only when `users.yaml` or the
+plan changed after the gate was consumed, and it spends the attempt. Under any other plan the lease names that user
+when they resolve, and no one otherwise. Readiness item `lease.principal` shows this before anyone approves: READY
+(`PRINCIPAL_NOT_REQUIRED`) when the plan requires no principal; otherwise WAITING (`PRINCIPAL_REQUIRED`, never
+mandatory) with the rule as its next action, and BLOCKED, mandatory, while no active `users.yaml` user holds the
+workspace role OWNER or `users.yaml` does not read (`NO_ACTIVE_LOCAL_OWNER`, `USERS_UNREADABLE`) and a lease is still
+to be minted this cycle, so neither approval is requested for an effect no one could run. Once the production lease is
+recorded it reads READY (`PRINCIPAL_EFFECTS_DONE`), never mandatory.
 A vault that is already locked when `complete`, `POST …/releases` or a retry is sent is refused before anything is
 consumed: readiness reads `signing.available` WAITING `VAULT_LOCKED` (409 `A4_NOT_READY`). A `DENY` on an unconsumed
 completion gate revokes the staging lease of the release that gate binds; a decision on a consumed gate is refused

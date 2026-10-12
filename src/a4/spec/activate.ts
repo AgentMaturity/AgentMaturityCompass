@@ -461,23 +461,30 @@ function leaseScopeItem(release: A4ChainLink | null, production: Record<string, 
 /**
  * Who may run the release and the deployment approval (P1-78): under a verified plan whose identity-binding requires a
  * principal (L0-IDN-01, mandatory in Layer 0; a plan that does not verify reads the same), their staging and production
- * leases name the owner who runs each effect, who must be an active local users.yaml user; the effects refuse anyone
- * else, a workspace-router session included (409 PRINCIPAL_UNRESOLVED), before anything is minted. WAITING and never
- * mandatory while that applies; BLOCKED and mandatory while no users.yaml user is active (or users.yaml does not read),
- * so no gate is requested whose effect no one could run. READY when the plan requires no principal (the lease then names
- * the user when they resolve, else no one).
+ * leases name the owner who runs each effect, who must be an active local users.yaml user; `complete`, POST …/releases
+ * and a retry refuse anyone else, a workspace-router session included (409 PRINCIPAL_UNRESOLVED), before the gate or
+ * the engine grant is consumed. WAITING and never mandatory while that applies; BLOCKED and mandatory while no active
+ * users.yaml user holds the workspace role OWNER (or users.yaml does not read) and a lease is still to be minted this
+ * cycle, so neither approval is requested for an effect no one could run. Once the production lease is recorded no
+ * lease is left to mint: READY (PRINCIPAL_EFFECTS_DONE), never mandatory. READY when the plan requires no principal
+ * (the lease then names the user when they resolve, else no one).
  */
-function leasePrincipalItem(live: A4ReadinessQuery["live"]): A4ReadinessItem {
+function leasePrincipalItem(live: A4ReadinessQuery["live"], production: Record<string, unknown> | null): A4ReadinessItem {
   if (live.leasePrincipalRequired === undefined) {
     return item("lease.principal", "NOT_EVALUATED", { kind: "not_evaluated", section: "governance", mandatory: false, reasonCodes: ["PLAN_NOT_READ"] });
   }
   if (!live.leasePrincipalRequired) return item("lease.principal", "READY", { section: "governance", mandatory: false, reasonCodes: ["PRINCIPAL_NOT_REQUIRED"] });
+  if (production !== null) {
+    return item("lease.principal", "READY", { section: "governance", mandatory: false, reasonCodes: ["PRINCIPAL_REQUIRED", "PRINCIPAL_EFFECTS_DONE"] });
+  }
   const label = "The active plan requires a principal for every tool call (L0-IDN-01): an owner signed in as an active local users.yaml user runs the release "
-    + "and completes the deployment approval, and each lease names them; anyone else, a workspace-router session included, is refused PRINCIPAL_UNRESOLVED before anything is minted";
-  if (live.activeLocal === null || live.activeLocal.length === 0) {
+    + "and completes the deployment approval, and each lease names them; anyone else, a workspace-router session included, is refused PRINCIPAL_UNRESOLVED "
+    + "before the gate is consumed";
+  const owners = live.activeLocalOwners ?? null;
+  if (owners === null || owners === 0) {
     return item("lease.principal", "BLOCKED", { kind: "evidence_missing", section: "governance",
-      reasonCodes: ["PRINCIPAL_REQUIRED", live.activeLocal === null ? "USERS_UNREADABLE" : "NO_ACTIVE_LOCAL_USER"],
-      nextAction: { label: `${label}. No users.yaml user is active${live.activeLocal === null ? " (users.yaml does not read)" : ""}: add one (amc user add) and make them a project owner` } });
+      reasonCodes: ["PRINCIPAL_REQUIRED", owners === null ? "USERS_UNREADABLE" : "NO_ACTIVE_LOCAL_OWNER"],
+      nextAction: { label: `${label}. No active users.yaml user holds the OWNER role${owners === null ? " (users.yaml does not read)" : ""}: add one (amc user add) and make them a project owner` } });
   }
   return waiting("lease.principal", ["PRINCIPAL_REQUIRED"], { kind: "review_pending", section: "governance", mandatory: false, nextAction: { label } });
 }
@@ -545,6 +552,7 @@ export function activateItems(state: A4ReadinessState, query: A4ReadinessQuery):
   const target = textValue(answerValues(answers).get("target"));
   const release = currentRelease(state.chain);
   const releaseId = typeof release?.body.releaseId === "string" ? release.body.releaseId : null;
+  const productionLease = releaseId === null ? null : productionLeaseOf(state.chain, releaseId);
   const direction = latestGate(state, "activate", "direction");
   return [
     askCodes.length === 0 ? item("ask_complete", "READY", { section: "recommendation" })
@@ -566,8 +574,8 @@ export function activateItems(state: A4ReadinessState, query: A4ReadinessQuery):
     // The bootstrap report records no image digest: pinned by tag only, WAITING, never BLOCKED.
     waiting("deployment.image_pinned", ["IMAGE_TAG_ONLY"], { kind: "review_pending", mandatory: false,
       nextAction: { label: `No image digest: ${IMAGE_TAG_ONLY_REASON} (the package README names the gap)` } }),
-    leaseScopeItem(release, releaseId === null ? null : productionLeaseOf(state.chain, releaseId)),
-    leasePrincipalItem(query.live),
+    leaseScopeItem(release, productionLease),
+    leasePrincipalItem(query.live, productionLease),
     receiptItem(state, releaseId),
     amcCheckItem(state, releaseId),
     monitoringItem(state, releaseId),

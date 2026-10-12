@@ -24,7 +24,7 @@ import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { latestEnforceResourceManifestPath, loadCanonicalEnforceResourceManifest, type EnforceResource } from "../enforce/resourceManifest.js";
 import { getAgentPaths } from "../fleet/paths.js";
 import { typedMultiAgentGraphDigest, typedMultiAgentGraphSchema } from "../fleet/typedGraph.js";
-import { issueLeaseForPrincipal, resolveLeasePrincipal } from "../leases/leasePrincipal.js";
+import { issueLeaseForPrincipal } from "../leases/leasePrincipal.js";
 import { revokeLease } from "../leases/leaseStore.js";
 import { readAndVerifyArtifactFileSignature, signArtifactBytes, signArtifactFile, type ArtifactSignature } from "../lifecycle/artifactSignature.js";
 import { assertOwnerMode } from "../mode/mode.js";
@@ -45,7 +45,7 @@ import { a4ProjectsRoot } from "./a4Blobs.js";
 import { conformanceView } from "./a4Conformance.js";
 import type { A4EffectContext, A4EffectDef, A4EffectOutcome } from "./a4Effects.js";
 import { A4_RUNTIME, signedA4Floor } from "./a4Gates.js";
-import { asLeasePrincipal, assertPurposeKeys, vaultLocked } from "./a4Preflight.js";
+import { asLeasePrincipal, assertPurposeKeys, leasePrincipalPreflight, vaultLocked } from "./a4Preflight.js";
 import { isRegulated, redoneStages, type A4ReadinessState } from "./a4Readiness.js";
 import {
   a4PackageV1Schema, a4PrincipalSchema, a4QualitySpecSchema, a4ReleaseV1Schema, a4ResourceDigestsSchema, type A4ChainLink, type A4PackageV1, type A4Principal, type A4ProjectRow,
@@ -327,11 +327,13 @@ function revokeJournaled(workspace: string, projectId: string, releaseId: string
 }
 /**
  * Before an effect's first side effect: the vault purpose keys a lease step signs with, in any signing mode (the lease key mints a lease, the revocation-list
- * key revokes one; a locked vault answers 423 A4_VAULT_LOCKED, a revoked key 409 A4_KEY_REVOKED), then the principal the lease will name (P1-78, src/a4/a4Preflight.ts), so a refusal leaves nothing revoked, written, minted or signed.
+ * key revokes one; a locked vault answers 423 A4_VAULT_LOCKED, a revoked key 409 A4_KEY_REVOKED), then the principal the lease will name again (P1-78,
+ * src/a4/a4Preflight.ts; the effect's `preflight` refused it before the gate was consumed, so this refuses only when users.yaml or the plan changed since,
+ * and spends the attempt), so a refusal leaves nothing revoked, written, minted or signed.
  */
 function assertLeaseKeys(workspace: string, principal: A4Principal, what: string): void {
   assertPurposeKeys(workspace, ["lease", "revocation-list"], what); // P1-08: revokeLease signs the lease revocation list with the revocation-list key
-  asLeasePrincipal(principal, (principalKey) => resolveLeasePrincipal(workspace, principalKey));
+  leasePrincipalPreflight(workspace, principal);
 }
 /** Mints one lease of the plan bound to the project's workspace, agent and release, naming `principal` (resolved again); its id is journaled before the token is returned. */
 function mintLease(workspace: string, state: A4ReadinessState, releaseId: string, plan: LeasePlan, principal: A4Principal): { leaseId: string; token: string; expiresAt: string; projection: Record<string, unknown> } {
@@ -781,11 +783,13 @@ export const RELEASE_EFFECT: A4EffectDef = {
   id: RELEASE_EFFECT_ID, toolName: "a4.activate.create_release", actionClass: "DEPLOY", consumes: "A4", completes: "activate.direction", inline: true,
   // The package digest is known only after the build, so the release approval's binding digest names the execution.
   executionId: (_state, gate) => `a4-release-${gate.binding_digest.slice(0, 32)}`,
+  preflight: leasePrincipalPreflight,
   run: createRelease
 };
 /** a4.activate.production_lease: on the deployment approval's own quorum (DEPLOY floor); inline. */
 export const PRODUCTION_LEASE_EFFECT: A4EffectDef = {
   id: PRODUCTION_LEASE_EFFECT_ID, toolName: "a4.activate.production_lease", actionClass: "DEPLOY", consumes: "gate", completes: "activate.completion", inline: true,
   executionId: (_state, gate) => `a4-production-lease-${gate.binding_digest.slice(0, 32)}`,
+  preflight: leasePrincipalPreflight,
   run: mintProductionLease
 };
