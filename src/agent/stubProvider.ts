@@ -30,7 +30,10 @@
  *   - tools are offered and no tool result is in the history yet  → one
  *     `tool_use` call of the first offered tool, with the last user text as its
  *     only argument. That is what makes `amc agent-loop run --stub` a genuine
- *     MULTI-STEP turn rather than one request and a period.
+ *     MULTI-STEP turn rather than one request and a period. A user text that is
+ *     exactly `{"tool": "<an offered tool>", "arguments": {...}}` asks for that
+ *     call instead: a scripted call, still governed like any other (the SDK
+ *     quickstart's fs.write, P1-40).
  *   - otherwise → one text block quoting what it was asked.
  *
  * FAULT INJECTION IS OPT-IN AND NAMED. `failFirst` makes the first N dispatches
@@ -176,6 +179,23 @@ function hasToolResult(request: EchoedRequest): boolean {
   );
 }
 
+/** The call a user text spells out as `{"tool", "arguments"}`, when it names an offered tool; the newest wins. */
+function directedCall(request: EchoedRequest): { readonly name: string; readonly args: string } | null {
+  for (const message of [...request.messages].reverse()) {
+    if (message.role !== "user") continue;
+    for (const block of [...message.content].reverse()) {
+      if (block?.type !== "text" || typeof block.text !== "string") continue;
+      let asked: unknown;
+      try { asked = JSON.parse(block.text); } catch { continue; } // plain text, not a directive
+      if (typeof asked !== "object" || asked === null) continue;
+      const { tool, arguments: args } = asked as { tool?: unknown; arguments?: unknown };
+      if (typeof tool === "string" && typeof args === "object" && args !== null && !Array.isArray(args)
+        && request.tools.some((offered) => offered.name === tool)) return { name: tool, args: JSON.stringify(args) };
+    }
+  }
+  return null;
+}
+
 /** Zero, and true: no model ran, so nothing was consumed. See the module header. */
 const STUB_USAGE = Object.freeze({ inputTokens: 0, outputTokens: 0 });
 
@@ -184,10 +204,10 @@ function* stubChunks(request: EchoedRequest): Generator<StreamChunk> {
   const tool = request.tools[0];
   if (tool !== undefined && !hasToolResult(request)) {
     const id = toolCallId(`stub-call-${request.messages.length}`);
-    const args = JSON.stringify({ text: asked });
+    const { name, args } = directedCall(request) ?? { name: tool.name, args: JSON.stringify({ text: asked }) };
     yield { type: "block-start", index: 0, blockKind: "tool_use" };
-    yield { type: "tool-call-delta", index: 0, id, name: tool.name, argumentsDelta: args };
-    yield { type: "block-end", index: 0, block: { kind: "tool_use", id, name: tool.name, arguments: args } };
+    yield { type: "tool-call-delta", index: 0, id, name, argumentsDelta: args };
+    yield { type: "block-end", index: 0, block: { kind: "tool_use", id, name, arguments: args } };
     yield { type: "usage", usage: STUB_USAGE };
     yield { type: "finish", reason: { kind: "tool_calls" } };
     return;
