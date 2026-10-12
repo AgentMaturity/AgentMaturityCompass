@@ -215,8 +215,8 @@ function stagingLeasesOf(chain: readonly A4ChainLink[], gateId: string): string[
 }
 
 /**
- * Before a DENY on an Activate completion gate: the revocation it owes is signed with the vault's auditor key (even in
- * NOTARY mode, where the DENY's own envelope is the notary's), so a DENY is refused while that key cannot sign (423
+ * Before a DENY on an Activate completion gate: the revocation it owes is signed with the vault's revocation-list purpose
+ * key (P1-08; even in NOTARY mode, where the DENY's own envelope is the notary's), so a DENY is refused while that key cannot sign (423
  * A4_VAULT_LOCKED while the vault is locked, 409 A4_KEY_REVOKED once the key is revoked), never recorded with the
  * staging lease left live.
  */

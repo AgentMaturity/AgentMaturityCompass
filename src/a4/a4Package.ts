@@ -230,7 +230,7 @@ function snapshotFiles(workspace: string, agentId: string, snapshot: { manifestI
   return out;
 }
 
-/** Who signs `kind` and with which key (the auditor key, or the notary the trust config pins). */
+/** Who signs `kind` and with which key (the vault's artifact-seal key, which the auditor role's public key names, or the notary the trust config pins). */
 function signerOf(workspace: string, kind: "A4_PACKAGE" | "A4_RECORD"): { route: "vault" | "notary"; fingerprint: string } {
   let route: "vault" | "notary";
   try {
@@ -326,8 +326,8 @@ function revokeJournaled(workspace: string, projectId: string, releaseId: string
   }
 }
 /**
- * Before an effect's first side effect: the vault keys a lease step signs with, in any signing mode (the lease key mints a lease, the auditor key revokes
- * one; a locked vault answers 423 A4_VAULT_LOCKED, a revoked key 409 A4_KEY_REVOKED), then the principal the lease will name (P1-78, src/a4/a4Preflight.ts), so a refusal leaves nothing revoked, written, minted or signed.
+ * Before an effect's first side effect: the vault purpose keys a lease step signs with, in any signing mode (the lease key mints a lease, the revocation-list
+ * key revokes one; a locked vault answers 423 A4_VAULT_LOCKED, a revoked key 409 A4_KEY_REVOKED), then the principal the lease will name (P1-78, src/a4/a4Preflight.ts), so a refusal leaves nothing revoked, written, minted or signed.
  */
 function assertLeaseKeys(workspace: string, principal: A4Principal, what: string): void {
   assertPurposeKeys(workspace, ["lease", "revocation-list"], what); // P1-08: revokeLease signs the lease revocation list with the revocation-list key
