@@ -3,7 +3,7 @@ import { z } from "zod";
 import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { getWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { appendOpsAuditEvent } from "../ops/audit.js";
-import { deletionTargetSchema, holdVerdict, readLegalHoldRegistry, withLegalHoldLock } from "./legalHoldRegistry.js";
+import { deletionTargetSchema, holdVerdict, LegalHoldRegistryError, readLegalHoldRegistry, withLegalHoldLock } from "./legalHoldRegistry.js";
 import type { DeletionRequest, HoldVerdict } from "./types.js";
 
 type Clear = Extract<HoldVerdict, { verdict: "clear" }>;
@@ -106,5 +106,9 @@ export function resolveDeletionWorkspace(workspace?: string): string {
     const snapshot = readLegalHoldRegistry(fallback);
     if (loadActiveCompiledPolicy(fallback) || !snapshot.headMissing || snapshot.holdsChecked) throw new Error("scope_required");
     return resolve(fallback);
-  } catch { throw new DeletionDenied({ verdict: "unknown", reason: "tenant_unmapped" }, false); }
+  } catch (error) {
+    // A checkpoint root inside the workspace keeps its own name (P0-57); any other failure leaves the fallback unmapped.
+    throw new DeletionDenied(error instanceof LegalHoldRegistryError && error.verdict.reason === "control_checkpoint_root_in_workspace"
+      ? error.verdict : { verdict: "unknown", reason: "tenant_unmapped" }, false);
+  }
 }

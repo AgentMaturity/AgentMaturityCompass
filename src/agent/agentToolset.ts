@@ -27,7 +27,7 @@ import {
 import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows, planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
 import type { ActionClass } from "../types.js";
-import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
+import { ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { writeEffectivePolicyReceipt } from "../policy/effectivePolicyReceipt.js";
 import { ToolRegistry } from "../tools/toolRegistry.js";
@@ -281,6 +281,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   try {
     compiled = loadActiveCompiledPolicy(workspace);
   } catch (error) {
+    // P0-57: a misplaced checkpoint root is its own refusal; restoring .amc/control-plan/ would not fix it.
+    if (error instanceof ControlCheckpointRootInWorkspaceError) throw error;
     throw new Error(`Refusing to start: the active compiled policy cannot be verified (${error instanceof Error ? error.message : String(error)}). Restore .amc/control-plan/ from backup, or recompile and reactivate with amc catalog compile --activate (docs/catalog/COMPILER.md)`);
   }
   // P1-67: bound only when the pinned plan's identity-binding requires a lease (L0-IDN-01); otherwise records bind as before.
