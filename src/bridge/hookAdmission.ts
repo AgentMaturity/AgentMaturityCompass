@@ -13,7 +13,7 @@ import { verifyManagedLease } from "../adapters/managedHookLease.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
-import { admitObservation, observationId, recordHookAudit, type HookObservationResult } from "./claudeCodeObservations.js";
+import { observationId, recordHookAudit, sessionRegistered, type HookObservationResult } from "./claudeCodeObservations.js";
 import { HookControlError } from "./hookProviders.js";
 
 export type HookAdmission = { readonly admitted: true } | { readonly admitted: false; readonly reason: string };
@@ -59,7 +59,8 @@ export function admitClaudeCodePrompt(input: { workspace: string; authenticatedA
     throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, "Claude Code UserPromptSubmit does not match its schema");
   }
   const now = input.now ?? Date.now();
-  const { registered } = admitObservation({ workspace: input.workspace, agentId: input.authenticatedAgentId, sessionId: parsed.session_id, now });
+  // Admission is a decision, not an after-the-fact observation: it is never capped.
+  const registered = sessionRegistered(input.workspace, input.authenticatedAgentId, parsed.session_id);
   const admission = checkHookAdmission(input.workspace, input.authenticatedAgentId, now);
   const sessionSha256 = claudeSessionSha256(parsed.session_id);
   // The prompt's digest and UTF-8 length are what AMC's forwarder reports from Claude Code's payload; the text never arrives.

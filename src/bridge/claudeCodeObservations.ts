@@ -4,7 +4,8 @@
  * authorized (PostToolUse, PostToolUseFailure). Every record is evidence: written in its own ledger session, sealed,
  * and verified (row integrity and signed receipt) before AMC answers. A record AMC's writer cannot write and verify
  * for a session with a verified registration latches the workspace's hooks (hookAuditLatch.ts); input never does.
- * Intake is capped per registration (and for unregistered sessions together), so a flood degrades only its source. A replayed or duplicated observation is recorded as such and refused.
+ * After-the-fact intake is capped per registration (unregistered sessions share one cap), never silently: what is
+ * refused is listed in a signed summary row, and the registration's calls are denied until its intake recovers. A replayed or duplicated observation is recorded as such and refused.
  *
  * A post-tool record is accepted as a call's outcome only when it names the PreToolUse decision it follows (by AMC's
  * action id from session and tool_use_id, and that decision's receipt digest, whose request digest covers the nonce)
@@ -36,32 +37,86 @@ import { HookControlError } from "./hookProviders.js";
 
 const MAX_BODY_BYTES = 262_144;
 const INTAKE_PER_MINUTE = 120;
+const WINDOW_MS = 60_000;
+const SUMMARY_IDS = 500;
 type Ledger = ReturnType<typeof openLedger>;
-// ponytail: an in-memory window per Bridge process; a restart resets it.
-const intake = new Map<string, number[]>();
+interface Shed { since: number; count: number; toolUseIds: string[]; actionIds: string[] }
+interface Intake { times: number[]; shed: Shed | null; backpressure: boolean }
+// ponytail: an in-memory window per Bridge process; a restart resets it (summary rows already written stay).
+const intake = new Map<string, Intake>();
+const intakeKey = (workspace: string, agentId: string, sessionSha256: string | null) => `${resolve(workspace)}\0${agentId}\0${sessionSha256 ?? "unregistered"}`;
 
-/**
- * Admit one observation of Claude Code session `sessionId` into the writer: whether the session has a verified
- * registration (only then can a writer fault latch), within its registration's per-minute cap. Over the cap it is
- * refused unrecorded (429).
- */
-export function admitObservation(input: { workspace: string; agentId: string; sessionId: string; now: number }): { registered: boolean } {
-  const ledger = openLedger(input.workspace);
-  let registered: boolean;
+/** Whether Claude Code session `sessionId` has a verified registration: only then can a fault of its writer latch. */
+export function sessionRegistered(workspace: string, agentId: string, sessionId: string): boolean {
+  const ledger = openLedger(workspace);
   try {
-    registered = claudeCodeSessionRegistration(ledger, input.agentId, input.sessionId).status === "registered";
+    return claudeCodeSessionRegistration(ledger, agentId, sessionId).status === "registered";
   } finally {
     ledger.close();
   }
-  const key = `${resolve(input.workspace)}\0${input.agentId}\0${registered ? claudeSessionSha256(input.sessionId) : "unregistered"}`;
-  const recent = (intake.get(key) ?? []).filter((ts) => input.now - ts < 60_000);
-  if (recent.length >= INTAKE_PER_MINUTE) {
-    intake.set(key, recent);
-    throw new HookControlError("HOOK_CONTROL_RATE_LIMITED", 429, "this Claude Code session's observations are over their per-minute limit; AMC refused this one");
+}
+
+/** One signed row listing what a registration's intake could not record since its last row; those calls never read as fully evidenced. */
+function writeIntakeSummary(input: { workspace: string; agentId: string; sessionSha256: string; registered: boolean; shed: Shed; now: number }): void {
+  const body = { kind: "amc.claude-code-intake-summary/v1", agentId: input.agentId, sessionSha256: input.sessionSha256, registered: input.registered,
+    reason: "observation not recorded (rate-limited)", window: { from: new Date(input.shed.since).toISOString(), to: new Date(input.now).toISOString() },
+    count: input.shed.count, toolUseIds: input.shed.toolUseIds, actionIds: input.shed.actionIds };
+  recordHookAudit({ workspace: input.workspace, now: input.now, sessionSha256: input.sessionSha256, body, meta: { intakeSummarySchemaVersion: 1, ...body },
+    id: observationId("ccintake", [input.agentId, input.sessionSha256, undefined], input.now), underRegistration: input.registered,
+    receipt: { kind: "guard_check", providerId: "hook-intake:claude-code" } });
+}
+
+/**
+ * Admit one after-the-fact observation (Stop, PostToolUse, PostToolUseFailure) of session `sessionId`, within its
+ * registration's per-minute cap (unregistered sessions share one). Over the cap it is refused (429), never silently: the
+ * first refusal of an episode, and every SUMMARY_IDS more, are written at once as a signed summary row; the rest when the
+ * registration next decides or its intake recovers. Until then its PreToolUse decisions are denied (intakeBackpressure).
+ */
+export function admitObservation(input: { workspace: string; agentId: string; sessionId: string; now: number; toolUseId?: string }): { registered: boolean } {
+  const registered = sessionRegistered(input.workspace, input.agentId, input.sessionId);
+  const sessionSha256 = claudeSessionSha256(input.sessionId);
+  const key = intakeKey(input.workspace, input.agentId, registered ? sessionSha256 : null);
+  const current = intake.get(key) ?? { times: [], shed: null, backpressure: false };
+  const times = current.times.filter((ts) => input.now - ts < WINDOW_MS);
+  const summary = { workspace: input.workspace, agentId: input.agentId, sessionSha256, registered, now: input.now };
+  if (times.length >= INTAKE_PER_MINUTE) {
+    const ids = input.toolUseId ? { toolUseIds: [input.toolUseId], actionIds: [claudeActionId(input.sessionId, input.toolUseId)] } : { toolUseIds: [], actionIds: [] };
+    const shed = { since: current.shed?.since ?? input.now, count: (current.shed?.count ?? 0) + 1,
+      toolUseIds: [...(current.shed?.toolUseIds ?? []), ...ids.toolUseIds], actionIds: [...(current.shed?.actionIds ?? []), ...ids.actionIds] };
+    intake.set(key, { times, shed, backpressure: true });
+    if (current.shed === null || shed.toolUseIds.length >= SUMMARY_IDS) {
+      writeIntakeSummary({ ...summary, shed });
+      intake.set(key, { times, shed: null, backpressure: true });
+    }
+    throw new HookControlError("HOOK_CONTROL_RATE_LIMITED", 429, "this Claude Code session's observations are over AMC's intake limit: AMC lists this one "
+      + "in a signed intake summary as not recorded and denies the session's calls until its intake recovers");
   }
-  if (intake.size > 10_000) for (const [stale, times] of intake) if (times.every((ts) => input.now - ts >= 60_000)) intake.delete(stale);
-  intake.set(key, [...recent, input.now]);
+  if (current.shed) writeIntakeSummary({ ...summary, shed: current.shed });
+  if (intake.size > 10_000) for (const [stale, state] of intake) if (!state.shed && state.times.every((ts) => input.now - ts >= WINDOW_MS)) intake.delete(stale);
+  intake.set(key, { times: [...times, input.now], shed: null, backpressure: false });
   return { registered };
+}
+
+/**
+ * Why registered session `sessionId`'s PreToolUse decision is denied: its intake refused observations and has not
+ * recovered. What it refused since the last summary row is written first. Decision rows themselves are never capped.
+ */
+export function intakeBackpressure(input: { workspace: string; agentId: string; sessionId: string; now: number }): string | null {
+  const sessionSha256 = claudeSessionSha256(input.sessionId);
+  const key = intakeKey(input.workspace, input.agentId, sessionSha256);
+  const current = intake.get(key);
+  if (!current?.backpressure) return null;
+  if (current.shed) {
+    writeIntakeSummary({ workspace: input.workspace, agentId: input.agentId, sessionSha256, registered: true, shed: current.shed, now: input.now });
+    intake.set(key, { ...current, shed: null });
+  }
+  const times = current.times.filter((ts) => input.now - ts < WINDOW_MS);
+  if (times.length < INTAKE_PER_MINUTE) {
+    intake.set(key, { times, shed: null, backpressure: false });
+    return null;
+  }
+  return "This Claude Code session's observations are over AMC's intake limit, and AMC listed those it could not record in a signed summary; "
+    + "AMC denies the session's calls until its intake recovers.";
 }
 
 export interface HookObservationResult {
@@ -193,7 +248,8 @@ export function recordClaudeCodePostExecution(input: { workspace: string; authen
   const now = input.now ?? Date.now();
   const sessionSha256 = claudeSessionSha256(parsed.session_id);
   const actionId = claudeActionId(parsed.session_id, parsed.tool_use_id);
-  const { registered } = admitObservation({ workspace: input.workspace, agentId: input.authenticatedAgentId, sessionId: parsed.session_id, now });
+  const { registered } = admitObservation({ workspace: input.workspace, agentId: input.authenticatedAgentId, sessionId: parsed.session_id, now,
+    toolUseId: parsed.tool_use_id });
   const ledger = openLedger(input.workspace);
   let decision: ReturnType<typeof verifiedDecision>;
   try {

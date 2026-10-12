@@ -59,6 +59,6 @@ export function controlRequest(payload: Record<string, unknown> | Buffer, nonce:
   return claudeEnvelope(Buffer.isBuffer(payload) ? payload : Buffer.from(JSON.stringify(payload), "utf8"), nonce);
 }
 
-export function decide(workspace: string, rawInput: string) {
-  return evaluateProviderHookControl({ workspace, authenticatedAgentId: agentId, provider: "claude-code", rawInput, lease });
+export function decide(workspace: string, rawInput: string, now?: number) {
+  return evaluateProviderHookControl({ workspace, authenticatedAgentId: agentId, provider: "claude-code", rawInput, lease, ...(now === undefined ? {} : { now }) });
 }

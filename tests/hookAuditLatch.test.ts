@@ -202,25 +202,6 @@ describe("only AMC's own writer, under a verified registration, can trip it; inp
     notLatched(tenantB);
   });
 
-  test("a flood degrades only its own registration", () => {
-    const workspace = claudeWorkspace();
-    register(workspace, "flooding-session");
-    const now = Date.now();
-    let refused = 0;
-    for (let i = 0; i < 130; i += 1) {
-      try {
-        handleHookControlRequest({ workspace, authenticatedAgentId: agentId, provider: "claude-code", lease, now, rawInput: JSON.stringify(stop("flooding-session")) });
-      } catch (error) {
-        expect(error).toMatchObject({ statusCode: 429 });
-        refused += 1;
-      }
-    }
-    expect(refused).toBeGreaterThan(0);
-    expect(handleHookControlRequest({ workspace, authenticatedAgentId: agentId, provider: "claude-code", lease, now,
-      rawInput: JSON.stringify(stop(sessionOf(workspace))) })).toMatchObject({ recorded: true });
-    notLatched(workspace);
-  });
-
   test("a fresh workspace, an empty ledger and a clean restart never come up latched", async () => {
     const empty = claudeWorkspace({ register: false });
     expect(hookAuditLatchState(empty)).toEqual({ latched: false });

@@ -2128,6 +2128,11 @@ components:
         observationConflict:
           type: boolean
           description: Claude Code control only. An outcome for this call was unmatched, conflicting or unverifiable.
+        observationNotRecorded:
+          type: string
+          nullable: true
+          enum: [rate-limited]
+          description: Claude Code control only. An observation of this call was refused by the intake cap and listed in a signed summary row; the call is not fully evidenced.
         rawProviderPayloadStored:
           type: boolean
           enum: [false]

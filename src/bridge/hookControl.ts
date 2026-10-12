@@ -973,7 +973,7 @@ export function evaluateProviderHookControl(input: {
     // Pi and Claude Code decisions that let an effect proceed bind P1-02's authorization record.
     const { requested, authorization, enforced, version } = authorizeHookDecision({
       workspace: input.workspace, agentId: input.authenticatedAgentId, lease: input.lease, provider, actionId: request.actionId,
-      call: request.call, toolInput: request.toolInput, ledger,
+      call: request.call, toolInput: request.toolInput, ledger, now,
       requested: requestedControlDecision({ workspace: input.workspace, agentId: input.authenticatedAgentId, request }),
     });
     const materialized = materializeProviderDecision({
