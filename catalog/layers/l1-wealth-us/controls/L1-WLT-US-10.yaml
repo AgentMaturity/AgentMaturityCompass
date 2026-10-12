@@ -1,0 +1,87 @@
+# Draft (P1-18): wealth.us.model-inventory. Experimental, agent-drafted and not independently reviewed; expert sign-off waits for D-08.
+# Extends L0-CHG-01 (Layer 0, P1-14) with the US finance parameter and citation.
+# A result under this control is evidence of conformity, never proof of compliance.
+
+id: L1-WLT-US-10
+version: "0.1.0"
+support: experimental
+layer: 1
+family: model-risk
+stations: [wealth]
+title: Traditional models the agent calls are inventoried and validated
+statement: Every traditional model the agent calls is in the model inventory and validated, a call to an unvalidated
+  model is refused, and a version change triggers revalidation.
+riskRationale: Model risk guidance expects inventory, validation and effective challenge of the models a bank relies on;
+  an agent that calls an unvalidated scoring model inherits its risk. Generative and agentic models are outside SR 26-2.
+mandatory: true
+applicability:
+  predicate: {always: true}
+  reasons:
+    - "The Wealth overlay applies to every US deployment in the Wealth station (pack scope: station wealth, jurisdiction
+      US)."
+  exclusions: []
+citations:
+  - key: us-sr-26-2-models
+    registerId: us-sr-26-2
+    instrument: Federal Reserve SR 26-2, Revised Guidance on Model Risk Management (with the OCC and FDIC)
+    clause: "SR 26-2: inventory, validation and effective challenge for the traditional models an agent calls; generative
+      and agentic AI models are outside its scope"
+    edition: SR 26-2 (17 April 2026)
+    jurisdiction: US
+    statusType: supervisory-guidance
+    superseded: null
+    effectiveDate: "2026-04-17"
+    complianceDueDate: null
+    dateNote: Letter dated 2026-04-17; supervisory guidance carries no compliance-due date.
+    url: https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm
+    retrieval:
+      state: unverified
+      reason: "P0-24 read the letter page and its attachment on 2026-10-07 without recording a hash
+        (src/domains/packs/catalogueUs.ts, us-sr-26-2): attachment footnote 3 puts generative and agentic AI models
+        outside the guidance. Not fetched in P1-18."
+    appliesWhen:
+      all:
+        - {fact: jurisdictions, includesAny: [US]}
+        - {fact: entityTypes, includesAny: [bank]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline]
+  mechanism: Model calls resolve through a signed version manifest; an unlisted or changed model version is refused until
+    it is revalidated (P1-75, not built yet).
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L1-WLT-US-10-T1
+    type: runtime_enforced
+    oracle:
+      kind: enforcement_receipt
+      observes: The refusal of a call to a model absent from, or changed since, the validated inventory.
+    fixtures:
+      positive: [L1-WLT-US-10/positive/evidence-valid.json]
+      negative:
+        - L1-WLT-US-10/negative/evidence-contradictory.json
+        - L1-WLT-US-10/negative/evidence-cross-tenant.json
+        - L1-WLT-US-10/negative/evidence-empty.json
+        - L1-WLT-US-10/negative/evidence-replayed.json
+        - L1-WLT-US-10/negative/evidence-stale.json
+        - L1-WLT-US-10/negative/evidence-violation.json
+    passCriteria: A call to a model absent from the validated inventory is refused, and a version change voids its
+      validation until a new one is recorded (T-US-MRM-1, T-US-MRM-2).
+    attempts: 1
+evidence:
+  - id: L1-WLT-US-10-E1
+    producer: amc.versionManifest
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: {maxAgeDays: 30}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+invalidatedBy: [model_version, deployment_version]
+owner: {role: senior_manager}
+clock: null
+levels: [L2]
+crosswalk: []
+review: {status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null}
+provenance: {draftedBy: ai, draftedAt: "2026-10-12", approvedBy: null}

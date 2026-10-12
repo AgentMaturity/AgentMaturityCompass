@@ -1,0 +1,19 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-06",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "tool_allowlist",
+    "tool": "fixture.customer.export",
+    "actionClass": "READ_ONLY",
+    "listed": [
+      "fixture.customer.read"
+    ],
+    "config": "signed"
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "guard_denied:tool-allowlist"
+  }
+}

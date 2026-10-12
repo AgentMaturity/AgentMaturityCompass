@@ -2,6 +2,7 @@
 # maxClaimKind caps what a producer's evidence can claim; a planned producer gives no evidence until it ships.
 # A planned row's `module` names the code it extends, or "none yet" with its plan key; it is not a finished emitter.
 # P1-70 to P1-76 and P1-78 are follow-up keys P1-14 proposes, not yet in the plan; the integrator confirms them.
+# P1-79 is the follow-up key P1-18 proposes for the bulk-extraction monitor; the integrator confirms or renumbers it.
 producers:
   - id: amc.leases.issuer
     module: src/leases/leaseSigner.ts
@@ -259,3 +260,11 @@ producers:
     maxClaimKind: observed
     status: planned
     plannedBy: P1-76
+  # Wealth overlay producers not built yet (P1-18).
+  - id: amc.dataflow.extractionMonitor
+    module: src/dataflow/purposePolicy.ts
+    # Protected-data admission flags nonpublic information in model requests; nothing throttles or alerts on bulk extraction.
+    emits: [extraction_attempt, extraction_alert]
+    maxClaimKind: observed
+    status: planned
+    plannedBy: P1-79

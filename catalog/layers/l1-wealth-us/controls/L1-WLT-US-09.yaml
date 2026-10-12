@@ -1,0 +1,146 @@
+# Draft (P1-18): wealth.us.vendor-oversight. Experimental, agent-drafted and not independently reviewed; expert sign-off waits for D-08.
+# Extends L0-CHG-04 (Layer 0, P1-14) with the US finance parameter and citation.
+# A result under this control is evidence of conformity, never proof of compliance.
+
+id: L1-WLT-US-09
+version: "0.1.0"
+support: experimental
+layer: 1
+family: third-party-oversight
+stations: [wealth]
+title: AI vendors tiered as third parties; a silent model change is detected
+statement: Model vendors, agent platforms, tool providers and MCP servers are tiered third parties under due diligence
+  and monitoring, and a vendor's silent model change is detected before more effects run.
+riskRationale: Third-party guidance and the Safeguards Rule expect oversight of service providers; a vendor that swaps
+  the model behind an endpoint changes the agent without review.
+mandatory: true
+applicability:
+  predicate: {always: true}
+  reasons:
+    - "The Wealth overlay applies to every US deployment in the Wealth station (pack scope: station wealth, jurisdiction
+      US)."
+  exclusions: []
+citations:
+  - key: us-glba-314-4-f
+    registerId: us-glba-safeguards
+    instrument: GLBA Safeguards Rule (FTC), 16 CFR Part 314
+    clause: "16 CFR 314.4(f): oversee service providers"
+    edition: CFR annual edition 2026, Title 16 Vol. 1 (revised 2026-01-01), GPO govinfo
+    jurisdiction: US
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: In force; no source in scope gives the date this paragraph took effect. The legal reviewer records it.
+    url: https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec314-4.xml
+    retrieval:
+      state: unverified
+      reason: "Unverified for paragraph (f): P1-17 fetched this file at 2026-10-07T17:10:30Z
+        (sha256:78db42ccdd11efa9aacd304e6deb2f9b1008e4af9f3c6d23b1f829fb455cc632,
+        qualification/2026-10-07-P1-17/sources.md) but encoded only paragraph (j); no text held in the repository
+        confirms paragraph (f). Not re-fetched in P1-18 (no network access)."
+    appliesWhen:
+      all:
+        - {fact: jurisdictions, includesAny: [US]}
+        - {fact: entityTypes, includesAny: [non_bank_financial_institution]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+  - key: us-sr-23-4
+    registerId: us-sr-23-4
+    instrument: "Federal Reserve SR 23-4, Interagency Guidance on Third-Party Relationships: Risk Management (with the OCC
+      and FDIC)"
+    clause: "SR 23-4: due diligence, contract negotiation and ongoing monitoring across the third-party relationship life
+      cycle, applied to AI vendors, AMC included"
+    edition: SR 23-4 (7 June 2023)
+    jurisdiction: US
+    statusType: supervisory-guidance
+    superseded: null
+    effectiveDate: "2023-06-07"
+    complianceDueDate: null
+    dateNote: Issued 2023-06-07 (the plan's research date); supervisory guidance carries no compliance-due date.
+    url: https://www.federalreserve.gov/supervisionreg/srletters/SR2304.htm
+    retrieval:
+      state: unverified
+      reason: "Unverified: not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11); the URL follows
+        the Federal Reserve SR-letter path S5 records for SR 26-2 (SR2602.htm) and is confirmed when read."
+    appliesWhen:
+      all:
+        - {fact: jurisdictions, includesAny: [US]}
+        - {fact: entityTypes, includesAny: [bank]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+  - key: us-tprm-proposal-2026
+    registerId: us-tprm-proposal-2026
+    instrument: Proposed replacement of the interagency third-party risk management guidance (SR 23-4)
+    clause: "Proposal of 2026-09-15: due diligence, contracts and monitoring for third parties, AI vendors included"
+    edition: Federal Register search for the 2026-09-15 proposal; its document number is not recorded
+    jurisdiction: US
+    statusType: draft
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: Proposal published 2026-09-15 with comments due 2026-11-16 (plan's US register); not final, so it has no
+      effective or compliance date.
+    url: https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=third-party%20relationships&conditions%5Bpublication_date%5D%5Bgte%5D=2026-09-15
+    retrieval:
+      state: unverified
+      reason: "Unverified: not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11); the proposal's
+        Federal Register document was not identified or read; the URL is a Federal Register search that should list it."
+    appliesWhen:
+      all:
+        - {fact: jurisdictions, includesAny: [US]}
+        - {fact: entityTypes, includesAny: [bank]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+binding:
+  kind: manual
+  points: []
+  mechanism: A named owner keeps the tiered register of AI vendors; detecting a silent model change needs the signed
+    version manifest (P1-75, not built yet).
+  parameters: []
+  manualDuty:
+    duty: Keep a tiered register of model vendors, agent platforms, tool providers and MCP servers with due diligence,
+      contract terms and monitoring per tier.
+    ownerRole: senior_manager
+    cadence: quarterly and at onboarding
+    evidenceOfPerformance: The vendor register and a review record per vendor.
+tests:
+  - id: L1-WLT-US-09-T1
+    type: document_review
+    oracle:
+      kind: human_assessor
+      observes: The vendor register, its review records and any model change found without a manifest entry.
+    fixtures:
+      positive: [L1-WLT-US-09/positive/evidence-valid.json]
+      negative:
+        - L1-WLT-US-09/negative/evidence-contradictory.json
+        - L1-WLT-US-09/negative/evidence-cross-tenant.json
+        - L1-WLT-US-09/negative/evidence-empty.json
+        - L1-WLT-US-09/negative/evidence-replayed.json
+        - L1-WLT-US-09/negative/evidence-stale.json
+        - L1-WLT-US-09/negative/evidence-violation.json
+    passCriteria: Every AI vendor in use is in the register with a tier and a current review, and a model change without a
+      version-manifest entry raises a finding (T-US-TP-1).
+    attempts: 1
+evidence:
+  - id: L1-WLT-US-09-E1
+    producer: amc.manualDuty.record
+    bindingFields: [deploymentId, controlId]
+    freshness: {maxAgeDays: 90}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+  - id: L1-WLT-US-09-E2
+    producer: amc.versionManifest
+    bindingFields: [deploymentId, controlId]
+    freshness: {maxAgeDays: 90}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+invalidatedBy: [model_version, deployment_version]
+owner: {role: senior_manager}
+clock: null
+levels: [L2]
+crosswalk: []
+review: {status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null}
+provenance: {draftedBy: ai, draftedAt: "2026-10-12", approvedBy: null}
