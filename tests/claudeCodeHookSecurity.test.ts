@@ -3,7 +3,7 @@
  * differential), nothing allows without a signed decision bound to this exact call (authorization bypass), and
  * observations are verified evidence bound to the decision they follow (audit integrity).
  */
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { runHookForward } from "../src/adapters/hookForwarder.js";
@@ -215,19 +215,18 @@ describe("audit integrity", () => {
     expect(() => route(workspace, admission)).toThrowError(expect.objectContaining<Partial<HookControlError>>({ code: "HOOK_CONTROL_REPLAY_CONFLICT" }));
   });
 
-  test("an observation that cannot be recorded latches its session: every later call is denied", () => {
+  test("an observation the forwarder could not record latches the workspace's hooks: every later call is refused", () => {
     const workspace = claudeWorkspace();
     const { result, input, session } = allowRead(workspace, "toolu_latch");
-    // The forwarder reports that the observed-ingress write failed; the session cannot be audited any further.
+    // The forwarder reports that the observed-ingress write failed; the workspace cannot be audited any further.
     expect(() => route(workspace, post(session, "toolu_latch", input, result.receiptSha256, { ingressRecorded: false })))
       .toThrowError(expect.objectContaining<Partial<HookControlError>>({ code: "HOOK_CONTROL_LEDGER_UNAVAILABLE" }));
-    const after = decide(workspace, controlRequest(pre(workspace, "Read", input)));
-    expect(after).toMatchObject({ decision: "deny" });
-    expect(after.reason).toContain("latched");
-    // The latch survives the Bridge's memory: it is read from disk at each decision.
-    expect(readFileSync(join(workspace, ".amc", "hooks", "claude-code.latched.json"), "utf8")).toContain("sessionSha256");
-    writeFileSync(join(workspace, ".amc", "hooks", "claude-code.latched.json"), "not json");
-    expect(decide(workspace, controlRequest(pre(workspace, "Read", input))).reason).toContain("latched");
+    expect(() => route(workspace, controlRequest(pre(workspace, "Read", input)))).toThrowError(/latched/);
+    // A latch file AMC cannot read latches every workspace (hookAuditLatch.test.ts covers new sessions, restarts and recovery).
+    const other = claudeWorkspace();
+    writeFileSync(join(process.env.AMC_HOME!, "state", "hook-audit-latch.json"), "not json");
+    expect(() => decide(other, controlRequest(pre(other, "Read", { file_path: join(cwdOf(other), "workspace", "public.txt") })))).toThrowError(/latched/);
+    rmSync(join(process.env.AMC_HOME!, "state", "hook-audit-latch.json"));
     expect(claudeActionId(session, "toolu_latch")).toMatch(/^cc\./);
   });
 });

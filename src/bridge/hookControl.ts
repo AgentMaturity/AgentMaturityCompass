@@ -36,6 +36,7 @@ import {
 // Still exported here for importers of hookControl.js, the archived HTTP parity module among them.
 export { HookControlError } from "./hookProviders.js";
 import { authorizeHookDecision, boundDecisionFacts, hookDecisionReceipt, type AuthorizationTarget, type HookLease } from "./hookAuthorization.js";
+import { hookAuditLatch, latchedMessage } from "./hookAuditLatch.js";
 
 export const CONTROL_HOOK_PATH = "/bridge/hooks/control/v1";
 export const CONTROL_HOOK_ROUTE = "/hooks/control/v1";
@@ -926,6 +927,8 @@ export function evaluateProviderHookControl(input: {
   now?: number;
 }): ProviderHookControlResult {
   const provider = parseProvider(input.provider);
+  const latched = hookAuditLatch(input.workspace);
+  if (latched !== null) throw new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, latchedMessage(latched));
   if (!SAFE_ID.test(input.authenticatedAgentId) || input.authenticatedAgentId.length > 160) {
     throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, "authenticated agent identity is invalid");
   }

@@ -3,7 +3,8 @@ import { isPiSessionStart, registerPiSession, type PiSessionRegistrationResult }
 import { registerClaudeCodeSession, type ClaudeCodeRegistrationResult } from "./claudeCodeSessionRegistry.js";
 import { recordClaudeCodePostExecution, recordClaudeCodeStop, type HookObservationResult } from "./claudeCodeObservations.js";
 import { admitClaudeCodePrompt } from "./hookAdmission.js";
-import { assertUnambiguousJson } from "./hookProviders.js";
+import { guardHookAudit } from "./hookAuditLatch.js";
+import { assertUnambiguousJson, HookControlError } from "./hookProviders.js";
 
 type Input = Parameters<typeof evaluateProviderHookControl>[0];
 const CLAUDE_SESSION_EVENTS: Record<string, (input: Input) => ClaudeCodeRegistrationResult | HookObservationResult> = {
@@ -24,10 +25,15 @@ function eventName(rawInput: string): unknown {
 
 /**
  * The Bridge's hook control route: a Pi `session_start` registration; Claude Code's SessionStart registration,
- * UserPromptSubmit admission, Stop and post-tool records; otherwise one provider tool request.
+ * UserPromptSubmit admission, Stop and post-tool records; otherwise one provider tool request. Every request passes the
+ * workspace's hook audit latch (hookAuditLatch.ts): refused while latched, and one that fails with a 5xx latches it.
  */
 export function handleHookControlRequest(input: Input):
   ProviderHookControlResult | PiSessionRegistrationResult | ClaudeCodeRegistrationResult | HookObservationResult {
+  return guardHookAudit(input.workspace, (message) => new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, message), () => route(input));
+}
+
+function route(input: Input): ProviderHookControlResult | PiSessionRegistrationResult | ClaudeCodeRegistrationResult | HookObservationResult {
   if (input.provider === "pi" && isPiSessionStart(input.rawInput)) return registerPiSession(input);
   // A repeated key could be read one way by AMC and another by whoever sent it: refused for every Claude Code body.
   if (input.provider === "claude-code") assertUnambiguousJson(input.rawInput);

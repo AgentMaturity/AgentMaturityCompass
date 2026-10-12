@@ -3,7 +3,7 @@
  * AMC never forces Claude Code to continue) and, after each tool call, whether the input that ran is the input AMC
  * authorized (PostToolUse, PostToolUseFailure). Every record is evidence: written in its own ledger session, sealed,
  * and verified (row integrity and signed receipt) before AMC answers. A record that cannot be written and verified
- * latches its session (claudeCodeLatch.ts). A replayed or duplicated observation is recorded as such and refused.
+ * fails with a 503, which latches the workspace's hooks (hookAuditLatch.ts). A replayed or duplicated observation is recorded as such and refused.
  *
  * A post-tool record is accepted as a call's outcome only when it names the PreToolUse decision it follows (by AMC's
  * action id from session and tool_use_id, and that decision's receipt digest, whose request digest covers the nonce)
@@ -26,7 +26,6 @@ import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../toolhub/
 import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { latchClaudeSession } from "./claudeCodeLatch.js";
 import { claudeCodeSessionRegistration } from "./claudeCodeSessionRegistry.js";
 import type { HookLease } from "./hookAuthorization.js";
 import { deterministicEventId as decisionEventId } from "./hookControl.js";
@@ -44,7 +43,7 @@ export interface HookObservationResult {
 }
 
 /** Append one signed audit row in its own ledger session, seal it, and verify the row and its receipt as written. */
-function appendVerified(ledger: Ledger, input: { id: string; now: number; meta: Record<string, unknown>; body: unknown;
+export function appendVerified(ledger: Ledger, input: { id: string; now: number; meta: Record<string, unknown>; body: unknown;
   receipt: { kind: ReceiptKind; providerId: string } }): { eventId: string; receiptId: string } {
   const agentId = String(input.meta.agentId);
   const bodySha256 = sha256Hex(Buffer.from(canonicalize(input.body), "utf8"));
@@ -67,7 +66,7 @@ function appendVerified(ledger: Ledger, input: { id: string; now: number; meta: 
 /**
  * Record one observation of Claude Code session `sessionSha256` under the deterministic `id`, verified as written. A
  * second observation under the same id is a replay, duplicate or conflict: AMC keeps it under its own id with
- * `conflictOf` and refuses it. A write or verification failure latches the session and fails closed.
+ * `conflictOf` and refuses it. A write or verification failure fails closed with a 503.
  */
 export function recordHookAudit(input: { workspace: string; id: string; now: number; sessionSha256: string; meta: Record<string, unknown>;
   body: unknown; receipt: { kind: ReceiptKind; providerId: string } }): HookObservationResult {
@@ -85,9 +84,8 @@ export function recordHookAudit(input: { workspace: string; id: string; now: num
     return { recorded: true, idempotentReplay: false, provider: "claude-code", ...appendVerified(ledger, input) };
   } catch (error) {
     if (replayed && error instanceof HookControlError) throw error;
-    const reason = `the Claude Code observation could not be recorded and verified: ${error instanceof Error ? error.message : String(error)}`;
-    latchClaudeSession(input.workspace, input.sessionSha256, reason);
-    throw new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, reason);
+    throw new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503,
+      `the Claude Code observation could not be recorded and verified: ${error instanceof Error ? error.message : String(error)}`);
   } finally {
     ledger?.close();
   }
@@ -204,9 +202,7 @@ export function recordClaudeCodePostExecution(input: { workspace: string; authen
   }
   const recorded = recordHookAudit({ ...audit, id: observationId("ccpost", [input.authenticatedAgentId, actionId], now) });
   if (!parsed.ingressRecorded) {
-    const reason = "AMC's forwarder could not record this tool outcome at the observed ingress";
-    latchClaudeSession(input.workspace, sessionSha256, reason);
-    throw new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, `${reason}; AMC latched the session`);
+    throw new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, "AMC's forwarder could not record this tool outcome at the observed ingress");
   }
   return recorded;
 }

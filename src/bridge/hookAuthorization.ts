@@ -9,8 +9,6 @@ import { authorizationRecordDigest, type AuthorizationRecordV1 } from "../action
 import { bindAuthorization, leasePrincipal } from "../actions/authorize.js";
 import { piSessionRegistration } from "./piSessionRegistry.js";
 import { claudeCodeSessionRegistration } from "./claudeCodeSessionRegistry.js";
-import { claudeSessionLatched } from "./claudeCodeLatch.js";
-import { claudeSessionSha256 } from "../adapters/hookProviders/claudeCode.js";
 import { claudeRequestRefusal } from "../adapters/hookProviders/claudeCodePayloads.js";
 import { assertContract } from "../contracts/index.js";
 import type { ActionReceiptMembers } from "../receipts/receipt.js";
@@ -108,9 +106,6 @@ function governedSession(input: { ledger: Parameters<typeof piSessionRegistratio
     const found = piSessionRegistration(input.ledger, input.agentId, call.sessionId);
     const refusal = registrationRefusal(found, call.pi);
     return { refusal, enforced: !refusal && found.status === "registered" && found.record.qualified, version: call.pi.version };
-  }
-  if (claudeSessionLatched(input.ledger.workspace, claudeSessionSha256(call.sessionId))) {
-    return { refusal: "An observation of this Claude Code session could not be recorded, so AMC latched the session and denies its calls.", enforced: false, version: null };
   }
   const found = claudeCodeSessionRegistration(input.ledger, input.agentId, call.sessionId);
   if (found.status === "missing") return { refusal: "This Claude Code session has no AMC registration, so it is not governed; AMC denied the call.", enforced: false, version: null };
