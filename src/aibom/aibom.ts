@@ -51,8 +51,9 @@ function digestComponent(fact: DigestFact): CycloneDxComponent {
 export function buildAibom(facts: AgentFacts, options: { specVersion?: "1.6" | "1.7"; now?: Date } = {}): CycloneDxBom {
   const specVersion = options.specVersion ?? "1.6";
   const unknown = [...facts.unknown];
-  const supplier = facts.agent?.providerTemplate;
   const models = facts.models.map((model): CycloneDxComponent => {
+    // The provider is known only when the model's declared route is the route of the agent's signed provider.
+    const supplier = facts.agent && facts.agent.providerRoute === model.route ? facts.agent.providerTemplate : undefined;
     unknown.push(...["version", "modelCard", "licenses", ...(supplier ? [] : ["supplier"])].map(field => `model ${model.id}: ${field}`));
     return { type: "machine-learning-model", "bom-ref": `amc:model:${model.id}`, name: model.id, ...(supplier ? { supplier: { name: supplier } } : {}),
       properties: [prop("amc:source", "signed adapters configuration"), prop("amc:provider.route", model.route), prop("amc:preferred", String(model.preferred))] };

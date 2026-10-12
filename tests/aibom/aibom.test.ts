@@ -144,6 +144,15 @@ describe("CycloneDX AIBOM of the governed agent", () => {
     expect(unknownOf(bom)).toEqual(expect.arrayContaining(["tools: .amc/tools.yaml did not verify (digest mismatch)"]));
   });
 
+  test("a model on another route than the agent's signed provider has no supplier, and says so", () => {
+    const root = workspace();
+    setAgentAdapterProfile(root, "default", { preferredAdapter: "generic-cli", preferredProviderRoute: "/other", preferredModel: "m-1", runMode: "SUPERVISE",
+      leaseScopes: ["gateway:llm"], routeAllowlist: ["/other"], modelAllowlist: ["m-1"] });
+    const bom = buildAibom(collectAgentFacts(root, "default"));
+    expect(bom.components.find(component => component.name === "m-1")?.supplier).toBeUndefined();
+    expect(unknownOf(bom)).toContain("model m-1: supplier");
+  });
+
   test("can be emitted as CycloneDX 1.7", () => {
     assertCycloneDx(buildAibom(collectAgentFacts(declared, "default"), { specVersion: "1.7" }), "1.7");
   });
