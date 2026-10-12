@@ -3,23 +3,19 @@ import { dirname, isAbsolute, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import YAML from "yaml";
 import { z } from "zod";
-import {
-  OBSERVED_AEP_HOOK_PATH,
-  OBSERVED_HOOK_CORRELATION_PATH,
-  observedAepActionEventSchema,
-  type ObservedAepActionEvent
-} from "../bridge/hookIngress.js";
-import {
-  CONTROL_HOOK_PATH,
-  CONTROL_HOOK_ROUTE,
-  verifyProviderHookControlResult,
-  type ProviderHookControlResult,
-} from "../bridge/hookControl.js";
-import { renderProviderControlResponse, type HookControlDecision, type HookProvider, type ProviderControlResponse } from "../bridge/hookProviders.js";
+import { observedAepActionEventSchema, type ObservedAepActionEvent } from "../bridge/hookIngress.js";
+import { CONTROL_HOOK_ROUTE } from "../bridge/hookControl.js";
+import type { HookControlDecision, HookProvider } from "../bridge/hookProviders.js";
 import { installPiHook, piHookStatus, PI_HOOK_SOURCE, removePiHook } from "./hookProviders/pi.js";
 import type { PiGovernance } from "../bridge/piSessionRegistry.js";
+import { CLAUDE_NOT_GOVERNED_NOTE, claudeCodeGovernance, type ClaudeCodeGovernance } from "../bridge/claudeCodeSessionRegistry.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
-import { boundedFetchSignal, CLAUDE_HOOK_TIMEOUT_SECONDS } from "./hookDeadline.js";
+import { CLAUDE_HOOK_TIMEOUT_SECONDS } from "./hookDeadline.js";
+import {
+  CLAUDE_CODE_HOOK_SOURCE, CLAUDE_CONTROL_STATUS_MESSAGE, CLAUDE_SESSION_HOOKS, CLAUDE_STATUS_MESSAGE, claudeActionId, claudeCodeBindingSchema,
+  measureClaudeCode, type ClaudeCodeBinding, type ClaudeCodeInstall,
+} from "./hookProviders/claudeCode.js";
+import { cachedFileSha256, clearPiDigestCache } from "./pi/piInstall.js";
 import { approvalPolicyPath, approvalPolicySigPath, initApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
 import { revokeLeaseForCli } from "../leases/leaseCli.js";
@@ -42,12 +38,7 @@ export {
   HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID, HookIntegrationError, type HookFileChange, type HookMode,
 } from "./hookProviders/installFiles.js";
 
-export const CLAUDE_CODE_HOOK_SOURCE = {
-  provider: "claude-code",
-  contract: "Claude Code project-local tool lifecycle command hooks",
-  url: "https://code.claude.com/docs/en/hooks.md",
-  reference: "sha256:e94e721874efc802248a7808e35ac917306088c5eaada2aa21e1def3fecc32e1"
-} as const;
+export { CLAUDE_CODE_HOOK_SOURCE } from "./hookProviders/claudeCode.js";
 
 export const GEMINI_CLI_HOOK_SOURCE = {
   provider: "gemini-cli",
@@ -74,20 +65,12 @@ const LEGACY_HOOK_SOURCES = {
 export const MAX_PROVIDER_HOOK_INPUT_BYTES = 262_144;
 
 const MAX_PROVIDER_CONFIG_BYTES = 4 * 1024 * 1024;
-const CLAUDE_STATUS_MESSAGE = `AMC Observe [${HOOK_INTEGRATION_ID}]`;
-const CLAUDE_CONTROL_STATUS_MESSAGE = `AMC Control [${HOOK_CONTROL_INTEGRATION_ID}]`;
 /** The providers configured through a JSON hooks file; Pi installs through src/adapters/hookProviders/pi.ts. */
 type ConfigHookProvider = Exclude<HookProvider, "pi">;
 export type { HookProvider };
 const hookProviderSchema = z.enum(["claude-code", "gemini-cli"]);
-const nativeHookEventNameSchema = z.enum([
-  "AfterTool",
-  "BeforeTool",
-  "PostToolUse",
-  "PostToolUseFailure",
-  "PreToolUse",
-]);
-const lifecyclePhaseSchema = z.enum(["requested", "completed", "failed", "completed-or-failed"]);
+const nativeHookEventNameSchema = z.enum(["AfterTool", "BeforeTool", "PostToolUse", "PostToolUseFailure", "PreToolUse", ...CLAUDE_SESSION_HOOKS]);
+const lifecyclePhaseSchema = z.enum(["requested", "completed", "failed", "completed-or-failed", "session-start", "turn-end", "prompt-submit"]);
 const sourceSchema = z.object({
   provider: hookProviderSchema,
   contract: z.string().min(1),
@@ -132,6 +115,8 @@ const manifestV1Schema = manifestCommonSchema.extend({
 
 const manifestV2Schema = manifestCommonSchema.extend({
   v: z.literal(2),
+  /** Claude Code control: AMC's forwarder entry and the Claude Code install sessions must run (claudeCode.ts). */
+  claudeCode: claudeCodeBindingSchema.optional(),
   handlers: z.array(z.object({
     eventName: nativeHookEventNameSchema,
     phase: lifecyclePhaseSchema,
@@ -184,8 +169,8 @@ export interface HookIntegrationStatus {
   expiresTs: number | null;
   issues: string[];
   files: { config: string; ignore: string; token: string; manifest: string; signature: string };
-  /** Pi only: what AMC may claim for the agent's Pi sessions, from verified session registrations. */
-  governance?: PiGovernance;
+  /** Pi and Claude Code control: what AMC may claim for the agent's sessions, from verified session registrations. */
+  governance?: PiGovernance | ClaudeCodeGovernance;
 }
 
 export interface InstallHookIntegrationOptions {
@@ -199,6 +184,9 @@ export interface InstallHookIntegrationOptions {
   dryRun?: boolean;
   /** Pi control mode: the installed @earendil-works/pi-coding-agent package sessions must run (the CLI finds it on PATH). */
   piPackageDir?: string;
+  /** Claude Code control mode: the `claude` binary sessions must run (the CLI finds it on PATH), or its measurement. */
+  claudeCodeBinary?: string;
+  claudeCodeInstall?: ClaudeCodeInstall;
 }
 
 export interface RemoveHookIntegrationOptions {
@@ -226,15 +214,22 @@ interface LocatedHandler {
 interface ProviderHookSpec {
   eventName: NativeHookEventName;
   phase: LifecyclePhase;
-  eventType: "action.requested" | "action.completed" | "action.failed";
+  /** The observed AEP event a tool hook maps to; Claude Code's session hooks map to none (the control route records them). */
+  eventType: "action.requested" | "action.completed" | "action.failed" | null;
 }
 
-function providerHookSpecs(provider: ConfigHookProvider): ProviderHookSpec[] {
+/** The hooks an installation in `mode` writes. Claude Code control adds SessionStart, Stop and UserPromptSubmit. */
+function providerHookSpecs(provider: ConfigHookProvider, mode: HookMode = "control"): ProviderHookSpec[] {
   return provider === "claude-code"
     ? [
         { eventName: "PostToolUse", phase: "completed", eventType: "action.completed" },
         { eventName: "PostToolUseFailure", phase: "failed", eventType: "action.failed" },
         { eventName: "PreToolUse", phase: "requested", eventType: "action.requested" },
+        ...(mode === "control" ? [
+          { eventName: "SessionStart", phase: "session-start", eventType: null },
+          { eventName: "Stop", phase: "turn-end", eventType: null },
+          { eventName: "UserPromptSubmit", phase: "prompt-submit", eventType: null },
+        ] as const : []),
       ]
     : [
         { eventName: "AfterTool", phase: "completed-or-failed", eventType: "action.completed" },
@@ -252,6 +247,8 @@ function providerSource(provider: ConfigHookProvider): typeof CLAUDE_CODE_HOOK_S
   return provider === "claude-code" ? CLAUDE_CODE_HOOK_SOURCE : GEMINI_CLI_HOOK_SOURCE;
 }
 
+export type { ConfigHookProvider };
+export { parseProvider as parseConfigHookProvider };
 function parseProvider(provider: unknown): ConfigHookProvider {
   const parsed = hookProviderSchema.safeParse(provider);
   if (!parsed.success) {
@@ -263,8 +260,9 @@ function parseProvider(provider: unknown): ConfigHookProvider {
   return parsed.data;
 }
 
-function providerControlOutcomes(provider: ConfigHookProvider): HookControlDecision[] {
-  return provider === "claude-code" ? ["allow", "deny", "ask"] : ["allow", "deny"];
+/** What control answers: allow or deny. Every ask is denied (a provider-local ask is not AMC approval). */
+function providerControlOutcomes(_provider: ConfigHookProvider): HookControlDecision[] {
+  return ["allow", "deny"];
 }
 
 function managedPaths(workspaceInput: string, provider: ConfigHookProvider): ManagedPaths {
@@ -350,9 +348,9 @@ function forwardArgs(input: {
   ];
 }
 
-/** AMC's own dist/cli.js, resolved from this installed package and never from the caller's cwd. */
-export function amcCliScriptPath(mode: HookMode, moduleUrl = import.meta.url): string {
-  const cliPath = resolve(dirname(fileURLToPath(moduleUrl)), "..", "..", "dist", "cli.js");
+/** AMC's own dist/cli.js (or its hook forwarder entry), resolved from this installed package and never from the caller's cwd. */
+export function amcCliScriptPath(mode: HookMode, moduleUrl = import.meta.url, entry: "cli" | "forwarder" = "cli"): string {
+  const cliPath = resolve(dirname(fileURLToPath(moduleUrl)), "..", "..", "dist", ...(entry === "cli" ? ["cli.js"] : ["adapters", "hookForwarder.js"]));
   if (mode === "control" && cliPath.split(sep).includes("_npx")) {
     throw new HookIntegrationError("HOOK_PATH_UNSAFE", "control hooks cannot run AMC from the purgeable npx cache; install AMC with npm, then re-run the install");
   }
@@ -369,12 +367,15 @@ function expectedHandler(input: {
 }): JsonObject {
   const args = forwardArgs(input);
   if (input.provider === "claude-code") {
+    // AMC's forwarder entry (no CLI bootstrap). In control mode a hook that cannot start, crashes, times out or prints
+    // an invalid answer blocks the action (`onFailure: "block"`, Claude Code 2.1.295 and later).
     return {
       type: "command",
       command: process.execPath,
-      args: [amcCliScriptPath(input.mode), ...args],
+      args: [amcCliScriptPath(input.mode, import.meta.url, "forwarder"), ...args.slice(3)],
       timeout: CLAUDE_HOOK_TIMEOUT_SECONDS,
-      statusMessage: input.mode === "control" ? CLAUDE_CONTROL_STATUS_MESSAGE : CLAUDE_STATUS_MESSAGE
+      statusMessage: input.mode === "control" ? CLAUDE_CONTROL_STATUS_MESSAGE : CLAUDE_STATUS_MESSAGE,
+      ...(input.mode === "control" ? { onFailure: "block" } : {}),
     };
   }
   return {
@@ -568,7 +569,7 @@ function validateManifestPaths(workspace: string, provider: ConfigHookProvider, 
     ? manifest.observation.eventType === "action.requested"
       && manifest.observation.correlation === (provider === "claude-code" ? "provider-call-id" : "derived-event-id")
     : canonicalize(manifest.handlers.map(({ eventName, phase }) => ({ eventName, phase }))) === canonicalize(
-        providerHookSpecs(provider).map(({ eventName, phase }) => ({ eventName, phase })),
+        providerHookSpecs(provider, manifest.mode).map(({ eventName, phase }) => ({ eventName, phase })),
       )
       && canonicalize(manifest.observation.eventTypes) === canonicalize(providerObservedEventTypes(provider))
       && manifest.observation.correlation === (
@@ -595,6 +596,15 @@ function validateManifestPaths(workspace: string, provider: ConfigHookProvider, 
 }
 
 function limitations(provider: ConfigHookProvider, mode: HookMode): string[] {
+  if (provider === "claude-code" && mode === "control") {
+    return [
+      "enforced at Claude Code PreToolUse for mapped tools, in sessions registered under this installation, on qualified Claude Code versions only; other tools, MCP tools included, are denied",
+      "UserPromptSubmit admits a prompt only with a valid lease, verified signed policies and no active freeze; AMC never receives the prompt text",
+      "SessionStart, Stop, PostToolUse and PostToolUseFailure are observed; AMC never forces Claude Code to continue; control never asks (a Claude Code ask is not AMC approval)",
+      "a session registration is a lease-holder attestation checked against disk, not proof that Claude Code ran a hook; sessions without one are not governed",
+      "not covered: OS containment, what an allowed Bash command starts, anything once a hook is removed or disabled; .claude/settings.local.json is user-editable, so regulated deployments use managed settings",
+    ];
+  }
   return [
     mode === "control"
       ? "control is loopback-only; raw provider input is evaluated in memory and never retained"
@@ -646,6 +656,40 @@ function unchangedInstallResult(input: {
   };
 }
 
+/**
+ * What a Claude Code control installation binds: AMC's forwarder entry (the handler's script) and the Claude Code
+ * binary sessions must run, measured now. Without a binary the installation binds none, and no session can register.
+ */
+function claudeCodeBinding(options: InstallHookIntegrationOptions, forwarderPath: string): ClaudeCodeBinding {
+  clearPiDigestCache();
+  const sha256 = cachedFileSha256(forwarderPath);
+  if (!sha256) throw new HookIntegrationError("HOOK_PATH_UNSAFE", `AMC's hook forwarder is missing or not a regular file: ${forwarderPath}; build or reinstall AMC`);
+  const install = options.claudeCodeInstall ?? (options.claudeCodeBinary ? measureClaudeCode(options.claudeCodeBinary) : null);
+  if (options.claudeCodeBinary && !install) throw new HookIntegrationError("HOOK_PATH_UNSAFE", `not a Claude Code binary: ${options.claudeCodeBinary}`);
+  return { forwarder: { path: forwarderPath, sha256 }, install };
+}
+
+/** Claude Code control: drift of the bound forwarder and Claude Code (an issue each), and the sessions' governance. */
+function claudeControlStatus(workspace: string, manifest: HookManifest, issues: string[]): { drifted: boolean; governance: ClaudeCodeGovernance } {
+  const binding = manifest.v === 2 ? manifest.claudeCode : undefined;
+  const drift = [
+    !binding ? "the control installation binds no AMC hook forwarder; reinstall" : null,
+    binding && cachedFileSha256(binding.forwarder.path) !== binding.forwarder.sha256 ? "AMC's hook forwarder changed after installation; reinstall to bind it" : null,
+    binding?.install && cachedFileSha256(binding.install.binaryPath) !== binding.install.sha256
+      ? "Claude Code on disk changed after installation (upgrade, edit or removal); reinstall to bind it" : null,
+  ].filter((issue): issue is string => issue !== null);
+  if (binding && !binding.install) issues.push("the control installation binds no Claude Code (none was given or on PATH at install); sessions cannot register and are not governed");
+  issues.push(...drift);
+  let governance: ClaudeCodeGovernance;
+  try {
+    governance = claudeCodeGovernance(workspace, manifest.agentId);
+  } catch {
+    governance = { claim: "not_evaluated", registeredSessions: 0, qualifiedSessions: 0, invalidRegistrations: 0, latestRegistrationAt: null, note: CLAUDE_NOT_GOVERNED_NOTE };
+  }
+  if (governance.invalidRegistrations > 0) issues.push(`${governance.invalidRegistrations} Claude Code session registration(s) failed verification`);
+  return { drifted: drift.length > 0, governance };
+}
+
 export function installHookIntegration(options: InstallHookIntegrationOptions): HookMutationResult {
   if (options.provider === "pi") return installPiHook(options, join(dirname(amcCliScriptPath(parseMode(options.mode))), "adapters", "pi", "amcPiExtension.js"));
   const provider = parseProvider(options.provider);
@@ -673,8 +717,9 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
       controlApprovalPolicy(workspace, mode);
 
     const desiredHandler = expectedHandler({ workspace, provider, mode, agentId, bridgeBase, tokenPath: paths.token });
+    const claudeCode = provider === "claude-code" && mode === "control" ? claudeCodeBinding(options, String((desiredHandler.args as string[])[0])) : undefined;
     const desiredHandlerHash = handlerHash(desiredHandler);
-    const desiredHandlers = providerHookSpecs(provider).map((spec) => ({
+    const desiredHandlers = providerHookSpecs(provider, mode).map((spec) => ({
       ...spec,
       handler: desiredHandler,
       handlerSha256: desiredHandlerHash,
@@ -694,6 +739,7 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
       bindingsEqual(handlerBindings(owned), desiredBindings) &&
       bindingsEqual(manifestBindings(existingManifest), desiredBindings) &&
       existingManifest.configSha256 === currentConfigSha &&
+      canonicalize(existingManifest.claudeCode ?? null) === canonicalize(claudeCode ?? null) &&
       hasManagedIgnoreBlock(ignoreRaw) &&
       existingLease.valid &&
       existingLease.payload?.leaseId === existingManifest.leaseId
@@ -784,6 +830,7 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
       })),
       installedTs: existingManifest?.installedTs ?? now,
       updatedTs: now,
+      ...(claudeCode ? { claudeCode } : {}),
       observation: {
         eventTypes: providerObservedEventTypes(provider),
         controlDecision: mode === "control",
@@ -957,15 +1004,20 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
   if (manifest && !ignoreProtected) issues.push(".amc/hooks/ is not protected by .gitignore");
 
   const lease = managedLeaseStatus(workspace, paths.token, manifest, issues);
+  const claude = provider === "claude-code" && manifest?.mode === "control" ? claudeControlStatus(workspace, manifest, issues) : null;
 
   let state: HookIntegrationStatus["state"] = "installed";
-  if (!manifestValid || !lease.valid && !lease.expired || !ignoreProtected || issues.some((issue) => issue.includes("signature") || issue.includes("permissions") || issue.includes("lease ID"))) {
+  if (!manifestValid || !lease.valid && !lease.expired || !ignoreProtected
+    || issues.some((issue) => issue.includes("signature") || issue.includes("permissions") || issue.includes("lease ID") || issue.includes("failed verification"))) {
     state = "invalid";
   } else if (lease.expired) {
     state = "expired";
-  } else if (!configOwned || manifest?.v === 1 || (manifest && config.raw !== null && sha256Hex(Buffer.from(config.raw, "utf8")) !== manifest.configSha256)) {
+  } else if (!configOwned || manifest?.v === 1 || claude?.drifted || (manifest && config.raw !== null && sha256Hex(Buffer.from(config.raw, "utf8")) !== manifest.configSha256)) {
     state = "drifted";
   }
+  // Only an intact installation keeps an enforced claim; a drifted, expired or invalid one is not governed.
+  const governance = claude && claude.governance.claim === "enforced_at_claude_code_pretooluse" && state !== "installed"
+    ? { ...claude.governance, claim: "not_governed" as const } : claude?.governance;
   return {
     provider,
     agentId: manifest?.agentId ?? null,
@@ -978,7 +1030,8 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
     leaseId: lease.payload?.leaseId ?? manifest?.leaseId ?? null,
     expiresTs: lease.payload?.expiresTs ?? manifest?.leaseExpiresTs ?? null,
     issues,
-    files
+    files,
+    ...(governance ? { governance } : {}),
   };
 }
 
@@ -1111,7 +1164,7 @@ type ProviderCorrelationSource = HookActionIdentitySource | "bridge-unmatched-re
 
 export interface ProviderHookEventInspection {
   eventName: NativeHookEventName;
-  eventType: "action.requested" | "action.completed" | "action.failed";
+  eventType: "action.requested" | "action.completed" | "action.failed" | null;
   phase: LifecyclePhase;
   correlationSha256: string;
 }
@@ -1161,7 +1214,9 @@ function hookCorrelationSha256(provider: ConfigHookProvider, parsed: ParsedProvi
 } {
   return resolveProviderHookRequestIdentity({
     provider,
-    providerActionId: parsed.tool_use_id ?? parsed.tool_call_id,
+    // AMC derives a Claude Code action id from the session and tool_use_id, as control does (claudeActionId).
+    providerActionId: provider === "claude-code" && parsed.session_id && isSafeProviderActionId(parsed.tool_use_id)
+      ? claudeActionId(parsed.session_id, parsed.tool_use_id) : parsed.tool_use_id ?? parsed.tool_call_id,
     sessionId: parsed.session_id,
     timestamp: parsed.timestamp,
     toolName: parsed.tool_name,
@@ -1197,6 +1252,9 @@ export function mapProviderHookEvent(input: {
   const agentId = validateAgentId(input.agentId);
   const parsed = parseProviderHookInput(input.rawInput);
   const spec = hookEventSpec(provider, parsed);
+  if (spec.eventType === null) {
+    throw new HookIntegrationError("HOOK_INPUT_UNSUPPORTED", `${spec.eventName} is recorded by AMC's control route, not as an observed action`);
+  }
   const observedAt = input.observedAt ?? Date.now();
   if (!Number.isFinite(observedAt)) {
     throw new HookIntegrationError("HOOK_INPUT_INVALID", "observed timestamp must be finite");
@@ -1207,9 +1265,8 @@ export function mapProviderHookEvent(input: {
   let actionId = requestIdentity.actionId;
   let correlationSource: ProviderCorrelationSource = requestIdentity.source;
   if (spec.phase !== "requested") {
-    const providerActionId = parsed.tool_use_id ?? parsed.tool_call_id;
-    if (provider === "claude-code" && isSafeProviderActionId(providerActionId)) {
-      actionId = providerActionId;
+    if (provider === "claude-code" && requestIdentity.source === "provider-call-id") {
+      actionId = requestIdentity.actionId;
       correlationSource = "provider-call-id";
     } else if (provider === "gemini-cli" && isSafeProviderActionId(input.resolvedActionId)) {
       actionId = input.resolvedActionId;
@@ -1277,7 +1334,7 @@ function resolveTokenPath(workspace: string, tokenFile: string): string {
   return path;
 }
 
-function authorizeForwardInvocation(input: {
+export function authorizeForwardInvocation(input: {
   workspace: string;
   provider: ConfigHookProvider;
   mode: HookMode;
@@ -1324,286 +1381,4 @@ function authorizeForwardInvocation(input: {
     tokenPath,
     token: readFileSync(tokenPath, "utf8").trim()
   };
-}
-
-function delay(ms: number): Promise<void> {
-  return ms <= 0 ? Promise.resolve() : new Promise((resolvePromise) => setTimeout(resolvePromise, ms));
-}
-
-async function resolveProviderTerminalAction(input: {
-  authorization: { bridgeBase: string; token: string };
-  provider: ConfigHookProvider;
-  correlationSha256: string;
-  retryDelayMs: number;
-  timeoutMs: number;
-  signal?: AbortSignal;
-}): Promise<string> {
-  const body = JSON.stringify({
-    provider: input.provider,
-    correlationSha256: input.correlationSha256,
-  });
-  const url = `${input.authorization.bridgeBase}${OBSERVED_HOOK_CORRELATION_PATH}`;
-  let lastError: string | null = null;
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        redirect: "error",
-        signal: boundedFetchSignal(input.timeoutMs, input.signal),
-        headers: {
-          authorization: `Bearer ${input.authorization.token}`,
-          "content-type": "application/json",
-          "content-length": String(Buffer.byteLength(body)),
-        },
-        body,
-      });
-      if (response.status >= 500 && attempt === 0) {
-        await response.arrayBuffer();
-        await delay(input.retryDelayMs);
-        continue;
-      }
-      const payload = await response.json().catch(() => null) as Record<string, unknown> | null;
-      if (!response.ok) {
-        const reason = typeof payload?.error === "string" ? payload.error : `HTTP ${response.status}`;
-        throw new HookIntegrationError(
-          "HOOK_CORRELATION_REQUIRED",
-          `terminal hook correlation failed closed: ${reason}`,
-        );
-      }
-      if (payload?.resolved !== true || !isSafeProviderActionId(payload.actionId)) {
-        throw new HookIntegrationError("HOOK_CORRELATION_REQUIRED", "terminal hook correlation response is incomplete");
-      }
-      return payload.actionId;
-    } catch (error) {
-      if (error instanceof HookIntegrationError) throw error;
-      lastError = error instanceof Error ? error.message : String(error);
-      if (attempt === 0) {
-        await delay(input.retryDelayMs);
-        continue;
-      }
-    }
-  }
-  throw new HookIntegrationError(
-    "HOOK_CORRELATION_REQUIRED",
-    `terminal hook correlation failed before a verified response${lastError ? `: ${lastError}` : ""}`,
-  );
-}
-
-export async function forwardProviderHookEvent(input: {
-  workspace: string;
-  provider: HookProvider;
-  agentId: string;
-  bridgeBase?: string;
-  tokenFile: string;
-  rawInput: string;
-  mode?: HookMode;
-  observedAt?: number;
-  retryDelayMs?: number;
-  timeoutMs?: number;
-  signal?: AbortSignal;
-}): Promise<{
-  status: number;
-  receiptId: string;
-  idempotentReplay: boolean;
-  actionId: string;
-  sourceEventType: ObservedAepActionEvent["type"];
-}> {
-  const workspace = resolve(input.workspace);
-  const provider = parseProvider(input.provider);
-  const mode = parseMode(input.mode);
-  const bridgeBase = normalizeBridgeBase(input.bridgeBase);
-  const agentId = validateAgentId(input.agentId);
-  const authorization = authorizeForwardInvocation({
-    workspace,
-    provider,
-    mode,
-    agentId,
-    bridgeBase,
-    tokenFile: input.tokenFile
-  });
-  const retryDelayMs = input.retryDelayMs ?? 100;
-  const timeoutMs = input.timeoutMs ?? 5_000;
-  const inspection = inspectProviderHookEvent({ provider, rawInput: input.rawInput });
-  const resolvedActionId = provider === "gemini-cli" && inspection.phase !== "requested"
-    ? await resolveProviderTerminalAction({
-        authorization,
-        provider,
-        correlationSha256: inspection.correlationSha256,
-        retryDelayMs,
-        timeoutMs,
-        signal: input.signal,
-      })
-    : undefined;
-  const event = mapProviderHookEvent({
-    provider,
-    agentId,
-    rawInput: input.rawInput,
-    observedAt: input.observedAt,
-    resolvedActionId,
-  });
-  const body = JSON.stringify(event);
-  const url = `${authorization.bridgeBase}${OBSERVED_AEP_HOOK_PATH}`;
-  let lastStatus: number | null = null;
-  let lastError: string | null = null;
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        redirect: "error",
-        signal: boundedFetchSignal(timeoutMs, input.signal),
-        headers: {
-          authorization: `Bearer ${authorization.token}`,
-          "content-type": "application/json",
-          "content-length": String(Buffer.byteLength(body))
-        },
-        body
-      });
-      lastStatus = response.status;
-      if (response.status >= 500 && attempt === 0) {
-        await response.arrayBuffer();
-        await delay(retryDelayMs);
-        continue;
-      }
-      if (!response.ok) {
-        throw new HookIntegrationError("HOOK_DELIVERY_FAILED", `hook ingress rejected the event with HTTP ${response.status}`);
-      }
-      const payload = await response.json() as Record<string, unknown>;
-      if (payload.observed !== true || typeof payload.receiptId !== "string") {
-        throw new HookIntegrationError("HOOK_DELIVERY_FAILED", "hook ingress response is missing an observed receipt");
-      }
-      return {
-        status: response.status,
-        receiptId: payload.receiptId,
-        idempotentReplay: payload.idempotentReplay === true,
-        actionId: typeof payload.actionId === "string" ? payload.actionId : event.action.id,
-        sourceEventType: event.type,
-      };
-    } catch (error) {
-      if (error instanceof HookIntegrationError) throw error;
-      lastError = error instanceof Error ? error.message : String(error);
-      if (attempt === 0) {
-        await delay(retryDelayMs);
-        continue;
-      }
-    }
-  }
-  throw new HookIntegrationError(
-    "HOOK_DELIVERY_FAILED",
-    lastStatus === null
-      ? `hook delivery failed before a response${lastError ? `: ${lastError}` : ""}`
-      : `hook delivery failed with HTTP ${lastStatus}`
-  );
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-export async function forwardProviderHookControl(input: {
-  workspace: string;
-  provider: HookProvider;
-  agentId: string;
-  bridgeBase?: string;
-  tokenFile: string;
-  rawInput: string;
-  observedAt?: number;
-  retryDelayMs?: number;
-  timeoutMs?: number;
-  signal?: AbortSignal;
-}): Promise<{
-  observation: { status: number; receiptId: string; idempotentReplay: boolean };
-  control: ProviderHookControlResult;
-}> {
-  const workspace = resolve(input.workspace);
-  const provider = parseProvider(input.provider);
-  const bridgeBase = normalizeBridgeBase(input.bridgeBase);
-  assertControlBridgeLocal("control", bridgeBase);
-  const agentId = validateAgentId(input.agentId);
-  const authorization = authorizeForwardInvocation({
-    workspace,
-    provider,
-    mode: "control",
-    agentId,
-    bridgeBase,
-    tokenFile: input.tokenFile,
-  });
-  const observation = await forwardProviderHookEvent({
-    ...input,
-    workspace,
-    provider,
-    agentId,
-    bridgeBase,
-    mode: "control",
-  });
-  const retryDelayMs = input.retryDelayMs ?? 100;
-  const timeoutMs = input.timeoutMs ?? 5_000;
-  const url = `${authorization.bridgeBase}${CONTROL_HOOK_PATH}`;
-  let lastStatus: number | null = null;
-  let lastError: string | null = null;
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        redirect: "error",
-        signal: boundedFetchSignal(timeoutMs, input.signal),
-        headers: {
-          authorization: `Bearer ${authorization.token}`,
-          "content-type": "application/json",
-          "content-length": String(Buffer.byteLength(input.rawInput)),
-          "x-amc-hook-provider": provider,
-        },
-        body: input.rawInput,
-      });
-      lastStatus = response.status;
-      if (response.status >= 500 && attempt === 0) {
-        await response.arrayBuffer();
-        await delay(retryDelayMs);
-        continue;
-      }
-      if (!response.ok) {
-        throw new HookIntegrationError("HOOK_DELIVERY_FAILED", `hook control rejected the request with HTTP ${response.status}`);
-      }
-      const payload = await response.json() as unknown;
-      if (!isRecord(payload)) {
-        throw new HookIntegrationError("HOOK_DELIVERY_FAILED", "hook control response is incomplete");
-      }
-      const verification = verifyProviderHookControlResult({
-        workspace,
-        authenticatedAgentId: agentId,
-        provider,
-        rawInput: input.rawInput,
-        result: payload,
-      });
-      if (!verification.ok) {
-        throw new HookIntegrationError(
-          "HOOK_DELIVERY_FAILED",
-          `hook control response verification failed: ${verification.error ?? "unknown verification error"}`,
-        );
-      }
-      return {
-        observation,
-        control: payload as unknown as ProviderHookControlResult,
-      };
-    } catch (error) {
-      if (error instanceof HookIntegrationError) throw error;
-      lastError = error instanceof Error ? error.message : String(error);
-      if (attempt === 0) {
-        await delay(retryDelayMs);
-        continue;
-      }
-    }
-  }
-  throw new HookIntegrationError(
-    "HOOK_DELIVERY_FAILED",
-    lastStatus === null
-      ? `hook control failed before a response${lastError ? `: ${lastError}` : ""}`
-      : `hook control failed with HTTP ${lastStatus}`,
-  );
-}
-
-export function failClosedProviderControlResponse(
-  provider: HookProvider,
-  reason = "AMC control is unavailable; the action is denied fail closed.",
-): ProviderControlResponse {
-  return renderProviderControlResponse(provider, "deny" satisfies HookControlDecision, reason);
 }

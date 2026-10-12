@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { providerSchema, type HookProvider } from "../bridge/hookProviders.js";
+import { controlMappingValid, providerSchema, type HookProvider } from "../bridge/hookProviders.js";
 import { openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import type { EvidenceEvent } from "../types.js";
 
@@ -53,6 +53,11 @@ export interface HookActionLifecycleInspection {
   };
   evidenceEventIds: string[];
   receiptIds: string[];
+  /**
+   * Claude Code control: whether the input the tool ran with differs from the input AMC authorized (PostToolUse check;
+   * observed, not prevented). Null when no verified post-execution record exists for the action.
+   */
+  authorizationMismatch: boolean | null;
   rawProviderPayloadStored: false;
   claimBoundary: string;
 }
@@ -110,27 +115,26 @@ const decisionMetaV2Schema = decisionMetaBaseSchema.extend({
   providerMapping: z.enum(["native", "corrective_deny", "fail_closed_deny"]),
   capabilityLossy: z.boolean(),
 }).passthrough().superRefine((value, ctx) => {
-  const native = value.providerMapping === "native"
-    && value.requestedDecision !== "steer"
-    && value.requestedDecision === value.decision
-    && value.effectiveOutcome === value.decision
-    && !value.capabilityLossy;
-  const corrective = value.providerMapping === "corrective_deny"
-    && value.provider === "claude-code"
-    && value.requestedDecision === "steer"
-    && value.decision === "deny"
-    && value.effectiveOutcome === "steer"
-    && !value.capabilityLossy;
-  const fallback = value.providerMapping === "fail_closed_deny"
-    && value.provider !== "claude-code"
-    && (value.requestedDecision === "ask" || value.requestedDecision === "steer")
-    && value.decision === "deny"
-    && value.effectiveOutcome === "deny"
-    && value.capabilityLossy;
-  if (!native && !corrective && !fallback) {
+  if (!controlMappingValid(value)) {
     ctx.addIssue({ code: "custom", path: ["providerMapping"], message: "provider outcome mapping is inconsistent" });
   }
 });
+
+const postExecutionMetaSchema = z.object({
+  postExecutionSchemaVersion: z.literal(1),
+  agentId: z.string().min(1),
+  actionId: z.string().min(1),
+  authorizationMismatch: z.boolean(),
+}).passthrough();
+
+/** The post-execution records of one action (claudeCodeObservations.ts), verified; a record that fails verification counts as a mismatch. */
+function authorizationMismatch(ledger: ReturnType<typeof openLedger>, events: EvidenceEvent[], agentId: string, actionId: string): boolean | null {
+  const rows = events.filter((event) => event.event_type === "audit").map((event) => ({ event, meta: postExecutionMetaSchema.safeParse(parseMeta(event)) }))
+    .filter((row) => row.meta.success && row.meta.data.agentId === agentId && row.meta.data.actionId === actionId);
+  if (rows.length === 0) return null;
+  return rows.some((row) => !row.meta.success || row.meta.data.authorizationMismatch
+    || !verifyEvidenceEventIntegrity({ ledger, eventId: row.event.id, requireReceipt: true, requireSealedSession: true }).ok);
+}
 
 const decisionMetaSchema = z.union([decisionMetaV2Schema, decisionMetaV1Schema]);
 
@@ -355,6 +359,7 @@ export function inspectHookActionLifecycle(input: {
       },
       evidenceEventIds: orderedRows.map((row) => row.event.id),
       receiptIds: orderedRows.map((row) => row.meta.receipt_id),
+      authorizationMismatch: authorizationMismatch(ledger, events, input.agentId, input.actionId),
       rawProviderPayloadStored: false,
       claimBoundary: "Verified AMC evidence lifecycle only; steer proves a blocked corrective signal, not retry execution, success, or protocol conformance beyond signed receipts.",
     };

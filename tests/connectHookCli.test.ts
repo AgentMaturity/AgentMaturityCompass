@@ -127,6 +127,10 @@ describe("amc connect hooks CLI", () => {
       "--agent", "control-cli-agent",
       "--token-file", ".amc/hooks/claude-code.lease",
     ], JSON.stringify({
+      session_id: "cli-outage-session",
+      transcript_path: "/private/transcript.jsonl",
+      cwd,
+      permission_mode: "default",
       hook_event_name: "PreToolUse",
       tool_name: "Read",
       tool_use_id: "toolu_cli_outage_01",

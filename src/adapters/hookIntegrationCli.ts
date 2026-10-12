@@ -4,12 +4,7 @@ import { stdin } from "node:process";
 import { unlockVaultInteractive, vaultStatusNow } from "../vault/vaultCli.js";
 import { unlockVault } from "../vault/vault.js";
 import {
-  HookIntegrationError,
-  failClosedProviderControlResponse,
-  forwardProviderHookControl,
-  forwardProviderHookEvent,
   getHookIntegrationStatus,
-  inspectProviderHookEvent,
   installHookIntegration,
   removeHookIntegration,
   type HookFileChange,
@@ -17,95 +12,15 @@ import {
   type HookMode,
   type HookProvider
 } from "./hookIntegration.js";
-import { isHookProvider, serializeProviderControlResponse } from "../bridge/hookProviders.js";
+import { isHookProvider } from "../bridge/hookProviders.js";
 import { findPiPackage } from "./pi/piInstall.js";
-import { redactBridgeText } from "../bridge/bridgeRedaction.js";
+import { findClaudeCode } from "./hookProviders/claudeCode.js";
 import { verifyClaudeControl, type ClaudeControlVerification } from "./claudeHookProbe.js";
-import { forwardDeadlineMs, HookDeadlineError, withHookDeadline } from "./hookDeadline.js";
+import { readStdinAll, runHookForward, type HookForwardOptions } from "./hookForwarder.js";
+// The hidden `connect hooks forward` and tests still reach the forwarder through here.
+export { runHookForward, type HookForwardOptions, type HookForwardOutcome } from "./hookForwarder.js";
 import { inspectHookActionLifecycle } from "../watch/hookActionLifecycle.js";
 import { inspectHookHealth } from "../watch/hookHealthDiagnostics.js";
-
-async function readStdinAll(): Promise<string> {
-  return new Promise((resolve) => {
-    let data = "";
-    stdin.setEncoding("utf8");
-    stdin.on("data", (chunk) => { data += chunk; });
-    stdin.on("end", () => resolve(data));
-    if (stdin.isTTY) resolve("");
-  });
-}
-
-export interface HookForwardOptions {
-  provider: HookProvider;
-  mode: HookMode;
-  agent: string;
-  tokenFile: string;
-  bridgeUrl: string;
-}
-
-export interface HookForwardOutcome {
-  stdout: string;
-  stderr: string;
-  exitCode: 0 | 1 | 2;
-}
-
-/**
- * Runs one provider hook delivery under forwardDeadlineMs(). Claude Code control mode turns
- * every failure into a deny with exit 2, because Claude Code runs the tool after any other
- * failure; Gemini CLI keeps its earlier outputs and exit codes.
- */
-export async function runHookForward(
-  opts: HookForwardOptions,
-  readInput: () => Promise<string>,
-  workspace = process.cwd(),
-  deadlineMs = forwardDeadlineMs(),
-): Promise<HookForwardOutcome> {
-  const denyExit = opts.provider === "claude-code" && opts.mode === "control" ? 2 : 0;
-  const deny = (message: string): HookForwardOutcome => ({
-    stdout: `${serializeProviderControlResponse(failClosedProviderControlResponse(opts.provider))}\n`,
-    stderr: `${message}\n`,
-    exitCode: denyExit,
-  });
-  // Assigned inside the deadline callback, so the cast stops narrowing to the initial value.
-  let stage = "input" as "empty" | "input" | "control" | "observe";
-  try {
-    return await withHookDeadline(deadlineMs, async (signal) => {
-      const rawInput = await readInput();
-      if (!rawInput.trim()) {
-        stage = "empty";
-        throw new HookIntegrationError("HOOK_INPUT_INVALID", "provider hook input is required on stdin");
-      }
-      const inspection = inspectProviderHookEvent({ provider: opts.provider, rawInput });
-      const forward = { workspace, provider: opts.provider, agentId: opts.agent, tokenFile: opts.tokenFile, bridgeBase: opts.bridgeUrl, rawInput, signal };
-      if (opts.mode === "control" && inspection.phase === "requested") {
-        stage = "control";
-        const { control } = await forwardProviderHookControl(forward);
-        const denied = control.decision === "deny";
-        return {
-          stdout: `${serializeProviderControlResponse(control.providerResponse)}\n`,
-          stderr: denied && denyExit === 2 ? `AMC policy denied the action: ${redactBridgeText(control.reason)}\n` : "",
-          exitCode: denied ? denyExit : 0,
-        };
-      }
-      stage = "observe";
-      await forwardProviderHookEvent({ ...forward, mode: opts.mode });
-      // Both supported providers treat an empty JSON object as a neutral observation result.
-      return { stdout: "{}\n", stderr: "", exitCode: 0 };
-    });
-  } catch (error) {
-    // A post-tool hook cannot stop a call that already ran, so it never claims a deny.
-    if (denyExit === 2 && stage === "observe") {
-      return { stdout: "{}\n", stderr: "AMC could not record the tool outcome; the action already ran.\n", exitCode: 2 };
-    }
-    if (denyExit === 2 || (opts.mode === "control" && stage !== "empty" && stage !== "observe")) {
-      if (error instanceof HookDeadlineError) return deny("AMC hook control timed out; action denied.");
-      return deny(stage === "control"
-        ? "AMC hook control unavailable; action denied."
-        : "AMC hook control input invalid; action denied.");
-    }
-    return { stdout: "", stderr: `${error instanceof Error ? error.message : String(error)}\n`, exitCode: 1 };
-  }
-}
 
 function printControlVerification(control: ClaudeControlVerification): void {
   console.log((control.verified ? chalk.green : chalk.red)(control.summary));
@@ -113,9 +28,9 @@ function printControlVerification(control: ClaudeControlVerification): void {
   for (const note of control.notes) console.log(chalk.yellow(`Note: ${note}`));
 }
 
-/** Pi: the claim comes from verified session registrations; sessions Pi ran without the extension are invisible. */
+/** Pi and Claude Code control: the claim comes from verified session registrations; sessions that ran no AMC hook are invisible. */
 function printGovernance(governance: NonNullable<HookIntegrationStatus["governance"]>): void {
-  console.log(`Governance: ${governance.claim} (${governance.registeredSessions} registered Pi session(s), ${governance.qualifiedSessions} on a qualified Pi)`);
+  console.log(`Governance: ${governance.claim} (${governance.registeredSessions} registered session(s), ${governance.qualifiedSessions} on a qualified version)`);
   console.log(chalk.gray(governance.note));
 }
 
@@ -167,8 +82,9 @@ export function registerHookIntegrationCommands(
         ttl: opts.ttl,
         rpm: Number(opts.rpm),
         dryRun: opts.dryRun,
-        // Pi control binds the Pi a person gets by running `pi` here.
-        piPackageDir: opts.provider === "pi" ? findPiPackage() ?? undefined : undefined
+        // Pi and Claude Code control bind the Pi or Claude Code a person gets by running `pi` or `claude` here.
+        piPackageDir: opts.provider === "pi" ? findPiPackage() ?? undefined : undefined,
+        claudeCodeBinary: opts.provider === "claude-code" && opts.mode === "control" && !opts.dryRun ? findClaudeCode() ?? undefined : undefined
       });
       if (opts.json) {
         console.log(JSON.stringify(result, null, 2));
@@ -184,7 +100,7 @@ export function registerHookIntegrationCommands(
       console.log(result.mode === "control"
         ? "Boundary: control is loopback-only and raw provider input is never retained."
         : "Boundary: observation only; provider control decisions are unchanged.");
-      if (result.provider === "pi") for (const limit of result.limitations) console.log(chalk.yellow(`Limit: ${limit}`));
+      if (result.provider === "pi" || result.mode === "control") for (const limit of result.limitations) console.log(chalk.yellow(`Limit: ${limit}`));
     });
 
   hooks
@@ -314,8 +230,9 @@ export function registerHookIntegrationCommands(
         console.log(`Provider: ${lifecycle.provider ?? "unverified"}`);
         console.log(`Evidence: ${lifecycle.evidenceEventIds.length} signed event(s)`);
         for (const reason of lifecycle.reasonCodes) console.log(chalk.yellow(`Issue: ${reason}`));
+        if (lifecycle.authorizationMismatch) console.log(chalk.red("Authorization mismatch: the tool ran with input other than the input AMC authorized (observed, not prevented)"));
       }
-      if (lifecycle.failClosed) process.exitCode = 1;
+      if (lifecycle.failClosed || lifecycle.authorizationMismatch) process.exitCode = 1;
     });
 
   hooks

@@ -42,7 +42,7 @@ function readVariants(path: string): string[] {
  * The location the OS opens for an absolute `path`: every existing component followed through symlinks, with the case
  * the file system stores, and missing trailing components kept as named. Null for a dangling link or a loop.
  */
-function realLocation(path: string): string | null {
+export function realLocation(path: string): string | null {
   const missing: string[] = [];
   for (let head = path; ; head = dirname(head)) {
     try {
@@ -66,7 +66,7 @@ const within = (root: string, location: string): string | null => {
 };
 
 /** `location` inside the workspace as the workspace names it (its `.amc` first, wherever that really lives), else as is. */
-function inWorkspace(location: string, workspace: string): string {
+export function inWorkspace(location: string, workspace: string): string {
   const realAmc = realLocation(join(resolve(workspace), ".amc"));
   const amcRel = realAmc === null ? null : within(realAmc, location);
   if (amcRel !== null) return join(resolve(workspace), ".amc", amcRel);

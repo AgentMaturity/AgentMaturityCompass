@@ -28,15 +28,14 @@ import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { resolveProviderHookRequestIdentity } from "./hookActionIdentity.js";
 import type { ShellCommandConnector, ShellCommandPlan } from "../enforce/shellCommandPlan.js";
 import {
-  canonicalToolRequests, CONTROL_HOOK_EVENTS, controlDecisionSchema, HookControlError, materializeProviderDecision,
-  parseProvider, piControlContext, piRefusal, providerSchema, runtimeFor, serializeProviderControlResponse, validateProviderControlResponse,
-  type CanonicalToolRequest, type HookControlDecision, type HookControlOutcome, type HookControlProviderMapping,
-  type HookProvider, type PiControlContext, type ProviderControlResponse,
+  canonicalToolRequests, CONTROL_HOOK_EVENTS, controlDecisionSchema, controlMappingValid, HookControlError, hookCall, hookCallRefusal,
+  materializeProviderDecision, parseProvider, providerSchema, runtimeFor, serializeProviderControlResponse, validateProviderControlResponse,
+  type CanonicalToolRequest, type HookCall, type HookControlDecision, type HookControlOutcome, type HookControlProviderMapping,
+  type HookProvider, type ProviderControlResponse,
 } from "./hookProviders.js";
 // Still exported here for importers of hookControl.js, the archived HTTP parity module among them.
 export { HookControlError } from "./hookProviders.js";
-import { authorizeHookDecision, hookDecisionReceipt, type AuthorizationTarget, type HookLease } from "./hookAuthorization.js";
-import { piActionId } from "../adapters/pi/piIdentity.js";
+import { authorizeHookDecision, boundDecisionFacts, hookDecisionReceipt, type AuthorizationTarget, type HookLease } from "./hookAuthorization.js";
 
 export const CONTROL_HOOK_PATH = "/bridge/hooks/control/v1";
 export const CONTROL_HOOK_ROUTE = "/hooks/control/v1";
@@ -111,7 +110,7 @@ interface NormalizedProviderToolRequest {
   canonicalRequests: CanonicalToolRequest[];
   commandPlan: ShellCommandPlan | null;
   rawInputSha256: string;
-  pi: PiControlContext | null;
+  call: HookCall | null;
   toolInput: Record<string, unknown>;
 }
 
@@ -265,27 +264,6 @@ interface ControlMappingFields {
   capabilityLossy: boolean;
 }
 
-function controlMappingValid(value: ControlMappingFields): boolean {
-  if (value.providerMapping === "native") {
-    return value.requestedDecision !== "steer"
-      && value.requestedDecision === value.decision
-      && value.effectiveOutcome === value.decision
-      && !value.capabilityLossy;
-  }
-  if (value.providerMapping === "corrective_deny") {
-    return value.provider === "claude-code"
-      && value.requestedDecision === "steer"
-      && value.decision === "deny"
-      && value.effectiveOutcome === "steer"
-      && !value.capabilityLossy;
-  }
-  return value.provider !== "claude-code"
-    && (value.requestedDecision === "ask" || value.requestedDecision === "steer")
-    && value.decision === "deny"
-    && value.effectiveOutcome === "deny"
-    && value.capabilityLossy;
-}
-
 function normalizeLegacyControlFields(value: {
   provider: HookProvider;
   requestedDecision: HookControlDecision;
@@ -349,18 +327,18 @@ function normalizeProviderRequest(input: {
   const expectedEvent = CONTROL_HOOK_EVENTS[input.provider];
   if (parsed.hook_event_name !== expectedEvent) throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, `hook control accepts only ${expectedEvent} events`);
   const rawInputSha256 = sha256Hex(Buffer.from(input.rawInput, "utf8"));
-  const pi = piControlContext(input.provider, parsed);
+  const call = hookCall(input.provider, parsed);
   const identity = resolveProviderHookRequestIdentity({
     provider: input.provider,
-    // A Pi action id is AMC's own derivation from Pi's session and call id, never an id the payload names.
-    providerActionId: pi ? piActionId(pi.sessionId, pi.toolCallId) : parsed.tool_use_id ?? parsed.tool_call_id,
+    // A Pi or Claude Code action id is AMC's own derivation from the session and call id, never an id the payload names.
+    providerActionId: call ? call.actionId : parsed.tool_use_id ?? parsed.tool_call_id,
     sessionId: parsed.session_id,
     timestamp: parsed.timestamp,
     toolName: parsed.tool_name,
     toolInput: parsed.tool_input,
     rawInputSha256,
   });
-  const mapped = canonicalToolRequests(input.provider, parsed.tool_name, parsed.tool_input, input.workspace, pi);
+  const mapped = canonicalToolRequests(input.provider, parsed.tool_name, parsed.tool_input, input.workspace, call);
   const canonicalToolName = mapped.requests.length === 1 ? mapped.requests[0]?.name ?? null : null;
   return {
     provider: input.provider,
@@ -370,7 +348,7 @@ function normalizeProviderRequest(input: {
     canonicalRequests: mapped.requests,
     commandPlan: mapped.commandPlan,
     rawInputSha256,
-    pi,
+    call,
     toolInput: parsed.tool_input,
   };
 }
@@ -593,7 +571,7 @@ function requestedControlDecision(input: {
   agentId: string;
   request: NormalizedProviderToolRequest;
 }): RequestedControlDecision {
-  const versionRefusal = input.request.pi ? piRefusal(input.request.pi, input.workspace, input.request.providerToolName) : null;
+  const versionRefusal = input.request.call ? hookCallRefusal(input.request.call, input.workspace, input.request.providerToolName, input.request.toolInput) : null;
   if (versionRefusal) return { decision: "deny", reason: versionRefusal, commandBlastRadius: null };
   const signatureChecks = [
     ["action policy", verifyActionPolicySignature(input.workspace)],
@@ -681,7 +659,7 @@ function requestedControlDecision(input: {
   }
 }
 
-function deterministicEventId(agentId: string, provider: HookProvider, actionId: string): string {
+export function deterministicEventId(agentId: string, provider: HookProvider, actionId: string): string {
   return `hook_control_${sha256Hex(canonicalize({ agentId, provider, actionId })).slice(0, 44)}`;
 }
 
@@ -819,7 +797,7 @@ function recoverControlResult(input: {
     requireSealedSession: true,
   });
   const receipt = verifyReceipt(stored.receipt, getPurposeKeyHistory(input.ledger.workspace, "receipt"));
-  const receiptKind = input.request.pi ? "action_state" : "guard_check";
+  const receiptKind = input.request.call ? "action_state" : "guard_check";
   const responseSha256 = sha256Hex(Buffer.from(
     serializeProviderControlResponse(stored.providerResponse),
     "utf8",
@@ -985,10 +963,10 @@ export function evaluateProviderHookControl(input: {
         "existing hook control session contains an unrelated event",
       );
     }
-    // Pi decisions that let an effect proceed bind P1-02's authorization record; P1-23 extends this to Claude Code.
-    const { requested, authorization, enforced } = authorizeHookDecision({
+    // Pi and Claude Code decisions that let an effect proceed bind P1-02's authorization record.
+    const { requested, authorization, enforced, version } = authorizeHookDecision({
       workspace: input.workspace, agentId: input.authenticatedAgentId, lease: input.lease, provider, actionId: request.actionId,
-      pi: request.pi, toolInput: request.toolInput, ledger,
+      call: request.call, toolInput: request.toolInput, ledger,
       requested: requestedControlDecision({ workspace: input.workspace, agentId: input.authenticatedAgentId, request }),
     });
     const materialized = materializeProviderDecision({
@@ -997,9 +975,7 @@ export function evaluateProviderHookControl(input: {
       requestedDecision: requested.decision,
       reason: requested.reason,
     });
-    const bound = request.pi
-      ? { piVersion: request.pi.version, authorizationRecordDigest: authorization?.ok ? authorization.digest : null }
-      : {};
+    const bound = request.call ? boundDecisionFacts(request.call, version, authorization) : {};
     const payload = {
       kind: "hook_control_decision",
       version: 2,
@@ -1017,7 +993,7 @@ export function evaluateProviderHookControl(input: {
       providerResponseSha256: materialized.providerResponseSha256,
       rawPayloadStored: false,
       ...bound,
-      ...(request.pi ? { authorizationRecord: authorization?.ok ? authorization.record : null } : {}),
+      ...(request.call ? { authorizationRecord: authorization?.ok ? authorization.record : null } : {}),
     };
     const appended = ledger.appendEvidenceWithReceipt({
       id: eventId,
@@ -1051,13 +1027,13 @@ export function evaluateProviderHookControl(input: {
         ...bound,
       },
       receipt: {
-        kind: request.pi ? "action_state" : "guard_check",
+        kind: request.call ? "action_state" : "guard_check",
         agentId: input.authenticatedAgentId,
         providerId: `hook-control:${provider}`,
         model: null,
         bodySha256: materialized.providerResponseSha256,
-        ...(request.pi ? {
-          action: hookDecisionReceipt({ provider, actionId: request.actionId, idempotencyKey: request.pi.toolCallId,
+        ...(request.call ? {
+          action: hookDecisionReceipt({ provider, actionId: request.actionId, idempotencyKey: request.call.callId,
             decision: materialized.decision, reason: materialized.reason, authorization, enforced }),
         } : {}),
       },

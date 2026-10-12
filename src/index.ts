@@ -500,7 +500,6 @@ export {
   GEMINI_CLI_HOOK_SOURCE,
   HOOK_INTEGRATION_ID,
   HookIntegrationError,
-  forwardProviderHookEvent,
   getHookIntegrationStatus,
   installHookIntegration,
   mapProviderHookEvent,
@@ -510,6 +509,7 @@ export {
   type HookMutationResult,
   type HookProvider
 } from "./adapters/hookIntegration.js";
+export { forwardProviderHookEvent } from "./adapters/hookForwarder.js";
 export {
   defaultBridgeConfig,
   bridgeConfigSchema,

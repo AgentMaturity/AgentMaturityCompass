@@ -14,6 +14,8 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { piCwdRefusal, piPathLocations } from "../adapters/pi/piPaths.js";
 import { piVersionRefusal } from "../adapters/pi/piVersions.js";
+import { piActionId } from "../adapters/pi/piIdentity.js";
+import { claudeActionId, claudeCodeRefusal, claudeControlRequestSchema, claudeToolRequest } from "../adapters/hookProviders/claudeCode.js";
 import { redactBridgeText } from "./bridgeRedaction.js";
 
 const HOOK_PROVIDERS = ["claude-code", "gemini-cli", "pi"] as const;
@@ -108,15 +110,62 @@ export function piControlContext(provider: HookProvider, input: Record<string, u
 }
 
 /**
- * Only Claude Code carries an ask natively. A Pi tool call has no channel for an AMC approval, and a confirmation in
- * Pi's own UI is not one, so every Pi ask is denied (capability-lossy).
+ * The call a Pi or Claude Code control request names. AMC derives the action id from the session and call id (an id
+ * the payload names is ignored); the request carries a fresh nonce, so one decision answers one request. None of it is
+ * authority. Other providers carry none; a Pi or Claude Code request that does not match its pinned shape is refused.
  */
-function supportsNativeAsk(provider: HookProvider): boolean {
-  return provider === "claude-code";
+export interface HookCall {
+  readonly provider: "pi" | "claude-code";
+  readonly actionId: string;
+  readonly sessionId: string;
+  readonly callId: string;
+  readonly parentActionId: string | null;
+  /** The provider's working directory, against which it resolves relative paths and runs shell commands. */
+  readonly cwd: string;
+  readonly pi: PiControlContext | null;
+}
+
+export function hookCall(provider: HookProvider, input: Record<string, unknown>): HookCall | null {
+  const pi = piControlContext(provider, input);
+  if (pi) {
+    return { provider: "pi", actionId: piActionId(pi.sessionId, pi.toolCallId), sessionId: pi.sessionId, callId: pi.toolCallId, cwd: pi.cwd, pi,
+      parentActionId: pi.parentToolCallId === null ? null : piActionId(pi.sessionId, pi.parentToolCallId) };
+  }
+  if (provider !== "claude-code") return null;
+  const parsed = claudeControlRequestSchema.safeParse(input);
+  if (!parsed.success) {
+    throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, "Claude Code hook input does not match the pinned PreToolUse payload with AMC's nonce");
+  }
+  const { session_id: sessionId, tool_use_id: callId, cwd } = parsed.data;
+  return { provider: "claude-code", actionId: claudeActionId(sessionId, callId), sessionId, callId, parentActionId: null, cwd, pi: null };
+}
+
+/** Why AMC refuses a Pi or Claude Code call before mapping it, or null. */
+export function hookCallRefusal(call: HookCall, workspace: string, toolName: string, toolInput: Record<string, unknown>): string | null {
+  return call.pi ? piRefusal(call.pi, workspace, toolName) : claudeCodeRefusal(call.cwd, workspace, toolName, toolInput);
+}
+
+/**
+ * Whether a recorded outcome mapping is one AMC produces: native, Claude Code's corrective deny for steer, or a
+ * capability-lossy deny for an ask (every provider: a provider-local ask is not AMC approval) or another provider's steer.
+ */
+export function controlMappingValid(value: { provider: HookProvider; requestedDecision: HookControlOutcome; decision: HookControlDecision;
+  effectiveOutcome: HookControlOutcome; providerMapping: HookControlProviderMapping; capabilityLossy: boolean }): boolean {
+  if (value.providerMapping === "native") {
+    return value.requestedDecision !== "steer" && value.requestedDecision === value.decision && value.effectiveOutcome === value.decision
+      && !value.capabilityLossy;
+  }
+  if (value.providerMapping === "corrective_deny") {
+    return value.provider === "claude-code" && value.requestedDecision === "steer" && value.decision === "deny"
+      && value.effectiveOutcome === "steer" && !value.capabilityLossy;
+  }
+  return (value.requestedDecision === "ask" || (value.requestedDecision === "steer" && value.provider !== "claude-code"))
+    && value.decision === "deny" && value.effectiveOutcome === "deny" && value.capabilityLossy;
 }
 
 /** Why AMC denied an outcome the provider's hook cannot carry (capability-lossy). */
 function lossyOutcomeNote(outcome: "ask" | "steer", provider: HookProvider): string {
+  if (provider === "claude-code") return "A Claude Code ask is not AMC approval, and AMC has no approval path for hook calls, so AMC denied the action.";
   if (provider === "pi") {
     return outcome === "ask"
       ? "A Pi tool call cannot carry an AMC approval, so AMC denied the action."
@@ -315,7 +364,7 @@ export function materializeProviderDecision(input: {
       reason = cleanReason(`${input.reason} ${lossyOutcomeNote("steer", input.provider)}`);
       providerResponse = renderProviderControlResponse(input.provider, "deny", reason, binding);
     }
-  } else if (input.requestedDecision === "ask" && !supportsNativeAsk(input.provider)) {
+  } else if (input.requestedDecision === "ask") {
     decision = "deny";
     effectiveOutcome = "deny";
     providerMapping = "fail_closed_deny";
@@ -403,9 +452,9 @@ export function canonicalToolRequests(
   toolName: string,
   toolInput: Record<string, unknown>,
   workspace: string,
-  pi: Pick<PiControlContext, "cwd"> | null = null,
+  call: Pick<HookCall, "cwd"> | null = null,
 ): { requests: CanonicalToolRequest[]; commandPlan: ShellCommandPlan | null } {
-  if (provider === "pi" && !pi) return { requests: [], commandPlan: null };
+  if (provider !== "gemini-cli" && !call) return { requests: [], commandPlan: null };
   const command = shellCommandForProviderTool(provider, toolName, toolInput);
   if (command !== null) {
     const commandPlan = parseShellCommandPlan(command);
@@ -420,23 +469,10 @@ export function canonicalToolRequests(
 
   let request: Omit<CanonicalToolRequest, "segment"> | null = null;
   if (provider === "claude-code") {
-    if (["Read", "Glob", "Grep"].includes(toolName)) {
-      request = {
-        name: "fs.read",
-        args: { path: firstString(toolInput, ["file_path", "path"]) ?? workspace },
-        argumentsReviewable: true,
-      };
-    } else if (["Write", "Edit", "MultiEdit", "NotebookEdit"].includes(toolName)) {
-      const path = firstString(toolInput, ["file_path", "notebook_path", "path"]);
-      request = path ? { name: "fs.write", args: { path }, argumentsReviewable: true } : null;
-    } else if (toolName === "WebFetch") {
-      const url = firstString(toolInput, ["url"]);
-      request = url
-        ? { name: "http.fetch", args: { url, method: "GET" }, argumentsReviewable: true }
-        : null;
-    }
+    const mapped = call ? claudeToolRequest(toolName, toolInput, workspace, call.cwd) : null;
+    request = mapped ? { ...mapped, argumentsReviewable: true } : null;
   } else if (provider === "pi") {
-    request = pi ? piToolRequest(toolName, toolInput, workspace, pi.cwd) : null;
+    request = call ? piToolRequest(toolName, toolInput, workspace, call.cwd) : null;
   } else if (["read_file", "list_directory", "glob", "search_file_content"].includes(toolName)) {
     request = {
       name: "fs.read",
