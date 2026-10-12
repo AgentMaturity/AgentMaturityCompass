@@ -29,7 +29,8 @@ import type { A4Answer, A4StageRegistry } from "../a4Schema.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import {
   ACTIVATE_CLAIM_BOUNDARY, ACTIVATE_SPEC_SCHEMA, activateItems, activateSpecOf, answerGaps, CAPTURED_SLOTS, CARRIED, carriedValues, currentRelease, cycleLinks,
-  IDENTITY_NOT_EVALUATED, leasePlans, PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, QUESTIONS, RELEASE_EFFECT_ID, understandingOf, type LeasePlan
+  IDENTITY_NOT_EVALUATED, IMAGE_TAG_ONLY_REASON, leasePlans, PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, QUESTIONS, RELEASE_EFFECT_ID, TOPOLOGY_QUALIFICATION,
+  understandingOf, type LeasePlan
 } from "../spec/activate.js";
 import { updatePolicyOf } from "../a4UpdatePolicy.js";
 import { answersDigestOf, answerValues, askGapCodes, listValue, mergeCarried, textValue } from "../spec/aspire.js";
@@ -79,9 +80,10 @@ function understandFacts(ctx: A4ProducerContext, target: string | null): Record<
     lifecycle: { currentStage: lifecycleNow(workspace, agentId).stage, requiredForStaging: requiredControlsForStage("staging"),
       requiredForProduction: requiredControlsForStage("production"), note: "A4 advances the lifecycle only through its bridge table, never by a typed control" },
     deployBase: { compose: fileSha(join(AMC_ROOT, "deploy", "compose", "docker-compose.yml")), helm: fileSha(join(AMC_ROOT, "deploy", "helm", "amc", "values.yaml")) },
-    image: { digest: null, reason: "the bootstrap report records no image digest; pinning waits for D-03 and P0-14 (IMAGE_TAG_ONLY)" },
+    image: { digest: null, reason: `${IMAGE_TAG_ONLY_REASON} (IMAGE_TAG_ONLY)` },
     hosting: hostingNow(),
-    topology: target === "helm" ? { status: "TOPOLOGY_UNDECIDED", key: "D-03" } : { status: null, key: null },
+    // D-03 (C): every topology stays documented; neither target A4 prepares is qualified in CI (Helm locally only).
+    topology: target === "helm" || target === "compose" ? { status: TOPOLOGY_QUALIFICATION[target].reasonCode, key: "D-03" } : { status: null, key: null },
     freeze: freeze === null ? null : { active: freeze.active, incidentIds: freeze.incidentIds },
     signing: { A4_RECORD: orNull(() => signingRoute(workspace, "A4_RECORD")), A4_PACKAGE: orNull(() => signingRoute(workspace, "A4_PACKAGE")) },
     deployRule: rule === null ? null : { requiredApprovals: rule.requiredApprovals, requireDistinctUsers: rule.requireDistinctUsers, rolesAllowed: rule.rolesAllowed },
@@ -134,11 +136,17 @@ function activateFacts(spec: Record<string, unknown>, answers: readonly A4Answer
       practitioner: `v1 is a same-host restart: the overlay restarts this hosted Studio (found: ${String(hosting.kind ?? "not hosted")}). Receipts are recordable only for an agent built here; `
         + "installing the package into another workspace is P2-40.",
       expert: `hostingNow() = ${JSON.stringify(hosting)}; deployment.same_host is BLOCKED (DEPLOYMENT_NOT_SAME_HOST, P2-40) unless it equals the target.` },
-    { id: "leases", sources: ["issueLeaseToken", "design §10.4 Build"], dataStatus: null,
-      novice: "AMC gives the operator a short-lived staging key when the release is built, and the production key only when the deployment is approved. Each key is shown once.",
+    { id: "leases", sources: ["issueLeaseForPrincipal", "P1-78", "design §10.4 Build"], dataStatus: null,
+      novice: "AMC gives the operator a short-lived staging key when the release is built, and the production key only when the deployment is approved. Each key is shown once "
+        + "and names the owner who released or approved it. When the active plan requires a named person for every tool call, that owner must be signed in as a local user of this workspace.",
       practitioner: "Staging lease: WRITE_LOW at most, the staging routes, 24 hours, minted inside the consumed release effect. Production lease: the answered scopes, routes and caps, "
-        + "minted by the deployment approval. Tokens are answered once and never stored; a DENY of the deployment approval revokes the staging lease.",
-      expert: "issueLeaseToken({ workspaceId, agentId, workOrderId: releaseId, executeActionClasses ⊆ {READ_ONLY, WRITE_LOW}, ttlMs ≤ 24 h }); a4_requests keeps the attempt id only; a replay answers token: null, TOKEN_ALREADY_DELIVERED once that attempt finished, its failure code otherwise." },
+        + "minted by the deployment approval. Tokens are answered once and never stored; a DENY of the deployment approval revokes the staging lease. Each lease names the owner "
+        + "who ran its effect when they are an active users.yaml user. Under a plan whose identity-binding requires a principal (L0-IDN-01), every tool call under a lease naming "
+        + "no one is refused, so complete, Release and a retry refuse anyone else, a workspace-router session included, with PRINCIPAL_UNRESOLVED before the gate is consumed (readiness item lease.principal).",
+      expert: "issueLeaseForPrincipal({ workspaceId, agentId, workOrderId: releaseId, executeActionClasses ⊆ {READ_ONLY, WRITE_LOW}, ttlMs ≤ 24 h, principalKey: the effect's caller }); "
+        + "readiness refuses progress and retryEffect (PRINCIPAL_UNRESOLVED) to a caller who is not an active local user; resolveLeasePrincipal runs in the effect's preflight "
+        + "inside the consuming transaction, again beside the lease and revocation-list key reads, and again at mint; a4_requests keeps the attempt id only; a replay answers "
+        + "token: null, TOKEN_ALREADY_DELIVERED once that attempt finished, its failure code otherwise." },
     { id: "lifecycle", sources: ["LIFECYCLE_BRIDGE", "requiredControlsForStage"], dataStatus: null,
       novice: `The agent's lifecycle stage is ${String(lifecycle.currentStage ?? "unknown")}. AMC only moves it when A4 evidence backs each control; otherwise the control stays not evaluated.`,
       practitioner: `Production requires ${Array.isArray(lifecycle.requiredForProduction) ? lifecycle.requiredForProduction.join(", ") : "(unread)"}. rollback_plan_validated and `
@@ -198,7 +206,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   const kpis = listValue(values.get("businessOutcomes"));
   const proposal = {
     deploymentTarget: { kind: textValue(values.get("target")), sameHost: true, destinationRef: textValue(values.get("destinationRef")), hostHint: textValue(values.get("hostHint")),
-      imageDigest: null, imagePin: "tag (IMAGE_TAG_ONLY until D-03 and P0-14)" },
+      imageDigest: null, imagePin: "tag (IMAGE_TAG_ONLY: the bootstrap report records no image digest)" },
     leases: { staging: leaseView(plans.staging), production: leaseView(plans.production) },
     updatePolicy: updatePolicyOf(answers),
     ownership: { releaseOwner: textValue(values.get("releaseOwner")), onCall: textValue(values.get("onCall")), claimKind: "self_reported" },
@@ -233,7 +241,8 @@ const target = (values: ReadonlyMap<string, unknown>): string | null => textValu
 
 const LIMITATIONS = [
   `AMC's check of the destination establishes reachability only: ${IDENTITY_NOT_EVALUATED}; runtime behaviour there is not evaluated.`,
-  "The image is pinned by tag until D-03 and P0-14 (IMAGE_TAG_ONLY); a Helm topology is undecided until D-03.",
+  `The image is pinned by tag (IMAGE_TAG_ONLY): ${IMAGE_TAG_ONLY_REASON}.`,
+  "D-03 keeps Helm, Compose, Railway and Vercel documented, and A4 v1 prepares Compose and Helm only (D-18). Neither is qualified in CI: Helm passed its qualification checks locally only, and Railway and Vercel stay unqualified.",
   "rollback_plan_validated and operator_handoff_acknowledged stay not evaluated until AMC's check can pass (P2-40), so the lifecycle stays at staging.",
   "The update policy is signed and not enforced (P2-34); the kill switch is not available in this release (P2-26).",
   "The SLO source is in-memory and unsigned: the monitor record carries it self_reported with evidence incomplete.",

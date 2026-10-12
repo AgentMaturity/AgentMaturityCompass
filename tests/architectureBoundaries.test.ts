@@ -46,9 +46,9 @@ describe("architecture boundary checks", () => {
       return readdirSync(join(root, dir), { withFileTypes: true }).flatMap(entry => entry.isDirectory() ? walk(`${dir}/${entry.name}`)
         : entry.name.endsWith(".ts") && roleCall.test(readSource(`${dir}/${entry.name}`)) ? [`${dir}/${entry.name}`] : []);
     })("src").filter(file => !/^src\/(keys|vault)\//.test(file) && file !== "src/crypto/keys.ts");
-    // The A4 lane's fail-early probes, each naming the purpose its later signer uses (P1-62's three since the 442cd919 merge).
-    expect(offenders.sort()).toEqual(["src/a4/a4Deploy.ts", "src/a4/a4Gates.ts", "src/a4/a4Package.ts", "src/a4/a4Rollback.ts", "src/a4/a4Store.ts",
-      "src/a4/assembleBuild.ts", "src/a4/stages/aspire.ts"]);
+    // The A4 lane's fail-early probes, each naming the purpose its later signer uses. P1-62's three (the lease effects,
+    // a DENY and a rollback) read through getSigningKey since the P1-62 review (src/a4/a4Preflight.ts).
+    expect(offenders.sort()).toEqual(["src/a4/a4Gates.ts", "src/a4/a4Store.ts", "src/a4/assembleBuild.ts", "src/a4/stages/aspire.ts"]);
   });
 
   test("api CLI family is registered through a command module", () => {

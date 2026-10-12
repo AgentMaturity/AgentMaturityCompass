@@ -110,7 +110,8 @@ sha256sum docker-compose.a4-<releaseId>.yml
 
 The overlay has these known limits:
 
-- The image is pinned by tag only until D-03 and P0-14 provide a digest (`IMAGE_TAG_ONLY`, a WAITING item, never a blocker).
+- The image is pinned by tag (`IMAGE_TAG_ONLY`, a WAITING item, never a blocker): AMC's bootstrap report records no digest of the image the Studio runs.
+- Decision D-03 keeps Compose documented, but it is not qualified: its CI qualification is pending (`TOPOLOGY_NOT_QUALIFIED`, a WAITING item, never a blocker).
 - The overlay sets `AMC_A4_PREVIEW=1`.
 - It moves the signed-journal checkpoint root to its own named volume at `/workspace`, outside the `/data/amc` workspace.
 - It mounts the lease token file as a Compose secret. Nothing in the Studio reads it; it is for the agent's gateway client.

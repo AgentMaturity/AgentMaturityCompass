@@ -435,7 +435,10 @@ function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Re
  * The lockout (design §7 item 10, C-11): an active plan with L0-IDN-01 denies every native tool call without a verified
  * lease. Since P1-67 a Studio workspace-tools task started or resumed after activation runs under a lease Studio mints
  * with the workspace's lease key, so the item is READY through P1-67 and names who is still denied rather than hiding
- * them. Studio refuses to start such a task when no lease can be minted (LEASE_UNAVAILABLE), so a locked vault keeps the
+ * them. Since P1-78 that lease names the task's signed-in principal, and L0-IDN-01 also requires a principal, so Studio
+ * refuses at start (409 PRINCIPAL_UNRESOLVED) a task whose principal is not an active local users.yaml user, a
+ * workspace-router session or the admin token included (PRINCIPAL_REQUIRED, NON_LOCAL_USER_SESSIONS_DENIED). Studio
+ * refuses to start any workspace-tools task when no lease can be minted (LEASE_UNAVAILABLE), so a locked vault keeps the
  * item WAITING (LEASE_NOT_ISSUED) and an unread vault state is NOT_EVALUATED, never READY. The head revision's bound
  * journal head decides only while it is current: a head moved since (an activation from the CLI or another project), a
  * journal that no longer verifies (every session refused) or an unread slot is NOT_EVALUATED, never NO_ACTIVE_PLAN.
@@ -453,8 +456,9 @@ function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery, regulated
   const active = head !== null || state.chain.some((link) => link.kind === "EFFECT_FINISHED" && link.body.effect === ACTIVATE_PLAN_EFFECT_ID);
   if (!active && !regulated) return item("adapt.plan.nativeSessionsAllowed", "READY", { section: "governance", mandatory: false, reasonCodes: ["NO_ACTIVE_PLAN"] });
   const codes = [active ? "PLAN_ACTIVE" : "PLAN_ACTIVATED_AT_COMPLETION", "PLAN_DENIES_NATIVE_SESSION", `NATIVE_TASK_LEASE:${NATIVE_LEASE_KEY}`,
-    "PRE_ACTIVATION_SESSIONS_DENIED", "CLI_AGENT_SESSIONS_DENIED", "DELEGATED_CHILDREN_DENIED"];
-  const denied = "tasks started before it, CLI agent sessions and delegated children carry none and are denied every call";
+    "PRE_ACTIVATION_SESSIONS_DENIED", "CLI_AGENT_SESSIONS_DENIED", "DELEGATED_CHILDREN_DENIED", "PRINCIPAL_REQUIRED", "NON_LOCAL_USER_SESSIONS_DENIED"];
+  const denied = "tasks started before it, CLI agent sessions and delegated children carry none and are denied every call; and a task whose signed-in principal "
+    + "is not an active local users.yaml user (a workspace-router session or the admin token included) is refused at start, 409 PRINCIPAL_UNRESOLVED (P1-78)";
   const vault = query.live.vaultUnlocked;
   if (active && vault !== true) {
     return item("adapt.plan.nativeSessionsAllowed", vault === null ? "NOT_EVALUATED" : "WAITING", { section: "governance", mandatory: false,

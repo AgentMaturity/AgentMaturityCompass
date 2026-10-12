@@ -137,7 +137,7 @@ function renderRelease(ctx) {
   return `<p class="muted">AMC builds a signed package and prepares the files an operator runs; it never deploys. Recorded: what the operator stated.
       Checked: what AMC's own probe found. v1 deploys by restarting the hosted Studio that built this agent (D-18).</p>
     ${proposal ? proposalSummary(proposal) : "<p class=\"muted\">Propose the release first: the draft comes from your answers.</p>"}
-    ${["package.inputs", "signing.notary_route", "lineage.independent_approvals", "release_effect", "lease.scope"].map((id) => status(ctx, id)).join("")}
+    ${["package.inputs", "signing.notary_route", "lineage.independent_approvals", "release_effect", "lease.scope", "lease.principal"].map((id) => status(ctx, id)).join("")}
     <h4>Release</h4>
     <p class="muted">Once the release approval (direction gate) has its quorum, an owner opens <code>${RELEASE_EFFECT}</code>, a second DEPLOY request decided
       separately; then an owner releases. The response carries the staging lease token (WRITE_LOW at most, the staging routes, 24 hours) once.</p>

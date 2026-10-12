@@ -19,7 +19,6 @@ import { z } from "zod";
 import { DEFAULT_ACTION_STALE_AFTER_MS } from "../actions/actionRecovery.js";
 import { approvalRequestBindingDigest, loadApprovalConsumed, loadApprovalRequestRecord } from "../approvals/approvalChainStore.js";
 import { consumeApprovedExecution, createApprovalForIntent } from "../approvals/approvalEngine.js";
-import { getPrivateKeyPem } from "../crypto/keys.js";
 import { activeFreezeStatus, createFreezeIncident } from "../drift/freezeEngine.js";
 import { latestEnforceResourceManifestPath, restoreEnforceResourceSnapshot } from "../enforce/resourceManifest.js";
 import { revokedLeaseIdSet, revokeLease } from "../leases/leaseStore.js";
@@ -31,6 +30,7 @@ import { COMPOSE_BASE_UP, mintedLeases } from "./a4Deploy.js";
 import { assertCallerNotCounted, settleEffect, sweepA4Effects, verifyAndConsumeEffect, type A4EffectDef } from "./a4Effects.js";
 import { A4_RUNTIME, assertAllowed, autoHold, engineRiskTier, evaluateFor, gateRowOf, livePrincipal, loadA4State, pendingExecutors, signedA4Floor, type A4Call } from "./a4Gates.js";
 import { journaledLeaseIds, writeReleaseRecord } from "./a4Package.js";
+import { assertPurposeKeys } from "./a4Preflight.js";
 import { isRegulated, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
 import { a4ReleaseV1Schema, a4RollbackReceiptV1Schema, headSeqSchema, reasonSchema, type A4ChainLink } from "./a4Schema.js";
 import { A4StoreError, type A4Store, type A4TransitionResult } from "./a4Store.js";
@@ -227,12 +227,8 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
   if (consumed !== null) assertCallerNotCounted(counted.some(Array.isArray) ? counted.flatMap((keys) => Array.isArray(keys) ? keys : []) : null, principal);
   const effectApproverKeys = consumed !== null ? null
     : verifyAndConsumeEffect(store, state, { def: effectDef(intent), gate, approvalRequestId, callerKey: principal.key, regulated: isRegulated(state, signedA4Floor(store.workspace)) });
-  // Signing keys first: every later step signs, and none may run when the record of it could not be written.
-  try {
-    for (const purpose of ["artifact-seal", "revocation-list"] as const) getPrivateKeyPem(store.workspace, purpose); // P1-08: grant, freeze, restore and receipt; lease revocations
-  } catch {
-    throw fail(423, "A4_VAULT_LOCKED", "Unlock the vault to roll back: every step signs a receipt.");
-  }
+  // Signing keys first: every later step signs, and none may run when the record of it could not be written (423 locked, 409 A4_KEY_REVOKED).
+  assertPurposeKeys(store.workspace, ["artifact-seal", "revocation-list"], "roll back (every step signs a receipt)"); // P1-08: grant, freeze, restore and receipt; lease revocations
   // Every lease the release's effects minted, and in production the successor's production lease, read now: revoking more
   // than the preview bound only cuts the safe way.
   let journaled: string[];
