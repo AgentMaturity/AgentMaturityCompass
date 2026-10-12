@@ -2,8 +2,8 @@
   "suite": "amc-verifier-fixtures",
   "version": "v1",
   "implementation": "amc-verify@0.1.0",
-  "ranAt": "2026-10-11T22:20:43.951Z",
-  "passed": 54,
+  "ranAt": "2026-10-12T00:09:43.475Z",
+  "passed": 55,
   "failed": 0,
   "cases": [
     {
@@ -173,6 +173,11 @@
     },
     {
       "case": "rotation-chain-head-not-first",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "scoped-attestation-v1",
       "result": "pass",
       "diff": null
     },

@@ -1,0 +1,8 @@
+# RED: npx vitest run tests/trust/admission.test.ts with the updated expectations, before 7fd866b40 (AMC admission at verification time)
+     × a key distrusted from a date, claim before it 4ms
+     × a key distrusted from a date after the verification time 0ms
+     × a superseded key, claim before the revocation 1ms
+     × an expired key, claim before validTo 0ms
+     × names the key id to pin and the signature in every refusal 1ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  5 failed | 38 passed (43)

@@ -33,4 +33,11 @@
 - L8-as-of-rollover (packages/verifier/src/cli.ts): KILLED by x refuses an --as-of that is not a calendar date with exit 64 6ms
 - multi-root-warning-dropped (packages/verifier/src/verify.ts): KILLED by x several pinned roots without a threshold say that one root's signature counts a list 5ms
 
-Total: 25 mutations, 25 killed.
+## Coordinator decisions round (AMC admission, P1-08 times), on the tree committed as 7fd866b40 and ddbffd94e
+- shared-rule-ignores-non-compromise-revocation (src/trust/admissionRule.ts): KILLED by x a superseded key, claim before the revocation 4ms; x a superseded key, claim at the revocation 1ms; x a superseded key, no claimed time 0ms; x names the key id to pin and the signature in every refusal 1ms; x revoked-superseded-earlier-claim 5ms; x admission never rests on the record's claimed time: only the verifier's as-of time decides it 4ms
+- amc-lists-judged-at-claimed-time (src/trust/admission.ts): KILLED by x a superseded key, claim before the revocation 5ms; x an expired key, claim before validTo 1ms; x names the key id to pin and the signature in every refusal 1ms
+- amc-distrust-judged-at-claimed-time (src/trust/admission.ts): KILLED by x a key distrusted from a date, claim before it 8ms
+- p108-time-refine-throws (src/utils/time.ts): KILLED by x refuses an impossible or empty time with a typed issue in each P1-08 statement schema 102ms
+- shared-rule-imports-amc-module (src/trust/admissionRule.ts): KILLED by check:architecture-boundaries ("may import only node: built-ins")
+
+Total: 30 mutations, 30 killed.

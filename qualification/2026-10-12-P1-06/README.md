@@ -1,54 +1,65 @@
-# P1-06 receipt: standalone pinned-issuer verifier and normative fixtures
+# P1-06 receipt: standalone pinned-issuer verifier, normative fixtures and shared admission rule
 
 Environment: local macOS arm64 (Darwin 25.6.0), Node v25.5.0, pnpm 10.33.0. Not CI. Container runs used the local colima
-VM `amc-s7f` (aarch64) with `--network none`. Other sessions kept the load average between 16 and 44.
+VM `amc-s7f` (aarch64) with `--network none`. Other sessions kept the load average between 11 and 44.
 
-Branch `rtd/p1-06-pinned-issuer-verifier`, from `int` at `8d1e8e7d7` (`git merge int`: already up to date). The checks
-ran at `bbd3f2b9a`. `770cd7977` changes only `scripts/quality/source-quality-baseline.json` (dead-code accept and
-shrink); the receipt commit adds only this folder.
+Branch `rtd/p1-06-pinned-issuer-verifier`. `int` was merged twice, last at `5001e9198`; the published counts were taken
+from int and regenerated. The checks ran at `d7d86dfa9`. The receipt commit adds only this folder.
+
+## Coordinator decisions applied
+
+1. Scoped attestation: v1 (`src/contracts/v1/scopedAttestation.ts`, its schema and its contract fixtures) is
+   byte-identical to int. The verifier's record is `scoped-attestation` v2 (`src/contracts/v2/`,
+   `spec/schemas/v2/scoped-attestation.schema.json`, listed in `spec/schemas/index.json`, published by `copySpec`). The
+   verifier refuses v1 as `UNSUPPORTED_VERSION` (fixture `scoped-attestation-v1`).
+2. `revoked-superseded-earlier-claim` fails with `ISSUER_REVOKED`. This deviates from the P1-06 spec, which expected a
+   pass with a warning: a signing time an artifact claims for itself can be backdated. Seam: once P1-25 adds RFC 3161
+   timestamps to these records, a signature that a pinned TSA proves earlier than the revocation becomes a pass with a
+   warning, by passing the attested time to the shared rule. This is documented in docs/STANDALONE_VERIFIER.md,
+   docs/TRUST_LIST.md, docs/TRUSTED_TIME.md and spec/fixtures/v1/README.md.
+3. Package name: `agent-maturity-compass-verifier` (unscoped), still `private: true`; nothing was published.
+4. AMC admission (`src/trust/admission.ts`) now judges distrust, validity and revocation at the verification time
+   through one rule, `src/trust/admissionRule.ts`, which the package compiles too (it imports only `node:` built-ins,
+   and check:architecture-boundaries enforces that). Verdicts that change are listed in
+   `.changeset/issuer-admission-at-verification-time.md` (major). The one AMC test that encoded the old rule
+   (`embeddedKeyForgery`, bundle sealed before a supersession) now expects refusal.
+5. The P1-08 parsers report an impossible date as a schema error (`isExactIsoTime` in `src/utils/json.ts`), with a test.
 
 ## What was checked
 
-- `checks.txt`: build, typecheck (now also the package), typecheck:tests, lint, check:counts, check:docs-drift,
-  check:freeze, check:architecture-boundaries (now also refuses any import in `packages/verifier` that is not `node:` or
-  inside the package), check:gates, check:schemas, check:api-ref, check:threat-model, check:duplicates, check:dead-code
-  (first exit 1 on a new `mkfifo` test-binary finding; accepted with a reason and stale entries shrunk, then exit 0),
-  check:clean-source, check:packed-install, `npx vitest run tests/verifier` (7 files, 128 tests passed), the
-  conformance runner (54/54) and `needs-snapshot.mjs int` (`none`).
-- `conformance-results.json`: `node packages/verifier/conformance/run.mjs --cmd "node packages/verifier/bin/amc-verify.mjs"`
-  at `bbd3f2b9a`, 54 of 54 cases pass, including the 19 the spec names.
-- `containers.txt`: the packed tarball installed offline into an empty directory, no other dependency, 54/54 on Node 22
-  and Node 24. Node 20 was not evaluated locally (no offline image or binary); the `verifier-conformance` CI job, set up
-  for Node 20, 22 and 24, has not run yet.
-- Fixture determinism: `tests/verifier/fixturesDeterministic.test.ts` regenerates the corpus into a temp directory and
-  compares every byte. Ed25519 is deterministic and all times are constants, so the bytes are fixed, not only the
-  verdicts.
-- Parity with AMC (`tests/verifier/parityWithAmc.test.ts`): shape validators agree with AMC's zod schemas on every corpus
-  record and 584 single-field mutations (a one-off exhaustive sweep of 31,572 mutations also agreed); the package's
-  reports parse as AMC verifier reports; reason codes, purposes, event types, receipt states, rotation reasons, claim
-  kinds, the overlap limit and the built-in distrust list are equal; a trust list counts for the package exactly when
-  AMC's `verifySignedTrustList` accepts it; external-evidence signatures verify alike, including a non-canonical base64
-  spelling.
-- `mutations.txt`: 25 deliberate breaks, every one failed at least one test: the spec's four (admit a key carried in
-  the artifact, skip the tenant comparison, ignore known sequences, let empty evidence pass), five more guards, four
-  for the coordinator's self-audit and twelve for the independent review.
-- `red/`: the new tests failing before each security fix (`self-audit.txt` before `9ccb71250`, `review.txt` before
-  `1f5de52ff`). Two review tests were added after their fix: the FIFO test (a FIFO open blocks the test worker before the
-  fix) and the pinned-threshold `allowDecrease` test; their mutations are in `mutations.txt`.
-- `full-suite.txt`: the full suite at `0fcd97035` (24,154 tests, 58 failed) and the triage of every failure: none is
-  caused by P1-06; the verifier failures in that run come from edits made while it ran.
+- `checks.txt` at `d7d86dfa9`: build, typecheck, typecheck:tests, lint, check:counts, check:docs-drift, check:freeze,
+  check:architecture-boundaries, check:gates, check:schemas (39 schemas, 80 contract fixtures incl. v2), check:api-ref,
+  check:threat-model, check:duplicates, check:dead-code, check:clean-source, check:packed-install,
+  `npx vitest run tests/verifier` (7 files, 129 tests), the conformance runner (55/55) and `needs-snapshot.mjs int`
+  (`none`): all exit 0.
+- Quality ratchet acceptances, each with a reason: `mkfifo` in the CLI test; `CONTRACTS_V2`, read by gen-spec-schemas
+  through dist; the shared rule's constant-time compare, which cannot reuse a private AMC helper.
+- `conformance-results.json`: 55 of 55 cases, including the 19 the spec names.
+- `containers.txt`: the packed tarball, installed offline into an empty directory with no other dependency, passes
+  55/55 on Node 22 and Node 24. Node 20 was not evaluated locally; the `verifier-conformance` CI job, set up for
+  Node 20, 22 and 24, has not run yet.
+- Fixture determinism: regeneration is byte-identical (`tests/verifier/fixturesDeterministic.test.ts`); no randomness is
+  involved, so bytes and verdicts are both fixed.
+- Parity with AMC (`tests/verifier/parityWithAmc.test.ts`):
+  - validators agree on the corpus and 584 single-field mutations, and an exhaustive one-off sweep of 31,572 agreed;
+  - the package's reports parse as AMC verifier reports;
+  - constants and the built-in distrust list are equal;
+  - verify-level differentials agree with `verifySignedTrustList` and `verifyExternalEvidence`.
+- `mutations.txt`: 30 deliberate breaks, all killed.
+- `red/`: new tests failing before each security fix. `self-audit.txt` precedes `9ccb71250`, `review.txt` precedes
+  `1f5de52ff`, `amc-admission.txt` precedes `7fd866b40` and `p108-times.txt` precedes `ddbffd94e`.
+- `full-suite.txt`: the full suite at `35c491d30` (24,194 tests, 46 failed) with every failure triaged. One was caused
+  by P1-06 (`apiRouters`, fixed in `5652c8249`). After the merges, the 19 trust-consuming files pass (447 tests).
 
 ## Not done here
 
-Publishing, naming the package (still "not yet"; `@amc/verifier` is a private working name), making
-`src/trust/admission.ts` call the package's `admit()`, and moving the a4-record fixtures into `spec/fixtures/v1/`
-are left for Sid and the integrator.
+Publishing, moving the a4-record fixtures (coordinated later), and the CI run itself.
 
 ## Reproduce
 
 ```bash
 npm run build
-npx vitest run tests/verifier
+npx vitest run tests/verifier tests/trust/admission.test.ts tests/keys/rotationStatement.test.ts
 npm run test:verifier-conformance
-node spec/fixtures/v1/generate.mjs --out /tmp/fixtures && diff -r /tmp/fixtures/valid-attestation spec/fixtures/v1/valid-attestation
+npm run check:schemas
 ```

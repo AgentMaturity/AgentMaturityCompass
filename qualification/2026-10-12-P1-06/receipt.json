@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P1-06",
   "date": "2026-10-12",
-  "commit": "bbd3f2b9a6571e929f95e96c0e34571ecb625f69",
+  "commit": "d7d86dfa9cc871dfd7c5370e14c6c07206491cba",
   "branch": "rtd/p1-06-pinned-issuer-verifier",
   "node": "v25.5.0",
   "pnpm": "10.33.0",
@@ -12,102 +12,102 @@
     {
       "cmd": "npm run -s build",
       "exit": 0,
-      "durationMs": 47372
+      "durationMs": 28944
     },
     {
       "cmd": "npm run -s typecheck",
       "exit": 0,
-      "durationMs": 31797
+      "durationMs": 25926
     },
     {
       "cmd": "npm run -s typecheck:tests",
       "exit": 0,
-      "durationMs": 42971
+      "durationMs": 35253
     },
     {
       "cmd": "npm run -s lint",
       "exit": 0,
-      "durationMs": 3860
+      "durationMs": 3109
     },
     {
       "cmd": "npm run -s check:counts",
       "exit": 0,
-      "durationMs": 931
+      "durationMs": 716
     },
     {
       "cmd": "npm run -s check:docs-drift",
       "exit": 0,
-      "durationMs": 524
+      "durationMs": 405
     },
     {
       "cmd": "npm run -s check:freeze",
       "exit": 0,
-      "durationMs": 2543
+      "durationMs": 1743
     },
     {
       "cmd": "npm run -s check:architecture-boundaries",
       "exit": 0,
-      "durationMs": 2091
+      "durationMs": 1877
     },
     {
       "cmd": "npm run -s check:gates",
       "exit": 0,
-      "durationMs": 378
+      "durationMs": 317
     },
     {
       "cmd": "npm run -s check:schemas",
       "exit": 0,
-      "durationMs": 823
+      "durationMs": 639
     },
     {
       "cmd": "npm run -s check:api-ref",
       "exit": 0,
-      "durationMs": 238
+      "durationMs": 204
     },
     {
       "cmd": "npm run -s check:threat-model",
       "exit": 0,
-      "durationMs": 301
+      "durationMs": 228
     },
     {
       "cmd": "npm run -s check:duplicates",
       "exit": 0,
-      "durationMs": 866
+      "durationMs": 681
     },
     {
       "cmd": "npm run -s check:dead-code",
-      "exit": 1,
-      "durationMs": 3803
+      "exit": 0,
+      "durationMs": 2847
     },
     {
       "cmd": "npm run -s check:clean-source",
       "exit": 0,
-      "durationMs": 89089
+      "durationMs": 55522
     },
     {
       "cmd": "npm run -s check:packed-install",
       "exit": 0,
-      "durationMs": 71737
+      "durationMs": 63126
     },
     {
       "cmd": "npx vitest run tests/verifier",
       "exit": 0,
-      "durationMs": 9215
+      "durationMs": 10832
     },
     {
       "cmd": "node packages/verifier/conformance/run.mjs --cmd \"node packages/verifier/bin/amc-verify.mjs\"",
       "exit": 0,
-      "durationMs": 4654
+      "durationMs": 4863
     },
     {
       "cmd": "node $SP/needs-snapshot.mjs int",
       "exit": 0,
-      "durationMs": 421
+      "durationMs": 345
     },
     {
-      "cmd": "npm run -s check:dead-code (after the accept and shrink, at 770cd7977)",
+      "cmd": "npx vitest run <19 trust-consuming test files> (at d7d86dfa9)",
       "exit": 0,
-      "durationMs": 4000
+      "durationMs": 0
     },
     {
       "cmd": "docker run --network none node:22-bookworm-slim: npm install --offline <tarball>; run.mjs --cmd amc-verify",
@@ -120,37 +120,45 @@
       "durationMs": 0
     },
     {
-      "cmd": "npx vitest run (full suite, at 0fcd97035)",
+      "cmd": "npx vitest run (full suite, at 35c491d30)",
       "exit": 1,
-      "durationMs": 2400000
+      "durationMs": 1898000
     }
   ],
   "tests": {
-    "total": 128,
-    "passed": 128,
+    "total": 129,
+    "passed": 129,
     "failed": 0,
     "skipped": 0
   },
   "artifacts": [
     {
       "path": "checks.txt",
-      "sha256": "3b9e41a938c2c215f1cd01e9bbb09e4f4bbd5e61fa58a34a795df0d0f4b001de"
+      "sha256": "a7f713cad6ff14f08345a0571b586ce8fc8f33b942c12efb017047d36ae638c8"
     },
     {
       "path": "conformance-results.json",
-      "sha256": "1853e0a09005301cfc01652f9b5491b6057b8c921232380b61cae6976ef28179"
+      "sha256": "5c412e4d4932dd4094bf767aeb5f0ccd64d7737c7ded39f8577506fd9c0c4a68"
     },
     {
       "path": "containers.txt",
-      "sha256": "525e3ad65e65e85f8d36c09fc33673053da98c0bdea1545023691baf9a87b093"
+      "sha256": "7fb1ccddfa12761ee7cf2d9445a33e6a67896788c5b13df89f410bda0e2a44e6"
     },
     {
       "path": "full-suite.txt",
-      "sha256": "47f50c1502b859ed7f641e4280aa8534d22f6cd3edc832a02f7acccf926ebfca"
+      "sha256": "79760f46d34a4299c6e0dba2f2bccb8eed0339487448e5d2b66c934e43d0bcfe"
     },
     {
       "path": "mutations.txt",
-      "sha256": "175f4df536a03a7502c477719d777700925b7b944d28048927d3f976a4fa82b0"
+      "sha256": "e799b3bd2e5328102959c18e0f956e90f9bdc9d9f1707bcb858f2b0b184b80a2"
+    },
+    {
+      "path": "red/amc-admission.txt",
+      "sha256": "90d95cde9c2443305e998044c3f7b2768ca2cdfeb398513172d4c1c9fd88eb1f"
+    },
+    {
+      "path": "red/p108-times.txt",
+      "sha256": "6e7834ec3cce75288d7fb8231311e91f539389b821f599315e74d00c7df97720"
     },
     {
       "path": "red/review.txt",
@@ -161,5 +169,5 @@
       "sha256": "22ff2f7122a32cc681922597d4aa1e12cc26c27347272ff434c3b745fd8f0644"
     }
   ],
-  "notes": "tests counts the 7 tests/verifier files at bbd3f2b9a. check:dead-code first exited 1 on a new finding (the CLI test runs the POSIX mkfifo utility); it was accepted with a reason and 6 stale entries shrunk in 770cd7977, then exit 0. The full suite exited 1: 58 failures at 0fcd97035, triaged in full-suite.txt (pre-existing on this lineage, worktree-only, load timeouts, or verifier tests edited while the run was in progress; none caused by P1-06). Container runs are local colima (aarch64), not CI; durations of 0 were not measured. Node 20 was not evaluated locally."
+  "notes": "tests counts the 7 tests/verifier files at the receipt commit. The full suite exited 1: 46 failures at 35c491d30, triaged in full-suite.txt. One was caused by P1-06 (apiRouters mocks src/utils/time.js) and is fixed in 5652c8249. The rest are pre-existing on this lineage, worktree-only, or load timeouts that pass when rerun alone. revoked-superseded-earlier-claim deliberately deviates from the P1-06 spec (refused, not pass-with-warning) by the coordinator's decision; the P1-25 trusted-timestamp seam is documented. Container runs are local colima (aarch64), not CI; durations of 0 were not measured. Node 20 was not evaluated locally."
 }

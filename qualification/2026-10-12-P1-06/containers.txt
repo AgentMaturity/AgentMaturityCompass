@@ -1,11 +1,11 @@
-# Packed amc-verifier-0.1.0.tgz (sha256 be6bbcf5353bdff582cd4ee944f2a3e60e7d8e969e4a0825a177c0bcfbd4be1c) at bbd3f2b9a, installed with npm install --offline into an empty directory and run against spec/fixtures/v1. Local colima VM amc-s7f on macOS arm64 (containers aarch64), docker --network none. Not CI. Node 20 was not run: no Node 20 image or binary exists offline here; the verifier-conformance CI job covers it.
-== node:22-bookworm-slim (colima amc-s7f, linux/arm64, --network none)
+# Packed agent-maturity-compass-verifier-0.1.0.tgz (sha256 b86f0c255dca53e5600ee177dca2a5d00919ae6abf7cd19f125085d85759aa9b) at 35c491d30 (the package is unchanged since), installed with npm install --offline into an empty directory and run against spec/fixtures/v1. Local colima VM amc-s7f on macOS arm64 (containers aarch64), docker --network none. Not CI. Node 20 was not run: no Node 20 image or binary exists offline here; the verifier-conformance CI job covers it.
+== node:22-bookworm-slim (colima amc-s7f, aarch64, --network none)
 v22.23.3
-installed: @amc
-amc-verify@0.1.0: 54/54 cases pass (/tmp/r.json)
+installed: agent-maturity-compass-verifier
+amc-verify@0.1.0: 55/55 cases pass (/tmp/r.json)
 runner exit 0
-== node:24-bookworm (colima amc-s7f, linux/arm64, --network none)
+== node:24-bookworm (colima amc-s7f, aarch64, --network none)
 v24.21.0
-installed: @amc
-amc-verify@0.1.0: 54/54 cases pass (/tmp/r.json)
+installed: agent-maturity-compass-verifier
+amc-verify@0.1.0: 55/55 cases pass (/tmp/r.json)
 runner exit 0
