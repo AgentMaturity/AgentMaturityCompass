@@ -234,7 +234,7 @@ function versionPrContract(text: string): string[] {
   if (sortedPermissions(workflow.permissions) !== sortedPermissions({ contents: "read" })) failures.push("workflow default permissions are not contents: read");
   if (JSON.stringify(workflow.env ?? {}).includes("secrets.")) failures.push("a secret is in the workflow env");
   for (const [id, job] of Object.entries(workflow.jobs)) {
-    const expected = id === "version-pr" ? { contents: "write", "pull-requests": "write" } : { contents: "read" };
+    const expected: Record<string, string> = id === "version-pr" ? { contents: "write", "pull-requests": "write" } : { contents: "read" };
     if (sortedPermissions(job.permissions) !== sortedPermissions(expected)) failures.push(`${id} permissions are ${JSON.stringify(job.permissions ?? null)}`);
     if (JSON.stringify(job.env ?? {}).includes("secrets.")) failures.push(`${id}: a secret is in the job env`);
     for (const step of job.steps) {

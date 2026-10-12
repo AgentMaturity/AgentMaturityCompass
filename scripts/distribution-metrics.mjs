@@ -53,7 +53,7 @@ async function githubReleaseAssets(fetchImpl) {
 
 const cell = (figure, measured) => (figure.status === "measured" ? measured(figure) : `not measured (${figure.reason})`);
 
-/** @param {{ fetch?: typeof fetch; now?: () => Date; root?: string; write?: boolean }} options */
+/** @param {{ fetch?: (url: string, init?: any) => Promise<any>; now?: () => Date; root?: string; write?: boolean }} options */
 export async function runDistributionMetrics({ fetch: fetchImpl = globalThis.fetch, now = () => new Date(), root = process.cwd(), write = false } = {}) {
   const recordedAt = now().toISOString();
   const entry = { recordedAt, npm: await npmLastWeek(fetchImpl), githubReleaseAssets: await githubReleaseAssets(fetchImpl) };

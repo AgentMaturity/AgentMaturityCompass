@@ -60,7 +60,7 @@ async function imageCheck(fetchImpl, version) {
   }
 }
 
-/** @param {{ version: string; fetch?: typeof fetch; now?: () => Date }} options */
+/** @param {{ version: string; fetch?: (url: string, init?: any) => Promise<any>; now?: () => Date }} options */
 export async function checkPublishedRelease({ version, fetch: fetchImpl = globalThis.fetch, now = () => new Date() }) {
   if (!/^\d+\.\d+\.\d+$/.test(version ?? "")) throw new Error(`"${version}" is not a release version (X.Y.Z)`);
   const checkedAt = now().toISOString();

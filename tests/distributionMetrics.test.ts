@@ -64,7 +64,7 @@ describe("distribution metrics (P1-41)", () => {
     });
     const result = await runDistributionMetrics({ fetch, now: NOW });
     expect(seen).toEqual([NPM_LAST_WEEK, page(1), page(2)]);
-    expect(result.entry.githubReleaseAssets.total).toBe(102);
+    expect(result.entry.githubReleaseAssets).toMatchObject({ status: "measured", total: 102 });
   });
 
   test("--write appends the entry to docs/program/distribution-metrics.json, also when a figure is not measured", async () => {
