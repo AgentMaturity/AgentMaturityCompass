@@ -20,7 +20,7 @@ import { canonicalize } from "../utils/json.js";
 import type { ProtectedDataClass } from "../vault/dataClassification.js";
 import { DETECTOR_SET_DIGEST, MAX_PROTECTED_TEXT_CHARS, redactProtectedText } from "./detectors.js";
 import { loadProcessorRegistrySnapshot } from "./processorRegistry.js";
-import { RedactionRefused, tokenFor } from "./tokenizer.js";
+import { isShieldingToken, RedactionRefused, TOKEN_PATTERN_SOURCE, tokenFor } from "./tokenizer.js";
 import { loadTokenKeys, storeTokens, type TokenEntry, type TokenKeys } from "./tokenVault.js";
 
 export type DeclaredFields = Readonly<Record<string, ProtectedDataClass>>;
@@ -32,19 +32,48 @@ export interface Redaction {
 export interface Redactor { redact(text: string, declared?: DeclaredFields): Redaction }
 
 const MAX_JSON_DEPTH = 64;
+const WHOLE_TOKEN = new RegExp(`^${TOKEN_PATTERN_SOURCE}$`);
+interface RawJson { readonly rawJSON: string }
+const jsonRaw = JSON as unknown as { rawJSON?: (text: string) => RawJson; isRawJSON?: (value: unknown) => value is RawJson };
+const isRawJson = (value: unknown): value is RawJson => jsonRaw.isRawJSON?.(value) === true;
+const JSON_STRING_OR_NUMBER = /"(?:[^"\\]|\\.)*"|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g;
 
-/** Tokenizes declared paths in a JSON document; `tokenize` counts each value. Returns the text unchanged when none matched. */
+/**
+ * Parses a declaring tool's result so that re-serializing it reproduces every number's source text: where the engine
+ * exposes it (Node 21+), each number keeps its literal; elsewhere a literal a double would change (1.0, 1e5, 2^53 + 1)
+ * refuses. A duplicate key keeps its last value, as the parse does, and the committed text is that re-serialization.
+ */
+function parseExact(text: string): unknown {
+  const rawJSON = jsonRaw.rawJSON;
+  const refused = () => new RedactionRefused("declared_fields_unparseable");
+  let root: unknown;
+  try {
+    root = rawJSON === undefined ? JSON.parse(text) : JSON.parse(text, (_key, value: unknown, context?: { readonly source?: unknown }) => {
+      if (typeof value !== "number") return value;
+      if (typeof context?.source !== "string") throw refused();
+      return rawJSON(context.source);
+    });
+  } catch { throw refused(); }
+  if (rawJSON === undefined) {
+    for (const [literal] of text.matchAll(JSON_STRING_OR_NUMBER)) if (!literal.startsWith("\"") && String(Number(literal)) !== literal) throw refused();
+  }
+  return root;
+}
+
+/** Tokenizes declared paths in a JSON document; `tokenize` counts each value. Returns the re-serialized document. */
 function tokenizeDeclared(text: string, declared: DeclaredFields, tokenize: (dataClass: ProtectedDataClass, value: string) => string,
   matched: Set<string>): string {
-  let root: unknown;
-  try { root = JSON.parse(text); } catch { throw new RedactionRefused("declared_fields_unparseable"); }
+  let root = parseExact(text);
   let tokens = 0;
   const deeper = (depth: number) => { if (depth > MAX_JSON_DEPTH) throw new RedactionRefused("declared_fields_unparseable"); return depth + 1; };
   const mapOwn = (value: object, map: (item: unknown, key: string) => unknown) =>
     Object.fromEntries(Object.entries(value).map(([key, item]) => [key, map(item, key)]));
   const cover = (value: unknown, dataClass: ProtectedDataClass, depth: number): unknown => {
     const next = deeper(depth);
+    // A value that already is a token stays as it is, so redacting twice changes nothing.
+    if (typeof value === "string" && WHOLE_TOKEN.test(value) && isShieldingToken(value)) return value;
     if (typeof value === "string" || typeof value === "number") { tokens += 1; return tokenize(dataClass, String(value)); }
+    if (isRawJson(value)) { tokens += 1; return tokenize(dataClass, value.rawJSON); }
     if (Array.isArray(value)) return value.map(item => cover(item, dataClass, next));
     return value !== null && typeof value === "object" ? mapOwn(value, item => cover(item, dataClass, next)) : value;
   };
@@ -52,7 +81,7 @@ function tokenizeDeclared(text: string, declared: DeclaredFields, tokenize: (dat
     const next = deeper(depth);
     if (Array.isArray(value)) return value.map(item => apply(item, parts, dataClass, next));
     if (parts.length === 0) return cover(value, dataClass, next);
-    if (value === null || typeof value !== "object" || !Object.hasOwn(value, parts[0]!)) return value;
+    if (value === null || typeof value !== "object" || isRawJson(value) || !Object.hasOwn(value, parts[0]!)) return value;
     return mapOwn(value, (item, key) => key === parts[0] ? apply(item, parts.slice(1), dataClass, next) : item);
   };
   for (const [path, dataClass] of Object.entries(declared)) {
@@ -60,7 +89,8 @@ function tokenizeDeclared(text: string, declared: DeclaredFields, tokenize: (dat
     root = apply(root, path.split("."), dataClass, 0);
     if (tokens > before) matched.add(path);
   }
-  return tokens === 0 ? text : JSON.stringify(root, null, text.includes("\n") ? 2 : undefined);
+  // Always the re-serialized parse, never the original bytes: a shadowed duplicate key's value was never inspected.
+  return JSON.stringify(root, null, text.includes("\n") ? 2 : undefined);
 }
 
 /** Declared fields first, then the text detectors over the result; every token's value is stored before this returns. */
@@ -75,6 +105,9 @@ export function createWorkspaceRedactor(workspace: string): Redactor {
         const tokenize = (dataClass: ProtectedDataClass, detector: string, value: string): string => {
           keys ??= loadTokenKeys(workspace);
           const token = tokenFor(keys.hmac, dataClass, value);
+          // Two values under one 64-bit token in the same redaction would otherwise merge silently.
+          const prior = entries.get(token);
+          if (prior !== undefined && prior.value !== value) throw new RedactionRefused("token_collision");
           entries.set(token, { token, dataClass, value });
           const finding = counts.get(`${dataClass}\0${detector}`) ?? { dataClass, detector, count: 0 };
           counts.set(`${dataClass}\0${detector}`, { ...finding, count: finding.count + 1 });
