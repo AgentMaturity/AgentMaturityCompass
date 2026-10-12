@@ -4,7 +4,7 @@ import type { ProtectedDataClass } from "../vault/dataClassification.js";
 import { findPIISpans, getPIIDetectorMetadata, PII_SPAN_SCAN_REVISION, type PiiSpan } from "../vault/dlp.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
-import { TOKEN_PATTERN_SOURCE } from "./tokenizer.js";
+import { isShieldingToken, TOKEN_PATTERN_SOURCE } from "./tokenizer.js";
 
 export interface ProtectedDataDetection {
   readonly classes: readonly ProtectedDataClass[];
@@ -29,7 +29,10 @@ const CLASS_BY_TYPE: Readonly<Record<string, ProtectedDataClass>> = Object.freez
 // "phone") if that recall matters. scanForPII still reports them.
 const NOISE_FILTERS: Readonly<Record<string, RegExp>> = Object.freeze({
   ip_address: /^\d{1,2}(?::\d{2}){1,2}(?:\.\d+)?$/, // HH:MM[:SS] clock times that IPV6_SOURCE also matches
-  phone: /^\d{10}$/ // bare 10-digit runs: Unix-seconds timestamps, counters, 2147483647
+  phone: /^\d{10}$/, // bare 10-digit runs: Unix-seconds timestamps, counters, 2147483647
+  // Bare 13-digit runs starting with 1: Unix-millisecond timestamps (2001-2033), about 10% Luhn-valid. No card network
+  // issues a 13-digit number starting with 1 (13-digit cards are legacy Visa, starting with 4).
+  credit_card: /^1\d{12}$/
 });
 // The phone pattern's leading \b cannot sit before "+", so an E.164 span starts after it; keep such a span. A clock-shaped
 // ip_address span right after "::" is the tail of a compressed IPv6 address (2001:db8::10:20:30, fe80::1:23:45); keep it.
@@ -53,23 +56,34 @@ export const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   classMapping: CLASS_BY_TYPE,
   noiseFilters: Object.fromEntries(Object.entries(NOISE_FILTERS).map(([type, re]) => [type, re.source])),
   tokenFormat: TOKEN_PATTERN_SOURCE,
-  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-amc-tokens-skipped-v8",
+  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-ms-timestamps-not-cards-spans-inside-letter-hex-token-skipped-token-crossing-spans-rechecked-without-tokens-v9",
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS }
 }));
 function refused(): never { throw new Error("Protected request detection refused unsupported or excessive traversal"); }
 const dataClass = (type: string): ProtectedDataClass => Object.hasOwn(CLASS_BY_TYPE, type) ? CLASS_BY_TYPE[type]! : refused();
 
-/** [start, end) of each AMC token in text order; tokens never overlap. */
+const TOKEN_HEX_CHARS = 16;
+const tokenPattern = () => new RegExp(TOKEN_PATTERN_SOURCE, "g");
+/** [start, end) of each shielding AMC token (see isShieldingToken) in text order; tokens never overlap. */
 const tokenRanges = (text: string): readonly (readonly [number, number])[] => text.includes("[[amc:")
-  ? Array.from(text.matchAll(new RegExp(TOKEN_PATTERN_SOURCE, "g")), match => [match.index, match.index + match[0].length] as const) : [];
-/** A span touching an AMC token matches the token's own hex, not a value: the last token starting before the span's end decides. */
-function inToken(tokens: readonly (readonly [number, number])[], span: PiiSpan): boolean {
+  ? Array.from(text.matchAll(tokenPattern()), match => [match.index, match.index + match[0].length] as const)
+    .filter(([start, end]) => isShieldingToken(text.slice(start, end))) : [];
+const withoutTokens = (text: string) => text.replace(tokenPattern(), token => isShieldingToken(token) ? "" : token);
+/**
+ * A span inside a shielding token's hex is the token, not a value. A span that crosses token text (a JSON password value
+ * holding a token) stays a detection only if it still is one with the tokens removed, so raw text beside a token is
+ * never hidden by it. The last token starting before the span's end is the only one the span can lie inside.
+ */
+function shieldedByToken(text: string, tokens: readonly (readonly [number, number])[], span: PiiSpan): boolean {
   let low = 0, high = tokens.length - 1, last = -1;
   while (low <= high) {
     const mid = (low + high) >> 1;
     if (tokens[mid]![0] < span.end) { last = mid; low = mid + 1; } else high = mid - 1;
   }
-  return last >= 0 && tokens[last]![1] > span.start;
+  if (last < 0 || tokens[last]![1] <= span.start) return false;
+  const hexEnd = tokens[last]![1] - 2;
+  if (span.start >= hexEnd - TOKEN_HEX_CHARS && span.end <= hexEnd) return true;
+  return !findPIISpans(withoutTokens(text.slice(span.start, span.end))).some(other => other.type === span.type);
 }
 
 /** Offsets refer to the original text. No matched values are returned or logged. */
@@ -78,7 +92,7 @@ export function detectProtectedText(text: string): readonly ProtectedDataSpan[] 
   // Noise and token hex are rejected inside the scan, so a dropped span cannot hide an overlapping match
   // ("12:34:56.78.90.12").
   const tokens = tokenRanges(text);
-  const spans = findPIISpans(text, span => isNoise(text, span) || inToken(tokens, span));
+  const spans = findPIISpans(text, span => isNoise(text, span) || shieldedByToken(text, tokens, span));
   return Object.freeze(spans.map(span => Object.freeze({
     start: span.start, end: span.end, dataClass: dataClass(span.type), detector: span.type
   })));

@@ -12,6 +12,14 @@ import type { ProtectedDataClass } from "../vault/dataClassification.js";
 /** Matches one token. The class list is closed and fixed-length hex follows, so the pattern cannot backtrack. */
 export const TOKEN_PATTERN_SOURCE = String.raw`\[\[amc:(?:phi|pii|card_number|bank_account|credential):[0-9a-f]{16}\]\]`;
 
+/**
+ * Whether a whole token-shaped string counts as a token, shielding its text from detection and re-tokenization: only
+ * when its 16 hex characters include a letter. All-decimal hex could be a raw card or account number written in token
+ * brackets, so it stays text. A real token's hex is all-decimal and Luhn-valid about 5e-5 of the time; it is then
+ * tokenized again, which over-redacts and is safe.
+ */
+export const isShieldingToken = (token: string): boolean => /[a-f]/.test(token.slice(-18, -2));
+
 const refusalReasons = ["vault_unavailable", "vault_integrity", "token_collision", "detector_invalid", "content_not_text",
   "attachment_not_redactable", "declared_fields_unparseable", "declared_fields_unverifiable", "receipt_failed",
   "redaction_failed"] as const;
