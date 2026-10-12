@@ -149,12 +149,20 @@ export function claudeCodeRefusal(cwd: string, workspace: string, toolName: stri
   if (toolName === "WebFetch" && !canonicalUrl(input.url)) {
     return "AMC accepts a WebFetch URL only in its canonical form (as the URL parser writes it), so AMC denied the call.";
   }
+  // AMC's own state (its hook lease, ledger and keys) is neither read nor written from a governed session.
+  const insideAmc = (location: string | null) => {
+    const rel = location === null ? ".." : relative(join(resolve(workspace), ".amc"), location);
+    return !(rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel));
+  };
+  const namesAmc = (glob: unknown) => typeof glob === "string" && glob.split("/").some((part) => part.toLowerCase() === ".amc");
+  if (toolName === "Read" && insideAmc(claudeFileLocation(input.file_path, workspace))) return "AMC protects its hook configuration.";
+  if ((toolName === "Glob" || toolName === "Grep") && (insideAmc(claudeFileLocation(input.path ?? cwd, workspace))
+    || namesAmc(toolName === "Glob" ? input.pattern : input.glob))) return "AMC protects its hook configuration.";
   if (toolName !== "Write" && toolName !== "Edit") return null;
   const location = claudeFileLocation(input.file_path, workspace);
   if (location === null) return null;
-  const amc = relative(join(resolve(workspace), ".amc"), location);
   const settings = basename(dirname(location)).toLowerCase() === ".claude" && /^settings(\..*)?\.json$/i.test(basename(location));
-  return settings || !(amc === ".." || amc.startsWith(`..${sep}`) || isAbsolute(amc)) ? "AMC protects its hook configuration." : null;
+  return settings || insideAmc(location) ? "AMC protects its hook configuration." : null;
 }
 
 export const claudeCodeInstallSchema = z.strictObject({ binaryPath: z.string().min(1), version: z.string().min(1), sha256: z.string().regex(/^[a-f0-9]{64}$/) });

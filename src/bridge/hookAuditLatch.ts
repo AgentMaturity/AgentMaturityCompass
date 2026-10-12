@@ -53,6 +53,7 @@ const entrySchema = z.strictObject({ type: z.literal("amc.hook-audit-latch"), ve
   latchedAt: z.iso.datetime(), reason: z.string().max(1_024) });
 type Entry = z.infer<typeof entrySchema>;
 export type HookAuditLatchState = { latched: false } | { latched: true; reason: string; latchedAt: string | null };
+const MEMORY_MAX = 1_024;
 const memory = new Map<string, Entry>();
 const fileOf = (scope: string) => `${DIR_REL}/${scope}.json`;
 
@@ -92,7 +93,8 @@ export function persistHookAuditLatch(entry: Entry): void {
 export function tripHookAuditLatch(workspace: string, fault: HookWriterFault): void {
   const scope = workspaceScope(workspace);
   const entry: Entry = { type: "amc.hook-audit-latch", version: 1, workspaceScope: scope, latchedAt: new Date().toISOString(), reason: fault.message.slice(0, 1_024) };
-  if (!memory.has(scope)) memory.set(scope, entry);
+  // Bounded: past MEMORY_MAX latched workspaces, the latch file alone holds a new one.
+  if (!memory.has(scope) && memory.size < MEMORY_MAX) memory.set(scope, entry);
   try {
     persistHookAuditLatch(entry);
   } catch (error) {

@@ -33,18 +33,13 @@ import { claudeCodeSessionRegistration } from "./claudeCodeSessionRegistry.js";
 import type { HookLease } from "./hookAuthorization.js";
 import { deterministicEventId as decisionEventId } from "./hookControl.js";
 import { writerFault } from "./hookAuditLatch.js";
+import { IntakeCounters, OBSERVATION_LIMITS, shedDigest, type IntakeLevel, type IntakeScope, type IntakeShed } from "./hookIntake.js";
 import { HookControlError } from "./hookProviders.js";
 
 const MAX_BODY_BYTES = 262_144;
-const INTAKE_PER_MINUTE = 120;
-const WINDOW_MS = 60_000;
-const SUMMARY_IDS = 500;
 type Ledger = ReturnType<typeof openLedger>;
-interface Shed { since: number; count: number; toolUseIds: string[]; actionIds: string[] }
-interface Intake { times: number[]; shed: Shed | null; backpressure: boolean }
-// ponytail: an in-memory window per Bridge process; a restart resets it (summary rows already written stay).
-const intake = new Map<string, Intake>();
-const intakeKey = (workspace: string, agentId: string, sessionSha256: string | null) => `${resolve(workspace)}\0${agentId}\0${sessionSha256 ?? "unregistered"}`;
+// ponytail: in-memory counters per Bridge process (bounded, hookIntake.ts); a restart resets them, summary rows already written stay.
+const observationCounters = new IntakeCounters(OBSERVATION_LIMITS);
 
 /** Whether Claude Code session `sessionId` has a verified registration: only then can a fault of its writer latch. */
 export function sessionRegistered(workspace: string, agentId: string, sessionId: string): boolean {
@@ -56,67 +51,53 @@ export function sessionRegistered(workspace: string, agentId: string, sessionId:
   }
 }
 
-/** One signed row listing what a registration's intake could not record since its last row; those calls never read as fully evidenced. */
-function writeIntakeSummary(input: { workspace: string; agentId: string; sessionSha256: string; registered: boolean; shed: Shed; now: number }): void {
-  const body = { kind: "amc.claude-code-intake-summary/v1", agentId: input.agentId, sessionSha256: input.sessionSha256, registered: input.registered,
-    reason: "observation not recorded (rate-limited)", window: { from: new Date(input.shed.since).toISOString(), to: new Date(input.now).toISOString() },
-    count: input.shed.count, toolUseIds: input.shed.toolUseIds, actionIds: input.shed.actionIds };
-  recordHookAudit({ workspace: input.workspace, now: input.now, sessionSha256: input.sessionSha256, body, meta: { intakeSummarySchemaVersion: 1, ...body },
-    id: observationId("ccintake", [input.agentId, input.sessionSha256, undefined], input.now), underRegistration: input.registered,
-    receipt: { kind: "guard_check", providerId: "hook-intake:claude-code" } });
+/** The intake scope of an observation or decision: its workspace, the lease it came with, and its session (unregistered ones share one). */
+function intakeScope(input: { workspace: string; agentId: string; leaseId: string | undefined; sessionId: string; registered: boolean }): IntakeScope {
+  return { workspace: resolve(input.workspace), lease: `${input.agentId}\0${input.leaseId ?? "no-lease"}`,
+    session: input.registered ? claudeSessionSha256(input.sessionId) : `unregistered\0${input.agentId}` };
+}
+
+/** The writer of signed intake summary rows for one scope: what was refused, at which cap, and the digest of the ids it lists. */
+function summaryWriter(input: { workspace: string; agentId: string; sessionSha256: string; leaseId: string | undefined; registered: boolean; now: number }) {
+  return (shed: IntakeShed, level: IntakeLevel): void => {
+    const body = { kind: "amc.claude-code-intake-summary/v1", agentId: input.agentId, sessionSha256: input.sessionSha256, leaseId: input.leaseId ?? null,
+      registered: input.registered, cap: level, reason: "observation not recorded (rate-limited)",
+      window: { from: new Date(shed.since).toISOString(), to: new Date(input.now).toISOString() }, count: shed.count,
+      toolUseIds: shed.toolUseIds, actionIds: shed.actionIds, idsSha256: shedDigest(shed) };
+    recordHookAudit({ workspace: input.workspace, now: input.now, sessionSha256: input.sessionSha256, body, meta: { intakeSummarySchemaVersion: 1, ...body },
+      id: observationId("ccintake", [input.agentId, input.sessionSha256, undefined], input.now), underRegistration: input.registered,
+      receipt: { kind: "guard_check", providerId: "hook-intake:claude-code" } });
+  };
 }
 
 /**
- * Admit one after-the-fact observation (Stop, PostToolUse, PostToolUseFailure) of session `sessionId`, within its
- * registration's per-minute cap (unregistered sessions share one). Over the cap it is refused (429), never silently: the
- * first refusal of an episode, and every SUMMARY_IDS more, are written at once as a signed summary row; the rest when the
- * registration next decides or its intake recovers. Until then its PreToolUse decisions are denied (intakeBackpressure).
+ * Admit one after-the-fact observation (Stop, PostToolUse, PostToolUseFailure) of session `sessionId` within the caps of
+ * its session, its lease and its workspace (hookIntake.ts). Over a cap it is refused (429), never silently: it is listed
+ * in a signed intake summary row, and decisions under the capped scope are denied until its window passes.
  */
-export function admitObservation(input: { workspace: string; agentId: string; sessionId: string; now: number; toolUseId?: string }): { registered: boolean } {
+export function admitObservation(input: { workspace: string; agentId: string; sessionId: string; leaseId: string | undefined; now: number;
+  toolUseId?: string }): { registered: boolean } {
   const registered = sessionRegistered(input.workspace, input.agentId, input.sessionId);
-  const sessionSha256 = claudeSessionSha256(input.sessionId);
-  const key = intakeKey(input.workspace, input.agentId, registered ? sessionSha256 : null);
-  const current = intake.get(key) ?? { times: [], shed: null, backpressure: false };
-  const times = current.times.filter((ts) => input.now - ts < WINDOW_MS);
-  const summary = { workspace: input.workspace, agentId: input.agentId, sessionSha256, registered, now: input.now };
-  if (times.length >= INTAKE_PER_MINUTE) {
-    const ids = input.toolUseId ? { toolUseIds: [input.toolUseId], actionIds: [claudeActionId(input.sessionId, input.toolUseId)] } : { toolUseIds: [], actionIds: [] };
-    const shed = { since: current.shed?.since ?? input.now, count: (current.shed?.count ?? 0) + 1,
-      toolUseIds: [...(current.shed?.toolUseIds ?? []), ...ids.toolUseIds], actionIds: [...(current.shed?.actionIds ?? []), ...ids.actionIds] };
-    intake.set(key, { times, shed, backpressure: true });
-    if (current.shed === null || shed.toolUseIds.length >= SUMMARY_IDS) {
-      writeIntakeSummary({ ...summary, shed });
-      intake.set(key, { times, shed: null, backpressure: true });
-    }
-    throw new HookControlError("HOOK_CONTROL_RATE_LIMITED", 429, "this Claude Code session's observations are over AMC's intake limit: AMC lists this one "
-      + "in a signed intake summary as not recorded and denies the session's calls until its intake recovers");
+  const write = summaryWriter({ ...input, sessionSha256: claudeSessionSha256(input.sessionId), registered });
+  const refused = observationCounters.admit(intakeScope({ ...input, registered }), input.now, write,
+    input.toolUseId ? { toolUseId: input.toolUseId, actionId: claudeActionId(input.sessionId, input.toolUseId) } : undefined);
+  if (refused !== null) {
+    throw new HookControlError("HOOK_CONTROL_RATE_LIMITED", 429, `Claude Code observations are over AMC's ${refused} intake limit: AMC lists this one `
+      + "in a signed intake summary as not recorded and denies the calls under that limit until it recovers");
   }
-  if (current.shed) writeIntakeSummary({ ...summary, shed: current.shed });
-  if (intake.size > 10_000) for (const [stale, state] of intake) if (!state.shed && state.times.every((ts) => input.now - ts >= WINDOW_MS)) intake.delete(stale);
-  intake.set(key, { times: [...times, input.now], shed: null, backpressure: false });
   return { registered };
 }
 
 /**
- * Why registered session `sessionId`'s PreToolUse decision is denied: its intake refused observations and has not
- * recovered. What it refused since the last summary row is written first. Decision rows themselves are never capped.
+ * Why registered session `sessionId`'s PreToolUse decision is denied: its session, its lease or its workspace refused
+ * observations and has not recovered. What was refused since the last summary row is written first. Decision rows
+ * themselves are never capped.
  */
-export function intakeBackpressure(input: { workspace: string; agentId: string; sessionId: string; now: number }): string | null {
-  const sessionSha256 = claudeSessionSha256(input.sessionId);
-  const key = intakeKey(input.workspace, input.agentId, sessionSha256);
-  const current = intake.get(key);
-  if (!current?.backpressure) return null;
-  if (current.shed) {
-    writeIntakeSummary({ workspace: input.workspace, agentId: input.agentId, sessionSha256, registered: true, shed: current.shed, now: input.now });
-    intake.set(key, { ...current, shed: null });
-  }
-  const times = current.times.filter((ts) => input.now - ts < WINDOW_MS);
-  if (times.length < INTAKE_PER_MINUTE) {
-    intake.set(key, { times, shed: null, backpressure: false });
-    return null;
-  }
-  return "This Claude Code session's observations are over AMC's intake limit, and AMC listed those it could not record in a signed summary; "
-    + "AMC denies the session's calls until its intake recovers.";
+export function intakeBackpressure(input: { workspace: string; agentId: string; sessionId: string; leaseId: string | undefined; now: number }): string | null {
+  const write = summaryWriter({ ...input, sessionSha256: claudeSessionSha256(input.sessionId), registered: true });
+  const levels = observationCounters.backpressure(intakeScope({ ...input, registered: true }), input.now, write);
+  return levels.length === 0 ? null : `Claude Code observations are over AMC's ${levels.join(" and ")} intake limit, and AMC listed those it could not `
+    + "record in a signed summary; AMC denies these calls until intake recovers.";
 }
 
 export interface HookObservationResult {
@@ -194,10 +175,12 @@ export function observationId(prefix: string, parts: readonly unknown[], now: nu
 }
 
 /** Record the end of one Claude Code turn. Observed only. */
-export function recordClaudeCodeStop(input: { workspace: string; authenticatedAgentId: string; rawInput: string; now?: number }): HookObservationResult {
+export function recordClaudeCodeStop(input: { workspace: string; authenticatedAgentId: string; rawInput: string; lease?: HookLease; now?: number }):
+  HookObservationResult {
   const parsed = parse(stopSchema, input.rawInput, "Claude Code Stop");
   const now = input.now ?? Date.now();
-  const { registered } = admitObservation({ workspace: input.workspace, agentId: input.authenticatedAgentId, sessionId: parsed.session_id, now });
+  const { registered } = admitObservation({ workspace: input.workspace, agentId: input.authenticatedAgentId, sessionId: parsed.session_id,
+    leaseId: input.lease?.leaseId, now });
   const sessionSha256 = claudeSessionSha256(parsed.session_id);
   const record = { kind: "amc.claude-code-turn-end/v1", agentId: input.authenticatedAgentId, sessionSha256, reported: { by: "claude-code",
     promptId: parsed.prompt_id ?? null, stopHookActive: parsed.stop_hook_active } };
@@ -248,7 +231,8 @@ export function recordClaudeCodePostExecution(input: { workspace: string; authen
   const now = input.now ?? Date.now();
   const sessionSha256 = claudeSessionSha256(parsed.session_id);
   const actionId = claudeActionId(parsed.session_id, parsed.tool_use_id);
-  const { registered } = admitObservation({ workspace: input.workspace, agentId: input.authenticatedAgentId, sessionId: parsed.session_id, now,
+  const { registered } = admitObservation({ workspace: input.workspace, agentId: input.authenticatedAgentId, sessionId: parsed.session_id,
+    leaseId: input.lease?.leaseId, now,
     toolUseId: parsed.tool_use_id });
   const ledger = openLedger(input.workspace);
   let decision: ReturnType<typeof verifiedDecision>;

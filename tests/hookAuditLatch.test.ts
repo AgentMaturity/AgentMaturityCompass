@@ -176,7 +176,7 @@ describe("only AMC's own writer, under a verified registration, can trip it; inp
     const session = sessionOf(workspace);
     expect(send(workspace, "{not json")).toThrowError(expect.objectContaining({ statusCode: 400 }));
     expect(send(workspace, { ...stop(session), stop_hook_active: "no" })).toThrowError(expect.objectContaining({ statusCode: 400 }));
-    expect(send(workspace, { ...stop(session), prompt_id: "p".repeat(300_000) })).toThrowError(expect.objectContaining({ statusCode: 400 }));
+    expect(send(workspace, { ...stop(session), prompt_id: "p".repeat(300_000) })).toThrowError(expect.objectContaining({ statusCode: 413 }));
     const once = { ...stop(session), prompt_id: "prompt-once" };
     send(workspace, once)();
     expect(send(workspace, once)).toThrowError(expect.objectContaining({ statusCode: 409 }));

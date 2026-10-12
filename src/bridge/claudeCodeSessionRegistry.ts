@@ -10,8 +10,9 @@
  * A session without a registration under the current installation is not governed: its tool calls are denied and
  * nothing reads "enforced" for it. AMC cannot see a session in which Claude Code ran none of its hooks.
  */
+import { randomUUID } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { isAbsolute, join } from "node:path";
+import { isAbsolute, join, resolve } from "node:path";
 import { z } from "zod";
 import {
   CLAUDE_MANAGED_SETTINGS_DIRS, claudeCodeBindingSchema, claudeSessionSha256, processExecutable, QUALIFIED_CLAUDE_CODE_VERSIONS,
@@ -25,6 +26,7 @@ import { verifyReceipt } from "../receipts/receipt.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { writerFault } from "./hookAuditLatch.js";
+import { IntakeCounters, REGISTRATION_LIMITS } from "./hookIntake.js";
 import { HookControlError } from "./hookProviders.js";
 
 export const CLAUDE_NOT_GOVERNED_NOTE = "AMC cannot see Claude Code sessions that ran none of AMC's hooks; they are reported as not governed.";
@@ -77,8 +79,12 @@ type LedgerHandle = ReturnType<typeof openLedger>;
 
 const invalid = (message: string) => new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, message);
 const manifestPath = (workspace: string) => join(workspace, ".amc", "hooks", "claude-code.json");
-const eventIdFor = (agentId: string, sessionId: string, manifestSha256: string) =>
+/** Every registration row of one session under one installation starts with this; the newest one is the session's active registration. */
+const prefixFor = (agentId: string, sessionId: string, manifestSha256: string) =>
   `cc_registration_${sha256Hex(canonicalize({ agentId, session: claudeSessionSha256(sessionId), manifest: manifestSha256 })).slice(0, 44)}`;
+const PREFIX_LENGTH = "cc_registration_".length + 44;
+// ponytail: in-memory per Bridge process (bounded, hookIntake.ts); a restart resets the window.
+const registrationCounters = new IntakeCounters(REGISTRATION_LIMITS);
 const bodySha256 = (record: ClaudeCodeRegistrationRecord) => sha256Hex(Buffer.from(canonicalize(record), "utf8"));
 const bindings = (manifest: Manifest): ClaudeHookBinding[] => manifest.handlers.map(({ eventName, handlerSha256 }) => ({ eventName, handlerSha256 }));
 const defaultManagedDir = () => CLAUDE_MANAGED_SETTINGS_DIRS[process.platform] ?? null;
@@ -133,8 +139,16 @@ function verifiedRegistration(ledger: LedgerHandle, eventId: string, agentId: st
   return { status: "invalid", reason: "the Claude Code session registration failed verification" };
 }
 
+/** The newest registration row of one session (ids `<prefix>_<suffix>`, read by primary-key range), verified, with its id. */
+function latestRegistration(ledger: LedgerHandle, prefix: string, agentId: string): ClaudeCodeRegistration & { eventId: string | null } {
+  const row = ledger.db.prepare("SELECT id FROM evidence_events WHERE id > ? AND id < ? ORDER BY ts DESC, rowid DESC LIMIT 1")
+    .get(`${prefix}_`, `${prefix}\``) as { id: string } | undefined;
+  return row ? { ...verifiedRegistration(ledger, row.id, agentId), eventId: row.id } : { status: "missing", eventId: null };
+}
+
 /**
- * The verified registration of Claude Code session `sessionId` for `agentId` under the current installation. Every
+ * The verified registration of Claude Code session `sessionId` for `agentId` under the current installation: the
+ * newest one recorded for the session, which supersedes and closes any earlier one. Every
  * call rechecks the disk: AMC's forwarder, the bound Claude Code and the settings Claude Code merges must still be what
  * the session registered, or the session is not governed.
  */
@@ -145,7 +159,7 @@ export function claudeCodeSessionRegistration(ledger: LedgerHandle, agentId: str
   const bytes = readFileSync(path);
   const manifest = parseManifest(bytes);
   if (!manifest) return { status: "missing" };
-  const found = verifiedRegistration(ledger, eventIdFor(agentId, sessionId, manifest.manifestSha256), agentId);
+  const { eventId: _eventId, ...found } = latestRegistration(ledger, prefixFor(agentId, sessionId, manifest.manifestSha256), agentId);
   if (found.status !== "registered") return found;
   const drift = bindingDrift(manifest.claudeCode);
   if (drift || found.record.forwarderSha256 !== manifest.claudeCode.forwarder.sha256) {
@@ -155,9 +169,9 @@ export function claudeCodeSessionRegistration(ledger: LedgerHandle, agentId: str
   return scan.problem ? { status: "invalid", reason: `${scan.problem}, after this session registered` } : found;
 }
 
-/** Record (or replay) the registration of one Claude Code session. A different registration of a recorded session conflicts. */
+/** Record (or replay) the registration of one Claude Code session. A different registration of a recorded session supersedes it. */
 export function registerClaudeCodeSession(input: { workspace: string; authenticatedAgentId: string; rawInput: string; now?: number;
-  managedDir?: string | null }): ClaudeCodeRegistrationResult {
+  managedDir?: string | null; lease?: { leaseId: string } }): ClaudeCodeRegistrationResult {
   if (Buffer.byteLength(input.rawInput, "utf8") > MAX_BODY_BYTES) throw invalid("Claude Code session registration is too large");
   let parsed: z.infer<typeof registrationInputSchema>;
   try {
@@ -186,24 +200,28 @@ export function registerClaudeCodeSession(input: { workspace: string; authentica
     claudeCodeSha256: install.sha256, forwarderSha256: manifest.claudeCode.forwarder.sha256, manifestSha256: manifest.manifestSha256, userSettingsPath,
     qualified: QUALIFIED_CLAUDE_CODE_VERSIONS.includes(install.version),
   };
-  const eventId = eventIdFor(input.authenticatedAgentId, parsed.session_id, manifest.manifestSha256);
+  const prefix = prefixFor(input.authenticatedAgentId, parsed.session_id, manifest.manifestSha256);
+  const now = input.now ?? Date.now();
   const ledger = openLedger(input.workspace);
   try {
-    const existing = verifiedRegistration(ledger, eventId, input.authenticatedAgentId);
+    const existing = latestRegistration(ledger, prefix, input.authenticatedAgentId);
     if (existing.status === "invalid") throw new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, existing.reason);
-    if (existing.status === "registered") {
-      if (canonicalize(existing.record) !== canonicalize(record)) {
-        throw new HookControlError("HOOK_CONTROL_REPLAY_CONFLICT", 409, "this Claude Code session is already registered differently");
-      }
-      const meta = JSON.parse((ledger.db.prepare("SELECT meta_json FROM evidence_events WHERE id = ?").get(eventId) as { meta_json: string }).meta_json) as
+    if (existing.status === "registered" && existing.eventId && canonicalize(existing.record) === canonicalize(record)) {
+      const meta = JSON.parse((ledger.db.prepare("SELECT meta_json FROM evidence_events WHERE id = ?").get(existing.eventId) as { meta_json: string }).meta_json) as
         { receipt_id: string };
-      return { registered: true, idempotentReplay: true, provider: "claude-code", record, eventId, receiptId: meta.receipt_id };
+      return { registered: true, idempotentReplay: true, provider: "claude-code", record, eventId: existing.eventId, receiptId: meta.receipt_id };
     }
+    // A new registration, or one that supersedes the session's earlier one: counted per lease and per workspace, never per
+    // registration, so churning registrations cannot reset the count. Intake counters are kept by session and lease.
+    const refused = registrationCounters.admit({ workspace: resolve(input.workspace), lease: `${input.authenticatedAgentId}\0${input.lease?.leaseId ?? "no-lease"}`,
+      session: prefix }, now);
+    if (refused !== null) throw new HookControlError("HOOK_CONTROL_RATE_LIMITED", 429, `Claude Code session registrations are over AMC's ${refused} limit; AMC refused this one`);
+    const eventId = `${prefix}_${sha256Hex(`${canonicalize(record)}\0${now}\0${randomUUID()}`).slice(0, 16)}`;
     const sessionId = `cc-registration-session-${sha256Hex(eventId).slice(0, 36)}`;
     try {
       ledger.startSession({ sessionId, runtime: "claude", binaryPath: "amc-bridge-claude-registration", binarySha256: hashBinaryOrPath("amc-bridge-claude-registration", "1") });
       const appended = ledger.appendEvidenceWithReceipt({
-        id: eventId, ts: input.now ?? Date.now(), sessionId, runtime: "claude", eventType: "audit",
+        id: eventId, ts: now, sessionId, runtime: "claude", eventType: "audit",
         payload: `${JSON.stringify({ record, hookSettingsSha256: scan.digest, managedDelivery: scan.managedDelivery }, null, 2)}\n`, payloadExt: "json", inline: false,
         meta: { trustTier: "OBSERVED", registrationSchemaVersion: 1, agentId: input.authenticatedAgentId, provider: "claude-code", registration: record,
           hookSettingsSha256: scan.digest, managedDelivery: scan.managedDelivery, bodySha256: bodySha256(record) },
@@ -238,8 +256,10 @@ export function claudeCodeGovernance(workspace: string, agentId: string): Claude
   const manifestSha256 = cachedFileSha256(manifestPath(workspace));
   const ledger = openLedger(workspace);
   try {
-    const rows = ledger.db.prepare("SELECT id, ts, meta_json FROM evidence_events WHERE event_type = 'audit' AND id LIKE 'cc_registration_%' ORDER BY ts ASC")
+    const all = ledger.db.prepare("SELECT id, ts, meta_json FROM evidence_events WHERE event_type = 'audit' AND id LIKE 'cc_registration_%' ORDER BY ts ASC, rowid ASC")
       .all() as Array<{ id: string; ts: number; meta_json: string }>;
+    // Only each session's newest registration counts: it supersedes the earlier ones.
+    const rows = [...new Map(all.map((row) => [row.id.slice(0, PREFIX_LENGTH), row])).values()];
     let registered = 0, qualified = 0, invalidCount = 0, latest: number | null = null;
     for (const row of rows) {
       // Other agents' rows are skipped; an edited agent field can only hide a registration, which lowers the claim.

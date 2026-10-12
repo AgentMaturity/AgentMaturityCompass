@@ -319,13 +319,27 @@ export function failClosedProviderControlResponse(
   return renderProviderControlResponse(provider, "deny" satisfies HookControlDecision, reason);
 }
 
-/** The hook payload's bytes exactly as received; Claude Code control decides on these bytes. */
-export async function readStdinAll(): Promise<Buffer> {
-  return new Promise((resolve) => {
+/** The most hook payload bytes the forwarder reads: no larger body could reach the Bridge's control route anyway. */
+const MAX_STDIN_BYTES = 262_144;
+
+/** The hook payload's bytes exactly as received (Claude Code control decides on these bytes), refused past the cap before more is buffered. */
+export async function readStdinAll(input: NodeJS.ReadableStream & { isTTY?: boolean } = stdin, maxBytes = MAX_STDIN_BYTES): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
-    stdin.on("data", (chunk: Buffer) => { chunks.push(Buffer.from(chunk)); });
-    stdin.on("end", () => resolve(Buffer.concat(chunks)));
-    if (stdin.isTTY) resolve(Buffer.alloc(0));
+    let total = 0;
+    input.on("data", (chunk: Buffer) => {
+      total += chunk.length;
+      if (total > maxBytes) {
+        input.removeAllListeners("data");
+        (input as { destroy?: () => void }).destroy?.();
+        reject(new Error(`the hook payload is too large (over ${maxBytes} bytes)`));
+        return;
+      }
+      chunks.push(Buffer.from(chunk));
+    });
+    input.on("end", () => resolve(Buffer.concat(chunks)));
+    input.on("error", reject);
+    if (input.isTTY) resolve(Buffer.alloc(0));
   });
 }
 
@@ -553,7 +567,7 @@ async function main(): Promise<void> {
     process.exitCode = 2;
     return;
   }
-  const outcome = await runHookForward(opts, readStdinAll);
+  const outcome = await runHookForward(opts, () => readStdinAll());
   stdin.destroy();
   if (outcome.stderr) process.stderr.write(outcome.stderr);
   process.stdout.write(outcome.stdout);

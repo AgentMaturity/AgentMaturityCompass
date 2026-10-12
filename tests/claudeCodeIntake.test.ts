@@ -6,10 +6,13 @@
  * denied. Decision rows themselves are never capped, and one registration's flood never touches another's.
  */
 import { join } from "node:path";
+import { Readable } from "node:stream";
 import { afterEach, describe, expect, test } from "vitest";
+import { readStdinAll } from "../src/adapters/hookForwarder.js";
 import { claudeActionId } from "../src/adapters/hookProviders/claudeCode.js";
 import { clearPiDigestCache } from "../src/adapters/pi/piInstall.js";
 import { handleHookControlRequest } from "../src/bridge/hookControlRoute.js";
+import { claudeCodeGovernance, claudeCodeSessionRegistration } from "../src/bridge/claudeCodeSessionRegistry.js";
 import { openLedger, verifyEvidenceEventIntegrity } from "../src/ledger/ledger.js";
 import { inspectHookActionLifecycle } from "../src/watch/hookActionLifecycle.js";
 import { agentId, claudeWorkspace, controlRequest, decide, lease, recorded, register } from "./helpers/claudeCodeHookFixtures.js";
@@ -100,4 +103,64 @@ describe("the intake cap never hides a session's actions", () => {
     expect(observe(workspace, post(workspace, other, call.toolUseId, decision.receiptSha256), now)()).toMatchObject({ recorded: true });
     expect(inspectHookActionLifecycle({ workspace, agentId, actionId: claudeActionId(other, call.toolUseId) }).observationNotRecorded).toBeNull();
   });
+});
+
+describe("registrations and payloads cannot defeat the caps", () => {
+  test("one lease cannot create registrations past its cap; a re-registration of the same session is not counted", () => {
+    const workspace = claudeWorkspace();
+    const session = String(recorded("SessionStart-startup", workspace).session_id);
+    let refused = 0;
+    for (let i = 0; i < 35; i += 1) {
+      try {
+        register(workspace, `churned-session-${i}`);
+      } catch (error) {
+        expect(error).toMatchObject({ statusCode: 429 });
+        refused += 1;
+      }
+    }
+    // claudeWorkspace() registered one session already: 30 per lease per minute in all.
+    expect(refused).toBe(35 - 29);
+    expect(register(workspace, session)).toMatchObject({ registered: true, idempotentReplay: true });
+  });
+
+  test("a new registration of a session supersedes the old one", () => {
+    const workspace = claudeWorkspace();
+    const session = String(recorded("SessionStart-startup", workspace).session_id);
+    const moved = join(workspace, ".fixture-home", "other-config");
+    expect(register(workspace, session, moved)).toMatchObject({ registered: true, idempotentReplay: false });
+    const ledger = openLedger(workspace);
+    try {
+      const found = claudeCodeSessionRegistration(ledger, agentId, session);
+      expect(found.status === "registered" && found.record.userSettingsPath).toBe(join(moved, "settings.json"));
+    } finally {
+      ledger.close();
+    }
+    expect(claudeCodeGovernance(workspace, agentId).registeredSessions).toBe(1);
+    expect(decide(workspace, readCall(workspace, session).raw).decision).toBe("allow");
+  });
+
+  test("an oversized body is refused before it is parsed, at the route and in the forwarder", async () => {
+    const workspace = claudeWorkspace();
+    // Repeated keys would be refused as ambiguous (400) by a parse; the size cap answers first.
+    const huge = `{${Array.from({ length: 30_000 }, (_, i) => `"k":${i}`).join(",")}}`;
+    expect(() => handleHookControlRequest({ workspace, authenticatedAgentId: agentId, provider: "claude-code", lease, rawInput: huge }))
+      .toThrowError(expect.objectContaining({ statusCode: 413 }));
+    let pushed = 0;
+    const endless = Readable.from((function* () { for (;;) { pushed += 1; yield Buffer.alloc(65_536, 0x20); } })());
+    await expect(readStdinAll(endless)).rejects.toThrow(/too large/);
+    expect(pushed).toBeLessThan(10);
+  });
+});
+
+test("Claude Code cannot read AMC's own state, its hook lease included", () => {
+  const workspace = claudeWorkspace();
+  const session = String(recorded("SessionStart-startup", workspace).session_id);
+  const cwd = String(recorded("PreToolUse-read", workspace).cwd);
+  for (const [tool, input] of [["Read", { file_path: join(cwd, ".amc", "hooks", "claude-code.lease") }], ["Grep", { pattern: "lease", path: join(cwd, ".amc") }],
+    ["Glob", { pattern: "**/*.lease", path: join(cwd, ".amc", "hooks") }]] as const) {
+    const decision = decide(workspace, controlRequest({ ...recorded("PreToolUse-read", workspace), session_id: session, tool_use_id: `toolu_amc_${tool}`,
+      tool_name: tool, tool_input: input }));
+    expect(decision.decision, tool).toBe("deny");
+    expect(decision.reason, tool).toContain("AMC protects its hook configuration");
+  }
 });

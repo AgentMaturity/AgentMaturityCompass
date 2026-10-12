@@ -1,4 +1,4 @@
-import { evaluateProviderHookControl, type ProviderHookControlResult } from "./hookControl.js";
+import { evaluateProviderHookControl, MAX_CONTROL_HOOK_BODY_BYTES, type ProviderHookControlResult } from "./hookControl.js";
 import { isPiSessionStart, registerPiSession, type PiSessionRegistrationResult } from "./piSessionRegistry.js";
 import { registerClaudeCodeSession, type ClaudeCodeRegistrationResult } from "./claudeCodeSessionRegistry.js";
 import { recordClaudeCodePostExecution, recordClaudeCodeStop, type HookObservationResult } from "./claudeCodeObservations.js";
@@ -34,6 +34,8 @@ export function handleHookControlRequest(input: Input):
 }
 
 function route(input: Input): ProviderHookControlResult | PiSessionRegistrationResult | ClaudeCodeRegistrationResult | HookObservationResult {
+  // The size cap comes before any parse.
+  if (Buffer.byteLength(input.rawInput, "utf8") > MAX_CONTROL_HOOK_BODY_BYTES) throw new HookControlError("HOOK_CONTROL_INPUT_TOO_LARGE", 413, "hook input is too large");
   if (input.provider === "pi" && isPiSessionStart(input.rawInput)) return registerPiSession(input);
   // A repeated key could be read one way by AMC and another by whoever sent it: refused for every Claude Code body.
   if (input.provider === "claude-code") assertUnambiguousJson(input.rawInput);

@@ -100,7 +100,7 @@ function registrationRefusal(found: ReturnType<typeof piSessionRegistration>, pi
 }
 
 /** A call's session registration: why it is not governed (or null), whether it is enforced, and the provider version it bound. */
-function governedSession(input: { ledger: Parameters<typeof piSessionRegistration>[0]; agentId: string; call: HookCall; now: number }):
+function governedSession(input: { ledger: Parameters<typeof piSessionRegistration>[0]; agentId: string; call: HookCall; now: number; leaseId?: string }):
   { refusal: string | null; enforced: boolean; version: string | null } {
   const { call } = input;
   if (call.pi) {
@@ -113,7 +113,8 @@ function governedSession(input: { ledger: Parameters<typeof piSessionRegistratio
   if (found.status === "invalid") return { refusal: `${found.reason}; this Claude Code session is not governed, so AMC denied the call.`, enforced: false, version: null };
   const version = found.record.claudeCodeVersion;
   if (!found.record.qualified) return { refusal: `AMC has not qualified Claude Code ${version}, so AMC denied the call.`, enforced: false, version };
-  const backpressure = intakeBackpressure({ workspace: input.ledger.workspace, agentId: input.agentId, sessionId: call.sessionId, now: input.now });
+  const backpressure = intakeBackpressure({ workspace: input.ledger.workspace, agentId: input.agentId, sessionId: call.sessionId, leaseId: input.leaseId,
+    now: input.now });
   if (backpressure) return { refusal: backpressure, enforced: true, version };
   // The request must match the registered release's own schemas, the mapped tool's input included.
   const mismatch = claudeRequestRefusal(version, call.request);
@@ -140,7 +141,7 @@ export function authorizeHookDecision<R extends { decision: string; reason: stri
 }): { requested: R; authorization: HookAuthorization | null; enforced: boolean; version: string | null } {
   const { call } = input;
   if (!call) return { requested: input.requested, authorization: null, enforced: false, version: null };
-  const { refusal, enforced, version } = governedSession({ ledger: input.ledger, agentId: input.agentId, call, now: input.now });
+  const { refusal, enforced, version } = governedSession({ ledger: input.ledger, agentId: input.agentId, call, now: input.now, leaseId: input.lease?.leaseId });
   if (refusal) return { requested: { ...input.requested, decision: "deny", reason: refusal }, authorization: null, enforced: false, version };
   const requested = input.requested;
   if (requested.decision !== "allow") return { requested, authorization: null, enforced, version };
