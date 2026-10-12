@@ -369,11 +369,11 @@ const AIBOM = Buffer.from(`${JSON.stringify({ bomFormat: "CycloneDX", specVersio
 const RUN = doc({ runId: "TEST ONLY run-42", agentId: "agent-payments" });
 const LEDGER_SLICE = Buffer.from("TEST ONLY ledger slice bytes (not a SQLite file)\n", "utf8");
 const DSSE_EVIDENCE = [AIBOM, RUN, LEDGER_SLICE];
-function dsseBundle({ signer = K.seal, payloadType = DSSE_TYPE } = {}) {
+function dsseBundle({ signer = K.seal, payloadType = DSSE_TYPE, claimKind = "observed" } = {}) {
   const statement = { _type: "https://in-toto.io/Statement/v1",
     subject: [{ name: "attestations/aibom.cdx.json", digest: { sha256: sha256(AIBOM) } }, { name: "run.json", digest: { sha256: sha256(RUN) } }],
     predicateType: "https://agentmaturity.co/attestations/control-results/v0.1",
-    predicate: { claimKind: "observed",
+    predicate: { claimKind,
       scope: { tenant: "tenant-a", deployment: "payments-prod", workspace: "ws-a", agent: "agent-payments", snapshot: sha256(RUN), profile: "finance-ops",
         profileVersion: "1.0.0", window: { start: T.windowStart, end: T.windowEnd }, exclusions: [] },
       controls: [{ controlId: "amc.diagnostic", dimensions: { result: "pass", applicability: { state: "applicable" }, evidence: "sufficient",
@@ -396,6 +396,8 @@ addCase("dsse-wrong-payload-type", "A correctly signed envelope whose payloadTyp
   { artifact: dsseBundle({ payloadType: "application/json" }), evidence: DSSE_EVIDENCE, verdict: "FNNNNN", codes: { integrity: ["UNSUPPORTED_VERSION"] } });
 addCase("dsse-unpinned-key", "The statement is signed by a key that no supplied trust list holds; the bundle's hint and the signature's keyid name that key. The keyid only selects among pinned keys, so the signature cannot be checked and the issuer is not admitted.",
   { artifact: dsseBundle({ signer: K.outsider }), evidence: DSSE_EVIDENCE, verdict: "NFNNNN", codes: { issuerAdmission: ["ISSUER_NOT_PINNED"] } });
+addCase("dsse-independent-claim-seal-key", "The statement claims independently_reviewed, but its signer is admitted only for artifact-seal. Only a key admitted for independent-attestation may state an independent review; a workspace seal key saying so must not pass.",
+  { artifact: dsseBundle({ claimKind: "independently_reviewed" }), evidence: DSSE_EVIDENCE, verdict: "PFNNNN", codes: { issuerAdmission: ["ISSUER_WRONG_PURPOSE"] } });
 addCase("dsse-expired", "The valid statement verified as of a time after its expiresAt. An expired statement must not pass as current.",
   { artifact: dsseBundle(), evidence: DSSE_EVIDENCE, params: { ...PARAMS, asOf: "2026-12-02T00:00:00.000Z" }, verdict: "PPPFPN", codes: { freshness: ["ATTESTATION_EXPIRED"] } });
 

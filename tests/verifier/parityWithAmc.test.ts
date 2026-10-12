@@ -199,7 +199,8 @@ describe("the package and AMC share their constants and their verify-level check
 
   test("a DSSE signature verifies for the package exactly when AMC's verifyDsse accepts it over the same PAE", () => {
     let compared = 0;
-    for (const name of caseNames().filter(item => item.startsWith("dsse-"))) {
+    const dsseCases = caseNames().filter(item => item.startsWith("dsse-"));
+    for (const name of dsseCases) {
       const { bytes, options } = loadCase(name);
       const bundle = JSON.parse(bytes.toString("utf8")) as { dsseEnvelope: { payload: string } };
       const twin = structuredClone(bundle);
@@ -214,7 +215,8 @@ describe("the package and AMC share their constants and their verify-level check
         compared += 1;
       }
     }
-    expect(compared).toBe(10);
+    expect(dsseCases.length).toBeGreaterThanOrEqual(5);
+    expect(compared).toBe(2 * dsseCases.length);
   });
 
   test("an external evidence signature verifies for the package exactly when it does for AMC", async () => {
