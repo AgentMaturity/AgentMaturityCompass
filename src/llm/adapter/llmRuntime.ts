@@ -62,7 +62,7 @@ import { BudgetEvidenceIntegrityError } from "../../budgets/nativeBudgetUsage.js
 import { bindProviderToolNames, usesProviderToolNames } from "../request/providerToolNames.js";
 import { ProviderToolBinding } from "./providerToolBinding.js";
 import { checkEgress, EgressBlocked } from "../../residency/checkEgress.js";
-import { detectProtectedRequest } from "../../dataflow/detectors.js";
+import { detectProtectedRequest, type ProtectedDataDetection } from "../../dataflow/detectors.js";
 import { admitProtectedModelRequest, DataFlowRefused } from "../../dataflow/purposePolicy.js";
 import { loadProcessorRegistrySnapshot } from "../../dataflow/processorRegistry.js";
 
@@ -227,7 +227,9 @@ export class LlmRuntime {
         // Opt-in: no .amc/dataflow/processors.yaml (and no .sig) means this workspace has not adopted protected-data admission.
         // The workspace is read per use and never fabricated: a session without one reads as an invalid registry, not a missing one.
         if (loadProcessorRegistrySnapshot(this.init.session.workspace).state === "missing") return;
-        const detection = detectProtectedRequest(request);
+        // A detector refusal (over-long leaf, excessive nesting, unsupported shape) is a typed refusal, not an untyped error.
+        let detection: ProtectedDataDetection;
+        try { detection = detectProtectedRequest(request); } catch { throw new DataFlowRefused("detector_invalid"); }
         if (detection.classes.length === 0) return;
         const admission = admitProtectedModelRequest(this.init.session.workspace, route.providerId, route.baseUrl, detection);
         const evidence = {
