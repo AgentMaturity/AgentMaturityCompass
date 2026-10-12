@@ -3,6 +3,7 @@ import { isPiSessionStart, registerPiSession, type PiSessionRegistrationResult }
 import { registerClaudeCodeSession, type ClaudeCodeRegistrationResult } from "./claudeCodeSessionRegistry.js";
 import { recordClaudeCodePostExecution, recordClaudeCodeStop, type HookObservationResult } from "./claudeCodeObservations.js";
 import { admitClaudeCodePrompt } from "./hookAdmission.js";
+import { assertUnambiguousJson } from "./hookProviders.js";
 
 type Input = Parameters<typeof evaluateProviderHookControl>[0];
 const CLAUDE_SESSION_EVENTS: Record<string, (input: Input) => ClaudeCodeRegistrationResult | HookObservationResult> = {
@@ -28,6 +29,8 @@ function eventName(rawInput: string): unknown {
 export function handleHookControlRequest(input: Input):
   ProviderHookControlResult | PiSessionRegistrationResult | ClaudeCodeRegistrationResult | HookObservationResult {
   if (input.provider === "pi" && isPiSessionStart(input.rawInput)) return registerPiSession(input);
+  // A repeated key could be read one way by AMC and another by whoever sent it: refused for every Claude Code body.
+  if (input.provider === "claude-code") assertUnambiguousJson(input.rawInput);
   const event = eventName(input.rawInput);
   const claudeSession = input.provider === "claude-code" && typeof event === "string" && Object.hasOwn(CLAUDE_SESSION_EVENTS, event)
     ? CLAUDE_SESSION_EVENTS[event] : undefined;

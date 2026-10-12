@@ -281,7 +281,7 @@ function managedPaths(workspaceInput: string, provider: ConfigHookProvider): Man
   };
 }
 
-function parseUnambiguousJson(text: string, kind: "config" | "input"): unknown {
+export function parseUnambiguousJson(text: string, kind: "config" | "input"): unknown {
   const bytes = Buffer.byteLength(text, "utf8");
   if (kind === "input" && bytes > MAX_PROVIDER_HOOK_INPUT_BYTES) {
     throw new HookIntegrationError("HOOK_INPUT_TOO_LARGE", "provider hook input exceeds 256 KiB");
@@ -1341,7 +1341,7 @@ export function authorizeForwardInvocation(input: {
   agentId: string;
   bridgeBase: string;
   tokenFile: string;
-}): { bridgeBase: string; tokenPath: string; token: string } {
+}): { bridgeBase: string; tokenPath: string; token: string; claudeCodeVersion: string | null } {
   const paths = managedPaths(input.workspace, input.provider);
   assertAllPathsSafe(input.workspace, Object.values(paths));
   const tokenPath = resolveTokenPath(input.workspace, input.tokenFile);
@@ -1379,6 +1379,8 @@ export function authorizeForwardInvocation(input: {
   return {
     bridgeBase: manifest.bridgeBase,
     tokenPath,
-    token: readFileSync(tokenPath, "utf8").trim()
+    token: readFileSync(tokenPath, "utf8").trim(),
+    // The Claude Code release this installation bound: its payload schemas are the only ones the forwarder accepts.
+    claudeCodeVersion: manifest.v === 2 ? manifest.claudeCode?.install?.version ?? null : null,
   };
 }

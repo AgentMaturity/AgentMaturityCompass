@@ -5,7 +5,6 @@
  * `AMC admission denied: <reason>`. AMC never receives or stores the prompt text: AMC's forwarder sends only its
  * length and SHA-256, and those are what the signed admission row records. Admission is not a claim about tool calls.
  */
-import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { z } from "zod";
 import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
@@ -14,9 +13,7 @@ import { verifyManagedLease } from "../adapters/managedHookLease.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
-import { sha256Hex } from "../utils/hash.js";
-import { canonicalize } from "../utils/json.js";
-import { recordHookAudit, type HookObservationResult } from "./claudeCodeObservations.js";
+import { observationId, recordHookAudit, type HookObservationResult } from "./claudeCodeObservations.js";
 import { HookControlError } from "./hookProviders.js";
 
 export type HookAdmission = { readonly admitted: true } | { readonly admitted: false; readonly reason: string };
@@ -48,6 +45,7 @@ export function checkHookAdmission(workspace: string, agentId: string, now: numb
 const promptSchema = z.strictObject({
   hook_event_name: z.literal("UserPromptSubmit"),
   session_id: z.string().min(1).max(256),
+  prompt_id: z.string().min(1).max(256).optional(),
   prompt: z.strictObject({ sha256: z.string().regex(/^[a-f0-9]{64}$/), length: z.number().int().nonnegative() }),
 });
 
@@ -62,10 +60,12 @@ export function admitClaudeCodePrompt(input: { workspace: string; authenticatedA
   }
   const now = input.now ?? Date.now();
   const admission = checkHookAdmission(input.workspace, input.authenticatedAgentId, now);
-  const record = { kind: "amc.claude-code-admission/v1", agentId: input.authenticatedAgentId, sessionSha256: claudeSessionSha256(parsed.session_id),
-    promptSha256: parsed.prompt.sha256, promptLength: parsed.prompt.length, admitted: admission.admitted,
-    reason: admission.admitted ? null : admission.reason, promptTextStored: false };
-  const recorded = recordHookAudit({ workspace: input.workspace, now, id: `ccadmit_${sha256Hex(`${canonicalize(record)}\0${now}\0${randomUUID()}`).slice(0, 44)}`,
+  const sessionSha256 = claudeSessionSha256(parsed.session_id);
+  // The prompt's digest and UTF-8 length are what AMC's forwarder reports from Claude Code's payload; the text never arrives.
+  const record = { kind: "amc.claude-code-admission/v1", agentId: input.authenticatedAgentId, sessionSha256, admitted: admission.admitted,
+    reason: admission.admitted ? null : admission.reason, promptTextStored: false,
+    reported: { by: "claude-code", promptId: parsed.prompt_id ?? null, promptSha256: parsed.prompt.sha256, promptLength: parsed.prompt.length } };
+  const recorded = recordHookAudit({ workspace: input.workspace, now, sessionSha256, id: observationId("ccadmit", [input.authenticatedAgentId, sessionSha256, parsed.prompt_id], now),
     meta: { admissionSchemaVersion: 1, ...record }, body: record, receipt: { kind: "guard_check", providerId: "hook-admission:claude-code" } });
   return { ...recorded, ...admission };
 }

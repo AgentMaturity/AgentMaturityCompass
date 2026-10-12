@@ -9,7 +9,8 @@ import { afterEach, describe, expect, test } from "vitest";
 import { authorizationRecordDigest } from "../src/actions/authorizationRecord.js";
 import { runHookForward } from "../src/adapters/hookForwarder.js";
 import { installHookIntegration } from "../src/adapters/hookIntegration.js";
-import { claudeActionId, claudeHookPayloadSchema, claudeSessionSha256 } from "../src/adapters/hookProviders/claudeCode.js";
+import { claudeActionId, claudeSessionSha256 } from "../src/adapters/hookProviders/claudeCode.js";
+import { claudeHookSchemasFor } from "../src/adapters/hookProviders/claudeCodePayloads.js";
 import { cachedFileSha256, clearPiDigestCache } from "../src/adapters/pi/piInstall.js";
 import { claudeCodeSessionRegistration } from "../src/bridge/claudeCodeSessionRegistry.js";
 import { verifyProviderHookControlResult } from "../src/bridge/hookControl.js";
@@ -66,8 +67,9 @@ describe("recorded Claude Code 2.1.296 payloads", () => {
     expect(fixtureNames()).toHaveLength(17);
     for (const name of fixtureNames()) {
       const payload = JSON.parse(readFileSync(join("tests", "fixtures", "harness-hooks", "claude-code", "2.1.296", name), "utf8")) as Record<string, unknown>;
-      expect(claudeHookPayloadSchema.safeParse(payload).success, name).toBe(true);
-      expect(claudeHookPayloadSchema.safeParse({ ...payload, unexpected_field: true }).success, name).toBe(false);
+      const schema = claudeHookSchemasFor("2.1.296")!.payload;
+      expect(schema.safeParse(payload).success, name).toBe(true);
+      expect(schema.safeParse({ ...payload, unexpected_field: true }).success, name).toBe(false);
     }
   });
 
@@ -160,7 +162,7 @@ describe("recorded Claude Code 2.1.296 payloads", () => {
     const settings = join(String(recorded("PreToolUse-read", tampered).cwd), ".claude", "settings.json");
     writeFileSync(settings, JSON.stringify({ hooks: { PreToolUse: [{ matcher: "*", hooks: [{ type: "command", command: "/bin/true" }] }] } }));
     expect(decide(tampered, controlRequest(recorded("PreToolUse-read", tampered))).reason)
-      .toContain("that is not AMC's can replace a tool's input after AMC allows it");
+      .toContain("that is not AMC's can change a tool's input or Bash environment after AMC allows it");
     expect(() => register(tampered, "another-session")).toThrowError(expect.objectContaining<Partial<HookControlError>>({ code: "HOOK_CONTROL_INPUT_INVALID" }));
     rmSync(settings);
 
@@ -210,7 +212,8 @@ describe("recorded Claude Code 2.1.296 payloads", () => {
     const registered = register(workspace, sessionId) as unknown as Record<string, unknown>;
     expect(registered).toMatchObject({ registered: true, idempotentReplay: false, record: { sessionSha256: claudeSessionSha256(sessionId), claudeCodeVersion: "2.1.296", qualified: true } });
     expect(register(workspace, sessionId)).toMatchObject({ idempotentReplay: true });
-    const stopped = route(workspace, { hook_event_name: "Stop", session_id: recorded("Stop-stop", workspace).session_id });
+    const stop = recorded("Stop-stop", workspace);
+    const stopped = route(workspace, { hook_event_name: "Stop", session_id: stop.session_id, prompt_id: stop.prompt_id, stop_hook_active: stop.stop_hook_active });
     expect(stopped).toMatchObject({ recorded: true, provider: "claude-code" });
     const ledger = openLedger(workspace);
     try {
@@ -236,20 +239,24 @@ describe("recorded Claude Code 2.1.296 payloads", () => {
     const allowed = decide(workspace, controlRequest(withInput(workspace, "PreToolUse-read", input)));
     expect(allowed.decision).toBe("allow");
     const post = recorded("PostToolUse-read", workspace);
-    const same = route(workspace, { hook_event_name: "PostToolUse", session_id: post.session_id, tool_use_id: post.tool_use_id, tool_name: "Read", tool_input: input });
-    expect(decisionRow(workspace, String(same.eventId)).meta).toMatchObject({ authorizationMismatch: false });
+    const same = route(workspace, { hook_event_name: "PostToolUse", session_id: post.session_id, tool_use_id: post.tool_use_id, tool_name: "Read",
+      tool_input: input, ingressRecorded: true });
+    expect(decisionRow(workspace, String(same.eventId)).meta).toMatchObject({ matched: true, authorizationMismatch: false });
     expect(inspectHookActionLifecycle({ workspace, agentId, actionId: allowed.actionId }).authorizationMismatch).toBe(false);
 
     // The recorded run where another hook rewrote the Bash input: PostToolUse reports the input that ran.
+    const second = decide(workspace, controlRequest({ ...withInput(workspace, "PreToolUse-read", input), tool_use_id: "toolu_rewritten" }));
+    expect(second.decision).toBe("allow");
     const rewritten = recorded("PostToolUse-rewritten-by-another-hook", workspace);
-    const changed = route(workspace, { hook_event_name: "PostToolUseFailure", session_id: post.session_id, tool_use_id: post.tool_use_id,
-      tool_name: "Read", tool_input: { ...input, offset: 2, note: (rewritten.tool_input as Record<string, unknown>).command } });
-    expect(decisionRow(workspace, String(changed.eventId)).meta).toMatchObject({ authorizationMismatch: true, outcome: "failed" });
-    expect(inspectHookActionLifecycle({ workspace, agentId, actionId: allowed.actionId }).authorizationMismatch).toBe(true);
+    const changed = route(workspace, { hook_event_name: "PostToolUseFailure", session_id: post.session_id, tool_use_id: "toolu_rewritten",
+      tool_name: "Read", tool_input: { ...input, offset: 2, note: (rewritten.tool_input as Record<string, unknown>).command }, ingressRecorded: true });
+    expect(decisionRow(workspace, String(changed.eventId)).meta).toMatchObject({ authorizationMismatch: true, reported: { by: "claude-code", outcome: "failed" } });
+    expect(inspectHookActionLifecycle({ workspace, agentId, actionId: second.actionId }).authorizationMismatch).toBe(true);
 
-    // A tool that ran with no allow decision AMC bound is a mismatch too.
-    const unbound = route(workspace, { hook_event_name: "PostToolUse", session_id: post.session_id, tool_use_id: "toolu_never_decided", tool_name: "Read", tool_input: input });
-    expect(decisionRow(workspace, String(unbound.eventId)).meta).toMatchObject({ authorizationMismatch: true, authorizedArgumentsDigest: null });
+    // A tool that ran with no allow decision AMC bound is a mismatch too, recorded as unmatched.
+    const unbound = route(workspace, { hook_event_name: "PostToolUse", session_id: post.session_id, tool_use_id: "toolu_never_decided", tool_name: "Read",
+      tool_input: input, ingressRecorded: true });
+    expect(decisionRow(workspace, String(unbound.eventId)).meta).toMatchObject({ matched: false, authorizationMismatch: true, authorizedArgumentsDigest: null });
   });
 
   test("the forwarder answers each session hook as its event needs when AMC is unreachable: deny, block, never force a stop", async () => {

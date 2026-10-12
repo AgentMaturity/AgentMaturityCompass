@@ -26,11 +26,11 @@ import {
 import { sha256Hex } from "../utils/hash.js";
 import { boundedFetchSignal, forwardDeadlineMs, HookDeadlineError, withHookDeadline } from "./hookDeadline.js";
 import {
-  authorizeForwardInvocation, HookIntegrationError, inspectProviderHookEvent, mapProviderHookEvent, parseConfigHookProvider,
+  authorizeForwardInvocation, HookIntegrationError, inspectProviderHookEvent, mapProviderHookEvent, parseConfigHookProvider, parseUnambiguousJson,
   type ConfigHookProvider, type HookMode,
 } from "./hookIntegration.js";
 import { assertControlBridgeLocal, normalizeBridgeBase, parseMode, validateAgentId } from "./hookProviders/installFiles.js";
-import { claudeHookPayloadSchema, type ClaudeHookPayload } from "./hookProviders/claudeCode.js";
+import { claudeHookSchemasFor, type ClaudeHookPayload } from "./hookProviders/claudeCodePayloads.js";
 
 function delay(ms: number): Promise<void> {
   return ms <= 0 ? Promise.resolve() : new Promise((resolvePromise) => setTimeout(resolvePromise, ms));
@@ -355,7 +355,9 @@ function claudeSessionBody(payload: ClaudeHookPayload): Record<string, unknown> 
     case "SessionStart":
       return { ...base, amc: { claudePid: Number(process.env.CLAUDE_PID), configDir: process.env.CLAUDE_CONFIG_DIR ?? join(homedir(), ".claude") } };
     case "UserPromptSubmit":
-      return { ...base, prompt: { sha256: sha256Hex(Buffer.from(payload.prompt, "utf8")), length: Buffer.byteLength(payload.prompt, "utf8") } };
+      return { ...base, prompt_id: payload.prompt_id, prompt: { sha256: sha256Hex(Buffer.from(payload.prompt, "utf8")), length: Buffer.byteLength(payload.prompt, "utf8") } };
+    case "Stop":
+      return { ...base, prompt_id: payload.prompt_id, stop_hook_active: payload.stop_hook_active };
     case "PostToolUse":
     case "PostToolUseFailure":
       return { ...base, tool_use_id: payload.tool_use_id, tool_name: payload.tool_name, tool_input: payload.tool_input };
@@ -390,10 +392,14 @@ async function forwardClaudeSessionHook(payload: ClaudeHookPayload, opts: HookFo
   signal: AbortSignal): Promise<HookForwardOutcome> {
   const forward = { workspace, provider: "claude-code" as const, agentId: opts.agent, tokenFile: opts.tokenFile, bridgeBase: opts.bridgeUrl };
   const authorization = authorizeForwardInvocation({ ...forward, mode: "control", bridgeBase: normalizeBridgeBase(opts.bridgeUrl) });
+  const body = claudeSessionBody(payload);
   if (payload.hook_event_name === "PostToolUse" || payload.hook_event_name === "PostToolUseFailure") {
-    await forwardProviderHookEvent({ ...forward, rawInput, mode: "control", signal });
+    // The control route records whether the observed ingress got this outcome; a miss latches the session there.
+    let ingressRecorded = true;
+    await forwardProviderHookEvent({ ...forward, rawInput, mode: "control", signal }).catch(() => { ingressRecorded = false; });
+    body.ingressRecorded = ingressRecorded;
   }
-  const answer = await postClaudeSessionEvent(authorization, claudeSessionBody(payload), signal);
+  const answer = await postClaudeSessionEvent(authorization, body, signal);
   if (payload.hook_event_name === "UserPromptSubmit") {
     if (answer.admitted === true) return { stdout: "{}\n", stderr: "", exitCode: 0 };
     if (answer.admitted === false && typeof answer.reason === "string") return PROMPT_BLOCKED(`AMC admission denied: ${redactBridgeText(answer.reason)}`);
@@ -404,9 +410,18 @@ async function forwardClaudeSessionHook(payload: ClaudeHookPayload, opts: HookFo
   return { stdout: "{}\n", stderr: "", exitCode: 0 };
 }
 
-/** How a failed Claude Code control-mode hook answers, by event: deny a tool, block a prompt, never block a start or a stop. */
+/** Events on which exit 2 keeps Claude Code (or a subagent or teammate) working, or that nothing can block: never exit 2. */
+const NEVER_BLOCKED = new Set(["Stop", "SubagentStop", "TeammateIdle", "TaskCompleted", "SessionEnd", "Notification", "SubagentStart"]);
+
+/**
+ * How a failed Claude Code control-mode hook answers, by event: deny a tool, block a prompt, never block a start or a
+ * stop. A hook event AMC does not install is answered the same way (never with an allow): a blockable one blocks.
+ */
 function claudeFailure(event: string | null, forwarding: boolean, deny: (message: string) => HookForwardOutcome, error: unknown): HookForwardOutcome {
   const why = error instanceof HookDeadlineError ? "timed out" : redactBridgeText(error instanceof Error ? error.message : String(error));
+  if (event !== null && NEVER_BLOCKED.has(event) && event !== "Stop") {
+    return { stdout: `${JSON.stringify({ systemMessage: `AMC does not handle the ${event} hook (${why}).` })}\n`, stderr: "", exitCode: 0 };
+  }
   if (event === "SessionStart") {
     return { stdout: `${JSON.stringify({ systemMessage: `AMC did not register this Claude Code session, so AMC denies its tool calls (${why}).` })}\n`, stderr: "", exitCode: 0 };
   }
@@ -449,8 +464,13 @@ export async function runHookForward(
       }
       if (claudeControl) {
         event = claudeEventName(rawInput);
-        // The pinned payload shape only: an unknown field or event is refused, as its event's failure.
-        const payload = claudeHookPayloadSchema.parse(JSON.parse(rawInput));
+        // A repeated key, then the bound release's own payload schema: an unknown field, type or event is refused, as its event's failure.
+        const unambiguous = parseUnambiguousJson(rawInput, "input");
+        const release = authorizeForwardInvocation({ workspace, provider: "claude-code", mode: "control", agentId: opts.agent,
+          bridgeBase: normalizeBridgeBase(opts.bridgeUrl), tokenFile: opts.tokenFile }).claudeCodeVersion;
+        const schemas = claudeHookSchemasFor(release);
+        if (!schemas) throw new HookIntegrationError("HOOK_INPUT_UNSUPPORTED", "the installation binds no qualified Claude Code release");
+        const payload = schemas.payload.parse(unambiguous);
         if (payload.hook_event_name !== "PreToolUse") return await forwardClaudeSessionHook(payload, opts, workspace, rawInput, signal);
         rawInput = JSON.stringify({ ...payload, amc: { nonce: randomUUID() } });
       }

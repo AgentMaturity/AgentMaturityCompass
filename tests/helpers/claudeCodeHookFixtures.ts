@@ -53,7 +53,7 @@ export function register(workspace: string, sessionId: string, configDir = join(
 }
 
 /** The PreToolUse request AMC's forwarder sends: Claude Code's payload plus a fresh nonce. */
-export function controlRequest(payload: Record<string, unknown>, nonce = randomUUID()): string {
+export function controlRequest(payload: Record<string, unknown>, nonce: string = randomUUID()): string {
   return JSON.stringify({ ...payload, amc: { nonce } });
 }
 

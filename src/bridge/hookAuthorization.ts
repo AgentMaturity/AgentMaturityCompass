@@ -9,6 +9,9 @@ import { authorizationRecordDigest, type AuthorizationRecordV1 } from "../action
 import { bindAuthorization, leasePrincipal } from "../actions/authorize.js";
 import { piSessionRegistration } from "./piSessionRegistry.js";
 import { claudeCodeSessionRegistration } from "./claudeCodeSessionRegistry.js";
+import { claudeSessionLatched } from "./claudeCodeLatch.js";
+import { claudeSessionSha256 } from "../adapters/hookProviders/claudeCode.js";
+import { claudeRequestRefusal } from "../adapters/hookProviders/claudeCodePayloads.js";
 import { assertContract } from "../contracts/index.js";
 import type { ActionReceiptMembers } from "../receipts/receipt.js";
 import { planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
@@ -104,12 +107,17 @@ function governedSession(input: { ledger: Parameters<typeof piSessionRegistratio
     const refusal = registrationRefusal(found, call.pi);
     return { refusal, enforced: !refusal && found.status === "registered" && found.record.qualified, version: call.pi.version };
   }
+  if (claudeSessionLatched(input.ledger.workspace, claudeSessionSha256(call.sessionId))) {
+    return { refusal: "An observation of this Claude Code session could not be recorded, so AMC latched the session and denies its calls.", enforced: false, version: null };
+  }
   const found = claudeCodeSessionRegistration(input.ledger, input.agentId, call.sessionId);
   if (found.status === "missing") return { refusal: "This Claude Code session has no AMC registration, so it is not governed; AMC denied the call.", enforced: false, version: null };
   if (found.status === "invalid") return { refusal: `${found.reason}; this Claude Code session is not governed, so AMC denied the call.`, enforced: false, version: null };
   const version = found.record.claudeCodeVersion;
-  return found.record.qualified ? { refusal: null, enforced: true, version }
-    : { refusal: `AMC has not qualified Claude Code ${version}, so AMC denied the call.`, enforced: false, version };
+  if (!found.record.qualified) return { refusal: `AMC has not qualified Claude Code ${version}, so AMC denied the call.`, enforced: false, version };
+  // The request must match the registered release's own schemas, the mapped tool's input included.
+  const mismatch = claudeRequestRefusal(version, call.request);
+  return mismatch ? { refusal: mismatch, enforced: true, version } : { refusal: null, enforced: true, version };
 }
 
 /**

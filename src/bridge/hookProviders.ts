@@ -15,7 +15,9 @@ import { canonicalize } from "../utils/json.js";
 import { piCwdRefusal, piPathLocations } from "../adapters/pi/piPaths.js";
 import { piVersionRefusal } from "../adapters/pi/piVersions.js";
 import { piActionId } from "../adapters/pi/piIdentity.js";
-import { claudeActionId, claudeCodeRefusal, claudeControlRequestSchema, claudeToolRequest } from "../adapters/hookProviders/claudeCode.js";
+import { claudeActionId, claudeCodeRefusal, claudeToolRequest } from "../adapters/hookProviders/claudeCode.js";
+import { parseQualifiedControlRequest } from "../adapters/hookProviders/claudeCodePayloads.js";
+import YAML from "yaml";
 import { redactBridgeText } from "./bridgeRedaction.js";
 
 const HOOK_PROVIDERS = ["claude-code", "gemini-cli", "pi"] as const;
@@ -123,21 +125,30 @@ export interface HookCall {
   /** The provider's working directory, against which it resolves relative paths and runs shell commands. */
   readonly cwd: string;
   readonly pi: PiControlContext | null;
+  /** Claude Code: the whole request, which the session's registered release must accept (claudeRequestRefusal). */
+  readonly request: Record<string, unknown> | null;
+}
+
+/** Refuses JSON with a repeated key: the provider and AMC could read different values from it. */
+export function assertUnambiguousJson(rawInput: string): void {
+  if (YAML.parseDocument(rawInput, { uniqueKeys: true }).errors.some((error) => /unique|duplicate/i.test(error.message))) {
+    throw new HookControlError("HOOK_CONTROL_INPUT_AMBIGUOUS", 400, "provider hook input contains duplicate JSON keys");
+  }
 }
 
 export function hookCall(provider: HookProvider, input: Record<string, unknown>): HookCall | null {
   const pi = piControlContext(provider, input);
   if (pi) {
     return { provider: "pi", actionId: piActionId(pi.sessionId, pi.toolCallId), sessionId: pi.sessionId, callId: pi.toolCallId, cwd: pi.cwd, pi,
-      parentActionId: pi.parentToolCallId === null ? null : piActionId(pi.sessionId, pi.parentToolCallId) };
+      parentActionId: pi.parentToolCallId === null ? null : piActionId(pi.sessionId, pi.parentToolCallId), request: null };
   }
   if (provider !== "claude-code") return null;
-  const parsed = claudeControlRequestSchema.safeParse(input);
-  if (!parsed.success) {
-    throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, "Claude Code hook input does not match the pinned PreToolUse payload with AMC's nonce");
+  const parsed = parseQualifiedControlRequest(input);
+  if (!parsed) {
+    throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, "Claude Code hook input does not match a qualified release's PreToolUse payload with AMC's nonce");
   }
-  const { session_id: sessionId, tool_use_id: callId, cwd } = parsed.data;
-  return { provider: "claude-code", actionId: claudeActionId(sessionId, callId), sessionId, callId, parentActionId: null, cwd, pi: null };
+  const { session_id: sessionId, tool_use_id: callId, cwd } = parsed;
+  return { provider: "claude-code", actionId: claudeActionId(sessionId, callId), sessionId, callId, parentActionId: null, cwd, pi: null, request: input };
 }
 
 /** Why AMC refuses a Pi or Claude Code call before mapping it, or null. */
@@ -435,9 +446,7 @@ function shellCommandForProviderTool(
   toolName: string,
   toolInput: Record<string, unknown>,
 ): string | null {
-  if (provider === "claude-code" && toolName === "Bash") {
-    return firstString(toolInput, ["command"]) ?? "";
-  }
+  // Claude Code's Bash is mapped only in its pure form (claudeToolRequest), never through a parsed shell plan.
   if (provider === "gemini-cli" && toolName === "run_shell_command") {
     return firstString(toolInput, ["command"]) ?? "";
   }
