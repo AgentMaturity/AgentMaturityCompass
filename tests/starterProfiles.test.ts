@@ -31,8 +31,10 @@ import { readPresets, resolvePreset } from "../src/presets/agentPresets.js";
 import { inspectRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { AMCNativeClient } from "../src/sdk/nativeAgentClient.js";
 import { applyStarterProfile, runStarterInit, starterProfileFlag } from "../src/setup/starterProfiles.js";
+import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { loadVerifiedToolsConfigSnapshot } from "../src/toolhub/toolhubValidators.js";
 import { lockVault } from "../src/vault/vault.js";
+import { freePort } from "./helpers/piHookFixtures.js";
 import { initWorkspace, loadAMCConfig } from "../src/workspace.js";
 
 const OWNER = { username: "starter-owner", password: "starter-owner-password" };
@@ -108,6 +110,14 @@ describe("amc init --coding (P1-40)", () => {
     applyStarterProfile(ws, "coding", OWNER);
     Object.defineProperty(process, "platform", { ...platform, value: os });
     expect(checkToolsetReadiness(ws).shell).toMatchObject({ offered: true, enforcement: "enforced", boundary });
+  });
+
+  it("never replaces an existing users.yaml", () => {
+    const ws = workspace();
+    const first = applyStarterProfile(ws, "coding", OWNER);
+    expect(() => applyStarterProfile(ws, "regulated", { username: "intruder", password: "intruder-password" })).toThrow("users.yaml exists");
+    expect(activeUserRecord(ws, first.owner.userId)?.username).toBe(OWNER.username);
+    expect(inspectRuntimeFirewallPolicy(ws).policy?.mode, "nothing was rewritten").toBe("warn");
   });
 
   it("reports the broken signature when tools.yaml is edited after init without re-signing", () => {
@@ -213,7 +223,7 @@ describe("runStarterInit (P1-40)", () => {
   });
 });
 
-describe("ACP still starts in each starter workspace (P1-40)", () => {
+describe("ACP and Studio still start in each starter workspace (P1-40)", () => {
   it.each(["coding", "regulated"] as const)("%s", async (kind) => {
     const ws = workspace();
     applyStarterProfile(ws, kind, OWNER);
@@ -222,6 +232,15 @@ describe("ACP still starts in each starter workspace (P1-40)", () => {
       expect((await client.newSession()).sessionId).toMatch(/\S/);
     } finally {
       await client.close();
+    }
+    const token = "starter-profile-admin-token";
+    const studio = await startStudioApiServer({ workspace: ws, host: "127.0.0.1", port: await freePort(), token });
+    try {
+      const login = await fetch(`${studio.url}/auth/login`, { method: "POST", body: JSON.stringify(OWNER),
+        headers: { "x-amc-admin-token": token, "content-type": "application/json" } });
+      expect(login.status, "the owner signs in to Studio with the login init recorded").toBe(200);
+    } finally {
+      await studio.close();
     }
   }, 60_000);
 });

@@ -18,7 +18,7 @@ import YAML from "yaml";
 import { checkToolsetReadiness, type ToolsetReadiness } from "../agent/agentToolset.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../agent/stubProvider.js";
 import { initApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
-import { initUsersConfig } from "../auth/authApi.js";
+import { initUsersConfig, usersConfigPath } from "../auth/authApi.js";
 import { compileCatalogPlan } from "../catalog/catalogCli.js";
 import { signAmcConfig } from "../config/amcConfigSignature.js";
 import { readSecretFromEnvOrFile } from "../config/loadConfig.js";
@@ -116,6 +116,8 @@ function compileStarterPlan(workspace: string): NonNullable<StarterProfileReport
  */
 export function applyStarterProfile(workspace: string, kind: StarterProfileKind, owner: StarterOwner): StarterProfileReport {
   assertOwnerMode(workspace, "init");
+  // Never over an existing users.yaml: it would replace every user and their roles.
+  if (pathExists(usersConfigPath(workspace))) throw new Error(`${usersConfigPath(workspace)} exists; a starter profile only initializes a new workspace.`);
   writeFileAtomic(toolsConfigPath(workspace), starterTools(), 0o644);
   signToolsConfig(workspace);
   const firewallMode = kind === "coding" ? "warn" : "block";
@@ -162,6 +164,7 @@ async function starterSecrets(kind: StarterProfileKind): Promise<StarterOwner> {
   }
   username ??= (await inquirer.prompt<{ value: string }>([{ type: "input", name: "value", message: "Owner username",
     default: userInfo().username }])).value.trim();
+  if (!username) throw new Error("The owner username cannot be empty.");
   password ??= await promptSecret(`Studio password for ${username}`);
   if (password.length < MIN_SECRET) throw new Error(`The owner password needs at least ${MIN_SECRET} characters.`);
   return { username, password };
