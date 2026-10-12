@@ -19,7 +19,7 @@ import { findClaudeCode } from "./hookProviders/claudeCode.js";
 import { verifyClaudeControl, type ClaudeControlVerification } from "./claudeHookProbe.js";
 import { readStdinAll, runHookForward, type HookForwardOptions } from "./hookForwarder.js";
 // The hidden `connect hooks forward` and tests still reach the forwarder through here.
-export { runHookForward, type HookForwardOptions, type HookForwardOutcome } from "./hookForwarder.js";
+export { runHookForward } from "./hookForwarder.js";
 import { inspectHookActionLifecycle } from "../watch/hookActionLifecycle.js";
 import { inspectHookHealth } from "../watch/hookHealthDiagnostics.js";
 

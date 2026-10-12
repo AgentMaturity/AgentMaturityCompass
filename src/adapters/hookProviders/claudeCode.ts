@@ -60,7 +60,7 @@ export function claudeSessionSha256(sessionId: string): string {
  * a form with more than one spelling or one AMC cannot resolve as the OS does: not absolute, `.` or `..` segments, a
  * repeated or trailing separator, not NFC, a control character, a dangling link, any path on Windows.
  */
-export function claudeFileLocation(value: unknown, workspace: string): string | null {
+function claudeFileLocation(value: unknown, workspace: string): string | null {
   if (process.platform === "win32" || typeof value !== "string" || !isAbsolute(value) || normalize(value) !== value
     || (value.length > 1 && value.endsWith(sep)) || value.normalize("NFC") !== value || /[\u0000-\u001f\u007f]/.test(value)) return null;
   const real = realLocation(value);
@@ -82,7 +82,7 @@ function containedGlob(value: unknown): boolean {
 const PURE_BASH = /^'\/[^'\u0000-\u001f\u007f]*'(?: '[^'\u0000-\u001f\u007f]*')*$/;
 
 /** The binary (where it really opens) and argv of a pure-form Bash command, or null. */
-export function claudePureBash(command: unknown, workspace: string): { binary: string; argv: string[] } | null {
+function claudePureBash(command: unknown, workspace: string): { binary: string; argv: string[] } | null {
   // One spelling: a command that is not NFC could name a binary or argument other than the one AMC evaluates.
   if (typeof command !== "string" || command.normalize("NFC") !== command || !PURE_BASH.test(command)) return null;
   const [first, ...argv] = command.slice(1, -1).split("' '");
@@ -165,7 +165,7 @@ export function claudeCodeRefusal(cwd: string, workspace: string, toolName: stri
   return settings || insideAmc(location) ? "AMC protects its hook configuration." : null;
 }
 
-export const claudeCodeInstallSchema = z.strictObject({ binaryPath: z.string().min(1), version: z.string().min(1), sha256: z.string().regex(/^[a-f0-9]{64}$/) });
+const claudeCodeInstallSchema = z.strictObject({ binaryPath: z.string().min(1), version: z.string().min(1), sha256: z.string().regex(/^[a-f0-9]{64}$/) });
 export type ClaudeCodeInstall = z.infer<typeof claudeCodeInstallSchema>;
 /** What a Claude Code control manifest binds: AMC's forwarder entry and the Claude Code install sessions must run. */
 export const claudeCodeBindingSchema = z.strictObject({

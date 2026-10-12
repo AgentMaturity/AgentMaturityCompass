@@ -313,7 +313,7 @@ export async function forwardProviderHookControl(input: {
   );
 }
 
-export function failClosedProviderControlResponse(
+function failClosedProviderControlResponse(
   provider: HookProvider,
   reason = "AMC control is unavailable; the action is denied fail closed.",
 ): ProviderControlResponse {

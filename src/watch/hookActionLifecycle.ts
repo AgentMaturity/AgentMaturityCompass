@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { controlMappingValid, providerSchema, type HookProvider } from "../bridge/hookProviders.js";
+import { refineControlMapping, providerSchema, type HookProvider } from "../bridge/hookProviders.js";
 import { openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import type { EvidenceEvent } from "../types.js";
 
@@ -119,11 +119,7 @@ const decisionMetaV2Schema = decisionMetaBaseSchema.extend({
   effectiveOutcome: z.enum(["allow", "deny", "ask", "steer"]),
   providerMapping: z.enum(["native", "corrective_deny", "fail_closed_deny"]),
   capabilityLossy: z.boolean(),
-}).passthrough().superRefine((value, ctx) => {
-  if (!controlMappingValid(value)) {
-    ctx.addIssue({ code: "custom", path: ["providerMapping"], message: "provider outcome mapping is inconsistent" });
-  }
-});
+}).passthrough().superRefine(refineControlMapping);
 
 const postExecutionMetaSchema = z.object({
   postExecutionSchemaVersion: z.literal(1),

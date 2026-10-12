@@ -12,3 +12,5 @@ Claude Code control hooks now govern sessions, not single calls, for Claude Code
 - **Audit latch.** A failure of AMC's own writer while recording for a registered session latches the workspace's hooks in `<AMC home>/state/hook-audit-latch/`: every hook request of the workspace is refused until `amc connect hooks recover` (new; owner mode, vault passphrase) records the recovery as verified evidence. Input never latches.
 - **Lifecycle and API.** `HookActionLifecycleResponse` gains `authorizationMismatch`, `observationConflict` and `observationNotRecorded`. A Pi lease without a named principal now binds the CLI's OS user as principal (P1-78).
 - **Measured.** The installed PreToolUse handler takes p50 566 ms / p95 680 ms on macOS arm64 and p50 670 ms / p95 768 ms on Linux arm64 (200 calls, loopback Bridge), far above the 50 ms target.
+
+freeze-exception: P1-23 — `amc connect hooks recover` is the explicit owner-mode, passphrase-gated recovery the review required for the hook audit latch; no existing command could carry it without mixing a recovery into a read-only one.

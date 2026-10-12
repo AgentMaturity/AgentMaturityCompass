@@ -82,7 +82,7 @@ export function hookAuditLatchState(workspace: string): HookAuditLatchState {
 }
 
 /** Write the latch file of `entry`'s workspace unless one exists; the first fault's reason is kept. */
-export function persistHookAuditLatch(entry: Entry): void {
+function persistHookAuditLatch(entry: Entry): void {
   const home = resolveAmcHome();
   mkdirSync(home, { recursive: true, mode: 0o700 });
   ensureContainedDir(home, DIR_REL);
@@ -90,7 +90,7 @@ export function persistHookAuditLatch(entry: Entry): void {
 }
 
 /** Latch the workspace whose writer failed: in memory at once, and in AMC home. */
-export function tripHookAuditLatch(workspace: string, fault: HookWriterFault): void {
+function tripHookAuditLatch(workspace: string, fault: HookWriterFault): void {
   const scope = workspaceScope(workspace);
   const entry: Entry = { type: "amc.hook-audit-latch", version: 1, workspaceScope: scope, latchedAt: new Date().toISOString(), reason: fault.message.slice(0, 1_024) };
   // Bounded: past MEMORY_MAX latched workspaces, the latch file alone holds a new one.

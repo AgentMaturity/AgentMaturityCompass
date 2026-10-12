@@ -28,7 +28,7 @@ import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { resolveProviderHookRequestIdentity } from "./hookActionIdentity.js";
 import type { ShellCommandConnector, ShellCommandPlan } from "../enforce/shellCommandPlan.js";
 import {
-  canonicalToolRequests, CONTROL_HOOK_EVENTS, controlDecisionSchema, controlMappingValid, HookControlError, hookCall, hookCallRefusal, openHookEnvelope,
+  canonicalToolRequests, CONTROL_HOOK_EVENTS, controlDecisionSchema, refineControlMapping, HookControlError, hookCall, hookCallRefusal, openHookEnvelope,
   materializeProviderDecision, parseProvider, providerSchema, runtimeFor, serializeProviderControlResponse, validateProviderControlResponse,
   type CanonicalToolRequest, type HookCall, type HookControlDecision, type HookControlOutcome, type HookControlProviderMapping,
   type HookProvider, type ProviderControlResponse,
@@ -213,11 +213,7 @@ const storedControlMetaV2Schema = z.object({
   receipt: z.string().min(1),
   receipt_id: z.string().min(1),
   receipt_sha256: z.string().regex(/^[a-f0-9]{64}$/),
-}).passthrough().superRefine((value, ctx) => {
-  if (!controlMappingValid(value)) {
-    ctx.addIssue({ code: "custom", path: ["providerMapping"], message: "provider outcome mapping is inconsistent" });
-  }
-});
+}).passthrough().superRefine(refineControlMapping);
 
 const storedControlMetaSchema = z.discriminatedUnion("controlSchemaVersion", [
   storedControlMetaV1Schema,

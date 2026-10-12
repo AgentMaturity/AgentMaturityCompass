@@ -75,7 +75,7 @@ function summaryWriter(input: { workspace: string; agentId: string; sessionSha25
  * its session, its lease and its workspace (hookIntake.ts). Over a cap it is refused (429), never silently: it is listed
  * in a signed intake summary row, and decisions under the capped scope are denied until its window passes.
  */
-export function admitObservation(input: { workspace: string; agentId: string; sessionId: string; leaseId: string | undefined; now: number;
+function admitObservation(input: { workspace: string; agentId: string; sessionId: string; leaseId: string | undefined; now: number;
   toolUseId?: string }): { registered: boolean } {
   const registered = sessionRegistered(input.workspace, input.agentId, input.sessionId);
   const write = summaryWriter({ ...input, sessionSha256: claudeSessionSha256(input.sessionId), registered });

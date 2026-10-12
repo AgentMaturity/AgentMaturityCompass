@@ -103,7 +103,7 @@ const piControlContextSchema = z.strictObject({
 export type PiControlContext = z.infer<typeof piControlContextSchema>;
 
 /** The Pi context of a pi request, or null for other providers. A pi request without a valid one is refused. */
-export function piControlContext(provider: HookProvider, input: Record<string, unknown>): PiControlContext | null {
+function piControlContext(provider: HookProvider, input: Record<string, unknown>): PiControlContext | null {
   if (provider !== "pi") return null;
   const parsed = piControlContextSchema.safeParse(input.pi);
   if (!parsed.success) {
@@ -180,6 +180,13 @@ export function hookCallRefusal(call: HookCall, workspace: string, toolName: str
  * Whether a recorded outcome mapping is one AMC produces: native, Claude Code's corrective deny for steer, or a
  * capability-lossy deny for an ask (every provider: a provider-local ask is not AMC approval) or another provider's steer.
  */
+/** A zod refinement that rejects a stored control row whose provider mapping is inconsistent (controlMappingValid). */
+export function refineControlMapping(value: Parameters<typeof controlMappingValid>[0], ctx: z.RefinementCtx): void {
+  if (!controlMappingValid(value)) {
+    ctx.addIssue({ code: "custom", path: ["providerMapping"], message: "provider outcome mapping is inconsistent" });
+  }
+}
+
 export function controlMappingValid(value: { provider: HookProvider; requestedDecision: HookControlOutcome; decision: HookControlDecision;
   effectiveOutcome: HookControlOutcome; providerMapping: HookControlProviderMapping; capabilityLossy: boolean }): boolean {
   if (value.providerMapping === "native") {

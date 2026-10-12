@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { z } from "zod";
-import { controlMappingValid, providerSchema } from "../bridge/hookProviders.js";
+import { refineControlMapping, providerSchema } from "../bridge/hookProviders.js";
 import {
   loadAdaptersConfig,
   verifyAdaptersConfigSignature,
@@ -118,11 +118,7 @@ const hookDecisionMetaV2Schema = receiptMetaSchema.extend({
   providerMapping: z.enum(["native", "corrective_deny", "fail_closed_deny"]),
   capabilityLossy: z.boolean(),
   rawPayloadStored: z.literal(false),
-}).passthrough().superRefine((value, ctx) => {
-  if (!controlMappingValid(value)) {
-    ctx.addIssue({ code: "custom", path: ["providerMapping"], message: "provider outcome mapping is inconsistent" });
-  }
-});
+}).passthrough().superRefine(refineControlMapping);
 
 const hookDecisionMetaSchema = z.union([hookDecisionMetaV2Schema, hookDecisionMetaV1Schema]);
 

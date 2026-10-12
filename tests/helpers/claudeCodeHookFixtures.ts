@@ -14,8 +14,8 @@ import { handleHookControlRequest } from "../../src/bridge/hookControlRoute.js";
 import { evaluateProviderHookControl } from "../../src/bridge/hookControl.js";
 import { controlledWorkspace } from "./piHookFixtures.js";
 
-export const CLAUDE_CODE_VERSION = "2.1.296";
-export const FIXTURE_DIR = resolve("tests", "fixtures", "harness-hooks", "claude-code", CLAUDE_CODE_VERSION);
+const CLAUDE_CODE_VERSION = "2.1.296";
+const FIXTURE_DIR = resolve("tests", "fixtures", "harness-hooks", "claude-code", CLAUDE_CODE_VERSION);
 export const agentId = "claude-controlled";
 export const lease = { leaseId: "lease_claude_fixture", expiresTs: Date.now() + 3_600_000 };
 

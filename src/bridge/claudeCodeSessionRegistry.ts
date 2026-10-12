@@ -54,7 +54,7 @@ const recordSchema = z.strictObject({
   userSettingsPath: z.string().min(1),
   qualified: z.boolean(),
 });
-export type ClaudeCodeRegistrationRecord = z.infer<typeof recordSchema>;
+type ClaudeCodeRegistrationRecord = z.infer<typeof recordSchema>;
 
 export type ClaudeCodeRegistration =
   | { readonly status: "registered"; readonly record: ClaudeCodeRegistrationRecord }
