@@ -60,7 +60,7 @@ export function assertOwnerMode(workspace: string, commandPath: string): void {
     "lease issue",
     "lease revoke",
     // P1-23: clearing the hook audit latch (src/bridge/hookAuditLatch.ts).
-    "connect hooks recover",
+    "connect hooks health --recover-latch",
     "target set",
     "vault init",
     "vault unlock",

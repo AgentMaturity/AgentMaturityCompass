@@ -101,6 +101,10 @@ jobs:
       - name: Check the release candidate
         run: node scripts/check-release-candidate.mjs
 
+      # P1-41: the notes github-release publishes never use a banned claim word, even negated (truth rule 4).
+      - name: Check the release notes for banned claim words
+        run: node scripts/check-release-notes.mjs "docs/releases/${AMC_RELEASE_TAG#v}.md"
+
       - name: Build
         run: npm run build
 

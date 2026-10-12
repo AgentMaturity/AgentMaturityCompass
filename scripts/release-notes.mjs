@@ -8,6 +8,7 @@
  *
  * The version defaults to the one `changeset version` gives from the last published release (plannedVersion).
  * Run it before the changesets are consumed; release:prepare does. With none pending, the notes are final and stay.
+ * P1-41: a minor or patch release without a notes file gets weekly-train notes (trainNotes); a breaking one is refused.
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -117,12 +118,51 @@ export function pageLineProblems(root, changesets) {
   });
 }
 
+/**
+ * P1-41: notes for a weekly minor or patch release that has no hand-written notes. Its prose names no change; the
+ * changes are the generated blocks. Reviewed, and its Summary edited by hand, in the version pull request.
+ */
+export function trainNotes(version, changesets) {
+  const level = LEVELS.find((candidate) => changesets.some((changeset) => changeset.level === candidate)) ?? "patch";
+  return `# AMC ${version}
+
+<!-- P1-41: written by release:prepare from the pending changesets because no hand-written notes existed. Review it in the version pull request and edit the Summary by hand. \`npm run release:notes\` regenerates the two blocks. -->
+
+## Summary
+
+${version} is a ${level} release from the weekly release train (docs/RELEASE_CADENCE.md). It contains the changesets listed below; CHANGELOG.md has their full text.
+
+## Breaking changes
+
+<!-- release-notes:breaking -->
+<!-- /release-notes:breaking -->
+
+## Migration
+
+None: this release has no breaking (major) changesets.
+
+## Changes
+
+<!-- release-notes:changes -->
+<!-- /release-notes:changes -->
+
+## Verify this release
+
+- Checksums: download \`SHA256SUMS\` from the GitHub release and run \`sha256sum -c SHA256SUMS\` beside the assets.
+- npm provenance: after \`npm install agent-maturity-compass@${version}\`, run \`npm audit signatures\` in that project.
+- Signed bundle: take the release public key from the tag (\`git show v${version}:trust/amc-release-signing.pub > amc-release-signing.pub\`), check its fingerprint against the copies published outside the repository, then run \`amc release verify amc-${version}.amcrelease --pubkey amc-release-signing.pub\`. Never verify against a key the bundle carries.
+`;
+}
+
 export function generateReleaseNotes(root, version, changesets = readChangesets(root)) {
   const relative = `docs/releases/${version}.md`;
   const path = join(root, relative);
-  if (!existsSync(path)) throw new Error(`${relative} is missing: write its hand-written sections first, as in docs/releases/2.0.0.md`);
-  const before = readFileSync(path, "utf8");
-  const after = applyBlocks(before, renderBlocks(changesets));
+  const exists = existsSync(path);
+  if (!exists && changesets.some((changeset) => changeset.level === "major")) {
+    throw new Error(`${relative} is missing: a breaking release needs hand-written notes and migration steps first, as in docs/releases/2.0.0.md`);
+  }
+  const before = exists ? readFileSync(path, "utf8") : "";
+  const after = applyBlocks(before || trainNotes(version, changesets), renderBlocks(changesets));
   const problems = [
     ...uncoveredBreaking(after, changesets).map((slug) => `breaking changeset \`${slug}\` is not cited in the Migration section`),
     ...findTruthClaims(relative, after).map((claim) => `line ${claim.line}: banned claim word "${claim.match}": ${claim.context}`),

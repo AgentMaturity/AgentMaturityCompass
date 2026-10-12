@@ -312,7 +312,7 @@ function mountProject(projectId, options) {
       <div class="a4-cards">${stageCards(stage).map((card) => view.renderCard(card, ctx, state.comments)).join("")}</div>
       <section class="card"><h4>Differences</h4>${state.diff?.error ? `<p class="status-bad">${view.esc(state.diff.error)}</p>`
         : view.renderDifferences(state.diff, project)}</section>
-      <section class="card"><h4>Missing requirements</h4>${view.renderMissing(readiness)}</section>
+      <section class="card"><h4>Missing requirements</h4>${view.renderMissing(readiness, stage)}</section>
       ${view.renderLanes(readiness, state.refs, project.revisionNo)}${view.renderApprovalsBar(ctx)}${view.renderMembers(ctx)}
       <section class="card"><h4>Here now</h4><div id="a4Presence"></div></section>`;
     renderPlanTimeline(root.querySelector("#a4Rail"), view.railPlan(project));
@@ -442,14 +442,15 @@ function mountProject(projectId, options) {
       case "complete": {
         const { met } = view.currentGates(state.gates, stage, state.readiness);
         if (!met) throw new Error("No approved gate is shown for this stage. Refresh before completing it.");
-        // Activate's completion delivers the production lease token once (design §10.4); this generic action would drop
-        // it. Its direction gate carries no token and is consumed here like any other.
-        if (stage === "activate" && met.gate === "completion") throw new Error(`${view.ACTIVATE_COMPLETE}. Nothing was sent.`);
+        // Both Activate gates run an inline effect whose lease token is answered once (the release's staging lease, the
+        // deployment approval's production lease; design §10.4); this generic action would drop it.
+        if (stage === "activate") throw new Error(`${view.ACTIVATE_COMPLETE}. Nothing was sent.`);
         return post("Complete stage", stagePath("complete"), { gateId: reviewedFor(met).gateId, ...headBinding() });
       }
       case "hold": return post("Hold", projectPath("/hold"), { reason: reason(), ...headBinding() }, REASON);
       case "resume": return post("Resume", projectPath("/resume"), { reason: reason(), ...headBinding() }, REASON);
-      // The item was listed by the viewed stage's readiness, so it is acknowledged at that stage, not the head's.
+      // The item was listed by the viewed stage's readiness, which offers Acknowledge only at the project's current stage;
+      // sending that stage binds it, so a project that moved on since is refused (409 A4_STEP_ORDER), never acknowledged elsewhere.
       case "acknowledge": return post("Acknowledge", projectPath("/acknowledge"), { itemId: button.dataset.item, stage, reason: reason(), ...headBinding() }, REASON);
       // The attempt readiness named (owner only); the effect's own stage, which may not be the one viewed.
       case "retry-effect": return post("Retry effect", projectPath(`/stages/${encodeURIComponent(button.dataset.effectStage)}/effects/${

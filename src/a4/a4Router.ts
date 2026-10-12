@@ -18,6 +18,7 @@ import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
 import { apiError, apiSuccess, isRequestBodyError } from "../api/apiHelpers.js";
 import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
 import { envelopeForUnboundResult } from "../claims/eligibility/adapters.js";
+import type { ClaimEnvelope } from "../claims/eligibility/types.js";
 import { eventMeta } from "../claims/evidenceProvenance.js";
 import { signingRoute } from "../crypto/signing/signer.js";
 import { getAgentPaths } from "../fleet/paths.js";
@@ -32,19 +33,22 @@ import { A4BlobError, getPrivate } from "./a4Blobs.js";
 import { A4_EVENT_WINDOW, a4Events } from "./a4Events.js";
 import {
   acknowledgeItem, assertAllowed, autoHold, changeGatePolicy, evaluateFor, holdProject, loadA4State, reopenStage, requestGate, resumeProject, retireProject,
-  tuneProject, type A4Call
+  signedA4Floor, tuneProject, type A4Call
 } from "./a4Gates.js";
 import { memberCandidates, resolveA4Principal } from "./a4Identity.js";
 import { A4_PRESENCE_TTL_MS, presenceOf, touchPresence } from "./a4Presence.js";
-import { gateStatus, type A4Action, type A4ReadinessState } from "./a4Readiness.js";
+import { gateStatus, isRegulated, type A4Action, type A4ReadinessState } from "./a4Readiness.js";
+import { monitorView } from "./a4Monitor.js";
+import { valueView } from "./a4Value.js";
 import { handleA4ReleaseRoute } from "./a4RouterReleases.js";
 import { handleA4StageRoute, STAGE_QUESTIONS } from "./a4RouterStages.js";
 import {
-  A4_GATES, A4_PROJECT_ROLES, A4_REF_KINDS, A4_STAGES, A4_STEPS, a4GatePolicyV1Schema, a4PreviewEnabled, type A4Member, type A4Principal,
-  type A4ProjectRow, type A4Stage
+  A4_GATES, A4_PROJECT_ROLES, A4_REF_KINDS, A4_STAGES, A4_STEPS, a4GatePolicyV1Schema, a4PreviewEnabled, clientRequestIdSchema, headSeqSchema, reasonSchema,
+  type A4Member, type A4Principal, type A4ProjectRow, type A4ProjectV1, type A4Stage
 } from "./a4Schema.js";
 import { A4_REQUEST_WINDOW_MS, A4StoreError, openA4Store, refreshVolatileFacts, type A4RequestKey, type A4Store, type A4TransitionResult } from "./a4Store.js";
 import { verifyA4Chain } from "./a4Verify.js";
+import { currentRelease } from "./spec/activate.js";
 
 export const A4_API_PREFIX = "/api/v1/a4";
 const BODY_LIMIT = 1024 * 1024;
@@ -54,11 +58,14 @@ const PROJECT_PATH = /^\/projects\/(a4p_[0-9a-f]{32})(\/.*)?$/;
 const IDENTITY_FIELDS = ["userId", "roles", "approver", "author", "approved", "approvalId", "token"];
 
 
-/** One admitted request. `principal` is null for the bootstrap admin token, which reads and does nothing else. */
+/**
+ * One admitted request. `principal` is null for the bootstrap admin token, which reads and does nothing else. `native`
+ * is Studio's native task service; an in-process caller (the CLI, P1-65) has none, so Assemble's build sessions refuse there.
+ */
 export interface A4Route {
   readonly workspace: string;
   readonly store: A4Store;
-  readonly native: NativeTaskApiContext;
+  readonly native?: NativeTaskApiContext;
   readonly principal: A4Principal | null;
   readonly pathname: string;
   readonly method: "GET" | "POST";
@@ -71,10 +78,6 @@ export function a4Fail(status: number, code: string, message: string, detail?: u
   return new A4StoreError(status, code, message, detail);
 }
 
-const clientRequestIdSchema = z.string().regex(/^[A-Za-z0-9_-]{8,128}$/, "clientRequestId: 8 to 128 letters, digits, _ or -");
-const headSeqSchema = z.number().int().min(0);
-const reasonSchema = z.string().trim().min(1).max(2000);
-
 /** Every supported query parameter, once; anything else is 400 (proxies and the server must read one URL alike). */
 export function assertQuery(params: URLSearchParams, allowed: readonly string[]): void {
   if ([...params.keys()].some((key) => !allowed.includes(key) || params.getAll(key).length !== 1)) {
@@ -86,7 +89,7 @@ export function assertQuery(params: URLSearchParams, allowed: readonly string[])
  * A client value (body, path segment, query parameter) parsed against `schema`: 400 INPUT_INVALID on a mismatch. Any
  * other ZodError is a stored row that no longer parses, which sendError reports as an integrity failure.
  */
-export function parseInput<S extends z.ZodType>(schema: S, value: unknown, what = "body"): z.output<S> {
+function parseInput<S extends z.ZodType>(schema: S, value: unknown, what = "body"): z.output<S> {
   const parsed = schema.safeParse(value);
   if (parsed.success) return parsed.data;
   const issue = parsed.error.issues[0];
@@ -260,7 +263,8 @@ export function unboundClaim(projectId: string, what: string, regulated: boolean
   return envelopeForUnboundResult({ producer: `a4:${projectId}:${what}`, method: "human_review", regulated, now: Date.now() });
 }
 
-const projectView = (row: A4ProjectRow, members: readonly A4Member[], readiness: { status: string; bindingDigest: string } | null) => ({
+/** `amc.a4-project/v1`: the head, the current members and the readiness summary (this router's and the MCP tools' project view). */
+export const projectView = (row: A4ProjectRow, members: readonly A4Member[], readiness: A4ProjectV1["readiness"]): A4ProjectV1 => ({
   schema: "amc.a4-project/v1", projectId: row.project_id, workspaceId: row.workspace_id, agentId: row.agent_id, name: row.name, stage: row.stage,
   step: row.step, hold: row.hold === 1, holdReason: row.hold_reason, revisionNo: row.revision_no, headSeq: row.head_seq, headDigest: row.head_digest,
   deployedReleaseId: row.deployed_release_id, baseReleaseId: row.base_release_id, createdByKey: row.created_by_key, createdTs: row.created_ts,
@@ -269,7 +273,7 @@ const projectView = (row: A4ProjectRow, members: readonly A4Member[], readiness:
 
 const createSchema = z.strictObject({
   clientRequestId: clientRequestIdSchema,
-  name: z.string().trim().min(1).max(200),
+  name: z.string().trim().min(1).max(200).refine((value) => !/[\x00-\x1f\x7f-\x9f]/.test(value), "The project name cannot contain control characters."),
   agentId: z.string().regex(/^[a-z0-9][a-z0-9_-]{0,127}$/, "Choose a valid agent ID.").optional(),
   archetype: z.string().trim().min(1).max(128).optional(),
   expertise: z.enum(["novice", "practitioner", "expert"])
@@ -319,9 +323,10 @@ function options(route: A4Route): void {
     schema: "amc.a4-options/v1", previewEnabled: true, stages: A4_STAGES, steps: A4_STEPS, gates: A4_GATES, projectRoles: A4_PROJECT_ROLES,
     refKinds: A4_REF_KINDS, expertise: ["novice", "practitioner", "expert"], questions: STAGE_QUESTIONS,
     limits: { eventWindow: A4_EVENT_WINDOW, presenceTtlMs: A4_PRESENCE_TTL_MS, requestWindowMs: A4_REQUEST_WINDOW_MS, bodyBytes: BODY_LIMIT },
-    workspace: { signingRoute: route_, readOnly: !route.native.executionAllowed() },
-    // Supported integration paths arrive with Assemble (P1-60); the running image digest with the bootstrap report.
-    integrationClaims: [], imageDigest: null
+    workspace: { signingRoute: route_, readOnly: route.native?.executionAllowed() !== true },
+    // Supported integration paths arrive with Assemble (P1-60). The running image digest would come from the bootstrap
+    // report (never studioServer.ts); runBootstrap records none, so it is null with its reason (P1-62).
+    integrationClaims: [], imageDigest: null, imageDigestReason: "the bootstrap report records no image digest, so A4's prepared files pin the image by tag (IMAGE_TAG_ONLY)"
   });
 }
 
@@ -624,17 +629,30 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
   if (rest === "/conformance") {
     assertQuery(params, params.has("stage") ? ["stage"] : []);
     const stage = params.has("stage") ? stageInput(params.get("stage")) : headStage(state.project);
-    // Adapt's acknowledgements as readiness counts them, evaluated only when the statement reads them live.
-    const statement = conformanceView(route.workspace, state, stage, now, () => readinessAt("adapt").items);
+    // Adapt's (or Activate's D-21) acknowledgements as readiness counts them, evaluated only when the statement reads them live.
+    const statement = conformanceView(route.workspace, state, stage, now, () => readinessAt(stage === "activate" ? "activate" : "adapt").items);
     apiSuccess(route.res, { projectId, view: "conformance", stage, statement, claim: statement.claim });
     return true;
   }
-  const unproduced = /^\/(value|monitor)$/.exec(rest)?.[1];
-  if (unproduced !== undefined) {
-    // The producers land with Activate (P1-62, value and monitor); until then nothing is evaluated.
+  if (rest === "/value") {
+    // Reads only: the value report ran once, at Review; GET never runs it and never appends a value event (C-30).
     assertQuery(params, []);
-    apiSuccess(route.res, { projectId, view: unproduced, status: "not_evaluated", reasonCodes: ["NO_PRODUCER_REGISTERED"], items: [],
-      claim: unboundClaim(projectId, unproduced, unproduced !== "monitor") });
+    let regulated = true;
+    try {
+      regulated = isRegulated(state, signedA4Floor(route.workspace));
+    } catch {
+      // An unverified approval policy reads regulated (fail closed).
+    }
+    apiSuccess(route.res, valueView(store, state, regulated, now));
+    return true;
+  }
+  if (rest === "/monitor") {
+    assertQuery(params, []);
+    const release = currentRelease(state.chain);
+    const view = monitorView(route.workspace, state, typeof release?.body.releaseId === "string" ? release.body.releaseId : null);
+    // The record's own aggregate when it resolves (one envelope per source, weakest member); otherwise nothing is evaluated.
+    const recorded = (view.monitor as { claim?: ClaimEnvelope } | null)?.claim;
+    apiSuccess(route.res, { projectId, view: "monitor", ...view, claim: recorded ?? unboundClaim(projectId, "monitor", false) });
     return true;
   }
   return false;
@@ -723,20 +741,29 @@ export async function handleA4Route(pathname: string, method: string, req: Incom
   const verb = method.toUpperCase();
   if (verb !== "GET" && verb !== "POST") return refuse(res, 405, "METHOD_NOT_ALLOWED", "A4 routes take GET or POST.");
   res.setHeader("cache-control", "no-store");
+  await serveA4({ workspace: context.workspace, native: nativeTasks, principal: resolved.principal, pathname, method: verb,
+    params: new URL(req.url ?? "/", "http://a4.invalid").searchParams, req, res });
+  return true;
+}
+
+/**
+ * The router behind admission: one store, the dispatch, and errors as the API answers them. The HTTP entry above calls
+ * it after its refusals; the CLI (P1-65, src/cli-a4-commands.ts) calls it with the principal its login token resolved
+ * to (admission native_login_token), so both run the same routes, gate functions and refusals.
+ */
+export async function serveA4(route: Omit<A4Route, "store">): Promise<void> {
   let store: A4Store;
   try {
-    store = openA4Store(context.workspace);
+    store = openA4Store(route.workspace);
   } catch (error) {
-    sendError(res, error, null);
-    return true;
+    sendError(route.res, error, null);
+    return;
   }
   try {
-    await dispatch({ workspace: context.workspace, store, native: nativeTasks, principal: resolved.principal, pathname, method: verb,
-      params: new URL(req.url ?? "/", "http://a4.invalid").searchParams, req, res });
+    await dispatch({ ...route, store });
   } catch (error) {
-    sendError(res, error, PROJECT_PATH.exec(pathname.slice(A4_API_PREFIX.length))?.[1] ?? null);
+    sendError(route.res, error, PROJECT_PATH.exec(route.pathname.slice(A4_API_PREFIX.length))?.[1] ?? null);
   } finally {
     store.close();
   }
-  return true;
 }

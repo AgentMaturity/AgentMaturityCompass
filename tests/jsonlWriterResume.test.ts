@@ -65,7 +65,8 @@ beforeEach(() => {
   workspace = mkdtempSync(join(root, "amc-jsonl-resume-"));
   const environment: Record<string, string | undefined> = { AMC_SESSION_STORE: undefined, AMC_NO_SIGN: undefined,
     AMC_EXPECTED_MONITOR_FINGERPRINT: undefined, AMC_HOME: join(workspace, "operator-home"),
-    AMC_CONTROL_CHECKPOINT_DIR: join(workspace, "control-checkpoints"), AMC_VAULT_REMEMBER: "0" };
+    // Outside the workspace: a checkpoint root inside it is refused by name (P0-57, CONTROL_CHECKPOINT_ROOT_IN_WORKSPACE).
+    AMC_CONTROL_CHECKPOINT_DIR: `${workspace}-control-checkpoints`, AMC_VAULT_REMEMBER: "0" };
   originalEnvironment = Object.fromEntries(Object.keys(environment).map(key => [key, process.env[key]]));
   for (const [key, value] of Object.entries(environment)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; }
   initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });

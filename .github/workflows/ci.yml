@@ -73,6 +73,10 @@ jobs:
       - name: No fabricated results
         run: npm run check:no-fabrication
 
+      # P1-41: published release notes never use a banned claim word, even negated (docs/RELEASE_RUNBOOK.md).
+      - name: Release notes claim words
+        run: node scripts/check-release-notes.mjs docs/releases/*.md
+
       # P0-11: every enforcement point, test and owner the channel map cites
       # exists (docs/security/THREAT_MODEL.md).
       - name: Threat model channel map
@@ -305,6 +309,55 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Packed-install check
         run: node scripts/packed-install-check.mjs
+
+  # P1-06: the standalone verifier is packed once, then installed with no other
+  # dependency and run against the normative fixtures on every supported Node.
+  verifier-pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: npm run build:verifier
+      - run: mkdir -p tmp/verifier-pack && cd packages/verifier && npm pack --pack-destination ../../tmp/verifier-pack
+      - uses: actions/upload-artifact@v7
+        with:
+          name: verifier-pack
+          path: tmp/verifier-pack/*.tgz
+
+  verifier-conformance:
+    needs: verifier-pack
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["20", "22", "24"]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: verifier-pack
+          path: tmp/verifier-pack
+      - name: Install the packed verifier offline into an empty directory
+        run: |
+          mkdir -p "$RUNNER_TEMP/consumer" && cd "$RUNNER_TEMP/consumer"
+          echo '{"name":"consumer","private":true}' > package.json
+          npm install --offline --no-audit --no-fund --ignore-scripts "$GITHUB_WORKSPACE"/tmp/verifier-pack/*.tgz
+      - name: Run the normative fixtures
+        run: node packages/verifier/conformance/run.mjs --cmd "$RUNNER_TEMP/consumer/node_modules/.bin/amc-verify" --out "conformance-results-node${{ matrix.node-version }}.json"
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: verifier-conformance-node${{ matrix.node-version }}
+          path: conformance-results-node${{ matrix.node-version }}.json
 
   # P0-35: every image is built and qualified natively on each published
   # architecture (GitHub-hosted arm64 Linux runner for public repositories).

@@ -794,7 +794,7 @@ import {
   standardVerifyCli
 } from "./standard/standardCli.js";
 import { runRedTeam, renderRedTeamMarkdown, listStrategies } from "./redteam/index.js";
-
+import { registerA4Commands } from "./cli-a4-commands.js";
 async function readStdinAll(): Promise<string> {
   return new Promise((resolve) => {
     let data = "";
@@ -10308,14 +10308,17 @@ bundle
   .requiredOption("--run <runId>", "run ID")
   .requiredOption("--out <file>", "output .amcbundle file")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { run: string; out: string; agent?: string }) => {
+  .option("--attest", "add the agent's CycloneDX AIBOM and a DSSE-signed in-toto statement about the run (artifact-seal key)")
+  .action((opts: { run: string; out: string; agent?: string; attest?: boolean }) => {
     const result = exportEvidenceBundle({
       workspace: process.cwd(),
       runId: opts.run,
       outFile: opts.out,
-      agentId: opts.agent ?? activeAgent(program)
+      agentId: opts.agent ?? activeAgent(program),
+      attest: opts.attest === true
     });
     console.log(chalk.green(`Bundle exported: ${result.outFile}`));
+    if (opts.attest) console.log("Attested: attestations/aibom.cdx.json and attestations/control-results.sigstore.json (DSSE, workspace artifact-seal key: a local audit trail until a trust list pins that key)");
     printClaimResult(runIdClaim(opts.run, opts.agent ?? activeAgent(program)), {});
     console.log(`Files: ${result.fileCount}, Events: ${result.eventCount}, Sessions: ${result.sessionCount}`);
   });
@@ -24359,7 +24362,7 @@ registerAgentCommands(program);
 registerNativeProviderCommands(program);
 registerNativeExtensionCommands(program);
 registerCredentialsCommands(program);
-
+registerA4Commands(program);
 function isTopLevelHelpRequest(argv: string[]): boolean {
   const args = argv.slice(2);
   if (!args.some((arg) => arg === "--help" || arg === "-h")) {

@@ -11,7 +11,7 @@
  * - Persist (`persistHookAuditLatch`): `<AMC home>/state/hook-audit-latch/<scope>.json`, one file per latched workspace,
  *   outside it (the scope is a digest of its real path, src/keys/highWater.ts), plus the Bridge's memory. A new session,
  *   a re-registration, a later successful write or a restart do not clear it; the file exists only once tripped.
- * - Recover (`recoverHookAuditLatch`): `amc connect hooks recover`, owner mode and vault passphrase, recorded as verified
+ * - Recover (`recoverHookAuditLatch`): `amc connect hooks health --recover-latch`, owner mode and vault passphrase, recorded as verified
  *   evidence with the same writer first. A running Bridge keeps its memory latch until it restarts.
  * - Startup (`hookAuditLatchState`): reports the state and never trips; no file, no state directory or an empty ledger
  *   read as not latched.
@@ -58,7 +58,7 @@ const memory = new Map<string, Entry>();
 const fileOf = (scope: string) => `${DIR_REL}/${scope}.json`;
 
 export const latchedMessage = (reason: string) => `AMC latched this workspace's hooks because its writer could not record their evidence (${reason}); `
-  + "every hook request is refused until the owner runs `amc connect hooks recover`";
+  + "every hook request is refused until the owner runs `amc connect hooks health --recover-latch`";
 
 /** The workspace's latch as this process sees it. Reads only: it never trips. A latch file AMC cannot read is still a latch. */
 export function hookAuditLatchState(workspace: string): HookAuditLatchState {
@@ -116,12 +116,12 @@ export function guardHookAudit<T>(workspace: string, refuse: (message: string) =
 }
 
 /**
- * `amc connect hooks recover`: in owner mode, with the vault passphrase, record the recovery as verified evidence with
+ * `amc connect hooks health --recover-latch`: in owner mode, with the vault passphrase, record the recovery as verified evidence with
  * the workspace's writer (a writer that still fails keeps the latch), then clear the latch.
  */
 export function recoverHookAuditLatch(input: { workspace: string; passphrase: string | undefined; now?: number }):
   { recovered: boolean; reason: string | null; eventId: string | null } {
-  assertOwnerMode(input.workspace, "connect hooks recover");
+  assertOwnerMode(input.workspace, "connect hooks health --recover-latch");
   if (!input.passphrase) throw new Error("Recovering latched hooks requires the vault passphrase (AMC_VAULT_PASSPHRASE or interactive input).");
   unlockVault(input.workspace, input.passphrase);
   const state = hookAuditLatchState(input.workspace);

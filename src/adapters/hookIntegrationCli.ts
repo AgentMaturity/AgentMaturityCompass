@@ -136,8 +136,9 @@ export function registerHookIntegrationCommands(
     .command("health")
     .description("Verify signed hook setup and show the latest verified provider event")
     .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi")
+    .option("--recover-latch", "owner only: first clear this workspace's hook audit latch (vault passphrase); the recovery is recorded", false)
     .option("--json", "emit structured JSON", false)
-    .action(async (opts: { provider: string; json: boolean }) => {
+    .action(async (opts: { provider: string; json: boolean; recoverLatch: boolean }) => {
       if (!isHookProvider(opts.provider)) {
         const message = "provider must be claude-code, gemini-cli or pi";
         if (opts.json) console.log(JSON.stringify({ ok: false, error: message }, null, 2));
@@ -154,13 +155,20 @@ export function registerHookIntegrationCommands(
           // The diagnostic below reports unavailable evidence without exposing credential errors.
         }
       }
+      const latchRecovery = opts.recoverLatch
+        ? recoverHookAuditLatch({ workspace, passphrase: passphrase ?? (await promptPassphrase("Vault passphrase (owner):")) })
+        : null;
       const health = inspectHookHealth({ workspace, provider: opts.provider });
       const control = health.provider === "claude-code" && health.mode === "control"
         ? await verifyClaudeControl({ workspace })
         : null;
       if (opts.json) {
-        console.log(JSON.stringify(control ? { ...health, control } : health, null, 2));
+        console.log(JSON.stringify({ ...health, ...(control ? { control } : {}), ...(latchRecovery ? { latchRecovery } : {}) }, null, 2));
       } else {
+        if (latchRecovery) {
+          console.log(latchRecovery.recovered ? `Hook audit latch cleared (was: ${latchRecovery.reason}); recovery recorded as ${latchRecovery.eventId}. `
+            + "Restart the Bridge: a running Bridge keeps the latch it holds in memory." : "Hook audit latch: not latched.");
+        }
         const color = health.status === "observed"
           ? chalk.hex("#4AEF79")
           : health.status === "fail_closed"
@@ -235,26 +243,6 @@ export function registerHookIntegrationCommands(
         if (lifecycle.observationConflict) console.log(chalk.red("Observation conflict: an outcome for this call was unmatched, conflicting or unverifiable"));
       }
       if (lifecycle.failClosed || lifecycle.authorizationMismatch || lifecycle.observationConflict) process.exitCode = 1;
-    });
-
-  hooks
-    .command("recover")
-    .description("Owner only: clear the hook audit latch set when AMC could not record hook evidence (vault passphrase)")
-    .option("--json", "emit structured JSON", false)
-    .action(async (opts: { json: boolean }) => {
-      const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):"));
-      const result = recoverHookAuditLatch({ workspace: process.cwd(), passphrase });
-      if (opts.json) {
-        console.log(JSON.stringify(result, null, 2));
-        return;
-      }
-      if (!result.recovered) {
-        console.log("AMC hooks are not latched in this workspace.");
-        return;
-      }
-      console.log(chalk.hex("#4AEF79")(`AMC hook audit latch cleared; recovery recorded as ${result.eventId}`));
-      console.log(`It was latched because: ${result.reason}`);
-      console.log("Restart the Bridge: a running Bridge keeps the latch it holds in memory.");
     });
 
   hooks

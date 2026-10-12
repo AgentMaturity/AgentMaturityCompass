@@ -3,7 +3,8 @@ import { verifyKeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
 import { sha256Hex } from "../utils/hash.js";
 import { KEY_PURPOSES, ROLE_PURPOSES, type KeyPurpose } from "./keyPurposes.js";
 import type { TrustContext } from "./trustContext.js";
-import { ed25519KeyId, type DistrustEntry, type TrustListEntry } from "./trustList.js";
+import { distrustAt, listsAt } from "./admissionRule.js";
+import { ed25519KeyId } from "./trustList.js";
 
 export const issuerAdmissionSchema = z.strictObject({
   signature: z.string(),
@@ -25,9 +26,9 @@ export interface AdmitKeyInput {
   signature: string;
   context: TrustContext;
   /**
-   * The signing time the artifact claims. Until P1-25 this is untrusted: a claim later than the verification time is
-   * refused, and an admission that rests on an earlier claim (a superseded or expired key) says so with
-   * timeBasis "claimed" and a warning.
+   * The signing time the artifact claims. It is untrusted, so it never admits a key: distrust, validity and revocation
+   * are judged at the verification time (P1-06). A claim later than the verification time, or before the admitting
+   * entry's validFrom, is refused, and an admission checked against a claim says so with timeBasis "claimed".
    */
   claimedSignedAt?: string | Date | null;
   /** A key-history envelope carried by the artifact (AMC-1525). */
@@ -42,42 +43,30 @@ function time(value: string | Date | null | undefined): number | null {
   return Number.isFinite(ms) ? ms : null;
 }
 
-/** Checks one trust-list entry that names the key, at the claimed signing time or else at the verification time. */
-function checkEntry(entry: TrustListEntry, listId: string, purpose: KeyPurpose, claimed: number | null, asOf: number): Verdict {
+/**
+ * The trust lists' verdict on a key, judged at the verification time by the shared rule (src/trust/admissionRule.ts,
+ * also compiled into the standalone verifier). A claimed signing time never admits a key the rule refuses; AMC also
+ * refuses a claim that lies outside the admitting entry's window or after the verification time, which the standalone
+ * verifier reports under freshness instead.
+ */
+function listVerdict(keyId: string, purpose: KeyPurpose, claimed: number | null, context: TrustContext): Verdict | null {
+  const asOf = context.asOf.getTime();
+  const found = listsAt(context.lists, keyId, purpose, asOf);
+  if (!found) return null;
+  const { entry, listId } = found;
   const refuse = (status: IssuerAdmission["status"], detail: string): Verdict => ({ status, source: null, listId, timeBasis: null, detail });
-  if (!entry.purposes.includes(purpose)) return refuse("wrong-purpose", `trust list ${listId} pins this key for ${entry.purposes.join(", ")}, not ${purpose}`);
+  switch (found.status) {
+    case "wrong-purpose": return refuse("wrong-purpose", `trust list ${listId} pins this key for ${entry.purposes.join(", ")}, not ${purpose}`);
+    case "not-yet-valid": return refuse("not-yet-valid", `trust list ${listId} admits this key from ${entry.validFrom}`);
+    case "expired": return refuse("expired", `trust list ${listId} admitted this key until ${entry.validTo}`);
+    case "revoked": return refuse("revoked", `trust list ${listId} revoked this key at ${entry.revokedAt ?? "an unrecorded time"} (${entry.revocationReason ?? "unspecified"})`);
+    case "admitted": break;
+  }
   if (claimed !== null && claimed > asOf) {
-    return refuse("not-yet-valid", `the signature claims a signing time after the verification time ${new Date(asOf).toISOString()}`);
+    return refuse("not-yet-valid", `the signature claims a signing time after the verification time ${context.asOf.toISOString()}`);
   }
-  const at = claimed ?? asOf;
-  if (at < Date.parse(entry.validFrom)) return refuse("not-yet-valid", `trust list ${listId} admits this key from ${entry.validFrom}`);
-  if (entry.validTo !== null && at >= Date.parse(entry.validTo)) return refuse("expired", `trust list ${listId} admitted this key until ${entry.validTo}`);
-  const timeBasis = claimed === null ? null : "claimed";
-  if (entry.revokedAt !== undefined) {
-    if (entry.revocationReason === "key-compromise" || claimed === null || claimed >= Date.parse(entry.revokedAt)) {
-      return refuse("revoked", `trust list ${listId} revoked this key at ${entry.revokedAt} (${entry.revocationReason ?? "unspecified"})`);
-    }
-    return { status: "admitted", source: "trust-list", listId, timeBasis: "claimed",
-      detail: `warning: key revoked at ${entry.revokedAt} (${entry.revocationReason}); admitted only on the signature's claimed time` };
-  }
-  const expiredNow = entry.validTo !== null && asOf >= Date.parse(entry.validTo);
-  return { status: "admitted", source: "trust-list", listId, timeBasis,
-    detail: expiredNow ? `warning: key expired at ${entry.validTo}; admitted only on the signature's claimed time` : null };
-}
-
-/** Step 1's rule: distrusted for every claim when distrustedFrom is null, otherwise for claims at or after it (or no claim). */
-function distrustOf(keyId: string, claimed: number | null, context: TrustContext): DistrustEntry | undefined {
-  return context.distrust.find(entry => entry.keyId === keyId
-    && (entry.distrustedFrom === null || claimed === null || claimed >= Date.parse(entry.distrustedFrom)));
-}
-
-/** A key-compromise revocation is a fact about the key, so one in any loaded list refuses it for every purpose and time. */
-function compromiseOf(keyId: string, context: TrustContext): { listId: string; revokedAt: string | undefined } | undefined {
-  for (const list of context.lists) {
-    const entry = list.entries.find(candidate => candidate.keyId === keyId && candidate.revocationReason === "key-compromise");
-    if (entry) return { listId: list.listId, revokedAt: entry.revokedAt };
-  }
-  return undefined;
+  if (claimed !== null && claimed < Date.parse(entry.validFrom)) return refuse("not-yet-valid", `trust list ${listId} admits this key from ${entry.validFrom}`);
+  return { status: "admitted", source: "trust-list", listId, timeBasis: claimed === null ? null : "claimed", detail: null };
 }
 
 /** AMC-1525: an older role key is admitted only through history signed by a pinned anchor that allows key history. */
@@ -90,8 +79,9 @@ function admitFromHistory(keyId: string, purpose: KeyPurpose, history: unknown, 
     for (const anchor of list.entries) {
       if (anchor.allowKeyHistory !== true) continue;
       // Distrust beats every pin, so a distrusted or compromised anchor vouches for no one.
-      if (distrustOf(anchor.keyId, claimed, context) || compromiseOf(anchor.keyId, context)) continue;
-      if (checkEntry(anchor, list.listId, purpose, claimed, context.asOf.getTime()).status !== "admitted") continue;
+      if (distrustAt(context.distrust, anchor.keyId, context.asOf.getTime())) continue;
+      if (listVerdict(anchor.keyId, purpose, claimed, { ...context, lists: [{ ...list, entries: [anchor] }] })?.status !== "admitted") continue;
+      if (listsAt(context.lists, anchor.keyId, purpose, context.asOf.getTime())?.status === "revoked") continue;
       const checked = verifyKeyHistoryEnvelope(history, roleKey, anchor.publicKeyPem);
       if (checked.valid && checked.envelope?.entries.some(entry => entry.fingerprint === keyId)) {
         return { status: "admitted", source: "trust-list-history", listId: list.listId, timeBasis: null,
@@ -113,8 +103,8 @@ export function admitKey(input: AdmitKeyInput): IssuerAdmission {
   if (canonicalId === null) return refuse("not-pinned", `key ${keyId} is not an Ed25519 SPKI public key, so no pin can admit it`);
   const claimed = time(input.claimedSignedAt);
 
-  // 1. Distrust beats every pin and every allow flag.
-  const distrusted = distrustOf(keyId, claimed, context);
+  // 1. Distrust beats every pin and every allow flag. It is judged at the verification time, never a claimed one.
+  const distrusted = distrustAt(context.distrust, keyId, context.asOf.getTime());
   if (distrusted) return refuse("distrusted", `key ${keyId} is distrusted (${distrusted.reason}, ${distrusted.source}): ${distrusted.note}`);
 
   // 2. Explicit pins (--pubkey, --expect-monitor), or the workspace's own keys in workspace-self mode.
@@ -124,17 +114,8 @@ export function admitKey(input: AdmitKeyInput): IssuerAdmission {
   }
 
   // 3. Trust-list entries that name this key. A key-compromise revocation in any list beats an entry in another.
-  const compromised = compromiseOf(keyId, context);
-  if (compromised) {
-    return result({ status: "revoked", source: null, listId: compromised.listId, timeBasis: null,
-      detail: `trust list ${compromised.listId} revoked this key at ${compromised.revokedAt ?? "an unrecorded time"} (key-compromise)` });
-  }
-  const verdicts = context.lists.flatMap(list => list.entries.filter(entry => entry.keyId === keyId)
-    .map(entry => checkEntry(entry, list.listId, purpose, claimed, context.asOf.getTime())));
-  const admitted = verdicts.find(verdict => verdict.status === "admitted");
-  if (admitted) return result(admitted);
-  const refused = verdicts.find(verdict => verdict.status !== "wrong-purpose") ?? verdicts[0];
-  if (refused) return result(refused);
+  const listed = listVerdict(keyId, purpose, claimed, context);
+  if (listed) return result(listed);
 
   // 4. Older keys through signed key history.
   const fromHistory = input.keyHistory === undefined ? null : admitFromHistory(keyId, purpose, input.keyHistory, context, claimed);

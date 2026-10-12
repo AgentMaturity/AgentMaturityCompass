@@ -249,7 +249,7 @@ what AMC can see.
 
 - **Audit latch.** If AMC's own writer fails (a disk, signing or chain fault) while recording for a registered session,
   the Bridge latches the workspace's hooks: every hook request of that workspace, any session, event or provider, is
-  refused until the owner runs `amc connect hooks recover` (owner mode, vault passphrase), which records the recovery as
+  refused until the owner runs `amc connect hooks health --provider claude-code --recover-latch` (owner mode, vault passphrase), which records the recovery as
   verified evidence first. Restart the Bridge afterwards. The latch is kept in `<AMC home>/state/hook-audit-latch/`, so a
   restart, a new session or a later successful write does not clear it. Malformed, duplicate, oversized, replayed or
   unauthenticated requests are refused and never latch.

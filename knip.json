@@ -11,7 +11,7 @@
         "scripts/compat-matrix-report.mjs", "scripts/fake-external-signer.mjs",
         "scripts/installed-crash-recovery-check.mjs", "scripts/studio-native-browser-check.mjs",
         "scripts/update-native-task-openapi.mjs",
-        "src/console/assets/app.js", "src/console/assets/sw.js",
+        "src/console/assets/app.js", "src/console/assets/sw.js", "src/console/assets/a4.js",
         "src/console/assets/benchCompare.js", "src/console/assets/benchPortfolio.js",
         "src/console/assets/benchRegistry.js", "src/console/assets/benchmarks.js",
         "src/console/assets/equalizer.js", "src/console/assets/mechanic.js",

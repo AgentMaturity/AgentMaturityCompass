@@ -1,7 +1,7 @@
 /**
  * Assemble's Build and Review (P1-60; design §10.2). Build runs the approved plan: refusals first (owner mode,
- * the signing key, the baseline Enforce manifest through proposeEnforceResourceLifecycle, and the native session's
- * admission as Studio's native task route checks it), then the deterministic executors (the revised typed graph, the
+ * the signing key, the baseline Enforce manifest through proposeEnforceResourceLifecycle, the native session's
+ * admission as Studio's native task route checks it, and the principal its lease will name, P1-78), then the deterministic executors (the revised typed graph, the
  * agent's preset merged into the signed presets file), and journals the native build session in its revision before
  * anything starts it: the router starts it after the transition commits, on the live NativeTaskService Studio already
  * holds (`context.nativeTasks.service`), never a second instance. Further turns, cancel and resume go through Studio's
@@ -13,16 +13,18 @@
  */
 import { randomUUID } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { join, relative, sep } from "node:path";
+import { join } from "node:path";
 import { actionEvidenceCoverage } from "../actions/actionEvidenceCoverage.js";
 import { verifyAgentRun } from "../agent/runReport.js";
 import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
 import { readBudgetEvents } from "../budgets/nativeBudgetUsage.js";
+import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { readAndVerifyArtifactFileSignature } from "../lifecycle/artifactSignature.js";
 import { lifecyclePath, lifecycleStages } from "../lifecycle/lifecycle.js";
 import { evaluateEnforceResourceLifecycle, projectEnforceResourceLifecycleStatus, proposeEnforceResourceLifecycle } from "../enforce/resourceManifest.js";
 import { writeTypedMultiAgentGraph } from "../fleet/typedGraph.js";
+import { LeasePrincipalRefused, resolveLeasePrincipal } from "../leases/leasePrincipal.js";
 import { openLedger } from "../ledger/ledger.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { readPresets, savePresets } from "../presets/agentPresets.js";
@@ -30,19 +32,18 @@ import { assertNativeExecutionIdentity, NativeAdmissionError } from "../studio/n
 import { nativeTaskId } from "../studio/nativeTaskDescriptors.js";
 import { nativeTaskStartSchema } from "../studio/nativeTaskInput.js";
 import { NativeTaskServiceError, type NativeTaskActor, type NativeTaskStartRequest, type NativeTaskView } from "../studio/nativeTaskTypes.js";
+import { planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { loadTrustContext } from "../trust/trustContext.js";
 import { buildVerifierReport } from "../trust/verifierReport.js";
 import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { A4ProducerContext, A4ProducerResult } from "./a4RouterStages.js";
-import { A4StoreError } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
 import { ASSEMBLE_CLAIM_BOUNDARY, assembleSpecOf, LIFECYCLE_SEAM_KEY, presetIdOf, proposedFor, STUB_WORDING } from "./spec/assemble.js";
 import { answerValues, listValue } from "./spec/aspire.js";
+import { fail, relPath } from "./stages/common.js";
 
-const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
-const relPath = (workspace: string, path: string): string => relative(workspace, path).split(sep).join("/");
 /** States in which a session may still change what it did: Review waits for them. */
 const RUNNING = new Set<NativeTaskView["state"]>(["starting", "running", "cancel-requested", "releasing", "verifying"]);
 
@@ -69,9 +70,37 @@ interface PlannedSession {
 type Session = { provider: NativeTaskStartRequest["provider"]; model: string | null; tools: "none" | "workspace"; toolsDigest: string | null; maxSteps: number; maxTokens: number };
 
 /**
+ * P1-78 before Build writes anything: a workspace-tools session under a plan whose identity-binding requires an agent
+ * lease (L0-IDN-01) runs under a lease Studio's native service mints for the session's principal (P1-67), and it
+ * refuses one that is not an active local users.yaml user under a plan that also requires a principal. The same
+ * principal (`session:<plane>:<userId>`, as the service keys it) is resolved here, so that refusal (409
+ * PRINCIPAL_UNRESOLVED) comes before the graph, the preset or the journaled session, never after the step is recorded.
+ * A plan that does not verify reads as requiring both (the service refuses to start under it too). Read-only.
+ */
+function assertSessionPrincipal(workspace: string, principalId: string): void {
+  let leased = true;
+  try {
+    leased = planRequiresAgentLease(loadActiveCompiledPolicy(workspace));
+  } catch {
+    // Unverifiable: resolved as if required (fail closed); the service refuses to start under it as well.
+  }
+  if (!leased) return;
+  try {
+    resolveLeasePrincipal(workspace, principalId.startsWith("session:") ? principalId.slice("session:".length) : null);
+  } catch (error) {
+    if (error instanceof LeasePrincipalRefused) {
+      throw fail(409, "PRINCIPAL_UNRESOLVED", `${error.message.replace(/^PRINCIPAL_UNRESOLVED: /, "")}. No build session was journaled and nothing was written; `
+        + "sign in as an active local users.yaml user.");
+    }
+    throw error;
+  }
+}
+
+/**
  * The native session Build journals: admitted as Studio's native task route admits it (read-only refusal, the human
- * execution identity) and checked against the live service's configuration, which must still offer the approved
- * provider (credential configured), tool scope (same digest) and validation config (same sha256). Read-only.
+ * execution identity, the principal its lease will name) and checked against the live service's configuration, which
+ * must still offer the approved provider (credential configured), tool scope (same digest) and validation config (same
+ * sha256). Read-only.
  */
 async function plannedSession(ctx: A4ProducerContext, spec: Record<string, unknown>): Promise<PlannedSession> {
   const native = requireNative(ctx);
@@ -85,6 +114,7 @@ async function plannedSession(ctx: A4ProducerContext, spec: Record<string, unkno
   } catch (error) {
     throw nativeRefusal(error);
   }
+  if (session.tools === "workspace") assertSessionPrincipal(ctx.workspace, native.principalId);
   const config = await native.service.configuration(nativeActor(native, agentId)).catch((error: unknown) => {
     throw nativeRefusal(error);
   });
@@ -297,7 +327,7 @@ function bindingMismatch(view: NativeTaskView, start: NativeTaskStartRequest): s
   return Object.keys(expected).filter((key) => expected[key] !== actual[key]);
 }
 /** What Review records about the prompt binding until the native task lane exposes the first submission's bodyHash. */
-export const PROMPT_BINDING = "not_evaluated (the native task view exposes no submission bodyHash to compare with the journaled start)";
+const PROMPT_BINDING = "not_evaluated (the native task view exposes no submission bodyHash to compare with the journaled start)";
 
 /**
  * One build session as its owner reads it now; refuses one that is not the journaled start (409 BUILD_SESSION_MISMATCH),

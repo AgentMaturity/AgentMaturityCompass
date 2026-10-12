@@ -1,0 +1,18 @@
+{
+  "case": "dsse-expired",
+  "normative": true,
+  "dimensions": {
+    "integrity": "pass",
+    "issuerAdmission": "pass",
+    "scope": "pass",
+    "freshness": "fail",
+    "completeness": "pass",
+    "satisfaction": "not-evaluated"
+  },
+  "reasonCodes": {
+    "freshness": [
+      "ATTESTATION_EXPIRED"
+    ]
+  },
+  "exitCode": 1
+}
