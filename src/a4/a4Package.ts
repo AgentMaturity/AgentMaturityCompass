@@ -6,9 +6,9 @@
  * digest names (`snapshots/<manifestId>/files`, verified against its signed manifest), and the context files and signed
  * configs Propose copied into `a4-projects/<projectId>/<revisionNo>/<sha256>`, each asserted equal to its bound slot —
  * scans it (PASS required), mints the narrowed staging lease (WRITE_LOW at most, the staging routes, 24 h, work order =
- * the release), signs the manifest (`A4_PACKAGE`), the update policy (`A4_PACKAGE`), the prepared deployment plan
+ * the release, naming its owner per P1-78), signs the manifest (`A4_PACKAGE`), the update policy (`A4_PACKAGE`), the prepared deployment plan
  * (`a4-deployment-plan`, slice B) and the tarball (`a4-package`), and records the release (`amc.a4-release/v1`, its own
- * `A4_RECORD` envelope) with a RELEASE transition; RELEASE's refusals are checked before anything is minted or signed.
+ * `A4_RECORD` envelope) with a RELEASE transition; RELEASE's refusals, the keys and the principal are checked before anything is minted or signed.
  * Only after RELEASE commits does it append the transparency entry and run the lifecycle bridge to testing and staging.
  * The staging token is answered once in the response that ran the effect and stored nowhere. The production lease is the deployment approval's own effect (`a4.activate.production_lease`, on activate.completion's
  * quorum), followed by the bridge to production. AMC never deploys: the package is the signed provenance record of what
@@ -24,7 +24,7 @@ import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { latestEnforceResourceManifestPath, loadCanonicalEnforceResourceManifest, type EnforceResource } from "../enforce/resourceManifest.js";
 import { getAgentPaths } from "../fleet/paths.js";
 import { typedMultiAgentGraphDigest, typedMultiAgentGraphSchema } from "../fleet/typedGraph.js";
-import { issueLeaseToken } from "../leases/leaseSigner.js";
+import { issueLeaseForPrincipal, resolveLeasePrincipal } from "../leases/leasePrincipal.js";
 import { revokeLease } from "../leases/leaseStore.js";
 import { readAndVerifyArtifactFileSignature, signArtifactBytes, signArtifactFile, type ArtifactSignature } from "../lifecycle/artifactSignature.js";
 import { assertOwnerMode } from "../mode/mode.js";
@@ -45,6 +45,7 @@ import { a4ProjectsRoot } from "./a4Blobs.js";
 import { conformanceView } from "./a4Conformance.js";
 import type { A4EffectContext, A4EffectDef, A4EffectOutcome } from "./a4Effects.js";
 import { A4_RUNTIME, signedA4Floor } from "./a4Gates.js";
+import { asLeasePrincipal } from "./a4Preflight.js";
 import { isRegulated, redoneStages, type A4ReadinessState } from "./a4Readiness.js";
 import {
   a4PackageV1Schema, a4PrincipalSchema, a4QualitySpecSchema, a4ReleaseV1Schema, a4ResourceDigestsSchema, type A4ChainLink, type A4PackageV1, type A4Principal, type A4ProjectRow,
@@ -327,11 +328,10 @@ function revokeJournaled(workspace: string, projectId: string, releaseId: string
   }
 }
 /**
- * The vault keys a lease step signs with, in any signing mode (the lease key mints a lease, the auditor key revokes one),
- * read before an effect's first side effect, so a locked vault answers A4_VAULT_LOCKED (423) before anything is revoked,
- * written, minted or signed, never part-way through.
+ * Before an effect's first side effect: the vault keys a lease step signs with, in any signing mode (the lease key mints a lease, the auditor key revokes
+ * one; a locked vault answers A4_VAULT_LOCKED, 423), then the principal the lease will name (P1-78, src/a4/a4Preflight.ts), so a refusal leaves nothing revoked, written, minted or signed.
  */
-function assertLeaseKeys(workspace: string, what: string): void {
+function assertLeaseKeys(workspace: string, principal: A4Principal, what: string): void {
   try {
     getPrivateKeyPem(workspace, "lease");
     getPrivateKeyPem(workspace, "revocation-list"); // P1-08: the key revokeLease signs the lease revocation list with
@@ -339,13 +339,14 @@ function assertLeaseKeys(workspace: string, what: string): void {
     if (vaultLocked(error)) throw coded("A4_VAULT_LOCKED", `unlock the vault to ${what}`);
     throw error;
   }
+  asLeasePrincipal(principal, (principalKey) => resolveLeasePrincipal(workspace, principalKey));
 }
-/** Mints one lease of the plan bound to the project's workspace, agent and release; its id is journaled before the token is returned. */
-function mintLease(workspace: string, state: A4ReadinessState, releaseId: string, plan: LeasePlan): { leaseId: string; token: string; expiresAt: string; projection: Record<string, unknown> } {
+/** Mints one lease of the plan bound to the project's workspace, agent and release, naming `principal` (resolved again); its id is journaled before the token is returned. */
+function mintLease(workspace: string, state: A4ReadinessState, releaseId: string, plan: LeasePlan, principal: A4Principal): { leaseId: string; token: string; expiresAt: string; projection: Record<string, unknown> } {
   realDir(join(realDir(a4ReleasesRoot(workspace)), state.project.project_id));
-  const { token, payload } = issueLeaseToken({ workspace, workspaceId: state.project.workspace_id, agentId: state.project.agent_id, ttlMs: plan.ttlMs,
-    scopes: plan.scopes, routeAllowlist: plan.routeAllowlist, modelAllowlist: plan.modelAllowlist, maxTokensPerMinute: plan.maxTokensPerMinute,
-    maxRequestsPerMinute: plan.maxRequestsPerMinute, maxCostUsdPerDay: plan.maxCostUsdPerDay, workOrderId: releaseId, executeActionClasses: plan.executeActionClasses });
+  const { token, payload } = asLeasePrincipal(principal, (principalKey) => issueLeaseForPrincipal({ workspace, workspaceId: state.project.workspace_id, agentId: state.project.agent_id,
+    ttlMs: plan.ttlMs, scopes: plan.scopes, routeAllowlist: plan.routeAllowlist, modelAllowlist: plan.modelAllowlist, maxTokensPerMinute: plan.maxTokensPerMinute,
+    maxRequestsPerMinute: plan.maxRequestsPerMinute, maxCostUsdPerDay: plan.maxCostUsdPerDay, workOrderId: releaseId, executeActionClasses: plan.executeActionClasses, principalKey }));
   const journal = [...journaledLeases(workspace, state.project.project_id, releaseId), { leaseId: payload.leaseId, scope: plan.scope, mintedTs: payload.issuedTs }];
   writeFileAtomic(leaseJournalPath(workspace, state.project.project_id, releaseId), `${JSON.stringify(journal, null, 2)}\n`, 0o600);
   const expiresAt = new Date(payload.expiresTs).toISOString();
@@ -496,7 +497,7 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
   if (!quality.success) throw coded("QUALITY_SPEC_MISSING", "the Aspire brief carries no quality specification");
   const integration = integrationClaimFor(assembleSpecOf(state).spec.path);
   if (integration === null) throw coded("INTEGRATION_PATH_UNKNOWN", "Assemble recorded no integration path");
-  assertLeaseKeys(workspace, "mint the release's staging lease");
+  assertLeaseKeys(workspace, ctx.principal, "mint the release's staging lease");
   revokeJournaled(workspace, projectId, releaseId, "staging");
   const projectDir = realDir(join(realDir(a4ReleasesRoot(workspace)), projectId));
   const staging = mkdtempSync(join(projectDir, ".staging-"));
@@ -514,7 +515,7 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
     const scan = scanExtractedReleaseForSecrets(staging);
     if (scan.status !== "PASS") throw coded("SECRET_SCAN_FAILED", [...new Set(scan.findings.filter((row) => row.severity === "HIGH").map((row) => row.type))].join(", "));
     // Minted only after the scan passed and inside the consumed effect: a refused package mints nothing.
-    stagingLease = mintLease(workspace, state, releaseId, plans.staging);
+    stagingLease = mintLease(workspace, state, releaseId, plans.staging, ctx.principal);
     minted = stagingLease.leaseId;
     const add = (path: string, bytes: Buffer, kind: string): string => {
       files.push({ path, bytes, kind });
@@ -773,9 +774,9 @@ async function mintProductionLease(ctx: A4EffectContext): Promise<A4EffectOutcom
   }
   const acknowledgement = acknowledgementOf(state, EXPERT_REVIEW_ITEM, Date.now(), gate.revision_no, "activate");
   if (regulated && acknowledgement === null) throw coded("EXPERT_REVIEW_PENDING", "a regulated deployment approval needs the owner's acknowledgement of the pending expert review (D-21)");
-  assertLeaseKeys(workspace, "mint the production lease");
+  assertLeaseKeys(workspace, ctx.principal, "mint the production lease");
   revokeJournaled(workspace, state.project.project_id, releaseId, "production");
-  const lease = mintLease(workspace, state, releaseId, plans.production);
+  const lease = mintLease(workspace, state, releaseId, plans.production, ctx.principal);
   // Then the lifecycle bridge to production, only with every production control evidenced (in v1 it stays at staging, P2-40).
   return { record: { lease: lease.projection, expertReview: { releaseId, regulated, itemId: EXPERT_REVIEW_ITEM, status: regulated ? "EXPERT_REVIEW_PENDING" : "NOT_REGULATED",
     acknowledgement: regulated ? acknowledgement : null }, lifecycle: lifecycleRecord(releaseId, advance(workspace, state, "production", releaseId)) },

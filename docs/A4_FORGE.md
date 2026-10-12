@@ -180,13 +180,19 @@ framework through a scaffold, connect instructions and a trace import.
   tasks page as the session's owner; the Build card loads the owner's build log with the same cursor contract. Build
   refuses, before any write, a session start Studio's native tasks would refuse (`ANSWER_INVALID:validation` or
   `ANSWER_INVALID:capabilities`): a check missing from the operator's config, checks without the signed workspace
-  `bash`, or more than 8 or duplicate check ids. Propose already leaves such checks out of the plan and lists them as
+  `bash`, or more than 8 or duplicate check ids. It also refuses, before any write, a workspace-tools session whose lease
+  Studio could not mint (P1-78): under a plan whose identity binding requires an agent lease and a principal
+  (`L0-IDN-01`), Studio's native service names the session's own `users.yaml` user in that lease and refuses anyone who
+  is not an active local user, a workspace-router session included, so Build answers 409 `PRINCIPAL_UNRESOLVED` first
+  instead of journaling a session that could never start. Propose already leaves such checks out of the plan and lists them as
   unsupported (`NOT_IN_VALIDATION_CONFIG`, `VALIDATION_SCOPE_REQUIRED`), and builds the prompt from the capabilities with
   control characters removed, cut by code point.
 - **External path.** After Build and before Review, an owner can write the path's scaffold, the bridge contract tests
   and the agent's policy pack into a new workspace directory outside `.amc/` (the record binds a manifest of every
   file's sha256; the files are written after it commits), get connect instructions (the lease token is shown once and
-  never stored; the record keeps the leaseId), and import the agent's traces through the neutral importer (originals
+  never stored; the record keeps the leaseId; the lease names the owner who asked for it when they are an active
+  `users.yaml` user, and under a plan whose identity binding requires a principal anyone else is refused 409
+  `PRINCIPAL_UNRESOLVED` before a lease is minted, P1-78), and import the agent's traces through the neutral importer (originals
   retained; imported traces are self-reported). A source already imported is refused (`IMPORT_EXISTS`): an existing
   import, which an earlier record may name, is never rewritten or rolled back. Whoever scaffolds, connects or imports
   counts as a builder of the stage: they cannot approve its completion gate or the `a4.assemble.apply` request. The scaffold directory and the import source are workspace paths of
@@ -288,7 +294,8 @@ the agent's prompt pack.
   plugin in its frame.
 - **Context probe.** `POST /api/v1/a4/projects/:id/stages/adapt/probe` (after Build; owner; owner mode) runs one
   in-process turn on the stub provider, with no network and no credential, with the plugin as an extra context. A4
-  composes the turn and writes nothing into its session: no tools and no receipt of its own. The runtime writes an
+  composes the turn and writes nothing into its session: no tools and no receipt of its own, and no lease, which no
+  call needs: the identity binding of an active plan is checked per tool call, and the turn makes none. The runtime writes an
   effective-policy receipt only before a governed tool call, and this turn makes none, so there is no receipt to cite.
   The probe checks that the run's signed `user/message` row carries the plugin's exact text and reads the turn's signed
   `turn/end` reason, and records the session's own signed `session/open` row (which names the agent) as a `ledger_event`
@@ -399,7 +406,8 @@ clientRequestId }` (owner) consumes the release approval and runs the effect ins
    the captured files read by the digest the gate bound. A file edited after the gate opened is
    `EFFECT_FAILED: RESOURCE_DRIFTED <slot>` and no package is written.
 2. The package must scan `PASS` for secrets. Only then is the staging lease minted: `WRITE_LOW` at most, the staging
-   routes, 24 hours, bound to this workspace and agent, with the release as its work order.
+   routes, 24 hours, bound to this workspace and agent, with the release as its work order, naming the owner who ran
+   the release when they are an active `users.yaml` user (P1-78; see the principal rule below).
 3. The manifest (`amc.a4-package/v1`, no absolute path; it names the staging lease by id and scope, never its token)
    is signed `A4_PACKAGE` and the tarball `a4-package`.
    `RELEASE`'s own refusals (`RELEASE_STEP_MOVED`, `RELEASE_STAGE_REDONE`, `RELEASE_ATTEMPT_SETTLED`) are checked before
@@ -433,6 +441,17 @@ the keys its consumed grant or gate quorum counted. An effect step that finds th
 artifact signature) answers 423 `A4_VAULT_LOCKED`. Both effects read the vault's `lease` and `revocation-list` purpose keys (P1-08)
 before their first side effect (a revocation, a file, a lease or a signature), so a locked vault or a revoked key fails
 them before the effect itself changes anything, and revoking an earlier attempt's lease with the vault locked answers the same code rather than `LEASE_REVOKE_FAILED`.
+The same pre-flight resolves the principal each lease names (P1-78): the owner who ran the effect, keyed as A4 keys
+its principals and never read from a body. Layer 0's mandatory `L0-IDN-01` makes every plan Adapt activates require a
+principal for every tool call, and a call under a lease that names no active `users.yaml` user is refused; so under
+such a plan (or one that does not verify) the release and the production-lease effects refuse anyone else, a
+workspace-router session included, with 409 `PRINCIPAL_UNRESOLVED` before anything is revoked, written, minted or
+signed, and the lease is minted through `issueLeaseForPrincipal`, which resolves the principal again. Under any other
+plan the lease names that user when they resolve, and no one otherwise. Readiness item `lease.principal` shows this
+before anyone approves: READY (`PRINCIPAL_NOT_REQUIRED`) when the plan requires no principal; otherwise WAITING
+(`PRINCIPAL_REQUIRED`, never mandatory) with the rule as its next action, and BLOCKED, mandatory, while no
+`users.yaml` user is active or `users.yaml` does not read (`NO_ACTIVE_LOCAL_USER`, `USERS_UNREADABLE`), so neither
+approval is requested for an effect no one could run.
 A vault that is already locked when `complete`, `POST …/releases` or a retry is sent is refused before anything is
 consumed: readiness reads `signing.available` WAITING `VAULT_LOCKED` (409 `A4_NOT_READY`). A `DENY` on an unconsumed
 completion gate revokes the staging lease of the release that gate binds; a decision on a consumed gate is refused
@@ -448,7 +467,7 @@ Readiness at Activate: `ask_complete`, `understanding_confirmed`, `release_propo
 `package.transparency` (BLOCKED while the current release's package has no transparency entry), `deployment.same_host` (BLOCKED `DEPLOYMENT_NOT_SAME_HOST`, naming P2-40, unless this Studio runs under the chosen
 target: v1 deploys by restarting it), `deployment.topology` (`TOPOLOGY_UNDECIDED` for Helm) and
 `deployment.image_pinned` (`IMAGE_TAG_ONLY`), both WAITING and never mandatory, `lease.scope` (`LEASE_STAGING_ONLY`
-until the production lease), `deployment.amc_check` (`DEPLOYMENT_UNCHECKED`) and `monitoring.source`
+until the production lease), `lease.principal` (`PRINCIPAL_REQUIRED` under an identity-binding plan, see above), `deployment.amc_check` (`DEPLOYMENT_UNCHECKED`) and `monitoring.source`
 (`MONITOR_NO_SOURCE`). `signing.notary_route` names both routes as `A4_RECORD:<route>` and `A4_PACKAGE:<route>`. In
 NOTARY mode, with the default `denyLocalVaultSigningIfNotaryEnabled: true`, both kinds route to the notary. The
 `requireNotaryFor` default (which now lists `A4_PACKAGE`) applies only to a `trust.yaml` that omits the field. An

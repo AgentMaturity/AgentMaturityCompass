@@ -13656,7 +13656,10 @@ paths:
         SOD_VIOLATION when the caller is an approver the production lease's gate quorum counted); an inline
         effect (the release, the production lease) runs before the response, which carries its lease token once
         (a replay answers token: null, TOKEN_ALREADY_DELIVERED once the attempt finished, or the attempt's
-        failure code) or its failure code"
+        failure code) or its failure code. Each lease names the caller when they are an active users.yaml user;
+        under a plan whose identity-binding requires a principal (L0-IDN-01) any other caller, a
+        workspace-router session included, fails the effect with 409 PRINCIPAL_UNRESOLVED before anything is
+        minted"
       tags:
         - Studio
         - A4 Forge
@@ -13829,8 +13832,11 @@ paths:
     post:
       summary: "Release (owner): consume the release approval (Activate's direction gate) and run the opened
         a4.activate.release effect inline: a signed package from content-addressed inputs and the staging lease
-        (WRITE_LOW at most, the staging routes, 24 h), whose token this response carries once; a replay answers
-        token: null, TOKEN_ALREADY_DELIVERED once the attempt finished, or the attempt's failure code"
+        (WRITE_LOW at most, the staging routes, 24 h, naming the caller when they are an active users.yaml
+        user), whose token this response carries once; a replay answers token: null, TOKEN_ALREADY_DELIVERED
+        once the attempt finished, or the attempt's failure code. Under a plan whose identity-binding requires a
+        principal (L0-IDN-01) a caller who is not an active local users.yaml user, a workspace-router session
+        included, fails the effect with 409 PRINCIPAL_UNRESOLVED before anything is written, minted or signed"
       tags:
         - Studio
         - A4 Forge
@@ -15022,7 +15028,9 @@ paths:
   /v1/a4/projects/{projectId}/stages/assemble/connect:
     post:
       summary: "External path, after Build (owner, owner mode): connect instructions with a lease whose token is in
-        this response once and never stored; the record keeps the leaseId (a replay answers token: null)"
+        this response once and never stored; the record keeps the leaseId (a replay answers token: null). The
+        lease names the caller when they are an active users.yaml user; under a plan whose identity-binding
+        requires a principal any other caller is 409 PRINCIPAL_UNRESOLVED and nothing is minted"
       tags:
         - Studio
         - A4 Forge
@@ -16456,8 +16464,10 @@ paths:
   /v1/a4/projects/{projectId}/stages/{stage}/build:
     post:
       summary: "Build (step built): the stage's producer (aspire, assemble and adapt: owner, owner mode; assemble's
-        native build session starts after the step is recorded and the response names it), or a self_reported
-        human-authored implementation ref while it has none"
+        native build session starts after the step is recorded and the response names it; a workspace-tools
+        session whose lease would name no active users.yaml user under a plan that requires a principal is 409
+        PRINCIPAL_UNRESOLVED before anything is written), or a self_reported human-authored implementation ref
+        while it has none"
       tags:
         - Studio
         - A4 Forge

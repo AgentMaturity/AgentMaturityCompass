@@ -447,6 +447,30 @@ function leaseScopeItem(release: A4ChainLink | null, production: Record<string, 
     nextAction: { label: "The staging lease (WRITE_LOW at most, staging routes, 24 h) is live; the production lease is minted at the deployment approval" } });
 }
 
+/**
+ * Who may run the release and the deployment approval (P1-78): under a verified plan whose identity-binding requires a
+ * principal (L0-IDN-01, mandatory in Layer 0; a plan that does not verify reads the same), their staging and production
+ * leases name the owner who runs each effect, who must be an active local users.yaml user; the effects refuse anyone
+ * else, a workspace-router session included (409 PRINCIPAL_UNRESOLVED), before anything is minted. WAITING and never
+ * mandatory while that applies; BLOCKED and mandatory while no users.yaml user is active (or users.yaml does not read),
+ * so no gate is requested whose effect no one could run. READY when the plan requires no principal (the lease then names
+ * the user when they resolve, else no one).
+ */
+function leasePrincipalItem(live: A4ReadinessQuery["live"]): A4ReadinessItem {
+  if (live.leasePrincipalRequired === undefined) {
+    return item("lease.principal", "NOT_EVALUATED", { kind: "not_evaluated", section: "governance", mandatory: false, reasonCodes: ["PLAN_NOT_READ"] });
+  }
+  if (!live.leasePrincipalRequired) return item("lease.principal", "READY", { section: "governance", mandatory: false, reasonCodes: ["PRINCIPAL_NOT_REQUIRED"] });
+  const label = "The active plan requires a principal for every tool call (L0-IDN-01): an owner signed in as an active local users.yaml user runs the release "
+    + "and completes the deployment approval, and each lease names them; anyone else, a workspace-router session included, is refused PRINCIPAL_UNRESOLVED before anything is minted";
+  if (live.activeLocal === null || live.activeLocal.length === 0) {
+    return item("lease.principal", "BLOCKED", { kind: "evidence_missing", section: "governance",
+      reasonCodes: ["PRINCIPAL_REQUIRED", live.activeLocal === null ? "USERS_UNREADABLE" : "NO_ACTIVE_LOCAL_USER"],
+      nextAction: { label: `${label}. No users.yaml user is active${live.activeLocal === null ? " (users.yaml does not read)" : ""}: add one (amc user add) and make them a project owner` } });
+  }
+  return waiting("lease.principal", ["PRINCIPAL_REQUIRED"], { kind: "review_pending", section: "governance", mandatory: false, nextAction: { label } });
+}
+
 /** Whether a monitor link's signed record still resolves to the ref's bytes (its ref as this load resolved it). */
 export const monitorResolves = (state: Pick<A4ReadinessState, "refs">, link: A4ChainLink): boolean =>
   state.refs.some((ref) => ref.refKind === "monitor" && ref.refId === link.body.refId && ref.sha256 === link.body.sha256 && ref.status === "resolved");
@@ -531,6 +555,7 @@ export function activateItems(state: A4ReadinessState, query: A4ReadinessQuery):
     waiting("deployment.image_pinned", ["IMAGE_TAG_ONLY", "KEY:P0-14"], { kind: "review_pending", mandatory: false,
       nextAction: { label: "The prepared files pin the image by tag; digest pinning waits for D-03 and P0-14 (the README names the gap)" } }),
     leaseScopeItem(release, releaseId === null ? null : productionLeaseOf(state.chain, releaseId)),
+    leasePrincipalItem(query.live),
     receiptItem(state, releaseId),
     amcCheckItem(state, releaseId),
     monitoringItem(state, releaseId),

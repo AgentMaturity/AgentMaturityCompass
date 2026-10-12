@@ -21,6 +21,7 @@ import type { SignKind } from "../crypto/signing/signerTypes.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { resolveSessionStoreBackend } from "../persistence/openSessionEventStore.js";
 import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
+import { planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
 import { loadTrustContext } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -37,8 +38,7 @@ import {
 } from "./a4Readiness.js";
 import {
   A4_STAGES, DEFAULT_A4_GATE_POLICY, a4DecisionRowSchema, a4EvidenceRefRowSchema, a4GatePolicyV1Schema, a4GateRowSchema, a4IntentV1Schema,
-  a4RevisionRowSchema, flatSlots, gatePolicyDigestOf, gatePolicyFloorViolations, gatePolicyOf, mapRiskTier, type A4GatePolicyV1, type A4IntentV1,
-  type A4Principal, type A4ReadinessV1, type A4Stage
+  a4RevisionRowSchema, flatSlots, gatePolicyDigestOf, gatePolicyFloorViolations, gatePolicyOf, mapRiskTier, type A4GatePolicyV1, type A4IntentV1, type A4Principal, type A4ReadinessV1, type A4Stage
 } from "./a4Schema.js";
 import { authorsOf, buildersOf, evaluateSod } from "./a4SoD.js";
 import { ensureA4Stages } from "./a4Stages.js";
@@ -197,7 +197,7 @@ function unrecordedResolutionsOf(store: A4Store, chain: A4ReadinessState["chain"
 /**
  * Everything readiness reads that is not a row; each unreadable source is null. `approvalPolicy` is the verdict of the
  * read evaluateFor used; the action journal and the engine requests the chain names are read only for an evaluation at `stage` Assemble,
- * the signed control results Adapt's Review recorded and the session store backend only at Adapt, the package route and the releases' transparency entries only at Activate.
+ * the signed control results Adapt's Review recorded and the session store backend only at Adapt, the package route, the releases' transparency entries and the lease-principal rule only at Activate.
  */
 function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage): A4LiveFacts {
   const workspace = store.workspace;
@@ -223,7 +223,7 @@ function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, appr
     unrecordedResolutions: stage === "assemble" ? unrecordedResolutionsOf(store, state.chain, blocking) : null,
     engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain, blocking ?? []) : null,
     ...(stage === "adapt" ? { controlResults: controlResultsNow(workspace, state), sessionStore: resolveSessionStoreBackend(workspace) } : {}),
-    ...(stage === "activate" ? { packageSigningRoute: collectRoute(workspace, "A4_PACKAGE"), packageTransparency: releaseEntries(workspace, state.chain) } : {})
+    ...(stage === "activate" ? { packageSigningRoute: collectRoute(workspace, "A4_PACKAGE"), packageTransparency: releaseEntries(workspace, state.chain), leasePrincipalRequired: planRequiresPrincipal(workspace) } : {})
   };
 }
 

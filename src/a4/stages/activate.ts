@@ -134,11 +134,16 @@ function activateFacts(spec: Record<string, unknown>, answers: readonly A4Answer
       practitioner: `v1 is a same-host restart: the overlay restarts this hosted Studio (found: ${String(hosting.kind ?? "not hosted")}). Receipts are recordable only for an agent built here; `
         + "installing the package into another workspace is P2-40.",
       expert: `hostingNow() = ${JSON.stringify(hosting)}; deployment.same_host is BLOCKED (DEPLOYMENT_NOT_SAME_HOST, P2-40) unless it equals the target.` },
-    { id: "leases", sources: ["issueLeaseToken", "design §10.4 Build"], dataStatus: null,
-      novice: "AMC gives the operator a short-lived staging key when the release is built, and the production key only when the deployment is approved. Each key is shown once.",
+    { id: "leases", sources: ["issueLeaseForPrincipal", "P1-78", "design §10.4 Build"], dataStatus: null,
+      novice: "AMC gives the operator a short-lived staging key when the release is built, and the production key only when the deployment is approved. Each key is shown once "
+        + "and names the owner who released or approved it. When the active plan requires a named person for every tool call, that owner must be signed in as a local user of this workspace.",
       practitioner: "Staging lease: WRITE_LOW at most, the staging routes, 24 hours, minted inside the consumed release effect. Production lease: the answered scopes, routes and caps, "
-        + "minted by the deployment approval. Tokens are answered once and never stored; a DENY of the deployment approval revokes the staging lease.",
-      expert: "issueLeaseToken({ workspaceId, agentId, workOrderId: releaseId, executeActionClasses ⊆ {READ_ONLY, WRITE_LOW}, ttlMs ≤ 24 h }); a4_requests keeps the attempt id only; a replay answers token: null, TOKEN_ALREADY_DELIVERED once that attempt finished, its failure code otherwise." },
+        + "minted by the deployment approval. Tokens are answered once and never stored; a DENY of the deployment approval revokes the staging lease. Each lease names the owner "
+        + "who ran its effect when they are an active users.yaml user. Under a plan whose identity-binding requires a principal (L0-IDN-01), every tool call under a lease naming "
+        + "no one is refused, so the effect refuses anyone else, a workspace-router session included, with PRINCIPAL_UNRESOLVED before anything is minted (readiness item lease.principal).",
+      expert: "issueLeaseForPrincipal({ workspaceId, agentId, workOrderId: releaseId, executeActionClasses ⊆ {READ_ONLY, WRITE_LOW}, ttlMs ≤ 24 h, principalKey: the effect's caller }); "
+        + "resolveLeasePrincipal runs in the pre-flight beside the lease and revocation-list key reads, and again at mint; a4_requests keeps the attempt id only; a replay answers "
+        + "token: null, TOKEN_ALREADY_DELIVERED once that attempt finished, its failure code otherwise." },
     { id: "lifecycle", sources: ["LIFECYCLE_BRIDGE", "requiredControlsForStage"], dataStatus: null,
       novice: `The agent's lifecycle stage is ${String(lifecycle.currentStage ?? "unknown")}. AMC only moves it when A4 evidence backs each control; otherwise the control stays not evaluated.`,
       practitioner: `Production requires ${Array.isArray(lifecycle.requiredForProduction) ? lifecycle.requiredForProduction.join(", ") : "(unread)"}. rollback_plan_validated and `

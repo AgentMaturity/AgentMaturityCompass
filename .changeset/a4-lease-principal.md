@@ -1,0 +1,11 @@
+---
+"agent-maturity-compass": patch
+---
+
+A4 leases now name the person who asked for them, so they work under the plans A4 Adapt activates. Layer 0's mandatory `L0-IDN-01` makes every such plan require a principal for every tool call, and a call under a lease that names no active `users.yaml` user is refused (`PRINCIPAL_UNRESOLVED`, P1-78). Before, Activate minted its staging and production leases with no principal, so under such a plan every call under them was refused.
+
+- The release effect and the deployment approval's production-lease effect mint their leases through `issueLeaseForPrincipal`, naming the owner who ran the effect (read from the authenticated session, never from a body). Under a plan whose identity binding requires a principal, or a plan that does not verify, an owner who is not an active local `users.yaml` user, a workspace-router session included, fails the effect with 409 `PRINCIPAL_UNRESOLVED`. The check runs beside the lease and `revocation-list` key reads, before anything is revoked, written, minted or signed, and again when the lease is minted. Under any other plan the lease names that user when they resolve, and no one otherwise.
+- New Activate readiness item `lease.principal`: READY `PRINCIPAL_NOT_REQUIRED` when the active plan requires no principal; WAITING `PRINCIPAL_REQUIRED` (never mandatory), naming the rule, when it does; BLOCKED and mandatory (`NO_ACTIVE_LOCAL_USER`, or `USERS_UNREADABLE`) when no `users.yaml` user is active, so neither the release approval nor the deployment approval is requested for an effect no one could run. The Activate card shows it.
+- Assemble connect names the owner in the connect lease the same way, and answers 409 `PRINCIPAL_UNRESOLVED` with nothing minted when the principal does not resolve under such a plan. `buildConnectInstructions` and `issueLeaseForCli` take an optional `principalKey`; without one they mint as before.
+- Assemble Build refuses a native workspace-tools session whose lease Studio could not mint, with 409 `PRINCIPAL_UNRESOLVED` before it writes the typed graph or the preset or journals the session. Before, Build recorded the step and the session then failed to start.
+- Adapt's context probe is unchanged: its turn makes no tool call and needs no lease.

@@ -128,6 +128,11 @@ export interface A4LiveFacts {
   readonly packageSigningRoute?: "vault" | "notary" | null;
   /** Activate only: each release's transparency entry in the log now (release id → entry hash, null for none); null when the log does not read. */
   readonly packageTransparency?: Readonly<Record<string, string | null>> | null;
+  /**
+   * Activate only: whether the verified active plan's identity-binding requires a principal (planRequiresPrincipal,
+   * L0-IDN-01; a plan that does not verify reads true), so the release's leases must name an active users.yaml user (P1-78).
+   */
+  readonly leasePrincipalRequired?: boolean;
 }
 export interface A4ReadinessQuery {
   readonly stage: A4Stage;
