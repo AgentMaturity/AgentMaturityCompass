@@ -4,6 +4,7 @@ import type { ProtectedDataClass } from "../vault/dataClassification.js";
 import { findPIISpans, getPIIDetectorMetadata, PII_SPAN_SCAN_REVISION, type PiiSpan } from "../vault/dlp.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
+import { TOKEN_PATTERN_SOURCE } from "./tokenizer.js";
 
 export interface ProtectedDataDetection {
   readonly classes: readonly ProtectedDataClass[];
@@ -39,31 +40,68 @@ const isNoise = (text: string, span: PiiSpan) =>
 // Nesting and per-leaf bounds, plus a request-wide scan budget far above any provider context window (about 2x a 2M-token
 // one). Hostile text scans in linear time but at up to ~0.55 s per MiB, so the budget caps one prepare at about 10 s.
 const MAX_DEPTH = 32;
-const MAX_TEXT_CHARS = 1_048_576;
+export const MAX_PROTECTED_TEXT_CHARS = 1_048_576;
 const MAX_REQUEST_SCAN_CHARS = 16_777_216;
 const JSON_ESCAPES: Readonly<Record<string, string>> = Object.freeze({ n: "\n", t: "\t", r: "\r", b: "\b", f: "\f" });
 // JSON string escapes (\n, \uXXXX, \" ...) decoded in one linear pass, so escaped text in malformed arguments still matches.
 const decodeJsonEscapes = (text: string) => text.replace(/\\(?:u([0-9a-fA-F]{4})|([\s\S]))/g,
   (_match, hex: string | undefined, char: string) => hex !== undefined ? String.fromCharCode(Number.parseInt(hex, 16))
     : Object.hasOwn(JSON_ESCAPES, char) ? JSON_ESCAPES[char]! : char);
-const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
+/** Binds the patterns, mappings, filters, token format and limits below; receipts and admission rows carry it. */
+export const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   schema: "amc.protected-detectors/v1", support: "experimental", patterns: getPIIDetectorMetadata(), spanScanRevision: PII_SPAN_SCAN_REVISION,
   classMapping: CLASS_BY_TYPE,
   noiseFilters: Object.fromEntries(Object.entries(NOISE_FILTERS).map(([type, re]) => [type, re.source])),
-  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-v7",
-  limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS }
+  tokenFormat: TOKEN_PATTERN_SOURCE,
+  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-amc-tokens-skipped-v8",
+  limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS }
 }));
 function refused(): never { throw new Error("Protected request detection refused unsupported or excessive traversal"); }
 const dataClass = (type: string): ProtectedDataClass => Object.hasOwn(CLASS_BY_TYPE, type) ? CLASS_BY_TYPE[type]! : refused();
 
+/** [start, end) of each AMC token in text order; tokens never overlap. */
+const tokenRanges = (text: string): readonly (readonly [number, number])[] => text.includes("[[amc:")
+  ? Array.from(text.matchAll(new RegExp(TOKEN_PATTERN_SOURCE, "g")), match => [match.index, match.index + match[0].length] as const) : [];
+/** A span touching an AMC token matches the token's own hex, not a value: the last token starting before the span's end decides. */
+function inToken(tokens: readonly (readonly [number, number])[], span: PiiSpan): boolean {
+  let low = 0, high = tokens.length - 1, last = -1;
+  while (low <= high) {
+    const mid = (low + high) >> 1;
+    if (tokens[mid]![0] < span.end) { last = mid; low = mid + 1; } else high = mid - 1;
+  }
+  return last >= 0 && tokens[last]![1] > span.start;
+}
+
 /** Offsets refer to the original text. No matched values are returned or logged. */
 export function detectProtectedText(text: string): readonly ProtectedDataSpan[] {
-  if (typeof text !== "string" || text.length > MAX_TEXT_CHARS) return refused();
-  // Noise is rejected inside the scan, so a dropped clock time cannot hide an overlapping address ("12:34:56.78.90.12").
-  const spans = findPIISpans(text, span => isNoise(text, span));
+  if (typeof text !== "string" || text.length > MAX_PROTECTED_TEXT_CHARS) return refused();
+  // Noise and token hex are rejected inside the scan, so a dropped span cannot hide an overlapping match
+  // ("12:34:56.78.90.12").
+  const tokens = tokenRanges(text);
+  const spans = findPIISpans(text, span => isNoise(text, span) || inToken(tokens, span));
   return Object.freeze(spans.map(span => Object.freeze({
     start: span.start, end: span.end, dataClass: dataClass(span.type), detector: span.type
   })));
+}
+
+/**
+ * Replaces each detected region with `replace(region, value)`. Overlapping detections merge into one region that keeps
+ * the class of the earliest (then longest) span; `spans` lists every detection. Over-long text throws, like
+ * detectProtectedText: a caller must refuse or replace it whole, never pass it through.
+ */
+export function redactProtectedText(text: string, replace: (region: ProtectedDataSpan, value: string) => string):
+  { readonly text: string; readonly spans: readonly ProtectedDataSpan[] } {
+  const spans = detectProtectedText(text);
+  const ordered = [...spans].sort((a, b) => a.start - b.start || b.end - a.end);
+  let out = "", cursor = 0;
+  for (let index = 0; index < ordered.length;) {
+    const first = ordered[index]!;
+    let end = first.end;
+    for (index += 1; index < ordered.length && ordered[index]!.start < end; index += 1) end = Math.max(end, ordered[index]!.end);
+    out += text.slice(cursor, first.start) + replace({ ...first, end }, text.slice(first.start, end));
+    cursor = end;
+  }
+  return Object.freeze({ text: spans.length === 0 ? text : out + text.slice(cursor), spans });
 }
 
 /**
@@ -85,9 +123,9 @@ export function detectProtectedRequest(request: EncodableRequest): ProtectedData
       // Keep the existing JSON-password heuristic without rescanning every object or double-counting its credential value.
       if (key?.toLowerCase() === "password" && !spans.some(span => span.dataClass === "credential")) {
         const context = JSON.stringify({ [key]: text });
-        if (context.length > MAX_TEXT_CHARS) refused();
+        if (context.length > MAX_PROTECTED_TEXT_CHARS) refused();
         charge(context.length);
-        if (findPIISpans(context).some(span => span.type === "password_json")) add("credential");
+        if (detectProtectedText(context).some(span => span.detector === "password_json")) add("credential");
       }
     };
     const visit = (value: unknown, depth: number, key?: string): void => {
