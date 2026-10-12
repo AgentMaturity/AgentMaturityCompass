@@ -358,6 +358,47 @@ addCase("excluded-failing-control", "The attestation excludes control PAY-09, wi
 addCase("rotation-chain-head-not-first", "A key rotation that names no previous statement yet claims sequence 5. Only the first statement of a chain names no predecessor, so it is refused rather than read as a chain start.",
   { artifact: keyRotation({ sequence: 5 }), raw: true, params: { asOf: T.asOf, trustRoots: [K.root.keyId] }, verdict: "FNNNNN", codes: { integrity: ["MALFORMED"] } });
 
+// ── DSSE-wrapped in-toto statements with the control-results predicate (P1-27) ──
+const DSSE_TYPE = "application/vnd.in-toto+json";
+/** DSSE v1.0 pre-authentication encoding: "DSSEv1" SP LEN(type) SP type SP LEN(body) SP body, lengths in bytes. */
+const dssePae = (type, body) => Buffer.concat([Buffer.from(`DSSEv1 ${Buffer.byteLength(type, "utf8")} ${type} ${body.length} `, "utf8"), body]);
+const AIBOM = Buffer.from(`${JSON.stringify({ bomFormat: "CycloneDX", specVersion: "1.6", version: 1,
+  metadata: { component: { type: "application", "bom-ref": "amc:agent:agent-payments", name: "agent-payments" },
+    properties: [{ name: "amc:aibom.status", value: "experimental" }, { name: "amc:unknown", value: "TEST ONLY fixture AIBOM: every model fact" }] },
+  components: [] }, null, 2)}\n`, "utf8");
+const RUN = doc({ runId: "TEST ONLY run-42", agentId: "agent-payments" });
+const LEDGER_SLICE = Buffer.from("TEST ONLY ledger slice bytes (not a SQLite file)\n", "utf8");
+const DSSE_EVIDENCE = [AIBOM, RUN, LEDGER_SLICE];
+function dsseBundle({ signer = K.seal, payloadType = DSSE_TYPE } = {}) {
+  const statement = { _type: "https://in-toto.io/Statement/v1",
+    subject: [{ name: "attestations/aibom.cdx.json", digest: { sha256: sha256(AIBOM) } }, { name: "run.json", digest: { sha256: sha256(RUN) } }],
+    predicateType: "https://agentmaturity.co/attestations/control-results/v0.1",
+    predicate: { claimKind: "observed",
+      scope: { tenant: "tenant-a", deployment: "payments-prod", workspace: "ws-a", agent: "agent-payments", snapshot: sha256(RUN), profile: "finance-ops",
+        profileVersion: "1.0.0", window: { start: T.windowStart, end: T.windowEnd }, exclusions: [] },
+      controls: [{ controlId: "amc.diagnostic", dimensions: { result: "pass", applicability: { state: "applicable" }, evidence: "sufficient",
+        enforcement: { state: "observed" }, review: "pending" } }],
+      evidence: [{ sha256: sha256(LEDGER_SLICE), kind: "ledger-slice" }], verifierReport: null, issuedAt: T.issued, expiresAt: "2026-12-01T09:00:00.000Z",
+      notice: "A signature proves who issued this statement and that it is unchanged, not that the statement is true or that the agent behaved well." } };
+  const payload = Buffer.from(JSON.stringify(statement), "utf8");
+  return { mediaType: "application/vnd.dev.sigstore.bundle.v0.3+json",
+    verificationMaterial: { publicKey: { hint: signer.keyId }, tlogEntries: [], timestampVerificationData: { rfc3161Timestamps: [] } },
+    dsseEnvelope: { payloadType, payload: b64(payload), signatures: [{ keyid: signer.keyId, sig: b64(signBytes(dssePae(payloadType, payload), signer)) }] } };
+}
+const tamperedAibom = Buffer.from(AIBOM);
+tamperedAibom[tamperedAibom.indexOf("experimental")] ^= 0x20;
+
+addCase("dsse-valid", "A key-based Sigstore bundle holding a DSSE envelope whose in-toto statement binds the agent's AIBOM and run report by digest, signed over the DSSE PAE by a key the pinned list admits for artifact-seal, in scope, fresh, with both subjects and the cited ledger slice supplied. Integrity, issuer, scope, freshness and completeness pass. Satisfaction is not evaluated: the statement declares a result this verifier cannot recompute (NOT_RECOMPUTABLE), so the exit code is 3, not 0.",
+  { artifact: dsseBundle(), evidence: DSSE_EVIDENCE, verdict: "PPPPPN", codes: { satisfaction: ["NOT_RECOMPUTABLE"] } });
+addCase("dsse-subject-mismatch", "The same signed statement, but the AIBOM supplied beside it had one byte changed after signing. Evidence is addressed by digest, so no supplied bytes hash to the AIBOM subject: the attested AIBOM is missing and a changed one must never stand in for it.",
+  { artifact: dsseBundle(), evidence: [tamperedAibom, RUN, LEDGER_SLICE], verdict: "PPPPFN", codes: { completeness: ["EVIDENCE_MISSING"] } });
+addCase("dsse-wrong-payload-type", "A correctly signed envelope whose payloadType is application/json, not application/vnd.in-toto+json. The PAE binds the type, and a verifier must refuse a type it does not expect rather than read the payload as an in-toto statement.",
+  { artifact: dsseBundle({ payloadType: "application/json" }), evidence: DSSE_EVIDENCE, verdict: "FNNNNN", codes: { integrity: ["UNSUPPORTED_VERSION"] } });
+addCase("dsse-unpinned-key", "The statement is signed by a key that no supplied trust list holds; the bundle's hint and the signature's keyid name that key. The keyid only selects among pinned keys, so the signature cannot be checked and the issuer is not admitted.",
+  { artifact: dsseBundle({ signer: K.outsider }), evidence: DSSE_EVIDENCE, verdict: "NFNNNN", codes: { issuerAdmission: ["ISSUER_NOT_PINNED"] } });
+addCase("dsse-expired", "The valid statement verified as of a time after its expiresAt. An expired statement must not pass as current.",
+  { artifact: dsseBundle(), evidence: DSSE_EVIDENCE, params: { ...PARAMS, asOf: "2026-12-02T00:00:00.000Z" }, verdict: "PPPFPN", codes: { freshness: ["ATTESTATION_EXPIRED"] } });
+
 // ── Write ──
 const json = value => `${JSON.stringify(value, null, 2)}\n`;
 for (const item of cases) {

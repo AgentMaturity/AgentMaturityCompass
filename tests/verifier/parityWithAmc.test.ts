@@ -6,6 +6,9 @@ import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import type { z } from "zod";
 import { actionReceiptV1Schema } from "../../src/actions/receiptStates.js";
+import { INTOTO_PAYLOAD_TYPE, verifyDsse } from "../../src/attest/dsse.js";
+import { envelopeFromSigstoreBundle } from "../../src/attest/sigstoreBundle.js";
+import { inTotoStatementSchema } from "../../src/attest/statement.js";
 import { controlResultV1Schema, evidenceEventV1Schema, receiptV2Schema, scopedAttestationV2Schema } from "../../src/contracts/index.js";
 import { signedRevocationListSchema } from "../../src/keys/revocationList.js";
 import { signedKeyRotationStatementSchema } from "../../src/keys/rotationStatement.js";
@@ -25,7 +28,8 @@ const ZOD: Record<Exclude<RecordKind, "external-evidence">, z.ZodType> = {
   "evidence-event": evidenceEventV1Schema,
   "key-rotation": signedKeyRotationStatementSchema,
   "root-rotation": signedRootRotationSchema,
-  "revocation-list": signedRevocationListSchema
+  "revocation-list": signedRevocationListSchema,
+  "intoto-statement": inTotoStatementSchema
 };
 
 const amcAccepts = (kind: RecordKind, value: unknown) =>
@@ -39,6 +43,7 @@ function kindOf(value: Json): RecordKind | null {
   if (!isObject(value)) return null;
   const nested = (key: string) => (isObject(value[key]) ? (value[key] as Record<string, Json>).type : undefined);
   if (value.type === "amc.scoped-attestation") return "scoped-attestation";
+  if (value._type === "https://in-toto.io/Statement/v1") return "intoto-statement";
   if (value.profile === "amc.external-evidence") return "external-evidence";
   if (value.schema === "amc.action-receipt/v1") return "action-receipt";
   if (value.type === "amc.control-result") return "control-result";
@@ -59,6 +64,10 @@ function corpus(): Array<{ kind: RecordKind; value: Json; from: string }> {
       return;
     }
     if (Array.isArray(value)) { value.forEach((item, index) => add(item, `${from}[${index}]`)); return; }
+    if (isObject(value) && isObject(value.dsseEnvelope)) {
+      add(JSON.parse(Buffer.from(String(value.dsseEnvelope.payload), "base64").toString("utf8")) as Json, `${from} statement`);
+      return;
+    }
     const kind = typeof value === "object" && value !== null && !Array.isArray(value) && (value.v === 2 && typeof value.receipt_id === "string") ? "receipt-payload" : kindOf(value);
     if (kind && !seen.has(JSON.stringify(value))) seen.set(JSON.stringify(value), { kind, value, from });
   };
@@ -105,7 +114,7 @@ describe("the package and AMC agree", () => {
 
   test("on every record of the corpus", () => {
     expect(new Set(records.map(record => record.kind))).toEqual(new Set(["trust-list", "scoped-attestation", "receipt-payload", "action-receipt",
-      "control-result", "evidence-event", "key-rotation", "root-rotation", "revocation-list", "external-evidence"]));
+      "control-result", "evidence-event", "key-rotation", "root-rotation", "revocation-list", "external-evidence", "intoto-statement"]));
     for (const record of records) {
       expect(validateRecord(record.kind, record.value).ok, record.from).toBe(amcAccepts(record.kind, record.value));
     }
@@ -186,6 +195,26 @@ describe("the package and AMC share their constants and their verify-level check
       }
     }
     expect(compared).toBeGreaterThan(100);
+  });
+
+  test("a DSSE signature verifies for the package exactly when AMC's verifyDsse accepts it over the same PAE", () => {
+    let compared = 0;
+    for (const name of caseNames().filter(item => item.startsWith("dsse-"))) {
+      const { bytes, options } = loadCase(name);
+      const bundle = JSON.parse(bytes.toString("utf8")) as { dsseEnvelope: { payload: string } };
+      const twin = structuredClone(bundle);
+      const payload = Buffer.from(twin.dsseEnvelope.payload, "base64");
+      payload[payload.length - 2] ^= 1;
+      twin.dsseEnvelope.payload = payload.toString("base64");
+      const keys = new Map((options.trustLists[0] as { list: { entries: Array<{ keyId: string; publicKeyPem: string }> } }).list.entries.map(entry => [entry.keyId, entry.publicKeyPem]));
+      for (const candidate of [bundle, twin]) {
+        const amc = verifyDsse(envelopeFromSigstoreBundle(candidate), INTOTO_PAYLOAD_TYPE, keys).ok;
+        const ours = verifyArtifact(Buffer.from(JSON.stringify(candidate)), options).integrity.status === "pass";
+        expect(ours, `${name}${candidate === twin ? " (payload changed)" : ""}`).toBe(amc);
+        compared += 1;
+      }
+    }
+    expect(compared).toBe(10);
   });
 
   test("an external evidence signature verifies for the package exactly when it does for AMC", async () => {

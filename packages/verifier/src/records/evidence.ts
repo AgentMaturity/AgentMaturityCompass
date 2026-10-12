@@ -86,14 +86,16 @@ const passDimensions = obj({ result: lit("pass"), applicability: obj({ state: li
 const otherDimensions = obj({ result: oneOf(["fail", "not_evaluated"] as const), applicability,
   evidence: oneOf(["sufficient", "incomplete", "stale", "contradictory", "untrusted"] as const), enforcement: dimensionEnforcement, review });
 
+/** The five status dimensions of a control; `pass` needs applicable and sufficient evidence. */
+export const controlDimensions = union("result", { pass: passDimensions, fail: otherDimensions, not_evaluated: otherDimensions });
+
 export const controlResult = obj({
   type: lit("amc.control-result"),
   version: lit(1, "UNSUPPORTED_VERSION"),
   controlId: nonEmpty,
   controlVersion: nonEmpty,
   evaluatedAt: isoTime,
-  dimensions: union("result",
-    { pass: passDimensions, fail: otherDimensions, not_evaluated: otherDimensions }),
+  dimensions: controlDimensions,
   claimKind: oneOf(CLAIM_KINDS),
   evidenceRefs: arr(nonEmpty),
   exceptions: arr(obj({ exceptionId: nonEmpty, issuer: nonEmpty, expiresAt: isoTime })),
