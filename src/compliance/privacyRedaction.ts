@@ -10,7 +10,7 @@ import { randomUUID } from "node:crypto";
 import { redactSecrets } from "../shield/redaction/redactSecrets.js";
 import { SECRET_PATTERNS } from "../shield/redaction/secretPatterns.js";
 import { detectProtectedText, MAX_PROTECTED_TEXT_CHARS } from "../dataflow/detectors.js";
-import { getPIIDetectorMetadata } from "../vault/dlp.js";
+import { findPIISpans, getPIIDetectorMetadata } from "../vault/dlp.js";
 // Type-only, so it is erased at compile time and creates no runtime cycle with
 // dataResidency.ts, which imports the values from here.
 import type {
@@ -29,7 +29,12 @@ import type {
  * Luhn-checked, with their noise filters), the API-key rule to the shared secret table
  * (src/shield/redaction/secretPatterns.ts). A built-in rule's `pattern` shows those regexes for reference only. A
  * caller's own rule, or a built-in rule whose pattern was changed, is applied as its own regex.
+ *
+ * Delegation never narrows a rule (ADR-0021: the broader pattern wins). The API-key rule also keeps its earlier keyword
+ * form (`token=`, `secret:` ...), which the shared table does not cover, and the phone rule keeps bare 10-digit runs,
+ * which the detectors drop as noise only because admission refuses on what they find; over-redaction is the safe side here.
  */
+const LEGACY_KEY_SOURCE = String.raw`(?:api[_-]?key|token|secret)[=:\s]+[A-Za-z0-9_\-]{16,}`;
 const BUILT_IN_RULES: ReadonlyArray<Omit<PrivacyRedactionRule, "pattern"> & { readonly dlpTypes: readonly string[] }> = [
   { ruleId: "redact-email", dlpTypes: ["email"], replacement: "[REDACTED_EMAIL]", category: "pii", description: "Redact email addresses" },
   { ruleId: "redact-phone", dlpTypes: ["phone"], replacement: "[REDACTED_PHONE]", category: "pii", description: "Redact US phone numbers" },
@@ -40,7 +45,7 @@ const BUILT_IN_RULES: ReadonlyArray<Omit<PrivacyRedactionRule, "pattern"> & { re
 ];
 
 function builtInPattern(rule: (typeof BUILT_IN_RULES)[number]): string {
-  if (rule.dlpTypes.length === 0) return SECRET_PATTERNS.map((entry) => entry.pattern.source).join("|");
+  if (rule.dlpTypes.length === 0) return [...SECRET_PATTERNS.map((entry) => entry.pattern.source), LEGACY_KEY_SOURCE].join("|");
   return getPIIDetectorMetadata().filter((entry) => rule.dlpTypes.includes(entry.type)).map((entry) => entry.source).join("|");
 }
 
@@ -74,11 +79,13 @@ export function applyRedaction(text: string, rules: PrivacyRedactionRule[]): str
     if (builtIn === undefined || rule.pattern !== builtInPattern(builtIn)) {
       result = result.replace(new RegExp(rule.pattern, "g"), rule.replacement);
     } else if (builtIn.dlpTypes.length === 0) {
-      result = redactSecrets(result, () => rule.replacement).redacted;
+      result = redactSecrets(result, () => rule.replacement).redacted.replace(new RegExp(LEGACY_KEY_SOURCE, "g"), rule.replacement);
+    } else if (result.length > MAX_PROTECTED_TEXT_CHARS) {
+      result = rule.replacement; // over the detectors' per-leaf limit the whole text is replaced: never returned unscanned
     } else {
-      // Over the detectors' per-leaf limit the whole text is replaced: never returned unscanned.
-      result = result.length > MAX_PROTECTED_TEXT_CHARS ? rule.replacement
-        : replaceSpans(result, detectProtectedText(result).filter((span) => builtIn.dlpTypes.includes(span.detector)), rule.replacement);
+      const spans = builtIn.ruleId === "redact-phone" ? findPIISpans(result).map((span) => ({ ...span, detector: span.type }))
+        : detectProtectedText(result);
+      result = replaceSpans(result, spans.filter((span) => builtIn.dlpTypes.includes(span.detector)), rule.replacement);
     }
   }
   return result;
