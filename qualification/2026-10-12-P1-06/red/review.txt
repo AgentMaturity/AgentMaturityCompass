@@ -1,0 +1,16 @@
+# RED: npx vitest run tests/verifier on 9ccb71250 plus the new review-round tests and fixtures, before the fix (1f5de52ff)
+     × an anchored receipt says that only the ledger row's eventHash is signed 18ms
+     × an external evidence signature in a non-canonical base64 spelling fails integrity 12ms
+     × several pinned roots without a threshold say that one root's signature counts a list 9ms
+     × controls left out by exclusions are named in a warning 12ms
+     × refuses an --as-of that is not a calendar date with exit 64 22ms
+     × distrusted-root-in-another-list 11ms
+     × evaluated-after-issuance 5ms
+     × forked-trust-list 3ms
+     × review-rejected-pass 3ms
+     × rotation-chain-head-not-first 2ms
+     × stale-list-beside-newer 4ms
+     × unreviewed-independent-claim 2ms
+     × passes 100% of the cases and writes conformance-results.json 13421ms
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  13 failed | 110 passed (123)

@@ -1,0 +1,5 @@
+# RED: npx vitest run tests/keys/rotationStatement.test.ts with the new schema-error test, before ddbffd94e
+     × refuses an impossible or empty time with a typed issue in each P1-08 statement schema 60ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+RangeError: Invalid time value
+      Tests  1 failed | 15 passed (16)

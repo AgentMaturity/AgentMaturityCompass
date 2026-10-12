@@ -22,7 +22,7 @@ import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { carryHighWaterMarks, compareHighWater, highWaterIds, highWaterKey, readHighWater, recordHighWater } from "../keys/highWater.js";
 import { containedExists, listContainedDir, readContained, readContainedOrNull, writeContained } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { canonicalize, isCanonicalSignatureBase64, parseCanonicalJson } from "../utils/json.js";
+import { canonicalize, isCanonicalSignatureBase64, isExactIsoTime, parseCanonicalJson } from "../utils/json.js";
 import { canonicalEd25519Pem, ed25519KeyId, parseTrustJson, parseTrustValue, TrustListError } from "./trustList.js";
 
 const DOMAIN = "amc.root-rotation/v1";
@@ -53,7 +53,7 @@ const statementSchema = z.strictObject({
   newThreshold: z.number().int().min(2, "a root set needs a threshold of at least 2").max(64),
   newRootPublicKeyPems: z.array(z.string().min(1).max(4096).refine(pem => canonicalEd25519Pem(pem) === pem, "canonical Ed25519 SPKI PEM")).max(64),
   allowDecrease: z.boolean(),
-  issuedAt: z.iso.datetime().refine(value => new Date(value).toISOString() === value, "time must be in toISOString form")
+  issuedAt: z.iso.datetime().refine(isExactIsoTime, "time must be in toISOString form")
 }).refine(statement => statement.newThreshold <= statement.newRoots.length, "newThreshold cannot exceed the number of new roots")
   .refine(statement => statement.newRootPublicKeyPems.length === statement.newRoots.length
     && statement.newRootPublicKeyPems.every((pem, index) => ed25519KeyId(pem) === statement.newRoots[index]), "newRootPublicKeyPems must be the new roots' keys, in order");
@@ -67,6 +67,8 @@ const signedSchema = z.strictObject({
     "signatures sorted by role then key id, one per key and role")
 });
 export type RootRotationStatement = z.infer<typeof statementSchema>;
+/** The signed statement's schema, for parity checks against independent verifiers (P1-06). */
+export { signedSchema as signedRootRotationSchema };
 type SignedRootRotation = z.infer<typeof signedSchema>;
 
 const bytesToSign = (statement: RootRotationStatement) => Buffer.concat([Buffer.from(DOMAIN, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(statement), "utf8")]);
