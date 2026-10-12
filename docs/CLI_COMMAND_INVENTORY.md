@@ -214,7 +214,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc budgets verify` | - | - | - |
 | `amc bundle` | Portable evidence bundle operations | - | - |
 | `amc bundle diff` | Diff two bundles (maturity/integrity/targets) | - | - |
-| `amc bundle export` | Export a portable, signed evidence bundle for a run | `--run <runId>`<br>`--out <file>`<br>`--agent <agentId>` | - |
+| `amc bundle export` | Export a portable, signed evidence bundle for a run | `--run <runId>`<br>`--out <file>`<br>`--agent <agentId>`<br>`--attest` | - |
 | `amc bundle inspect` | Inspect bundle metadata | - | - |
 | `amc bundle verify` | Verify evidence bundle offline | `--pubkey <path>`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc business` | Business impact — KPI correlation, ROI tracking, and maturity-to-outcome mapping | - | - |
