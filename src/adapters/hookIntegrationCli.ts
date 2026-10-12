@@ -1,7 +1,8 @@
 import chalk from "chalk";
 import type { Command } from "commander";
 import { stdin } from "node:process";
-import { unlockVaultInteractive, vaultStatusNow } from "../vault/vaultCli.js";
+import { promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "../vault/vaultCli.js";
+import { recoverHookAuditLatch } from "../bridge/hookAuditLatch.js";
 import { unlockVault } from "../vault/vault.js";
 import {
   getHookIntegrationStatus,
@@ -234,6 +235,26 @@ export function registerHookIntegrationCommands(
         if (lifecycle.observationConflict) console.log(chalk.red("Observation conflict: an outcome for this call was unmatched, conflicting or unverifiable"));
       }
       if (lifecycle.failClosed || lifecycle.authorizationMismatch || lifecycle.observationConflict) process.exitCode = 1;
+    });
+
+  hooks
+    .command("recover")
+    .description("Owner only: clear the hook audit latch set when AMC could not record hook evidence (vault passphrase)")
+    .option("--json", "emit structured JSON", false)
+    .action(async (opts: { json: boolean }) => {
+      const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):"));
+      const result = recoverHookAuditLatch({ workspace: process.cwd(), passphrase });
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+      if (!result.recovered) {
+        console.log("AMC hooks are not latched in this workspace.");
+        return;
+      }
+      console.log(chalk.hex("#4AEF79")(`AMC hook audit latch cleared; recovery recorded as ${result.eventId}`));
+      console.log(`It was latched because: ${result.reason}`);
+      console.log("Restart the Bridge: a running Bridge keeps the latch it holds in memory.");
     });
 
   hooks
