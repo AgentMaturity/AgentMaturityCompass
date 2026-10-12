@@ -132,8 +132,11 @@ function validatedLength(pattern: PiiPattern, text: string, start: number, value
  * (e.g. "Qty 2 4111 1111 1111 1111", "ES9121000418450200051332 to Acme") no longer hides a real card or IBAN.
  */
 export function findPIISpans(text: string): readonly PiiSpan[] {
-  // ponytail: retrying from the next index re-matches digit-dense text, about 10x the single-pass cost on hostile input
-  // (~0.3 s per 1 MiB of "1 1 1 ..."); resume after the first absorbed group instead if that ever matters.
+  // ponytail: retrying a rejected match re-matches dense candidate text. Measured on hostile input: ~0.3 s per MiB of
+  // "1 1 1 ..." and ~1.2 s per MiB of IBAN-shaped words ("DE89 DE89 ..."), where every word is a candidate start that
+  // fails mod-97 on the match and each stripped prefix. The scan is synchronous and runs per leaf, so a request pays it
+  // for every hostile leaf in its history, again on every prepare, blocking the event loop for every session. If that
+  // matters: a charCode mod-97 (about 2x), resuming after the first absorbed group, or a per-leaf candidate cap that refuses.
   const spans: PiiSpan[] = [];
   for (const pattern of PII_PATTERNS) {
     const re = cloneGlobal(pattern.re);
