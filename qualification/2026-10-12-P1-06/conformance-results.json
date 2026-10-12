@@ -2,7 +2,7 @@
   "suite": "amc-verifier-fixtures",
   "version": "v1",
   "implementation": "amc-verify@0.1.0",
-  "ranAt": "2026-10-12T00:09:43.475Z",
+  "ranAt": "2026-10-12T00:18:28.526Z",
   "passed": 55,
   "failed": 0,
   "cases": [

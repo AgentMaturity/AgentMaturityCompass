@@ -3,8 +3,9 @@
 Environment: local macOS arm64 (Darwin 25.6.0), Node v25.5.0, pnpm 10.33.0. Not CI. Container runs used the local colima
 VM `amc-s7f` (aarch64) with `--network none`. Other sessions kept the load average between 11 and 44.
 
-Branch `rtd/p1-06-pinned-issuer-verifier`. `int` was merged twice, last at `5001e9198`; the published counts were taken
-from int and regenerated. The checks ran at `d7d86dfa9`. The receipt commit adds only this folder.
+Branch `rtd/p1-06-pinned-issuer-verifier`. `int` was merged three times, last at its P1-58 head; the published counts and
+the source-quality baseline were taken from int, counts regenerated, P1-06's three findings re-accepted and stale entries
+shrunk with the tool. The checks ran at `6b0d755cd`. The receipt commit adds only this folder.
 
 ## Coordinator decisions applied
 
@@ -27,11 +28,12 @@ from int and regenerated. The checks ran at `d7d86dfa9`. The receipt commit adds
 
 ## What was checked
 
-- `checks.txt` at `d7d86dfa9`: build, typecheck, typecheck:tests, lint, check:counts, check:docs-drift, check:freeze,
+- `checks.txt` at `6b0d755cd`: build, typecheck, typecheck:tests, lint, check:counts, check:docs-drift,
   check:architecture-boundaries, check:gates, check:schemas (39 schemas, 80 contract fixtures incl. v2), check:api-ref,
   check:threat-model, check:duplicates, check:dead-code, check:clean-source, check:packed-install,
   `npx vitest run tests/verifier` (7 files, 129 tests), the conformance runner (55/55) and `needs-snapshot.mjs int`
-  (`none`): all exit 0.
+  (`none`) exit 0. check:freeze exits 1 on int's own P1-65 exception (the `amc a4` CLI, merged into int at
+  `c85019416`), which origin/main's baseline does not list; P1-06 adds no command path.
 - Quality ratchet acceptances, each with a reason: `mkfifo` in the CLI test; `CONTRACTS_V2`, read by gen-spec-schemas
   through dist; the shared rule's constant-time compare, which cannot reuse a private AMC helper.
 - `conformance-results.json`: 55 of 55 cases, including the 19 the spec names.
@@ -49,7 +51,7 @@ from int and regenerated. The checks ran at `d7d86dfa9`. The receipt commit adds
 - `red/`: new tests failing before each security fix. `self-audit.txt` precedes `9ccb71250`, `review.txt` precedes
   `1f5de52ff`, `amc-admission.txt` precedes `7fd866b40` and `p108-times.txt` precedes `ddbffd94e`.
 - `full-suite.txt`: the full suite at `35c491d30` (24,194 tests, 46 failed) with every failure triaged. One was caused
-  by P1-06 (`apiRouters`, fixed in `5652c8249`). After the merges, the 19 trust-consuming files pass (447 tests).
+  by P1-06 (`apiRouters`, fixed in `5652c8249`). After the last merge, the 20 trust-consuming test files pass (452 tests).
 
 ## Not done here
 

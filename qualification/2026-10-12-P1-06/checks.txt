@@ -1,19 +1,19 @@
-npm run -s build: exit 0 (28944 ms) 
-npm run -s typecheck: exit 0 (25926 ms) 
-npm run -s typecheck:tests: exit 0 (35253 ms) 
-npm run -s lint: exit 0 (3109 ms) Lint contract passed: three unsafe patterns rejected; safe counterparts accepted. | check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 10; 16 random marker(s); 0 pending entries.
-npm run -s check:counts: exit 0 (716 ms) Published source counts match the repository; this check does not execute tests.
-npm run -s check:docs-drift: exit 0 (405 ms) Docs drift check passed (336 files scanned; truth claims and commands checked in 247 public files; 4 logged exceptions).
-npm run -s check:freeze: exit 0 (1743 ms) Freeze guard passed: {"cliCommandPaths":1231,"cliInventoryPaths":1231,"stationPacks":41,"stationPackQuestions":632}
-npm run -s check:architecture-boundaries: exit 0 (1877 ms)     "src/sdk/nativeAgentErrors.ts": 39, |     "src/utils/errors.ts": 23, |     "src/watch/proofDelegatedMonitor.ts": 242,
-npm run -s check:gates: exit 0 (317 ms) 11 registered emitters, 4 evidence maps, 279 literal audit emissions classified, 9 evaluated gate requirements checked. | check:gates: every evaluated gate requirement has a registered, non-synthetic emitter.
-npm run -s check:schemas: exit 0 (639 ms) gen-spec-schemas: 39 schemas current; 80 contract fixtures agree
-npm run -s check:api-ref: exit 0 (204 ms) 
-npm run -s check:threat-model: exit 0 (228 ms) 
-npm run -s check:duplicates: exit 0 (681 ms) {"scan":"duplicates","baseline":1234,"current":1262,"new":0,"stale":0,"accepted":28}
-npm run -s check:dead-code: exit 0 (2847 ms) {"scan":"dead-code","baseline":2755,"current":2781,"new":0,"stale":0,"accepted":26}
-npm run -s check:clean-source: exit 0 (55522 ms) 
-npm run -s check:packed-install: exit 0 (63126 ms) note: packing with --ignore-scripts; the prepack release gate is a separate gate, not exercised here | ok   A4 preview gate: 0 amc_a4_* tools without it, 5 with it
-npx vitest run tests/verifier: exit 0 (10832 ms)  Test Files  7 passed (7) |       Tests  129 passed (129)
-node packages/verifier/conformance/run.mjs --cmd "node packages/verifier/bin/amc-verify.mjs": exit 0 (4863 ms) amc-verify@0.1.0: 55/55 cases pass (conformance-results.json)
-node $SP/needs-snapshot.mjs int: exit 0 (345 ms) none
+npm run -s build: exit 0 (33299 ms) 
+npm run -s typecheck: exit 0 (28090 ms) 
+npm run -s typecheck:tests: exit 0 (38489 ms) 
+npm run -s lint: exit 0 (3689 ms) Lint contract passed: three unsafe patterns rejected; safe counterparts accepted. | check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 10; 16 random marker(s); 0 pending entries.
+npm run -s check:counts: exit 0 (914 ms) Published source counts match the repository; this check does not execute tests.
+npm run -s check:docs-drift: exit 0 (499 ms) Docs drift check passed (336 files scanned; truth claims and commands checked in 247 public files; 4 logged exceptions).
+npm run -s check:freeze: exit 1 (2224 ms): "Freeze exception P1-65 is not in the base baseline's allowedExceptionKeys" - inherited from int (P1-65 amc a4 CLI, merged into int at c85019416); P1-06 adds no command path (cliCommandPaths unchanged by P1-06)
+npm run -s check:architecture-boundaries: exit 0 (2336 ms)     "src/sdk/nativeAgentErrors.ts": 39, |     "src/utils/errors.ts": 23, |     "src/watch/proofDelegatedMonitor.ts": 242,
+npm run -s check:gates: exit 0 (422 ms) 11 registered emitters, 4 evidence maps, 279 literal audit emissions classified, 9 evaluated gate requirements checked. | check:gates: every evaluated gate requirement has a registered, non-synthetic emitter.
+npm run -s check:schemas: exit 0 (838 ms) gen-spec-schemas: 39 schemas current; 80 contract fixtures agree
+npm run -s check:api-ref: exit 0 (297 ms) 
+npm run -s check:threat-model: exit 0 (381 ms) 
+npm run -s check:duplicates: exit 0 (799 ms) {"scan":"duplicates","baseline":1231,"current":1243,"new":0,"stale":0,"accepted":12}
+npm run -s check:dead-code: exit 0 (3063 ms) {"scan":"dead-code","baseline":2717,"current":2721,"new":0,"stale":0,"accepted":4}
+npm run -s check:clean-source: exit 0 (57988 ms) 
+npm run -s check:packed-install: exit 0 (56575 ms) note: packing with --ignore-scripts; the prepack release gate is a separate gate, not exercised here | ok   A4 preview gate: 0 amc_a4_* tools without it, 5 with it
+npx vitest run tests/verifier: exit 0 (9502 ms)  Test Files  7 passed (7) |       Tests  129 passed (129)
+node packages/verifier/conformance/run.mjs --cmd "node packages/verifier/bin/amc-verify.mjs": exit 0 (5136 ms) amc-verify@0.1.0: 55/55 cases pass (conformance-results.json)
+node $SP/needs-snapshot.mjs int: exit 0 (361 ms) none

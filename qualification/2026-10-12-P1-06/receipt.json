@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P1-06",
   "date": "2026-10-12",
-  "commit": "d7d86dfa9cc871dfd7c5370e14c6c07206491cba",
+  "commit": "6b0d755cdbec9bae142f2280eead06b1f1a354fb",
   "branch": "rtd/p1-06-pinned-issuer-verifier",
   "node": "v25.5.0",
   "pnpm": "10.33.0",
@@ -12,100 +12,100 @@
     {
       "cmd": "npm run -s build",
       "exit": 0,
-      "durationMs": 28944
+      "durationMs": 33299
     },
     {
       "cmd": "npm run -s typecheck",
       "exit": 0,
-      "durationMs": 25926
+      "durationMs": 28090
     },
     {
       "cmd": "npm run -s typecheck:tests",
       "exit": 0,
-      "durationMs": 35253
+      "durationMs": 38489
     },
     {
       "cmd": "npm run -s lint",
       "exit": 0,
-      "durationMs": 3109
+      "durationMs": 3689
     },
     {
       "cmd": "npm run -s check:counts",
       "exit": 0,
-      "durationMs": 716
+      "durationMs": 914
     },
     {
       "cmd": "npm run -s check:docs-drift",
       "exit": 0,
-      "durationMs": 405
+      "durationMs": 499
     },
     {
       "cmd": "npm run -s check:freeze",
-      "exit": 0,
-      "durationMs": 1743
+      "exit": 1,
+      "durationMs": 2224
     },
     {
       "cmd": "npm run -s check:architecture-boundaries",
       "exit": 0,
-      "durationMs": 1877
+      "durationMs": 2336
     },
     {
       "cmd": "npm run -s check:gates",
       "exit": 0,
-      "durationMs": 317
+      "durationMs": 422
     },
     {
       "cmd": "npm run -s check:schemas",
       "exit": 0,
-      "durationMs": 639
+      "durationMs": 838
     },
     {
       "cmd": "npm run -s check:api-ref",
       "exit": 0,
-      "durationMs": 204
+      "durationMs": 297
     },
     {
       "cmd": "npm run -s check:threat-model",
       "exit": 0,
-      "durationMs": 228
+      "durationMs": 381
     },
     {
       "cmd": "npm run -s check:duplicates",
       "exit": 0,
-      "durationMs": 681
+      "durationMs": 799
     },
     {
       "cmd": "npm run -s check:dead-code",
       "exit": 0,
-      "durationMs": 2847
+      "durationMs": 3063
     },
     {
       "cmd": "npm run -s check:clean-source",
       "exit": 0,
-      "durationMs": 55522
+      "durationMs": 57988
     },
     {
       "cmd": "npm run -s check:packed-install",
       "exit": 0,
-      "durationMs": 63126
+      "durationMs": 56575
     },
     {
       "cmd": "npx vitest run tests/verifier",
       "exit": 0,
-      "durationMs": 10832
+      "durationMs": 9502
     },
     {
       "cmd": "node packages/verifier/conformance/run.mjs --cmd \"node packages/verifier/bin/amc-verify.mjs\"",
       "exit": 0,
-      "durationMs": 4863
+      "durationMs": 5136
     },
     {
       "cmd": "node $SP/needs-snapshot.mjs int",
       "exit": 0,
-      "durationMs": 345
+      "durationMs": 361
     },
     {
-      "cmd": "npx vitest run <19 trust-consuming test files> (at d7d86dfa9)",
+      "cmd": "npx vitest run <20 trust-consuming test files> (at 6b0d755cd)",
       "exit": 0,
       "durationMs": 0
     },
@@ -134,11 +134,11 @@
   "artifacts": [
     {
       "path": "checks.txt",
-      "sha256": "a7f713cad6ff14f08345a0571b586ce8fc8f33b942c12efb017047d36ae638c8"
+      "sha256": "603a7a571109294b361ca278e134d310041e426d6624a1d15cc968503ad105e9"
     },
     {
       "path": "conformance-results.json",
-      "sha256": "5c412e4d4932dd4094bf767aeb5f0ccd64d7737c7ded39f8577506fd9c0c4a68"
+      "sha256": "35cdcfd998886d10b4c6127b7e1e3913bdc78936056e1277703913983b43d769"
     },
     {
       "path": "containers.txt",
@@ -146,7 +146,7 @@
     },
     {
       "path": "full-suite.txt",
-      "sha256": "79760f46d34a4299c6e0dba2f2bccb8eed0339487448e5d2b66c934e43d0bcfe"
+      "sha256": "00a9405a9cc8db3989612a21c7739685812318aa71e179356add4d17fcd25235"
     },
     {
       "path": "mutations.txt",
@@ -169,5 +169,5 @@
       "sha256": "22ff2f7122a32cc681922597d4aa1e12cc26c27347272ff434c3b745fd8f0644"
     }
   ],
-  "notes": "tests counts the 7 tests/verifier files at the receipt commit. The full suite exited 1: 46 failures at 35c491d30, triaged in full-suite.txt. One was caused by P1-06 (apiRouters mocks src/utils/time.js) and is fixed in 5652c8249. The rest are pre-existing on this lineage, worktree-only, or load timeouts that pass when rerun alone. revoked-superseded-earlier-claim deliberately deviates from the P1-06 spec (refused, not pass-with-warning) by the coordinator's decision; the P1-25 trusted-timestamp seam is documented. Container runs are local colima (aarch64), not CI; durations of 0 were not measured. Node 20 was not evaluated locally."
+  "notes": "tests counts the 7 tests/verifier files at the receipt commit. The full suite exited 1: 46 failures at 35c491d30, triaged in full-suite.txt. One was caused by P1-06 (apiRouters mocks src/utils/time.js) and is fixed in 5652c8249. The rest are pre-existing on this lineage, worktree-only, or load timeouts that pass when rerun alone. revoked-superseded-earlier-claim deliberately deviates from the P1-06 spec (refused, not pass-with-warning) by the coordinator's decision; the P1-25 trusted-timestamp seam is documented. Container runs are local colima (aarch64), not CI; durations of 0 were not measured. Node 20 was not evaluated locally. check:freeze exits 1 on int's own P1-65 freeze exception (amc a4 CLI), which the origin/main baseline does not list; P1-06 adds no command path."
 }

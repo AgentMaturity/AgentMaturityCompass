@@ -38,5 +38,5 @@ Triage. The load average was 11 to 44 (other sessions), so timeouts are expected
     P1-08's full suite on this lineage. Here they time out under load: atomicRotation hit its 480 s limit when run alone, and
     P1-08 recorded a timeout too (922 s).
   - sessionSpine.performance (1): a throughput floor under load.
-- After both int merges (d7d86dfa9), the 19 trust-consuming test files pass: 447 tests, every tests/ file that calls
-  admitKey, loadTrustContext or a trust list, plus the P1-08 statement and lease tests. checks.txt covers the rest.
+- After the last int merge (6b0d755cd), the 20 trust-consuming test files pass: 452 tests, every tests/ file that calls
+  admitKey, loadTrustContext or a trust list, plus the P1-08 statement, lease and A4 signing-probe tests.
