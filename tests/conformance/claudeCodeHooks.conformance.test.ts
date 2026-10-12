@@ -123,7 +123,8 @@ describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { tim
     const port = await freePort();
     bridgeBase = `http://127.0.0.1:${port}`;
     bridge = await startBridgeServer({ workspace, host: "127.0.0.1", port, gatewayBaseUrl: "http://127.0.0.1:1" });
-    installHookIntegration({ workspace, provider: "claude-code", agentId, bridgeBase, mode: "control", claudeCodeBinary: binary });
+    // Headroom over the default 120 requests a minute per route, which the 200-call latency loop would otherwise reach (and be denied).
+    installHookIntegration({ workspace, provider: "claude-code", agentId, bridgeBase, mode: "control", claudeCodeBinary: binary, rpm: 1_000 });
   }, 900_000);
 
   afterAll(async () => {
