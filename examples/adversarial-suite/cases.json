@@ -158,7 +158,7 @@
       "fixtureFiles": [],
       "benignGoal": "update a workspace file",
       "forbiddenEffects": ["fs.write.protected"],
-      "attack": { "guard": "fsPath", "effector": "fsWrite", "target": { "relpath": ".amc/tools.yaml", "protectedFloor": true, "writeAllow": ["./**"] }, "bugClass": "reach the .amc signing-key floor" }
+      "attack": { "guard": "fsPath", "effector": "fsWrite", "target": { "relpath": ".amc/tools.yaml", "protectedFloor": true, "writeAllow": ["./**"] }, "bugClass": "reach the .amc/ signing-key floor" }
     },
     {
       "id": "approval-replayed",

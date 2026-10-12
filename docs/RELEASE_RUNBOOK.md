@@ -6,6 +6,34 @@ Use it for every production release.
 
 ---
 
+## Weekly release train (P1-41)
+
+After 2.0.0, releases ship through the weekly train in [RELEASE_CADENCE.md](./RELEASE_CADENCE.md). Each release
+copies the [release checklist](./program/release-checklist.md) into its `RELEASED` record.
+
+1. Tuesday: `npm-publish.yml` refreshes the "Version Packages" pull request with the output of
+   `node scripts/release-prepare.mjs --version-only` (needs `CHANGESETS_GITHUB_TOKEN`). No pending changesets, no
+   pull request: the week is skipped.
+2. Review it: the changesets, the version, and `docs/releases/<version>.md` (edit the weekly-train summary by hand).
+   CI must be green on it, including the release-notes claim-word check. A breaking release needs hand-written notes
+   and a Sid decision first.
+3. Release day, Sid (B3 below applies): merge the version pull request, then from a fresh clone tag the merge commit
+   and push the tag:
+
+   ```bash
+   git fetch origin && git rev-parse origin/main          # the merge commit; confirm CI is green on it
+   git tag -a vX.Y.Z <sha> -m "AMC X.Y.Z"
+   git push origin vX.Y.Z
+   ```
+
+4. Approve the `approve`, `sign` and `release` jobs of that tag's Release run in the `release` environment (section 3).
+5. `post-publish-verify.yml` runs when the Release run succeeds (section 4). Copy its artifacts into
+   `qualification/<YYYY-MM-DD>-release-<version>/`, then record the published version in
+   `website/publication-status.json` through the post-publish pins pull request: `release:prepare` plans the next
+   version from it.
+
+---
+
 ## Phase B gates (B0–B4)
 
 These steps follow `plans/2026-09-09-amc-execution-brief.md` §6. Phase B starts
@@ -189,7 +217,7 @@ At minimum:
 2. Create and push tag:
 
 ```bash
-git tag v<version>
+git tag -a v<version> <merge commit sha> -m "AMC <version>"
 git push origin v<version>
 ```
 
@@ -227,9 +255,48 @@ amc release verify amc-<version>.amcrelease --pubkey amc-release-signing.pub
 Then record the new npm version in `website/publication-status.json` (with the evidence of the check):
 `release:prepare` plans the next version from it.
 
+### Post-publish workflow (P1-41)
+
+`post-publish-verify.yml` runs after every successful Release run from a tag push, and on dispatch
+(`gh workflow run post-publish-verify.yml -f version=<version>`). It holds `contents: read` only and no secret, and
+reads public endpoints only:
+
+- `verify` (`node scripts/check-published-release.mjs <version>`): npm has the version with an integrity and a SLSA
+  provenance attestation, dist-tag `latest` is that version, the GitHub release has every asset release.yml attaches,
+  and `ghcr.io/agentmaturity/amc-studio:v<version>` resolves for an anonymous client. Compare the digest it records
+  with `image-digests.json` on the release.
+- `distribution` (`node scripts/distribution-metrics.mjs --write`): one dated row with npm's last-week downloads and
+  the cumulative GitHub release asset downloads per release. It also runs every Monday for the weekly status.
+
+Each check is pass, fail or "not measured" (its endpoint could not be read); only all-pass is green, and a figure is
+never filled in. Copy the `post-publish-receipt` and `distribution-metrics` artifacts into
+`qualification/<YYYY-MM-DD>-release-<version>/`, and add the row to the Monday status. P0-40 adds the install smoke
+on clean machines to this workflow.
+
 ---
 
-## 5) Rollback runbook (fail-safe)
+## 5) Rollback and deprecation policy
+
+### A bad npm release (P1-41)
+
+- **Never unpublish** a version people may have installed. npm allows an unpublish only within 72 hours and with no
+  dependents, or later under narrower conditions; re-read <https://docs.npmjs.com/policies/unpublish> before relying on
+  it. AMC does not use it: an unpublished version breaks every lockfile that names it.
+- **Deprecate it** with the reason and the fixed version:
+  `npm deprecate agent-maturity-compass@<bad> "<reason>. Upgrade to <fixed>."`
+- **Fix forward:** ship the fix as the next patch through the train, out of band when it is a security fix.
+- **When the fix needs more than a day,** move `latest` back:
+  `npm dist-tag add agent-maturity-compass@<good> latest`, and record it in `website/publication-status.json`.
+- **Images:** point the tags back at the previous digest:
+  `docker buildx imagetools create -t ghcr.io/agentmaturity/amc-studio:<tag> ghcr.io/agentmaturity/amc-studio@<previous digest>`,
+  for `latest` and for the bad version's tag, and record both digests.
+- **GitHub release:** add a warning to the top of its notes (`gh release edit v<bad> --notes-file <file>`), naming the
+  fixed version.
+- **Installers:** pin them back to the last good release through a post-publish pins pull request
+  (`website/install-channel.json`, `website/publication-status.json`, `install.sh`, `website/install.sh`,
+  `website/install.ps1`).
+
+### A bad deployment
 
 Trigger rollback if any of the following happen:
 - migration fails or produces integrity mismatch
