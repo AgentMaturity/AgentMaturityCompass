@@ -20,6 +20,7 @@ import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../securi
 import { admitKey, buildVerifierReport, checkDigestSignature, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import { carriedLedgerAnchoring } from "../trust/signatureCheck.js";
 import { assertNotExample } from "../claims/eligibility/exampleMode.js";
+import { attestBundleRoot } from "../attest/bundleAttestation.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -638,6 +639,7 @@ export function exportEvidenceBundle(params: {
   runId: string;
   outFile: string;
   agentId?: string;
+  attest?: boolean; // P1-27: add the AIBOM and a DSSE-signed in-toto statement, both listed in the manifest
 }): { outFile: string; manifest: BundleManifest; fileCount: number; eventCount: number; sessionCount: number } {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const agentPaths = getAgentPaths(params.workspace, agentId);
@@ -653,9 +655,7 @@ export function exportEvidenceBundle(params: {
     ensureDir(join(root, "metadata"));
 
     const reportJsonPath = join(agentPaths.runsDir, `${params.runId}.json`);
-    if (!pathExists(reportJsonPath)) {
-      throw new Error(`Run JSON not found: ${reportJsonPath}`);
-    }
+    if (!pathExists(reportJsonPath)) throw new Error(`Run JSON not found: ${reportJsonPath}`);
     writeFileAtomic(join(root, "run.json"), readFileSync(reportJsonPath));
 
     const reportMdPath = join(agentPaths.reportsDir, `${params.runId}.md`);
@@ -770,6 +770,7 @@ export function exportEvidenceBundle(params: {
       0o644
     );
 
+    if (params.attest) attestBundleRoot({ workspace: params.workspace, root, agentId });
     const manifest: BundleManifest = {
       schemaVersion: 1,
       runId: report.runId,
