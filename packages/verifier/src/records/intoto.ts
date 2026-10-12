@@ -2,7 +2,7 @@
  * A DSSE envelope, bare or in a key-based Sigstore bundle v0.3, and the in-toto Statement v1 with AMC's control-results
  * predicate v0.1 it carries (P1-27). Mirrors src/attest/statement.ts and src/attest/sigstoreBundle.ts.
  */
-import { anyRecord, arr, isoTime, lit, nonEmpty, nullable, obj, oneOf, sha256 } from "../schema.js";
+import { anyRecord, arr, isoTime, lit, nonEmpty, nullable, obj, oneOf, opt, sha256 } from "../schema.js";
 import { controlDimensions } from "./evidence.js";
 
 export const INTOTO_PAYLOAD_TYPE = "application/vnd.in-toto+json";
@@ -16,8 +16,9 @@ export const dsseEnvelope = obj({ payloadType: nonEmpty, payload: nonEmpty, sign
 /** Key-based only: no log entries, no timestamps and a public-key hint; a keyless (certificate) bundle is not admitted here. */
 export const sigstoreDsseBundle = obj({
   mediaType: lit(SIGSTORE_BUNDLE_V03, "UNSUPPORTED_VERSION"),
-  verificationMaterial: obj({ publicKey: obj({ hint: sha256 }), tlogEntries: arr(anyRecord, { max: 0 }),
-    timestampVerificationData: obj({ rfc3161Timestamps: arr(anyRecord, { max: 0 }) }) }),
+  // Protobuf JSON omits an empty repeated field or writes it as []; either way it must be empty.
+  verificationMaterial: obj({ publicKey: obj({ hint: sha256 }), tlogEntries: opt(arr(anyRecord, { max: 0 })),
+    timestampVerificationData: opt(obj({ rfc3161Timestamps: opt(arr(anyRecord, { max: 0 })) })) }),
   dsseEnvelope
 });
 

@@ -4,18 +4,15 @@
     "publicKey": {
       "hint": "9fdd063b94b38ecc325c781518956db1b5cf08be394c33efdf702b8eea791cfc"
     },
-    "tlogEntries": [],
-    "timestampVerificationData": {
-      "rfc3161Timestamps": []
-    }
+    "timestampVerificationData": {}
   },
   "dsseEnvelope": {
-    "payloadType": "application/json",
     "payload": "eyJfdHlwZSI6Imh0dHBzOi8vaW4tdG90by5pby9TdGF0ZW1lbnQvdjEiLCJzdWJqZWN0IjpbeyJuYW1lIjoiYXR0ZXN0YXRpb25zL2FpYm9tLmNkeC5qc29uIiwiZGlnZXN0Ijp7InNoYTI1NiI6IjYxZTk2M2Q0N2IwNDM4MTE1NTM4M2M4ZTU1NzE4MmUwZjhmNzE0Njk2NjdmNjJiNzFiMWZlYjlkNjg1MjljMDYifX0seyJuYW1lIjoicnVuLmpzb24iLCJkaWdlc3QiOnsic2hhMjU2IjoiZWQ5MWJiMjM1ZjJlNDVlMjY0YzAzMzRiY2ZmZGQwODJjMjZkZTY2MjhlMjVlOTQyOTM2ZTkzYmFkNDJmZWM5ZSJ9fV0sInByZWRpY2F0ZVR5cGUiOiJodHRwczovL2FnZW50bWF0dXJpdHkuY28vYXR0ZXN0YXRpb25zL2NvbnRyb2wtcmVzdWx0cy92MC4xIiwicHJlZGljYXRlIjp7ImNsYWltS2luZCI6Im9ic2VydmVkIiwic2NvcGUiOnsidGVuYW50IjoidGVuYW50LWEiLCJkZXBsb3ltZW50IjoicGF5bWVudHMtcHJvZCIsIndvcmtzcGFjZSI6IndzLWEiLCJhZ2VudCI6ImFnZW50LXBheW1lbnRzIiwic25hcHNob3QiOiJlZDkxYmIyMzVmMmU0NWUyNjRjMDMzNGJjZmZkZDA4MmMyNmRlNjYyOGUyNWU5NDI5MzZlOTNiYWQ0MmZlYzllIiwicHJvZmlsZSI6ImZpbmFuY2Utb3BzIiwicHJvZmlsZVZlcnNpb24iOiIxLjAuMCIsIndpbmRvdyI6eyJzdGFydCI6IjIwMjYtMDgtMDFUMDA6MDA6MDAuMDAwWiIsImVuZCI6IjIwMjYtMDktMDFUMDA6MDA6MDAuMDAwWiJ9LCJleGNsdXNpb25zIjpbXX0sImNvbnRyb2xzIjpbeyJjb250cm9sSWQiOiJhbWMuZGlhZ25vc3RpYyIsImRpbWVuc2lvbnMiOnsicmVzdWx0IjoicGFzcyIsImFwcGxpY2FiaWxpdHkiOnsic3RhdGUiOiJhcHBsaWNhYmxlIn0sImV2aWRlbmNlIjoic3VmZmljaWVudCIsImVuZm9yY2VtZW50Ijp7InN0YXRlIjoib2JzZXJ2ZWQifSwicmV2aWV3IjoicGVuZGluZyJ9fV0sImV2aWRlbmNlIjpbeyJzaGEyNTYiOiJhOGY1NzU3ZTMxNjYwZjczYjgzMTI1NmVmYjhhYThkNmM5OGI0ZGM1MjA3YjAzYWU1YmUyYTkxODg4NjQzYTBjIiwia2luZCI6ImxlZGdlci1zbGljZSJ9XSwidmVyaWZpZXJSZXBvcnQiOm51bGwsImlzc3VlZEF0IjoiMjAyNi0wOS0wMlQwMDowMDowMC4wMDBaIiwiZXhwaXJlc0F0IjoiMjAyNi0xMi0wMVQwOTowMDowMC4wMDBaIiwibm90aWNlIjoiQSBzaWduYXR1cmUgcHJvdmVzIHdobyBpc3N1ZWQgdGhpcyBzdGF0ZW1lbnQgYW5kIHRoYXQgaXQgaXMgdW5jaGFuZ2VkLCBub3QgdGhhdCB0aGUgc3RhdGVtZW50IGlzIHRydWUgb3IgdGhhdCB0aGUgYWdlbnQgYmVoYXZlZCB3ZWxsLiJ9fQ==",
+    "payloadType": "application/json",
     "signatures": [
       {
-        "keyid": "9fdd063b94b38ecc325c781518956db1b5cf08be394c33efdf702b8eea791cfc",
-        "sig": "x8jm+bVAfQD5iHoueZ9s1WDmwE/lURSZ/OLOuOL1O5u3WlY6idyjF1oTjRAMoItUNDr69uhj8pktP6+XpPTfCA=="
+        "sig": "x8jm+bVAfQD5iHoueZ9s1WDmwE/lURSZ/OLOuOL1O5u3WlY6idyjF1oTjRAMoItUNDr69uhj8pktP6+XpPTfCA==",
+        "keyid": "9fdd063b94b38ecc325c781518956db1b5cf08be394c33efdf702b8eea791cfc"
       }
     ]
   }

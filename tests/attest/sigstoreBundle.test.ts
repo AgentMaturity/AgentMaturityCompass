@@ -18,11 +18,12 @@ describe("Sigstore bundle v0.3 around a key-based DSSE envelope", () => {
   test("wraps the envelope with a public-key hint equal to the key id, no log entries and no network material", () => {
     const envelope = signDsse(INTOTO_PAYLOAD_TYPE, payload, signer);
     const bundle = toSigstoreBundle(envelope);
-    expect(bundle).toEqual({
+    // The protobuf JSON form @sigstore/bundle emits: empty repeated fields omitted, its member order.
+    expect(JSON.stringify(bundle)).toBe(JSON.stringify({
       mediaType: SIGSTORE_BUNDLE_V03_MEDIA_TYPE,
-      verificationMaterial: { publicKey: { hint: signer.keyid }, tlogEntries: [], timestampVerificationData: { rfc3161Timestamps: [] } },
-      dsseEnvelope: envelope
-    });
+      verificationMaterial: { publicKey: { hint: signer.keyid }, timestampVerificationData: {} },
+      dsseEnvelope: { payload: envelope.payload, payloadType: envelope.payloadType, signatures: [{ sig: envelope.signatures[0]!.sig, keyid: signer.keyid }] }
+    }));
     expect(SIGSTORE_BUNDLE_V03_MEDIA_TYPE).toBe("application/vnd.dev.sigstore.bundle.v0.3+json");
   });
 
@@ -39,6 +40,12 @@ describe("Sigstore bundle v0.3 around a key-based DSSE envelope", () => {
     expect(() => envelopeFromSigstoreBundle({ ...bundle, extra: true })).toThrow();
     expect(() => envelopeFromSigstoreBundle({ ...bundle, verificationMaterial: { certificate: { rawBytes: "AA==" }, tlogEntries: [], timestampVerificationData: { rfc3161Timestamps: [] } } }))
       .toThrow(/keyless/);
+    expect(() => envelopeFromSigstoreBundle({ ...bundle, verificationMaterial: { ...bundle.verificationMaterial, tlogEntries: [{ logIndex: "1" }] } })).toThrow(/no log entries/);
+    expect(() => envelopeFromSigstoreBundle({ ...bundle, verificationMaterial: { publicKey: bundle.verificationMaterial.publicKey,
+      timestampVerificationData: { rfc3161Timestamps: [{ signedTimestamp: "AA==" }] } } })).toThrow(/no timestamps/);
+    // The equivalent spelling with empty arrays is the same bundle.
+    expect(() => envelopeFromSigstoreBundle({ ...bundle, verificationMaterial: { publicKey: bundle.verificationMaterial.publicKey, tlogEntries: [],
+      timestampVerificationData: { rfc3161Timestamps: [] } } })).not.toThrow();
   });
 
   test("sigstoreSigner implements @sigstore/sign's Signer over AMC's key: a public key with the key id as its hint", async () => {

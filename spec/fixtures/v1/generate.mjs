@@ -381,9 +381,10 @@ function dsseBundle({ signer = K.seal, payloadType = DSSE_TYPE, claimKind = "obs
       evidence: [{ sha256: sha256(LEDGER_SLICE), kind: "ledger-slice" }], verifierReport: null, issuedAt: T.issued, expiresAt: "2026-12-01T09:00:00.000Z",
       notice: "A signature proves who issued this statement and that it is unchanged, not that the statement is true or that the agent behaved well." } };
   const payload = Buffer.from(JSON.stringify(statement), "utf8");
+  // The protobuf JSON form @sigstore/bundle emits for a key-based bundle: empty repeated fields omitted.
   return { mediaType: "application/vnd.dev.sigstore.bundle.v0.3+json",
-    verificationMaterial: { publicKey: { hint: signer.keyId }, tlogEntries: [], timestampVerificationData: { rfc3161Timestamps: [] } },
-    dsseEnvelope: { payloadType, payload: b64(payload), signatures: [{ keyid: signer.keyId, sig: b64(signBytes(dssePae(payloadType, payload), signer)) }] } };
+    verificationMaterial: { publicKey: { hint: signer.keyId }, timestampVerificationData: {} },
+    dsseEnvelope: { payload: b64(payload), payloadType, signatures: [{ sig: b64(signBytes(dssePae(payloadType, payload), signer)), keyid: signer.keyId }] } };
 }
 const tamperedAibom = Buffer.from(AIBOM);
 tamperedAibom[tamperedAibom.indexOf("experimental")] ^= 0x20;

@@ -13,22 +13,31 @@ export const SIGSTORE_BUNDLE_V03_MEDIA_TYPE = "application/vnd.dev.sigstore.bund
 
 export interface KeyBasedSigstoreBundle {
   mediaType: typeof SIGSTORE_BUNDLE_V03_MEDIA_TYPE;
-  verificationMaterial: { publicKey: { hint: string }; tlogEntries: []; timestampVerificationData: { rfc3161Timestamps: [] } };
-  dsseEnvelope: DsseEnvelope;
+  verificationMaterial: { publicKey: { hint: string }; timestampVerificationData: Record<string, never> };
+  dsseEnvelope: { payload: string; payloadType: string; signatures: Array<{ sig: string; keyid: string }> };
 }
 
-/** The JSON form `@sigstore/bundle`'s bundleToJSON gives a key-based DSSE bundle. */
+/**
+ * Exactly the JSON `@sigstore/bundle`'s bundleToJSON gives a key-based DSSE bundle without witnesses (checked against
+ * DSSEBundleBuilder in qualification/2026-10-12-P1-27): empty repeated fields are omitted, as protobuf JSON does.
+ */
 export function toSigstoreBundle(envelope: DsseEnvelope): KeyBasedSigstoreBundle {
+  const [signature] = envelope.signatures;
   return { mediaType: SIGSTORE_BUNDLE_V03_MEDIA_TYPE,
-    verificationMaterial: { publicKey: { hint: envelope.signatures[0]!.keyid }, tlogEntries: [], timestampVerificationData: { rfc3161Timestamps: [] } },
-    dsseEnvelope: envelope };
+    verificationMaterial: { publicKey: { hint: signature!.keyid }, timestampVerificationData: {} },
+    dsseEnvelope: { payload: envelope.payload, payloadType: envelope.payloadType, signatures: [{ sig: signature!.sig, keyid: signature!.keyid }] } };
 }
 
 const isObject = (value: unknown): value is Record<string, unknown> => value !== null && typeof value === "object" && !Array.isArray(value);
 const keysAre = (value: Record<string, unknown>, keys: string[]) => Object.keys(value).sort().join() === [...keys].sort().join();
-const emptyArray = (value: unknown) => Array.isArray(value) && value.length === 0;
+const keysWithin = (value: Record<string, unknown>, keys: string[]) => Object.keys(value).every(key => keys.includes(key));
+/** Absent or an empty array: protobuf JSON may write an empty repeated field either way. */
+const noneOrEmpty = (value: unknown) => value === undefined || (Array.isArray(value) && value.length === 0);
 
-/** The DSSE envelope of a key-based bundle in exactly the form toSigstoreBundle writes; anything else throws. */
+/**
+ * The DSSE envelope of a key-based bundle with no log entries and no timestamps; anything else throws. AMC does not check
+ * log entries or timestamps, so a bundle carrying them is refused rather than half-verified.
+ */
 export function envelopeFromSigstoreBundle(value: unknown): DsseEnvelope {
   if (!isObject(value) || !keysAre(value, ["mediaType", "verificationMaterial", "dsseEnvelope"])) throw new Error("not a Sigstore DSSE bundle");
   if (value.mediaType !== SIGSTORE_BUNDLE_V03_MEDIA_TYPE) throw new Error(`media type ${String(value.mediaType)} is not ${SIGSTORE_BUNDLE_V03_MEDIA_TYPE}`);
@@ -36,10 +45,11 @@ export function envelopeFromSigstoreBundle(value: unknown): DsseEnvelope {
   if (isObject(material) && ("certificate" in material || "x509CertificateChain" in material)) {
     throw new Error("a keyless bundle (certificate material): verify it with Sigstore tooling; AMC admits pinned keys only");
   }
-  if (!isObject(material) || !keysAre(material, ["publicKey", "tlogEntries", "timestampVerificationData"]) || !emptyArray(material.tlogEntries)
-    || !isObject(material.timestampVerificationData) || !keysAre(material.timestampVerificationData, ["rfc3161Timestamps"])
-    || !emptyArray(material.timestampVerificationData.rfc3161Timestamps) || !isObject(material.publicKey) || !keysAre(material.publicKey, ["hint"])) {
-    throw new Error("verificationMaterial must be { publicKey: { hint }, tlogEntries: [], timestampVerificationData: { rfc3161Timestamps: [] } }");
+  const timestamps = isObject(material) ? material.timestampVerificationData : undefined;
+  if (!isObject(material) || !keysWithin(material, ["publicKey", "tlogEntries", "timestampVerificationData"]) || !noneOrEmpty(material.tlogEntries)
+    || (timestamps !== undefined && (!isObject(timestamps) || !keysWithin(timestamps, ["rfc3161Timestamps"]) || !noneOrEmpty(timestamps.rfc3161Timestamps)))
+    || !isObject(material.publicKey) || !keysAre(material.publicKey, ["hint"])) {
+    throw new Error("verificationMaterial must be a public-key hint with no log entries and no timestamps");
   }
   const envelope = value.dsseEnvelope;
   const signatures = isObject(envelope) && Array.isArray(envelope.signatures) ? envelope.signatures as unknown[] : [];
