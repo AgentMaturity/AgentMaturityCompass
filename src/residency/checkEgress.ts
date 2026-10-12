@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import { checkpointRootInWorkspace, ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy,
+import { ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy,
   type ActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { emitGuardEvent, getWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -44,14 +44,12 @@ interface Context {
   readonly facts: { readonly dataClasses: readonly string[] | null; readonly jurisdictions: readonly string[] | null; readonly storageUrl: string } | null;
 }
 /**
- * The verified active plan, or null when none is active. activate.ts reads a workspace that contains the control
- * checkpoint root (HOME as the workspace, P0-57) as having no plan unless `.amc/control-plan/` exists, and refuses it
- * as ControlCheckpointRootInWorkspaceError when it does. A destination registry opts such a workspace in as well, so it
- * gets the same refusal. That refusal is never reported as active_policy_unverifiable.
+ * The verified active plan, or null when none is active. A workspace that contains the control checkpoint root (HOME as
+ * the workspace, P0-57) is refused by name (ControlCheckpointRootInWorkspaceError, fail closed: no plan there can be told
+ * apart from a deleted one), never reported as active_policy_unverifiable.
  */
-function activePolicy(input: CheckEgressInput, registryPresent: boolean): ActiveCompiledPolicy | null {
+function activePolicy(input: CheckEgressInput): ActiveCompiledPolicy | null {
   try {
-    if (registryPresent && checkpointRootInWorkspace(input.workspace)) throw new ControlCheckpointRootInWorkspaceError();
     return loadActiveCompiledPolicy(input.workspace);
   } catch (error) {
     return error instanceof ControlCheckpointRootInWorkspaceError
@@ -61,7 +59,7 @@ function activePolicy(input: CheckEgressInput, registryPresent: boolean): Active
 }
 function context(input: CheckEgressInput, cwdFallback: boolean): Context {
   const snapshot = loadDestinationRegistrySnapshot(input.workspace);
-  const active = activePolicy(input, snapshot.state !== "missing");
+  const active = activePolicy(input);
   if (cwdFallback && (active || snapshot.state !== "missing")) return block(input, "registry_unverifiable", "workspace_scope_required");
   if (snapshot.state === "invalid") return block(input, "registry_unverifiable", snapshot.reason);
   if (snapshot.state === "missing") {

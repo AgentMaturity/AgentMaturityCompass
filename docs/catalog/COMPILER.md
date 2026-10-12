@@ -200,8 +200,8 @@ tool service load it when they start. The load verifies the journal whole, then 
 (digest and signature in the same read), then the shipped catalog against the plan's lockfile. Anything that does not
 verify refuses the session. With no plan ever activated, the session runs and its receipt records the downgrade
 `no_compiled_policy`. A workspace that contains the control checkpoint root (for example the home directory, with
-`AMC_CONTROL_CHECKPOINT_DIR` unset) cannot hold a verifiable plan. Without `.amc/control-plan/` it reads as having no
-plan; with that directory the load refuses as `ControlCheckpointRootInWorkspaceError`, which names
+`AMC_CONTROL_CHECKPOINT_DIR` unset) cannot hold a verifiable plan, and a missing plan there cannot be told apart from a
+deleted one, so every load refuses as `ControlCheckpointRootInWorkspaceError` (fail closed). It names
 `AMC_CONTROL_CHECKPOINT_DIR` and is never reported as a plan to restore (P0-57).
 
 The `compiled-policy` guard runs first in the native pipeline and fails closed:
