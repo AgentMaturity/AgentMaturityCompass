@@ -139,9 +139,10 @@ maturity evidence. Rules the schema cannot express:
 
 - `sessionId` equals the session of the audit row that carries the receipt.
 - `callId` is non-null exactly when `source` is `tool/result`.
-- `redactedDigest` is the SHA-256 of the redacted text: a message, queued input, a tool result, or an attachment's
-  content or file name (each redacted separately). For a tool result above the spill cap it equals the spill's
-  `contentSha256`. It is never a digest of a raw value.
+- `redactedDigest` is the SHA-256 of the redacted text: a message, queued input, a tool result, native-validation
+  output, operator compaction text, or an attachment's content or file name (each redacted separately). For a tool
+  result above the spill cap it equals the spill's `contentSha256`. It is never a digest of a raw value.
+- Gateway and bridge redactions emit no receipt; their markers are not tokens.
 - `findings` are heuristic detections and declared-field matches. They do not show that nothing was missed, and a
   token in the redacted text is a pseudonym, not de-identified or anonymized data.
 
