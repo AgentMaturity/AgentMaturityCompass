@@ -76,7 +76,8 @@ export interface LegalHoldV1 {
 export type HoldVerdict =
   | { readonly verdict: "clear"; readonly registryDigest: string; readonly holdsChecked: number; readonly warning?: "head_missing_unregulated" }
   | { readonly verdict: "held"; readonly holdIds: readonly string[] }
-  | { readonly verdict: "unknown"; readonly reason: "registry_unreadable" | "record_corrupt" | "signature_invalid" | "head_missing" | "tenant_unmapped" };
+  | { readonly verdict: "unknown"; readonly reason: "registry_unreadable" | "record_corrupt" | "signature_invalid" | "head_missing" | "tenant_unmapped"
+      | "control_checkpoint_root_in_workspace" };
 export interface DeletionRequest {
   readonly workspace: string;
   readonly executor: string;
