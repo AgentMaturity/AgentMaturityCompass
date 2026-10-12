@@ -13,7 +13,7 @@ import { verifyManagedLease } from "../adapters/managedHookLease.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
-import { observationId, recordHookAudit, type HookObservationResult } from "./claudeCodeObservations.js";
+import { admitObservation, observationId, recordHookAudit, type HookObservationResult } from "./claudeCodeObservations.js";
 import { HookControlError } from "./hookProviders.js";
 
 export type HookAdmission = { readonly admitted: true } | { readonly admitted: false; readonly reason: string };
@@ -59,6 +59,7 @@ export function admitClaudeCodePrompt(input: { workspace: string; authenticatedA
     throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, "Claude Code UserPromptSubmit does not match its schema");
   }
   const now = input.now ?? Date.now();
+  const { registered } = admitObservation({ workspace: input.workspace, agentId: input.authenticatedAgentId, sessionId: parsed.session_id, now });
   const admission = checkHookAdmission(input.workspace, input.authenticatedAgentId, now);
   const sessionSha256 = claudeSessionSha256(parsed.session_id);
   // The prompt's digest and UTF-8 length are what AMC's forwarder reports from Claude Code's payload; the text never arrives.
@@ -66,6 +67,7 @@ export function admitClaudeCodePrompt(input: { workspace: string; authenticatedA
     reason: admission.admitted ? null : admission.reason, promptTextStored: false,
     reported: { by: "claude-code", promptId: parsed.prompt_id ?? null, promptSha256: parsed.prompt.sha256, promptLength: parsed.prompt.length } };
   const recorded = recordHookAudit({ workspace: input.workspace, now, sessionSha256, id: observationId("ccadmit", [input.authenticatedAgentId, sessionSha256, parsed.prompt_id], now),
-    meta: { admissionSchemaVersion: 1, ...record }, body: record, receipt: { kind: "guard_check", providerId: "hook-admission:claude-code" } });
+    meta: { admissionSchemaVersion: 1, ...record }, body: record, receipt: { kind: "guard_check", providerId: "hook-admission:claude-code" },
+    underRegistration: registered });
   return { ...recorded, ...admission };
 }

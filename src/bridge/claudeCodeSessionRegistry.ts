@@ -24,6 +24,7 @@ import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
 import { verifyReceipt } from "../receipts/receipt.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { writerFault } from "./hookAuditLatch.js";
 import { HookControlError } from "./hookProviders.js";
 
 export const CLAUDE_NOT_GOVERNED_NOTE = "AMC cannot see Claude Code sessions that ran none of AMC's hooks; they are reported as not governed.";
@@ -199,16 +200,21 @@ export function registerClaudeCodeSession(input: { workspace: string; authentica
       return { registered: true, idempotentReplay: true, provider: "claude-code", record, eventId, receiptId: meta.receipt_id };
     }
     const sessionId = `cc-registration-session-${sha256Hex(eventId).slice(0, 36)}`;
-    ledger.startSession({ sessionId, runtime: "claude", binaryPath: "amc-bridge-claude-registration", binarySha256: hashBinaryOrPath("amc-bridge-claude-registration", "1") });
-    const appended = ledger.appendEvidenceWithReceipt({
-      id: eventId, ts: input.now ?? Date.now(), sessionId, runtime: "claude", eventType: "audit",
-      payload: `${JSON.stringify({ record, hookSettingsSha256: scan.digest, managedDelivery: scan.managedDelivery }, null, 2)}\n`, payloadExt: "json", inline: false,
-      meta: { trustTier: "OBSERVED", registrationSchemaVersion: 1, agentId: input.authenticatedAgentId, provider: "claude-code", registration: record,
-        hookSettingsSha256: scan.digest, managedDelivery: scan.managedDelivery, bodySha256: bodySha256(record) },
-      receipt: { kind: "work_accepted", agentId: input.authenticatedAgentId, providerId: PROVIDER_ID, model: null, bodySha256: bodySha256(record) },
-    });
-    ledger.sealSession(sessionId);
-    return { registered: true, idempotentReplay: false, provider: "claude-code", record, eventId: appended.id, receiptId: appended.receiptId };
+    try {
+      ledger.startSession({ sessionId, runtime: "claude", binaryPath: "amc-bridge-claude-registration", binarySha256: hashBinaryOrPath("amc-bridge-claude-registration", "1") });
+      const appended = ledger.appendEvidenceWithReceipt({
+        id: eventId, ts: input.now ?? Date.now(), sessionId, runtime: "claude", eventType: "audit",
+        payload: `${JSON.stringify({ record, hookSettingsSha256: scan.digest, managedDelivery: scan.managedDelivery }, null, 2)}\n`, payloadExt: "json", inline: false,
+        meta: { trustTier: "OBSERVED", registrationSchemaVersion: 1, agentId: input.authenticatedAgentId, provider: "claude-code", registration: record,
+          hookSettingsSha256: scan.digest, managedDelivery: scan.managedDelivery, bodySha256: bodySha256(record) },
+        receipt: { kind: "work_accepted", agentId: input.authenticatedAgentId, providerId: PROVIDER_ID, model: null, bodySha256: bodySha256(record) },
+      });
+      ledger.sealSession(sessionId);
+      return { registered: true, idempotentReplay: false, provider: "claude-code", record, eventId: appended.id, receiptId: appended.receiptId };
+    } catch (error) {
+      // The registration was verified (installation, process and settings) before AMC's writer was reached.
+      throw writerFault(error, true, "the Claude Code session registration");
+    }
   } finally {
     ledger.close();
   }

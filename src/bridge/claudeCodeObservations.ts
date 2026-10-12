@@ -2,8 +2,9 @@
  * What AMC records from Claude Code's session hooks (P1-23), all observed, none enforced: the end of each turn (Stop;
  * AMC never forces Claude Code to continue) and, after each tool call, whether the input that ran is the input AMC
  * authorized (PostToolUse, PostToolUseFailure). Every record is evidence: written in its own ledger session, sealed,
- * and verified (row integrity and signed receipt) before AMC answers. A record that cannot be written and verified
- * fails with a 503, which latches the workspace's hooks (hookAuditLatch.ts). A replayed or duplicated observation is recorded as such and refused.
+ * and verified (row integrity and signed receipt) before AMC answers. A record AMC's writer cannot write and verify
+ * for a session with a verified registration latches the workspace's hooks (hookAuditLatch.ts); input never does.
+ * Intake is capped per registration (and for unregistered sessions together), so a flood degrades only its source. A replayed or duplicated observation is recorded as such and refused.
  *
  * A post-tool record is accepted as a call's outcome only when it names the PreToolUse decision it follows (by AMC's
  * action id from session and tool_use_id, and that decision's receipt digest, whose request digest covers the nonce)
@@ -15,6 +16,7 @@
  * because the tool already ran. Raw tool input reaches AMC over loopback only and is never stored.
  */
 import { randomUUID } from "node:crypto";
+import { resolve } from "node:path";
 import { z } from "zod";
 import { normalizeArguments } from "../actions/normalizeArguments.js";
 import { claudeActionId, claudeSessionSha256 } from "../adapters/hookProviders/claudeCode.js";
@@ -29,10 +31,38 @@ import { canonicalize } from "../utils/json.js";
 import { claudeCodeSessionRegistration } from "./claudeCodeSessionRegistry.js";
 import type { HookLease } from "./hookAuthorization.js";
 import { deterministicEventId as decisionEventId } from "./hookControl.js";
+import { writerFault } from "./hookAuditLatch.js";
 import { HookControlError } from "./hookProviders.js";
 
 const MAX_BODY_BYTES = 262_144;
+const INTAKE_PER_MINUTE = 120;
 type Ledger = ReturnType<typeof openLedger>;
+// ponytail: an in-memory window per Bridge process; a restart resets it.
+const intake = new Map<string, number[]>();
+
+/**
+ * Admit one observation of Claude Code session `sessionId` into the writer: whether the session has a verified
+ * registration (only then can a writer fault latch), within its registration's per-minute cap. Over the cap it is
+ * refused unrecorded (429).
+ */
+export function admitObservation(input: { workspace: string; agentId: string; sessionId: string; now: number }): { registered: boolean } {
+  const ledger = openLedger(input.workspace);
+  let registered: boolean;
+  try {
+    registered = claudeCodeSessionRegistration(ledger, input.agentId, input.sessionId).status === "registered";
+  } finally {
+    ledger.close();
+  }
+  const key = `${resolve(input.workspace)}\0${input.agentId}\0${registered ? claudeSessionSha256(input.sessionId) : "unregistered"}`;
+  const recent = (intake.get(key) ?? []).filter((ts) => input.now - ts < 60_000);
+  if (recent.length >= INTAKE_PER_MINUTE) {
+    intake.set(key, recent);
+    throw new HookControlError("HOOK_CONTROL_RATE_LIMITED", 429, "this Claude Code session's observations are over their per-minute limit; AMC refused this one");
+  }
+  if (intake.size > 10_000) for (const [stale, times] of intake) if (times.every((ts) => input.now - ts >= 60_000)) intake.delete(stale);
+  intake.set(key, [...recent, input.now]);
+  return { registered };
+}
 
 export interface HookObservationResult {
   recorded: true;
@@ -66,10 +96,10 @@ export function appendVerified(ledger: Ledger, input: { id: string; now: number;
 /**
  * Record one observation of Claude Code session `sessionSha256` under the deterministic `id`, verified as written. A
  * second observation under the same id is a replay, duplicate or conflict: AMC keeps it under its own id with
- * `conflictOf` and refuses it. A write or verification failure fails closed with a 503.
+ * `conflictOf` and refuses it. A writer failure is a `HookWriterFault`, which latches only `underRegistration`.
  */
 export function recordHookAudit(input: { workspace: string; id: string; now: number; sessionSha256: string; meta: Record<string, unknown>;
-  body: unknown; receipt: { kind: ReceiptKind; providerId: string } }): HookObservationResult {
+  body: unknown; receipt: { kind: ReceiptKind; providerId: string }; underRegistration: boolean }): HookObservationResult {
   let ledger: Ledger | null = null;
   let replayed = false;
   try {
@@ -84,8 +114,7 @@ export function recordHookAudit(input: { workspace: string; id: string; now: num
     return { recorded: true, idempotentReplay: false, provider: "claude-code", ...appendVerified(ledger, input) };
   } catch (error) {
     if (replayed && error instanceof HookControlError) throw error;
-    throw new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503,
-      `the Claude Code observation could not be recorded and verified: ${error instanceof Error ? error.message : String(error)}`);
+    throw writerFault(error, input.underRegistration, "the Claude Code observation");
   } finally {
     ledger?.close();
   }
@@ -113,12 +142,13 @@ export function observationId(prefix: string, parts: readonly unknown[], now: nu
 export function recordClaudeCodeStop(input: { workspace: string; authenticatedAgentId: string; rawInput: string; now?: number }): HookObservationResult {
   const parsed = parse(stopSchema, input.rawInput, "Claude Code Stop");
   const now = input.now ?? Date.now();
+  const { registered } = admitObservation({ workspace: input.workspace, agentId: input.authenticatedAgentId, sessionId: parsed.session_id, now });
   const sessionSha256 = claudeSessionSha256(parsed.session_id);
   const record = { kind: "amc.claude-code-turn-end/v1", agentId: input.authenticatedAgentId, sessionSha256, reported: { by: "claude-code",
     promptId: parsed.prompt_id ?? null, stopHookActive: parsed.stop_hook_active } };
   return recordHookAudit({ workspace: input.workspace, now, sessionSha256, body: record, meta: { turnEndSchemaVersion: 1, ...record },
     id: observationId("ccstop", [input.authenticatedAgentId, sessionSha256, parsed.prompt_id, parsed.stop_hook_active], now),
-    receipt: { kind: "work_accepted", providerId: "hook-session:claude-code" } });
+    receipt: { kind: "work_accepted", providerId: "hook-session:claude-code" }, underRegistration: registered });
 }
 
 const postSchema = z.strictObject({
@@ -127,7 +157,7 @@ const postSchema = z.strictObject({
   tool_use_id: z.string().min(1).max(160),
   tool_name: z.string().min(1).max(512),
   tool_input: z.record(z.string(), z.unknown()),
-  /** Whether AMC's forwarder recorded this outcome at the observed ingress first; false latches the session. */
+  /** Whether AMC's forwarder recorded this outcome at the observed ingress first; false is recorded and refused. */
   ingressRecorded: z.boolean(),
   /** The receipt digest of the decision this outcome follows, as AMC's forwarder read it from the ledger. */
   decisionReceiptSha256: z.string().regex(/^[a-f0-9]{64}$/).nullable(),
@@ -163,12 +193,11 @@ export function recordClaudeCodePostExecution(input: { workspace: string; authen
   const now = input.now ?? Date.now();
   const sessionSha256 = claudeSessionSha256(parsed.session_id);
   const actionId = claudeActionId(parsed.session_id, parsed.tool_use_id);
+  const { registered } = admitObservation({ workspace: input.workspace, agentId: input.authenticatedAgentId, sessionId: parsed.session_id, now });
   const ledger = openLedger(input.workspace);
   let decision: ReturnType<typeof verifiedDecision>;
-  let registered: boolean;
   try {
     decision = verifiedDecision(ledger, input.authenticatedAgentId, actionId);
-    registered = claudeCodeSessionRegistration(ledger, input.authenticatedAgentId, parsed.session_id).status === "registered";
   } finally {
     ledger.close();
   }
@@ -194,7 +223,7 @@ export function recordClaudeCodePostExecution(input: { workspace: string; authen
     ingressRecorded: parsed.ingressRecorded,
   };
   const audit = { workspace: input.workspace, now, sessionSha256, meta: { postExecutionSchemaVersion: 1, ...record }, body: record,
-    receipt: { kind: "tool_result" as const, providerId: "hook-post-execution:claude-code" } };
+    receipt: { kind: "tool_result" as const, providerId: "hook-post-execution:claude-code" }, underRegistration: registered };
   if (bindingRefusal !== null) {
     // Recorded under its own id, so it never takes the call's place, then refused.
     recordHookAudit({ ...audit, id: observationId("ccpost", [input.authenticatedAgentId, actionId, "unmatched", undefined], now) });
@@ -202,7 +231,8 @@ export function recordClaudeCodePostExecution(input: { workspace: string; authen
   }
   const recorded = recordHookAudit({ ...audit, id: observationId("ccpost", [input.authenticatedAgentId, actionId], now) });
   if (!parsed.ingressRecorded) {
-    throw new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, "AMC's forwarder could not record this tool outcome at the observed ingress");
+    // The forwarder's own report: AMC recorded it above (ingressRecorded: false) and refuses it, but input never latches.
+    throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 422, "AMC recorded this tool outcome, but AMC's forwarder could not record it at the observed ingress");
   }
   return recorded;
 }

@@ -36,7 +36,7 @@ import {
   MAX_CONTROL_HOOK_BODY_BYTES,
 } from "./hookControl.js";
 import { handleHookControlRequest } from "./hookControlRoute.js";
-import { guardHookAudit } from "./hookAuditLatch.js";
+import { guardHookAudit, hookAuditLatchState, latchedMessage } from "./hookAuditLatch.js";
 import { HookControlError, isHookProvider } from "./hookProviders.js";
 interface HandleBridgeRequestOptions {
   workspace: string;
@@ -1365,6 +1365,8 @@ export async function startBridgeServer(params: {
     server.once("error", rejectPromise);
     server.listen(params.port, params.host, () => resolvePromise());
   });
+  const latch = hookAuditLatchState(params.workspace); // Startup reports the hook audit latch; it never trips it.
+  if (latch.latched) process.stderr.write(`[amc] ${latchedMessage(latch.reason)}\n`);
   return {
     server,
     close: async () => {

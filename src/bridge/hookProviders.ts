@@ -33,6 +33,7 @@ export type HookControlErrorCode =
   | "HOOK_CONTROL_INPUT_TOO_LARGE"
   | "HOOK_CONTROL_PROVIDER_UNSUPPORTED"
   | "HOOK_CONTROL_REPLAY_CONFLICT"
+  | "HOOK_CONTROL_RATE_LIMITED"
   | "HOOK_CONTROL_LEDGER_UNAVAILABLE";
 
 export class HookControlError extends Error {
