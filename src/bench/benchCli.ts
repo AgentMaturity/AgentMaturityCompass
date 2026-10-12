@@ -1,3 +1,4 @@
+import { cliInitiator } from "../approvals/approvalEngine.js";
 import { resolve } from "node:path";
 import { benchArtifactSchema } from "./benchSchema.js";
 import type { BenchRegistryConfig } from "./benchRegistrySchema.js";
@@ -176,6 +177,7 @@ export function benchPublishRequestCli(params: {
 }) {
   return benchPublishRequestForApi({
     workspace: params.workspace,
+    initiator: cliInitiator(),
     agentId: params.agentId,
     file: resolve(params.file),
     registryDir: resolve(params.registryDir),

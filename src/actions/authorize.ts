@@ -8,11 +8,11 @@
  */
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { userInfo } from "node:os";
 import { join } from "node:path";
 import { intersectDelegationScopes } from "../agent/delegationScope.js";
 import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalRequestRecord } from "../approvals/approvalChainStore.js";
-import { consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
+import { cliInitiator, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
+import { activeUserRecord } from "../auth/authApi.js";
 import { assertContract } from "../contracts/index.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
@@ -34,6 +34,11 @@ import {
 import { mintIdempotencyKey } from "./idempotency.js";
 import { normalizeArguments } from "./normalizeArguments.js";
 
+/**
+ * The deploymentId of a record no active compiled plan binds to a deployment: no plan, or one compiled before P1-78.
+ * Such a record names its workspace and deploymentDigest only and claims no deployment (docs/adr/009-authorization-record.md).
+ */
+export const DEPLOYMENT_NOT_BOUND = "not_bound";
 /** A record with no shorter-lived authority expires this soon after it is bound. */
 const DEFAULT_RECORD_TTL_MS = 5 * 60_000;
 const APPROVAL_REQUEST_ID = /^apprreq_[a-f0-9]{32}$/;
@@ -42,6 +47,8 @@ const APPROVAL_REQUEST_ID = /^apprreq_[a-f0-9]{32}$/;
 export interface CompiledPolicyFacts {
   readonly digest: string;
   readonly revision: number;
+  /** The tenant and deployment its profile names (P1-78); null when the plan names none. */
+  readonly deployment: { readonly tenantId: string; readonly deploymentId: string } | null;
   controlFor(actionClass: ActionClass): { readonly controlId: string; readonly controlVersion: string | null } | null;
 }
 
@@ -113,8 +120,9 @@ function actionFacts(call: Call, compiled?: CompiledPolicyFacts): { readonly ok:
       actionPolicyDigest: policy.actionPolicyDigest, approvalPolicyDigest: policy.approvalPolicyDigest,
       budgetsDigest: policy.budgetsDigest, compiledPolicyDigest: policy.compiledPolicyDigest, agentConfigDigest: null }));
     return { ok: true, facts: {
-      // ponytail: tenant and deployment id stay unregistered; the compiled plan does not carry them (P1-10 schema).
-      scope: { workspaceId: workspaceIdFromDirectory(call.workspace), tenantId: null, deploymentId: "unregistered", deploymentDigest },
+      // From the verified plan the session pinned (P1-78); without one the record claims no tenant and no deployment.
+      scope: { workspaceId: workspaceIdFromDirectory(call.workspace), tenantId: compiled?.deployment?.tenantId ?? null,
+        deploymentId: compiled?.deployment?.deploymentId ?? DEPLOYMENT_NOT_BOUND, deploymentDigest },
       policy,
       action: { toolName: call.name, adapterId: signed?.context?.kind === "mcp" ? `mcp:${signed.context.server.id}` : "native",
         actionClass: call.actionClass, mode: call.effectiveMode, argumentsDigest: args.argumentsDigest, normalizer: args.normalizer },
@@ -165,15 +173,16 @@ const LEASE_ERRORS: Record<string, RecheckFailure> = {
 };
 
 /**
- * The lease, verified with its signature, expiry, agent, execute scope and classes, and the signed revocation list.
- * Without an action class it checks everything but the class (the effective-policy receipt, P1-67).
+ * The lease, verified with its signature, expiry, agent, workspace, execute scope and classes, and the signed revocation
+ * list. A lease naming another workspace is refused even when this workspace's key signed it (P1-78). Without an action
+ * class it checks everything but the class (the effective-policy receipt, P1-67).
  */
 export function checkLease(execution: Pick<ToolExecution, "workspace" | "agentId"> & { readonly actionClass?: ActionClass },
   token: string): { readonly payload: LeasePayload } | Failed {
   const workspace = execution.workspace;
   try {
     const verified = verifyLeaseToken({ workspace, token, expectedAgentId: execution.agentId, requiredScope: "toolhub:execute",
-      actionClass: execution.actionClass, revokedLeaseIds: revokedLeaseIdSet(workspace) });
+      expectedWorkspaceId: workspaceIdFromDirectory(workspace), actionClass: execution.actionClass, revokedLeaseIds: revokedLeaseIdSet(workspace) });
     if (verified.ok && verified.payload) return { payload: verified.payload };
     return failed(LEASE_ERRORS[verified.error ?? ""] ?? "scope_widened", verified.error ?? "lease refused");
   } catch (error) {
@@ -181,13 +190,31 @@ export function checkLease(execution: Pick<ToolExecution, "workspace" | "agentId
   }
 }
 
-function osUser(): string {
+/**
+ * The accountable principal of a lease-bound call (P1-78), from authenticated server state only: the lease names a user
+ * id, and the principal is that user's record in the signed users.yaml, read and verified here. A lease naming nobody
+ * contributes no principal (identity-binding then refuses the call); one naming a user that is not active there, or a
+ * users.yaml that does not verify, refuses. The lease token's own identity is never a principal. A user whose only role
+ * is AGENT is a registered service; any other user is a human. `state` is the user record's digest, which the recheck
+ * compares, so a principal deactivated or demoted between bind and execution is refused.
+ */
+function leasePrincipal(workspace: string, payload: LeasePayload):
+  { readonly principal: AuthorizationRecordV1["principal"]; readonly state: string } | null | Failed {
+  const named = payload.principal;
+  if (!named) return null;
+  let user: ReturnType<typeof activeUserRecord>;
   try {
-    return userInfo().username || "unknown";
-  } catch {
-    return process.env.USER ?? "unknown";
+    user = activeUserRecord(workspace, named.userId);
+  } catch (error) {
+    return failed("authority_store_unavailable", `the lease names user ${named.userId}, and users.yaml could not be verified: ${message(error)}`);
   }
+  if (!user) return failed("principal_unresolved", `the lease names user ${named.userId}, who is not an active user of the signed users.yaml`);
+  return { principal: { principalId: user.userId, kind: user.roles.every((role) => role === "AGENT") ? "service" : "human", authenticatedVia: "lease" },
+    state: sha256Hex(canonicalize({ userId: user.userId, status: user.status, roles: [...user.roles].sort() })) };
 }
+
+/** The bound principal's users.yaml state per record, for the recheck (in-process: the pipeline rechecks the object it bound). */
+const boundPrincipalState = new WeakMap<AuthorizationRecordV1, string>();
 
 /** Build the record for one call. Issued and expiry times come from AMC's clock, never from a caller. */
 export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationContext = {}): BindResult {
@@ -201,6 +228,8 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
   }
   const lease = ctx.leaseToken === undefined ? null : checkLease(execution, ctx.leaseToken);
   if (lease !== null && "ok" in lease) return lease;
+  const named = lease === null ? null : leasePrincipal(execution.workspace, lease.payload);
+  if (named !== null && "ok" in named) return named;
   const issuedTs = Date.now();
   // Earliest of every authority's own expiry. ponytail: no parent record is in reach in-process; P2-25 clamps to it.
   const expiresTs = Math.min(issuedTs + DEFAULT_RECORD_TTL_MS, lease?.payload.expiresTs ?? Infinity,
@@ -217,10 +246,10 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
       expiresAt: new Date(expiresTs).toISOString(),
       scope: facts.facts.scope,
       subject: { governedAs: execution.agentId, runAs: ctx.runAs ?? execution.agentId, agentConfigDigest: null },
-      // An approval names who authorized the effect; a lease names a service; otherwise the CLI user, self-reported.
+      // An approval names who authorized the effect; a lease, the principal its issuer named (never the lease itself,
+      // P1-78); otherwise the CLI user, self-reported, which identity-binding refuses.
       principal: approverIds.length > 0 ? { principalId: approverIds.join(","), kind: "human", authenticatedVia: "approval-engine" }
-        : lease ? { principalId: `lease:${lease.payload.leaseId}`, kind: "service", authenticatedVia: "lease" }
-          : { principalId: osUser(), kind: "human", authenticatedVia: "cli-os-user" },
+        : named?.principal ?? { principalId: cliInitiator(), kind: "human", authenticatedVia: "cli-os-user" },
       delegation: { depth: delegation.depth, parentExecutionId: delegation.parentExecutionId,
         allowedActionClasses: intersectDelegationScopes(delegation.allowedActionClasses, lease?.payload.executeActionClasses) ?? [...ACTION_CLASSES],
         leaseId: lease?.payload.leaseId ?? null },
@@ -237,6 +266,7 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
       evidenceRefs: [...(ctx.evidenceRefs ?? [])],
       ...(facts.facts.agentSuppliedMetadata === null ? {} : { agentSuppliedMetadata: facts.facts.agentSuppliedMetadata })
     });
+    if (named !== null && record.principal.authenticatedVia === "lease") boundPrincipalState.set(record, named.state);
     return { ok: true, record, digest: authorizationRecordDigest(record), effects: facts.facts.effects };
   } catch (error) {
     return failed("authority_store_unavailable", `the authorization record could not be built: ${message(error)}`);
@@ -307,6 +337,12 @@ export function recheckAuthorization(record: AuthorizationRecordV1, execution: T
       : checkLease(execution, ctx.leaseToken);
     if ("ok" in lease) add(...lease.failures);
     else if (lease.payload.leaseId !== record.delegation.leaseId) add("scope_widened");
+    else if (record.principal.authenticatedVia === "lease") {
+      // The principal again, from the signed users.yaml in this read: deactivated, demoted or changed since bind refuses.
+      const now = leasePrincipal(execution.workspace, lease.payload);
+      if (now !== null && "ok" in now) add(...now.failures);
+      else if (now === null || now.state !== boundPrincipalState.get(record) || now.principal.principalId !== record.principal.principalId) add("principal_unresolved");
+    }
   }
   try {
     const freeze = activeFreezeStatus(execution.workspace, execution.agentId);

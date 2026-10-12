@@ -514,6 +514,8 @@ export function assuranceReadinessGate(workspace: string): {
 export function assuranceWaiverRequestForApi(params: {
   workspace: string;
   agentId: string;
+  /** Who raises the approval request (P1-78): the authenticated principal, or the CLI's self-reported OS user. */
+  initiator: string;
   reason: string;
   hours: number;
 }) {
@@ -530,6 +532,7 @@ export function assuranceWaiverRequestForApi(params: {
 
   const approval = createApprovalForIntent({
     workspace: params.workspace,
+    initiator: params.initiator,
     agentId: params.agentId,
     intentId,
     toolName: "assurance.waiver",

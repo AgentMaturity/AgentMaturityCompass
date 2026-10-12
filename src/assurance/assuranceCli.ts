@@ -1,3 +1,4 @@
+import { cliInitiator } from "../approvals/approvalEngine.js";
 import { readUtf8 } from "../utils/fs.js";
 import YAML from "yaml";
 import {
@@ -116,7 +117,7 @@ export function assuranceWaiverRequestCli(params: {
   reason: string;
   hours: number;
 }) {
-  return assuranceWaiverRequestForApi(params);
+  return assuranceWaiverRequestForApi({ ...params, initiator: cliInitiator() });
 }
 
 export function assuranceWaiverStatusCli(workspace: string) {

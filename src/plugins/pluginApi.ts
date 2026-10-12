@@ -308,6 +308,8 @@ function writeInstalledPackage(params: {
 export async function requestPluginInstall(params: {
   workspace: string;
   agentId: string;
+  /** Who raises the approval request (P1-78): the authenticated principal, or the CLI's self-reported OS user. */
+  initiator: string;
   registryId: string;
   pluginRef: string;
   action?: "install" | "upgrade";
@@ -344,6 +346,7 @@ export async function requestPluginInstall(params: {
     const intentId = `plugin-${action}-${requestId}`;
     const approval = createApprovalForIntent({
       workspace,
+      initiator: params.initiator,
       agentId,
       intentId,
       toolName: `plugin.${action}`,
@@ -403,6 +406,8 @@ export async function requestPluginInstall(params: {
 export function requestPluginRemove(params: {
   workspace: string;
   agentId: string;
+  /** Who raises the approval request (P1-78): the authenticated principal, or the CLI's self-reported OS user. */
+  initiator: string;
   pluginId: string;
 }): {
   requestId: string;
@@ -420,6 +425,7 @@ export function requestPluginRemove(params: {
   const intentId = `plugin-remove-${requestId}`;
   const approval = createApprovalForIntent({
     workspace: params.workspace,
+    initiator: params.initiator,
     agentId: params.agentId,
     intentId,
     toolName: "plugin.remove",

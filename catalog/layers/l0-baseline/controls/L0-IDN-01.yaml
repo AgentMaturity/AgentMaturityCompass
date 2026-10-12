@@ -68,7 +68,10 @@ binding:
   mechanism: >-
     A tool-pipeline guard denies any call whose lease is missing, expired,
     revoked or issued for another workspace, or whose authorization record
-    names no principal, before the tool body runs.
+    names no accountable principal, before the tool body runs. The principal
+    is a signed approval's approvers, or the active user of the signed
+    users.yaml the lease names (a human, or a service registered there); the
+    lease token's own identity never counts.
   parameters:
     - { name: toolPipeline.requireAgentLease, value: true, strictness: true_wins }
     - { name: toolPipeline.requirePrincipal, value: true, strictness: true_wins }
@@ -82,22 +85,29 @@ tests:
     fixtures:
       positive:
         - L0-IDN-01/positive/lease-and-principal.json
+        - L0-IDN-01/positive/lease-registered-service.json
         - L0-IDN-01/positive/evidence-valid.json
       negative:
         - L0-IDN-01/negative/no-lease.json
         - L0-IDN-01/negative/expired-lease.json
         - L0-IDN-01/negative/other-workspace-lease.json
+        - L0-IDN-01/negative/lease-without-principal.json
+        - L0-IDN-01/negative/lease-unregistered-principal.json
         - L0-IDN-01/negative/no-principal.json
         - L0-IDN-01/negative/replayed-authorization.json
         - L0-IDN-01/negative/contradictory-receipts.json
         - L0-IDN-01/negative/empty-window.json
     passCriteria: >-
-      Under an active compiled plan, calls with no lease, an expired lease or a
-      lease from another workspace are denied with IDENTITY_UNRESOLVED and no
-      tool body runs, and a call with a verified lease is allowed. The
-      no-principal, replayed, contradictory and empty evidence fixtures give
-      not_evaluated through the evidence evaluator. A lease counts as a service
-      principal today, so a missing human principal is not refused (P1-78).
+      Under an active compiled plan, calls with no lease, an expired lease, a
+      lease from another workspace or a lease naming a user who is not active
+      in the signed users.yaml are denied with IDENTITY_UNRESOLVED, and a lease
+      that names no principal is denied with PRINCIPAL_UNRESOLVED; no tool body
+      runs.
+      A call under a verified lease naming a human principal or a registered
+      service is allowed, and its authorization record names that principal
+      and the plan's deployment. The no-principal, replayed, contradictory and
+      empty evidence fixtures give not_evaluated through the evidence
+      evaluator.
     attempts: 1
 evidence:
   - id: L0-IDN-01-E1

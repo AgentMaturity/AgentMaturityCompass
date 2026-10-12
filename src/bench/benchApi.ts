@@ -243,6 +243,8 @@ export function benchComparisonLatestForApi(workspace: string) {
 export function benchPublishRequestForApi(params: {
   workspace: string;
   agentId: string;
+  /** Who raises the approval request (P1-78): the authenticated principal, or the CLI's self-reported OS user. */
+  initiator: string;
   file: string;
   registryDir: string;
   registryKeyPath: string;
@@ -268,6 +270,7 @@ export function benchPublishRequestForApi(params: {
   const intentId = `bench-publish-${requestId}`;
   const approval = createApprovalForIntent({
     workspace: params.workspace,
+    initiator: params.initiator,
     agentId: params.agentId,
     intentId,
     toolName: "bench.publish",

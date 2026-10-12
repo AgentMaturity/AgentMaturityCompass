@@ -69,6 +69,7 @@ describe("GAP-1635 Viper consent blast-radius boundary", () => {
     }).workOrder;
 
     const intent = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       workOrderId: workOrder.workOrderId,
       toolName: "process.spawn",
@@ -106,6 +107,7 @@ describe("GAP-1635 Viper consent blast-radius boundary", () => {
       allowedActionClasses: ["WRITE_HIGH"]
     }).workOrder;
     const intent = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       workOrderId: workOrder.workOrderId,
       toolName: "process.spawn",

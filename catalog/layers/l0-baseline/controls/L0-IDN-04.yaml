@@ -44,11 +44,14 @@ tests:
         - L0-IDN-04/negative/evidence-replayed.json
         - L0-IDN-04/negative/evidence-stale.json
         - L0-IDN-04/negative/evidence-violation.json
+        - L0-IDN-04/negative/principal-deactivated-in-flight.json
+        - L0-IDN-04/negative/principal-demoted-in-flight.json
         - L0-IDN-04/negative/revoked-in-flight.json
         - L0-IDN-04/negative/unverifiable-revocations.json
     passCriteria: >-
       A call allowed before revocation is refused on the next call after it, with lease_revoked; the drill
-      records the time to effect.
+      records the time to effect. A lease's principal deactivated or demoted in the signed users.yaml while the
+      call waits for approval is refused at the recheck before the body (principal_unresolved).
     attempts: 1
 evidence:
   - id: L0-IDN-04-E1

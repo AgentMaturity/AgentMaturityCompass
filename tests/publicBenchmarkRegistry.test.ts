@@ -296,6 +296,7 @@ describe("public benchmark registry", () => {
     });
 
     const requested = benchPublishRequestForApi({
+      initiator: "test-operator",
       workspace: ws,
       agentId: "default",
       file: bench.outFile,

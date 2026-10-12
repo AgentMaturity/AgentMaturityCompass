@@ -41,8 +41,8 @@ Citations:
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: enforcement point approvals. The approval engine refuses a second decision by the same user when the signed policy requires distinct users, and counts only distinct approvers toward the quorum.
 - Evidence producers: `amc.approvals.engine` (available). Levels: L2, L3.
-- Tests: L0-OVS-03-T1 runtime (1 attempt): Two distinct approvers meet the quorum; the same user deciding twice is refused. Today the request records no initiator, so initiator-approver separation is not enforced.
-- Executed test: yes (oversight.test.ts). Partial. The engine refuses a second decision by the same user and counts only distinct approvers. Requests record no initiator, so initiator-approver separation is not enforced (P1-78).
+- Tests: L0-OVS-03-T1 runtime (1 attempt): Two distinct approvers meet the quorum; the same user deciding twice is refused. Where the class requires distinct users, a request's recorded initiator cannot approve it, and an approval by the initiator written past the engine's refusal is not counted; where it does not (a single-user class), the initiator's approval counts and the initiator stays recorded.
+- Executed test: yes (oversight.test.ts). Partial. The engine refuses a second decision by the same user. Every approval request raised outside A4 records its initiator, and where the class's rule requires distinct users the engine refuses the initiator's approval and the quorum never counts one, reading the initiator only from the signed request. Initiators raised from the CLI are the self-reported OS user, and a delegated child's or kernel host's approvals record one only when their composer names it.
 - Crosswalk: amc-audit-map-v1 ACCESS_CONTROL.APPROVALS (partial).
 
 Citations:

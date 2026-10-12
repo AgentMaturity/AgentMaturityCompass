@@ -171,6 +171,9 @@ export function requestAuditEvidenceApproval(params: {
   const intentId = `audit-request-${request.requestId}-${randomUUID().replace(/-/g, "").slice(0, 12)}`;
   const created = createApprovalForIntent({
     workspace: params.workspace,
+    // The auditor who filed the evidence request started it (P1-78); the request keeps them only as an id hash. The owner
+    // filing this approval is its first approver, as the dual-control flow below records.
+    initiator: `sha256-16:${request.requesterUserIdHash}`,
     agentId,
     intentId,
     toolName: "audit.request.fulfill",

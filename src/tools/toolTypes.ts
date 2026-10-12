@@ -80,6 +80,13 @@ export interface ToolExecution {
 }
 
 /**
+ * What a pipeline recorder sees (P1-78): an execution, or a call refused at visibility before it became one. Such a call's
+ * class is the registered tool's when there is one (a direct call under code mode) and null when no tool of that name is
+ * registered: a refusal is evidence too, and an unknown tool has no class to report.
+ */
+export type RecordedToolCall = Omit<ToolExecution, "actionClass"> & { readonly actionClass: ActionClass | null };
+
+/**
  * A monotonic execution guard, evaluated after pre-execute policy (including
  * approval) and immediately before the tool body.
  *

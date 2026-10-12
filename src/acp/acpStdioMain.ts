@@ -1,3 +1,4 @@
+import { cliInitiator } from "../approvals/approvalEngine.js";
 import { nativeRouteFor, paramsFor } from "../cli-agent-options.js";
 import { hostname } from "node:os";
 import { randomUUID } from "node:crypto";
@@ -102,6 +103,8 @@ export interface AcpStdioInit {
   readonly expectedToolsDigest?: string;
   /** A lease the spawning composer minted for this process (P1-67, Studio native tasks); see `AgentToolsetOptions.leaseToken`. */
   readonly leaseToken?: string;
+  /** Who started this runtime (P1-78): Studio's task principal; absent, the OS user running it, self-reported. */
+  readonly initiator?: string;
   readonly validationConfig?: string;
   readonly validationConfigSha256?: string;
   readonly validate?: readonly string[];
@@ -249,11 +252,13 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
       ...(approval ? { approval } : {}), ...(mcp ? { mcp } : {}),
       ...(init.credentialsHome === undefined ? {} : { credentialsHome: init.credentialsHome }),
       ...(init.credentialsFile === undefined ? {} : { credentialsFile: init.credentialsFile }),
+      initiator: init.initiator ?? cliInitiator(),
       onApprovalRaised: event => { stderr.write(`amc acp: signed approval pending: ${event.approvalRequestId}\n`); } }),
     resumeSessionFactory: params => prepareAcpNativeSession({ session: sessionOptions(params), claimant, signal: params.signal,
       ...(approval ? { approval } : {}), ...(mcp ? { mcp } : {}),
       ...(init.credentialsHome === undefined ? {} : { credentialsHome: init.credentialsHome }),
       ...(init.credentialsFile === undefined ? {} : { credentialsFile: init.credentialsFile }),
+      initiator: init.initiator ?? cliInitiator(),
       onApprovalRaised: event => { stderr.write(`amc acp: signed approval pending: ${event.approvalRequestId}\n`); } }),
     onUnusable: () => { void close().catch(reportShutdownFailure); },
     // stderr, never stdout. See the module note.

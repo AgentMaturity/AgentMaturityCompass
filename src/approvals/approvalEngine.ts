@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { userInfo } from "node:os";
 import { join } from "node:path";
 import type { ActionClass, ExecutionMode } from "../types.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
@@ -9,6 +10,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
   a4FloorFor,
+  approvalRuleForAction,
   evaluateApprovalRequestPolicy,
   initApprovalPolicy,
   loadApprovalPolicy,
@@ -30,7 +32,7 @@ import {
   type ApprovalDecisionKind,
   type ApprovalRequestRecord
 } from "./approvalChainStore.js";
-import { evaluateApprovalQuorum } from "./approvalQuorum.js";
+import { evaluateApprovalQuorum, isApprovalInitiator } from "./approvalQuorum.js";
 import { AUTHZ_INTENT_SCHEMA } from "../actions/authorizationRecord.js";
 import { parseUserRoles, type UserRole } from "../auth/roles.js";
 
@@ -51,6 +53,24 @@ export interface ApprovalRequestInput {
    * by intersection, and the TTL by max up to the signed policy's `a4.maxTtlMinutes` (never past the rule without it).
    */
   quorumFloor?: { requiredApprovals?: number; requireDistinctUsers?: boolean; rolesAllowed?: UserRole[]; ttlMinutes?: number };
+  /**
+   * Who raises the request (P1-78), from the caller's authenticated principal, never from a request body: a principal key
+   * as A4 keys one (`<plane>:<userId>`) or a user id. That principal can never approve it. Optional: absent, the request
+   * records none and nothing changes.
+   */
+  initiator?: string;
+}
+
+/**
+ * The OS account running this process (P1-78): the initiator a CLI command records, and a record's principal when nothing
+ * else names one. Self-reported, so as an initiator it can only refuse that same user id's approval, never allow anything.
+ */
+export function cliInitiator(): string {
+  try {
+    return userInfo().username || "unknown";
+  } catch {
+    return process.env.USER ?? "unknown";
+  }
 }
 
 function fileDigestOrFallback(workspace: string, rel: string, fallback = ""): string {
@@ -242,7 +262,8 @@ export function createApprovalForIntent(input: ApprovalRequestInput): {
     requiredAssurancePacks: rule.requireAssurancePacks,
     boundHashes: requestBoundHashes(input),
     // Kept with the signed request so an approver sees the protected facts and a recheck can name what changed.
-    ...(input.intentPayload.schema === AUTHZ_INTENT_SCHEMA ? { authorizationIntent: input.intentPayload } : {})
+    ...(input.intentPayload.schema === AUTHZ_INTENT_SCHEMA ? { authorizationIntent: input.intentPayload } : {}),
+    ...(input.initiator === undefined ? {} : { initiator: input.initiator })
   });
   return {
     approval: {
@@ -320,6 +341,12 @@ export function decideApprovalForIntent(params: {
   }
   const reviewerUserId = params.userId ?? "owner";
   const reviewerUsername = params.username ?? "owner";
+  // Initiator is never approver where distinct users are required (P1-78): by the signed request's own rule, or by the
+  // class's rule in the signed approval policy now (the lookup operator resolutions use, P1-04).
+  if (params.decision === "APPROVED" && isApprovalInitiator(request, { userId: reviewerUserId, username: reviewerUsername })
+    && (request.requireDistinctUsers || approvalRuleForAction(loadApprovalPolicy(params.workspace), request.actionClass).requireDistinctUsers)) {
+    throw new Error("initiator cannot approve their own request; this action class requires a different approver (approval policy requireDistinctUsers)");
+  }
   if (request.requireDistinctUsers && params.decision === "APPROVED") {
     const priorApproval = listApprovalDecisions({
       workspace: params.workspace,

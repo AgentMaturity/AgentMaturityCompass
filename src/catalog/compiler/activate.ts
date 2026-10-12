@@ -56,6 +56,8 @@ export interface ActiveCompiledPolicy {
   readonly lockDigest: string;
   readonly runtimePolicy: EffectiveRuntimePolicy;
   readonly controls: readonly ActiveControl[];
+  /** The tenant and deployment the plan's profile names, from the verified plan; null for a plan compiled before P1-78. */
+  readonly deployment: { readonly tenantId: string; readonly deploymentId: string } | null;
 }
 
 /** Structure, then the plan's own digest and CONTROL_PLAN signature, over the payload the journal just verified. */
@@ -108,7 +110,7 @@ export function loadActiveCompiledPolicy(workspace: string): ActiveCompiledPolic
     return { controlId: r.controlId, controlVersion: r.controlVersion, points: record.binding.points, compiledPoints, review: record.review.status };
   });
   return { revision: journal.revision, entrySha256: journal.entrySha256 ?? "", planDigest: plan.digest, profileSha256: plan.profile.sha256,
-    lockDigest: digestOf(plan.lock), runtimePolicy: plan.runtimePolicy, controls };
+    lockDigest: digestOf(plan.lock), runtimePolicy: plan.runtimePolicy, controls, deployment: plan.profile.deployment ?? null };
 }
 
 export interface ActivateInput {

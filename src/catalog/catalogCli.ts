@@ -6,6 +6,7 @@
  * once that review approved exactly this plan. A plan is evidence-of-conformity planning, never a compliance claim.
  */
 import { readFileSync } from "node:fs";
+import { cliInitiator } from "../approvals/approvalEngine.js";
 import { dirname, join, resolve } from "node:path";
 import chalk from "chalk";
 import type { Command } from "commander";
@@ -57,7 +58,8 @@ export function runCatalogCompile(workspace: string, opts: CompileFlags): number
     throw new Error(`Refusing to write a control plan under ${join(resolve(workspace), ".amc")}: .amc/** is reserved for signed configs.`);
   }
   const { signed, weakenings } = signPlan({
-    workspace, plan, previous, allowWeakening: opts.allowWeakening, reviewAgentId: opts.requestReview ? profile.deployment.agentIds[0] : null
+    workspace, plan, previous, allowWeakening: opts.allowWeakening, reviewAgentId: opts.requestReview ? profile.deployment.agentIds[0] : null,
+    initiator: cliInitiator()
   });
   const files: Record<string, string> = {
     "plan.json": json(plan),

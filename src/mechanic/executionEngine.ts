@@ -4,7 +4,7 @@ import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { loadBudgetsConfig, budgetsPath, signBudgetsConfig } from "../budgets/budgets.js";
 import { loadToolsConfig, signToolsConfig, toolsConfigPath } from "../toolhub/toolhubValidators.js";
 import { loadApprovalPolicy, approvalPolicyPath, signApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
-import { createApprovalForIntent, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
+import { cliInitiator, createApprovalForIntent, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
 import { policyPackApplyCli, policyPackListCli } from "../policyPacks/packCli.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
 import { createAgentTransformPlanForApi } from "../transformation/transformApi.js";
@@ -157,6 +157,7 @@ async function executeAction(params: {
       }
       const request = await requestPluginInstall({
         workspace: params.workspace,
+        initiator: cliInitiator(),
         agentId,
         registryId,
         pluginRef
@@ -261,6 +262,7 @@ export function requestPlanApprovals(params: {
       const intentId = `mechanic-${plan.planId}-${action.id}`;
       const approval = createApprovalForIntent({
         workspace: params.workspace,
+        initiator: params.actor,
         agentId: selectAgentId(plan),
         intentId,
         toolName: "mechanic.plan.execute",

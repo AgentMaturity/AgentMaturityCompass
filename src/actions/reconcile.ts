@@ -248,8 +248,9 @@ export function requestManualResolution(executionId: string, input: ManualResolu
   const journal = openActionJournal(input.workspace);
   try {
     const { head, intent } = settleable(journal, executionId);
-    const { payload } = resolutionIntent(executionId, head, intent, input);
-    const created = createApprovalForIntent({ workspace: input.workspace, agentId: head.agentId, intentId: `resolve:${executionId}`,
+    const { payload, stated } = resolutionIntent(executionId, head, intent, input);
+    // The operator stating the resolution raises its approval (P1-78): under distinct users they cannot approve it.
+    const created = createApprovalForIntent({ workspace: input.workspace, initiator: stated.operatorId, agentId: head.agentId, intentId: `resolve:${executionId}`,
       toolName: RESOLVE_TOOL, actionClass: payload.actionClass, requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: "high",
       intentPayload: payload, quorumFloor });
     return { approvalRequestId: created.approval.approvalRequestId, agentId: head.agentId, actionClass: payload.actionClass,

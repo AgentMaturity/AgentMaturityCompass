@@ -1,0 +1,19 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-LOG-01",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "ledger_trace",
+    "tool": "fs.read",
+    "args": {
+      "path": "workspace/n.txt"
+    },
+    "audit": "TOOL_CALL_ALLOWED",
+    "writer": "none"
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "UNVERIFIABLE_TOOL_EVIDENCE"
+  }
+}

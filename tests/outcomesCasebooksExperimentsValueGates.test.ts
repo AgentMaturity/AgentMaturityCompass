@@ -297,6 +297,7 @@ describe("outcome compass", () => {
     });
 
     const intent = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       workOrderId: wo.workOrder.workOrderId,
       toolName: "fs.read",

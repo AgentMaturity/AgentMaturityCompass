@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { openActionJournal, type ActionJournal } from "../../../src/actions/actionJournal.js";
@@ -10,7 +10,12 @@ import { activateControlPlan, loadActiveCompiledPolicy } from "../../../src/cata
 import { compilePlan, parseDeploymentProfile } from "../../../src/catalog/compiler/compile.js";
 import { signPlan } from "../../../src/catalog/compiler/sign.js";
 import { writeRuntimeFirewallPolicy } from "../../../src/runtime/firewall.js";
-import { issueLeaseForCli } from "../../../src/leases/leaseCli.js";
+import { addUser, initUsersConfig, revokeUser, setUserRoles } from "../../../src/auth/authApi.js";
+import { parseLeaseTtlToMs } from "../../../src/leases/leaseCli.js";
+import type { LeasePayload, LeaseScope } from "../../../src/leases/leaseSchema.js";
+import { issueLeaseToken } from "../../../src/leases/leaseSigner.js";
+import { issueLeaseForPrincipal, LeasePrincipalRefused } from "../../../src/leases/leasePrincipal.js";
+import { planRequiresPrincipal } from "../../../src/tools/guards/compiledPolicyGuard.js";
 import { leaseRevocationPaths, revokeLease } from "../../../src/leases/leaseStore.js";
 import { toolEvidenceFor } from "../../../src/tools/toolEvidence.js";
 import { ToolPipeline, type ToolApprovalAsker } from "../../../src/tools/toolPipeline.js";
@@ -31,8 +36,10 @@ type DrillSetup = { actionClass: ActionClass; mode: string; boundMs: number };
 const leaseIdOf = (token: string): string =>
   (JSON.parse(Buffer.from(token.split(".")[0]!, "base64url").toString("utf8")) as { leaseId: string }).leaseId;
 
-function issue(ws: string, agentId: string, scopes: string[], ttl = "1h"): string {
-  return issueLeaseForCli({ workspace: ws, agentId, ttl, scopes: scopes.join(","), routes: "/", models: "*", rpm: 1000, tpm: 1_000_000 }).token;
+function issue(ws: string, agentId: string, scopes: string[], ttl = "1h", workspaceId?: string, principal?: LeasePayload["principal"]): string {
+  return issueLeaseToken({ workspace: ws, agentId, ttlMs: parseLeaseTtlToMs(ttl), scopes: scopes as LeaseScope[], routeAllowlist: ["/"],
+    modelAllowlist: ["*"], maxRequestsPerMinute: 1000, maxTokensPerMinute: 1_000_000, maxCostUsdPerDay: null,
+    ...(workspaceId ? { workspaceId } : {}), ...(principal ? { principal } : {}) }).token;
 }
 
 function compose(ws: string, actionClass: ActionClass, leaseToken: () => string, approve?: ToolApprovalAsker) {
@@ -74,7 +81,11 @@ describe("L0-IDN-02 short-lived scoped credentials (lease check at the authoriza
       const s = f.envelope.setup as unknown as LeaseSetup;
       const ws = newWorkspace();
       const signer = s.lease.state === "signed_by_other_workspace" ? newWorkspace("amc-l0-other-") : ws;
-      const token = issue(signer, s.lease.agentId, s.lease.scopes, s.lease.state === "expired" ? "60s" : "1h");
+      // Signed by this workspace's own lease key, naming another workspace: only the workspace check refuses it (P1-78).
+      if (s.lease.state === "names_unregistered_principal") initUsersConfig({ workspace: ws, username: "layer0-owner", password: "layer0-fixture-password" });
+      const token = issue(signer, s.lease.agentId, s.lease.scopes, s.lease.state === "expired" ? "60s" : "1h",
+        s.lease.state === "names_other_workspace" ? "other-workspace" : undefined,
+        s.lease.state === "names_unregistered_principal" ? { userId: "user-not-in-users-yaml" } : undefined);
       if (s.lease.state === "revoked") revokeLease(ws, leaseIdOf(token), "layer0 fixture");
       if (s.lease.state === "expired") {
         vi.useFakeTimers({ toFake: ["Date"] });
@@ -118,14 +129,25 @@ describe("L0-IDN-04 revocation takes effect (drill)", () => {
         return;
       }
       let approve: ToolApprovalAsker | undefined;
-      if (s.mode === "revoke_during_approval") {
+      let principalToken: string | undefined;
+      if (s.mode === "deactivate_principal_during_approval" || s.mode === "demote_principal_during_approval") {
+        // The lease names an active OPERATOR; while the call waits for approval an owner deactivates or demotes them (P1-78).
+        initUsersConfig({ workspace: ws, username: "layer0-owner", password: "layer0-fixture-password" });
+        const user = addUser({ workspace: ws, username: "layer0-operator", roles: ["OPERATOR"], password: "layer0-fixture-password" });
+        principalToken = issue(ws, "default", ["toolhub:execute"], "1h", undefined, { userId: user.userId });
+        approve = async () => {
+          if (s.mode === "deactivate_principal_during_approval") revokeUser({ workspace: ws, username: "layer0-operator" });
+          else setUserRoles({ workspace: ws, username: "layer0-operator", roles: ["VIEWER"] });
+          return "allow";
+        };
+      } else if (s.mode === "revoke_during_approval") {
         approve = async () => { revokeLease(ws, leaseIdOf(token), "layer0 drill, in flight"); return "allow"; };
       } else if (s.mode === "revocation_list_tampered") {
         revokeLease(ws, "lease-unrelated", "seed the signed list");
         const { file } = leaseRevocationPaths(ws);
         writeFileSync(file, readFileSync(file, "utf8").replace("lease-unrelated", "lease-renamed"));
       } else throw new Error(`unknown drill mode ${s.mode}`);
-      const h = compose(ws, s.actionClass, () => token, approve);
+      const h = compose(ws, s.actionClass, () => principalToken ?? token, approve);
       const r = await h.call();
       h.close();
       expectRefused(f, r);
@@ -136,11 +158,30 @@ describe("L0-IDN-04 revocation takes effect (drill)", () => {
 /**
  * L0-IDN-01 under a real active compiled plan (P1-10, P1-12, P1-67): the fixture profile compiles against the shipped
  * catalog to a ready plan, which is signed, approved by two distinct owners and activated; the native toolset pins it
- * and its compiled-policy guard enforces identity-binding. The lease is the agent identity. A lease also counts as the
- * principal (a service principal), so a lease-bound call with no human principal is allowed: that part of the
- * statement is not enforced yet (proposed follow-up P1-78), and no fixture claims it is.
+ * and its compiled-policy guard enforces identity-binding. The lease is the agent identity; the principal is the one the
+ * signed lease names (P1-78): a human, or a service registered as an active user in the signed users.yaml. The lease
+ * token's own identity is never a principal, so a lease naming none, or naming an unregistered service, is refused.
  */
-type IdentitySetup = { profile: unknown; tool: string; args: Record<string, unknown>; lease: "valid" | "none" | "expired" | "signed_by_other_workspace" };
+type IdentitySetup = { profile: unknown; tool: string; args: Record<string, unknown>;
+  lease: "valid" | "none" | "expired" | "signed_by_other_workspace" | "valid_without_principal" | "registered_service" | "unregistered_principal" };
+
+/**
+ * The user the fixture's lease names, and the record principal the bind must resolve from the signed users.yaml. "valid"
+ * names the owner, as a native task's lease names its Studio user; "registered_service" an AGENT-only user.
+ */
+function leasePrincipal(ws: string, state: IdentitySetup["lease"]): { named: LeasePayload["principal"]; expected?: Record<string, string> } {
+  if (state === "none" || state === "valid_without_principal") return { named: undefined };
+  const { owner } = initUsersConfig({ workspace: ws, username: "layer0-owner", password: "layer0-fixture-password" });
+  const service = addUser({ workspace: ws, username: "layer0-scheduler", roles: ["AGENT"], password: "layer0-fixture-password" });
+  if (state === "unregistered_principal") return { named: { userId: "user-not-in-users-yaml" } };
+  const [user, kind] = state === "registered_service" ? [service, "service"] : [owner, "human"];
+  return { named: { userId: user.userId }, expected: { principalId: user.userId, kind, authenticatedVia: "lease" } };
+}
+
+/** The authorization records among the rows a call recorded. */
+const authorizationRecords = (rows: ReadonlyArray<{ payload: string; meta: Record<string, unknown> }>) =>
+  rows.filter((row) => row.meta.auditType === "AUTHORIZATION_RECORD")
+    .map((row) => (JSON.parse(row.payload) as { record: { scope: { tenantId: string | null; deploymentId: string }; principal: Record<string, string> } }).record);
 
 function activate(ws: string, profile: unknown): void {
   const plan = compilePlan({ profile: parseDeploymentProfile(profile), catalog, asOf: new Date().toISOString() });
@@ -156,6 +197,36 @@ function activate(ws: string, profile: unknown): void {
 }
 
 describe("L0-IDN-01 unique agent identity under an active compiled plan (compiled-policy identity-binding)", () => {
+  it("planRequiresPrincipal reads the verified active plan and fails closed (P1-78)", () => {
+    const ws = newWorkspace();
+    initApprovalPolicy(ws);
+    expect(planRequiresPrincipal(ws), "no plan, no requirement").toBe(false);
+    activate(ws, (catalog.fixtures.get("L0-IDN-01/positive/lease-and-principal.json")?.envelope?.setup as { profile: unknown }).profile);
+    expect(planRequiresPrincipal(ws)).toBe(true);
+    const heads = join(ws, ".amc", "control-plan", "heads");
+    const entries = readdirSync(heads, { recursive: true, withFileTypes: true }).filter((e) => e.isFile());
+    expect(entries.length, "the activation journal has entries to tamper with").toBeGreaterThan(0);
+    for (const e of entries) writeFileSync(join(e.parentPath, e.name), "{\"tampered\":true}\n");
+    expect(() => loadActiveCompiledPolicy(ws), "the tampered journal does not verify").toThrow();
+    expect(planRequiresPrincipal(ws), "an unverifiable plan reads as requiring a principal").toBe(true);
+  });
+
+  it("issueLeaseForPrincipal names an active users.yaml user and refuses before minting when none resolves (P1-78)", () => {
+    const ws = newWorkspace();
+    initApprovalPolicy(ws);
+    const { owner } = initUsersConfig({ workspace: ws, username: "layer0-owner", password: "layer0-fixture-password" });
+    const lease = (principalKey: string | null) => issueLeaseForPrincipal({ workspace: ws, agentId: "default", ttlMs: 3_600_000,
+      scopes: ["toolhub:execute"], routeAllowlist: ["/"], modelAllowlist: ["*"], maxRequestsPerMinute: 10, maxTokensPerMinute: 10, maxCostUsdPerDay: null, principalKey });
+    expect(lease(null).payload.principal, "no plan: a lease naming no one, as before").toBeUndefined();
+    activate(ws, (catalog.fixtures.get("L0-IDN-01/positive/lease-and-principal.json")?.envelope?.setup as { profile: unknown }).profile);
+    expect(lease(`LOCAL_USER:${owner.userId}`).payload.principal).toEqual({ userId: owner.userId });
+    for (const key of [null, `WORKSPACE_ROUTER:${owner.userId}`, "LOCAL_USER:user-not-in-users-yaml", "bootstrap-admin"]) {
+      expect(() => lease(key), String(key)).toThrow(LeasePrincipalRefused);
+    }
+    revokeUser({ workspace: ws, username: "layer0-owner" });
+    expect(() => lease(`LOCAL_USER:${owner.userId}`), "a deactivated user").toThrow(/PRINCIPAL_UNRESOLVED/);
+  });
+
   const fixtures = fixturesFor("compiled_identity", "L0-IDN-01");
   it("has fixtures", () => expect(fixtures.length).toBeGreaterThan(1));
   for (const f of fixtures) {
@@ -170,15 +241,18 @@ describe("L0-IDN-01 unique agent identity under an active compiled plan (compile
       activate(ws, s.profile);
       expect(loadActiveCompiledPolicy(ws)?.controls.some((c) => c.controlId === "L0-IDN-01")).toBe(true);
       const signer = s.lease === "signed_by_other_workspace" ? newWorkspace("amc-l0-other-") : ws;
-      const token = s.lease === "none" ? undefined : issue(signer, "default", ["toolhub:execute"], s.lease === "expired" ? "60s" : "1h");
+      const principal = leasePrincipal(ws, s.lease);
+      const token = s.lease === "none" ? undefined : issue(signer, "default", ["toolhub:execute"], s.lease === "expired" ? "60s" : "1h", undefined, principal.named);
       if (s.lease === "expired") {
         vi.useFakeTimers({ toFake: ["Date"] });
         vi.setSystemTime(Date.now() + 2 * 3_600_000);
       }
-      // No session writer: under an active plan SessionService.open also requires a pinned residency profile (P2-01),
-      // which is L0-DAT-04's concern, not this control's. The toolset records through its own ledger handle.
+      // A capturing writer: under an active plan SessionService.open also requires a pinned residency profile (P2-01),
+      // which is L0-DAT-04's concern, not this control's. The rows are the ones a session writer would be handed.
       const sessionId = `layer0-identity-${f.envelope.evidenceClass}`;
-      const toolset = agentToolset({ workspace: ws, agentId: "default", sessionId, ...(token ? { leaseToken: token } : {}) });
+      const rows: Array<{ payload: string; meta: Record<string, unknown> }> = [];
+      const toolset = agentToolset({ workspace: ws, agentId: "default", sessionId, ...(token ? { leaseToken: token } : {}),
+        recorder: { recordProjectedEvidence: (row) => { rows.push(row); return null; } } });
       let result: Awaited<ReturnType<typeof toolset.seam.execute>>;
       try {
         result = await toolset.seam.execute({ callId: "layer0-identity-call", toolName: s.tool, rawArguments: JSON.stringify(s.args), sessionId,
@@ -190,6 +264,13 @@ describe("L0-IDN-01 unique agent identity under an active compiled plan (compile
       if (f.envelope.expected.result === "allow") {
         expect(text).toContain('"outcome":"OK"');
         expect(text).not.toMatch(/IDENTITY_UNRESOLVED|PRINCIPAL_UNRESOLVED/);
+        // The record binds the deployment the active plan's profile names (P1-78), not a placeholder.
+        const records = authorizationRecords(rows);
+        expect(records.length, "the call was bound to an authorization record").toBeGreaterThan(0);
+        for (const record of records) {
+          expect(record.scope).toMatchObject({ tenantId: "tenant-a", deploymentId: "dep-a" });
+          expect(record.principal, "resolved from the signed users.yaml, never the lease itself").toEqual(principal.expected);
+        }
         return;
       }
       expect(text).not.toContain('"outcome":"OK"');

@@ -11,14 +11,14 @@ import { issueScopedLegalHold, legalHoldRegistryRoot } from "../../../src/reside
 import { writeRuntimeFirewallPolicy } from "../../../src/runtime/firewall.js";
 import { SessionService } from "../../../src/session/sessionService.js";
 import { sha256Hex } from "../../../src/utils/hash.js";
-import { fixturesFor } from "./harness.js";
+import { fixturesFor, type L0Fixture } from "./harness.js";
 import { newWorkspace } from "./workspaces.js";
 
 /**
  * L0-LOG-01, L0-LOG-02 and L0-LOG-03 against the real ledger, native toolset and deletion gate (P1-14). The oracle is
  * the hash-chained rows and the verifier's result, and the gate's verdict and audit row; never the agent's reply.
  */
-type TraceSetup = { tool: string; args: Record<string, unknown>; audit: string };
+type TraceSetup = { tool: string; args: Record<string, unknown>; audit: string; writer?: "ledger_session" | "none" };
 type TamperSetup = { events: number; tamper: "none" | "rewrite" | "delete" | "reorder" };
 type GateSetup = { executor: string; target: "logs"; holds: "none" | "active" | "corrupt" };
 
@@ -32,17 +32,53 @@ function rows(ws: string): Array<{ session_id: string; meta: Record<string, unkn
   }
 }
 
+/**
+ * A toolset with no session writer (P1-78): it records into the raw ledger only when the ledger holds its session open,
+ * as a legacy caller that starts and seals the session does; otherwise it refuses the call and writes nothing.
+ */
+async function writerless(f: L0Fixture, ws: string, s: TraceSetup): Promise<void> {
+  const sessionId = `layer0-${f.envelope.evidenceClass}-writerless`;
+  if (s.writer === "ledger_session") {
+    const ledger = openLedger(ws);
+    ledger.startSession({ sessionId, runtime: "amc", binaryPath: "layer0-fixture", binarySha256: "00".repeat(32) });
+    ledger.close();
+  }
+  const toolset = agentToolset({ workspace: ws, agentId: "default", sessionId });
+  let result: Awaited<ReturnType<typeof toolset.seam.execute>>;
+  try {
+    result = await toolset.seam.execute({ callId: "layer0-call-1", toolName: s.tool, rawArguments: JSON.stringify(s.args), sessionId, turn: 1, step: 1,
+      parentToken: null, dispatch: "native", signal: new AbortController().signal });
+  } finally {
+    toolset.close();
+  }
+  const own = rows(ws).filter((r) => r.session_id === sessionId);
+  if (s.writer === "ledger_session") {
+    const ledger = openLedger(ws);
+    ledger.sealSession(sessionId);
+    ledger.close();
+    expect(own.find((r) => r.meta.auditType === s.audit)?.meta).toMatchObject({ agentId: "default", toolName: s.tool });
+  } else {
+    expect(JSON.stringify(result), "the call is refused").not.toContain('"outcome":"OK"');
+    expect(JSON.stringify(result)).toContain(String(f.envelope.expected.reasonCode));
+    expect(own, "no row names a session the ledger does not hold").toEqual([]);
+  }
+  const verified = verifyLedgerIntegrity(ws);
+  expect(verified.chain.ok, verified.chain.errors.join("; ")).toBe(true);
+  expect(verified.errors).toEqual([]);
+}
+
 describe("L0-LOG-01 step-level traces (native toolset into the hash-chained ledger)", () => {
   const fixtures = fixturesFor("ledger_trace", "L0-LOG-01");
   it("has fixtures", () => expect(fixtures.length).toBeGreaterThan(1));
   for (const f of fixtures) {
-    it(`${f.ref}: ${f.envelope.expected.result}`, async () => {
+    it(`${f.ref}: ${f.envelope.expected.result} ${f.envelope.expected.reasonCode ?? ""}`, async () => {
       const s = f.envelope.setup as unknown as TraceSetup;
       const ws = newWorkspace();
       initBudgets(ws, "default");
       writeRuntimeFirewallPolicy({ workspace: ws, mode: "observe" });
       mkdirSync(join(ws, "workspace", "output"), { recursive: true });
       writeFileSync(join(ws, "workspace", "n.txt"), "fixture");
+      if (s.writer !== undefined) return writerless(f, ws, s);
       // The session's own writer records the call, as the native runtime composes it: the rows carry its envelope.
       const sessionId = `layer0-${f.envelope.evidenceClass}-session`;
       const session = new SessionService(ws);

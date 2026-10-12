@@ -1,0 +1,23 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-OVS-03",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "approval_quorum",
+    "actionClass": "WRITE_LOW",
+    "initiator": "LOCAL_USER:approver-1",
+    "decisions": [
+      {
+        "userId": "approver-1",
+        "roles": [
+          "OWNER"
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": null
+  }
+}

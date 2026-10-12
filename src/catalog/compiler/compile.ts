@@ -87,7 +87,8 @@ export function compilePlan(input: CompileInput): CompiledPlan {
   const body: Omit<CompiledPlan, "digest"> = {
     planVersion: 1,
     compiler: { name: "amc-catalog-compiler", version: amcVersion },
-    profile: { profileId: profile.profileId, sha256: sha256Hex(canonicalize(profile)), factProvenance },
+    profile: { profileId: profile.profileId, sha256: sha256Hex(canonicalize(profile)), factProvenance,
+      deployment: { tenantId: profile.deployment.tenantId, deploymentId: profile.deployment.deploymentId } },
     lock,
     status: blocked ? "blocked" : "ready",
     requirements,

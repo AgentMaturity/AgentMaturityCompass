@@ -309,6 +309,11 @@ export abstract class SessionEventWriter {
     }
   }
 
+  /** Throws unless this writer can append now (opened, not closed): a toolset checks it before a tool body runs (P1-78). */
+  assertWritable(): void {
+    this.ensureUsable();
+  }
+
   protected ensureUsable(): void {
     if (this.sessionIdValue === null) {
       throw new Error("SessionService used before open()");
