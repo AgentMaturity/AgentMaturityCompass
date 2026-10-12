@@ -1,7 +1,7 @@
 /** Experimental text heuristics. Binary media, clinical semantics, and complete detection are outside this detector set. */
 import type { EncodableRequest } from "../llm/request/requestSpec.js";
 import type { ProtectedDataClass } from "../vault/dataClassification.js";
-import { findPIISpans, getPIIDetectorMetadata, PII_SPAN_SCAN_REVISION } from "../vault/dlp.js";
+import { findPIISpans, getPIIDetectorMetadata, PII_SPAN_SCAN_REVISION, type PiiSpan } from "../vault/dlp.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -23,12 +23,17 @@ const CLASS_BY_TYPE: Readonly<Record<string, ProtectedDataClass>> = Object.freez
   eu_vat: "pii", eu_national_id: "pii", passport_number: "pii", health_record_id: "phi",
   api_key_openai: "credential", api_key_github: "credential", api_key_aws: "credential", password_json: "credential"
 });
-// ponytail: dropping bare-digit phone spans means unformatted 10-digit phone numbers are no longer detected; add a
-// context-keyed phone rule (e.g. "tel:", "phone") if that recall matters. scanForPII still reports them.
+// ponytail: a bare 10-digit run not preceded by "+" is dropped as noise, so a phone number written that way is not
+// detected; E.164 (+14155552671) and 11-digit (14155552671) runs still are. Add a context-keyed phone rule (e.g. "tel:",
+// "phone") if that recall matters. scanForPII still reports them.
 const NOISE_FILTERS: Readonly<Record<string, RegExp>> = Object.freeze({
   ip_address: /^\d{1,2}(?::\d{2}){1,2}(?:\.\d+)?$/, // HH:MM[:SS] clock times that IPV6_SOURCE also matches
-  phone: /^\d+$/ // bare digit runs: Unix timestamps, counters, 2147483647
+  phone: /^\d{10}$/ // bare 10-digit runs: Unix-seconds timestamps, counters, 2147483647
 });
+// The phone pattern's leading \b cannot sit before "+", so an E.164 span starts after it; keep such a span.
+const isNoise = (text: string, span: PiiSpan) =>
+  Object.hasOwn(NOISE_FILTERS, span.type) && NOISE_FILTERS[span.type]!.test(text.slice(span.start, span.end))
+  && !(span.type === "phone" && text.charAt(span.start - 1) === "+");
 // Per-leaf and nesting bounds only. Request-wide totals refused every long session, so they are gone.
 const MAX_DEPTH = 32;
 const MAX_TEXT_CHARS = 1_048_576;
@@ -36,7 +41,7 @@ const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   schema: "amc.protected-detectors/v1", support: "experimental", patterns: getPIIDetectorMetadata(), spanScanRevision: PII_SPAN_SCAN_REVISION,
   classMapping: CLASS_BY_TYPE,
   noiseFilters: Object.fromEntries(Object.entries(NOISE_FILTERS).map(([type, re]) => [type, re.source])),
-  traversalRevision: "request-json-leaves-password-context-malformed-args-as-text-per-leaf-limits-noise-filtered-v4",
+  traversalRevision: "request-json-leaves-password-context-malformed-or-non-finite-args-as-text-per-leaf-limits-noise-filtered-plus-kept-v5",
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_TEXT_CHARS }
 }));
 function refused(): never { throw new Error("Protected request detection refused unsupported or excessive traversal"); }
@@ -45,8 +50,7 @@ const dataClass = (type: string): ProtectedDataClass => Object.hasOwn(CLASS_BY_T
 /** Offsets refer to the original text. No matched values are returned or logged. */
 export function detectProtectedText(text: string): readonly ProtectedDataSpan[] {
   if (typeof text !== "string" || text.length > MAX_TEXT_CHARS) return refused();
-  const spans = findPIISpans(text).filter(span =>
-    !(Object.hasOwn(NOISE_FILTERS, span.type) && NOISE_FILTERS[span.type]!.test(text.slice(span.start, span.end))));
+  const spans = findPIISpans(text).filter(span => !isNoise(text, span));
   return Object.freeze(spans.map(span => Object.freeze({
     start: span.start, end: span.end, dataClass: dataClass(span.type), detector: span.type
   })));
@@ -93,11 +97,18 @@ export function detectProtectedRequest(request: EncodableRequest): ProtectedData
       }
       active.delete(value);
     };
-    // Empty or malformed tool-call arguments are committed by design; they are scanned as text, never refused.
+    // Empty or malformed tool-call arguments are committed by design; they are scanned as text, never refused. So are
+    // arguments with a number that overflows to Infinity (1e999), which visit() would refuse on every later prepare.
     const json = (text: string) => {
       if (typeof text !== "string") refused();
-      let parsed: unknown;
-      try { parsed = JSON.parse(text); } catch { scan(text); return; }
+      let parsed: unknown, nonFinite = false;
+      try {
+        parsed = JSON.parse(text, (_key, value: unknown) => {
+          if (typeof value === "number" && !Number.isFinite(value)) nonFinite = true;
+          return value;
+        });
+      } catch { scan(text); return; }
+      if (nonFinite) { scan(text); return; }
       visit(parsed, 0);
     };
 
