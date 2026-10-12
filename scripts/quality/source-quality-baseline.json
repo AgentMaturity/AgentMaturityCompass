@@ -2011,7 +2011,6 @@
     {"id":"fb8ed19a1085170355462593f9180bd5fcdf91fc415247d9430c3e2afe8817e5","file":"src/credentials/index.ts","kind":"types"},
     {"id":"fbcfcae9f03af96208641122649e775fa09d0a6e605b3820b2b9f185bc2ce233","file":"src/credentials/index.ts","kind":"types"},
     {"id":"f83079e5edcf5d0ffbff2d9fb435965b3acea0a752f842b292e4a8c5c16629dd","file":"src/crypto/keyHistoryChain.ts","kind":"exports"},
-    {"id":"c6c9c180b13d3a4ed32ba49d29144a3b820fae072c497683b4f006c67b91d327","file":"src/crypto/keys.ts","kind":"exports"},
     {"id":"75ca4d9177f3c15dac203e9f03a7c9160b84c47e235ba7bbb53377a30043a9e0","file":"src/crypto/signing/signerTypes.ts","kind":"exports"},
     {"id":"8e2829e7b8f14bd389992b030b242b3cdc51fe5452ba679860efa3d0244d4cf8","file":"src/crypto/signing/signerTypes.ts","kind":"types"},
     {"id":"18b78ca67f1123f40f1c9ff7672a3cc52cfd0bc065c59c8791e9beb7b369f339","file":"src/dashboard/components/teamViews.js","kind":"files"},
