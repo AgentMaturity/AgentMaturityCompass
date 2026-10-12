@@ -44,7 +44,7 @@ const isNoise = (text: string, span: PiiSpan) =>
 // one). Hostile text scans in linear time but at up to ~0.55 s per MiB, so the budget caps one prepare at about 10 s.
 const MAX_DEPTH = 32;
 export const MAX_PROTECTED_TEXT_CHARS = 1_048_576;
-const MAX_REQUEST_SCAN_CHARS = 16_777_216;
+export const MAX_REQUEST_SCAN_CHARS = 16_777_216;
 const JSON_ESCAPES: Readonly<Record<string, string>> = Object.freeze({ n: "\n", t: "\t", r: "\r", b: "\b", f: "\f" });
 // JSON string escapes (\n, \uXXXX, \" ...) decoded in one linear pass, so escaped text in malformed arguments still matches.
 const decodeJsonEscapes = (text: string) => text.replace(/\\(?:u([0-9a-fA-F]{4})|([\s\S]))/g,
@@ -116,6 +116,22 @@ export function redactProtectedText(text: string, replace: (region: ProtectedDat
     cursor = end;
   }
   return Object.freeze({ text: spans.length === 0 ? text : out + text.slice(cursor), spans });
+}
+
+/**
+ * Applies `redact` to every key and string leaf of a parsed JSON value, and to each number leaf as text (a number with a
+ * detection becomes the redacted string), so the result still serializes as JSON. Stored gateway and bridge evidence use it.
+ */
+export function redactJsonLeaves(value: unknown, redact: (text: string) => string): unknown {
+  if (typeof value === "string") return redact(value);
+  if (typeof value === "number") {
+    const text = String(value);
+    const redacted = redact(text);
+    return redacted === text ? value : redacted;
+  }
+  if (Array.isArray(value)) return value.map(item => redactJsonLeaves(item, redact));
+  if (value === null || typeof value !== "object") return value;
+  return Object.fromEntries(Object.entries(value).map(([key, item]) => [redact(key), redactJsonLeaves(item, redact)]));
 }
 
 /**

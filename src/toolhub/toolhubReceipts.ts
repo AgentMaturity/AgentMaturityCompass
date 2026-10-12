@@ -1,6 +1,7 @@
 import type { Ledger } from "../ledger/ledger.js";
 import { defaultGatewayConfig, loadGatewayConfig } from "../gateway/config.js";
 import { redactBody } from "../gateway/redaction.js";
+import { protectedDataOptedIn } from "../dataflow/processorRegistry.js";
 import { sha256Hex } from "../utils/hash.js";
 
 function redactToolPayload(workspace: string, payload: string): {
@@ -15,7 +16,8 @@ function redactToolPayload(workspace: string, payload: string): {
     // fall back to defaults
   }
   const body = Buffer.from(payload, "utf8");
-  const redacted = redactBody(body, "application/json", redaction);
+  // P2-02: the protected-data detectors run only where the workspace opted in.
+  const redacted = redactBody(body, "application/json", redaction, { protectedData: protectedDataOptedIn(workspace) });
   return {
     redacted: redacted.redactedBytes.toString("utf8"),
     wasRedacted: redacted.wasRedacted,
