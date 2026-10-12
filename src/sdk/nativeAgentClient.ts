@@ -35,7 +35,7 @@ export const AMC_NATIVE_EVENT_LIMITS = Object.freeze({ maxEvents: 8192, maxBytes
 const MAX_WRITE_QUEUE_BYTES = 8 * 1024 * 1024;
 const MAX_WRITE_QUEUE_FRAMES = 64;
 
-/** Lower the retention ceilings; no event is silently dropped when a ceiling is reached. */
+/** Lower the retention ceilings; no event is silently dropped when a ceiling is reached. @public */
 export interface AMCNativeEventBufferOptions {
   readonly maxEvents?: number;
   readonly maxBytes?: number;
@@ -87,7 +87,7 @@ export {
   AMCNativeCancelledError, AMCNativeInputError, AMCNativeLimitError, AMCNativeProcessError, AMCNativeProtocolError, AMCNativeRefusedError
 } from "./nativeAgentErrors.js";
 
-export interface AMCNativeClientOptions {
+/** @public */ export interface AMCNativeClientOptions {
   readonly workspace: string;
   /** Explicit selection: stub is a local demonstration, never a live-provider fallback. */
   readonly provider: string;
@@ -127,13 +127,13 @@ export interface AMCNativeClientOptions {
   readonly eventBuffer?: AMCNativeEventBufferOptions;
 }
 
-export interface AMCNativeUpdate {
+/** @public */ export interface AMCNativeUpdate {
   readonly sessionId: string;
   /** Committed-block notifications from ACP, not provider token deltas or a verifier verdict. */
   readonly update: Readonly<JsonObject> & { readonly sessionUpdate: string };
 }
 
-export interface AMCNativeRunResult {
+/** @public */ export interface AMCNativeRunResult {
   readonly sessionId: string;
   readonly state: "completed";
   /** ACP end_turn also represents some lossy endings; inspect meta and verify evidence separately. */
@@ -146,14 +146,14 @@ export interface AMCNativeRunResult {
   readonly validation: NativeValidationResult;
 }
 
-export interface AMCNativeReceipt {
+/** @public */ export interface AMCNativeReceipt {
   readonly sessionId: string;
   readonly state: "verified";
   readonly scope: "workspace-key-consistency" | "externally-anchored";
   readonly report: AgentRunVerification;
 }
 
-/** One prompt in flight. Cancelling requests a stop; only the result establishes its outcome. */
+/** One prompt in flight. Cancelling requests a stop; only the result establishes its outcome. @public */
 export class AMCNativeTurn implements AsyncIterable<AMCNativeUpdate> {
   readonly result: Promise<AMCNativeRunResult>;
   private resolveResult!: (value: AMCNativeRunResult) => void;
@@ -168,7 +168,7 @@ export class AMCNativeTurn implements AsyncIterable<AMCNativeUpdate> {
   private readonly limits: Required<AMCNativeEventBufferOptions>;
   state: "submitted" | "receiving" | "cancel-requested" | "completed" | "failed" = "submitted";
 
-  constructor(readonly sessionId: string, private readonly requestCancel: () => void, options: AMCNativeEventBufferOptions = {}) {
+  /** @internal */ constructor(readonly sessionId: string, private readonly requestCancel: () => void, options: AMCNativeEventBufferOptions = {}) {
     this.limits = eventLimits(options);
     this.result = new Promise((resolve_, reject) => { this.resolveResult = resolve_; this.rejectResult = reject; });
     // Consumers may read the stream before awaiting result. Keep rejection handled until then.
@@ -273,11 +273,11 @@ export class AMCNativeTurn implements AsyncIterable<AMCNativeUpdate> {
   }
 }
 
-export class AMCNativeSession {
+/** @public */ export class AMCNativeSession {
   readonly state = "accepted" as const;
   private released = false;
   private releasePromise: Promise<void> | undefined;
-  constructor(private readonly client: AMCNativeClient, readonly sessionId: string,
+  /** @internal */ constructor(private readonly client: AMCNativeClient, readonly sessionId: string,
     readonly history: readonly AMCNativeUpdate[] = []) {}
   /** Local handle lifecycle only, not a signed writer or evidence verdict. */
   get lifecycle(): "accepted" | "releasing" | "released" | "closed" {
@@ -291,11 +291,11 @@ export class AMCNativeSession {
     this.assertUsable();
     return this.client.promptSession(this.sessionId, text, options.signal, options.images);
   }
-  promptParts(parts: readonly NativeInputPart[], options: { readonly signal?: AbortSignal } = {}): AMCNativeTurn {
+  /** @experimental Ordered text and image parts (amc-image-input@2). */ promptParts(parts: readonly NativeInputPart[], options: { readonly signal?: AbortSignal } = {}): AMCNativeTurn {
     this.assertUsable();
     return this.client.promptSessionParts(this.sessionId, parts, options.signal);
   }
-  promptAudioParts(parts: readonly NativeAudioPart[], options: { readonly signal?: AbortSignal } = {}): AMCNativeTurn {
+  /** @experimental Ordered audio parts (amc-audio-input@1). */ promptAudioParts(parts: readonly NativeAudioPart[], options: { readonly signal?: AbortSignal } = {}): AMCNativeTurn {
     this.assertUsable();
     return this.client.promptSessionAudioParts(this.sessionId, parts, options.signal);
   }
@@ -324,7 +324,7 @@ interface PendingRequest {
   readonly timer: ReturnType<typeof setTimeout>;
 }
 
-/** Local operator client. This spawns the governed ACP runtime; it does not turn a bridge lease into execution authority. */
+/** Local operator client. This spawns the governed ACP runtime; it does not turn a bridge lease into execution authority. @public */
 export class AMCNativeClient {
   readonly workspace: string;
   readonly protocolVersion = 1;
