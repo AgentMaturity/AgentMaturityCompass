@@ -17,6 +17,9 @@ export const TOKEN_PATTERN_SOURCE = String.raw`\[\[amc:(?:phi|pii|card_number|ba
  * when its 16 hex characters include a letter. All-decimal hex could be a raw card or account number written in token
  * brackets, so it stays text. A real token's hex is all-decimal and Luhn-valid about 5e-5 of the time; it is then
  * tokenized again, which over-redacts and is safe.
+ * ponytail: a value that is itself 16 lowercase hex characters with a letter (a lowercase Belgian IBAN, for one) is
+ * still shielded when written in token brackets; checking a token against the vault (the slice-3 detokenize gate's
+ * lookup) closes that.
  */
 export const isShieldingToken = (token: string): boolean => /[a-f]/.test(token.slice(-18, -2));
 
