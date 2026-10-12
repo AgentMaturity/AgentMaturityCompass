@@ -154,6 +154,8 @@ export interface HookMutationResult {
     expiresTs: number | null;
   };
   limitations: string[];
+  /** Claude Code: the exact `hooks` block AMC writes (or would write), to copy into managed settings unchanged. */
+  hooks?: Record<string, unknown>;
 }
 
 export interface HookIntegrationStatus {
@@ -627,6 +629,7 @@ function unchangedInstallResult(input: {
   paths: ManagedPaths;
   manifest: HookManifest;
   dryRun: boolean;
+  hooks?: Record<string, unknown>;
 }): HookMutationResult {
   return {
     operation: "install",
@@ -654,7 +657,8 @@ function unchangedInstallResult(input: {
       leaseId: input.manifest.leaseId,
       expiresTs: input.manifest.leaseExpiresTs
     },
-    limitations: limitations(input.provider, input.manifest.mode)
+    limitations: limitations(input.provider, input.manifest.mode),
+    ...(input.hooks ? { hooks: input.hooks } : {}),
   };
 }
 
@@ -726,6 +730,7 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
       const handler = handlerFor(spec.eventName);
       return { ...spec, handler, handlerSha256: handlerHash(handler) };
     });
+    const hooks = provider === "claude-code" ? Object.fromEntries(desiredHandlers.map((row) => [row.eventName, [{ matcher: "*", hooks: [row.handler] }]])) : undefined;
     const desiredBindings = desiredHandlers.map((row) => ({
       eventName: row.eventName,
       handlerSha256: row.handlerSha256,
@@ -751,7 +756,8 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
         provider,
         paths,
         manifest: existingManifest,
-        dryRun: options.dryRun === true
+        dryRun: options.dryRun === true,
+        hooks,
       });
     }
 
@@ -798,7 +804,8 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
         changed: true,
         files,
         lease: { scope: "hook:observe", scopes: leaseScopes(mode), route: "/hooks", leaseId: null, expiresTs: null },
-        limitations: limitations(provider, mode)
+        limitations: limitations(provider, mode),
+        ...(hooks ? { hooks } : {}),
       };
     }
 
@@ -915,7 +922,8 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
         leaseId: leasePayload.leaseId,
         expiresTs: leasePayload.expiresTs
       },
-      limitations: limitations(provider, mode)
+      limitations: limitations(provider, mode),
+      ...(hooks ? { hooks } : {}),
     };
   };
 

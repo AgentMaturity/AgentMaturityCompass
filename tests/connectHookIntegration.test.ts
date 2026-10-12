@@ -344,7 +344,13 @@ describe("AMC provider hook integration", () => {
     const userHooks = { PostToolUse: [{ matcher: "Write", hooks: [{ type: "command", command: "npm test" }] }], Stop: [{ hooks: [{ type: "command", command: "say done" }] }] };
     writeJson(paths.config, { hooks: userHooks });
     const options = { workspace, provider: "claude-code" as const, agentId: "session-hooks-agent", mode: "control" as const, claudeCodeInstall: boundClaudeCode() };
+    const plan = installHookIntegration({ ...options, dryRun: true });
     installHookIntegration(options);
+    // The dry run's `hooks` block is exactly what the install wrote (the managed-settings guide copies it unchanged).
+    const written = readJson(paths.config) as { hooks: Record<string, Array<{ hooks: Array<Record<string, unknown>> }>> };
+    for (const [event, groups] of Object.entries(plan.hooks as Record<string, Array<{ matcher: string; hooks: unknown[] }>>)) {
+      expect(written.hooks[event]).toContainEqual(groups[0]);
+    }
 
     const config = readJson(paths.config) as { hooks: Record<string, Array<{ matcher?: string; hooks: Array<Record<string, unknown>> }>> };
     expect(Object.keys(config.hooks).sort()).toEqual(["PostToolUse", "PostToolUseFailure", "PreToolUse", "SessionStart", "Stop", "UserPromptSubmit"]);
