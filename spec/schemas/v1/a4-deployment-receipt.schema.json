@@ -45,6 +45,7 @@
       "enum": [
         "deploy",
         "verify",
+        "rollback",
         "monitor"
       ],
       "type": "string"

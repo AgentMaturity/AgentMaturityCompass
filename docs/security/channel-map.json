@@ -211,7 +211,8 @@
       "name": "CLI",
       "enforcementPoints": [
         { "path": "src/cli.ts", "symbol": "skipVault" },
-        { "path": "src/vault/vault.ts", "symbol": "unlockVault" }
+        { "path": "src/vault/vault.ts", "symbol": "unlockVault" },
+        { "path": "src/a4/a4Identity.ts", "symbol": "resolveA4LoginPrincipal" }
       ],
       "evidence": "Ledger rows for the commands that write them; no per-command record in general",
       "status": "advisory",

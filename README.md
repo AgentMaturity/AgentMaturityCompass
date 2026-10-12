@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C679-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C680-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -535,19 +535,6 @@ The default `observe` mode preserves unrelated provider settings, adds a managed
 
 `--mode control` is an explicit loopback-only Enforce path. It adds `hook:control`, evaluates raw provider input in memory without retaining it, reuses signed ToolHub, Action Policy, Approval Policy, budget, freeze, maturity, and assurance gates, and binds the exact native response to a signed receipt. Claude Code can receive `allow`, `deny`, or `ask`. Gemini CLI has no native `ask` result, so AMC converts that outcome to an explicit deny. Multi-user or distinct-user AMC quorum is never weakened to one provider prompt. Codex, Cursor, OpenCode, and other providers remain unsupported until their native per-tool hook contracts are pinned and fixture-tested.
 
-Pi connects through an optional AMC extension at Pi's `tool_call` hook rather than a hooks file:
-
-```bash
-amc connect hooks install --provider pi --mode control --agent my-agent
-```
-
-- Control mode: "enforced at Pi's `tool_call` hook", per mapped tool, for qualified Pi versions only (1.0.2 and 1.0.4), in a Pi session registered under the current installation, and only while Pi's tool registry names Pi's own built-in for that tool name.
-- Not covered: OS containment; effects that bypass `tool_call` (another extension's own I/O, Pi Durable, Codemode-internal calls unless step 2 confirms they emit `tool_call`).
-- Not covered: an extension that rewrites Pi's tool registry itself. AMC denies a mapped tool name when Pi's registry does not name Pi's built-in for it (an extension tool registered under a built-in's name), but extensions run in Pi's process with full rights.
-- AMC cannot see sessions where Pi did not load the extension; they are reported as not governed.
-- A session registration is a lease-holder attestation: registration made with the session lease and matching on-disk extension and Pi digests. A process holding the lease can still attest without Pi. AMC cannot prove Pi executed the hook; it can prove only that every allowed call went through AMC with a signed receipt.
-- Pi loads `.pi/extensions/amc.js` only for a trusted project; while it does not, nothing is enforced. Calls in an unregistered session are denied. Pi ask is always denied until an AMC approval path exists. See [Pi tool_call control](docs/adapters/pi.md).
-
 Track real first-run outcomes without creating traffic or evidence:
 
 ```bash
@@ -796,7 +783,7 @@ The full trust stack is **free and MIT licensed**. Industry Packs are the planne
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,231 registered CLI command paths, browser playground, CI gates |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,255 registered CLI command paths, browser playground, CI gates |
 | **Industry Packs (planned; not yet purchasable)** | Planned `$9.99/month` tier for all 41 Industry Domain Packs; public checkout is not live |
 | **Enterprise (contact-first; not self-serve)** | Planned Industry Packs access plus priority support, custom pack development, and deployment assistance |
 
@@ -831,7 +818,7 @@ The full trust stack is **free and MIT licensed**. Industry Packs are the planne
 | [Community Demo Kit](docs/COMMUNITY_DEMO_KIT.md) | [Why AMC One-Pager](docs/WHY_AMC_ONE_PAGER.md) |
 | [Solo Dev Quickstart](docs/SOLO_DEV_QUICKSTART.md) | [Platform Engineer Quickstart](docs/PLATFORM_ENGINEER_QUICKSTART.md) |
 | [Security & Compliance Quickstart](docs/SECURITY_COMPLIANCE_QUICKSTART.md) | [Troubleshooting](docs/TROUBLESHOOTING.md) |
-| [CLI Reference (1,231 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
+| [CLI Reference (1,255 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
 | [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md) | [Starter Blueprints](docs/STARTER_BLUEPRINTS.md) |
 | [Install Packages](docs/INSTALL_PACKAGES.md) | [Support Policy](docs/SUPPORT_POLICY.md) |
 | [Release Cadence](docs/RELEASE_CADENCE.md) | [CI Templates](docs/CI_TEMPLATES.md) |
@@ -930,7 +917,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,679<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,680<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -951,6 +938,6 @@ cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- a
 ---
 
 <p align="center">
-  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,231 CLI command paths</strong><br>
+  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,255 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

@@ -3,7 +3,9 @@
  * re-asked when it is missing or when its `dependencyDigest` (sha256 over the canonical answers of `dependsOn`, as the
  * answers route records it) no longer matches, so changing `markets` re-asks only `stations` and `governance`. The
  * producers live in src/a4/stages/aspire.ts and are loaded on first use. The item builders are pure: they read the
- * newest Aspire revision and the chain, never a file, and nothing here computes a maturity level.
+ * newest Aspire revision and the chain, never a file, and nothing here computes a maturity level. The answer helpers the
+ * later stages share live here too: a stage's newest revision (stageSpecOf), a question bank's unanswered and stale
+ * questions (askGaps, askGapCodes) and the answers a stage carries (carriedValuesOf, carriedGaps, carryAnswers, mergeCarried).
  */
 import { z } from "zod";
 import { validateContextGraph } from "../../context/contextGraph.js";
@@ -12,9 +14,9 @@ import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { parseStation, STATIONS } from "../../domains/stations.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
-import type { A4ReadinessItem, A4ReadinessQuery, A4ReadinessState } from "../a4Readiness.js";
+import { readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
 import type { A4Producer } from "../a4RouterStages.js";
-import { a4AnswerSchema, a4HypothesisSchema, type A4Answer, type A4Hypothesis, type A4Question, type A4Step } from "../a4Schema.js";
+import { a4AnswerSchema, a4HypothesisSchema, type A4Answer, type A4Hypothesis, type A4Question, type A4Stage, type A4Step } from "../a4Schema.js";
 
 const question = (id: string, prompt: string, kind: A4Question["kind"], required: boolean, dependsOn: string[] = []): A4Question =>
   ({ id, stage: "aspire", prompt, dependsOn, required, kind });
@@ -39,7 +41,7 @@ export const QUESTIONS: A4Question[] = [
 ];
 
 /** The values a choice question takes (archetypeInterest takes a listed archetype id). `riskTier` keeps the context-graph spelling. */
-export const CHOICES: Readonly<Record<string, readonly string[]>> = {
+const CHOICES: Readonly<Record<string, readonly string[]>> = {
   expertise: ["novice", "practitioner", "expert"], riskTier: ["low", "med", "high", "critical"], governance: ["regulated", "standard"]
 };
 
@@ -97,13 +99,24 @@ export const answersDigestOf = (answers: readonly A4Answer[]): string =>
 export const understandingCurrent = (spec: Record<string, unknown>, answers: readonly A4Answer[]): boolean =>
   (spec.understanding as { answersDigest?: unknown } | null | undefined)?.answersDigest === answersDigestOf(answers);
 
+/** Of `questions`, the required ones with no answer and the answered ones whose dependencies changed since (to be asked again). */
+export function askGaps(questions: readonly A4Question[], answers: readonly A4Answer[]): { missing: string[]; stale: string[] } {
+  const values = answerValues(answers);
+  const byId = new Map(answers.map((answer) => [answer.questionId, answer]));
+  const missing = questions.filter((entry) => entry.required && !answered(values.get(entry.id))).map((entry) => entry.id);
+  const stale = questions.filter((entry) => byId.has(entry.id) && entry.dependsOn.length > 0
+    && byId.get(entry.id)!.dependencyDigest !== dependencyDigest(entry.dependsOn, values)).map((entry) => entry.id);
+  return { missing, stale };
+}
+/** ask_complete's reason codes for a stage's answer gaps (each unanswered, stale and invalid question, then the carried gaps); none once Ask is complete. */
+export const askGapCodes = (gaps: { missing: readonly string[]; stale: readonly string[]; invalid: readonly string[]; carried?: readonly string[] }): string[] =>
+  [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`), ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`),
+    ...(gaps.carried ?? [])];
+
 /** Required questions with no answer, and answered ones whose dependencies changed since (to be asked again). */
 export function answerGaps(answers: readonly A4Answer[]): { missing: string[]; stale: string[]; invalid: string[] } {
   const values = answerValues(answers);
-  const byId = new Map(answers.map((answer) => [answer.questionId, answer]));
-  const missing = QUESTIONS.filter((entry) => entry.required && !answered(values.get(entry.id))).map((entry) => entry.id);
-  const stale = QUESTIONS.filter((entry) => byId.has(entry.id) && entry.dependsOn.length > 0
-    && byId.get(entry.id)!.dependencyDigest !== dependencyDigest(entry.dependsOn, values)).map((entry) => entry.id);
+  const { missing, stale } = askGaps(QUESTIONS, answers);
   const invalid = Object.entries(CHOICES).filter(([id, allowed]) => textValue(values.get(id)) !== null && !allowed.includes(textValue(values.get(id))!))
     .map(([id]) => id);
   // "regulated" promises regulated gates (no self-approval); isRegulated (src/a4/a4Readiness.ts) gives that only for a high or critical tier.
@@ -114,15 +127,63 @@ export function answerGaps(answers: readonly A4Answer[]): { missing: string[]; s
   return { missing, stale, invalid };
 }
 
-/** The newest Aspire revision's spec and answers (the stage's record). */
-export function aspireSpecOf(state: Pick<A4ReadinessState, "revisions">): { spec: Record<string, unknown>; answers: A4Answer[]; revisionNo: number | null } {
-  const revision = state.revisions.filter((row) => row.stage === "aspire").at(-1);
+/** The newest revision recorded at `stage`: its spec, its answers (one that does not parse is left out) and its number. */
+export function stageSpecOf(state: Pick<A4ReadinessState, "revisions">, stage: A4Stage): { spec: Record<string, unknown>; answers: A4Answer[]; revisionNo: number | null } {
+  const revision = state.revisions.filter((row) => row.stage === stage).at(-1);
   const spec = revision ? JSON.parse(revision.spec_json) as Record<string, unknown> : {};
   const answers = Array.isArray(spec.answers) ? spec.answers.flatMap((answer) => {
     const parsed = a4AnswerSchema.safeParse(answer);
     return parsed.success ? [parsed.data] : [];
   }) : [];
   return { spec, answers, revisionNo: revision?.revision_no ?? null };
+}
+/** The newest Aspire revision's spec and answers (the stage's record). */
+export function aspireSpecOf(state: Pick<A4ReadinessState, "revisions">): ReturnType<typeof stageSpecOf> {
+  return stageSpecOf(state, "aspire");
+}
+
+/** A carrying stage's answer gaps: unanswered, to ask again, not one of their question's values, and carried (carriedGaps). */
+export interface CarryingAnswerGaps { missing: string[]; stale: string[]; invalid: string[]; carried: string[] }
+/** The answers a later stage carries (`ids`), as the newest revision of `from` (Aspire unless named) records them (absent ones are left out). */
+export function carriedValuesOf(state: Pick<A4ReadinessState, "revisions">, ids: readonly string[], from: A4Stage = "aspire"): Map<string, unknown> {
+  const values = answerValues(stageSpecOf(state, from).answers);
+  return new Map(ids.filter((id) => values.has(id)).map((id) => [id, values.get(id)]));
+}
+/** The carried answers (`ids`) that are missing or no longer their stage's (`carried`, as carriedValuesOf reads them); fail closed: re-carry at Understand. */
+export function carriedGaps(ids: readonly string[], answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): string[] {
+  const values = answerValues(answers);
+  const byId = new Map(answers.map((answer) => [answer.questionId, answer]));
+  return ids.flatMap((id) => !carried.has(id) ? [] : !byId.has(id) ? [`CARRIED_MISSING:${id}`]
+    : JSON.stringify(values.get(id) ?? null) !== JSON.stringify(carried.get(id) ?? null) ? [`CARRIED_STALE:${id}`] : []);
+}
+/**
+ * Understand's carry at a later stage: the stage's own answers without the carried ids (`kept`), the values they give with
+ * the carried ones over them, and the carried answers recorded at `revisionNo` (`source: "carried"`).
+ */
+export function carryAnswers(answers: readonly A4Answer[], ids: readonly string[], carried: ReadonlyMap<string, unknown>, revisionNo: number):
+  { kept: A4Answer[]; values: Map<string, unknown>; carriedAnswers: A4Answer[] } {
+  const kept = answers.filter((answer) => !ids.includes(answer.questionId));
+  const values = answerValues(kept);
+  for (const [id, value] of carried) values.set(id, value);
+  const carriedAnswers: A4Answer[] = [...carried].map(([questionId, value]) => ({ questionId, value, source: "carried", answeredAtRevision: revisionNo,
+    dependencyDigest: dependencyDigest([], values) }));
+  return { kept, values, carriedAnswers };
+}
+/**
+ * Understand's answers at a stage whose own questions depend on carried ones (carryAnswers, sorted by question id): an
+ * answer given before a carried question it depends on had any value here (the answers route digested it as null) and
+ * current then is stamped against the values carried now; one given against another, earlier carried value stays stale.
+ */
+export function mergeCarried(questions: readonly A4Question[], answers: readonly A4Answer[], ids: readonly string[], carried: ReadonlyMap<string, unknown>,
+  revisionNo: number): A4Answer[] {
+  const { kept, values, carriedAnswers } = carryAnswers(answers, ids, carried, revisionNo);
+  const previous = answerValues(answers);
+  const restamp = (answer: A4Answer): A4Answer => {
+    const dependsOn = questions.find((entry) => entry.id === answer.questionId)?.dependsOn ?? [];
+    const firstCarry = dependsOn.some((id) => ids.includes(id) && (previous.get(id) ?? null) === null);
+    return firstCarry && answer.dependencyDigest === dependencyDigest(dependsOn, previous) ? { ...answer, dependencyDigest: dependencyDigest(dependsOn, values) } : answer;
+  };
+  return [...kept.map(restamp), ...carriedAnswers].sort((a, b) => a.questionId.localeCompare(b.questionId));
 }
 
 /** Quality targets with neither an evidence source (blank counts as none) nor `measure: "not instrumented"`. */
@@ -152,13 +213,7 @@ export const learningPlanSchema = z.array(z.strictObject({
   dependsOn: z.array(z.string()), status: z.literal("planned")
 })).min(1);
 
-type Fields = Partial<Omit<A4ReadinessItem, "id" | "status">>;
-const item = (id: string, status: A4ReadinessItem["status"], fields: Fields = {}): A4ReadinessItem => ({
-  id, status, kind: null, reasonCodes: [], section: "recommendation", evidence: [], claim: null, report: null, acknowledged: null,
-  nextAction: null, mandatory: true, bound: false, ...fields
-} as A4ReadinessItem);
-const waiting = (id: string, codes: string[], fields: Fields = {}): A4ReadinessItem =>
-  item(id, "WAITING", { kind: "evidence_missing", reasonCodes: codes, ...fields });
+const { item, waiting } = readinessItemBuilders("recommendation");
 
 /** Whether the project has reached `step` at Aspire (any later stage counts). */
 function reached(state: A4ReadinessState, step: A4Step): boolean {
@@ -279,16 +334,14 @@ function hypothesisItems(state: A4ReadinessState, spec: Record<string, unknown>,
 /** Aspire's readiness items (design §10.1); `sod` and the two gates are the governance items every stage carries. */
 export function aspireItems(state: A4ReadinessState, query: A4ReadinessQuery): A4ReadinessItem[] {
   const { spec, answers, revisionNo } = aspireSpecOf(state);
-  const gaps = answerGaps(answers);
+  const askCodes = askGapCodes(answerGaps(answers));
   return [
     !reached(state, "understood") ? waiting("understanding_confirmed", ["UNDERSTANDING_NOT_CONFIRMED"], { nextAction: { label: "Run Understand, then confirm it" } })
       // Answers do not change after Aspire; at Aspire a confirmation counts only for an understanding of the current answers.
       : state.project.stage === "aspire" && !understandingCurrent(spec, answers)
         ? waiting("understanding_confirmed", ["UNDERSTANDING_STALE"], { nextAction: { label: "Answers changed: run Understand again, then confirm it" } })
         : item("understanding_confirmed", "READY"),
-    gaps.missing.length + gaps.stale.length + gaps.invalid.length === 0 ? item("ask_complete", "READY")
-      : waiting("ask_complete", [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`),
-        ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`)], { nextAction: { label: "Answer or confirm the listed questions" } }),
+    askCodes.length === 0 ? item("ask_complete", "READY") : waiting("ask_complete", askCodes, { nextAction: { label: "Answer or confirm the listed questions" } }),
     ...proposalItems(spec, answers),
     ...buildItems(state, spec, revisionNo, query.live.driftedSlots),
     ...hypothesisItems(state, spec, query.now)

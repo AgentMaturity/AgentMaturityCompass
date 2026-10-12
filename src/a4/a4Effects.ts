@@ -40,12 +40,18 @@ export interface A4EffectContext {
   readonly approvalRequestId: string;
   /** Extra heartbeat for long steps; the runner already beats every 5 s. */
   readonly heartbeat: () => void;
+  /** The live principal whose request runs an `inline` effect's attempt; null for one run after the response. */
+  readonly principal: A4Principal | null;
 }
 export interface A4EffectOutcome {
   /** Recorded on EFFECT_FINISHED as an implementation-lane, self_reported ref. */
   readonly receipt?: { readonly refKind: A4RefKind; readonly refId: string; readonly sha256: string; readonly label: string };
   /** `consumes: "executor"` only: the engine's consumed record's executionId (design §6.1). */
   readonly consumedExecutionId?: string;
+  /** Signed onto EFFECT_FINISHED (an id projection, never a credential). */
+  readonly record?: Record<string, unknown>;
+  /** `inline` effects only: answered once in the response that ran the attempt (a lease token), never stored or journaled. */
+  readonly deliver?: Record<string, unknown>;
 }
 /** One effect a stage lane registers (design §6.1 table). */
 export interface A4EffectDef {
@@ -55,7 +61,8 @@ export interface A4EffectDef {
   /**
    * "A4": the runner consumes the engine grant as step 0. "executor": the executor consumes it itself and is never retried.
    * "gate": no effect gate and no engine request; the documentary gate's own quorum, consumed by GATE_CONSUMED in the same
-   * transaction, authorizes it (a workspace write its approvers saw in the bound spec, design §10.1 Aspire completion).
+   * transaction, authorizes it (a workspace write its approvers saw in the bound spec, design §10.1 Aspire completion);
+   * above WRITE_LOW, never for a `complete` or retry caller that quorum counted (plan rule 9).
    */
   readonly consumes: "A4" | "executor" | "gate";
   /**
@@ -68,6 +75,13 @@ export interface A4EffectDef {
    * stage's readiness may still require it), and it can no longer be opened on that consumed gate.
    */
   readonly optional?: boolean;
+  /**
+   * Runs inside the request that started the attempt (complete or retry), which answers its `deliver` once, so a
+   * credential it mints is never delivered to nobody. That request's replay row keeps the attempt id only (the store
+   * never sees the delivery), and a replay answers the attempt's outcome from the chain (src/a4/a4RouterStages.ts): token
+   * null with TOKEN_ALREADY_DELIVERED once it finished, its failure code otherwise. Every other effect runs after the response.
+   */
+  readonly inline?: boolean;
   /** Deterministic from the rows, e.g. `a4-apply-<manifestId>`. */
   readonly executionId: (state: A4ReadinessState, gate: A4GateRow) => string;
   /** The engine intent; the default binds the documentary gate's binding digest and the execution id. */
@@ -91,6 +105,8 @@ const lookupEffect = (id: string): A4EffectDef | undefined => {
   ensureA4Stages();
   return EFFECTS.get(id);
 };
+/** Whether effect `id` runs inline (inside the request that started its attempt; A4EffectDef.inline). */
+export const inlineEffect = (id: string): boolean => lookupEffect(id)?.inline === true;
 const effectDef = (id: string): A4EffectDef => {
   const def = lookupEffect(id);
   if (def === undefined) throw fail(404, "A4_EFFECT_UNKNOWN", `no A4 effect ${id} is registered`);
@@ -401,18 +417,39 @@ export function verifyAndConsumeEffect(store: A4Store, state: A4ReadinessState, 
 }
 
 /**
+ * Whether plan rule 9 (an effect's quorum excludes the `complete` caller) applies to `def` beyond the effect gate's own
+ * count: every engine-consumed effect, and a gate-quorum effect above WRITE_LOW (the production lease, a deploy). A
+ * WRITE_LOW gate-quorum write (Aspire's contracts) keeps the documentary gate's own rule.
+ */
+const callerExcluded = (def: A4EffectDef): boolean => def.consumes !== "gate" || (def.actionClass !== "READ_ONLY" && def.actionClass !== "WRITE_LOW");
+/**
+ * Plan rule 9 where the quorum was counted before this caller came (a gate-quorum effect at `complete`, a retry or re-run
+ * on a grant already consumed): a caller among the keys the quorum counted (`keys`, as GATE_CONSUMED or EFFECT_STARTED
+ * recorded them) never runs it, since an inline attempt delivers to its caller; keys not recorded refuse too (fail
+ * closed). 409 SOD_VIOLATION.
+ */
+export function assertCallerNotCounted(keys: unknown, principal: Pick<A4Principal, "key" | "username">): void {
+  if (!Array.isArray(keys) || keys.includes(principal.key)) {
+    throw fail(409, "SOD_VIOLATION", `${principal.username}: ${Array.isArray(keys) ? "an approver this effect's quorum counted"
+      : "the approvers this effect's quorum counted are not recorded, so the caller"} may not run it (the caller is excluded from an effect's quorum)`);
+  }
+}
+
+/**
  * `complete` for a stage whose completion triggers an effect (design §6.5): GATE_CONSUMED (with the resolved effect
  * approver keys) + EFFECT_STARTED (owner pid/host, heartbeat, engine request id, execution id) + the a4_effects row, in
- * one transaction. The caller then runs `runA4Effect(store, projectId, attemptId)` after the response, outside the lock.
+ * one transaction. A gate-quorum effect above WRITE_LOW is refused to a caller the gate counted (409 SOD_VIOLATION). The
+ * caller then runs `runA4Effect(store, projectId, attemptId)` after the response, outside the lock.
  */
-export function completeWithEffect(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; effectId: string;
+function completeWithEffect(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; effectId: string;
   expectedHeadSeq: number }): { result: A4TransitionResult; attemptId: string } {
   const def = effectDef(input.effectId);
   const attemptId = randomId("a4e");
-  const result = consumeGate(store, projectId, { ...input, response: { attemptId } }, ({ state, row, principal, regulated, ts }) => {
+  const result = consumeGate(store, projectId, { ...input, response: { attemptId } }, ({ state, row, principal, regulated, ts, approverKeys }) => {
     const executionId = def.executionId(state, row);
     // A gate-quorum effect is authorized by the GATE_CONSUMED this transaction writes; it has no engine request.
     if (def.consumes === "gate") {
+      if (callerExcluded(def)) assertCallerNotCounted(approverKeys, principal);
       return { payload: { effect: def.id }, specs: [{ kind: "EFFECT_STARTED", stage: row.stage, revisionNo: row.revision_no,
         payload: { effectId: attemptId, effect: def.id, gateId: row.gate_id, executionId, approvalRequestId: null, ownerPid: process.pid, ownerHost: hostname(), heartbeatTs: ts },
         startEffect: { effectId: attemptId, gateId: row.gate_id, executionId, approvalRequestId: null } }] };
@@ -497,7 +534,7 @@ export function completeStage(store: A4Store, projectId: string, input: A4Call &
 }
 
 /** EFFECT_FINISHED / EFFECT_FAILED by amc-runtime, settling the liveness row in the same transaction; once per attempt. */
-function settleEffect(store: A4Store, projectId: string, attemptId: string, kind: "EFFECT_FINISHED" | "EFFECT_FAILED", payload: Record<string, unknown>,
+export function settleEffect(store: A4Store, projectId: string, attemptId: string, kind: "EFFECT_FINISHED" | "EFFECT_FAILED", payload: Record<string, unknown>,
   receipt?: A4EffectOutcome["receipt"]): A4TransitionResult {
   return store.transition(projectId, A4_RUNTIME, ({ seq, ts }) => {
     const chain = store.readChain(projectId);
@@ -524,7 +561,8 @@ function settleEffect(store: A4Store, projectId: string, attemptId: string, kind
  * for a transient store error); if that still throws, the attempt stays unsettled and reads as lost (PROCESS_LOST /
  * outcome_unknown), never as a definite failure of an effect that ran.
  */
-export async function runA4Effect(store: A4Store, projectId: string, attemptId: string): Promise<A4TransitionResult> {
+export async function runA4Effect(store: A4Store, projectId: string, attemptId: string, principal: A4Principal | null = null):
+  Promise<A4TransitionResult & { readonly deliver?: Record<string, unknown> }> {
   const { workspace } = store;
   const failWith = (error: string): A4TransitionResult => settleEffect(store, projectId, attemptId, "EFFECT_FAILED", { error: error.slice(0, 500) });
   let outcome: A4EffectOutcome;
@@ -564,22 +602,27 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
     const timer = setInterval(beat, HEARTBEAT_MS);
     timer.unref();
     try {
-      outcome = await def.run({ workspace, state, gate, executionId, approvalRequestId, heartbeat: beat });
+      outcome = await def.run({ workspace, state, gate, executionId, approvalRequestId, heartbeat: beat, principal });
     } finally {
       clearInterval(timer);
     }
   } catch (error) {
-    return failWith(error instanceof Error ? error.message : String(error));
+    // An uncoded vault-locked throw (a lease key, an artifact signature, step 0's grant) is recorded as A4_VAULT_LOCKED, so
+    // the route, a replay and readiness all answer 423 with its code.
+    const text = error instanceof Error ? error.message : String(error);
+    return failWith(!/^[A-Z][A-Z0-9_]{2,63}/.test(text) && /vault locked/i.test(text) ? `A4_VAULT_LOCKED: ${text}` : text);
   }
   const finish = (): A4TransitionResult => settleEffect(store, projectId, attemptId, "EFFECT_FINISHED", { consumedExecutionId: outcome.consumedExecutionId ?? null,
-    receipt: outcome.receipt ?? null, slotChecks: Object.entries(bound).filter(([, value]) => value !== null).map(([slot, expected]) => ({ slot, expected, ok: true })) },
-  outcome.receipt);
+    receipt: outcome.receipt ?? null, slotChecks: Object.entries(bound).filter(([, value]) => value !== null).map(([slot, expected]) => ({ slot, expected, ok: true })),
+    ...(outcome.record === undefined ? {} : { record: outcome.record }) }, outcome.receipt);
+  let settled: A4TransitionResult;
   try {
-    return finish();
+    settled = finish();
   } catch {
     // A second throw propagates and leaves the attempt unsettled (lost), never EFFECT_FAILED.
-    return finish();
+    settled = finish();
   }
+  return outcome.deliver === undefined ? settled : { ...settled, deliver: outcome.deliver };
 }
 
 /**
@@ -606,7 +649,9 @@ export function sweepA4Effects(store: A4Store, staleAfterMs = DEFAULT_ACTION_STA
  * Retry (owner; design §6.5): only for effects A4 or the gate's quorum consumes, and only when the chain has a failure
  * and no finish for this execution id, no attempt of it is still running (the retry first settles lost ones), and the engine grant, if
  * consumed, was consumed by this execution id; one not consumed yet is verified as at `complete` (verifyAndConsumeEffect:
- * an expired, denied or cancelled grant, or an approver since revoked or removed, is refused). A second failure needs a new revision (409 EFFECT_NOT_RETRYABLE), and a
+ * an expired, denied or cancelled grant, or an approver since revoked or removed, is refused). On a grant already consumed,
+ * or the gate's own quorum, a caller that quorum counted is refused (409 SOD_VIOLATION; plan rule 9, assertCallerNotCounted),
+ * since an inline attempt delivers to its caller. A second failure needs a new revision (409 EFFECT_NOT_RETRYABLE), and a
  * failure whose stage was redone since its attempt started is cleared, not retried (409 A4_GATE_STALE). A new attempt with the same execution
  * id; executors that consume their own grant re-open the effect gate instead, and `complete` on the consumed gate runs
  * them again (`rerunExecutorEffect`).
@@ -641,6 +686,11 @@ export function retryEffect(store: A4Store, projectId: string, input: A4Call & {
     assertNotRedone(state, row.stage, failures.at(-1));
     const consumed = def.consumes === "gate" ? null : loadApprovalConsumed({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId });
     if (consumed !== null && consumed.executionId !== executionId) throw fail(409, "GRANT_ALREADY_USED", "The engine grant was consumed by another execution.");
+    // Counted before this caller came (the gate's quorum, or a grant already consumed): rule 9 against the keys GATE_CONSUMED recorded.
+    if ((consumed !== null || def.consumes === "gate") && callerExcluded(def)) {
+      const body = state.chain.find((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === row.gate_id)?.body;
+      assertCallerNotCounted(def.consumes === "gate" ? body?.approverKeys : body?.effectApproverKeys, principal);
+    }
     const { readiness, query } = evaluateFor(store, state, principal, input, row.stage, now);
     assertAllowed(readiness, "retryEffect");
     // Lost before step 0, the grant is still unconsumed and step 0 will consume it (markApprovalConsumed checks no status

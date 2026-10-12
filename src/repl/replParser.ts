@@ -29,6 +29,25 @@ interface NaturalMapping {
 
 const NATURAL_MAPPINGS: NaturalMapping[] = [
   // ════════════════════════════════════════════════════
+  // A4 FORGE (preview: AMC_A4_PREVIEW=1)
+  // ════════════════════════════════════════════════════
+  {
+    patterns: [/^a4\s+status\s+(a4p_[0-9a-f]{32})$/i],
+    command: "a4 readiness $1",
+    description: "Evaluating the A4 project's readiness",
+  },
+  {
+    patterns: [/^show\s+(?:a4\s+)?project\s+(a4p_[0-9a-f]{32})$/i],
+    command: "a4 show $1",
+    description: "Showing the A4 project",
+  },
+  {
+    patterns: [/^a4\s+status$/i, /^show\s+(?:a4\s+)?projects?$/i],
+    command: "a4 list",
+    description: "Listing A4 projects (add a project id for one project)",
+  },
+
+  // ════════════════════════════════════════════════════
   // SCORING & ASSESSMENT
   // ════════════════════════════════════════════════════
   {
@@ -462,6 +481,7 @@ export function getCompletions(): string[] {
     "doctor", "status", "setup", "dashboard", "up", "down", "logs",
     "adapters list", "mcp list-tools", "target show",
     "report --executive latest", "export sarif", "glossary", "version",
+    "a4 status", "show project", "a4 guide", "a4 list", "a4 show ", "a4 readiness ", "a4 verify ",
     "help", "exit", "quit", "clear",
   ];
 }

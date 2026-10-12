@@ -42,7 +42,12 @@ const artifactKindSchema = z.enum([
     "effective-policy-receipt",
     "a4-stage-output",
     "legal-hold",
-    "a4-binder"
+    "a4-binder",
+    "a4-package",
+    "a4-deployment-plan",
+    "a4-deployment-receipt",
+    "a4-rollback-receipt",
+    "a4-amc-check"
 ]);
 
 const artifactSignatureFields = {

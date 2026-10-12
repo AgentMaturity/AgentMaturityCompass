@@ -24,8 +24,8 @@ import { z, ZodError } from "zod";
 import { A4BlobError } from "../a4/a4Blobs.js";
 import { conformanceView } from "../a4/a4Conformance.js";
 import { evaluateFor, loadA4State } from "../a4/a4Gates.js";
-import { A4_API_PREFIX, headStage } from "../a4/a4Router.js";
-import { A4_STAGES, a4PreviewEnabled, type A4Member, type A4Principal, type A4ProjectRow, type A4ProjectV1, type A4Stage } from "../a4/a4Schema.js";
+import { A4_API_PREFIX, headStage, projectView } from "../a4/a4Router.js";
+import { A4_STAGES, a4PreviewEnabled, type A4Member, type A4Principal, type A4Stage } from "../a4/a4Schema.js";
 import { A4StoreError, openA4Store, type A4Store } from "../a4/a4Store.js";
 import { resolveApiRolePolicy } from "../api/accessPolicy.js";
 import { listVerifiedUsers, verifyUsersConfigSignature } from "../auth/authApi.js";
@@ -38,7 +38,7 @@ import { verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { unboundClaim, withClaim } from "./mcpClaimOutput.js";
 
 /** The MCP server config's env entry naming the `amc approvals login` token file; its path is never printed. */
-export const A4_SESSION_TOKEN_ENV = "AMC_A4_SESSION_TOKEN_FILE";
+const A4_SESSION_TOKEN_ENV = "AMC_A4_SESSION_TOKEN_FILE";
 
 const TOOLS = [
   { name: "amc_a4_list_projects", description: "List the A4 Forge projects this identity may read (read-only)", input: "{ workspace?: string }" },
@@ -193,14 +193,6 @@ const readinessAt = (ctx: Ctx, state: ReturnType<typeof loadA4State>, stage: A4S
 /** This process's signing probe is not READY: always, since it never holds the vault. */
 const signingHere = (readiness: ReturnType<typeof readinessAt>): boolean =>
   readiness.items.some((item) => item.id === "signing.available" && item.status !== "READY");
-
-/** `amc.a4-project/v1`, as the router's projectView builds it. */
-const projectView = (row: A4ProjectRow, members: readonly A4Member[], readiness: A4ProjectV1["readiness"]): A4ProjectV1 => ({
-  schema: "amc.a4-project/v1", projectId: row.project_id, workspaceId: row.workspace_id, agentId: row.agent_id, name: row.name, stage: row.stage,
-  step: row.step, hold: row.hold === 1, holdReason: row.hold_reason, revisionNo: row.revision_no, headSeq: row.head_seq, headDigest: row.head_digest,
-  deployedReleaseId: row.deployed_release_id, baseReleaseId: row.base_release_id, createdByKey: row.created_by_key, createdTs: row.created_ts,
-  updatedTs: row.updated_ts, members: [...members], readiness
-});
 
 async function a4Tool(host: Host, name: string, workspace: string | undefined, pathname: string, method: "GET" | "POST",
   handle: (ctx: Ctx) => ToolResult | Promise<ToolResult>): Promise<ToolResult> {
