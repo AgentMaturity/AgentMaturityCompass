@@ -131,6 +131,20 @@ Contract only: P1-02 builds it at the enforcement point and defines its digest
 - `agentSuppliedMetadata` is what the agent said. It is untrusted and no rule may read it.
 - Freshness: the record is valid only while `asOf` < `expiresAt`.
 
+## redaction-receipt
+
+Emitted in workspaces that opted in to protected-data redaction (P2-02): the payload of one `PROTECTED_DATA_REDACTED`
+audit row in a native session, written before the row it describes. It is local enforcement bookkeeping and is never
+maturity evidence. Rules the schema cannot express:
+
+- `sessionId` equals the session of the audit row that carries the receipt.
+- `callId` is non-null exactly when `source` is `tool/result`.
+- `redactedDigest` is the SHA-256 of the redacted text: a message, queued input, a tool result, or an attachment's
+  content or file name (each redacted separately). For a tool result above the spill cap it equals the spill's
+  `contentSha256`. It is never a digest of a raw value.
+- `findings` are heuristic detections and declared-field matches. They do not show that nothing was missed, and a
+  token in the redacted text is a pseudonym, not de-identified or anonymized data.
+
 ## control-result
 
 Contract only: P1-11 emits it. The schema already refuses `pass` unless applicability is `applicable` and evidence is

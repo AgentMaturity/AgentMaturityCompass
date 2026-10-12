@@ -17,6 +17,7 @@ import type { LoopLlm, LoopRoute } from "./stepRunner.js";
 import type { TurnCancelCause, TurnEndReason } from "../session/sessionTypes.js";
 import type { EvidenceEvent } from "../types.js";
 import { SessionService } from "../session/sessionService.js";
+import { redactingSessionFor } from "../dataflow/redactingSession.js";
 import { resumeSession } from "../session/sessionResume.js";
 import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 
@@ -140,11 +141,12 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
     const compaction = init.compaction === undefined ? undefined : resolveCompactionConfig(init.compaction);
     const sessionId = init.sessionId ?? randomUUID();
-    const session = claimant === undefined ? new SessionService(workspace) : resumeSession({
+    // P2-02: in an opted-in workspace, messages and tool results are tokenized before any row is committed.
+    const session = redactingSessionFor(claimant === undefined ? new SessionService(workspace) : resumeSession({
       workspace, sessionId, agentId: init.agentId,
       harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest,
       policyDigest: init.policyDigest, claimant
-    }).service;
+    }).service);
     // The toolset writes its tool evidence into THIS session rather than into
     // `agentToolset`'s default `toolset-<agentId>`, which nothing ever starts --
     // so a run that actually called a tool left rows referencing a session with no

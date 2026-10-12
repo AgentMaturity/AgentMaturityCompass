@@ -70,6 +70,14 @@ export const toolDefinitionSchema = z.object({
     resourceId: z.string().min(1).max(128).optional(),
     resourceVersion: z.string().min(1).max(128).optional()
   }).strict().optional(),
+  // Result fields that carry protected data (P2-02), as dot paths into the tool's JSON result: `patient.name: phi`. In a
+  // workspace with a processor registry, a native session tokenizes them before the result is committed. An array
+  // applies the rest of the path to each element; a path ending at an object or array covers every value beneath it.
+  protectedFields: z.record(
+    z.string().regex(/^[A-Za-z0-9_$-]{1,64}(?:\.[A-Za-z0-9_$-]{1,64}){0,15}$/)
+      .refine(path => !path.split(".").some(part => ["__proto__", "constructor", "prototype"].includes(part)), "reserved path segment"),
+    z.enum(["phi", "pii", "card_number", "bank_account", "credential"])
+  ).refine(fields => Object.keys(fields).length <= 256, "at most 256 protected fields").optional(),
   // What the tool's effect is and how AMC settles it (P1-04). `repeatable` is true only when repeating the effect is
   // harmless. `idempotency` names where AMC's per-execution key travels: an HTTP header the body sets, or an argument AMC
   // fills (excluded from the arguments digest). `reconcile` names the adapter that asks the system of record.
