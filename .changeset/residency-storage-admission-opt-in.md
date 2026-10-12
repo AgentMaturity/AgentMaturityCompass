@@ -1,0 +1,9 @@
+---
+"agent-maturity-compass": patch
+---
+
+Residency storage admission and egress checks are opt-in when the control checkpoint root (`AMC_CONTROL_CHECKPOINT_DIR`, default `~/.amc/control-checkpoints`) sits outside the workspace: a workspace with no destination registry (`.amc/residency/destinations.yaml` or its `.sig`) and no active compiled plan is not checked (`no_rule`). A present but invalid registry, or an active plan that does not verify, still refuses, and a journal deleted behind its host checkpoints is still an integrity failure.
+
+A workspace that contains its checkpoint root (for example after `amc init` in the home directory) cannot anchor its control journal, so a missing plan there cannot be told apart from a deleted one. It stays refused (fail closed, P0-57), but now under its own name instead of `registry_unverifiable (active_policy_unverifiable)` or advice to restore `.amc/control-plan/`: `registry_unverifiable (control_checkpoint_root_in_workspace)` from residency checks, `ControlCheckpointRootInWorkspaceError` from the compiled-plan loader and the agent toolset, and `NATIVE_CONTROL_CHECKPOINT_ROOT_IN_WORKSPACE` from Studio. Each message names `AMC_CONTROL_CHECKPOINT_DIR` and the condition without host paths, because these messages reach HTTP and tool responses. The fix is to set `AMC_CONTROL_CHECKPOINT_DIR` to a directory outside the workspace. Legal-hold reads there report `control_checkpoint_root_in_workspace` instead of `record_corrupt` or `registry_unreadable`, and deletion stays refused.
+
+`LlmRuntime` also no longer requires a session workspace at construction. The workspace is read when a check runs: the egress check refuses a missing one as `workspace_scope_required`, and protected-data admission treats it as an invalid registry, not a missing one.
