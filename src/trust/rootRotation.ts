@@ -22,8 +22,7 @@ import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { carryHighWaterMarks, compareHighWater, highWaterIds, highWaterKey, readHighWater, recordHighWater } from "../keys/highWater.js";
 import { containedExists, listContainedDir, readContained, readContainedOrNull, writeContained } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { isExactIsoTime } from "../utils/time.js";
-import { canonicalize, isCanonicalSignatureBase64, parseCanonicalJson } from "../utils/json.js";
+import { canonicalize, isCanonicalSignatureBase64, isExactIsoTime, parseCanonicalJson } from "../utils/json.js";
 import { canonicalEd25519Pem, ed25519KeyId, parseTrustJson, parseTrustValue, TrustListError } from "./trustList.js";
 
 const DOMAIN = "amc.root-rotation/v1";

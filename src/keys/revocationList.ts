@@ -12,8 +12,7 @@ import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 import { ed25519KeyId } from "../trust/trustList.js";
 import { readContainedOrNull, removeContained, writeContained } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { isExactIsoTime } from "../utils/time.js";
-import { canonicalize, isCanonicalSignatureBase64, parseCanonicalJson } from "../utils/json.js";
+import { canonicalize, isCanonicalSignatureBase64, isExactIsoTime, parseCanonicalJson } from "../utils/json.js";
 import { assertNotRolledBack, loggedAnchor, markSequence, type AnchorTarget } from "./anchors.js";
 
 const DOMAIN_TAG = "AMC_REVOCATION_LIST_V1";

@@ -15,8 +15,7 @@ import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 import { KEY_PURPOSES, type KeyPurpose } from "../trust/keyPurposes.js";
 import { canonicalEd25519Pem, ed25519KeyId } from "../trust/trustList.js";
 import { sha256Hex } from "../utils/hash.js";
-import { isExactIsoTime } from "../utils/time.js";
-import { canonicalize, isCanonicalSignatureBase64, parseCanonicalJson } from "../utils/json.js";
+import { canonicalize, isCanonicalSignatureBase64, isExactIsoTime, parseCanonicalJson } from "../utils/json.js";
 
 export const ROTATION_REASONS = ["scheduled", "superseded", "purpose-split", "key-compromise"] as const;
 export type RotationReason = (typeof ROTATION_REASONS)[number];
