@@ -28,7 +28,7 @@ import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { resolveProviderHookRequestIdentity } from "./hookActionIdentity.js";
 import type { ShellCommandConnector, ShellCommandPlan } from "../enforce/shellCommandPlan.js";
 import {
-  canonicalToolRequests, CONTROL_HOOK_EVENTS, controlDecisionSchema, controlMappingValid, HookControlError, hookCall, hookCallRefusal,
+  canonicalToolRequests, CONTROL_HOOK_EVENTS, controlDecisionSchema, controlMappingValid, HookControlError, hookCall, hookCallRefusal, openHookEnvelope,
   materializeProviderDecision, parseProvider, providerSchema, runtimeFor, serializeProviderControlResponse, validateProviderControlResponse,
   type CanonicalToolRequest, type HookCall, type HookControlDecision, type HookControlOutcome, type HookControlProviderMapping,
   type HookProvider, type ProviderControlResponse,
@@ -296,12 +296,10 @@ function normalizeControlResult(
 }
 
 
-function parseProviderInput(rawInput: string): z.infer<typeof providerHookInputSchema> {
-  if (Buffer.byteLength(rawInput, "utf8") > MAX_CONTROL_HOOK_BODY_BYTES) {
-    throw new HookControlError("HOOK_CONTROL_INPUT_TOO_LARGE", 413, "provider hook input exceeds 256 KiB");
-  }
-  let value: unknown;
-  try {
+/** `payload`: the Claude Code payload AMC's envelope carried, already strictly read (openHookEnvelope). */
+function parseProviderInput(rawInput: string, payload?: unknown): z.infer<typeof providerHookInputSchema> {
+  let value: unknown = payload;
+  if (payload === undefined) try {
     value = JSON.parse(rawInput) as unknown;
   } catch {
     throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, "provider hook input must be valid JSON");
@@ -323,11 +321,15 @@ function normalizeProviderRequest(input: {
   provider: HookProvider;
   rawInput: string;
 }): NormalizedProviderToolRequest {
-  const parsed = parseProviderInput(input.rawInput);
+  if (Buffer.byteLength(input.rawInput, "utf8") > MAX_CONTROL_HOOK_BODY_BYTES) {
+    throw new HookControlError("HOOK_CONTROL_INPUT_TOO_LARGE", 413, "provider hook input exceeds 256 KiB");
+  }
+  const envelope = input.provider === "claude-code" ? openHookEnvelope(input.rawInput) : null;
+  const parsed = parseProviderInput(input.rawInput, envelope?.payload);
   const expectedEvent = CONTROL_HOOK_EVENTS[input.provider];
   if (parsed.hook_event_name !== expectedEvent) throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, `hook control accepts only ${expectedEvent} events`);
   const rawInputSha256 = sha256Hex(Buffer.from(input.rawInput, "utf8"));
-  const call = hookCall(input.provider, parsed);
+  const call = hookCall(input.provider, parsed, envelope);
   const identity = resolveProviderHookRequestIdentity({
     provider: input.provider,
     // A Pi or Claude Code action id is AMC's own derivation from the session and call id, never an id the payload names.
@@ -975,7 +977,7 @@ export function evaluateProviderHookControl(input: {
       requestedDecision: requested.decision,
       reason: requested.reason,
     });
-    const bound = request.call ? boundDecisionFacts(request.call, version, authorization) : {};
+    const bound = request.call ? boundDecisionFacts(request.call, { version, authorization, lease: input.lease, targets: request.canonicalRequests }) : {};
     const payload = {
       kind: "hook_control_decision",
       version: 2,

@@ -9,6 +9,7 @@ import { mkdirSync, readdirSync, readFileSync, realpathSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { installHookIntegration } from "../../src/adapters/hookIntegration.js";
 import { cachedFileSha256 } from "../../src/adapters/pi/piInstall.js";
+import { claudeEnvelope } from "../../src/adapters/hookProviders/claudeCodePayloads.js";
 import { handleHookControlRequest } from "../../src/bridge/hookControlRoute.js";
 import { evaluateProviderHookControl } from "../../src/bridge/hookControl.js";
 import { controlledWorkspace } from "./piHookFixtures.js";
@@ -38,9 +39,10 @@ export function boundClaudeCode(version = CLAUDE_CODE_VERSION) {
 }
 
 /** A workspace with signed policies and a signed Claude Code control installation, with no managed settings. */
-export function claudeWorkspace(options: { version?: string; register?: boolean } = {}): string {
+export function claudeWorkspace(options: { version?: string; register?: boolean; bridgeBase?: string } = {}): string {
   const workspace = controlledWorkspace(agentId);
-  installHookIntegration({ workspace, provider: "claude-code", agentId, mode: "control", claudeCodeInstall: boundClaudeCode(options.version) });
+  installHookIntegration({ workspace, provider: "claude-code", agentId, mode: "control", claudeCodeInstall: boundClaudeCode(options.version),
+    ...(options.bridgeBase ? { bridgeBase: options.bridgeBase } : {}) });
   if (options.register !== false) register(workspace, String(recorded("SessionStart-startup", workspace).session_id));
   return workspace;
 }
@@ -52,9 +54,9 @@ export function register(workspace: string, sessionId: string, configDir = join(
     rawInput: JSON.stringify({ hook_event_name: "SessionStart", session_id: sessionId, amc: { claudePid: pid, configDir } }) });
 }
 
-/** The PreToolUse request AMC's forwarder sends: Claude Code's payload plus a fresh nonce. */
-export function controlRequest(payload: Record<string, unknown>, nonce: string = randomUUID()): string {
-  return JSON.stringify({ ...payload, amc: { nonce } });
+/** The PreToolUse request AMC's forwarder sends: Claude Code's payload bytes in AMC's envelope with a fresh nonce. */
+export function controlRequest(payload: Record<string, unknown> | Buffer, nonce: string = randomUUID()): string {
+  return claudeEnvelope(Buffer.isBuffer(payload) ? payload : Buffer.from(JSON.stringify(payload), "utf8"), nonce);
 }
 
 export function decide(workspace: string, rawInput: string) {

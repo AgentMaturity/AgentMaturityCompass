@@ -16,6 +16,8 @@ import { assertContract } from "../contracts/index.js";
 import type { ActionReceiptMembers } from "../receipts/receipt.js";
 import { planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
 import type { ActionClass } from "../types.js";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import { CONTROL_HOOK_EVENTS, type HookCall, type HookControlDecision, type HookProvider, type PiControlContext } from "./hookProviders.js";
 
 /** The canonical tool an authorization record names: the highest-class one the decision evaluated. */
@@ -151,14 +153,21 @@ export function authorizeHookDecision<R extends { decision: string; reason: stri
 
 /**
  * What a decision's ledger row records about its call: the provider version its session bound, the authorization
- * record digest, and the tool, class and argument digest it authorized, which PostToolUse compares with what ran.
+ * record digest, and the tool, class and argument digest it authorized, which PostToolUse compares with what ran. For
+ * Claude Code also the lease that obtained it (only that lease may report the call's outcome), the SHA-256 of the
+ * payload bytes as Claude Code sent them, and of the targets AMC resolved (paths followed through symlinks) when it
+ * decided: what the decision covers.
  */
-export function boundDecisionFacts(call: HookCall, version: string | null, authorization: HookAuthorization | null): Record<string, unknown> {
+export function boundDecisionFacts(call: HookCall, facts: { version: string | null; authorization: HookAuthorization | null; lease?: HookLease;
+  targets: ReadonlyArray<{ name: string; args: Record<string, unknown> }> }): Record<string, unknown> {
+  const { authorization } = facts;
   return {
-    [call.pi ? "piVersion" : "claudeCodeVersion"]: version,
+    [call.pi ? "piVersion" : "claudeCodeVersion"]: facts.version,
     authorizationRecordDigest: authorization?.ok ? authorization.digest : null,
     ...(authorization?.ok ? { authorizedAction: { toolName: authorization.record.action.toolName, actionClass: authorization.record.action.actionClass,
       argumentsDigest: authorization.record.action.argumentsDigest } } : {}),
+    ...(call.pi ? {} : { leaseId: facts.lease?.leaseId ?? null, claudePayloadSha256: call.payloadSha256,
+      resolvedTargetsSha256: sha256Hex(canonicalize(facts.targets.map(({ name, args }) => ({ name, args })))) }),
   };
 }
 

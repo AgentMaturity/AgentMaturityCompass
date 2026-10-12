@@ -1657,6 +1657,7 @@ function studioSchemas(): Record<string, unknown> {
             },
             evidenceEventIds: { type: "array", items: { type: "string" } },
             receiptIds: { type: "array", items: { type: "string" } },
+            authorizationMismatch: { type: ["boolean", "null"] }, observationConflict: { type: "boolean" },
             rawProviderPayloadStored: { type: "boolean", const: false },
             claimBoundary: { type: "string" },
           },

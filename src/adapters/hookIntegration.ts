@@ -281,7 +281,7 @@ function managedPaths(workspaceInput: string, provider: ConfigHookProvider): Man
   };
 }
 
-export function parseUnambiguousJson(text: string, kind: "config" | "input"): unknown {
+function parseUnambiguousJson(text: string, kind: "config" | "input"): unknown {
   const bytes = Buffer.byteLength(text, "utf8");
   if (kind === "input" && bytes > MAX_PROVIDER_HOOK_INPUT_BYTES) {
     throw new HookIntegrationError("HOOK_INPUT_TOO_LARGE", "provider hook input exceeds 256 KiB");
@@ -364,6 +364,8 @@ function expectedHandler(input: {
   agentId: string;
   bridgeBase: string;
   tokenPath: string;
+  /** Claude Code: the event this handler is installed for; the forwarder refuses a payload naming another. */
+  eventName?: NativeHookEventName;
 }): JsonObject {
   const args = forwardArgs(input);
   if (input.provider === "claude-code") {
@@ -372,7 +374,7 @@ function expectedHandler(input: {
     return {
       type: "command",
       command: process.execPath,
-      args: [amcCliScriptPath(input.mode, import.meta.url, "forwarder"), ...args.slice(3)],
+      args: [amcCliScriptPath(input.mode, import.meta.url, "forwarder"), ...args.slice(3), ...(input.eventName ? ["--event", input.eventName] : [])],
       timeout: CLAUDE_HOOK_TIMEOUT_SECONDS,
       statusMessage: input.mode === "control" ? CLAUDE_CONTROL_STATUS_MESSAGE : CLAUDE_STATUS_MESSAGE,
       ...(input.mode === "control" ? { onFailure: "block" } : {}),
@@ -404,7 +406,7 @@ export function expectedClaudeControlHandler(workspaceInput: string): JsonObject
   const bridgeBase = normalizeBridgeBase(manifest.bridgeBase);
   assertControlBridgeLocal("control", bridgeBase);
   const agentId = validateAgentId(manifest.agentId);
-  return expectedHandler({ workspace, provider: "claude-code", mode: "control", agentId, bridgeBase, tokenPath: paths.token });
+  return expectedHandler({ workspace, provider: "claude-code", mode: "control", agentId, bridgeBase, tokenPath: paths.token, eventName: "PreToolUse" });
 }
 
 function handlerHash(handler: JsonObject): string {
@@ -716,14 +718,14 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
     const { path: approvalPath, sigPath: approvalSigPath, before: approvalBefore, sigBefore: approvalSigBefore } =
       controlApprovalPolicy(workspace, mode);
 
-    const desiredHandler = expectedHandler({ workspace, provider, mode, agentId, bridgeBase, tokenPath: paths.token });
-    const claudeCode = provider === "claude-code" && mode === "control" ? claudeCodeBinding(options, String((desiredHandler.args as string[])[0])) : undefined;
-    const desiredHandlerHash = handlerHash(desiredHandler);
-    const desiredHandlers = providerHookSpecs(provider, mode).map((spec) => ({
-      ...spec,
-      handler: desiredHandler,
-      handlerSha256: desiredHandlerHash,
-    }));
+    // Claude Code: one handler per event, each naming its event, so a payload of another event is refused.
+    const handlerFor = (eventName: NativeHookEventName) => expectedHandler({ workspace, provider, mode, agentId, bridgeBase, tokenPath: paths.token,
+      ...(provider === "claude-code" ? { eventName } : {}) });
+    const claudeCode = provider === "claude-code" && mode === "control" ? claudeCodeBinding(options, String((handlerFor("PreToolUse").args as string[])[0])) : undefined;
+    const desiredHandlers = providerHookSpecs(provider, mode).map((spec) => {
+      const handler = handlerFor(spec.eventName);
+      return { ...spec, handler, handlerSha256: handlerHash(handler) };
+    });
     const desiredBindings = desiredHandlers.map((row) => ({
       eventName: row.eventName,
       handlerSha256: row.handlerSha256,
@@ -989,6 +991,9 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
   }
   let configOwned = manifest ? bindingsEqual(handlerBindings(owned), manifestBindings(manifest)) : false;
   if (manifest && owned.length === 0) issues.push("managed hook handler is missing from provider config");
+  // AMC installs every Claude Code hook with the `*` matcher; a narrower one lets some tools skip AMC, so nothing reads enforced.
+  const narrowed = provider === "claude-code" && owned.some((row) => (eventGroups(config.value, row.eventName, false)?.[row.groupIndex] as JsonObject).matcher !== "*");
+  if (narrowed) issues.push("AMC's Claude Code hooks do not match every tool (a matcher other than *)");
   if (manifest && owned.length > 0 && !configOwned) {
     issues.push("managed hook handler set differs from the signed installation manifest");
     configOwned = false;
@@ -1012,7 +1017,7 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
     state = "invalid";
   } else if (lease.expired) {
     state = "expired";
-  } else if (!configOwned || manifest?.v === 1 || claude?.drifted || (manifest && config.raw !== null && sha256Hex(Buffer.from(config.raw, "utf8")) !== manifest.configSha256)) {
+  } else if (!configOwned || manifest?.v === 1 || claude?.drifted || narrowed || (manifest && config.raw !== null && sha256Hex(Buffer.from(config.raw, "utf8")) !== manifest.configSha256)) {
     state = "drifted";
   }
   // Only an intact installation keeps an enforced claim; a drifted, expired or invalid one is not governed.

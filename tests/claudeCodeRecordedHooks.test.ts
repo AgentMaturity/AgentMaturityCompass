@@ -240,7 +240,7 @@ describe("recorded Claude Code 2.1.296 payloads", () => {
     expect(allowed.decision).toBe("allow");
     const post = recorded("PostToolUse-read", workspace);
     const same = route(workspace, { hook_event_name: "PostToolUse", session_id: post.session_id, tool_use_id: post.tool_use_id, tool_name: "Read",
-      tool_input: input, ingressRecorded: true });
+      tool_input: input, ingressRecorded: true, decisionReceiptSha256: allowed.receiptSha256 });
     expect(decisionRow(workspace, String(same.eventId)).meta).toMatchObject({ matched: true, authorizationMismatch: false });
     expect(inspectHookActionLifecycle({ workspace, agentId, actionId: allowed.actionId }).authorizationMismatch).toBe(false);
 
@@ -249,14 +249,14 @@ describe("recorded Claude Code 2.1.296 payloads", () => {
     expect(second.decision).toBe("allow");
     const rewritten = recorded("PostToolUse-rewritten-by-another-hook", workspace);
     const changed = route(workspace, { hook_event_name: "PostToolUseFailure", session_id: post.session_id, tool_use_id: "toolu_rewritten",
-      tool_name: "Read", tool_input: { ...input, offset: 2, note: (rewritten.tool_input as Record<string, unknown>).command }, ingressRecorded: true });
+      tool_name: "Read", tool_input: { ...input, offset: 2, note: (rewritten.tool_input as Record<string, unknown>).command }, ingressRecorded: true,
+      decisionReceiptSha256: second.receiptSha256 });
     expect(decisionRow(workspace, String(changed.eventId)).meta).toMatchObject({ authorizationMismatch: true, reported: { by: "claude-code", outcome: "failed" } });
     expect(inspectHookActionLifecycle({ workspace, agentId, actionId: second.actionId }).authorizationMismatch).toBe(true);
 
-    // A tool that ran with no allow decision AMC bound is a mismatch too, recorded as unmatched.
-    const unbound = route(workspace, { hook_event_name: "PostToolUse", session_id: post.session_id, tool_use_id: "toolu_never_decided", tool_name: "Read",
-      tool_input: input, ingressRecorded: true });
-    expect(decisionRow(workspace, String(unbound.eventId)).meta).toMatchObject({ matched: false, authorizationMismatch: true, authorizedArgumentsDigest: null });
+    // A tool that ran with no decision AMC bound is recorded as unmatched and refused.
+    expect(() => route(workspace, { hook_event_name: "PostToolUse", session_id: post.session_id, tool_use_id: "toolu_never_decided", tool_name: "Read",
+      tool_input: input, ingressRecorded: true, decisionReceiptSha256: null })).toThrowError(/recorded this outcome as unmatched/);
   });
 
   test("the forwarder answers each session hook as its event needs when AMC is unreachable: deny, block, never force a stop", async () => {

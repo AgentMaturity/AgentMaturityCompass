@@ -352,8 +352,14 @@ describe("AMC provider hook integration", () => {
     expect([CLAUDE_STATUS_MESSAGE, CLAUDE_CONTROL_STATUS_MESSAGE]).toEqual([`AMC Observe [${HOOK_INTEGRATION_ID}]`, `AMC Control [${HOOK_CONTROL_INTEGRATION_ID}]`]);
     const owned = Object.values(config.hooks).flat().flatMap((group) => group.hooks).filter((handler) => handler.statusMessage === CLAUDE_CONTROL_STATUS_MESSAGE);
     expect(owned).toHaveLength(6);
-    expect(new Set(owned.map((handler) => JSON.stringify(handler))).size).toBe(1);
-    expect(owned[0]).toMatchObject({ type: "command", command: process.execPath, timeout: 10, onFailure: "block" });
+    // One handler per event, identical but for the event it names, which the forwarder enforces.
+    for (const [event, groups] of Object.entries(config.hooks)) {
+      for (const handler of groups.flatMap((group) => group.hooks).filter((row) => row.statusMessage === CLAUDE_CONTROL_STATUS_MESSAGE)) {
+        expect((handler.args as string[]).slice(-2), event).toEqual(["--event", event]);
+        expect(handler).toMatchObject({ type: "command", command: process.execPath, timeout: 10, onFailure: "block" });
+      }
+    }
+    for (const groups of Object.values(config.hooks)) expect(groups.every((group) => group.hooks.some((row) => row.statusMessage !== CLAUDE_CONTROL_STATUS_MESSAGE) || group.matcher === "*")).toBe(true);
     const manifest = readJson(paths.manifest) as { handlers: Array<{ eventName: string; phase: string }>; claudeCode: Record<string, any> };
     expect(manifest.handlers.map((row) => [row.eventName, row.phase])).toEqual([["PostToolUse", "completed"], ["PostToolUseFailure", "failed"],
       ["PreToolUse", "requested"], ["SessionStart", "session-start"], ["Stop", "turn-end"], ["UserPromptSubmit", "prompt-submit"]]);
@@ -402,11 +408,13 @@ describe("AMC provider hook integration", () => {
     expect(legacyHandler.command).toBe("amc");
     expect((legacyHandler.args as string[])[0]).toBe("connect");
     const manifest = readJson(paths.manifest) as Record<string, any>;
-    const legacyHash = sha256Hex(canonicalize(legacyHandler));
+    // Each event's legacy handler (P1-23 handlers name their event, so each has its own digest).
+    const legacyHashFor = (event: string) => sha256Hex(canonicalize(config.hooks[event]!.flatMap((group) => group.hooks)
+      .find((handler) => String(handler.statusMessage).startsWith("AMC Control"))!));
     writeJson(paths.manifest, {
       ...manifest,
       configSha256: sha256Hex(Buffer.from(legacyText, "utf8")),
-      handlers: manifest.handlers.map((row: Record<string, unknown>) => ({ ...row, handlerSha256: legacyHash })),
+      handlers: manifest.handlers.map((row: Record<string, unknown>) => ({ ...row, handlerSha256: legacyHashFor(String(row.eventName)) })),
     });
     signFileWithAuditor(workspace, paths.manifest);
     expect(getHookIntegrationStatus({ workspace, provider: "claude-code" }).state).toBe("installed");

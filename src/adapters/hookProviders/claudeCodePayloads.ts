@@ -5,7 +5,9 @@
  * tool's input with a field its schema lacks is refused, so AMC never decides on a reading of the payload that differs
  * from the one Claude Code acts on.
  */
+import { createHash } from "node:crypto";
 import { z } from "zod";
+import YAML from "yaml";
 
 const id = z.string().min(1).max(256);
 const path = z.string().min(1).max(4096);
@@ -34,8 +36,7 @@ function schemas2_1_296() {
       z.strictObject({ ...common, hook_event_name: z.literal("Stop"), stop_hook_active: z.boolean(), last_assistant_message: z.string().optional(),
         background_tasks: z.array(z.unknown()).optional(), session_crons: z.array(z.unknown()).optional() }),
     ]),
-    /** What AMC's forwarder sends to the control route for PreToolUse: Claude Code's payload plus a fresh nonce. */
-    controlRequest: z.strictObject({ ...common, hook_event_name: z.literal("PreToolUse"), ...tool, amc: z.strictObject({ nonce: z.string().min(16).max(128) }) }),
+    preToolUse: z.strictObject({ ...common, hook_event_name: z.literal("PreToolUse"), ...tool }),
     /** The inputs of the tools AMC maps (`BashInput`, `FileReadInput`, … in the release's sdk-tools.d.ts). */
     toolInputs: {
       Bash: z.strictObject({ command: z.string(), description: z.string().optional(), timeout: count.optional(), run_in_background: z.boolean().optional(),
@@ -56,29 +57,98 @@ function schemas2_1_296() {
 /** The schemas of each qualified release; a release qualifies only with a passing conformance receipt. */
 export const CLAUDE_HOOK_SCHEMAS: Readonly<Record<string, ReturnType<typeof schemas2_1_296>>> = { "2.1.296": schemas2_1_296() };
 export type ClaudeHookPayload = z.infer<ReturnType<typeof schemas2_1_296>["payload"]>;
-export type ClaudeControlRequest = z.infer<ReturnType<typeof schemas2_1_296>["controlRequest"]>;
+export type ClaudePreToolUse = z.infer<ReturnType<typeof schemas2_1_296>["preToolUse"]>;
 
 export function claudeHookSchemasFor(version: string | null | undefined): ReturnType<typeof schemas2_1_296> | null {
   return version && Object.hasOwn(CLAUDE_HOOK_SCHEMAS, version) ? CLAUDE_HOOK_SCHEMAS[version]! : null;
 }
 
-/** A control request some qualified release's schema accepts, or null. The session's registration names the release that must. */
-export function parseQualifiedControlRequest(input: unknown): ClaudeControlRequest | null {
+/** A PreToolUse payload some qualified release's schema accepts, or null. The session's registration names the release that must. */
+export function parseQualifiedPreToolUse(input: unknown): ClaudePreToolUse | null {
   for (const schemas of Object.values(CLAUDE_HOOK_SCHEMAS)) {
-    const parsed = schemas.controlRequest.safeParse(input);
+    const parsed = schemas.preToolUse.safeParse(input);
     if (parsed.success) return parsed.data;
   }
   return null;
 }
 
-/** Why a control request does not match release `version`'s schemas (the request, and a mapped tool's input), or null. */
+/** Why a PreToolUse payload does not match release `version`'s schemas (the payload, and a mapped tool's input), or null. */
 export function claudeRequestRefusal(version: string, request: unknown): string | null {
   const schemas = claudeHookSchemasFor(version);
   if (!schemas) return `AMC has no payload schema for Claude Code ${version}, so AMC denied the call.`;
-  const parsed = schemas.controlRequest.safeParse(request);
+  const parsed = schemas.preToolUse.safeParse(request);
   if (!parsed.success) return `The PreToolUse payload does not match Claude Code ${version}'s, so AMC denied the call.`;
   const toolSchema = Object.hasOwn(schemas.toolInputs, parsed.data.tool_name) ? schemas.toolInputs[parsed.data.tool_name] : undefined;
   return toolSchema && !toolSchema.safeParse(parsed.data.tool_input).success
     ? `The ${parsed.data.tool_name} input does not match Claude Code ${version}'s ${parsed.data.tool_name} schema, so AMC denied the call.`
     : null;
+}
+
+/** Why a payload's bytes have more than one reading. */
+export class ClaudePayloadError extends Error {
+  constructor(readonly kind: "ambiguous" | "invalid", message: string) {
+    super(message);
+    this.name = "ClaudePayloadError";
+  }
+}
+
+const LONE_SURROGATE = /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/;
+
+function assertWellFormed(value: unknown): void {
+  if (typeof value === "string") {
+    if (LONE_SURROGATE.test(value)) throw new ClaudePayloadError("invalid", "the payload holds a lone surrogate");
+  } else if (Array.isArray(value)) {
+    value.forEach(assertWellFormed);
+  } else if (value !== null && typeof value === "object") {
+    for (const [key, item] of Object.entries(value)) {
+      assertWellFormed(key);
+      assertWellFormed(item);
+    }
+  }
+}
+
+/**
+ * Claude Code's hook payload bytes, read the one way they can be read: strict UTF-8 with no byte-order mark, JSON with
+ * no repeated key, and no lone surrogate in any string or key. Anything else could be read one way by AMC and another
+ * by Claude Code, so it is refused.
+ */
+export function strictClaudeJson(bytes: Buffer): { text: string; value: unknown } {
+  if (bytes.length >= 3 && bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf) throw new ClaudePayloadError("invalid", "the payload starts with a byte-order mark");
+  let text: string;
+  try {
+    text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+  } catch {
+    throw new ClaudePayloadError("invalid", "the payload is not valid UTF-8");
+  }
+  let value: unknown;
+  try {
+    value = JSON.parse(text) as unknown;
+  } catch {
+    throw new ClaudePayloadError("invalid", "the payload is not JSON");
+  }
+  if (YAML.parseDocument(text, { uniqueKeys: true }).errors.some((error) => /unique|duplicate/i.test(error.message))) {
+    throw new ClaudePayloadError("ambiguous", "the payload repeats a JSON key");
+  }
+  assertWellFormed(value);
+  return { text, value };
+}
+
+const BASE64 = /^[A-Za-z0-9+/]*={0,2}$/;
+const envelopeSchema = z.strictObject({ amc: z.strictObject({ nonce: z.string().min(16).max(128) }), payload: z.string().max(400_000).regex(BASE64) });
+
+/**
+ * What AMC's forwarder sends the control route for a PreToolUse: Claude Code's payload bytes exactly as received
+ * (base64) and a fresh nonce. AMC hashes and decides on those bytes; the nonce makes each request single-use.
+ */
+export function claudeEnvelope(payload: Buffer, nonce: string): string {
+  return JSON.stringify({ amc: { nonce }, payload: payload.toString("base64") });
+}
+
+/** The envelope's payload bytes (strictly read), their SHA-256 and the nonce; the envelope itself must be exact. */
+export function openClaudeEnvelope(value: unknown): { payload: unknown; payloadSha256: string; nonce: string } {
+  const parsed = envelopeSchema.safeParse(value);
+  if (!parsed.success) throw new ClaudePayloadError("invalid", "the control request is not AMC's envelope");
+  const bytes = Buffer.from(parsed.data.payload, "base64");
+  if (bytes.toString("base64") !== parsed.data.payload) throw new ClaudePayloadError("invalid", "the envelope payload is not canonical base64");
+  return { payload: strictClaudeJson(bytes).value, payloadSha256: createHash("sha256").update(bytes).digest("hex"), nonce: parsed.data.amc.nonce };
 }

@@ -22,6 +22,7 @@ import { canonicalize } from "../src/utils/json.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { inspectHookActionLifecycle } from "../src/watch/hookActionLifecycle.js";
 import { claudeActionId } from "../src/adapters/hookProviders/claudeCode.js";
+import { claudeEnvelope } from "../src/adapters/hookProviders/claudeCodePayloads.js";
 import { handleHookControlRequest } from "../src/bridge/hookControlRoute.js";
 import { getPurposeKeyHistory } from "../src/keys/signingKeys.js";
 import { boundClaudeCode } from "./helpers/claudeCodeHookFixtures.js";
@@ -118,11 +119,11 @@ function claudeControlled(workspace: string, agentId: string, sessionId = "priva
     rawInput: JSON.stringify({ hook_event_name: "SessionStart", session_id: sessionId, amc: { claudePid: process.pid, configDir } }) });
 }
 
-/** Claude Code's pinned PreToolUse payload for `fields`, plus the nonce AMC's forwarder adds. */
+/** Claude Code's pinned PreToolUse payload for `fields`, in the envelope AMC's forwarder sends (raw bytes and a nonce). */
 function claudeRequest(workspace: string, fields: { tool_name: string; tool_use_id: string; tool_input: Record<string, unknown>; session_id?: string },
   nonce = "nonce-fixture-000000000000"): string {
-  return JSON.stringify({ session_id: "private-session", transcript_path: "/private/transcript.jsonl", cwd: realpathSync.native(workspace),
-    permission_mode: "default", hook_event_name: "PreToolUse", ...fields, amc: { nonce } });
+  return claudeEnvelope(Buffer.from(JSON.stringify({ session_id: "private-session", transcript_path: "/private/transcript.jsonl",
+    cwd: realpathSync.native(workspace), permission_mode: "default", hook_event_name: "PreToolUse", ...fields })), nonce);
 }
 
 afterEach(() => {
@@ -586,6 +587,10 @@ describe("provider-native signed hook control", () => {
         bridgeBase,
         tokenFile,
         rawInput: claudeRequest(workspace, { session_id: "private-bridge-session", tool_name: "Read", tool_use_id: "toolu_bridge_control_01",
+          tool_input: { file_path: join(realpathSync.native(workspace), "workspace", "bridge.txt") } }),
+        // The envelope carries the payload bytes; the observation maps the payload itself.
+        observedInput: JSON.stringify({ session_id: "private-bridge-session", transcript_path: "/private/transcript.jsonl", cwd: realpathSync.native(workspace),
+          permission_mode: "default", hook_event_name: "PreToolUse", tool_name: "Read", tool_use_id: "toolu_bridge_control_01",
           tool_input: { file_path: join(realpathSync.native(workspace), "workspace", "bridge.txt") } }),
       });
 

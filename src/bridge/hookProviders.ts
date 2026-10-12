@@ -16,7 +16,7 @@ import { piCwdRefusal, piPathLocations } from "../adapters/pi/piPaths.js";
 import { piVersionRefusal } from "../adapters/pi/piVersions.js";
 import { piActionId } from "../adapters/pi/piIdentity.js";
 import { claudeActionId, claudeCodeRefusal, claudeToolRequest } from "../adapters/hookProviders/claudeCode.js";
-import { parseQualifiedControlRequest } from "../adapters/hookProviders/claudeCodePayloads.js";
+import { ClaudePayloadError, openClaudeEnvelope, parseQualifiedPreToolUse } from "../adapters/hookProviders/claudeCodePayloads.js";
 import YAML from "yaml";
 import { redactBridgeText } from "./bridgeRedaction.js";
 
@@ -125,8 +125,26 @@ export interface HookCall {
   /** The provider's working directory, against which it resolves relative paths and runs shell commands. */
   readonly cwd: string;
   readonly pi: PiControlContext | null;
-  /** Claude Code: the whole request, which the session's registered release must accept (claudeRequestRefusal). */
+  /** Claude Code: the payload, which the session's registered release must accept (claudeRequestRefusal). */
   readonly request: Record<string, unknown> | null;
+  /** Claude Code: the SHA-256 of the payload bytes exactly as Claude Code sent them, which the decision binds. */
+  readonly payloadSha256: string | null;
+}
+
+/**
+ * AMC's envelope around a Claude Code PreToolUse (claudeCodePayloads.ts): the payload bytes as received, strictly read
+ * (UTF-8, no byte-order mark, no repeated key, no lone surrogate), their SHA-256 and the nonce.
+ */
+export function openHookEnvelope(rawInput: string): ReturnType<typeof openClaudeEnvelope> {
+  try {
+    assertUnambiguousJson(rawInput);
+    return openClaudeEnvelope(JSON.parse(rawInput) as unknown);
+  } catch (error) {
+    if (error instanceof HookControlError) throw error;
+    const ambiguous = error instanceof ClaudePayloadError && error.kind === "ambiguous";
+    throw new HookControlError(ambiguous ? "HOOK_CONTROL_INPUT_AMBIGUOUS" : "HOOK_CONTROL_INPUT_INVALID", 400,
+      `Claude Code hook input refused: ${error instanceof Error ? error.message : "unreadable"}`);
+  }
 }
 
 /** Refuses JSON with a repeated key: the provider and AMC could read different values from it. */
@@ -136,19 +154,20 @@ export function assertUnambiguousJson(rawInput: string): void {
   }
 }
 
-export function hookCall(provider: HookProvider, input: Record<string, unknown>): HookCall | null {
+export function hookCall(provider: HookProvider, input: Record<string, unknown>, envelope: { payloadSha256: string } | null = null): HookCall | null {
   const pi = piControlContext(provider, input);
   if (pi) {
     return { provider: "pi", actionId: piActionId(pi.sessionId, pi.toolCallId), sessionId: pi.sessionId, callId: pi.toolCallId, cwd: pi.cwd, pi,
-      parentActionId: pi.parentToolCallId === null ? null : piActionId(pi.sessionId, pi.parentToolCallId), request: null };
+      parentActionId: pi.parentToolCallId === null ? null : piActionId(pi.sessionId, pi.parentToolCallId), request: null, payloadSha256: null };
   }
   if (provider !== "claude-code") return null;
-  const parsed = parseQualifiedControlRequest(input);
-  if (!parsed) {
-    throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, "Claude Code hook input does not match a qualified release's PreToolUse payload with AMC's nonce");
+  const parsed = parseQualifiedPreToolUse(input);
+  if (!parsed || !envelope) {
+    throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, "Claude Code hook input is not a qualified release's PreToolUse payload in AMC's envelope");
   }
   const { session_id: sessionId, tool_use_id: callId, cwd } = parsed;
-  return { provider: "claude-code", actionId: claudeActionId(sessionId, callId), sessionId, callId, parentActionId: null, cwd, pi: null, request: input };
+  return { provider: "claude-code", actionId: claudeActionId(sessionId, callId), sessionId, callId, parentActionId: null, cwd, pi: null, request: input,
+    payloadSha256: envelope.payloadSha256 };
 }
 
 /** Why AMC refuses a Pi or Claude Code call before mapping it, or null. */

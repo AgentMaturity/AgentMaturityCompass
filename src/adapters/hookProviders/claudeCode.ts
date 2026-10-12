@@ -83,7 +83,8 @@ const PURE_BASH = /^'\/[^'\u0000-\u001f\u007f]*'(?: '[^'\u0000-\u001f\u007f]*')*
 
 /** The binary (where it really opens) and argv of a pure-form Bash command, or null. */
 export function claudePureBash(command: unknown, workspace: string): { binary: string; argv: string[] } | null {
-  if (typeof command !== "string" || !PURE_BASH.test(command)) return null;
+  // One spelling: a command that is not NFC could name a binary or argument other than the one AMC evaluates.
+  if (typeof command !== "string" || command.normalize("NFC") !== command || !PURE_BASH.test(command)) return null;
   const [first, ...argv] = command.slice(1, -1).split("' '");
   const binary = claudeFileLocation(first, workspace);
   return binary ? { binary, argv } : null;
@@ -231,15 +232,15 @@ function settingsFiles(input: { workspace: string; userSettingsPath: string; man
 
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** Every handler of a settings document as [event, handler]; throws on a hooks block Claude Code would not read as written. */
-function handlers(settings: Record<string, unknown>): Array<[string, unknown]> {
+/** Every handler of a settings document as [event, handler, its group's matcher]; throws on a hooks block Claude Code would not read as written. */
+function handlers(settings: Record<string, unknown>): Array<[string, unknown, unknown]> {
   if (settings.hooks === undefined) return [];
   if (!isObject(settings.hooks)) throw new Error("hooks is not an object");
   return Object.entries(settings.hooks).flatMap(([event, groups]) => {
     if (!Array.isArray(groups)) throw new Error(`hooks.${event} is not an array`);
     return groups.flatMap((group) => {
       if (!isObject(group) || !Array.isArray(group.hooks)) throw new Error(`a hooks.${event} group has no hooks array`);
-      return group.hooks.map((handler) => [event, handler] as [string, unknown]);
+      return group.hooks.map((handler) => [event, handler, group.matcher] as [string, unknown, unknown]);
     });
   });
 }
@@ -274,17 +275,19 @@ export function scanClaudeHookSettings(input: { workspace: string; userSettingsP
   const wanted = new Set(input.bindings.map((binding) => `${binding.eventName}\0${binding.handlerSha256}`));
   const seen = { all: new Set<string>(), managed: new Set<string>() };
   for (const file of othersRun ? read : managed) {
-    let entries: Array<[string, unknown]>;
+    let entries: Array<[string, unknown, unknown]>;
     try {
       entries = handlers(file.value!);
     } catch (error) {
       return result(`Claude Code settings ${file.path}: ${error instanceof Error ? error.message : String(error)}`);
     }
-    for (const [event, handler] of entries) {
+    for (const [event, handler, matcher] of entries) {
       const marker = isObject(handler) ? handler.statusMessage : undefined;
       if (marker === CLAUDE_STATUS_MESSAGE || marker === CLAUDE_CONTROL_STATUS_MESSAGE) {
         const key = `${event}\0${sha256Hex(canonicalize(handler))}`;
         if (!wanted.has(key)) return result(`an AMC ${event} hook in ${file.path} is not the one this installation wrote`);
+        // AMC installs its hooks for every tool; a narrower matcher would let some tools skip AMC.
+        if (matcher !== "*") return result(`AMC's ${event} hook in ${file.path} does not match every tool (matcher ${JSON.stringify(matcher ?? null)})`);
         seen.all.add(key);
         if (file.scope === "managed") seen.managed.add(key);
       } else if (CALL_CHANGING_EVENTS.has(event)) {

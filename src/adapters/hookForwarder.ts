@@ -16,7 +16,8 @@ import { join, resolve } from "node:path";
 import { stdin } from "node:process";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
-import { CONTROL_HOOK_PATH, verifyProviderHookControlResult, type ProviderHookControlResult } from "../bridge/hookControl.js";
+import { CONTROL_HOOK_PATH, deterministicEventId, verifyProviderHookControlResult, type ProviderHookControlResult } from "../bridge/hookControl.js";
+import { openLedger } from "../ledger/ledger.js";
 import { OBSERVED_AEP_HOOK_PATH, OBSERVED_HOOK_CORRELATION_PATH, type ObservedAepActionEvent } from "../bridge/hookIngress.js";
 import { isSafeProviderActionId } from "../bridge/hookActionIdentity.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
@@ -26,11 +27,12 @@ import {
 import { sha256Hex } from "../utils/hash.js";
 import { boundedFetchSignal, forwardDeadlineMs, HookDeadlineError, withHookDeadline } from "./hookDeadline.js";
 import {
-  authorizeForwardInvocation, HookIntegrationError, inspectProviderHookEvent, mapProviderHookEvent, parseConfigHookProvider, parseUnambiguousJson,
+  authorizeForwardInvocation, HookIntegrationError, inspectProviderHookEvent, mapProviderHookEvent, parseConfigHookProvider,
   type ConfigHookProvider, type HookMode,
 } from "./hookIntegration.js";
 import { assertControlBridgeLocal, normalizeBridgeBase, parseMode, validateAgentId } from "./hookProviders/installFiles.js";
-import { claudeHookSchemasFor, type ClaudeHookPayload } from "./hookProviders/claudeCodePayloads.js";
+import { claudeEnvelope, claudeHookSchemasFor, strictClaudeJson, type ClaudeHookPayload } from "./hookProviders/claudeCodePayloads.js";
+import { claudeActionId } from "./hookProviders/claudeCode.js";
 
 function delay(ms: number): Promise<void> {
   return ms <= 0 ? Promise.resolve() : new Promise((resolvePromise) => setTimeout(resolvePromise, ms));
@@ -212,6 +214,8 @@ export async function forwardProviderHookControl(input: {
   bridgeBase?: string;
   tokenFile: string;
   rawInput: string;
+  /** The provider payload to observe when `rawInput` is AMC's envelope around it (Claude Code). */
+  observedInput?: string;
   observedAt?: number;
   retryDelayMs?: number;
   timeoutMs?: number;
@@ -235,6 +239,7 @@ export async function forwardProviderHookControl(input: {
   });
   const observation = await forwardProviderHookEvent({
     ...input,
+    rawInput: input.observedInput ?? input.rawInput,
     workspace,
     provider,
     agentId,
@@ -314,13 +319,13 @@ export function failClosedProviderControlResponse(
   return renderProviderControlResponse(provider, "deny" satisfies HookControlDecision, reason);
 }
 
-export async function readStdinAll(): Promise<string> {
+/** The hook payload's bytes exactly as received; Claude Code control decides on these bytes. */
+export async function readStdinAll(): Promise<Buffer> {
   return new Promise((resolve) => {
-    let data = "";
-    stdin.setEncoding("utf8");
-    stdin.on("data", (chunk) => { data += chunk; });
-    stdin.on("end", () => resolve(data));
-    if (stdin.isTTY) resolve("");
+    const chunks: Buffer[] = [];
+    stdin.on("data", (chunk: Buffer) => { chunks.push(Buffer.from(chunk)); });
+    stdin.on("end", () => resolve(Buffer.concat(chunks)));
+    if (stdin.isTTY) resolve(Buffer.alloc(0));
   });
 }
 
@@ -330,6 +335,8 @@ export interface HookForwardOptions {
   agent: string;
   tokenFile: string;
   bridgeUrl: string;
+  /** Claude Code: the hook event this handler was installed for; a payload naming another event is refused. */
+  event?: string;
 }
 
 export interface HookForwardOutcome {
@@ -348,8 +355,28 @@ function claudeEventName(rawInput: string): string | null {
   }
 }
 
+/**
+ * The receipt digest of the PreToolUse decision a post-tool hook follows, read from this workspace's ledger, or null.
+ * The control route accepts the observation as this call's only when it names that decision and comes with the lease
+ * that obtained it.
+ */
+function decisionReceiptSha256(workspace: string, agentId: string, sessionId: string, toolUseId: string): string | null {
+  let ledger: ReturnType<typeof openLedger> | null = null;
+  try {
+    ledger = openLedger(workspace);
+    const row = ledger.db.prepare("SELECT meta_json FROM evidence_events WHERE id = ? LIMIT 1")
+      .get(deterministicEventId(agentId, "claude-code", claudeActionId(sessionId, toolUseId))) as { meta_json: string } | undefined;
+    const digest = row ? (JSON.parse(row.meta_json) as { receipt_sha256?: unknown }).receipt_sha256 : null;
+    return typeof digest === "string" ? digest : null;
+  } catch {
+    return null;
+  } finally {
+    ledger?.close();
+  }
+}
+
 /** What AMC's forwarder sends to the control route for a Claude Code hook other than PreToolUse: never raw prompt text. */
-function claudeSessionBody(payload: ClaudeHookPayload): Record<string, unknown> {
+function claudeSessionBody(payload: ClaudeHookPayload, workspace: string, agentId: string): Record<string, unknown> {
   const base = { hook_event_name: payload.hook_event_name, session_id: payload.session_id };
   switch (payload.hook_event_name) {
     case "SessionStart":
@@ -360,7 +387,8 @@ function claudeSessionBody(payload: ClaudeHookPayload): Record<string, unknown> 
       return { ...base, prompt_id: payload.prompt_id, stop_hook_active: payload.stop_hook_active };
     case "PostToolUse":
     case "PostToolUseFailure":
-      return { ...base, tool_use_id: payload.tool_use_id, tool_name: payload.tool_name, tool_input: payload.tool_input };
+      return { ...base, tool_use_id: payload.tool_use_id, tool_name: payload.tool_name, tool_input: payload.tool_input,
+        decisionReceiptSha256: decisionReceiptSha256(workspace, agentId, payload.session_id, payload.tool_use_id) };
     default:
       return base;
   }
@@ -392,7 +420,7 @@ async function forwardClaudeSessionHook(payload: ClaudeHookPayload, opts: HookFo
   signal: AbortSignal): Promise<HookForwardOutcome> {
   const forward = { workspace, provider: "claude-code" as const, agentId: opts.agent, tokenFile: opts.tokenFile, bridgeBase: opts.bridgeUrl };
   const authorization = authorizeForwardInvocation({ ...forward, mode: "control", bridgeBase: normalizeBridgeBase(opts.bridgeUrl) });
-  const body = claudeSessionBody(payload);
+  const body = claudeSessionBody(payload, workspace, opts.agent);
   if (payload.hook_event_name === "PostToolUse" || payload.hook_event_name === "PostToolUseFailure") {
     // The control route records whether the observed ingress got this outcome; a miss latches the session there.
     let ingressRecorded = true;
@@ -441,7 +469,7 @@ function claudeFailure(event: string | null, forwarding: boolean, deny: (message
  */
 export async function runHookForward(
   opts: HookForwardOptions,
-  readInput: () => Promise<string>,
+  readInput: () => Promise<string | Buffer>,
   workspace = process.cwd(),
   deadlineMs = forwardDeadlineMs(),
 ): Promise<HookForwardOutcome> {
@@ -457,25 +485,35 @@ export async function runHookForward(
   let event = null as string | null;
   try {
     return await withHookDeadline(deadlineMs, async (signal) => {
-      let rawInput = await readInput();
+      const received = await readInput();
+      const bytes = typeof received === "string" ? Buffer.from(received, "utf8") : received;
+      let rawInput = bytes.toString("utf8");
+      let observedInput: string | undefined;
+      // The event this handler was installed for answers a failure; the payload's own name is a fallback.
+      event = opts.event ?? claudeEventName(rawInput);
       if (!rawInput.trim()) {
         stage = "empty";
         throw new HookIntegrationError("HOOK_INPUT_INVALID", "provider hook input is required on stdin");
       }
       if (claudeControl) {
-        event = claudeEventName(rawInput);
-        // A repeated key, then the bound release's own payload schema: an unknown field, type or event is refused, as its event's failure.
-        const unambiguous = parseUnambiguousJson(rawInput, "input");
+        // The bytes as received, read the one way they can be read (no BOM, strict UTF-8, no repeated key, no lone
+        // surrogate), then the bound release's own payload schema: anything else is refused, as its event's failure.
+        const strict = strictClaudeJson(bytes);
         const release = authorizeForwardInvocation({ workspace, provider: "claude-code", mode: "control", agentId: opts.agent,
           bridgeBase: normalizeBridgeBase(opts.bridgeUrl), tokenFile: opts.tokenFile }).claudeCodeVersion;
         const schemas = claudeHookSchemasFor(release);
         if (!schemas) throw new HookIntegrationError("HOOK_INPUT_UNSUPPORTED", "the installation binds no qualified Claude Code release");
-        const payload = schemas.payload.parse(unambiguous);
-        if (payload.hook_event_name !== "PreToolUse") return await forwardClaudeSessionHook(payload, opts, workspace, rawInput, signal);
-        rawInput = JSON.stringify({ ...payload, amc: { nonce: randomUUID() } });
+        const payload = schemas.payload.parse(strict.value);
+        if (opts.event !== undefined && payload.hook_event_name !== opts.event) {
+          throw new HookIntegrationError("HOOK_INPUT_UNSUPPORTED", `a ${payload.hook_event_name} payload reached AMC's ${opts.event} hook`);
+        }
+        if (payload.hook_event_name !== "PreToolUse") return await forwardClaudeSessionHook(payload, opts, workspace, strict.text, signal);
+        // AMC decides on these exact bytes: the control route hashes them, and the nonce makes the request single-use.
+        observedInput = strict.text;
+        rawInput = claudeEnvelope(bytes, randomUUID());
       }
-      const inspection = inspectProviderHookEvent({ provider: opts.provider, rawInput });
-      const forward = { workspace, provider: opts.provider, agentId: opts.agent, tokenFile: opts.tokenFile, bridgeBase: opts.bridgeUrl, rawInput, signal };
+      const inspection = inspectProviderHookEvent({ provider: opts.provider, rawInput: observedInput ?? rawInput });
+      const forward = { workspace, provider: opts.provider, agentId: opts.agent, tokenFile: opts.tokenFile, bridgeBase: opts.bridgeUrl, rawInput, observedInput, signal };
       if (opts.mode === "control" && inspection.phase === "requested") {
         stage = "control";
         const { control } = await forwardProviderHookControl(forward);
@@ -487,12 +525,12 @@ export async function runHookForward(
         };
       }
       stage = "observe";
-      await forwardProviderHookEvent({ ...forward, mode: opts.mode });
+      await forwardProviderHookEvent({ ...forward, rawInput: observedInput ?? rawInput, mode: opts.mode });
       // Both supported providers treat an empty JSON object as a neutral observation result.
       return { stdout: "{}\n", stderr: "", exitCode: 0 };
     });
   } catch (error) {
-    if (claudeControl) return claudeFailure(stage === "empty" ? null : event, stage === "control", deny, error);
+    if (claudeControl) return claudeFailure(stage === "empty" && opts.event === undefined ? null : event, stage === "control", deny, error);
     if (opts.mode === "control" && stage !== "empty" && stage !== "observe") {
       if (error instanceof HookDeadlineError) return deny("AMC hook control timed out; action denied.");
       return deny(stage === "control" ? "AMC hook control unavailable; action denied." : "AMC hook control input invalid; action denied.");
@@ -506,10 +544,10 @@ async function main(): Promise<void> {
   let opts: HookForwardOptions;
   try {
     const { values } = parseArgs({ strict: true, allowPositionals: false, options: { provider: { type: "string" }, mode: { type: "string" },
-      agent: { type: "string" }, "token-file": { type: "string" }, "bridge-url": { type: "string" } } });
+      agent: { type: "string" }, "token-file": { type: "string" }, "bridge-url": { type: "string" }, event: { type: "string" } } });
     if (!values.provider || !values.agent || !values["token-file"]) throw new Error("missing flag");
     opts = { provider: values.provider as HookProvider, mode: (values.mode ?? "observe") as HookMode, agent: values.agent,
-      tokenFile: values["token-file"], bridgeUrl: values["bridge-url"] ?? "http://127.0.0.1:3212" };
+      tokenFile: values["token-file"], bridgeUrl: values["bridge-url"] ?? "http://127.0.0.1:3212", ...(values.event ? { event: values.event } : {}) };
   } catch {
     process.stderr.write("AMC hook forwarder arguments are invalid; reinstall the hook.\n");
     process.exitCode = 2;

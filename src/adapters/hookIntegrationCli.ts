@@ -231,8 +231,9 @@ export function registerHookIntegrationCommands(
         console.log(`Evidence: ${lifecycle.evidenceEventIds.length} signed event(s)`);
         for (const reason of lifecycle.reasonCodes) console.log(chalk.yellow(`Issue: ${reason}`));
         if (lifecycle.authorizationMismatch) console.log(chalk.red("Authorization mismatch: the tool ran with input other than the input AMC authorized (observed, not prevented)"));
+        if (lifecycle.observationConflict) console.log(chalk.red("Observation conflict: an outcome for this call was unmatched, conflicting or unverifiable"));
       }
-      if (lifecycle.failClosed || lifecycle.authorizationMismatch) process.exitCode = 1;
+      if (lifecycle.failClosed || lifecycle.authorizationMismatch || lifecycle.observationConflict) process.exitCode = 1;
     });
 
   hooks
