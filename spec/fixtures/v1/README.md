@@ -64,8 +64,10 @@ appear in a trust list outside this corpus.
 The 19 cases P1-06 names: `valid-attestation`, `valid-external-evidence-attested`, `forged-embedded-key`,
 `unpinned-issuer`, `wrong-purpose`, `revoked-key-compromise`, `revoked-superseded-earlier-claim`, `distrusted-key`,
 `stale-attestation`, `stale-trust-list`, `replayed`, `contradictory`, `cross-tenant`, `empty`, `missing-evidence`,
-`unanchored`, `backdated`, `tampered` and `rollback-revocation-list`. The others give every reason code and every record
-kind at least one case. The spec expected `revoked-superseded-earlier-claim` to pass with a claimed-time warning; it is
+`unanchored`, `backdated`, `tampered` and `rollback-revocation-list`. P1-27 adds the DSSE in-toto cases `dsse-valid`
+(exit 3: satisfaction is `NOT_RECOMPUTABLE`), `dsse-subject-mismatch`, `dsse-wrong-payload-type`, `dsse-unpinned-key`,
+`dsse-expired` and `dsse-independent-claim-seal-key`. The others give every reason code and every record kind at least
+one case. The spec expected `revoked-superseded-earlier-claim` to pass with a claimed-time warning; it is
 refused here (`ISSUER_REVOKED`) because a claimed time is not a trusted timestamp, and
 `revoked-superseded-as-of-before-revocation` shows the cut-off the verifier's user sets with `--as-of`. Once P1-25 adds
 RFC 3161 timestamps to these records, a signature a pinned TSA proves earlier than the revocation becomes a pass with a

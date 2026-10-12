@@ -1,0 +1,4 @@
+Bundle exported: <workspace>/run.amcbundle
+Attested: attestations/aibom.cdx.json and attestations/control-results.sigstore.json (DSSE, workspace artifact-seal key: a local audit trail until a trust list pins that key)
+Claim: Self-reported · Result: not evaluated (no evidence events were recorded) · Evidence: untrusted · Enforcement: none · Review: pending · Applicability: applicable
+Files: 13, Events: 0, Sessions: 0

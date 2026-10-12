@@ -1,0 +1,79 @@
+{
+  "exitCode": 1,
+  "report": {
+    "type": "amc.verifier-report",
+    "version": 1,
+    "artifact": {
+      "kind": "dsse-intoto",
+      "path": "sample-control-results.sigstore.json",
+      "sha256": "f8471c6bfaddb10bceca3c622f7eba61e9a9bb88d9e55d5d54b478c321e08d70"
+    },
+    "verifier": {
+      "name": "amc-verify",
+      "version": "0.1.0"
+    },
+    "verifiedAt": "<run time>",
+    "asOf": "2026-10-12T01:02:50.059Z",
+    "integrity": {
+      "status": "pass",
+      "errors": []
+    },
+    "issuerAdmission": {
+      "status": "pass",
+      "signatures": [
+        {
+          "signature": "dsseEnvelope.signatures[0]",
+          "purpose": "artifact-seal",
+          "keyId": "62a2797313d9a7593b6cef66e59ef667e9c1c80ff343b81eb1976ac250257eff",
+          "status": "admitted",
+          "source": "trust-list",
+          "listId": "p1-27-qualification",
+          "timeBasis": null,
+          "detail": "admitted"
+        }
+      ]
+    },
+    "anchoring": {
+      "status": "not-applicable",
+      "detail": null
+    },
+    "time": {
+      "claimedAt": "2026-10-12T01:02:48.497Z",
+      "attested": null,
+      "basis": "claimed"
+    },
+    "scope": {
+      "status": "pass",
+      "reasons": []
+    },
+    "freshness": {
+      "status": "pass",
+      "reasons": []
+    },
+    "completeness": {
+      "status": "fail",
+      "reasons": [
+        "EVIDENCE_MISSING: subject attestations/aibom.cdx.json (sha256 a5d0e490438badbd4b1b8d6dd3ca531f032aea0b29a1b26c5c6ed6b950795d29) was not supplied; no supplied bytes hash to it"
+      ]
+    },
+    "satisfaction": {
+      "status": "not-evaluated",
+      "reasons": [
+        "evaluated only when the other five dimensions pass"
+      ]
+    },
+    "reasonCodes": {
+      "integrity": [],
+      "issuerAdmission": [],
+      "scope": [],
+      "freshness": [],
+      "completeness": [
+        "EVIDENCE_MISSING"
+      ],
+      "satisfaction": []
+    },
+    "trusted": true,
+    "overrides": [],
+    "warnings": []
+  }
+}
