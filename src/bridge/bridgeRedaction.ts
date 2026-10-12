@@ -1,5 +1,6 @@
 import { redactSecrets } from "../shield/redaction/redactSecrets.js";
 import { createHash } from "node:crypto";
+import { MAX_PROTECTED_TEXT_CHARS, redactProtectedText } from "../dataflow/detectors.js";
 import { canonicalize } from "../utils/json.js";
 
 
@@ -21,8 +22,20 @@ function clip(value: string, maxChars: number): string {
  * The anonymous placeholder is deliberate here: a bridge row is durable and
  * signed, and naming the KIND of secret that was present is itself a small
  * disclosure. `blindSecrets` makes the opposite choice for its own reasons.
+ *
+ * The protected-data detectors (P2-02: card numbers, IBANs, SSNs, emails and the
+ * rest of the native session's set) then replace what they find with the same
+ * anonymous marker, in every workspace. Text over their per-leaf limit is
+ * replaced whole rather than stored unscanned.
  */
 export function redactBridgeText(input: string): string {
+  const secretsRedacted = redactBridgeSecrets(input);
+  if (secretsRedacted.length > MAX_PROTECTED_TEXT_CHARS) return "<AMC_REDACTED>";
+  return redactProtectedText(secretsRedacted, () => "<AMC_REDACTED>").text;
+}
+
+/** Secrets only, for a wrapped agent's own terminal output; what the bridge stores still goes through redactBridgeText. */
+export function redactBridgeSecrets(input: string): string {
   return redactSecrets(input, () => "<AMC_REDACTED>").redacted;
 }
 

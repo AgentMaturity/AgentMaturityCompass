@@ -1,3 +1,4 @@
+import { MAX_PROTECTED_TEXT_CHARS, redactProtectedText } from "../dataflow/detectors.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { GatewayConfig } from "./config.js";
 
@@ -100,6 +101,29 @@ function applyTextRegexRedaction(text: string, patterns: string[]): { changed: b
   return { changed, value: current, reasons };
 }
 
+/**
+ * The protected-data detectors (P2-02), as the native session uses them, over stored gateway evidence. Every workspace,
+ * no opt-in: a detected value becomes `[REDACTED]` (no key or token here, so nothing is restorable), and text over the
+ * detectors' per-leaf limit is replaced whole rather than stored unscanned.
+ */
+function redactProtectedString(text: string, reasons: Set<string>): string {
+  if (text.length > MAX_PROTECTED_TEXT_CHARS) { reasons.add("protectedData:unscanned"); return "[REDACTED]"; }
+  return redactProtectedText(text, (region) => { reasons.add(`protectedData:${region.dataClass}`); return "[REDACTED]"; }).text;
+}
+
+/** Keys and string leaves; a number leaf with a detection becomes the marker string, so the body stays valid JSON. */
+function redactProtectedLeaves(value: unknown, reasons: Set<string>): unknown {
+  if (typeof value === "string") return redactProtectedString(value, reasons);
+  if (typeof value === "number") {
+    const text = String(value);
+    const redacted = redactProtectedString(text, reasons);
+    return redacted === text ? value : redacted;
+  }
+  if (Array.isArray(value)) return value.map((item) => redactProtectedLeaves(item, reasons));
+  if (value === null || typeof value !== "object") return value;
+  return Object.fromEntries(Object.entries(value).map(([key, item]) => [redactProtectedString(key, reasons), redactProtectedLeaves(item, reasons)]));
+}
+
 export function redactBody(
   body: Buffer,
   contentType: string | undefined,
@@ -123,17 +147,19 @@ export function redactBody(
     try {
       const parsed = JSON.parse(body.toString("utf8")) as unknown;
       const pathResult = applyJsonPathRedaction(parsed, redaction.jsonPathsDenylist);
-      let text = JSON.stringify(pathResult.value);
+      const protectedReasons = new Set<string>();
+      let text = JSON.stringify(redactProtectedLeaves(pathResult.value, protectedReasons));
       const regexResult = applyTextRegexRedaction(text, redaction.textRegexDenylist);
       text = regexResult.value;
 
-      const wasRedacted = pathResult.changed || regexResult.changed;
+      const wasRedacted = pathResult.changed || regexResult.changed || protectedReasons.size > 0;
       const redactedBytes = Buffer.from(text, "utf8");
       return {
         redactedBytes,
         wasRedacted,
         redactionReasons: [
           ...(pathResult.changed ? ["jsonPath"] : []),
+          ...[...protectedReasons].sort(),
           ...regexResult.reasons
         ],
         originalPayloadSha256: wasRedacted ? null : originalSha,
@@ -144,12 +170,14 @@ export function redactBody(
     }
   }
 
-  const textResult = applyTextRegexRedaction(body.toString("utf8"), redaction.textRegexDenylist);
+  const protectedReasons = new Set<string>();
+  const textResult = applyTextRegexRedaction(redactProtectedString(body.toString("utf8"), protectedReasons), redaction.textRegexDenylist);
+  const wasRedacted = textResult.changed || protectedReasons.size > 0;
   return {
     redactedBytes: Buffer.from(textResult.value, "utf8"),
-    wasRedacted: textResult.changed,
-    redactionReasons: textResult.reasons,
-    originalPayloadSha256: textResult.changed ? null : originalSha,
-    originalHashOmitted: textResult.changed
+    wasRedacted,
+    redactionReasons: [...[...protectedReasons].sort(), ...textResult.reasons],
+    originalPayloadSha256: wasRedacted ? null : originalSha,
+    originalHashOmitted: wasRedacted
   };
 }
