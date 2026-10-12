@@ -3,7 +3,7 @@ import { evaluateControl } from "../../../src/catalog/evidence/evaluate.js";
 import type { EvaluationContext, EvidenceItem } from "../../../src/catalog/evidence/types.js";
 import { sha256Hex } from "../../../src/utils/hash.js";
 import { canonicalize } from "../../../src/utils/json.js";
-import { catalog, fixturesFor, layer0 } from "./harness.js";
+import { catalog, controls, fixturesFor } from "./harness.js";
 
 /**
  * Every Layer 0 evidence fixture runs through P1-11's evaluateControl (P1-14). A negative fixture never passes; each
@@ -31,8 +31,8 @@ function evaluate(setup: EvidenceSetup, controlId: string) {
 const fixtures = fixturesFor("evidence");
 
 describe("Layer 0 evidence fixtures through evaluateControl (P1-11)", () => {
-  it("every Layer 0 control has evidence fixtures", () => {
-    expect(new Set(fixtures.map((f) => f.control.id))).toEqual(new Set(layer0.map((c) => c.id)));
+  it("every catalog control has evidence fixtures", () => {
+    expect(new Set(fixtures.map((f) => f.control.id))).toEqual(new Set(controls.map((c) => c.id)));
   });
 
   for (const f of fixtures) {
