@@ -262,7 +262,8 @@ describe("recorded Claude Code 2.1.296 payloads", () => {
   test("the forwarder answers each session hook as its event needs when AMC is unreachable: deny, block, never force a stop", async () => {
     const workspace = claudeWorkspace();
     const opts = { provider: "claude-code" as const, mode: "control" as const, agent: agentId, tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: "http://127.0.0.1:9" };
-    const run = (name: string) => runHookForward(opts, async () => JSON.stringify(recorded(name, workspace)), workspace, 3_000);
+    const run = (name: string) => runHookForward({ ...opts, event: String(recorded(name, workspace).hook_event_name) }, async () => JSON.stringify(recorded(name, workspace)),
+      workspace, 3_000);
     expect(await run("SessionStart-startup")).toMatchObject({ exitCode: 0, stdout: expect.stringContaining("AMC did not register this Claude Code session") });
     expect(await run("Stop-stop")).toMatchObject({ exitCode: 0, stdout: expect.stringContaining("systemMessage") });
     const prompt = await run("UserPromptSubmit-prompt");
@@ -270,7 +271,8 @@ describe("recorded Claude Code 2.1.296 payloads", () => {
     expect(JSON.parse(prompt.stdout)).toMatchObject({ decision: "block", hookSpecificOutput: { hookEventName: "UserPromptSubmit", suppressOriginalPrompt: true } });
     expect(await run("PreToolUse-bash")).toMatchObject({ exitCode: 2 });
     expect(await run("PostToolUse-bash")).toMatchObject({ exitCode: 2, stdout: "{}\n" });
-    const unknown = await runHookForward(opts, async () => JSON.stringify({ ...recorded("PreToolUse-bash", workspace), surprise: 1 }), workspace, 3_000);
+    const unknown = await runHookForward({ ...opts, event: "PreToolUse" }, async () => JSON.stringify({ ...recorded("PreToolUse-bash", workspace), surprise: 1 }),
+      workspace, 3_000);
     expect(unknown).toMatchObject({ exitCode: 2, stderr: "AMC hook control input invalid; action denied.\n" });
   });
 });

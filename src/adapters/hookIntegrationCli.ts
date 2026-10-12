@@ -265,6 +265,7 @@ export function registerHookIntegrationCommands(
     .requiredOption("--agent <agentId>", "agent ID")
     .requiredOption("--token-file <path>", "dedicated hook lease token")
     .option("--bridge-url <url>", "Bridge origin", "http://127.0.0.1:3212")
+    .option("--event <event>", "the provider hook this handler is installed for (Claude Code control answers only that hook)")
     .action(async (opts: HookForwardOptions) => {
       const outcome = await runHookForward(opts, readStdinAll);
       stdin.destroy();

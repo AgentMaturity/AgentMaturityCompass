@@ -152,6 +152,7 @@ function forward(input: {
   bridgeBase: string;
   stdin: string;
   env?: Record<string, string>;
+  event?: string;
 }): Promise<ForwardRun> {
   const started = Date.now();
   const child = spawn(process.execPath, [
@@ -161,6 +162,8 @@ function forward(input: {
     "--agent", input.agentId,
     "--bridge-url", input.bridgeBase,
     "--token-file", `.amc/hooks/${input.provider}.lease`,
+    // The hook this handler is installed for, as the installer writes it; a malformed payload goes to the PreToolUse one.
+    "--event", input.event ?? (() => { try { return String(JSON.parse(input.stdin).hook_event_name ?? "PreToolUse"); } catch { return "PreToolUse"; } })(),
   ], {
     cwd: input.workspace,
     env: { ...process.env, NO_COLOR: "1", AMC_VAULT_PASSPHRASE: PASSPHRASE, ...input.env },
@@ -382,7 +385,8 @@ describe("in-process forwarder deadline", () => {
     const workspace = newWorkspace();
     const bridgeBase = await listen(() => { /* never answers */ });
     installControl(workspace, "claude-code", "slow-start-agent", bridgeBase);
-    const claude = { provider: "claude-code" as const, mode: "control" as const, agent: "slow-start-agent", tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: bridgeBase };
+    const claude = { provider: "claude-code" as const, mode: "control" as const, agent: "slow-start-agent", tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: bridgeBase,
+      event: "PreToolUse" };
     // A process that already spent 8.7 s starting has 300 ms left before the 10 s timeout minus the 1 s margin.
     vi.spyOn(process, "uptime").mockReturnValue(8.7);
     try {
@@ -399,7 +403,8 @@ describe("in-process forwarder deadline", () => {
     const workspace = newWorkspace();
     const bridgeBase = await listen(() => { /* never answers */ });
     installControl(workspace, "claude-code", "inproc-agent", bridgeBase);
-    const claude = { provider: "claude-code" as const, mode: "control" as const, agent: "inproc-agent", tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: bridgeBase };
+    const claude = { provider: "claude-code" as const, mode: "control" as const, agent: "inproc-agent", tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: bridgeBase,
+      event: "PreToolUse" };
 
     const hung = await runHookForward(claude, async () => claudeRead("/private/inproc.txt", "toolu_inproc_01"), workspace, 300);
     expect(hung).toEqual({ stdout: `${JSON.stringify(CLAUDE_DENY)}\n`, stderr: "AMC hook control timed out; action denied.\n", exitCode: 2 });
@@ -410,7 +415,7 @@ describe("in-process forwarder deadline", () => {
     const empty = await runHookForward(claude, async () => "  ", workspace);
     expect(empty).toMatchObject({ exitCode: 2, stderr: "AMC hook control input invalid; action denied.\n" });
 
-    const terminal = await runHookForward(claude, async () => JSON.stringify({
+    const terminal = await runHookForward({ ...claude, event: "PostToolUse" }, async () => JSON.stringify({
       hook_event_name: "PostToolUse",
       tool_name: "Read",
       tool_use_id: "toolu_inproc_02",
@@ -419,7 +424,7 @@ describe("in-process forwarder deadline", () => {
     // The tool already ran: no PreToolUse deny and no claim that the action was denied.
     const notRecorded = { stdout: "{}\n", stderr: "AMC could not record the tool outcome; the action already ran.\n", exitCode: 2 };
     expect(terminal).toEqual(notRecorded);
-    const failure = await runHookForward(claude, async () => JSON.stringify({
+    const failure = await runHookForward({ ...claude, event: "PostToolUseFailure" }, async () => JSON.stringify({
       hook_event_name: "PostToolUseFailure",
       tool_name: "Bash",
       tool_use_id: "toolu_inproc_03",

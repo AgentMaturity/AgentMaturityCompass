@@ -138,18 +138,21 @@ describe("authorization bypass", () => {
       .toThrowError(expect.objectContaining<Partial<HookControlError>>({ code: "HOOK_CONTROL_REPLAY_CONFLICT" }));
   });
 
-  test("a hook event AMC does not install never blocks a stop and never allows", async () => {
+  test("a hook event AMC does not install never blocks a stop and never allows; a handler naming no event denies", async () => {
     const workspace = claudeWorkspace();
     const opts = { provider: "claude-code" as const, mode: "control" as const, agent: agentId, tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: "http://127.0.0.1:3212" };
     const base = recorded("Stop-stop", workspace);
     for (const event of ["SubagentStop", "TeammateIdle", "TaskCompleted", "SessionEnd"]) {
-      const outcome = await runHookForward(opts, async () => JSON.stringify({ ...base, hook_event_name: event }), workspace, 3_000);
+      const outcome = await runHookForward({ ...opts, event }, async () => JSON.stringify({ ...base, hook_event_name: event }), workspace, 3_000);
       expect(outcome.exitCode, event).toBe(0);
       expect(outcome.stdout, event).not.toContain("allow");
     }
-    const unknownTool = await runHookForward(opts, async () => JSON.stringify({ ...recorded("PreToolUse-bash", workspace), hook_event_name: "PermissionRequest" }), workspace, 3_000);
-    expect(unknownTool.exitCode).toBe(2);
-    expect(unknownTool.stdout).not.toContain('"allow"');
+    const permission = { ...recorded("PreToolUse-bash", workspace), hook_event_name: "PermissionRequest" };
+    for (const event of ["PermissionRequest", undefined]) {
+      const outcome = await runHookForward({ ...opts, ...(event ? { event } : {}) }, async () => JSON.stringify(permission), workspace, 3_000);
+      expect(outcome.exitCode, String(event)).toBe(2);
+      expect(outcome.stdout, String(event)).not.toContain('"allow"');
+    }
   });
 });
 

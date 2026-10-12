@@ -17,7 +17,7 @@ import { stdin } from "node:process";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { CONTROL_HOOK_PATH, deterministicEventId, verifyProviderHookControlResult, type ProviderHookControlResult } from "../bridge/hookControl.js";
-import { openLedger } from "../ledger/ledger.js";
+import { openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import { OBSERVED_AEP_HOOK_PATH, OBSERVED_HOOK_CORRELATION_PATH, type ObservedAepActionEvent } from "../bridge/hookIngress.js";
 import { isSafeProviderActionId } from "../bridge/hookActionIdentity.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
@@ -32,7 +32,8 @@ import {
 } from "./hookIntegration.js";
 import { assertControlBridgeLocal, normalizeBridgeBase, parseMode, validateAgentId } from "./hookProviders/installFiles.js";
 import { claudeEnvelope, claudeHookSchemasFor, strictClaudeJson, type ClaudeHookPayload } from "./hookProviders/claudeCodePayloads.js";
-import { claudeActionId } from "./hookProviders/claudeCode.js";
+import { claudeActionId, claudeSessionSha256 } from "./hookProviders/claudeCode.js";
+import { claudeAllow, claudeDeny } from "./hookProviders/claudeAllow.js";
 
 function delay(ms: number): Promise<void> {
   return ms <= 0 ? Promise.resolve() : new Promise((resolvePromise) => setTimeout(resolvePromise, ms));
@@ -359,16 +360,6 @@ export interface HookForwardOutcome {
   exitCode: 0 | 1 | 2;
 }
 
-/** The Claude Code hook a payload names, read loosely, so even an invalid payload is answered as its event needs. */
-function claudeEventName(rawInput: string): string | null {
-  try {
-    const name = (JSON.parse(rawInput) as { hook_event_name?: unknown }).hook_event_name;
-    return typeof name === "string" ? name : null;
-  } catch {
-    return null;
-  }
-}
-
 /**
  * The receipt digest of the PreToolUse decision a post-tool hook follows, read from this workspace's ledger, or null.
  * The control route accepts the observation as this call's only when it names that decision and comes with the lease
@@ -423,6 +414,24 @@ async function postClaudeSessionEvent(authorization: { bridgeBase: string; token
   return answer;
 }
 
+/** Whether the Bridge's admission is the signed, sealed row admitting exactly this prompt of this session; otherwise the prompt is blocked. */
+function verifiedAdmission(workspace: string, agentId: string, eventId: unknown, sessionId: string, body: Record<string, unknown>): boolean {
+  if (typeof eventId !== "string") return false;
+  let ledger: ReturnType<typeof openLedger> | null = null;
+  try {
+    ledger = openLedger(workspace);
+    const row = ledger.db.prepare("SELECT meta_json FROM evidence_events WHERE id = ? LIMIT 1").get(eventId) as { meta_json: string } | undefined;
+    if (!row || !verifyEvidenceEventIntegrity({ ledger, eventId, requireReceipt: true, requireSealedSession: true }).ok) return false;
+    const meta = JSON.parse(row.meta_json) as { admitted?: unknown; agentId?: unknown; sessionSha256?: unknown; reported?: { promptSha256?: unknown } };
+    return meta.admitted === true && meta.agentId === agentId && meta.sessionSha256 === claudeSessionSha256(sessionId)
+      && meta.reported?.promptSha256 === (body.prompt as { sha256?: unknown } | undefined)?.sha256;
+  } catch {
+    return false;
+  } finally {
+    ledger?.close();
+  }
+}
+
 const PROMPT_BLOCKED = (reason: string): HookForwardOutcome => ({
   stdout: `${JSON.stringify({ decision: "block", reason, hookSpecificOutput: { hookEventName: "UserPromptSubmit", suppressOriginalPrompt: true } })}\n`,
   stderr: `${reason}\n`,
@@ -443,7 +452,7 @@ async function forwardClaudeSessionHook(payload: ClaudeHookPayload, opts: HookFo
   }
   const answer = await postClaudeSessionEvent(authorization, body, signal);
   if (payload.hook_event_name === "UserPromptSubmit") {
-    if (answer.admitted === true) return { stdout: "{}\n", stderr: "", exitCode: 0 };
+    if (answer.admitted === true && verifiedAdmission(workspace, opts.agent, answer.eventId, payload.session_id, body)) return { stdout: "{}\n", stderr: "", exitCode: 0 };
     if (answer.admitted === false && typeof answer.reason === "string") return PROMPT_BLOCKED(`AMC admission denied: ${redactBridgeText(answer.reason)}`);
     throw new HookIntegrationError("HOOK_DELIVERY_FAILED", "AMC's admission answer is malformed");
   }
@@ -459,7 +468,7 @@ const NEVER_BLOCKED = new Set(["Stop", "SubagentStop", "TeammateIdle", "TaskComp
  * How a failed Claude Code control-mode hook answers, by event: deny a tool, block a prompt, never block a start or a
  * stop. A hook event AMC does not install is answered the same way (never with an allow): a blockable one blocks.
  */
-function claudeFailure(event: string | null, forwarding: boolean, deny: (message: string) => HookForwardOutcome, error: unknown): HookForwardOutcome {
+function claudeFailure(event: string | null, forwarding: boolean, error: unknown): HookForwardOutcome {
   const why = error instanceof HookDeadlineError ? "timed out" : redactBridgeText(error instanceof Error ? error.message : String(error));
   if (event !== null && NEVER_BLOCKED.has(event) && event !== "Stop") {
     return { stdout: `${JSON.stringify({ systemMessage: `AMC does not handle the ${event} hook (${why}).` })}\n`, stderr: "", exitCode: 0 };
@@ -472,8 +481,67 @@ function claudeFailure(event: string | null, forwarding: boolean, deny: (message
   if (event === "PostToolUse" || event === "PostToolUseFailure") {
     return { stdout: "{}\n", stderr: "AMC could not record the tool outcome; the action already ran.\n", exitCode: 2 };
   }
-  if (error instanceof HookDeadlineError) return deny("AMC hook control timed out; action denied.");
-  return deny(forwarding ? "AMC hook control unavailable; action denied." : "AMC hook control input invalid; action denied.");
+  if (error instanceof HookDeadlineError) return claudeDeny("AMC hook control timed out; action denied.");
+  return claudeDeny(forwarding ? "AMC hook control unavailable; action denied." : "AMC hook control input invalid; action denied.");
+}
+
+/** Claude Code's payload bytes read the one way they can be read, then the installation's bound release's payload schema. */
+function claudePayload(bytes: Buffer, opts: HookForwardOptions, workspace: string): { payload: ClaudeHookPayload; text: string } {
+  const strict = strictClaudeJson(bytes);
+  const release = authorizeForwardInvocation({ workspace, provider: "claude-code", mode: "control", agentId: opts.agent,
+    bridgeBase: normalizeBridgeBase(opts.bridgeUrl), tokenFile: opts.tokenFile }).claudeCodeVersion;
+  const schemas = claudeHookSchemasFor(release);
+  if (!schemas) throw new HookIntegrationError("HOOK_INPUT_UNSUPPORTED", "the installation binds no qualified Claude Code release");
+  const payload = schemas.payload.parse(strict.value);
+  if (payload.hook_event_name !== opts.event) throw new HookIntegrationError("HOOK_INPUT_UNSUPPORTED", `a ${payload.hook_event_name} payload reached AMC's ${opts.event} hook`);
+  return { payload, text: strict.text };
+}
+
+/**
+ * Claude Code control mode: a default-deny dispatcher over the hook this handler was installed for (`--event`). The
+ * PreToolUse case answers allow only through claudeAllow (claudeAllow.ts); every other outcome of every case, any
+ * exception, a timeout, and a missing or unknown event answer with that event's deny or non-blocking answer.
+ */
+async function answerClaudeHook(opts: HookForwardOptions, readInput: () => Promise<string | Buffer>, workspace: string,
+  deadlineMs: number): Promise<HookForwardOutcome> {
+  const handler = opts.event ?? null;
+  let forwarding = false;
+  try {
+    return await withHookDeadline(deadlineMs, async (signal) => {
+      const received = await readInput();
+      const bytes = typeof received === "string" ? Buffer.from(received, "utf8") : received;
+      switch (handler) {
+        case "PreToolUse": {
+          const { payload, text } = claudePayload(bytes, opts, workspace);
+          if (payload.hook_event_name !== "PreToolUse") break;
+          // AMC decides on these exact bytes: the control route hashes them, and the nonce makes the request single-use.
+          const envelope = claudeEnvelope(bytes, randomUUID());
+          forwarding = true;
+          const { control } = await forwardProviderHookControl({ workspace, provider: "claude-code", agentId: opts.agent, tokenFile: opts.tokenFile,
+            bridgeBase: opts.bridgeUrl, rawInput: envelope, observedInput: text, signal });
+          const allowed = claudeAllow({ workspace, agentId: opts.agent, payloadBytes: bytes, sessionId: payload.session_id, toolUseId: payload.tool_use_id,
+            envelope, result: control });
+          if (allowed) return allowed.answer;
+          return control.decision === "deny" ? claudeDeny(`AMC policy denied the action: ${redactBridgeText(control.reason)}`, control.providerResponse)
+            : claudeDeny("AMC did not verify an allow for this exact call; action denied.");
+        }
+        case "UserPromptSubmit":
+        case "SessionStart":
+        case "Stop":
+        case "PostToolUse":
+        case "PostToolUseFailure": {
+          const { payload, text } = claudePayload(bytes, opts, workspace);
+          forwarding = true;
+          return await forwardClaudeSessionHook(payload, opts, workspace, text, signal);
+        }
+        default:
+          break;
+      }
+      throw new HookIntegrationError("HOOK_INPUT_UNSUPPORTED", `AMC's Claude Code hook handler names no event AMC handles (${handler ?? "none"}); reinstall the hook`);
+    });
+  } catch (error) {
+    return claudeFailure(handler, forwarding, error);
+  }
 }
 
 /**
@@ -487,64 +555,36 @@ export async function runHookForward(
   workspace = process.cwd(),
   deadlineMs = forwardDeadlineMs(),
 ): Promise<HookForwardOutcome> {
-  const claudeControl = opts.provider === "claude-code" && opts.mode === "control";
-  const denyExit = claudeControl ? 2 : 0;
+  if (opts.provider === "claude-code" && opts.mode === "control") return answerClaudeHook(opts, readInput, workspace, deadlineMs);
   const deny = (message: string): HookForwardOutcome => ({
     stdout: `${serializeProviderControlResponse(failClosedProviderControlResponse(opts.provider))}\n`,
     stderr: `${message}\n`,
-    exitCode: denyExit,
+    exitCode: 0,
   });
   // Assigned inside the deadline callback, so the cast stops narrowing to the initial value.
   let stage = "input" as "empty" | "input" | "control" | "observe";
-  let event = null as string | null;
   try {
     return await withHookDeadline(deadlineMs, async (signal) => {
       const received = await readInput();
       const bytes = typeof received === "string" ? Buffer.from(received, "utf8") : received;
-      let rawInput = bytes.toString("utf8");
-      let observedInput: string | undefined;
-      // The event this handler was installed for answers a failure; the payload's own name is a fallback.
-      event = opts.event ?? claudeEventName(rawInput);
+      const rawInput = bytes.toString("utf8");
       if (!rawInput.trim()) {
         stage = "empty";
         throw new HookIntegrationError("HOOK_INPUT_INVALID", "provider hook input is required on stdin");
       }
-      if (claudeControl) {
-        // The bytes as received, read the one way they can be read (no BOM, strict UTF-8, no repeated key, no lone
-        // surrogate), then the bound release's own payload schema: anything else is refused, as its event's failure.
-        const strict = strictClaudeJson(bytes);
-        const release = authorizeForwardInvocation({ workspace, provider: "claude-code", mode: "control", agentId: opts.agent,
-          bridgeBase: normalizeBridgeBase(opts.bridgeUrl), tokenFile: opts.tokenFile }).claudeCodeVersion;
-        const schemas = claudeHookSchemasFor(release);
-        if (!schemas) throw new HookIntegrationError("HOOK_INPUT_UNSUPPORTED", "the installation binds no qualified Claude Code release");
-        const payload = schemas.payload.parse(strict.value);
-        if (opts.event !== undefined && payload.hook_event_name !== opts.event) {
-          throw new HookIntegrationError("HOOK_INPUT_UNSUPPORTED", `a ${payload.hook_event_name} payload reached AMC's ${opts.event} hook`);
-        }
-        if (payload.hook_event_name !== "PreToolUse") return await forwardClaudeSessionHook(payload, opts, workspace, strict.text, signal);
-        // AMC decides on these exact bytes: the control route hashes them, and the nonce makes the request single-use.
-        observedInput = strict.text;
-        rawInput = claudeEnvelope(bytes, randomUUID());
-      }
-      const inspection = inspectProviderHookEvent({ provider: opts.provider, rawInput: observedInput ?? rawInput });
-      const forward = { workspace, provider: opts.provider, agentId: opts.agent, tokenFile: opts.tokenFile, bridgeBase: opts.bridgeUrl, rawInput, observedInput, signal };
+      const inspection = inspectProviderHookEvent({ provider: opts.provider, rawInput });
+      const forward = { workspace, provider: opts.provider, agentId: opts.agent, tokenFile: opts.tokenFile, bridgeBase: opts.bridgeUrl, rawInput, signal };
       if (opts.mode === "control" && inspection.phase === "requested") {
         stage = "control";
         const { control } = await forwardProviderHookControl(forward);
-        const denied = control.decision === "deny";
-        return {
-          stdout: `${serializeProviderControlResponse(control.providerResponse)}\n`,
-          stderr: denied && denyExit === 2 ? `AMC policy denied the action: ${redactBridgeText(control.reason)}\n` : "",
-          exitCode: denied ? denyExit : 0,
-        };
+        return { stdout: `${serializeProviderControlResponse(control.providerResponse)}\n`, stderr: "", exitCode: 0 };
       }
       stage = "observe";
-      await forwardProviderHookEvent({ ...forward, rawInput: observedInput ?? rawInput, mode: opts.mode });
+      await forwardProviderHookEvent({ ...forward, mode: opts.mode });
       // Both supported providers treat an empty JSON object as a neutral observation result.
       return { stdout: "{}\n", stderr: "", exitCode: 0 };
     });
   } catch (error) {
-    if (claudeControl) return claudeFailure(stage === "empty" && opts.event === undefined ? null : event, stage === "control", deny, error);
     if (opts.mode === "control" && stage !== "empty" && stage !== "observe") {
       if (error instanceof HookDeadlineError) return deny("AMC hook control timed out; action denied.");
       return deny(stage === "control" ? "AMC hook control unavailable; action denied." : "AMC hook control input invalid; action denied.");
