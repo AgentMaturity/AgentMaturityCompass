@@ -18,6 +18,7 @@ import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
 import { resolveApiRolePolicy } from "../api/accessPolicy.js";
 import { listUsers, listVerifiedUsers } from "../auth/authApi.js";
 import { USER_ROLES, type UserRole } from "../auth/roles.js";
+import { planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
 import type { A4Member, A4Principal } from "./a4Schema.js";
 
 type A4Refusal = { ok: false; status: 401 | 403; code: string; message: string };
@@ -195,6 +196,21 @@ export function principalPopulation(workspace: string, now = Date.now()): { acti
   }
   const sessions = liveRouterSessions(workspace, now);
   return { activeLocal, hostPrincipals: sessions === null ? null : new Set(sessions.map((record) => record.userId)).size };
+}
+
+/**
+ * Activate's lease-principal facts (P1-78): whether the verified active plan requires a principal (a plan that does not
+ * verify reads true), and how many ACTIVE local users hold the workspace role OWNER, the role the release and the
+ * production-lease effects take (null when users.yaml does not read).
+ */
+export function leasePrincipalFacts(workspace: string): { leasePrincipalRequired: boolean; activeLocalOwners: number | null } {
+  let activeLocalOwners: number | null;
+  try {
+    activeLocalOwners = listUsers(workspace).filter((user) => user.status === "ACTIVE" && user.roles.includes("OWNER")).length;
+  } catch {
+    activeLocalOwners = null;
+  }
+  return { leasePrincipalRequired: planRequiresPrincipal(workspace), activeLocalOwners };
 }
 
 /** The population as a transition records it (`ratchetedFromChain` reads it): counts, null where unreadable. */

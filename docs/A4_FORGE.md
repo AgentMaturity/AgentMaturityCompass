@@ -126,7 +126,11 @@ and re-approve.
 
 An activated compiled plan whose identity binding requires a lease used to deny every native tool call from Studio
 tasks, which carry none. P1-67 has Studio mint a lease per native task runtime; Adapt (P1-61) models the remaining
-cases as the readiness item `adapt.plan.nativeSessionsAllowed` (`PLAN_DENIES_NATIVE_SESSION`) rather than hiding them.
+cases as the readiness item `adapt.plan.nativeSessionsAllowed` (`PLAN_DENIES_NATIVE_SESSION`) rather than hiding them:
+tasks started before activation, CLI agent sessions and delegated children carry no lease and are denied every call.
+`L0-IDN-01` also requires a principal, and since P1-78 the lease names the task's signed-in principal, so Studio refuses
+at start (409 `PRINCIPAL_UNRESOLVED`) a task whose principal is not an active local `users.yaml` user, a workspace-router
+session or the admin token included; the item lists `PRINCIPAL_REQUIRED` and `NON_LOCAL_USER_SESSIONS_DENIED` and says so.
 Every revision now binds `plan.journalEntrySha256` (the active compiled-plan journal's head; any activation, in A4 or
 from the CLI, makes an open gate `RESOURCE_DRIFTED`) and `plan.lockDigest` (the shipped catalog's lock, digested without
 `generatedBy`, the AMC version that built it, which `verifyCatalogLock` ignores too: an AMC upgrade with an unchanged
@@ -180,13 +184,21 @@ framework through a scaffold, connect instructions and a trace import.
   tasks page as the session's owner; the Build card loads the owner's build log with the same cursor contract. Build
   refuses, before any write, a session start Studio's native tasks would refuse (`ANSWER_INVALID:validation` or
   `ANSWER_INVALID:capabilities`): a check missing from the operator's config, checks without the signed workspace
-  `bash`, or more than 8 or duplicate check ids. Propose already leaves such checks out of the plan and lists them as
+  `bash`, or more than 8 or duplicate check ids. It also refuses, before any write, a native workspace-tools session
+  whose lease would name no active `users.yaml` user under a plan that requires one (P1-78): under a plan whose identity
+  binding requires an agent lease and a principal (`L0-IDN-01`), Studio's native service names the session's own
+  `users.yaml` user in that lease and refuses anyone who is not an active local user, a workspace-router session
+  included, so Build answers 409 `PRINCIPAL_UNRESOLVED` first instead of journaling a session that could never start.
+  Other lease-mint failures, a revoked or unreadable `lease` key (`LEASE_UNAVAILABLE`) or a plan that does not verify
+  (`POLICY_UNVERIFIED`), still surface as the session's start error after the step is recorded. Propose already leaves such checks out of the plan and lists them as
   unsupported (`NOT_IN_VALIDATION_CONFIG`, `VALIDATION_SCOPE_REQUIRED`), and builds the prompt from the capabilities with
   control characters removed, cut by code point.
 - **External path.** After Build and before Review, an owner can write the path's scaffold, the bridge contract tests
   and the agent's policy pack into a new workspace directory outside `.amc/` (the record binds a manifest of every
   file's sha256; the files are written after it commits), get connect instructions (the lease token is shown once and
-  never stored; the record keeps the leaseId), and import the agent's traces through the neutral importer (originals
+  never stored; the record keeps the leaseId; the lease names the owner who asked for it when they are an active
+  `users.yaml` user, and under a plan whose identity binding requires a principal anyone else is refused 409
+  `PRINCIPAL_UNRESOLVED` before a lease is minted, P1-78), and import the agent's traces through the neutral importer (originals
   retained; imported traces are self-reported). A source already imported is refused (`IMPORT_EXISTS`): an existing
   import, which an earlier record may name, is never rewritten or rolled back. Whoever scaffolds, connects or imports
   counts as a builder of the stage: they cannot approve its completion gate or the `a4.assemble.apply` request. The scaffold directory and the import source are workspace paths of
@@ -288,7 +300,8 @@ the agent's prompt pack.
   plugin in its frame.
 - **Context probe.** `POST /api/v1/a4/projects/:id/stages/adapt/probe` (after Build; owner; owner mode) runs one
   in-process turn on the stub provider, with no network and no credential, with the plugin as an extra context. A4
-  composes the turn and writes nothing into its session: no tools and no receipt of its own. The runtime writes an
+  composes the turn and writes nothing into its session: no tools and no receipt of its own, and no lease, which no
+  call needs: the identity binding of an active plan is checked per tool call, and the turn makes none. The runtime writes an
   effective-policy receipt only before a governed tool call, and this turn makes none, so there is no receipt to cite.
   The probe checks that the run's signed `user/message` row carries the plugin's exact text and reads the turn's signed
   `turn/end` reason, and records the session's own signed `session/open` row (which names the agent) as a `ledger_event`
@@ -399,7 +412,8 @@ clientRequestId }` (owner) consumes the release approval and runs the effect ins
    the captured files read by the digest the gate bound. A file edited after the gate opened is
    `EFFECT_FAILED: RESOURCE_DRIFTED <slot>` and no package is written.
 2. The package must scan `PASS` for secrets. Only then is the staging lease minted: `WRITE_LOW` at most, the staging
-   routes, 24 hours, bound to this workspace and agent, with the release as its work order.
+   routes, 24 hours, bound to this workspace and agent, with the release as its work order, naming the owner who ran
+   the release when they are an active `users.yaml` user (P1-78; see the principal rule below).
 3. The manifest (`amc.a4-package/v1`, no absolute path; it names the staging lease by id and scope, never its token)
    is signed `A4_PACKAGE` and the tarball `a4-package`.
    `RELEASE`'s own refusals (`RELEASE_STEP_MOVED`, `RELEASE_STAGE_REDONE`, `RELEASE_ATTEMPT_SETTLED`) are checked before
@@ -431,14 +445,35 @@ caller, so an owner that gate's quorum counted cannot complete it (409 `SOD_VIOL
 caller, as the release effect's engine request already does. A retry of a failed effect applies the same rule against
 the keys its consumed grant or gate quorum counted. An effect step that finds the vault locked (the lease key, an
 artifact signature) answers 423 `A4_VAULT_LOCKED`. Both effects read the vault's `lease` and `revocation-list` purpose keys (P1-08)
-before their first side effect (a revocation, a file, a lease or a signature), so a locked vault or a revoked key fails
+before their first side effect (a revocation, a file, a lease or a signature), so a locked vault (423 `A4_VAULT_LOCKED`) or a
+revoked key (409 `A4_KEY_REVOKED`, naming the purpose and the recovery, `amc keys rotate --purpose <purpose>`) fails
 them before the effect itself changes anything, and revoking an earlier attempt's lease with the vault locked answers the same code rather than `LEASE_REVOKE_FAILED`.
+Any other failure to read those keys (an unreadable or unverifiable key revocation list, an incomplete key set) is 409
+`SIGNING_FAILED` with its reason.
+The same pre-flight resolves the principal each lease names (P1-78): the owner who ran the effect, keyed as A4 keys
+its principals and never read from a body. Layer 0's mandatory `L0-IDN-01` makes every plan Adapt activates require a
+principal for every tool call, and a call under a lease that names no active `users.yaml` user is refused; so under
+such a plan (or one that does not verify) `complete`, `POST …/releases` and a retry refuse anyone else, a
+workspace-router session included, with 409 `PRINCIPAL_UNRESOLVED` before the gate or the engine grant is consumed:
+readiness lists `PRINCIPAL_UNRESOLVED` under that caller's `progress` and `retryEffect` at Activate, and the effect's
+pre-flight resolves the principal again inside the transaction that would consume the gate or start the retry, so
+neither `GATE_CONSUMED` nor `EFFECT_STARTED` is written and step 0 never runs. The effect resolves the principal once
+more beside the key reads, before anything is revoked, written, minted or signed, and the lease is minted through
+`issueLeaseForPrincipal`, which resolves it again; a refusal inside the effect happens only when `users.yaml` or the
+plan changed after the gate was consumed, and it spends the attempt. Under any other plan the lease names that user
+when they resolve, and no one otherwise. Readiness item `lease.principal` shows this before anyone approves: READY
+(`PRINCIPAL_NOT_REQUIRED`) when the plan requires no principal; otherwise WAITING (`PRINCIPAL_REQUIRED`, never
+mandatory) with the rule as its next action, and BLOCKED, mandatory, while no active `users.yaml` user holds the
+workspace role OWNER or `users.yaml` does not read (`NO_ACTIVE_LOCAL_OWNER`, `USERS_UNREADABLE`) and a lease is still
+to be minted this cycle, so neither approval is requested or approved for an effect no one could run; it does not refuse a
+`DENY`, which mints nothing (on the completion gate the `DENY` revokes the staging lease). Once the production lease is
+recorded it reads READY (`PRINCIPAL_EFFECTS_DONE`), never mandatory.
 A vault that is already locked when `complete`, `POST …/releases` or a retry is sent is refused before anything is
 consumed: readiness reads `signing.available` WAITING `VAULT_LOCKED` (409 `A4_NOT_READY`). A `DENY` on an unconsumed
 completion gate revokes the staging lease of the release that gate binds; a decision on a consumed gate is refused
 (`A4_GATE_STALE: consumed`) and revokes nothing. The revocation is signed with the vault's `revocation-list` key, even in
-NOTARY mode, so such a `DENY` is refused with 423 `A4_VAULT_LOCKED` while that key cannot be read or is revoked, rather than recorded with the
-staging lease left live. If a revocation still fails after the `DENY` is recorded, the `DENY` stands and the answer is
+NOTARY mode, so such a `DENY` is refused with 423 `A4_VAULT_LOCKED` while the vault is locked and 409 `A4_KEY_REVOKED`
+while that key is revoked, rather than recorded with the staging lease left live. If a revocation still fails after the `DENY` is recorded, the `DENY` stands and the answer is
 409 `LEASE_REVOKE_FAILED` naming the lease ids, never a success (423 `A4_VAULT_LOCKED`, also naming them, when the vault
 locked meanwhile, and on a replay sent while it is locked): sending the same request again (same
 `clientRequestId`) retries the revocation, or the operator revokes the lease with `amc lease revoke`. The staging lease lasts 24 hours and a completion gate lasts at least a day after it is requested, so
@@ -446,9 +481,10 @@ the staging lease has expired before such a gate can.
 
 Readiness at Activate: `ask_complete`, `understanding_confirmed`, `release_proposed`, `package.inputs`,
 `package.transparency` (BLOCKED while the current release's package has no transparency entry), `deployment.same_host` (BLOCKED `DEPLOYMENT_NOT_SAME_HOST`, naming P2-40, unless this Studio runs under the chosen
-target: v1 deploys by restarting it), `deployment.topology` (`TOPOLOGY_UNDECIDED` for Helm) and
+target: v1 deploys by restarting it), `deployment.topology` (`TOPOLOGY_QUALIFIED_LOCALLY_ONLY` for Helm,
+`TOPOLOGY_NOT_QUALIFIED` for Compose, each with `CI_QUALIFICATION_PENDING`) and
 `deployment.image_pinned` (`IMAGE_TAG_ONLY`), both WAITING and never mandatory, `lease.scope` (`LEASE_STAGING_ONLY`
-until the production lease), `deployment.amc_check` (`DEPLOYMENT_UNCHECKED`) and `monitoring.source`
+until the production lease), `lease.principal` (`PRINCIPAL_REQUIRED` under an identity-binding plan, see above), `deployment.amc_check` (`DEPLOYMENT_UNCHECKED`) and `monitoring.source`
 (`MONITOR_NO_SOURCE`). `signing.notary_route` names both routes as `A4_RECORD:<route>` and `A4_PACKAGE:<route>`. In
 NOTARY mode, with the default `denyLocalVaultSigningIfNotaryEnabled: true`, both kinds route to the notary. The
 `requireNotaryFor` default (which now lists `A4_PACKAGE`) applies only to a `trust.yaml` that omits the field. An
@@ -463,8 +499,13 @@ The package also carries the prepared deployment under `deploy/`: the Compose ov
 `docker-compose.a4-<releaseId>.yml` or the Helm values overlay `values.a4-<releaseId>.yaml`, and `deploy/plan.json` with
 the steps (pre-flight `amc doctor --strict --json`, deploy, verification, rollback), the receipt form and the gaps. The plan
 is signed `a4-deployment-plan`. `GET …/releases/:rid` shows its steps only while that signature verifies and the
-verified package manifest lists the plan's digest (`plan: null` with the reason otherwise). AMC never runs these commands. Both targets are recordable in v1. The image is pinned by
-tag (`IMAGE_TAG_ONLY`, until D-03 and P0-14), and a Helm topology is undecided (`TOPOLOGY_UNDECIDED`, until D-03). Both are
+verified package manifest lists the plan's digest (`plan: null` with the reason otherwise). AMC never runs these commands. Both targets are recordable in v1.
+Decision D-03 (option C, 2026-10-11) keeps all four topologies documented (Helm, Compose, Railway and Vercel), and A4 v1
+prepares Compose and Helm only (D-18). Neither is qualified in CI yet: Helm passed its qualification checks locally only
+(kind on macOS arm64, 2026-10-11; `TOPOLOGY_QUALIFIED_LOCALLY_ONLY`), Compose is documented but not qualified
+(`TOPOLOGY_NOT_QUALIFIED`), and Railway and Vercel stay documented but unqualified. The image is pinned by tag
+(`IMAGE_TAG_ONLY`): the bootstrap report records no digest of the image the Studio runs, so the Helm overlay leaves the
+chart's `image.digest` unset. The overlay, the plan's `topology` and `gaps` and the package README state both. Both are
 WAITING items, never blockers. The Compose overlay sets `AMC_CONTROL_CHECKPOINT_DIR` on its own named volume outside the
 workspace; the chart mounts only the workspace, so the Helm overlay cannot and the plan says so. The chart also renders
 a fixed environment list, so the Helm overlay cannot set `AMC_A4_PREVIEW=1` (`A4_PREVIEW_NOT_SET_BY_CHART`): the plan's
@@ -529,7 +570,8 @@ then names the same target, so that rollback is finished first, run again in pro
 of the target's rollback does not bar the release. A production lease minted before the target's production rollback started is
 revoked by it (step 4 below). `POST …/releases/:rid/rollback { environment, toReleaseId, confirmManifestId, reason }`
 then confirms the exact ids the preview bound. The rollback is journaled like every A4 effect: `EFFECT_STARTED` (owner
-pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, on rows that still pass both preview refusals
+pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, once the vault's `artifact-seal` and
+`revocation-list` keys read (423 `A4_VAULT_LOCKED` while it is locked, 409 `A4_KEY_REVOKED` for a revoked one, before anything), on rows that still pass both preview refusals
 above, and a second attempt while one runs is refused (`EFFECT_RUNNING`). So is a rollback while the deployment approval's production-lease effect runs, and that effect refuses
 to mint (`RELEASE_ROLLED_BACK`) once a rollback of the release has started (any attempt, settled or not: a failed one may
 already have consumed its grant and restored the Enforce snapshot), so no lease is minted beside a rollback. Then

@@ -13656,7 +13656,9 @@ paths:
         SOD_VIOLATION when the caller is an approver the production lease's gate quorum counted); an inline
         effect (the release, the production lease) runs before the response, which carries its lease token once
         (a replay answers token: null, TOKEN_ALREADY_DELIVERED once the attempt finished, or the attempt's
-        failure code) or its failure code"
+        failure code) or its failure code. Each lease names the caller when they are an active users.yaml user;
+        under a plan whose identity-binding requires a principal (L0-IDN-01) any other caller, a
+        workspace-router session included, is refused 409 PRINCIPAL_UNRESOLVED before the gate is consumed"
       tags:
         - Studio
         - A4 Forge
@@ -13829,8 +13831,12 @@ paths:
     post:
       summary: "Release (owner): consume the release approval (Activate's direction gate) and run the opened
         a4.activate.release effect inline: a signed package from content-addressed inputs and the staging lease
-        (WRITE_LOW at most, the staging routes, 24 h), whose token this response carries once; a replay answers
-        token: null, TOKEN_ALREADY_DELIVERED once the attempt finished, or the attempt's failure code"
+        (WRITE_LOW at most, the staging routes, 24 h, naming the caller when they are an active users.yaml
+        user), whose token this response carries once; a replay answers token: null, TOKEN_ALREADY_DELIVERED
+        once the attempt finished, or the attempt's failure code. Under a plan whose identity-binding requires a
+        principal (L0-IDN-01) a caller who is not an active local users.yaml user, a workspace-router session
+        included, is refused 409 PRINCIPAL_UNRESOLVED before the release approval or its engine grant is
+        consumed"
       tags:
         - Studio
         - A4 Forge
@@ -14514,17 +14520,18 @@ paths:
   /v1/a4/projects/{projectId}/releases/{releaseId}/rollback:
     post:
       summary: "Roll back (owner, owner mode) with the exact release and Enforce manifest the preview bound,
-        journaled as an effect (EFFECT_STARTED first, pinned to expectedHeadSeq and refused again with
-        ROLLBACK_RELEASE_NOT_RUNNING or ROLLBACK_TARGET_ROLLED_BACK on the rows it reads; 409 EFFECT_RUNNING
-        while another attempt or the deployment approval's production-lease effect runs): the grant consumed (a
-        re-run uses the grant its own execution consumed, never for an approver its quorum counted: 409
-        SOD_VIOLATION; GRANT_ALREADY_USED when another execution consumed it), a freeze first for a high or
-        critical risk tier, the Enforce restore, every lease of the release revoked (read again at execution,
-        and the lease journal once more before it settles; in production also the production lease of every
-        release, in any cycle, whose rollback target this release is), the prepared commands, a signed
-        a4-rollback-receipt, then ROLLBACK with EFFECT_FINISHED; a failed step is EFFECT_FAILED with its code
-        and a replay answers the attempt's outcome; the lifecycle is never moved backwards and deployedReleaseId
-        moves when the operator records a production rollback row"
+        journaled as an effect (refused before anything while the vault's artifact-seal or revocation-list key
+        cannot sign: 423 A4_VAULT_LOCKED, 409 A4_KEY_REVOKED for a revoked one; EFFECT_STARTED first, pinned to
+        expectedHeadSeq and refused again with ROLLBACK_RELEASE_NOT_RUNNING or ROLLBACK_TARGET_ROLLED_BACK on
+        the rows it reads; 409 EFFECT_RUNNING while another attempt or the deployment approval's
+        production-lease effect runs): the grant consumed (a re-run uses the grant its own execution consumed,
+        never for an approver its quorum counted: 409 SOD_VIOLATION; GRANT_ALREADY_USED when another execution
+        consumed it), a freeze first for a high or critical risk tier, the Enforce restore, every lease of the
+        release revoked (read again at execution, and the lease journal once more before it settles; in
+        production also the production lease of every release, in any cycle, whose rollback target this release
+        is), the prepared commands, a signed a4-rollback-receipt, then ROLLBACK with EFFECT_FINISHED; a failed
+        step is EFFECT_FAILED with its code and a replay answers the attempt's outcome; the lifecycle is never
+        moved backwards and deployedReleaseId moves when the operator records a production rollback row"
       tags:
         - Studio
         - A4 Forge
@@ -15022,7 +15029,9 @@ paths:
   /v1/a4/projects/{projectId}/stages/assemble/connect:
     post:
       summary: "External path, after Build (owner, owner mode): connect instructions with a lease whose token is in
-        this response once and never stored; the record keeps the leaseId (a replay answers token: null)"
+        this response once and never stored; the record keeps the leaseId (a replay answers token: null). The
+        lease names the caller when they are an active users.yaml user; under a plan whose identity-binding
+        requires a principal any other caller is 409 PRINCIPAL_UNRESOLVED and nothing is minted"
       tags:
         - Studio
         - A4 Forge
@@ -15614,9 +15623,10 @@ paths:
     post:
       summary: Deny a gate (bound to its request digest and seq; separation of duties refused at write). A DENY of
         an unconsumed Activate completion gate revokes its release's staging lease (423 A4_VAULT_LOCKED while
-        that cannot be signed; 409 LEASE_REVOKE_FAILED naming the lease ids when it fails after the DENY is
-        recorded, which stands, 423 A4_VAULT_LOCKED naming them when the vault locked meanwhile, and the same
-        request retries it)
+        the vault is locked and 409 A4_KEY_REVOKED while its revocation-list key is revoked, before the DENY is
+        recorded; 409 LEASE_REVOKE_FAILED naming the lease ids when it fails after the DENY is recorded, which
+        stands, 423 A4_VAULT_LOCKED naming them when the vault locked meanwhile, and the same request retries
+        it)
       tags:
         - Studio
         - A4 Forge
@@ -15826,7 +15836,9 @@ paths:
   /v1/a4/projects/{projectId}/stages/{stage}/effects/{effectId}/retry:
     post:
       summary: Retry a failed effect under the liveness rule (owner; 409 SOD_VIOLATION for an approver its consumed
-        grant or gate quorum counted)
+        grant or gate quorum counted; at Activate, under a plan whose identity-binding requires a principal, 409
+        PRINCIPAL_UNRESOLVED for a caller who is not an active local users.yaml user, before a new attempt
+        starts or the grant is consumed)
       tags:
         - Studio
         - A4 Forge
@@ -16456,8 +16468,10 @@ paths:
   /v1/a4/projects/{projectId}/stages/{stage}/build:
     post:
       summary: "Build (step built): the stage's producer (aspire, assemble and adapt: owner, owner mode; assemble's
-        native build session starts after the step is recorded and the response names it), or a self_reported
-        human-authored implementation ref while it has none"
+        native build session starts after the step is recorded and the response names it; a workspace-tools
+        session whose lease would name no active users.yaml user under a plan that requires a principal is 409
+        PRINCIPAL_UNRESOLVED before anything is written), or a self_reported human-authored implementation ref
+        while it has none"
       tags:
         - Studio
         - A4 Forge

@@ -1,3 +1,4 @@
+import { issueLeaseForPrincipal } from "./leasePrincipal.js";
 import { issueLeaseToken } from "./leaseSigner.js";
 import { verifyLeaseToken } from "./leaseVerifier.js";
 import { bootstrapLeaseRevocations, revokeLease, revokedLeaseIdSet, signLeaseRevocations, verifyLeaseRevocationsSignature } from "./leaseStore.js";
@@ -42,8 +43,13 @@ export function issueLeaseForCli(params: {
   tpm: number;
   maxCostUsdPerDay?: number | null;
   workOrderId?: string;
+  /**
+   * An authenticated session's principal (P1-78; A4 Assemble connect): when given, the lease is minted through
+   * issueLeaseForPrincipal, naming that users.yaml user or refusing (LeasePrincipalRefused) before anything is minted.
+   */
+  principalKey?: string | null;
 }): { token: string } {
-  const lease = issueLeaseToken({
+  const input = {
     workspace: params.workspace,
     workspaceId: params.workspaceId,
     agentId: params.agentId,
@@ -55,7 +61,8 @@ export function issueLeaseForCli(params: {
     maxTokensPerMinute: params.tpm,
     maxCostUsdPerDay: params.maxCostUsdPerDay ?? null,
     workOrderId: params.workOrderId ?? null
-  });
+  };
+  const lease = params.principalKey === undefined ? issueLeaseToken(input) : issueLeaseForPrincipal({ ...input, principalKey: params.principalKey });
   return {
     token: lease.token
   };

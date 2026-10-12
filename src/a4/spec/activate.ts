@@ -74,6 +74,17 @@ export function effectUnsettled(chain: readonly A4ChainLink[], match: (body: Rec
 const STAGING_LEASE_TTL_MS = 24 * 60 * 60 * 1000;
 /** No unauthenticated digest source exists at a destination until P2-40 (D-18 option 1). */
 export const IDENTITY_NOT_EVALUATED = "no unauthenticated digest source at the destination (P2-40)";
+/** Why the prepared files pin the image by tag (IMAGE_TAG_ONLY): AMC holds no digest to pin, whatever the chart supports. */
+export const IMAGE_TAG_ONLY_REASON = "the bootstrap report records no digest of the image this Studio runs, so the prepared files pin it by tag";
+/**
+ * Each target A4 v1 prepares (D-18: Compose and Helm only) as decision D-03 (option C, 2026-10-11) leaves it: all four
+ * topologies (Helm, Compose, Railway, Vercel) stay documented, and only a qualified one may be called supported. Neither
+ * prepared target has passed CI qualification; Railway and Vercel are documented but unqualified and never prepared here.
+ */
+export const TOPOLOGY_QUALIFICATION = {
+  helm: { reasonCode: "TOPOLOGY_QUALIFIED_LOCALLY_ONLY", note: "D-03 keeps Helm documented; it passed its qualification checks locally only (kind, 2026-10-11), and its CI qualification is pending" },
+  compose: { reasonCode: "TOPOLOGY_NOT_QUALIFIED", note: "D-03 keeps Compose documented but not qualified; its CI qualification is pending" }
+} as const;
 
 const load = () => import("../stages/activate.js");
 /** Activate's producers (Understand, Explain, Propose, Review); Build is the release effect (POST …/releases). */
@@ -447,6 +458,37 @@ function leaseScopeItem(release: A4ChainLink | null, production: Record<string, 
     nextAction: { label: "The staging lease (WRITE_LOW at most, staging routes, 24 h) is live; the production lease is minted at the deployment approval" } });
 }
 
+/**
+ * Who may run the release and the deployment approval (P1-78): under a verified plan whose identity-binding requires a
+ * principal (L0-IDN-01, mandatory in Layer 0; a plan that does not verify reads the same), their staging and production
+ * leases name the owner who runs each effect, who must be an active local users.yaml user; `complete`, POST …/releases
+ * and a retry refuse anyone else, a workspace-router session included (409 PRINCIPAL_UNRESOLVED), before the gate or
+ * the engine grant is consumed. WAITING and never mandatory while that applies; BLOCKED and mandatory while no active
+ * users.yaml user holds the workspace role OWNER (or users.yaml does not read) and a lease is still to be minted this
+ * cycle, so neither approval is requested or approved for an effect no one could run (a DENY, which mints nothing, is
+ * not refused). Once the production lease is recorded no lease is left to mint: READY (PRINCIPAL_EFFECTS_DONE), never
+ * mandatory. READY when the plan requires no principal (the lease then names the user when they resolve, else no one).
+ */
+function leasePrincipalItem(live: A4ReadinessQuery["live"], production: Record<string, unknown> | null): A4ReadinessItem {
+  if (live.leasePrincipalRequired === undefined) {
+    return item("lease.principal", "NOT_EVALUATED", { kind: "not_evaluated", section: "governance", mandatory: false, reasonCodes: ["PLAN_NOT_READ"] });
+  }
+  if (!live.leasePrincipalRequired) return item("lease.principal", "READY", { section: "governance", mandatory: false, reasonCodes: ["PRINCIPAL_NOT_REQUIRED"] });
+  if (production !== null) {
+    return item("lease.principal", "READY", { section: "governance", mandatory: false, reasonCodes: ["PRINCIPAL_REQUIRED", "PRINCIPAL_EFFECTS_DONE"] });
+  }
+  const label = "The active plan requires a principal for every tool call (L0-IDN-01): an owner signed in as an active local users.yaml user runs the release "
+    + "and completes the deployment approval, and each lease names them; anyone else, a workspace-router session included, is refused PRINCIPAL_UNRESOLVED "
+    + "before the gate is consumed";
+  const owners = live.activeLocalOwners ?? null;
+  if (owners === null || owners === 0) {
+    return item("lease.principal", "BLOCKED", { kind: "evidence_missing", section: "governance",
+      reasonCodes: ["PRINCIPAL_REQUIRED", owners === null ? "USERS_UNREADABLE" : "NO_ACTIVE_LOCAL_OWNER"],
+      nextAction: { label: `${label}. No active users.yaml user holds the OWNER role${owners === null ? " (users.yaml does not read)" : ""}: add one (amc user add) and make them a project owner` } });
+  }
+  return waiting("lease.principal", ["PRINCIPAL_REQUIRED"], { kind: "review_pending", section: "governance", mandatory: false, nextAction: { label } });
+}
+
 /** Whether a monitor link's signed record still resolves to the ref's bytes (its ref as this load resolved it). */
 export const monitorResolves = (state: Pick<A4ReadinessState, "refs">, link: A4ChainLink): boolean =>
   state.refs.some((ref) => ref.refKind === "monitor" && ref.refId === link.body.refId && ref.sha256 === link.body.sha256 && ref.status === "resolved");
@@ -510,6 +552,7 @@ export function activateItems(state: A4ReadinessState, query: A4ReadinessQuery):
   const target = textValue(answerValues(answers).get("target"));
   const release = currentRelease(state.chain);
   const releaseId = typeof release?.body.releaseId === "string" ? release.body.releaseId : null;
+  const productionLease = releaseId === null ? null : productionLeaseOf(state.chain, releaseId);
   const direction = latestGate(state, "activate", "direction");
   return [
     askCodes.length === 0 ? item("ask_complete", "READY", { section: "recommendation" })
@@ -524,13 +567,15 @@ export function activateItems(state: A4ReadinessState, query: A4ReadinessQuery):
     packageInputsItem(state, spec, proposed),
     transparencyItem(state.project.project_id, release, query.live.packageTransparency),
     sameHostItem(facts, target),
-    // D-03 is open: a Helm target is recordable, its topology undecided (WAITING, never BLOCKED; C8).
-    target === "helm" ? waiting("deployment.topology", ["TOPOLOGY_UNDECIDED", "KEY:D-03"], { kind: "review_pending", mandatory: false })
+    // D-03 keeps both prepared targets documented and either is recordable; neither is qualified in CI (WAITING, never BLOCKED; C8).
+    target === "helm" || target === "compose" ? waiting("deployment.topology", [TOPOLOGY_QUALIFICATION[target].reasonCode, "CI_QUALIFICATION_PENDING"],
+      { kind: "review_pending", mandatory: false, nextAction: { label: `${TOPOLOGY_QUALIFICATION[target].note}. A ${target} receipt is recordable` } })
       : item("deployment.topology", "READY", { mandatory: false, reasonCodes: target === null ? ["TARGET_NOT_ANSWERED"] : [] }),
-    // No image digest exists until D-03 and P0-14 (the bootstrap report records none): pinned by tag only, WAITING, never BLOCKED.
-    waiting("deployment.image_pinned", ["IMAGE_TAG_ONLY", "KEY:P0-14"], { kind: "review_pending", mandatory: false,
-      nextAction: { label: "The prepared files pin the image by tag; digest pinning waits for D-03 and P0-14 (the README names the gap)" } }),
-    leaseScopeItem(release, releaseId === null ? null : productionLeaseOf(state.chain, releaseId)),
+    // The bootstrap report records no image digest: pinned by tag only, WAITING, never BLOCKED.
+    waiting("deployment.image_pinned", ["IMAGE_TAG_ONLY"], { kind: "review_pending", mandatory: false,
+      nextAction: { label: `No image digest: ${IMAGE_TAG_ONLY_REASON} (the package README names the gap)` } }),
+    leaseScopeItem(release, productionLease),
+    leasePrincipalItem(query.live, productionLease),
     receiptItem(state, releaseId),
     amcCheckItem(state, releaseId),
     monitoringItem(state, releaseId),

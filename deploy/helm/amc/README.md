@@ -94,8 +94,8 @@ helm history amc
 
 Known gaps, each a WAITING item or a note in the plan, never a blocker:
 
-- The overlay pins the image by tag (`IMAGE_TAG_ONLY`): it does not set the chart's `image.digest` yet.
-- The plan still reads `TOPOLOGY_UNDECIDED` (`KEY:D-03`): D-03 has since kept Helm documented, and A4 does not read that decision yet.
+- The overlay pins the image by tag (`IMAGE_TAG_ONLY`): AMC's bootstrap report records no digest of the image the Studio runs, so the overlay leaves the chart's `image.digest` unset. Set it yourself to deploy by digest.
+- The plan reads `TOPOLOGY_QUALIFIED_LOCALLY_ONLY`: decision D-03 keeps Helm documented, and the chart passed its qualification checks locally only (kind, 2026-10-11); its CI qualification is pending.
 - The chart has no volume of its own for the signed-journal checkpoint root, so `AMC_CONTROL_CHECKPOINT_DIR` is not set.
 - The chart renders a fixed environment list, so the values overlay cannot set `AMC_A4_PREVIEW=1`
   (`A4_PREVIEW_NOT_SET_BY_CHART`). Set it on the Studio container yourself after each upgrade, for example with the

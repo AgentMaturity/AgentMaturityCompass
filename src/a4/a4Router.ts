@@ -326,7 +326,7 @@ function options(route: A4Route): void {
     workspace: { signingRoute: route_, readOnly: route.native?.executionAllowed() !== true },
     // Supported integration paths arrive with Assemble (P1-60). The running image digest would come from the bootstrap
     // report (never studioServer.ts); runBootstrap records none, so it is null with its reason (P1-62).
-    integrationClaims: [], imageDigest: null, imageDigestReason: "the bootstrap report records no image digest; pinning waits for D-03 and P0-14 (IMAGE_TAG_ONLY)"
+    integrationClaims: [], imageDigest: null, imageDigestReason: "the bootstrap report records no image digest, so A4's prepared files pin the image by tag (IMAGE_TAG_ONLY)"
   });
 }
 
