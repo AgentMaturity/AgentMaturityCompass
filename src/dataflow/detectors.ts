@@ -50,7 +50,7 @@ const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   schema: "amc.protected-detectors/v1", support: "experimental", patterns: getPIIDetectorMetadata(), spanScanRevision: PII_SPAN_SCAN_REVISION,
   classMapping: CLASS_BY_TYPE,
   noiseFilters: Object.fromEntries(Object.entries(NOISE_FILTERS).map(([type, re]) => [type, re.source])),
-  traversalRevision: "request-json-leaves-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-v6",
+  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-v7",
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS }
 }));
 function refused(): never { throw new Error("Protected request detection refused unsupported or excessive traversal"); }
@@ -113,6 +113,8 @@ export function detectProtectedRequest(request: EncodableRequest): ProtectedData
     };
     // Empty or malformed tool-call arguments are committed by design; they are scanned as escape-decoded text, never
     // refused. A number that overflows to Infinity (1e999) carries no text and becomes null, since visit() refuses it.
+    // Valid arguments are also scanned as raw decoded text, because the provider receives these bytes whatever a parser
+    // keeps: a duplicate key hides its earlier value from the parsed leaves. That pass only adds classes not yet counted.
     const json = (text: string) => {
       if (typeof text !== "string") refused();
       let parsed: unknown;
@@ -125,6 +127,9 @@ export function detectProtectedRequest(request: EncodableRequest): ProtectedData
         return;
       }
       visit(parsed, 0);
+      const raw = decodeJsonEscapes(text);
+      charge(raw.length);
+      for (const span of detectProtectedText(raw)) if (!(counts[span.dataClass] ?? 0)) add(span.dataClass);
     };
 
     scan(request.model);
