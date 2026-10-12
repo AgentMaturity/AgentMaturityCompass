@@ -668,9 +668,7 @@ export function exportEvidenceBundle(params: {
     if (latestOutcome) {
       ensureDir(join(root, "outcomes"));
       writeFileAtomic(join(root, "outcomes", "report.json"), readFileSync(latestOutcome.json));
-      if (latestOutcome.md) {
-        writeFileAtomic(join(root, "outcomes", "report.md"), readFileSync(latestOutcome.md), 0o644);
-      }
+      if (latestOutcome.md) writeFileAtomic(join(root, "outcomes", "report.md"), readFileSync(latestOutcome.md), 0o644);
     }
 
     const latestExperiment = findLatestExperimentReport(agentPaths.rootDir);

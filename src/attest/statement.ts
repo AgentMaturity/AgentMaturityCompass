@@ -15,11 +15,11 @@ import { sha256Hex } from "../utils/hash.js";
 export const INTOTO_STATEMENT_TYPE = "https://in-toto.io/Statement/v1";
 /** Never reuse a published predicate version: a changed shape gets a new URI. */
 export const CONTROL_RESULTS_PREDICATE = "https://agentmaturity.co/attestations/control-results/v0.1";
-export const ATTESTATION_TTL_DAYS = 90;
-export const ATTESTATION_NOTICE = "A signature proves who issued this statement and that it is unchanged, not that the statement is true or that the agent behaved well.";
+const ATTESTATION_TTL_DAYS = 90;
+const ATTESTATION_NOTICE = "A signature proves who issued this statement and that it is unchanged, not that the statement is true or that the agent behaved well.";
 
 
-export const controlResultsPredicateSchema = z.strictObject({
+const controlResultsPredicateSchema = z.strictObject({
   claimKind: claimKindSchema.exclude(["synthetic_example"]),
   scope: z.strictObject({
     tenant: nonEmpty.nullable(),
@@ -40,7 +40,7 @@ export const controlResultsPredicateSchema = z.strictObject({
   expiresAt: isoTimeSchema,
   notice: z.literal(ATTESTATION_NOTICE)
 });
-export type ControlResultsPredicate = z.infer<typeof controlResultsPredicateSchema>;
+type ControlResultsPredicate = z.infer<typeof controlResultsPredicateSchema>;
 
 export const inTotoStatementSchema = z.strictObject({
   _type: z.literal(INTOTO_STATEMENT_TYPE),

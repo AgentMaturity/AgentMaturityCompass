@@ -8,7 +8,7 @@ import type { AgentFacts, DigestFact } from "./collect.js";
 type Property = { name: string; value: string };
 type Hash = { alg: "SHA-256"; content: string };
 
-export interface CycloneDxComponent {
+interface CycloneDxComponent {
   type: "application" | "machine-learning-model" | "data" | "file";
   "bom-ref": string;
   name: string;

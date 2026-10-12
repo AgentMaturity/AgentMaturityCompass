@@ -1268,7 +1268,6 @@
     {"id":"e4155a8bf2069b8d98c93cf2244c77290603973c42d7c83a377fed51a79d1901","file":"src/actions/reconcile.ts","kind":"types"},
     {"id":"e599044bca1af737f538d7d76bdaafc3966eacbf526e30ec00e8a8dfef96aa76","file":"src/actions/reconcile.ts","kind":"types"},
     {"id":"60cb899190e95cf083fa8f7015d491a4531b786b8ac0aee67cf173479432ac20","file":"src/adapters/adapterCapabilities.ts","kind":"types"},
-    {"id":"c95f68c71c2487d6ef1ec70a2badbc3c12273e835f4e0c03bc25eb1a6a679561","file":"src/adapters/adapterConfigSchema.ts","kind":"exports"},
     {"id":"8edfb93a2379dcb87cf765dddac217f1c4e546a56c0577bfbae428eb61da360b","file":"src/adapters/adapterConfigStore.ts","kind":"exports"},
     {"id":"c6735d06c4c0aeb6b91f042f1bd263cef1be467cf17cde9d200df31ff1ba2aee","file":"src/adapters/adapterConfigStore.ts","kind":"exports"},
     {"id":"e01bf5d2fc92a40c9702085447757fe43181442eac897b9f827becc5c458137d","file":"src/adapters/adapterConfigStore.ts","kind":"exports"},

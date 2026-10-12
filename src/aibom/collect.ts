@@ -18,8 +18,8 @@ import { sha256Hex } from "../utils/hash.js";
 import { amcVersion } from "../version.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 
-export interface SignedFileFact { path: string; sha256: string; signature: string }
-export interface ToolFact { name: string; actionClass: string; mcp: { id: string; name: string; version?: string; transport?: string } | null }
+interface SignedFileFact { path: string; sha256: string; signature: string }
+interface ToolFact { name: string; actionClass: string; mcp: { id: string; name: string; version?: string; transport?: string } | null }
 export interface DigestFact { kind: "system-prompt" | "prompt-pack" | "dataset"; sha256: string }
 
 export interface AgentFacts {

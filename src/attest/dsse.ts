@@ -40,7 +40,7 @@ export function signDsse(payloadType: string, payload: Uint8Array, signer: DsseS
 }
 
 /** Standard base64 in its one canonical spelling (padded, zero trailing bits); null otherwise. */
-export function canonicalBase64(text: unknown): Buffer | null {
+function canonicalBase64(text: unknown): Buffer | null {
   if (typeof text !== "string" || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(text)) return null;
   const bytes = Buffer.from(text, "base64");
   return bytes.toString("base64") === text ? bytes : null;
