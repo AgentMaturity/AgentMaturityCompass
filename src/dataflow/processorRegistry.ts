@@ -162,6 +162,15 @@ function parse(bytes: Buffer): ProcessorRegistryV1 {
     { maxAliasCount: 0, uniqueKeys: true })));
 }
 
+/**
+ * The P2-02 opt-in, without reading or verifying anything: the registry file or its `.sig` exists (the snapshot below is
+ * `missing` only when neither does). A path that cannot be checked counts as opted in, so it fails closed.
+ */
+export function protectedDataOptedIn(workspace: string): boolean {
+  try { return present(processorRegistryPath(workspace)) || present(processorRegistrySigPath(workspace)); }
+  catch { return true; }
+}
+
 /** Missing, unsigned, broken, or ambiguous data never supplies protected-request permission. */
 export function loadProcessorRegistrySnapshot(workspace: string): ProcessorRegistrySnapshot {
   let path: string;

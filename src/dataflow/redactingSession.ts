@@ -6,20 +6,26 @@
  *
  * Every failure refuses the commit: a locked vault, a vault or receipt write that fails, a token collision, text over the
  * per-leaf limit, undecodable bytes or a declaring tool's unparseable result throws a static `RedactionRefused`, and the
- * raw value is never committed. Binary attachments and media inbox input are refused (`attachment_not_redactable`).
+ * raw value is never committed. A refused tool result (or native-validation output) is still answered, with a static
+ * withheld notice and a `PROTECTED_DATA_REDACTION_REFUSED` audit row, so the transcript stays well formed. Binary
+ * attachments and media inbox input are refused (`attachment_not_redactable`), media before anything is spilled.
  * Each redaction writes one `RedactionReceiptV1` audit row before the commit it describes.
  *
  * Detection is heuristic: regexes miss names and free-text identifiers outside declared fields, and model output is
  * recorded as the model produced it. Tokenization reduces identifiers; it is not de-identification or anonymization.
  */
 import { redactionReceiptV1Schema, type RedactionReceiptV1 } from "../contracts/v1/redactionReceipt.js";
+import { NATIVE_AUDIO_INPUT_FORMAT } from "../attachments/nativeAudioInput.js";
+import { NATIVE_IMAGE_INPUT_FORMAT } from "../attachments/nativeImageInput.js";
+import { NATIVE_ORDERED_INPUT_FORMAT } from "../attachments/nativeOrderedInput.js";
 import type { SessionEventRef, SessionService } from "../session/sessionService.js";
 import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
+import { RUN_CODE_TOOL } from "../tools/toolPipeline.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { ProtectedDataClass } from "../vault/dataClassification.js";
 import { DETECTOR_SET_DIGEST, MAX_PROTECTED_TEXT_CHARS, redactProtectedText } from "./detectors.js";
-import { loadProcessorRegistrySnapshot } from "./processorRegistry.js";
+import { protectedDataOptedIn } from "./processorRegistry.js";
 import { isShieldingToken, RedactionRefused, TOKEN_PATTERN_SOURCE, tokenFor } from "./tokenizer.js";
 import { loadTokenKeys, storeTokens, type TokenEntry, type TokenKeys } from "./tokenVault.js";
 
@@ -140,8 +146,11 @@ function declaredFieldsFor(workspace: string, toolName: string | undefined): Dec
     if (snapshot.signatureExists) throw new RedactionRefused("declared_fields_unverifiable");
     return undefined;
   }
-  if (toolName !== undefined) return findToolDefinition(snapshot.config, toolName)?.protectedFields;
-  // A result whose call this session never recorded cannot be matched to its tool's declarations.
+  if (toolName !== undefined && toolName !== RUN_CODE_TOOL) return findToolDefinition(snapshot.config, toolName)?.protectedFields;
+  // A result whose call this session never recorded cannot be matched to its tool's declarations, and a Code Mode result
+  // relays what declaring tools returned to the program, raw.
+  // ponytail: so every run_code result is refused (withheld) while some tool declares fields; tokenizing each sub-call's
+  // declared fields at the ToolPipeline boundary, before the program sees them, lifts that.
   if (snapshot.config.tools.allowedTools.some(tool => tool.protectedFields !== undefined)) throw new RedactionRefused("declared_fields_unverifiable");
   return undefined;
 }
@@ -151,23 +160,47 @@ function decodeText(content: string | Buffer, refusal: "content_not_text" | "att
   try { return new TextDecoder("utf-8", { fatal: true }).decode(content); } catch { throw new RedactionRefused(refusal); }
 }
 
+/** Redacts `text` and, when anything was found, writes its receipt row on `session` first; any failure refuses. */
+function redactWithReceipt(session: SessionService, redactor: Redactor, text: string, source: RedactionReceiptV1["source"],
+  callId: string | null, declared?: DeclaredFields): string {
+  const result = redactor.redact(text, declared);
+  if (result.findings.length === 0) return result.text;
+  try {
+    const receipt = redactionReceiptV1Schema.parse({ schema: "amc.redaction-receipt/v1", sessionId: session.sessionId, source, callId,
+      detectorsVersion: DETECTOR_SET_DIGEST, findings: result.findings, declaredFields: result.declaredFields, redactedDigest: sha256Hex(result.text) });
+    session.recordProjectedEvidence({ eventType: "audit", payload: canonicalize(receipt), meta: { auditType: "PROTECTED_DATA_REDACTED",
+      redactionSource: receipt.source, callId: receipt.callId, detectorsVersion: receipt.detectorsVersion, findings: receipt.findings,
+      declaredFields: receipt.declaredFields, redactedDigest: receipt.redactedDigest } });
+  } catch {
+    throw new RedactionRefused("receipt_failed");
+  }
+  return result.text;
+}
+
+// The canonical encodings of queued media input start with their format (canonicalize sorts keys, and "format" sorts first).
+const MEDIA_INPUT_PREFIXES = [NATIVE_IMAGE_INPUT_FORMAT, NATIVE_ORDERED_INPUT_FORMAT, NATIVE_AUDIO_INPUT_FORMAT]
+  .map(format => Buffer.from(`{"format":"${format}"`, "utf8"));
+
 /** Wraps `session`: the record methods below redact, then delegate; every other member is the session's own. */
 export function createRedactingSession(session: SessionService, redactor: Redactor): SessionService {
   const toolNames = new Map<string, string>();
   const spilledDescriptors = new Set<string>();
-  const redact = (text: string, source: RedactionReceiptV1["source"], callId: string | null, declared?: DeclaredFields): string => {
-    const result = redactor.redact(text, declared);
-    if (result.findings.length === 0) return result.text;
+  const redact = (text: string, source: RedactionReceiptV1["source"], callId: string | null, declared?: DeclaredFields): string =>
+    redactWithReceipt(session, redactor, text, source, callId, declared);
+  /**
+   * Tool output that must still be answered. A refusal commits a static notice in place of the output, after a
+   * `PROTECTED_DATA_REDACTION_REFUSED` row naming the reason, so the call is never left unanswered; the output is not
+   * committed anywhere.
+   */
+  const redactOrWithhold = (callId: string, redactOutput: () => string): string => {
     try {
-      const receipt = redactionReceiptV1Schema.parse({ schema: "amc.redaction-receipt/v1", sessionId: session.sessionId, source, callId,
-        detectorsVersion: DETECTOR_SET_DIGEST, findings: result.findings, declaredFields: result.declaredFields, redactedDigest: sha256Hex(result.text) });
-      session.recordProjectedEvidence({ eventType: "audit", payload: canonicalize(receipt), meta: { auditType: "PROTECTED_DATA_REDACTED",
-        redactionSource: receipt.source, callId: receipt.callId, detectorsVersion: receipt.detectorsVersion, findings: receipt.findings,
-        declaredFields: receipt.declaredFields, redactedDigest: receipt.redactedDigest } });
-    } catch {
-      throw new RedactionRefused("receipt_failed");
+      return redactOutput();
+    } catch (error) {
+      if (!(error instanceof RedactionRefused)) throw error;
+      session.recordProjectedEvidence({ eventType: "audit", payload: "", meta: { auditType: "PROTECTED_DATA_REDACTION_REFUSED",
+        redactionSource: "tool/result", callId, reason: error.reason } });
+      return `[amc] tool output withheld: protected-data redaction refused (${error.reason})`;
     }
-    return result.text;
   };
   const toolNameOf = (callId: string): string | undefined => {
     const known = toolNames.get(callId);
@@ -198,10 +231,34 @@ export function createRedactingSession(session: SessionService, redactor: Redact
       return ref;
     },
     recordToolResult(result: Parameters<SessionService["recordToolResult"]>[0]): SessionEventRef {
-      // Declared fields bind a successful result's JSON; error, denial and cancellation text gets the detectors only.
-      const declared = result.outcome === "OK" ? declaredFieldsFor(session.workspace, toolNameOf(result.toolCallId)) : undefined;
-      const content = redact(decodeText(result.content, "content_not_text"), "tool/result", result.toolCallId, declared);
+      const content = redactOrWithhold(result.toolCallId, () => {
+        // Declared fields bind a successful result's JSON; error, denial and cancellation text gets the detectors only,
+        // except a Code Mode result, whose text in any outcome can carry what a declaring tool returned.
+        const toolName = toolNameOf(result.toolCallId);
+        const declared = result.outcome === "OK" || toolName === RUN_CODE_TOOL ? declaredFieldsFor(session.workspace, toolName) : undefined;
+        return redact(decodeText(result.content, "content_not_text"), "tool/result", result.toolCallId, declared);
+      });
       return session.recordToolResult({ ...result, content });
+    },
+    /**
+     * Evidence about tool output. A native-validation check's output is redacted like a tool result. A stdout row keeps
+     * its sizes but not `outputSha256`, the plain SHA-256 of the raw output, which a short value (an SSN, a card number)
+     * would let anyone brute-force; the output it hashed is not retained anyway.
+     */
+    recordProjectedEvidence(row: Parameters<SessionService["recordProjectedEvidence"]>[0]): SessionEventRef {
+      if (row.eventType === "stdout") {
+        let payload: unknown;
+        try { payload = JSON.parse(row.payload); } catch { throw new RedactionRefused("redaction_failed"); }
+        if (payload === null || typeof payload !== "object" || Array.isArray(payload)) throw new RedactionRefused("redaction_failed");
+        const { outputSha256: _payloadDigest, ...kept } = payload as Record<string, unknown>;
+        const { outputSha256: _metaDigest, ...meta } = row.meta;
+        return session.recordProjectedEvidence({ ...row, payload: JSON.stringify(kept), meta });
+      }
+      if (row.meta.kind === "native-validation" && row.meta.phase === "check-result" && row.payload !== "") {
+        const callId = typeof row.meta.callId === "string" ? row.meta.callId : "native-validation";
+        return session.recordProjectedEvidence({ ...row, payload: redactOrWithhold(callId, () => redact(row.payload, "tool/result", callId)) });
+      }
+      return session.recordProjectedEvidence(row);
     },
     // The inbox row is the queued message's first durable copy, so it is redacted here, before user/message is.
     recordLoopEvent(record: Parameters<SessionService["recordLoopEvent"]>[0]): SessionEventRef {
@@ -212,6 +269,8 @@ export function createRedactingSession(session: SessionService, redactor: Redact
     },
     retainOversizeInput(...[what, bytes, cap, subject]: Parameters<SessionService["retainOversizeInput"]>): ReturnType<SessionService["retainOversizeInput"]> {
       if (subject.subject !== "loop/inbox") return session.retainOversizeInput(what, bytes, cap, subject);
+      // Media is refused before its spill commitment or object is written, not after.
+      if (MEDIA_INPUT_PREFIXES.some(prefix => bytes.subarray(0, prefix.length).equals(prefix))) throw new RedactionRefused("attachment_not_redactable");
       const redacted = Buffer.from(redact(decodeText(bytes, "content_not_text"), "loop/inbox", null), "utf8");
       const retained = session.retainOversizeInput(what, redacted, cap, subject);
       spilledDescriptors.add(retained.descriptor.toString("utf8"));
@@ -229,6 +288,11 @@ export function createRedactingSession(session: SessionService, redactor: Redact
 
 /** Opt-in, like admission: with no processor registry file and no `.sig`, the session is returned unchanged. */
 export function redactingSessionFor(session: SessionService): SessionService {
-  return loadProcessorRegistrySnapshot(session.workspace).state === "missing" ? session
-    : createRedactingSession(session, createWorkspaceRedactor(session.workspace));
+  return protectedDataOptedIn(session.workspace) ? createRedactingSession(session, createWorkspaceRedactor(session.workspace)) : session;
+}
+
+/** Operator compaction text (`amc session compact`): redacted, with its receipt on `session`, in an opted-in workspace. */
+export function redactCompactionReplacement(session: SessionService, text: string): string {
+  return protectedDataOptedIn(session.workspace)
+    ? redactWithReceipt(session, createWorkspaceRedactor(session.workspace), text, "operator/compaction", null) : text;
 }

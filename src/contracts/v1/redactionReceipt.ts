@@ -9,11 +9,12 @@ true satisfies ([ProtectedDataClass] extends [(typeof PROTECTED_DATA_CLASSES)[nu
  * One redaction of protected data before a row was committed (P2-02). It carries classes, detector names, counts, the
  * declared fields that matched and the digest of the redacted text only: never a raw value, a span or a hash of one.
  * `detectorsVersion` is the detector-set digest. Detection is heuristic; a receipt does not show that nothing was missed.
+ * Sources are the native session's inputs and operator compaction text; gateway and bridge redactions write no receipt.
  */
 export const redactionReceiptV1Schema = z.strictObject({
   schema: z.literal("amc.redaction-receipt/v1"),
   sessionId: nonEmpty,
-  source: z.enum(["user/message", "user/attachment", "tool/result", "loop/inbox", "gateway", "bridge"]),
+  source: z.enum(["user/message", "user/attachment", "tool/result", "loop/inbox", "operator/compaction"]),
   callId: nonEmpty.nullable(),
   detectorsVersion: sha256HexSchema,
   findings: z.array(z.strictObject({ dataClass: z.enum(PROTECTED_DATA_CLASSES), detector: nonEmpty, count: z.number().int().positive() })).min(1),

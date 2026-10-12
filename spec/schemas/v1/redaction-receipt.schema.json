@@ -77,8 +77,7 @@
         "user/attachment",
         "tool/result",
         "loop/inbox",
-        "gateway",
-        "bridge"
+        "operator/compaction"
       ],
       "type": "string"
     }

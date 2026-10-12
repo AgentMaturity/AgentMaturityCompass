@@ -9,6 +9,7 @@ import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { protectedDataOptedIn } from "../dataflow/processorRegistry.js";
 import { freezeToolArguments } from "./toolArguments.js";
 import type { ToolRegistry } from "./toolRegistry.js";
 import {
@@ -175,10 +176,14 @@ function effectVerdict(actionClass: string, settled: { readonly result: ToolBody
     : { state: "completed", effect: null, reasonCode: "completed" };
 }
 
-/** What a receipt binds about an outcome: its facts and the output's digest, never the output. */
-function outcomeDigest(outcome: ToolOutcome): string {
+/**
+ * What a receipt binds about an outcome: its facts and the output's digest, never the output. In a workspace that opted
+ * in to protected-data redaction (P2-02) the output's digest is left out: a plain SHA-256 of a short output (an SSN, a
+ * card number) can be brute-forced, and the committed tool result holds the redacted text, not those bytes.
+ */
+function outcomeDigest(outcome: ToolOutcome, withOutput: boolean): string {
   return sha256Hex(canonicalize({ ok: outcome.ok, exitCode: outcome.exitCode, timedOut: outcome.timedOut, bytes: outcome.bytes,
-    outputSha256: sha256Hex(outcome.output) }));
+    ...(withOutput ? { outputSha256: sha256Hex(outcome.output) } : {}) }));
 }
 
 /**
@@ -556,7 +561,7 @@ export class ToolPipeline {
     try {
       if (verdict.state === "completed") {
         const ref = "result" in settled ? settled.result.externalRef : undefined;
-        journal.complete(executionId, { effect: verdict.effect, outcomeDigest: outcomeDigest(outcome), reasonCode: verdict.reasonCode,
+        journal.complete(executionId, { effect: verdict.effect, outcomeDigest: outcomeDigest(outcome, !protectedDataOptedIn(this.init.workspace)), reasonCode: verdict.reasonCode,
           externalRef: typeof ref === "string" && ref.length > 0 && ref.length <= 512 ? ref : null });
       } else {
         journal.markUnknown(executionId, verdict.reasonCode);

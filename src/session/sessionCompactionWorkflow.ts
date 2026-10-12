@@ -7,6 +7,7 @@ import { describeMeasuredLiveEntries, prepareSurfaceCompaction } from "./surface
 import { compactionReceipt } from "./surfaceCompactionValidation.js";
 import { resumeSession } from "./sessionResume.js";
 import type { SessionService } from "./sessionService.js";
+import { redactCompactionReplacement } from "../dataflow/redactingSession.js";
 
 function snapshot(workspace: string, sessionId: string) {
   // Inspect the recorded backend, never a permissive fallback selected from a
@@ -77,11 +78,13 @@ export function compactReleasedSession(input: SessionCompactionInput) {
       claimant: { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Math.round(Date.now() - process.uptime() * 1000) } });
     service = resumed.service;
     if (resumed.report.observedHeadEventId !== source.head.id) throw new Error("Session changed during writer acquisition; no compaction applied, list it again");
+    // P2-02: operator text becomes model-visible surface content, so an opted-in workspace tokenizes it first, with a receipt.
+    const replacement = input.mode === "drop" ? "" : redactCompactionReplacement(service, input.replacement!);
     const ref = input.mode === "drop"
       ? service.dropSurfaceRange({ originEventIds: input.originEventIds, reason: input.reason })
       : input.mode === "replace"
-        ? service.compactSurfaceEntry({ originEventId: input.originEventIds[0]!, replacement: input.replacement!, reason: input.reason })
-        : service.compactSurfaceRange({ originEventIds: input.originEventIds, replacement: input.replacement!, reason: input.reason,
+        ? service.compactSurfaceEntry({ originEventId: input.originEventIds[0]!, replacement, reason: input.reason })
+        : service.compactSurfaceRange({ originEventIds: input.originEventIds, replacement, reason: input.reason,
           ...(input.summaryRole === undefined ? {} : { summaryRole: input.summaryRole }) });
     const row = service.readEvents().find(event => event.id === ref.eventId);
     if (!row) throw new Error("Compaction append returned without its committed receipt");
