@@ -465,7 +465,8 @@ when they resolve, and no one otherwise. Readiness item `lease.principal` shows 
 (`PRINCIPAL_NOT_REQUIRED`) when the plan requires no principal; otherwise WAITING (`PRINCIPAL_REQUIRED`, never
 mandatory) with the rule as its next action, and BLOCKED, mandatory, while no active `users.yaml` user holds the
 workspace role OWNER or `users.yaml` does not read (`NO_ACTIVE_LOCAL_OWNER`, `USERS_UNREADABLE`) and a lease is still
-to be minted this cycle, so neither approval is requested for an effect no one could run. Once the production lease is
+to be minted this cycle, so neither approval is requested or approved for an effect no one could run; it does not refuse a
+`DENY`, which mints nothing (on the completion gate the `DENY` revokes the staging lease). Once the production lease is
 recorded it reads READY (`PRINCIPAL_EFFECTS_DONE`), never mandatory.
 A vault that is already locked when `complete`, `POST …/releases` or a retry is sent is refused before anything is
 consumed: readiness reads `signing.available` WAITING `VAULT_LOCKED` (409 `A4_NOT_READY`). A `DENY` on an unconsumed

@@ -542,9 +542,9 @@ export function recordDecision(store: A4Store, projectId: string, input: A4Call 
     if (gate.status !== "PENDING") throw fail(409, "A4_GATE_CLOSED", `the gate is ${gate.status}`);
     // A policy gate is not one of the stage's direction/completion gates: their openness, roles, votes and expiry do not
     // bar it, and its own were just checked (roles just below). Its proposal was floor-checked at request and is again at
-    // GATE_POLICY_CHANGED, so a policy in force below the floor does not bar it.
-    assertAllowed(readiness, "decide", row.gate === "policy"
-      ? ["GATE_NOT_OPEN", "GATE_ROLE_NOT_ALLOWED", "A4_DUPLICATE_DECISION", "GATE_EXPIRING", "gate.policy_floor"] : []);
+    // GATE_POLICY_CHANGED, so a policy in force below the floor does not bar it. `lease.principal` bars approvals only: a DENY mints no lease (at Activate it revokes one).
+    assertAllowed(readiness, "decide", [...(row.gate === "policy" ? ["GATE_NOT_OPEN", "GATE_ROLE_NOT_ALLOWED", "A4_DUPLICATE_DECISION", "GATE_EXPIRING", "gate.policy_floor"] : []),
+      ...(input.decision === "deny" ? ["lease.principal"] : [])]);
     if (!principal.roles.some((role) => gate.request.rolesAllowed.includes(role))) {
       throw fail(403, "PRINCIPAL_ROLE_INSUFFICIENT", `this gate accepts ${gate.request.rolesAllowed.join(", ")}`);
     }

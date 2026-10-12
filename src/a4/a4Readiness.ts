@@ -561,6 +561,8 @@ export function roleRefusals(state: A4ReadinessState, stage: A4Stage, action: A4
  * PRINCIPAL_ROLE_INSUFFICIENT), a vote already cast (A4_DUPLICATE_DECISION) and the expiry guard (GATE_EXPIRING). It
  * leaves out the gate's SoD exclusions: an excluded requester, author or builder may still deny, and recordDecision
  * refuses their approval at write (400 SOD_VIOLATION; `selfApprovalAllowed` says whether self-approval is open).
+ * A BLOCKED `lease.principal` is listed under `decide` but refuses an approval only: a DENY mints no lease, and on the
+ * Activate completion gate it is what revokes the staging lease, so recordDecision lets it through.
  * At Activate under a plan that requires a principal, `progress` and `retryEffect` refuse a caller who is not an active
  * local users.yaml user (PRINCIPAL_UNRESOLVED, P1-78), since the effect they run mints a lease that must name them.
  */

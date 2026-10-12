@@ -465,9 +465,9 @@ function leaseScopeItem(release: A4ChainLink | null, production: Record<string, 
  * and a retry refuse anyone else, a workspace-router session included (409 PRINCIPAL_UNRESOLVED), before the gate or
  * the engine grant is consumed. WAITING and never mandatory while that applies; BLOCKED and mandatory while no active
  * users.yaml user holds the workspace role OWNER (or users.yaml does not read) and a lease is still to be minted this
- * cycle, so neither approval is requested for an effect no one could run. Once the production lease is recorded no
- * lease is left to mint: READY (PRINCIPAL_EFFECTS_DONE), never mandatory. READY when the plan requires no principal
- * (the lease then names the user when they resolve, else no one).
+ * cycle, so neither approval is requested or approved for an effect no one could run (a DENY, which mints nothing, is
+ * not refused). Once the production lease is recorded no lease is left to mint: READY (PRINCIPAL_EFFECTS_DONE), never
+ * mandatory. READY when the plan requires no principal (the lease then names the user when they resolve, else no one).
  */
 function leasePrincipalItem(live: A4ReadinessQuery["live"], production: Record<string, unknown> | null): A4ReadinessItem {
   if (live.leasePrincipalRequired === undefined) {
