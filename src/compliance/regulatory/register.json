@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "policy": {
     "reviewWindowDays": 90,
-    "note": "An entry whose lastReviewed is older than reviewWindowDays fails scripts/check-regulatory-currency.mjs. verified=true means every keyDate and obligation encoded in the entry was read from an official source in the review that set lastReviewed and the entry has no open questions; it is not legal advice. The round-2 batches applied on 2026-10-04 read their sources that day (retrievedAt 2026-10-04) and keep lastReviewed 2026-10-03, the earlier and so stricter date for the review window; the register therefore validates from 2026-10-04. A keyDate whose basis names a dated program receipt (research/<station>/digest.json, read 2026-10-03) counts as read in the 2026-10-03 review; its url and retrievedAt are the receipt's. Program receipts are cited as program-records/2026-10-03/<path>: a name for the 2026-10-03 program records, which are held outside the repository, not a path in it. status \"superseded\" also covers revoked and withdrawn instruments; taskStatus says which. A keyDate with observation=true records a retrieval observation, not a legal date, and is not a calendar event. supersedes/supersededBy hold register entry ids only; supersedesInstruments names predecessors that have no entry.",
-    "officialHostsNote": "Every source URL's hostname must equal an officialHosts entry or be a subdomain of one: regulators, legislatures, official journals and standards bodies. Secondary or commentary sites are not sources. finra.org is a self-regulatory organisation, cited only for its own rules; oecd.org, oecd.ai and coe.int are the intergovernmental publishers of their own instruments; etsi.org is a European standards organisation. aiverifyfoundation.sg was proposed and rejected (a foundation, not a regulator).",
-    "officialHosts": ["europa.eu", "nist.gov", "iso.org", "federalregister.gov", "hhs.gov", "healthit.gov", "fda.gov", "nerc.com", "ferc.gov", "sec.gov", "ed.gov", "nhtsa.gov", "transportation.gov", "leg.colorado.gov", "capitol.texas.gov", "leginfo.legislature.ca.gov", "gov.ca.gov", "cppa.ca.gov", "msit.go.kr", "law.go.kr", "pcisecuritystandards.org", "cac.gov.cn", "planalto.gov.br", "pib.gov.in", "indiacode.nic.in", "ppc.go.jp", "japaneselawtranslation.go.jp", "gov.uk", "ico.org.uk", "cao.go.jp", "korea.kr", "imda.gov.sg", "mddi.gov.sg", "coe.int", "oecd.org", "oecd.ai", "etsi.org", "whitehouse.gov", "ecfr.gov", "govinfo.gov", "reginfo.gov", "ftc.gov", "fcc.gov", "cisa.gov", "epa.gov", "eeoc.gov", "ada.gov", "federalreserve.gov", "finra.org", "nyc.gov", "coag.gov", "calcivilrights.ca.gov", "nysed.gov", "ohio.gov", "illinois.gov", "ilga.gov", "utah.gov"]
+    "note": "An entry whose lastReviewed is older than reviewWindowDays fails scripts/check-regulatory-currency.mjs. verified=true means every keyDate and obligation encoded in the entry was read from an official source in the review that set lastReviewed and the entry has no open questions; it is not legal advice. The round-2 batches applied on 2026-10-04 read their sources that day (retrievedAt 2026-10-04) and keep lastReviewed 2026-10-03, the earlier and so stricter date for the review window; the register therefore validated from 2026-10-04 until P1-18 added US entries recorded 2026-10-07 to 2026-10-12, and validates from 2026-10-12. A keyDate whose basis names a dated program receipt (research/<station>/digest.json, read 2026-10-03) counts as read in the 2026-10-03 review; its url and retrievedAt are the receipt's. Program receipts are cited as program-records/2026-10-03/<path>: a name for the 2026-10-03 program records, which are held outside the repository, not a path in it. status \"superseded\" also covers revoked and withdrawn instruments; taskStatus says which. A keyDate with observation=true records a retrieval observation, not a legal date, and is not a calendar event. supersedes/supersededBy hold register entry ids only; supersedesInstruments names predecessors that have no entry.",
+    "officialHostsNote": "Every source URL's hostname must equal an officialHosts entry or be a subdomain of one: regulators, legislatures, official journals and standards bodies. Secondary or commentary sites are not sources. finra.org is a self-regulatory organisation, cited only for its own rules; oecd.org, oecd.ai and coe.int are the intergovernmental publishers of their own instruments; etsi.org is a European standards organisation. aiverifyfoundation.sg was proposed and rejected (a foundation, not a regulator). consumerfinance.gov (Consumer Financial Protection Bureau), dfs.ny.gov (New York State Department of Financial Services) and cms.gov (Centers for Medicare & Medicaid Services) are regulators, added by P1-18 for Sid's approval.",
+    "officialHosts": ["europa.eu", "nist.gov", "iso.org", "federalregister.gov", "hhs.gov", "healthit.gov", "fda.gov", "nerc.com", "ferc.gov", "sec.gov", "ed.gov", "nhtsa.gov", "transportation.gov", "leg.colorado.gov", "capitol.texas.gov", "leginfo.legislature.ca.gov", "gov.ca.gov", "cppa.ca.gov", "msit.go.kr", "law.go.kr", "pcisecuritystandards.org", "cac.gov.cn", "planalto.gov.br", "pib.gov.in", "indiacode.nic.in", "ppc.go.jp", "japaneselawtranslation.go.jp", "gov.uk", "ico.org.uk", "cao.go.jp", "korea.kr", "imda.gov.sg", "mddi.gov.sg", "coe.int", "oecd.org", "oecd.ai", "etsi.org", "whitehouse.gov", "ecfr.gov", "govinfo.gov", "reginfo.gov", "ftc.gov", "fcc.gov", "cisa.gov", "epa.gov", "eeoc.gov", "ada.gov", "federalreserve.gov", "finra.org", "nyc.gov", "coag.gov", "calcivilrights.ca.gov", "nysed.gov", "ohio.gov", "illinois.gov", "ilga.gov", "utah.gov", "consumerfinance.gov", "dfs.ny.gov", "cms.gov"]
   },
   "entries": [
     {
@@ -362,7 +362,7 @@
       "citation": "Colorado SB26-189 (repeals and reenacts Part 17 of Article 1 of Title 6, C.R.S.)",
       "bindingForce": "binding",
       "status": "enacted-not-yet-applicable",
-      "stations": ["health", "education", "governance", "wealth"],
+      "stations": ["health", "education", "governance", "wealth", "environment", "technology", "mobility"],
       "agentObligations": [
         { "ref": "Developers", "summary": "Give deployers technical documentation (intended uses, training-data categories, known limitations, instructions for use and human review), notify material updates, keep records at least 3 years.", "verified": true },
         { "ref": "Deployers", "summary": "Clear and conspicuous notice at points of interaction; plain-language description of the system's role within 30 days after an adverse consequential decision; meaningful human review on request.", "verified": true }
@@ -3335,7 +3335,7 @@
       "citation": "NPRM 90 FR 898 (FR Doc 2024-30983), RIN 0945-AA22; proposed amendments to 45 CFR Part 164",
       "bindingForce": "binding",
       "status": "proposed",
-      "stations": ["health"],
+      "stations": ["health", "technology"],
       "agentObligations": [
         { "ref": "45 CFR 164.308(a)(1)(i)", "summary": "Proposed 45 CFR 164.308(a)(1)(i): a written technology asset inventory and network map. Agent runtimes, models, tools/connectors and MCP servers that touch ePHI are technology assets.", "verified": true },
         { "ref": "45 CFR 164 (proposed) #2", "summary": "Preamble (risk analysis): ePHI in AI training data, prediction models and algorithm data is protected, and regulated entities are expected to include AI tool use in risk analysis and risk management.", "verified": true },
@@ -3691,7 +3691,7 @@
       "citation": "CMS-0057-F, 89 FR 8758",
       "bindingForce": "binding",
       "status": "in-force",
-      "stations": ["health"],
+      "stations": ["health", "wealth"],
       "agentObligations": [
         { "ref": "CMS-0057-F #1", "summary": "An agent that drafts or decides prior authorizations for impacted payers must state a specific denial reason and meet the 72-hour or 7-day decision timeframes. Starting 2027 it must expose PA status through the APIs.", "verified": true }
       ],
@@ -4567,6 +4567,185 @@
       "supersedesInstruments": ["SR 11-7", "SR 21-8"]
     },
     {
+      "id": "us-reg-e",
+      "jurisdiction": "US",
+      "instrument": "Electronic Fund Transfer Act, Regulation E",
+      "citation": "12 CFR Part 1005 (Regulation E): §1005.2(m) and Supplement I comment 2(m)-3",
+      "bindingForce": "binding",
+      "status": "in-force",
+      "stations": ["wealth", "technology"],
+      "agentObligations": [
+        { "ref": "12 CFR 1005.2(m)", "summary": "A transfer by a person the consumer furnished the access device to is not unauthorized until the consumer withdraws that authority. How this applies to an agent holding delegated credentials is untested: delegation must be explicit and revocable, and an agent transfer is never treated as authorized by default (plan's US register).", "verified": false },
+        { "ref": "comment 2(m)-3", "summary": "A transfer made with an access device obtained by fraud (plan's US register).", "verified": false }
+      ],
+      "keyDates": [
+        { "id": "2026-10-12-source-not-read", "date": "2026-10-12", "event": "Entry recorded by P1-18 from the plan's US register without reading the source (no network access); no legal date is encoded", "verified": false, "url": "https://www.ecfr.gov/current/title-12/section-1005.2", "retrievedAt": "2026-10-12", "observation": true }
+      ],
+      "sources": [
+        { "title": "eCFR: 12 CFR 1005.2 Definitions", "url": "https://www.ecfr.gov/current/title-12/section-1005.2", "publisher": "Office of the Federal Register (eCFR)", "retrievedAt": "2026-10-12", "fetched": false, "note": "Not fetched (not attempted): P1-18 ran without network access (Sid, 2026-10-11); read and hash before review." },
+        { "title": "CFPB: Regulation E official interpretations to §1005.2", "url": "https://www.consumerfinance.gov/rules-policy/regulations/1005/interp-2/", "publisher": "Consumer Financial Protection Bureau", "retrievedAt": "2026-10-12", "fetched": false, "note": "Not fetched (not attempted): P1-18 ran without network access (Sid, 2026-10-11); read and hash before review." }
+      ],
+      "lastReviewed": "2026-10-12",
+      "verified": false,
+      "openQuestions": ["Neither source was read: P1-18 had no network access. Read and hash 12 CFR 1005.2(m) and comment 2(m)-3 before review.", "Re-verify how Reg E applies to agents holding delegated credentials."],
+      "taskStatus": "in force",
+      "provenance": ["catalog/registers/us.json (P1-18)"]
+    },
+    {
+      "id": "us-glba-safeguards",
+      "jurisdiction": "US",
+      "instrument": "GLBA Safeguards Rule (Standards for Safeguarding Customer Information)",
+      "citation": "16 CFR Part 314 (FTC), §314.4",
+      "bindingForce": "binding",
+      "status": "in-force",
+      "stations": ["wealth", "technology"],
+      "agentObligations": [
+        { "ref": "16 CFR 314.4(j)", "summary": "Notify the FTC as soon as possible and no later than 30 days after discovering a notification event involving at least 500 consumers (read by P1-17).", "verified": true },
+        { "ref": "16 CFR 314.4(c)(5)", "summary": "Multi-factor authentication for any individual accessing any information system (plan's US register).", "verified": false },
+        { "ref": "16 CFR 314.4(c)(8)", "summary": "Monitor and log the activity of authorized users, agents included (plan's US register).", "verified": false },
+        { "ref": "16 CFR 314.4(f)", "summary": "Oversee service providers (plan's US register).", "verified": false }
+      ],
+      "keyDates": [
+        { "id": "2024-05-13-ecfr-latest-amendment", "date": "2024-05-13", "event": "Latest amendment of 16 CFR 314.4 in the eCFR version history, read by P1-17; not recorded as any paragraph's effective date", "verified": true, "url": "https://www.ecfr.gov/api/versioner/v1/versions/title-16.json?section=314.4", "retrievedAt": "2026-10-07", "observation": true }
+      ],
+      "sources": [
+        { "title": "16 CFR 314.4, CFR annual edition 2026 (Title 16 Vol. 1, revised 2026-01-01), GPO govinfo", "url": "https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec314-4.xml", "publisher": "U.S. Government Publishing Office", "retrievedAt": "2026-10-07T17:10:30Z", "fetched": true, "note": "Read and hashed by P1-17 (qualification/2026-10-07-P1-17/sources.md)" }
+      ],
+      "lastReviewed": "2026-10-07",
+      "verified": false,
+      "openQuestions": ["Paragraphs (c)(5), (c)(8) and (f) are not confirmed from text held in the repository: P1-17 encoded only (j)."],
+      "taskStatus": "in force",
+      "provenance": ["qualification/2026-10-07-P1-17/sources.md"]
+    },
+    {
+      "id": "us-bsa-sar",
+      "jurisdiction": "US",
+      "instrument": "Bank Secrecy Act: reports by banks of suspicious transactions",
+      "citation": "31 CFR 1020.320",
+      "bindingForce": "binding",
+      "status": "in-force",
+      "stations": ["wealth"],
+      "agentObligations": [
+        { "ref": "31 CFR 1020.320(b)(3)", "summary": "File the SAR no later than 30 calendar days after initial detection of facts that may be a basis for filing (read by P1-17).", "verified": true },
+        { "ref": "31 CFR 1020.320(e)", "summary": "A SAR, and any information that would reveal its existence, is confidential (read by P1-17).", "verified": true },
+        { "ref": "31 CFR 1020.320(d)", "summary": "Keep a copy of the SAR and its supporting documentation for five years (read by P1-17).", "verified": true }
+      ],
+      "keyDates": [
+        { "id": "2016-12-23-ecfr-latest-amendment", "date": "2016-12-23", "event": "Latest amendment of 31 CFR 1020.320 in the eCFR version history, read by P1-17; not recorded as an effective date", "verified": true, "url": "https://www.ecfr.gov/api/versioner/v1/versions/title-31.json?section=1020.320", "retrievedAt": "2026-10-07", "observation": true }
+      ],
+      "sources": [
+        { "title": "31 CFR 1020.320, CFR annual edition 2025 (Title 31 Vol. 3, revised 2025-07-01), GPO govinfo", "url": "https://www.govinfo.gov/content/pkg/CFR-2025-title31-vol3/xml/CFR-2025-title31-vol3-sec1020-320.xml", "publisher": "U.S. Government Publishing Office", "retrievedAt": "2026-10-07T17:10:02Z", "fetched": true, "note": "Read and hashed by P1-17 (qualification/2026-10-07-P1-17/sources.md)" }
+      ],
+      "lastReviewed": "2026-10-07",
+      "verified": false,
+      "openQuestions": ["The paragraph letters come from P1-17's reading; the plan leaves their confirmation and the effective dates to a legal reviewer (D-08)."],
+      "taskStatus": "in force",
+      "provenance": ["qualification/2026-10-07-P1-17/sources.md"]
+    },
+    {
+      "id": "us-nydfs-part-500",
+      "jurisdiction": "US-NY",
+      "instrument": "NYDFS Cybersecurity Regulation (23 NYCRR Part 500) and its 2024 industry letter on AI",
+      "citation": "23 NYCRR Part 500 as amended by the Second Amendment (effective 2023-11-01); NYDFS industry letter of 2024-10-16",
+      "bindingForce": "binding",
+      "status": "in-force",
+      "stations": ["wealth", "technology"],
+      "agentObligations": [
+        { "ref": "23 NYCRR 500.17(a)(1)", "summary": "Notify the superintendent within 72 hours after determining that a cybersecurity incident occurred (read by P1-17).", "verified": true },
+        { "ref": "23 NYCRR 500.13", "summary": "Asset inventory, which the AI letter reads to include agents and their credentials (plan's US register; section number not confirmed).", "verified": false },
+        { "ref": "23 NYCRR 500.12", "summary": "Multi-factor authentication for all users (plan's US register; section number not confirmed).", "verified": false },
+        { "ref": "Industry letter 2024-10-16", "summary": "Monitor for prompts that try to extract nonpublic information (plan's US register).", "verified": false }
+      ],
+      "keyDates": [
+        { "id": "2023-11-01-second-amendment-effective", "date": "2023-11-01", "event": "Second Amendment to 23 NYCRR Part 500 effective (the adopted text P1-17 read)", "verified": true, "url": "https://www.dfs.ny.gov/system/files/documents/2023/10/rf_fs_2amend23NYCRR500_text_20231101.pdf", "retrievedAt": "2026-10-07" },
+        { "id": "2024-10-16-ai-industry-letter", "date": "2024-10-16", "event": "Industry letter on cybersecurity risks arising from AI (plan's US register)", "verified": false, "url": "https://www.dfs.ny.gov/industry-guidance/industry-letters/il20241016-cyber-risks-ai-and-strategies-combat-related-risks", "retrievedAt": "2026-10-12" },
+        { "id": "2025-11-01-mfa-and-asset-inventory", "date": "2025-11-01", "event": "MFA and asset-inventory requirements due (plan's US register; not confirmed from the text P1-17 read)", "verified": false, "url": "https://www.dfs.ny.gov/system/files/documents/2023/10/rf_fs_2amend23NYCRR500_text_20231101.pdf", "retrievedAt": "2026-10-07" }
+      ],
+      "sources": [
+        { "title": "23 NYCRR Part 500, Second Amendment as adopted (effective 2023-11-01)", "url": "https://www.dfs.ny.gov/system/files/documents/2023/10/rf_fs_2amend23NYCRR500_text_20231101.pdf", "publisher": "New York State Department of Financial Services", "retrievedAt": "2026-10-07T17:11:34Z", "fetched": true, "note": "Read and hashed by P1-17 (qualification/2026-10-07-P1-17/sources.md)" },
+        { "title": "NYDFS industry letter, 2024-10-16: Cybersecurity Risks Arising from Artificial Intelligence and Strategies to Combat Related Risks", "url": "https://www.dfs.ny.gov/industry-guidance/industry-letters/il20241016-cyber-risks-ai-and-strategies-combat-related-risks", "publisher": "New York State Department of Financial Services", "retrievedAt": "2026-10-12", "fetched": false, "note": "Not fetched (not attempted): P1-18 ran without network access (Sid, 2026-10-11); read and hash before review. The URL is the DFS industry-letter path as P1-18 recorded it." }
+      ],
+      "lastReviewed": "2026-10-07",
+      "verified": false,
+      "openQuestions": ["The 500.12 and 500.13 section numbers, their 2025-11-01 date and the AI letter's text are not confirmed from text held in the repository."],
+      "taskStatus": "in force",
+      "provenance": ["qualification/2026-10-07-P1-17/sources.md", "catalog/registers/us.json (P1-18)"]
+    },
+    {
+      "id": "us-sr-23-4",
+      "jurisdiction": "US",
+      "instrument": "Interagency Guidance on Third-Party Relationships: Risk Management",
+      "citation": "Federal Reserve SR 23-4 (with OCC and FDIC)",
+      "bindingForce": "voluntary",
+      "status": "published",
+      "stations": ["wealth", "technology"],
+      "agentObligations": [
+        { "ref": "SR 23-4 #1", "summary": "Due diligence, contract negotiation and ongoing monitoring across the third-party relationship life cycle, applied to AI vendors, AMC included (plan's US register).", "verified": false }
+      ],
+      "keyDates": [
+        { "id": "2023-06-07-sr-23-4-issued", "date": "2023-06-07", "event": "SR 23-4 issued (plan's research date)", "verified": false, "url": "https://www.federalreserve.gov/supervisionreg/srletters/SR2304.htm", "retrievedAt": "2026-10-12" }
+      ],
+      "sources": [
+        { "title": "Federal Reserve SR 23-4: Interagency Guidance on Third-Party Relationships: Risk Management", "url": "https://www.federalreserve.gov/supervisionreg/srletters/SR2304.htm", "publisher": "Federal Reserve Board", "retrievedAt": "2026-10-12", "fetched": false, "note": "Not fetched (not attempted): P1-18 ran without network access (Sid, 2026-10-11); read and hash before review. The URL follows the SR-letter path of SR2602.htm." }
+      ],
+      "lastReviewed": "2026-10-12",
+      "verified": false,
+      "openQuestions": ["The source was not read (P1-18 had no network access).", "Re-verify SR 23-4's replacement: a proposal of 2026-09-15 (us-tprm-proposal-2026)."],
+      "taskStatus": "in force",
+      "provenance": ["catalog/registers/us.json (P1-18)"]
+    },
+    {
+      "id": "us-tprm-proposal-2026",
+      "jurisdiction": "US",
+      "instrument": "Proposed replacement of the interagency third-party risk management guidance (SR 23-4)",
+      "citation": "Proposal of 2026-09-15 replacing SR 23-4 (Federal Register document number not recorded)",
+      "bindingForce": "voluntary",
+      "status": "proposed",
+      "stations": ["wealth", "technology"],
+      "agentObligations": [
+        { "ref": "Proposal #1", "summary": "Due diligence, contracts and monitoring for third parties, AI vendors included (plan's US register).", "verified": false }
+      ],
+      "keyDates": [
+        { "id": "2026-09-15-proposal-published", "date": "2026-09-15", "event": "Proposal published (plan's US register)", "verified": false, "url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=third-party%20relationships&conditions%5Bpublication_date%5D%5Bgte%5D=2026-09-15", "retrievedAt": "2026-10-12" },
+        { "id": "2026-11-16-comments-due", "date": "2026-11-16", "event": "Comments due (plan's US register)", "verified": false, "url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=third-party%20relationships&conditions%5Bpublication_date%5D%5Bgte%5D=2026-09-15", "retrievedAt": "2026-10-12" }
+      ],
+      "sources": [
+        { "title": "Federal Register search: third-party relationships, published from 2026-09-15", "url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=third-party%20relationships&conditions%5Bpublication_date%5D%5Bgte%5D=2026-09-15", "publisher": "Office of the Federal Register (NARA/GPO)", "retrievedAt": "2026-10-12", "fetched": false, "note": "Not fetched (not attempted): P1-18 ran without network access (Sid, 2026-10-11); read and hash before review. The proposal's own document was not identified." }
+      ],
+      "lastReviewed": "2026-10-12",
+      "verified": false,
+      "openQuestions": ["The proposal's Federal Register document was not identified or read (P1-18 had no network access)."],
+      "taskStatus": "proposed",
+      "provenance": ["catalog/registers/us.json (P1-18)"]
+    },
+    {
+      "id": "us-hipaa-rules",
+      "jurisdiction": "US",
+      "instrument": "HIPAA Privacy, Security and Breach Notification Rules",
+      "citation": "45 CFR Parts 160 and 164 (Subparts C, D and E)",
+      "bindingForce": "binding",
+      "status": "in-force",
+      "stations": ["health", "technology"],
+      "agentObligations": [
+        { "ref": "45 CFR 164.404(b)", "summary": "Notify affected individuals without unreasonable delay and no later than 60 calendar days after discovering a breach (read by F4).", "verified": true },
+        { "ref": "45 CFR 164.502(b)", "summary": "Minimum necessary, applied to prompts, tools and logs (plan's US register).", "verified": false },
+        { "ref": "45 CFR 164.312", "summary": "A unique identity per agent (164.312(a)) and audit controls (164.312(b)) (plan's US register).", "verified": false },
+        { "ref": "45 CFR 164.502(e), 164.504(e)", "summary": "Agent endpoints that receive PHI run only under a business associate agreement (plan's US register).", "verified": false }
+      ],
+      "keyDates": [
+        { "id": "2024-04-26-latest-final-rule-listed", "date": "2024-04-26", "event": "Latest final rule affecting 45 CFR Part 164 in the Federal Register API listing (FR 2024-08503), as the pack catalogue records; not an effective date of the clauses here", "verified": true, "url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Btype%5D%5B%5D=RULE&conditions%5Bcfr%5D%5Btitle%5D=45&conditions%5Bcfr%5D%5Bpart%5D=164", "retrievedAt": "2026-10-03", "observation": true }
+      ],
+      "sources": [
+        { "title": "45 CFR 164.404, CFR annual edition 2024 (Title 45 Vol. 2), GPO govinfo", "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-404.xml", "publisher": "U.S. Government Publishing Office", "retrievedAt": "2026-10-03T16:38:09Z", "fetched": true, "note": "Read by F4 (src/incidents/regulatoryClocksTable.ts) without a content hash" },
+        { "title": "45 CFR 164.312, CFR annual edition 2024 (Title 45 Vol. 2), GPO govinfo", "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-312.xml", "publisher": "U.S. Government Publishing Office", "retrievedAt": "2026-10-03", "fetched": true, "note": "Read by track F1 without a content hash (L0-IDN-01)" }
+      ],
+      "lastReviewed": "2026-10-12",
+      "verified": false,
+      "openQuestions": ["164.502(b), 164.312 and 164.502(e)/164.504(e) are the plan's paragraphs and are not confirmed from text held in the repository."],
+      "taskStatus": "in force",
+      "provenance": ["catalog/registers/us.json (P1-18)"]
+    },
+    {
       "id": "us-finra-ai",
       "jurisdiction": "US",
       "instrument": "FINRA Regulatory Notice 24-09 and 2026 Annual Regulatory Oversight Report (GenAI)",
@@ -4682,7 +4861,7 @@
       "citation": "CCPA regulations (11 CCR) on ADMT, risk assessments and cybersecurity audits (CPPA; OAL-approved 2025-09-22)",
       "bindingForce": "binding",
       "status": "partially-applicable",
-      "stations": ["mobility", "technology", "wealth"],
+      "stations": ["mobility", "technology", "wealth", "education", "environment", "health", "governance"],
       "agentObligations": [
         { "ref": "11 CCR §7220", "summary": "Pre-use notice before ADMT is used for a significant decision.", "verified": true },
         { "ref": "11 CCR Article 11", "summary": "Opt-out and access rights for ADMT used for significant decisions; existing uses comply by 2027-01-01 (§7200(b)).", "verified": true },
