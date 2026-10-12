@@ -7,6 +7,10 @@
  * is the one part of that module a caller can use without a workspace.
  */
 import { randomUUID } from "node:crypto";
+import { redactSecrets } from "../shield/redaction/redactSecrets.js";
+import { SECRET_PATTERNS } from "../shield/redaction/secretPatterns.js";
+import { detectProtectedText, MAX_PROTECTED_TEXT_CHARS } from "../dataflow/detectors.js";
+import { getPIIDetectorMetadata } from "../vault/dlp.js";
 // Type-only, so it is erased at compile time and creates no runtime cycle with
 // dataResidency.ts, which imports the values from here.
 import type {
@@ -20,53 +24,44 @@ import type {
 // ---------------------------------------------------------------------------
 
 /**
+ * The built-in rules delegate to the shared detectors rather than carry a second rule set (P2-02): PII rules to the
+ * protected-data detectors (src/dataflow/detectors.ts: the DLP patterns and validators in src/vault/dlp.ts, cards
+ * Luhn-checked, with their noise filters), the API-key rule to the shared secret table
+ * (src/shield/redaction/secretPatterns.ts). A built-in rule's `pattern` shows those regexes for reference only. A
+ * caller's own rule, or a built-in rule whose pattern was changed, is applied as its own regex.
+ */
+const BUILT_IN_RULES: ReadonlyArray<Omit<PrivacyRedactionRule, "pattern"> & { readonly dlpTypes: readonly string[] }> = [
+  { ruleId: "redact-email", dlpTypes: ["email"], replacement: "[REDACTED_EMAIL]", category: "pii", description: "Redact email addresses" },
+  { ruleId: "redact-phone", dlpTypes: ["phone"], replacement: "[REDACTED_PHONE]", category: "pii", description: "Redact US phone numbers" },
+  { ruleId: "redact-ssn", dlpTypes: ["ssn"], replacement: "[REDACTED_SSN]", category: "pii", description: "Redact Social Security Numbers" },
+  { ruleId: "redact-credit-card", dlpTypes: ["credit_card"], replacement: "[REDACTED_CC]", category: "financial", description: "Redact Luhn-valid credit card numbers" },
+  { ruleId: "redact-api-key", dlpTypes: [], replacement: "[REDACTED_KEY]", category: "credentials", description: "Redact API keys and tokens" },
+  { ruleId: "redact-ip", dlpTypes: ["ip_address"], replacement: "[REDACTED_IP]", category: "pii", description: "Redact IP addresses" },
+];
+
+function builtInPattern(rule: (typeof BUILT_IN_RULES)[number]): string {
+  if (rule.dlpTypes.length === 0) return SECRET_PATTERNS.map((entry) => entry.pattern.source).join("|");
+  return getPIIDetectorMetadata().filter((entry) => rule.dlpTypes.includes(entry.type)).map((entry) => entry.source).join("|");
+}
+
+/** Replaces each span from the original text's offsets; an overlapping span extends the region it overlaps. */
+function replaceSpans(text: string, spans: ReadonlyArray<{ readonly start: number; readonly end: number }>, replacement: string): string {
+  let out = "";
+  let cursor = 0;
+  for (const span of [...spans].sort((a, b) => a.start - b.start)) {
+    if (span.start < cursor) { cursor = Math.max(cursor, span.end); continue; }
+    out += text.slice(cursor, span.start) + replacement;
+    cursor = span.end;
+  }
+  return out + text.slice(cursor);
+}
+
+/**
  * Get built-in privacy redaction rules for common PII patterns.
  */
 export function getBuiltInRedactionRules(): PrivacyRedactionRule[] {
-  return [
-    {
-      ruleId: "redact-email",
-      pattern: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}",
-      replacement: "[REDACTED_EMAIL]",
-      category: "pii",
-      description: "Redact email addresses",
-    },
-    {
-      ruleId: "redact-phone",
-      pattern: "\\b\\d{3}[-.\\s]?\\d{3}[-.\\s]?\\d{4}\\b",
-      replacement: "[REDACTED_PHONE]",
-      category: "pii",
-      description: "Redact US phone numbers",
-    },
-    {
-      ruleId: "redact-ssn",
-      pattern: "\\b\\d{3}-\\d{2}-\\d{4}\\b",
-      replacement: "[REDACTED_SSN]",
-      category: "pii",
-      description: "Redact Social Security Numbers",
-    },
-    {
-      ruleId: "redact-credit-card",
-      pattern: "\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b",
-      replacement: "[REDACTED_CC]",
-      category: "financial",
-      description: "Redact credit card numbers",
-    },
-    {
-      ruleId: "redact-api-key",
-      pattern: "(?:api[_-]?key|token|secret)[=:\\s]+[A-Za-z0-9_\\-]{16,}",
-      replacement: "[REDACTED_KEY]",
-      category: "credentials",
-      description: "Redact API keys and tokens",
-    },
-    {
-      ruleId: "redact-ip",
-      pattern: "\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b",
-      replacement: "[REDACTED_IP]",
-      category: "pii",
-      description: "Redact IPv4 addresses",
-    },
-  ];
+  return BUILT_IN_RULES.map((rule) => ({ ruleId: rule.ruleId, pattern: builtInPattern(rule), replacement: rule.replacement,
+    category: rule.category, description: rule.description }));
 }
 
 /**
@@ -75,8 +70,16 @@ export function getBuiltInRedactionRules(): PrivacyRedactionRule[] {
 export function applyRedaction(text: string, rules: PrivacyRedactionRule[]): string {
   let result = text;
   for (const rule of rules) {
-    const regex = new RegExp(rule.pattern, "g");
-    result = result.replace(regex, rule.replacement);
+    const builtIn = BUILT_IN_RULES.find((candidate) => candidate.ruleId === rule.ruleId);
+    if (builtIn === undefined || rule.pattern !== builtInPattern(builtIn)) {
+      result = result.replace(new RegExp(rule.pattern, "g"), rule.replacement);
+    } else if (builtIn.dlpTypes.length === 0) {
+      result = redactSecrets(result, () => rule.replacement).redacted;
+    } else {
+      // Over the detectors' per-leaf limit the whole text is replaced: never returned unscanned.
+      result = result.length > MAX_PROTECTED_TEXT_CHARS ? rule.replacement
+        : replaceSpans(result, detectProtectedText(result).filter((span) => builtIn.dlpTypes.includes(span.detector)), rule.replacement);
+    }
   }
   return result;
 }
