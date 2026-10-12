@@ -282,6 +282,30 @@
       "const": "a4-agent-package",
       "type": "string"
     },
+    "leases": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "leaseId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "staging",
+              "production"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "leaseId",
+          "scope"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
     "package": {
       "additionalProperties": false,
       "properties": {
@@ -460,6 +484,7 @@
     "files",
     "artifacts",
     "approvals",
+    "leases",
     "integration",
     "quality",
     "provenance",

@@ -42,7 +42,7 @@ import { authorsOf, buildersOf, evaluateSod, type SodDecision } from "./a4SoD.js
 import { a4WitnessExists, A4StoreError, readA4Store } from "./a4Store.js";
 
 /** The ledger migration that created the A4 tables (src/ledger/ledgerSchemaA4.ts). */
-export const A4_MIGRATION = 13;
+const A4_MIGRATION = 13;
 const OBSERVED_TIERS = new Set(["OBSERVED", "OBSERVED_HARDENED"]);
 /** Lowest first, as src/a4/a4Evidence.ts ranks them; a missing or unknown tier ranks below all of them. */
 const TIER_ORDER: readonly string[] = ["SELF_REPORTED", "ATTESTED", "OBSERVED", "OBSERVED_HARDENED"];
@@ -219,11 +219,14 @@ function checkRefs(ledger: Ledger, projectId: string, trust: TrustContext, now: 
   });
 }
 
-/** Every EFFECT_FINISHED names exactly the bound slots of its gate's intent, each checked. */
+/**
+ * Every EFFECT_FINISHED names exactly the bound slots of its gate's intent, each checked. A rollback's engine intent binds
+ * its preview, not the release gate's resources (src/a4/a4Rollback.ts), so it names none.
+ */
 function checkEffects(links: readonly A4ChainLink[], gates: Map<string, Row>, out: Findings): void {
   for (const finished of links.filter((link) => link.kind === "EFFECT_FINISHED")) {
     const started = links.find((link) => link.kind === "EFFECT_STARTED" && link.body.effectId === finished.body.effectId);
-    const intent = object(gates.get(String(started?.body.gateId))?.intent_json);
+    const intent = started?.body.effect === "a4.activate.rollback" ? null : object(gates.get(String(started?.body.gateId))?.intent_json);
     const bound = flat(intent?.resourceDigests).map(([slot, expected]) => canonicalize({ slot, expected })).sort();
     const checks = Array.isArray(finished.body.slotChecks) ? finished.body.slotChecks as Row[] : null;
     const recorded = (checks ?? []).map((check) => canonicalize({ slot: check.slot, expected: check.expected })).sort();
@@ -478,7 +481,7 @@ function recordReport(ledger: Ledger, record: A4RecordV1, trust: TrustContext, n
  * An `amc.a4-record/v1` export, loaded into a temporary ledger of exactly its rows. Trust is the caller's. `bundleAgentId`
  * is the signed manifest's agent when the record came from a bundle (undefined for a record file on its own).
  */
-export function verifyA4Record(record: A4RecordV1, trust: TrustContext, now = Date.now(),
+function verifyA4Record(record: A4RecordV1, trust: TrustContext, now = Date.now(),
   artifact: VerifierReportV1["artifact"] = { kind: "a4-record", path: record.projectId, sha256: sha256Hex(canonicalize(record)) }, note: string | null = RECORD_NOTE,
   bundleAgentId?: string | null): VerifierReportV1 {
   let materialized: ReturnType<typeof materializeA4Record>;

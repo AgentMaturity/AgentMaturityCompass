@@ -40,6 +40,12 @@
       "gate": "direction"
     }
   ],
+  "leases": [
+    {
+      "leaseId": "lease_example",
+      "scope": "staging"
+    }
+  ],
   "integration": {
     "path": "native",
     "enforcementBoundary": "tool_pipeline",

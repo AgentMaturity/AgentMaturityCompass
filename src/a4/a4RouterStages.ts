@@ -19,7 +19,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
 import { a4ProjectsRoot, putPrivate } from "./a4Blobs.js";
-import { completeStage, openEffectGate, retryEffect, runA4Effect } from "./a4Effects.js";
+import { completeStage, inlineEffect, openEffectGate, retryEffect, runA4Effect } from "./a4Effects.js";
 import {
   assertAllowed, driftedSlots, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, pendingExecutors, recordDecision, refuseOnFreeze,
   requestChanges, requestGate, RESOURCE_SLOTS
@@ -30,15 +30,16 @@ import {
   a4Fail, assertNoSecrets, callOf, mutationResult, precheck, priorReplay, readJson, requirePrincipal, stageInput, type A4Route
 } from "./a4Router.js";
 import { flatSlots,
-  a4AnswerSchema, a4ResourceDigestsSchema, gatePolicyDigestOf, type A4Answer, type A4Principal, type A4Question, type A4Stage, type A4Step
+  a4ResourceDigestsSchema, clientRequestIdSchema, gatePolicyDigestOf, headSeqSchema, reasonSchema, type A4ChainLink, type A4Principal, type A4Question, type A4Stage, type A4Step
 } from "./a4Schema.js";
 import { PRODUCERS as ACTIVATE_PRODUCERS, QUESTIONS as ACTIVATE_QUESTIONS } from "./spec/activate.js";
 import { PRODUCERS as ADAPT_PRODUCERS, QUESTIONS as ADAPT_QUESTIONS } from "./spec/adapt.js";
 import {
-  hypothesisDigestOf, previousHypotheses, PRODUCERS as ASPIRE_PRODUCERS, QUESTIONS as ASPIRE_QUESTIONS, understandingCurrent
+  hypothesisDigestOf, previousHypotheses, PRODUCERS as ASPIRE_PRODUCERS, QUESTIONS as ASPIRE_QUESTIONS, stageSpecOf, understandingCurrent
 } from "./spec/aspire.js";
 import { PRODUCERS as ASSEMBLE_PRODUCERS, QUESTIONS as ASSEMBLE_QUESTIONS } from "./spec/assemble.js";
 import { openA4Store, type A4ChangeSpec, type A4RequestKey, type A4TransitionResult } from "./a4Store.js";
+import { assertStagingRevocable, revokeStagingAfterDeny } from "./a4Deploy.js";
 import { handleAssembleRoute } from "./assembleResolve.js";
 import { handleAdaptRoute } from "./adaptContextPlugin.js";
 
@@ -71,6 +72,12 @@ export interface A4ProducerResult {
     readonly method: string | null; readonly body: unknown; readonly claimKind?: "self_reported" | "synthetic_example" }>;
   /** A new revision at the stage with this spec (the producer carries the answers). */
   readonly spec?: Record<string, unknown>;
+  /**
+   * Files the producer wrote and signed itself (Activate's monitor record under a4-releases/), each recorded beside the
+   * step as its own ref: lane implementation, self_reported, never observed. `note` joins the ref's signed body.
+   */
+  readonly refs?: ReadonlyArray<{ readonly refKind: "monitor"; readonly refId: string; readonly sha256: string; readonly label: string;
+    readonly note: Readonly<Record<string, unknown>> }>;
   /** Review only: the reason codes of the explicit not_evaluated output `reviewed` records without an observed ref. */
   readonly notEvaluated?: readonly string[];
   /** Signed onto the STEP body (checks whose result is no evidence ref, such as integrity self-checks). */
@@ -112,9 +119,6 @@ const STEP_ROUTES: Record<StepRoute, { action: A4Action; from: readonly A4Step[]
   review: { action: "review", from: ["built"], to: "reviewed", output: "review" }
 };
 const UNDERSTANDING_STEPS: ReadonlySet<StepRoute> = new Set(["confirm-understanding", "explain", "propose"]);
-const clientRequestIdSchema = z.string().regex(/^[A-Za-z0-9_-]{8,128}$/, "clientRequestId: 8 to 128 letters, digits, _ or -");
-const headSeqSchema = z.number().int().min(0);
-const reasonSchema = z.string().trim().min(1).max(2000);
 const base = { expectedHeadSeq: headSeqSchema, clientRequestId: clientRequestIdSchema };
 // Required on the no-producer path (stageStep); beside a producer it is the member's own statement, recorded next to AMC's.
 const content = z.string().trim().min(1).max(65_536).optional();
@@ -128,17 +132,6 @@ const STEP_SCHEMAS = {
   build: z.strictObject({ ...base, content }),
   review: z.strictObject({ ...base, content })
 } as const;
-
-/** The newest revision recorded at `stage`, and its answers. */
-function stageSpec(state: A4ReadinessState, stage: A4Stage): { spec: Record<string, unknown>; answers: A4Answer[] } {
-  const revision = state.revisions.filter((row) => row.stage === stage).at(-1);
-  const spec = revision ? JSON.parse(revision.spec_json) as Record<string, unknown> : {};
-  const answers = Array.isArray(spec.answers) ? spec.answers.flatMap((answer) => {
-    const parsed = a4AnswerSchema.safeParse(answer);
-    return parsed.success ? [parsed.data] : [];
-  }) : [];
-  return { spec, answers };
-}
 
 /**
  * The slots a revision binds: every slot a lane registered a recomputer for (the signed configs, Aspire's brief), as it
@@ -217,7 +210,7 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
     if (def.from !== null && !def.from.includes(project.step)) throw a4Fail(409, "A4_STEP_ORDER", `${kind} follows ${def.from.join(" or ")}; the project is at ${project.step}.`);
     // Explain and Propose build on Understand's facts, so they and the confirmation need an Understand of the current answers.
     if ((stage === "aspire" || stage === "assemble") && UNDERSTANDING_STEPS.has(kind)) {
-      const { spec, answers } = stageSpec(state, stage);
+      const { spec, answers } = stageSpecOf(state, stage);
       if (!understandingCurrent(spec, answers)) {
         throw a4Fail(409, "A4_NOT_READY", "Understand has not run on the current answers; run Understand again, then confirm it.", { reasonCodes: ["UNDERSTANDING_STALE"] });
       }
@@ -262,7 +255,7 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
       const readiness = check(state);
       const project = state.project;
       const specs: A4ChangeSpec[] = [];
-      const { spec, answers } = stageSpec(state, stage);
+      const { spec, answers } = stageSpecOf(state, stage);
       if (kind === "answers") {
         const revisionNo = project.revision_no + 1;
         const bank = STAGE_QUESTIONS[stage];
@@ -284,12 +277,16 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
       if (produced?.spec !== undefined) specs.push(revisionSpec(route.workspace, state, stage, produced.spec, principal.key, ts));
       // A revision recorded here comes first, so the outputs and the step land on it.
       const revisionNo = project.revision_no + (specs.length > 0 ? 1 : 0);
-      for (const entry of outputs) {
-        const claimKind = "claimKind" in entry && entry.claimKind === "synthetic_example" ? "synthetic_example" : "self_reported";
-        specs.push({ kind: "EVIDENCE_REF", stage, payload: { refKind: "stage_output", refId: entry.refId, sha256: entry.sha256, lane: entry.lane,
-          claimKind, output: entry.output, producer: entry.producer },
+      const refs = [...outputs.map((entry) => ({ refKind: "stage_output" as const, refId: entry.refId, sha256: entry.sha256, lane: entry.lane, method: entry.method,
+        label: entry.label, claimKind: "claimKind" in entry && entry.claimKind === "synthetic_example" ? "synthetic_example" as const : "self_reported" as const,
+        note: { output: entry.output, producer: entry.producer } })),
+      ...(produced?.refs ?? []).map((ref) => ({ ...ref, lane: "implementation" as const, method: null, claimKind: "self_reported" as const,
+        note: { ...ref.note, producer: producer!.id } }))];
+      for (const entry of refs) {
+        specs.push({ kind: "EVIDENCE_REF", stage, payload: { ...entry.note, refKind: entry.refKind, refId: entry.refId, sha256: entry.sha256, lane: entry.lane,
+          claimKind: entry.claimKind },
           sideRows: [{ table: "a4_evidence_refs", values: { project_id: projectId, seq: project.head_seq + 1 + specs.length, revision_no: revisionNo, stage,
-            lane: entry.lane, ref_kind: "stage_output", ref_id: entry.refId, sha256: entry.sha256, claim_kind: claimKind, trust_tier: null,
+            lane: entry.lane, ref_kind: entry.refKind, ref_id: entry.refId, sha256: entry.sha256, claim_kind: entry.claimKind, trust_tier: null,
             method: entry.method, label: entry.label, actor_key: principal.key, ts } }] });
       }
       if (def.to !== null && def.to !== project.step) {
@@ -341,6 +338,70 @@ function runEffectAfterResponse(workspace: string, projectId: string, attemptId:
   });
 }
 
+/**
+ * Runs an attempt `complete` or retry started: an inline effect here, awaited on the request's store, whose delivery
+ * (a lease token) this response answers once; a failure is the effect's own code (409, or 423 for a locked vault) naming
+ * the attempt, though the consumption it follows stays recorded. Any other effect runs after the response.
+ */
+async function runEffect(route: A4Route, projectId: string, attemptId: string): Promise<Record<string, unknown>> {
+  const started = route.store.readChain(projectId).find((link) => link.kind === "EFFECT_STARTED" && link.body.effectId === attemptId);
+  const effect = String(started?.body.effect);
+  if (!inlineEffect(effect)) {
+    runEffectAfterResponse(route.workspace, projectId, attemptId);
+    return {};
+  }
+  pendingExecutors.add(attemptId);
+  let settled: Awaited<ReturnType<typeof runA4Effect>>;
+  try {
+    settled = await runA4Effect(route.store, projectId, attemptId, livePrincipal(route.store, callOf(route)));
+  } finally {
+    pendingExecutors.delete(attemptId);
+  }
+  if (!settled.replay && settled.kind === "EFFECT_FINISHED") return { attemptId, effect: { status: "finished", seq: settled.seq }, ...settled.deliver };
+  throw effectFailure(projectId, started, attemptId,
+    settled.replay ? "EFFECT_NOT_SETTLED" : String(route.store.readChain(projectId).find((link) => link.seq === settled.seq)?.body.error ?? "EFFECT_FAILED"));
+}
+
+/** An inline effect's failure as its request answers it: its own code (423 for a locked vault, else 409) and the retry route. */
+function effectFailure(projectId: string, started: A4ChainLink | undefined, attemptId: string, error: string): Error {
+  const effect = String(started?.body.effect);
+  const code = /^[A-Z][A-Z0-9_]{2,63}/.exec(error)?.[0] ?? "EFFECT_FAILED";
+  return a4Fail(code === "A4_VAULT_LOCKED" ? 423 : 409, code, `The ${effect} effect failed after the gate was consumed: ${error}`,
+    { attemptId, retry: `POST /api/v1/a4/projects/${projectId}/stages/${String(started?.body.stage)}/effects/${effect}/retry` });
+}
+
+/**
+ * What a replay of a request that started an inline effect's attempt answers, from the chain and never from a delivery
+ * claim: once that attempt finished, its stored answer with token null (TOKEN_ALREADY_DELIVERED); a failed attempt, its
+ * failure as the request answered it; one not settled yet, 409 EFFECT_NOT_SETTLED. Any other replay answers as stored.
+ */
+function attemptReplay(route: A4Route, projectId: string, replay: Record<string, unknown>): Record<string, unknown> {
+  const attemptId = replay.attemptId;
+  if (typeof attemptId !== "string") return replay;
+  const chain = route.store.readChain(projectId);
+  const started = chain.find((link) => link.kind === "EFFECT_STARTED" && link.body.effectId === attemptId);
+  if (started === undefined || !inlineEffect(String(started.body.effect))) return replay;
+  const outcome = chain.find((link) => (link.kind === "EFFECT_FINISHED" || link.kind === "EFFECT_FAILED") && link.body.effectId === attemptId);
+  if (outcome?.kind === "EFFECT_FINISHED") return { ...replay, effect: { status: "finished", seq: outcome.seq }, token: null, reasonCode: "TOKEN_ALREADY_DELIVERED" };
+  throw effectFailure(projectId, started, attemptId, outcome === undefined ? "EFFECT_NOT_SETTLED" : String(outcome.body.error ?? "EFFECT_FAILED"));
+}
+
+/**
+ * `complete` (design §6.5; POST …/releases runs it on Activate's direction gate): consumes the gate and runs the effect
+ * it starts, an inline one before answering (runEffect). A replay answers the attempt's outcome (attemptReplay).
+ */
+export async function completeAndRun(route: A4Route, projectId: string, stage: A4Stage, body: { gateId: string; expectedHeadSeq: number },
+  request: A4RequestKey | undefined): Promise<true> {
+  const replay = priorReplay(route.store, request, projectId);
+  if (replay) return (apiSuccess(route.res, attemptReplay(route, projectId, replay)), true);
+  // complete evaluates integrity in full (verifyA4Chain), as GET and verify do (design §7); the effect comes from the chain.
+  const started = completeStage(route.store, projectId, { ...callOf(route, request, true), stage, gateId: body.gateId, expectedHeadSeq: body.expectedHeadSeq });
+  if (started.result.replay) return (apiSuccess(route.res, attemptReplay(route, projectId, mutationResult(started.result))), true);
+  const ran = started.attemptId === null ? {} : { attemptId: started.attemptId, ...await runEffect(route, projectId, started.attemptId) };
+  apiSuccess(route.res, mutationResult(started.result, ran));
+  return true;
+}
+
 const gateIdSchema = z.string().regex(/^a4gate_[0-9a-f]{32}$/);
 const decideSchema = z.strictObject({ reason: reasonSchema, expectedRequestDigestSha256: z.string().regex(/^[0-9a-f]{64}$/),
   expectedReadinessBindingDigest: z.string().regex(/^[0-9a-f]{64}$/).optional(), expectedGateSeq: headSeqSchema, clientRequestId: clientRequestIdSchema });
@@ -373,7 +434,7 @@ async function observeHypothesis(route: A4Route, projectId: string, hypothesisId
   return respond(route, projectId, request, () => {
     const state = precheck(route, projectId, "observeHypothesis", body.expectedHeadSeq);
     if (state.project.stage === "aspire") throw a4Fail(409, "A4_STEP_ORDER", "Hypotheses are observed after Aspire; the project is still at Aspire.");
-    const { spec } = stageSpec(state, "aspire");
+    const { spec } = stageSpecOf(state, "aspire");
     const hypothesis = previousHypotheses(spec).find((entry) => entry.id === hypothesisId);
     if (hypothesis === undefined) throw a4Fail(404, "A4_HYPOTHESIS_NOT_FOUND", `no hypothesis ${hypothesisId} in the Aspire brief`);
     // The ref binds this hypothesis's content: an older observation of another statement under the same id does not count.
@@ -445,28 +506,28 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
     }
     const { body, request } = await readJson(route, decideSchema);
     const verdict = decision[2] as "approve" | "deny";
+    // A DENY of the deployment approval owes the staging lease's revocation: refused while it could not be signed, and
+    // answered 409 LEASE_REVOKE_FAILED (the DENY stands) while a lease it owes stays live; a replay of the request retries it.
+    if (verdict === "deny" && priorReplay(store, request, projectId) !== null) revokeStagingAfterDeny(store, projectId, gateId);
+    let revoked: Record<string, unknown> = {};
     return respond(route, projectId, request, () => {
+      if (verdict === "deny") assertStagingRevocable(store, projectId, gateId);
       const result = recordDecision(store, projectId, { ...callOf(route, request), gateId, decision: verdict, reason: body.reason,
         expectedRequestDigestSha256: body.expectedRequestDigestSha256, expectedGateSeq: body.expectedGateSeq,
         ...(body.expectedReadinessBindingDigest === undefined ? {} : { expectedReadinessBindingDigest: body.expectedReadinessBindingDigest }) });
       const head = store.readHead(projectId);
       if (!result.replay && head) auditA4(route.workspace, { type: "A4_GATE_DECIDED", agentId: head.agent_id, projectId, username: requirePrincipal(route).username,
         summary: `A4 gate ${verdict === "approve" ? "approved" : "denied"} on ${head.name}`, details: { gateId, decision: verdict, seq: result.seq } });
+      // A DENY recorded on an unconsumed Activate completion gate revokes the release's staging lease (design §6.4 step 7).
+      if (verdict === "deny") revoked = revokeStagingAfterDeny(store, projectId, gateId);
       return result;
-    }, 201);
+    }, 201, () => revoked);
   }
   const complete = /^\/stages\/([a-z]+)\/complete$/.exec(tail);
   if (complete !== null) {
     const stage = stageInput(complete[1]);
     const { body, request } = await readJson(route, completeSchema);
-    let attemptId: string | null = null;
-    return respond(route, projectId, request, () => {
-      // complete evaluates integrity in full (verifyA4Chain), as GET and verify do (design §7); the effect comes from the chain.
-      const started = completeStage(store, projectId, { ...callOf(route, request, true), stage, gateId: body.gateId, expectedHeadSeq: body.expectedHeadSeq });
-      attemptId = started.attemptId;
-      if (attemptId !== null && !started.result.replay) runEffectAfterResponse(route.workspace, projectId, attemptId);
-      return started.result;
-    }, 200, () => (attemptId === null ? {} : { attemptId }));
+    return completeAndRun(route, projectId, stage, body, request);
   }
   const effect = /^\/stages\/([a-z]+)\/effects\/([a-z0-9_.-]{1,128})\/(open|retry)$/.exec(tail);
   if (effect !== null) {
@@ -478,15 +539,14 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
         expectedHeadSeq: body.expectedHeadSeq }), 201);
     }
     const { body, request } = await readJson(route, z.strictObject({ ...base, attemptId: z.string().regex(/^a4e_[0-9a-f]{32}$/) }));
-    let nextAttempt = "";
-    return respond(route, projectId, request, () => {
-      const started = store.readChain(projectId).find((link) => link.kind === "EFFECT_STARTED" && link.body.effectId === body.attemptId);
-      if (started?.body.effect !== effectId) throw a4Fail(404, "A4_EFFECT_NOT_FOUND", `no attempt ${body.attemptId} of effect ${effectId}`);
-      const retried = retryEffect(store, projectId, { ...callOf(route, request), attemptId: body.attemptId, expectedHeadSeq: body.expectedHeadSeq });
-      nextAttempt = retried.attemptId;
-      if (!retried.result.replay) runEffectAfterResponse(route.workspace, projectId, nextAttempt);
-      return retried.result;
-    }, 201, () => ({ attemptId: nextAttempt }));
+    const replay = priorReplay(store, request, projectId);
+    if (replay) return (apiSuccess(route.res, attemptReplay(route, projectId, replay)), true);
+    const started = store.readChain(projectId).find((link) => link.kind === "EFFECT_STARTED" && link.body.effectId === body.attemptId);
+    if (started?.body.effect !== effectId) throw a4Fail(404, "A4_EFFECT_NOT_FOUND", `no attempt ${body.attemptId} of effect ${effectId}`);
+    const retried = retryEffect(store, projectId, { ...callOf(route, request), attemptId: body.attemptId, expectedHeadSeq: body.expectedHeadSeq });
+    if (retried.result.replay) return (apiSuccess(route.res, attemptReplay(route, projectId, mutationResult(retried.result))), true);
+    apiSuccess(route.res, mutationResult(retried.result, { attemptId: retried.attemptId, ...await runEffect(route, projectId, retried.attemptId) }), 201);
+    return true;
   }
   const observe = /^\/hypotheses\/([A-Za-z0-9_.-]{1,128})\/observe$/.exec(tail);
   if (observe !== null) return observeHypothesis(route, projectId, observe[1]!);

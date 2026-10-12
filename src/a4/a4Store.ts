@@ -47,7 +47,7 @@ import {
   type A4TransitionRow, a4ResourceDigestsSchema
 } from "./a4Schema.js";
 
-export const A4_AUDIT_TYPE = "A4_STATE" as const;
+const A4_AUDIT_TYPE = "A4_STATE" as const;
 /** The rows only this store writes in its `a4-<projectId>-<seq>` sessions (the ledger refuses any other writer there). */
 export const A4_WITNESS = { sessions: `binary_path = '${A4_STORE_BINARY}'`,
   events: `json_extract(meta_json, '$.source') = 'a4-store' AND json_extract(meta_json, '$.auditType') = '${A4_AUDIT_TYPE}'` };
@@ -80,9 +80,9 @@ const SIDE_TABLE_KEYS = {
   a4_revisions: ["project_id", "revision_no"], a4_gates: ["gate_id"], a4_decisions: ["decision_id"], a4_members: ["project_id", "seq"],
   a4_comments: ["comment_id"], a4_evidence_refs: ["project_id", "seq"], a4_releases: ["release_id"], a4_deployments: ["deployment_id"]
 } as const;
-export type A4SideTable = keyof typeof SIDE_TABLE_KEYS;
+type A4SideTable = keyof typeof SIDE_TABLE_KEYS;
 /** Every column except `evidence_event_id`, which the store fills from the transition's audit row. */
-export interface A4SideRow { readonly table: A4SideTable; readonly values: Readonly<Record<string, Cell>> }
+interface A4SideRow { readonly table: A4SideTable; readonly values: Readonly<Record<string, Cell>> }
 /** The head's mutable state. Every body signs it as `headAfter`, so readers and writes never trust the unsigned head row. */
 const HEAD_COLUMNS = ["stage", "step", "hold", "hold_reason", "revision_no", "deployed_release_id", "base_release_id"] as const;
 type A4HeadState = Pick<A4ProjectRow, (typeof HEAD_COLUMNS)[number]>;
@@ -163,8 +163,8 @@ const integrityFailed = (projectId: string, problems: readonly string[]): A4Stor
   new A4StoreError(409, "A4_INTEGRITY_FAILED", `project ${projectId} failed verification`, problems);
 const randomId = (prefix: string): string => `${prefix}_${randomBytes(16).toString("hex")}`;
 
-/** Studio's read-only rule (users or trust signature invalid), re-read here because studioServer keeps it private. */
-function readOnlyNow(workspace: string): boolean | null {
+/** Studio's read-only rule (users or trust signature invalid), re-read here because studioServer keeps it private; `amc a4` refuses writes on it. */
+export function readOnlyNow(workspace: string): boolean | null {
   try {
     const users = verifyUsersConfigSignature(workspace);
     return (users.signatureExists && !users.valid) || !verifyTrustConfigSignature(workspace).valid;

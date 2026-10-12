@@ -20,7 +20,7 @@ import { listUsers, listVerifiedUsers } from "../auth/authApi.js";
 import { USER_ROLES, type UserRole } from "../auth/roles.js";
 import type { A4Member, A4Principal } from "./a4Schema.js";
 
-export type A4Refusal = { ok: false; status: 401 | 403; code: string; message: string };
+type A4Refusal = { ok: false; status: 401 | 403; code: string; message: string };
 export type A4Resolution =
   /** The route's role class passed on live roles; project membership is still checked per action (assertMember). */
   | { ok: true; principal: A4Principal; allowed: { read: true; mutate: true } }
@@ -117,14 +117,36 @@ export function resolveA4Principal(input: { workspace: string; nativeTasks: Nati
   if (!parsed) return refuse(401, "A4_PRINCIPAL_UNRECOGNIZED", "This session does not name a human principal.");
   const principal = livePrincipal(input.workspace, parsed[1] as A4Principal["authSource"], parsed[2]!, "browser_csrf", input.now ?? Date.now());
   if ("ok" in principal) return principal;
-  const required = resolveApiRolePolicy(input.pathname, input.method).roles;
+  return withRoleClass(principal, input.pathname, input.method);
+}
+
+/** The route's role class re-run on the live roles. */
+function withRoleClass(principal: A4Principal, pathname: string, method: string): A4Resolution {
+  const required = resolveApiRolePolicy(pathname, method).roles;
   if (!principal.roles.some((role) => required.includes(role))) {
     return refuse(403, "PRINCIPAL_ROLE_INSUFFICIENT", `This route needs one of ${required.join(", ")}.`);
   }
   return { ok: true, principal, allowed: { read: true, mutate: true } };
 }
 
-/** The live roles of a principal now; empty when the user is gone or revoked. The CLI (P1-65) refuses token roles beyond these. */
+/**
+ * The identity of `amc a4` (P1-65): the user of an `amc approvals login` token, which readNativeApprovalActor verified,
+ * re-resolved from one verified users.yaml read (admission native_login_token, identityCheck users_yaml). A user no
+ * longer ACTIVE is refused, and so is a token holding a role users.yaml no longer grants (minted as OWNER, demoted
+ * since). Then the route's role class, as for a browser session. No flag names an identity.
+ */
+export function resolveA4LoginPrincipal(input: { workspace: string; actor: { userId: string; username: string; roles: readonly string[] };
+  pathname: string; method: string; now?: number }): A4Resolution {
+  const principal = livePrincipal(input.workspace, "LOCAL_USER", input.actor.userId, "native_login_token", input.now ?? Date.now());
+  if ("ok" in principal) return principal;
+  const live: readonly string[] = principal.roles;
+  if (principal.username !== input.actor.username || input.actor.roles.some((role) => !live.includes(role))) {
+    return refuse(403, "A4_TOKEN_ROLES_STALE", "This login token holds a role users.yaml no longer grants this user; run `amc approvals login` again.");
+  }
+  return withRoleClass(principal, input.pathname, input.method);
+}
+
+/** The live roles of a principal now; empty when the user is gone or revoked (every governed write re-reads them). */
 export function liveRolesFor(workspace: string, principal: Pick<A4Principal, "authSource" | "userId">, now = Date.now()): UserRole[] {
   const live = livePrincipal(workspace, principal.authSource, principal.userId, "native_login_token", now);
   return "ok" in live ? [] : live.roles;
