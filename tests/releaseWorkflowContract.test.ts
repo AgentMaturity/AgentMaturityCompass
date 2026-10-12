@@ -6,11 +6,14 @@ import YAML from "yaml";
 /**
  * P0-34: release.yml is the only publisher. It publishes exactly the tarball that passed the gate, from a job that
  * installs and builds nothing and is the only one holding id-token: write; npm-publish.yml only opens version PRs.
+ * P1-41: the weekly train. npm-publish.yml refreshes the version PR on a weekly schedule, release.yml checks the tag's
+ * notes for banned claim words before anything is packed, and post-publish-verify.yml runs read-only checks after
+ * every Release run with no write permission and no secret.
  */
 type Step = { name?: string; id?: string; if?: string; run?: string; uses?: string; with?: Record<string, unknown>; env?: Record<string, string> };
 type Job = { environment?: string | { name: string }; "timeout-minutes"?: number; needs?: string | string[]; env?: Record<string, string>;
   if?: string; permissions?: Record<string, string>; outputs?: Record<string, string>; steps: Step[] };
-type Workflow = { on: Record<string, unknown>; env?: Record<string, string>; permissions?: Record<string, string>; jobs: Record<string, Job> };
+type Workflow = { name?: string; on: Record<string, unknown>; env?: Record<string, string>; permissions?: Record<string, string>; jobs: Record<string, Job> };
 
 const read = (name: string) => readFileSync(join(process.cwd(), ".github", "workflows", name), "utf8");
 const parse = (text: string) => YAML.parse(text) as Workflow;
@@ -31,6 +34,11 @@ export function credentialSkips(script: string): string[] {
 }
 
 const runsOf = (job: Job) => job.steps.map(step => step.run ?? "");
+/** Every `uses:` is pinned by a full commit SHA or carries the repository's TODO for Sid to pin it. */
+const unpinnedActions = (text: string) => text.split("\n").filter(line => /^\s+(?:- )?uses: /.test(line))
+  .filter(line => !/@[0-9a-f]{40}\b/.test(line) && !/# TODO\(P\d-\d+ follow-up\): pin \S+ by full commit SHA/.test(line))
+  .map(line => `unpinned action without a TODO: ${line.trim()}`);
+const sortedPermissions = (permissions?: Record<string, string>) => JSON.stringify(Object.entries(permissions ?? {}).sort());
 /** Where each secret may be read: only from the env of these jobs' steps. */
 const SECRET_JOBS: Record<string, string[]> = {
   NPM_TOKEN: ["release"], AMC_RELEASE_SIGNING_KEY: ["sign"], HOMEBREW_TAP_TOKEN: ["homebrew"],
@@ -108,6 +116,8 @@ function gateContract(gate: Job | undefined): string[] {
   if (!/check-pack-contents\.mjs --tarball "\$TARBALL"/.test(all)) failures.push("pack contents are not checked on the packed tarball");
   if (!/npm publish "\$TARBALL" --dry-run/.test(all)) failures.push("the dry run does not publish the packed tarball");
   if (!/pnpm install --frozen-lockfile/.test(all)) failures.push("gate does not install from the committed lockfile");
+  const notes = all.search(/node scripts\/check-release-notes\.mjs "docs\/releases\/\$\{AMC_RELEASE_TAG#v\}\.md"/);
+  if (notes < 0 || notes > all.search(/\bnpm pack\b/)) failures.push("gate does not check the tag's release notes for banned claim words before packing");
   for (const command of ["check-release-candidate.mjs", "release-record.mjs tag", "release-record.mjs write", "release-record.mjs verify"]) {
     if (!all.includes(command)) failures.push(`gate does not run ${command}`);
   }
@@ -202,23 +212,90 @@ function releaseContract(text: string): string[] {
   }
   for (const asset of ["tmp/signed/sbom.cdx.json", "tmp/signed/licenses.json"]) if (!ghRelease.includes(asset)) failures.push(`${asset} is not attached`);
   failures.push(...exposureContract(workflow));
-  for (const line of text.split("\n").filter(candidate => /^\s+(?:- )?uses: /.test(candidate))) {
-    if (!/@[0-9a-f]{40}\b/.test(line) && !/# TODO\(P0-34 follow-up\): pin \S+ by full commit SHA/.test(line)) failures.push(`unpinned action without a TODO: ${line.trim()}`);
-  }
+  failures.push(...unpinnedActions(text));
   return failures;
 }
 
+type Triggers = { push?: unknown; schedule?: { cron?: string }[]; workflow_dispatch?: { inputs?: Record<string, unknown> } | null;
+  workflow_run?: unknown };
+const WEEKLY = /^\d{1,2} \d{1,2} \* \* [0-6]$/;
+const weekly = (on: Triggers) => Array.isArray(on.schedule) && on.schedule.length === 1 && WEEKLY.test(on.schedule[0]?.cron ?? "");
+const triggersOf = (workflow: Workflow) => Object.keys(workflow.on).sort().join(", ");
+
+/** Version PRs only: weekly and on push to main; the token can open the PR and nothing else; nothing publishes. */
 function versionPrContract(text: string): string[] {
   const failures: string[] = [];
   const workflow = parse(text);
+  const on = workflow.on as Triggers;
+  if (triggersOf(workflow) !== "push, schedule, workflow_dispatch") failures.push(`version PR triggers are ${triggersOf(workflow)}`);
+  if (JSON.stringify(on.push) !== JSON.stringify({ branches: ["main"] })) failures.push("push is not main only");
+  if (!weekly(on)) failures.push("no weekly schedule refreshes the version PR");
+  if (on.workflow_dispatch?.inputs) failures.push("workflow_dispatch takes inputs");
+  if (sortedPermissions(workflow.permissions) !== sortedPermissions({ contents: "read" })) failures.push("workflow default permissions are not contents: read");
+  if (JSON.stringify(workflow.env ?? {}).includes("secrets.")) failures.push("a secret is in the workflow env");
   for (const [id, job] of Object.entries(workflow.jobs)) {
+    const expected = id === "version-pr" ? { contents: "write", "pull-requests": "write" } : { contents: "read" };
+    if (sortedPermissions(job.permissions) !== sortedPermissions(expected)) failures.push(`${id} permissions are ${JSON.stringify(job.permissions ?? null)}`);
+    if (JSON.stringify(job.env ?? {}).includes("secrets.")) failures.push(`${id}: a secret is in the job env`);
     for (const step of job.steps) {
       if (step.uses?.startsWith("changesets/action") && step.with && "publish" in step.with) failures.push(`${id}: changesets publish input`);
       if (/\bnpm publish\b|changeset publish|npm run release(?![:\w-])/.test(step.run ?? "")) failures.push(`${id}: publishes`);
       if (step.env && ("NODE_AUTH_TOKEN" in step.env || "NPM_TOKEN" in step.env)) failures.push(`${id}: npm credential in env`);
+      if (JSON.stringify(step.with ?? {}).includes("secrets.") || (step.run ?? "").includes("secrets.")) failures.push(`${id}: a secret outside a step env`);
+      if (JSON.stringify(step.env ?? {}).includes("secrets.") && id !== "version-pr") failures.push(`${id}: reads a secret`);
     }
   }
-  if (/createRef|createRelease/.test(text)) failures.push("creates a tag or a release");
+  const versionPr = workflow.jobs["version-pr"];
+  if (!versionPr) failures.push("no version-pr job");
+  else {
+    const checkout = versionPr.steps.find(step => step.uses?.startsWith("actions/checkout"));
+    if (checkout?.with?.["persist-credentials"] !== false) failures.push("version PR checkout persists the workflow token, so pushes would not run CI");
+    const changesets = versionPr.steps.find(step => step.uses?.startsWith("changesets/action"));
+    if (changesets?.with?.version !== "node scripts/release-prepare.mjs --version-only") failures.push("version PR is not release:prepare --version-only output");
+  }
+  if (/createRef|createRelease|git tag|git push/.test(text)) failures.push("creates or pushes a tag or a release");
+  failures.push(...unpinnedActions(text));
+  return failures;
+}
+
+/** Read-only after every Release run, by dispatch and weekly: no write permission, no secret, no expression in a script. */
+function postPublishContract(text: string, releaseName: string | undefined): string[] {
+  const failures: string[] = [];
+  const workflow = parse(text);
+  const on = workflow.on as Triggers;
+  if (triggersOf(workflow) !== "schedule, workflow_dispatch, workflow_run") failures.push(`post-publish triggers are ${triggersOf(workflow)}`);
+  if (!releaseName || JSON.stringify(on.workflow_run) !== JSON.stringify({ workflows: [releaseName], types: ["completed"] })) {
+    failures.push("post-publish does not run when the Release workflow completes");
+  }
+  if (Object.keys(on.workflow_dispatch?.inputs ?? {}).join(", ") !== "version") failures.push("dispatch does not take exactly a version");
+  if (!weekly(on)) failures.push("no weekly schedule records the distribution figure");
+  if (sortedPermissions(workflow.permissions) !== sortedPermissions({ contents: "read" })) failures.push("workflow default permissions are not contents: read");
+  if (text.includes("secrets.")) failures.push("post-publish reads a secret");
+  for (const [id, job] of Object.entries(workflow.jobs)) {
+    if (Object.values(job.permissions ?? {}).some(level => level !== "read" && level !== "none")) failures.push(`${id} has a write permission`);
+    for (const step of job.steps) if ((step.run ?? "").includes("${{")) failures.push(`${id}: an expression is interpolated into a script`);
+    if (!job.steps.some(step => step.uses?.startsWith("actions/upload-artifact") && step.if === "always()")) failures.push(`${id} does not always upload its receipt`);
+  }
+  const verify = workflow.jobs.verify;
+  if (!verify || !runsOf(verify).some(run => run.includes("node scripts/check-published-release.mjs"))) failures.push("no job runs check-published-release.mjs");
+  for (const guard of ["github.event.workflow_run.conclusion == 'success'", "github.event.workflow_run.event == 'push'",
+    "github.event.workflow_run.head_repository.full_name == github.repository"]) {
+    if (!verify?.if?.includes(guard)) failures.push(`verify does not require ${guard}`);
+  }
+  const distribution = workflow.jobs.distribution;
+  if (!distribution || !runsOf(distribution).some(run => run.includes("node scripts/distribution-metrics.mjs --write"))) {
+    failures.push("no job records the distribution figure");
+  }
+  failures.push(...unpinnedActions(text));
+  return failures;
+}
+
+/** CI checks every release notes file on every pull request and push. */
+function ciNotesContract(text: string): string[] {
+  const workflow = parse(text);
+  const failures = triggersOf(workflow).includes("pull_request_target") ? ["ci.yml has a pull_request_target trigger"] : [];
+  const step = workflow.jobs["build-test"]?.steps.find(candidate => candidate.run === "node scripts/check-release-notes.mjs docs/releases/*.md");
+  if (!step || step.if) failures.push("CI does not check every release notes file for banned claim words");
   return failures;
 }
 
@@ -229,6 +306,50 @@ describe("release workflow contract (P0-34)", () => {
 
   test("npm-publish.yml opens version PRs and never publishes, tags or releases", () => {
     expect(versionPrContract(read("npm-publish.yml"))).toEqual([]);
+  });
+
+  test("P1-41: the weekly train's workflows hold the least privilege they need and check notes in CI", () => {
+    expect(postPublishContract(read("post-publish-verify.yml"), parse(read("release.yml")).name)).toEqual([]);
+    expect(ciNotesContract(read("ci.yml"))).toEqual([]);
+  });
+
+  test("P1-41 mutation: unchecked notes, publishing or broad version PRs, and writable or secret post-publish runs are caught", () => {
+    const mutated = (name: string, contract: (text: string) => string[]) => (from: string | RegExp, to: string) => {
+      const text = read(name);
+      const changed = text.replace(from, to);
+      expect(changed).not.toBe(text);
+      return contract(changed);
+    };
+    const release = mutated("release.yml", releaseContract);
+    expect(release(/\n\s+- name: Check the release notes[^\n]*\n\s+run: [^\n]*\n/, "\n"))
+      .toContain("gate does not check the tag's release notes for banned claim words before packing");
+
+    const versionPr = mutated("npm-publish.yml", versionPrContract);
+    expect(versionPr(/\n  schedule:\n[^\n]*\n/, "\n")).toEqual(expect.arrayContaining(["no weekly schedule refreshes the version PR"]));
+    expect(versionPr(/(\n  version-pr:\n[\s\S]*?permissions:\n)/, "$1      id-token: write\n")).toEqual(expect.arrayContaining([
+      expect.stringMatching(/^version-pr permissions are /)]));
+    expect(versionPr(/(\n  test-build:\n[\s\S]*?permissions:\n\s+contents: )read/, "$1write")).toEqual(expect.arrayContaining([
+      expect.stringMatching(/^test-build permissions are /)]));
+    expect(versionPr(/(\n  version-pr:\n[\s\S]*?)persist-credentials: false/, "$1persist-credentials: true"))
+      .toContain("version PR checkout persists the workflow token, so pushes would not run CI");
+    expect(versionPr("workflow_dispatch:\n", "workflow_dispatch:\n    inputs:\n      version: { type: string }\n"))
+      .toContain("workflow_dispatch takes inputs");
+    expect(versionPr(/(version: node scripts\/release-prepare\.mjs[^\n]*\n)/, "$1          publish: npm run release\n"))
+      .toContain("version-pr: changesets publish input");
+
+    const postPublish = mutated("post-publish-verify.yml", text => postPublishContract(text, parse(read("release.yml")).name));
+    expect(postPublish(/\npermissions:\n  contents: read\n/, "\npermissions:\n  contents: write\n"))
+      .toContain("workflow default permissions are not contents: read");
+    expect(postPublish(/(\n  verify:\n[\s\S]*?permissions:\n)/, "$1      actions: write\n")).toContain("verify has a write permission");
+    expect(postPublish(/(\n  distribution:\n[\s\S]*?    steps:\n)/, "$1      - run: echo hi\n        env:\n          T: ${{ secrets.NPM_TOKEN }}\n"))
+      .toContain("post-publish reads a secret");
+    expect(postPublish(/ && github\.event\.workflow_run\.event == 'push'/, "")).toContain("verify does not require github.event.workflow_run.event == 'push'");
+    expect(postPublish("on:\n", "on:\n  pull_request_target:\n")).toContain("post-publish triggers are pull_request_target, schedule, workflow_dispatch, workflow_run");
+    expect(postPublish(/node scripts\/check-published-release\.mjs "\$VERSION"/, 'node scripts/check-published-release.mjs "${{ inputs.version }}"'))
+      .toContain("verify: an expression is interpolated into a script");
+
+    const ci = mutated("ci.yml", ciNotesContract);
+    expect(ci(/\n\s+- name: Release notes claim words\n[^\n]*\n/, "\n")).toContain("CI does not check every release notes file for banned claim words");
   });
 
   test("mutation: skips, installs, rebuilds, unverified or ungated publishes, moving checkouts and broad permissions are caught", () => {
@@ -276,7 +397,5 @@ describe("release workflow contract (P0-34)", () => {
     expect(mutate(/(\n  release:\n)/, "$1    if: github.run_attempt == 1\n")).toContain("release has an if: that can skip it");
     expect(mutate(/required_reviewers/g, "reviewers")).toContain("approve does not refuse an unprotected release environment");
     expect(mutate(/ref: \$\{\{ github\.sha \}\}/, "ref: refs/heads/main")).toContain("gate does not check out the commit the tag push names");
-    const publishing = read("npm-publish.yml").replace(/(version: node scripts\/release-prepare\.mjs[^\n]*\n)/, "$1          publish: npm run release\n");
-    expect(versionPrContract(publishing)).toContain("release: changesets publish input");
   });
 });

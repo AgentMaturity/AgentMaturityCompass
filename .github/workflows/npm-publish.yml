@@ -2,23 +2,27 @@ name: npm Publish
 
 # Version PRs only (P0-34). This workflow never publishes, tags or creates a release:
 # release.yml, run from a v*.*.* tag in the protected `release` environment, is the only publisher.
-# P1-41 redesigns the release train.
 #
-# Flow:
+# P1-41 weekly release train (docs/RELEASE_CADENCE.md):
 #   1. Changesets land on main via PRs (ci.yml enforces their presence)
-#   2. When CHANGESETS_GITHUB_TOKEN is configured, this workflow opens or updates a "Version Packages" PR
-#      through scripts/release-prepare.mjs --version-only: release notes, version bump from the published
-#      version, one CHANGELOG heading and the version-coupled files
-#   3. A maintainer merges it, then tags the commit; the tag runs release.yml
+#   2. On every push to main, every Tuesday 09:00 UTC (the day before the Wednesday release day; Sid confirms the
+#      day and time, docs/PUBLISHING.md) and on manual dispatch, when CHANGESETS_GITHUB_TOKEN is configured, this
+#      workflow opens or refreshes the "Version Packages" PR with exactly the output of
+#      `node scripts/release-prepare.mjs --version-only`: release notes, the version bump from the published version,
+#      one CHANGELOG heading and the version-coupled files. With no pending changesets there is no PR: that week is
+#      skipped. The PR's commits are pushed with that token, so CI runs on them.
+#   3. Sid merges it, then tags the merge commit; the tag runs release.yml (docs/RELEASE_RUNBOOK.md)
 
 on:
   push:
     branches:
       - main
+  schedule:
+    - cron: "0 9 * * 2"
+  workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 concurrency:
   group: npm-publish-${{ github.ref }}
@@ -28,22 +32,24 @@ jobs:
   # Gate: full test + build must pass before any release action
   test-build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6 # TODO(P1-41 follow-up): pin actions/checkout@v6 by full commit SHA
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v4 # TODO(P1-41 follow-up): pin pnpm/action-setup@v4 by full commit SHA
         with:
           version: 10.33.0
 
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6 # TODO(P1-41 follow-up): pin actions/setup-node@v6 by full commit SHA
         with:
           node-version: "24"
-          registry-url: "https://registry.npmjs.org"
           cache: pnpm
 
       - name: Install dependencies
@@ -68,7 +74,7 @@ jobs:
 
       - name: Upload test diagnostics
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7 # TODO(P1-41 follow-up): pin actions/upload-artifact@v7 by full commit SHA
         with:
           name: npm-publish-test-diagnostics
           path: tmp/ci-tests/
@@ -80,24 +86,29 @@ jobs:
       - name: Prepack release guardrails
         run: npm run release:prepack-check
 
-  release:
+  # Writes only through CHANGESETS_GITHUB_TOKEN, which reaches only the changesets step. The checkout keeps no
+  # credentials, so changesets/action pushes with that token (not the workflow token) and CI runs on the PR.
+  version-pr:
     needs: test-build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6 # TODO(P1-41 follow-up): pin actions/checkout@v6 by full commit SHA
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v4 # TODO(P1-41 follow-up): pin pnpm/action-setup@v4 by full commit SHA
         with:
           version: 10.33.0
 
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6 # TODO(P1-41 follow-up): pin actions/setup-node@v6 by full commit SHA
         with:
           node-version: "24"
-          registry-url: "https://registry.npmjs.org"
           cache: pnpm
 
       - name: Install dependencies
@@ -120,7 +131,7 @@ jobs:
 
       - name: Create or update the version PR
         if: steps.release_preflight.outputs.enabled == 'true'
-        uses: changesets/action@v1
+        uses: changesets/action@v1 # TODO(P1-41 follow-up): pin changesets/action@v1 by full commit SHA
         with:
           version: node scripts/release-prepare.mjs --version-only
           title: "chore: version packages for release"
