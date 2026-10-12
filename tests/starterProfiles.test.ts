@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -204,6 +204,15 @@ describe("runStarterInit (P1-40)", () => {
     vi.stubEnv("AMC_BOOTSTRAP_OWNER_USERNAME", OWNER.username);
     vi.stubEnv("AMC_BOOTSTRAP_OWNER_PASSWORD", OWNER.password);
     await expect(runStarterInit(dir, "coding")).rejects.toThrow("already has an .amc directory");
+  });
+
+  it("collects the secrets before --force deletes anything", async () => {
+    const dir = emptyDir();
+    mkdirSync(join(dir, ".amc"));
+    writeFileSync(join(dir, ".amc", "keep"), "an existing workspace");
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    await expect(runStarterInit(dir, "coding", true)).rejects.toThrow("needs a real vault passphrase");
+    expect(existsSync(join(dir, ".amc", "keep")), "a refused --force leaves the workspace alone").toBe(true);
   });
 
   it("initializes a ready workspace and prints no secret", async () => {

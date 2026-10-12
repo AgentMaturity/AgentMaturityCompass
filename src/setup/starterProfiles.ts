@@ -10,7 +10,7 @@
  * unknown: the compiler never guesses a fact, so the plan stays blocked until the operator states them, and activating
  * it needs a plan review approved by two OWNER or AUDITOR users other than its requester. Nothing is activated here.
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, rmSync } from "node:fs";
 import { userInfo } from "node:os";
 import { join, relative } from "node:path";
 import inquirer from "inquirer";
@@ -200,12 +200,21 @@ function printReport(workspace: string, report: StarterProfileReport): void {
   console.log("  TypeScript SDK quickstart: docs/sdk/TYPESCRIPT_SDK.md");
 }
 
-/** `amc init --coding|--regulated` in `workspace`, which must not hold an .amc directory yet. */
-export async function runStarterInit(workspace: string, kind: StarterProfileKind): Promise<StarterProfileReport> {
-  if (pathExists(join(workspace, ".amc"))) {
+/**
+ * `amc init --coding|--regulated` in `workspace`, which must not hold an .amc directory yet. The operator's secrets are
+ * collected first, so a refusal leaves an existing workspace untouched; only then does `force` delete .amc, as
+ * `amc init --force` does.
+ */
+export async function runStarterInit(workspace: string, kind: StarterProfileKind, force = false): Promise<StarterProfileReport> {
+  const owner = await starterSecrets(kind);
+  const amcDir = join(workspace, ".amc");
+  if (force && pathExists(amcDir)) {
+    rmSync(amcDir, { recursive: true, force: true });
+    console.log("Removed existing .amc directory (--force mode)");
+  }
+  if (pathExists(amcDir)) {
     throw new Error(`${workspace} already has an .amc directory; a starter profile initializes a new workspace (--force deletes .amc first).`);
   }
-  const owner = await starterSecrets(kind);
   initWorkspace({ workspacePath: workspace });
   const report = applyStarterProfile(workspace, kind, owner);
   printReport(workspace, report);

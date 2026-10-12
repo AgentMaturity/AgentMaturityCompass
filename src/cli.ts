@@ -2198,8 +2198,10 @@ program
   .option("--regulated", "Starter profile: deny-by-default egress, firewall block, approvals on, a signed Layer 0 plan (P1-40)")
   .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean; coding?: boolean; regulated?: boolean }) => {
     const { starterProfileFlag, runStarterInit } = await import("./setup/starterProfiles.js");
-    let starter: ReturnType<typeof starterProfileFlag>;
-    try { starter = starterProfileFlag(opts); } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
+    try {
+      const starter = starterProfileFlag(opts);
+      if (starter) { await runStarterInit(process.cwd(), starter, opts.force); return; }
+    } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
     // Force mode: delete existing .amc directory before re-init
     if (opts.force) {
       const { rmSync, existsSync } = await import("fs");
@@ -2209,10 +2211,6 @@ program
         rmSync(amcDir, { recursive: true, force: true });
         console.log(chalk.yellow("🔄 Removed existing .amc directory (--force mode)"));
       }
-    }
-    if (starter) {
-      try { await runStarterInit(process.cwd(), starter); } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
-      return;
     }
     if (opts.minimal) {
       await initializeMinimalStartupWorkspace({
