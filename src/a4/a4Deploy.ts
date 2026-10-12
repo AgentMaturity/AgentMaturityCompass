@@ -1,8 +1,8 @@
 /**
  * Activate's deployment plans and receipts (P1-62 slice B; design §10.4 Record deployment, §14.3). AMC prepares the
  * Compose or Helm files and commands inside the package (`deploy/`, the plan signed `a4-deployment-plan`) and never
- * runs them; both targets are recordable in v1, with the image pinned by tag (IMAGE_TAG_ONLY) and, for Helm, the
- * topology undecided (TOPOLOGY_UNDECIDED), both WAITING. v1 is a same-host restart with a pinned image (D-18): a receipt
+ * runs them; both targets are recordable in v1, with the image pinned by tag (IMAGE_TAG_ONLY) and each target's D-03
+ * qualification stated (neither is qualified in CI; Helm locally only), both WAITING. v1 is a same-host restart with a pinned image (D-18): a receipt
  * is recordable only from the Compose or Helm-hosted Studio that built the agent (DEPLOYMENT_NOT_SAME_HOST otherwise,
  * P2-40). A receipt is the operator's statement in two columns: `recorded_status` (self_reported) and
  * `amc_check_status` (`not_evaluated` here; AMC's own probe is src/a4/a4DeployVerify.ts). It lists what changed —
@@ -22,8 +22,8 @@ import { assertPurposeKeys, vaultLocked } from "./a4Preflight.js";
 import type { A4ReadinessState } from "./a4Readiness.js";
 import { a4DeploymentReceiptV1Schema, headSeqSchema, type A4ChainLink, type A4Stage } from "./a4Schema.js";
 import { A4StoreError, type A4ChangeSpec, type A4Store, type A4TransitionResult } from "./a4Store.js";
-import { currentRelease, DESTINATION_REF, IDENTITY_NOT_EVALUATED, productionLeaseOf, productionReleaseOf, releaseDestination, rollbackRecorded, rollbackRoute, rollbackStarted,
-  rolledBack, rolledBackTarget } from "./spec/activate.js";
+import { currentRelease, DESTINATION_REF, IDENTITY_NOT_EVALUATED, IMAGE_TAG_ONLY_REASON, productionLeaseOf, productionReleaseOf, releaseDestination, rollbackRecorded, rollbackRoute, rollbackStarted,
+  rolledBack, rolledBackTarget, TOPOLOGY_QUALIFICATION } from "./spec/activate.js";
 import { fail } from "./stages/common.js";
 
 const json = (value: unknown): Buffer => Buffer.from(`${JSON.stringify(value, null, 2)}\n`, "utf8");
@@ -69,7 +69,8 @@ const inContainer = (input: DeployPlanInput, releaseId: string): string =>
 const header = (input: DeployPlanInput): string[] => [
   `# AMC A4 release ${input.releaseId} (project ${input.projectId}, agent ${input.agentId}). Prepared by AMC; AMC never runs it.`,
   "# v1 is a same-host restart with a pinned image (D-18): this overlay restarts the hosted Studio that built the agent.",
-  "# IMAGE_TAG_ONLY: the image is pinned by tag until D-03 and P0-14 provide a digest."
+  `# IMAGE_TAG_ONLY: ${IMAGE_TAG_ONLY_REASON}.`,
+  `# ${TOPOLOGY_QUALIFICATION[input.target].reasonCode}: ${TOPOLOGY_QUALIFICATION[input.target].note}.`
 ];
 
 function composeOverlay(input: DeployPlanInput): string {
@@ -86,7 +87,7 @@ function composeOverlay(input: DeployPlanInput): string {
 
 function helmOverlay(input: DeployPlanInput): string {
   return [...header(input),
-    "# TOPOLOGY_UNDECIDED until D-03. The chart has no image.digest field yet (P0-14) and mounts one volume, the workspace,",
+    "# The overlay leaves the chart's image.digest unset (IMAGE_TAG_ONLY). The chart mounts one volume, the workspace,",
     "# so AMC_CONTROL_CHECKPOINT_DIR is not set here. Secrets are named only; the chart's change-me-* defaults are never copied.",
     "# A4_PREVIEW_NOT_SET_BY_CHART: the chart renders a fixed env list, so no values key sets AMC_A4_PREVIEW=1; see deploy/plan.json.",
     "image:", "  repository: amc-studio", `  tag: "${IMAGE_TAG}"`, ""].join("\n");
@@ -151,8 +152,8 @@ export function deploymentPlan(input: DeployPlanInput): { files: Array<{ path: s
   const plan = {
     schema: "amc.a4-deployment-plan/v1", releaseId: input.releaseId, projectId: input.projectId, agentId: input.agentId, target: input.target, sameHost: true,
     destinationRef: input.destinationRef, overlay: { path: overlayPath, sha256: sha256Hex(overlay) },
-    image: { pin: "tag", reference: `amc-studio:${IMAGE_TAG}`, digest: null, reasonCode: "IMAGE_TAG_ONLY", key: "P0-14" },
-    topology: helm ? { reasonCode: "TOPOLOGY_UNDECIDED", key: "D-03" } : null,
+    image: { pin: "tag", reference: `amc-studio:${IMAGE_TAG}`, digest: null, reasonCode: "IMAGE_TAG_ONLY", reason: IMAGE_TAG_ONLY_REASON },
+    topology: { reasonCode: TOPOLOGY_QUALIFICATION[input.target].reasonCode, decision: "D-03", ciQualification: "pending" },
     steps,
     receiptForm: { method: "POST", route: `/api/v1/a4/projects/${input.projectId}/releases/${input.releaseId}/deployments`, body: {
       kind: "deploy", environment: "staging", target: input.target, packageDigest: "<packageDigest from the release response>", imageDigest: null,
@@ -160,10 +161,10 @@ export function deploymentPlan(input: DeployPlanInput): { files: Array<{ path: s
       leaseIds: ["<the lease id from the release response>"], destinationRef: input.destinationRef, operatorStated: { status: "succeeded | failed | partial" },
       expectedHeadSeq: "<the project's head seq>", clientRequestId: "<8 to 128 letters, digits, _ or ->" } },
     gaps: [
-      { reasonCode: "IMAGE_TAG_ONLY", note: "No image digest exists until D-03 and P0-14; the image is pinned by tag. WAITING, never BLOCKED." },
+      { reasonCode: "IMAGE_TAG_ONLY", note: `${IMAGE_TAG_ONLY_REASON}. WAITING, never BLOCKED.` },
+      { reasonCode: TOPOLOGY_QUALIFICATION[input.target].reasonCode, note: `${TOPOLOGY_QUALIFICATION[input.target].note}; a ${input.target} receipt is recordable. WAITING, never BLOCKED.` },
       { reasonCode: "RELEASE_IDENTITY_NOT_EVALUATED", note: `AMC's check establishes reachability only: ${IDENTITY_NOT_EVALUATED}.` },
       ...(helm ? [
-        { reasonCode: "TOPOLOGY_UNDECIDED", note: "D-03 is open; a Helm receipt is recordable. WAITING, never BLOCKED." },
         { reasonCode: "CHECKPOINT_DIR_NOT_SET", note: "The chart mounts one volume (the workspace), so the signed-journal checkpoint root stays in the home directory." },
         { reasonCode: "A4_PREVIEW_NOT_SET_BY_CHART", note: "The chart renders a fixed env list, so the values overlay cannot set AMC_A4_PREVIEW=1; set it on the Studio container out of band (the deploy step names one way). A chart values key is a later item." },
         { reasonCode: "EGRESS_CIDRS_NOT_SET", note: "networkPolicy.allowedEgressCidrs stays the chart's: no Adapt answer carries CIDRs." }] : [])

@@ -61,8 +61,8 @@ import { contextPluginPath } from "./adaptContextPlugin.js";
 import { memoryPolicyPath } from "./adaptMemoryPolicy.js";
 import { integrationClaimFor } from "./assemblePaths.js";
 import {
-  ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, enforceManifestIdFor, EXPERT_REVIEW_ITEM, IDENTITY_NOT_EVALUATED, leasePlans,
-  PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, proposedFor, RELEASE_EFFECT_ID, rolledBackTarget, rollbackRecorded, rollbackRoute, rollbackStarted, type LeasePlan
+  ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, enforceManifestIdFor, EXPERT_REVIEW_ITEM, IDENTITY_NOT_EVALUATED, IMAGE_TAG_ONLY_REASON, leasePlans,
+  PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, proposedFor, RELEASE_EFFECT_ID, rolledBackTarget, rollbackRecorded, rollbackRoute, rollbackStarted, TOPOLOGY_QUALIFICATION, type LeasePlan
 } from "./spec/activate.js";
 import { acknowledgementOf, adaptSpecOf, lockDigestOf, proposedPlan } from "./spec/adapt.js";
 import { aspireSpecOf } from "./spec/aspire.js";
@@ -403,7 +403,8 @@ function packageInputs(workspace: string, state: A4ReadinessState, gateRevisionN
     `# A4 agent package (${deployInput.target})`, "", PACKAGE_BOUNDARY, "", ACTIVATE_CLAIM_BOUNDARY, "",
     `- deploy/ holds the prepared ${deployInput.target} overlay and ${PLAN_PATH} (steps, the receipt form, the gaps), signed a4-deployment-plan. AMC never runs them.`,
     "- v1 deployment is a same-host restart with a pinned image: the overlay restarts the hosted Studio that built this agent; receipts are recordable only for an agent built in that Studio (D-18).",
-    "- The image is pinned by tag only until D-03 and P0-14 add a digest (IMAGE_TAG_ONLY); a Helm topology is undecided until D-03 (TOPOLOGY_UNDECIDED).",
+    `- IMAGE_TAG_ONLY: ${IMAGE_TAG_ONLY_REASON}. ${TOPOLOGY_QUALIFICATION[deployInput.target].reasonCode}: ${TOPOLOGY_QUALIFICATION[deployInput.target].note}.`,
+    "- D-03 also keeps Railway and Vercel documented but unqualified; A4 v1 prepares Compose and Helm only (D-18).",
     `- AMC's check of a destination establishes reachability only: ${IDENTITY_NOT_EVALUATED}. Runtime behaviour at the destination is not evaluated.`,
     "- A re-snapshot into another workspace is P2-40. The SBOM lists AMC's runtime dependencies only; the agent's AIBOM is P1-27/P2-18.",
     "- The staging lease token is delivered once to the release owner and stored nowhere; mount it as an operator-supplied secret file. The manifest and leases.json name its id only.",

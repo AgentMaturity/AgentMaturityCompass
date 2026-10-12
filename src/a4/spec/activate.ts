@@ -74,6 +74,17 @@ export function effectUnsettled(chain: readonly A4ChainLink[], match: (body: Rec
 const STAGING_LEASE_TTL_MS = 24 * 60 * 60 * 1000;
 /** No unauthenticated digest source exists at a destination until P2-40 (D-18 option 1). */
 export const IDENTITY_NOT_EVALUATED = "no unauthenticated digest source at the destination (P2-40)";
+/** Why the prepared files pin the image by tag (IMAGE_TAG_ONLY): AMC holds no digest to pin, whatever the chart supports. */
+export const IMAGE_TAG_ONLY_REASON = "the bootstrap report records no digest of the image this Studio runs, so the prepared files pin it by tag";
+/**
+ * Each target A4 v1 prepares (D-18: Compose and Helm only) as decision D-03 (option C, 2026-10-11) leaves it: all four
+ * topologies (Helm, Compose, Railway, Vercel) stay documented, and only a qualified one may be called supported. Neither
+ * prepared target has passed CI qualification; Railway and Vercel are documented but unqualified and never prepared here.
+ */
+export const TOPOLOGY_QUALIFICATION = {
+  helm: { reasonCode: "TOPOLOGY_QUALIFIED_LOCALLY_ONLY", note: "D-03 keeps Helm documented; it passed its qualification checks locally only (kind, 2026-10-11), and its CI qualification is pending" },
+  compose: { reasonCode: "TOPOLOGY_NOT_QUALIFIED", note: "D-03 keeps Compose documented but not qualified; its CI qualification is pending" }
+} as const;
 
 const load = () => import("../stages/activate.js");
 /** Activate's producers (Understand, Explain, Propose, Review); Build is the release effect (POST …/releases). */
@@ -548,12 +559,13 @@ export function activateItems(state: A4ReadinessState, query: A4ReadinessQuery):
     packageInputsItem(state, spec, proposed),
     transparencyItem(state.project.project_id, release, query.live.packageTransparency),
     sameHostItem(facts, target),
-    // D-03 is open: a Helm target is recordable, its topology undecided (WAITING, never BLOCKED; C8).
-    target === "helm" ? waiting("deployment.topology", ["TOPOLOGY_UNDECIDED", "KEY:D-03"], { kind: "review_pending", mandatory: false })
+    // D-03 keeps both prepared targets documented and either is recordable; neither is qualified in CI (WAITING, never BLOCKED; C8).
+    target === "helm" || target === "compose" ? waiting("deployment.topology", [TOPOLOGY_QUALIFICATION[target].reasonCode, "CI_QUALIFICATION_PENDING"],
+      { kind: "review_pending", mandatory: false, nextAction: { label: `${TOPOLOGY_QUALIFICATION[target].note}. A ${target} receipt is recordable` } })
       : item("deployment.topology", "READY", { mandatory: false, reasonCodes: target === null ? ["TARGET_NOT_ANSWERED"] : [] }),
-    // No image digest exists until D-03 and P0-14 (the bootstrap report records none): pinned by tag only, WAITING, never BLOCKED.
-    waiting("deployment.image_pinned", ["IMAGE_TAG_ONLY", "KEY:P0-14"], { kind: "review_pending", mandatory: false,
-      nextAction: { label: "The prepared files pin the image by tag; digest pinning waits for D-03 and P0-14 (the README names the gap)" } }),
+    // The bootstrap report records no image digest: pinned by tag only, WAITING, never BLOCKED.
+    waiting("deployment.image_pinned", ["IMAGE_TAG_ONLY"], { kind: "review_pending", mandatory: false,
+      nextAction: { label: `No image digest: ${IMAGE_TAG_ONLY_REASON} (the package README names the gap)` } }),
     leaseScopeItem(release, releaseId === null ? null : productionLeaseOf(state.chain, releaseId)),
     leasePrincipalItem(query.live),
     receiptItem(state, releaseId),

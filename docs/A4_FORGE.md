@@ -468,7 +468,8 @@ the staging lease has expired before such a gate can.
 
 Readiness at Activate: `ask_complete`, `understanding_confirmed`, `release_proposed`, `package.inputs`,
 `package.transparency` (BLOCKED while the current release's package has no transparency entry), `deployment.same_host` (BLOCKED `DEPLOYMENT_NOT_SAME_HOST`, naming P2-40, unless this Studio runs under the chosen
-target: v1 deploys by restarting it), `deployment.topology` (`TOPOLOGY_UNDECIDED` for Helm) and
+target: v1 deploys by restarting it), `deployment.topology` (`TOPOLOGY_QUALIFIED_LOCALLY_ONLY` for Helm,
+`TOPOLOGY_NOT_QUALIFIED` for Compose, each with `CI_QUALIFICATION_PENDING`) and
 `deployment.image_pinned` (`IMAGE_TAG_ONLY`), both WAITING and never mandatory, `lease.scope` (`LEASE_STAGING_ONLY`
 until the production lease), `lease.principal` (`PRINCIPAL_REQUIRED` under an identity-binding plan, see above), `deployment.amc_check` (`DEPLOYMENT_UNCHECKED`) and `monitoring.source`
 (`MONITOR_NO_SOURCE`). `signing.notary_route` names both routes as `A4_RECORD:<route>` and `A4_PACKAGE:<route>`. In
@@ -485,8 +486,13 @@ The package also carries the prepared deployment under `deploy/`: the Compose ov
 `docker-compose.a4-<releaseId>.yml` or the Helm values overlay `values.a4-<releaseId>.yaml`, and `deploy/plan.json` with
 the steps (pre-flight `amc doctor --strict --json`, deploy, verification, rollback), the receipt form and the gaps. The plan
 is signed `a4-deployment-plan`. `GET …/releases/:rid` shows its steps only while that signature verifies and the
-verified package manifest lists the plan's digest (`plan: null` with the reason otherwise). AMC never runs these commands. Both targets are recordable in v1. The image is pinned by
-tag (`IMAGE_TAG_ONLY`, until D-03 and P0-14), and a Helm topology is undecided (`TOPOLOGY_UNDECIDED`, until D-03). Both are
+verified package manifest lists the plan's digest (`plan: null` with the reason otherwise). AMC never runs these commands. Both targets are recordable in v1.
+Decision D-03 (option C, 2026-10-11) keeps all four topologies documented (Helm, Compose, Railway and Vercel), and A4 v1
+prepares Compose and Helm only (D-18). Neither is qualified in CI yet: Helm passed its qualification checks locally only
+(kind on macOS arm64, 2026-10-11; `TOPOLOGY_QUALIFIED_LOCALLY_ONLY`), Compose is documented but not qualified
+(`TOPOLOGY_NOT_QUALIFIED`), and Railway and Vercel stay documented but unqualified. The image is pinned by tag
+(`IMAGE_TAG_ONLY`): the bootstrap report records no digest of the image the Studio runs, so the Helm overlay leaves the
+chart's `image.digest` unset. The overlay, the plan's `topology` and `gaps` and the package README state both. Both are
 WAITING items, never blockers. The Compose overlay sets `AMC_CONTROL_CHECKPOINT_DIR` on its own named volume outside the
 workspace; the chart mounts only the workspace, so the Helm overlay cannot and the plan says so. The chart also renders
 a fixed environment list, so the Helm overlay cannot set `AMC_A4_PREVIEW=1` (`A4_PREVIEW_NOT_SET_BY_CHART`): the plan's

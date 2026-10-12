@@ -29,7 +29,8 @@ import type { A4Answer, A4StageRegistry } from "../a4Schema.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import {
   ACTIVATE_CLAIM_BOUNDARY, ACTIVATE_SPEC_SCHEMA, activateItems, activateSpecOf, answerGaps, CAPTURED_SLOTS, CARRIED, carriedValues, currentRelease, cycleLinks,
-  IDENTITY_NOT_EVALUATED, leasePlans, PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, QUESTIONS, RELEASE_EFFECT_ID, understandingOf, type LeasePlan
+  IDENTITY_NOT_EVALUATED, IMAGE_TAG_ONLY_REASON, leasePlans, PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, QUESTIONS, RELEASE_EFFECT_ID, TOPOLOGY_QUALIFICATION,
+  understandingOf, type LeasePlan
 } from "../spec/activate.js";
 import { updatePolicyOf } from "../a4UpdatePolicy.js";
 import { answersDigestOf, answerValues, askGapCodes, listValue, mergeCarried, textValue } from "../spec/aspire.js";
@@ -79,9 +80,10 @@ function understandFacts(ctx: A4ProducerContext, target: string | null): Record<
     lifecycle: { currentStage: lifecycleNow(workspace, agentId).stage, requiredForStaging: requiredControlsForStage("staging"),
       requiredForProduction: requiredControlsForStage("production"), note: "A4 advances the lifecycle only through its bridge table, never by a typed control" },
     deployBase: { compose: fileSha(join(AMC_ROOT, "deploy", "compose", "docker-compose.yml")), helm: fileSha(join(AMC_ROOT, "deploy", "helm", "amc", "values.yaml")) },
-    image: { digest: null, reason: "the bootstrap report records no image digest; pinning waits for D-03 and P0-14 (IMAGE_TAG_ONLY)" },
+    image: { digest: null, reason: `${IMAGE_TAG_ONLY_REASON} (IMAGE_TAG_ONLY)` },
     hosting: hostingNow(),
-    topology: target === "helm" ? { status: "TOPOLOGY_UNDECIDED", key: "D-03" } : { status: null, key: null },
+    // D-03 (C): every topology stays documented; neither target A4 prepares is qualified in CI (Helm locally only).
+    topology: target === "helm" || target === "compose" ? { status: TOPOLOGY_QUALIFICATION[target].reasonCode, key: "D-03" } : { status: null, key: null },
     freeze: freeze === null ? null : { active: freeze.active, incidentIds: freeze.incidentIds },
     signing: { A4_RECORD: orNull(() => signingRoute(workspace, "A4_RECORD")), A4_PACKAGE: orNull(() => signingRoute(workspace, "A4_PACKAGE")) },
     deployRule: rule === null ? null : { requiredApprovals: rule.requiredApprovals, requireDistinctUsers: rule.requireDistinctUsers, rolesAllowed: rule.rolesAllowed },
@@ -203,7 +205,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   const kpis = listValue(values.get("businessOutcomes"));
   const proposal = {
     deploymentTarget: { kind: textValue(values.get("target")), sameHost: true, destinationRef: textValue(values.get("destinationRef")), hostHint: textValue(values.get("hostHint")),
-      imageDigest: null, imagePin: "tag (IMAGE_TAG_ONLY until D-03 and P0-14)" },
+      imageDigest: null, imagePin: "tag (IMAGE_TAG_ONLY: the bootstrap report records no image digest)" },
     leases: { staging: leaseView(plans.staging), production: leaseView(plans.production) },
     updatePolicy: updatePolicyOf(answers),
     ownership: { releaseOwner: textValue(values.get("releaseOwner")), onCall: textValue(values.get("onCall")), claimKind: "self_reported" },
@@ -238,7 +240,8 @@ const target = (values: ReadonlyMap<string, unknown>): string | null => textValu
 
 const LIMITATIONS = [
   `AMC's check of the destination establishes reachability only: ${IDENTITY_NOT_EVALUATED}; runtime behaviour there is not evaluated.`,
-  "The image is pinned by tag until D-03 and P0-14 (IMAGE_TAG_ONLY); a Helm topology is undecided until D-03.",
+  `The image is pinned by tag (IMAGE_TAG_ONLY): ${IMAGE_TAG_ONLY_REASON}.`,
+  "D-03 keeps Helm, Compose, Railway and Vercel documented, and A4 v1 prepares Compose and Helm only (D-18). Neither is qualified in CI: Helm passed its qualification checks locally only, and Railway and Vercel stay unqualified.",
   "rollback_plan_validated and operator_handoff_acknowledged stay not evaluated until AMC's check can pass (P2-40), so the lifecycle stays at staging.",
   "The update policy is signed and not enforced (P2-34); the kill switch is not available in this release (P2-26).",
   "The SLO source is in-memory and unsigned: the monitor record carries it self_reported with evidence incomplete.",
