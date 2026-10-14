@@ -1,0 +1,8 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`no certification from self-assessment (P0-21) > the domain report carries no certification field or wording 1`] = `
+[
+  "**Claim:** Self-reported · **Result:** not evaluated · **Evidence:** sufficient · **Enforcement:** none · **Review:** pending · **Applicability:** applicable",
+  "**Claim:** Synthetic example (not evidence) · **Result:** not evaluated (synthetic example values are not evidence) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** applicable",
+]
+`;

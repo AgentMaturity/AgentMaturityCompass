@@ -1,6 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { explainDiagnosticReportStatus, generateReport } from "../src/diagnostic/runner.js";
 import type { DiagnosticReport } from "../src/types.js";
+import { getPublicMethodologyManifest } from "../src/methodology/publicMethodology.js";
+import { renderClaimLegend } from "../src/claims/eligibility/render.js";
 
 function report(overrides: Partial<DiagnosticReport> = {}): DiagnosticReport {
   return {
@@ -36,6 +38,27 @@ function report(overrides: Partial<DiagnosticReport> = {}): DiagnosticReport {
 }
 
 describe("diagnostic report status explanation", () => {
+  test.each(["1.1.1", undefined])("keeps version %s legacy in the rendered report", (version) => {
+    const stored = report(version ? { methodology: { ...getPublicMethodologyManifest(), amcVersion: version } } : {});
+    const markdown = generateReport(stored, "md") as string;
+    expect(markdown).toContain("**Claim:** Legacy (1.x), self-reported");
+    expect(markdown).toContain("**Result:** not evaluated");
+    expect(markdown).toContain(renderClaimLegend("markdown"));
+    expect(markdown).not.toContain("**Claim:** Observed");
+    expect(markdown).not.toContain("**Claim:** Independently reviewed");
+    expect(markdown.split("\n").find((line) => line.startsWith("**Claim:**"))).toMatchSnapshot();
+  });
+
+  test("a current stored run needs a checked seal before its claim is observed", () => {
+    const current = report({ methodology: getPublicMethodologyManifest() });
+    const markdown = generateReport(current, "md") as string;
+    expect(markdown).toContain("**Claim:** Self-reported · **Result:** not evaluated");
+    expect(markdown).toContain("**Evidence:** untrusted");
+    expect(markdown.split("\n").find((line) => line.startsWith("**Claim:**"))).toMatchSnapshot();
+    expect(markdown).toContain(renderClaimLegend("markdown"));
+    expect(markdown).not.toContain("**Claim:** Independently reviewed");
+  });
+
   test("explains invalid reports instead of showing a raw unexplained status", () => {
     const invalid = report({
       status: "INVALID",

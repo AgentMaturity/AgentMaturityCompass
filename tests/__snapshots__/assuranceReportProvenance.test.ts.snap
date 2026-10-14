@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`assurance report provenance gate > empty and inconclusive-only assurance reports cannot render a passing claim 1`] = `"**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** applicable"`;
+
+exports[`assurance report provenance gate > empty and inconclusive-only assurance reports cannot render a passing claim 2`] = `"**Claim:** Observed · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** applicable"`;
+
+exports[`assurance report provenance gate > rendered pack claims reflect sealVerified=false without reviewer promotion 1`] = `
+[
+  "**Claim:** Self-reported · **Result:** not evaluated (the signature does not verify) · **Evidence:** untrusted · **Enforcement:** none · **Review:** pending · **Applicability:** applicable",
+  "| toolGovernance | 88.00 | 1 | 0 | OBSERVED | self_reported |",
+]
+`;
+
+exports[`assurance report provenance gate > rendered pack claims reflect sealVerified=true without reviewer promotion 1`] = `
+[
+  "**Claim:** Observed · **Result:** pass · **Evidence:** sufficient · **Enforcement:** none · **Review:** pending · **Applicability:** applicable",
+  "| toolGovernance | 88.00 | 1 | 0 | OBSERVED | observed |",
+]
+`;

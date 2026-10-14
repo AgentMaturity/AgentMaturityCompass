@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Fleet Scoring > fleet report preserves each legacy member's claim label 1`] = `
+{
+  "legend": "## How to read claim kinds
+
+### Claim kinds
+
+- **Synthetic example (not evidence)**: example values from a labelled example mode; never evidence, never a level
+- **Self-reported**: stated by the agent or its operator, or not backed by observed evidence, including results stored by AMC 1.x; numeric self-answers reach at most level 1 and never pass a regulated control
+- **Observed**: AMC observed the behaviour at runtime or in an executed test
+- **Independently reviewed**: approved by an independent reviewer whose key is pinned
+
+### Status dimensions
+
+- **Result**: pass, fail or not evaluated
+- **Evidence**: sufficient, incomplete, stale, contradictory or untrusted
+- **Enforcement**: none, advisory, observed or enforced at a named boundary
+- **Review**: pending, approved, rejected or expired
+- **Applicability**: applicable, not applicable with a rationale, or unresolved
+
+### Results
+
+- **Not evaluated**: AMC could not decide from trustworthy evidence; it is never a pass, a partial result or a default score",
+  "memberClaims": {
+    "current": "Self-reported",
+    "legacy": "Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1)",
+  },
+  "reportClaim": "**Claim:** Self-reported · **Result:** not evaluated (the signature does not verify) · **Evidence:** untrusted · **Enforcement:** none · **Review:** pending · **Applicability:** applicable",
+}
+`;
