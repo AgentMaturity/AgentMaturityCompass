@@ -94,6 +94,13 @@
       "sha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293"
     },
     {
+      "path": "src/audit/binderArtifact.ts",
+      "issue": "P1-16",
+      "baseCommit": "1c1ff4b1ff3d94960aee7e130e5dba6988126d4c",
+      "archivePath": "unused-code/plan-edits/P1-16/src/audit/binderArtifact.ts.landed",
+      "sha256": "9b40bd627e04b45b395fba58e4318808b71c34ab40048d344088a22d635c7e46"
+    },
+    {
       "path": "src/auth/authApi.ts",
       "issue": "P1-56",
       "baseCommit": "2a592a00f0e3c6452f19e9a3902b569c111eb4c1",
@@ -323,6 +330,13 @@
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
       "archivePath": "unused-code/plan-edits/P0-06/src/sdk/nativeAgentClient.ts.landed",
       "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10"
+    },
+    {
+      "path": "src/session/spill/spillStore.ts",
+      "issue": "P2-01",
+      "baseCommit": "e89f4842892c1eae4e4acf6996c7d0d31a4b229e",
+      "archivePath": "unused-code/plan-edits/P2-01/src/session/spill/spillStore.ts.landed",
+      "sha256": "de1469cf447c9ccf8a22fef1ebcce716b3af7455b7127eb00ddc7cb5a7bc59e7"
     },
     {
       "path": "src/studio/studioServer.ts",

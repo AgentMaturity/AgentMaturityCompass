@@ -10,6 +10,7 @@ import * as currentDrilldown from "../src/diagnostic/evidenceDrilldown.js";
 import * as contracts from "../src/diagnostic/explainabilityContracts.js";
 import * as realHash from "../src/utils/hash.js";
 import * as realJson from "../src/utils/json.js";
+import * as levelSemantics from "../src/diagnostic/levelSemantics.js";
 import { buildWatchObsStudioSourceArtifactLinks } from "../src/watch/evidenceDrilldown.js";
 import type { DiagnosticReport } from "../src/types.js";
 import { landedBytes, landedText } from "./helpers/landedSource.js";
@@ -24,15 +25,30 @@ const originals = JSON.parse(readFileSync(resolve(archive, "originals.json"), "u
 };
 const restoration = JSON.parse(readFileSync(resolve(archive, "restoration.json"), "utf8")) as {
   inverseEdits: Array<{ path: string; before: string; after: string }>;
+  forwardEdits: Array<{ issue: string; commit: string; path: string; before: string; after: string }>;
   statusSites: string[];
   projections: Array<{ name: string; keys: string[] }>;
 };
 
-function originalModule<T>(file: string): T {
+/**
+ * Intended behaviour changes since the archive are recorded in its restoration.json `forwardEdits` and applied to the
+ * archived source, so the parity still runs every other archived byte. Each `before` occurs once in the archive and each
+ * `after` once in the live source, so an edit is exactly the landed change. P1-07 follow-up (8f6665727): repairHintFor
+ * names a not-evaluated next level and its reason instead of advising toward it; rowHash, manifestHash and packHash
+ * follow from that hint.
+ */
+const forwardEdits = restoration.forwardEdits;
+
+function originalModule<T>(file: string, applyForwardEdits = true): T {
   const row = originals.files.find(item => item.path === file)!;
   const bytes = readFileSync(resolve(row.originalArchive));
   if (hash(bytes) !== row.sha256) throw new Error("Original changed: " + file);
-  const compiled = ts.transpileModule(bytes.toString("utf8"), {
+  let source = bytes.toString("utf8");
+  for (const edit of applyForwardEdits ? forwardEdits.filter(item => item.path === file) : []) {
+    if (source.split(edit.before).length !== 2) throw new Error(`${edit.issue} forward edit does not apply once to the archive: ${file}`);
+    source = source.replace(edit.before, edit.after);
+  }
+  const compiled = ts.transpileModule(source, {
     fileName: file,
     compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS },
     reportDiagnostics: true,
@@ -40,7 +56,8 @@ function originalModule<T>(file: string): T {
   if (compiled.diagnostics?.some(item => item.category === ts.DiagnosticCategory.Error)) throw new Error("Original did not transpile");
   const exports = {};
   // Both original modules execute intact. Their value dependencies are the actual unchanged modules.
-  const dependencies: Record<string, unknown> = { "../utils/hash.js": realHash, "../utils/json.js": realJson };
+  const dependencies: Record<string, unknown> = { "../utils/hash.js": realHash, "../utils/json.js": realJson,
+    ...(source.includes('from "./levelSemantics.js"') ? { "./levelSemantics.js": levelSemantics } : {}) };
   new Function("exports", "require", compiled.outputText)(exports, (specifier: string) => {
     if (!(specifier in dependencies)) throw new Error("Unexpected original dependency: " + specifier);
     return dependencies[specifier];
@@ -48,6 +65,7 @@ function originalModule<T>(file: string): T {
   return exports as T;
 }
 const originalQuestion = originalModule<typeof currentQuestion>("src/diagnostic/questionScoreExplainability.ts");
+const archivedQuestion = originalModule<typeof currentQuestion>("src/diagnostic/questionScoreExplainability.ts", false);
 const originalDrilldown = originalModule<typeof currentDrilldown>("src/diagnostic/evidenceDrilldown.ts");
 type Input = currentQuestion.BuildQuestionExplainabilityReportInput;
 const fixtureBytes = readFileSync(resolve(originals.fixtureSource.archive));
@@ -140,6 +158,36 @@ describe("explainability shared contracts retain complete original exported flow
     expect(packageEntriesSha256(landedBytes("package.json"))).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);
     expect(Object.keys(currentQuestion)).toEqual(Object.keys(originalQuestion));
     expect(Object.keys(currentDrilldown)).toEqual(Object.keys(originalDrilldown));
+  });
+  test("forward edits are exactly the landed intended changes and only move repair hints and the hashes over them", () => {
+    for (const edit of forwardEdits) expect(readFileSync(resolve(edit.path), "utf8").split(edit.after)).toHaveLength(2);
+    const leaves = (value: unknown, path = ""): Array<[string, string]> => value !== null && typeof value === "object"
+      ? Object.entries(value).flatMap(([key, child]) => leaves(child, `${path}.${key}`)) : [[path, JSON.stringify(value)]];
+    let changedHints = 0;
+    for (const input of fixtures) {
+      const archived = archivedQuestion.buildQuestionExplainabilityReport(structuredClone(input));
+      const edited = originalQuestion.buildQuestionExplainabilityReport(structuredClone(input));
+      const before = new Map(leaves(archived)), after = leaves(edited);
+      expect(after.map(([path]) => path)).toEqual([...before.keys()]);
+      for (const [path, value] of after.filter(([path, value]) => before.get(path) !== value)) {
+        expect(path).toMatch(/^\.rows\.\d+\.(repairHint|rowHash)$|^\.manifestHash$/);
+        if (path.endsWith(".repairHint")) { changedHints++; expect(JSON.parse(value)).toMatch(/^Target L[1-5]: Not evaluated: /); }
+      }
+    }
+    expect(changedHints).toBeGreaterThan(0);
+  });
+  test("rows whose next level is evaluable keep the archived repair advice byte for byte", () => {
+    // Every literal fixture sits below a not-evaluated level, so lower each row to an evaluable one to run the archived advice.
+    let advised = 0;
+    for (const input of fixtures) for (const [index, row] of input.rows.entries()) {
+      const level = [0, 1, 2, 3, 4].find(value => !levelSemantics.notEvaluatedLevel(row.question, value, value + 1));
+      if (level === undefined) continue;
+      const lowered = structuredClone(input);
+      lowered.rows[index].score.finalLevel = level as typeof row.score.finalLevel;
+      expect(parity(lowered).rows[index].repairHint).not.toContain("Not evaluated");
+      advised++;
+    }
+    expect(advised).toBeGreaterThan(0);
   });
   test("uses existing literal report inputs and exercises every changed domain with a ready original receipt", () => {
     expect(fixtures.length).toBeGreaterThan(20);
