@@ -60,6 +60,8 @@ All tests must pass before submitting a PR.
 
 ## Duplicate and Dead-Code Ratchet
 
+Both checks are required in CI: a failed source-quality step fails the build job (P0-33).
+
 `npm run check:duplicates` (jscpd over `src/`) and `npm run check:dead-code` (Knip over the `knip.json` workspaces) compare the current findings with `scripts/quality/source-quality-baseline.json` (decision D-11, option A). Existing debt is recorded there; a check fails only when:
 
 - a finding is **new** (not in the baseline). The message prints its id and its two paths (relative to `src/`) or its file, category and symbol. Remove the duplicate or the dead code. If the finding must stay, accept it with a reason of at least 20 characters; your `git config user.name` and today's date are recorded with it:
