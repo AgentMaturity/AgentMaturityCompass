@@ -36,7 +36,7 @@ describe("evidenceProducer", () => {
     [{ source: "dogfood-maturity" }, "synthetic"],
     ...["eval_import", "import", "watch", "attested_ingest", "chatgpt", "claude_console", "gemini_ui", "generic_json", "generic_text"]
       .map((source): [Record<string, unknown>, string] => [{ source }, "import"]),
-    ...["manual", "operator", "feedback.ingest"].map((source): [Record<string, unknown>, string] => [{ source }, "manual"]),
+    ...["manual", "operator", "feedback.ingest", "user", "inferred", "carried", "numeric_self_answer", "default"].map((source): [Record<string, unknown>, string] => [{ source }, "manual"]),
     [{ source: "webhook" }, "external-report"],
     [{ source: "stdin_pipe" }, "amc-runtime"],
     [{ source: "constructor" }, "amc-runtime"],
@@ -68,7 +68,10 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "redteam", "registry", "release", "replay-benchmark-corpus", "reports", "request-failure", "retention.auto",
   "risk-cost-latency-slo", "roles", "sdk", "settings", "shield.exploit_confirmation", "stdin_pipe", "studio",
   "studio-audit", "support-observation", "toolhub", "tools", "trace", "transform", "transparency", "trust", "trust-list",
-  "trust-list-history", "turn-error", "turn-events", "undeclared-runner", "user-env", "users", "validators"
+  "trust-list-history", "turn-error", "turn-events", "undeclared-runner", "user-env", "users", "validators",
+  // Result envelopes (studioClaimOutput/resultRouteRegistry), applicability metadata and legal-hold registry formats.
+  // These labels do not name ledger-event producers; self-reported source labels are classified above as manual.
+  "compliance_report", "diagnostic_report", "path_presence", "predicate", "reviewer_exception", "record", "legacy", "legacy-unverified"
 ]);
 
 function sourceFiles(dir: string): string[] {

@@ -94,7 +94,6 @@
     "src/output/schema.ts",
     "src/persona",
     "src/pii",
-    "src/policy",
     "src/population",
     "src/prediction",
     "src/privacy",

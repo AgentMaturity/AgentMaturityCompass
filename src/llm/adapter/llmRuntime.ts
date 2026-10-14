@@ -38,7 +38,6 @@
  * row records both the provider's facts and the retry verdict the route's frozen
  * policy reached.
  */
-import { resolve } from "node:path";
 import type { CredentialsService } from "../../credentials/credentialsService.js";
 import { credentialRefName } from "../../credentials/credentialRef.js";
 import type { RecordedCredential } from "../../session/requestOutcomeMeta.js";
@@ -172,14 +171,11 @@ export class LlmRuntime {
 
   private readonly transport: HttpTransport;
 
-  private readonly workspace: string;
-
   private readonly now: () => number;
 
   constructor(init: LlmRuntimeInit) {
     this.init = init;
     this.transport = init.transport ?? fetchTransport;
-    this.workspace = resolve(init.session.workspace);
     this.now = init.now ?? Date.now;
   }
 
@@ -229,10 +225,11 @@ export class LlmRuntime {
       assertRequest: (request) => {
         assertRequestCapabilities(route.capabilities, request);
         // Opt-in: no .amc/dataflow/processors.yaml (and no .sig) means this workspace has not adopted protected-data admission.
-        if (loadProcessorRegistrySnapshot(this.workspace).state === "missing") return;
+        // The workspace is read per use and never fabricated: a session without one reads as an invalid registry, not a missing one.
+        if (loadProcessorRegistrySnapshot(this.init.session.workspace).state === "missing") return;
         const detection = detectProtectedRequest(request);
         if (detection.classes.length === 0) return;
-        const admission = admitProtectedModelRequest(this.workspace, route.providerId, route.baseUrl, detection);
+        const admission = admitProtectedModelRequest(this.init.session.workspace, route.providerId, route.baseUrl, detection);
         const evidence = {
           classes: [...detection.classes],
           counts: { ...detection.counts },
@@ -346,8 +343,9 @@ export class LlmRuntime {
 
     let response: HttpResponse;
     try {
-      // The same gate covers injected transports and fetch, before either can transmit the pinned bytes.
-      checkEgress({ workspace: this.workspace, channel: "provider", url: request.url });
+      // The same gate covers injected transports and fetch, before either can transmit the pinned bytes. checkEgress
+      // resolves the session's workspace itself and refuses a missing one as workspace_scope_required.
+      checkEgress({ workspace: this.init.session.workspace, channel: "provider", url: request.url });
       dispatchAttempted = true;
       response = await this.transport({ ...request, redirect: "error" });
     } catch (error: unknown) {

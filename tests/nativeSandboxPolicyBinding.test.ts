@@ -156,15 +156,21 @@ describe("the requirement follows the actual confined body", () => {
   });
 
   it.each(["signed", "unsigned"] as const)("refuses a %s policy change between admission and dispatch", async mode => {
-    const root = setup(); sign(root); const { registry, pipeline } = compose(root);
+    const root = setup(); sign(root); const { registry } = compose(root);
     registry.guard("operator-policy-change", () => {
       if (mode === "signed") sign(root, { nativeSandbox: { kind: "linux-bwrap", writableDirectories: [] } });
       else writeFileSync(join(root, ".amc", "tools.yaml"), "tools: broken\n");
       return undefined;
     });
-    const result = await pipeline.execute(call());
+    // P1-02: the authorization record's recheck, the last stage before the body, refuses the changed policy first.
+    const result = await new ToolPipeline({ registry, workspace: root }).execute(call());
     expect(result.ok).toBe(false);
-    expect(result.output).toMatch(mode === "signed" ? /changed after shell admission/ : /verifiable signed tools policy/);
+    expect(result.denied).toMatchObject({ stage: "authorization", reason: expect.stringContaining("policy_revision_changed") });
+    // A composition that binds no authorization record still reaches the shell body's own admission check.
+    sign(root);
+    const unrecorded = await new ToolPipeline({ registry, workspace: root, authorizeClasses: new Set() }).execute(call());
+    expect(unrecorded.ok).toBe(false);
+    expect(unrecorded.output).toMatch(mode === "signed" ? /changed after shell admission/ : /verifiable signed tools policy/);
     expect(backend.run).not.toHaveBeenCalled();
   });
 

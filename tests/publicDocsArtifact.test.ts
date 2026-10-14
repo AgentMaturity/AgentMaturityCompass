@@ -154,6 +154,10 @@ describe("public Docs Pages artifact", () => {
     const serialized = JSON.stringify(reflection);
     for (const symbol of ["initWorkspace", "InitWorkspaceOptions", "AMCNativeClient"]) expect(serialized).toContain(`"name":"${symbol}"`);
     expect(serialized).toContain(`/blob/${revision}/`);
+    const sourceUrls = [...serialized.matchAll(/"url":"([^"]+)"/g)].map(match => match[1]!);
+    expect(sourceUrls.some(url => url.startsWith(
+      `https://github.com/AgentMaturity/AgentMaturityCompass/blob/${revision}/src/workspace.ts#L`
+    ))).toBe(true);
     expect(pnpmIntegrityFor("typedoc", String(pkg.devDependencies.typedoc), root)).not.toBeNull();
     const initPage = readFileSync(resolve(first, "api/functions/index.initWorkspace.html"), "utf8");
     expect(initPage).toContain("interfaces/index.InitWorkspaceOptions.html");

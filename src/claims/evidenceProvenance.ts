@@ -28,6 +28,12 @@ export const PRODUCER_BY_SOURCE: Readonly<Record<string, Exclude<EvidenceProduce
   manual: "manual",
   operator: "manual",
   "feedback.ingest": "manual",
+  // Self-reported and derived answers are recorded as manual claims, never runtime observations.
+  user: "manual",
+  inferred: "manual",
+  carried: "manual",
+  numeric_self_answer: "manual",
+  default: "manual",
   webhook: "external-report",
   // A4 Forge rows are human statements recorded by AMC, never runtime observations (P1-56).
   "a4-store": "manual"

@@ -59,7 +59,9 @@ describe("compare badge DevRel docs", () => {
     const read = (path: string): string => readFileSync(join(process.cwd(), path), "utf8");
 
     expect(read("README.md")).toContain("amc compare <run-a> <run-b> --output compare.json --badge");
-    expect(read("README.md")).toContain("model-compare-badge.svg");
+    // P0-15: model comparison is not evaluated, so the README no longer advertises a per-model badge.
+    expect(read("README.md")).toContain("writes compare-badge.svg beside the report");
+    expect(read("README.md")).not.toContain("model-compare-badge.svg");
     expect(read("docs/GETTING_STARTED.md")).toContain("Compare scored runs and write a comparison SVG badge");
     expect(read("docs/QUICKSTART.md")).toContain("Compare scored runs with badge output");
     expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("compare-badge docs/runtime behavior are resolved");
