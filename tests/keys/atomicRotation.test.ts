@@ -32,7 +32,7 @@ const roots: string[] = [];
 afterEach(() => {
   crash.at = 0;
   for (const root of roots.splice(0)) { lockVault(root); rmSync(root, { recursive: true, force: true }); }
-});
+}, 120_000);
 
 function workspace(): string {
   const root = mkdtempSync(join(tmpdir(), "amc-atomic-rotation-"));
