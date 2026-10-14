@@ -123,7 +123,7 @@ async function cliSmokeStep(root, execute) {
 
 async function liveHealthStep(liveUrl, execute) {
   if (!liveUrl) {
-    return skippedStep("live-deploy-health", "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health.");
+    return skippedStep("live-deploy-health", "live-deploy-health skipped: no supported deployment until D-03 names one (written skip until P2-06).");
   }
   return execute("live-deploy-health", "node", ["-e", `
 const url = process.argv[1];

@@ -266,7 +266,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: release-gate-receipts
-          path: tmp/release-gate/
+          path: |
+            tmp/release-gate/
+            coverage/coverage-summary.json
           if-no-files-found: ignore
 
   e2e-playwright:

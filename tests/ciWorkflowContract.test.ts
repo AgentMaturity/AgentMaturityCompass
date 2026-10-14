@@ -75,6 +75,7 @@ function ciWorkflowFailures(workflow: Workflow): string[] {
     }
     const upload = uploadStep(gate, "tmp/release-gate/");
     if (!upload || !["always()", "${{ always() }}"].includes(upload.if ?? "")) failures.push("release-gate does not always retain its reports");
+    if (!uploadStep(gate, "coverage/coverage-summary.json")) failures.push("release-gate does not retain measured coverage");
   }
   const playwright = workflow.jobs["e2e-playwright"];
   if (playwright) {
@@ -111,8 +112,11 @@ describe("CI workflow contract (P0-33)", () => {
     commandStep(workflow.jobs["build-test"], "npm run check:duplicates")!["continue-on-error"] = true;
     workflow.jobs["e2e-playwright"]!["continue-on-error"] = true;
     workflow.jobs["release-gate"]!["runs-on"] = "ubuntu-latest";
+    const upload = uploadStep(workflow.jobs["release-gate"]!, "tmp/release-gate/")!;
+    upload.with!.path = "tmp/release-gate/";
     expect(ciWorkflowFailures(workflow)).toContain("build-test does not require npm run check:duplicates");
     expect(ciWorkflowFailures(workflow)).toContain("e2e-playwright can ignore failures");
     expect(ciWorkflowFailures(workflow)).toContain("release-gate does not execute the full native corpus on Darwin");
+    expect(ciWorkflowFailures(workflow)).toContain("release-gate does not retain measured coverage");
   });
 });

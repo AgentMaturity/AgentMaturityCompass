@@ -157,6 +157,8 @@ describe("release gate execution and qualification scope", () => {
     expect(receipt).toMatchObject({ status: "passed", qualification: "partial", partial: true,
       counts: { executed: 21, passed: 21, failed: 0, skipped: 1, total: 22 } });
     expect(receipt.summary).toContain("live-deploy-health");
+    expect(receipt.steps.find((step: { id: string }) => step.id === "live-deploy-health").remediation)
+      .toBe("live-deploy-health skipped: no supported deployment until D-03 names one (written skip until P2-06).");
   });
 
   it("never invokes build-dependent consumers after build failure, even with a stale CLI present", async () => {
