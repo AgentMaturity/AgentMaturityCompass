@@ -42,7 +42,7 @@ function requireExplicitRefusal(scan: () => SecretScanReport): void {
 
 afterEach(() => {
   for (const root of fixtures.splice(0)) rmSync(root, { recursive: true, force: true });
-});
+}, 120_000);
 
 describe("release secret scanner content coverage", () => {
   it.each([999_999, 1_000_000, 1_000_001])("detects a token at the end of a %i-byte file", (bytes) => {

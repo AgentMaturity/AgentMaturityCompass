@@ -27,7 +27,7 @@ describe("release readiness scripts", () => {
     expect(gate).toContain("install-persona-qa");
     expect(gate).toContain("qa:install-personas");
     expect(gate).toContain("full-test-suite");
-    expect(gate).toContain('vitestStep("full-test-suite", ["--coverage", "--exclude", "tests/performance/**"]');
+    expect(gate).toContain('vitestStep("full-test-suite", ["--coverage", "--coverage.reportOnFailure", "--exclude", "tests/performance/**"]');
     expect(gate).toContain("audit:runtime");
     expect(gate).toContain("const child = spawn(command, args");
     expect(gate).toContain("const timer = setTimeout(() =>");

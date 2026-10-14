@@ -53,6 +53,20 @@ function fixture(fail: string[] = [], writeInventory = true, testReport = "valid
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
 
 describe("release gate execution and qualification scope", () => {
+  it("registers every step in order", async () => {
+    const f = fixture();
+    const receipt = await releaseGate({ root: f.root, execute: f.execute, liveUrl: "https://health.example.invalid" });
+    expect(receipt.steps.map((step: { id: string }) => step.id)).toEqual([
+      "console-js-syntax", "openapi-parse", "typecheck", "typecheck-tests", "build", "lint",
+      "source-duplicates", "source-dead-code", "package-lint", "citations", "packed-install",
+      "gap-0626-adversarial-regression", "full-test-suite", "performance-floors", "per-file-coverage",
+      "command-inventory", "architecture-boundaries", "docs-drift-public-naming",
+      "runtime-dependency-audit", "cli-and-domain-smoke", "install-persona-qa", "live-deploy-health"
+    ]);
+    const typecheck = f.calls.find((call) => call.id === "typecheck-tests")!;
+    expect(typecheck).toMatchObject({ command: "npm", args: ["run", "typecheck:tests"] });
+    expect(f.calls.indexOf(typecheck)).toBeLessThan(f.calls.findIndex((call) => call.id === "build"));
+  });
   it("fails release qualification when the real lint step fails", async () => {
     const f = fixture(["lint"]);
     const receipt = await releaseGate({ root: f.root, execute: f.execute, liveUrl: "https://health.example.invalid" });
@@ -103,6 +117,7 @@ describe("release gate execution and qualification scope", () => {
     expect(existsSync(suite.artifact.path)).toBe(true);
     expect(f.calls.find((call) => call.id === "full-test-suite")!.args).toContain("--reporter=json");
     expect(f.calls.find((call) => call.id === "full-test-suite")!.args).toContain("--coverage");
+    expect(f.calls.find((call) => call.id === "full-test-suite")!.args).toContain("--coverage.reportOnFailure");
     const coverage = f.calls.find((call) => call.id === "full-test-suite")!;
     expect(coverage).toMatchObject({ timeoutMs: 2_700_000 });
     expect(coverage.args).toContain("--exclude");

@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -235,6 +236,67 @@ jobs:
       - name: Tests left the checkout clean (end of job)
         if: always()
         run: git status --porcelain=v1 --untracked-files=all > /tmp/after-tests.txt; if [ -s /tmp/after-tests.txt ]; then cat /tmp/after-tests.txt; exit 1; fi
+
+  release-gate:
+    if: github.event_name != 'pull_request'
+    # The full native-test corpus exercises Darwin confinement; Ubuntu matrix jobs remain separate.
+    runs-on: macos-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Full release gate
+        env:
+          AMC_RELEASE_GATE_LIVE_URL: ${{ vars.AMC_RELEASE_GATE_LIVE_URL }}
+        run: npm run release:gate -- --json --out tmp/release-gate/ci.json
+      - name: Upload release gate receipts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-gate-receipts
+          path: tmp/release-gate/
+          if-no-files-found: ignore
+
+  e2e-playwright:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium and system dependencies
+        run: npx playwright install --with-deps chromium
+      - name: Playwright suite
+        run: npm run test:e2e -- --reporter=line,html
+      - name: Upload Playwright failure report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
 
   e2e-smoke-local:
     runs-on: ubuntu-latest

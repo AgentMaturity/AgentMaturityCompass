@@ -244,7 +244,7 @@ export async function releaseGate({
       remediation: "Fix GAP-0626 synthetic adversarial regression fixture, expected DENIED decision, or Score/Shield/Watch rerun output."
     }), ["build"]);
     // Match CI: instrument the correctness suite, then measure performance without coverage or file concurrency.
-    add("full-test-suite", () => vitestStep("full-test-suite", ["--coverage", "--exclude", "tests/performance/**"],
+    add("full-test-suite", () => vitestStep("full-test-suite", ["--coverage", "--coverage.reportOnFailure", "--exclude", "tests/performance/**"],
       2_700_000, "Quick mode skips the full Vitest suite; CI must run it before release."), quick ? [] : ["build"]);
     add("performance-floors", () => vitestStep("performance-floors", ["tests/performance", "--no-file-parallelism"],
       600_000, "Quick mode skips serial performance floors; run the full release gate."), quick ? [] : ["build"]);
