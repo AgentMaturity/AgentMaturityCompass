@@ -194,7 +194,9 @@ describe("release secret scanner content coverage", () => {
     runTarCreate(npm, join(npmDir, "one.tgz"));
     copyFileSync(join(npmDir, "one.tgz"), join(npmDir, "two.tgz"));
     expect(() => scanExtractedReleaseForSecrets(releaseRoot)).toThrowError(expect.objectContaining({ code: "ENTRY_LIMIT_EXCEEDED" }));
-  }, 15_000);
+    // Keep both real archives and the production entry cap under parallel
+    // coverage; this is an input-budget assertion, not a throughput test.
+  }, 120_000);
 
   it("retains a complete report at the finding budget", () => {
     const root = fixture();

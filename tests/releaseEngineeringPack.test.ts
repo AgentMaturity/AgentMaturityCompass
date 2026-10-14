@@ -60,7 +60,9 @@ describe("release engineering pack", () => {
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
-  });
+    // This case packs and scans the actual workspace. Parallel coverage can
+    // take over 30 seconds; retain the full input and every trust assertion.
+  }, 120_000);
 
   it("embeds the gated npm tarball, SBOM and licence files byte for byte instead of packing (P0-34)", () => {
     const dir = tmp("amc-release-gated-");

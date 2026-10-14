@@ -145,6 +145,8 @@ pnpm run release:gate -- --json --out tmp/release-gate/candidate.json
 pnpm run release:prepack-check
 ```
 
+The full gate follows CI's test profiles: the correctness suite runs with coverage and a 45-minute process limit, then performance floors run serially without coverage. Both profiles retain separate JSON reports and fail qualification on test failures, missing or invalid reports, or skipped/todo cases. The per-file coverage ratchet includes `src/` and `packages/verifier/src/`; its existing floors still apply. Quick mode records these checks as omitted and cannot establish complete qualification.
+
 What this validates:
 - the npm artifact can be produced from the built source
 - SBOM + license inventory generation works

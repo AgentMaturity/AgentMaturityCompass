@@ -151,6 +151,56 @@ export async function releaseGate({
   const add = (id, run, needs = []) => tasks.push({ id, run, needs, allowFailure: false,
     after: tasks.length ? [tasks[tasks.length - 1].id] : [] });
   const step = (id, command, args, options = {}) => execute(id, command, args, { cwd: root, ...options });
+  const vitestStep = async (id, args, timeoutMs, quickReason) => {
+    let testReportPath = null;
+    if (!quick) {
+      const reports = join(root, "tmp", "release-gate");
+      mkdirSync(reports, { recursive: true });
+      testReportPath = join(mkdtempSync(join(reports, `vitest-${id}-`)), "results.json");
+    }
+    const suite = quick
+      ? skippedStep(id, quickReason)
+      : await step(id, "npx", ["vitest", "run", ...args, "--reporter=dot", "--reporter=json",
+        ...(testReportPath ? [`--outputFile.json=${testReportPath}`] : [])], {
+        timeoutMs, remediation: `Fix ${id} before release.`
+      });
+    if (testReportPath) {
+      const produced = existsSync(testReportPath);
+      let valid = false;
+      let sha256 = null;
+      let counts = null;
+      if (produced) {
+        const bytes = readFileSync(testReportPath);
+        sha256 = createHash("sha256").update(bytes).digest("hex");
+        try {
+          const report = JSON.parse(bytes.toString("utf8"));
+          const count = (value) => Number.isFinite(value) ? value : null;
+          counts = {
+            total: count(report?.numTotalTests), passed: count(report?.numPassedTests),
+            failed: count(report?.numFailedTests), pending: count(report?.numPendingTests),
+            todo: count(report?.numTodoTests), failedSuites: count(report?.numFailedTestSuites),
+            pendingSuites: count(report?.numPendingTestSuites),
+            files: Array.isArray(report?.testResults) ? report.testResults.length : null
+          };
+          // This mandatory profile permits no skipped/todo tests. Vitest's JSON
+          // success excludes unhandled errors, so process success is also required below.
+          valid = report?.success === true
+            && Object.values(counts).every((value) => Number.isInteger(value) && value >= 0)
+            && counts.passed > 0 && counts.total === counts.passed
+            && counts.failed === 0 && counts.pending === 0 && counts.todo === 0
+            && counts.failedSuites === 0 && counts.pendingSuites === 0 && counts.files > 0
+            && report.testResults.every((file) => file?.status === "passed" && file.message === "");
+        } catch { /* Malformed reports cannot qualify successful execution. */ }
+      }
+      if (suite.status === "passed" && !valid) {
+        suite.status = "failed";
+        suite.stderr = "Vitest exited successfully without a valid JSON report of passing tests and zero failed, pending, todo, or errored suites.";
+        suite.remediation = "Fix structured Vitest reporting and execute every mandatory test before qualifying the full suite.";
+      }
+      suite.artifact = { path: testReportPath, produced, valid, sha256, counts, temporary: false, retained: true };
+    }
+    return suite;
+  };
   try {
     add("console-js-syntax", () => step("console-js-syntax", "node", ["--check", "src/console/assets/app.js"], {
       remediation: "Fix Studio JavaScript syntax."
@@ -193,56 +243,11 @@ export async function releaseGate({
       timeoutMs: 180_000,
       remediation: "Fix GAP-0626 synthetic adversarial regression fixture, expected DENIED decision, or Score/Shield/Watch rerun output."
     }), ["build"]);
-    add("full-test-suite", async () => {
-      let testReportPath = null;
-      if (!quick) {
-        const reports = join(root, "tmp", "release-gate");
-        mkdirSync(reports, { recursive: true });
-        testReportPath = join(mkdtempSync(join(reports, "vitest-")), "results.json");
-      }
-      const suite = quick
-        ? skippedStep("full-test-suite", "Quick mode skips the full Vitest suite; CI must run it before release.")
-        : await step("full-test-suite", "npx", ["vitest", "run", "--coverage", "--reporter=dot", "--reporter=json",
-          ...(testReportPath ? [`--outputFile.json=${testReportPath}`] : [])], {
-          timeoutMs: 900_000, remediation: "Fix the full Vitest suite before release."
-        });
-      if (testReportPath) {
-        const produced = existsSync(testReportPath);
-        let valid = false;
-        let sha256 = null;
-        let counts = null;
-        if (produced) {
-          const bytes = readFileSync(testReportPath);
-          sha256 = createHash("sha256").update(bytes).digest("hex");
-          try {
-            const report = JSON.parse(bytes.toString("utf8"));
-            const count = (value) => Number.isFinite(value) ? value : null;
-            counts = {
-              total: count(report?.numTotalTests), passed: count(report?.numPassedTests),
-              failed: count(report?.numFailedTests), pending: count(report?.numPendingTests),
-              todo: count(report?.numTodoTests), failedSuites: count(report?.numFailedTestSuites),
-              pendingSuites: count(report?.numPendingTestSuites),
-              files: Array.isArray(report?.testResults) ? report.testResults.length : null
-            };
-            // This mandatory profile permits no skipped/todo tests. Vitest's JSON
-            // success excludes unhandled errors, so process success is also required below.
-            valid = report?.success === true
-              && Object.values(counts).every((value) => Number.isInteger(value) && value >= 0)
-              && counts.passed > 0 && counts.total === counts.passed
-              && counts.failed === 0 && counts.pending === 0 && counts.todo === 0
-              && counts.failedSuites === 0 && counts.pendingSuites === 0 && counts.files > 0
-              && report.testResults.every((file) => file?.status === "passed" && file.message === "");
-          } catch { /* Malformed reports cannot qualify successful execution. */ }
-        }
-        if (suite.status === "passed" && !valid) {
-          suite.status = "failed";
-          suite.stderr = "Vitest exited successfully without a valid JSON report of passing tests and zero failed, pending, todo, or errored suites.";
-          suite.remediation = "Fix structured Vitest reporting and execute every mandatory test before qualifying the full suite.";
-        }
-        suite.artifact = { path: testReportPath, produced, valid, sha256, counts, temporary: false, retained: true };
-      }
-      return suite;
-    }, quick ? [] : ["build"]);
+    // Match CI: instrument the correctness suite, then measure performance without coverage or file concurrency.
+    add("full-test-suite", () => vitestStep("full-test-suite", ["--coverage", "--exclude", "tests/performance/**"],
+      2_700_000, "Quick mode skips the full Vitest suite; CI must run it before release."), quick ? [] : ["build"]);
+    add("performance-floors", () => vitestStep("performance-floors", ["tests/performance", "--no-file-parallelism"],
+      600_000, "Quick mode skips serial performance floors; run the full release gate."), quick ? [] : ["build"]);
     add("per-file-coverage", () => quick
       ? skippedStep("per-file-coverage", "Quick mode omits coverage measurement and per-file enforcement.")
       : step("per-file-coverage", "npm", ["run", "check:coverage"], {
