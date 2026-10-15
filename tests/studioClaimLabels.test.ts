@@ -16,6 +16,7 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { getPublicMethodologyManifest } from "../src/methodology/publicMethodology.js";
 import { ENTITLEMENT_NOTE } from "../src/studio/studioClaimOutput.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
+import { ensureAgentToken } from "../src/studio/studioState.js";
 import type { DiagnosticReport } from "../src/types.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
@@ -75,13 +76,14 @@ type Fixture = Awaited<ReturnType<typeof studioFixture>>;
 interface Response { status: number; contentType: string; body: string; json: Record<string, any> }
 
 // Actual HTTP is restricted to this fixture's loopback origin; there is no external transport.
-function get(fixture: Fixture, path: string, evidenceName: string, token: string | null = ADMIN): Promise<Response> {
+function get(fixture: Fixture, path: string, evidenceName: string, token: string | null = ADMIN, agentToken?: string): Promise<Response> {
   const target = new URL(path, fixture.server.url);
   expect(target.origin).toBe(fixture.server.url);
   expect(target.hostname).toBe("127.0.0.1");
   return new Promise((resolve, reject) => {
     const req = httpRequest(target, {
-      method: "GET", headers: { Connection: "close", ...(token === null ? {} : { "x-amc-admin-token": token }) },
+      method: "GET", headers: { Connection: "close", ...(token === null ? {} : { "x-amc-admin-token": token }),
+        ...(agentToken === undefined ? {} : { "x-amc-agent-token": agentToken }) },
     }, response => {
       const chunks: Buffer[] = [];
       response.on("data", chunk => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
@@ -91,7 +93,8 @@ function get(fixture: Fixture, path: string, evidenceName: string, token: string
           const body = Buffer.concat(chunks).toString("utf8");
           const result = { status: response.statusCode ?? 0, contentType: String(response.headers["content-type"] ?? ""),
             body, json: JSON.parse(body) as Response["json"] };
-          captureEvidence(evidenceName, { method: "GET", path, authenticated: token === ADMIN, ...result });
+          captureEvidence(evidenceName, { method: "GET", path,
+            credentialType: agentToken !== undefined ? "agent" : token === null ? "none" : "admin", ...result });
           resolve(result);
         } catch (error) { reject(error); }
       });
@@ -248,6 +251,45 @@ describe("Studio claims over actual authenticated loopback HTTP (P0-23)", () => 
     requireError(response);
     expect(response.status, response.body).toBe(404);
   });
+
+  test("malformed stored JSON keeps its sanitized 400 instead of becoming a missing run", async () => {
+    const fixture = await studioFixture();
+    const report = storeRun(fixture.workspace, { runId: "studio-malformed-run", version: "1.2.0", seal: true, storedReadiness: true });
+    writeFileSync(join(getAgentPaths(fixture.workspace, report.agentId).runsDir, `${report.runId}.json`), "{invalid JSON");
+    const response = await get(fixture, `/runs/${report.runId}/report`, report.runId);
+    requireError(response);
+    expect(response.status).toBe(400);
+    expect(response.json).toEqual({ error: "invalid JSON body" });
+  });
+
+  test.each(["default", "p023-other-agent"])("preserves stored-report scope for a real %s bearer token", async agentId => {
+    const fixture = await studioFixture();
+    const report = storeRun(fixture.workspace, { runId: "studio-agent-scope", version: "1.2.0", seal: true, storedReadiness: true });
+    const token = ensureAgentToken(fixture.workspace, agentId).token;
+    const response = await get(fixture, `/runs/${report.runId}/report`, `studio-scope-${agentId}`, null, token);
+    if (agentId === report.agentId) {
+      requireReport(response, report);
+    } else {
+      requireError(response);
+      expect(response.status).toBe(403);
+      expect(response.json).toEqual({ error: "scope does not include this agent" });
+    }
+  });
+
+  test.each(["../studio-private-run", "..\\studio-private-run", "\u0000studio-private-run"])(
+    "refuses a decoded run ID outside the exact file-name contract: %j", async runId => {
+      const fixture = await studioFixture();
+      const report = storeRun(fixture.workspace, { runId: "studio-contained-run", version: "1.2.0", seal: true, storedReadiness: true });
+      const privateFile = join(getAgentPaths(fixture.workspace, report.agentId).rootDir, "studio-private-run.json");
+      const original = JSON.stringify(report);
+      writeFileSync(privateFile, original);
+      const response = await get(fixture, `/runs/${encodeURIComponent(runId)}/report`, `studio-invalid-id-${encodeURIComponent(runId)}`);
+      requireError(response);
+      expect(response.status).toBe(400);
+      expect(response.json).toEqual({ error: "invalid run id" });
+      expect(readFileSync(privateFile, "utf8")).toBe(original);
+    }
+  );
 
   test("an unknown authenticated Studio route keeps its 404 error contract", async () => {
     const response = await get(await studioFixture(), "/p0-23-unknown-owned-route", "studio-unknown-route");
