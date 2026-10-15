@@ -1,0 +1,486 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-15T06:23:07.437009+00:00",
+  "scope": "Read-only next-lane routing after bounded P045 then P011; does not activate another issue.",
+  "recommendation": {
+    "nextKey": "P0-41",
+    "title": "Track success metrics and post weekly status updates",
+    "mode": "Conditional existing-source qualification readiness, not production or external reporting.",
+    "gate": "G0",
+    "priority": "Medium",
+    "due": "2026-10-16",
+    "blockedBy": [
+      "P0-01"
+    ],
+    "blocks": [
+      "GATE-G0"
+    ],
+    "activationCondition": "Root first finishes boundedP045/P011 handoffs, then explicitly assigns a P041 owned readiness/qualification lane. No runtime authorized by this report.",
+    "why": "Other remaining higher-priority G0 candidates retain specific human, dependency or ownership blockers or prior handled/skip boundaries. P041 has an explicit historical Codex source scope and current candidate source, but missing requested unit tests and real measurement/reporting debt remain."
+  },
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+    "observedHead": "2024f25c79973987b44a4a1298488d55ee0d6227",
+    "productionCodeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "readOnlyDiffDomains": [
+      "src",
+      "tests",
+      "scripts",
+      "package.json",
+      "pnpm-lock.yaml",
+      "vitest.config.ts"
+    ],
+    "diffWithinThoseDomains": [],
+    "meaning": "Current source comparison only; no runtime or whole release/acceptance claim."
+  },
+  "authority": {
+    "planPins": [
+      {
+        "path": "/Users/sid/Downloads/Agent contract.md",
+        "bytes": 25110,
+        "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f",
+        "matchesP045Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Issues.md",
+        "bytes": 38227,
+        "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541",
+        "matchesP045Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Workstreams.md",
+        "bytes": 78486,
+        "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04",
+        "matchesP045Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/A4 \u00b7 Forge.md",
+        "bytes": 47286,
+        "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65",
+        "matchesP045Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "bytes": 157127,
+        "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0",
+        "matchesP045Authority": true
+      }
+    ],
+    "reservation": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+      "matchesP045Authority": true
+    },
+    "orderingLines": "AMC Ready-to-Deploy Implementation Plan.md:165-176",
+    "humanDecisionLines": "AMC Ready-to-Deploy Implementation Plan.md:285-288",
+    "issuesG0Lines": "Issues.md:11-72",
+    "workstreamLines": "Workstreams.md:145-171",
+    "F5AndFreeze": "Agent contract.md:24-31,47-49",
+    "reservationLines": "RESERVATIONS.md:561-570,584-588,1496-1504,1580-1588",
+    "specPins": [
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-26.md",
+        "bytes": 11744,
+        "sha256": "f93db22557ec8efe753a13a3a8d64f1e88ca8625aac53c91d481fd202065c1fa"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-28.md",
+        "bytes": 15667,
+        "sha256": "f74ae4c6cffa7e7d22a8a09670262136d2e62bc20da9c0c0762d7ddac8db127b"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-41.md",
+        "bytes": 9022,
+        "sha256": "97510873b2cc9229fc94b3a291175bfee227a7e6cf0e8dc496d57846de99ff60"
+      }
+    ]
+  },
+  "candidateGates": [
+    {
+      "key": "P0-03",
+      "priority": "High",
+      "due": "2026-10-16",
+      "state": "Needs-Sid cleanup plan; existing inventory/preservation boundary retained",
+      "allowedNow": "Read-only routing/inventory evidence only; no autonomous cleanup."
+    },
+    {
+      "key": "P0-28",
+      "priority": "High",
+      "due": "2026-10-28",
+      "blockedBy": [
+        "D-03",
+        "P0-15",
+        "P0-22",
+        "P0-23"
+      ],
+      "state": "Claude-reserved; strict label/API/Studio residuals unresolved",
+      "allowedNow": "Read existing source/docs and prepare a scoped qualification proposal; existing docs-drift behavior alone is partial.",
+      "unapproved": [
+        "Held production transfer",
+        "Archive/move/shared CLI edits",
+        "New or weakened docs guard/allowlist",
+        "Dependency/Done closure"
+      ],
+      "sameDateTieBreak": "Deeper G0 release chain thanP026 if both actually become eligible; presently blocked."
+    },
+    {
+      "key": "P0-26",
+      "priority": "High",
+      "due": "2026-10-28",
+      "blockedBy": [
+        "P0-12"
+      ],
+      "state": "Needs-Sid and Claude-reserved",
+      "allowedNow": "Static inventory or a separately assigned review-packet proposal without applied decisions.",
+      "unapproved": [
+        "Floor policy retire-floor versus defer-below-floor-drops",
+        "30 individual keep/drop/defer decisions",
+        "Confirmed content drops",
+        "Held source transfer",
+        "Floor/count-test changes"
+      ]
+    },
+    {
+      "key": "P0-31",
+      "priority": "High",
+      "due": "2026-10-29",
+      "state": "Installed candidate/release prerequisites and reservation unresolved; no accepted release/pack proof inferred"
+    },
+    {
+      "key": "P0-32",
+      "priority": "High",
+      "due": "2026-10-30",
+      "state": "Needs-Sid Done-contract closure depends onP030/P031; qualification is not trackerDone"
+    },
+    {
+      "key": "P0-41",
+      "priority": "Medium",
+      "due": "2026-10-16",
+      "state": "Conditional next remaining existing-source candidate; explicit source release retained",
+      "allowedNow": "This routing only. Later root may assign bounded readiness/proposal for compute/check/Markdown/JSON with actual input evidence.",
+      "unapproved": [
+        "Monday outward post",
+        "Real measurement claim without source",
+        "--online npm view",
+        "D01 funded-target choice",
+        "New unreviewed fixture/runtime",
+        "Source adoption/guard or baseline edit"
+      ]
+    }
+  ],
+  "heldUrgent": [
+    {
+      "keys": [
+        "P0-14",
+        "P0-35"
+      ],
+      "reason": "Claude reservation, retained deployment/template approvals and source holds; D03C is not blanket clearance."
+    },
+    {
+      "keys": [
+        "P0-37",
+        "P0-36"
+      ],
+      "reason": "Actual owner signing-key rotation/distrust proof and advisory severity/review remain human/dependency-gated."
+    },
+    {
+      "keys": [
+        "P0-53",
+        "P0-55"
+      ],
+      "reason": "A4 accepted-base/ownership and unresolved signing/claim/issuer/lifecycle dependencies; prior explicit follow-up limits preserved."
+    },
+    {
+      "keys": [
+        "P1-52",
+        "P0-33"
+      ],
+      "reason": "Unwaived required duplicate1269/dead2751 debt and prior release-gate residuals; no ratchet/quality waiver."
+    },
+    {
+      "keys": [
+        "P0-34",
+        "P0-38",
+        "P0-39",
+        "P0-40"
+      ],
+      "reason": "Held label/docs/deployment/release/credential/publish chain; no external operation or installed release acceptance."
+    }
+  ],
+  "P026Observed": {
+    "recommendedIds": [
+      "EDU-HE-3",
+      "EDU-SE-11",
+      "EDU-SE-13",
+      "EDU-SE-15",
+      "ENV-SS-5",
+      "ENV-SS-14",
+      "GOV-DCR-14",
+      "GOV-DD-15",
+      "GOV-PL-14",
+      "GOV-PPC-15",
+      "HLT-WM-17",
+      "HLT-PL-17",
+      "MOB-SC-14",
+      "MOB-RE-15",
+      "MOB-VI-14",
+      "MOB-F3W-8",
+      "TECH-OS-4",
+      "TECH-OS-15",
+      "TECH-INF-15",
+      "TECH-PP-7",
+      "TECH-PP-13",
+      "TECH-PP-14",
+      "WLT-FW-6",
+      "WLT-FW-14",
+      "WLT-NP-6",
+      "WLT-NP-11",
+      "WLT-NP-14",
+      "WLT-CE-14",
+      "WLT-CE-15",
+      "WLT-BC-15"
+    ],
+    "allThirtyIdStringsPresentInCurrentIndustrySource": true,
+    "meaning": "String presence only, not product registry execution, approved editorial judgment or F5 data authenticity.",
+    "missingRequestedPaths": [
+      "docs/program/f5/drops.json",
+      "docs/program/f5/decisions.json",
+      "docs/program/f5-drop-review.md",
+      "scripts/program/f5-drop-review.mjs",
+      "tests/f5DropDecisions.test.ts"
+    ],
+    "humanChoicesNotInferred": true,
+    "existingFloorTest": "tests/industryPackDepthFloor.test.ts:20-29 retains15floor and thin-pack refusal; no retirement authorized."
+  },
+  "P028Observed": {
+    "namedTestAbsent": "tests/docsTruthReset.test.ts",
+    "docsDriftScope": "scripts/docs-drift-check.mjs reads selecteddocs/website/console/AMC_OS and applies source-name, stale-command, narrow capability and quickscore patterns; it does not implement full P028 truth-claim/command/archival criteria.",
+    "archiveDirectoryExists": true,
+    "archiveAcceptanceProven": false,
+    "sourceBehaviorChangeNotAuthorized": true
+  },
+  "P041Observed": {
+    "directSourcePins": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/scripts/program-metrics.mjs",
+        "bytes": 23978,
+        "sha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/program/gaps.json",
+        "bytes": 16375,
+        "sha256": "bb7eded5387d9b4bb1782b23720042b7c5b26d7fbff119cefc9ceefe7095f006"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/program/metrics.json",
+        "bytes": 5866,
+        "sha256": "541373a8e5ddb8ba1dfe4581f72d371afa7cdc4885ad25077def2ed85e8955ed"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/program/metrics-manual.json",
+        "bytes": 20,
+        "sha256": "364b37738032a28a72829f4d2192b70bd9353c9ee8dddfc5b70c2785f995d6ac"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/program/status-update-template.md",
+        "bytes": 6702,
+        "sha256": "34686a67909e18f776fb7054e5824a2c9f33689a05c10179b4af78eebb84898e"
+      }
+    ],
+    "canonicalMetricRows": 15,
+    "gapRows": 26,
+    "criticalRowsOpen": 7,
+    "manualEmpty": true,
+    "onlyNonnullRegisteredSource": "critical_gaps_open",
+    "missingRequiredOriginalTest": "tests/programMetrics.test.ts",
+    "CLIHeadProofSites": "scripts/program-metrics.mjs:298-344",
+    "onlineQuerySites": "scripts/program-metrics.mjs:347-357",
+    "reservationTransfer": "RESERVATIONS.md:563-568 moves P054 A4 metric row to P041; source scope and current qualification are distinct.",
+    "sourceOnlyPriorIntegration": [
+      "f402c81df",
+      "79dbc41af",
+      "16361774b"
+    ],
+    "futureQualificationLimits": [
+      "No count claimed for absent original test corpus.",
+      "Controlled new fixtures need separate proposal/review.",
+      "Genuine committed HEAD metadata is required for CLI ancestry checks; no fakeGit.",
+      "Computed rows are bounded supplied-input results, not real programme outcomes.",
+      "No signatures/merge approval/truth follows from HEAD existence and ancestry.",
+      "No online npm query or Monday outward posting."
+    ]
+  },
+  "handledChoicesPreserved": {
+    "serialKeys": [
+      "P0-33",
+      "P0-29",
+      "P0-47",
+      "P0-48",
+      "P0-49",
+      "P0-50",
+      "P0-22",
+      "P0-23",
+      "P0-51",
+      "P0-46",
+      "P0-52",
+      "P0-54",
+      "P0-20",
+      "P0-27",
+      "P0-19",
+      "P0-24",
+      "P0-18",
+      "P0-30",
+      "P0-25"
+    ],
+    "P029": "Explicit user skip remains; unresolved successors and original work preserved.",
+    "meaning": "These are previously handled, skipped or bounded handoffs, not twenty Done claims. Their strict gaps and pending human decisions remain. The existence of an unresolved earlier item does not authorize an unchanged rerun or reopen its held scope.",
+    "historicalDone": "Do not automatically reselect old P0-01/02/04-10/12-17/42-44 solely because some current whole-program proof is absent. New defects or an explicit root assignment would justify reopening a narrow lane.",
+    "additionalCurrentBoundaries": [
+      "P0-21 bounded canonical handoff",
+      "P0-45 active final audit/canonical handoff, not claimed complete here",
+      "P0-11 next assigned baseline lane, not claimed complete here"
+    ],
+    "P054": "Already handled in serial sequence; no unchanged rerun solely from earlier due date.",
+    "P022": "Strict unresolved report arrays and shared source constraints remain; no implicit closure.",
+    "deployHealth": "User-authorized written skip untilP2-06 preserved."
+  },
+  "graphNavigation": {
+    "usedExistingNavigationFirst": true,
+    "recordedIn": {
+      "path": "/private/tmp/p0-11-readonly-readiness-20261015.json",
+      "bytes": 59639,
+      "sha256": "9e94b03051722cbc7593f7c0c827079060d10cabdffead3d062f56b18bc8565a"
+    },
+    "graphPinAsRecorded": {
+      "path": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+      "bytes": 45692207,
+      "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395"
+    },
+    "freshness": "Stale source anchor4247e; navigation only, current plan/source read directly.",
+    "newQueryRefreshWatchServerOrInstall": false
+  },
+  "referencePins": [
+    {
+      "path": "/private/tmp/amc-next-after-p0-25-readonly-routing-20261015.json",
+      "bytes": 23914,
+      "sha256": "e70186df02502326e435b921cf4cef09ec186d9cbe9556dc812fba4e71c0dc95"
+    },
+    {
+      "path": "/private/tmp/p0-11-readonly-readiness-20261015.json",
+      "bytes": 59639,
+      "sha256": "9e94b03051722cbc7593f7c0c827079060d10cabdffead3d062f56b18bc8565a"
+    },
+    {
+      "path": "/private/tmp/p0-45-qualification-20261015/initial-preflight.json",
+      "bytes": 13867,
+      "sha256": "c79bffa5d78f899acacc004aff4fa06e050cece48d7ddf459dab864c305dffb7"
+    }
+  ],
+  "selectedSourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/scripts/program-metrics.mjs",
+      "bytes": 23978,
+      "sha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/program/gaps.json",
+      "bytes": 16375,
+      "sha256": "bb7eded5387d9b4bb1782b23720042b7c5b26d7fbff119cefc9ceefe7095f006"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/program/metrics.json",
+      "bytes": 5866,
+      "sha256": "541373a8e5ddb8ba1dfe4581f72d371afa7cdc4885ad25077def2ed85e8955ed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/program/metrics-manual.json",
+      "bytes": 20,
+      "sha256": "364b37738032a28a72829f4d2192b70bd9353c9ee8dddfc5b70c2785f995d6ac"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/program/status-update-template.md",
+      "bytes": 6702,
+      "sha256": "34686a67909e18f776fb7054e5824a2c9f33689a05c10179b4af78eebb84898e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/scripts/docs-drift-check.mjs",
+      "bytes": 3501,
+      "sha256": "ce70da5c5bb14ef1545ba9b74a13d5f4b7713ed61f3f52c719faea4a6233f1a6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/domains/industryPacks.ts",
+      "bytes": 621751,
+      "sha256": "4c107021524aa7805ea7e32b55e6d65e74f17d5c88dc5c85cbcaa56ce0ea34d7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/industryPackDepthFloor.test.ts",
+      "bytes": 2262,
+      "sha256": "170484563451163adff34a689285fda39e20844a29a6d23f6547ea8de846925a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/publicQuestionCountDrift.test.ts",
+      "bytes": 4613,
+      "sha256": "675d9cac3076342d261cc37524f6f0afb474a0629d46ec0aeed2f811105ceaa2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/regulatoryClaimsHonesty.test.ts",
+      "bytes": 2583,
+      "sha256": "7e34788d0aaae6536579ae1717c7abf9076f4562e56a3514120168b1380cca44"
+    }
+  ],
+  "absentCurrentPaths": [
+    "docs/program/f5/drops.json",
+    "docs/program/f5/decisions.json",
+    "docs/program/f5-drop-review.md",
+    "scripts/program/f5-drop-review.mjs",
+    "tests/f5DropDecisions.test.ts",
+    "tests/docsTruthReset.test.ts",
+    "tests/programMetrics.test.ts"
+  ],
+  "unresolvedDecisions": [
+    "P026 all30 logged choices and floor policy",
+    "P011 Sid residual-risk signoff after bounded handoff",
+    "P003 cleanup agreement",
+    "Actual key rotation/advisory/release/publish owner proof",
+    "D01 funded metric targets",
+    "All ownership/pending transfers and inherited expert/formal acceptance gaps"
+  ],
+  "peerReadOnlyAssist": {
+    "agent": "/root/failure_diagnosis",
+    "method": "Direct read-only P054/P041 plan/reservation/source assist; no files or runtime.",
+    "summary": "P054 already handled; P041 explicit source scope, existing15-metric candidate, absent required test, online/posting/real-measurement boundaries."
+  },
+  "limits": [
+    "No full issue acceptance, formal dependency closure, status update or priority waiver is asserted.",
+    "Reserved code may be read; no production transfer or blind adoption follows.",
+    "All higher-priority handled residuals, Claude work, paused P202 and pending transfers remain preserved.",
+    "No later-gate runtime selection until fresh readiness/WIP/dependency check after boundedP041."
+  ],
+  "performed": {
+    "productImportsTestsCollectionOrRuntime": false,
+    "parserCompilerBuildInstall": false,
+    "copySetupControllerMutation": false,
+    "sourceTrackerGitWrites": false,
+    "externalMessagesOrUserQuestions": false,
+    "mutableP045PhaseClosureOrJournalReads": false,
+    "writes": "Only NEW routing JSON/MD pair."
+  },
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "markdown": {
+    "path": "/private/tmp/amc-next-after-p0-11-readonly-routing-20261015.md",
+    "bytes": 5042,
+    "sha256": "e8227e6e11e174ca14994ceb0aee7d89027439c8ca14f87b9e1515ec75a62677"
+  }
+}

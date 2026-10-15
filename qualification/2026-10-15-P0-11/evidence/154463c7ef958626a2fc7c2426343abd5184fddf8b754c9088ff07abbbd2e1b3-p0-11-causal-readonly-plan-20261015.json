@@ -1,0 +1,827 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "preparedUtc": "2026-10-15T06:29:17.129914+00:00",
+  "state": "Read-only causal design. No runtime, product import, test collection, build, install, private closure, controller or mutation was performed.",
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true,
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+    "observedHead": "2024f25c79973987b44a4a1298488d55ee0d6227",
+    "productionCodeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "futureP011Parent": "Unresolved until the P045 canonical handoff and root creates an owned P011 lane. Current pins are not a claim of that future parent.",
+    "readiness": {
+      "path": "/private/tmp/p0-11-readonly-readiness-20261015.json",
+      "bytes": 59639,
+      "sha256": "9e94b03051722cbc7593f7c0c827079060d10cabdffead3d062f56b18bc8565a"
+    },
+    "readinessMarkdown": {
+      "path": "/private/tmp/p0-11-readonly-readiness-20261015.md",
+      "bytes": 4186,
+      "sha256": "9a6f92f70ad12fcabc92533d9d7335f9dab94ddfb72a85a50d77f5d91225fd30"
+    },
+    "spec": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-11.md",
+      "bytes": 16346,
+      "sha256": "ebf31f8e80615b05a449c62a0ef02da996fca57e12d770fe5226872a4ba5d4e8"
+    }
+  },
+  "graphNavigation": {
+    "graph": {
+      "path": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+      "bytes": 45692207,
+      "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395"
+    },
+    "builtAtCommit": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+    "nodes": 36459,
+    "observedInstalledVersion": "0.9.74",
+    "reviewedRefreshPin": "graphifyy==0.9.56",
+    "queries": [
+      {
+        "argv": [
+          "graphify",
+          "query",
+          "threat model channel map failure policy telemetry exporter",
+          "--budget",
+          "1400"
+        ],
+        "exit": 0,
+        "found": 270,
+        "shown": 48,
+        "truncated": 222,
+        "limit": "Broad terms hit unrelated nodes; not used as enforcement proof."
+      },
+      {
+        "argv": [
+          "graphify",
+          "query",
+          "queueEvidenceEventSpan OTelExporter flush telemetry",
+          "--budget",
+          "1200"
+        ],
+        "exit": 0,
+        "found": 164,
+        "shown": 39,
+        "truncated": 125,
+        "located": [
+          "queueEvidenceEventSpan at old src/observability/otelExporter.ts:L846",
+          "ledger appendEvidenceWithReceipt",
+          "JSONL appendSessionEvent",
+          "ops OTELExporter"
+        ]
+      }
+    ],
+    "meaning": "Stale navigation only. The graph retains the old47-line docs/THREAT_MODEL and omits the new P011 map/checker/tests. Current source was verified directly. No refresh, watcher, server, extraction, package installation or graph write occurred.",
+    "thisTurn": "Existing scoped Graphify navigation was already read before direct source work; no duplicate query or refresh was performed. The stale graph does not establish present control enforcement."
+  },
+  "scope": {
+    "writes": [
+      "/private/tmp/p0-11-causal-readonly-plan-20261015.json",
+      "/private/tmp/p0-11-causal-readonly-plan-20261015.md"
+    ],
+    "prohibited": "No repository, canonical qualification, source, test, fixture, helper, guard, CLI, archive, baseline, dependency, tracker or role-inbox edit. No ownership transfer. Active P045 causal phases, closure and live journal were not read.",
+    "futureRuntimeAuthorization": "Only root may activate the owned lane and separately review/release exact physical-copy source recipes. These proposed controls do not authorize execution."
+  },
+  "currentCorpus": {
+    "registrationBasis": "Static unchanged test definitions read directly; not collected or executed in this turn. Actual runner registration and every actual result must be recorded later.",
+    "primary": [
+      {
+        "file": "tests/threatModelMap.test.ts",
+        "staticLiteralDefinitions": 7,
+        "cases": [
+          {
+            "line": 21,
+            "name": "a valid map passes"
+          },
+          {
+            "line": 27,
+            "name": "a cited path that does not exist fails and names the entry"
+          },
+          {
+            "line": 34,
+            "name": "a symbol absent from its file fails"
+          },
+          {
+            "line": 41,
+            "name": "an owner that is not a plan key fails"
+          },
+          {
+            "line": 48,
+            "name": "a failure row with no test and no owner fails"
+          },
+          {
+            "line": 55,
+            "name": "the real channel map passes with 16 channels and 8 failure rows"
+          },
+          {
+            "line": 64,
+            "name": "the threat model document names every channel, failure row and ASI id in the map"
+          }
+        ],
+        "actualCollectedOrExecuted": false,
+        "primary": true
+      },
+      {
+        "file": "tests/telemetryExporterFailure.test.ts",
+        "staticLiteralDefinitions": 2,
+        "cases": [
+          {
+            "line": 82,
+            "name": "does not fail a governed tool call or drop its ledger row when recording throws"
+          },
+          {
+            "line": 95,
+            "name": "does not fail a governed tool call or drop its ledger row when the collector is unreachable"
+          }
+        ],
+        "actualCollectedOrExecuted": false,
+        "primary": true
+      }
+    ],
+    "primaryStaticDefinitions": 9,
+    "adjacentRecorderControl": {
+      "file": "tests/toolEvidenceRecording.test.ts",
+      "staticLiteralDefinitions": 7,
+      "cases": [
+        {
+          "line": 83,
+          "name": "records an ALLOWED call"
+        },
+        {
+          "line": 97,
+          "name": "records a DENIED call, with which guard refused and why"
+        },
+        {
+          "line": 113,
+          "name": "writes an audit row AND a metric row per call"
+        },
+        {
+          "line": 141,
+          "name": "correlates a call to its token, so a denial can be traced"
+        },
+        {
+          "line": 154,
+          "name": "does NOT copy the arguments into the audit row"
+        },
+        {
+          "line": 185,
+          "name": "returns the tool's real outcome when the recorder throws"
+        },
+        {
+          "line": 218,
+          "name": "labels the three outcomes distinctly"
+        }
+      ],
+      "actualCollectedOrExecuted": false,
+      "primary": false
+    },
+    "adjacentStaticDefinitions": 7,
+    "counting": "Primary7+2 is9 definitions. Adjacent7 is separate. Repeated baseline/mutant/restored executions are not additional unique tests; no measured count or aggregate is supplied. Optional five preview tests are not required for this minimal causal plan."
+  },
+  "actualFlow": [
+    {
+      "frames": [
+        "scripts/check-threat-model.mjs:38-84",
+        "tests/threatModelMap.test.ts:15-17"
+      ],
+      "detail": "The MJS CLI uses actual Ajv, filesystem reads and whole-identifier matching. Six original cases spawn process.execPath synchronously, inheriting cwd/environment and without an explicit spawn timeout; the seventh checks document headings/identifiers. Script ROOT is its physical module parent; a later full private source copy needs matching CWD and unchanged original file locations, without import adapters."
+    },
+    {
+      "frames": [
+        "tests/telemetryExporterFailure.test.ts:27-79",
+        "src/agent/agentToolset.ts:432-467",
+        "src/ledger/ledger.ts:623-651",
+        "src/observability/otelExporter.ts:848-855",
+        "src/tools/toolPipeline.ts:305-330"
+      ],
+      "detail": "Actual fresh workspace/vault/budgets/observe firewall and governed fs.read reach toolEvidenceFor and appendEvidenceBatch. The whole SQLite batch is committed before telemetry queue calls. The inner telemetry catch counts a drop. The outer pipeline catch preserves a tool outcome when its recorder fails; these are separate barriers."
+    },
+    {
+      "frames": [
+        "tests/telemetryExporterFailure.test.ts:95-109",
+        "src/observability/otelExporter.ts:467-545",
+        "src/observability/otelExporter.ts:882-886",
+        "src/observability/otelExportTransport.ts:64-104"
+      ],
+      "detail": "The collector test forces reported buffer counts to128 and stubs global fetch with an ECONNREFUSED TypeError. It awaits shared flush, then asserts a fetch occurred, OK and one matching audit. Existing dispatcher retries/egress checks/manual redirects and failed-result conversion remain real source, but no real collector/socket outage is produced by this test."
+    },
+    {
+      "frames": [
+        "src/observability/otelExporter.ts:794-822",
+        "tests/telemetryExporterFailure.test.ts:27-34",
+        "tests/telemetryExporterFailure.test.ts:82-107"
+      ],
+      "detail": "OTLP and Jaeger default to http://127.0.0.1:4318 and Zipkin to http://127.0.0.1:9411, with environment overrides. Test beforeEach enables OTLP before readyWorkspace, while record/fetch spies begin after initialization. The original file alone proves neither credential-free initialization nor transport isolation. A future launcher must freeze and record its actual effective endpoint/environment contract before baseline, without inventing zero transport."
+    },
+    {
+      "frames": [
+        "tests/toolEvidenceRecording.test.ts:185-213"
+      ],
+      "detail": "The adjacent direct READ_ONLY echo control supplies a genuinely throwing record callback. It directly observes the outer pipeline barrier. It is not a real ledger failure, a journaled protected effect, a replay/reconciliation probe or independent crypto verification."
+    }
+  ],
+  "recommendedMinimalControls": [
+    {
+      "id": "C1-map-missing-path-fail-open",
+      "state": "unexecuted private source recipe proposal; not permission or observed outcome",
+      "target": "scripts/check-threat-model.mjs",
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/scripts/check-threat-model.mjs",
+        "bytes": 3560,
+        "sha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b"
+      },
+      "find": "      if (!existsSync(file)) {\n        errors.push(`channel ${channel.id}: ${path} does not exist`);\n        continue;\n      }",
+      "replace": "      if (!existsSync(file)) {\n        continue;\n      }",
+      "observedAnchorOccurrences": 1,
+      "prospectiveTargetSha256": "363ba9d901a0075c74705f13bc0d73efbb8a60d3f9cd506b6d1d281324a3d4f9",
+      "prospectiveHashMeaning": "In-memory recipe expansion only; no mutated file, copy, compiler or product execution was created.",
+      "corpus": {
+        "files": [
+          "tests/threatModelMap.test.ts"
+        ],
+        "staticDefinitions": 7
+      },
+      "meaning": "Remove only the missing-path error admission while preserving continue, so the missing file is not subsequently read. This is a newly specified fail-open semantic control, not the literal whole-branch removal requested in the historical spec.",
+      "hypothesesNotResults": [
+        {
+          "case": "a cited path that does not exist fails and names the entry",
+          "firstFrame": "tests/threatModelMap.test.ts:29",
+          "prediction": "The missing-path fixture would exit 0 and the original expect(status).toBe(1) would fail first. Output assertions at lines30–31 would be masked. Actual outcomes must supersede this prediction."
+        },
+        {
+          "positiveControls": [
+            "a valid map passes",
+            "the real channel map passes with 16 channels and 8 failure rows"
+          ],
+          "prediction": "Expected to remain accepted; every other original negative remains unchanged. No measured 7-to-6 count is claimed."
+        }
+      ],
+      "classification": "A measured status0 on the original invalid fixture, plus the named original status assertion and green baseline/restored controls, would show source reference admission sensitivity. It would not prove actual enforcement of any advertised channel status."
+    },
+    {
+      "id": "C2-tool-recorder-error-propagates",
+      "state": "unexecuted private source recipe proposal; not permission or observed outcome",
+      "target": "src/tools/toolPipeline.ts",
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+        "bytes": 29435,
+        "sha256": "de0791037badc8d0abc62642527d87e7a6030d1d364e322c30995d187ccaf794"
+      },
+      "find": "      } catch {\n        // The guarantee belongs HERE, not to each recorder.",
+      "replace": "      } catch (error) {\n        throw error;\n        // The guarantee belongs HERE, not to each recorder.",
+      "observedAnchorOccurrences": 1,
+      "prospectiveTargetSha256": "3a7f58aae191b877cea66f308648c0a330ad46c56259135dc14bf5828929eea0",
+      "prospectiveHashMeaning": "In-memory recipe expansion only; no mutated file, copy, compiler or product execution was created.",
+      "corpus": {
+        "files": [
+          "tests/toolEvidenceRecording.test.ts"
+        ],
+        "staticDefinitions": 7
+      },
+      "meaning": "Rethrow the genuine recorder exception at the outer pipeline barrier. Existing journal code and tests remain byte-identical, although the remaining catch body is intentionally unreachable in this private mutant. Source-mode execution makes no successful typecheck/build claim.",
+      "hypothesesNotResults": [
+        {
+          "case": "returns the tool's real outcome when the recorder throws",
+          "sourceFrames": [
+            "tests/toolEvidenceRecording.test.ts:202",
+            "tests/toolEvidenceRecording.test.ts:206",
+            "src/tools/toolPipeline.ts:305-330"
+          ],
+          "prediction": "The real injected callback throws \"the evidence store is unreachable\" after the echo body. The original await may reject before assertions210–213. This is a specific expected test-body rejection, not an AssertionError, an invented denial, a measured durable-store outage or a demonstrated journaled-effect failure."
+        },
+        {
+          "masking": "If await rejects, recorderCalled/outcome.ok/output/denied assertions210–213 are not reached. Other six cases are original positive/projection context, not independently proven by this source recipe."
+        }
+      ],
+      "classification": "Accept only an exact original callback error attributed through the mutated pipeline barrier and the named direct test, with normal fixture/setup/teardown and green baseline/restored controls. A generic nonzero, timeout, hook error, SQLite/native error or late shutdown banner is not a guard kill. If no exact rejection occurs, retain the survivor or actual differing failure without altering tests."
+    }
+  ],
+  "optionalDistinctDiagnostics": [
+    {
+      "id": "D1-optional-inner-telemetry-barrier-masking-probe",
+      "state": "unexecuted private source recipe proposal; not permission or observed outcome",
+      "target": "src/observability/otelExporter.ts",
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/observability/otelExporter.ts",
+        "bytes": 29231,
+        "sha256": "8e6fee4594df8b74c87e3fa0b583888cbe1bb126195a4f49d2ddf973390a9d58"
+      },
+      "find": "export function queueEvidenceEventSpan(event: EvidenceEvent, workspace?: string): void {\n  try {\n    const exporter = getSharedObservabilityExporter();\n    workspace !== undefined ? withWorkspaceScope(workspace, () => exporter.recordEvidenceEvent(event)) : exporter.recordEvidenceEvent(event);\n    maybeFlushSharedExporter(exporter);\n  } catch {\n    noteTelemetryDropped(1); // Observability must never block core workflows; the drop is counted.\n  }\n}",
+      "replace": "export function queueEvidenceEventSpan(event: EvidenceEvent, workspace?: string): void {\n  try {\n    const exporter = getSharedObservabilityExporter();\n    workspace !== undefined ? withWorkspaceScope(workspace, () => exporter.recordEvidenceEvent(event)) : exporter.recordEvidenceEvent(event);\n    maybeFlushSharedExporter(exporter);\n  } catch (error) {\n    noteTelemetryDropped(1); // Observability must never block core workflows; the drop is counted.\n    throw error;\n  }\n}",
+      "observedAnchorOccurrences": 1,
+      "prospectiveTargetSha256": "2feb95ed58078118a9bd04ac8f8dbb2f13606aa095cf28d0ff97a3ad21fc2a0a",
+      "prospectiveHashMeaning": "In-memory recipe expansion only; no mutated file, copy, compiler or product execution was created.",
+      "corpus": {
+        "files": [
+          "tests/telemetryExporterFailure.test.ts"
+        ],
+        "staticDefinitions": 2
+      },
+      "meaning": "Optional separate boundary probe if root wants sensitivity of the actual inner queue catch. Preserve counting and rethrow the original exception. This is not needed to replace the actual two-case baseline and is not a predicted kill.",
+      "hypothesesNotResults": [
+        {
+          "case": "does not fail a governed tool call or drop its ledger row when recording throws",
+          "firstPossibleFrames": [
+            "tests/telemetryExporterFailure.test.ts:90",
+            "tests/telemetryExporterFailure.test.ts:91",
+            "tests/telemetryExporterFailure.test.ts:92"
+          ],
+          "prediction": "A survivor is plausible: appendEvidenceBatch commits all rows before queueEvidenceEventSpan, and ToolPipeline catches later recorder exceptions. If another pre-execute receipt path propagates the exception, retain its actual body error/outcome and source trace instead. Do not manufacture a failure or claim the audit disappeared."
+        },
+        {
+          "case": "does not fail a governed tool call or drop its ledger row when the collector is unreachable",
+          "prediction": "This is an asynchronous canned fetch rejection; dispatchTelemetryRequest and flushInternal already convert it to failed telemetry dispatch. The changed synchronous record catch may be irrelevant. fetchSpy called is the first assertion at line106; actual result decides."
+        }
+      ],
+      "classification": "Preserve an actual all-green mutant as a masking/coverage limit, not equivalence or proof that telemetry error propagation is safe generally. If a named outcome/row assertion fails, record its exact value and reached frame; do not infer later assertions. No new tests or stronger outage claim are supplied."
+    },
+    {
+      "id": "L1-optional-historical-literal-whole-branch-removal",
+      "state": "unexecuted private source recipe proposal; not permission or observed outcome",
+      "target": "scripts/check-threat-model.mjs",
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/scripts/check-threat-model.mjs",
+        "bytes": 3560,
+        "sha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b"
+      },
+      "find": "      if (!existsSync(file)) {\n        errors.push(`channel ${channel.id}: ${path} does not exist`);\n        continue;\n      }",
+      "replace": "",
+      "observedAnchorOccurrences": 1,
+      "prospectiveTargetSha256": "c843f26336d00d65286202d0f56102ceee75ced5d0cc7048bbbd196b241e8ccc",
+      "prospectiveHashMeaning": "In-memory recipe expansion only; no mutated file, copy, compiler or product execution was created.",
+      "corpus": {
+        "files": [
+          "tests/threatModelMap.test.ts"
+        ],
+        "staticDefinitions": 7
+      },
+      "meaning": "Historical spec wording literally removes the whole existence branch; retain it as a separate observer if root requires exact-text acceptance evidence. It is not C1 and is not silently replaced by C1.",
+      "hypothesesNotResults": [
+        {
+          "case": "a cited path that does not exist fails and names the entry",
+          "prediction": "readFileSync on src/tools/noSuchFile.ts then throws ENOENT. The script catches the exception and still exits1. Status assertion29 may pass while output assertion30 or31 fails. The invalid fixture has still been refused, so the historical requirement that it pass is not established."
+        }
+      ],
+      "classification": "A changed diagnostic or nonzero test run alone is not a fail-open path admission. Report literal-contract mismatch and retain strict historical criterion; do not waive it with the separately labelled semantic C1 control."
+    }
+  ],
+  "phasePlanNotExecuted": [
+    {
+      "order": 1,
+      "action": "After root assigns an owned P011 lane at the final accepted parent, preserve source/config/test/fixture/dependency/native and current plan/reservation pins, perform ordinary frozen install/build/freeze, then observe actual Node22 process executable/version/ABI and native compatibility in that owned lane. Do not borrow or mutate a Node24/25 installation or another session’s native binary."
+    },
+    {
+      "order": 2,
+      "action": "Run actual checker CLI and the unchanged primary seven-map/two-telemetry files. Preserve normal global/per-file guards,30s test timeout, all fixture cleanup, actual child argv/cwd/environment, raw reports, streams and late diagnostics. Actual check:threat-model is the Node MJS CLI; it is not a built amc/dist witness."
+    },
+    {
+      "order": 3,
+      "action": "If root adopts C2, run the whole unchanged adjacent seven-case file separately. It keeps native-host platform seam and SQLite fixture behavior exactly as written. No -t filter, skipped/todo, assertion removal or replacement callback is needed."
+    },
+    {
+      "order": 4,
+      "action": "Only after a static reviewed release, run each recommended source-mode private control in its exact original file corpus: baseline, one exact private target change, mutant, exact restoration, restored. No tsc, compiled-output mutation or src-to-dist adapter is required for these source imports; the MJS checker child runs the private MJS file directly. Keep full copied dist byte-identical and record it honestly as unused/unmodified, not freshly tested."
+    },
+    {
+      "order": 5,
+      "action": "C1 is a distinct semantic source-admission witness; keep the historical literal requirement open unless its exact observation is separately captured. D1 is optional and may survive due to the demonstrated outer barrier; never force a kill or change expectations. No broad additional mutants are needed merely to inflate a count."
+    },
+    {
+      "order": 6,
+      "action": "Close only owned processes and fixtures through normal unchanged cleanup. Parent/controller must retain timeout, hook, late-close, residual-process and restoration uncertainty; it must not restore a live target or classify an uncertain/non-assertion run generically as a kill. Hash all final source/native/config/test/guard bytes and retain immutable evidence. Formal acceptance remains open regardless of focused outcomes."
+    }
+  ],
+  "commandsNotExecuted": [
+    "pnpm install --frozen-lockfile",
+    "pnpm run build",
+    "pnpm run check:freeze",
+    "node scripts/check-threat-model.mjs",
+    "npm run check:threat-model",
+    "pnpm exec vitest run tests/threatModelMap.test.ts tests/telemetryExporterFailure.test.ts --maxWorkers=1 --no-file-parallelism --cache=false --reporter=default --reporter=json --outputFile.json=<fresh-owned-primary-report.json>",
+    "pnpm exec vitest run tests/toolEvidenceRecording.test.ts --maxWorkers=1 --no-file-parallelism --cache=false --reporter=default --reporter=json --outputFile.json=<fresh-owned-adjacent-report.json>"
+  ],
+  "evidenceAndMaskingRules": [
+    "Every baseline/restored phase must actually register every original selected case, with zero failed/pending/todo and no hidden setup/hook/unhandled/late-close failure. Static counts are not substitutes for reports.",
+    "C1 predicts an actual body AssertionError at the first status assertion; retain later masked output checks rather than claiming them executed.",
+    "C2 may reject at the original await with its exact genuine callback error before any outcome assertion. Classify this exact source-attributed body rejection separately from AssertionErrors and from infrastructure failures.",
+    "D1 may remain green because audit rows already committed and outer recorder catch preserve OK. A survivor is a scoped observation or coverage limit, not equivalence or an invitation to weaken assertions.",
+    "Original telemetry row checks use a second readonly SQLite connection while the toolset ledger remains open. They are not fully cold readers, no-WAL-effects proof, signed-seal verification, or independently retained durable evidence after cleanup.",
+    "Original fixtures generate fresh keys/workspaces/call IDs. Repeated phases reuse corpus, generator inputs and criteria, not identical physical key/row bytes.",
+    "Original afterEach catches some toolset-close errors. Record actual logs and launcher process uncertainty; an outer group absence check cannot prove every detached descendant or every swallowed close result.",
+    "No real built CLI, external provider/model, authenticated user, sixteen-channel destination/RBAC/race assurance, released package or live system claim follows from these controls."
+  ],
+  "acceptanceAndOwnershipHolds": [
+    {
+      "kind": "Human review",
+      "evidence": "THREAT_MODEL.md:3 explicitly says Sid review of residual-risk/status is pending.",
+      "meaning": "No local reviewer approval or heading comment was established. No external PR/tracker was queried; approval elsewhere is not inferred."
+    },
+    {
+      "kind": "External titles",
+      "evidence": "THREAT_MODEL.md:251-255 retains re-verify and experimental labeling for ASI01..10.",
+      "meaning": "No OWASP page was fetched in this preparation. Preserve the re-verify label until separately authorized factual verification before publishing."
+    },
+    {
+      "kind": "Follow-up key collision",
+      "evidence": "THREAT_MODEL.md:272-274 proposes P1-56/57/58 for MCP containment, skip-vault passphrase and egressProxy. Current Issues.md:133-135 assigns those keys to A4.",
+      "meaning": "Historical proposals are not actual free plan keys or filed follow-ups. Root/plan owner must resolve attribution before any issue/PR closure; do not overwrite A4 keys."
+    },
+    {
+      "kind": "Freshness/coverage",
+      "evidence": "Map still declares verifiedAt2026-10-07 and commit e25cce1a03b17a023d4aadfbcdb71dfe653db87a; docs carry later P105/P102/P112/P166/P167 updates.",
+      "meaning": "Existence/identifier/schema guard is not current behavioral validation, complete STRIDE assurance or no-bypass proof. Do not update timestamps to manufacture acceptance."
+    },
+    {
+      "kind": "Required mutation semantics",
+      "evidence": "Checker missing-path branch pushes an error and continues. Removing the entire existence if would fall through to readFileSync and still refuse ENOENT.",
+      "meaning": "A generic nonzero or altered error does not show the requested missing-path fixture passed. A later exact private fail-open error-removal-with-continue control can be proposed, reviewed and measured with unchanged seven tests; that is not silently the same textual removal. No recipe/controller or mutation is authored now."
+    },
+    {
+      "kind": "Current validation pending",
+      "evidence": "No P011 runtime occurred.",
+      "meaning": "Original9, actual checker/negative fixtures, causal mutation, full suite/types/lint/docs/architecture, PR/merged SHA and Sid review remain unqualified here. Earlier broad passes do not transfer automatically."
+    },
+    {
+      "kind": "Inherited debt",
+      "evidence": "Current prior exact-code context reports duplicate1269/dead2751 failed, plus earlier bounded residuals.",
+      "meaning": "No thresholds/freeze/baselines are changed or waived. P029 skip, P022 arrays, P023 heldAPI/Studio, P051 trust/formal failures, P024 ISO/expert cells, P019/P020 proposals, P030 batch/runner/installed-pack gaps and paused/shared/Claude boundaries persist."
+    },
+    {
+      "kind": "Historical missing-path textual mutation",
+      "meaning": "C1 intentionally differs from whole-branch removal to avoid ENOENT fallback. Its separately labelled success would not silently satisfy or rewrite the old literal pass-after-removal expectation."
+    },
+    {
+      "kind": "Fail-closed versus best effort",
+      "meaning": "Map invalid reference admission is fail-closed. Telemetry failure preserves execution and already written mandatory evidence; this is not permission to treat an actual mandatory-store or authority-store failure as telemetry."
+    },
+    {
+      "kind": "Lane activation",
+      "meaning": "P045 canonical commit and future P011 owned parent are unresolved in this preparation. No source transfer or new acceptance decision was inferred from idle sessions or current source equality."
+    }
+  ],
+  "ownership": {
+    "wholeIssue": "No explicit P011 issue reservation was found in the frozen notes, but this is not path transfer. Existing-source read-only qualification can be proposed independently.",
+    "heldPaths": [
+      "docs/security/THREAT_MODEL.md",
+      "docs/security/channel-map.json",
+      "src/a4/*",
+      "src/api/*",
+      "src/studio/*",
+      "src/approvals/*",
+      "src/mode/mode.ts",
+      "src/verify/verifyAll.ts",
+      "shared CLI/registries",
+      "paused P2-02 sources"
+    ],
+    "telemetry": "Observability paths have an existing Codex P201 source-only reservation/history. New P011 fixes are not authorized by that history; no telemetry, ledger or action journal repair is proposed.",
+    "futureRepairRule": "Root must audit the exact path, accepted base and live owner before authoring any repair. No transfer, source edits, held-code copy or baseline change follows from this readiness."
+  },
+  "directSourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/security/THREAT_MODEL.md",
+      "bytes": 49246,
+      "sha256": "816600297a6dbc51487b993172ccd3b7ac920593582baba53c5d35f6873398fa",
+      "relativePath": "docs/security/THREAT_MODEL.md",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/security/channel-map.json",
+      "bytes": 20174,
+      "sha256": "261c15667a63b6a815dba312e6f2dce0d0d1b01cf02d1b282a33d060070d449e",
+      "relativePath": "docs/security/channel-map.json",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/security/channel-map.schema.json",
+      "bytes": 2669,
+      "sha256": "6d11b2bf91471c4da936d793e686d755f147d444bed09600994c5a2d8c7cce42",
+      "relativePath": "docs/security/channel-map.schema.json",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/THREAT_MODEL.md",
+      "bytes": 403,
+      "sha256": "9172c2a1e3c9b25eced0fb70972658158ea658f5090936f3b681e1f8dbaa40d3",
+      "relativePath": "docs/THREAT_MODEL.md",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/archive/THREAT_MODEL-2026-02.md",
+      "bytes": 2943,
+      "sha256": "6449f0bc83aa43fed09986238fc2c98757c5f0667d8ac1db29667a1ca762de28",
+      "relativePath": "docs/archive/THREAT_MODEL-2026-02.md",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/HARDENING.md",
+      "bytes": 1598,
+      "sha256": "7ac55a463b818f70d415472e900cdc992ff22e907310d152ac53499296530d6a",
+      "relativePath": "docs/HARDENING.md",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/READING_ORDER.md",
+      "bytes": 15006,
+      "sha256": "9348552e0dbba4aba2c5075970943231298f5f87c86dacdae1787b9c99002b1c",
+      "relativePath": "docs/READING_ORDER.md",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/SECURITY_COMPLIANCE_QUICKSTART.md",
+      "bytes": 873,
+      "sha256": "fbf932970bfb250de91121430ff8903b28787d609977119f5cbedac85130c298",
+      "relativePath": "docs/SECURITY_COMPLIANCE_QUICKSTART.md",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/scripts/check-threat-model.mjs",
+      "bytes": 3560,
+      "sha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b",
+      "relativePath": "scripts/check-threat-model.mjs",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "relativePath": "package.json",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "relativePath": "pnpm-lock.yaml",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/.github/workflows/ci.yml",
+      "bytes": 14134,
+      "sha256": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6",
+      "relativePath": ".github/workflows/ci.yml",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "relativePath": "vitest.config.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+      "relativePath": "tests/setup/guardWorkspace.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+      "relativePath": "tests/setup/repoWorkspaceGuard.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+      "relativePath": "tests/setup/repoWorkspaceGuard.global.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "bytes": 29435,
+      "sha256": "de0791037badc8d0abc62642527d87e7a6030d1d364e322c30995d187ccaf794",
+      "relativePath": "src/tools/toolPipeline.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/tools/toolEvidence.ts",
+      "bytes": 6941,
+      "sha256": "c0453fde0f6b1f29cc9847120735ff241eacf876228c291f7291e377682e1162",
+      "relativePath": "src/tools/toolEvidence.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/agent/agentToolset.ts",
+      "bytes": 29046,
+      "sha256": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546",
+      "relativePath": "src/agent/agentToolset.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "relativePath": "src/ledger/ledger.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/persistence/jsonl/jsonlSessionEventStore.ts",
+      "bytes": 18803,
+      "sha256": "0d835399a02ebb3ce8b22daee1eccfcf4864dc1533342657d39983a5d3f79a5c",
+      "relativePath": "src/persistence/jsonl/jsonlSessionEventStore.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/observability/otelExporter.ts",
+      "bytes": 29231,
+      "sha256": "8e6fee4594df8b74c87e3fa0b583888cbe1bb126195a4f49d2ddf973390a9d58",
+      "relativePath": "src/observability/otelExporter.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/observability/otelExportTransport.ts",
+      "bytes": 3282,
+      "sha256": "b47298f37f681a75c68919d8c8de0b7dfe700281ac357ab8780b1195bbfe71b3",
+      "relativePath": "src/observability/otelExportTransport.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/observability/telemetryDrops.ts",
+      "bytes": 705,
+      "sha256": "3648fb9dd42536b2822f6e97fe984c0cd103c4ee2fea05f563d0a1cfee4bbe96",
+      "relativePath": "src/observability/telemetryDrops.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/ops/otelExporter.ts",
+      "bytes": 13248,
+      "sha256": "250eb6d4ebe930eaef7f1e8df4a47ae75eddabe2ab373ba09b171aaf91cb18ab",
+      "relativePath": "src/ops/otelExporter.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/actions/actionJournal.ts",
+      "bytes": 33320,
+      "sha256": "b42e3b88bc1a849d4c5409259a4328ea4f1a29a660bf9e0e4f55e1d96916e1b4",
+      "relativePath": "src/actions/actionJournal.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "relativePath": "scripts/freeze-baseline.json",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "relativePath": "scripts/check-freeze.mjs",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/scripts/graphify-navigation.py",
+      "bytes": 23480,
+      "sha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a",
+      "relativePath": "scripts/graphify-navigation.py",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/threatModelMap.test.ts",
+      "bytes": 3263,
+      "sha256": "47741b152a40bdfd164fa8b5708d243c530248043e2d3fd4fa1c7a380c046d30",
+      "relativePath": "tests/threatModelMap.test.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/telemetryExporterFailure.test.ts",
+      "bytes": 4746,
+      "sha256": "fcf694842227d513eaf52e2c62c57910ccbb332e420cf82f38a57bc29d836e16",
+      "relativePath": "tests/telemetryExporterFailure.test.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/observabilityOtelExporter.test.ts",
+      "bytes": 5975,
+      "sha256": "4bab25e8a2d72c4c9c2d703a45434a15b5f5005c89aa8d7f1e5f6287568986d4",
+      "relativePath": "tests/observabilityOtelExporter.test.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/toolEvidenceRecording.test.ts",
+      "bytes": 11449,
+      "sha256": "8dcbb281f950c7f0f60cf50e9b2e3c1c620db985b684b7c2005885818bc73168",
+      "relativePath": "tests/toolEvidenceRecording.test.ts",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/fixtures/threat-model/bad-owner.json",
+      "bytes": 867,
+      "sha256": "05a6739b2a7b881cb62e5f76cc55b4ebc190876041a48bed33a3c6a327c8150e",
+      "relativePath": "tests/fixtures/threat-model/bad-owner.json",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/fixtures/threat-model/missing-path.json",
+      "bytes": 869,
+      "sha256": "fd72bcc1821a8461370a3624be441e9f51ad53c0d9008f0294d2cf7e8e440f77",
+      "relativePath": "tests/fixtures/threat-model/missing-path.json",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/fixtures/threat-model/missing-symbol.json",
+      "bytes": 868,
+      "sha256": "012beba72e467ed34a0b56626c444864df13e19d00b04c6d21a08231675eb967",
+      "relativePath": "tests/fixtures/threat-model/missing-symbol.json",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/fixtures/threat-model/orphan-failure-row.json",
+      "bytes": 791,
+      "sha256": "2d6292637d403a8dbcbf43fc15213c76cf6c076b6f245ed9d6db73f7e71a049d",
+      "relativePath": "tests/fixtures/threat-model/orphan-failure-row.json",
+      "matchesFrozenReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/fixtures/threat-model/valid.json",
+      "bytes": 867,
+      "sha256": "d5b5e641c830ccb5c0ca5014b5b5e44f7a324818494522694631e94bf6887661",
+      "relativePath": "tests/fixtures/threat-model/valid.json",
+      "matchesFrozenReadiness": true
+    }
+  ],
+  "referencePins": {
+    "readiness": {
+      "path": "/private/tmp/p0-11-readonly-readiness-20261015.json",
+      "bytes": 59639,
+      "sha256": "9e94b03051722cbc7593f7c0c827079060d10cabdffead3d062f56b18bc8565a"
+    },
+    "readinessMarkdown": {
+      "path": "/private/tmp/p0-11-readonly-readiness-20261015.md",
+      "bytes": 4186,
+      "sha256": "9a6f92f70ad12fcabc92533d9d7335f9dab94ddfb72a85a50d77f5d91225fd30"
+    },
+    "recoveredSpec": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-11.md",
+      "bytes": 16346,
+      "sha256": "ebf31f8e80615b05a449c62a0ef02da996fca57e12d770fe5226872a4ba5d4e8"
+    },
+    "authorityFromFrozenReadiness": {
+      "planPins": [
+        {
+          "path": "/Users/sid/Downloads/Agent contract.md",
+          "bytes": 25110,
+          "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f"
+        },
+        {
+          "path": "/Users/sid/Downloads/Issues.md",
+          "bytes": 38227,
+          "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+        },
+        {
+          "path": "/Users/sid/Downloads/Workstreams.md",
+          "bytes": 78486,
+          "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04"
+        },
+        {
+          "path": "/Users/sid/Downloads/A4 · Forge.md",
+          "bytes": 47286,
+          "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65"
+        },
+        {
+          "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+          "bytes": 157127,
+          "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+        }
+      ],
+      "reservation": {
+        "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+        "bytes": 275376,
+        "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+      },
+      "priorRouting": {
+        "path": "/private/tmp/amc-next-after-p0-25-readonly-routing-20261015.json",
+        "bytes": 23914,
+        "sha256": "e70186df02502326e435b921cf4cef09ec186d9cbe9556dc812fba4e71c0dc95"
+      },
+      "P045Readiness": {
+        "path": "/private/tmp/p0-45-readonly-readiness-20261015.json",
+        "bytes": 46780,
+        "sha256": "4b2742a95afa6f06d8c3b680fe7264df0c6548e1784e76d41a03f3d0cd86c8c0"
+      },
+      "planLocations": {
+        "issues": "Issues.md:21,36,38,55,64,71",
+        "ordering": "AMC Ready-to-Deploy Implementation Plan.md:165-174,209,262-263,285",
+        "workstreamAcceptance": "Workstreams.md:246,265",
+        "reservations": "RESERVATIONS.md:340,495,549,1114-1130,1496-1499,1588"
+      }
+    },
+    "meaning": "Only directSourcePins/readiness/spec were freshly rehashed here. Authority/graph metadata are attributed to the frozen readiness and prior/current read-only routing, not a newly executed authority check or graph refresh."
+  },
+  "completedOperations": "Ordinary filesystem reads, metadata hashing, exact-anchor count/in-memory recipe expansion, JSON metadata reading and read-only git rev-parse HEAD. Only this new JSON/Markdown pair was written. No product import, parser/AST, test collection, runtime, source edit, controller, closure or mutant file exists from this task.",
+  "subsequentParentActivationNotice": {
+    "provenance": "Root message received after source reads and initial authoring; no P011 source or runtime read was performed by this lane.",
+    "P045CanonicalCommit": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+    "P045CanonicalMeaning": "Root reports qualification-only157path commit and normal postcommit freeze/qualification pass.",
+    "P045PrivateHandoffSha256": "baba589557056bce672295ef22c99c2219740052885b9759a9338ce7f5e5d082",
+    "newP011Root": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+    "newP011Branch": "codex/p0-11-current-qualification",
+    "newP011Parent": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+    "rootReports": "8362 tracked files;623 qualification-only differences from production58;92 mapped direct pins match readiness; frozen install started. Original7map/2telemetry/5preview/7recording remain separate. All three OTEL endpoint overrides absent.",
+    "meaning": "The source-anchor plan remains at independently inspected2024/prod58; root reports the newer fa3 activation separately. Root alone owns installation/runtime. No isolation, real collector outage, future pass or recipe-release claim is inferred."
+  }
+}

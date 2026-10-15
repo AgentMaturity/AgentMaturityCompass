@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/classification.json",
+    "bytes": 227,
+    "sha256": "91c20674729fcbed4fd622bf6f22112342c0af0fa9255787c8cde71ca5d4f34c"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/command.json",
+    "bytes": 1742,
+    "sha256": "7c79371fc7239e98ae1cfc1724bd13b29da80232d41f7d0736006264b024cfe1"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/inputs-after.json",
+    "bytes": 830,
+    "sha256": "1eece51a63460b9dd21d2aa79ae9f2cdcabef1dcf9a350ba03d7e928a6aa106a"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/inputs-before.json",
+    "bytes": 830,
+    "sha256": "97f1ff1e857171b482d9ee2afd8002f1ce4772a4086dcd8da169c03cd73f9dc8"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/observer.json",
+    "bytes": 3577,
+    "sha256": "662baffcfbfa8cea5a05e42ddcfb742265f8716ded78539a252b431b1bd3c7aa"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "9f50dbd41d1fa83048dd681f6fbd6b9ea1032c3ed18df5c799001bbffd9d94d6"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/owned-process.json",
+    "bytes": 1368,
+    "sha256": "e3aad87cd7693174d1b5f3ed154be293d8b062ab4c7cbc49f0fa50ce08ea526b"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/raw.json",
+    "bytes": 2561,
+    "sha256": "a4bb6b16ea2953b39b9f2acaedfd23d6afe2a5b5034cc6f813516d06fd284c05"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/stdout-stderr.log",
+    "bytes": 439,
+    "sha256": "cea584b559bfdaf8caa134222563599bf4406691c65b21b99aead39bf5a61102"
+  }
+]

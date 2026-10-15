@@ -1,0 +1,106 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 23402,
+  "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+  "reason": "passed",
+  "files": [
+    "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts"
+  ],
+  "testCount": 7,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-1647471160",
+      "name": "tests/threatModelMap.test.ts",
+      "fullName": null,
+      "filepath": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1647471160_0",
+      "name": "tests/threatModelMap.test.ts check-threat-model",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1647471160_0_0",
+      "name": "tests/threatModelMap.test.ts check-threat-model a valid map passes",
+      "fullName": "check-threat-model a valid map passes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1647471160_0_1",
+      "name": "tests/threatModelMap.test.ts check-threat-model a cited path that does not exist fails and names the entry",
+      "fullName": "check-threat-model a cited path that does not exist fails and names the entry",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1647471160_0_2",
+      "name": "tests/threatModelMap.test.ts check-threat-model a symbol absent from its file fails",
+      "fullName": "check-threat-model a symbol absent from its file fails",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1647471160_0_3",
+      "name": "tests/threatModelMap.test.ts check-threat-model an owner that is not a plan key fails",
+      "fullName": "check-threat-model an owner that is not a plan key fails",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1647471160_0_4",
+      "name": "tests/threatModelMap.test.ts check-threat-model a failure row with no test and no owner fails",
+      "fullName": "check-threat-model a failure row with no test and no owner fails",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1647471160_0_5",
+      "name": "tests/threatModelMap.test.ts check-threat-model the real channel map passes with 16 channels and 8 failure rows",
+      "fullName": "check-threat-model the real channel map passes with 16 channels and 8 failure rows",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1647471160_0_6",
+      "name": "tests/threatModelMap.test.ts check-threat-model the threat model document names every channel, failure row and ASI id in the map",
+      "fullName": "check-threat-model the threat model document names every channel, failure row and ASI id in the map",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}
