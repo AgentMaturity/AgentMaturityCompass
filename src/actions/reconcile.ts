@@ -108,6 +108,7 @@ function adapterFor(workspace: string, toolName: string, adapters: ReadonlyMap<s
 async function lookup(adapter: ReconcileAdapter, query: ReconcileQuery, signal?: AbortSignal): Promise<SystemOfRecordObservation> {
   const deadline = AbortSignal.any([AbortSignal.timeout(LOOKUP_TIMEOUT_MS), ...(signal ? [signal] : [])]);
   try {
+    deadline.throwIfAborted();
     const answer = await Promise.race([adapter.lookup(query, deadline), new Promise<never>((_, reject) => {
       if (deadline.aborted) reject(deadline.reason);
       deadline.addEventListener("abort", () => reject(deadline.reason), { once: true });
