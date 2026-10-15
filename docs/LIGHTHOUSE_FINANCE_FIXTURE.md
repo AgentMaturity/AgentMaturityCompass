@@ -1,3 +1,5 @@
+> Current local evidence (16 October 2026): the source-only description below records the original 9 October slice. The service and client now have bounded local qualification; the full normative finance workflow remains open. See the qualification update below.
+
 # Synthetic finance lighthouse fixture
 
 Status: P1-19 partial source implementation; unqualified. The service has not been started and the scenarios have not been run. This is a synthetic provider model, not a real payment integration, compliance claim or proof of universal safety.
@@ -45,3 +47,13 @@ The client uses a supplied Unix socket or an HTTP origin at literal `127.0.0.1`,
 The data's `executionStatus: "not_run"` records preparation only. Expected decisions, receipt states, counts and control dimensions are planned requirements, never observed results.
 
 This slice adds no finance tools to the default or native toolset. Full tool integration still needs a trusted asynchronous payee/resource refresh before the existing authorization recheck, protected-fact mapping, journaled dispatch and credential separation. The protected approval/pipeline/enforcement modules remain unchanged. The independent oracle, scenario driver, fixture-control evaluator, tests, builds, typechecks, lint, CI, model runs and qualification receipts are deferred under the coding-only instruction. No zero-failure or coverage metric has been measured.
+
+## Local qualification update: 16 October 2026
+
+The local macOS arm64 Node 22 run exercised 110 service and client/adapter cases. The first run passed 109 and exposed a payee-version overflow: a valid maximum-safe seed allowed an admin destination update to publish an unsafe version. A one-line guard now returns HTTP 409 `payee_version_exhausted` before updating the payee or appending a payee-update record. All 110 unchanged tests then passed; test TypeScript checking also passed. Ordinary destination updates still increment the version.
+
+The checks launched real synthetic service children over Unix sockets and loopback TCP, exercised all six fault plans, verified a controlled crash and replay after restart, and required three corrupt histories to refuse startup without repair. Provider log hashes and final checkpoints were checked independently. Every observed child closed naturally with closed streams and an actual PID-absence observation. These finite component checks do not establish an AMC-authorized payment workflow, OS credential isolation, power-loss recovery or any real provider contract.
+
+Subsequent component runs passed 31 service cases and 89 client/adapter cases, for 120 distinct cases. The expanded checks observed two same-key requests before the first commit, restored a CLI-loaded fault counter after restart, and found a delayed commit through 23 GET lookups after a real client timeout without a second POST. Six owned loopback HTTP peers checked malformed JSON, schema refusal, redirect refusal, the response-byte cap and fixed error handling; every peer closed its listener and connections. These results remain component evidence, not F01–F38 outcomes.
+
+The F01–F38 case data remains `not_run`. Full finance tool registration, trusted payee refresh and digest mapping before authorization, the normative oracle and runner, compliance evidence loaders and decisive/example tests remain open. The earlier no-tests restriction has been superseded for this qualification; protected approval, journal, pipeline and enforcement contracts have not been changed for the finance fixture. See `qualification/2026-10-16-P1-19/` for the recorded commands, results and limits.

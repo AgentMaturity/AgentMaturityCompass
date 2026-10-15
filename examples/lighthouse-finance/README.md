@@ -1,3 +1,5 @@
+> Current local evidence (16 October 2026): the source-only description below records the original 9 October slice. The service and client now have bounded local qualification; the full normative finance workflow remains open. See the qualification update below.
+
 # Synthetic finance provider
 
 This is the source-only P1-19 fixture slice. Its Node service imports no AMC source or built output; seed, fault plans and F01–F38 scenario data are under `spec/fixtures/v1/lighthouse-finance/`.
@@ -5,3 +7,7 @@ This is the source-only P1-19 fixture slice. Its Node service imports no AMC sou
 See [the fixture guide](../../docs/LIGHTHOUSE_FINANCE_FIXTURE.md) for operation, credentials, transaction-log semantics and integration boundaries. No service, scenario runner, oracle or evaluation was executed. Scenario expectations are unobserved; the source remains unqualified.
 
 All tenants, names, accounts and destination tokens are synthetic. This fixture models finite cases and does not establish any real provider's behavior, exactly-once delivery, compliance or universal safety.
+
+## Local qualification update: 16 October 2026
+
+The service and client/adapter have 120 passing local Node 22 component cases across the service and client runs after repairing payee-version overflow. See the fixture guide and `qualification/2026-10-16-P1-19/` for evidence and boundaries. Full AMC tool composition, oracle, example runner and F01–F38 qualification remain open; no normative case status has been promoted.
