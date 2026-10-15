@@ -1,0 +1,912 @@
+{
+  "schemaVersion": "amc.canonical-outline/v1",
+  "key": "P0-21",
+  "preparedUtc": "2026-10-15T05:15:47.890355+00:00",
+  "preparedOnly": true,
+  "enactmentAuthorized": false,
+  "builderWritten": false,
+  "canonicalDirectoryCreated": false,
+  "allPreparationReadsFinished": true,
+  "target": {
+    "futureCanonicalDirectory": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-21",
+    "sourceRoot": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+    "source": "f58d88d80ab490490184354cc8665631d6999cc1",
+    "productionCodeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "branch": "codex/p0-21-current-qualification",
+    "originalTrackedFilesToPreserve": 7945,
+    "compiledFilesToPreserve": 4529,
+    "causalPhysicalCopyFiles": 12474,
+    "boundary": "Source attribution describes the existing f58 candidate; this outline does not make or inspect a new product copy, run a command, or requalify mutable causal phases."
+  },
+  "shapeReference": {
+    "path": "/private/tmp/p0-25-build-canonical-packet-20261015.py",
+    "bytes": 9622,
+    "sha256": "c38a0eea4dbd0d66f81f728bc0d251d1b143c575a4f3971f2b07914fbc1c8b47"
+  },
+  "requiredFutureBindings": [
+    {
+      "binding": "finalBoundedPacket",
+      "path": null,
+      "sha256": null,
+      "requiredBeforeEnactment": true,
+      "meaning": "Root supplies the actual frozen P0-21 bounded packet after all six controls, complete preservation and an immutable artifact index. Do not invent final packet fields or filenames."
+    },
+    {
+      "binding": "independentActualReview",
+      "path": null,
+      "sha256": null,
+      "requiredBeforeEnactment": true,
+      "meaning": "Root supplies the completed independent actual review and Markdown. It must bind the exact final packet/index and distinguish preserved acceptance gaps from actionable evidence blockers."
+    },
+    {
+      "binding": "rootOutcome",
+      "path": null,
+      "sha256": null,
+      "requiredBeforeEnactment": true,
+      "meaning": "Root supplies its final bounded outcome with exact packet/review references, review disposition and formalAcceptanceClosed:false. The outline supplies no approval or fabricated outcome."
+    },
+    {
+      "binding": "frozenFinalArtifactIndex",
+      "path": null,
+      "sha256": null,
+      "requiredBeforeEnactment": true,
+      "meaning": "Resolve from the actual final packet. Rehash every row; original absolute path/byte/hash equality is required."
+    },
+    {
+      "binding": "frozenFinalRootCommandJournal",
+      "path": null,
+      "sha256": null,
+      "requiredBeforeEnactment": true,
+      "meaning": "Root must create a separate frozen snapshot after final commands. The live /private/tmp/p0-21-commands-20261015.jsonl was reported as13rows at assignment and remains appendable; it was not read, pinned, overwritten or treated as final here."
+    },
+    {
+      "binding": "finalStaticReviewAndReleaseInputs",
+      "paths": [],
+      "requiredBeforeEnactment": true,
+      "meaning": "Root supplies exact frozen controller/setup static reviews and actual per-control release files. Current setup-v3/index-v3/controller-v3 pins below are prepared provenance, not runtime proof."
+    }
+  ],
+  "selectionPlan": {
+    "currentImmutableCopyCandidates": [
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-qualification-20261015/initial-preflight.json",
+          "bytes": 15064,
+          "sha256": "b039ec6dd5834b494623d6a1ddc3c4415675d829532c38e4ca3c30835de62802"
+        },
+        "role": "Frozen original-lane summary or observer context; copy unchanged only after final root approval."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-qualification-20261015/original-corpora-summary.json",
+          "bytes": 6370,
+          "sha256": "c6098f0805c3ec3879a90f4f03f29d6fbe51047f9dd9a327c6c966c6750d6e52"
+        },
+        "role": "Frozen original-lane summary or observer context; copy unchanged only after final root approval."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-qualification-20261015/exact-source-validation-context.json",
+          "bytes": 3352,
+          "sha256": "79da41374b6d9d69dbaa7b819d9cc2b52804633577eaf1566c93eca9545298fe"
+        },
+        "role": "Frozen original-lane summary or observer context; copy unchanged only after final root approval."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-qualification-20261015/certification-wording-acceptance-gap.json",
+          "bytes": 9804,
+          "sha256": "9ba0ccbdd290475da8e8e8e44524da92ef3799e3cc49db2c5aaebecf07df4267"
+        },
+        "role": "Frozen original-lane summary or observer context; copy unchanged only after final root approval."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-qualification-20261015/known-late-close-retrospective-audit.json",
+          "bytes": 2039,
+          "sha256": "ce67e789c62a686baef1a2ecd8f102eb0cc098a779068fbe2ca0c83c84a27ea1"
+        },
+        "role": "Frozen original-lane summary or observer context; copy unchanged only after final root approval."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-qualification-20261015/runtime-fingerprint.cjs",
+          "bytes": 1147,
+          "sha256": "2457017b6cdafb1560f98c90c2fa48815b839ed7c31eca8ff873b3a2dff53f7e"
+        },
+        "role": "Frozen original-lane summary or observer context; copy unchanged only after final root approval."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        },
+        "role": "Frozen original-lane summary or observer context; copy unchanged only after final root approval."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-original-core-20261015.json",
+          "bytes": 13531,
+          "sha256": "5956cd0924105ed8af8c535a0d9a9e5700f9bedcc684dc012f983d97393ac9e2"
+        },
+        "role": "original-core raw; preserve separate invocation and original attribution."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observers/original-core.json",
+          "bytes": 20673,
+          "sha256": "a184fdece85e47d6d25d4e6730bfa21157598b152a3e15cc8a067ea9df5ceacb"
+        },
+        "role": "original-core observer; preserve separate invocation and original attribution."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-original-core-20261015.log",
+          "bytes": 756,
+          "sha256": "ca86226e2433acbe6a56afdce4619cdcd7752deca2aa8286eaf52c62790ce15d"
+        },
+        "role": "original-core combinedStream; preserve separate invocation and original attribution."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-original-cli-20261015.json",
+          "bytes": 5336,
+          "sha256": "11395d84ec62ac0282a2f3c0b027c934b525c461ee006dcdf1bab2a90e36b925"
+        },
+        "role": "original-cli raw; preserve separate invocation and original attribution."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observers/original-cli.json",
+          "bytes": 7690,
+          "sha256": "8b7547cd2f35a3de1c8918cc234298d4ce6e5599780be0cb39b6992cc27fc2f3"
+        },
+        "role": "original-cli observer; preserve separate invocation and original attribution."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-original-cli-20261015.log",
+          "bytes": 1283,
+          "sha256": "0ff82949f54c37bdb3799f3a4db37f13d03e6d75a681e2d1b35d4bbc88270d41"
+        },
+        "role": "original-cli combinedStream; preserve separate invocation and original attribution."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-original-consumers-20261015.json",
+          "bytes": 15550,
+          "sha256": "7922b303999bdc675f210fe4613f803fc19cee76b3060f68a7f0874007d8e32d"
+        },
+        "role": "original-consumers raw; preserve separate invocation and original attribution."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observers/original-consumers.json",
+          "bytes": 21993,
+          "sha256": "8a147dbc48d51bcbc96fa1e15754e12a4f620fc3c16713bc2937a078eacfff83"
+        },
+        "role": "original-consumers observer; preserve separate invocation and original attribution."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-original-consumers-20261015.log",
+          "bytes": 543,
+          "sha256": "c2c535d81692936b3bcf1034871d5f5fadfd0442bec1a29687f23eedee9d6f08"
+        },
+        "role": "original-consumers combinedStream; preserve separate invocation and original attribution."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-v3.json",
+          "bytes": 15393,
+          "sha256": "6b7cfa580a5718e414f8b1ebc36d91d286cfba646acaba780e6dfd21dff4942d"
+        },
+        "role": "Frozen prepared causal input, not a runtime result. Superseded v1/v2 remain context-only and unexecuted."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index-v3.json",
+          "bytes": 5376,
+          "sha256": "6366f1ac7a7507b68c9f0d0469cd91d935ea9016192c3c692fbf70221fd2e4b5"
+        },
+        "role": "Frozen prepared causal input, not a runtime result. Superseded v1/v2 remain context-only and unexecuted."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-causal-qualification-20261015/README-v3.md",
+          "bytes": 1387,
+          "sha256": "8d4553fb18818dce26f8131167b77feddcfac762da76bb2feb4dbf3022fe997e"
+        },
+        "role": "Frozen prepared causal input, not a runtime result. Superseded v1/v2 remain context-only and unexecuted."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-v3-change-note.json",
+          "bytes": 3507,
+          "sha256": "b3d54ca7895f0a03888a5d3fc6987cdc74d847085f2b199dfd955f484512bd15"
+        },
+        "role": "Frozen prepared causal input, not a runtime result. Superseded v1/v2 remain context-only and unexecuted."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-causal-qualification-20261015/proposal.json",
+          "bytes": 11790,
+          "sha256": "fa4c77f0bbcbb976cd8d7a505eae72db7689888f145154b9c1af76900e0645d2"
+        },
+        "role": "Frozen prepared causal input, not a runtime result. Superseded v1/v2 remain context-only and unexecuted."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller-v3.py",
+          "bytes": 19822,
+          "sha256": "b43db98145e32451f5552ec56cd9a407bda1118bc1fb10cd07f8ae5ae863ed68"
+        },
+        "role": "Frozen prepared causal input, not a runtime result. Superseded v1/v2 remain context-only and unexecuted."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        },
+        "role": "Frozen prepared causal input, not a runtime result. Superseded v1/v2 remain context-only and unexecuted."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/case-identities.json",
+          "bytes": 6257,
+          "sha256": "a820cd5df029a9481785484541f6c5f1ca1b8e3bbfd0cc0a3483209931d2921d"
+        },
+        "role": "Frozen prepared causal input, not a runtime result. Superseded v1/v2 remain context-only and unexecuted."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/preservation.json",
+          "bytes": 8436,
+          "sha256": "c91b8b4d0663f0a69510e5384559abad6305096510b164a8b260dcae21d993a3"
+        },
+        "role": "Frozen prepared causal input, not a runtime result. Superseded v1/v2 remain context-only and unexecuted."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-readonly-readiness-v2-20261015.json",
+          "bytes": 63104,
+          "sha256": "0d6d0d47b68c29cc60c2c5d430f6c4f3ed8e7157514b4462bc7686530b35d348"
+        },
+        "role": "Source, scope or routing attribution; no new qualification follows from a readiness document."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-45-readonly-readiness-20261015.json",
+          "bytes": 46780,
+          "sha256": "4b2742a95afa6f06d8c3b680fe7264df0c6548e1784e76d41a03f3d0cd86c8c0"
+        },
+        "role": "Source, scope or routing attribution; no new qualification follows from a readiness document."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-25-canonical-postcommit-handoff-20261015.json",
+          "bytes": 3756,
+          "sha256": "fc1d63929ab12b7cced3a9d8d85cec562b44e775193fd3b64de9b3561dcc40cb"
+        },
+        "role": "Source, scope or routing attribution; no new qualification follows from a readiness document."
+      },
+      {
+        "original": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-21.md",
+          "bytes": 13758,
+          "sha256": "ae1ed1d28f1d15d0d124b7f10e783e0fa38fb234f2001492c901c791aab7c938"
+        },
+        "role": "Source, scope or routing attribution; no new qualification follows from a readiness document."
+      }
+    ],
+    "currentCandidatesStatus": "All listed files exist and their bytes/hashes were read. This is copy planning only, not an independent actual runtime audit. Original raw/observer/stream pins match their existing summary.",
+    "futureCopyCandidates": [
+      "finalBoundedPacket JSON and Markdown",
+      "independentActualReview JSON and Markdown",
+      "rootOutcome JSON and any approved Markdown",
+      "frozenFinalArtifactIndex only if within1MiB; otherwise compact reference summary plus private exact hash",
+      "separately frozen final root command journal and actual current command logs selected from that journal",
+      "exact frozen setup/controller static reviews and actual release bindings",
+      "six result--<control>.json files, phase raw/observer/full-stream/command/group observations selected from the final immutable index",
+      "compact final source/dist/native/prior-preservation report",
+      "this outline only if useful as explicitly unexecuted preparation provenance"
+    ],
+    "futureCausalCandidates": [
+      {
+        "id": "P021-C1-likert-origin",
+        "futureResultPath": "/private/tmp/p0-21-causal-qualification-20261015/result--P021-C1-likert-origin.json",
+        "resultStatus": "Not read or asserted by this preparation. Require the final root-frozen index.",
+        "futurePhases": [
+          {
+            "stage": "baseline",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--baseline",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          },
+          {
+            "stage": "mutant",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          },
+          {
+            "stage": "restored",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--restored",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          }
+        ]
+      },
+      {
+        "id": "P021-C2-L2-threshold",
+        "futureResultPath": "/private/tmp/p0-21-causal-qualification-20261015/result--P021-C2-L2-threshold.json",
+        "resultStatus": "Not read or asserted by this preparation. Require the final root-frozen index.",
+        "futurePhases": [
+          {
+            "stage": "baseline",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          },
+          {
+            "stage": "mutant",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          },
+          {
+            "stage": "restored",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          }
+        ]
+      },
+      {
+        "id": "P021-C3-numeric-self-eligible-cap",
+        "futureResultPath": "/private/tmp/p0-21-causal-qualification-20261015/result--P021-C3-numeric-self-eligible-cap.json",
+        "resultStatus": "Not read or asserted by this preparation. Require the final root-frozen index.",
+        "futurePhases": [
+          {
+            "stage": "baseline",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--baseline",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          },
+          {
+            "stage": "mutant",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          },
+          {
+            "stage": "restored",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          }
+        ]
+      },
+      {
+        "id": "P021-C4-base-L3-self-tier",
+        "futureResultPath": "/private/tmp/p0-21-causal-qualification-20261015/result--P021-C4-base-L3-self-tier.json",
+        "resultStatus": "Not read or asserted by this preparation. Require the final root-frozen index.",
+        "futurePhases": [
+          {
+            "stage": "baseline",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          },
+          {
+            "stage": "mutant",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          },
+          {
+            "stage": "restored",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--restored",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          }
+        ]
+      },
+      {
+        "id": "P021-C5-default-gate-self-tier",
+        "futureResultPath": "/private/tmp/p0-21-causal-qualification-20261015/result--P021-C5-default-gate-self-tier.json",
+        "resultStatus": "Not read or asserted by this preparation. Require the final root-frozen index.",
+        "futurePhases": [
+          {
+            "stage": "baseline",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          },
+          {
+            "stage": "mutant",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          },
+          {
+            "stage": "restored",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--restored",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          }
+        ]
+      },
+      {
+        "id": "P021-C6-representative-raw-size",
+        "futureResultPath": "/private/tmp/p0-21-causal-qualification-20261015/result--P021-C6-representative-raw-size.json",
+        "resultStatus": "Not read or asserted by this preparation. Require the final root-frozen index.",
+        "futurePhases": [
+          {
+            "stage": "baseline",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--baseline",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          },
+          {
+            "stage": "mutant",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          },
+          {
+            "stage": "restored",
+            "directory": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored",
+            "allowedCompactLeaves": [
+              "raw.json",
+              "observer.json",
+              "stdout-stderr.log",
+              "command.json",
+              "owned-process.json",
+              "owned-group-after-exit.json",
+              "inputs-before.json",
+              "inputs-after.json"
+            ],
+            "expectedOriginalRegistrations": 37,
+            "actualOutcomes": "Bind only from frozen raw/observer/command evidence; preserve survivors and masking, never infer a kill from exit alone."
+          }
+        ]
+      }
+    ],
+    "privateReferenceOnly": [
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/physical-copy-manifest.json",
+          "bytes": 3978574,
+          "sha256": "58ef19180c72f3818b797f6e37de6b7700d07604d6be019f3df05211c8547416"
+        },
+        "boundary": "Mandatory private-only reference: 3,978,574 bytes exceeds 1MiB. Never copy it into canonical evidence or split it to bypass the cap."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-qualification-20261015/tracked-source-before.json",
+          "bytes": 948064,
+          "sha256": "33488a499321073557a83b7a4e8446f1c7e4744f0c05fbc6edf27fb26f9c4caf"
+        },
+        "boundary": "Hash-only by default to keep canonical evidence compact; final verification must still rehash all 7,945 original files."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-qualification-20261015/compiled-after-build.json",
+          "bytes": 485185,
+          "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48"
+        },
+        "boundary": "Hash-only by default; final verification must still rehash all 4,529 compiled files."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/source-manifest.json",
+          "bytes": 948064,
+          "sha256": "33488a499321073557a83b7a4e8446f1c7e4744f0c05fbc6edf27fb26f9c4caf"
+        },
+        "boundary": "Same frozen source map in the causal namespace; do not copy or mutate original source."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/compiled-manifest.json",
+          "bytes": 485185,
+          "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48"
+        },
+        "boundary": "Same compiled map in the causal namespace; no compiled causal mutation or per-mutant build."
+      },
+      {
+        "original": {
+          "path": "/private/tmp/p0-25-build-canonical-packet-20261015.py",
+          "bytes": 9622,
+          "sha256": "c38a0eea4dbd0d66f81f728bc0d251d1b143c575a4f3971f2b07914fbc1c8b47"
+        },
+        "boundary": "Shape reference only. It must not be executed for P0-21 or copied with stale P0-25 source/field names."
+      }
+    ],
+    "neverCopy": [
+      "causal closure or product source trees",
+      "node_modules or native binaries",
+      "private HOME/TMPDIR/workspaces/stores/vaults/keys/credentials/cache",
+      "ACTIVE/HALTED or unfinished/appendable phase evidence as if complete",
+      "4MB physical-copy manifest",
+      "unreviewed or mutable files matched by broad directory globs"
+    ]
+  },
+  "proposedCanonicalFiles": [
+    {
+      "relativePath": "README.md",
+      "meaning": "Final bounded explanation based on the draft below, with every bracketed instruction replaced from frozen actual evidence. No unresolved draft placeholder may enter the canonical README."
+    },
+    {
+      "relativePath": "receipt.json",
+      "meaning": "Current schema only; primary original 37 test result, actual command triples and artifact hashes. Write last, excluding receipt itself from its own artifacts."
+    },
+    {
+      "relativePath": "outcomes.json",
+      "meaning": "Separate original-core 37, original-cli14, original-consumers 48, each actual control BMR, failures/masking/survivors, infrastructure/late diagnostics, environment/lifecycle boundaries, fresh versus historical reused checks, review and root outcome."
+    },
+    {
+      "relativePath": "acceptance-gaps.json",
+      "meaning": "formalAcceptanceClosed:false, literal wording20/10 outside R4 gap, unwaived quality1269/2751, currentOBSERVEDL2/schema3, inherited skips/holds and conditional P0-45 routing."
+    },
+    {
+      "relativePath": "evidence-map.json",
+      "meaning": "Each copied source keeps original absolute path, bytes and SHA256 plus canonical relative copy path. Read original bytes only, copy byte-for-byte, and verify copied bytes/hash equality. No edits to originals."
+    },
+    {
+      "relativePath": "private-references.json",
+      "meaning": "Exact private absolute path/bytes/hash rows from the frozen index, with source/run/scope attribution and explicit private-only oversized manifests. Does not copy referenced sensitive data or assert independent installation."
+    },
+    {
+      "relativePath": "evidence/<sha-prefix>-<basename>",
+      "meaning": "Only explicitly selected compact regular files, each at most 1,048,576bytes and free of forbidden credential names/private-key content. Resolve prefix/name collisions by exact hash/byte equality or a longer unique prefix; never overwrite unequal bytes."
+    }
+  ],
+  "receiptPlan": {
+    "schema": {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/qualification/receipt.schema.json",
+      "bytes": 2315,
+      "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6"
+    },
+    "checker": {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    },
+    "schemaVersion": 1,
+    "key": "P0-21",
+    "date": "2026-10-15",
+    "commit": "f58d88d80ab490490184354cc8665631d6999cc1",
+    "branch": "codex/p0-21-current-qualification",
+    "tests": {
+      "total": 37,
+      "passed": 37,
+      "failed": 0,
+      "skipped": 0
+    },
+    "testsBinding": "Require the frozen final original-core raw/observer/summary to preserve this exact37/37 primary result. Do not sum separate runs or causal repetitions into receipt.tests. If original measured results differ, stop and re-review the outline.",
+    "runtimeFields": "Use actual final-bound runtime metadata for node, pnpm, os and arch. Existing original summary records Nodev22.23.3/ABI127 and nativeSELECT1; do not infer per-causal-child native loading or observe the packaging machine and relabel it as the runtime.",
+    "commands": "Select actual final frozen command rows and emit only schema fields cmd/exit/durationMs. Preserve actual exit codes/durations. Explain intentional mutant assertion exits and any other nonzero commands truthfully in notes/outcomes; do not label infrastructure failures expected causal kills. Do not invent a single 99-test command or merge root/controller/child durations.",
+    "artifacts": "Every approved canonical regular file other than receipt.json receives its normalized inside-directory relative path and final SHA256. Hash after all content is final. No self-reference or schema-extra keys.",
+    "notesDraft": "Bounded existing-source qualification, not formal acceptance or Done. tests records only original core 37. Separate original CLI 14 and scoring-consumer 48 invocations and six controls repeating the same 37 are distinct in outcomes.json. Expected mutant process1 body assertions must be described with their actual original source sites and masking; setup/hook/teardown/timeout failures are incomplete, not kills. v1/v2 are preserved unexecuted preparation; v3 execution is bound only to actual final command records. Original lane environment is inherited; causal copy borrows parent dependencies and uses a seven-key allowlist without OS/network/universal-descendant isolation. The literal certification inventory20/10 outside R4-list gap and duplicate1269/dead2751 remain unwaived. OBSERVEDL2/schema3 and all original source/tests/config/guards/dist remain preserved as verified in the final packet. No full-suite, Node24, hosted, installed release, formal dependency, G0 or Done claim."
+  },
+  "outcomeSeparations": {
+    "originalPrimary": {
+      "phase": "original-core",
+      "tests": 37,
+      "existingRecordedPassed": 37,
+      "summary": {
+        "path": "/private/tmp/p0-21-qualification-20261015/original-corpora-summary.json",
+        "bytes": 6370,
+        "sha256": "c6098f0805c3ec3879a90f4f03f29d6fbe51047f9dd9a327c6c966c6750d6e52"
+      }
+    },
+    "separateOriginalRuns": [
+      {
+        "phase": "original-cli",
+        "tests": 14,
+        "existingRecordedPassed": 14
+      },
+      {
+        "phase": "original-consumers",
+        "tests": 48,
+        "existingRecordedPassed": 48
+      }
+    ],
+    "causalCounting": "Six controls each repeat the same 37-case corpus baseline/mutant/restored. If all 18 phases complete with37 registrations, that is666 case executions across those phases, not666 new unique cases and not a new primary total. No count/outcome for a future phase is asserted here.",
+    "staticPreparationChronology": "v1/v2 setup/controller bytes remain superseded, preserved and unexecuted. v3 prepared state is historical at its capture; describe actual execution only from final release/commands.",
+    "sourceAndCompiled": "Only approved private TS deltas may differ during their exact mutant phases; all source must restore and all 4,529 compiled files remain unchanged. No per-mutant compiler, import/helper adaptation, assertion/config/guard/deadline/cleanup/data/allowlist change.",
+    "freshChecks": "Root original lane summary identifies fresh no-fabrication/architecture/docs/counts/normal-freeze. Final packet must preserve exact commands and distinguish strict no-fab JSON from literal grep.",
+    "reusedChecks": "Prior production-types/test-types/lint/clean-source/duplicates/dead-code remain older exact-source evidence with original pins and outcomes. Do not relabel these as fresh P0-21 runs."
+  },
+  "readmeDraft": "# P0-21 bounded qualification\n\nThe original six-file core corpus passes **37/37** on source `f58d88d80ab490490184354cc8665631d6999cc1`, whose production code is equivalent to `58e91dcef111bf02f773dcbfd1921d428cf75e34`. Separate unchanged runs pass **14/14 CLI cases** and **48/48 scoring-consumer cases**. These are three invocations, not one 99-case run. The primary count in `receipt.json` is the original 37-case run.\n\n[REQUIRED FINAL INSERT: summarize each of the six frozen causal controls using its actual baseline→mutant→restored counts, exact target, original assertion site and any masked later assertions. Preserve actual survivors or incomplete phases. Each phase repeats the same original 37 cases; these are repeated executions, not additional unique cases. Name controller-v3 as executed only if the final command records prove it, and identify v1/v2 as preserved unexecuted preparation.]\n\nThe original core uses mocked MCP entitlement/transport and hand-shaped diagnostic evidence. The CLI run uses the actual built entrypoint against locally authored run JSON; it does not authenticate stored results or establish paid transport. Canned MCP capabilities and benchmark counters remain fixture data. The existing OBSERVED-supported L2 behavior and audit schema3 remain intact; no earlier requested policy is silently restored. No expert, legal or compliance authority follows from these fixtures.\n\nThe original lane inherits its parent environment with a private HOME and pinned Node PATH. The separate causal lane is a physical filesystem copy with borrowed parent dependencies, not an independent installation or literal Git clone. Its seven-key environment allowlist, private HOME/TMPDIR, pinned Node and owned process observations do not establish operating-system, network or universal descendant isolation. Its reporter ends before global teardown; process exits, complete streams and known late diagnostics must remain separate evidence. The historical original-stream close audit is retrospective, not a runtime rerun.\n\n[FILL FROM FINAL PRESERVATION: all 7,945 original tracked files and4,529 compiled files remain exact; all original test/config/guard/assertion/deadline/cleanup bytes and native/dependency provenance are preserved. Do not use this sentence until the final packet and independent review substantiate it.] The 3,978,574-byte physical-copy manifest remains private and is referenced by its exact hash. No private HOME, store, cache, native binary, key, credential or vault is copied into this packet.\n\nThe strict no-fabrication guard reports zero failing rules and zero pending entries. The separate literal certification-word inventory has 20 lines:10 in explicit permanent R4 files and 10 outside. The guard scans different syntax and files; its pass does not close literal grep-to-allowlist acceptance. No allowlist or product wording was changed to manufacture agreement. Required source-quality failures of 1,269 duplicates and 2,751 dead-code findings remain unwaived. Reused prior type/lint/clean-source/quality checks retain their original source and command attribution.\n\nFull suite, coverage, Node24, hosted CI, installed release, complete P0-21/G0 acceptance, formal dependency closure and Done are not claimed. Earlier skips, unresolved decisions, Claude/shared-path holds and pending transfers remain intact. Any next P0-45 route remains conditional on root's current plan/ownership check.\n\n`outcomes.json` separates core 37, CLI 14, consumers 48, fresh versus reused checks, actual causal controls and runtime boundaries. `acceptance-gaps.json` preserves unresolved literal and quality requirements. The independent actual review and root outcome are copied unchanged.\n",
+  "mandatoryLimits": {
+    "formalAcceptanceClosed": false,
+    "wording": {
+      "literalLines": 20,
+      "inExplicitPermanentR4Files": 10,
+      "outsideThoseFiles": 10,
+      "strictNoFabricationPending": 0,
+      "meaning": "Different scanning domains; strict guard0does not reconcile the literal grep criterion or authorize new allowlist exceptions."
+    },
+    "sourceQuality": {
+      "duplicateFindings": 1269,
+      "deadCodeFindings": 2751,
+      "status": "Required failed debt, unwaived; no new quality execution here."
+    },
+    "preservedBehavior": [
+      "Current OBSERVED-supported L2",
+      "Current audit schema3",
+      "Original source/test/config/guard/assertion/deadline/cleanup bytes",
+      "Current no-fabrication allowlist and data",
+      "Claude/shared CLI/A4/held/pausedP2-02 boundaries",
+      "User P0-29 skip and all prior unresolved decisions/transfers"
+    ],
+    "noClaims": [
+      "full suite",
+      "coverage",
+      "Node24",
+      "hosted CI",
+      "installed release or complete release gate",
+      "formal dependencies closed",
+      "P0-21 or GATE-G0 Done",
+      "expert/legal/compliance truth",
+      "authenticated stored CLI results",
+      "paid provider/model transport",
+      "independent causal dependency installation",
+      "OS/network/universal descendant isolation"
+    ]
+  },
+  "environmentAndLifecycleAttribution": {
+    "originalLane": "Inherited parent environment plus private HOME and pinned Node PATH; isolated HOME is not a credential-free allowlist.",
+    "causalLane": {
+      "copy": "Independent physical filesystem copy; no .git; parent node_modules borrowed through a link.",
+      "environmentKeys": [
+        "PATH",
+        "HOME",
+        "TMPDIR",
+        "NODE_ENV",
+        "NO_COLOR",
+        "GIT_NO_LAZY_FETCH",
+        "AMC_P021_RUNTIME_OBSERVER_PATH"
+      ],
+      "meaning": "Seven exact keys, private HOME/TMPDIR and pinned executable. No universal cache absence, OS or network isolation.",
+      "runtimeObservation": "Controller run-end reporter precedes global teardown. Require actual outer exit0/1 as appropriate, raw/observer identity/error agreement, complete streams/known late diagnostics and positive owned-group ESRCH before restoration. Only owned group is probed; no universal detached-descendant proof.",
+      "uncertainty": "ACTIVE/HALTED, timeout, incomplete preservation, observer/hook/unhandled/late diagnostic or group uncertainty forbids source restoration/new runtime. Do not package such a phase as a kill.",
+      "noSignals": "Controller policy sends no termination signals; actual final evidence must substantiate normal completed phases rather than infer them from prepared policy."
+    }
+  },
+  "preEnactmentChecklist": [
+    "Require all three actual final bindings, their exact hashes and a completed root disposition; this outline grants no enactment authority.",
+    "Recheck exactf58 source/branch and ordinary real-Git freeze/status under root authority at enactment. Require canonical destination absent; never overwrite an existing packet. No Git command was run for this outline.",
+    "Rehash all final index rows, original7945 and compiled4529 maps, native/dependency provenance and prior/reference preservation. Treat changed mutable inboxes by their explicitly approved point-in-time prefix boundary, not silent index updates.",
+    "Validate all six actual control result/release/phase records against the same original 37 identities and bytes; preserve every real outcome, first-assertion mask and survivor. Do not assume proposed guard sensitivity.",
+    "Freeze a separate final root command journal and copy only approved immutable streams. Never truncate, rewrite or pin the live13-row-at-assignment journal as complete.",
+    "Classify every selected artifact before copying: regular file only, no symlinks, within1MiB, no credential/key/vault/HOME/store/cache content; preserve oversized sources privately with exact hash and compact honest summary.",
+    "Verify every evidence-map original/copy pair byte equality and every artifact hash/path; write receipt last. Keep source attribution, primary and separate run counts, and all acceptance gaps explicit.",
+    "Run ordinary qualification/freeze and required checks only after separate root review/release; no check, parser/import, install/build, runtime, mutation or repository write occurs in this preparation."
+  ],
+  "preparationReadPins": [
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/initial-preflight.json",
+      "bytes": 15064,
+      "sha256": "b039ec6dd5834b494623d6a1ddc3c4415675d829532c38e4ca3c30835de62802"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/original-corpora-summary.json",
+      "bytes": 6370,
+      "sha256": "c6098f0805c3ec3879a90f4f03f29d6fbe51047f9dd9a327c6c966c6750d6e52"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/exact-source-validation-context.json",
+      "bytes": 3352,
+      "sha256": "79da41374b6d9d69dbaa7b819d9cc2b52804633577eaf1566c93eca9545298fe"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/certification-wording-acceptance-gap.json",
+      "bytes": 9804,
+      "sha256": "9ba0ccbdd290475da8e8e8e44524da92ef3799e3cc49db2c5aaebecf07df4267"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/known-late-close-retrospective-audit.json",
+      "bytes": 2039,
+      "sha256": "ce67e789c62a686baef1a2ecd8f102eb0cc098a779068fbe2ca0c83c84a27ea1"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-v3.json",
+      "bytes": 15393,
+      "sha256": "6b7cfa580a5718e414f8b1ebc36d91d286cfba646acaba780e6dfd21dff4942d"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index-v3.json",
+      "bytes": 5376,
+      "sha256": "6366f1ac7a7507b68c9f0d0469cd91d935ea9016192c3c692fbf70221fd2e4b5"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller-v3.py",
+      "bytes": 19822,
+      "sha256": "b43db98145e32451f5552ec56cd9a407bda1118bc1fb10cd07f8ae5ae863ed68"
+    }
+  ],
+  "readVerification": {
+    "originalRawObserverStreamPinsMatched": 9,
+    "sealedSetupIndexReferencesMatched": 24,
+    "scope": "Hash and metadata verification only; no original test rerun, active causal phase read, product import/parser/build or independent actual runtime review.",
+    "futureCanonicalAbsentAtPreparation": true,
+    "appendableRootJournalRead": false,
+    "finalPacketOrReviewOrOutcomeFabricated": false
+  },
+  "writes": "Only this NEW private outline JSON/Markdown pair. No executable builder, product copy, repository/source/test/data/guard/allowlist/Git write or prior artifact mutation."
+}

@@ -1,0 +1,90 @@
+{
+  "control": "P021-C2-L2-threshold",
+  "baseline": {
+    "classification": "passed",
+    "total": 37,
+    "passed": 37,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "failures": [],
+    "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+  },
+  "mutant": {
+    "classification": "body-assertion-failures-observed",
+    "total": 37,
+    "passed": 36,
+    "failed": 1,
+    "pending": 0,
+    "todo": 0,
+    "failures": [
+      {
+        "file": "tests/scoreUnits.test.ts",
+        "fullName": "typed score units (P0-21) percentToLevel is the one level table: L2 starts at 30",
+        "rawFailureMessages": [
+          "AssertionError: percent 30: expected 1 to be 2 // Object.is equality\n    at /private/tmp/p0-21-causal-qualification-20261015/closure/tests/scoreUnits.test.ts:47:58\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "observerErrors": [
+          {
+            "message": "percent 30: expected 1 to be 2 // Object.is equality",
+            "actual": "1",
+            "expected": "2",
+            "showDiff": true,
+            "operator": "strictEqual",
+            "diff": "- Expected\n+ Received\n\n- 2\n+ 1",
+            "name": "AssertionError",
+            "ok": false,
+            "stack": "AssertionError: percent 30: expected 1 to be 2 // Object.is equality\n    at /private/tmp/p0-21-causal-qualification-20261015/closure/tests/scoreUnits.test.ts:47:58\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+            "stacks": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-21-causal-qualification-20261015/closure/tests/scoreUnits.test.ts",
+                "line": 47,
+                "column": 58
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+  },
+  "restored": {
+    "classification": "passed",
+    "total": 37,
+    "passed": 37,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "failures": [],
+    "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+  },
+  "finalPreservation": {
+    "capturedUtc": "2026-10-15T05:21:11.293576+00:00",
+    "parentTrackedChecked": 7945,
+    "parentCompiledChecked": 4529,
+    "privateFilesChecked": 12474,
+    "parentDelta": [],
+    "privateUnexpectedDelta": [],
+    "immutableExternalDelta": [],
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 538645305,
+      "nlink": 1,
+      "mode": 493
+    },
+    "expectedSourceDeviations": [],
+    "privateHashMapSha256": "94400f3c28f2484c07886772560da11e549ff977f6f2ea85bedca017533b12db",
+    "processBoundary": "File bytes only; dependency/cache universe and detached descendants are not proven absent."
+  },
+  "restoredExactly": true,
+  "verdict": "body-assertion-sensitivity-awaiting-root-attribution",
+  "limits": [
+    "No compiler, dist edit, import rewrite or original criteria/config/deadline change.",
+    "Only the owned process group was probed after exit; detached descendants are not universally excluded.",
+    "The root observer precedes global teardown; raw process exit and full streams were separately checked."
+  ]
+}

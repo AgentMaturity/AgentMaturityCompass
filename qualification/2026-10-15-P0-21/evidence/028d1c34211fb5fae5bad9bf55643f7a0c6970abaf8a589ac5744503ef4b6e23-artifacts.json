@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/classification.json",
+    "bytes": 3691,
+    "sha256": "8385777671d7387932c2428cc2b0396dba3200ca788fda680d50665d6733725f"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/command.json",
+    "bytes": 1939,
+    "sha256": "cb61af6b8cdbffe5737548c80966b59357ab5117714537f4d25ac7f5a594af0f"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/inputs-after.json",
+    "bytes": 863,
+    "sha256": "4c5174182d307f39e754e27d992398aef6bf227f67eb6a2c52998f7675daad9a"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/inputs-before.json",
+    "bytes": 863,
+    "sha256": "4f0ff52aff637598d9c9b6d421b3af7cf3a8d15633d8bd1b465c485ebae24274"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/observer.json",
+    "bytes": 22415,
+    "sha256": "a4019bb8e0d5e08d086099f739a9a8e64f9cb7ac7babea457175d4ac43bf07b6"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "4df79e7c6d91fd618d365452b927ce65e3c8fae86096526cce9aa7c11dbd4cb5"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/owned-process.json",
+    "bytes": 1564,
+    "sha256": "43f4075f022d8e320e94c6cf140fc07597698ab135d93ac7962300c6cd73ece6"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/raw.json",
+    "bytes": 14748,
+    "sha256": "f1b8d57ac0314804454bd4c1fc32387c66989ec741e9b55dd256ab61b7086268"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/stdout-stderr.log",
+    "bytes": 2032,
+    "sha256": "555058eaf9e493925b2cc977608c2b5d46e98f4bda2ee129e05a4391643cafd6"
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/classification.json",
+    "bytes": 229,
+    "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/command.json",
+    "bytes": 1931,
+    "sha256": "f378b7c300199d09436b6f7b0f7aaa0cd769bb8b85b136a5c208e23b3691ff9d"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/inputs-after.json",
+    "bytes": 830,
+    "sha256": "358420b26b25ef20be7dc47ef6184f346c8337b8bacae539c7c7db1711a47656"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/inputs-before.json",
+    "bytes": 830,
+    "sha256": "442e7b7bf141bc447709846352cfc8fe00bee560901d9ca19e5184fa3197cdde"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/observer.json",
+    "bytes": 20517,
+    "sha256": "2600d5b1dcdd25f7f602e2fbaedc63cf85d576de858c42198fed1e8ff3155d5a"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "b1bc5ad575446ced331a12ff9e6f8f467dc6c2afaa833b5bbf924e85a7f68b64"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/owned-process.json",
+    "bytes": 1556,
+    "sha256": "f3985d097eedde3262ea4f681a06bd185fd65d27b2771924a0ea04a9a0590c6e"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/raw.json",
+    "bytes": 13473,
+    "sha256": "d5334c4f946d05c8443475e8de7969a3869e470945728d788edd80f251245998"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/stdout-stderr.log",
+    "bytes": 793,
+    "sha256": "b18b558499ed8bd53152fcc7530bec96a59579a1ed3b77db24cb38da0e1fc888"
+  }
+]

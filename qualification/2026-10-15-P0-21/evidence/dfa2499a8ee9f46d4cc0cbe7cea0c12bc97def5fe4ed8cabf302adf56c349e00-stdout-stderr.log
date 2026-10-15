@@ -1,0 +1,17 @@
+
+ RUN  v4.1.11 /private/tmp/p0-21-causal-qualification-20261015/closure
+
+ ✓ tests/transparencyReport.test.ts (15 tests) 38ms
+ ✓ tests/noCertificationFromSelfAssessment.test.ts (7 tests) 2473ms
+     ✓ MCP sector-pack and trust-score text say self-assessment and evidence standing  2432ms
+ ✓ tests/selfReportedLevelCap.test.ts (5 tests) 18ms
+ ✓ tests/logisticsIndustryPack.test.ts (2 tests) 6ms
+ ✓ tests/scoreUnits.test.ts (4 tests) 5ms
+ ✓ tests/domainAssessmentUnits.test.ts (4 tests) 11ms
+
+ Test Files  6 passed (6)
+      Tests  37 passed (37)
+   Start at  10:53:19
+   Duration  3.80s (transform 2.21s, setup 72ms, import 625ms, tests 2.55s, environment 0ms)
+
+JSON report written to /private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--restored/raw.json

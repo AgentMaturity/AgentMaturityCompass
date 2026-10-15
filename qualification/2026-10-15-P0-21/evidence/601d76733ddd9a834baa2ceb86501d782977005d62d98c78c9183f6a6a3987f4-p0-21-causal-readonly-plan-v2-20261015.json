@@ -1,0 +1,539 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-15T04:54:56.845150+00:00",
+  "key": "P0-21",
+  "state": "Read-only exact current causal proposal. No private closure, runtime, mutation, source change or execution verdict exists in this report.",
+  "source": {
+    "readRoot": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+    "readinessHead": "2d552741d727aaf3a26759b9df9343f7804d157a",
+    "parentReportedLaterP025ArtifactCommit": "f58d88d80ab490490184354cc8665631d6999cc1",
+    "productionAnchor": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "scope": "Current selected production/test inputs directly match the frozen readiness; no newly opened P0-21 tree was read because no path was assigned to this author."
+  },
+  "basis": {
+    "readiness": {
+      "path": "/private/tmp/p0-21-readonly-readiness-v2-20261015.json",
+      "bytes": 63104,
+      "sha256": "0d6d0d47b68c29cc60c2c5d430f6c4f3ed8e7157514b4462bc7686530b35d348"
+    },
+    "routing": {
+      "path": "/private/tmp/amc-next-after-p0-25-readonly-routing-20261015.json",
+      "bytes": 23914,
+      "sha256": "e70186df02502326e435b921cf4cef09ec186d9cbe9556dc812fba4e71c0dc95"
+    },
+    "spec": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-21.md",
+      "bytes": 13758,
+      "sha256": "ae1ed1d28f1d15d0d124b7f10e783e0fa38fb234f2001492c901c791aab7c938"
+    }
+  },
+  "preferredRuntimeDesign": {
+    "mode": "Normal source-mode Vitest in an independently owned complete filesystem copy, only after explicit root release.",
+    "fixedCorpus": [
+      "tests/scoreUnits.test.ts",
+      "tests/domainAssessmentUnits.test.ts",
+      "tests/noCertificationFromSelfAssessment.test.ts",
+      "tests/selfReportedLevelCap.test.ts",
+      "tests/logisticsIndustryPack.test.ts",
+      "tests/transparencyReport.test.ts"
+    ],
+    "staticRegisteredCases": 37,
+    "command": "pnpm exec vitest run tests/scoreUnits.test.ts tests/domainAssessmentUnits.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/selfReportedLevelCap.test.ts tests/logisticsIndustryPack.test.ts tests/transparencyReport.test.ts --reporter=default --reporter=json --outputFile.json=<new-owned-phase-report>",
+    "matrix": "For each distinct recipe, unchanged original37 baseline\u2192one exact source mutation\u2192restored37. Case titles/criteria/fixtures/config/setup/cleanup/deadlines stay byte identical. Registered/passed/failed/pending/todo and file errors come from the actual report, never predictions here.",
+    "compiledBoundary": "Preferred source-mode changes one TS source only and keeps all private compiled outputs unchanged. Equivalent compiled anchors are pinned for root review, not permission to change both TS and JS. Original src-importing tests do not prove an unimported dist edit. A compiled-only proof would need separately reviewed import-only routing/closure pins; ordinary full tsc must not be introduced silently.",
+    "preservation": "Pin all copied source/compiled/data/config/helpers/native/resolver links and protected root/prior packet inputs before/after; exact one target-source delta during mutation, exact full restoration after every control. Keep every initial setup/timeout/pending/transport/compiler failure; generic nonzero is not a guard kill.",
+    "notSelected": "The original CLI14 and consumer48 are separately qualified by root. They are not needed in every private core mutation and are not added to unique-case counts."
+  },
+  "recipes": [
+    {
+      "id": "P021-C1-likert-origin",
+      "title": "Shift validated Likert conversion from (x-1)/4 to x/5",
+      "source": {
+        "file": "src/score/units.ts",
+        "find": "return percent(((x - 1) / 4) * 100);",
+        "occurrences": 1,
+        "firstLine": 40,
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/score/units.ts",
+          "bytes": 2022,
+          "sha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df"
+        },
+        "replace": "return percent((x / 5) * 100);"
+      },
+      "compiledAlternative": {
+        "file": "dist/score/units.js",
+        "find": "return percent(((x - 1) / 4) * 100);",
+        "occurrences": 1,
+        "firstLine": 21,
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/dist/score/units.js",
+          "bytes": 1194,
+          "sha256": "cdc13d44af5f897491eb71789a4aace6f46d0487f13d1709e3c88b9efeaed397"
+        },
+        "replace": "return percent((x / 5) * 100);",
+        "status": "Static equivalent anchor only. Not an executed compiled mutant; preferred source-mode matrix does not alter this file."
+      },
+      "existingAssertions": [
+        {
+          "file": "tests/scoreUnits.test.ts",
+          "case": "conversions are explicit",
+          "line": 34,
+          "assertions": [
+            "likertToPercent(likert(5)) === 100",
+            "likertToPercent(likert(1)) === 0",
+            "likertToPercent(likert(3)) === 50"
+          ],
+          "reachability": "Calls the exact production converter directly; the first maximum assertion is predicted unchanged, then the answer1 assertion sees20 rather than0. Later assertions in that case can be masked by its first failure."
+        },
+        {
+          "file": "tests/domainAssessmentUnits.test.ts",
+          "case": "valid units convert explicitly: base levels via levelToPercent, answers via likertToPercent",
+          "line": 34,
+          "reachability": "Actual assessDomain loops through answerFor and the shared converter. The domainScore50 assertion observes the changed middle answer without modifying source fixtures."
+        }
+      ],
+      "interpretation": "A true conversion-value regression using still-valid finite percentages. No historical normalizeScore loop or clamping logic is reintroduced.",
+      "maskingAndLimits": "The maximum5 still yields100, so all-5 scoring alone is insufficient. Do not call this malformed-input admission or the old raw6 regression; it is the explicit conversion-origin control.",
+      "runtimeOutcome": "Unexecuted proposal. No compile, import, test, private copy or mutation performed."
+    },
+    {
+      "id": "P021-C2-L2-threshold",
+      "title": "Move the one L2 boundary from30 to35",
+      "source": {
+        "file": "src/score/units.ts",
+        "find": "if (p >= 30) return level(2);",
+        "occurrences": 1,
+        "firstLine": 57,
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/score/units.ts",
+          "bytes": 2022,
+          "sha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df"
+        },
+        "replace": "if (p >= 35) return level(2);"
+      },
+      "compiledAlternative": {
+        "file": "dist/score/units.js",
+        "find": "if (p >= 30)\n        return level(2);",
+        "occurrences": 1,
+        "firstLine": 38,
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/dist/score/units.js",
+          "bytes": 1194,
+          "sha256": "cdc13d44af5f897491eb71789a4aace6f46d0487f13d1709e3c88b9efeaed397"
+        },
+        "replace": "if (p >= 35)\n        return level(2);",
+        "status": "Static equivalent anchor only. Not an executed compiled mutant; preferred source-mode matrix does not alter this file."
+      },
+      "existingAssertions": [
+        {
+          "file": "tests/scoreUnits.test.ts",
+          "case": "percentToLevel is the one level table: L2 starts at 30",
+          "line": 42,
+          "reachability": "Original literal table contains29.9\u21921 and30\u21922. The30 assertion directly reaches this branch and is predicted to fail; the later55/75/90 cases must not be counted as reached after that first failure."
+        }
+      ],
+      "interpretation": "Direct sensitivity of the already accepted30 boundary. It does not choose a new methodology or claim every consumer independently retested every edge.",
+      "maskingAndLimits": "All-5 results and the existing domain composite56 are above35; those positive controls can stay green. Keep current table/comment/docs intact outside the one private branch.",
+      "runtimeOutcome": "Unexecuted proposal. No compile, import, test, private copy or mutation performed."
+    },
+    {
+      "id": "P021-C3-numeric-self-eligible-cap",
+      "title": "Bypass only the numeric self-answer eligible-level cap",
+      "source": {
+        "file": "src/claims/eligibility/evaluate.ts",
+        "find": "    if (level !== null && level > 1) reasons.push(\"SELF_REPORTED_LEVEL_CAP\");\n    level = capAtOne(level);",
+        "occurrences": 1,
+        "firstLine": 68,
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/claims/eligibility/evaluate.ts",
+          "bytes": 5777,
+          "sha256": "cf92cf3ffd0961579a12ec04006e9fd110ef45018a17c60edd53af064d4388b0"
+        },
+        "replace": "    if (level !== null && level > 1) reasons.push(\"SELF_REPORTED_LEVEL_CAP\");\n    level = input.proposed.level;"
+      },
+      "compiledAlternative": {
+        "file": "dist/claims/eligibility/evaluate.js",
+        "find": "            reasons.push(\"SELF_REPORTED_LEVEL_CAP\");\n        level = capAtOne(level);",
+        "occurrences": 1,
+        "firstLine": 56,
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/dist/claims/eligibility/evaluate.js",
+          "bytes": 5715,
+          "sha256": "c68e95772bcb7636d61923df2b878ac169c6966222db7ce40f20bf4ab6bdd8b1"
+        },
+        "replace": "            reasons.push(\"SELF_REPORTED_LEVEL_CAP\");\n        level = input.proposed.level;",
+        "status": "Static equivalent anchor only. Not an executed compiled mutant; preferred source-mode matrix does not alter this file."
+      },
+      "existingAssertions": [
+        {
+          "file": "tests/noCertificationFromSelfAssessment.test.ts",
+          "case": "all-5 answers on every registered pack are a complete self-assessment, not a certification",
+          "line": 70,
+          "assertionLine": 78,
+          "reachability": "scoreIndustryPack\u2192selfAssessPack\u2192packSelfAssessmentEnvelope\u2192envelopeForSelfAssessment\u2192evaluateClaimEligibility(method numeric_self_answer). Actual eligibleLevel is checked\u22641 for each registered pack."
+        },
+        {
+          "file": "tests/noCertificationFromSelfAssessment.test.ts",
+          "case": "the pack audit reports a self-reported overall with no certified field",
+          "line": 95,
+          "assertionLine": 101,
+          "reachability": "Current /3 audit calls the same self-assessment path and independently checks overall.eligibleLevel\u22641."
+        },
+        {
+          "file": "tests/logisticsIndustryPack.test.ts",
+          "case": "scores concrete logistics controls and surfaces low-level compliance gaps",
+          "line": 29,
+          "assertionLine": 54,
+          "reachability": "The actual answered logistics result must have eligibleLevel exactly1 while keeping its raw level5 and percentage100."
+        },
+        {
+          "file": "tests/claims/claimEligibility.test.ts",
+          "case": "numeric self-answers all 5, regulated / numeric self-answers, not regulated, proposed L3",
+          "line": 64,
+          "status": "Optional existing direct helper corpus, not required to add or run for this proposal.",
+          "reachability": "Existing table rows and weak-method loop directly require eligibleLevel1; they are not new tests."
+        }
+      ],
+      "interpretation": "A proposed actual eligible-level leak is visible in existing pure producer outputs. The numeric branch kind, incomplete evidence, regulated blockPass and weak-method cap remain untouched.",
+      "maskingAndLimits": "The shared capAtOne call occurs twice, so bare global replacement is forbidden. The two-line numeric reason context above is exact-once. This does not make a regulated result pass: other status/applicability guards still block positive results. Preserve null as null, raw percentage/level, /3 signatures and all other status fields.",
+      "runtimeOutcome": "Unexecuted proposal. No compile, import, test, private copy or mutation performed."
+    },
+    {
+      "id": "P021-C4-base-L3-self-tier",
+      "title": "Let only base L3 fall through to the self-reported tier list",
+      "source": {
+        "file": "src/diagnostic/questionBank.ts",
+        "find": ": level >= 2 // P0-21: self-reported evidence caps at L1",
+        "occurrences": 1,
+        "firstLine": 152,
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/questionBank.ts",
+          "bytes": 287500,
+          "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a"
+        },
+        "replace": ": level >= 2 && level !== 3 // P0-21: self-reported evidence caps at L1"
+      },
+      "compiledAlternative": {
+        "file": "dist/diagnostic/questionBank.js",
+        "find": ": level >= 2 // P0-21: self-reported evidence caps at L1",
+        "occurrences": 1,
+        "firstLine": 122,
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/dist/diagnostic/questionBank.js",
+          "bytes": 304412,
+          "sha256": "2e31419be55be2bed7fdc4369b96040b458eb8227edd344e548fee902c13493f"
+        },
+        "replace": ": level >= 2 && level !== 3 // P0-21: self-reported evidence caps at L1",
+        "status": "Static equivalent anchor only. Not an executed compiled mutant; preferred source-mode matrix does not alter this file."
+      },
+      "existingAssertions": [
+        {
+          "file": "tests/selfReportedLevelCap.test.ts",
+          "case": "no base gate at L2 or above accepts SELF_REPORTED",
+          "line": 64,
+          "assertionLine": 67,
+          "reachability": "Iterates actual registered questionBank gates includingL3 and rejects a SELF_REPORTED policy entry. It is independent of whether evaluateLevels admits any rows for that gate."
+        }
+      ],
+      "interpretation": "Exact current policy-guard sensitivity corresponding to the historical L3 self-report regression. Original L2/L4+ tier policies remain unchanged.",
+      "maskingAndLimits": "AMC-5.29 has l2 tool-call-allowed/tool-call-denied and an empty l3 map. Its SELF_REPORTED-shaped runtime rows are rejected by emitterAdmits, imported rows have onlyL1 uses, and absent maps make higher levels not evaluated. Therefore current behavioral cap cases may stay green even while the policy assertion fails. Do not claim self-reported rows actually reachedL3, do not change emitter/maps/provenance to force it, and retain the current OBSERVEDL2 assertion.",
+      "runtimeOutcome": "Unexecuted proposal. No compile, import, test, private copy or mutation performed."
+    },
+    {
+      "id": "P021-C5-default-gate-self-tier",
+      "title": "Admit self-reported rows when a gate names no tiers",
+      "source": {
+        "file": "src/diagnostic/gates.ts",
+        "find": ": [\"OBSERVED\", \"ATTESTED\"]; // self-reported evidence never meets a gate that names no tiers",
+        "occurrences": 1,
+        "firstLine": 91,
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+          "bytes": 9684,
+          "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+        },
+        "replace": ": [\"OBSERVED\", \"ATTESTED\", \"SELF_REPORTED\"]; // self-reported evidence never meets a gate that names no tiers"
+      },
+      "compiledAlternative": {
+        "file": "dist/diagnostic/gates.js",
+        "find": ": [\"OBSERVED\", \"ATTESTED\"]; // self-reported evidence never meets a gate that names no tiers",
+        "occurrences": 1,
+        "firstLine": 68,
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/dist/diagnostic/gates.js",
+          "bytes": 9269,
+          "sha256": "88eaf2578733685a307512a54dea7b0508d37d8c1c8e17cb7372f061e54fff98"
+        },
+        "replace": ": [\"OBSERVED\", \"ATTESTED\", \"SELF_REPORTED\"]; // self-reported evidence never meets a gate that names no tiers",
+        "status": "Static equivalent anchor only. Not an executed compiled mutant; preferred source-mode matrix does not alter this file."
+      },
+      "existingAssertions": [
+        {
+          "file": "tests/selfReportedLevelCap.test.ts",
+          "case": "a gate that lists no tiers defaults to OBSERVED and ATTESTED",
+          "line": 72,
+          "assertionLine": 77,
+          "reachability": "The original direct evaluateGate fixture setsL2, requires stdout with minima1 and no mustInclude fields. Existing SELF_REPORTED ParsedEvidenceEvents contain matching stdout; baseline refusal is false. Adding the tier directly changes that evaluated helper boundary. The later ATTESTED positive is a separate original assertion and may be masked by the first failure."
+        }
+      ],
+      "interpretation": "Actual evaluateGate tier-filter refusal sensitivity on its existing typed input contract. This is not a full diagnostic provenance or signed-ledger integration.",
+      "maskingAndLimits": "The test passes already parsed hand-shaped rows to evaluateGate. Do not describe them as authenticated stored records or use this result to bypass parseEvidenceEventWith/readerTrustFor. No map or emitter change is needed or allowed.",
+      "runtimeOutcome": "Unexecuted proposal. No compile, import, test, private copy or mutation performed."
+    }
+  ],
+  "newWitnessDecision": {
+    "neededNow": false,
+    "reason": "All five bounded current branch proposals have direct existing assertions. The direct numeric helper table can be run as an optional existing corpus if root wants more precise pure-helper attribution; no new fixture or permanent test is justified before those outcomes are known.",
+    "higherLevelLimit": "These five controls do not independently prove a real signed SELF_REPORTED ledger can or cannot reachL3. Current methodology leaves the relevant L3 map empty, so inventing an L3 binding or disabling provenance would alter a different boundary. Do not add a witness that forces an unsupported level.",
+    "conditionalFutureWitness": "Only if actual original results leave a concrete boundary unobserved, root may separately authorize a tiny private observation driver using unchanged actual functions/fixtures and recording perLevel, matched ids, gate accepted tiers and effective trust before assertions. It must retain current map, crypto/admission and registry data and label any hand-shaped rows as parsed-input controls. This report authors or executes no such driver."
+  },
+  "expectedClassification": {
+    "unitConversion": "Value equality failures in explicit converter/domain test; raw6 admission is not claimed.",
+    "threshold": "Literal30 table assertion; not every downstream range is independently reached.",
+    "numericCap": "Actual producer eligibleLevel mismatch; no positive regulated pass claim.",
+    "baseL3Tier": "Policy-array assertion; do not convert its failure into an observed higher-level promotion.",
+    "defaultTier": "Direct evaluateGate refusal changes on its typed fixture contract; not stored provenance.",
+    "mandatory": "Unexpected results/survivors stay visible. Setup, import, compiler, timeout and pending cases are not semantic kills. Every restored baseline must be genuinely rerun after exact restoration before closing a matrix."
+  },
+  "frozenLaterContracts": [
+    "One level table already chosen at30/55/75/90; no threshold policy decision is reopened.",
+    "OBSERVED positive remainsL2, not historicalL3.",
+    "Industry audit schema/3 and signed/trust contracts remain.",
+    "Raw self-assessment numeric level and eligibleLevel are distinct; raw level5 may remain whileeligible\u22641.",
+    "All source/CLI/A4/pausedP2-02, shared guard/registry, expert, release and source-quality holds remain. No ownership transfer or Done acceptance."
+  ],
+  "inputPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/dist/claims/eligibility/evaluate.js",
+      "bytes": 5715,
+      "sha256": "c68e95772bcb7636d61923df2b878ac169c6966222db7ce40f20bf4ab6bdd8b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/dist/diagnostic/gates.js",
+      "bytes": 9269,
+      "sha256": "88eaf2578733685a307512a54dea7b0508d37d8c1c8e17cb7372f061e54fff98"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/dist/diagnostic/questionBank.js",
+      "bytes": 304412,
+      "sha256": "2e31419be55be2bed7fdc4369b96040b458eb8227edd344e548fee902c13493f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/dist/score/units.js",
+      "bytes": 1194,
+      "sha256": "cdc13d44af5f897491eb71789a4aace6f46d0487f13d1709e3c88b9efeaed397"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/docs/SCORING_METHODOLOGY.md",
+      "bytes": 828603,
+      "sha256": "c19cbb4f8afefedc79e5b73cab15463b311e1035a326251af4cdf619aa88bf80"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/claims/eligibility/adapters.ts",
+      "bytes": 8482,
+      "sha256": "c7b666c37c3b7348164002ccb2ad21a85c16d60e92d50ec6a417436ef279c497"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/claims/eligibility/evaluate.ts",
+      "bytes": 5777,
+      "sha256": "cf92cf3ffd0961579a12ec04006e9fd110ef45018a17c60edd53af064d4388b0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+      "bytes": 3431,
+      "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/questionBank.ts",
+      "bytes": 287500,
+      "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/industryPackAudit.ts",
+      "bytes": 26330,
+      "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/industryPacks.ts",
+      "bytes": 621751,
+      "sha256": "4c107021524aa7805ea7e32b55e6d65e74f17d5c88dc5c85cbcaa56ce0ea34d7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/packSelfAssessment.ts",
+      "bytes": 2580,
+      "sha256": "620d7530aad40f170f7932462f479e9974b178dab1b497df4a9ff4b3f582379e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/score/units.ts",
+      "bytes": 2022,
+      "sha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/claims/claimEligibility.test.ts",
+      "bytes": 11384,
+      "sha256": "d5afe1a4c02b488108bba0964b332ab1adab335ea66ddfd2acbaa8d3092807c4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/domainAssessmentUnits.test.ts",
+      "bytes": 1890,
+      "sha256": "a443651c90db62faed2b8448ade66a9b5369b948c00e5ab2fbdd2a488dca869f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/logisticsIndustryPack.test.ts",
+      "bytes": 2360,
+      "sha256": "1cc9c645873c45848a1aaaaba2d349de9258221b200132978f191906d5130dfc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/noCertificationFromSelfAssessment.test.ts",
+      "bytes": 8422,
+      "sha256": "bd0e41ec108a46bb00414ad74c20b525ae0136b123c1896e28bc058b62c3e102"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/scoreUnits.test.ts",
+      "bytes": 1934,
+      "sha256": "15a8a89ebc46ce78a164c20f99c9fdb082da5100cf4e47bf9adcec9a5cb63543"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/selfReportedLevelCap.test.ts",
+      "bytes": 4018,
+      "sha256": "9bd9059516724dedf1901851b5ac2f24237248eda7d6c647004610611d4e6365"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/transparencyReport.test.ts",
+      "bytes": 11833,
+      "sha256": "5905d72f1f4a446c62c9ad910111a05b2789cb64350052d455a1de8b050bdd3c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    }
+  ],
+  "readinessDirectComparisons": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/docs/SCORING_METHODOLOGY.md",
+      "matchesReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/package.json",
+      "matchesReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "matchesReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "matchesReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "matchesReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/claims/eligibility/adapters.ts",
+      "matchesReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/claims/eligibility/evaluate.ts",
+      "matchesReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "matchesReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+      "matchesReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/questionBank.ts",
+      "matchesReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/industryPackAudit.ts",
+      "matchesReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/industryPacks.ts",
+      "matchesReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/packSelfAssessment.ts",
+      "matchesReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/score/units.ts",
+      "matchesReadiness": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/vitest.config.ts",
+      "matchesReadiness": true
+    }
+  ],
+  "observerNotes": [
+    "One source search guessed src/diagnostic/evidenceMap.ts and returnedexit2. The actual import is ./evidenceMaps/index.js; its source was then read directly and pinned. No product change followed."
+  ],
+  "allReadsFinished": true,
+  "onlyWrites": [
+    "/private/tmp/p0-21-causal-readonly-plan-20261015.json",
+    "/private/tmp/p0-21-causal-readonly-plan-20261015.md",
+    "/private/tmp/p0-21-causal-readonly-plan-v2-20261015.json",
+    "/private/tmp/p0-21-causal-readonly-plan-v2-20261015.md"
+  ],
+  "pointerCorrection": {
+    "originalPairPreserved": [
+      {
+        "path": "/private/tmp/p0-21-causal-readonly-plan-20261015.json",
+        "bytes": 29771,
+        "sha256": "a6a5a47edb1c1095b501d779516ddf2a3dfc687882161b46806c4eac061e5fc6"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-readonly-plan-20261015.md",
+        "bytes": 2572,
+        "sha256": "1c6b5305a22adabbce2a560326a85c56fc6a597d8ab63d36fed5f740bacdd1ec"
+      }
+    ],
+    "change": "Only logistics eligibleLevel assertion line corrected60\u219254 after direct rg verification; the exact case, inputs, predicates, five recipes and all source/dist pins are unchanged."
+  }
+}

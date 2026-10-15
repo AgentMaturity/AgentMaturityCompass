@@ -1,0 +1,1273 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-15T04:47:44.245994+00:00",
+  "key": "P0-21",
+  "state": "Read-only readiness; no runtime activation, implementation, acceptance or Done approval.",
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+    "head": "2d552741d727aaf3a26759b9df9343f7804d157a",
+    "productionAnchor": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "headProvenance": "Parent current-lane handoff; no Git operation performed. Exact source/test/input hashes are direct current reads.",
+    "currentP025Limit": "Parent is finalizing P0-25. This report does not execute or reopen that lane."
+  },
+  "authority": {
+    "routing": {
+      "path": "/private/tmp/amc-next-after-p0-25-readonly-routing-20261015.json",
+      "bytes": 23914,
+      "sha256": "e70186df02502326e435b921cf4cef09ec186d9cbe9556dc812fba4e71c0dc95"
+    },
+    "routingMarkdown": {
+      "path": "/private/tmp/amc-next-after-p0-25-readonly-routing-20261015.md",
+      "bytes": 2642,
+      "sha256": "ea1947ddc0cb4a6ec327e5d88518230dfad6adbdcceab89515e111b955d5651d"
+    },
+    "spec": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-21.md",
+      "bytes": 13758,
+      "sha256": "ae1ed1d28f1d15d0d124b7f10e783e0fa38fb234f2001492c901c791aab7c938"
+    },
+    "planPins": [
+      {
+        "path": "/Users/sid/Downloads/Agent contract.md",
+        "bytes": 25110,
+        "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f",
+        "matchesFrozenP025Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Issues.md",
+        "bytes": 38227,
+        "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541",
+        "matchesFrozenP025Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Workstreams.md",
+        "bytes": 78486,
+        "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04",
+        "matchesFrozenP025Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/A4 \u00b7 Forge.md",
+        "bytes": 47286,
+        "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65",
+        "matchesFrozenP025Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "bytes": 157127,
+        "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0",
+        "matchesFrozenP025Authority": true
+      }
+    ],
+    "reservationPin": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "ownership": "No explicit in-flight P0-21 issue entry was found in the frozen reservation notes. This authorizes no production transfer: shared src/cli.ts/resultCommandRegistry/replParser coordination, Claude/A4/held/P2-02 reservations and all normal freeze/D15 requirements remain.",
+    "dependencyLimit": "P0-08/P0-12/P0-15 remain the exact spec blockers. Their current source was already the foundation of prior label work, but this readiness does not newly mark whole dependencies Done."
+  },
+  "graphNavigation": {
+    "path": "/private/tmp/p0-52-graph-navigation-w8xr443v/graphify-out/graph.json",
+    "builtAtSource": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+    "nodes": 36459,
+    "reviewedRefreshPin": "graphifyy==0.9.56",
+    "priorObservedInstalledVersion": "0.9.74",
+    "actualQueryThisTurn": "graphify query 'typed score units scoreIndustryPack selfReportedLevelCap' --budget 1200",
+    "exit": 0,
+    "found": 171,
+    "shown": 43,
+    "truncated": 128,
+    "navigation": "Graph located scoreIndustryPack at old src/domains/industryPacks.ts:L2441 and startMcpServer; current source was verified directly. Unrelated typedGraph/fleet hits were not treated as scoring evidence.",
+    "limit": "Stale navigation only. No graph refresh, watcher, server, extraction or dependency operation occurred."
+  },
+  "corpus": {
+    "registrationBasis": "Static direct declarations plus two literal each arrays. Product modules and Vitest were not imported/executed. A future raw report controls measured registration and outcomes.",
+    "specSixFiles": [
+      "tests/scoreUnits.test.ts",
+      "tests/domainAssessmentUnits.test.ts",
+      "tests/noCertificationFromSelfAssessment.test.ts",
+      "tests/selfReportedLevelCap.test.ts",
+      "tests/logisticsIndustryPack.test.ts",
+      "tests/transparencyReport.test.ts"
+    ],
+    "specSixStaticRegistrations": 37,
+    "cliFile": "tests/industryAdjustCurrentScore.test.ts",
+    "cliStaticRegistrations": 14,
+    "specPlusCliStaticRegistrations": 51,
+    "scoringConsumerExtension": [
+      "tests/domain-packs.test.ts",
+      "tests/domain-assessment.test.ts",
+      "tests/scoreCrossFrameworkMapping.test.ts",
+      "tests/mcpComplianceSafety.test.ts"
+    ],
+    "scoringConsumerExtensionStaticRegistrations": 48,
+    "recommendedExistingFiles": [
+      "tests/scoreUnits.test.ts",
+      "tests/domainAssessmentUnits.test.ts",
+      "tests/noCertificationFromSelfAssessment.test.ts",
+      "tests/selfReportedLevelCap.test.ts",
+      "tests/logisticsIndustryPack.test.ts",
+      "tests/transparencyReport.test.ts",
+      "tests/industryAdjustCurrentScore.test.ts",
+      "tests/domain-packs.test.ts",
+      "tests/domain-assessment.test.ts",
+      "tests/scoreCrossFrameworkMapping.test.ts",
+      "tests/mcpComplianceSafety.test.ts"
+    ],
+    "recommendedStaticRegistrations": 99,
+    "recommendedFileCount": 11,
+    "inventory": [
+      {
+        "file": "tests/scoreUnits.test.ts",
+        "staticRegistrations": 4,
+        "declarations": [
+          {
+            "line": 14,
+            "sourceDeclaration": "test(\"a Likert answer is an integer 1-5 and nothing else\", () => {"
+          },
+          {
+            "line": 22,
+            "sourceDeclaration": "test(\"percent, level and fraction reject values outside their range\", () => {"
+          },
+          {
+            "line": 34,
+            "sourceDeclaration": "test(\"conversions are explicit\", () => {"
+          },
+          {
+            "line": 42,
+            "sourceDeclaration": "test(\"percentToLevel is the one level table: L2 starts at 30\", () => {"
+          }
+        ],
+        "expansion": "One registration per direct declaration; loops remain inside their containing case.",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/scoreUnits.test.ts",
+          "bytes": 1934,
+          "sha256": "15a8a89ebc46ce78a164c20f99c9fdb082da5100cf4e47bf9adcec9a5cb63543"
+        }
+      },
+      {
+        "file": "tests/domainAssessmentUnits.test.ts",
+        "staticRegistrations": 4,
+        "declarations": [
+          {
+            "line": 22,
+            "sourceDeclaration": "test(\"a raw 6 in domainQuestionScores throws instead of scoring 6%\", () => {"
+          },
+          {
+            "line": 26,
+            "sourceDeclaration": "test(\"a percentage passed as a Likert answer throws\", () => {"
+          },
+          {
+            "line": 30,
+            "sourceDeclaration": "test(\"a base level of 7 throws\", () => {"
+          },
+          {
+            "line": 34,
+            "sourceDeclaration": "test(\"valid units convert explicitly: base levels via levelToPercent, answers via likertToPercent\", () => {"
+          }
+        ],
+        "expansion": "One registration per direct declaration; loops remain inside their containing case.",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/domainAssessmentUnits.test.ts",
+          "bytes": 1890,
+          "sha256": "a443651c90db62faed2b8448ade66a9b5369b948c00e5ab2fbdd2a488dca869f"
+        }
+      },
+      {
+        "file": "tests/noCertificationFromSelfAssessment.test.ts",
+        "staticRegistrations": 7,
+        "declarations": [
+          {
+            "line": 70,
+            "sourceDeclaration": "test(\"all-5 answers on every registered pack are a complete self-assessment, not a certification\", () => {"
+          },
+          {
+            "line": 84,
+            "sourceDeclaration": "test(\"a partial self-assessment is reported as incomplete\", () => {"
+          },
+          {
+            "line": 90,
+            "sourceDeclaration": "test(\"an answer outside 1-5 is refused, not clamped\", () => {"
+          },
+          {
+            "line": 95,
+            "sourceDeclaration": "test(\"the pack audit reports a self-reported overall with no certified field\", () => {"
+          },
+          {
+            "line": 111,
+            "sourceDeclaration": "test(\"the domain report carries no certification field or wording\", () => {"
+          },
+          {
+            "line": 128,
+            "sourceDeclaration": "test(\"the transparency report shows evidence standing, never certification\", () => {"
+          },
+          {
+            "line": 138,
+            "sourceDeclaration": "test(\"MCP sector-pack and trust-score text say self-assessment and evidence standing\", async () => {"
+          }
+        ],
+        "expansion": "One registration per direct declaration; loops remain inside their containing case.",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/noCertificationFromSelfAssessment.test.ts",
+          "bytes": 8422,
+          "sha256": "bd0e41ec108a46bb00414ad74c20b525ae0136b123c1896e28bc058b62c3e102"
+        }
+      },
+      {
+        "file": "tests/selfReportedLevelCap.test.ts",
+        "staticRegistrations": 5,
+        "declarations": [
+          {
+            "line": 39,
+            "sourceDeclaration": "test(\"L2 counts met only by SELF_REPORTED events support at most level 1\", () => {"
+          },
+          {
+            "line": 45,
+            "sourceDeclaration": "test(\"imported rows tagged to the question support exactly level 1\", () => {"
+          },
+          {
+            "line": 59,
+            "sourceDeclaration": "test(\"the same counts with OBSERVED events support level 2, the highest its evidence map evaluates (P1-07)\", () => {"
+          },
+          {
+            "line": 64,
+            "sourceDeclaration": "test(\"no base gate at L2 or above accepts SELF_REPORTED\", () => {"
+          },
+          {
+            "line": 72,
+            "sourceDeclaration": "test(\"a gate that lists no tiers defaults to OBSERVED and ATTESTED\", () => {"
+          }
+        ],
+        "expansion": "One registration per direct declaration; loops remain inside their containing case.",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/selfReportedLevelCap.test.ts",
+          "bytes": 4018,
+          "sha256": "9bd9059516724dedf1901851b5ac2f24237248eda7d6c647004610611d4e6365"
+        }
+      },
+      {
+        "file": "tests/logisticsIndustryPack.test.ts",
+        "staticRegistrations": 2,
+        "declarations": [
+          {
+            "line": 11,
+            "sourceDeclaration": "test(\"registers the dedicated logistics pack under mobility discovery\", () => {"
+          },
+          {
+            "line": 29,
+            "sourceDeclaration": "test(\"scores concrete logistics controls and surfaces low-level compliance gaps\", () => {"
+          }
+        ],
+        "expansion": "One registration per direct declaration; loops remain inside their containing case.",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/logisticsIndustryPack.test.ts",
+          "bytes": 2360,
+          "sha256": "1cc9c645873c45848a1aaaaba2d349de9258221b200132978f191906d5130dfc"
+        }
+      },
+      {
+        "file": "tests/transparencyReport.test.ts",
+        "staticRegistrations": 15,
+        "declarations": [
+          {
+            "line": 140,
+            "sourceDeclaration": "it(\"generates report for valid agent\", () => {"
+          },
+          {
+            "line": 163,
+            "sourceDeclaration": "it(\"report has correct identity fields\", () => {"
+          },
+          {
+            "line": 179,
+            "sourceDeclaration": "it(\"report has correct dimensions from run\", () => {"
+          },
+          {
+            "line": 198,
+            "sourceDeclaration": "it(\"renders markdown with expected sections\", () => {"
+          },
+          {
+            "line": 217,
+            "sourceDeclaration": "it.each([\"1.1.1\", undefined])(\"preserves legacy version %s in rendered transparency output\", (amcVersion) => {"
+          },
+          {
+            "line": 228,
+            "sourceDeclaration": "it(\"does not promote an unsealed current transparency run to observed\", () => {"
+          },
+          {
+            "line": 239,
+            "sourceDeclaration": "it(\"renders valid JSON\", () => {"
+          },
+          {
+            "line": 254,
+            "sourceDeclaration": "it(\"throws for non-existent agent\", () => {"
+          },
+          {
+            "line": 263,
+            "sourceDeclaration": "it(\"handles agent with no runs gracefully\", () => {"
+          },
+          {
+            "line": 278,
+            "sourceDeclaration": "it(\"handles agent with no BOM gracefully\", () => {"
+          },
+          {
+            "line": 289,
+            "sourceDeclaration": "it(\"report version is 1.0\", () => {"
+          },
+          {
+            "line": 298,
+            "sourceDeclaration": "it(\"evidence standing \u2014 evidence_supported when integrity >= 0.9 and level >= 4\", () => {"
+          },
+          {
+            "line": 309,
+            "sourceDeclaration": "it(\"evidence standing \u2014 partial_evidence when integrity >= 0.6 or level >= 2\", () => {"
+          },
+          {
+            "line": 320,
+            "sourceDeclaration": "it(\"evidence standing \u2014 insufficient_evidence when integrity < 0.6 and level < 2\", () => {"
+          }
+        ],
+        "expansion": "Two literal version rows for one it.each.",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/transparencyReport.test.ts",
+          "bytes": 11833,
+          "sha256": "5905d72f1f4a446c62c9ad910111a05b2789cb64350052d455a1de8b050bdd3c"
+        }
+      },
+      {
+        "file": "tests/industryAdjustCurrentScore.test.ts",
+        "staticRegistrations": 14,
+        "declarations": [
+          {
+            "line": 65,
+            "sourceDeclaration": "test(\"uses the latest run integrity score when --score is omitted\", () => {"
+          },
+          {
+            "line": 77,
+            "sourceDeclaration": "test(\"still accepts explicit manual score input\", () => {"
+          },
+          {
+            "line": 87,
+            "sourceDeclaration": "test(\"--score is a percentage 0-100: 75 means 75%\", () => {"
+          },
+          {
+            "line": 96,
+            "sourceDeclaration": "test.each([\"1.5\", \"0.75\", \"101\", \"-5\", \"abc\"])(\"--score %s is refused instead of being reinterpreted\", (score) => {"
+          },
+          {
+            "line": 105,
+            "sourceDeclaration": "test(\"explains how adjusted score differs from raw score\", () => {"
+          },
+          {
+            "line": 117,
+            "sourceDeclaration": "test(\"shows per-dimension weighting drilldown on request\", () => {"
+          },
+          {
+            "line": 133,
+            "sourceDeclaration": "test(\"includes per-dimension drilldown in JSON on request\", () => {"
+          },
+          {
+            "line": 153,
+            "sourceDeclaration": "test(\"exports an industry-adjusted comparison report across scored runs\", () => {"
+          },
+          {
+            "line": 183,
+            "sourceDeclaration": "test(\"includes run comparison rows in JSON history output\", () => {"
+          },
+          {
+            "line": 201,
+            "sourceDeclaration": "test(\"keeps the UX audit aligned with current score auto-read behavior\", () => {"
+          }
+        ],
+        "expansion": "Five literal invalid-score strings for one test.each.",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/industryAdjustCurrentScore.test.ts",
+          "bytes": 9298,
+          "sha256": "576c9b0e75a5c106ff265b712f76494016eae75e97e8f7adc529f2cfb314205d"
+        }
+      },
+      {
+        "file": "tests/domain-packs.test.ts",
+        "staticRegistrations": 8,
+        "declarations": [
+          {
+            "line": 18,
+            "sourceDeclaration": "test(\"exactly 7 domain packs registered\", () => {"
+          },
+          {
+            "line": 32,
+            "sourceDeclaration": "test(\"health pack contains extended questions (HC-7, HC-8, HC-9)\", () => {"
+          },
+          {
+            "line": 40,
+            "sourceDeclaration": "test(\"wealth pack absorbs financial questions (FIN-1 through FIN-8)\", () => {"
+          },
+          {
+            "line": 49,
+            "sourceDeclaration": "test(\"mobility pack absorbs safety-critical questions (SC-1 through SC-8)\", () => {"
+          },
+          {
+            "line": 58,
+            "sourceDeclaration": "test(\"education, environment, governance, technology each expose 6 questions\", () => {"
+          },
+          {
+            "line": 66,
+            "sourceDeclaration": "test(\"pack scoring reflects maturity without a certification field\", () => {"
+          },
+          {
+            "line": 77,
+            "sourceDeclaration": "test(\"mid answers score 50% and land on L2 of the one level table\", () => {"
+          },
+          {
+            "line": 83,
+            "sourceDeclaration": "test(\"an answer outside 1-5 is refused, not clamped\", () => {"
+          }
+        ],
+        "expansion": "One registration per direct declaration; loops remain inside their containing case.",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/domain-packs.test.ts",
+          "bytes": 3184,
+          "sha256": "b95e4be68a8258dde9bcac0f205e7ef5ee502af3c380ed31332db184c025a048"
+        }
+      },
+      {
+        "file": "tests/domain-assessment.test.ts",
+        "staticRegistrations": 3,
+        "declarations": [
+          {
+            "line": 24,
+            "sourceDeclaration": "test(\"computes composite score with 60/40 weighting\", () => {"
+          },
+          {
+            "line": 40,
+            "sourceDeclaration": "test(\"identifies compliance gaps when controls are weak\", () => {"
+          },
+          {
+            "line": 54,
+            "sourceDeclaration": "test(\"reaches L5 with no gaps for high-maturity answers\", () => {"
+          }
+        ],
+        "expansion": "One registration per direct declaration; loops remain inside their containing case.",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/domain-assessment.test.ts",
+          "bytes": 2534,
+          "sha256": "c3c538fab7e280721217a32f77e75e5c4364c016c9045743543c5311e29ca6f7"
+        }
+      },
+      {
+        "file": "tests/scoreCrossFrameworkMapping.test.ts",
+        "staticRegistrations": 22,
+        "declarations": [
+          {
+            "line": 5,
+            "sourceDeclaration": "test(\"listSupportedFrameworks returns all expected framework entries\", () => {"
+          },
+          {
+            "line": 22,
+            "sourceDeclaration": "test(\"framework metadata includes non-zero control counts and descriptions\", () => {"
+          },
+          {
+            "line": 30,
+            "sourceDeclaration": "test(\"SOC2 framework has article-level controls and zero coverage with no evidence\", () => {"
+          },
+          {
+            "line": 38,
+            "sourceDeclaration": "test(\"GDPR framework has article-level controls and zero coverage with no evidence\", () => {"
+          },
+          {
+            "line": 46,
+            "sourceDeclaration": "test(\"GDPR Article 5 accountability is represented and coverable\", () => {"
+          },
+          {
+            "line": 56,
+            "sourceDeclaration": "test(\"MITRE ATLAS has technique-level controls and zero coverage with no evidence\", () => {"
+          },
+          {
+            "line": 63,
+            "sourceDeclaration": "test(\"OWASP API Top 10 has all 10 controls and zero coverage with no evidence\", () => {"
+          },
+          {
+            "line": 70,
+            "sourceDeclaration": "test(\"MITRE ATLAS coverage via prompt injection question\", () => {"
+          },
+          {
+            "line": 81,
+            "sourceDeclaration": "test(\"OWASP API coverage via security question\", () => {"
+          },
+          {
+            "line": 90,
+            "sourceDeclaration": "test(\"NIST report with no evidence has zero coverage and all controls as gaps\", () => {"
+          },
+          {
+            "line": 98,
+            "sourceDeclaration": "test(\"NIST coverage can be satisfied by AMC question IDs\", () => {"
+          },
+          {
+            "line": 107,
+            "sourceDeclaration": "test(\"NIST coverage can also be satisfied by active modules\", () => {"
+          },
+          {
+            "line": 115,
+            "sourceDeclaration": "test(\"NIST non-automatable controls are placed in manualControls\", () => {"
+          },
+          {
+            "line": 125,
+            "sourceDeclaration": "test(\"coveragePercent uses rounded integer percent\", () => {"
+          },
+          {
+            "line": 133,
+            "sourceDeclaration": "test(\"NIST coverage target is met when coverage threshold is fully met\", () => {"
+          },
+          {
+            "line": 159,
+            "sourceDeclaration": "test(\"NIST coverage target stays unmet for low coverage\", () => {"
+          },
+          {
+            "line": 168,
+            "sourceDeclaration": "test(\"EU AI Act manual controls include EU-61 when AMC-2.11 is covered\", () => {"
+          },
+          {
+            "line": 177,
+            "sourceDeclaration": "test(\"ISO 42001 manual controls include ISO-8.4 when AMC-2.12 is covered\", () => {"
+          },
+          {
+            "line": 186,
+            "sourceDeclaration": "test(\"gap control entries include both control id and control name\", () => {"
+          },
+          {
+            "line": 192,
+            "sourceDeclaration": "test(\"auditArtifacts are populated for every framework report\", () => {"
+          },
+          {
+            "line": 210,
+            "sourceDeclaration": "test(\"duplicate QIDs in input do not duplicate control IDs in output\", () => {"
+          },
+          {
+            "line": 218,
+            "sourceDeclaration": "test(\"control coverage uses OR logic between QIDs and modules\", () => {"
+          }
+        ],
+        "expansion": "One registration per direct declaration; loops remain inside their containing case.",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/scoreCrossFrameworkMapping.test.ts",
+          "bytes": 8159,
+          "sha256": "b17b209507642161ef0efac1c734b5738512cf7aec94f9e44c36bc4c48aa4769"
+        }
+      },
+      {
+        "file": "tests/mcpComplianceSafety.test.ts",
+        "staticRegistrations": 15,
+        "declarations": [
+          {
+            "line": 62,
+            "sourceDeclaration": "test(\"scores full compliance with strong MCP safety posture\", () => {"
+          },
+          {
+            "line": 75,
+            "sourceDeclaration": "test(\"flags missing tool output validation\", () => {"
+          },
+          {
+            "line": 88,
+            "sourceDeclaration": "test(\"penalizes unverified MCP servers\", () => {"
+          },
+          {
+            "line": 106,
+            "sourceDeclaration": "test(\"detects prompt injection patterns in MCP payloads\", () => {"
+          },
+          {
+            "line": 117,
+            "sourceDeclaration": "test(\"raises high warning when injection is observed but not blocked\", () => {"
+          },
+          {
+            "line": 132,
+            "sourceDeclaration": "test(\"does not raise high warning when injection defenses are active\", () => {"
+          },
+          {
+            "line": 145,
+            "sourceDeclaration": "test(\"penalizes permission scope enforcement gaps\", () => {"
+          },
+          {
+            "line": 161,
+            "sourceDeclaration": "test(\"penalizes weak MCP supply-chain governance\", () => {"
+          },
+          {
+            "line": 189,
+            "sourceDeclaration": "test(\"penalizes weak MCP Security Bench NRP and taxonomy coverage\", () => {"
+          },
+          {
+            "line": 209,
+            "sourceDeclaration": "test(\"returns minimal when only MCP core checks pass\", () => {"
+          },
+          {
+            "line": 241,
+            "sourceDeclaration": "test(\"returns non-compliant when MCP protocol support is missing\", () => {"
+          },
+          {
+            "line": 253,
+            "sourceDeclaration": "test(\"guide includes MCP safety pillars\", () => {"
+          },
+          {
+            "line": 266,
+            "sourceDeclaration": "test(\"question bank includes AMC-MCP and supply-chain integrity controls\", () => {"
+          },
+          {
+            "line": 276,
+            "sourceDeclaration": "test(\"core policy packs expose mcp-safety\", () => {"
+          },
+          {
+            "line": 288,
+            "sourceDeclaration": "test(\"assurance policy pack registry exposes mcp-safety\", () => {"
+          }
+        ],
+        "expansion": "One registration per direct declaration; loops remain inside their containing case.",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/mcpComplianceSafety.test.ts",
+          "bytes": 11600,
+          "sha256": "122d1b8e17e3da6e73dba897fe9396ef78220705f6d14515aacf6d8b66ce3687"
+        }
+      }
+    ],
+    "notExtraCases": "Loops across all registered packs and all question-bank gates are assertions within one registered case, not hundreds of extra cases. Optional historical/context runs are not added to these99."
+  },
+  "actualFlow": [
+    "src/score/units.ts validates finite branded inputs. Likert1..5 and Level0..5 are integer units; percent/fraction allow bounded finite numbers. Explicit converters use one table: below30=L1,30=L2,55=L3,75=L4,90=L5. The table is already documented; no new threshold decision is required.",
+    "domainAssessmentEngine validates untyped incoming base levels through level() and answers through likert(), then uses explicit converters. Empty/default answers remain the existing producer semantics, not a new claim of evidence.",
+    "industryPacks and industryPackAudit delegate numeric answer scoring to packSelfAssessment, which validates actual supplied and fallback answers and stamps the claim through envelopeForSelfAssessment. The raw numeric level may beL5 while eligibleLevel stays at most1; these are distinct fields.",
+    "evaluateClaimEligibility in src/claims/eligibility/evaluate.ts implements the actual numeric_self_answer branch: self_reported kind, incomplete evidence, no positive regulated result and capAtOne preserving null. It is pure and returns the unchanged five status dimensions and provenance shape. No claim-engine change is requested.",
+    "Domain report uses envelopeForUnverifiedResult for caller scores; transparency standing is self-computed from recorded run data. Their labels cannot promote answer claims into evidence or independent review.",
+    "Question-bank base gates atL2+ excludeSELF_REPORTED. evaluateGate defaults unspecified tiers toOBSERVED/ATTESTED. evaluateLevels also selects rows through the current P1-07 emitter/evidence map and fails levels with no evaluable map. parseEvidenceEventWith derives trust through real provenance first; hand-shaped ParsedEvidenceEvents bypass that parse boundary.",
+    "industry-adjust CLI explicitly accepts a whole percentage0..100, rejects1.5/0.75/non-numbers/out-of-range and uses percentToFraction. Its original CLI test invokes process.execPath and the built dist entrypoint."
+  ],
+  "testEvidenceBoundaries": {
+    "directComponents": "Unit, domain, logistics, rubric and framework tests call current production functions with locally constructed input. All-5 loops cover every registered industry pack; they do not run a model or authenticate real-world facts.",
+    "mcpMocks": "noCertificationFromSelfAssessment mocks MCP SDK server/stdio classes and industryPackEntitlement. Actual handler and producer functions run inside that fixture, but it proves neither real paid entitlement nor actual SDK transport/auth/full MCP routes.",
+    "runFixtures": "Transparency/no-certification fixtures write synthetic local run JSON. A sig-placeholder or declared verificationPassed field is not a genuine seal. These cases primarily inspect formatting, fields and fail-closed claim classification.",
+    "capFixture": "selfReportedLevelCap writes no ledger; its rows are hand-shaped ParsedEvidenceEvents and call evaluateLevels/evaluateGate directly. The imported-tag control is local synthetic input and not an import/crypto integration claim.",
+    "mcpComplianceSafety": "The extension supplies canned capability booleans, messages and benchmark counters to the actual scoreMcpCompliance function. It exercises scoring/badge behavior, not measured protocol compliance or attacks.",
+    "cliEnvironment": "industryAdjustCurrentScore.runCli spreads process.env and adds NO_COLOR. Existing wrappers that inherit os.environ do not establish credential-free or transport-isolated execution. Future scope/claims must match the actual wrapper environment; this report supplies no such runtime proof.",
+    "cliWorkspace": "Original CLI cases use own temporary workspaces and manual local run JSON. They do not initialize or independently seal those reports and do not test real provider behavior."
+  },
+  "strictGapsAndChronology": [
+    {
+      "item": "P1-07 cap positive",
+      "evidence": "Historical P0-21 spec asks the same OBSERVED counts to reachL3; current unchanged test expectsL2, the highest mapped level ofAMC-5.29. Preserve current body and document this later contract. The raw security cap remains self-reported at mostL1.",
+      "action": "Do not rewrite assertions to the historical number. Record the current map and exact causal reachability separately."
+    },
+    {
+      "item": "Audit schema",
+      "evidence": "Spec proposedamc.industry-pack-audit/2. Current producer and existing assertion require/3 after later signing work.",
+      "action": "Preserve/3 and issuer/signature semantics; never restore/2 for historical compatibility."
+    },
+    {
+      "item": "Historical raw<=5 mutation anchor",
+      "evidence": "The old normalizeScore/levelFromRaw size-based reinterpretation is gone. Current validation is in answerFor/averageScores and units constructors.",
+      "action": "Before any private mutation, root must review an exact current recipe representing the historical regression. Preserve all current assertions and distinguish downstream RangeErrors or policy-introspection failures from actual acceptance of invalid units."
+    },
+    {
+      "item": "Restoring SELF_REPORTED atL3",
+      "evidence": "P1-07 map/provenance filters can mask an old tier mutation in a behavioral cap fixture. The existing no-base-gate-atL2+ case directly inspects registered gate policy.",
+      "action": "Use exact original assertions; classify a policy assertion failure as such. Do not claim stored signed evidence reachedL3 without actual measured behavior. A survivor remains a coverage boundary."
+    },
+    {
+      "item": "Literal certification acceptance",
+      "evidence": "Spec demands only permanent approved occurrences in src and removal of its pending entries. Current no-fabrication allowlist pending is empty, but third-party certification prose remains legitimate data.",
+      "action": "Run the ordinary unchanged guard and inspect exact matches under its current permanent policy. No new exceptions, deletions, pending-entry removal or regex weakening are authorized."
+    },
+    {
+      "item": "Current genuine runtime",
+      "evidence": "No P0-21-specific current99-case or two-mutation run has been made in this task. Existing source and old outcomes do not establish fresh qualification.",
+      "action": "Capture actual total/pass/fail/pending/todo and every setup/timeout/fixture failure before considering repair."
+    }
+  ],
+  "priorEvidence": {
+    "P022": {
+      "index": {
+        "path": "/private/tmp/p0-22-evidence-index-20261014.json",
+        "bytes": 160328,
+        "sha256": "bb64a8fcca6910304a2fd1146e05a66f607c6d2f65b7b9c1e1d52a68d502e7b9"
+      },
+      "raw": {
+        "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/final-bounded-node22.json",
+        "bytes": 181700,
+        "sha256": "5f519062d66f4f463a9b07c3da144b609f87ef522f6b3929ebf519314dbbc2b8"
+      },
+      "measuredSource": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "overallCounts": {
+        "success": false,
+        "numTotalTests": 512,
+        "numPassedTests": 510,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "relevantComponents": [
+        {
+          "name": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/noCertificationFromSelfAssessment.test.ts",
+          "status": "passed",
+          "registered": 7,
+          "passed": 7,
+          "failed": 0,
+          "pending": 0,
+          "caseNames": [
+            "no certification from self-assessment (P0-21) all-5 answers on every registered pack are a complete self-assessment, not a certification",
+            "no certification from self-assessment (P0-21) a partial self-assessment is reported as incomplete",
+            "no certification from self-assessment (P0-21) an answer outside 1-5 is refused, not clamped",
+            "no certification from self-assessment (P0-21) the pack audit reports a self-reported overall with no certified field",
+            "no certification from self-assessment (P0-21) the domain report carries no certification field or wording",
+            "no certification from self-assessment (P0-21) the transparency report shows evidence standing, never certification",
+            "no certification from self-assessment (P0-21) MCP sector-pack and trust-score text say self-assessment and evidence standing"
+          ]
+        },
+        {
+          "name": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/selfReportedLevelCap.test.ts",
+          "status": "passed",
+          "registered": 5,
+          "passed": 5,
+          "failed": 0,
+          "pending": 0,
+          "caseNames": [
+            "self-reported evidence caps at L1 (P0-21) L2 counts met only by SELF_REPORTED events support at most level 1",
+            "self-reported evidence caps at L1 (P0-21) imported rows tagged to the question support exactly level 1",
+            "self-reported evidence caps at L1 (P0-21) the same counts with OBSERVED events support level 2, the highest its evidence map evaluates (P1-07)",
+            "self-reported evidence caps at L1 (P0-21) no base gate at L2 or above accepts SELF_REPORTED",
+            "self-reported evidence caps at L1 (P0-21) a gate that lists no tiers defaults to OBSERVED and ATTESTED"
+          ]
+        },
+        {
+          "name": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/transparencyReport.test.ts",
+          "status": "passed",
+          "registered": 15,
+          "passed": 15,
+          "failed": 0,
+          "pending": 0,
+          "caseNames": [
+            "generateTransparencyReport generates report for valid agent",
+            "generateTransparencyReport report has correct identity fields",
+            "generateTransparencyReport report has correct dimensions from run",
+            "generateTransparencyReport renders markdown with expected sections",
+            "generateTransparencyReport preserves legacy version 1.1.1 in rendered transparency output",
+            "generateTransparencyReport preserves legacy version undefined in rendered transparency output",
+            "generateTransparencyReport does not promote an unsealed current transparency run to observed",
+            "generateTransparencyReport renders valid JSON",
+            "generateTransparencyReport throws for non-existent agent",
+            "generateTransparencyReport handles agent with no runs gracefully",
+            "generateTransparencyReport handles agent with no BOM gracefully",
+            "generateTransparencyReport report version is 1.0",
+            "generateTransparencyReport evidence standing \u2014 evidence_supported when integrity >= 0.9 and level >= 4",
+            "generateTransparencyReport evidence standing \u2014 partial_evidence when integrity >= 0.6 or level >= 2",
+            "generateTransparencyReport evidence standing \u2014 insufficient_evidence when integrity < 0.6 and level < 2"
+          ]
+        }
+      ],
+      "componentsPassed": 27,
+      "directComparison": [
+        {
+          "relativePath": "tests/noCertificationFromSelfAssessment.test.ts",
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/noCertificationFromSelfAssessment.test.ts",
+            "bytes": 8422,
+            "sha256": "bd0e41ec108a46bb00414ad74c20b525ae0136b123c1896e28bc058b62c3e102"
+          },
+          "priorWorkspace": {
+            "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/noCertificationFromSelfAssessment.test.ts",
+            "bytes": 8422,
+            "sha256": "bd0e41ec108a46bb00414ad74c20b525ae0136b123c1896e28bc058b62c3e102"
+          },
+          "equal": true
+        },
+        {
+          "relativePath": "tests/selfReportedLevelCap.test.ts",
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/selfReportedLevelCap.test.ts",
+            "bytes": 4018,
+            "sha256": "9bd9059516724dedf1901851b5ac2f24237248eda7d6c647004610611d4e6365"
+          },
+          "priorWorkspace": {
+            "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/selfReportedLevelCap.test.ts",
+            "bytes": 4018,
+            "sha256": "9bd9059516724dedf1901851b5ac2f24237248eda7d6c647004610611d4e6365"
+          },
+          "equal": true
+        },
+        {
+          "relativePath": "tests/transparencyReport.test.ts",
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/transparencyReport.test.ts",
+            "bytes": 11833,
+            "sha256": "5905d72f1f4a446c62c9ad910111a05b2789cb64350052d455a1de8b050bdd3c"
+          },
+          "priorWorkspace": {
+            "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/transparencyReport.test.ts",
+            "bytes": 11833,
+            "sha256": "5905d72f1f4a446c62c9ad910111a05b2789cb64350052d455a1de8b050bdd3c"
+          },
+          "equal": true
+        },
+        {
+          "relativePath": "src/score/units.ts",
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/score/units.ts",
+            "bytes": 2022,
+            "sha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df"
+          },
+          "priorWorkspace": {
+            "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/score/units.ts",
+            "bytes": 2022,
+            "sha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df"
+          },
+          "equal": true
+        },
+        {
+          "relativePath": "src/domains/packSelfAssessment.ts",
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/packSelfAssessment.ts",
+            "bytes": 2580,
+            "sha256": "620d7530aad40f170f7932462f479e9974b178dab1b497df4a9ff4b3f582379e"
+          },
+          "priorWorkspace": {
+            "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/domains/packSelfAssessment.ts",
+            "bytes": 2580,
+            "sha256": "620d7530aad40f170f7932462f479e9974b178dab1b497df4a9ff4b3f582379e"
+          },
+          "equal": true
+        },
+        {
+          "relativePath": "src/domains/industryPacks.ts",
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/industryPacks.ts",
+            "bytes": 621751,
+            "sha256": "4c107021524aa7805ea7e32b55e6d65e74f17d5c88dc5c85cbcaa56ce0ea34d7"
+          },
+          "priorWorkspace": {
+            "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/domains/industryPacks.ts",
+            "bytes": 621751,
+            "sha256": "4c107021524aa7805ea7e32b55e6d65e74f17d5c88dc5c85cbcaa56ce0ea34d7"
+          },
+          "equal": true
+        },
+        {
+          "relativePath": "src/domains/industryPackAudit.ts",
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/industryPackAudit.ts",
+            "bytes": 26330,
+            "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d"
+          },
+          "priorWorkspace": {
+            "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/domains/industryPackAudit.ts",
+            "bytes": 26330,
+            "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d"
+          },
+          "equal": true
+        },
+        {
+          "relativePath": "src/domains/domainAssessmentEngine.ts",
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/domainAssessmentEngine.ts",
+            "bytes": 8075,
+            "sha256": "191a628a588bdcf40fcf9897df53d06946164ffbfd227df5e6aaebb58fa10c57"
+          },
+          "priorWorkspace": {
+            "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/domains/domainAssessmentEngine.ts",
+            "bytes": 8075,
+            "sha256": "191a628a588bdcf40fcf9897df53d06946164ffbfd227df5e6aaebb58fa10c57"
+          },
+          "equal": true
+        },
+        {
+          "relativePath": "src/domains/domainReportBuilder.ts",
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/domainReportBuilder.ts",
+            "bytes": 6892,
+            "sha256": "6759d400bd4fb1df620bc40a2655b25867a8bad7cd89344f4c8d274247447a6b"
+          },
+          "priorWorkspace": {
+            "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/domains/domainReportBuilder.ts",
+            "bytes": 6892,
+            "sha256": "6759d400bd4fb1df620bc40a2655b25867a8bad7cd89344f4c8d274247447a6b"
+          },
+          "equal": true
+        },
+        {
+          "relativePath": "src/claims/eligibility/adapters.ts",
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/claims/eligibility/adapters.ts",
+            "bytes": 8482,
+            "sha256": "c7b666c37c3b7348164002ccb2ad21a85c16d60e92d50ec6a417436ef279c497"
+          },
+          "priorWorkspace": {
+            "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/claims/eligibility/adapters.ts",
+            "bytes": 8482,
+            "sha256": "c7b666c37c3b7348164002ccb2ad21a85c16d60e92d50ec6a417436ef279c497"
+          },
+          "equal": true
+        },
+        {
+          "relativePath": "src/diagnostic/gates.ts",
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+            "bytes": 9684,
+            "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+          },
+          "priorWorkspace": {
+            "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+            "bytes": 9684,
+            "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+          },
+          "equal": true
+        },
+        {
+          "relativePath": "src/diagnostic/levelSemantics.ts",
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+            "bytes": 12367,
+            "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+          },
+          "priorWorkspace": {
+            "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+            "bytes": 12367,
+            "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+          },
+          "equal": true
+        },
+        {
+          "relativePath": "src/mcp/amcMcpServer.ts",
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/mcp/amcMcpServer.ts",
+            "bytes": 31445,
+            "sha256": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a"
+          },
+          "priorWorkspace": {
+            "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/mcp/amcMcpServer.ts",
+            "bytes": 31445,
+            "sha256": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a"
+          },
+          "equal": true
+        },
+        {
+          "relativePath": "src/mcp/mcpClaimOutput.ts",
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/mcp/mcpClaimOutput.ts",
+            "bytes": 2089,
+            "sha256": "5585b461f2abe8e240cb5547e422e81e1eb758bb887119f22250bdc4aaf644ac"
+          },
+          "priorWorkspace": {
+            "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/mcp/mcpClaimOutput.ts",
+            "bytes": 1741,
+            "sha256": "10e7132ff8f81ff8f116e97728dabd601bf5b8c72ced079a6f3b26c9944d9e9e"
+          },
+          "equal": false
+        }
+      ],
+      "reuseMeaning": "Exactly thirteen of fourteen selected files match; mcpClaimOutput differs. The three old component test files are byte-identical, but no full transitive closure/compiled comparison was performed. Prior27passes are historical corroboration, not a substitute for current MCP or whole P0-21 execution. Overall512report remains510pass/two empty-array failures."
+    },
+    "P020": {
+      "receipt": {
+        "path": "/private/tmp/p0-20-signing-qualification-20261015.json",
+        "bytes": 28643,
+        "sha256": "9959d38414eac38abd90e6392adcac72954cbc83ed61b310efe8d14aa0c4a9b8"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-20-signing-first-20261015.json",
+        "bytes": 9108,
+        "sha256": "a3e92cc0b7ce53530c01a6cf1a6b7bc9119ec207faa3c3acd36b9ae59a277b13"
+      },
+      "measuredSource": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true
+      },
+      "scope": "Twenty-one genuine local signed-audit/trust/refusal cases retain self_reported/not_evaluated and eligibleLevel1 for answered inputs. This is signing/issuer/cap corroboration, not P0-21 unit-boundary or CLI-label acceptance. No new transitive exact-input reuse is asserted."
+    },
+    "P018": {
+      "receipt": {
+        "path": "/private/tmp/p0-18-crypto-qualification-20261015.json",
+        "bytes": 153041,
+        "sha256": "8b60d2f3e6dc904c12348ead337fc0dfa28e65a4d15b995e45705c83afae6986"
+      },
+      "firstRaw": {
+        "path": "/private/tmp/p0-18-crypto-first-20261015.json",
+        "bytes": 6179,
+        "sha256": "44d700a10e213f867edf8c8398a873841dacc7fdede5296d8233c0955c1883d6"
+      },
+      "measuredSource": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+      "counts": {
+        "total": 14,
+        "passed": 14,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      "scope": "Genuine local signed-list ingestion and cold-reader provenance, plus three separate14\u219213\u219214 matrices. It proves its own recorded contracts, not a new P0-21 score-cap integration. Own-key ATTESTED examples include explicit in-memory projections; do not call them all stored history."
+    },
+    "notReused": "No historical passing grand total is moved to current source. P0-24 causal30 and P0-25 citation32 are unrelated corpora, not extra P0-21 cases."
+  },
+  "minimalRuntimePlanAfterRootRelease": [
+    {
+      "phase": "own-lane-baseline",
+      "actions": "Root assigns fresh managed P0-21 checkout from the chosen accepted source; preserve parent/held/Claude paths. Pin exact source/test/docs/package/lock/freeze and observe actual runtime/native ABI. Normal frozen install and ordinary build must finish before any dist readers.",
+      "commands": [
+        "pnpm install --frozen-lockfile",
+        "pnpm run build",
+        "npm run check:freeze"
+      ],
+      "limit": "Do not skip lifecycle scripts, bypass freeze or use a newer held overlay to manufacture a baseline."
+    },
+    {
+      "phase": "original-core",
+      "commands": [
+        "pnpm exec vitest run tests/scoreUnits.test.ts tests/domainAssessmentUnits.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/selfReportedLevelCap.test.ts tests/logisticsIndustryPack.test.ts tests/transparencyReport.test.ts --reporter=default --reporter=json --outputFile.json=<new-owned-core-report>"
+      ],
+      "staticCases": 37,
+      "limit": "No test edits or snapshot updates. Actual registration/output governs."
+    },
+    {
+      "phase": "actual-cli",
+      "commands": [
+        "pnpm exec vitest run tests/industryAdjustCurrentScore.test.ts --reporter=default --reporter=json --outputFile.json=<new-owned-cli-report>"
+      ],
+      "staticCases": 14,
+      "limit": "Qualified process.execPath and scoped PATH; actual inherited versus sanitized environment recorded honestly. Keep actual private file effects and all refused-score results."
+    },
+    {
+      "phase": "existing-consumers",
+      "commands": [
+        "pnpm exec vitest run tests/domain-packs.test.ts tests/domain-assessment.test.ts tests/scoreCrossFrameworkMapping.test.ts tests/mcpComplianceSafety.test.ts --reporter=default --reporter=json --outputFile.json=<new-owned-consumer-report>"
+      ],
+      "staticCases": 48,
+      "limit": "These original direct scoring contracts complete the proposed11-file99-case component inventory, not a whole suite or transport audit."
+    },
+    {
+      "phase": "normal-source-checks",
+      "commands": [
+        "npm run check:no-fabrication",
+        "npm run typecheck",
+        "npm run typecheck:tests",
+        "npm run lint",
+        "npm run check:architecture-boundaries",
+        "npm run check:docs-drift",
+        "npm run check:counts",
+        "npm run check:clean-source",
+        "npm run check:freeze"
+      ],
+      "limit": "Required quality1269duplicate/2751dead-code debt remains unwaived until an actual new observation; do not claim full release green. Full suite/coverage/Node24/hosted/PR/merge acceptance remains separate."
+    },
+    {
+      "phase": "bounded-causal-controls",
+      "actions": "Only after root reviews exact current recipes: independent complete private copy; unchanged original assertions baseline\u2192mutant\u2192restored; source-mode where possible; preserve all config/guards/setup/deadlines and exact restoration. Capture which assertion failed and any masking. No production or old test edits.",
+      "limit": "No guard recipes, new tests or mutation execution are authorized by this readiness."
+    }
+  ],
+  "directPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/score/units.ts",
+      "bytes": 2022,
+      "sha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/packSelfAssessment.ts",
+      "bytes": 2580,
+      "sha256": "620d7530aad40f170f7932462f479e9974b178dab1b497df4a9ff4b3f582379e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/domainAssessmentEngine.ts",
+      "bytes": 8075,
+      "sha256": "191a628a588bdcf40fcf9897df53d06946164ffbfd227df5e6aaebb58fa10c57"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/domainReportBuilder.ts",
+      "bytes": 6892,
+      "sha256": "6759d400bd4fb1df620bc40a2655b25867a8bad7cd89344f4c8d274247447a6b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/industryPacks.ts",
+      "bytes": 621751,
+      "sha256": "4c107021524aa7805ea7e32b55e6d65e74f17d5c88dc5c85cbcaa56ce0ea34d7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/industryPackAudit.ts",
+      "bytes": 26330,
+      "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/score/domainPacks.ts",
+      "bytes": 38665,
+      "sha256": "4f01d76961a0db3deed76cb01c7a86d0b6cb1525566b163d42e8adf25832cbaf"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/score/crossFrameworkMapping.ts",
+      "bytes": 30532,
+      "sha256": "c40def13e74d79099544768e3f105159f6d08f212a23d0cb96607e1851d05ebc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/score/mcpCompliance.ts",
+      "bytes": 28451,
+      "sha256": "aff1dfc172d6c1bdbc61911276151fcccf55826995ae70fb3b0bb274fc03eacb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/transparency/transparencyReport.ts",
+      "bytes": 18062,
+      "sha256": "0d8dc013ec14e0d3989c05c2157d7dedcb32081fc7665fbe6f77b905afb87cd1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/transparency/transparencyReportCli.ts",
+      "bytes": 4597,
+      "sha256": "45e04200799d1b484234389c518f467d85c97ceabaa5702652a020368eddf6bd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/mcp/amcMcpServer.ts",
+      "bytes": 31445,
+      "sha256": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/mcp/mcpClaimOutput.ts",
+      "bytes": 2089,
+      "sha256": "5585b461f2abe8e240cb5547e422e81e1eb758bb887119f22250bdc4aaf644ac"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/claims/eligibility/adapters.ts",
+      "bytes": 8482,
+      "sha256": "c7b666c37c3b7348164002ccb2ad21a85c16d60e92d50ec6a417436ef279c497"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/claims/eligibility/adapters/results.ts",
+      "bytes": 9797,
+      "sha256": "ce2b501208ca030e371bb1fb453d851b2e80556dc53ff5cc84ef1c24710e8e3b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/questionBank.ts",
+      "bytes": 287500,
+      "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/cli.ts",
+      "bytes": 1064339,
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/no-fabrication-allowlist.json",
+      "bytes": 2554,
+      "sha256": "33ed6db7299ffb7ef1cdb32ea4882e28d4601f5cb19334114820efcadddd5937"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/check-no-fabrication.mjs",
+      "bytes": 13211,
+      "sha256": "57bc9a8e3db3e49aad6703402555b995847dc5fd6ec811865a7b077b50d34dcc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/architecture-boundaries-check.mjs",
+      "bytes": 9087,
+      "sha256": "485eee162256218e2d51c1ada9dd4185a478a632ba86288e89438d1c2b24a067"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/docs/SCORING_METHODOLOGY.md",
+      "bytes": 828603,
+      "sha256": "c19cbb4f8afefedc79e5b73cab15463b311e1035a326251af4cdf619aa88bf80"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/docs/CLAIM_KINDS.md",
+      "bytes": 19131,
+      "sha256": "af3ba70e70583ba42cfe81b9f7a5275f6a74097c33ed741feda9e8fc5c1e0e52"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/docs/SECTOR_PACKS.md",
+      "bytes": 13155,
+      "sha256": "75b2f9614943f9f3c1b28983103212862c813292e4bf66427f647787d46c44bd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/docs/MCP_SERVER.md",
+      "bytes": 18531,
+      "sha256": "61daaab281c399f486090fb91cca3437a86d13966e78935161763d211c16709b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/docs/TRANSPARENCY_REPORT.md",
+      "bytes": 6441,
+      "sha256": "027e5954f8024cb18c57b5eb67ebc248159c9c237115e5522c3e76d805c12e9a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/docs/program/READY_TO_DEPLOY.md",
+      "bytes": 8158,
+      "sha256": "0ad78603fd26bd26d1a106b4a52d31ed382c21c4ab9cce901704c588532aadd4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/__snapshots__/noCertificationFromSelfAssessment.test.ts.snap",
+      "bytes": 594,
+      "sha256": "ca5723141f633590744c4a9fa9c3c6f93af89cfa720e236fbf23dfce58763fac"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/claims/eligibility/evaluate.ts",
+      "bytes": 5777,
+      "sha256": "cf92cf3ffd0961579a12ec04006e9fd110ef45018a17c60edd53af064d4388b0"
+    }
+  ],
+  "possibleFollowingLane": {
+    "key": "P0-45",
+    "priority": "High",
+    "due": "2026-10-22",
+    "reason": "After P0-21 is handled, same-date P0-45 precedes later High P0-11/26/28 by due date; its direct dependent chain isGATE-G0.",
+    "condition": "Conditional read-only routing only: root must recheck actual decisions/ownership and preserve all earlier skips/residuals. No P0-45 active work or runtime is started."
+  },
+  "observerHistory": [
+    "Some large read-only source/receipt outputs were truncated; exact title inventory, current direct source and compact raw-report metadata supplied the recorded counts.",
+    "A targeted search mentioned absent src/mcp/industryPackTools.ts, which is the explicitly later P1-44 surface. No product file was added. A guessed P0-20 summary filename was absent; the real signing receipt/raw were read instead.",
+    "The first report preserved an absent guessed claimEligibility.ts pointer. This version follows the real adapter import to evaluate.ts; the original report pair is retained by exact hash."
+  ],
+  "limits": [
+    "Only this new private readiness pair was written. No product import/runtime/parser/test/build/install/mutation, Git, source/CLI/A4/pausedP2-02 change, artifact overwrite, tracker or Claude message occurred.",
+    "Graphify query was read-only navigation against an already existing stale graph; it did not qualify current behavior.",
+    "No authenticated people, expert/legal truth, provider/model execution, paid transport, full suite, coverage, Node24, hosted CI, G0 Done or publication claim."
+  ],
+  "allReadsFinished": true,
+  "readinessPointerCorrection": {
+    "preservedFirstPair": [
+      {
+        "path": "/private/tmp/p0-21-readonly-readiness-20261015.json",
+        "bytes": 61815,
+        "sha256": "837e18f57bec20854cc8ae27bc29d848c6d19a9a947a3bde72d1b57b0518fc07"
+      },
+      {
+        "path": "/private/tmp/p0-21-readonly-readiness-20261015.md",
+        "bytes": 2974,
+        "sha256": "78621100353393d85b4ec4b7191d4492105531a23b2af0bcd1d060d4c3c2986d"
+      }
+    ],
+    "reason": "First readiness correctly marked guessed src/claims/eligibility/claimEligibility.ts absent. The actual adapters import ./evaluate.js; evaluate.ts has now been read directly and pinned. No source, tests, criteria, counts or runtime outcomes changed. The first pair remains byte immutable."
+  }
+}
