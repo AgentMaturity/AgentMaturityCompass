@@ -7,6 +7,7 @@ import { z } from "zod";
 import { bodyJsonSchema, apiSuccess, apiError, apiRequestError, isRequestBodyError, queryParam } from './apiHelpers.js';
 import { PolicyFirewall } from '../enforce/policyFirewall.js';
 import type { PolicyDecision, PolicyRule } from '../enforce/policyFirewall.js';
+import { requestTrustOverride } from '../trust/requestTrust.js';
 import {
   isEnforceResourceIntegrityError,
   projectEnforceResourcePublicValue,
@@ -457,7 +458,9 @@ export async function handleEnforceRoute(
     try {
       const body = await bodyJsonSchema(req, z.object({
         certificate: z.record(z.string(), z.unknown()),
-      }));
+      }).passthrough());
+      const refused = requestTrustOverride(body);
+      if (refused) { apiError(res, 400, refused); return true; }
       const { verifyCertificate } = await import('../enforce/formalVerification.js');
       const { loadTrustContext, unsignedArtifactReport, untrustedReasons } = await import('../trust/index.js');
       const { sha256Hex } = await import('../utils/hash.js');

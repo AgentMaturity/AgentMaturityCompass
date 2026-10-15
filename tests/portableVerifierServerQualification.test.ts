@@ -136,6 +136,30 @@ describe("actual portable-verifier API trust admission", () => {
       issuerAdmission: { status: "fail", signatures: [{ keyId: null, status: "not-pinned" }] }, overrides: [] });
   });
 
+  test("formal certificate metadata does not become operator trust", async () => {
+    const result = await route(handleEnforceRoute, "/api/v1/enforce/formal/certificate", {
+      certificate: { ...certificate, publicKey: "untrusted certificate metadata" }, requestId: "certificate-compatibility"
+    }, "formal-metadata-compatibility");
+    expect(result.status).toBe(200);
+    expect(result.body.data).toMatchObject({ status: "UNTRUSTED", valid: false, integrityValid: true });
+    expect(verifierReportSchema.parse(result.body.data?.report)).toMatchObject({ trusted: false, overrides: [] });
+  });
+
+  test("a tampered formal certificate remains an integrity failure", async () => {
+    const result = await route(handleEnforceRoute, "/api/v1/enforce/formal/certificate", {
+      certificate: { ...certificate, certificateHash: "0".repeat(64) }
+    }, "formal-tampered-certificate");
+    expect(result.status).toBe(200);
+    expect(result.body.data).toMatchObject({ status: "UNTRUSTED", valid: false, integrityValid: false });
+    expect(verifierReportSchema.parse(result.body.data?.report)).toMatchObject({ trusted: false, integrity: { status: "fail" }, overrides: [] });
+  });
+
+  test.each([{}, { certificate: null }, { certificate: [] }])("formal certificate rejects malformed input %j", async body => {
+    const result = await route(handleEnforceRoute, "/api/v1/enforce/formal/certificate", body, "formal-malformed-input");
+    expect(result.status).toBe(400);
+    expect(result.body).toMatchObject({ ok: false, error: expect.stringContaining("Invalid request body:") });
+  });
+
   test("a genuinely locally valid HMAC token is not evaluated as portable authorship", async () => {
     const result = await route(handlePassportRoute, "/api/v1/passport/trust-token/verify", { token }, "token-no-issuer");
     expect(result.status).toBe(200);
