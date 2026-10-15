@@ -1,5 +1,5 @@
 import { verify } from "node:crypto";
-import { chmodSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
@@ -93,6 +93,62 @@ async function laterVerify(f: Fixture, name: string) {
   activate(f); const before = snapshot(f.root);
   const result = await verifyAssuranceRun({ workspace: f.workspace, agentId: "default", assuranceRunId: f.report.assuranceRunId });
   records.push({ name, result, before, after: snapshot(f.root) }); return result;
+}
+
+async function completionFault(kind: "seal" | "markdown") {
+  const name = `completion-${kind}-fault`, root = mkdtempSync(join(tmpdir(), `amc-p0-19-${name}-`));
+  roots.push(root); chmodSync(root, 0o700);
+  const workspace = join(root, "workspace"), home = join(root, "operator-home"); mkdirSync(home, { mode: 0o700 });
+  activate({ home, monitorId: "" });
+  initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
+  const monitorPem = workspaceKeyPem(workspace, "monitor"), auditorPem = workspaceKeyPem(workspace, "auditor"), monitorId = sha256Hex(monitorPem);
+  activate({ home, monitorId });
+  writeFileSync(join(evidence, `${name}-monitor.pub`), monitorPem, { mode: 0o600 });
+  writeFileSync(join(evidence, `${name}-auditor.pub`), auditorPem, { mode: 0o600 });
+  const blocker = join(root, "owned-markdown-parent-file");
+  const agent = await startFakeAgentServer({ reply: () => compliantReply() }), restore = useFakeAgentEnv(agent.baseUrl);
+  let ledger: ReturnType<typeof openLedger> | undefined;
+  try {
+    ledger = openLedger(workspace);
+    if (kind === "seal") {
+      ledger.db.exec("CREATE TRIGGER p019_completion_seal_fault BEFORE UPDATE ON sessions WHEN OLD.binary_path='amc-assurance-runner' AND NEW.session_seal_sig IS NOT NULL BEGIN SELECT RAISE(ABORT,'P019_COMPLETION_SEAL_FAULT'); END");
+    } else {
+      writeFileSync(blocker, "A real file prevents creation of the Markdown parent directory.\n");
+      ledger.db.exec("CREATE TABLE p019_seal_updates (session_id TEXT, final_hash TEXT, seal_sig TEXT); CREATE TRIGGER p019_seal_observer AFTER UPDATE ON sessions WHEN OLD.binary_path='amc-assurance-runner' AND NEW.session_seal_sig IS NOT NULL BEGIN INSERT INTO p019_seal_updates VALUES (NEW.session_id, NEW.session_final_event_hash, NEW.session_seal_sig); END");
+    }
+    records.push({ name, phase: "captured-before-faulted-producer", monitorId, auditorId: sha256Hex(auditorPem),
+      pinsCapturedBeforeRows: true, before: snapshot(root) });
+    let returned: AssuranceReport | undefined, caught: unknown;
+    try {
+      returned = await runAssurance({ workspace, agentId: "default", packIds: ["injection"], mode: "sandbox", window: "1d", noSign: false,
+        ...(kind === "markdown" ? { outputMarkdownPath: join(blocker, "report.md") } : {}) });
+    } catch (error) { caught = error; }
+    const sessions = ledger.getAllSessions().filter(row => row.binary_path === "amc-assurance-runner");
+    const events = ledger.getAllEvents().filter(row => sessions.some(session => session.session_id === row.session_id));
+    const runs = ledger.listAssuranceRuns("default");
+    const reportsDir = join(getAgentPaths(workspace, "default").reportsDir, "assurance");
+    const reportFiles = existsSync(reportsDir) ? readdirSync(reportsDir).sort() : [];
+    const jsonReports = reportFiles.filter(file => file.endsWith(".json")).map(file => ({ file,
+      bytesSha256: sha256Hex(readFileSync(join(reportsDir, file))), report: JSON.parse(readFileSync(join(reportsDir, file), "utf8")) as AssuranceReport }));
+    const sealUpdates = kind === "markdown" ? ledger.db.prepare("SELECT * FROM p019_seal_updates").all() : [];
+    const integrity = verifyLedgerIntegrity(workspace, { expectedMonitorFingerprint: monitorId,
+      trust: loadTrustContext({ amcHome: home, expectMonitor: monitorId, env: {} }) });
+    const errorValue = (error: unknown) => error instanceof Error ? { name: error.name, message: error.message,
+      code: (error as NodeJS.ErrnoException).code, path: (error as NodeJS.ErrnoException).path, syscall: (error as NodeJS.ErrnoException).syscall } : error;
+    records.push({ name, phase: "actual-faulted-producer-result", returned: returned ?? null, error: errorValue(caught),
+      cause: errorValue(caught instanceof Error ? caught.cause : undefined), calls: agent.prompts.length,
+      sessions, events, runs, reportFiles, jsonReports, sealUpdates, integrity, after: snapshot(root),
+      scope: "Actual serial SQL/FS faults. A late report-write error may leave an already-written JSON artifact; report persistence is not transactional." });
+    return { returned, caught, sessions, events, runs, reportFiles, jsonReports, sealUpdates, integrity, monitorPem, auditorPem,
+      blocker, calls: agent.prompts.length };
+  } finally {
+    try {
+      if (ledger) {
+        try { ledger.db.exec("DROP TRIGGER IF EXISTS p019_completion_seal_fault; DROP TRIGGER IF EXISTS p019_seal_observer; DROP TABLE IF EXISTS p019_seal_updates"); }
+        finally { ledger.close(); }
+      }
+    } finally { restore(); await agent.close(); }
+  }
 }
 
 beforeAll(async () => {
@@ -213,5 +269,65 @@ describe("P0-19 actual local runner inconclusive contracts", () => {
     expect(report.vulnerabilities).toEqual([]); expect(report.pluginResults[0]!.scenarioResults.map(row => row.scenarioId)).toEqual(scenarioIds.map(id => `${id}::direct`));
     expect(report.pluginResults[0]).toMatchObject({ scenarioCount: scenarioIds.length, passCount: 0, failCount: 0, score0to100: 0 });
     for (const row of report.pluginResults[0]!.scenarioResults) expect(row).toMatchObject({ inconclusive: true, inconclusiveCause: "tool_calls_ungraded", pass: false, score0to100: 0, score0to5: 0, toolCalls: calls });
+  });
+
+  test("a genuine measured failure is a VALID artifact without turning its failed findings into a pass", () => {
+    activate(failure);
+    const pack = failure.report.packResults[0]!, run = loadAssuranceRun(failure.workspace, failure.report.assuranceRunId)!;
+    const findings = loadAssuranceFindings(failure.workspace, failure.report.assuranceRunId)!;
+    records.push({ name: "measured-failure-validity-with-failed-findings", report: failure.report, run, findings });
+    const digest = sha256Hex(canonicalize({ ...failure.report, reportJsonSha256: "", runSealSig: "" }));
+    expect(verify(null, Buffer.from(digest, "hex"), failure.auditorPem, Buffer.from(failure.report.runSealSig, "base64"))).toBe(true);
+    expect(failure.report).toMatchObject({ status: "VALID", verificationPassed: true, evidenceStatus: "MEASURED" });
+    expect(pack.failCount).toBeGreaterThan(0); expect(run.score).toMatchObject({ status: "FAIL", pass: false });
+    expect(findings.findings).toHaveLength(pack.failCount);
+  });
+
+  test("a genuine signed tool-only artifact is VALID while remaining insufficient and unscored", () => {
+    activate(tool);
+    const run = loadAssuranceRun(tool.workspace, tool.report.assuranceRunId)!;
+    records.push({ name: "tool-only-artifact-validity-without-measurement", report: tool.report, run });
+    const digest = sha256Hex(canonicalize({ ...tool.report, reportJsonSha256: "", runSealSig: "" }));
+    expect(verify(null, Buffer.from(digest, "hex"), tool.auditorPem, Buffer.from(tool.report.runSealSig, "base64"))).toBe(true);
+    expect(tool.report).toMatchObject({ status: "VALID", verificationPassed: true, evidenceStatus: "INSUFFICIENT_EVIDENCE", overallScore0to100: 0 });
+    expect(tool.report.packResults[0]).toMatchObject({ passCount: 0, failCount: 0, score0to100: 0, regulatedEligible: false });
+    expect(run.score).toMatchObject({ status: "INSUFFICIENT_EVIDENCE", pass: false });
+  });
+
+  test("a real completion seal-update fault retains the SQLite error without persisting a success report", async () => {
+    const result = await completionFault("seal");
+    expect(result.calls).toBe(scenarioIds.length); expect(result.returned).toBeUndefined();
+    expect(result.caught).toBeInstanceOf(Error);
+    expect(result.caught).toMatchObject({ code: "SQLITE_CONSTRAINT_TRIGGER", message: "P019_COMPLETION_SEAL_FAULT" });
+    expect((result.caught as Error).cause).toBeInstanceOf(Error);
+    expect((result.caught as Error).cause).not.toBe(result.caught);
+    expect((result.caught as Error).cause).toMatchObject({ code: "SQLITE_CONSTRAINT_TRIGGER", message: "P019_COMPLETION_SEAL_FAULT" });
+    expect(result.sessions).toHaveLength(1);
+    expect(result.sessions[0]).toMatchObject({ ended_ts: null, session_final_event_hash: null, session_seal_sig: null });
+    expect(result.events.filter(row => JSON.parse(row.meta_json).auditType === "ASSURANCE_RUN_ABORTED")).toHaveLength(1);
+    for (const row of result.events) expect(verify(null, Buffer.from(row.event_hash, "hex"), result.monitorPem, Buffer.from(row.writer_sig, "base64"))).toBe(true);
+    expect(result.integrity.chain.ok).toBe(false); expect(result.integrity.chain.errors.join("\n")).toContain("missing seal");
+    expect(result.reportFiles).toEqual([]); expect(result.runs).toEqual([]);
+  });
+
+  test("a real late Markdown-write failure preserves its error and the already-sealed session without abort or reseal", async () => {
+    const result = await completionFault("markdown");
+    expect(result.calls).toBe(scenarioIds.length); expect(result.returned).toBeUndefined();
+    expect(result.caught).toBeInstanceOf(Error);
+    expect(result.caught).toMatchObject({ code: "EEXIST", syscall: "mkdir", path: result.blocker });
+    expect((result.caught as Error).cause).toBeUndefined();
+    expect(result.sessions).toHaveLength(1); expect(result.sealUpdates).toHaveLength(1);
+    const session = result.sessions[0]!;
+    expect(session.ended_ts).not.toBeNull(); expect(session.session_final_event_hash).toBe(result.events.at(-1)!.event_hash);
+    expect(verify(null, Buffer.from(session.session_final_event_hash!, "hex"), result.monitorPem, Buffer.from(session.session_seal_sig!, "base64"))).toBe(true);
+    expect(result.events.filter(row => JSON.parse(row.meta_json).auditType === "ASSURANCE_RUN_ABORTED")).toEqual([]);
+    expect(result.integrity.chain.ok).toBe(true); expect(result.integrity.trustRoot.anchored).toBe(true); expect(result.runs).toEqual([]);
+    // JSON is written before Markdown. Its possible presence is not a successful returned or stored run.
+    expect(result.reportFiles.every(file => file.endsWith(".json"))).toBe(true); expect(result.jsonReports.length).toBeLessThanOrEqual(1);
+    for (const { report } of result.jsonReports) {
+      const digest = sha256Hex(canonicalize({ ...report, reportJsonSha256: "", runSealSig: "" }));
+      expect(report.reportJsonSha256).toBe(digest);
+      expect(verify(null, Buffer.from(digest, "hex"), result.auditorPem, Buffer.from(report.runSealSig, "base64"))).toBe(true);
+    }
   });
 });
