@@ -58,7 +58,8 @@ function createFixture(name: string, tagged = false): Fixture {
       start("system");
       f.system.push(append("system", "tagged-system-open", "session/open", { agentId: "default" }));
       f.system.push(append("system", "untagged-system-tail", "stdout", {}));
-      ledger.sealSession("system"); f.expected = ["tagged-system-open"];
+      f.system.push(append("system", "tagged-system-snake", "stdout", { agent_id: "default" }));
+      ledger.sealSession("system"); f.expected = [];
     } else {
       start(f.ownedSession); f.expected.push(append(f.ownedSession, "owned-open", "session/open", { agentId: "default" }));
       for (let i = 0; i < 24; i++) f.expected.push(append(f.ownedSession, `owned-${i}`, "stdout", {}));
@@ -168,13 +169,20 @@ describe("P0-27 genuine seeded evidence collector", () => {
     expect(dataset.schemaVersion).toBe(2); expect(dataset.records.map(row => row.eventId)).toEqual(matrix.expected);
     const after = openLedger(matrix.workspace); try { expect(after.getAllEvents()).toEqual(events); } finally { after.close(); }
   });
-  test("records accepted explicit system-row metadata behavior without making system session-owned", () => {
-    const result = collect("accepted-tagged-system", taggedSystem, "default");
-    expect(result.records.map(row => row.eventId)).toEqual(["tagged-system-open"]);
-    expect(result.agentFilter).toMatchObject({ sessionsIncluded: [], rowsExcluded: 1 });
+  test("excludes camel- and snake-tagged system rows from named exports and reports their exclusion", () => {
+    const result = collect("excluded-tagged-system", taggedSystem, "default");
+    expect(result.records).toEqual([]);
+    expect(result).toMatchObject({ schemaVersion: 2, eventCount: 0, chainInvalidCount: 0,
+      agentFilter: { sessionsIncluded: [], rowsExcluded: 3 } });
   });
-  test("[strict spec conflict] never includes a system row even when its direct metadata names the agent", () => {
+  test("never includes a system row even when its direct metadata names the agent", () => {
     const result = collect("strict-system-spec", taggedSystem, "default");
     expect(result.records.filter(row => row.sessionId === "system")).toEqual([]);
+  });
+  test("unfiltered export retains all tagged and untagged system rows", () => {
+    const result = collect("unfiltered-tagged-system", taggedSystem);
+    expect(result.records.map(row => row.eventId)).toEqual(taggedSystem.all);
+    expect(result).toMatchObject({ eventCount: 3, agentFilter: null, chainInvalidCount: 0 });
+    expect(result.records.every(row => row.chainValid)).toBe(true);
   });
 });
