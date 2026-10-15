@@ -1,0 +1,10 @@
+{
+  "capturedUtc": "2026-10-15T05:51:47.563719+00:00",
+  "stage": "initial-preflight-preparation",
+  "actualError": "FileNotFoundError: /Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/dist/cli.js",
+  "cause": "The first preflight attempted to verify a readiness compiled-file pin before the normal build. It stopped before creating BASE or writing setup files.",
+  "correction": "Verify all non-dist source pins before setup; retain three compiled-file pins as explicit expected post-build inputs and verify them after the normal build.",
+  "sourceOrRuntimeChanged": false,
+  "baseExistedAtCorrection": false,
+  "noProductRuntimeOccurred": true
+}

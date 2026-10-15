@@ -1,0 +1,61 @@
+{
+  "source": "2024f25c79973987b44a4a1298488d55ee0d6227",
+  "removedCorruptedLiteralGrep": {
+    "phase": "old-delete-message-inventory",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+    "cmd": "git grep -n 'Removed corrupted' -- src",
+    "exit": 1,
+    "durationMs": 96,
+    "startedUtc": "2026-10-15T05:58:57.519507+00:00",
+    "endedUtc": "2026-10-15T05:58:57.630955+00:00",
+    "log": "/private/tmp/p0-45-qualification-20261015/command-old-delete-message-inventory/stdout-stderr.log",
+    "head": "2024f25c79973987b44a4a1298488d55ee0d6227",
+    "headAfter": "2024f25c79973987b44a4a1298488d55ee0d6227",
+    "ownedProcess": {
+      "pid": 17902,
+      "ownedPgid": 17902,
+      "observedPgidAfterLaunch": 17902,
+      "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "grep",
+        "-n",
+        "Removed corrupted",
+        "--",
+        "src"
+      ],
+      "startedUtc": "2026-10-15T05:58:57.519507+00:00",
+      "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+      "overriddenEnvironmentKeys": [
+        "PATH",
+        "HOME",
+        "GIT_NO_LAZY_FETCH"
+      ]
+    },
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "observed": false,
+    "artifacts": {},
+    "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+  },
+  "grepLog": {
+    "path": "/private/tmp/p0-45-qualification-20261015/command-old-delete-message-inventory/stdout-stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "grepInterpretation": "git grep exits1 with an empty stream: no literal matches, the expected negative inventory result. This is not an original test or a failed guard.",
+  "verifyActionSource": {
+    "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/cli.ts",
+    "bytes": 1064339,
+    "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+  },
+  "verifyActionRange": {
+    "startLine": 6222,
+    "endLine": 6279,
+    "directRmSyncCalls": 0,
+    "directUnlinkSyncCalls": 0
+  },
+  "limits": "Direct current action source inventory only, not universal read-only behavior: --sign-config and --relabel-legacy are separate write modes. Repair rollback may unlink its own intent after returning all moved evidence; original tests cover closed-writer fixtures, not active-writer/JSONL/crash-atomic safety.",
+  "formalAcceptanceClosed": false
+}

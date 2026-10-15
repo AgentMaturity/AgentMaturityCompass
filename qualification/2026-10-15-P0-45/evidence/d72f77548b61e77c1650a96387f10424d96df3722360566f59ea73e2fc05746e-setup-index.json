@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "preparedOnly": true,
+  "artifactCount": 11,
+  "artifacts": [
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/README.md",
+      "bytes": 2778,
+      "sha256": "69e06da2596cf4f9643b14ada562923e5efe56a2a2cf77dba1fc1c3f56862b33"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/copy-stage.json",
+      "bytes": 1006,
+      "sha256": "f7ec3355ff69f541660ed419596aefd1ab2d405e0ebb12b8da38ffaceb47ca3c"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/driver/controller.py",
+      "bytes": 22514,
+      "sha256": "9479a7a7186ce97e740dad14fda9c0244f3f3173d8d41a30b659de8e5e40e192"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/driver/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/inputs/case-identities.json",
+      "bytes": 1766,
+      "sha256": "1e9ecabdc7c3700a9f7a661a33fdf2a71eb509cf81eb70f1bf969cde84dc7070"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/inputs/compiled-manifest.json",
+      "bytes": 485185,
+      "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/inputs/physical-copy-manifest.json",
+      "bytes": 4083433,
+      "sha256": "9f398a6bc849138253bb0e4fafe920891a40b63ea18d46db463cad84297a18ea"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/inputs/preservation.json",
+      "bytes": 24811,
+      "sha256": "cfaadfe1062c5cd94cf0b692f32d0baf6d8a3236807508ec202aaff3345c391e"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/inputs/source-manifest.json",
+      "bytes": 999893,
+      "sha256": "1d2ae6b2a90b8e4c9e10de35b8bc870d87e0e784fabbdba6914d9fc5423a963b"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/proposal.json",
+      "bytes": 3767,
+      "sha256": "5161f783b18396d03d1c4d4e18dc6b196f282aa33b394a0b8f6c6952cf76612f"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/setup.json",
+      "bytes": 7901,
+      "sha256": "e5c206bac71f342068f035291aa5f5e99ed5411cbf73e1a1e3816b08426765dd"
+    }
+  ],
+  "closureCount": 12734,
+  "sourceCount": 8205,
+  "compiledCount": 4529,
+  "allPhysicalCopyBytesExact": true,
+  "nativeIdentityExact": true,
+  "futureBoundary": "No runtime or release. This index excludes itself and later summary to avoid hash cycles. Physical manifest is private-only, not a canonical file-size bypass."
+}

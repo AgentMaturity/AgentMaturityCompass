@@ -1,0 +1,913 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-45-original-corpora-independent-review",
+  "reviewer": "native_race_static_review",
+  "decision": "FOUR_SEPARATE_ORIGINAL_CORPORA_VERIFIED_WITH_BOUNDED_MEANING",
+  "blockingFindings": [],
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true,
+  "authorship": "Root executed the original runs. Reviewer authored only the authorized new summary and this separate review pair; no product runtime, rerun, import, source parser/compiler, copy/controller/setup/mutation, Git/network or signal.",
+  "verification": {
+    "failures": [],
+    "closedRuns": [
+      {
+        "phase": "original-core",
+        "registered": 12,
+        "passed": 12,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "command": {
+          "phase": "original-core",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/verifyRepair.test.ts --cache=false --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p0-45-qualification-20261015/command-original-core/raw-producer.json",
+          "exit": 0,
+          "durationMs": 6140,
+          "startedUtc": "2026-10-15T05:54:04.879701+00:00",
+          "endedUtc": "2026-10-15T05:54:11.034631+00:00",
+          "log": "/private/tmp/p0-45-qualification-20261015/command-original-core/stdout-stderr.log",
+          "head": "2024f25c79973987b44a4a1298488d55ee0d6227",
+          "headAfter": "2024f25c79973987b44a4a1298488d55ee0d6227",
+          "ownedProcess": {
+            "pid": 17310,
+            "ownedPgid": 17310,
+            "observedPgidAfterLaunch": 17310,
+            "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+            "argv": [
+              "/opt/homebrew/opt/node@22/bin/node",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/verifyRepair.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "--outputFile=/private/tmp/p0-45-qualification-20261015/command-original-core/raw-producer.json"
+            ],
+            "startedUtc": "2026-10-15T05:54:04.879701+00:00",
+            "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+            "overriddenEnvironmentKeys": [
+              "PATH",
+              "HOME",
+              "GIT_NO_LAZY_FETCH",
+              "AMC_P021_RUNTIME_OBSERVER_PATH"
+            ]
+          },
+          "groupAbsentByESRCH": true,
+          "signalsOtherThanZeroSent": false,
+          "observed": true,
+          "artifacts": {
+            "rawProducer": {
+              "path": "/private/tmp/p0-45-qualification-20261015/command-original-core/raw-producer.json",
+              "bytes": 4183,
+              "sha256": "e6b9eafd9216d1671d7a7bdfcb1edf5fec562b93a105368accf059c7c83fa08a"
+            },
+            "rawSnapshot": {
+              "path": "/private/tmp/p0-45-qualification-20261015/command-original-core/raw.json",
+              "bytes": 4183,
+              "sha256": "e6b9eafd9216d1671d7a7bdfcb1edf5fec562b93a105368accf059c7c83fa08a"
+            },
+            "observer": {
+              "path": "/private/tmp/p0-45-qualification-20261015/command-original-core/observer.json",
+              "bytes": 6214,
+              "sha256": "2441122052d822fdda75aa8dafc58c8102f3cf75141c7fde08dce433b5e911e9"
+            },
+            "reporter": {
+              "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "bytes": 2110,
+              "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+            }
+          },
+          "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+        },
+        "checks": {
+          "sourceTitlesExact": true,
+          "rawObserverIdentitiesExact": true,
+          "counters": true,
+          "allPassedNoBodyErrors": true,
+          "noFileMessages": true,
+          "observerBinding": true,
+          "runEndComplete": true,
+          "exitAndSource": true,
+          "ownedPIDPGID": true,
+          "groupESRCH": true,
+          "producerSnapshotExact": true,
+          "artifactPins": true,
+          "knownLateClear": true
+        },
+        "fileTitleIdentities": [
+          {
+            "file": "tests/verifyRepair.test.ts",
+            "fullName": "planVerifyRepair plans nothing for a healthy store and apply moves nothing"
+          },
+          {
+            "file": "tests/verifyRepair.test.ts",
+            "fullName": "planVerifyRepair leaves evidence alone when only a signed config failed"
+          },
+          {
+            "file": "tests/verifyRepair.test.ts",
+            "fullName": "planVerifyRepair counts a tampered blob and plans to archive the ledger, the blobs, the index and its signature"
+          },
+          {
+            "file": "tests/verifyRepair.test.ts",
+            "fullName": "planVerifyRepair counts a missing blob and keeps the ledger in plan mode"
+          },
+          {
+            "file": "tests/verifyRepair.test.ts",
+            "fullName": "applyVerifyRepair moves every planned file into quarantine with its original SHA-256 and leaves .amc/reports alone"
+          },
+          {
+            "file": "tests/verifyRepair.test.ts",
+            "fullName": "applyVerifyRepair refuses when the legal hold state is unknown, and moves nothing"
+          },
+          {
+            "file": "tests/verifyRepair.test.ts",
+            "fullName": "applyVerifyRepair refuses when the hold check itself throws"
+          },
+          {
+            "file": "tests/verifyRepair.test.ts",
+            "fullName": "applyVerifyRepair refuses under an active hold and names it"
+          },
+          {
+            "file": "tests/verifyRepair.test.ts",
+            "fullName": "applyVerifyRepair refuses when the monitor key does not match the expected fingerprint"
+          },
+          {
+            "file": "tests/verifyRepair.test.ts",
+            "fullName": "applyVerifyRepair refuses before any move when signing fails"
+          },
+          {
+            "file": "tests/verifyRepair.test.ts",
+            "fullName": "applyVerifyRepair refuses when a planned file changed after the plan"
+          },
+          {
+            "file": "tests/verifyRepair.test.ts",
+            "fullName": "applyVerifyRepair puts moved files back when a rename fails part way"
+          }
+        ],
+        "pins": [
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-core/command.json",
+            "bytes": 2634,
+            "sha256": "ee4bbd948bb816b527265b69a2f800bfedfb8e74e832d849efe3112acd1bb0fc"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-core/observer.json",
+            "bytes": 6214,
+            "sha256": "2441122052d822fdda75aa8dafc58c8102f3cf75141c7fde08dce433b5e911e9"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-core/owned-group-after-exit.json",
+            "bytes": 261,
+            "sha256": "4d3afc3e8dd7b17e3e446074741a2e36cf390a07ed1a988f1079181b0c6c3ffb"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-core/owned-process.json",
+            "bytes": 793,
+            "sha256": "13c1c9b2a942a7a29d857aa25f4662b55be2536eacb75ac5f6117742b051c334"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-core/raw-producer.json",
+            "bytes": 4183,
+            "sha256": "e6b9eafd9216d1671d7a7bdfcb1edf5fec562b93a105368accf059c7c83fa08a"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-core/raw.json",
+            "bytes": 4183,
+            "sha256": "e6b9eafd9216d1671d7a7bdfcb1edf5fec562b93a105368accf059c7c83fa08a"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-core/stdout-stderr.log",
+            "bytes": 411,
+            "sha256": "c057dedc4479e74cf7f324ecd1082d707d80545aa467bc569559c7f486e2e95a"
+          }
+        ],
+        "sourceTestPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+          "bytes": 13875,
+          "sha256": "3e0c3b58eeb2f77ec05216c5f316020a0aff88a989ff9e811f1b809005689540"
+        },
+        "knownLateMatches": [],
+        "infrastructureErrorsObserved": 0
+      },
+      {
+        "phase": "original-cli",
+        "registered": 5,
+        "passed": 5,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "command": {
+          "phase": "original-cli",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/verifyRepairCli.test.ts --cache=false --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p0-45-qualification-20261015/command-original-cli/raw-producer.json",
+          "exit": 0,
+          "durationMs": 8268,
+          "startedUtc": "2026-10-15T05:54:49.809713+00:00",
+          "endedUtc": "2026-10-15T05:54:58.090944+00:00",
+          "log": "/private/tmp/p0-45-qualification-20261015/command-original-cli/stdout-stderr.log",
+          "head": "2024f25c79973987b44a4a1298488d55ee0d6227",
+          "headAfter": "2024f25c79973987b44a4a1298488d55ee0d6227",
+          "ownedProcess": {
+            "pid": 17377,
+            "ownedPgid": 17377,
+            "observedPgidAfterLaunch": 17377,
+            "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+            "argv": [
+              "/opt/homebrew/opt/node@22/bin/node",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/verifyRepairCli.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "--outputFile=/private/tmp/p0-45-qualification-20261015/command-original-cli/raw-producer.json"
+            ],
+            "startedUtc": "2026-10-15T05:54:49.809713+00:00",
+            "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+            "overriddenEnvironmentKeys": [
+              "PATH",
+              "HOME",
+              "GIT_NO_LAZY_FETCH",
+              "AMC_P021_RUNTIME_OBSERVER_PATH"
+            ]
+          },
+          "groupAbsentByESRCH": true,
+          "signalsOtherThanZeroSent": false,
+          "observed": true,
+          "artifacts": {
+            "rawProducer": {
+              "path": "/private/tmp/p0-45-qualification-20261015/command-original-cli/raw-producer.json",
+              "bytes": 2256,
+              "sha256": "598fa371f0df648cc624e95c796ad5311f3684457d77359a3737bc9b2cb4bcb3"
+            },
+            "rawSnapshot": {
+              "path": "/private/tmp/p0-45-qualification-20261015/command-original-cli/raw.json",
+              "bytes": 2256,
+              "sha256": "598fa371f0df648cc624e95c796ad5311f3684457d77359a3737bc9b2cb4bcb3"
+            },
+            "observer": {
+              "path": "/private/tmp/p0-45-qualification-20261015/command-original-cli/observer.json",
+              "bytes": 3354,
+              "sha256": "2a879288a2228732b69bb011ebc4320560278cd0642214035389b5aeaebe8624"
+            },
+            "reporter": {
+              "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "bytes": 2110,
+              "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+            }
+          },
+          "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+        },
+        "checks": {
+          "sourceTitlesExact": true,
+          "rawObserverIdentitiesExact": true,
+          "counters": true,
+          "allPassedNoBodyErrors": true,
+          "noFileMessages": true,
+          "observerBinding": true,
+          "runEndComplete": true,
+          "exitAndSource": true,
+          "ownedPIDPGID": true,
+          "groupESRCH": true,
+          "producerSnapshotExact": true,
+          "artifactPins": true,
+          "knownLateClear": true
+        },
+        "fileTitleIdentities": [
+          {
+            "file": "tests/verifyRepairCli.test.ts",
+            "fullName": "amc verify --repair changes nothing on a healthy workspace and exits 0"
+          },
+          {
+            "file": "tests/verifyRepairCli.test.ts",
+            "fullName": "amc verify --repair prints a plan for a tampered workspace, exits 1 and changes nothing"
+          },
+          {
+            "file": "tests/verifyRepairCli.test.ts",
+            "fullName": "amc verify --repair refuses --apply without a TTY or --yes, exits 2 and moves nothing"
+          },
+          {
+            "file": "tests/verifyRepairCli.test.ts",
+            "fullName": "amc verify --repair archives a tampered store with --apply --yes under a receipt signed as REPAIR_RECEIPT"
+          },
+          {
+            "file": "tests/verifyRepairCli.test.ts",
+            "fullName": "amc verify messages no longer recommends cleaning and rebuilding when every signature fails"
+          }
+        ],
+        "pins": [
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-cli/command.json",
+            "bytes": 2633,
+            "sha256": "473404a5929cba1153130865c9b763eafb0a30cad20b73bf201eb2dc21f4865a"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-cli/observer.json",
+            "bytes": 3354,
+            "sha256": "2a879288a2228732b69bb011ebc4320560278cd0642214035389b5aeaebe8624"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-cli/owned-group-after-exit.json",
+            "bytes": 261,
+            "sha256": "81d2d9ad6d33d07dc2227f26baee15608b6960db42e2d47ab20af11f5ad18f6d"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-cli/owned-process.json",
+            "bytes": 795,
+            "sha256": "54dee0ef522134b62ff2d6011dee1a3c6cc37311838dcf791ecd12e29b48e7ae"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-cli/raw-producer.json",
+            "bytes": 2256,
+            "sha256": "598fa371f0df648cc624e95c796ad5311f3684457d77359a3737bc9b2cb4bcb3"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-cli/raw.json",
+            "bytes": 2256,
+            "sha256": "598fa371f0df648cc624e95c796ad5311f3684457d77359a3737bc9b2cb4bcb3"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-cli/stdout-stderr.log",
+            "bytes": 835,
+            "sha256": "678324f40a4c4f513b4af37ebaa6078e0c221d4bfef07a1cc19203a61da825b3"
+          }
+        ],
+        "sourceTestPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/verifyRepairCli.test.ts",
+          "bytes": 8093,
+          "sha256": "4491c817f7910b54a53eeede711577c04d5de86423966f076161865c590642fd"
+        },
+        "knownLateMatches": [],
+        "infrastructureErrorsObserved": 0
+      },
+      {
+        "phase": "original-separation",
+        "registered": 4,
+        "passed": 4,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "command": {
+          "phase": "original-separation",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/ledgerVerifySeparation.test.ts --cache=false --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p0-45-qualification-20261015/command-original-separation/raw-producer.json",
+          "exit": 0,
+          "durationMs": 3588,
+          "startedUtc": "2026-10-15T05:55:54.060187+00:00",
+          "endedUtc": "2026-10-15T05:55:57.660990+00:00",
+          "log": "/private/tmp/p0-45-qualification-20261015/command-original-separation/stdout-stderr.log",
+          "head": "2024f25c79973987b44a4a1298488d55ee0d6227",
+          "headAfter": "2024f25c79973987b44a4a1298488d55ee0d6227",
+          "ownedProcess": {
+            "pid": 17480,
+            "ownedPgid": 17480,
+            "observedPgidAfterLaunch": 17480,
+            "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+            "argv": [
+              "/opt/homebrew/opt/node@22/bin/node",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/ledgerVerifySeparation.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "--outputFile=/private/tmp/p0-45-qualification-20261015/command-original-separation/raw-producer.json"
+            ],
+            "startedUtc": "2026-10-15T05:55:54.060187+00:00",
+            "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+            "overriddenEnvironmentKeys": [
+              "PATH",
+              "HOME",
+              "GIT_NO_LAZY_FETCH",
+              "AMC_P021_RUNTIME_OBSERVER_PATH"
+            ]
+          },
+          "groupAbsentByESRCH": true,
+          "signalsOtherThanZeroSent": false,
+          "observed": true,
+          "artifacts": {
+            "rawProducer": {
+              "path": "/private/tmp/p0-45-qualification-20261015/command-original-separation/raw-producer.json",
+              "bytes": 2163,
+              "sha256": "1bb0ead9e5bc08d95cc9f50c5525f58fb3518dc2345479ee3b4e9dd03c17addc"
+            },
+            "rawSnapshot": {
+              "path": "/private/tmp/p0-45-qualification-20261015/command-original-separation/raw.json",
+              "bytes": 2163,
+              "sha256": "1bb0ead9e5bc08d95cc9f50c5525f58fb3518dc2345479ee3b4e9dd03c17addc"
+            },
+            "observer": {
+              "path": "/private/tmp/p0-45-qualification-20261015/command-original-separation/observer.json",
+              "bytes": 3029,
+              "sha256": "e5918fea1dece754a782123ac1e1468b3c2a787fa114ee73562ea80dbe507219"
+            },
+            "reporter": {
+              "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "bytes": 2110,
+              "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+            }
+          },
+          "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+        },
+        "checks": {
+          "sourceTitlesExact": true,
+          "rawObserverIdentitiesExact": true,
+          "counters": true,
+          "allPassedNoBodyErrors": true,
+          "noFileMessages": true,
+          "observerBinding": true,
+          "runEndComplete": true,
+          "exitAndSource": true,
+          "ownedPIDPGID": true,
+          "groupESRCH": true,
+          "producerSnapshotExact": true,
+          "artifactPins": true,
+          "knownLateClear": true
+        },
+        "fileTitleIdentities": [
+          {
+            "file": "tests/ledgerVerifySeparation.test.ts",
+            "fullName": "evidence-chain verification is separate from config governance a clean workspace passes both halves"
+          },
+          {
+            "file": "tests/ledgerVerifySeparation.test.ts",
+            "fullName": "evidence-chain verification is separate from config governance a broken gateway config does not report the evidence chain as failed"
+          },
+          {
+            "file": "tests/ledgerVerifySeparation.test.ts",
+            "fullName": "evidence-chain verification is separate from config governance a rewritten evidence event does fail the chain half"
+          },
+          {
+            "file": "tests/ledgerVerifySeparation.test.ts",
+            "fullName": "evidence-chain verification is separate from config governance still reports the whole set of errors in one list"
+          }
+        ],
+        "pins": [
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-separation/command.json",
+            "bytes": 2696,
+            "sha256": "4392e626f89a8df88eed736ccdb9ece609e71145b672dd09842b0108cec5d684"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-separation/observer.json",
+            "bytes": 3029,
+            "sha256": "e5918fea1dece754a782123ac1e1468b3c2a787fa114ee73562ea80dbe507219"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-separation/owned-group-after-exit.json",
+            "bytes": 261,
+            "sha256": "2df7add3309c3c2b6d1b0e130e1840147ef2a5ecb4d7a26c8f04ef6a0f090034"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-separation/owned-process.json",
+            "bytes": 809,
+            "sha256": "f75ed12dcd1dfff25c6ae541deb9dd1e496edb1fe10ea5cc86b34daacb160436"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-separation/raw-producer.json",
+            "bytes": 2163,
+            "sha256": "1bb0ead9e5bc08d95cc9f50c5525f58fb3518dc2345479ee3b4e9dd03c17addc"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-separation/raw.json",
+            "bytes": 2163,
+            "sha256": "1bb0ead9e5bc08d95cc9f50c5525f58fb3518dc2345479ee3b4e9dd03c17addc"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-separation/stdout-stderr.log",
+            "bytes": 423,
+            "sha256": "20dd58f4878ae49469a51b28d013e4c3222e2e0b5e2955cbc99c732ed7e1be4f"
+          }
+        ],
+        "sourceTestPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/ledgerVerifySeparation.test.ts",
+          "bytes": 4311,
+          "sha256": "9f4bd6c1e007f9cc0539b4dd9725d69a704d589e19bc7d0eb0b023052db0114f"
+        },
+        "knownLateMatches": [],
+        "infrastructureErrorsObserved": 0
+      },
+      {
+        "phase": "original-read-only",
+        "registered": 10,
+        "passed": 10,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "command": {
+          "phase": "original-read-only",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/ledgerVerificationReadOnly.test.ts --cache=false --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p0-45-qualification-20261015/command-original-read-only/raw-producer.json",
+          "exit": 0,
+          "durationMs": 9977,
+          "startedUtc": "2026-10-15T05:56:38.878033+00:00",
+          "endedUtc": "2026-10-15T05:56:48.869227+00:00",
+          "log": "/private/tmp/p0-45-qualification-20261015/command-original-read-only/stdout-stderr.log",
+          "head": "2024f25c79973987b44a4a1298488d55ee0d6227",
+          "headAfter": "2024f25c79973987b44a4a1298488d55ee0d6227",
+          "ownedProcess": {
+            "pid": 17553,
+            "ownedPgid": 17553,
+            "observedPgidAfterLaunch": 17553,
+            "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+            "argv": [
+              "/opt/homebrew/opt/node@22/bin/node",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/ledgerVerificationReadOnly.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "--outputFile=/private/tmp/p0-45-qualification-20261015/command-original-read-only/raw-producer.json"
+            ],
+            "startedUtc": "2026-10-15T05:56:38.878033+00:00",
+            "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+            "overriddenEnvironmentKeys": [
+              "PATH",
+              "HOME",
+              "GIT_NO_LAZY_FETCH",
+              "AMC_P021_RUNTIME_OBSERVER_PATH"
+            ]
+          },
+          "groupAbsentByESRCH": true,
+          "signalsOtherThanZeroSent": false,
+          "observed": true,
+          "artifacts": {
+            "rawProducer": {
+              "path": "/private/tmp/p0-45-qualification-20261015/command-original-read-only/raw-producer.json",
+              "bytes": 3753,
+              "sha256": "cc194f41cadf1da0126110bba4bca34f20887de5d76bc7a40405b899d1140cd8"
+            },
+            "rawSnapshot": {
+              "path": "/private/tmp/p0-45-qualification-20261015/command-original-read-only/raw.json",
+              "bytes": 3753,
+              "sha256": "cc194f41cadf1da0126110bba4bca34f20887de5d76bc7a40405b899d1140cd8"
+            },
+            "observer": {
+              "path": "/private/tmp/p0-45-qualification-20261015/command-original-read-only/observer.json",
+              "bytes": 5268,
+              "sha256": "9b5fb892fa9e9d9120b191ec47ecb315fef8acc13098af7d67fab0889e8facf5"
+            },
+            "reporter": {
+              "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "bytes": 2110,
+              "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+            }
+          },
+          "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+        },
+        "checks": {
+          "sourceTitlesExact": true,
+          "rawObserverIdentitiesExact": true,
+          "counters": true,
+          "allPassedNoBodyErrors": true,
+          "noFileMessages": true,
+          "observerBinding": true,
+          "runEndComplete": true,
+          "exitAndSource": true,
+          "ownedPIDPGID": true,
+          "groupESRCH": true,
+          "producerSnapshotExact": true,
+          "artifactPins": true,
+          "knownLateClear": true
+        },
+        "fileTitleIdentities": [
+          {
+            "file": "tests/ledgerVerificationReadOnly.test.ts",
+            "fullName": "cold-process current vault verification reads encrypted evidence without trust mutations"
+          },
+          {
+            "file": "tests/ledgerVerificationReadOnly.test.ts",
+            "fullName": "cold-process legacy vault verification reads encrypted evidence without trust mutations"
+          },
+          {
+            "file": "tests/ledgerVerificationReadOnly.test.ts",
+            "fullName": "cold-process encrypted evidence fails closed for missing-passphrase without modifying disk"
+          },
+          {
+            "file": "tests/ledgerVerificationReadOnly.test.ts",
+            "fullName": "cold-process encrypted evidence fails closed for wrong-passphrase without modifying disk"
+          },
+          {
+            "file": "tests/ledgerVerificationReadOnly.test.ts",
+            "fullName": "cold-process encrypted evidence fails closed for missing-vault without modifying disk"
+          },
+          {
+            "file": "tests/ledgerVerificationReadOnly.test.ts",
+            "fullName": "cold-process encrypted evidence fails closed for corrupt-vault without modifying disk"
+          },
+          {
+            "file": "tests/ledgerVerificationReadOnly.test.ts",
+            "fullName": "public-only ledger verification preserves the supplied trust anchors without creating a vault"
+          },
+          {
+            "file": "tests/ledgerVerificationReadOnly.test.ts",
+            "fullName": "JSONL-only verification checks signed rows without creating a SQLite ledger"
+          },
+          {
+            "file": "tests/ledgerVerificationReadOnly.test.ts",
+            "fullName": "a JSONL backend marker without its event log is not verified evidence"
+          },
+          {
+            "file": "tests/ledgerVerificationReadOnly.test.ts",
+            "fullName": "verification cannot initialize a missing ledger into an apparently valid empty workspace"
+          }
+        ],
+        "pins": [
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-read-only/command.json",
+            "bytes": 2697,
+            "sha256": "1b36bc192b7f4b3a7b3d1a478291919463c6a498b166d193084058fd4eb71aec"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-read-only/observer.json",
+            "bytes": 5268,
+            "sha256": "9b5fb892fa9e9d9120b191ec47ecb315fef8acc13098af7d67fab0889e8facf5"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-read-only/owned-group-after-exit.json",
+            "bytes": 261,
+            "sha256": "5c9191e770d1e6da539731a6f144579a75ce872e4d881c600063efabe5e6fe93"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-read-only/owned-process.json",
+            "bytes": 812,
+            "sha256": "52b169068a9daf56db9fb2bb53fbe5b06fcc3e40a3fdeb995fd4e00a2f0f57d2"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-read-only/raw-producer.json",
+            "bytes": 3753,
+            "sha256": "cc194f41cadf1da0126110bba4bca34f20887de5d76bc7a40405b899d1140cd8"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-read-only/raw.json",
+            "bytes": 3753,
+            "sha256": "cc194f41cadf1da0126110bba4bca34f20887de5d76bc7a40405b899d1140cd8"
+          },
+          {
+            "path": "/private/tmp/p0-45-qualification-20261015/command-original-read-only/stdout-stderr.log",
+            "bytes": 1049,
+            "sha256": "5253c59b616ca193f50d1675d03406ded15dac37d644a1a9500f557ffea386f3"
+          }
+        ],
+        "sourceTestPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/ledgerVerificationReadOnly.test.ts",
+          "bytes": 9057,
+          "sha256": "4190737d0e35f10c8bd909294017071933156d90d9ebcb79189973ea52521d96"
+        },
+        "knownLateMatches": [],
+        "infrastructureErrorsObserved": 0
+      }
+    ],
+    "originalRunCount": 4,
+    "distinctFileTitleRegistrations": 31,
+    "sumOriginalRegistrations": 31,
+    "provenancePin": {
+      "path": "/private/tmp/p0-45-qualification-20261015/post-build-provenance.json",
+      "bytes": 4103,
+      "sha256": "82c61a37a95c1dbd02fd7a5a1150daf73542761501c5d11ec51d9394a1639c89"
+    },
+    "provenanceRuntimeLogExact": true,
+    "provenance": {
+      "source": "2024f25c79973987b44a4a1298488d55ee0d6227",
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesABI": "127",
+        "napi": "10",
+        "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+        "sqliteSelected": 1,
+        "native": {
+          "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 538734665,
+          "nlink": 1
+        },
+        "boundary": "Fresh owned source-install native load and in-memory query. No shared native rebuild, product model call, OS isolation or per-other-child ABI inference."
+      },
+      "runtimeLog": {
+        "path": "/private/tmp/p0-45-qualification-20261015/command-runtime-fingerprint/stdout-stderr.log",
+        "bytes": 737,
+        "sha256": "3ae66ce5aaad4b10408d753fff1f21029e64e76d540f0a8f2f12fbb7f4fea0bc"
+      },
+      "normalBuildExit": 0,
+      "compiled4529ExactToP021": true,
+      "compiledManifest": {
+        "path": "/private/tmp/p0-45-qualification-20261015/compiled-after-build.json",
+        "bytes": 485185,
+        "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48"
+      },
+      "readinessCompiledPinsVerified": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/dist/cli.js",
+          "bytes": 1054087,
+          "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+          "priorReadinessPin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/cli.js",
+            "bytes": 1054087,
+            "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+          }
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/dist/cli-verify-repair.js",
+          "bytes": 5969,
+          "sha256": "e54fc251be8750ea4e48770b3c589f8ab25f9c4fc641a55342aeab54af1f44a1",
+          "priorReadinessPin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/cli-verify-repair.js",
+            "bytes": 5969,
+            "sha256": "e54fc251be8750ea4e48770b3c589f8ab25f9c4fc641a55342aeab54af1f44a1"
+          }
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/dist/ledger/verifyRepair.js",
+          "bytes": 9833,
+          "sha256": "1f1b870fe18fbb61800c4a0334a375b5c860f1e5beabc3ba1b31a3cdfd040e80",
+          "priorReadinessPin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/ledger/verifyRepair.js",
+            "bytes": 9833,
+            "sha256": "1f1b870fe18fbb61800c4a0334a375b5c860f1e5beabc3ba1b31a3cdfd040e80"
+          }
+        }
+      ],
+      "tracked8205Unchanged": true,
+      "priorNativesPhysicallyDistinct": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 538645305,
+          "nlink": 1
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 538593142,
+          "nlink": 1
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 537685380,
+          "nlink": 1
+        }
+      ],
+      "meaning": "Fresh owned native fingerprint is one actual process/in-memory query. No shared rebuild or per-test-child ABI inference. Prior native bodies are hash/stat checked only."
+    },
+    "nativeChecks": [
+      {
+        "actual": {
+          "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 538734665,
+          "nlink": 1
+        },
+        "matches": true
+      },
+      {
+        "actual": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 538645305,
+          "nlink": 1
+        },
+        "matches": true
+      },
+      {
+        "actual": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 538593142,
+          "nlink": 1
+        },
+        "matches": true
+      },
+      {
+        "actual": {
+          "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+          "device": 16777231,
+          "inode": 537685380,
+          "nlink": 1
+        },
+        "matches": true
+      }
+    ],
+    "nativeIdentitiesUnique": true,
+    "knownLatePatterns": [
+      "Unhandled Errors?",
+      "Unhandled Rejection",
+      "uncaught exception",
+      "Error during teardown",
+      "Error during global teardown",
+      "Tests modified the repository workspace",
+      "Hook timed out",
+      "ELIFECYCLE",
+      "error during close",
+      "close timed out",
+      "Tests closed successfully but something prevents"
+    ],
+    "currentManifestChecks": [
+      {
+        "manifestPin": {
+          "path": "/private/tmp/p0-45-qualification-20261015/tracked-source-before.json",
+          "bytes": 999893,
+          "sha256": "1d2ae6b2a90b8e4c9e10de35b8bc870d87e0e784fabbdba6914d9fc5423a963b"
+        },
+        "count": 8205,
+        "expected": 8205,
+        "exactCount": true,
+        "failures": []
+      },
+      {
+        "manifestPin": {
+          "path": "/private/tmp/p0-45-qualification-20261015/compiled-after-build.json",
+          "bytes": 485185,
+          "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48"
+        },
+        "count": 4529,
+        "expected": 4529,
+        "exactCount": true,
+        "failures": []
+      }
+    ],
+    "appendableJournalReadOrPinned": false
+  },
+  "meaning": {
+    "core12": "Owned workspace/real encrypted blob writer and ledger verifier, then tamper/plans/apply snapshots. Hold verdict callbacks and receipt SignedDigest signer are injected; receipt signatures are stub strings. fs is an existing plain-object mock for rename spying. Writer/pools are closed before repair; no active-writer race.",
+    "builtCLI5": "Actual built dist/cli.js children through the unchanged helper; expected exit0/1/2 results, plan/no-confirmation/receipt/archive-note behavior and one edited-monitor failure message. Local real REPAIR_RECEIPT signature verification and altered-byte refusal are assertions in the passing source case. Inherited environment, per-call AMC_HOME/passphrase and original60s child timeout remain. No independent external issuer/trust anchor, separate child transcript/PID record or active-writer claim.",
+    "separation4": "Evidence-chain versus config-governance cases using owned local keys/workspaces, one invalid config signature, a valid signed-event baseline and a deliberate fixture DB metadata rewrite after dropping its immutability trigger. This is verifier/governance sensitivity in local fixtures.",
+    "readOnly10": "Two cold-process vault-format positives plus four cold-process encrypted-evidence refusal cases; four further original in-process cases cover public-only key preservation/no vault, JSONL signed-row tamper/no SQLite creation, missing JSONL log and missing ledger. Disk-state comparison checks SHA/mtime/mode while excluding SQLite WAL/SHM. Six cold Node/tsx calls are in the original passing case paths; per-child PID/stdout evidence is not separately retained. Local fixture keys are not independent external authority.",
+    "lifecycle": "Four observed outer Vitest groups closed with actual retained signal-zero ESRCH after exit0. Run-end observer is before global teardown; full streams/exit/group records supplement it. This is not universal descendant absence, whole-filesystem nonmutation or complete teardown proof.",
+    "environment": "Original launch environment is inherited with private HOME, Node22 PATH and explicit reporter output/GIT_NO_LAZY_FETCH overrides. It is not a credential-free allowlist or operating-system/network sandbox.",
+    "sourceVersusBuilt": "Core12 imports original TS source via normal Vitest source resolution. CLI5 runs the built entrypoint. Future TS-only controls over core12 cannot claim compiled CLI sensitivity while dist remains unchanged.",
+    "futureBoundary": "These four passing original corpora are a necessary baseline only. Root's remaining normal guards, separate complete causal preparation/static review and exact release must finish before causal execution. C1/C2 are still unexecuted recipes; no mutation result or full formal acceptance is supplied."
+  },
+  "findings": [
+    {
+      "id": "O1",
+      "severity": "info",
+      "finding": "Four separate original runs pass12/5/4/10 with31 unique file/title identities across4 files; no single31-case run claimed."
+    },
+    {
+      "id": "O2",
+      "severity": "info",
+      "finding": "Producer snapshots, artifact pins, raw/observer/source titles, counts, hooks/errors and PID/cwd bindings agree. Retained outer group ESRCH follows normal0 exits; no known late diagnostic observed."
+    },
+    {
+      "id": "O3",
+      "severity": "info",
+      "finding": "Current8205 tracked and4529 compiled manifests match. Fresh native hash/stat identity and all three earlier native identities match and remain physically distinct."
+    },
+    {
+      "id": "O4",
+      "severity": "trust-and-observation-limit",
+      "finding": "Core hold/receipt injections, CLI local signature verification, hand-owned fixtures, six cold verifier paths and existing disk/WAL exclusions have the stated source-derived limits. No external issuer, live-writer or universal filesystem/descendant proof."
+    },
+    {
+      "id": "O5",
+      "severity": "future-precondition",
+      "finding": "Passing baselines do not release causal controls or close acceptance. Remaining normal guards and exact reviewed causal preparation/release are root prerequisites; appendable journal/active guards remain unpinned."
+    }
+  ],
+  "appendableJournalReadOrPinned": false,
+  "summaryPin": {
+    "path": "/private/tmp/p0-45-qualification-20261015/original-corpora-summary.json",
+    "bytes": 24298,
+    "sha256": "571e35ee51bbe85e25dbc9c7a852d6275eeaf11f686b16445112219914a8f6b3"
+  },
+  "markdownPin": {
+    "path": "/private/tmp/p0-45-original-corpora-independent-review-20261015.md",
+    "bytes": 2466,
+    "sha256": "f0fdab74a29ed54cffacfd807f2e6b8ad3801269bda8ae27a57427adbc9029fd"
+  }
+}

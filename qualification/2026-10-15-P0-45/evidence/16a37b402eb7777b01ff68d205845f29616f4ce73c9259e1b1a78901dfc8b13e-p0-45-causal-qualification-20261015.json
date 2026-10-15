@@ -1,0 +1,1243 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-45",
+  "source": "2024f25c79973987b44a4a1298488d55ee0d6227",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T06:16:11.693383+00:00",
+  "state": "complete-pending-independent-review",
+  "formalAcceptanceClosed": false,
+  "runtimeArtifactIndex": {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/runtime-artifact-index.json",
+    "bytes": 50431,
+    "sha256": "032e4ec6ee8e1041c4116ec8ac571620bda7871459c7572f3a51be0dac7978bb"
+  },
+  "finalSourcePreservation": {
+    "path": "/private/tmp/p0-45-qualification-20261015/final-source-preservation.json",
+    "bytes": 3063,
+    "sha256": "eb68c2db7cf340cda1dcf4652cd71459fd94fd57b35a5d9711351f1273e2ffd7"
+  },
+  "controller": {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/driver/controller.py",
+    "bytes": 22514,
+    "sha256": "9479a7a7186ce97e740dad14fda9c0244f3f3173d8d41a30b659de8e5e40e192"
+  },
+  "freezer": {
+    "path": "/private/tmp/p0-45-freeze-qualified-evidence-v2-20261015.py",
+    "bytes": 39181,
+    "sha256": "a1c0de3feaf6fd5a7b2e823ca4b92b096a153c371d28da6ad2d2b6c35571137b"
+  },
+  "controls": [
+    {
+      "control": "P045-C1-fail-closed-hold-admission",
+      "recipe": {
+        "id": "P045-C1-fail-closed-hold-admission",
+        "title": "Remove unknown and active legal-hold refusals as one current admission control",
+        "file": "src/ledger/verifyRepair.ts",
+        "baselineSha256": "5ba4d59b5293e5e498d3cec3d58635133c75bc8d31db518a0d6b49d65f9164bb",
+        "anchors": [
+          {
+            "find": "  if (hold.state === \"unknown\") throw new RepairRefused(`legal hold state unknown: ${hold.reason}`);",
+            "replace": "",
+            "occurrences": 1,
+            "line": 180
+          },
+          {
+            "find": "  if (hold.state === \"active\") throw new RepairRefused(`legal hold active: ${hold.holdIds.join(\", \")}`);",
+            "replace": "",
+            "occurrences": 1,
+            "line": 181
+          }
+        ],
+        "proposedMutantSha256": "75bf1ce550fd79842e17816935939b4edc046317ae49d9a463ef8d0275861bfe",
+        "meaning": "Potential fail-closed admission sensitivity under injected legalHolds callbacks and a stub signer. Source permits proceeding after callback unknown/active when both refusals are removed; original case bodies may stop before all state assertions. The returned receipt uses literal legalHold.state none at source:208, but these original failed cases do not independently retain/assert that receipt.",
+        "notEstablished": [
+          "Actual signed registry active/unknown behavior",
+          "A built CLI hold bypass from a TS-only mutation",
+          "Every post-failure filesystem/receipt fact unless separately retained before cleanup",
+          "Deletion or irrecoverable byte loss",
+          "Independent trusted-time or issuer proof"
+        ]
+      },
+      "result": {
+        "path": "/private/tmp/p0-45-causal-qualification-20261015/result--P045-C1-fail-closed-hold-admission.json",
+        "bytes": 13356,
+        "sha256": "36f12f708c42b590866b18cf6f5a125116c56a8cdf8fcbf4e364a1f8f942baa1"
+      },
+      "release": {
+        "path": "/private/tmp/p0-45-causal-qualification-20261015/releases/P045-C1-fail-closed-hold-admission.json",
+        "bytes": 3370,
+        "sha256": "ccde67e6833dbcad27995bbe720b2ef590b5d7f1d06268baef2d6003ecc6ae3c"
+      },
+      "verdict": "body-assertion-sensitivity-awaiting-root-attribution",
+      "phases": [
+        {
+          "phase": "P045-C1-fail-closed-hold-admission--baseline",
+          "stage": "baseline",
+          "classification": {
+            "classification": "passed",
+            "total": 12,
+            "passed": 12,
+            "failed": 0,
+            "pending": 0,
+            "todo": 0,
+            "failures": [],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:12:23.250699+00:00",
+            "pid": 19285,
+            "sessionLeaderExpected": 19285,
+            "observedPgidAfterLaunch": 19285,
+            "ownedPgid": 19285,
+            "cwd": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/verifyRepair.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-45-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--baseline/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 0,
+            "endedUtc": "2026-10-15T06:12:28.682356+00:00",
+            "durationMs": 5434,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:12:28.682049+00:00",
+                "pgid": 19285,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 0
+          },
+          "directory": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--baseline",
+          "raw": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--baseline/raw.json",
+            "bytes": 4157,
+            "sha256": "e67bd720267b411936da32cca1796b8ce1cc934b3fe8f77294a0950b6fc6413a"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--baseline/observer.json",
+            "bytes": 6178,
+            "sha256": "32c5b43616a0071a1bf382bc735e692e00c18247a8900506901cdbf791885f64"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--baseline/stdout-stderr.log",
+            "bytes": 427,
+            "sha256": "fe04b62dfdb6478806dc7ae8562973194cfbc46b6c21fe387960357df8b65864"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--baseline/artifacts.json",
+            "bytes": 2181,
+            "sha256": "60f2c994efe881caaaf8b57cb882642d46c634cb999bae4ba039b56fe38f9b6b"
+          }
+        },
+        {
+          "phase": "P045-C1-fail-closed-hold-admission--mutant",
+          "stage": "mutant",
+          "classification": {
+            "classification": "body-assertion-failures-observed",
+            "total": 12,
+            "passed": 9,
+            "failed": 3,
+            "pending": 0,
+            "todo": 0,
+            "failures": [
+              {
+                "file": "tests/verifyRepair.test.ts",
+                "fullName": "applyVerifyRepair refuses under an active hold and names it",
+                "rawFailureMessages": [
+                  "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:221:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+                ],
+                "observerErrors": [
+                  {
+                    "message": "expected undefined to be an instance of RepairRefused",
+                    "showDiff": false,
+                    "operator": "strictEqual",
+                    "name": "AssertionError",
+                    "ok": false,
+                    "stack": "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:221:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+                    "stacks": [
+                      {
+                        "method": "expectRefused",
+                        "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+                        "line": 99,
+                        "column": 18
+                      },
+                      {
+                        "method": "",
+                        "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+                        "line": 221,
+                        "column": 5
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "file": "tests/verifyRepair.test.ts",
+                "fullName": "applyVerifyRepair refuses when the hold check itself throws",
+                "rawFailureMessages": [
+                  "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:213:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+                ],
+                "observerErrors": [
+                  {
+                    "message": "expected undefined to be an instance of RepairRefused",
+                    "showDiff": false,
+                    "operator": "strictEqual",
+                    "name": "AssertionError",
+                    "ok": false,
+                    "stack": "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:213:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+                    "stacks": [
+                      {
+                        "method": "expectRefused",
+                        "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+                        "line": 99,
+                        "column": 18
+                      },
+                      {
+                        "method": "",
+                        "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+                        "line": 213,
+                        "column": 5
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "file": "tests/verifyRepair.test.ts",
+                "fullName": "applyVerifyRepair refuses when the legal hold state is unknown, and moves nothing",
+                "rawFailureMessages": [
+                  "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:203:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+                ],
+                "observerErrors": [
+                  {
+                    "message": "expected undefined to be an instance of RepairRefused",
+                    "showDiff": false,
+                    "operator": "strictEqual",
+                    "name": "AssertionError",
+                    "ok": false,
+                    "stack": "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:203:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+                    "stacks": [
+                      {
+                        "method": "expectRefused",
+                        "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+                        "line": 99,
+                        "column": 18
+                      },
+                      {
+                        "method": "",
+                        "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+                        "line": 203,
+                        "column": 5
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:12:30.651755+00:00",
+            "pid": 19305,
+            "sessionLeaderExpected": 19305,
+            "observedPgidAfterLaunch": 19305,
+            "ownedPgid": 19305,
+            "cwd": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/verifyRepair.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-45-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 1,
+            "endedUtc": "2026-10-15T06:12:35.862592+00:00",
+            "durationMs": 5212,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:12:35.862306+00:00",
+                "pgid": 19305,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 0
+          },
+          "directory": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant",
+          "raw": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/raw.json",
+            "bytes": 8232,
+            "sha256": "bec4808ffcdb7beda92372c5ce82c2f966994b5398e17dfdc69772282b49c987"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/observer.json",
+            "bytes": 12442,
+            "sha256": "0f5f18c684bc3c719cde9dc55b06cc02233961a0152200d420ea11611e7a5a29"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/stdout-stderr.log",
+            "bytes": 3055,
+            "sha256": "adc64b6b0341076c3466c7985ddc2b68b0e5ac50b436c2c44d91768de80ce1ba"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/artifacts.json",
+            "bytes": 2167,
+            "sha256": "ab29b952407053ce732e48d10d1f04e89d2b5599defdeac55cf2a810af4bc977"
+          }
+        },
+        {
+          "phase": "P045-C1-fail-closed-hold-admission--restored",
+          "stage": "restored",
+          "classification": {
+            "classification": "passed",
+            "total": 12,
+            "passed": 12,
+            "failed": 0,
+            "pending": 0,
+            "todo": 0,
+            "failures": [],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:12:37.832139+00:00",
+            "pid": 19315,
+            "sessionLeaderExpected": 19315,
+            "observedPgidAfterLaunch": 19315,
+            "ownedPgid": 19315,
+            "cwd": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/verifyRepair.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-45-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 0,
+            "endedUtc": "2026-10-15T06:12:43.129542+00:00",
+            "durationMs": 5299,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:12:43.129315+00:00",
+                "pgid": 19315,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 0
+          },
+          "directory": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored",
+          "raw": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/raw.json",
+            "bytes": 4173,
+            "sha256": "cfb594b91c64e17934da5d900d321d69d854a3d5797bc7f7e36768210f7b210e"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/observer.json",
+            "bytes": 6178,
+            "sha256": "2359cf1ef4d3866744a883dfc5c14d85d8290feda1cab7468bffc78079a2fb8f"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/stdout-stderr.log",
+            "bytes": 427,
+            "sha256": "8ed7bd3aca44d02e48971a1e5e0ae5af886644818bbee9c4997ff023eb222f4f"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/artifacts.json",
+            "bytes": 2181,
+            "sha256": "497ed914a4f161c981abb4577e668c28cb5be870bd1b2b21582ffd6f05dafa62"
+          }
+        }
+      ]
+    },
+    {
+      "control": "P045-C2-forward-copy-then-unlink",
+      "recipe": {
+        "id": "P045-C2-forward-copy-then-unlink",
+        "title": "Replace only the single forward quarantine rename with faithful copy plus unlink",
+        "file": "src/ledger/verifyRepair.ts",
+        "baselineSha256": "5ba4d59b5293e5e498d3cec3d58635133c75bc8d31db518a0d6b49d65f9164bb",
+        "anchors": [
+          {
+            "find": "      fs.renameSync(join(workspace, file.path), target);",
+            "replace": "      fs.copyFileSync(join(workspace, file.path), target);\n      fs.unlinkSync(join(workspace, file.path));",
+            "occurrences": 1,
+            "line": 149
+          }
+        ],
+        "proposedMutantSha256": "062cbc9bb2be83c47f3550fa3c2ad6f970150b41c603f0e63b587eb61dc34145",
+        "meaning": "If the rename-fault case alone detects the mutant, report call-path/fault-injection sensitivity and a changed repair mechanism. Do not call it an observed lost-byte kill, proof of copy-delete crash danger, or complete satisfaction of the spec invariant mutation criterion.",
+        "notEstablished": [
+          "Atomicity across copy/unlink or multi-file move",
+          "Loss on crash, interrupted copy, unlink failure or active writer/WAL race",
+          "Copy destination permission/inode/mode equivalence",
+          "Rollback-after-copy-failure correctness",
+          "Full CLI mutation propagation with dist unchanged"
+        ],
+        "protectedAnchor": {
+          "find": "      fs.renameSync(join(workspace, row.to), join(workspace, row.from));",
+          "occurrences": 1,
+          "line": 124,
+          "meaning": "Rollback rename must remain byte-identical. Receipt atomic-write helper and every guard stay unchanged."
+        }
+      },
+      "result": {
+        "path": "/private/tmp/p0-45-causal-qualification-20261015/result--P045-C2-forward-copy-then-unlink.json",
+        "bytes": 5910,
+        "sha256": "e1abf593851c78daa90a95b51ae06889f96dfdb23c15b713561fb629be67a426"
+      },
+      "release": {
+        "path": "/private/tmp/p0-45-causal-qualification-20261015/releases/P045-C2-forward-copy-then-unlink.json",
+        "bytes": 3410,
+        "sha256": "450b3d91a124990f64d623d2a159b05724df52106e71bbedf6a7ff9bb5aa0ab8"
+      },
+      "verdict": "body-assertion-sensitivity-awaiting-root-attribution",
+      "phases": [
+        {
+          "phase": "P045-C2-forward-copy-then-unlink--baseline",
+          "stage": "baseline",
+          "classification": {
+            "classification": "passed",
+            "total": 12,
+            "passed": 12,
+            "failed": 0,
+            "pending": 0,
+            "todo": 0,
+            "failures": [],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:14:23.517960+00:00",
+            "pid": 19530,
+            "sessionLeaderExpected": 19530,
+            "observedPgidAfterLaunch": 19530,
+            "ownedPgid": 19530,
+            "cwd": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/verifyRepair.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-45-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 0,
+            "endedUtc": "2026-10-15T06:14:29.276502+00:00",
+            "durationMs": 5761,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:14:29.276049+00:00",
+                "pgid": 19530,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 1
+          },
+          "directory": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline",
+          "raw": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/raw.json",
+            "bytes": 4164,
+            "sha256": "e4060c150e0ca8acaeda27fbb0d8522cdb07ff97467a3572188bdc3342a5fd2c"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/observer.json",
+            "bytes": 6178,
+            "sha256": "e81953ddb5fef406d3d33f63c89475e227374f5122e25ea41b2c4b91824917ee"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/stdout-stderr.log",
+            "bytes": 425,
+            "sha256": "e264afe39aedd971fecdcc47bdac9316a83ff029d71e35ada6927c6b259ed4d3"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/artifacts.json",
+            "bytes": 2163,
+            "sha256": "947e518260c87921499306bd548f371af73c15f1cfc50c40d2eb9d23f1f97611"
+          }
+        },
+        {
+          "phase": "P045-C2-forward-copy-then-unlink--mutant",
+          "stage": "mutant",
+          "classification": {
+            "classification": "body-assertion-failures-observed",
+            "total": 12,
+            "passed": 11,
+            "failed": 1,
+            "pending": 0,
+            "todo": 0,
+            "failures": [
+              {
+                "file": "tests/verifyRepair.test.ts",
+                "fullName": "applyVerifyRepair puts moved files back when a rename fails part way",
+                "rawFailureMessages": [
+                  "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:268:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+                ],
+                "observerErrors": [
+                  {
+                    "message": "expected undefined to be an instance of RepairRefused",
+                    "showDiff": false,
+                    "operator": "strictEqual",
+                    "name": "AssertionError",
+                    "ok": false,
+                    "stack": "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:268:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+                    "stacks": [
+                      {
+                        "method": "expectRefused",
+                        "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+                        "line": 99,
+                        "column": 18
+                      },
+                      {
+                        "method": "",
+                        "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+                        "line": 268,
+                        "column": 5
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:14:31.276205+00:00",
+            "pid": 19542,
+            "sessionLeaderExpected": 19542,
+            "observedPgidAfterLaunch": 19542,
+            "ownedPgid": 19542,
+            "cwd": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/verifyRepair.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-45-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 1,
+            "endedUtc": "2026-10-15T06:14:36.765526+00:00",
+            "durationMs": 5492,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:14:36.765251+00:00",
+                "pgid": 19542,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 0
+          },
+          "directory": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant",
+          "raw": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/raw.json",
+            "bytes": 5523,
+            "sha256": "7c085e56dc6c4b1b0caa7be0625e6b6f1fd6842f369b1b4e7f1ef30f152fba62"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/observer.json",
+            "bytes": 8266,
+            "sha256": "99717e7631311c2284a14ebde0f323afc62cec4d73e720620f7de2d914a5412d"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/stdout-stderr.log",
+            "bytes": 1959,
+            "sha256": "24debb849944edecfc72133344ab920c6f5804a250d5cc9304347b1e29db3c22"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/artifacts.json",
+            "bytes": 2147,
+            "sha256": "547761f67ca3a29fa24a6a2aee8c13e68d44320bf006c64b648a0fe553bf4b49"
+          }
+        },
+        {
+          "phase": "P045-C2-forward-copy-then-unlink--restored",
+          "stage": "restored",
+          "classification": {
+            "classification": "passed",
+            "total": 12,
+            "passed": 12,
+            "failed": 0,
+            "pending": 0,
+            "todo": 0,
+            "failures": [],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:14:38.794082+00:00",
+            "pid": 19555,
+            "sessionLeaderExpected": 19555,
+            "observedPgidAfterLaunch": 19555,
+            "ownedPgid": 19555,
+            "cwd": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/verifyRepair.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-45-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--restored/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 0,
+            "endedUtc": "2026-10-15T06:14:44.385709+00:00",
+            "durationMs": 5594,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:14:44.385374+00:00",
+                "pgid": 19555,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 0
+          },
+          "directory": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--restored",
+          "raw": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--restored/raw.json",
+            "bytes": 4161,
+            "sha256": "837e6ef993274bdbbff4db2dae0dbd5898d078be1c41beac45dddf6ab419c42a"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--restored/observer.json",
+            "bytes": 6178,
+            "sha256": "d7501ec8f68b76966f5a431dc6397fd61c16ffbdbbf16bb56346775bf2fb0e14"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--restored/stdout-stderr.log",
+            "bytes": 425,
+            "sha256": "1d966f458e2a6dd1b9c14510e5a09ccb9bd18fcbed28b361d20bff195659a284"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--restored/artifacts.json",
+            "bytes": 2163,
+            "sha256": "98ebc03e0d6d7de4b7417bd7ecf79389517a24c439ab34b1e933f5f898e81cea"
+          }
+        }
+      ]
+    }
+  ],
+  "causalCommandRecords": [
+    {
+      "startedUtc": "2026-10-15T06:12:23.250699+00:00",
+      "pid": 19285,
+      "sessionLeaderExpected": 19285,
+      "observedPgidAfterLaunch": 19285,
+      "ownedPgid": 19285,
+      "cwd": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/verifyRepair.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-45-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--baseline/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 0,
+      "endedUtc": "2026-10-15T06:12:28.682356+00:00",
+      "durationMs": 5434,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:12:28.682049+00:00",
+          "pgid": 19285,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 0
+    },
+    {
+      "startedUtc": "2026-10-15T06:12:30.651755+00:00",
+      "pid": 19305,
+      "sessionLeaderExpected": 19305,
+      "observedPgidAfterLaunch": 19305,
+      "ownedPgid": 19305,
+      "cwd": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/verifyRepair.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-45-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 1,
+      "endedUtc": "2026-10-15T06:12:35.862592+00:00",
+      "durationMs": 5212,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:12:35.862306+00:00",
+          "pgid": 19305,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 0
+    },
+    {
+      "startedUtc": "2026-10-15T06:12:37.832139+00:00",
+      "pid": 19315,
+      "sessionLeaderExpected": 19315,
+      "observedPgidAfterLaunch": 19315,
+      "ownedPgid": 19315,
+      "cwd": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/verifyRepair.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-45-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 0,
+      "endedUtc": "2026-10-15T06:12:43.129542+00:00",
+      "durationMs": 5299,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:12:43.129315+00:00",
+          "pgid": 19315,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 0
+    },
+    {
+      "startedUtc": "2026-10-15T06:14:23.517960+00:00",
+      "pid": 19530,
+      "sessionLeaderExpected": 19530,
+      "observedPgidAfterLaunch": 19530,
+      "ownedPgid": 19530,
+      "cwd": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/verifyRepair.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-45-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 0,
+      "endedUtc": "2026-10-15T06:14:29.276502+00:00",
+      "durationMs": 5761,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:14:29.276049+00:00",
+          "pgid": 19530,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 1
+    },
+    {
+      "startedUtc": "2026-10-15T06:14:31.276205+00:00",
+      "pid": 19542,
+      "sessionLeaderExpected": 19542,
+      "observedPgidAfterLaunch": 19542,
+      "ownedPgid": 19542,
+      "cwd": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/verifyRepair.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-45-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 1,
+      "endedUtc": "2026-10-15T06:14:36.765526+00:00",
+      "durationMs": 5492,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:14:36.765251+00:00",
+          "pgid": 19542,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 0
+    },
+    {
+      "startedUtc": "2026-10-15T06:14:38.794082+00:00",
+      "pid": 19555,
+      "sessionLeaderExpected": 19555,
+      "observedPgidAfterLaunch": 19555,
+      "ownedPgid": 19555,
+      "cwd": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/verifyRepair.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-45-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--restored/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 0,
+      "endedUtc": "2026-10-15T06:14:44.385709+00:00",
+      "durationMs": 5594,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:14:44.385374+00:00",
+          "pgid": 19555,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 0
+    }
+  ],
+  "executionCounts": {
+    "total": 72,
+    "passed": 68,
+    "failed": 4,
+    "pending": 0,
+    "todo": 0
+  },
+  "distinctRepeatedCorpusRegistrations": 12,
+  "distinctFailedFileTitlePairs": 4,
+  "mutantPassedCounts": [
+    9,
+    11
+  ],
+  "survivingControls": [],
+  "controllerHistory": "Derived from preserved P021v3; actual execution here is bound only to the two completed P045 controls, six phase commands and their exact releases.",
+  "failuresAndMasking": [
+    {
+      "file": "tests/verifyRepair.test.ts",
+      "fullName": "applyVerifyRepair refuses under an active hold and names it",
+      "rawFailureMessages": [
+        "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:221:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+      ],
+      "observerErrors": [
+        {
+          "message": "expected undefined to be an instance of RepairRefused",
+          "showDiff": false,
+          "operator": "strictEqual",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:221:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "stacks": [
+            {
+              "method": "expectRefused",
+              "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+              "line": 99,
+              "column": 18
+            },
+            {
+              "method": "",
+              "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+              "line": 221,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "tests/verifyRepair.test.ts",
+      "fullName": "applyVerifyRepair refuses when the hold check itself throws",
+      "rawFailureMessages": [
+        "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:213:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+      ],
+      "observerErrors": [
+        {
+          "message": "expected undefined to be an instance of RepairRefused",
+          "showDiff": false,
+          "operator": "strictEqual",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:213:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "stacks": [
+            {
+              "method": "expectRefused",
+              "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+              "line": 99,
+              "column": 18
+            },
+            {
+              "method": "",
+              "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+              "line": 213,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "tests/verifyRepair.test.ts",
+      "fullName": "applyVerifyRepair refuses when the legal hold state is unknown, and moves nothing",
+      "rawFailureMessages": [
+        "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:203:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+      ],
+      "observerErrors": [
+        {
+          "message": "expected undefined to be an instance of RepairRefused",
+          "showDiff": false,
+          "operator": "strictEqual",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:203:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "stacks": [
+            {
+              "method": "expectRefused",
+              "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+              "line": 99,
+              "column": 18
+            },
+            {
+              "method": "",
+              "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+              "line": 203,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "tests/verifyRepair.test.ts",
+      "fullName": "applyVerifyRepair puts moved files back when a rename fails part way",
+      "rawFailureMessages": [
+        "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:268:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+      ],
+      "observerErrors": [
+        {
+          "message": "expected undefined to be an instance of RepairRefused",
+          "showDiff": false,
+          "operator": "strictEqual",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:268:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "stacks": [
+            {
+              "method": "expectRefused",
+              "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+              "line": 99,
+              "column": 18
+            },
+            {
+              "method": "",
+              "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+              "line": 268,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "manualRootAttribution": "Pending independent actual review. Preserve original first frames and masked later assertions; a C2 rename-spy failure is not observed byte loss.",
+  "limits": [
+    "Bounded qualification is complete pending independent actual review; formalAcceptanceClosed remains false.",
+    "Original12 core,5 built CLI,4 separation and10 readonly verifier are four separate invocations. Six causal phases repeat only the same12 source-mode cases;72 executions add no new unique registrations.",
+    "C1 removes unknown and active legal-hold refusals together under injected callbacks and a stub signer. Shared expectRefused99 can fail before reason/snapshot/quarantine/reachability assertions; retain actual first frames and masking.",
+    "C2 changes only the forward rename to faithful copy then unlink; rollback rename remains unchanged. Byte-reachability checks may survive. A rename-fault-spy assertion failure is mechanism/fault-path sensitivity, not observed byte loss or proof of the spec invariant mutation criterion.",
+    "Actual mutant outcomes, including survivors, are derived from completed raw/observer/process records. Body AssertionErrors await semantic attribution; generic nonzero, setup/hook/native/late/timeout/pending or group uncertainty is not a kill.",
+    "Core12 uses real owned encrypted-blob writer/verifier and SHA256 snapshots, injected hold callbacks and stub SignedDigest signatures. Writers and pools close before repair; this is not active-writer or crash-atomic proof.",
+    "Original builtCLI5 combines a source fixture parent with actual dist/cli.js children, real local REPAIR_RECEIPT signature verification and altered-byte refusal. It is separate from TS-only mutations with all4529 compiled files unchanged; no independently pinned external issuer or separate per-child ABI/transcript is inferred.",
+    "Original CLI environment is inherited with per-call AMC_HOME/passphrase; the causal copy has a seven-key allowlist and borrowed unchanged parent dependencies. Neither proves OS/network, universal descendant or all-cache isolation.",
+    "Only the owned process group was probed with signal zero after exit. The run-end reporter precedes global teardown; complete process exits and known late diagnostics are checked separately. Supervisor420s sends no terminating signal and does not alter original30s tests or CLI60s children.",
+    "Original CLI assertions verify a real local repair receipt and altered-byte refusal, but afterAll deletes the owned fixture. Retained source/raw/observer/outer streams are not a separately retained CLI repair-receipt sample; no sample criterion is closed. Historical origin/main red, PR/merge, full suite and installed P031 remain formal open.",
+    "Full JSONL repair, live writer/WAL race, interactive TTY, genuine active/unknown signed registry, second signing failure, rollback failure, crash/interrupted publication and arbitrary hostile-plan/symlink containment remain unqualified.",
+    "The adjacent doctor static note identifies a dangling top-level .amc symlink deletion branch without the evidence-name exclusion/gate; its cache branch has an existing gate. This is an unapproved adjacent follow-up with no owner assigned, not observed deletion/byte loss or a verify-repair-path defect. No doctor/hold source was changed.",
+    "Required source quality remains failed and unwaived:1269duplicates/2751dead-code findings. Older exact-code type/lint/clean-source/quality evidence retains its original command/source attribution; these are not fresh P045 runs.",
+    "P021 literal20/10-outside-R4 reconciliation, P029 skip, P022 arrays, P023 held API/Studio, P051 issuer/formal, P024 ISO/expert gaps, P019/P020 proposals and P030 held runner/fullbatch/installed-pack gaps remain unresolved.",
+    "Claude/shared CLI/API/Studio/A4 and paused P2-02 reservations and all pending transfers remain intact. Historical Done is not acceptance or ownership clearance.",
+    "Historical original-red requirement, full suite, coverage, Node24, hosted CI, PR/merge, release, formal dependency/G0/Done are not established. P011 remains conditional read-only preparation after this bounded handoff."
+  ]
+}
