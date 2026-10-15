@@ -18,3 +18,6 @@ The service and client/adapter have 120 passing local Node 22 component cases ac
 Ten local Node 22 oracle tests now pass, including a genuine signed positive and the specified negative families. The oracle independently reads provider/action evidence, authenticates ledger rows with a pinned cold CLI, and requires an external operator manifest and exact database/WAL/key checks. See the fixture guide's independent-oracle update for the runnable test, trust boundaries, retained original failures and profile limits.
 
 P1-19 remains active. Finance tool composition, the normative oracle/profile, example runner, compliance controls and F01–F38 qualification remain open. Scenario statuses are unchanged; these finite oracle tests establish no universal safety, external identity, live-provider, compliance or release claim.
+
+
+The opt-in finance composition is in `src/lighthouse/finance/financeOpsTools.ts`, with durable preimage resolution in `financePaymentContext.ts`. It offers five scoped tools and reuses genuine signed approvals, action receipts, reader refresh and the existing payment adapter. The caller owns configuration, journal and recording. It is not installed in default tool sets. See `docs/LIGHTHOUSE_FINANCE_FIXTURE.md` for the exact trust and recovery limits; the full normative runner and P1-19 qualification remain open.
