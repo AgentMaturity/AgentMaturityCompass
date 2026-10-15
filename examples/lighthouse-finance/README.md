@@ -11,3 +11,10 @@ All tenants, names, accounts and destination tokens are synthetic. This fixture 
 ## Local qualification update: 16 October 2026
 
 The service and client/adapter have 120 passing local Node 22 component cases across the service and client runs after repairing payee-version overflow. See the fixture guide and `qualification/2026-10-16-P1-19/` for evidence and boundaries. Full AMC tool composition, oracle, example runner and F01–F38 qualification remain open; no normative case status has been promoted.
+
+
+## Independent oracle update: 16 October 2026
+
+Ten local Node 22 oracle tests now pass, including a genuine signed positive and the specified negative families. The oracle independently reads provider/action evidence, authenticates ledger rows with a pinned cold CLI, and requires an external operator manifest and exact database/WAL/key checks. See the fixture guide's independent-oracle update for the runnable test, trust boundaries, retained original failures and profile limits.
+
+P1-19 remains active. Finance tool composition, the normative oracle/profile, example runner, compliance controls and F01–F38 qualification remain open. Scenario statuses are unchanged; these finite oracle tests establish no universal safety, external identity, live-provider, compliance or release claim.
