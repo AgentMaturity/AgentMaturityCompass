@@ -1,0 +1,33 @@
+{
+  "utc": "2026-10-15T08:40:36.915869+00:00",
+  "trackedCount": 8751,
+  "compiledCount": 4529,
+  "allBytesModesExact": true,
+  "distMembershipExact": true,
+  "protectedHeads": {
+    "/Users/sid/AgentMaturityCompass": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+    "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+    "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass": "559fafc4fb52e586606f5fdf471ce65f44c5cf58",
+    "held": "3b4a673c8f6fc11a947279054979e977f95b34d1"
+  },
+  "native": {
+    "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "inode": 539021299,
+    "nlink": 1
+  },
+  "stripControlIndex": {
+    "path": "/private/tmp/p1-01-strip-control-runtime-artifact-index-20261015.json",
+    "bytes": 3426456,
+    "sha256": "971676ba19e3b83c53e456f521642d8d8d4df00290b53be6ba82d111fcda2111",
+    "files": 13319
+  },
+  "pagesManifest": {
+    "path": "/private/tmp/p1-01-qualification-20261015/pages-output-files.json",
+    "bytes": 1037058,
+    "sha256": "8d841f01c1a3b7e497fabcce36d64d7e6ced6055c80556625c30986f77694ba4",
+    "files": 4047
+  },
+  "failedLiteralControlRetained": true
+}

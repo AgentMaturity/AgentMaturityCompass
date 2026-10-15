@@ -1,0 +1,23 @@
+{
+  "phase": "baseline-receipt",
+  "argv": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "/private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs",
+    "receipt",
+    "/private/tmp/p1-01-source-strip-control-20261015/copy"
+  ],
+  "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+  "pid": 39982,
+  "exit": 0,
+  "expectedExit": 0,
+  "durationMs": 204,
+  "ownedGroupProbes": [
+    {
+      "utc": "2026-10-15T08:39:11.680577+00:00",
+      "signal": 0,
+      "errno": 3,
+      "absentByESRCH": true
+    }
+  ],
+  "signalsOtherThanZeroSent": false
+}

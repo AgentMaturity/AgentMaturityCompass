@@ -1,0 +1,22 @@
+{
+  "kind": "human-WIP-policy-decision-append",
+  "utc": "2026-10-15T08:21:01.132133+00:00",
+  "source": "Explicit current user message",
+  "dependabotExcluded": true,
+  "allOtherReadinessAndFreezeChecksIntact": true,
+  "path": "/Users/sid/AgentMaturityCompass/AMC_OS/INBOX/REV_QA_LEAD.md",
+  "before": {
+    "bytes": 883555,
+    "sha256": "6a869db5c96a03de616fbf946763464bc126d8eabfd57f0b4d3ab42b3a11b39d"
+  },
+  "append": {
+    "path": "/private/tmp/amc-dependabot-wip-decision-20261015.md",
+    "bytes": 1019,
+    "sha256": "893fc80ad0597a95d83b5c996aa2ec1f82973fb0c4cec3043fb97c452701b920"
+  },
+  "after": {
+    "bytes": 884574,
+    "sha256": "c9bea23dfaa64e2bd01526c8e023ae0f54a0863b20134890b196d01046492b64"
+  },
+  "previousPrefixExact": true
+}

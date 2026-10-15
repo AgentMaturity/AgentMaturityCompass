@@ -1,0 +1,34 @@
+{
+  "kind": "immutable-artifact-staged-whitespace-proof",
+  "stagedCheckExit": 2,
+  "diagnosticCount": 8,
+  "counts": {
+    "originalDiffContextTrailingSpaces": 6,
+    "originalDiffBlankEOF": 1,
+    "originalBuildLogBlankEOF": 1
+  },
+  "exactCopiedOrigins": [
+    {
+      "source": {
+        "path": "/private/tmp/p1-01-canonical-builder-v2-preparation-20261015.diff",
+        "bytes": 5771,
+        "sha256": "263d15607c504f314a799b4d61c410d8dba40f068772cb50c6331d4198332772"
+      },
+      "copiedPath": "evidence/015-p1-01-canonical-builder-v2-preparation-20261015.diff",
+      "sha256": "263d15607c504f314a799b4d61c410d8dba40f068772cb50c6331d4198332772"
+    },
+    {
+      "source": {
+        "path": "/private/tmp/p1-01-qualification-20261015/command-build/stdout-stderr.log",
+        "bytes": 945,
+        "sha256": "d2f03ddf69f1d9c15c5c6a4c008637a4db9f6cafe9a75d0fbcecc44e12c88fed"
+      },
+      "copiedPath": "evidence/033-stdout-stderr.log",
+      "sha256": "d2f03ddf69f1d9c15c5c6a4c008637a4db9f6cafe9a75d0fbcecc44e12c88fed"
+    }
+  ],
+  "rawDiagnostics": "qualification/2026-10-15-P1-01/evidence/015-p1-01-canonical-builder-v2-preparation-20261015.diff:5: trailing whitespace.\n+ \nqualification/2026-10-15-P1-01/evidence/015-p1-01-canonical-builder-v2-preparation-20261015.diff:12: trailing whitespace.\n+ \nqualification/2026-10-15-P1-01/evidence/015-p1-01-canonical-builder-v2-preparation-20261015.diff:14: trailing whitespace.\n+ \nqualification/2026-10-15-P1-01/evidence/015-p1-01-canonical-builder-v2-preparation-20261015.diff:18: trailing whitespace.\n+ \nqualification/2026-10-15-P1-01/evidence/015-p1-01-canonical-builder-v2-preparation-20261015.diff:65: trailing whitespace.\n+ \nqualification/2026-10-15-P1-01/evidence/015-p1-01-canonical-builder-v2-preparation-20261015.diff:66: trailing whitespace.\n+ \nqualification/2026-10-15-P1-01/evidence/015-p1-01-canonical-builder-v2-preparation-20261015.diff:65: new blank line at EOF.\nqualification/2026-10-15-P1-01/evidence/033-stdout-stderr.log:21: new blank line at EOF.\n",
+  "rawStdoutPath": "/private/tmp/p1-01-staged-validation-20261015/stdout.log",
+  "rawStdoutSha256": "ecbc8a00828920c80ad24c0971d736acc1e67054275befd0fed35b38f06b2f26",
+  "action": "Preserve exact frozen diff/log bytes and the actual nonzero check. No trimming, ignore switch, hook or freeze bypass."
+}

@@ -1,0 +1,18 @@
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: receipt V2 must refuse the unrecognized top-level member
+
+true !== false
+
+    at file:///private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs:64:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: true,
+  expected: false,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.23.3

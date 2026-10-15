@@ -1,0 +1,11 @@
+{
+  "kind": "preexecution-compiler-build-artifact-correction",
+  "v3": "/private/tmp/p1-01-source-strip-control-v3-prepared-20261015.py",
+  "v3Executed": false,
+  "v4": "/private/tmp/p1-01-source-strip-control-v4-prepared-20261015.py",
+  "v4Sha256": "01931c4fd626984a21946ed5276df8eed94d7ab716052509c9f67dea7ea4cb59",
+  "v4Executed": false,
+  "knownThinKernelSha256": "7960e3a179f94a8ed511eb24176d49da67e8e162919e71878b4cc14c514e14d1",
+  "change": "After real successful tsc and owned ESRCH, require exact known unchanged thin kernel emission, retain it, restore exact accepted parent kernel bundle before any contract probes; source and receipt mutation unchanged.",
+  "noCompilerErrorOrFreezeBypass": true
+}

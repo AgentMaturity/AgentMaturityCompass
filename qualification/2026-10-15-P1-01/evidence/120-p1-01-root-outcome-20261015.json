@@ -1,0 +1,144 @@
+{
+  "kind": "root-bounded-qualification-outcome",
+  "utc": "2026-10-15T08:46:31.616606+00:00",
+  "key": "P1-01",
+  "source": "559fafc4fb52e586606f5fdf471ce65f44c5cf58",
+  "productionSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "branch": "codex/p1-01-current-qualification",
+  "root": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass",
+  "boundedQualificationCompleted": true,
+  "formalAcceptanceClosed": false,
+  "doneOrDependencyClosure": false,
+  "productFilesChanged": false,
+  "WIP": {
+    "userExcludesDependabot": true,
+    "observedOpenDependabot": 13,
+    "countedNonDependabot": 0,
+    "decision": {
+      "path": "/private/tmp/amc-dependabot-wip-decision-20261015.md",
+      "bytes": 1019,
+      "sha256": "893fc80ad0597a95d83b5c996aa2ec1f82973fb0c4cec3043fb97c452701b920"
+    },
+    "freshQueryReview": {
+      "path": "/private/tmp/amc-wip-after-dependabot-exclusion-readonly-20261015.json",
+      "bytes": 20710,
+      "sha256": "3856facfad75ab3600dc352e8e951a9607d06d3c29d5e607c33bf09a7ae906cd"
+    }
+  },
+  "journal": {
+    "path": "/private/tmp/p1-01-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 29025,
+    "sha256": "18d349e1868c2fe83a78dfbe31bfb81f3bfe9ed4c857bb5b598c22572cc07510"
+  },
+  "closedFlag": {
+    "path": "/private/tmp/p1-01-qualification-20261015/commands-closed.json",
+    "bytes": 500,
+    "sha256": "ecef558460558ca8f6941555cbb5f8db7a332c73a74d509a26f5bb639c2ee12a"
+  },
+  "rootCommands": {
+    "total": 21,
+    "exit0": 18,
+    "nonzero": {
+      "duplicates": 1,
+      "dead-code": 1,
+      "source-control": 1
+    }
+  },
+  "originalTests": {
+    "total": 16,
+    "passed": 16,
+    "failed": 0,
+    "skipped": 0,
+    "files": 2,
+    "externalEvidence": 15,
+    "standardSchema": 1
+  },
+  "separateChecks": {
+    "schemas": 38,
+    "directParityFixtures": 75,
+    "jsonInventory": 84,
+    "outsideParityA4RecordAndTrust": 9,
+    "nodeProbeModes": [
+      "vectors",
+      "publication",
+      "receipt"
+    ],
+    "pages": {
+      "files": 4047,
+      "guides": 201,
+      "typeDocErrors": 0,
+      "typeDocWarnings": 469,
+      "sourceRevision": null,
+      "deployedProof": false
+    }
+  },
+  "stripControl": {
+    "result": {
+      "path": "/private/tmp/p1-01-source-strip-control-20261015/result.json",
+      "bytes": 5188,
+      "sha256": "75da6150f94040f1bdeda3ce71626e119c985cca77394ad93b38ff9a1e2186dc"
+    },
+    "childExits": [
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0
+    ],
+    "actualMutantFirstFailure": "AssertionError receipt V2 must refuse the unrecognized top-level member at probe64:10; later negative assertions masked, all pre-assert observations retained.",
+    "staleDiagnostics": [
+      "spec/schemas/v1/receipt.schema.json",
+      "spec/schemas/index.json"
+    ],
+    "realCompilerExit": 0,
+    "kernelHeldConstant": "Exact unchanged accepted kernel bundle restored after known thin compiler emission; direct contract checks, not a complete mutant build or kernel route.",
+    "restored": true
+  },
+  "literalPassthroughAttempt": {
+    "compilerExit": 2,
+    "diagnostic": "TS2339 src/actions/actionJournal.ts(202,92) fromReceiptId does not exist on {}",
+    "negativeChecksExecuted": false,
+    "restorationExecuted": false,
+    "retainedActiveAndHalted": true,
+    "mutationKill": false,
+    "index": {
+      "path": "/private/tmp/p1-01-literal-control-failed-artifact-index-20261015.json",
+      "bytes": 3341530,
+      "sha256": "cf225683857de5dd6a47578dab5b8173b0f638c09bc6928e65cdbaf60c9b985d"
+    }
+  },
+  "normalFreeze": {
+    "initialExit": 0,
+    "finalExit": 0,
+    "baseRef": "559fafc4fb52e586606f5fdf471ce65f44c5cf58",
+    "cliCommandPaths": 1236,
+    "cliInventoryPaths": 1236,
+    "stationPacks": 41,
+    "stationPackQuestions": 632,
+    "guardOrBaselineChanges": false
+  },
+  "preservation": {
+    "path": "/private/tmp/p1-01-qualification-20261015/final-source-preservation.json",
+    "bytes": 1367,
+    "sha256": "f0ca6c26aca8cabc952331e4b93e8135c40f692bdb99b4ddd24bdad535332d4b"
+  },
+  "independentActualReview": {
+    "path": "/private/tmp/p1-01-bounded-independent-actual-review-20261015.json",
+    "bytes": 26388,
+    "sha256": "ef87b3461d584dd71e8c8886728f43545fd636186c495e257ed0c3453ab62bc1"
+  },
+  "unresolved": [
+    "Required permanent tests/contracts absent",
+    "Literal passthrough mutation criterion compile-blocked",
+    "Exporter-negative runtime and semantic/refinement/issuer proof absent",
+    "Verifier-report spelling/summary and legacy compatibility normative handoffs preserved",
+    "Full suite, coverage, Node24, hosted CI, deployed index, PR/reviewed merge, release and formal issue/dependency closure unqualified",
+    "Duplicate1269/dead-code2751 failures unwaived; P1-52 reserved",
+    "P0-57/P1-65 held-source and freeze barriers preserved",
+    "Claude/shared/A4/native ownership and pausedP2-02 preserved",
+    "P0-19/P0-20/P0-52 transfers pending; P0-29/P0-22 user-held gaps retained; D03 skip only untilP2-06"
+  ],
+  "externalMutation": false
+}

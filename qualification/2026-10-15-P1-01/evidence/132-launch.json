@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-15T08:33:46.835246+00:00",
+  "pid": 39478,
+  "ownedPgid": 39478,
+  "observedPgid": 39478,
+  "cwd": "/private/tmp/p1-01-source-control-20261015/copy",
+  "argv": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "tsconfig.json"
+  ],
+  "environment": "Inherited from root wrapper; private HOME and Node22 PATH; no isolation claim."
+}

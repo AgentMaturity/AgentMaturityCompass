@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-15T08:39:46.668688+00:00",
+  "pid": 40043,
+  "ownedPgid": 40043,
+  "observedPgid": 40043,
+  "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+  "argv": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "/private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs",
+    "receipt",
+    "/private/tmp/p1-01-source-strip-control-20261015/copy"
+  ],
+  "environment": "Inherited from root wrapper; private HOME and Node22 PATH; no isolation claim."
+}
