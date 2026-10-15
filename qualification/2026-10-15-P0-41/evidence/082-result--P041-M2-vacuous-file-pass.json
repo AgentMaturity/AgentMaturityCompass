@@ -1,0 +1,111 @@
+{
+  "control": "P041-M2-vacuous-file-pass",
+  "plan": {
+    "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/plan-bound.json",
+    "bytes": 32806,
+    "sha256": "9888941998eb409295712feb80bc4a3c386fbbd33fbadd89db5f6ffb57da0c20"
+  },
+  "release": {
+    "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/release--P041-M2-vacuous-file-pass.json",
+    "bytes": 1492,
+    "sha256": "85db07efe1199e11c8b044e1ad9850f4ff45ab9cd121edf96a3e4db1dc88d442"
+  },
+  "baseline": {
+    "classification": "passed",
+    "total": 27,
+    "passed": 27,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "failures": [],
+    "killClaim": false,
+    "formalAcceptanceClosed": false,
+    "ownedGroupAbsentByESRCH": true,
+    "cliArtifactRoot": "/private/tmp/p0-41-causal-qualification-v2-20261015/cli-artifacts/P041-M2-vacuous-file-pass--baseline"
+  },
+  "mutant": {
+    "classification": "body-assertions-observed-awaiting-root-source-attribution",
+    "total": 27,
+    "passed": 26,
+    "failed": 1,
+    "pending": 0,
+    "todo": 0,
+    "failures": [
+      {
+        "file": "tests/p041ProgramMetricsQualification.test.ts",
+        "fullName": "P041 supplied-input and genuine local Git qualification Q6a an empty assertion list stays null before later nonvacuity checks",
+        "rawFailureMessages": [
+          "AssertionError: expected 1 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:300:25\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "observerErrors": [
+          {
+            "message": "expected 1 to be null",
+            "actual": "1",
+            "expected": "null",
+            "showDiff": true,
+            "operator": "strictEqual",
+            "diff": "\u001b[32m- Expected:\u001b[39m\nnull\n\n\u001b[31m+ Received:\u001b[39m\n1",
+            "name": "AssertionError",
+            "ok": false,
+            "stack": "AssertionError: expected 1 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:300:25\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+            "stacks": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 300,
+                "column": 25
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "killClaim": false,
+    "formalAcceptanceClosed": false,
+    "ownedGroupAbsentByESRCH": true,
+    "cliArtifactRoot": "/private/tmp/p0-41-causal-qualification-v2-20261015/cli-artifacts/P041-M2-vacuous-file-pass--mutant"
+  },
+  "restored": {
+    "classification": "passed",
+    "total": 27,
+    "passed": 27,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "failures": [],
+    "killClaim": false,
+    "formalAcceptanceClosed": false,
+    "ownedGroupAbsentByESRCH": true,
+    "cliArtifactRoot": "/private/tmp/p0-41-causal-qualification-v2-20261015/cli-artifacts/P041-M2-vacuous-file-pass--restored"
+  },
+  "restoredExactly": true,
+  "finalPreservation": {
+    "capturedUtc": "2026-10-15T07:35:57.302534+00:00",
+    "parentSourceChecked": 8574,
+    "parentCompiledChecked": 4529,
+    "privateFilesChecked": 13104,
+    "native": {
+      "bytes": 1931552,
+      "device": 16777231,
+      "inode": 538905647,
+      "mode": 493,
+      "nlink": 1,
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    },
+    "targetSha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9",
+    "privateHashMapSha256": "0bc8d1c0184e73336c30d0fd5c8198168c23848600e6766e4ab1f2c37408167b",
+    "parentDelta": [],
+    "privateUnexpectedDelta": [],
+    "externalPinDelta": [],
+    "limits": "Tracked manifest bytes and owned group only; no universal cache/network/OS/detached-descendant isolation."
+  },
+  "verdict": "body-assertion-sensitivity-awaiting-root-first-frame-and-masking-audit",
+  "killClaim": false,
+  "formalAcceptanceClosed": false,
+  "limits": [
+    "NEW fixture, not historical coverage or a program outcome measurement.",
+    "Observer precedes global teardown; actual exit/full streams checked separately.",
+    "Owned group only; detached descendants/cache/network/OS isolation not universal."
+  ]
+}

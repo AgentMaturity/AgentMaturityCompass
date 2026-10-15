@@ -1,0 +1,8 @@
+{
+  "capturedUtc": "2026-10-15T07:25:37.334353+00:00",
+  "errorType": "Stop",
+  "message": "Unexpected or inconsistent failure",
+  "activeMarkerRetained": true,
+  "automaticRestorationOnException": false,
+  "rule": "No automatic signal, retry, cleanup, restoration or further runtime."
+}

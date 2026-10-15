@@ -1,0 +1,16 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.11 [39m[90m/private/tmp/p0-41-causal-qualification-v2-20261015/source[39m
+
+ [32m✓[39m tests/p041ProgramMetricsQualification.test.ts [2m([22m[2m27 tests[22m[2m)[22m[33m 4685[2mms[22m[39m
+     [33m[2m✓[22m[39m Q10b committed registered JSON zero survives changed and deleted working copies [33m 471[2mms[22m[39m
+     [33m[2m✓[22m[39m Q11b invalid manual provenance refuses all output modes [33m 371[2mms[22m[39m
+     [33m[2m✓[22m[39m Q11c conflicting modes, unknown flags and invalid report paths refuse [33m 537[2mms[22m[39m
+     [33m[2m✓[22m[39m Q12e a genuine sibling commit is not an ancestor of the closure commit [33m 393[2mms[22m[39m
+     [33m[2m✓[22m[39m Q12f a committed synthetic path and real ancestor pass structural checks only [33m 301[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m27 passed[39m[22m[90m (27)[39m
+[2m   Start at [22m 13:05:33
+[2m   Duration [22m 4.88s[2m (transform 37ms, setup 22ms, import 54ms, tests 4.68s, environment 0ms)[22m
+
+JSON report written to /private/tmp/p0-41-causal-qualification-v2-20261015/phases/P041-M2-vacuous-file-pass--baseline/raw-producer.json

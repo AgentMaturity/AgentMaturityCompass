@@ -1,0 +1,306 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 29951,
+  "cwd": "/private/tmp/p0-41-causal-qualification-v2-20261015/source",
+  "reason": "passed",
+  "files": [
+    "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts"
+  ],
+  "testCount": 27,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-981875566",
+      "name": "tests/p041ProgramMetricsQualification.test.ts",
+      "fullName": null,
+      "filepath": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-981875566_0",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_0",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q1 preserves 15 Plan rows, 90 target cells, owners and all 26 historical registrations",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q1 preserves 15 Plan rows, 90 target cells, owners and all 26 historical registrations",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_1",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q2 missing evidence stays null before any status or current-value assertions",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q2 missing evidence stays null before any status or current-value assertions",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_2",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q3 pure closure computation counts only a shaped declaration and does not authenticate it",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q3 pure closure computation counts only a shaped declaration and does not authenticate it",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_3",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q4 absent registered report, workflow and JSON inputs remain pending",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q4 absent registered report, workflow and JSON inputs remain pending",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_4",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q5 supplied partial surface report distinguishes two passes, one failure and two missing",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q5 supplied partial surface report distinguishes two passes, one failure and two missing",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_5",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q6a an empty assertion list stays null before later nonvacuity checks",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q6a an empty assertion list stays null before later nonvacuity checks",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_6",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q6b a failed registered file outranks its absent sibling",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q6b a failed registered file outranks its absent sibling",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_7",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q6c duplicate matching report paths refuse rather than double count",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q6c duplicate matching report paths refuse rather than double count",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_8",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q7a YAML matrices count distinct configured OS families, not versions or containment",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q7a YAML matrices count distinct configured OS families, not versions or containment",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_9",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q7b absent, unknown, conflicting and unsupported YAML jobs remain pending",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q7b absent, unknown, conflicting and unsupported YAML jobs remain pending",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_10",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q8a a dated sourced manual zero is measured while malformed provenance refuses",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q8a a dated sourced manual zero is measured while malformed provenance refuses",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_11",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q8b registered JSON zero, escaped pointers, absence and malformed values stay distinct",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q8b registered JSON zero, escaped pointers, absence and malformed values stay distinct",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_12",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q9a genuine CLI check reports structural validity only",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q9a genuine CLI check reports structural validity only",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_13",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q9b genuine CLI JSON returns 15 rows, declared seven and fourteen pending values",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q9b genuine CLI JSON returns 15 rows, declared seven and fourteen pending values",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_14",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q9c explicit and default markdown agree with 15 rows and funded columns",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q9c explicit and default markdown agree with 15 rows and funded columns",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_15",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q10a a dirty gap closure cannot override committed open registrations",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q10a a dirty gap closure cannot override committed open registrations",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_16",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q10b committed registered JSON zero survives changed and deleted working copies",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q10b committed registered JSON zero survives changed and deleted working copies",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_17",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q11a a committed closed gap without a closing declaration refuses",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q11a a committed closed gap without a closing declaration refuses",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_18",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q11b invalid manual provenance refuses all output modes",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q11b invalid manual provenance refuses all output modes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_19",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q11c conflicting modes, unknown flags and invalid report paths refuse",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q11c conflicting modes, unknown flags and invalid report paths refuse",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_20",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q12a a missing qualification path at HEAD refuses a shaped closure",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q12a a missing qualification path at HEAD refuses a shaped closure",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_21",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q12b untracked-only evidence cannot satisfy the HEAD path check",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q12b untracked-only evidence cannot satisfy the HEAD path check",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_22",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q12c a zero merged SHA refuses even with a committed evidence path",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q12c a zero merged SHA refuses even with a committed evidence path",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_23",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q12d a nonexistent full merged SHA refuses with a committed evidence path",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q12d a nonexistent full merged SHA refuses with a committed evidence path",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_24",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q12e a genuine sibling commit is not an ancestor of the closure commit",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q12e a genuine sibling commit is not an ancestor of the closure commit",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_25",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q12f a committed synthetic path and real ancestor pass structural checks only",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q12f a committed synthetic path and real ancestor pass structural checks only",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981875566_0_26",
+      "name": "tests/p041ProgramMetricsQualification.test.ts P041 supplied-input and genuine local Git qualification Q13 only a synthetic singleMaintainer selection adds its column and cells are escaped",
+      "fullName": "P041 supplied-input and genuine local Git qualification Q13 only a synthetic singleMaintainer selection adds its column and cells are escaped",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

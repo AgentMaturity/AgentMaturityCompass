@@ -1,0 +1,111 @@
+{
+  "key": "P0-41",
+  "kind": "ROOT_BOUNDED_OUTCOME",
+  "capturedUtc": "2026-10-15T07:49:32.517261+00:00",
+  "boundedQualificationFinished": true,
+  "formalAcceptanceClosed": false,
+  "done": false,
+  "dependencyReady": false,
+  "source": "33a8e20bf340f2f9c717bb813f95de3b648a4ad4",
+  "productionSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "branch": "codex/p0-41-current-qualification",
+  "packet": {
+    "path": "/private/tmp/p0-41-bounded-qualification-20261015.json",
+    "bytes": 36601,
+    "sha256": "7a61cc8015d362cf12e856f9e2870a63c17058b89d7aeaa42eb27ba82754198d"
+  },
+  "actualReview": {
+    "path": "/private/tmp/p0-41-bounded-independent-actual-review-20261015.json",
+    "bytes": 38027,
+    "sha256": "4c5b558302ee2fc3434b911a448a74fdbabf0b141c7ab819ebe97d38cdf6370d"
+  },
+  "actualReviewMarkdown": {
+    "path": "/private/tmp/p0-41-bounded-independent-actual-review-20261015.md",
+    "bytes": 3623,
+    "sha256": "714cd2bf0640cba40652f1ae1b82a3a011235cd05d8c92a001b5859379fff6bf"
+  },
+  "rootReadFullFixtureControllerAndReviewMarkdown": true,
+  "latestNewPrivateTests": {
+    "total": 27,
+    "passed": 27,
+    "failed": 0,
+    "skipped": 0
+  },
+  "controls": [
+    {
+      "id": "P041-M1-missing-source-zero",
+      "counts": "27→19→27",
+      "firstIntendedFailure": "Q2 null248:27; actual0",
+      "scope": "Changes pending() only; 8 actual body AssertionErrors across8names; masks recorded."
+    },
+    {
+      "id": "P041-M2-vacuous-file-pass",
+      "counts": "27→26→27",
+      "firstIntendedFailure": "Q6a null300:25; actual1",
+      "scope": "Changes file completeness only; one actual body AssertionError, later variants masked."
+    }
+  ],
+  "sourceAndCommands": "13 ordinary source commands all0, including initial/final normal freeze. All8574 old trackedsource+4529dist/native remain unchanged; sourcecopy13103 physical entries plus one fixture overlay. No source/guard/baseline/quality-policy edit.",
+  "failedV1": "27/26/1 fixture128-vs1 precondition error kept separate. Productrefusal masked then. No source mutant launched or restored; old ACTIVE/HALTED remain intact with recorded ESRCH. New fixture corrects only normal numeric-nonzero Git precondition.",
+  "genuineGitLimits": "Actual peer verified1038 childrecords/4386 inputsnapshots/144 commitrecords/226 GitobjectIDs offline; 150 CLI executions. Synthetic ancestry does not authenticate approval, closure truth, signatures, current measurements or OS containment.",
+  "reviewIndependence": "Actual auditor authored fixture; separately reviewed fixture by peer. Actual audit is independent of root runtime, not an externally signed independent-review eligibility claim.",
+  "sourceAdoption": {
+    "productionEdits": false,
+    "permanentTrackedTestAdoption": false,
+    "qualificationMetadataOnly": true,
+    "noPushMergePRDeployOrTrackerClosure": true
+  },
+  "canonicalBuilder": {
+    "path": "/private/tmp/p0-41-build-canonical-packet-v2-prepared-20261015.py",
+    "bytes": 14193,
+    "sha256": "1eba191daac1256bc5b6b97a74c25d0dace3926bc3b5bed007696a0d354c4b7b"
+  },
+  "rootBuilderReview": {
+    "path": "/private/tmp/p0-41-canonical-builder-root-review-20261015.json",
+    "bytes": 682,
+    "sha256": "0b7fb4c7ca832b371e5c62290dac5e5a9ba4b04d919b80cf4631bcfc353add90"
+  },
+  "nextAdmission": {
+    "selectedRuntime": null,
+    "decision": "HOLD_NEW_ITEM_READINESS",
+    "WipReview": {
+      "path": "/private/tmp/amc-current-wip-classification-readonly-20261015.json",
+      "bytes": 23469,
+      "sha256": "dfa37bfd359c951685d3931d4d5c368f144a51bd614114a0668c821f57ce0432"
+    },
+    "WipReviewMarkdown": {
+      "path": "/private/tmp/amc-current-wip-classification-readonly-20261015.md",
+      "bytes": 3136,
+      "sha256": "a0ab2b1ce90c4595e301ea66245eab0b6585a2cec70f5d21fb0ae28d243c0205"
+    },
+    "facts": "13 OPEN non-draft Dependabot PRs, no recorded reviews. No explicit bot exemption in inspected plan/contract/decisions; per-epic allocation unknown.",
+    "inference": "Conservative count13 awaitingreview exceeds general cap10. Ready rule requires fewerthan10; no new-admission clearance established. This is a policy inference, not GitHub-required-review status.",
+    "P057ReadOnly": {
+      "path": "/private/tmp/p0-57-held-candidate-readonly-reconciliation-20261015.json",
+      "bytes": 31285,
+      "sha256": "397cbee80d448a01932e98e019f6917dec46eb5ccc8c7b3cb94224beebb15fca"
+    },
+    "P057Boundary": "Held fix mixes compiler deployment dependencies/callers and P1-65 added allowlist/1255counts vs accepted1236. No held-source adoption, self-baseline acceptance, freeze waiver or new runtime.",
+    "G1ReadOnly": {
+      "path": "/private/tmp/amc-g1-next-readonly-routing-20261015.json",
+      "bytes": 77917,
+      "sha256": "929d91632ce41446a7e47969d1ee5ae098b185358a0667564940255cf786028d"
+    },
+    "G1Boundary": "Plan permits later gate whenunblockedandWIPcleared. P1-01 is rankedreadinesslead, not activated; exactaccepteddeps/owner/E17family scope stillneeded."
+  },
+  "userDecisionsPreserved": [
+    "P0-29 skip with38 successorrows unresolved.",
+    "P0-22 successful empty passport[] contract unresolved afterboundedqualification.",
+    "D03 livehealth written skip onlyuntilP2-06.",
+    "P0-52/P0-20/P0-19 transfers pending/unapplied; Claude/shared/A4/native ownership preserved.",
+    "P2-02 paused; no resumption.",
+    "Follow current planpriority/dependencies; no bot-WIP exemption or freeze exception invented."
+  ],
+  "formalOpen": [
+    "Original permanent test absent; new fixture unadopted.",
+    "Underlying ownermeasurements remain notmeasured;15currentPlanrows vs14historicalspec kept explicit;funded untilD01.",
+    "No successful CLI--vitest-json path, --online, fullsuite/typecheck/lint/coverage/Node24/hostedCI inthislane.",
+    "First Monday19Oct statuscomment requiresSid; no externalmessage or automation created.",
+    "Prior quality1269duplicates/2751dead andall inherited formal/ownership/expert/ISO/release gaps remain unwaived."
+  ]
+}

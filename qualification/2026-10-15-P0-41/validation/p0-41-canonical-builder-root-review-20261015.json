@@ -1,0 +1,16 @@
+{
+  "reviewedPrepared": {
+    "path": "/private/tmp/p0-41-build-canonical-packet-prepared-20261015.py",
+    "bytes": 14182,
+    "sha256": "c30fa985d2dbe3c1e714ab994f518307993a31eb000a9d719eaa845ee33ea7e2"
+  },
+  "selectedBuilder": {
+    "path": "/private/tmp/p0-41-build-canonical-packet-v2-prepared-20261015.py",
+    "bytes": 14193,
+    "sha256": "1eba191daac1256bc5b6b97a74c25d0dace3926bc3b5bed007696a0d354c4b7b"
+  },
+  "rootReadAllPreparedCode": true,
+  "exactSingleChange": "README uses actual plan key P1-65, replacing compressed P165. No code/selection/guard/count or execution behavior changed.",
+  "executionAuthorizedByThisNote": false,
+  "formalAcceptanceClosed": false
+}

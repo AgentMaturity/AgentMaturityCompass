@@ -1,0 +1,23 @@
+{
+  "phaseCount": 12,
+  "allExitZero": true,
+  "allOwnedGroupsAbsentByESRCH": true,
+  "knownLateDiagnosticMatches": [],
+  "actualCLI": {
+    "checkExit": 0,
+    "jsonValid": true,
+    "metricRows": 15,
+    "criticalGapsOpen": 7,
+    "pendingNullRows": 14,
+    "funded": true,
+    "g0": true,
+    "defaultEqualsMarkdownBytes": true,
+    "onlineInvoked": false
+  },
+  "notes": [
+    "Static source and register inputs are historical; these CLI runs do not refresh current measurements.",
+    "Environment inherited, private HOME; no network or operating-system isolation claim.",
+    "No test fixture has yet been collected or run."
+  ],
+  "formalAcceptanceClosed": false
+}
