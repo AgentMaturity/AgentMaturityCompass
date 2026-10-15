@@ -1,0 +1,691 @@
+{
+  "schemaVersion": 1,
+  "mode": "Bounded observed-recipe inventory only; not the held reusable --batch format or completed76-entry run",
+  "candidateSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "recordedMainBatchCommit": null,
+  "recoveredFullBatchExecuted": false,
+  "recipeInventory": [
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+        "bytes": 103946,
+        "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+      },
+      "pointer": "/matrices/0/recipe",
+      "recipe": {
+        "id": "S7-M11-profile-import-gate-221",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/standard/externalEvidenceProfile.ts",
+        "sourceFind": "if (signatureVerified && profile.provenance.captureMethod !== \"import\"\n        && authority",
+        "sourceReplace": "if (signatureVerified\n        && authority",
+        "sourceOccurrences": 1,
+        "sourceLine": 221,
+        "compiledTarget": "dist/standard/externalEvidenceProfile.js",
+        "compiledFind": "if (signatureVerified && profile.provenance.captureMethod !== \"import\"\n                && authority",
+        "compiledReplace": "if (signatureVerified && authority",
+        "compiledOccurrences": 1,
+        "compiledLine": 215,
+        "historicalExactCorpus": [
+          "tests/externalEvidenceProfile.test.ts",
+          "tests/importProvenance.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+        "bytes": 103946,
+        "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+      },
+      "pointer": "/matrices/1/recipe",
+      "recipe": {
+        "id": "S7-M12-profile-lower-clamp-230",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/standard/externalEvidenceProfile.ts",
+        "sourceFind": "if (ranks[profile.provenance.trustTier] < ranks[trustTier]) trustTier = profile.provenance.trustTier;",
+        "sourceReplace": "if (false) trustTier = profile.provenance.trustTier;",
+        "sourceOccurrences": 1,
+        "sourceLine": 230,
+        "compiledTarget": "dist/standard/externalEvidenceProfile.js",
+        "compiledFind": "if (ranks[profile.provenance.trustTier] < ranks[trustTier])\n        trustTier = profile.provenance.trustTier;",
+        "compiledReplace": "",
+        "compiledOccurrences": 1,
+        "compiledLine": 225,
+        "historicalExactCorpus": [
+          "tests/externalEvidenceProfile.test.ts",
+          "tests/importProvenance.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+        "bytes": 103946,
+        "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+      },
+      "pointer": "/matrices/2/recipe",
+      "recipe": {
+        "id": "S7-M13-export-chunk-bound",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/externalEvidenceExport.ts",
+        "sourceFind": "Math.ceil(input.traces.length / 1000)",
+        "sourceReplace": "Math.ceil(input.traces.length / 2000)",
+        "sourceOccurrences": 1,
+        "sourceLine": 13,
+        "compiledTarget": "dist/importers/externalEvidenceExport.js",
+        "compiledFind": "Math.ceil(input.traces.length / 1000)",
+        "compiledReplace": "Math.ceil(input.traces.length / 2000)",
+        "compiledOccurrences": 1,
+        "compiledLine": 5,
+        "historicalExactCorpus": [
+          "tests/neutralImporter.test.ts",
+          "tests/neutralImportMapping.test.ts",
+          "tests/externalEvidenceExport.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+        "bytes": 103946,
+        "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+      },
+      "pointer": "/matrices/3/recipe",
+      "recipe": {
+        "id": "S7-M14-export-callback-cancel",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/externalEvidenceExport.ts",
+        "sourceFind": "callback.cancelled === true || ",
+        "sourceReplace": "",
+        "sourceOccurrences": 1,
+        "sourceLine": 51,
+        "compiledTarget": "dist/importers/externalEvidenceExport.js",
+        "compiledFind": "callback.cancelled === true || ",
+        "compiledReplace": "",
+        "compiledOccurrences": 1,
+        "compiledLine": 52,
+        "historicalExactCorpus": [
+          "tests/neutralImporter.test.ts",
+          "tests/neutralImportMapping.test.ts",
+          "tests/externalEvidenceExport.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+        "bytes": 103946,
+        "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+      },
+      "pointer": "/matrices/4/recipe",
+      "recipe": {
+        "id": "S7-M15-export-unicode-replace",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/externalEvidenceExport.ts",
+        "sourceFind": "Array.from(value.replace(/[\\uD800-\\uDBFF](?![\\uDC00-\\uDFFF])|(?<![\\uD800-\\uDBFF])[\\uDC00-\\uDFFF]/gu, \"\\uFFFD\"))",
+        "sourceReplace": "Array.from(value)",
+        "sourceOccurrences": 1,
+        "sourceLine": 29,
+        "compiledTarget": "dist/importers/externalEvidenceExport.js",
+        "compiledFind": "Array.from(value.replace(/[\\uD800-\\uDBFF](?![\\uDC00-\\uDFFF])|(?<![\\uD800-\\uDBFF])[\\uDC00-\\uDFFF]/gu, \"\\uFFFD\"))",
+        "compiledReplace": "Array.from(value)",
+        "compiledOccurrences": 1,
+        "compiledLine": 23,
+        "historicalExactCorpus": [
+          "tests/neutralImporter.test.ts",
+          "tests/neutralImportMapping.test.ts",
+          "tests/externalEvidenceExport.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+        "bytes": 103946,
+        "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+      },
+      "pointer": "/matrices/5/recipe",
+      "recipe": {
+        "id": "S7-M16-export-time-range",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/externalEvidenceExport.ts",
+        "sourceFind": " && time <= 253402300799999 ?",
+        "sourceReplace": " ?",
+        "sourceOccurrences": 1,
+        "sourceLine": 45,
+        "compiledTarget": "dist/importers/externalEvidenceExport.js",
+        "compiledFind": " && time <= 253402300799999 ?",
+        "compiledReplace": " ?",
+        "compiledOccurrences": 1,
+        "compiledLine": 44,
+        "historicalExactCorpus": [
+          "tests/neutralImporter.test.ts",
+          "tests/neutralImportMapping.test.ts",
+          "tests/externalEvidenceExport.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+        "bytes": 103946,
+        "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+      },
+      "pointer": "/matrices/6/recipe",
+      "recipe": {
+        "id": "S7-M17-export-duration-loss",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/externalEvidenceExport.ts",
+        "sourceFind": "if (ns !== null && durationNs === null) precisionLoss = true;",
+        "sourceReplace": "",
+        "sourceOccurrences": 1,
+        "sourceLine": 50,
+        "compiledTarget": "dist/importers/externalEvidenceExport.js",
+        "compiledFind": "if (ns !== null && durationNs === null)\n                precisionLoss = true;",
+        "compiledReplace": "",
+        "compiledOccurrences": 1,
+        "compiledLine": 50,
+        "historicalExactCorpus": [
+          "tests/neutralImporter.test.ts",
+          "tests/neutralImportMapping.test.ts",
+          "tests/externalEvidenceExport.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+        "bytes": 103946,
+        "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+      },
+      "pointer": "/matrices/7/recipe",
+      "recipe": {
+        "id": "S7-M18-export-redaction-loss",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/externalEvidenceExport.ts",
+        "sourceFind": "if (candidate.redactionCount > 0) losses.push",
+        "sourceReplace": "if (false) losses.push",
+        "sourceOccurrences": 1,
+        "sourceLine": 21,
+        "compiledTarget": "dist/importers/externalEvidenceExport.js",
+        "compiledFind": "if (candidate.redactionCount > 0)\n            losses.push",
+        "compiledReplace": "if (false)\n            losses.push",
+        "compiledOccurrences": 1,
+        "compiledLine": 13,
+        "historicalExactCorpus": [
+          "tests/neutralImporter.test.ts",
+          "tests/neutralImportMapping.test.ts",
+          "tests/externalEvidenceExport.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+        "bytes": 103946,
+        "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+      },
+      "pointer": "/matrices/8/recipe",
+      "recipe": {
+        "id": "S7-M19-export-time-loss",
+        "oldIssue": "AMC-1516",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/externalEvidenceExport.ts",
+        "sourceFind": "if (time !== null && time !== undefined && date === null) precisionLoss = true;",
+        "sourceReplace": "",
+        "sourceOccurrences": 1,
+        "sourceLine": 46,
+        "compiledTarget": "dist/importers/externalEvidenceExport.js",
+        "compiledFind": "if (time !== null && time !== undefined && date === null)\n                precisionLoss = true;",
+        "compiledReplace": "",
+        "compiledOccurrences": 1,
+        "compiledLine": 45,
+        "historicalExactCorpus": [
+          "tests/neutralImporter.test.ts",
+          "tests/neutralImportMapping.test.ts",
+          "tests/externalEvidenceExport.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+        "bytes": 189825,
+        "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+      },
+      "pointer": "/originalMatrices/0/recipe",
+      "recipe": {
+        "id": "S7-M20-callback-allowlist-66",
+        "oldIssue": "AMC-1517",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/callbackTelemetryCapture.ts",
+        "sourceFind": "if (!this.allowed.has(key) || (SENSITIVE_KEY",
+        "sourceReplace": "if ((SENSITIVE_KEY",
+        "sourceOccurrences": 1,
+        "sourceLine": 66,
+        "compiledTarget": "dist/importers/callbackTelemetryCapture.js",
+        "compiledFind": "if (!this.allowed.has(key) || (SENSITIVE_KEY",
+        "compiledReplace": "if ((SENSITIVE_KEY",
+        "compiledOccurrences": 1,
+        "compiledLine": 67,
+        "historicalExactCorpus": [
+          "tests/neutralImportMapping.test.ts",
+          "tests/callbackTelemetryCapture.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+        "bytes": 189825,
+        "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+      },
+      "pointer": "/originalMatrices/1/recipe",
+      "recipe": {
+        "id": "S7-M21-callback-sensitive-extension-66",
+        "oldIssue": "AMC-1517",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/callbackTelemetryCapture.ts",
+        "sourceFind": "|| (SENSITIVE_KEY.test(key) && !DEFAULT_CALLBACK_ATTRIBUTES.includes(key))) { filtered++",
+        "sourceReplace": ") { filtered++",
+        "sourceOccurrences": 1,
+        "sourceLine": 66,
+        "compiledTarget": "dist/importers/callbackTelemetryCapture.js",
+        "compiledFind": "if (!this.allowed.has(key) || (SENSITIVE_KEY.test(key) && !DEFAULT_CALLBACK_ATTRIBUTES.includes(key)))",
+        "compiledReplace": "if (!this.allowed.has(key))",
+        "compiledOccurrences": 1,
+        "compiledLine": 67,
+        "historicalExactCorpus": [
+          "tests/neutralImportMapping.test.ts",
+          "tests/callbackTelemetryCapture.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+        "bytes": 189825,
+        "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+      },
+      "pointer": "/originalMatrices/2/recipe",
+      "recipe": {
+        "id": "S7-M22-callback-token-counter-exemption-66",
+        "oldIssue": "AMC-1517",
+        "historicalExpected": "killed",
+        "sourceTarget": "src/importers/callbackTelemetryCapture.ts",
+        "sourceFind": "(SENSITIVE_KEY.test(key) && !DEFAULT_CALLBACK_ATTRIBUTES.includes(key))",
+        "sourceReplace": "SENSITIVE_KEY.test(key)",
+        "sourceOccurrences": 1,
+        "sourceLine": 66,
+        "compiledTarget": "dist/importers/callbackTelemetryCapture.js",
+        "compiledFind": "(SENSITIVE_KEY.test(key) && !DEFAULT_CALLBACK_ATTRIBUTES.includes(key))",
+        "compiledReplace": "SENSITIVE_KEY.test(key)",
+        "compiledOccurrences": 1,
+        "compiledLine": 67,
+        "historicalExactCorpus": [
+          "tests/neutralImportMapping.test.ts",
+          "tests/callbackTelemetryCapture.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+        "bytes": 189825,
+        "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+      },
+      "pointer": "/originalMatrices/3/recipe",
+      "recipe": {
+        "id": "S7-M23-callback-closed-113-equivalent",
+        "oldIssue": "AMC-1517",
+        "historicalExpected": "equivalent",
+        "sourceTarget": "src/importers/callbackTelemetryCapture.ts",
+        "sourceFind": "      if (this.closed || entry.ended) return;\n      try { operation(); }",
+        "sourceReplace": "      if (entry.ended) return;\n      try { operation(); }",
+        "sourceOccurrences": 1,
+        "sourceLine": 113,
+        "compiledTarget": "dist/importers/callbackTelemetryCapture.js",
+        "compiledFind": "const recordCall = (operation) => {\n            if (this.closed || entry.ended)",
+        "compiledReplace": "const recordCall = (operation) => {\n            if (entry.ended)",
+        "compiledOccurrences": 1,
+        "compiledLine": 140,
+        "historicalExactCorpus": [
+          "tests/neutralImportMapping.test.ts",
+          "tests/callbackTelemetryCapture.test.ts"
+        ],
+        "currentRuntime": "not executed; candidate-only static recipe, root must separately authorize and record future private baseline/mutant/restored run"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+        "bytes": 95234,
+        "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+      },
+      "pointer": "/matrices/0/recipe",
+      "recipe": {
+        "id": "P30-1525-envelope-signature",
+        "oldIssue": "AMC-1525",
+        "file": "src/crypto/keyHistoryEnvelope.ts",
+        "find": "if (!verify(null, payloadBytes(base), currentPublicKeyPem, Buffer.from(signature, \"base64\"))) return fail(\"history admission signature is invalid\");",
+        "replace": "if (false && !verify(null, payloadBytes(base), currentPublicKeyPem, Buffer.from(signature, \"base64\"))) return fail(\"history admission signature is invalid\");",
+        "tests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts",
+          "tests/crypto/keyHistoryAdmission.test.ts",
+          "tests/crypto/keyHistoryForgery.test.ts"
+        ],
+        "expect": "killed",
+        "candidateOccurrences": 1,
+        "heldOccurrences": 1,
+        "candidateFindLine": 102,
+        "missingCandidateTests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts"
+        ],
+        "staticMatchAndTestsExist": false
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+        "bytes": 95234,
+        "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+      },
+      "pointer": "/matrices/1/recipe",
+      "recipe": {
+        "id": "P30-1525-unsigned-migration",
+        "oldIssue": "AMC-1525",
+        "file": "src/vault/vault.ts",
+        "find": "    } else if (!existingVault || !pathExists(historyFile)) {\n      // Only a private-key-derived current key is admitted at initialization.\n      // Existing unsigned arrays are never imported into a fresh envelope.\n      history = JSON.stringify(sealKeyHistory(kind, [buildKeyHistoryEntry(publicPem, [])], params[`${kind}PrivateKeyPem`]), null, 2);\n    }",
+        "replace": "    } else {\n      let planted: Parameters<typeof buildKeyHistoryEntry>[1] = [];\n      try { const disk: unknown = JSON.parse(readUtf8(historyFile)); if (Array.isArray(disk)) planted = disk; } catch { /* no legacy list */ }\n      if (!existingVault || !pathExists(historyFile) || planted.length > 0) {\n        const entries = planted.some((entry) => entry.publicKeyPem === publicPem) ? [...planted] : [...planted, buildKeyHistoryEntry(publicPem, planted)];\n        history = JSON.stringify(sealKeyHistory(kind, entries, params[`${kind}PrivateKeyPem`]), null, 2);\n      }\n    }",
+        "tests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts",
+          "tests/crypto/keyHistoryAdmission.test.ts"
+        ],
+        "expect": "killed",
+        "candidateOccurrences": 1,
+        "heldOccurrences": 0,
+        "candidateFindLine": 201,
+        "missingCandidateTests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts"
+        ],
+        "staticMatchAndTestsExist": false
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+        "bytes": 95234,
+        "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+      },
+      "pointer": "/matrices/2/recipe",
+      "recipe": {
+        "id": "P30-1525-bundle-raw-history",
+        "oldIssue": "AMC-1525",
+        "file": "src/bundles/bundle.ts",
+        "find": "const history = authenticatedHistoryFromBundle(root, kind);\n  return",
+        "replace": "const raw: unknown = bundleKeyHistory(root, kind);\n  const history = { entries: (Array.isArray(raw) ? raw : (raw as { entries?: unknown[] } | null | undefined)?.entries ?? []) as Array<{ publicKeyPem: string }> };\n  return",
+        "tests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts",
+          "tests/keyHistoryBundleCertificate.test.ts"
+        ],
+        "expect": "killed",
+        "candidateOccurrences": 1,
+        "heldOccurrences": 1,
+        "candidateFindLine": 578,
+        "missingCandidateTests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts"
+        ],
+        "staticMatchAndTestsExist": false
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+        "bytes": 95234,
+        "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+      },
+      "pointer": "/matrices/3/recipe",
+      "recipe": {
+        "id": "P30-1525-certificate-raw-history",
+        "oldIssue": "AMC-1525",
+        "file": "src/assurance/certificate.ts",
+        "find": "const history = authenticatedHistoryFromCert(root, kind);\n  return",
+        "replace": "const raw: unknown = certKeyHistory(root, kind);\n  const history = { entries: (Array.isArray(raw) ? raw : (raw as { entries?: unknown[] } | null | undefined)?.entries ?? []) as Array<{ publicKeyPem: string }> };\n  return",
+        "tests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts",
+          "tests/keyHistoryBundleCertificate.test.ts"
+        ],
+        "expect": "killed",
+        "candidateOccurrences": 1,
+        "heldOccurrences": 1,
+        "candidateFindLine": 638,
+        "missingCandidateTests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts"
+        ],
+        "staticMatchAndTestsExist": false
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+        "bytes": 95234,
+        "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+      },
+      "pointer": "/matrices/4/recipe",
+      "recipe": {
+        "id": "P30-1525-cold-vault-initializes",
+        "oldIssue": "AMC-1525",
+        "file": "src/ledger/ledgerVerification.ts",
+        "find": "ledger = openLedger(workspacePath, { readonly: true });",
+        "replace": "ledger = openLedger(workspacePath);",
+        "tests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts",
+          "tests/ledgerVerificationReadOnly.test.ts"
+        ],
+        "expect": "killed",
+        "candidateOccurrences": 1,
+        "heldOccurrences": 1,
+        "candidateFindLine": 702,
+        "missingCandidateTests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts"
+        ],
+        "staticMatchAndTestsExist": false
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.json",
+        "bytes": 142868,
+        "sha256": "662259e4a654d757576bb3fe70c75a820bcc302469ef0b6f3cbb5776c8b8280f"
+      },
+      "pointer": "/matrices/0/recipe",
+      "recipe": {
+        "id": "P30-1542-current-empty-set",
+        "historicalId": "P30-1542-empty-set",
+        "sourceTarget": "src/leases/leaseStore.ts",
+        "sourceFind": "    throw new Error(\n      `lease revocation store unverifiable (${error instanceof Error ? error.message : String(error)}); refusing to treat it as empty`\n    );",
+        "sourceReplace": "    return new Set<string>();",
+        "compiledTarget": "dist/leases/leaseStore.js",
+        "compiledFind": "        throw new Error(`lease revocation store unverifiable (${error instanceof Error ? error.message : String(error)}); refusing to treat it as empty`);",
+        "compiledReplace": "        return new Set();",
+        "corpus": [
+          "tests/leaseRevocationFailClosed.test.ts",
+          "tests/leaseRevocationWriterIntegrity.test.ts"
+        ],
+        "staticSourceExpandedCases": 35,
+        "meaning": "Current catch-refusal semantic reanchor only.",
+        "sourceOccurrences": 1,
+        "compiledOccurrences": 1,
+        "sourceLine": 173,
+        "compiledLine": 154,
+        "currentRuntime": "UNEXECUTED"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.json",
+        "bytes": 142868,
+        "sha256": "662259e4a654d757576bb3fe70c75a820bcc302469ef0b6f3cbb5776c8b8280f"
+      },
+      "pointer": "/matrices/1/recipe",
+      "recipe": {
+        "id": "P30-1542-revoke-snapshot",
+        "historicalId": "P30-1542-revoke-snapshot",
+        "sourceTarget": "src/leases/leaseStore.ts",
+        "sourceFind": "current = readVerifiedRevocations(workspace);",
+        "sourceReplace": "current = loadLeaseRevocations(workspace);",
+        "compiledTarget": "dist/leases/leaseStore.js",
+        "compiledFind": "current = readVerifiedRevocations(workspace);",
+        "compiledReplace": "current = loadLeaseRevocations(workspace);",
+        "corpus": [
+          "tests/leaseRevocationWriterIntegrity.test.ts"
+        ],
+        "staticSourceExpandedCases": 10,
+        "meaning": "Exact original current source anchor.",
+        "sourceOccurrences": 1,
+        "compiledOccurrences": 1,
+        "sourceLine": 130,
+        "compiledLine": 110,
+        "currentRuntime": "UNEXECUTED"
+      },
+      "boundary": "Inventory of actually observed series, not an executable recovered full batch. Recipe historical tests/expectations may differ from the current executed corpus; consult packet actual phases."
+    }
+  ],
+  "packetSeries": [
+    {
+      "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+      "bytes": 93748,
+      "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.json",
+      "bytes": 39183,
+      "sha256": "6b847d4156cfbb76674d38faccd6e2a998adcba5fed5b9aa355181f3f5f0c08e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015.json",
+      "bytes": 48220,
+      "sha256": "f33581d913273e0ae0b2cf5048b35850df6a9429581959d5e1a8bca8bc313c3a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+      "bytes": 103946,
+      "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+      "bytes": 189825,
+      "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+      "bytes": 95234,
+      "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015.json",
+      "bytes": 21149,
+      "sha256": "e3bb16af1d94f4a6d8d7ba5c29710ca19dccd5b2de02b33fa397edb9469714ad"
+    },
+    {
+      "path": "/private/tmp/p0-30-portable-delegation-qualification-20261015.json",
+      "bytes": 66869,
+      "sha256": "3f8e97550ba11716f63e34bce9157e17dc20e6b96a32a239b585977871217ceb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015.json",
+      "bytes": 18352,
+      "sha256": "b163c11f374ac9c9fff4e307f2ee6b0b4889b8b0ce47f4dee7780a162d6858ff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015.json",
+      "bytes": 12191,
+      "sha256": "388932daefcc227c4a99c7a8227751a6f356c7b9744fdfeca4aa8074f791760c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.json",
+      "bytes": 15816,
+      "sha256": "748c1796cdfd0f3bb843f04e5fb33f55d26786e4d96b8f072db96b601be5580b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015.json",
+      "bytes": 22735,
+      "sha256": "01d0925418ca9ae46c177728693c8c1f7ffa417bce7ce00ab98fed851efaa0fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.json",
+      "bytes": 142868,
+      "sha256": "662259e4a654d757576bb3fe70c75a820bcc302469ef0b6f3cbb5776c8b8280f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015.json",
+      "bytes": 8254,
+      "sha256": "f45962ff6d63a7e05610eaecd839ec6c6fbfe6847ca73bd16c30eb38b2a72ee8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.json",
+      "bytes": 67992,
+      "sha256": "f742eb98000b34cc74e4933798ffc2f02d23580d422d9f53dead91c4e533dbdc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015.json",
+      "bytes": 31431,
+      "sha256": "7f3268cc7bdbe333255c956631e6ed55df9fc536b1976de17fe5248c6f3e0275"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+      "bytes": 64984,
+      "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015.json",
+      "bytes": 10348,
+      "sha256": "9ef02732d6e61939bcebeb072aab5ee7d7e64d385878fcfeecbb87f129ca1a56"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015.json",
+      "bytes": 72597,
+      "sha256": "de1a9ea9b169e10c44cc3e827c48b09a131191a2448b77744f3c8fc7ba04f3cb"
+    }
+  ],
+  "formalRunnerAcceptance": "Missing held reusable runner/test ownership and full-batch acceptance remain open. Private controllers do not satisfy the permanent exact-once/dirty-tree/SIGINT/SIGTERM runner criterion."
+}

@@ -1,0 +1,443 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-15T00:01:25.327450+00:00",
+  "scope": "Independent static review of exactly two ordinary callback close/flush proposal cases. No product import, runtime, syntax check, test, compile, build, install, network or input edit. The independent reentrant getter lead is assessed as a separate unexecuted scope.",
+  "sourceAnchor": {
+    "root": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+    "sourceCommit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "limit": "Root-provided source58 with directly hashed current source/contract/compiled inputs; no Git command in this task."
+  },
+  "result": {
+    "ordinaryProposalFindings": [],
+    "ordinaryProposalStaticReady": true,
+    "runtimePass": false,
+    "M23CurrentEquivalent": false,
+    "M23CurrentKilled": false,
+    "allLiveInputReadsFinished": true
+  },
+  "proposalPins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-lifecycle-proposal-20261015/lifecycle.test.mjs",
+      "bytes": 11569,
+      "lines": 236,
+      "sha256": "e133bce991d5efb808ef554dfa90f964b9f1eb178ec20e2e7429a1dd6833dc84"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-lifecycle-proposal-20261015/proposal.json",
+      "bytes": 29521,
+      "lines": 583,
+      "sha256": "2982f36a16daeeabf912965834975bec44b226f97bf40df11551d770a261b791"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-lifecycle-proposal-20261015/README.md",
+      "bytes": 2674,
+      "lines": 17,
+      "sha256": "4a52de4092e211f85f92cf4c62b8e754ae0c51a7c16ba2f03445e097d0361ae7"
+    }
+  ],
+  "directSourceContractDocsPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/importers/callbackTelemetryCapture.ts",
+      "bytes": 14035,
+      "lines": 209,
+      "sha256": "bcfb468560feb46c296d28176c384c63420a88ae97eaea1e1c852c839a82c366",
+      "relativePath": "src/importers/callbackTelemetryCapture.ts"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/importers/callbackTelemetryContract.ts",
+      "bytes": 4817,
+      "lines": 64,
+      "sha256": "bafdef85eee19230c563865f5541b1747c81a5a31c60c573499ae569b6ad6089",
+      "relativePath": "src/importers/callbackTelemetryContract.ts"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/importers/traceMapping.ts",
+      "bytes": 4408,
+      "lines": 88,
+      "sha256": "0286f3ae576c1211935d004459d328c38313e783c8251dfef28e69b6da5f6125",
+      "relativePath": "src/importers/traceMapping.ts"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/importers/callbackTelemetryCapture.js",
+      "bytes": 13856,
+      "lines": 284,
+      "sha256": "6f0037d14fc206beea41ece9215e83dd91a04d4e7d569b98ceb145a1e19f193a",
+      "relativePath": "dist/importers/callbackTelemetryCapture.js"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/importers/callbackTelemetryContract.js",
+      "bytes": 3798,
+      "lines": 46,
+      "sha256": "2b0577a43114d28001f8b18cd6b5e276d1100b7cf6bc7b26538c4f97b33152a0",
+      "relativePath": "dist/importers/callbackTelemetryContract.js"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/importers/traceMapping.js",
+      "bytes": 3779,
+      "lines": 76,
+      "sha256": "3d8e9cea7f91ee3d1f05e0587f1e67e7076cfbcef500761bde60759eb8c1e2b1",
+      "relativePath": "dist/importers/traceMapping.js"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/docs/PI_CALLBACK_TELEMETRY.md",
+      "bytes": 5340,
+      "lines": 43,
+      "sha256": "111f60d69a88cc8b7e3cfb25ee581a9451f08b93a47af3702837e90b4caf096f",
+      "relativePath": "docs/PI_CALLBACK_TELEMETRY.md"
+    }
+  ],
+  "readinessPinRecheck": {
+    "count": 32,
+    "allExact": true,
+    "pins": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/importers/callbackTelemetryCapture.js",
+        "bytes": 13856,
+        "lines": 284,
+        "sha256": "6f0037d14fc206beea41ece9215e83dd91a04d4e7d569b98ceb145a1e19f193a"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/importers/externalEvidenceExport.js",
+        "bytes": 5147,
+        "lines": 70,
+        "sha256": "3417d72cb9fa95480326df9a060509972ffbd8f1a5a57f210fb28bd8fef4b70e"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/standard/externalEvidenceProfile.js",
+        "bytes": 15307,
+        "lines": 231,
+        "sha256": "a78855df54d8090b0fcb6f93d0c9d634c8dbf43bbad34853d18a5ee1ef28b9e2"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/package.json",
+        "bytes": 8631,
+        "lines": 218,
+        "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+        "bytes": 155432,
+        "lines": 4839,
+        "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/pnpm-workspace.yaml",
+        "bytes": 1521,
+        "lines": 36,
+        "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+        "bytes": 9946,
+        "lines": 210,
+        "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+        "bytes": 554,
+        "lines": 32,
+        "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/diagnostic/evidenceReadiness.ts",
+        "bytes": 6072,
+        "lines": 158,
+        "sha256": "b213abd2246373799e87cb12631f75502ebbff430869898020ad16c3b8182624"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/importers/callbackTelemetryCapture.ts",
+        "bytes": 14035,
+        "lines": 209,
+        "sha256": "bcfb468560feb46c296d28176c384c63420a88ae97eaea1e1c852c839a82c366"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/importers/callbackTelemetryContract.ts",
+        "bytes": 4817,
+        "lines": 64,
+        "sha256": "bafdef85eee19230c563865f5541b1747c81a5a31c60c573499ae569b6ad6089"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/importers/externalEvidenceExport.ts",
+        "bytes": 5230,
+        "lines": 68,
+        "sha256": "a65b88a8dfb6885305c06d5f2ec0617f31fdeae299deddae8f094ec571d86392"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/importers/neutralImportMapping.ts",
+        "bytes": 16877,
+        "lines": 211,
+        "sha256": "1c6509f1c4088b236206db5edafe5b19bb7f239fb22319890c80bf9a9b643b76"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/importers/neutralImporter.ts",
+        "bytes": 43554,
+        "lines": 986,
+        "sha256": "ada80550a503430aceb484e42fa0a9cd78d3c2f70252052aa30604caa2726479"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/importers/traceMapping.ts",
+        "bytes": 4408,
+        "lines": 88,
+        "sha256": "0286f3ae576c1211935d004459d328c38313e783c8251dfef28e69b6da5f6125"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/standard/externalEvidenceFiles.ts",
+        "bytes": 4470,
+        "lines": 65,
+        "sha256": "8884260742d322c82fe73aea2aa22aa9962635dce8991d568ed8a7fb2d2c08c9"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/standard/externalEvidenceProfile.ts",
+        "bytes": 16961,
+        "lines": 234,
+        "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/utils/hash.ts",
+        "bytes": 259,
+        "lines": 9,
+        "sha256": "1507e34cf2dcc614e9b7bf05a790806a18ab878e8d282c16cb673718f92a6601"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/callbackTelemetryCapture.test.ts",
+        "bytes": 2255,
+        "lines": 36,
+        "sha256": "daa2618daec4398f248d4dc5561cfc1a2294133e1410f820d8ba5f8807b423f7"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/externalEvidenceExport.test.ts",
+        "bytes": 5707,
+        "lines": 80,
+        "sha256": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+        "bytes": 7956,
+        "lines": 93,
+        "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/helpers/trustContext.ts",
+        "bytes": 4280,
+        "lines": 77,
+        "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/importProvenance.test.ts",
+        "bytes": 6256,
+        "lines": 134,
+        "sha256": "37e5534c65b181b55140b4c402aceb44e25358b57df9e2af6896ba3bc04e43c4"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/neutralImportMapping.test.ts",
+        "bytes": 12916,
+        "lines": 160,
+        "sha256": "9510fb35a0003e4f0049b5d2284a6bbbc00ab4584302fdd5e4bd6b6b7ecd5421"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/neutralImporter.test.ts",
+        "bytes": 16811,
+        "lines": 378,
+        "sha256": "99164c15364cee66ee2e33e539d7fe1b9c197816ce3f22550e4b470e01e01421"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "lines": 33,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "lines": 82,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "lines": 20,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/trust/trustFixtures.ts",
+        "bytes": 2312,
+        "lines": 49,
+        "sha256": "da8626dc36baf6756414f921450228cf780327e6dd24793a2e35c1de16fdb61d"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tsconfig.json",
+        "bytes": 504,
+        "lines": 20,
+        "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+        "bytes": 18181,
+        "lines": 405,
+        "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "lines": 36,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      }
+    ],
+    "limit": "Thirty-two original readiness records match current hashes; this is a static read, not a freeze or runtime check."
+  },
+  "ordinaryCaseReview": [
+    {
+      "name": "close while callback is pending preserves recorded state and original fulfillment",
+      "driverLines": [
+        123,
+        164
+      ],
+      "actualAPI": "createCallbackTelemetryCapture(), startSpan(), span.setAttributes/addEvent/setStatus/startSpan(), close(), recordDroppedCall(), snapshot(); no private state/prototype injection.",
+      "barriers": "Healthy span resolves before pending admission. ready is released inside the actual pending callback before gate wait. Promise.race distinguishes callback readiness from early completion. Public close returns before release of late recording.",
+      "criteria": "checkBefore asserts two spans, full six stats and specified healthy/pending expected fields; expectedClose deep-clones the full before document, changes only pending settlement and appends exact closed loss. Later complete normalized snapshots must equal that closed record. Original callback value plus late child/root values retain identity and callbacks each execute once.",
+      "cleanup": "finally releases the pending gate, awaits the observed fulfilled/rejected wrapper and emits completed=false plus pre/post cleanup trace if an assertion failed. No native resources or timers other than the Node test deadline are introduced."
+    },
+    {
+      "name": "close during explicit flush preserves its batch and original callback rejection",
+      "driverLines": [
+        166,
+        236
+      ],
+      "actualAPI": "Real explicit public flush uses a user-supplied async sink; sink entry/release have their own deferred barriers.",
+      "barriers": "sinkEntered is released before the sink waits, while snapshot normalization/push happens synchronously before its await. The test waits for actual sink entry rather than sleeping, closes the admitted pending span, releases the callback before the still-blocked sink, then releases the sink.",
+      "criteria": "First sink batch retains the healthy span only and all original document fields/stats. Exact original Error identity is rejected; snapshot stays closed until flush settlement. First flush exports1/remaining1, second exports1/remaining0; full retained spans/losses/source and full exported counters transform exactly within capture.",
+      "observerErrors": "Assertions are outside the sink. If normalization throws before its wait, the saved document comparison or eventual exact flush result fails; capture's sink-failed return cannot turn that into a pass. flushing is immediately wrapped by outcome, and its .then tracking callback cannot throw.",
+      "cleanup": "finally releases both callback and sink gates, awaits observed outcomes with Promise.allSettled and emits partial evidence. A pathological implementation that never settles can hit the ten-second test deadline; timeout/cancellation must remain infrastructure evidence, not an ordinary guard kill."
+    }
+  ],
+  "snapshotReview": {
+    "driverLines": [
+      29,
+      49,
+      60,
+      85,
+      132,
+      156,
+      177,
+      227
+    ],
+    "independentExpectedScope": "Specified baseline fields and all six stats are authored independently. Other baseline field values (including real capture/span IDs) come from the actual snapshot and are retained by full within-capture comparisons; no claim of independently authored expected values for every field. The corrected prose accurately states this limit.",
+    "excludedMetadata": [
+      "recordedAt"
+    ],
+    "metadataLimit": "recordedAt is checked as a string and excluded as capture metadata. Source timestamp1000/duration7 are explicit synthetic attributes, checked against traceTimestamp current numeric behavior. No elapsed-time, producer chronology or absent source timestamp is invented.",
+    "fullState": "source contract/trust/signature/evaluation, losses, all spans/fields/stats are retained. Relative close/flush transformations compare the complete normalized document, including fields not independently expected at initial baseline.",
+    "crossPhase": "Random real IDs are retained and hashed; cross-phase digest equality is deliberately not asserted. Future phases must retain identical case names, authored bytes/inputs, criteria and comparison rules."
+  },
+  "promiseAndSinkReview": {
+    "faithfulResults": "Source start:158-162 preserves callback fulfilled value and original rejection reason; proposal asserts object/Error identity, not original promise-object identity. Late NOOP root/child still invoke callback and retain result.",
+    "sourceNOOPLines": [
+      17,
+      20
+    ],
+    "sourceSettlementLines": [
+      139,
+      162
+    ],
+    "sourceCloseLines": [
+      198,
+      203
+    ],
+    "sourceFlushLines": [
+      184,
+      196
+    ],
+    "flushScope": "Only one in-flight healthy sink and a later sequential flush are exercised. No rejected sink, uncertain delivery/retry, concurrently queued flushes, arbitrary exporter, process concurrency or budget boundary is qualified.",
+    "hangScope": "Deferred gates always release in normal finally paths; races distinguish early settlement. No sleep ordering. A future controller must retain raw failure output and apply an outer deadline for broken implementations if needed; no such deadline/controller was created here."
+  },
+  "exactM23Recipe": {
+    "id": "S7-M23-callback-closed-113-equivalent",
+    "sourceTarget": "src/importers/callbackTelemetryCapture.ts",
+    "sourceFind": "      if (this.closed || entry.ended) return;\n      try { operation(); }",
+    "sourceReplace": "      if (entry.ended) return;\n      try { operation(); }",
+    "sourceOccurrences": 1,
+    "sourceLine": 113,
+    "compiledTarget": "dist/importers/callbackTelemetryCapture.js",
+    "compiledFind": "const recordCall = (operation) => {\n            if (this.closed || entry.ended)",
+    "compiledReplace": "const recordCall = (operation) => {\n            if (entry.ended)",
+    "compiledOccurrences": 1,
+    "compiledLine": 140,
+    "limit": "Matches only recordCall, not the independent settle closed/ended guard. In these two ordinary scenarios close sees the already-admitted pending entry and marks it ended, so removal of closed is statically predicted benign for those fixtures only. This is not a current runtime equivalence classification."
+  },
+  "reentrantGetterLead": {
+    "executed": false,
+    "proposalEdited": false,
+    "newCaseAuthored": false,
+    "inputExample": "{ get name() { capture.close(); return 'reentrant'; } }",
+    "typeCompatibility": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/importers/callbackTelemetryContract.ts",
+      "line": 6,
+      "statement": "A getter that returns a string supplies the required name:string property structurally. The interface has no plain-data/descriptor restriction; this is a static language/source assessment, with no compiler check."
+    },
+    "docsCompatibility": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/docs/PI_CALLBACK_TELEMETRY.md",
+      "lines": [
+        3,
+        13,
+        31,
+        33,
+        41,
+        43
+      ],
+      "statement": "The inspected callback contract/docs describe ordinary public callback/close behavior, unreadable-input losses and preserved results; they do not prohibit accessors or public close from an options getter. Historical Pi conformance prose is dated/receipt-limited and cannot supply a new prohibition or current equivalence proof."
+    },
+    "sourcePath": [
+      {
+        "line": 98,
+        "meaning": "start first checks this.closed while capture is open."
+      },
+      {
+        "line": 102,
+        "meaning": "text(options.name) evaluates the public name getter. Getter can call public close on an empty map before entry admission."
+      },
+      {
+        "line": 199,
+        "meaning": "close sets closed=true, visits no entries, and returns."
+      },
+      {
+        "line": 109,
+        "meaning": "start continues without a second closed check; creates a new entry with ended=false and commits it."
+      },
+      {
+        "line": 110,
+        "meaning": "That entry is admitted after close. A later idempotent close returns without ending it."
+      },
+      {
+        "line": 113,
+        "meaning": "Original recordCall still refuses through closed; the ended-only M23 variant can record because ended remains false."
+      },
+      {
+        "line": 140,
+        "meaning": "Settlement independently retains its closed guard; therefore it can leave the admitted record pending even when callback fulfills. Do not mutate this guard or claim a final outcome."
+      }
+    ],
+    "assessment": "This public route breaks the global premise that every retained entry is ended whenever capture is closed. It is a concrete separate static causal lead, not a demonstrated mutation kill, compatibility test result, proposed production fix or finding against the two ordinary-case proposal. Root correctly requires a separately reviewed case before runtime/global classification."
+  },
+  "scopeLimits": [
+    "Existing original thirteen tests remain unchanged and have no close/flush coverage; these two proposed cases do not inherit their result or authorize global M23 equivalence.",
+    "The module-root prefix assertions at driver8-12 establish an explicit private path convention only, not completeness/ownership/native identity. Root's future complete closure/input manifest, exact isolation/restoration and normal checks remain required.",
+    "SELF_REPORTED, signed=false, NOT_EVALUATED and synthetic operational attributes remain exact; no task success, external agent/person/tenant, Pi conformance, real HTTP, transport, hosted/installed/release or Done claim.",
+    "No input, source, compiled module, original test/helper, counter, guard, archive, old private packet or held work was modified."
+  ],
+  "operations": {
+    "onlyWrites": [
+      "/private/tmp/p0-30-AMC-1517-lifecycle-static-review-20261015.json",
+      "/private/tmp/p0-30-AMC-1517-lifecycle-static-review-20261015.md"
+    ],
+    "runtimeImportsSyntaxTestsBuilds": false,
+    "sourceProposalOriginalTestOrHeldMutations": false,
+    "allInputReadsFinished": true
+  },
+  "finalInputRecheck": {
+    "proposalFiles": 3,
+    "directSourceFiles": 7,
+    "readinessRecords": 32,
+    "allExact": true,
+    "allInputReadsFinished": true
+  }
+}

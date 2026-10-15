@@ -1,0 +1,1994 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1542",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T00:39:14.268901+00:00",
+  "state": "BOUNDED_CORE_CONTROLS_COMPLETE_NOT_WHOLE_ACCEPTANCE",
+  "workspace": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+  "privateRoot": "/private/tmp/p0-30-AMC-1542-qualification-20261015",
+  "construction": "Fresh private filesystem copy, not a literal Git clone. No Git metadata was created or changed; no checkout hook or guard was bypassed.",
+  "runtime": {
+    "actualProcessOnlyFingerprint": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "fingerprintCommand": {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/actual-runtime-fingerprint/command.json",
+      "bytes": 1499,
+      "sha256": "988d4093ab61775c16ea88a99dcab17af0b4d44782de0e2f1b7a28567f36cc09"
+    },
+    "scope": "The separate current launcher process records ABI127. Test commands use this explicit Node22 path; per-test-worker ABI was not printed and is not retrospectively asserted as directly observed."
+  },
+  "native": {
+    "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "device": 16777231,
+    "inode": 537685380,
+    "nlink": 1
+  },
+  "preservation": {
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "completeClosureFiles": 12268,
+    "readinessPins": 92,
+    "rootProtectedPins": 31,
+    "rootAndPrivateSourceExact": true,
+    "rootAndPrivateCompiledAlwaysExact": true,
+    "nativeBytesDeviceInodeNlinkExact": true,
+    "priorPackagesExact": true,
+    "rootGitStatus": "clean",
+    "sourceImportsConfigSetupGuardsAndDeadlines": "Original unchanged source-mode Vitest, with 30000ms test timeout; no import adapter, compiler, compiled mutation or transport blocker."
+  },
+  "originalCorpus": {
+    "files": [
+      "tests/leaseRevocationFailClosed.test.ts",
+      "tests/leaseRevocationWriterIntegrity.test.ts"
+    ],
+    "distinctCases": 35,
+    "baseline": {
+      "numTotalTests": 35,
+      "numPassedTests": 35,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": true,
+      "phase": "unchanged-original-two-file-baseline",
+      "exit": 0,
+      "names": [
+        "revokedLeaseIdSet fails closed returns the revoked ids from a healthy signed store",
+        "revokedLeaseIdSet fails closed throws on a tampered store instead of answering an empty set",
+        "revokedLeaseIdSet fails closed refuses a deleted list while preserving its surviving signature",
+        "revokedLeaseIdSet fails closed allows a never-initialised store to bootstrap without inventing revocations",
+        "verifyLeaseForCli checks the store it trusts accepts a valid lease and rejects a revoked one on a healthy store",
+        "verifyLeaseForCli checks the store it trusts refuses to verify anything against a tampered revocation store",
+        "ensureLeaseRevocationStore does not launder tampering bootstraps a missing store as signed and valid",
+        "ensureLeaseRevocationStore does not launder tampering reports a tampered store invalid and leaves the evidence in place",
+        "ensureLeaseRevocationStore does not launder tampering re-running on a healthy store keeps it valid",
+        "resignLeaseRevocationsForCli is the one deliberate repair path re-signing a tampered store restores verification and reports what was vouched for",
+        "managed hooks authenticate the revocation store claude-code observe refuses a 'tampered list' before forwarding or reinstalling",
+        "managed hooks authenticate the revocation store claude-code observe refuses a 'deleted list' before forwarding or reinstalling",
+        "managed hooks authenticate the revocation store claude-code control refuses a 'tampered list' before forwarding or reinstalling",
+        "managed hooks authenticate the revocation store claude-code control refuses a 'deleted list' before forwarding or reinstalling",
+        "managed hooks authenticate the revocation store gemini-cli observe refuses a 'tampered list' before forwarding or reinstalling",
+        "managed hooks authenticate the revocation store gemini-cli observe refuses a 'deleted list' before forwarding or reinstalling",
+        "managed hooks authenticate the revocation store gemini-cli control refuses a 'tampered list' before forwarding or reinstalling",
+        "managed hooks authenticate the revocation store gemini-cli control refuses a 'deleted list' before forwarding or reinstalling",
+        "managed hooks authenticate the revocation store reports signed malformed store data as an invalid lease rather than throwing from status",
+        "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'tampered list'",
+        "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'deleted list'",
+        "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'tampered list'",
+        "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'deleted list'",
+        "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'tampered list' without reaching its upstream",
+        "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'deleted list' without reaching its upstream",
+        "AMC-1542 revocation writer authenticates the prior snapshot preserves earlier revoked IDs while signing a healthy append and idempotent update",
+        "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+        "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+        "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+        "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+        "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+        "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+        "AMC-1542 revocation writer authenticates the prior snapshot keeps a truly absent list and signature eligible for normal first-revocation bootstrap",
+        "AMC-1542 revocation writer authenticates the prior snapshot does not overwrite the prior signed list when the signer is unavailable",
+        "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation"
+      ],
+      "cases": [
+        {
+          "name": "revokedLeaseIdSet fails closed returns the revoked ids from a healthy signed store",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "revokedLeaseIdSet fails closed throws on a tampered store instead of answering an empty set",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "revokedLeaseIdSet fails closed refuses a deleted list while preserving its surviving signature",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "revokedLeaseIdSet fails closed allows a never-initialised store to bootstrap without inventing revocations",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "verifyLeaseForCli checks the store it trusts accepts a valid lease and rejects a revoked one on a healthy store",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "verifyLeaseForCli checks the store it trusts refuses to verify anything against a tampered revocation store",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "ensureLeaseRevocationStore does not launder tampering bootstraps a missing store as signed and valid",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "ensureLeaseRevocationStore does not launder tampering reports a tampered store invalid and leaves the evidence in place",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "ensureLeaseRevocationStore does not launder tampering re-running on a healthy store keeps it valid",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "resignLeaseRevocationsForCli is the one deliberate repair path re-signing a tampered store restores verification and reports what was vouched for",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "managed hooks authenticate the revocation store claude-code observe refuses a 'tampered list' before forwarding or reinstalling",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "managed hooks authenticate the revocation store claude-code observe refuses a 'deleted list' before forwarding or reinstalling",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "managed hooks authenticate the revocation store claude-code control refuses a 'tampered list' before forwarding or reinstalling",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "managed hooks authenticate the revocation store claude-code control refuses a 'deleted list' before forwarding or reinstalling",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "managed hooks authenticate the revocation store gemini-cli observe refuses a 'tampered list' before forwarding or reinstalling",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "managed hooks authenticate the revocation store gemini-cli observe refuses a 'deleted list' before forwarding or reinstalling",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "managed hooks authenticate the revocation store gemini-cli control refuses a 'tampered list' before forwarding or reinstalling",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "managed hooks authenticate the revocation store gemini-cli control refuses a 'deleted list' before forwarding or reinstalling",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "managed hooks authenticate the revocation store reports signed malformed store data as an invalid lease rather than throwing from status",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'tampered list'",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'deleted list'",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'tampered list'",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'deleted list'",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'tampered list' without reaching its upstream",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'deleted list' without reaching its upstream",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot preserves earlier revoked IDs while signing a healthy append and idempotent update",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot keeps a truly absent list and signature eligible for normal first-revocation bootstrap",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot does not overwrite the prior signed list when the signer is unavailable",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ],
+      "suiteMessages": [
+        {
+          "name": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts",
+          "status": "passed",
+          "message": ""
+        },
+        {
+          "name": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts",
+          "status": "passed",
+          "message": ""
+        }
+      ],
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/raw-tests.json",
+        "bytes": 14134,
+        "sha256": "eddd548007d030849c0574997e2d9ca0f14d5efdfa1e5d8e3b8ff9f155965b00"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/command.json",
+        "bytes": 1857,
+        "sha256": "7648f379d050d83fae586eec09223a0d886e7d48b276093349b8ddaa414c267b"
+      },
+      "incompleteOrSetupIssue": false,
+      "semanticInterpretation": "Raw assertion and suite messages require independent classification; a nonzero process status alone is not a guard kill."
+    },
+    "counting": "The writer10 is a subset of the same original35. Repeated baselines, mutants and restores are not added as distinct cases."
+  },
+  "matrices": [
+    {
+      "recipe": {
+        "id": "P30-1542-current-empty-set",
+        "historicalId": "P30-1542-empty-set",
+        "sourceTarget": "src/leases/leaseStore.ts",
+        "sourceFind": "    throw new Error(\n      `lease revocation store unverifiable (${error instanceof Error ? error.message : String(error)}); refusing to treat it as empty`\n    );",
+        "sourceReplace": "    return new Set<string>();",
+        "compiledTarget": "dist/leases/leaseStore.js",
+        "compiledFind": "        throw new Error(`lease revocation store unverifiable (${error instanceof Error ? error.message : String(error)}); refusing to treat it as empty`);",
+        "compiledReplace": "        return new Set();",
+        "corpus": [
+          "tests/leaseRevocationFailClosed.test.ts",
+          "tests/leaseRevocationWriterIntegrity.test.ts"
+        ],
+        "staticSourceExpandedCases": 35,
+        "meaning": "Current catch-refusal semantic reanchor only.",
+        "sourceOccurrences": 1,
+        "compiledOccurrences": 1,
+        "sourceLine": 173,
+        "compiledLine": 154,
+        "currentRuntime": "UNEXECUTED"
+      },
+      "baseline": {
+        "numTotalTests": 35,
+        "numPassedTests": 35,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "phase": "P30-1542-current-empty-set-baseline",
+        "exit": 0,
+        "names": [
+          "revokedLeaseIdSet fails closed returns the revoked ids from a healthy signed store",
+          "revokedLeaseIdSet fails closed throws on a tampered store instead of answering an empty set",
+          "revokedLeaseIdSet fails closed refuses a deleted list while preserving its surviving signature",
+          "revokedLeaseIdSet fails closed allows a never-initialised store to bootstrap without inventing revocations",
+          "verifyLeaseForCli checks the store it trusts accepts a valid lease and rejects a revoked one on a healthy store",
+          "verifyLeaseForCli checks the store it trusts refuses to verify anything against a tampered revocation store",
+          "ensureLeaseRevocationStore does not launder tampering bootstraps a missing store as signed and valid",
+          "ensureLeaseRevocationStore does not launder tampering reports a tampered store invalid and leaves the evidence in place",
+          "ensureLeaseRevocationStore does not launder tampering re-running on a healthy store keeps it valid",
+          "resignLeaseRevocationsForCli is the one deliberate repair path re-signing a tampered store restores verification and reports what was vouched for",
+          "managed hooks authenticate the revocation store claude-code observe refuses a 'tampered list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store claude-code observe refuses a 'deleted list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store claude-code control refuses a 'tampered list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store claude-code control refuses a 'deleted list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store gemini-cli observe refuses a 'tampered list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store gemini-cli observe refuses a 'deleted list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store gemini-cli control refuses a 'tampered list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store gemini-cli control refuses a 'deleted list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store reports signed malformed store data as an invalid lease rather than throwing from status",
+          "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'tampered list'",
+          "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'deleted list'",
+          "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'tampered list'",
+          "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'deleted list'",
+          "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'tampered list' without reaching its upstream",
+          "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'deleted list' without reaching its upstream",
+          "AMC-1542 revocation writer authenticates the prior snapshot preserves earlier revoked IDs while signing a healthy append and idempotent update",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot keeps a truly absent list and signature eligible for normal first-revocation bootstrap",
+          "AMC-1542 revocation writer authenticates the prior snapshot does not overwrite the prior signed list when the signer is unavailable",
+          "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation"
+        ],
+        "cases": [
+          {
+            "name": "revokedLeaseIdSet fails closed returns the revoked ids from a healthy signed store",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "revokedLeaseIdSet fails closed throws on a tampered store instead of answering an empty set",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "revokedLeaseIdSet fails closed refuses a deleted list while preserving its surviving signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "revokedLeaseIdSet fails closed allows a never-initialised store to bootstrap without inventing revocations",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "verifyLeaseForCli checks the store it trusts accepts a valid lease and rejects a revoked one on a healthy store",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "verifyLeaseForCli checks the store it trusts refuses to verify anything against a tampered revocation store",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "ensureLeaseRevocationStore does not launder tampering bootstraps a missing store as signed and valid",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "ensureLeaseRevocationStore does not launder tampering reports a tampered store invalid and leaves the evidence in place",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "ensureLeaseRevocationStore does not launder tampering re-running on a healthy store keeps it valid",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "resignLeaseRevocationsForCli is the one deliberate repair path re-signing a tampered store restores verification and reports what was vouched for",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store claude-code observe refuses a 'tampered list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store claude-code observe refuses a 'deleted list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store claude-code control refuses a 'tampered list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store claude-code control refuses a 'deleted list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store gemini-cli observe refuses a 'tampered list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store gemini-cli observe refuses a 'deleted list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store gemini-cli control refuses a 'tampered list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store gemini-cli control refuses a 'deleted list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store reports signed malformed store data as an invalid lease rather than throwing from status",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'tampered list'",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'deleted list'",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'tampered list'",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'deleted list'",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'tampered list' without reaching its upstream",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'deleted list' without reaching its upstream",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot preserves earlier revoked IDs while signing a healthy append and idempotent update",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot keeps a truly absent list and signature eligible for normal first-revocation bootstrap",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot does not overwrite the prior signed list when the signer is unavailable",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation",
+            "status": "passed",
+            "failureMessages": []
+          }
+        ],
+        "suiteMessages": [
+          {
+            "name": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts",
+            "status": "passed",
+            "message": ""
+          },
+          {
+            "name": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts",
+            "status": "passed",
+            "message": ""
+          }
+        ],
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/raw-tests.json",
+          "bytes": 14131,
+          "sha256": "f461eb53a5188de4ca91587f8f1a0aa2244e89496986e194d358732c29754393"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/command.json",
+          "bytes": 1850,
+          "sha256": "5c28a4af559249facb0a774f1a2bb01fbfee3844095fb8fc1bec664550e9a162"
+        },
+        "incompleteOrSetupIssue": false,
+        "semanticInterpretation": "Raw assertion and suite messages require independent classification; a nonzero process status alone is not a guard kill."
+      },
+      "mutant": {
+        "numTotalTests": 35,
+        "numPassedTests": 15,
+        "numFailedTests": 20,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "phase": "P30-1542-current-empty-set-mutant",
+        "exit": 1,
+        "names": [
+          "revokedLeaseIdSet fails closed returns the revoked ids from a healthy signed store",
+          "revokedLeaseIdSet fails closed throws on a tampered store instead of answering an empty set",
+          "revokedLeaseIdSet fails closed refuses a deleted list while preserving its surviving signature",
+          "revokedLeaseIdSet fails closed allows a never-initialised store to bootstrap without inventing revocations",
+          "verifyLeaseForCli checks the store it trusts accepts a valid lease and rejects a revoked one on a healthy store",
+          "verifyLeaseForCli checks the store it trusts refuses to verify anything against a tampered revocation store",
+          "ensureLeaseRevocationStore does not launder tampering bootstraps a missing store as signed and valid",
+          "ensureLeaseRevocationStore does not launder tampering reports a tampered store invalid and leaves the evidence in place",
+          "ensureLeaseRevocationStore does not launder tampering re-running on a healthy store keeps it valid",
+          "resignLeaseRevocationsForCli is the one deliberate repair path re-signing a tampered store restores verification and reports what was vouched for",
+          "managed hooks authenticate the revocation store claude-code observe refuses a 'tampered list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store claude-code observe refuses a 'deleted list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store claude-code control refuses a 'tampered list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store claude-code control refuses a 'deleted list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store gemini-cli observe refuses a 'tampered list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store gemini-cli observe refuses a 'deleted list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store gemini-cli control refuses a 'tampered list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store gemini-cli control refuses a 'deleted list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store reports signed malformed store data as an invalid lease rather than throwing from status",
+          "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'tampered list'",
+          "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'deleted list'",
+          "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'tampered list'",
+          "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'deleted list'",
+          "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'tampered list' without reaching its upstream",
+          "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'deleted list' without reaching its upstream",
+          "AMC-1542 revocation writer authenticates the prior snapshot preserves earlier revoked IDs while signing a healthy append and idempotent update",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot keeps a truly absent list and signature eligible for normal first-revocation bootstrap",
+          "AMC-1542 revocation writer authenticates the prior snapshot does not overwrite the prior signed list when the signer is unavailable",
+          "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation"
+        ],
+        "cases": [
+          {
+            "name": "revokedLeaseIdSet fails closed returns the revoked ids from a healthy signed store",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "revokedLeaseIdSet fails closed throws on a tampered store instead of answering an empty set",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts:128:48\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+            ]
+          },
+          {
+            "name": "revokedLeaseIdSet fails closed refuses a deleted list while preserving its surviving signature",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts:143:48\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+            ]
+          },
+          {
+            "name": "revokedLeaseIdSet fails closed allows a never-initialised store to bootstrap without inventing revocations",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "verifyLeaseForCli checks the store it trusts accepts a valid lease and rejects a revoked one on a healthy store",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "verifyLeaseForCli checks the store it trusts refuses to verify anything against a tampered revocation store",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected true to be false // Object.is equality\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts:193:23\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+            ]
+          },
+          {
+            "name": "ensureLeaseRevocationStore does not launder tampering bootstraps a missing store as signed and valid",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "ensureLeaseRevocationStore does not launder tampering reports a tampered store invalid and leaves the evidence in place",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "ensureLeaseRevocationStore does not launder tampering re-running on a healthy store keeps it valid",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "resignLeaseRevocationsForCli is the one deliberate repair path re-signing a tampered store restores verification and reports what was vouched for",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store claude-code observe refuses a 'tampered list' before forwarding or reinstalling",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected { provider: 'claude-code', \u2026(11) } to match object { state: 'invalid', \u2026(2) }\n(18 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts:258:24\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "managed hooks authenticate the revocation store claude-code observe refuses a 'deleted list' before forwarding or reinstalling",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected { provider: 'claude-code', \u2026(11) } to match object { state: 'invalid', \u2026(2) }\n(18 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts:258:24\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "managed hooks authenticate the revocation store claude-code control refuses a 'tampered list' before forwarding or reinstalling",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected { provider: 'claude-code', \u2026(11) } to match object { state: 'invalid', \u2026(2) }\n(18 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts:258:24\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "managed hooks authenticate the revocation store claude-code control refuses a 'deleted list' before forwarding or reinstalling",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected { provider: 'claude-code', \u2026(11) } to match object { state: 'invalid', \u2026(2) }\n(18 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts:258:24\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "managed hooks authenticate the revocation store gemini-cli observe refuses a 'tampered list' before forwarding or reinstalling",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected { provider: 'gemini-cli', \u2026(11) } to match object { state: 'invalid', \u2026(2) }\n(18 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts:258:24\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "managed hooks authenticate the revocation store gemini-cli observe refuses a 'deleted list' before forwarding or reinstalling",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected { provider: 'gemini-cli', \u2026(11) } to match object { state: 'invalid', \u2026(2) }\n(18 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts:258:24\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "managed hooks authenticate the revocation store gemini-cli control refuses a 'tampered list' before forwarding or reinstalling",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected { provider: 'gemini-cli', \u2026(11) } to match object { state: 'invalid', \u2026(2) }\n(18 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts:258:24\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "managed hooks authenticate the revocation store gemini-cli control refuses a 'deleted list' before forwarding or reinstalling",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected { provider: 'gemini-cli', \u2026(11) } to match object { state: 'invalid', \u2026(2) }\n(18 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts:258:24\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "managed hooks authenticate the revocation store reports signed malformed store data as an invalid lease rather than throwing from status",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected { provider: 'claude-code', \u2026(11) } to match object { state: 'invalid', \u2026(2) }\n(18 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts:297:78\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+            ]
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'tampered list'",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected { ok: true, \u2026(2) } to match object { ok: false, payload: null, \u2026(1) }\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts:318:53\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'deleted list'",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected { ok: true, \u2026(2) } to match object { ok: false, payload: null, \u2026(1) }\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts:318:53\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'tampered list'",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'deleted list'",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'tampered list' without reaching its upstream",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'deleted list' without reaching its upstream",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot preserves earlier revoked IDs while signing a healthy append and idempotent update",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts:58:43\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts:58:43\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts:58:43\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts:58:43\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts:58:43\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts:58:43\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot keeps a truly absent list and signature eligible for normal first-revocation bootstrap",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot does not overwrite the prior signed list when the signer is unavailable",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation",
+            "status": "passed",
+            "failureMessages": []
+          }
+        ],
+        "suiteMessages": [
+          {
+            "name": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts",
+            "status": "failed",
+            "message": ""
+          },
+          {
+            "name": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts",
+            "status": "failed",
+            "message": ""
+          }
+        ],
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/raw-tests.json",
+          "bytes": 42664,
+          "sha256": "2f08ae1a07cecbb93ab5b0656b041689c5590d329660a14e7035158b295f8365"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/command.json",
+          "bytes": 1836,
+          "sha256": "c504afc56cb0e34ef241aa57fbbab4bd6cf493da70493b7cb39720858f130679"
+        },
+        "incompleteOrSetupIssue": false,
+        "semanticInterpretation": "Raw assertion and suite messages require independent classification; a nonzero process status alone is not a guard kill."
+      },
+      "restored": {
+        "numTotalTests": 35,
+        "numPassedTests": 35,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "phase": "P30-1542-current-empty-set-restored",
+        "exit": 0,
+        "names": [
+          "revokedLeaseIdSet fails closed returns the revoked ids from a healthy signed store",
+          "revokedLeaseIdSet fails closed throws on a tampered store instead of answering an empty set",
+          "revokedLeaseIdSet fails closed refuses a deleted list while preserving its surviving signature",
+          "revokedLeaseIdSet fails closed allows a never-initialised store to bootstrap without inventing revocations",
+          "verifyLeaseForCli checks the store it trusts accepts a valid lease and rejects a revoked one on a healthy store",
+          "verifyLeaseForCli checks the store it trusts refuses to verify anything against a tampered revocation store",
+          "ensureLeaseRevocationStore does not launder tampering bootstraps a missing store as signed and valid",
+          "ensureLeaseRevocationStore does not launder tampering reports a tampered store invalid and leaves the evidence in place",
+          "ensureLeaseRevocationStore does not launder tampering re-running on a healthy store keeps it valid",
+          "resignLeaseRevocationsForCli is the one deliberate repair path re-signing a tampered store restores verification and reports what was vouched for",
+          "managed hooks authenticate the revocation store claude-code observe refuses a 'tampered list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store claude-code observe refuses a 'deleted list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store claude-code control refuses a 'tampered list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store claude-code control refuses a 'deleted list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store gemini-cli observe refuses a 'tampered list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store gemini-cli observe refuses a 'deleted list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store gemini-cli control refuses a 'tampered list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store gemini-cli control refuses a 'deleted list' before forwarding or reinstalling",
+          "managed hooks authenticate the revocation store reports signed malformed store data as an invalid lease rather than throwing from status",
+          "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'tampered list'",
+          "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'deleted list'",
+          "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'tampered list'",
+          "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'deleted list'",
+          "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'tampered list' without reaching its upstream",
+          "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'deleted list' without reaching its upstream",
+          "AMC-1542 revocation writer authenticates the prior snapshot preserves earlier revoked IDs while signing a healthy append and idempotent update",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot keeps a truly absent list and signature eligible for normal first-revocation bootstrap",
+          "AMC-1542 revocation writer authenticates the prior snapshot does not overwrite the prior signed list when the signer is unavailable",
+          "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation"
+        ],
+        "cases": [
+          {
+            "name": "revokedLeaseIdSet fails closed returns the revoked ids from a healthy signed store",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "revokedLeaseIdSet fails closed throws on a tampered store instead of answering an empty set",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "revokedLeaseIdSet fails closed refuses a deleted list while preserving its surviving signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "revokedLeaseIdSet fails closed allows a never-initialised store to bootstrap without inventing revocations",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "verifyLeaseForCli checks the store it trusts accepts a valid lease and rejects a revoked one on a healthy store",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "verifyLeaseForCli checks the store it trusts refuses to verify anything against a tampered revocation store",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "ensureLeaseRevocationStore does not launder tampering bootstraps a missing store as signed and valid",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "ensureLeaseRevocationStore does not launder tampering reports a tampered store invalid and leaves the evidence in place",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "ensureLeaseRevocationStore does not launder tampering re-running on a healthy store keeps it valid",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "resignLeaseRevocationsForCli is the one deliberate repair path re-signing a tampered store restores verification and reports what was vouched for",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store claude-code observe refuses a 'tampered list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store claude-code observe refuses a 'deleted list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store claude-code control refuses a 'tampered list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store claude-code control refuses a 'deleted list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store gemini-cli observe refuses a 'tampered list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store gemini-cli observe refuses a 'deleted list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store gemini-cli control refuses a 'tampered list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store gemini-cli control refuses a 'deleted list' before forwarding or reinstalling",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "managed hooks authenticate the revocation store reports signed malformed store data as an invalid lease rather than throwing from status",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'tampered list'",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'deleted list'",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'tampered list'",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'deleted list'",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'tampered list' without reaching its upstream",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'deleted list' without reaching its upstream",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot preserves earlier revoked IDs while signing a healthy append and idempotent update",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot keeps a truly absent list and signature eligible for normal first-revocation bootstrap",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot does not overwrite the prior signed list when the signer is unavailable",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation",
+            "status": "passed",
+            "failureMessages": []
+          }
+        ],
+        "suiteMessages": [
+          {
+            "name": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationFailClosed.test.ts",
+            "status": "passed",
+            "message": ""
+          },
+          {
+            "name": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts",
+            "status": "passed",
+            "message": ""
+          }
+        ],
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/raw-tests.json",
+          "bytes": 14108,
+          "sha256": "75eaaaf04e93ee5535a49237894d298ef41452e68a6afdf71ba165468db7dea4"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/command.json",
+          "bytes": 1850,
+          "sha256": "bebef1726ef99d11707a8d8789ec38912a3255c0754bc37a9d1b75dffcdfb3c3"
+        },
+        "incompleteOrSetupIssue": false,
+        "semanticInterpretation": "Raw assertion and suite messages require independent classification; a nonzero process status alone is not a guard kill."
+      },
+      "classification": "measured-failure-requiring-semantic-review",
+      "sourceRestorationExact": true,
+      "compiledImageUnchanged": true,
+      "sameOriginalCorpusAndGeneratorCriteria": true,
+      "physicalFixturesAcrossPhases": "Fresh random keys, UUIDs and workspaces from unchanged original fixture code; no physical cross-phase equality claim."
+    },
+    {
+      "recipe": {
+        "id": "P30-1542-revoke-snapshot",
+        "historicalId": "P30-1542-revoke-snapshot",
+        "sourceTarget": "src/leases/leaseStore.ts",
+        "sourceFind": "current = readVerifiedRevocations(workspace);",
+        "sourceReplace": "current = loadLeaseRevocations(workspace);",
+        "compiledTarget": "dist/leases/leaseStore.js",
+        "compiledFind": "current = readVerifiedRevocations(workspace);",
+        "compiledReplace": "current = loadLeaseRevocations(workspace);",
+        "corpus": [
+          "tests/leaseRevocationWriterIntegrity.test.ts"
+        ],
+        "staticSourceExpandedCases": 10,
+        "meaning": "Exact original current source anchor.",
+        "sourceOccurrences": 1,
+        "compiledOccurrences": 1,
+        "sourceLine": 130,
+        "compiledLine": 110,
+        "currentRuntime": "UNEXECUTED"
+      },
+      "baseline": {
+        "numTotalTests": 10,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "phase": "P30-1542-revoke-snapshot-baseline",
+        "exit": 0,
+        "names": [
+          "AMC-1542 revocation writer authenticates the prior snapshot preserves earlier revoked IDs while signing a healthy append and idempotent update",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot keeps a truly absent list and signature eligible for normal first-revocation bootstrap",
+          "AMC-1542 revocation writer authenticates the prior snapshot does not overwrite the prior signed list when the signer is unavailable",
+          "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation"
+        ],
+        "cases": [
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot preserves earlier revoked IDs while signing a healthy append and idempotent update",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot keeps a truly absent list and signature eligible for normal first-revocation bootstrap",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot does not overwrite the prior signed list when the signer is unavailable",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation",
+            "status": "passed",
+            "failureMessages": []
+          }
+        ],
+        "suiteMessages": [
+          {
+            "name": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts",
+            "status": "passed",
+            "message": ""
+          }
+        ],
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/raw-tests.json",
+          "bytes": 4605,
+          "sha256": "6d1f4619e8bfd52e1ed3f1b50a07c34191e01af547e536a6db6f6d74e1aa6820"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/command.json",
+          "bytes": 1788,
+          "sha256": "362e103fec7c019d98a255c33ccba692b884ccfc52868f644468f344e98e9580"
+        },
+        "incompleteOrSetupIssue": false,
+        "semanticInterpretation": "Raw assertion and suite messages require independent classification; a nonzero process status alone is not a guard kill."
+      },
+      "mutant": {
+        "numTotalTests": 10,
+        "numPassedTests": 5,
+        "numFailedTests": 5,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "phase": "P30-1542-revoke-snapshot-mutant",
+        "exit": 1,
+        "names": [
+          "AMC-1542 revocation writer authenticates the prior snapshot preserves earlier revoked IDs while signing a healthy append and idempotent update",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot keeps a truly absent list and signature eligible for normal first-revocation bootstrap",
+          "AMC-1542 revocation writer authenticates the prior snapshot does not overwrite the prior signed list when the signer is unavailable",
+          "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation"
+        ],
+        "cases": [
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot preserves earlier revoked IDs while signing a healthy append and idempotent update",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts:56:115\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts:56:115\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts:56:115\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts:56:115\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ]
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot keeps a truly absent list and signature eligible for normal first-revocation bootstrap",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot does not overwrite the prior signed list when the signer is unavailable",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts:79:70\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+            ]
+          }
+        ],
+        "suiteMessages": [
+          {
+            "name": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts",
+            "status": "failed",
+            "message": ""
+          }
+        ],
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/raw-tests.json",
+          "bytes": 11538,
+          "sha256": "3d8405b79b1012c4e4adfd9817b2871dfcfda283b4825045175db78e455b61cb"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/command.json",
+          "bytes": 1774,
+          "sha256": "8991980da409d9d61175c6e43df93836aa584029164a1b3a10a072a8946da659"
+        },
+        "incompleteOrSetupIssue": false,
+        "semanticInterpretation": "Raw assertion and suite messages require independent classification; a nonzero process status alone is not a guard kill."
+      },
+      "restored": {
+        "numTotalTests": 10,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "phase": "P30-1542-revoke-snapshot-restored",
+        "exit": 0,
+        "names": [
+          "AMC-1542 revocation writer authenticates the prior snapshot preserves earlier revoked IDs while signing a healthy append and idempotent update",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+          "AMC-1542 revocation writer authenticates the prior snapshot keeps a truly absent list and signature eligible for normal first-revocation bootstrap",
+          "AMC-1542 revocation writer authenticates the prior snapshot does not overwrite the prior signed list when the signer is unavailable",
+          "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation"
+        ],
+        "cases": [
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot preserves earlier revoked IDs while signing a healthy append and idempotent update",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot keeps a truly absent list and signature eligible for normal first-revocation bootstrap",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot does not overwrite the prior signed list when the signer is unavailable",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation",
+            "status": "passed",
+            "failureMessages": []
+          }
+        ],
+        "suiteMessages": [
+          {
+            "name": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure/tests/leaseRevocationWriterIntegrity.test.ts",
+            "status": "passed",
+            "message": ""
+          }
+        ],
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/raw-tests.json",
+          "bytes": 4604,
+          "sha256": "a904ebae8fede6e90713e97c226044718a7515751baac581f6a88242ad98ef68"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/command.json",
+          "bytes": 1788,
+          "sha256": "8588ffc81074e32175b3034f1da90fab18733ea74e4b3882d19c78907fda2817"
+        },
+        "incompleteOrSetupIssue": false,
+        "semanticInterpretation": "Raw assertion and suite messages require independent classification; a nonzero process status alone is not a guard kill."
+      },
+      "classification": "measured-failure-requiring-semantic-review",
+      "sourceRestorationExact": true,
+      "compiledImageUnchanged": true,
+      "sameOriginalCorpusAndGeneratorCriteria": true,
+      "physicalFixturesAcrossPhases": "Fresh random keys, UUIDs and workspaces from unchanged original fixture code; no physical cross-phase equality claim."
+    }
+  ],
+  "semanticClassification": [
+    {
+      "id": "P30-1542-current-empty-set",
+      "caseFailures": [
+        {
+          "name": "revokedLeaseIdSet fails closed throws on a tampered store instead of answering an empty set",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected [Function] to throw an error",
+          "originalTestLocations": [
+            "leaseRevocationFailClosed.test.ts:128:48"
+          ]
+        },
+        {
+          "name": "revokedLeaseIdSet fails closed refuses a deleted list while preserving its surviving signature",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected [Function] to throw an error",
+          "originalTestLocations": [
+            "leaseRevocationFailClosed.test.ts:143:48"
+          ]
+        },
+        {
+          "name": "verifyLeaseForCli checks the store it trusts refuses to verify anything against a tampered revocation store",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected true to be false // Object.is equality",
+          "originalTestLocations": [
+            "leaseRevocationFailClosed.test.ts:193:23"
+          ]
+        },
+        {
+          "name": "managed hooks authenticate the revocation store claude-code observe refuses a 'tampered list' before forwarding or reinstalling",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected { provider: 'claude-code', \u2026(11) } to match object { state: 'invalid', \u2026(2) }",
+          "originalTestLocations": [
+            "leaseRevocationFailClosed.test.ts:258:24"
+          ]
+        },
+        {
+          "name": "managed hooks authenticate the revocation store claude-code observe refuses a 'deleted list' before forwarding or reinstalling",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected { provider: 'claude-code', \u2026(11) } to match object { state: 'invalid', \u2026(2) }",
+          "originalTestLocations": [
+            "leaseRevocationFailClosed.test.ts:258:24"
+          ]
+        },
+        {
+          "name": "managed hooks authenticate the revocation store claude-code control refuses a 'tampered list' before forwarding or reinstalling",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected { provider: 'claude-code', \u2026(11) } to match object { state: 'invalid', \u2026(2) }",
+          "originalTestLocations": [
+            "leaseRevocationFailClosed.test.ts:258:24"
+          ]
+        },
+        {
+          "name": "managed hooks authenticate the revocation store claude-code control refuses a 'deleted list' before forwarding or reinstalling",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected { provider: 'claude-code', \u2026(11) } to match object { state: 'invalid', \u2026(2) }",
+          "originalTestLocations": [
+            "leaseRevocationFailClosed.test.ts:258:24"
+          ]
+        },
+        {
+          "name": "managed hooks authenticate the revocation store gemini-cli observe refuses a 'tampered list' before forwarding or reinstalling",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected { provider: 'gemini-cli', \u2026(11) } to match object { state: 'invalid', \u2026(2) }",
+          "originalTestLocations": [
+            "leaseRevocationFailClosed.test.ts:258:24"
+          ]
+        },
+        {
+          "name": "managed hooks authenticate the revocation store gemini-cli observe refuses a 'deleted list' before forwarding or reinstalling",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected { provider: 'gemini-cli', \u2026(11) } to match object { state: 'invalid', \u2026(2) }",
+          "originalTestLocations": [
+            "leaseRevocationFailClosed.test.ts:258:24"
+          ]
+        },
+        {
+          "name": "managed hooks authenticate the revocation store gemini-cli control refuses a 'tampered list' before forwarding or reinstalling",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected { provider: 'gemini-cli', \u2026(11) } to match object { state: 'invalid', \u2026(2) }",
+          "originalTestLocations": [
+            "leaseRevocationFailClosed.test.ts:258:24"
+          ]
+        },
+        {
+          "name": "managed hooks authenticate the revocation store gemini-cli control refuses a 'deleted list' before forwarding or reinstalling",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected { provider: 'gemini-cli', \u2026(11) } to match object { state: 'invalid', \u2026(2) }",
+          "originalTestLocations": [
+            "leaseRevocationFailClosed.test.ts:258:24"
+          ]
+        },
+        {
+          "name": "managed hooks authenticate the revocation store reports signed malformed store data as an invalid lease rather than throwing from status",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected { provider: 'claude-code', \u2026(11) } to match object { state: 'invalid', \u2026(2) }",
+          "originalTestLocations": [
+            "leaseRevocationFailClosed.test.ts:297:78"
+          ]
+        },
+        {
+          "name": "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'tampered list'",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected { ok: true, \u2026(2) } to match object { ok: false, payload: null, \u2026(1) }",
+          "originalTestLocations": [
+            "leaseRevocationFailClosed.test.ts:318:53"
+          ]
+        },
+        {
+          "name": "lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'deleted list'",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected { ok: true, \u2026(2) } to match object { ok: false, payload: null, \u2026(1) }",
+          "originalTestLocations": [
+            "leaseRevocationFailClosed.test.ts:318:53"
+          ]
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected [Function] to throw an error",
+          "originalTestLocations": [
+            "leaseRevocationWriterIntegrity.test.ts:58:43"
+          ]
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected [Function] to throw an error",
+          "originalTestLocations": [
+            "leaseRevocationWriterIntegrity.test.ts:58:43"
+          ]
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected [Function] to throw an error",
+          "originalTestLocations": [
+            "leaseRevocationWriterIntegrity.test.ts:58:43"
+          ]
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected [Function] to throw an error",
+          "originalTestLocations": [
+            "leaseRevocationWriterIntegrity.test.ts:58:43"
+          ]
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-json without rewriting list or signature",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected [Function] to throw an error",
+          "originalTestLocations": [
+            "leaseRevocationWriterIntegrity.test.ts:58:43"
+          ]
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses signed-malformed without rewriting list or signature",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected [Function] to throw an error",
+          "originalTestLocations": [
+            "leaseRevocationWriterIntegrity.test.ts:58:43"
+          ]
+        }
+      ],
+      "groupsByFirstLocation": {
+        "leaseRevocationFailClosed.test.ts:128:48": 1,
+        "leaseRevocationFailClosed.test.ts:143:48": 1,
+        "leaseRevocationFailClosed.test.ts:193:23": 1,
+        "leaseRevocationFailClosed.test.ts:258:24": 8,
+        "leaseRevocationFailClosed.test.ts:297:78": 1,
+        "leaseRevocationFailClosed.test.ts:318:53": 2,
+        "leaseRevocationWriterIntegrity.test.ts:58:43": 6
+      },
+      "scope": "Exact original assertion failures caused by one source guard change; no fixture/setup/transport/compiler failure was used as a kill.",
+      "interpretation": [
+        "Two direct reader refusals at FailClosed lines128/143 no longer throw.",
+        "The independent CLI verification refusal at193 returns ok:true.",
+        "Eight managed-hook cases stop at status assertion258; later forwarding, reinstall and byte-preservation assertions are not independently reached in this mutant.",
+        "The signed-malformed managed status case stops at297.",
+        "Two combined CLI/Bridge cases stop on the CLI assertion318; they do not independently exercise their later mutant Bridge assertion.",
+        "Six writer variants fail only the final revokedLeaseIdSet assertion58. Their preceding writer-refusal assertion56 and exact list/signature snapshot assertion57 pass. This is reader-guard sensitivity, not a writer fail-open finding.",
+        "The original router and gateway HTTP refusal cases pass in this mutant, so the measured result is not a claim that every consumer is sensitive to this one guard."
+      ]
+    },
+    {
+      "id": "P30-1542-revoke-snapshot",
+      "caseFailures": [
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected [Function] to throw an error",
+          "originalTestLocations": [
+            "leaseRevocationWriterIntegrity.test.ts:56:115"
+          ]
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected [Function] to throw an error",
+          "originalTestLocations": [
+            "leaseRevocationWriterIntegrity.test.ts:56:115"
+          ]
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected [Function] to throw an error",
+          "originalTestLocations": [
+            "leaseRevocationWriterIntegrity.test.ts:56:115"
+          ]
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected [Function] to throw an error",
+          "originalTestLocations": [
+            "leaseRevocationWriterIntegrity.test.ts:56:115"
+          ]
+        },
+        {
+          "name": "AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation",
+          "kind": "AssertionError",
+          "firstMessage": "AssertionError: expected [Function] to throw an error",
+          "originalTestLocations": [
+            "leaseRevocationWriterIntegrity.test.ts:79:70"
+          ]
+        }
+      ],
+      "groupsByFirstLocation": {
+        "leaseRevocationWriterIntegrity.test.ts:56:115": 4,
+        "leaseRevocationWriterIntegrity.test.ts:79:70": 1
+      },
+      "scope": "Exact original assertion failures caused by one source guard change; no fixture/setup/transport/compiler failure was used as a kill.",
+      "interpretation": [
+        "Four variants (removed-entry, missing-list, missing-signature and invalid-signature) reach writer line56 without the expected refusal.",
+        "The deliberate repair-separation control reaches writer line79 without the expected ordinary-revoke refusal.",
+        "The failed toThrow assertions stop before later byte and reader checks. No exact post-failure filesystem effect is inferred from those unexecuted checks.",
+        "Invalid JSON and signed-malformed raw loads still throw and the corresponding cases pass. Healthy append/update, absent bootstrap and unavailable-signer controls also pass."
+      ]
+    }
+  ],
+  "phaseInventory": [
+    {
+      "phase": "actual-runtime-fingerprint",
+      "exit": 0,
+      "durationMs": 87,
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/actual-runtime-fingerprint/command.json",
+        "bytes": 1499,
+        "sha256": "988d4093ab61775c16ea88a99dcab17af0b4d44782de0e2f1b7a28567f36cc09"
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/actual-runtime-fingerprint/stdout.log",
+        "bytes": 114,
+        "sha256": "6356112c023d338d4ce2eb165c4ea56d3e428ef958059d868a720d4b17a6639c"
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/actual-runtime-fingerprint/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "phase": "unchanged-original-two-file-baseline",
+      "exit": 0,
+      "durationMs": 10702,
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/command.json",
+        "bytes": 1857,
+        "sha256": "7648f379d050d83fae586eec09223a0d886e7d48b276093349b8ddaa414c267b"
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/stdout.log",
+        "bytes": 133,
+        "sha256": "b768d8ab790b115f34d4f2b2885c1d41da60caa2ea3c1ece7f62f716008eaf48"
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/summary.json",
+        "bytes": 12974,
+        "sha256": "eedd020c3d1f498b275509e0557443f422b930a0947bd503f4da79c549f7742c"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/raw-tests.json",
+        "bytes": 14134,
+        "sha256": "eddd548007d030849c0574997e2d9ca0f14d5efdfa1e5d8e3b8ff9f155965b00"
+      }
+    },
+    {
+      "phase": "P30-1542-current-empty-set-baseline",
+      "exit": 0,
+      "durationMs": 10559,
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/command.json",
+        "bytes": 1850,
+        "sha256": "5c28a4af559249facb0a774f1a2bb01fbfee3844095fb8fc1bec664550e9a162"
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/stdout.log",
+        "bytes": 132,
+        "sha256": "3db826e0b47b03632dd70943ff04be577a8fcde26802d8b9da548d05ec5482a9"
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/summary.json",
+        "bytes": 12971,
+        "sha256": "8c68a98e6e2759c05cab25463d00b98894c6997fa6a3cdb68318b7292868f6cd"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/raw-tests.json",
+        "bytes": 14131,
+        "sha256": "f461eb53a5188de4ca91587f8f1a0aa2244e89496986e194d358732c29754393"
+      }
+    },
+    {
+      "phase": "P30-1542-current-empty-set-mutant",
+      "exit": 1,
+      "durationMs": 10584,
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/command.json",
+        "bytes": 1836,
+        "sha256": "c504afc56cb0e34ef241aa57fbbab4bd6cf493da70493b7cb39720858f130679"
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/stdout.log",
+        "bytes": 130,
+        "sha256": "b458d0f12ba801aed033a70caf174ab149f938e56c2a7e94d800be5788e6cac6"
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/summary.json",
+        "bytes": 41892,
+        "sha256": "9deb4281f8633b550232ee18ddffcee4d141336b854d233a18000090c16ebd91"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/raw-tests.json",
+        "bytes": 42664,
+        "sha256": "2f08ae1a07cecbb93ab5b0656b041689c5590d329660a14e7035158b295f8365"
+      }
+    },
+    {
+      "phase": "P30-1542-current-empty-set-restored",
+      "exit": 0,
+      "durationMs": 10678,
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/command.json",
+        "bytes": 1850,
+        "sha256": "bebef1726ef99d11707a8d8789ec38912a3255c0754bc37a9d1b75dffcdfb3c3"
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/stdout.log",
+        "bytes": 132,
+        "sha256": "92f962110716e5e7238ef83e691221fe1094244c5d73f43f003f8a725095f1e8"
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/summary.json",
+        "bytes": 12971,
+        "sha256": "124c329298e893b7dd1d5483fa1676dfd8506e47c34de84d5b867cfdd2415067"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/raw-tests.json",
+        "bytes": 14108,
+        "sha256": "75eaaaf04e93ee5535a49237894d298ef41452e68a6afdf71ba165468db7dea4"
+      }
+    },
+    {
+      "phase": "P30-1542-revoke-snapshot-baseline",
+      "exit": 0,
+      "durationMs": 4173,
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/command.json",
+        "bytes": 1788,
+        "sha256": "362e103fec7c019d98a255c33ccba692b884ccfc52868f644468f344e98e9580"
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/stdout.log",
+        "bytes": 130,
+        "sha256": "48576344666b85e70c10c0555db47118dd2ccbcaf7de8fb6b2a02dba40b1e8d2"
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/summary.json",
+        "bytes": 4564,
+        "sha256": "73fc036af18b168fe1fc507839a65bff73bff8823e5d62b7ba6b6a730c84d905"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/raw-tests.json",
+        "bytes": 4605,
+        "sha256": "6d1f4619e8bfd52e1ed3f1b50a07c34191e01af547e536a6db6f6d74e1aa6820"
+      }
+    },
+    {
+      "phase": "P30-1542-revoke-snapshot-mutant",
+      "exit": 1,
+      "durationMs": 4208,
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/command.json",
+        "bytes": 1774,
+        "sha256": "8991980da409d9d61175c6e43df93836aa584029164a1b3a10a072a8946da659"
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/stdout.log",
+        "bytes": 128,
+        "sha256": "8fff9376a6eabd25853e8273973e5c171915c9f3e922ecf0760708a6cdce6cad"
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/summary.json",
+        "bytes": 11573,
+        "sha256": "7d6e0b8da3ca0e16aec5611e33d88a4138684cd988bf19421691ecb7fd8cd0be"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/raw-tests.json",
+        "bytes": 11538,
+        "sha256": "3d8405b79b1012c4e4adfd9817b2871dfcfda283b4825045175db78e455b61cb"
+      }
+    },
+    {
+      "phase": "P30-1542-revoke-snapshot-restored",
+      "exit": 0,
+      "durationMs": 4241,
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/command.json",
+        "bytes": 1788,
+        "sha256": "8588ffc81074e32175b3034f1da90fab18733ea74e4b3882d19c78907fda2817"
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/stdout.log",
+        "bytes": 130,
+        "sha256": "71d1da469e2905c5e8828b846990af1a5c897597ac3269c9effed61753f4e637"
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/summary.json",
+        "bytes": 4564,
+        "sha256": "37dcf2b1cc4b544e49e04e9279f9aa6a994455900ce6c769cffc9ad4a6b4584b"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/raw-tests.json",
+        "bytes": 4604,
+        "sha256": "a904ebae8fede6e90713e97c226044718a7515751baac581f6a88242ad98ef68"
+      }
+    },
+    {
+      "phase": "root-head-after",
+      "exit": 0,
+      "durationMs": 24,
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-head-after/command.json",
+        "bytes": 1369,
+        "sha256": "f1a5b7fd6c5c8dd9f67d59ac0ef8f69396ec6d203aea32668e3437e26b25d5a7"
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-head-after/stdout.log",
+        "bytes": 41,
+        "sha256": "4d6100c6870dbeb5ee06470bb88c465f6304ec0b7d1ef2684adc01718809997b"
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-head-after/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "phase": "root-status-after",
+      "exit": 0,
+      "durationMs": 45,
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-status-after/command.json",
+        "bytes": 1384,
+        "sha256": "c4f9e434764c4f3ebc4662e7021c4ecba9e5342b5aead0b5ae8e02db126766db"
+      },
+      "stdout": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-status-after/stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-status-after/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "frozenJournal": {
+    "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 15715,
+    "sha256": "d48ebdd7f43ff4adb6ce8467572b325b1db33cd0b961892f033fb8ccd6f3c9ee"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/artifact-index.json",
+    "bytes": 23209,
+    "sha256": "fdac085c74624c508572bdc469d3561583caa08d491bc7b048c66365461733a8"
+  },
+  "setupChronology": {
+    "frozenOriginalPair": [
+      {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/setup-receipt.json",
+        "bytes": 10954,
+        "sha256": "4db6c1143d69dabd490cc73d70e5870ff36b7c8332308d7826e8ff2facd64a8f"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/setup-receipt.md",
+        "bytes": 2005,
+        "sha256": "34fbb3f4d39217ba8915a9587f5c2bd77cf18fcf9ff2153d8dd6a07fd602f670"
+      }
+    ],
+    "frozenOriginalIndex": {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/index/setup-artifact-index.json",
+      "bytes": 3051,
+      "sha256": "4fe9ae84c883f02ec4f49ca27dba99f93e6257b53fcebec715d1a047f60c4864"
+    },
+    "observerHistory": [
+      {
+        "kind": "read-only observer error",
+        "detail": "A preliminary read guessed tests/helpers/repoWorkspaceGuard.global.ts. The configured path is tests/setup/repoWorkspaceGuard.global.ts; the corrected read completed. No file was created at the guessed path and no product runtime occurred."
+      }
+    ],
+    "outerReceipt": "Updated to final core evidence; all original setup hash references target frozen setup-receipt files, not this mutable outer receipt."
+  },
+  "historicalBoundary": "The new current-empty-set semantic reanchor is distinct from the old held absent readRevokedLeaseIds recipe. Current35, historical46, held newer consumer15, historical nine IDs/eight primary results, Node25.5 and P1-08 drift are not conflated. No held runner/source/test/helper was copied or executed.",
+  "effectsBoundary": "Original assertions and cleanup are unchanged, including exact list/signature snapshots, managed-hook file snapshots, no-fetch spy assertions and actual loopback gateway/router/upstream counters. Fresh random keys and workspaces are generated per phase. No independent fixed-physical-fixture/no-write/every-consumer claim is added; failed assertions can mask later effect checks as documented.",
+  "limits": [
+    "Core source-mode sensitivity only; no production fix or current baseline product failure.",
+    "The private copy is not literal fresh-clone qualification.",
+    "The hook CLI path is serialized metadata and not executed; copied dist remains unchanged, so no mutated compiled or installed route claim is made.",
+    "Seven-consumer proposal is separate, unauthored and unexecuted in this package.",
+    "Original tests contain their existing fetch spy; no producer/router/store verifier mock or new bypass was introduced.",
+    "No cross-process transactional, race, all-consumer, whole P0-30, old held batch, Node24, full suite, coverage, hosted CI, G0, release or Done acceptance."
+  ],
+  "allRuntimeAndLiveReadsFinished": true
+}

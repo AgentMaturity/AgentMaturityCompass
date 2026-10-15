@@ -1,0 +1,310 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1534",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T02:17:10.853004+00:00",
+  "state": "BOUNDED_ORIGINAL_NATIVE_AND_CLI_CONTEXT_WITH_TWO_SOURCE_CONTROLS_COMPLETE",
+  "workspace": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+  "privateRoot": "/private/tmp/p0-30-AMC-1534-qualification-20261015",
+  "construction": "Independent physical filesystem copy, not a Git clone.",
+  "initialNativeBaseline": {
+    "actualPassed": 25,
+    "failedPendingTodo": [
+      0,
+      0,
+      0
+    ],
+    "raw": {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/unchanged-original-native-budget-baseline/raw-tests.json",
+      "bytes": 11408,
+      "sha256": "1ae69a769b5371cc1e27144eda3fa9e2933a6f2fcfe39c3b782fb614ee75398b"
+    },
+    "command": {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/unchanged-original-native-budget-baseline/command.json",
+      "bytes": 1739,
+      "sha256": "340a85d3e4bdf4a7618a3a5201124df9decbd7f9d96a8b034210d66e9a12faee"
+    }
+  },
+  "separateCLIContextBaseline": {
+    "actualPassed": 9,
+    "failedPendingTodo": [
+      0,
+      0,
+      0
+    ],
+    "raw": {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/separate-original-cli-agent-loop-context/raw-tests.json",
+      "bytes": 4218,
+      "sha256": "eca812acd63245a789bac6df7db6c07bdb6f5a833804bb5efdc396ac2aa71782"
+    },
+    "command": {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/separate-original-cli-agent-loop-context/command.json",
+      "bytes": 1740,
+      "sha256": "3b9a6da27451bae70198fe1e746ebcee0dc62ee90e255a953fbe7ec9387c79eb"
+    },
+    "boundary": "Original CLI context runs alone because it changes cwd. In-process Commander/keyless stub, not either mutation corpus, packaged installed CLI or a newly pre-recorded external operator pin."
+  },
+  "controls": [
+    {
+      "id": "P30-1534-budget-compare",
+      "files": [
+        "tests/nativeBudgets.test.ts"
+      ],
+      "sourceTarget": "src/budgets/nativeBudgetAdmission.ts",
+      "provenance": "Exact recovered historical recipe; current source-mode runtime not yet executed.",
+      "historicalExpectationOnly": "killed",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 25,
+          "numPassedTests": 25,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 25,
+          "numPassedTests": 23,
+          "numFailedTests": 2,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 25,
+          "numPassedTests": 25,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailures": [
+        {
+          "name": "AMC-1534 native budget admissions and signed accounting counts one executed audit per call, separates denials and failures, and blocks at the exact class cap",
+          "firstLine": "AssertionError: expected undefined to be 'budgets' // Object.is equality",
+          "typePrefix": "AssertionError",
+          "locations": [
+            "tests/nativeBudgets.test.ts:217:70"
+          ],
+          "fullFailureMessageSha256": "3ed8562c15755183c5fe3f0b21b7b494e59200d7d3d291fa6bdd91fceb9e62fc",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-mutant/raw-tests.json",
+            "bytes": 12190,
+            "sha256": "f934fc4b6452e3078445b1f152881011576f7be70deeca3a1e2f93a41be44236"
+          }
+        },
+        {
+          "name": "AMC-1534 native budget admissions and signed accounting missing final recording retains a pending reservation instead of freeing the final tool slot",
+          "firstLine": "AssertionError: expected undefined to be 'budgets' // Object.is equality",
+          "typePrefix": "AssertionError",
+          "locations": [
+            "tests/nativeBudgets.test.ts:232:70"
+          ],
+          "fullFailureMessageSha256": "03e0f2094168287126251018190ef557d8e5d4cab80ce2ed8f06f77a0999ff4e",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-mutant/raw-tests.json",
+            "bytes": 12190,
+            "sha256": "f934fc4b6452e3078445b1f152881011576f7be70deeca3a1e2f93a41be44236"
+          }
+        }
+      ],
+      "classificationAndMasking": {
+        "classification": "Two direct original exact class-cap/pending-slot refusal assertions; subsequent accounting and race behavior are not inferred.",
+        "notes": [
+          "Actual 25 \u2192 23 \u2192 25, with zero pending/todo. The healthy same-owner READ_ONLY calls at 216/231 pass before both exact budgets guard-label assertions at 217/232 fail: actual undefined instead of budgets. No generic identity, signature or integrity refusal is substituted.",
+          "The first body at 217 stops before later failed-body/fixture-denial checks at 218\u2013219 and usage/executed/denied/pending/body totals at 220\u2013224. The missing-final-recording case stops at 232 before usage/executed/pending counts at 234, tool-body count at 235 and reservation seal at 239. These later effects are not measured in the mutant; intact baselines/restoration execute them.",
+          "This is native class-budget admission sensitivity. It does not establish all-accounting correctness, actual provider behavior or a two-process final-unit race."
+        ]
+      },
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true,
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-budget-compare-matrix.json",
+        "bytes": 49462,
+        "sha256": "89aba78ca6a5197864441ddabea527880aa8557cf33ba8bf93e8f05c6656975e"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-budget-compare-source-change.json",
+        "bytes": 1994,
+        "sha256": "3acc6bc5cf5d653ac4cbb6186c0cfa7c04fd496a06a098f4f19e130a1e7b2069"
+      },
+      "mutantManifest": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-budget-compare-mutant-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "80674b338de8f53af2e98ef29266009945996d57bc0ee00ef1862b1b5c39030c"
+      },
+      "restoredManifest": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-budget-compare-restored-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+      }
+    },
+    {
+      "id": "P30-1534-no-transaction",
+      "files": [
+        "tests/nativeBudgets.test.ts"
+      ],
+      "sourceTarget": "src/budgets/nativeBudgetAdmission.ts",
+      "provenance": "Exact recovered historical recipe; current source-mode runtime not yet executed.",
+      "historicalExpectationOnly": "killed",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 25,
+          "numPassedTests": 25,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 25,
+          "numPassedTests": 25,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "restored": {
+          "numTotalTests": 25,
+          "numPassedTests": 25,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailures": [],
+      "classificationAndMasking": {
+        "classification": "Bounded original-corpus survivor; missing independent two-process causal observer, not equivalence.",
+        "notes": [
+          "Actual 25 \u2192 25 \u2192 25, with zero failed/pending/todo. The original overlap case at 199\u2013209 runs in one JavaScript process: the first synchronous read/check/reserve completes before the canned transport awaits, so overlapping transport does not force overlapping admissions.",
+          "The rollback case at 307\u2013319 creates its own unmutated ledger transaction without reserveNativeToolBudget. It does not isolate removal of the actual admission wrapper. No two-process contender/barrier exists in current25, so survivor is required coverage debt rather than cross-process atomicity or equivalence.",
+          "Original afterEach swallows session.close at 36. Successful tests do not establish every pooled handle physically closed, a whole-cold interval or resolution of prior mixed-parent corruption. The unreviewed race draft and held worker remain unstaged."
+        ]
+      },
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true,
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-no-transaction-matrix.json",
+        "bytes": 47233,
+        "sha256": "2b9dcf83881e2cf3c6233a531090670dd19200f5bf8f8ce9ea661bb59bb76dc4"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-no-transaction-source-change.json",
+        "bytes": 1841,
+        "sha256": "f2cf18abeed37bacdc2172519383d6a2b603e309816d46059ea0e9ea55498806"
+      },
+      "mutantManifest": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-no-transaction-mutant-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "9a8baf382b11ae480ed27b5e1917c35d846acecf0b725284c740c1ce0aa1c387"
+      },
+      "restoredManifest": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-no-transaction-restored-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+      }
+    }
+  ],
+  "caseStatusInventory": {
+    "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/case-status-inventory.json",
+    "bytes": 45009,
+    "sha256": "7cdda8c26a475cafc4b0f178288ef3e7ad9cc6b77e7ba3fb2fbc08a327ac16e6"
+  },
+  "semanticClassification": {
+    "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/semantic-classification.json",
+    "bytes": 8670,
+    "sha256": "77d17735024c91ea602e5e8be970da4af5803a6f121aa750dd6a2c11a83f09cb"
+  },
+  "boundedStaticSubreview": {
+    "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/bounded-static-subreview.json",
+    "bytes": 1113,
+    "sha256": "aebba4a3b590be5a1b75abdc482422e6c98096dd95cf945636a88089a9f3c939"
+  },
+  "runtime": {
+    "actualCurrentProcessOnlyFingerprint": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "scope": "Current same-launcher process directly observes Node v22.23.3/ABI 127. Test argv uses its explicit executable; original workers do not print ABI, so no direct per-worker ABI measurement is invented.",
+    "environment": "Own allowlisted credential-free launch environment with phase-specific private 0700 HOME/AMC_HOME/TMPDIR. Original local fixture credentials, canned transport and custom tool bodies remain unchanged; no live provider or blanket transport-isolation claim."
+  },
+  "preservation": {
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "completePrivateClosureFiles": 12268,
+    "newCasesStaged": 0,
+    "sourceRestoredExact": true,
+    "allCompiledBytesNeverChanged": true,
+    "protectedPins": 203,
+    "lateProtectedPins": 3,
+    "priorArtifactReferences": 2182,
+    "allReferencedPriorArtifactsAndManifestListedActualClosuresRecheckedExact": true,
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "rootHead": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "rootGitStatus": "clean",
+    "originalCasesConfigGuardsSetupCleanupAnd30sDeadlinesUnchanged": true,
+    "separateCWDContextPreserved": true
+  },
+  "measurementLimits": [
+    "Original tests use actual SessionService, signed config, signature/hash/envelope/seal validation, SQLite reservation journal and JSONL reconciliation; injected transport and custom bodies are local controls, not provider/model capability.",
+    "A compare failure at an early exact denial assertion masks later body/usage/pending/seal assertions. No generic identity/config/integrity refusal substitutes for the healthy same-owner signed class-cap control.",
+    "The original no-transaction corpus has same-process overlap and a separately constructed outer rollback. It lacks an independent two-process read/check/reserve observer. Survival is required coverage debt, not equivalence or current race correctness.",
+    "Original afterEach swallows session.close errors and does not prove every physical pooled handle closed. No successful run resolves prior mixed-parent SQLITE_CORRUPT cause or becomes a cold readonly interval.",
+    "Local monitor/auditor histories are workspace authority inputs. Deleting evidence and lifecycle records together is not detected without an external pin. Known cost subtotal is not a hard USD price oracle.",
+    "Current 25=18+3+4 and separate CLI 9 remain distinct from held 27 and historical 26. Repeated 184 executions are not 184 unique cases or identical physical fixtures.",
+    "No new race draft, held worker/test/runner, permanent source/test/helper/CLI/counter/guard/archive/dependency/native/root Git edit, compiler/build/import adapter or dist mutation.",
+    "No notary runtime, whole-cold/race/full P0-30/old batch/Node24/full suite/coverage/hosted/G0/release/Done acceptance or later dependency closure."
+  ],
+  "setupChronology": {
+    "frozenReport": {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/setup-prepared.json",
+      "bytes": 6840,
+      "sha256": "870eb2eb11d73aadebda2e7bb169aa561deb7c26b820523bb842f9e3f76bbc37"
+    },
+    "frozenMarkdown": {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/setup-prepared.md",
+      "bytes": 2386,
+      "sha256": "2bf39d9bbcb0352c5f793f0327dc4398c6cafa4f7396943b1a39d8652e320bc5"
+    },
+    "frozenIndex": {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/index/setup-artifact-index.json",
+      "bytes": 537965,
+      "sha256": "944282561f3bc53619512c4b5d572f4c32c41fc78f201a59548cead0ba238c3f"
+    },
+    "preparationNavigationError": {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/preparation-navigation-note.json",
+      "bytes": 464,
+      "sha256": "c4f9aef91843151da2e4bdd216b7bb8b6ad123924c515275339614015406b5c9"
+    }
+  },
+  "frozenJournal": {
+    "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 15928,
+    "sha256": "d7ef95d508d69e6a8ed81700cacea42885d8978dc7cef9096ff49a4e11c53512"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/artifact-index.json",
+    "bytes": 558115,
+    "sha256": "7c594d01e2cf509681d6c703570a831fc33ae0c8129d7cc9382cfeda2812eda0"
+  },
+  "allRuntimeAndLiveReadsFinished": true
+}

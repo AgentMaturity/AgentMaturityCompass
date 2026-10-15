@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1534",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T03:00:45.165723+00:00",
+  "state": "BOUNDED_ORIGINAL_AND_NEW_TWO_PROCESS_SUPPLEMENT_REVIEWED",
+  "originalOutcome": {
+    "path": "/private/tmp/p0-30-AMC-1534-original-root-bounded-outcome-20261015.json",
+    "bytes": 9932,
+    "sha256": "24ab520bb55d0cf5a3dcb32f96beded84ade91117767a15a9bbc837f482c9aff"
+  },
+  "supplementPacket": {
+    "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015.json",
+    "bytes": 12191,
+    "sha256": "388932daefcc227c4a99c7a8227751a6f356c7b9744fdfeca4aa8074f791760c"
+  },
+  "independentActualReview": {
+    "path": "/private/tmp/p0-30-AMC-1534-race-independent-review-20261015.json",
+    "bytes": 71494,
+    "sha256": "e108c318dfb6ef91a5d2fb2dfc923ab68dc6cf37a7501240176e4cb23b3226ac"
+  },
+  "independentPublicCryptoReview": {
+    "path": "/private/tmp/p0-30-AMC-1534-race-public-crypto-review-20261015.json",
+    "bytes": 111829,
+    "sha256": "54500c03c7a0aaf6d4467ff774519369efa262c85a6e0a370eaf2b7b61751dff"
+  },
+  "originalCounts": {
+    "nativeBaseline": 25,
+    "separateCLIContext": 9,
+    "classBudgetCompare": [
+      25,
+      23,
+      25
+    ],
+    "noTransactionOriginal": [
+      25,
+      25,
+      25
+    ]
+  },
+  "newScenario": {
+    "uniqueRegisteredCases": 1,
+    "initialPassed": 1,
+    "noTransactionBMR": [
+      1,
+      0,
+      1
+    ],
+    "actualChildProcessesAcrossFourExecutions": 24,
+    "intactAndRestored": {
+      "gateInTransaction": true,
+      "admitted": 1,
+      "exactREADONLYCapRefusals": 1,
+      "coldPending": 1,
+      "coldExecuted": 0
+    },
+    "privateControl": {
+      "gateInTransaction": [
+        false,
+        false
+      ],
+      "admitted": 2,
+      "coldPending": 2,
+      "coldExecuted": 0,
+      "bothAdmittedIdentitiesBijectiveToDistinctSignedSealedReservations": true
+    },
+    "firstAssertions": {
+      "exactlyOneAdmission": 219,
+      "onePendingReservation": 228,
+      "aggregate": 277
+    },
+    "meaning": "Exact private removal of the transaction wrapper permits both real read/check/reserve contenders before release. Intact and restored signed cap1 admission permit one. No tool or provider is invoked.",
+    "masking": "Mutant checks at219/228 stop later assertions in those checks; actual cold readers already captured full rows, signature/seal/integrity and identities, independently reviewed. No setup/SQLite/observer/timeout/cleanup failure is credited."
+  },
+  "publicCrypto": {
+    "localRoleKeyPins": 32,
+    "exactSignedCap1BudgetYAML": 8,
+    "reservationEventSealPairs": 9,
+    "allRetainedRowDigestSignatures": 33,
+    "allRetainedSessionSeals": 21,
+    "failures": [],
+    "limits": "Offline built-in Ed25519 calculations from retained public inputs. Does not independently recompute canonical row preimages, rerun product chains, re-admit histories or recreate deleted private vaults. Roles are local fixture authority, not separate external accredited people."
+  },
+  "preservation": {
+    "rootSource7739AndDist4529Exact": true,
+    "privateClosureWithFiveSupplementFiles": 12273,
+    "permanentChanges": 0,
+    "compiledMutationOrBuild": false,
+    "protectedPins": 205,
+    "priorReferences": 2334,
+    "draftHistoryReferences": 402,
+    "latePins": 3,
+    "releasePins": 2,
+    "priorActualClosures": 13,
+    "allFiveOwnedGroupsEmptyWithoutSignals": true,
+    "all24ChildrenExitZero": true,
+    "allWorkerDescriptorsRestored": true,
+    "allPhaseOwnedRootsRemoved": true
+  },
+  "counting": "Original25, separately runCLI9 and newone scenario are separate corpora. Original no-transaction survivor is unchanged; the new causal witness does not retroactively turn it into a kill. Held27/historical26 and old76 batch are distinct. Four new executions/24children/9reservations are not additional unique cases.",
+  "effects": "Eight retained full owned-root reader intervals each contain273 changes, including homes/tmp/cache/WAL/SHM. No no-effects or whole-machine isolation claim. Prior P0-27 mixed-parent corruption cause remains unresolved.",
+  "interruption": "The runtime journal, initial result and complete BMR were saved before an agent reporting turn received an automated content flag. Root froze existing evidence read-only; both independent reviews used saved inputs. No retry, rerun or new experiment was performed after that flag. Earlier unexecuted v1 draft and review failures remain preserved.",
+  "open": [
+    "Original25 transaction-removal coverage gap remains a fixed-corpus result, now supplemented by one separate bounded race witness.",
+    "No every-schedule proof, provider execution, hardware identity, whole-cold P0-27 cause repair or external authority claim.",
+    "Current exact-source required duplicates1269/dead2751 failures remain unwaived.",
+    "No old full batch, whole P0-30, full suite/coverage/Node24/hosted/G0/release/Done or dependency closure."
+  ],
+  "formalAcceptanceClosed": false,
+  "next": "AMC-1529 original notary corpus after preparation review and separate explicit root release."
+}
