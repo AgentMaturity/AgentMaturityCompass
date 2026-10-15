@@ -1,0 +1,302 @@
+{
+  "source": "2d552741d727aaf3a26759b9df9343f7804d157a",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "originalFocused": {
+    "source": "2d552741d727aaf3a26759b9df9343f7804d157a",
+    "atUtc": "2026-10-15T04:34:22.703057+00:00",
+    "raw": {
+      "path": "/private/tmp/p0-25-original-citations-mapping-20261015.json",
+      "bytes": 10220,
+      "sha256": "f9250d40691dfeb47f8186d21710526563f456ed088d07235bbe1b19f3fec2ce"
+    },
+    "observer": {
+      "path": "/private/tmp/p0-25-qualification-20261015/observers/original-citations-mapping.json",
+      "bytes": 15507,
+      "sha256": "face22b6fd610d8ed0dd32e94854b5c21ff4121da8d13afe62715146171df5ee"
+    },
+    "outerCombinedStream": {
+      "path": "/private/tmp/p0-25-original-citations-mapping-20261015.log",
+      "bytes": 519,
+      "sha256": "16c02be51040858b2b5745d5d19cc02211af2eb932f6aeda5e94ab33faa248be"
+    },
+    "registered": 32,
+    "passed": 32,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "fileCounts": [
+      {
+        "file": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/citations/checkCitationsCli.test.ts",
+        "registered": 9
+      },
+      {
+        "file": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/citations/lintCitations.test.ts",
+        "registered": 21
+      },
+      {
+        "file": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/compliance/mappingPackRefs.test.ts",
+        "registered": 2
+      }
+    ],
+    "recordedSuiteHookUnhandledKnownLateErrors": 0,
+    "boundary": "Original21 linter fixtures +9 in-process CLI injected-finding contracts +2 mappings against actual registered packs. Filled table metadata/host-subset checks are not legal correctness, expert content approval or actual whole collector/fullgate/hosted evidence. Reporter precedes global teardown; combined post-exit stream checks known late diagnostics, not universal child/side-effect absence."
+  },
+  "separateInjectedReleaseContracts": {
+    "source": "2d552741d727aaf3a26759b9df9343f7804d157a",
+    "raw": {
+      "path": "/private/tmp/p0-25-release-executor-contracts-20261015.json",
+      "bytes": 8707,
+      "sha256": "7fceee2436c1b18c27ab8016a00d8bffa5ee5f304c51a7e6acd496bc8a5c0b12"
+    },
+    "observer": {
+      "path": "/private/tmp/p0-25-qualification-20261015/observers/release-executor-contracts.json",
+      "bytes": 11918,
+      "sha256": "a5452d57d332269d5472f0f4fe2e89fd9dfea808abf9a96592bdf90307ba49ee"
+    },
+    "registered": 22,
+    "passed": 22,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "boundary": "All22 original injected-executor release-gate contracts pass. Citation failure/needs-build and build-failure blocking are checked against supported execute injection. Fixture passed steps/fullsuite reports are simulated data, not executed gates, real build/pack, deployment/live health, hosted CI or production readiness. Separate from focused32 and actual collector/package processes."
+  },
+  "actualCollector": {
+    "source": "2d552741d727aaf3a26759b9df9343f7804d157a",
+    "capturedUtc": "2026-10-15T04:35:44.278297+00:00",
+    "directCollector": {
+      "path": "/private/tmp/p0-25-actual-collector-json-20261015.log",
+      "bytes": 170681,
+      "sha256": "dde3bd869c7d2ad044fd5c435e5035713e0d07e987b6b699977d925bedfc5110"
+    },
+    "npmPackageCommand": {
+      "path": "/private/tmp/p0-25-actual-package-command-20261015.log",
+      "bytes": 170772,
+      "sha256": "295b1b187a5c887c085b00af08a970627db1bec09587b908c83e08e97ddbba3e"
+    },
+    "directAndPackageStructuredOutputsExact": true,
+    "ok": true,
+    "errors": 0,
+    "ratcheted": 623,
+    "baseline": 623,
+    "rules": {
+      "CIT001": {
+        "name": "superseded-as-live",
+        "zeroTolerance": true,
+        "findings": 0,
+        "zeroToleranceFindings": 0,
+        "baseline": 0
+      },
+      "CIT002": {
+        "name": "framework-id",
+        "zeroTolerance": false,
+        "findings": 3,
+        "zeroToleranceFindings": 0,
+        "baseline": 3
+      },
+      "CIT003": {
+        "name": "pack-reference",
+        "zeroTolerance": true,
+        "findings": 0,
+        "zeroToleranceFindings": 0,
+        "baseline": 0
+      },
+      "CIT004": {
+        "name": "record-incomplete",
+        "zeroTolerance": false,
+        "findings": 620,
+        "zeroToleranceFindings": 0,
+        "baseline": 620
+      },
+      "CIT005": {
+        "name": "status-type",
+        "zeroTolerance": true,
+        "findings": 0,
+        "zeroToleranceFindings": 0,
+        "baseline": 0
+      }
+    },
+    "baselineProblems": [],
+    "overBaseline": [],
+    "belowBaseline": [],
+    "boundary": "Two genuine processes execute the current built collector. 623 permitted baseline findings are not blocking command errors. This does not establish legal correctness, reference provenance truth, expert review, whole release/hosted qualification, nor erase strict P024 ISO failure. No reasoned baseline update was invoked."
+  },
+  "actualCLIRefusals": {
+    "source": "2d552741d727aaf3a26759b9df9343f7804d157a",
+    "capturedUtc": "2026-10-15T04:37:03.910890+00:00",
+    "processRefusals": [
+      {
+        "command": {
+          "phase": "cli-unknown-flag",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+          "cmd": "npm run check:citations -- --frobnicate",
+          "exit": 1,
+          "durationMs": 258,
+          "startedUtc": "2026-10-15T04:36:01.968523+00:00",
+          "log": "/private/tmp/p0-25-cli-unknown-flag-20261015.log",
+          "head": "2d552741d727aaf3a26759b9df9343f7804d157a"
+        },
+        "actualRefusal": "unknown argument \"--frobnicate\"",
+        "log": {
+          "path": "/private/tmp/p0-25-cli-unknown-flag-20261015.log",
+          "bytes": 228,
+          "sha256": "118600b01abf1f156a260ff505e2b33c1bfdb75bd9098f236c27c54ce2a64792"
+        }
+      },
+      {
+        "command": {
+          "phase": "cli-update-without-reason",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+          "cmd": "npm run check:citations -- --update-baseline",
+          "exit": 1,
+          "durationMs": 185,
+          "startedUtc": "2026-10-15T04:36:02.337768+00:00",
+          "log": "/private/tmp/p0-25-cli-update-without-reason-20261015.log",
+          "head": "2d552741d727aaf3a26759b9df9343f7804d157a"
+        },
+        "actualRefusal": "--update-baseline requires --reason",
+        "log": {
+          "path": "/private/tmp/p0-25-cli-update-without-reason-20261015.log",
+          "bytes": 246,
+          "sha256": "ad39e1e7ae9da59b2ff8e582ba3423c8a2b1dd2811fd32cb5fa31c7662fbe725"
+        }
+      },
+      {
+        "command": {
+          "phase": "cli-reason-without-update",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+          "cmd": "npm run check:citations -- --reason p0-25-stray-reason",
+          "exit": 1,
+          "durationMs": 177,
+          "startedUtc": "2026-10-15T04:36:02.672490+00:00",
+          "log": "/private/tmp/p0-25-cli-reason-without-update-20261015.log",
+          "head": "2d552741d727aaf3a26759b9df9343f7804d157a"
+        },
+        "actualRefusal": "--reason is only valid with --update-baseline",
+        "log": {
+          "path": "/private/tmp/p0-25-cli-reason-without-update-20261015.log",
+          "bytes": 257,
+          "sha256": "7df94903fdbcd419d864eb2d602e0efe2a8557d9bb33d2f20bebef43eaf4e01d"
+        }
+      }
+    ],
+    "baselineUnchanged": {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/citations-baseline.json",
+      "bytes": 2413,
+      "sha256": "31d07b0f9ea2022e1994f0b9692a3a55c87271d4aaf5e645d9b68a3583d69f59"
+    },
+    "boundary": "Three real npm child command exits1 are intended parser refusals, not citation data failures or test registration counts. No --update-baseline with a reason was invoked against the project."
+  },
+  "historicalCausalReuse": {
+    "originalSource": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+    "originalCases": 30,
+    "resolver": [
+      30,
+      26,
+      30
+    ],
+    "ratchet": [
+      30,
+      29,
+      30
+    ],
+    "protected2471AndBuilt4529RecheckedExact": true,
+    "receipt": {
+      "path": "/private/tmp/p0-24-citation-causal-qualification-20261015.json",
+      "bytes": 61638,
+      "sha256": "a05fb74b1c7e19e93f862187ed09cf2cb4be49a8179522343d0b3aa06999ef54"
+    },
+    "boundary": "Old private compiled import-prefix-only adaptation; original assertions/fixtures unchanged there. No current mutation run/newkill/all32under-mutation claim."
+  },
+  "review": {
+    "path": "/private/tmp/p0-25-bounded-independent-review-20261015.json",
+    "bytes": 31742,
+    "sha256": "edcb1b6f29516e66a22f0ceb115ca421ddf3aae4e3734360d06123b645891e11"
+  },
+  "rootOutcome": {
+    "key": "P0-25",
+    "source": "2d552741d727aaf3a26759b9df9343f7804d157a",
+    "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "capturedUtc": "2026-10-15T04:49:51.915085+00:00",
+    "state": "BOUNDED_EXISTING_SOURCE_EVIDENCE_REVIEWED_FORMAL_ACCEPTANCE_OPEN",
+    "packet": {
+      "path": "/private/tmp/p0-25-bounded-qualification-20261015.json",
+      "bytes": 18330,
+      "sha256": "7575816b0d993a8327039bbe9d904271d1e2c5937d91d27f03e83ab2d2c36ae6"
+    },
+    "index": {
+      "path": "/private/tmp/p0-25-qualification-20261015/artifact-index.json",
+      "bytes": 29617,
+      "sha256": "c652dff2952703b79bde504c8367be90cc67201dd5535d6ea910ba58ff134127"
+    },
+    "review": {
+      "path": "/private/tmp/p0-25-bounded-independent-review-20261015.json",
+      "bytes": 31742,
+      "sha256": "edcb1b6f29516e66a22f0ceb115ca421ddf3aae4e3734360d06123b645891e11"
+    },
+    "rootReview": "Root read the frozen actual review and original source flow, verified actual collector/npm semantics and source58 equivalence. The only source58-to-source2d552 differences are149 prior P030 qualification files. No blocking evidence contradiction remains. This is a bounded evidence outcome, not issue acceptance.",
+    "actualMeaning": {
+      "primaryOriginalRun": {
+        "total": 32,
+        "passed": 32,
+        "failed": 0,
+        "pending": 0
+      },
+      "separateInjectedExecutorRun": {
+        "total": 22,
+        "passed": 22,
+        "failed": 0,
+        "pending": 0
+      },
+      "realCollectorAndPackage": {
+        "processes": 2,
+        "exit": 0,
+        "ok": true,
+        "errors": 0,
+        "ratcheted": 623,
+        "baseline": 623
+      },
+      "realArgumentRefusals": {
+        "processes": 3,
+        "exit": 1,
+        "projectBaselineUnchanged": true
+      }
+    },
+    "historicalCausalReuse": {
+      "source": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+      "resolver": [
+        30,
+        26,
+        30
+      ],
+      "resolverFailures": "Three direct AssertionErrors and one downstream TypeError at original lintCitations.test.ts71:20 after the mutated resolver removed the finding; later message assertion masked. Not four AssertionErrors.",
+      "ratchet": [
+        30,
+        29,
+        30
+      ],
+      "ratchetFailure": "One direct return-code AssertionError at original checkCitationsCli.test.ts41:18; later text assertions masked.",
+      "equivalence": "Current2471 protected and4529 compiled inputs match the old immutable manifests; the two current mapping cases were not under old mutations. No current mutation/newkill/all32-under-mutation claim."
+    },
+    "preservation": "7888 tracked files and4529 compiled files exact; independent native inode and original P030 inode unchanged. Frozen12-row journal/index/packet/generator preserved. No production/test/data/reference/baseline/workflow/guard/counter changes.",
+    "limits": [
+      "CIT0023 and CIT004620 baseline findings unchanged; strict prior P024 ISO23/22/1 remains unresolved and ISO reference table/expert31 remain empty. No expert/legal truth approval.",
+      "Catalogue and linter share the host array; register checker still reads its separate JSON policy list, with subset asserted. Literal one-list acceptance is not established.",
+      "Source workflow after-build citations step is blocking and release DAG requires build; real collector/package and parser refusal processes are measured.22release contracts use injected execute fixture; no complete release gate or hosted CI run.",
+      "Required duplicate1269/dead2751 prerequisites remain unwaived. Exact-source type/lint/other prior validation is reused atcode58, not newP025 executions; fullsuite/Node24/coverage/hosted/PR+merge/G0/Done and formal dependency acceptance remain open.",
+      "All earlier unresolved/skipped/paused/ownership scopes and pendingP052/P020/P019 transfers remain untouched; D03 skip remains only untilP206.",
+      "Inherited environment plus private HOME/Node22PATH is not credential/network/OS isolation. Observer precedes global teardown; combined post-exit known-diagnostic checks are bounded, not universal descendant or filesystem absence."
+    ],
+    "canonicalBuilder": {
+      "path": "/private/tmp/p0-25-build-canonical-packet-20261015.py",
+      "bytes": 9622,
+      "sha256": "c38a0eea4dbd0d66f81f728bc0d251d1b143c575a4f3971f2b07914fbc1c8b47"
+    },
+    "formalAcceptanceClosed": false,
+    "nextLane": "P0-21",
+    "allRootReadsFinished": true
+  },
+  "formalAcceptanceClosed": false
+}

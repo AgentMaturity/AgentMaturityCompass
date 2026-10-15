@@ -1,0 +1,490 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-15T04:38:44.849107+00:00",
+  "scope": "Read-only next-lane routing after the pending P0-25 bounded handoff. No next issue is activated by this report.",
+  "recommendation": {
+    "nextKey": "P0-21",
+    "title": "Use typed score units and one methodology; no certification from self-assessment",
+    "gate": "G0",
+    "priority": "High",
+    "due": "2026-10-22",
+    "mode": "Existing-source qualification in a new explicitly owned lane, after P0-25 evidence is frozen. No production implementation or ownership transfer is authorized.",
+    "reason": "Among remaining unhandled agent qualification candidates, P0-21 has the earliest High due date after held Urgent lanes. It blocks P0-22/P0-23, P1-16/P1-42 and GATE-G0; the label-to-docs-to-release chain is deeper than same-date P0-45. Historical Done is neither the selection reason nor fresh behavior proof.",
+    "dependencyStatus": "P0-08/P0-12/P0-15 are the exact plan blockers. Existing merged source was already the basis of the prior P0-22/P0-23 lane; this routing does not newly approve full dependency acceptance or clear their residuals.",
+    "activationCondition": "Root must finish the current P0-25 bounded handoff and assign the new lane/runtime before any P0-21 execution."
+  },
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+    "parentReportedHead": "2d552741d727aaf3a26759b9df9343f7804d157a",
+    "productionSourceAnchor": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "basis": "Parent current-lane handoff plus fresh selected source hashes; no Git operation or product runtime performed.",
+    "parentCurrentP025Observation": "Fresh original32 passed; actual collector and npm package citation check exited0 with ok:true/errors0/ratcheted623/baseline623. Those are allowed baseline findings, CIT0023+CIT004620. Strict P0-24 ISO remains a separate RED. These current runtime facts are parent-reported, not rerun here."
+  },
+  "authority": {
+    "ordering": "Plan171-176: earliest open gate, Urgent then High, earlier due date, then longest dependent chain. Missing decisions remain blocked; plan statuses are dated evidence.",
+    "planPins": [
+      {
+        "path": "/Users/sid/Downloads/Agent contract.md",
+        "bytes": 25110,
+        "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f",
+        "matchesFrozenP025Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Issues.md",
+        "bytes": 38227,
+        "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541",
+        "matchesFrozenP025Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Workstreams.md",
+        "bytes": 78486,
+        "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04",
+        "matchesFrozenP025Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/A4 \u00b7 Forge.md",
+        "bytes": 47286,
+        "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65",
+        "matchesFrozenP025Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "bytes": 157127,
+        "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0",
+        "matchesFrozenP025Authority": true
+      }
+    ],
+    "reservations": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "referencePins": [
+      {
+        "path": "/private/tmp/amc-next-after-p0-50-20261014.json",
+        "bytes": 13107,
+        "sha256": "d82b4b34925d94c3a2774c0577f3a3d39dba31f2bdff15e369e448c38a1b03ea"
+      },
+      {
+        "path": "/private/tmp/p0-18-next-key-readonly-routing-preflight-20261015.json",
+        "bytes": 215664,
+        "sha256": "a146f7b75cf2004213cf46563b9a9819f3c5b6d8708ba3605c1d43cceb937295"
+      },
+      {
+        "path": "/private/tmp/p0-25-readonly-readiness-20261015.json",
+        "bytes": 23647,
+        "sha256": "7ea93dd1ec1fed290b1b7e701ae7c3e4a44f7a8631c45dc86a3b898d73e83b95"
+      },
+      {
+        "path": "/private/tmp/p0-25-corpus-propagation-readonly-supplement-20261015.json",
+        "bytes": 22880,
+        "sha256": "0b31e2d70d53599b929f06390fd173a64d6402d449ad5c3f995119396ae7d82b"
+      },
+      {
+        "path": "/Users/sid/.codex/attachments/c12ec231-6ce3-4c9c-a092-17b53dbd615b/Pasted text.txt",
+        "bytes": 5767,
+        "sha256": "5cb0587587fb64e1597b046a6ead7b1f6b495c93035716b9140e4b5ef118695e"
+      }
+    ],
+    "specPins": [
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-21.md",
+        "bytes": 13758,
+        "sha256": "ae1ed1d28f1d15d0d124b7f10e783e0fa38fb234f2001492c901c791aab7c938"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-14.md",
+        "bytes": 12884,
+        "sha256": "ddbde43361411a3f7f7d848a9851788b6dd15852f63c32b323a2610ce0213b89"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-26.md",
+        "bytes": 11744,
+        "sha256": "f93db22557ec8efe753a13a3a8d64f1e88ca8625aac53c91d481fd202065c1fa"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-28.md",
+        "bytes": 15667,
+        "sha256": "f74ae4c6cffa7e7d22a8a09670262136d2e62bc20da9c0c0762d7ddac8db127b"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-45.md",
+        "bytes": 16932,
+        "sha256": "0eac6a814d32339c3b8db9f506db7db1c79644158bb2197d33f4919bd028a7dd"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-53.md",
+        "bytes": 7832,
+        "sha256": "b4a8a466829205daff263d337f8e730d90570c614e36547063d9fc63b93ef219"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-55.md",
+        "bytes": 9347,
+        "sha256": "d77a082bd93e1dd71c16063854c1be74d574a0d9b73ecffdbc890bf31783398d"
+      }
+    ]
+  },
+  "handledChoicesPreserved": {
+    "serialKeys": [
+      "P0-33",
+      "P0-29",
+      "P0-47",
+      "P0-48",
+      "P0-49",
+      "P0-50",
+      "P0-22",
+      "P0-23",
+      "P0-51",
+      "P0-46",
+      "P0-52",
+      "P0-54",
+      "P0-20",
+      "P0-27",
+      "P0-19",
+      "P0-24",
+      "P0-18",
+      "P0-30",
+      "P0-25"
+    ],
+    "P029": "Explicit user skip; original draft and unresolved successors remain preserved. Do not resume.",
+    "meaning": "These are previously handled, skipped or bounded handoffs, not twenty Done claims. Their strict gaps and pending human decisions remain. The existence of an unresolved earlier item does not authorize an unchanged rerun or reopen its held scope.",
+    "historicalDone": "Do not automatically reselect old P0-01/02/04-10/12-17/42-44 solely because some current whole-program proof is absent. New defects or an explicit root assignment would justify reopening a narrow lane."
+  },
+  "candidateDecisions": [
+    {
+      "keys": [
+        "P0-53"
+      ],
+      "priority": "Urgent",
+      "due": "2026-10-14",
+      "next": false,
+      "reason": "Needs-Sid held A4 exception lane. Current base allowedExceptionKeys lacks P1-65. Recorded D-22/default acceptance does not constitute the required accepted-base change; do not self-authorize or resume held P1-65."
+    },
+    {
+      "keys": [
+        "P0-14"
+      ],
+      "priority": "Urgent",
+      "due": "2026-10-20",
+      "next": false,
+      "reason": "Retained Claude reservation plus dated chart0.1 default-Secret exposure/remediation and action/tool SHA/checksum approvals remain in its preserved receipt. D-03 optionC was already answered; do not ask it again or treat it as all deployment approvals. No original picks/held deployment code are replayed."
+    },
+    {
+      "keys": [
+        "P0-37"
+      ],
+      "priority": "Urgent",
+      "due": "2026-10-20",
+      "next": false,
+      "reason": "Needs-Sid actual signing-key rotation/exposure proof. No credentials, publishing or external operation is authorized by a qualification lane."
+    },
+    {
+      "keys": [
+        "P0-55"
+      ],
+      "priority": "Urgent",
+      "due": "2026-10-21",
+      "next": false,
+      "reason": "Depends on P0-09/18/20/22/27/51; bounded packets retain unresolved signing/claim/issuer/lifecycle constraints. Existing withSealedSession follow-up was deliberately skipped, and no helper/source rewrite is authorized. A4 follow-up is not a GATE-G0 blocker without Sid promotion; do not invent promotion or resume paused A4/P2-02."
+    },
+    {
+      "keys": [
+        "P1-52"
+      ],
+      "priority": "Urgent",
+      "due": "2026-10-23",
+      "next": false,
+      "reason": "Retained Claude reservation; D-11 optionA is already recorded. Main required duplicate1269/dead2751 debt remains unwaived. Do not copy held ratchet/baseline or interpret prior report-only CI step as acceptance."
+    },
+    {
+      "keys": [
+        "P0-33",
+        "P0-22",
+        "P0-23",
+        "P0-30"
+      ],
+      "priority": "Urgent",
+      "next": false,
+      "reason": "Already handled serially with bounded evidence and explicit remaining failures/gaps. No decision to reopen unchanged proof now. Full gate, strict arrays/API/Studio, held runner/batch and whole P0-30 scope remain open."
+    },
+    {
+      "keys": [
+        "P0-36"
+      ],
+      "priority": "Urgent",
+      "due": "2026-10-27",
+      "next": false,
+      "reason": "Reserved and blocked on actual P0-37 rotation; no advisory publication or vulnerability disclosure messaging is authorized."
+    },
+    {
+      "keys": [
+        "P0-34",
+        "P0-35",
+        "P0-38",
+        "P0-39",
+        "P0-40"
+      ],
+      "priority": "Urgent",
+      "next": false,
+      "reason": "Release/deployment/credential/publication chain remains blocked by held P0-14, P0-22/23, P0-28, P0-33 and human release decisions. No installed or published acceptance is inferred."
+    },
+    {
+      "keys": [
+        "P0-03"
+      ],
+      "priority": "High",
+      "due": "2026-10-16",
+      "next": false,
+      "reason": "Needs-Sid cleanup plan and in-progress inventory; user preservation requirement prevents autonomous cleanup. No new inventory sweep is needed for this route."
+    },
+    {
+      "keys": [
+        "P0-21"
+      ],
+      "priority": "High",
+      "due": "2026-10-22",
+      "next": true,
+      "reason": "Existing typed-unit/cap/wording source and tests are present. No explicit P0-21 issue reservation was found in the frozen notes. Qualification can be isolated without production edits; shared-path repairs still require exact coordination."
+    },
+    {
+      "keys": [
+        "P0-45"
+      ],
+      "priority": "High",
+      "due": "2026-10-22",
+      "next": false,
+      "reason": "Same due date, but blocks only GATE-G0; P0-21 has the deeper dependent chain. This is a later possible existing-source qualification candidate, not a new failure or permission to edit shared CLI/retention."
+    },
+    {
+      "keys": [
+        "P0-11"
+      ],
+      "priority": "High",
+      "due": "2026-10-25",
+      "next": false,
+      "reason": "Later due; current threat-model/guard evidence already supports prior bounded work. A full channel/auth enforcement proof is not inferred, and its open status alone does not require an unchanged rerun."
+    },
+    {
+      "keys": [
+        "P0-26"
+      ],
+      "priority": "High",
+      "due": "2026-10-28",
+      "next": false,
+      "reason": "Claude-reserved and Needs-Sid. All30 keep/drop/defer decisions and floor policy must be logged; no confirmed-drop clearance is inferred. Do not delete questions or lower the floor from AI recommendations."
+    },
+    {
+      "keys": [
+        "P0-28"
+      ],
+      "priority": "High",
+      "due": "2026-10-28",
+      "next": false,
+      "reason": "Claude-reserved; depends on D-03 and P0-15/22/23 with known label gaps. No archival/move/shared CLI edits authorized. D-03 vocabulary answer is already known, not the missing ownership/qualification clearance."
+    },
+    {
+      "keys": [
+        "P0-31",
+        "P0-32"
+      ],
+      "priority": "High",
+      "due": "2026-10-29 / 2026-10-30",
+      "next": false,
+      "reason": "Release-candidate/installed matrix and Done-contract closure depend on unresolved P0-33/34/31 plus retained ownership and Sid review. No fresh accepted release candidate or closure proof exists here."
+    },
+    {
+      "keys": [
+        "P0-41"
+      ],
+      "priority": "Medium",
+      "due": "2026-10-16",
+      "next": false,
+      "reason": "A remaining eligible High lane precedes Medium. No tracker or weekly-status write requested."
+    }
+  ],
+  "P021Readiness": {
+    "specBlockedBy": [
+      "P0-08",
+      "P0-12",
+      "P0-15"
+    ],
+    "specBlocks": [
+      "P0-22",
+      "P0-23",
+      "P1-16",
+      "P1-42",
+      "GATE-G0"
+    ],
+    "existingCoreCorpus": [
+      "tests/scoreUnits.test.ts",
+      "tests/domainAssessmentUnits.test.ts",
+      "tests/noCertificationFromSelfAssessment.test.ts",
+      "tests/selfReportedLevelCap.test.ts",
+      "tests/logisticsIndustryPack.test.ts",
+      "tests/transparencyReport.test.ts"
+    ],
+    "existingCliCorpus": "tests/industryAdjustCurrentScore.test.ts spawns process.execPath against dist/cli.js and has explicit percentage75 plus refusal1.5/0.75/101/-5/abc controls. It inherits process.env, so any future run must use an owned credential-free parent environment and qualified Node PATH. No current case count is claimed without an actual report.",
+    "currentStaticBehavior": [
+      "Unit constructors reject invalid/NaN/infinite/range values; common threshold table is L2 from30, L3 from55, L4 from75 and L5 from90. This is already chosen and documented; no new threshold choice is needed.",
+      "Whole-percentage CLI guard rejects decimal values including1.5 and0.75 rather than guessing fraction/percent.",
+      "Question-bank base gates atL2+ excludeSELF_REPORTED; default unspecified tier list isOBSERVED/ATTESTED.",
+      "P0-16 pending allowlist is currently empty; preserve its exact policy rather than removing entries opportunistically."
+    ],
+    "evidenceLimits": [
+      "noCertificationFromSelfAssessment mocks the MCP SDK transports and entitlement API; it invokes actual handlers/producers but is not a genuine paid entitlement, SDK transport or full MCP integration proof. Existing direct pack/audit scoring checks remain meaningful component controls.",
+      "selfReportedLevelCap uses hand-shaped ParsedEvidenceEvents; its current OBSERVED positive expectsL2 under the P1-07 map, while the older P0-21 spec requestedL3. A successful current suite must retain that contract chronology and must not be described as fresh stored, independently signed provenance proof.",
+      "Current audit schema is /3 after later signing work, whereas the historical P0-21 step proposed /2. Do not downgrade or rewrite later contracts to match the stale proposal.",
+      "Spec requests raw-score reinterpretation and self-reported-L3 mutations. Any future private causal controls must establish exact reachable guards and retain survivors/masking; no production mutation or artificial test weakening is authorized."
+    ],
+    "ownership": "Frozen RESERVATIONS1496 reserves remaining non-E17 Agent-Doable lanes, explicitly including P0-14/26/28/30/31/32/34/35/36/40; P0-21 is not an explicit in-flight issue entry. RESERVATIONS1588 still holds src/cli.ts/resultCommandRegistry/replParser coordination; API/Studio/A4/P2-02 and held signer/ledger work remain protected. Existing-source tests in an owned lane do not authorize production changes.",
+    "safeNextPreparation": [
+      "Assign fresh owned source-qualified P0-21 worktree and verify selected source/test/docs/guard pins; no held overlays.",
+      "Read the full recovered spec and existing tests before adding any case. Existing permanent tests already cover the main API and CLI contracts; avoid duplicate tests.",
+      "Only after runtime/build release, execute original focused corpus and CLI cases under qualifiedNode22 (or a separately assigned Node24 lane), retaining every actual registration, failure and skipped/todo count.",
+      "Run unchanged normal freeze/no-fabrication/types/lint/architecture/docs/count checks as assigned. Any actual failure gets root-cause diagnosis before the smallest explicitly authorized repair.",
+      "Keep causal guards in a complete independently owned private closure with baseline/mutant/restored evidence if later authorized. No requirement or approval to touch frozen/shared source is inferred."
+    ]
+  },
+  "selectedSourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/score/units.ts",
+      "bytes": 2022,
+      "sha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/domainAssessmentEngine.ts",
+      "bytes": 8075,
+      "sha256": "191a628a588bdcf40fcf9897df53d06946164ffbfd227df5e6aaebb58fa10c57"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/industryPacks.ts",
+      "bytes": 621751,
+      "sha256": "4c107021524aa7805ea7e32b55e6d65e74f17d5c88dc5c85cbcaa56ce0ea34d7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/industryPackAudit.ts",
+      "bytes": 26330,
+      "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/domainReportBuilder.ts",
+      "bytes": 6892,
+      "sha256": "6759d400bd4fb1df620bc40a2655b25867a8bad7cd89344f4c8d274247447a6b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/score/domainPacks.ts",
+      "bytes": 38665,
+      "sha256": "4f01d76961a0db3deed76cb01c7a86d0b6cb1525566b163d42e8adf25832cbaf"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/score/crossFrameworkMapping.ts",
+      "bytes": 30532,
+      "sha256": "c40def13e74d79099544768e3f105159f6d08f212a23d0cb96607e1851d05ebc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/score/mcpCompliance.ts",
+      "bytes": 28451,
+      "sha256": "aff1dfc172d6c1bdbc61911276151fcccf55826995ae70fb3b0bb274fc03eacb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/transparency/transparencyReport.ts",
+      "bytes": 18062,
+      "sha256": "0d8dc013ec14e0d3989c05c2157d7dedcb32081fc7665fbe6f77b905afb87cd1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/transparency/transparencyReportCli.ts",
+      "bytes": 4597,
+      "sha256": "45e04200799d1b484234389c518f467d85c97ceabaa5702652a020368eddf6bd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/mcp/amcMcpServer.ts",
+      "bytes": 31445,
+      "sha256": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/cli.ts",
+      "bytes": 1064339,
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/questionBank.ts",
+      "bytes": 287500,
+      "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/scoreUnits.test.ts",
+      "bytes": 1934,
+      "sha256": "15a8a89ebc46ce78a164c20f99c9fdb082da5100cf4e47bf9adcec9a5cb63543"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/domainAssessmentUnits.test.ts",
+      "bytes": 1890,
+      "sha256": "a443651c90db62faed2b8448ade66a9b5369b948c00e5ab2fbdd2a488dca869f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/noCertificationFromSelfAssessment.test.ts",
+      "bytes": 8422,
+      "sha256": "bd0e41ec108a46bb00414ad74c20b525ae0136b123c1896e28bc058b62c3e102"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/selfReportedLevelCap.test.ts",
+      "bytes": 4018,
+      "sha256": "9bd9059516724dedf1901851b5ac2f24237248eda7d6c647004610611d4e6365"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/industryAdjustCurrentScore.test.ts",
+      "bytes": 9298,
+      "sha256": "576c9b0e75a5c106ff265b712f76494016eae75e97e8f7adc529f2cfb314205d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/logisticsIndustryPack.test.ts",
+      "bytes": 2360,
+      "sha256": "1cc9c645873c45848a1aaaaba2d349de9258221b200132978f191906d5130dfc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/transparencyReport.test.ts",
+      "bytes": 11833,
+      "sha256": "5905d72f1f4a446c62c9ad910111a05b2789cb64350052d455a1de8b050bdd3c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/docs/SCORING_METHODOLOGY.md",
+      "bytes": 828603,
+      "sha256": "c19cbb4f8afefedc79e5b73cab15463b311e1035a326251af4cdf619aa88bf80"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/docs/program/READY_TO_DEPLOY.md",
+      "bytes": 8158,
+      "sha256": "0ad78603fd26bd26d1a106b4a52d31ed382c21c4ab9cce901704c588532aadd4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/no-fabrication-allowlist.json",
+      "bytes": 2554,
+      "sha256": "33ed6db7299ffb7ef1cdb32ea4882e28d4601f5cb19334114820efcadddd5937"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    }
+  ],
+  "limits": [
+    "No product runtime, imports, parser execution, tests, build, install, source/workflow/baseline/data change, Git operation, tracker or Claude message occurred. Only this private routing pair was written.",
+    "No global gate, dependency Done, legal/expert approval, hosted CI, full suite, coverage, installed release, publication or merge acceptance is inferred.",
+    "Earlier unresolved decisions and the explicit P0-29 skip are preserved."
+  ],
+  "observerNotes": [
+    "An initial broad read-only search returned truncated output; later exact issue rows, full P0-21 spec and scoped source files supplied the facts used here.",
+    "A read-only search used nonexistent scripts/no-fabrication-baseline.json and returnedexit2. The actual scripts/no-fabrication-allowlist.json was subsequently read; its pending list is empty. No product or guard repair followed."
+  ],
+  "allReadsFinished": true
+}
