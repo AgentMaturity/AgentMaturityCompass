@@ -1,0 +1,35 @@
+{
+  "capturedUtc": "2026-10-15T22:43:35.805690+00:00",
+  "state": "Root reviewed full v1 source and exact v2 diff; v2 admission awaits closed updated tests and independent peer delta review",
+  "testFirstActualRed": {
+    "path": "/private/tmp/p1-19-oracle-implementation-20261016/actual-missing-oracle-red.json",
+    "bytes": 6719,
+    "sha256": "a4ea0dfbafda9e805afa8418dd8c1681d8bcd32df3702d2cc8c7bf31a850256c"
+  },
+  "independentMissingOracleAudit": {
+    "path": "/private/tmp/p1-19-oracle-implementation-20261016/missing-oracle-audit/review.json",
+    "bytes": 37050,
+    "sha256": "7a13a9435a1f9ee414fd5448f09920951dd0358fc04a6d8502a0a0e324320de0"
+  },
+  "reviewedSourceV2": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19441,
+      "sha256": "90a24dd18f8695efb2bdcee5ece5605c507690d3fe940edb3e7a4911e3eb43a8"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 28475,
+      "sha256": "4df67b11e019797c5b485bc91ed428d7f8c3f38b9da3f3cad08ba7c8a9e6526b"
+    }
+  ],
+  "rootAcceptedChanges": [
+    "An external exact default approval-policy hash and fixed 2 distinct OWNER-or-AUDITOR approvals with 10-minute TTL anchor the finite profile.",
+    "Request quorum fields must match that profile, and genuine decisions remain independently verified.",
+    "bodyFields must be a unique exact body key set.",
+    "Unsupported expectation fields and contradictory outcomes are refused before invoking the cold CLI."
+  ],
+  "strictTtlLimit": "Current core creates request timestamps through two Date.now calls; no tolerance is introduced. Actual baseline request delta was exactly600000ms. A future drift failure remains a protected follow-up, not permission to weaken the check.",
+  "RSourceFilesApplied": false,
+  "formalP119Acceptance": false
+}

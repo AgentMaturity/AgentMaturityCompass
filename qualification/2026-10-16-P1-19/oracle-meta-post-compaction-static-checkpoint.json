@@ -1,0 +1,273 @@
+{
+  "capturedUtc": "2026-10-15T22:38:06.149490+00:00",
+  "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+  "gitStatus": "",
+  "verifiedPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/server.mjs",
+      "bytes": 27740,
+      "sha256": "f3e493bcfb1507bb5c324e773776795c90318183856123080e7f828aec0c8be0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/txlog.mjs",
+      "bytes": 6696,
+      "sha256": "45b8bf0624ebfb3fb1a7cfb8291cc3835205763ffd865a7d32fb6e469d360140"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/faults.mjs",
+      "bytes": 2864,
+      "sha256": "7aad83275985054c5c1fd6173f02a7dd5a86b8a1d5a470adde73dd7390d5290b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentArgs.ts",
+      "bytes": 1865,
+      "sha256": "73f37d1a65ff5100aa66e7e9c729b84bc6f977fc59fff18490b9e0ee63dc15fa"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentAdapter.ts",
+      "bytes": 7838,
+      "sha256": "f6bf640a995cfcfb7f2aa3edb5cb16460ba129621caa3e4a4d44f4a26be4ee4e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentServiceClient.ts",
+      "bytes": 11998,
+      "sha256": "6c95c1d07fc6a6965733180c53a964c7a11c4e1d840e0670c1bc31d9a8b1ccd7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionJournal.ts",
+      "bytes": 33320,
+      "sha256": "b42e3b88bc1a849d4c5409259a4328ea4f1a29a660bf9e0e4f55e1d96916e1b4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/receiptStates.ts",
+      "bytes": 7612,
+      "sha256": "7df3a6cf1e7f4a54e384ede867577dcf184c669e607ce164a578f72a93d25446"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/authorizationRecord.ts",
+      "bytes": 4176,
+      "sha256": "03707d72dfecef59af3e003dcbca4a675b06dffd5f568bada178d171f446150d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/normalizeArguments.ts",
+      "bytes": 6300,
+      "sha256": "4efdbc0db4e4926c87509754e94867b1eafd45b13a2d14dca9a79749dbe81908"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/authorize.ts",
+      "bytes": 20450,
+      "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionCliCommands.ts",
+      "bytes": 3337,
+      "sha256": "5e15ae02eb3168ea11a46df76fdaac3ebc966185240a77bd7815bfd0c97d609d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "bytes": 32498,
+      "sha256": "185437847aef58288e7d56601d8fef7d47de3fbbbb9ec0e6adf51d23a92d429b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolTypes.ts",
+      "bytes": 7901,
+      "sha256": "e8b2c56d487a091506369fcf6d11db91fe1030957494bfc7d5bb04058f75077a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolEvidence.ts",
+      "bytes": 6941,
+      "sha256": "c0453fde0f6b1f29cc9847120735ff241eacf876228c291f7291e377682e1162"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/ledgerSchema.ts",
+      "bytes": 22470,
+      "sha256": "8375975c42861af68a69ba33e367f8f03a9b691155a9e974152916da90c0df25"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+      "bytes": 35501,
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/eventHash.ts",
+      "bytes": 1726,
+      "sha256": "da31a26164e9fee0752619a67e7f78790082d5a1c14cf95e72f716192b6ca06a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/sessionVerification.ts",
+      "bytes": 3048,
+      "sha256": "b231357057916a626c440d5f11462bbe8004994602024b93f47f75744abf2f7f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/receipts/receipt.ts",
+      "bytes": 5409,
+      "sha256": "fa24ce3e706cdbfce461dcf553a35d54389a1cc831135eebe9d109f352508d67"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-session-commands.ts",
+      "bytes": 17552,
+      "sha256": "c640189b30cecb2539e59cb2f088d3a4a8277f3431cc2a145c88706694e015ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-trust-flags.ts",
+      "bytes": 6277,
+      "sha256": "fe92104ef1561ca0d45c0b9db46c346a0fc9f77e1e11d428c22205300739a081"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-evidence-store-commands.ts",
+      "bytes": 7392,
+      "sha256": "43549b82cec61a77333fb3889238ad8d896c3e09290dcb5b6589114c9d152559"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalChainStore.ts",
+      "bytes": 26341,
+      "sha256": "72f14a9fe4a01375ab20a4129f05a7ef8c2ccd6959cdc2777a87f429d7f443ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalQuorum.ts",
+      "bytes": 4388,
+      "sha256": "0f2c806ee6bb748f209f649b1c19092ec93bfe75b349c8a0aa381a90549e62a8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalEngine.ts",
+      "bytes": 21065,
+      "sha256": "a2257cea092960d8815e6608e4d2cd416cba5d429eabb6e3a1147d7902e91b06"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+      "bytes": 12366,
+      "sha256": "19b046e71142f66a5ba514bb1ea8bb1d26bbc39ddd15cfb882bab253d3c517c5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/toolhub/toolhubValidators.ts",
+      "bytes": 14760,
+      "sha256": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/governor/actionPolicyEngine.ts",
+      "bytes": 34205,
+      "sha256": "95448aec3b9d3b9abbe675a1a6f9922b069818a44b4e1876d3a4751724eeef2d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/budgets/budgets.ts",
+      "bytes": 10695,
+      "sha256": "bae506f230b0511759f795cb0099f9b8d3fdb77aa42789e70658e4f84d15243c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/contracts/v1/authorizationRecord.ts",
+      "bytes": 3279,
+      "sha256": "2e67a443157adabbcd05ab47f52619a26a93c4edf5bcb2a2da4c1e9deccab953"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/contracts/v1/receipt.ts",
+      "bytes": 2606,
+      "sha256": "16c5ecce46d99e465923c7cde3eea81defc3375ccd417877b34ba4073e722e20"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceId.ts",
+      "bytes": 1151,
+      "sha256": "507c07573b42279d672230063af0af48e356603c336598b4d3d462f8279ea016"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/schemas/v1/authorization-record.schema.json",
+      "bytes": 14589,
+      "sha256": "93c50b8e80c49a8d831f990c6899be765be1f66066df3673797a01f730f5e36f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/schemas/v1/receipt.schema.json",
+      "bytes": 11129,
+      "sha256": "858bb4712a4edb484538c82fdf6dcb58b3dae4364c9e519f33524cdd6cec52c6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/cases.json",
+      "bytes": 52804,
+      "sha256": "f955827ca996c2adaad3b4c31faf895375a13644b4c616d7cdeb302d6ef55999"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/seed.json",
+      "bytes": 4718,
+      "sha256": "1b52e98459eeb6cfa4dcc0501c6409cc4fa6c38a070df2558b6b9c43a443d50e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/evidence/exporter.ts",
+      "bytes": 17632,
+      "sha256": "3f99c5f37339a2640ef27654d9249a3bec546f0b9172bd405fa47b6a8cea9021"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/evidence/auditPacket.ts",
+      "bytes": 8432,
+      "sha256": "7880cbd53abbb153cf541e0387ccbf8341bd31903122907b032f33b0edd8565c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/bundles/bundle.ts",
+      "bytes": 42233,
+      "sha256": "a28de38c02c4c748de0c81c925b655b274ce287b72db9e834823b41375d78894"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/harness-comparison/nativeOracle.mjs",
+      "bytes": 18098,
+      "sha256": "e91a3bded2fd7a04e9660d350830cc04b74dc82587a68f3107ab55b07a226cf6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/HARNESS_COMPARISON.md",
+      "bytes": 20955,
+      "sha256": "1ba0b836ecaeac644804af3bfb79c858a228d69dbbb801ba0c871460042fec4e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+      "bytes": 8551,
+      "sha256": "1fe44a2e01c5ea8ea02199ff404312617117dd02f1621af5c1e09fbf7ebb9ab5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-19.md",
+      "bytes": 28238,
+      "sha256": "25846731b701a4d0b44c1a22d9be0957005b463b15203db629cfb7e5fc00d0b9"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/original-service-audit/audit.json",
+      "bytes": 6965,
+      "sha256": "8bbef814aba6bc0957f7e692a979ec948a39583b77e6f678d443790544618652"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/followup-service-audit/audit.json",
+      "bytes": 6868,
+      "sha256": "74b64e674945860bb5df30e7a5f265853f199a88c83283cd6b33ece91947717a"
+    }
+  ],
+  "runtimeMarkers": {
+    "ACTIVE.json": false,
+    "HALTED.json": false
+  },
+  "runtimeExecuted": false,
+  "RfilesApplied": []
+}

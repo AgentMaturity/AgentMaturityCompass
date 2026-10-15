@@ -1,0 +1,59 @@
+{
+  "schema": "private-qualification-layout-readonly-design/1",
+  "capturedUtc": "2026-10-15T22:54:52.672271+00:00",
+  "recommendation": "Add flat oracle-prefixed supplement artifacts to existing real-date P1-19 folder; preserve all existing component files byte-exact.",
+  "proposedNewPaths": [
+    "qualification/2026-10-16-P1-19/oracle.receipt.json",
+    "qualification/2026-10-16-P1-19/oracle.README.md",
+    "qualification/2026-10-16-P1-19/oracle.evidence.json"
+  ],
+  "canonicalFields": "Use unchanged 13-field receipt schema, keyP1-19 and real date2026-10-16, exact actual source commit/branch/host/closed command triples; overlapping test counts remain separate and precisely scoped. Do not prefill pending run results.",
+  "validatorFacts": {
+    "topLevelDiscovery": "validateQualificationDir checks each immediate child directory and only its receipt.json/README.md.",
+    "allFileChecks": "Its recursive checkFiles still applies1MiB/symlink/forbidden-name/private-key scans to new supplement files under normal root.",
+    "schemaGap": "Normal global invocation does not parse oracle.receipt.json as a second receipt. An explicit unchanged-validator mirror check is mandatory for the supplement schema, commands/tests/artifact hashes.",
+    "folderRule": "Folder suffix must exactly equal schema key; P1-19-oracle key invalid. Fake future dates are not an option.",
+    "observedPatterns": "18 current top-level canonical receipt folders; no same-key multi-date examples and no *.receipt.json found in current qualification tree. Do not claim alternate-name auto-discovery already exists."
+  },
+  "futureValidationRecipe": [
+    "Create a fresh private mirror root, no symlinks; child folder exactly2026-10-16-P1-19.",
+    "Copy final oracle.receipt.json BYTE-EXACT to mirror receipt.json; copy oracle.README.md BYTE-EXACT to mirror README.md.",
+    "Preserve each artifact.path exactly inside mirror: if receipt lists oracle.README.md, also copy that same-named file; all other oracle-prefixed selected artifacts copy byte-exact.",
+    "Record source-to-mirror regular-file byte/hash equality and actual source/final-artifact pins before invoking unchanged validator --root <mirrorRoot>.",
+    "Root executes and retains actual normal validator result for mirror and full repository; neither was executed in this design.",
+    "Recheck old sealed three files and any previously listed component artifact pins unchanged; append a new checkpoint pointer only in separately admitted live docs/handoff, without revising old sealed README."
+  ],
+  "historyMeaning": "Old receipt remains a valid bounded component checkpoint for b9. New oracle receipt is an additive scoped checkpoint, not rewriting old totals/claims, upgrading component evidence, or establishing formalP119Done.",
+  "alternativeRejectedForNow": "Versioning/replacing main sealed files can preserve Git history but changes their absolute-path bytes and old private pin meaning; avoid unless root explicitly chooses a separate reviewed migration.",
+  "sourceAndSchemaChangesNeeded": false,
+  "inputPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/receipt.schema.json",
+      "bytes": 2315,
+      "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/receipt.json",
+      "bytes": 8265,
+      "sha256": "9525e5ce3be3759dbddf59e37fc40f0195333f5e1459c4ffd7de808a32ab55ba"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/README.md",
+      "bytes": 8496,
+      "sha256": "b25a234319ae2148ec794e27d9db426d6880879aef36ade0e1331cf07d31486e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/evidence.json",
+      "bytes": 164462,
+      "sha256": "d5083491b84693d0fc1ddc47b5d9108ed82cf913efd32a0b22eda42e3b4bdf46"
+    }
+  ],
+  "runtimeOrRepositoryWrites": false,
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true
+}

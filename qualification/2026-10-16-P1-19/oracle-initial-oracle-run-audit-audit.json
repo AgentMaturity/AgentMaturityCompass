@@ -1,0 +1,853 @@
+{
+  "schema": "lighthouse-finance-oracle-initial-actual-audit/1",
+  "capturedUtc": "2026-10-15T22:48:04.126123+00:00",
+  "state": "closed-failed-source-v2-tests-v4-run",
+  "phase": "p119-oracle-v2-tests-v4-initial",
+  "recordedHead": "335a3a9ae977f898391fdf2db186138e82d000ae",
+  "commandResult": {
+    "exit": 1,
+    "durationMs": 23159,
+    "pid": 3089,
+    "ownedPgid": 3089,
+    "actualGroupESRCH": true,
+    "noNonzeroSignals": true
+  },
+  "counts": {
+    "registered": 10,
+    "passed": 5,
+    "failed": 5,
+    "pending": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "runtimePeerReview": {
+    "path": "/private/tmp/p1-19-oracle-implementation-20261016/initial-oracle-runtime-peer-review/review.json",
+    "bytes": 86071,
+    "sha256": "4fc12e33961394eb7dccf88a140942994289832efe9aee4d5ab6fc8ce055b574"
+  },
+  "observations": [
+    {
+      "mode": "completed",
+      "launcherRoot": "/private/tmp/lhfo-u44EX3",
+      "providerRoot": "/private/tmp/lhf-gNUB8b",
+      "testCallbackSucceeded": false,
+      "oracleVerdict": "fail",
+      "falseChecks": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "oracleCalls": 1,
+      "controlledMutations": 0
+    },
+    {
+      "mode": "duplicate",
+      "launcherRoot": "/private/tmp/lhfo-76eyTQ",
+      "providerRoot": "/private/tmp/lhf-wGjNNi",
+      "testCallbackSucceeded": true,
+      "oracleVerdict": "fail",
+      "falseChecks": [
+        "no-duplicate",
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "oracleCalls": 1,
+      "controlledMutations": 0
+    },
+    {
+      "mode": "body-mismatch",
+      "launcherRoot": "/private/tmp/lhfo-TswbXt",
+      "providerRoot": "/private/tmp/lhf-P0ecB6",
+      "testCallbackSucceeded": true,
+      "oracleVerdict": "fail",
+      "falseChecks": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "oracleCalls": 1,
+      "controlledMutations": 0
+    },
+    {
+      "mode": "provider-only",
+      "launcherRoot": "/private/tmp/lhfo-8qJG3U",
+      "providerRoot": "/private/tmp/lhf-9YD48F",
+      "testCallbackSucceeded": true,
+      "oracleVerdict": "fail",
+      "falseChecks": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "oracleCalls": 1,
+      "controlledMutations": 0
+    },
+    {
+      "mode": "completed",
+      "launcherRoot": "/private/tmp/lhfo-aKPiV0",
+      "providerRoot": "/private/tmp/lhf-oCLNvq",
+      "testCallbackSucceeded": false,
+      "oracleVerdict": "fail",
+      "falseChecks": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "oracleCalls": 1,
+      "controlledMutations": 0
+    },
+    {
+      "mode": "provider-only",
+      "launcherRoot": "/private/tmp/lhfo-qeWzPa",
+      "providerRoot": "/private/tmp/lhf-te1dqJ",
+      "testCallbackSucceeded": true,
+      "oracleVerdict": "fail",
+      "falseChecks": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "oracleCalls": 1,
+      "controlledMutations": 0
+    },
+    {
+      "mode": "completed",
+      "launcherRoot": "/private/tmp/lhfo-OsoKtQ",
+      "providerRoot": "/private/tmp/lhf-bS2zJp",
+      "testCallbackSucceeded": false,
+      "oracleVerdict": "fail",
+      "falseChecks": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "oracleCalls": 1,
+      "controlledMutations": 0
+    },
+    {
+      "mode": "completed",
+      "launcherRoot": "/private/tmp/lhfo-r4Tdb5",
+      "providerRoot": "/private/tmp/lhf-72KHYi",
+      "testCallbackSucceeded": false,
+      "oracleVerdict": "fail",
+      "falseChecks": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "oracleCalls": 1,
+      "controlledMutations": 0
+    },
+    {
+      "mode": "weaker-policy",
+      "launcherRoot": "/private/tmp/lhfo-8PtUcU",
+      "providerRoot": "/private/tmp/lhf-EisegE",
+      "testCallbackSucceeded": false,
+      "oracleVerdict": "fail",
+      "falseChecks": [
+        "payload-bound",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "oracleCalls": 1,
+      "controlledMutations": 0
+    },
+    {
+      "mode": "unsupported-expectation",
+      "launcherRoot": "/private/tmp/lhfo-HLmYwC",
+      "providerRoot": "/private/tmp/lhf-i6L79O",
+      "testCallbackSucceeded": true,
+      "oracleVerdict": "fail",
+      "falseChecks": [
+        "inputs",
+        "txlog-chain",
+        "post-count",
+        "commit-count",
+        "no-duplicate",
+        "no-dispatch-on-deny",
+        "payload-bound",
+        "payload-minimal",
+        "receipt-state",
+        "unauthorized-effects",
+        "action-evidence-coverage",
+        "control-result",
+        "cold-ledger-verifier",
+        "snapshot-stable",
+        "action-chain",
+        "authorization"
+      ],
+      "oracleCalls": 1,
+      "controlledMutations": 0
+    }
+  ],
+  "lifecycle": {
+    "launcherChildNaturalZeroClosedPidESRCH": 30,
+    "providerChildNaturalZeroClosedPidESRCH": 10,
+    "reachedColdVerifierZeroPidESRCH": 9,
+    "oracleOutputs": 10,
+    "providerObservations": 10,
+    "cleanupErrors": 0,
+    "sourceClaim": "Only inherited outer group and own-PID proof for nested children; outer PGID has independent wrapper observation."
+  },
+  "providerPublicHashCalculation": {
+    "method": "Python standard-library SHA-256 over independently recursively key-sorted canonical JSON excluding each hash; check sequence, prevHash, checkpoint, whole log bytes, post/commit row subsets and producer original-to-copy pins. No product imports or SQL.",
+    "views": 10,
+    "rows": 105,
+    "posts": 11,
+    "commits": 11,
+    "results": [
+      {
+        "mode": "completed",
+        "rows": 11,
+        "posts": 1,
+        "commits": 1,
+        "postedAmountMinor": [
+          12000
+        ],
+        "hashSeqPrevCheckpointAndCopyChecks": true
+      },
+      {
+        "mode": "duplicate",
+        "rows": 14,
+        "posts": 2,
+        "commits": 2,
+        "postedAmountMinor": [
+          12000,
+          12000
+        ],
+        "hashSeqPrevCheckpointAndCopyChecks": true
+      },
+      {
+        "mode": "body-mismatch",
+        "rows": 11,
+        "posts": 1,
+        "commits": 1,
+        "postedAmountMinor": [
+          12001
+        ],
+        "hashSeqPrevCheckpointAndCopyChecks": true
+      },
+      {
+        "mode": "provider-only",
+        "rows": 7,
+        "posts": 1,
+        "commits": 1,
+        "postedAmountMinor": [
+          12000
+        ],
+        "hashSeqPrevCheckpointAndCopyChecks": true
+      },
+      {
+        "mode": "completed",
+        "rows": 11,
+        "posts": 1,
+        "commits": 1,
+        "postedAmountMinor": [
+          12000
+        ],
+        "hashSeqPrevCheckpointAndCopyChecks": true
+      },
+      {
+        "mode": "provider-only",
+        "rows": 7,
+        "posts": 1,
+        "commits": 1,
+        "postedAmountMinor": [
+          12000
+        ],
+        "hashSeqPrevCheckpointAndCopyChecks": true
+      },
+      {
+        "mode": "completed",
+        "rows": 11,
+        "posts": 1,
+        "commits": 1,
+        "postedAmountMinor": [
+          12000
+        ],
+        "hashSeqPrevCheckpointAndCopyChecks": true
+      },
+      {
+        "mode": "completed",
+        "rows": 11,
+        "posts": 1,
+        "commits": 1,
+        "postedAmountMinor": [
+          12000
+        ],
+        "hashSeqPrevCheckpointAndCopyChecks": true
+      },
+      {
+        "mode": "weaker-policy",
+        "rows": 11,
+        "posts": 1,
+        "commits": 1,
+        "postedAmountMinor": [
+          12000
+        ],
+        "hashSeqPrevCheckpointAndCopyChecks": true
+      },
+      {
+        "mode": "unsupported-expectation",
+        "rows": 11,
+        "posts": 1,
+        "commits": 1,
+        "postedAmountMinor": [
+          12000
+        ],
+        "hashSeqPrevCheckpointAndCopyChecks": true
+      }
+    ]
+  },
+  "snapshotCause": {
+    "status": "exactly-reconstructed-from-retained-files",
+    "retainedFailures": 5,
+    "method": "Read actual v2 snapshot metadata columns and bytes without opening SQLite. Current DB/WAL/8 key rows exactly hash to recorded after. Replace only current zero-byte WAL row with its absent marker; canonical hash exactly equals recorded before. No DB/key change is required to explain any of these five pairs.",
+    "results": [
+      {
+        "root": "/private/tmp/lhfo-u44EX3",
+        "recordedBefore": "6b9cd4cb93f3984ad74cd90260220c8d0c7ec45e042668ae0ee51a4b9123db95",
+        "recordedAfter": "3d25bf2e8551b1040885cb08a9dd4ea881574c86e7acdbe9fa58b412ceab6d19",
+        "currentExactlyMatchesRecordedAfter": true,
+        "replaceOnlyEmptyWalWithAbsentExactlyMatchesRecordedBefore": true,
+        "walBytes": 0,
+        "dataAndKeyPins": [
+          {
+            "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/evidence.sqlite",
+            "dev": 16777231,
+            "ino": 541767675,
+            "bytes": 577536,
+            "sha256": "340caaade51d538e3106d5fe35977d95a4237e3e6742e7068da6e2942e369d22"
+          },
+          {
+            "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/evidence.sqlite-wal",
+            "dev": 16777231,
+            "ino": 541767831,
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/auditor_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541767656,
+            "bytes": 113,
+            "sha256": "28b6fa416128fa13b7122f7e0c9f9bcb119b06cb2897e20b5c2a5281bf1bdd24"
+          },
+          {
+            "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/auditor_history.json",
+            "dev": 16777231,
+            "ino": 541767657,
+            "bytes": 717,
+            "sha256": "e321f0d4664ed4d23ea5ea36c67d064e4aa80bf071011d9393c079e94e4d994f"
+          },
+          {
+            "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/lease_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541767658,
+            "bytes": 113,
+            "sha256": "d16b83edb0060501a6e17a04e2910b6417c8df5e21f61052011c1123310f624e"
+          },
+          {
+            "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/lease_history.json",
+            "dev": 16777231,
+            "ino": 541767659,
+            "bytes": 715,
+            "sha256": "7a0fb914121009c6d5a397da2cf133c1c058d222563a657e45ef2b51864824d2"
+          },
+          {
+            "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/monitor_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541767654,
+            "bytes": 113,
+            "sha256": "7016936dafb765cf6e21299054c95132348b9acbb7871ffca3a38b17fdb2d469"
+          },
+          {
+            "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/monitor_history.json",
+            "dev": 16777231,
+            "ino": 541767655,
+            "bytes": 717,
+            "sha256": "fd218df371d42d62a27e90d6fe12c3ada72e72df2c0b722580aa2f0fd2f3ce5b"
+          },
+          {
+            "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/session_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541767660,
+            "bytes": 113,
+            "sha256": "09ed3b20eace57675b4d5cf9cf00e52c95209b7a46aa48ec071c154e41a97f33"
+          },
+          {
+            "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/session_history.json",
+            "dev": 16777231,
+            "ino": 541767661,
+            "bytes": 717,
+            "sha256": "cf8d4ca5f366f9408357658ddc46d437208504918a2723904503d8fa9293728d"
+          }
+        ],
+        "coordinationPin": {
+          "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/evidence.sqlite-shm",
+          "dev": 16777231,
+          "ino": 541767832,
+          "bytes": 32768,
+          "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+        }
+      },
+      {
+        "root": "/private/tmp/lhfo-aKPiV0",
+        "recordedBefore": "e20a158fb15d0f4be44f82bb5a456f5a3513a0528aeb93f47379ba63bf4e6bcb",
+        "recordedAfter": "f1848c409d4e30211f32971e642b80d9860219b107af3967d9d0eada7cdf35e4",
+        "currentExactlyMatchesRecordedAfter": true,
+        "replaceOnlyEmptyWalWithAbsentExactlyMatchesRecordedBefore": true,
+        "walBytes": 0,
+        "dataAndKeyPins": [
+          {
+            "path": "/private/tmp/lhfo-aKPiV0/workspaces/p119-oracle-b42ebbc8-db49-4f5a-9634-6d2c76aaeb71/.amc/evidence.sqlite",
+            "dev": 16777231,
+            "ino": 541768506,
+            "bytes": 577536,
+            "sha256": "2c99ea861f1c80f2b5a312026946825b869b2bfa8632b2d0509a462852e26788"
+          },
+          {
+            "path": "/private/tmp/lhfo-aKPiV0/workspaces/p119-oracle-b42ebbc8-db49-4f5a-9634-6d2c76aaeb71/.amc/evidence.sqlite-wal",
+            "dev": 16777231,
+            "ino": 541768664,
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "/private/tmp/lhfo-aKPiV0/workspaces/p119-oracle-b42ebbc8-db49-4f5a-9634-6d2c76aaeb71/.amc/keys/auditor_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541768487,
+            "bytes": 113,
+            "sha256": "b90d505460f7cc25df2dd59d491431749ceea23d1fb95a1883d7491b43b4cd41"
+          },
+          {
+            "path": "/private/tmp/lhfo-aKPiV0/workspaces/p119-oracle-b42ebbc8-db49-4f5a-9634-6d2c76aaeb71/.amc/keys/auditor_history.json",
+            "dev": 16777231,
+            "ino": 541768488,
+            "bytes": 717,
+            "sha256": "511154705bad68873fe39fc88ab288aa93ab16c8bc10d84568f0352506de80f0"
+          },
+          {
+            "path": "/private/tmp/lhfo-aKPiV0/workspaces/p119-oracle-b42ebbc8-db49-4f5a-9634-6d2c76aaeb71/.amc/keys/lease_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541768489,
+            "bytes": 113,
+            "sha256": "335c708392b367c8719c937f5af5b04e2ce837fa8b536e9902d6d16130437bc4"
+          },
+          {
+            "path": "/private/tmp/lhfo-aKPiV0/workspaces/p119-oracle-b42ebbc8-db49-4f5a-9634-6d2c76aaeb71/.amc/keys/lease_history.json",
+            "dev": 16777231,
+            "ino": 541768490,
+            "bytes": 715,
+            "sha256": "3f5a43515cb8f052d8cc9b5d48b4b6073001808995235a4ef69dd35950bd3018"
+          },
+          {
+            "path": "/private/tmp/lhfo-aKPiV0/workspaces/p119-oracle-b42ebbc8-db49-4f5a-9634-6d2c76aaeb71/.amc/keys/monitor_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541768485,
+            "bytes": 113,
+            "sha256": "00bef5788e4c7d34ef37b1b78989fa125e3e127aaf8ad85e025d1d788491c262"
+          },
+          {
+            "path": "/private/tmp/lhfo-aKPiV0/workspaces/p119-oracle-b42ebbc8-db49-4f5a-9634-6d2c76aaeb71/.amc/keys/monitor_history.json",
+            "dev": 16777231,
+            "ino": 541768486,
+            "bytes": 717,
+            "sha256": "b3d3e10db583e14fc492df1e7496745757ef96bdc1c98997bb4916df3bd592a4"
+          },
+          {
+            "path": "/private/tmp/lhfo-aKPiV0/workspaces/p119-oracle-b42ebbc8-db49-4f5a-9634-6d2c76aaeb71/.amc/keys/session_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541768491,
+            "bytes": 113,
+            "sha256": "a639d217bb42b9165b19f9cefd0ca451df2bc6f3cd248491e021528d27f6a847"
+          },
+          {
+            "path": "/private/tmp/lhfo-aKPiV0/workspaces/p119-oracle-b42ebbc8-db49-4f5a-9634-6d2c76aaeb71/.amc/keys/session_history.json",
+            "dev": 16777231,
+            "ino": 541768492,
+            "bytes": 717,
+            "sha256": "bf203672383d6ec494eb36bd42730f41db8fb56b607889eda7a4349347727748"
+          }
+        ],
+        "coordinationPin": {
+          "path": "/private/tmp/lhfo-aKPiV0/workspaces/p119-oracle-b42ebbc8-db49-4f5a-9634-6d2c76aaeb71/.amc/evidence.sqlite-shm",
+          "dev": 16777231,
+          "ino": 541768665,
+          "bytes": 32768,
+          "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+        }
+      },
+      {
+        "root": "/private/tmp/lhfo-OsoKtQ",
+        "recordedBefore": "f50a4c21f7272b656d73dabb75398d3c748091de918dc2366028cddd1b4b2046",
+        "recordedAfter": "a718a9cbb480148bf008bf411db41ad1a85db07abd2abf451cd6f7c06a5f3525",
+        "currentExactlyMatchesRecordedAfter": true,
+        "replaceOnlyEmptyWalWithAbsentExactlyMatchesRecordedBefore": true,
+        "walBytes": 0,
+        "dataAndKeyPins": [
+          {
+            "path": "/private/tmp/lhfo-OsoKtQ/workspaces/p119-oracle-4e9af6a8-0aec-412b-ac47-5c83f161857e/.amc/evidence.sqlite",
+            "dev": 16777231,
+            "ino": 541768912,
+            "bytes": 577536,
+            "sha256": "58ca8bd78e462b62d6ae0470745c2d9b91a63df1cea4efefed2df4ce686d5e32"
+          },
+          {
+            "path": "/private/tmp/lhfo-OsoKtQ/workspaces/p119-oracle-4e9af6a8-0aec-412b-ac47-5c83f161857e/.amc/evidence.sqlite-wal",
+            "dev": 16777231,
+            "ino": 541769067,
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "/private/tmp/lhfo-OsoKtQ/workspaces/p119-oracle-4e9af6a8-0aec-412b-ac47-5c83f161857e/.amc/keys/auditor_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541768893,
+            "bytes": 113,
+            "sha256": "64ada0ba1f09844f01f3ff887b26f5380ccd8ab86ea323d186a5a36105c968e5"
+          },
+          {
+            "path": "/private/tmp/lhfo-OsoKtQ/workspaces/p119-oracle-4e9af6a8-0aec-412b-ac47-5c83f161857e/.amc/keys/auditor_history.json",
+            "dev": 16777231,
+            "ino": 541768894,
+            "bytes": 717,
+            "sha256": "6b00536f081d67246c333bd8c35f98ebd546ed45c8038e3bb02f94c970ffbb23"
+          },
+          {
+            "path": "/private/tmp/lhfo-OsoKtQ/workspaces/p119-oracle-4e9af6a8-0aec-412b-ac47-5c83f161857e/.amc/keys/lease_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541768895,
+            "bytes": 113,
+            "sha256": "934fb37f3fc536d2931a33f3299977e76ad4241cee913d2ad9708b8529c46100"
+          },
+          {
+            "path": "/private/tmp/lhfo-OsoKtQ/workspaces/p119-oracle-4e9af6a8-0aec-412b-ac47-5c83f161857e/.amc/keys/lease_history.json",
+            "dev": 16777231,
+            "ino": 541768896,
+            "bytes": 715,
+            "sha256": "7a87714e06b74c9e44280321bfb1319eeedf925e9647af3bb3f824750f2189f4"
+          },
+          {
+            "path": "/private/tmp/lhfo-OsoKtQ/workspaces/p119-oracle-4e9af6a8-0aec-412b-ac47-5c83f161857e/.amc/keys/monitor_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541768891,
+            "bytes": 113,
+            "sha256": "47a030a06ed9711bc648c2a526199e5180622ff570e445e651a140cd01f325fc"
+          },
+          {
+            "path": "/private/tmp/lhfo-OsoKtQ/workspaces/p119-oracle-4e9af6a8-0aec-412b-ac47-5c83f161857e/.amc/keys/monitor_history.json",
+            "dev": 16777231,
+            "ino": 541768892,
+            "bytes": 717,
+            "sha256": "6acd127f0bf1387e628129b40f57d3d9ffaf7035e7a62e27d03066a82c8ed52e"
+          },
+          {
+            "path": "/private/tmp/lhfo-OsoKtQ/workspaces/p119-oracle-4e9af6a8-0aec-412b-ac47-5c83f161857e/.amc/keys/session_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541768897,
+            "bytes": 113,
+            "sha256": "a9e1d4c9e54fa28d8440f95966401cbc6d70178728a849857e0bbaea84fb28b6"
+          },
+          {
+            "path": "/private/tmp/lhfo-OsoKtQ/workspaces/p119-oracle-4e9af6a8-0aec-412b-ac47-5c83f161857e/.amc/keys/session_history.json",
+            "dev": 16777231,
+            "ino": 541768898,
+            "bytes": 717,
+            "sha256": "eff76c0f82538d694f9bea02bb5c6c8eea16f4d94e538e62eb2f454725975249"
+          }
+        ],
+        "coordinationPin": {
+          "path": "/private/tmp/lhfo-OsoKtQ/workspaces/p119-oracle-4e9af6a8-0aec-412b-ac47-5c83f161857e/.amc/evidence.sqlite-shm",
+          "dev": 16777231,
+          "ino": 541769068,
+          "bytes": 32768,
+          "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+        }
+      },
+      {
+        "root": "/private/tmp/lhfo-r4Tdb5",
+        "recordedBefore": "0eb7fda7807a8dada78dfd31e6c081332e8059ba515fe4d8065a5bed6e29ce0e",
+        "recordedAfter": "35ceab0e78027f47980d664ba477727b17abf446b6178ee748f1f36e86ce6e1b",
+        "currentExactlyMatchesRecordedAfter": true,
+        "replaceOnlyEmptyWalWithAbsentExactlyMatchesRecordedBefore": true,
+        "walBytes": 0,
+        "dataAndKeyPins": [
+          {
+            "path": "/private/tmp/lhfo-r4Tdb5/workspaces/p119-oracle-fd50a5be-3fbb-4ace-a91f-070a3a1bea01/.amc/evidence.sqlite",
+            "dev": 16777231,
+            "ino": 541769123,
+            "bytes": 577536,
+            "sha256": "255a7931def0e001d7b789493eba0ed56828518a6db7dc4056060e427048043c"
+          },
+          {
+            "path": "/private/tmp/lhfo-r4Tdb5/workspaces/p119-oracle-fd50a5be-3fbb-4ace-a91f-070a3a1bea01/.amc/evidence.sqlite-wal",
+            "dev": 16777231,
+            "ino": 541769278,
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "/private/tmp/lhfo-r4Tdb5/workspaces/p119-oracle-fd50a5be-3fbb-4ace-a91f-070a3a1bea01/.amc/keys/auditor_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541769104,
+            "bytes": 113,
+            "sha256": "0d96415279fd7c75580a8a67610d3e0eaed76ec74f6dea7b65945e185db74121"
+          },
+          {
+            "path": "/private/tmp/lhfo-r4Tdb5/workspaces/p119-oracle-fd50a5be-3fbb-4ace-a91f-070a3a1bea01/.amc/keys/auditor_history.json",
+            "dev": 16777231,
+            "ino": 541769105,
+            "bytes": 717,
+            "sha256": "b04aa848770daa9dc9624dd6ff89ae4d9227c47c698789d730f7ee76a87a4543"
+          },
+          {
+            "path": "/private/tmp/lhfo-r4Tdb5/workspaces/p119-oracle-fd50a5be-3fbb-4ace-a91f-070a3a1bea01/.amc/keys/lease_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541769106,
+            "bytes": 113,
+            "sha256": "30e4bd8add2659a34ea0340320011298f9f9091bc5579c6dd2a080273c285ff7"
+          },
+          {
+            "path": "/private/tmp/lhfo-r4Tdb5/workspaces/p119-oracle-fd50a5be-3fbb-4ace-a91f-070a3a1bea01/.amc/keys/lease_history.json",
+            "dev": 16777231,
+            "ino": 541769107,
+            "bytes": 715,
+            "sha256": "8997870bd177e89351a62886c91ba5a4bc7dfed97af3788f2c55ab7d315da4d6"
+          },
+          {
+            "path": "/private/tmp/lhfo-r4Tdb5/workspaces/p119-oracle-fd50a5be-3fbb-4ace-a91f-070a3a1bea01/.amc/keys/monitor_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541769102,
+            "bytes": 113,
+            "sha256": "1759b360f7718fb1e94846788a25acb900d62edf7be6eed6fdef899046ed6730"
+          },
+          {
+            "path": "/private/tmp/lhfo-r4Tdb5/workspaces/p119-oracle-fd50a5be-3fbb-4ace-a91f-070a3a1bea01/.amc/keys/monitor_history.json",
+            "dev": 16777231,
+            "ino": 541769103,
+            "bytes": 717,
+            "sha256": "22a0fd1b7545e39461dd1cdf2290df873f1150885d19258178c11a4479057abb"
+          },
+          {
+            "path": "/private/tmp/lhfo-r4Tdb5/workspaces/p119-oracle-fd50a5be-3fbb-4ace-a91f-070a3a1bea01/.amc/keys/session_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541769108,
+            "bytes": 113,
+            "sha256": "e46dafeecd6c0876e817ff74632e62940b415f131596b8b445da99b80b9a3606"
+          },
+          {
+            "path": "/private/tmp/lhfo-r4Tdb5/workspaces/p119-oracle-fd50a5be-3fbb-4ace-a91f-070a3a1bea01/.amc/keys/session_history.json",
+            "dev": 16777231,
+            "ino": 541769109,
+            "bytes": 717,
+            "sha256": "521d5d7ba82599b2a264091a1ac6ddd6d722644ce49b38f7fc572f0dcc34deab"
+          }
+        ],
+        "coordinationPin": {
+          "path": "/private/tmp/lhfo-r4Tdb5/workspaces/p119-oracle-fd50a5be-3fbb-4ace-a91f-070a3a1bea01/.amc/evidence.sqlite-shm",
+          "dev": 16777231,
+          "ino": 541769279,
+          "bytes": 32768,
+          "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+        }
+      },
+      {
+        "root": "/private/tmp/lhfo-8PtUcU",
+        "recordedBefore": "54da63796c867b1d2e86f15b280a647359af52a9ee552ab6eb06cb74446a025b",
+        "recordedAfter": "a674c11788ac2fef55c172f97e642c0f5f9808ec5428fe35b326e4a0ffd4b8d7",
+        "currentExactlyMatchesRecordedAfter": true,
+        "replaceOnlyEmptyWalWithAbsentExactlyMatchesRecordedBefore": true,
+        "walBytes": 0,
+        "dataAndKeyPins": [
+          {
+            "path": "/private/tmp/lhfo-8PtUcU/workspaces/p119-oracle-ddeddec6-00ce-4091-8806-b885311dd490/.amc/evidence.sqlite",
+            "dev": 16777231,
+            "ino": 541769334,
+            "bytes": 577536,
+            "sha256": "179832a0038848d3d473ae03a788c53118ada75234d238d836b88ed3a03cc79a"
+          },
+          {
+            "path": "/private/tmp/lhfo-8PtUcU/workspaces/p119-oracle-ddeddec6-00ce-4091-8806-b885311dd490/.amc/evidence.sqlite-wal",
+            "dev": 16777231,
+            "ino": 541769494,
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "/private/tmp/lhfo-8PtUcU/workspaces/p119-oracle-ddeddec6-00ce-4091-8806-b885311dd490/.amc/keys/auditor_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541769315,
+            "bytes": 113,
+            "sha256": "00a63c77744472eb5f9efa30ea02fc1b0d682c706bcbc0b1fe3c1eeab3816b23"
+          },
+          {
+            "path": "/private/tmp/lhfo-8PtUcU/workspaces/p119-oracle-ddeddec6-00ce-4091-8806-b885311dd490/.amc/keys/auditor_history.json",
+            "dev": 16777231,
+            "ino": 541769316,
+            "bytes": 717,
+            "sha256": "84212cf90d6a6c706f67104d37b05641b9366a55c00e860dfd92617a4915d473"
+          },
+          {
+            "path": "/private/tmp/lhfo-8PtUcU/workspaces/p119-oracle-ddeddec6-00ce-4091-8806-b885311dd490/.amc/keys/lease_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541769317,
+            "bytes": 113,
+            "sha256": "e26c0489afd2848d0ec01485e1ef1d6fa71b94413792e88e2fb2ca580cfbccca"
+          },
+          {
+            "path": "/private/tmp/lhfo-8PtUcU/workspaces/p119-oracle-ddeddec6-00ce-4091-8806-b885311dd490/.amc/keys/lease_history.json",
+            "dev": 16777231,
+            "ino": 541769318,
+            "bytes": 715,
+            "sha256": "42f3b224f27cbd3348ea99cbf1c70f38d67cdffe367e49fecf2d413e816a47f6"
+          },
+          {
+            "path": "/private/tmp/lhfo-8PtUcU/workspaces/p119-oracle-ddeddec6-00ce-4091-8806-b885311dd490/.amc/keys/monitor_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541769313,
+            "bytes": 113,
+            "sha256": "ab148ae9cb39f75ee2ff32da6999c5d058f79ba049ceeb062558c5183fb6c25c"
+          },
+          {
+            "path": "/private/tmp/lhfo-8PtUcU/workspaces/p119-oracle-ddeddec6-00ce-4091-8806-b885311dd490/.amc/keys/monitor_history.json",
+            "dev": 16777231,
+            "ino": 541769314,
+            "bytes": 717,
+            "sha256": "03c8041fba3c9ab5d95bc9dd050c335f6bf47d814813970f0ac54b0fcd6ae4c1"
+          },
+          {
+            "path": "/private/tmp/lhfo-8PtUcU/workspaces/p119-oracle-ddeddec6-00ce-4091-8806-b885311dd490/.amc/keys/session_ed25519.pub",
+            "dev": 16777231,
+            "ino": 541769319,
+            "bytes": 113,
+            "sha256": "c3a72d9a26ac612a1e1042e41b95579081c2be8d6064a66b77d3831d8e6348e7"
+          },
+          {
+            "path": "/private/tmp/lhfo-8PtUcU/workspaces/p119-oracle-ddeddec6-00ce-4091-8806-b885311dd490/.amc/keys/session_history.json",
+            "dev": 16777231,
+            "ino": 541769320,
+            "bytes": 717,
+            "sha256": "474d61fbc871fccb4a1553698c1e4217fbba9d7dd41ad93a9dac78d5948f7857"
+          }
+        ],
+        "coordinationPin": {
+          "path": "/private/tmp/lhfo-8PtUcU/workspaces/p119-oracle-ddeddec6-00ce-4091-8806-b885311dd490/.amc/evidence.sqlite-shm",
+          "dev": 16777231,
+          "ino": 541769495,
+          "bytes": 32768,
+          "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+        }
+      }
+    ],
+    "notEstablished": "Existing snapshots bracket cold CLI plus independent actionEvidence read, so they do not identify which reader created the empty WAL. Four successful disposable roots cannot be re-read; their recorded snapshot-false results are retained but this raw-files reconstruction applies only to the five retained roots.",
+    "sharedMemory": "SHM was already excluded from stable data snapshot and separately reported; its creation is not the cause of the dataAndKeys digest difference."
+  },
+  "firstFailuresAndMasking": [
+    {
+      "case": "real completed positive",
+      "frame": "financeOracle.test.ts:24:44, caller30:53",
+      "actual": "verdict fail vs expected pass",
+      "masked": "every-check true loop is not reached; public output records empty chain/auth errors and one matched commit but seven authentication-gated false checks."
+    },
+    {
+      "case": "truncated closed log",
+      "frame": "financeOracle.test.ts:24:44, caller52:7",
+      "actual": "positive precheck verdict fail",
+      "masked": "truncateLog and second oracle call not reached; zero controlled mutation records."
+    },
+    {
+      "case": "changed preimage",
+      "frame": "financeOracle.test.ts:24:44, caller65:7",
+      "actual": "positive precheck verdict fail",
+      "masked": "tamperPreimage and second oracle call not reached; zero controlled mutation records."
+    },
+    {
+      "case": "corrupted approval signature",
+      "frame": "financeOracle.test.ts:24:44, caller70:7",
+      "actual": "positive precheck verdict fail",
+      "masked": "tamperApprovalSignature and second oracle call not reached; zero controlled mutation records."
+    },
+    {
+      "case": "weaker signed policy",
+      "frame": "financeOracle.test.ts:77:41",
+      "actual": "action-chain false vs expected true; prior authorization-false check passes and output contains explicit default-policy mismatch",
+      "masked": "successful authorization-negative qualification blocked by common stable/authentication gate."
+    }
+  ],
+  "provisionalNegatives": [
+    "Actual duplicate has2POSTs/2commits/same reference/different keys; specific no-duplicate false observed.",
+    "Actual body mismatch POST is12001minor vs normal12000; intended mismatch evidence observed.",
+    "Both provider-only cases show genuine provider effects and no action preimage; no forged receipt accepted.",
+    "Unsupported expected field is explicitly refused at inputs; later stages are not reached.",
+    "None is promoted to a semantically qualified oracle suite until a fresh genuine positive passes all mandatory checks."
+  ],
+  "inputPreservation": {
+    "selectedDirectQualifiedBuildInputs": 24,
+    "allMatchRecordedPins": true,
+    "retainedEmittedProducerScripts": 5,
+    "allEqualClosedV4EmbeddedProducer": true,
+    "retainedPreArtifactAnchorComparisons": 5,
+    "allMatchInitializedAndManifest": true,
+    "originalAndCopyPublicProviderFilesChecked": 20,
+    "allMatchCopyPins": true,
+    "rawProducerSnapshotEqual": true
+  },
+  "limits": [
+    "This reviewer authored the test producer, so source expectations also have an independent peer review; root alone ran the product.",
+    "No product runtime/imports/parsers/SQL, signals or repository writes occurred in this audit.",
+    "Provider SHA chaining is not an external signature. Cold ledger crypto is the actual pinned CLI result, not independently reimplemented crypto here.",
+    "No source repair or relaxed WAL/snapshot criterion is proposed or applied by this audit.",
+    "Local SOFTWARE authority, full normative finance corpus, automatic integration/recovery, OS isolation and release remain unqualified."
+  ],
+  "blockingQualificationFindings": [
+    {
+      "id": "Q1",
+      "finding": "No genuine all-check positive; common snapshot gate false makes initial oracle suite qualification fail."
+    },
+    {
+      "id": "Q2",
+      "finding": "Three intended tampering mutations never ran because their positive prechecks failed."
+    }
+  ],
+  "blockingPacketFindings": [],
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true
+}
