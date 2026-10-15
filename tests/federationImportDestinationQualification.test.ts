@@ -1,4 +1,4 @@
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, renameSync, rmSync, rmdirSync, symlinkSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, realpathSync, renameSync, rmSync, rmdirSync, symlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
@@ -96,6 +96,56 @@ describe("P0-52 genuine imports into static linked destinations", () => {
     expect(readdirSync(dirname(result.importedPath))).toEqual([bundle.manifest.manifestId]);
     expect(result).toMatchObject({ benchmarkCount: 0, certCount: 0, bomCount: 0, pluginCount: 0 });
     writeFileSync(join(evidence, `normal-${sequence++}.json`), JSON.stringify({ result, recipient: snapshot(dest) }, null, 2), { mode: 0o600 });
+  });
+
+  test("a link to the workspace root imports inside the real operator workspace", () => {
+    const { dest, bundle } = fixture();
+    const linkedWorkspace = join(state, "recipient-link");
+    symlinkSync(dest, linkedWorkspace, "dir");
+    const linkBefore = snapshot(linkedWorkspace);
+    const result = importFederationPackage({ workspace: linkedWorkspace, bundleFile: bundle.outFile });
+    const expected = join(federationInboxDir(realpathSync(dest)), "known-publisher", bundle.manifest.manifestId);
+    expect(realpathSync(result.importedPath)).toBe(realpathSync(expected));
+    expect(JSON.parse(readFileSync(join(result.importedPath, "manifest.json"), "utf8"))).toEqual(bundle.manifest);
+    for (const name of ["manifest.sig", "public-keys/publisher.pub"]) expect(existsSync(join(result.importedPath, name))).toBe(true);
+    expect(snapshot(linkedWorkspace)).toEqual(linkBefore);
+    expect(result).toMatchObject({ benchmarkCount: 0, certCount: 0, bomCount: 0, pluginCount: 0 });
+    writeFileSync(join(evidence, `workspace-link-${sequence++}.json`), JSON.stringify({ result, expectedRealPath: realpathSync(expected),
+      workspaceLink: snapshot(linkedWorkspace), recipient: snapshot(dest) }, null, 2), { mode: 0o600 });
+  });
+
+  test("missing inbox and publisher directories are created inside the recipient", () => {
+    const { dest, bundle } = fixture();
+    const inbox = federationInboxDir(dest), publisher = join(inbox, "known-publisher");
+    expect(existsSync(publisher)).toBe(false);
+    rmdirSync(inbox);
+    expect(existsSync(inbox)).toBe(false);
+    const result = importFederationPackage({ workspace: dest, bundleFile: bundle.outFile });
+    expect(realpathSync(result.importedPath)).toBe(join(realpathSync(dest), ".amc", "federation", "inbox", "known-publisher", bundle.manifest.manifestId));
+    for (const directory of [inbox, publisher, result.importedPath]) {
+      expect(lstatSync(directory).isDirectory()).toBe(true);
+      expect(lstatSync(directory).isSymbolicLink()).toBe(false);
+    }
+    expect(JSON.parse(readFileSync(join(result.importedPath, "manifest.json"), "utf8"))).toEqual(bundle.manifest);
+    for (const name of ["manifest.sig", "public-keys/publisher.pub"]) expect(existsSync(join(result.importedPath, name))).toBe(true);
+    writeFileSync(join(evidence, `missing-suffix-${sequence++}.json`), JSON.stringify({ result, recipient: snapshot(dest) }, null, 2), { mode: 0o600 });
+  });
+
+  test("an existing final directory is refused without replacing its contents", () => {
+    const { dest, bundle } = fixture();
+    const target = join(federationInboxDir(dest), "known-publisher", bundle.manifest.manifestId);
+    mkdirSync(target, { recursive: true });
+    writeFileSync(join(target, "owned-sentinel.txt"), "An existing final destination must not be replaced.\n");
+    const before = snapshot(dest);
+    let result: ReturnType<typeof importFederationPackage> | null = null;
+    let error: string | null = null;
+    try { result = importFederationPackage({ workspace: dest, bundleFile: bundle.outFile }); }
+    catch (caught) { error = String(caught); }
+    const after = snapshot(dest);
+    writeFileSync(join(evidence, `final-collision-${sequence++}.json`), JSON.stringify({ result, error, before, after }, null, 2), { mode: 0o600 });
+    expect.soft(result).toBeNull();
+    expect.soft(error).toMatch(/already imported|already exists|destination.*exists|cannot read the manifest.*refusing to import/i);
+    expect(after).toEqual(before);
   });
 
   test.each(["inbox", "publisher", "federation-root"] as const)("refuses a static linked %s before writing outside the recipient", (boundary) => {

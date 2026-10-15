@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, rmSync, writeFileSync } from "node:fs";
+import { verify } from "node:crypto";
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
@@ -94,8 +95,9 @@ function tar(args: string[]): void {
   expect(result.status, result.stderr || result.stdout).toBe(0);
 }
 
-/** Real exporter bytes, with only declared history metadata changed and sealed again by the actual publisher. */
-function packageAt(source: Publisher, label: string, createdTs: number, manifestId?: string): Package {
+/** Real exporter bytes with explicit fixture metadata claims, sealed again by the actual publisher. */
+function packageAt(source: Publisher, label: string, createdTs: number, manifestId?: string,
+  metadata: Partial<Pick<FederationManifest, "sourceOrgId" | "publisherKeyFingerprint">> = {}): Package {
   const holder = join(state, label); mkdirSync(holder);
   const original = exportFederationPackage({ workspace: source.workspace, outFile: join(holder, "export.amcfed") });
   const unpacked = join(holder, "unpacked"); mkdirSync(unpacked);
@@ -104,7 +106,7 @@ function packageAt(source: Publisher, label: string, createdTs: number, manifest
   const manifestPath = join(root, "manifest.json");
   const manifest = federationManifestSchema.parse({
     ...federationManifestSchema.parse(JSON.parse(readFileSync(manifestPath, "utf8"))),
-    createdTs, ...(manifestId === undefined ? {} : { manifestId }),
+    createdTs, ...(manifestId === undefined ? {} : { manifestId }), ...metadata,
   });
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
   const digest = sha256Hex(readFileSync(manifestPath));
@@ -130,6 +132,7 @@ function packageAt(source: Publisher, label: string, createdTs: number, manifest
     label, publisherKeyId: source.keyId, independentlyCapturedPublicKeySha256: sha256Hex(source.publicKeyPem),
     retainedFile, operatorPin, fileSha256: sha256, manifest, signedTs, originalExportManifestId: original.manifest.manifestId,
     fixtureMetadata: "createdTs and optional manifestId are explicit fixture claims, with a genuine replacement publisher seal",
+    signedMetadataOverrides: metadata,
   }, null, 2), { mode: 0o600 });
   return { file, manifest, publisher: source, signedTs, sha256 };
 }
@@ -158,20 +161,24 @@ function accept(dest: string, bundle: Package, bucket: string): ReturnType<typeo
   return result;
 }
 
-function refuseUnchanged(name: string, dest: string, bundle: Package, reason: RegExp): void {
+function refuseUnchanged(name: string, dest: string, bundle: Package, reason: RegExp, outside?: string): void {
   const before = snapshot(dest);
+  const outsideBefore = outside === undefined ? null : snapshot(outside);
   let refusal: string | null = null;
   let returned: ReturnType<typeof importFederationPackage> | null = null;
   try { returned = importFederationPackage({ workspace: dest, bundleFile: bundle.file }); }
   catch (error) { refusal = error instanceof Error ? error.message : String(error); }
   const after = snapshot(dest);
+  const outsideAfter = outside === undefined ? null : snapshot(outside);
   writeFileSync(join(evidence, `effect-${sequence++}-${name}.json`), JSON.stringify({
     name, dest, incoming: { publisherKeyId: bundle.publisher.keyId, manifestId: bundle.manifest.manifestId,
       createdTs: bundle.manifest.createdTs, signedTs: bundle.signedTs, sha256: bundle.sha256 },
     refusal, returned, before, after, beforeSha256: sha256Hex(JSON.stringify(before)), afterSha256: sha256Hex(JSON.stringify(after)),
+    outside: outside ?? null, outsideBefore, outsideAfter,
   }, null, 2), { mode: 0o600 });
   expect.soft(refusal, "The genuine admitted package must be refused for its history, not accepted").not.toBeNull();
   expect.soft(refusal ?? "").toMatch(reason);
+  if (outside !== undefined) expect.soft(outsideAfter, "The owned history-link target must remain unchanged").toEqual(outsideBefore);
   expect(after, "Recipient names, file contents, history and link/inode metadata must equal the pre-refusal snapshot").toEqual(before);
 }
 
@@ -222,6 +229,20 @@ describe("federation publisher history with genuine signed packages", () => {
 });
 
 describe("publisher history across admitted-identity aliases", () => {
+  test.each(["bucket", "package", "public-keys", "manifest.json", "manifest.sig", "public-keys/publisher.pub"] as const)(
+    "a static retained-history link at %s refuses a genuine later package without changing either location", (boundary) => {
+      const source = publisher(), dest = newWorkspace("dest"); addPeer(dest, source, "peer-z");
+      const first = packageAt(source, "first", claimedBase), later = packageAt(source, "later", claimedBase + 1_000);
+      const original = accept(dest, first, "peer-z");
+      const target = boundary === "bucket" ? join(federationInboxDir(dest), "peer-z")
+        : boundary === "package" ? original.importedPath : join(original.importedPath, boundary);
+      const outside = join(state, "owned-history-link-target");
+      renameSync(target, outside);
+      symlinkSync(outside, target, lstatSync(outside).isDirectory() ? "dir" : "file");
+      refuseUnchanged(`linked-history-${boundary.replaceAll("/", "-")}`, dest, later,
+        boundary === "bucket" ? /linked or non-directory destination component/ : /cannot read the manifest.*refusing to import/, outside);
+    });
+
   test.each(["replay", "rollback"] as const)("signed-list key bucket to peer alias retains %s refusal", (operation) => {
     const source = publisher(), dest = newWorkspace("dest");
     useOperatorList([source]);
@@ -239,5 +260,72 @@ describe("publisher history across admitted-identity aliases", () => {
     accept(dest, first, "peer-z");
     addPeer(dest, source, "peer-a");
     refuseUnchanged(`earlier-peer-alias-${operation}`, dest, incoming, operation === "replay" ? /already imported/ : /refused as a rollback/);
+  });
+
+  test.each(["replay", "rollback"] as const)("replacing the old peer alias with another key retains the original publisher's %s refusal", (operation) => {
+    const source = publisher(), replacement = publisher("replacement"), dest = newWorkspace("dest");
+    expect(replacement.keyId).not.toBe(source.keyId);
+    addPeer(dest, source, "peer-z");
+    const first = packageAt(source, "first", claimedBase + 1_000);
+    const incoming = operation === "replay" ? first : packageAt(source, "older", claimedBase);
+    accept(dest, first, "peer-z");
+    addPeer(dest, replacement, "peer-z");
+    addPeer(dest, source, "peer-a");
+    refuseUnchanged(`replaced-peer-alias-${operation}`, dest, incoming, operation === "replay" ? /already imported/ : /refused as a rollback/);
+  });
+
+  test.each(["manifest", "publisher-key"] as const)("an unauthentic retained %s blocks import after an alias change", (damage) => {
+    const source = publisher(), replacement = publisher("replacement"), dest = newWorkspace("dest");
+    addPeer(dest, source, "peer-z"); addPeer(dest, replacement, "peer-b");
+    const first = packageAt(source, "first", claimedBase);
+    const incoming = packageAt(source, "later", claimedBase + 1_000);
+    const original = accept(dest, first, "peer-z");
+    addPeer(dest, source, "peer-a");
+    const manifestPath = join(original.importedPath, "manifest.json");
+    const signaturePath = join(original.importedPath, "manifest.sig");
+    const publisherPath = join(original.importedPath, "public-keys", "publisher.pub");
+    const signatureBytes = readFileSync(signaturePath);
+    if (damage === "manifest") {
+      const changed = federationManifestSchema.parse({ ...first.manifest, createdTs: claimedBase - 1_000 });
+      writeFileSync(manifestPath, JSON.stringify(changed, null, 2));
+      expect(federationManifestSchema.parse(JSON.parse(readFileSync(manifestPath, "utf8")))).toEqual(changed);
+    } else {
+      expect(replacement.keyId).not.toBe(source.keyId);
+      writeFileSync(publisherPath, replacement.publicKeyPem);
+      expect(readFileSync(publisherPath, "utf8")).toBe(replacement.publicKeyPem);
+    }
+    expect(readFileSync(signaturePath)).toEqual(signatureBytes);
+    const signature = federationManifestSignatureSchema.parse(JSON.parse(signatureBytes.toString("utf8")));
+    expect(verify(null, Buffer.from(sha256Hex(readFileSync(manifestPath)), "hex"), readFileSync(publisherPath, "utf8"),
+      Buffer.from(signature.signature, "base64"))).toBe(false);
+    refuseUnchanged(`unauthentic-prior-${damage}`, dest, incoming, /cannot (?:read|authenticate|verify).*imported federation package.*refusing to import/);
+  });
+
+  test("a different authenticated key stays independent when its signed metadata names the first publisher", () => {
+    const a = publisher("source-a"), b = publisher("source-b"), dest = newWorkspace("dest");
+    expect(b.keyId).not.toBe(a.keyId);
+    addPeer(dest, a, "peer-a"); addPeer(dest, b, "peer-b");
+    const first = packageAt(a, "first", claimedBase + 1_000);
+    const other = packageAt(b, "other", claimedBase, undefined, {
+      sourceOrgId: first.manifest.sourceOrgId, publisherKeyFingerprint: first.manifest.publisherKeyFingerprint,
+    });
+    expect(other.manifest.sourceOrgId).toBe(first.manifest.sourceOrgId);
+    expect(other.manifest.publisherKeyFingerprint).toBe(first.manifest.publisherKeyFingerprint);
+    const original = accept(dest, first, "peer-a"), before = snapshot(original.importedPath);
+    accept(dest, other, "peer-b");
+    expect(snapshot(original.importedPath)).toEqual(before);
+  });
+
+  test("reusing a peer alias for another authenticated key does not inherit the first publisher's newer history", () => {
+    const a = publisher("source-a"), b = publisher("source-b"), dest = newWorkspace("dest");
+    expect(b.keyId).not.toBe(a.keyId);
+    useOperatorList([a, b]);
+    addPeer(dest, a, "peer-shared");
+    const first = packageAt(a, "first", claimedBase + 1_000), other = packageAt(b, "other", claimedBase);
+    const original = accept(dest, first, "peer-shared"), before = snapshot(original.importedPath);
+    addPeer(dest, b, "peer-shared");
+    accept(dest, other, "peer-shared");
+    expect(snapshot(original.importedPath)).toEqual(before);
+    expect(readdirSync(join(federationInboxDir(dest), "peer-shared")).sort()).toEqual([first.manifest.manifestId, other.manifest.manifestId].sort());
   });
 });
