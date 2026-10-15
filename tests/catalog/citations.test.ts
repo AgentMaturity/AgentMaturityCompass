@@ -51,6 +51,20 @@ describe("catalog citation rules", () => {
     expect(validateCitation({ ...input, statusType: "supervisory-guidance" }, context())).toEqual([]);
   });
 
+  it.each([
+    ["binding-now", "eu-gdpr", "in-force", "binding"],
+    ["binding-now", "eu-ai-act", "partially-applicable", "binding"],
+    ["binding-future", "us-co-sb26-189", "enacted-not-yet-applicable", "binding"],
+    ["draft", "eu-psr-psd3", "proposed", "binding"],
+    ["voluntary-standard", "us-nist-ai-rmf", "in-force", "voluntary"]
+  ] as const)("requires %s to agree with register entry %s", (statusType, registerId, status, bindingForce) => {
+    expect(getRegisterEntry(registerId)).toMatchObject({ status, bindingForce });
+    const input: Citation = { ...citation(), registerId, statusType, instrument: "Synthetic citation-status fixture", clause: "test-clause" };
+    expect(validateCitation(input, context())).toEqual([]);
+    expect(validateCitation({ ...input, statusType: statusType === "draft" ? "binding-future" : "draft" }, context())
+      .map((issue) => issue.code)).toContain("CAT_CITATION_STATUS_MISMATCH");
+  });
+
   it("refuses an unknown register ID", () => {
     expect(validateCitation({ ...citation(), registerId: "qualification-unknown-register" }, context()).map((issue) => issue.code)).toContain("CAT_CITATION_REGISTER");
   });
