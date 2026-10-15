@@ -1,0 +1,379 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 11249,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4oBTOJ/checkout/tests/lighthouse/financeOpsTools.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4oBTOJ/checkout/tests/lighthouse/financePaymentContext.test.ts"
+  ],
+  "testCount": 32,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-787943911",
+      "name": "tests/lighthouse/financeOpsTools.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4oBTOJ/checkout/tests/lighthouse/financeOpsTools.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-787943911_0",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_0",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools five model schemas and a real PENDING proposal require no provider call or decision",
+      "fullName": "P1-19 actual opt-in finance tools five model schemas and a real PENDING proposal require no provider call or decision",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_1",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools a genuine two-role factory execution has one effect and passes the independent cold oracle",
+      "fullName": "P1-19 actual opt-in finance tools a genuine two-role factory execution has one effect and passes the independent cold oracle",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_2",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools post-decision destination changes cause a real refresh and zero dispatch",
+      "fullName": "P1-19 actual opt-in finance tools post-decision destination changes cause a real refresh and zero dispatch",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_3",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"amountMinor\":12001}",
+      "fullName": "P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"amountMinor\":12001}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_4",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"amount\":\"120.01\"}",
+      "fullName": "P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"amount\":\"120.01\"}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_5",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"payeeId\":\"payee-a-001\"}",
+      "fullName": "P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"payeeId\":\"payee-a-001\"}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_6",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"sourceAccountId\":\"acct-other\"}",
+      "fullName": "P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"sourceAccountId\":\"acct-other\"}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_7",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"currency\":\"EUR\"}",
+      "fullName": "P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"currency\":\"EUR\"}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_8",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"reference\":\"RF-CHANGED\"}",
+      "fullName": "P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"reference\":\"RF-CHANGED\"}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_9",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"approvedBy\":\"the-model\"}",
+      "fullName": "P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"approvedBy\":\"the-model\"}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_10",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"amountMinor\":9007199254740992}",
+      "fullName": "P1-19 actual opt-in finance tools strict envelope or genuine binding refuses changed arguments {\"amountMinor\":9007199254740992}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_11",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools a foreign reader cannot establish the approved payee and cannot dispatch",
+      "fullName": "P1-19 actual opt-in finance tools a foreign reader cannot establish the approved payee and cannot dispatch",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_12",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools an actual unavailable payee refresh refuses without dispatch",
+      "fullName": "P1-19 actual opt-in finance tools an actual unavailable payee refresh refuses without dispatch",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_13",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools refresh success and fake consent cannot replace real granted authority",
+      "fullName": "P1-19 actual opt-in finance tools refresh success and fake consent cannot replace real granted authority",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_14",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools shadow and foreign-agent scope refuse at visibility before a service request",
+      "fullName": "P1-19 actual opt-in finance tools shadow and foreign-agent scope refuse at visibility before a service request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_15",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools missing writer secret after a real quorum produces no effect without an approval-denial fiction",
+      "fullName": "P1-19 actual opt-in finance tools missing writer secret after a real quorum produces no effect without an approval-denial fiction",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_16",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools actual read results and the seed's three discrepancies stay read-only",
+      "fullName": "P1-19 actual opt-in finance tools actual read results and the seed's three discrepancies stay read-only",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_0_17",
+      "name": "tests/lighthouse/financeOpsTools.test.ts P1-19 actual opt-in finance tools simulation and pre-aborted execution never create a provider effect",
+      "fullName": "P1-19 actual opt-in finance tools simulation and pre-aborted execution never create a provider effect",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-787943911_1",
+      "name": "tests/lighthouse/financeOpsTools.test.ts a real durable-preimage persistence fault completes not_applied after signed start without a provider POST",
+      "fullName": "a real durable-preimage persistence fault completes not_applied after signed start without a provider POST",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1881213351",
+      "name": "tests/lighthouse/financePaymentContext.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4oBTOJ/checkout/tests/lighthouse/financePaymentContext.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1881213351_0",
+      "name": "tests/lighthouse/financePaymentContext.test.ts P1-19 actual durable finance payment context",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1881213351_0_0",
+      "name": "tests/lighthouse/financePaymentContext.test.ts P1-19 actual durable finance payment context a fresh process authenticates the actual signed intent/preimage and exposes only GET-based lookup",
+      "fullName": "P1-19 actual durable finance payment context a fresh process authenticates the actual signed intent/preimage and exposes only GET-based lookup",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1881213351_0_1",
+      "name": "tests/lighthouse/financePaymentContext.test.ts P1-19 actual durable finance payment context a lost real response settles through cold core reconciliation without a second POST",
+      "fullName": "P1-19 actual durable finance payment context a lost real response settles through cold core reconciliation without a second POST",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1881213351_0_2",
+      "name": "tests/lighthouse/financePaymentContext.test.ts P1-19 actual durable finance payment context expired provider key indexes use reference GET without treating absence as not_applied",
+      "fullName": "P1-19 actual durable finance payment context expired provider key indexes use reference GET without treating absence as not_applied",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1881213351_0_3",
+      "name": "tests/lighthouse/financePaymentContext.test.ts P1-19 actual durable finance payment context each query field is checked against the genuine signed journal: {\"executionId\":\"exec_another\"}",
+      "fullName": "P1-19 actual durable finance payment context each query field is checked against the genuine signed journal: {\"executionId\":\"exec_another\"}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1881213351_0_4",
+      "name": "tests/lighthouse/financePaymentContext.test.ts P1-19 actual durable finance payment context each query field is checked against the genuine signed journal: {\"idempotencyKey\":\"other_payment_key\"}",
+      "fullName": "P1-19 actual durable finance payment context each query field is checked against the genuine signed journal: {\"idempotencyKey\":\"other_payment_key\"}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1881213351_0_5",
+      "name": "tests/lighthouse/financePaymentContext.test.ts P1-19 actual durable finance payment context each query field is checked against the genuine signed journal: {\"toolName\":\"finops_other_payment\"}",
+      "fullName": "P1-19 actual durable finance payment context each query field is checked against the genuine signed journal: {\"toolName\":\"finops_other_payment\"}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1881213351_0_6",
+      "name": "tests/lighthouse/financePaymentContext.test.ts P1-19 actual durable finance payment context each query field is checked against the genuine signed journal: {\"argumentsDigest\":\"0000000000000000000000000000000000000000000000000000000000000000\"}",
+      "fullName": "P1-19 actual durable finance payment context each query field is checked against the genuine signed journal: {\"argumentsDigest\":\"0000000000000000000000000000000000000000000000000000000000000000\"}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1881213351_0_7",
+      "name": "tests/lighthouse/financePaymentContext.test.ts P1-19 actual durable finance payment context each query field is checked against the genuine signed journal: {\"bindings\":{\"amount\":{\"value\":\"999\",\"currency\":\"USD\"},\"recipient\":\"payee-a-002\",\"destination\":\"3dcbe928e26c6d6e96aa0728827bfaac68b80bd90476ac6fedc9f64d3d5f2a2a\",\"resourceId\":\"payee-a-002\",\"resourceVersion\":\"1\"}}",
+      "fullName": "P1-19 actual durable finance payment context each query field is checked against the genuine signed journal: {\"bindings\":{\"amount\":{\"value\":\"999\",\"currency\":\"USD\"},\"recipient\":\"payee-a-002\",\"destination\":\"3dcbe928e26c6d6e96aa0728827bfaac68b80bd90476ac6fedc9f64d3d5f2a2a\",\"resourceId\":\"payee-a-002\",\"resourceVersion\":\"1\"}}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1881213351_0_8",
+      "name": "tests/lighthouse/financePaymentContext.test.ts P1-19 actual durable finance payment context each query field is checked against the genuine signed journal: {\"startedAt\":\"2026-01-01T00:00:00.000Z\"}",
+      "fullName": "P1-19 actual durable finance payment context each query field is checked against the genuine signed journal: {\"startedAt\":\"2026-01-01T00:00:00.000Z\"}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1881213351_0_9",
+      "name": "tests/lighthouse/financePaymentContext.test.ts P1-19 actual durable finance payment context a missing preimage cannot replace actual durable authority",
+      "fullName": "P1-19 actual durable finance payment context a missing preimage cannot replace actual durable authority",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1881213351_0_10",
+      "name": "tests/lighthouse/financePaymentContext.test.ts P1-19 actual durable finance payment context a arguments preimage cannot replace actual durable authority",
+      "fullName": "P1-19 actual durable finance payment context a arguments preimage cannot replace actual durable authority",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1881213351_0_11",
+      "name": "tests/lighthouse/financePaymentContext.test.ts P1-19 actual durable finance payment context a record preimage cannot replace actual durable authority",
+      "fullName": "P1-19 actual durable finance payment context a record preimage cannot replace actual durable authority",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1881213351_0_12",
+      "name": "tests/lighthouse/financePaymentContext.test.ts P1-19 actual durable finance payment context an already-aborted cold query remains unknown without provider traffic",
+      "fullName": "P1-19 actual durable finance payment context an already-aborted cold query remains unknown without provider traffic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}
