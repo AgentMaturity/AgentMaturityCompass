@@ -3,12 +3,12 @@ import { appendFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSyn
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { authorizationIntentFor, checkLease, type AuthorizationContext } from "../../src/actions/authorize.js";
-import { authorizationRecordDigest } from "../../src/actions/authorizationRecord.js";
+import { authorizationIntentFor, bindAuthorization, checkLease, recheckAuthorization, type AuthorizationContext } from "../../src/actions/authorize.js";
+import { authorizationRecordDigest, intentHashFor } from "../../src/actions/authorizationRecord.js";
 import {
   cancelApprovalRequestForIntent, createApprovalForIntent, decideApprovalForIntent, verifyApprovalForExecution
 } from "../../src/approvals/approvalEngine.js";
-import { listApprovalDecisions } from "../../src/approvals/approvalChainStore.js";
+import { listApprovalDecisions, loadApprovalConsumed } from "../../src/approvals/approvalChainStore.js";
 import { initApprovalPolicy } from "../../src/approvals/approvalPolicyEngine.js";
 import { initBudgets } from "../../src/budgets/budgets.js";
 import { getPublicKeyPem, verifyHexDigest } from "../../src/crypto/keys.js";
@@ -28,6 +28,7 @@ import { defineTool, ToolRegistry } from "../../src/tools/toolRegistry.js";
 import type { ToolExecution, ToolOutcome } from "../../src/tools/toolTypes.js";
 import type { ActionClass } from "../../src/types.js";
 import { sha256Hex } from "../../src/utils/hash.js";
+import { canonicalize } from "../../src/utils/json.js";
 import { lockVault } from "../../src/vault/vault.js";
 import { initWorkspace } from "../../src/workspace.js";
 
@@ -441,5 +442,63 @@ describe("P1-02 authorization recheck: fourteen specification groups", () => {
   test("14b: a JSON numeric amount is refused, not interpreted as a decimal approval", async () => {
     const f = fixture();
     refused(f, await execute(f, { arguments: { ...ARGS, amount: 100 } }), "binding_fields_missing");
+  });
+
+
+  // Independent public-API controls: no ToolPipeline body is dispatched here.
+  test("guard A: changing the call after binding refuses without spending its still-matching grant", () => {
+    const f = fixture();
+    const grant = approve(f);
+    expect(grant.request).toMatchObject({ requiredApprovals: 2, requireDistinctUsers: true, rolesAllowed: ["OWNER", "AUDITOR"] });
+    const callId = `p102-after-bind-${randomUUID()}`;
+    const original: ToolExecution = { ...call(), token: `p102-after-bind-token-${randomUUID()}`, callId, rootCallId: callId,
+      parentToken: null, workspace: f.workspace, actionClass: "FINANCIAL", effectiveMode: "EXECUTE" };
+    const context: AuthorizationContext = { sessionId: f.sessionId, ...f.context, authority: grant.authority };
+    const bound = bindAuthorization(original, context);
+    expect(bound.ok).toBe(true);
+    if (!bound.ok) throw new Error(`Owned after-bind control refused: ${bound.reason}`);
+    expect(bound.record.bindings.amount).toEqual({ value: "100", currency: "USD" });
+    expect(intentHashFor(bound.record)).toBe(grant.request.boundHashes.intentHash);
+    expect(verifyApprovalForExecution({ workspace: f.workspace, approvalId: grant.id, expectedAgentId: AGENT,
+      expectedIntentId: grant.request.intentId, expectedToolName: TRANSFER, expectedActionClass: "FINANCIAL",
+      expectedIntentHash: intentHashFor(bound.record) })).toMatchObject({ ok: true, status: "QUORUM_MET", quorum: { required: 2, received: 2 } });
+    expect(loadApprovalConsumed({ workspace: f.workspace, agentId: AGENT, approvalRequestId: grant.id })).toBeNull();
+    const changed: ToolExecution = { ...original, arguments: { ...original.arguments, amount: "1000.00" } };
+    const denied = recheckAuthorization(bound.record, changed, context);
+    const afterDenial = loadApprovalConsumed({ workspace: f.workspace, agentId: AGENT, approvalRequestId: grant.id });
+    expect({ ok: denied.ok, failures: denied.failures, consumed: afterDenial })
+      .toEqual({ ok: false, failures: ["binding_changed:amount"], consumed: null });
+    // The original call remains authorized after the changed call is refused.
+    expect(recheckAuthorization(bound.record, original, context)).toMatchObject({ ok: true, failures: [] });
+    expect(loadApprovalConsumed({ workspace: f.workspace, agentId: AGENT, approvalRequestId: grant.id }))
+      .toMatchObject({ approvalRequestId: grant.id, agentId: AGENT, executionId: bound.record.executionId });
+    signedArtifact(join(getAgentPaths(f.workspace, AGENT).rootDir, "approvals", "consumed", `${grant.id}.json`), f.auditorPem);
+    expect(f.bodies).toHaveLength(0);
+    expect(existsSync(f.effectPath)).toBe(false);
+  });
+
+  test("guard B: the engine refuses a changed intent hash despite the matching intent id and tool", () => {
+    const f = fixture();
+    const grant = approve(f);
+    expect(grant.request).toMatchObject({ requiredApprovals: 2, requireDistinctUsers: true, rolesAllowed: ["OWNER", "AUDITOR"] });
+    const matching = { workspace: f.workspace, approvalId: grant.id, expectedAgentId: AGENT,
+      expectedIntentId: grant.request.intentId, expectedToolName: TRANSFER, expectedActionClass: "FINANCIAL" as const,
+      expectedIntentHash: grant.request.boundHashes.intentHash };
+    expect(verifyApprovalForExecution(matching)).toMatchObject({ ok: true, status: "QUORUM_MET", quorum: { required: 2, received: 2 } });
+    const original = call();
+    const changed = authorizationIntentFor({ workspace: f.workspace, name: original.name, actionClass: "FINANCIAL",
+      effectiveMode: "EXECUTE", arguments: { ...original.arguments, amount: "1000.00" } });
+    expect(changed.ok).toBe(true);
+    if (!changed.ok) throw new Error(`Owned changed-call intent refused: ${changed.reason}`);
+    const changedHash = sha256Hex(canonicalize(changed.payload));
+    expect(changedHash).not.toBe(matching.expectedIntentHash);
+    const rejected = verifyApprovalForExecution({ ...matching, expectedIntentHash: changedHash });
+    const afterRejection = loadApprovalConsumed({ workspace: f.workspace, agentId: AGENT, approvalRequestId: grant.id });
+    expect({ ok: rejected.ok, status: rejected.status, error: rejected.error ?? null, consumed: afterRejection })
+      .toEqual({ ok: false, status: null, error: "approval intent hash mismatch", consumed: null });
+    expect(verifyApprovalForExecution(matching)).toMatchObject({ ok: true, status: "QUORUM_MET" });
+    expect(loadApprovalConsumed({ workspace: f.workspace, agentId: AGENT, approvalRequestId: grant.id })).toBeNull();
+    expect(f.bodies).toHaveLength(0);
+    expect(existsSync(f.effectPath)).toBe(false);
   });
 });
