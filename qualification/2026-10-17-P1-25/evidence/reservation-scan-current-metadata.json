@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-16T18:46:49.313842+00:00",
+  "originalCommandSha256": "abf0e3ceb01aebe1aa61d83e733f08f6cea7c6aaadcebbf9144fcb0c77934f2d",
+  "readOnlyMatchingShellMetadata": [],
+  "matchingShellMetadataAbsent": true,
+  "naturalExitNotEstablished": true,
+  "nestedSessionIdNotRecovered": true,
+  "descendantAbsenceNotClaimed": true,
+  "resultSuppliesNoSourceOrQualificationEvidence": true,
+  "signalsSent": false,
+  "reexecution": false,
+  "scope": "Read-only exact command marker lookup only; no unrelated process metadata retained."
+}

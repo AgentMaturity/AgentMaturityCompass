@@ -1,0 +1,14 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass
+
+ ✓ tests/time/verifyTimestamp.test.ts (17 tests) 25ms
+ ✓ tests/trust/verifierReport.test.ts (5 tests) 9ms
+ ✓ tests/trust/trustList.test.ts (25 tests) 553ms
+     ✓ accepts 4,096 distinct entries and refuses 4,097 on the size limit  531ms
+
+ Test Files  3 passed (3)
+      Tests  47 passed (47)
+   Start at  00:20:20
+   Duration  811ms (transform 177ms, setup 62ms, import 283ms, tests 587ms, environment 0ms)
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p125-source-verifier.raw.json
