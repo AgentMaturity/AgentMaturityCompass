@@ -1,0 +1,21 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > reviews a version-bound catalog and executes one granted call without a session
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-xWuLPB/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > a finite broken tools/call response is not replayed and disposes its grant
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-rNfFb4/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > a broken tools/call is recorded with strict typed unknown evidence
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-p49Jdu/public-evidence.json
+
+ ✓ tests/mcp/mcp20260728.test.ts (3 tests) 887ms
+     ✓ reviews a version-bound catalog and executes one granted call without a session  370ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  20:53:57
+   Duration  3.70s (transform 1.92s, setup 21ms, import 2.67s, tests 887ms, environment 0ms)
+
+JSON report written to /private/tmp/p1-37-post-typecheck-20261016/p139-typed-outcome-three-cases.raw.json

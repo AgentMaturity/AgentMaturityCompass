@@ -1,0 +1,1979 @@
+{
+  "schema": "p139-actual-phase-audit/1",
+  "phase": "p139-issuer-restored-nine-files",
+  "command": {
+    "phase": "p139-issuer-restored-nine-files",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout tests/mcp/mcpLegacyFallback.test.ts tests/mcp/mcp20260728.test.ts tests/mcp/mcpOauth.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts tests/nativeMcpClient.test.ts tests/nativeMcpHttp.test.ts tests/toolEvidenceRecording.test.ts tests/workflowTool.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p139-issuer-restored-nine-files.raw.json",
+    "exit": 0,
+    "durationMs": 11395,
+    "startedUtc": "2026-10-16T16:06:44.312645+00:00",
+    "endedUtc": "2026-10-16T16:06:55.721479+00:00",
+    "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p139-issuer-restored-nine-files/stdout-stderr.log",
+    "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "ownedProcess": {
+      "pid": 83906,
+      "ownedPgid": 83906,
+      "observedPgidAfterLaunch": 83906,
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--root",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+        "tests/mcp/mcpLegacyFallback.test.ts",
+        "tests/mcp/mcp20260728.test.ts",
+        "tests/mcp/mcpOauth.test.ts",
+        "tests/reconciliationDefectsMcp.test.ts",
+        "tests/reconciliationDefectsMcpHttp.test.ts",
+        "tests/nativeMcpClient.test.ts",
+        "tests/nativeMcpHttp.test.ts",
+        "tests/toolEvidenceRecording.test.ts",
+        "tests/workflowTool.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p139-issuer-restored-nine-files.raw.json"
+      ],
+      "startedUtc": "2026-10-16T16:06:44.312645+00:00",
+      "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+      "overriddenEnvironmentKeys": [
+        "PATH",
+        "HOME",
+        "GIT_NO_LAZY_FETCH",
+        "AMC_P021_RUNTIME_OBSERVER_PATH"
+      ]
+    },
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "observed": true,
+    "artifacts": {
+      "rawProducer": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/p139-issuer-restored-nine-files.raw.json",
+        "bytes": 31512,
+        "sha256": "7657876c9e3ad77ea28e13758146372155e00afa5fd7bdbaa0b420176dfc102c"
+      },
+      "rawSnapshot": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p139-issuer-restored-nine-files/raw.json",
+        "bytes": 31512,
+        "sha256": "7657876c9e3ad77ea28e13758146372155e00afa5fd7bdbaa0b420176dfc102c"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p139-issuer-restored-nine-files/observer.json",
+        "bytes": 47866,
+        "sha256": "b60d507064be881e2fb88bdb09ab68f24ea49903888355a94fd757842e6a2432"
+      },
+      "reporter": {
+        "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "bytes": 2110,
+        "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+      }
+    },
+    "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+  },
+  "tests": {
+    "numTotalTests": 81,
+    "numPassedTests": 81,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "actualFiles": [
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/nativeMcpClient.test.ts",
+      "total": 15,
+      "failed": 0
+    },
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/nativeMcpHttp.test.ts",
+      "total": 15,
+      "failed": 0
+    },
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/reconciliationDefectsMcp.test.ts",
+      "total": 2,
+      "failed": 0
+    },
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/reconciliationDefectsMcpHttp.test.ts",
+      "total": 2,
+      "failed": 0
+    },
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/toolEvidenceRecording.test.ts",
+      "total": 8,
+      "failed": 0
+    },
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/workflowTool.test.ts",
+      "total": 9,
+      "failed": 0
+    },
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts",
+      "total": 13,
+      "failed": 0
+    },
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpLegacyFallback.test.ts",
+      "total": 5,
+      "failed": 0
+    },
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpOauth.test.ts",
+      "total": 12,
+      "failed": 0
+    }
+  ],
+  "rawObserverIdentityAndStateEquality": true,
+  "hooksPassed": 60,
+  "unhandledErrors": [],
+  "failures": [],
+  "publicRecords": [
+    {
+      "label": "discovery-order",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-GXdjFA/public-evidence.json",
+      "schema": "amc-p139-oauth-first/1",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 7,
+      "effects": null,
+      "observations": {
+        "explicitOrder": [
+          "POST /mcp/v1",
+          "GET /explicit-prm",
+          "GET /.well-known/oauth-authorization-server/issuer/path",
+          "GET /.well-known/openid-configuration/issuer/path",
+          "GET /issuer/path/.well-known/openid-configuration"
+        ],
+        "fallbackOrder": [
+          "GET /.well-known/oauth-protected-resource/mcp/v1",
+          "GET /.well-known/oauth-protected-resource"
+        ],
+        "explicitResourceMatches": true,
+        "issuerMatches": true,
+        "fallbackResourceMatches": true
+      },
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": false
+    },
+    {
+      "label": "literal-issuer-mismatch",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-RSVKGC/public-evidence.json",
+      "schema": "amc-p139-oauth-first/1",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 2,
+      "effects": null,
+      "observations": {
+        "matchingIssuer": true,
+        "mismatchFailed": true,
+        "mismatchClassified": true,
+        "mismatchFixedDiagnostic": true,
+        "requests": 2
+      },
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": false
+    },
+    {
+      "label": "S256-required",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-Ubj9bY/public-evidence.json",
+      "schema": "amc-p139-oauth-first/1",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 4,
+      "effects": null,
+      "observations": {
+        "positiveIssuerMatches": true,
+        "rows": [
+          {
+            "label": "absent",
+            "refused": true,
+            "fixed": true
+          },
+          {
+            "label": "empty",
+            "refused": true,
+            "fixed": true
+          },
+          {
+            "label": "plain-only",
+            "refused": true,
+            "fixed": true
+          }
+        ]
+      },
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": false
+    },
+    {
+      "label": "state-and-iss-table",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-Z3eqk6/public-evidence.json",
+      "schema": "amc-p139-oauth-first/1",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 0,
+      "effects": null,
+      "observations": {
+        "rows": [
+          {
+            "label": "required-match",
+            "acceptedExactCode": true,
+            "classifiedRefusal": false,
+            "serverTextHidden": true
+          },
+          {
+            "label": "required-absent",
+            "acceptedExactCode": false,
+            "classifiedRefusal": true,
+            "serverTextHidden": true
+          },
+          {
+            "label": "required-wrong",
+            "acceptedExactCode": false,
+            "classifiedRefusal": true,
+            "serverTextHidden": true
+          },
+          {
+            "label": "optional-absent",
+            "acceptedExactCode": true,
+            "classifiedRefusal": false,
+            "serverTextHidden": true
+          },
+          {
+            "label": "optional-match",
+            "acceptedExactCode": true,
+            "classifiedRefusal": false,
+            "serverTextHidden": true
+          },
+          {
+            "label": "optional-wrong",
+            "acceptedExactCode": false,
+            "classifiedRefusal": true,
+            "serverTextHidden": true
+          },
+          {
+            "label": "wrong-state",
+            "acceptedExactCode": false,
+            "classifiedRefusal": true,
+            "serverTextHidden": true
+          },
+          {
+            "label": "wrong-issuer-error",
+            "acceptedExactCode": false,
+            "classifiedRefusal": true,
+            "serverTextHidden": true
+          },
+          {
+            "label": "server-error",
+            "acceptedExactCode": false,
+            "classifiedRefusal": true,
+            "serverTextHidden": true
+          }
+        ]
+      },
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": false
+    },
+    {
+      "label": "real-PKCE-token-store",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-nJs3Kc/public-evidence.json",
+      "schema": "amc-p139-oauth-first/1",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 5,
+      "effects": null,
+      "observations": {
+        "authorizeValid": true,
+        "tokenValid": true,
+        "grantMatches": true,
+        "receiptSafe": true,
+        "credentialFileMode": 384,
+        "credentialDirectoryMode": 448,
+        "tokenRequests": 1,
+        "productionCallbackCloseBoundary": "Product closeAllConnections/void close is not an awaitable server-close observation"
+      },
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": false
+    },
+    {
+      "label": "unpinned-legacy-catalog",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-NOCNw3/public-evidence.json",
+      "schema": "amc-p139-legacy/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 6,
+      "effects": null,
+      "observations": [],
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "modern-pin-refuses-legacy",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-e3fWTf/public-evidence.json",
+      "schema": "amc-p139-legacy/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 1,
+      "effects": null,
+      "observations": [],
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "exact-legacy-pin",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-AYtMpy/public-evidence.json",
+      "schema": "amc-p139-legacy/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 5,
+      "effects": null,
+      "observations": [],
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "legacy-pin-mismatch",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-UwLcoO/public-evidence.json",
+      "schema": "amc-p139-legacy/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 2,
+      "effects": null,
+      "observations": [],
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "registration-priority-opt-in",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-1Qb4mL/public-evidence.json",
+      "schema": "amc-p139-oauth-first/1",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 26,
+      "effects": null,
+      "observations": {
+        "rows": [
+          {
+            "label": "pre-registered",
+            "success": true,
+            "classifiedRefusal": false,
+            "registrationCount": 0,
+            "tokenCount": 1,
+            "authorizationCount": 1,
+            "correctClientStored": true,
+            "confidentialDiagnostic": false
+          },
+          {
+            "label": "metadata-document",
+            "success": true,
+            "classifiedRefusal": false,
+            "registrationCount": 0,
+            "tokenCount": 1,
+            "authorizationCount": 1,
+            "correctClientStored": true,
+            "confidentialDiagnostic": false
+          },
+          {
+            "label": "default-off",
+            "success": false,
+            "classifiedRefusal": true,
+            "registrationCount": 0,
+            "tokenCount": 0,
+            "authorizationCount": 0,
+            "correctClientStored": false,
+            "confidentialDiagnostic": false
+          },
+          {
+            "label": "explicit-off",
+            "success": false,
+            "classifiedRefusal": true,
+            "registrationCount": 0,
+            "tokenCount": 0,
+            "authorizationCount": 0,
+            "correctClientStored": false,
+            "confidentialDiagnostic": false
+          },
+          {
+            "label": "explicit-on",
+            "success": true,
+            "classifiedRefusal": false,
+            "registrationCount": 1,
+            "tokenCount": 1,
+            "authorizationCount": 1,
+            "correctClientStored": true,
+            "confidentialDiagnostic": false
+          },
+          {
+            "label": "confidential-refused",
+            "success": false,
+            "classifiedRefusal": true,
+            "registrationCount": 1,
+            "tokenCount": 0,
+            "authorizationCount": 0,
+            "correctClientStored": false,
+            "confidentialDiagnostic": true
+          }
+        ],
+        "publicNativeRegistration": true
+      },
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": false
+    },
+    {
+      "label": "redirect-target",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-7FP6tf/public-evidence.json",
+      "schema": "amc-p139-oauth-first/1",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 0,
+      "effects": null,
+      "observations": {
+        "requestsFromRefusedRedirect": 0
+      },
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": false
+    },
+    {
+      "label": "redirect-source",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-e7bi9M/public-evidence.json",
+      "schema": "amc-p139-oauth-first/1",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 2,
+      "effects": null,
+      "observations": {
+        "metadataRefused": true,
+        "metadataFixed": true,
+        "challengeRefused": true,
+        "challengeFixed": true,
+        "forbidden": [
+          true,
+          true,
+          true
+        ],
+        "targetRequests": 0,
+        "sourceRequests": 2
+      },
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": false
+    },
+    {
+      "label": "real-store-refresh",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-AniCFT/public-evidence.json",
+      "schema": "amc-p139-oauth-first/1",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 15,
+      "effects": null,
+      "observations": {
+        "rows": [
+          {
+            "variant": "rotate",
+            "success": true,
+            "classifiedRefusal": false,
+            "tokenRequests": 1,
+            "formValid": true,
+            "returnedNewAccess": true,
+            "savedExpectedGrant": true,
+            "receiptSafe": true
+          },
+          {
+            "variant": "retain",
+            "success": true,
+            "classifiedRefusal": false,
+            "tokenRequests": 1,
+            "formValid": true,
+            "returnedNewAccess": true,
+            "savedExpectedGrant": true,
+            "receiptSafe": true
+          },
+          {
+            "variant": "refused",
+            "success": false,
+            "classifiedRefusal": true,
+            "tokenRequests": 1,
+            "formValid": true,
+            "returnedNewAccess": false,
+            "savedExpectedGrant": true,
+            "receiptSafe": true
+          },
+          {
+            "variant": "missing",
+            "success": false,
+            "classifiedRefusal": true,
+            "tokenRequests": 0,
+            "formValid": false,
+            "returnedNewAccess": false,
+            "savedExpectedGrant": true,
+            "receiptSafe": true
+          }
+        ],
+        "clockReplaced": false,
+        "realExpirySeed": true
+      },
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": false
+    },
+    {
+      "label": "issuer-resource-binding-B",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-kbdmZ3/public-evidence.json",
+      "schema": "amc-p139-oauth-first/1",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 8,
+      "effects": null,
+      "observations": {
+        "correctHeader": true,
+        "tokenInUrlOrBody": false,
+        "authenticatedMethods": [
+          "server/discover",
+          "tools/list"
+        ]
+      },
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": false
+    },
+    {
+      "label": "issuer-resource-binding-A",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-sUHNiN/public-evidence.json",
+      "schema": "amc-p139-oauth-first/1",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 0,
+      "effects": null,
+      "observations": {
+        "wrongIssuerMissing": true,
+        "wrongResourceMissing": true,
+        "missingBClassified": true,
+        "headerOnly": true,
+        "correctHeader": true,
+        "tokenInUrlOrBody": false,
+        "catalogRead": true,
+        "grantsRemainSeparate": true,
+        "authenticatedMethods": [
+          "server/discover",
+          "tools/list"
+        ],
+        "beforeGrantAuthorizationHeaders": 0,
+        "setupCallerEnvironment": "Inherited process.env and user dotenv remain enabled by the public configuration caller"
+      },
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": false
+    },
+    {
+      "label": "catalog-scope-union",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-D7oXvJ/public-evidence.json",
+      "schema": "amc-p139-oauth-first/1",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 28,
+      "effects": null,
+      "observations": {
+        "completed": true,
+        "unexpectedError": false,
+        "scopes": [
+          [
+            "operator",
+            "read"
+          ],
+          [
+            "operator",
+            "read",
+            "write"
+          ],
+          [
+            "operator",
+            "read",
+            "write",
+            "admin"
+          ]
+        ],
+        "authorizations": 3,
+        "tokenRequests": 3,
+        "tokenFormValid": true,
+        "correctHeader": true,
+        "tokenInUrlOrBody": false,
+        "authenticatedMethods": [
+          "server/discover",
+          "server/discover",
+          "server/discover",
+          "tools/list"
+        ],
+        "calls": 0,
+        "savedScopes": [
+          "operator",
+          "read",
+          "write",
+          "admin"
+        ],
+        "receiptScopes": [
+          "operator",
+          "read",
+          "write",
+          "admin"
+        ],
+        "catalogRead": true
+      },
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": false
+    },
+    {
+      "label": "catalog-step-up-limit",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-SqPWxt/public-evidence.json",
+      "schema": "amc-p139-oauth-first/1",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 27,
+      "effects": null,
+      "observations": {
+        "completed": false,
+        "classifiedRefusal": true,
+        "lastRequiredScopes": [
+          "fourth"
+        ],
+        "scopes": [
+          [
+            "operator",
+            "read"
+          ],
+          [
+            "operator",
+            "read",
+            "write"
+          ],
+          [
+            "operator",
+            "read",
+            "write",
+            "admin"
+          ]
+        ],
+        "authorizations": 3,
+        "tokenRequests": 3,
+        "tokenFormValid": true,
+        "correctHeader": true,
+        "tokenInUrlOrBody": false,
+        "authenticatedMethods": [
+          "server/discover",
+          "server/discover",
+          "server/discover"
+        ],
+        "calls": 0
+      },
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": false
+    },
+    {
+      "label": "stateless-governed-call",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-cRDVwG/public-evidence.json",
+      "schema": "amc-p139-stateless/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 6,
+      "effects": 1,
+      "observations": [],
+      "outcomes": [
+        {
+          "callId": "stateless-call-1",
+          "result": {
+            "outcome": "OK",
+            "content": "{\"content\":[{\"type\":\"text\",\"text\":\"synthetic lookup completed\"}],\"resultType\":\"complete\"}",
+            "exitCode": 0,
+            "timedOut": false,
+            "denied": false
+          }
+        }
+      ],
+      "receipt": {
+        "serverId": "stateless_fixture",
+        "catalogDigest": "64edffb1f8d20ebcf1e16a6cf19789c2ba9545786e4253610e2d1d0f7ec25719",
+        "protocol": {
+          "negotiatedVersion": "2026-07-28",
+          "mode": "stateless",
+          "serverInfo": {
+            "name": "synthetic-stateless-untrusted",
+            "version": "1"
+          }
+        },
+        "auth": null
+      },
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0,
+        "sessionOpened": true,
+        "stepEnded": true,
+        "turnEnded": true,
+        "turnSealed": true,
+        "sessionClosed": true,
+        "toolsetClosed": true
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "legacy-receipt-version-review",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-b6ct8n/public-evidence.json",
+      "schema": "amc-p139-legacy/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 30,
+      "effects": null,
+      "observations": [],
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "stateless-tool-no-replay",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-ZztXr8/public-evidence.json",
+      "schema": "amc-p139-stateless/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 6,
+      "effects": 1,
+      "observations": [],
+      "outcomes": [
+        {
+          "callId": "stateless-call-1",
+          "result": {
+            "outcome": "TOOL_OUTCOME_UNKNOWN",
+            "content": "[amc] outcome unknown: the action may have taken effect. It is not retried automatically. MCP tool call outcome unknown (TOOL_OUTCOME_UNKNOWN): the response stream broke before a result arrived.; the remote tool may have executed. It was not replayed. Inspect the remote service before another invocation.",
+            "exitCode": 1,
+            "timedOut": false,
+            "denied": false
+          }
+        },
+        {
+          "callId": "stateless-call-2",
+          "result": {
+            "outcome": "DENIED",
+            "content": "[amc] visibility denied: unknown tool \"mcp_stateless_fixture_29a1af58c1382740\"",
+            "exitCode": null,
+            "timedOut": false,
+            "denied": true
+          }
+        }
+      ],
+      "receipt": {
+        "serverId": "stateless_fixture",
+        "catalogDigest": "64edffb1f8d20ebcf1e16a6cf19789c2ba9545786e4253610e2d1d0f7ec25719",
+        "protocol": {
+          "negotiatedVersion": "2026-07-28",
+          "mode": "stateless",
+          "serverInfo": {
+            "name": "synthetic-stateless-untrusted",
+            "version": "1"
+          }
+        },
+        "auth": null
+      },
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0,
+        "sessionOpened": true,
+        "stepEnded": true,
+        "turnEnded": true,
+        "turnSealed": true,
+        "sessionClosed": true,
+        "toolsetClosed": true
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "governed-token-redaction",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-APM5M7/public-evidence.json",
+      "schema": "amc-p139-oauth-first/1",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 14,
+      "effects": null,
+      "observations": {
+        "realAuthorization": {
+          "startedWithoutGrant": true,
+          "completed": true,
+          "authorizeValid": true,
+          "tokenValid": true,
+          "grantReloadMatches": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/mcp/v1",
+              "status": 401,
+              "authorizationPresent": false
+            },
+            {
+              "method": "GET",
+              "path": "/prm",
+              "status": 200,
+              "authorizationPresent": false
+            },
+            {
+              "method": "GET",
+              "path": "/.well-known/oauth-authorization-server/issuer/path",
+              "status": 200,
+              "authorizationPresent": false
+            },
+            {
+              "method": "GET",
+              "path": "/authorize",
+              "status": 302,
+              "authorizationPresent": false
+            },
+            {
+              "method": "POST",
+              "path": "/token",
+              "status": 200,
+              "authorizationPresent": false
+            }
+          ],
+          "authorizations": 1,
+          "tokenRequests": 1
+        },
+        "authenticatedMethods": [
+          "server/discover",
+          "tools/list",
+          "server/discover",
+          "tools/list",
+          "tools/list",
+          "tools/call"
+        ],
+        "governedOutcomeOK": true,
+        "callCount": 1,
+        "correctHeader": true,
+        "tokenInUrlOrBody": false,
+        "outcomeTokenAbsent": true,
+        "outcomeHasRedaction": true,
+        "toolEvents": [
+          "tool/call",
+          "tool/result"
+        ],
+        "toolEventsSigned": true,
+        "metadataSafe": true,
+        "payloadsSafe": true,
+        "resultHasRedaction": true,
+        "committedPayloadsRead": 9,
+        "receiptSafe": true,
+        "receiptMatchesReviewed": true,
+        "receiptStateless": true,
+        "receiptAuthMatches": true,
+        "sampleMountReceipt": {
+          "serverId": "oauth_fixture",
+          "catalogDigest": "25592d15431056566b4dde61e8de7fa3ceabbf6c4a25d497b21cb49446d11d48",
+          "protocol": {
+            "negotiatedVersion": "2026-07-28",
+            "mode": "stateless",
+            "serverInfo": {
+              "name": "synthetic-oauth-catalog",
+              "version": "1"
+            }
+          },
+          "auth": {
+            "issuer": "http://127.0.0.1:55075/issuer/path",
+            "scopes": [
+              "read"
+            ],
+            "tokenExpiresAt": "2026-10-16T17:06:48.440Z"
+          }
+        },
+        "setupCallerEnvironment": "Inherited process.env and user dotenv remain enabled by the public configuration caller",
+        "governedLifecycle": {
+          "sessionOpened": true,
+          "turnStarted": true,
+          "stepStarted": true,
+          "mountClosed": true,
+          "toolsetClosed": true,
+          "stepEnded": true,
+          "turnEnded": true,
+          "turnSealed": true,
+          "sessionClosed": true,
+          "disposedUnsealed": false,
+          "cleanupErrorCount": 0
+        }
+      },
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0
+      },
+      "productionCallbackServerCloseObserved": false
+    },
+    {
+      "label": "strict-typed-unknown-evidence",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-AHjc5h/public-evidence.json",
+      "schema": "amc-p139-stateless/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 6,
+      "effects": 1,
+      "observations": [],
+      "outcomes": [
+        {
+          "callId": "stateless-call-1",
+          "result": {
+            "outcome": "TOOL_OUTCOME_UNKNOWN",
+            "content": "[amc] outcome unknown: the action may have taken effect. It is not retried automatically. MCP tool call outcome unknown (TOOL_OUTCOME_UNKNOWN): the response stream broke before a result arrived.; the remote tool may have executed. It was not replayed. Inspect the remote service before another invocation.",
+            "exitCode": 1,
+            "timedOut": false,
+            "denied": false
+          }
+        }
+      ],
+      "receipt": {
+        "serverId": "stateless_fixture",
+        "catalogDigest": "64edffb1f8d20ebcf1e16a6cf19789c2ba9545786e4253610e2d1d0f7ec25719",
+        "protocol": {
+          "negotiatedVersion": "2026-07-28",
+          "mode": "stateless",
+          "serverInfo": {
+            "name": "synthetic-stateless-untrusted",
+            "version": "1"
+          }
+        },
+        "auth": null
+      },
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0,
+        "sessionOpened": true,
+        "stepEnded": true,
+        "turnEnded": true,
+        "turnSealed": true,
+        "sessionClosed": true,
+        "toolsetClosed": true
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "list-one-reissue",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-kdwVkY/public-evidence.json",
+      "schema": "amc-p139-stateless/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 3,
+      "effects": 0,
+      "observations": [
+        {
+          "kind": "one-list-reissue",
+          "catalog": {
+            "serverId": "stateless_fixture",
+            "protocol": {
+              "negotiatedVersion": "2026-07-28",
+              "mode": "stateless",
+              "serverInfo": {
+                "name": "synthetic-stateless-untrusted",
+                "version": "1"
+              }
+            },
+            "tools": [
+              {
+                "name": "lookup",
+                "description": "Synthetic stateless lookup",
+                "inputSchema": {
+                  "type": "object",
+                  "properties": {
+                    "query": {
+                      "type": "string",
+                      "x-mcp-header": "Query"
+                    }
+                  },
+                  "required": [
+                    "query"
+                  ],
+                  "additionalProperties": false
+                },
+                "outputSchema": null,
+                "annotations": null,
+                "execution": null
+              }
+            ],
+            "digest": "64edffb1f8d20ebcf1e16a6cf19789c2ba9545786e4253610e2d1d0f7ec25719"
+          },
+          "lists": [
+            {
+              "ordinal": 2,
+              "httpMethod": "POST",
+              "path": "/mcp",
+              "rpc": "tools/list",
+              "id": 1,
+              "meta": {
+                "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                "io.modelcontextprotocol/clientInfo": {
+                  "name": "amc-governed-native-tools",
+                  "version": "1.0.0"
+                },
+                "io.modelcontextprotocol/clientCapabilities": {}
+              },
+              "bodyBytes": 262,
+              "bodySha256": "2895f7262d0eec0bb9146f2eba47348d721068319f947a48b05c5e5d9764cadd",
+              "query": null,
+              "protocolHeader": "2026-07-28",
+              "methodHeader": "tools/list",
+              "nameHeader": null,
+              "paramHeader": null,
+              "originMatches": true,
+              "acceptJson": true,
+              "acceptSse": true,
+              "requestSessionPresent": false,
+              "lastEventIdPresent": false,
+              "requestEnded": true,
+              "requestComplete": true,
+              "requestClosed": true,
+              "responseStatus": 200,
+              "responseKind": "finite-sse-eof",
+              "responseId": null,
+              "responseResultType": null,
+              "responseSessionPresent": false,
+              "responseFinished": true,
+              "responseClosed": true
+            },
+            {
+              "ordinal": 3,
+              "httpMethod": "POST",
+              "path": "/mcp",
+              "rpc": "tools/list",
+              "id": "amc-reissue-1",
+              "meta": {
+                "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                "io.modelcontextprotocol/clientInfo": {
+                  "name": "amc-governed-native-tools",
+                  "version": "1.0.0"
+                },
+                "io.modelcontextprotocol/clientCapabilities": {}
+              },
+              "bodyBytes": 276,
+              "bodySha256": "1a8448162da8d503713918f7ea4a3c883a12d754be0fad10d4f2981fb65cd895",
+              "query": null,
+              "protocolHeader": "2026-07-28",
+              "methodHeader": "tools/list",
+              "nameHeader": null,
+              "paramHeader": null,
+              "originMatches": true,
+              "acceptJson": true,
+              "acceptSse": true,
+              "requestSessionPresent": false,
+              "lastEventIdPresent": false,
+              "requestEnded": true,
+              "requestComplete": true,
+              "requestClosed": true,
+              "responseStatus": 200,
+              "responseKind": "json",
+              "responseId": "amc-reissue-1",
+              "responseResultType": "complete",
+              "responseSessionPresent": true,
+              "responseFinished": true,
+              "responseClosed": true
+            }
+          ]
+        }
+      ],
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0,
+        "sessionOpened": true,
+        "stepEnded": true,
+        "turnEnded": true,
+        "turnSealed": true,
+        "sessionClosed": true,
+        "toolsetClosed": true
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "list-reissue-exhausted",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-F1b3QR/public-evidence.json",
+      "schema": "amc-p139-stateless/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 3,
+      "effects": 0,
+      "observations": [
+        {
+          "kind": "exhausted-list-refusal",
+          "error": {
+            "scope": "expected-refusal",
+            "name": "NativeMcpHttpRefused",
+            "message": "MCP HTTP connection failed; review the endpoint and credential references.",
+            "stack": "NativeMcpHttpRefused: MCP HTTP connection failed; review the endpoint and credential references.\n    at connectionFailure (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:114:12)\n    at discoverNativeMcpCatalog (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:247:27)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned.listEofs (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:405:26)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:258:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:403:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          }
+        }
+      ],
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0,
+        "sessionOpened": true,
+        "stepEnded": true,
+        "turnEnded": true,
+        "turnSealed": true,
+        "sessionClosed": true,
+        "toolsetClosed": true
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "digest-grant-and-fresh-catalog",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-t9D6Pz/public-evidence.json",
+      "schema": "amc-p139-stateless/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 11,
+      "effects": 0,
+      "observations": [
+        {
+          "kind": "admission-attempt",
+          "attempt": {
+            "label": "wrong-digest",
+            "accepted": false,
+            "visible": false,
+            "requestDelta": 2,
+            "error": {
+              "scope": "expected-admission-refusal",
+              "name": "Error",
+              "message": "MCP mount refused; review the configured server, catalog digest and tool grants",
+              "stack": "Error: MCP mount refused; review the configured server, catalog digest and tool grants\n    at connectionFailure (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:116:62)\n    at mountNativeMcpServer (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:390:11)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at Object.mountPinned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:117:17)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:431:25\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:258:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:420:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            }
+          }
+        },
+        {
+          "kind": "admission-attempt",
+          "attempt": {
+            "label": "empty-grants",
+            "accepted": false,
+            "visible": false,
+            "requestDelta": 0,
+            "error": {
+              "scope": "expected-admission-refusal",
+              "name": "Error",
+              "message": "Choose an explicit bounded MCP tool grant",
+              "stack": "Error: Choose an explicit bounded MCP tool grant\n    at mountNativeMcpServer (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:282:68)\n    at Object.mountPinned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:117:23)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:431:33\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:258:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:420:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            }
+          }
+        },
+        {
+          "kind": "admission-attempt",
+          "attempt": {
+            "label": "absent-remote-tool",
+            "accepted": false,
+            "visible": false,
+            "requestDelta": 2,
+            "error": {
+              "scope": "expected-admission-refusal",
+              "name": "Error",
+              "message": "MCP mount refused; review the configured server, catalog digest and tool grants",
+              "stack": "Error: MCP mount refused; review the configured server, catalog digest and tool grants\n    at connectionFailure (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:116:62)\n    at mountNativeMcpServer (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:390:11)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at Object.mountPinned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:117:17)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:431:25\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:258:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:420:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            }
+          }
+        },
+        {
+          "kind": "changed-catalog-call",
+          "advertisedTtlMs": 86400000,
+          "cacheScope": "server",
+          "description": "Synthetic changed catalog despite long TTL",
+          "requestsAfterCall": [
+            {
+              "ordinal": 11,
+              "httpMethod": "POST",
+              "path": "/mcp",
+              "rpc": "tools/list",
+              "id": 2,
+              "meta": {
+                "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                "io.modelcontextprotocol/clientInfo": {
+                  "name": "amc-governed-native-tools",
+                  "version": "1.0.0"
+                },
+                "io.modelcontextprotocol/clientCapabilities": {}
+              },
+              "bodyBytes": 262,
+              "bodySha256": "2cf0cae5d2074c29de545e8f100f0775174f55dd2b5886b4f46f6d17775d2883",
+              "query": null,
+              "protocolHeader": "2026-07-28",
+              "methodHeader": "tools/list",
+              "nameHeader": null,
+              "paramHeader": null,
+              "originMatches": true,
+              "acceptJson": true,
+              "acceptSse": true,
+              "requestSessionPresent": false,
+              "lastEventIdPresent": false,
+              "requestEnded": true,
+              "requestComplete": true,
+              "requestClosed": true,
+              "responseStatus": 200,
+              "responseKind": "json",
+              "responseId": 2,
+              "responseResultType": "complete",
+              "responseSessionPresent": true,
+              "responseFinished": true,
+              "responseClosed": true
+            }
+          ],
+          "outcome": {
+            "outcome": "ERROR",
+            "content": "MCP call failed or catalog changed; review and mount again",
+            "exitCode": 1,
+            "timedOut": false,
+            "denied": false
+          },
+          "granted": false
+        }
+      ],
+      "outcomes": [
+        {
+          "callId": "stateless-call-1",
+          "result": {
+            "outcome": "ERROR",
+            "content": "MCP call failed or catalog changed; review and mount again",
+            "exitCode": 1,
+            "timedOut": false,
+            "denied": false
+          }
+        }
+      ],
+      "receipt": {
+        "serverId": "stateless_fixture",
+        "catalogDigest": "64edffb1f8d20ebcf1e16a6cf19789c2ba9545786e4253610e2d1d0f7ec25719",
+        "protocol": {
+          "negotiatedVersion": "2026-07-28",
+          "mode": "stateless",
+          "serverInfo": {
+            "name": "synthetic-stateless-untrusted",
+            "version": "1"
+          }
+        },
+        "auth": null
+      },
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0,
+        "sessionOpened": true,
+        "stepEnded": true,
+        "turnEnded": true,
+        "turnSealed": true,
+        "sessionClosed": true,
+        "toolsetClosed": true
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "missing-result-type",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-1OlBvj/public-evidence.json",
+      "schema": "amc-p139-stateless/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 6,
+      "effects": 1,
+      "observations": [],
+      "outcomes": [
+        {
+          "callId": "stateless-call-1",
+          "result": {
+            "outcome": "OK",
+            "content": "{\"content\":[{\"type\":\"text\",\"text\":\"synthetic lookup completed\"}]}",
+            "exitCode": 0,
+            "timedOut": false,
+            "denied": false
+          }
+        }
+      ],
+      "receipt": {
+        "serverId": "stateless_fixture",
+        "catalogDigest": "64edffb1f8d20ebcf1e16a6cf19789c2ba9545786e4253610e2d1d0f7ec25719",
+        "protocol": {
+          "negotiatedVersion": "2026-07-28",
+          "mode": "stateless",
+          "serverInfo": {
+            "name": "synthetic-stateless-untrusted",
+            "version": "1"
+          }
+        },
+        "auth": null
+      },
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0,
+        "sessionOpened": true,
+        "stepEnded": true,
+        "turnEnded": true,
+        "turnSealed": true,
+        "sessionClosed": true,
+        "toolsetClosed": true
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "list-result-type-input_required",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-inH3kL/public-evidence.json",
+      "schema": "amc-p139-stateless/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 2,
+      "effects": 0,
+      "observations": [
+        {
+          "kind": "list-result-type-refusal",
+          "mode": "input_required",
+          "error": {
+            "scope": "expected-refusal",
+            "name": "NativeMcpProtocolRefused",
+            "message": "MCP tools/list returned input_required, which the protocol does not allow; it was refused.",
+            "stack": "NativeMcpProtocolRefused: MCP tools/list returned input_required, which the protocol does not allow; it was refused.\n    at readCatalog (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:192:57)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at catalog (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:231:21)\n    at discoverNativeMcpCatalog (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:246:12)\n    at owned.listResultType (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:471:26)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:258:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:469:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          }
+        }
+      ],
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0,
+        "sessionOpened": true,
+        "stepEnded": true,
+        "turnEnded": true,
+        "turnSealed": true,
+        "sessionClosed": true,
+        "toolsetClosed": true
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "list-result-type-invalid",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-7BebBp/public-evidence.json",
+      "schema": "amc-p139-stateless/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 2,
+      "effects": 0,
+      "observations": [
+        {
+          "kind": "list-result-type-refusal",
+          "mode": "invalid",
+          "error": {
+            "scope": "expected-refusal",
+            "name": "NativeMcpProtocolRefused",
+            "message": "MCP result has an unrecognized resultType; it was refused.",
+            "stack": "NativeMcpProtocolRefused: MCP result has an unrecognized resultType; it was refused.\n    at nativeMcpResultType (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/protocol/version.ts:59:9)\n    at readCatalog (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:192:9)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at catalog (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:231:21)\n    at discoverNativeMcpCatalog (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:246:12)\n    at owned.listResultType (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:471:26)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:258:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:469:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          }
+        }
+      ],
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0,
+        "sessionOpened": true,
+        "stepEnded": true,
+        "turnEnded": true,
+        "turnSealed": true,
+        "sessionClosed": true,
+        "toolsetClosed": true
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "call-result-type-input_required",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-rpMNlN/public-evidence.json",
+      "schema": "amc-p139-stateless/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 6,
+      "effects": 1,
+      "observations": [
+        {
+          "kind": "call-result-type",
+          "mode": "input_required",
+          "outcome": {
+            "outcome": "ERROR",
+            "content": "MCP server asked for more input (input_required). AMC declares no sampling, roots or elicitation capability; the call did not complete and was not retried.",
+            "exitCode": 1,
+            "timedOut": false,
+            "denied": false
+          },
+          "granted": true
+        }
+      ],
+      "outcomes": [
+        {
+          "callId": "stateless-call-1",
+          "result": {
+            "outcome": "ERROR",
+            "content": "MCP server asked for more input (input_required). AMC declares no sampling, roots or elicitation capability; the call did not complete and was not retried.",
+            "exitCode": 1,
+            "timedOut": false,
+            "denied": false
+          }
+        }
+      ],
+      "receipt": {
+        "serverId": "stateless_fixture",
+        "catalogDigest": "64edffb1f8d20ebcf1e16a6cf19789c2ba9545786e4253610e2d1d0f7ec25719",
+        "protocol": {
+          "negotiatedVersion": "2026-07-28",
+          "mode": "stateless",
+          "serverInfo": {
+            "name": "synthetic-stateless-untrusted",
+            "version": "1"
+          }
+        },
+        "auth": null
+      },
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0,
+        "sessionOpened": true,
+        "stepEnded": true,
+        "turnEnded": true,
+        "turnSealed": true,
+        "sessionClosed": true,
+        "toolsetClosed": true
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "call-result-type-invalid",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-36rLbH/public-evidence.json",
+      "schema": "amc-p139-stateless/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 6,
+      "effects": 1,
+      "observations": [
+        {
+          "kind": "call-result-type",
+          "mode": "invalid",
+          "outcome": {
+            "outcome": "ERROR",
+            "content": "MCP call failed or catalog changed; review and mount again; the remote tool executed and its received result was discarded. It was not replayed. Inspect the remote service before another invocation.",
+            "exitCode": 1,
+            "timedOut": false,
+            "denied": false
+          },
+          "granted": false
+        }
+      ],
+      "outcomes": [
+        {
+          "callId": "stateless-call-1",
+          "result": {
+            "outcome": "ERROR",
+            "content": "MCP call failed or catalog changed; review and mount again; the remote tool executed and its received result was discarded. It was not replayed. Inspect the remote service before another invocation.",
+            "exitCode": 1,
+            "timedOut": false,
+            "denied": false
+          }
+        }
+      ],
+      "receipt": {
+        "serverId": "stateless_fixture",
+        "catalogDigest": "64edffb1f8d20ebcf1e16a6cf19789c2ba9545786e4253610e2d1d0f7ec25719",
+        "protocol": {
+          "negotiatedVersion": "2026-07-28",
+          "mode": "stateless",
+          "serverInfo": {
+            "name": "synthetic-stateless-untrusted",
+            "version": "1"
+          }
+        },
+        "auth": null
+      },
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0,
+        "sessionOpened": true,
+        "stepEnded": true,
+        "turnEnded": true,
+        "turnSealed": true,
+        "sessionClosed": true,
+        "toolsetClosed": true
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "wrong-list-response-id",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-ZQX6g3/public-evidence.json",
+      "schema": "amc-p139-stateless/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 2,
+      "effects": 0,
+      "observations": [
+        {
+          "kind": "response-id-refusal",
+          "error": {
+            "scope": "expected-refusal",
+            "name": "NativeMcpHttpRefused",
+            "message": "MCP HTTP response is not one JSON-RPC response for its request.",
+            "stack": "NativeMcpHttpRefused: MCP HTTP response is not one JSON-RPC response for its request.\n    at connectionFailure (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:114:12)\n    at discoverNativeMcpCatalog (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:247:27)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned.wrongListResponseId (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:502:26)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:258:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:500:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          }
+        }
+      ],
+      "outcomes": [],
+      "receipt": null,
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0,
+        "sessionOpened": true,
+        "stepEnded": true,
+        "turnEnded": true,
+        "turnSealed": true,
+        "sessionClosed": true,
+        "toolsetClosed": true
+      },
+      "productionCallbackServerCloseObserved": null
+    },
+    {
+      "label": "untrusted-error-marker-stays-error",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-vphrj7/public-evidence.json",
+      "schema": "amc-p139-stateless/2",
+      "bodyFailed": false,
+      "bodyError": null,
+      "requests": 6,
+      "effects": 1,
+      "observations": [
+        {
+          "kind": "untrusted-error-marker",
+          "outcome": {
+            "outcome": "ERROR",
+            "content": "{\"content\":[{\"type\":\"text\",\"text\":\"Synthetic remote error: TOOL_OUTCOME_UNKNOWN\"}],\"isError\":true,\"resultType\":\"complete\"}",
+            "exitCode": 1,
+            "timedOut": false,
+            "denied": false
+          },
+          "remoteEffects": 1,
+          "calls": [
+            {
+              "ordinal": 6,
+              "httpMethod": "POST",
+              "path": "/mcp",
+              "rpc": "tools/call",
+              "id": 3,
+              "meta": {
+                "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                "io.modelcontextprotocol/clientInfo": {
+                  "name": "amc-governed-native-tools",
+                  "version": "1.0.0"
+                },
+                "io.modelcontextprotocol/clientCapabilities": {}
+              },
+              "bodyBytes": 308,
+              "bodySha256": "a39d34892be659b0f3114eaf4f80a5330dd0931b2f307d69adc0aa141a0f9ff6",
+              "query": "caf\u00e9",
+              "protocolHeader": "2026-07-28",
+              "methodHeader": "tools/call",
+              "nameHeader": "lookup",
+              "paramHeader": "=?base64?Y2Fmw6k=?=",
+              "originMatches": true,
+              "acceptJson": true,
+              "acceptSse": true,
+              "requestSessionPresent": false,
+              "lastEventIdPresent": false,
+              "requestEnded": true,
+              "requestComplete": true,
+              "requestClosed": true,
+              "responseStatus": 200,
+              "responseKind": "json",
+              "responseId": 3,
+              "responseResultType": "complete",
+              "responseSessionPresent": true,
+              "responseFinished": true,
+              "responseClosed": true
+            }
+          ]
+        }
+      ],
+      "outcomes": [
+        {
+          "callId": "stateless-call-1",
+          "result": {
+            "outcome": "ERROR",
+            "content": "{\"content\":[{\"type\":\"text\",\"text\":\"Synthetic remote error: TOOL_OUTCOME_UNKNOWN\"}],\"isError\":true,\"resultType\":\"complete\"}",
+            "exitCode": 1,
+            "timedOut": false,
+            "denied": false
+          }
+        }
+      ],
+      "receipt": {
+        "serverId": "stateless_fixture",
+        "catalogDigest": "64edffb1f8d20ebcf1e16a6cf19789c2ba9545786e4253610e2d1d0f7ec25719",
+        "protocol": {
+          "negotiatedVersion": "2026-07-28",
+          "mode": "stateless",
+          "serverInfo": {
+            "name": "synthetic-stateless-untrusted",
+            "version": "1"
+          }
+        },
+        "auth": null
+      },
+      "lifecycle": {
+        "started": true,
+        "closed": true,
+        "listening": false,
+        "openSockets": 0,
+        "sessionOpened": true,
+        "stepEnded": true,
+        "turnEnded": true,
+        "turnSealed": true,
+        "sessionClosed": true,
+        "toolsetClosed": true
+      },
+      "productionCallbackServerCloseObserved": null
+    }
+  ],
+  "pins": [
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p139-issuer-restored-nine-files/command.json",
+      "bytes": 3382,
+      "sha256": "3f0209f1786d33a525cbdf0c099a6b8768b67b3ea64d1c2f144206bbfe287305"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p139-issuer-restored-nine-files/owned-process.json",
+      "bytes": 1137,
+      "sha256": "3eca033e72c096129066d26d8341d0ef8a74d6475d7d819788de0887c77a5df6"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p139-issuer-restored-nine-files/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "4a5256601f0c39d7aed800b7a6112faf2e60994173d721933d8d480d2d4e19f1"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p139-issuer-restored-nine-files/stdout-stderr.log",
+      "bytes": 13243,
+      "sha256": "a319a7d84f4684173315f84a9e00797b4173bf060b36e11b444a8fc8c9acf0f1"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p139-issuer-restored-nine-files/raw.json",
+      "bytes": 31512,
+      "sha256": "7657876c9e3ad77ea28e13758146372155e00afa5fd7bdbaa0b420176dfc102c"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p139-issuer-restored-nine-files/observer.json",
+      "bytes": 47866,
+      "sha256": "b60d507064be881e2fb88bdb09ab68f24ea49903888355a94fd757842e6a2432"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-GXdjFA/public-evidence.json",
+      "bytes": 3690,
+      "sha256": "5ffe4f690a4bf2db0151a8d47a772bbc30fabb16bcd154e7cf84af8344cc1c58"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-RSVKGC/public-evidence.json",
+      "bytes": 1601,
+      "sha256": "a6fae0b22f63333dbe30fd4449501d9a8acd07f0a15015b55e6732b58444416b"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-Ubj9bY/public-evidence.json",
+      "bytes": 2520,
+      "sha256": "be2c7b9bb84b31cb3bbb153d4531d2dbba00a94afc6199a5282e708dece96e9b"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-Z3eqk6/public-evidence.json",
+      "bytes": 2132,
+      "sha256": "8e06252e72ce0f4310dea7218aa7045a69098ba5fc5f8d756ca351800f1299d2"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-nJs3Kc/public-evidence.json",
+      "bytes": 3198,
+      "sha256": "a56e80a9040ad6e216023d11bc6ef235749dadac80c4e0598ae85416a685cfb0"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-NOCNw3/public-evidence.json",
+      "bytes": 5431,
+      "sha256": "647832a0b41baab26e846395102462843f3f1f77d2a8238f02f0b76d4bb6460e"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-e3fWTf/public-evidence.json",
+      "bytes": 2618,
+      "sha256": "42be5ef44c3a9c06dcf2d4475c5bdf56a402b953b87af708e3ce538a9e0ca7b3"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-AYtMpy/public-evidence.json",
+      "bytes": 4784,
+      "sha256": "c53fe506cd783bdc13e02776a3f47318f40482215b32d38f8a3a8d5f27993719"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-UwLcoO/public-evidence.json",
+      "bytes": 3295,
+      "sha256": "5c0c40244583609aacbeef3d26ab57ed97d2f334dda9abb9df4444c61f4d8993"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-1Qb4mL/public-evidence.json",
+      "bytes": 12681,
+      "sha256": "f6329f8d168abb216bb49f0f37df7f98b6ee7c0a6e69edf0626d6ca571caf70f"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-7FP6tf/public-evidence.json",
+      "bytes": 741,
+      "sha256": "fb86ff0b7dd90b149f317a37c0d3be5137c1a3782c1a01013c9a15a5337d1fb1"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-e7bi9M/public-evidence.json",
+      "bytes": 1598,
+      "sha256": "9af462c8e9376420f5eeadfd8858bf65f9d74f750cd3aace2a25e2b4d7cc74dc"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-AniCFT/public-evidence.json",
+      "bytes": 6908,
+      "sha256": "ce657144c6151e323ecddc8e3a8e21ebcc13fc6b1009bea6f261244844e39497"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-kbdmZ3/public-evidence.json",
+      "bytes": 3556,
+      "sha256": "0a88021b5144b4a43fd11122390a5d40502168f057c8ecb2bf07b35256c54141"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-sUHNiN/public-evidence.json",
+      "bytes": 1196,
+      "sha256": "a58e9d46c699f770ec21f0e181ecb2ed8409c46c8f988fbbd3b8df830e460cbb"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-D7oXvJ/public-evidence.json",
+      "bytes": 12348,
+      "sha256": "378f1fa91e69a878879753daa8e9705dcc47369f40a31a8b7f1b4c31fcf94ad3"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-SqPWxt/public-evidence.json",
+      "bytes": 11850,
+      "sha256": "e2d7fee8e7fae1fb5db9288229a1d0bf16fac0f77d4ed2095c558919e5dd6e39"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-cRDVwG/public-evidence.json",
+      "bytes": 12418,
+      "sha256": "fe342352fe9cee59b762b65bf709ac9ee81d811392d6c079a4a03eaab2c6b6db"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-b6ct8n/public-evidence.json",
+      "bytes": 29171,
+      "sha256": "8bae1490e28e8fa058b8ec1d5c5794a715497958627d371c141456df163daf90"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-ZztXr8/public-evidence.json",
+      "bytes": 15649,
+      "sha256": "49d882ad650ad3e624ac796b4a029002b9436ce9cdd3fe5b7b37df3b233d7343"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-APM5M7/public-evidence.json",
+      "bytes": 8568,
+      "sha256": "9b5725dbd68a708b5d4ecd921ef2cbc965a1b546a9cd2e0e7f08c36814ceb86f"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-AHjc5h/public-evidence.json",
+      "bytes": 12670,
+      "sha256": "36acc49aad96400a4cd8ce010bc9ca572faa39e6bc47f482f65ae761effe2c79"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-kdwVkY/public-evidence.json",
+      "bytes": 9173,
+      "sha256": "4e73624cdcd435814fe58cce2cd96a9a19c94ca5f288562470db22e8a79bfd69"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-F1b3QR/public-evidence.json",
+      "bytes": 6038,
+      "sha256": "d6bbcc11c4d6d1d359cb6e93b48ff713c180819aba928409f9ea9d59ea9611dc"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-t9D6Pz/public-evidence.json",
+      "bytes": 24643,
+      "sha256": "ce4feca458483d13fae2b3306c7c89c5d9b3824118357459c98a4d44386eee68"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-1OlBvj/public-evidence.json",
+      "bytes": 12430,
+      "sha256": "f56ecde460a7efc840e42b6b052248f84672572e5308656a0e51342e3300f950"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-inH3kL/public-evidence.json",
+      "bytes": 5072,
+      "sha256": "c619ffb5329db966b31ac087f13d1ad385d31337795d4096b7930920cdcc69bd"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-7BebBp/public-evidence.json",
+      "bytes": 5154,
+      "sha256": "0b156c0dd28015b4c8a2c7d2cb05cd18c2ae0c3b6663beaf6ded7c7c214db222"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-rpMNlN/public-evidence.json",
+      "bytes": 12943,
+      "sha256": "be9b6a4e78cbd5256bb01e04ce2c772bb611122b473731eae395dcbe1ba3c8db"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-36rLbH/public-evidence.json",
+      "bytes": 13024,
+      "sha256": "c1f282ffc71460e06b8fabb944252e47673057e333115ebe183a18857d528715"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-ZQX6g3/public-evidence.json",
+      "bytes": 4849,
+      "sha256": "a74afbc629347a13871ff47d25ff6a8f8bb3b947422344bc1344223e2b856d18"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-vphrj7/public-evidence.json",
+      "bytes": 14198,
+      "sha256": "63f8fc73ede96971ba2489649971c0b13c13cb3f6232765c0eb438c465237860"
+    }
+  ],
+  "boundaries": [
+    "Source tests, no compiled-child control credit.",
+    "Owned new-fixture lifecycle observations only; prior regression fixtures retain their existing lifecycle limits.",
+    "Inherited environment/privateHOME are not OS isolation.",
+    "No independent cryptographic verification from signed-presence checks.",
+    "Full P139/global quality/release/plan completion remains unclaimed."
+  ]
+}

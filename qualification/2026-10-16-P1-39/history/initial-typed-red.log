@@ -1,0 +1,44 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > reviews a version-bound catalog and executes one granted call without a session
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-pN6jBD/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > a finite broken tools/call response is not replayed and disposes its grant
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-m1RBla/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > a broken tools/call is recorded with strict typed unknown evidence
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-enlCOS/public-evidence.json
+
+ ❯ tests/mcp/mcp20260728.test.ts (3 tests | 1 failed) 824ms
+     ✓ reviews a version-bound catalog and executes one granted call without a session  347ms
+     ✓ a finite broken tools/call response is not replayed and disposes its grant 243ms
+     × a broken tools/call is recorded with strict typed unknown evidence 231ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > a broken tools/call is recorded with strict typed unknown evidence
+AssertionError: expected 'ERROR' to be 'TOOL_OUTCOME_UNKNOWN' // Object.is equality
+
+Expected: "TOOL_OUTCOME_UNKNOWN"
+Received: "ERROR"
+
+ ❯ tests/mcp/mcp20260728.test.ts:342:35
+    340|       // The current ordinary native-client failure may map to ERROR h…
+    341|       // Keep the specification's typed-evidence assertion; do not rel…
+    342|       expect(result.meta.outcome).toBe("TOOL_OUTCOME_UNKNOWN");
+       |                                   ^
+    343|       expect(outcome.outcome).toBe("TOOL_OUTCOME_UNKNOWN");
+    344|       expect(String(outcome.content)).toContain("TOOL_OUTCOME_UNKNOWN"…
+ ❯ owned tests/mcp/mcp20260728.test.ts:222:5
+ ❯ tests/mcp/mcp20260728.test.ts:336:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  20:45:51
+   Duration  3.45s (transform 1.83s, setup 18ms, import 2.51s, tests 824ms, environment 0ms)
+
+JSON report written to /private/tmp/p1-37-post-typecheck-20261016/p139-stateless-three-cases.raw.json

@@ -1,0 +1,59 @@
+{
+  "schema": "amc-p139-legacy/2",
+  "label": "modern-pin-refuses-legacy",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-RCtepa",
+  "configuredProtocolVersion": "2026-07-28",
+  "requests": [
+    {
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "server/discover",
+      "id": 0,
+      "hasId": true,
+      "requestedVersion": null,
+      "responseVersion": null,
+      "protocolHeader": "2026-07-28",
+      "originMatches": true,
+      "requestSessionPresent": false,
+      "requestSessionMatches": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseErrorCode": -32601,
+      "responseSessionPresent": false,
+      "responseFinished": true,
+      "responseClosed": true
+    }
+  ],
+  "sockets": [
+    {
+      "closed": true,
+      "hadError": false
+    }
+  ],
+  "lifecycle": {
+    "started": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0
+  },
+  "errors": [],
+  "outcome": {
+    "refusal": {
+      "scope": "expected-refusal",
+      "name": "NativeMcpProtocolRefused",
+      "message": "MCP server did not accept the pinned protocol version 2026-07-28.",
+      "stack": "NativeMcpProtocolRefused: MCP server did not accept the pinned protocol version 2026-07-28.\n    at negotiate (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:171:37)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at discoverNativeMcpCatalog (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:245:22)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpLegacyFallback.test.ts:228:36\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpLegacyFallback.test.ts:141:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpLegacyFallback.test.ts:226:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    }
+  },
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "environmentMutated": false,
+  "exactEnvironmentRestored": true,
+  "childProcessCreated": false,
+  "signalsSent": false
+}
