@@ -1,0 +1,360 @@
+{
+  "schema": "p111-actual-control-chain/1",
+  "at": "2026-10-16T19:39:55.060078+00:00",
+  "sourceCommit": "a6909ac52ec7db1411696b82c4ef6c9cb61a89d2",
+  "phases": [
+    {
+      "phase": "p111-fresh-canonical",
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout tests/catalog/evidence/decisive.test.ts tests/compliance/complianceFailClosed.test.ts tests/compliance/evidenceBinding.test.ts tests/compliance/coverageScorer.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p111-fresh-canonical.raw.json",
+        "exit": 0,
+        "durationMs": 7682
+      },
+      "groupAbsentByESRCH": true,
+      "hooks": 29
+    },
+    {
+      "phase": "p111-m1",
+      "tests": {
+        "total": 88,
+        "passed": 87,
+        "failed": 1,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout tests/catalog/evidence/decisive.test.ts tests/compliance/complianceFailClosed.test.ts tests/compliance/evidenceBinding.test.ts tests/compliance/coverageScorer.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p111-m1.raw.json",
+        "exit": 1,
+        "durationMs": 7058
+      },
+      "groupAbsentByESRCH": true,
+      "hooks": 29
+    },
+    {
+      "phase": "p111-m1-restored",
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout tests/catalog/evidence/decisive.test.ts tests/compliance/complianceFailClosed.test.ts tests/compliance/evidenceBinding.test.ts tests/compliance/coverageScorer.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p111-m1-restored.raw.json",
+        "exit": 0,
+        "durationMs": 6907
+      },
+      "groupAbsentByESRCH": true,
+      "hooks": 29
+    },
+    {
+      "phase": "p111-m2",
+      "tests": {
+        "total": 88,
+        "passed": 87,
+        "failed": 1,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout tests/catalog/evidence/decisive.test.ts tests/compliance/complianceFailClosed.test.ts tests/compliance/evidenceBinding.test.ts tests/compliance/coverageScorer.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p111-m2.raw.json",
+        "exit": 1,
+        "durationMs": 6896
+      },
+      "groupAbsentByESRCH": true,
+      "hooks": 29
+    },
+    {
+      "phase": "p111-m2-restored",
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout tests/catalog/evidence/decisive.test.ts tests/compliance/complianceFailClosed.test.ts tests/compliance/evidenceBinding.test.ts tests/compliance/coverageScorer.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p111-m2-restored.raw.json",
+        "exit": 0,
+        "durationMs": 7114
+      },
+      "groupAbsentByESRCH": true,
+      "hooks": 29
+    },
+    {
+      "phase": "p111-m3",
+      "tests": {
+        "total": 88,
+        "passed": 87,
+        "failed": 1,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout tests/catalog/evidence/decisive.test.ts tests/compliance/complianceFailClosed.test.ts tests/compliance/evidenceBinding.test.ts tests/compliance/coverageScorer.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p111-m3.raw.json",
+        "exit": 1,
+        "durationMs": 7011
+      },
+      "groupAbsentByESRCH": true,
+      "hooks": 29
+    },
+    {
+      "phase": "p111-m3-restored",
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout tests/catalog/evidence/decisive.test.ts tests/compliance/complianceFailClosed.test.ts tests/compliance/evidenceBinding.test.ts tests/compliance/coverageScorer.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p111-m3-restored.raw.json",
+        "exit": 0,
+        "durationMs": 6885
+      },
+      "groupAbsentByESRCH": true,
+      "hooks": 29
+    },
+    {
+      "phase": "p111-m4",
+      "tests": {
+        "total": 88,
+        "passed": 85,
+        "failed": 3,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout tests/catalog/evidence/decisive.test.ts tests/compliance/complianceFailClosed.test.ts tests/compliance/evidenceBinding.test.ts tests/compliance/coverageScorer.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p111-m4.raw.json",
+        "exit": 1,
+        "durationMs": 6879
+      },
+      "groupAbsentByESRCH": true,
+      "hooks": 29
+    },
+    {
+      "phase": "p111-m4-restored",
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      },
+      "command": {
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout tests/catalog/evidence/decisive.test.ts tests/compliance/complianceFailClosed.test.ts tests/compliance/evidenceBinding.test.ts tests/compliance/coverageScorer.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p111-m4-restored.raw.json",
+        "exit": 0,
+        "durationMs": 7061
+      },
+      "groupAbsentByESRCH": true,
+      "hooks": 29
+    }
+  ],
+  "fileOrderedIdentities": {
+    "tests/compliance/complianceFailClosed.test.ts": [
+      "compliance fails closed (P0-17) empty ledger with signed maps: every category NOT_EVALUATED, evidence incomplete, score null",
+      "compliance fails closed (P0-17) runtime events for agent A and no denied audits: requires_no_audit has sufficient evidence, applicability unresolved",
+      "compliance fails closed (P0-17) imported review rows carrying agent A's id are not agent activity for requires_no_audit",
+      "compliance fails closed (P0-17) synthetic rows leave the report's trust-tier coverage unchanged (P0-18)",
+      "compliance fails closed (P0-17) no activity for agent A: requires_no_audit is not evaluated, absence of violations proves nothing",
+      "compliance fails closed (P0-17) a bound event for agent B only leaves agent A's category NOT_EVALUATED",
+      "compliance fails closed (P0-17) a bound positive event in session system: agent-scoped rejected, workspace-scoped admitted",
+      "compliance fails closed (P0-17) a denied audit type in session system fails agent A's requires_no_audit",
+      "compliance fails closed (P0-17) an event bound to soc2_availability does not satisfy nist_map",
+      "compliance fails closed (P0-17) a bound event from eval_import is NOT_EVALUATED with untrusted evidence",
+      "compliance fails closed (P0-17) bound events below the observed ratio are NOT_EVALUATED with untrusted evidence",
+      "compliance fails closed (P0-17) a bound event without meta.agentId is not credited to default",
+      "compliance fails closed (P0-17) an event outside the window is not counted",
+      "compliance fails closed (P0-17) a tampered maps signature makes every category NOT_EVALUATED and untrusted, never PARTIAL",
+      "compliance fails closed (P0-17) a hand-written assurance report JSON leaves requires_assurance_pack NOT_EVALUATED and untrusted",
+      "compliance fails closed (P0-17) a sealed run below minScore fails requires_assurance_pack",
+      "compliance fails closed (P0-17) a sealed passing run of a keyword-graded pack is NOT_EVALUATED and untrusted, never a pass (P0-19)",
+      "compliance fails closed (P0-17) a sealed run whose pack scenarios were all inconclusive leaves requires_assurance_pack NOT_EVALUATED",
+      "compliance fails closed (P0-17) a passing pack score with inconclusive scenarios is NOT_EVALUATED, not a pass on a partial measurement",
+      "compliance fails closed (P0-17) bound runtime OBSERVED events, a sealed passing run and no violations: sufficient and observed, but not a pass without applicability",
+      "compliance fails closed (P0-17) a failing requirement next to a sufficient one fails the category; PARTIAL is never emitted (P1-11)"
+    ],
+    "tests/compliance/coverageScorer.test.ts": [
+      "coverageScore (P0-17) score is null when nothing was evaluated",
+      "coverageScore (P0-17) only a pass earns credit; NOT_EVALUATED, UNKNOWN and legacy PARTIAL earn 0 and stay in the denominator"
+    ],
+    "tests/compliance/evidenceBinding.test.ts": [
+      "evidenceProducer {\"provenance\":\"dogfood\"} -> synthetic",
+      "evidenceProducer {\"claimKind\":\"synthetic_example\",\"source\":\"bridge\"} -> synthetic",
+      "evidenceProducer {\"source\":\"dogfood-maturity\"} -> synthetic",
+      "evidenceProducer {\"source\":\"eval_import\"} -> import",
+      "evidenceProducer {\"source\":\"import\"} -> import",
+      "evidenceProducer {\"source\":\"watch\"} -> import",
+      "evidenceProducer {\"source\":\"attested_ingest\"} -> import",
+      "evidenceProducer {\"source\":\"chatgpt\"} -> import",
+      "evidenceProducer {\"source\":\"claude_console\"} -> import",
+      "evidenceProducer {\"source\":\"gemini_ui\"} -> import",
+      "evidenceProducer {\"source\":\"generic_json\"} -> import",
+      "evidenceProducer {\"source\":\"generic_text\"} -> import",
+      "evidenceProducer {\"source\":\"manual\"} -> manual",
+      "evidenceProducer {\"source\":\"operator\"} -> manual",
+      "evidenceProducer {\"source\":\"feedback.ingest\"} -> manual",
+      "evidenceProducer {\"source\":\"user\"} -> manual",
+      "evidenceProducer {\"source\":\"inferred\"} -> manual",
+      "evidenceProducer {\"source\":\"carried\"} -> manual",
+      "evidenceProducer {\"source\":\"numeric_self_answer\"} -> manual",
+      "evidenceProducer {\"source\":\"default\"} -> manual",
+      "evidenceProducer {\"source\":\"webhook\"} -> external-report",
+      "evidenceProducer {\"source\":\"stdin_pipe\"} -> amc-runtime",
+      "evidenceProducer {\"source\":\"constructor\"} -> amc-runtime",
+      "evidenceProducer {} -> amc-runtime",
+      "evidenceProducer unparseable meta is runtime with no claims (it binds to nothing)",
+      "source-literal enumeration every source literal in src is classified",
+      "isBoundToControl binds through meta.controlIds naming the mapping",
+      "isBoundToControl binds an audit event through the requirement's auditTypes only",
+      "subjectRole meta {\"agentId\":\"a\"} in session-1 with scope agent -> positive",
+      "subjectRole meta {\"agentId\":\"b\"} in session-1 with scope agent -> none",
+      "subjectRole meta {} in session-1 with scope agent -> none",
+      "subjectRole meta {} in session-1 with scope workspace -> none",
+      "subjectRole meta {} in system with scope agent -> violation-only",
+      "subjectRole meta {\"agentId\":\"a\"} in system with scope agent -> violation-only",
+      "subjectRole meta {} in system with scope workspace -> positive",
+      "subjectRole a missing agent id is never credited to default",
+      "verifiedAssuranceByPack counts sealed in-window reports, names unverifiable ones and skips insufficient evidence",
+      "verifiedAssuranceByPack a sealed report the runner marked INVALID (ledger integrity failed) is unverifiable, not evidence",
+      "verifiedAssuranceByPack only an evidence status of MEASURED counts: a missing or unknown status is not evidence",
+      "verifiedAssuranceByPack an agent without a reports folder has no verified packs"
+    ],
+    "tests/catalog/evidence/decisive.test.ts": [
+      "catalog evidence decisions on already-derived unit inputs returns all five dimensions for fresh bound observed evidence at its enforcement point",
+      "catalog evidence decisions on already-derived unit inputs withholds a pass from an empty stream",
+      "catalog evidence decisions on already-derived unit inputs requires every declared binding field",
+      "catalog evidence decisions on already-derived unit inputs refuses individually changed subject, control, version, policy and scope bindings",
+      "catalog evidence decisions on already-derived unit inputs refuses another tenant and treats its evidence as untrusted",
+      "catalog evidence decisions on already-derived unit inputs requires an available producer named by the contract",
+      "catalog evidence decisions on already-derived unit inputs requires verified provenance proving the claimed producer and a derived tier",
+      "catalog evidence decisions on already-derived unit inputs uses recorded time for freshness even when claimed time looks fresh",
+      "catalog evidence decisions on already-derived unit inputs admits the exact freshness boundary despite an old claimed time",
+      "catalog evidence decisions on already-derived unit inputs refuses recorded times outside either window boundary or with invalid syntax",
+      "catalog evidence decisions on already-derived unit inputs refuses prefixed ref and receipt identities previously used in another window",
+      "catalog evidence decisions on already-derived unit inputs admits a receipt identity once per evaluation",
+      "catalog evidence decisions on already-derived unit inputs refuses the loader's derived foreign-receipt decision",
+      "catalog evidence decisions on already-derived unit inputs invalidates evidence only for a listed trigger after its recorded time",
+      "catalog evidence decisions on already-derived unit inputs withholds passes for absent, unresolved and not-applicable plan decisions",
+      "catalog evidence decisions on already-derived unit inputs withholds a pass when admitted nonviolating observations contradict each other",
+      "catalog evidence decisions on already-derived unit inputs preserves trusted violation failure despite incomplete sampling",
+      "catalog evidence decisions on already-derived unit inputs lets an unadmitted violation block a pass without crediting its provenance",
+      "catalog evidence decisions on already-derived unit inputs rejects system-session positives but retains their violation-only agent rule",
+      "catalog evidence decisions on already-derived unit inputs consumes the derived SELF_REPORTED tier despite an ignored OBSERVED attribute label",
+      "catalog evidence decisions on already-derived unit inputs caps observed provenance at the producer's self-reported or synthetic maximum",
+      "catalog evidence decisions on already-derived unit inputs withholds a pass when the required observed sampling ratio is not met",
+      "catalog evidence decisions on already-derived unit inputs distinguishes advisory and observed behavior from enforcement at the binding point",
+      "catalog evidence decisions on already-derived unit inputs keeps input order and input objects unchanged while binding the result digest to admitted refs",
+      "catalog evidence decisions on already-derived unit inputs binds already-verified review decisions to the digest without promoting claim kind"
+    ]
+  },
+  "same88CaseIdentitiesAcrossNinePhases": true,
+  "failures": [
+    {
+      "phase": "p111-m1",
+      "operator": "tenant-comparison",
+      "failures": [
+        {
+          "file": "tests/catalog/evidence/decisive.test.ts",
+          "case": "catalog evidence decisions on already-derived unit inputs refuses another tenant and treats its evidence as untrusted",
+          "messages": [
+            "AssertionError: expected [] to deeply equal [ { id: 'unit-event-a', \u2026(1) } ]\n    at refusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/catalog/evidence/decisive.test.ts:67:80)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/catalog/evidence/decisive.test.ts:124:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ],
+          "firstAssertion": [
+            "67",
+            "80"
+          ]
+        }
+      ],
+      "maskedBoundary": "Only each first failing assertion is directly observed in this RED body. Later assertions/iterations are masked; restored GREEN separately verifies the complete bodies.",
+      "unitTierBoundary": null
+    },
+    {
+      "phase": "p111-m2",
+      "operator": "freshness",
+      "failures": [
+        {
+          "file": "tests/catalog/evidence/decisive.test.ts",
+          "case": "catalog evidence decisions on already-derived unit inputs uses recorded time for freshness even when claimed time looks fresh",
+          "messages": [
+            "AssertionError: expected [] to deeply equal [ { id: 'unit-event-a', \u2026(1) } ]\n    at refusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/catalog/evidence/decisive.test.ts:67:80)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/catalog/evidence/decisive.test.ts:147:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ],
+          "firstAssertion": [
+            "67",
+            "80"
+          ]
+        }
+      ],
+      "maskedBoundary": "Only each first failing assertion is directly observed in this RED body. Later assertions/iterations are masked; restored GREEN separately verifies the complete bodies.",
+      "unitTierBoundary": null
+    },
+    {
+      "phase": "p111-m3",
+      "operator": "operator-tier-consumption",
+      "failures": [
+        {
+          "file": "tests/catalog/evidence/decisive.test.ts",
+          "case": "catalog evidence decisions on already-derived unit inputs consumes the derived SELF_REPORTED tier despite an ignored OBSERVED attribute label",
+          "messages": [
+            "AssertionError: expected 'OBSERVED' to be 'SELF_REPORTED' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/catalog/evidence/decisive.test.ts:266:42\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ],
+          "firstAssertion": [
+            "266",
+            "42"
+          ]
+        }
+      ],
+      "maskedBoundary": "Only each first failing assertion is directly observed in this RED body. Later assertions/iterations are masked; restored GREEN separately verifies the complete bodies.",
+      "unitTierBoundary": "The tier control tests consumption of supplied derived provenance, not raw meta.trustTier loader derivation."
+    },
+    {
+      "phase": "p111-m4",
+      "operator": "replay",
+      "failures": [
+        {
+          "file": "tests/catalog/evidence/decisive.test.ts",
+          "case": "catalog evidence decisions on already-derived unit inputs refuses prefixed ref and receipt identities previously used in another window",
+          "messages": [
+            "AssertionError: expected [] to deeply equal [ { id: 'unit-event-a', \u2026(1) } ]\n    at refusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/catalog/evidence/decisive.test.ts:67:80)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/catalog/evidence/decisive.test.ts:168:7\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ],
+          "firstAssertion": [
+            "67",
+            "80"
+          ]
+        },
+        {
+          "file": "tests/catalog/evidence/decisive.test.ts",
+          "case": "catalog evidence decisions on already-derived unit inputs admits a receipt identity once per evaluation",
+          "messages": [
+            "AssertionError: expected [ 'unit-event-a', 'unit-event-b' ] to deeply equal [ 'unit-event-a' ]\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/catalog/evidence/decisive.test.ts:177:52\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ],
+          "firstAssertion": [
+            "177",
+            "52"
+          ]
+        },
+        {
+          "file": "tests/catalog/evidence/decisive.test.ts",
+          "case": "catalog evidence decisions on already-derived unit inputs refuses the loader's derived foreign-receipt decision",
+          "messages": [
+            "AssertionError: expected [] to deeply equal [ { id: 'unit-event-a', \u2026(1) } ]\n    at refusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/catalog/evidence/decisive.test.ts:67:80)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/catalog/evidence/decisive.test.ts:183:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ],
+          "firstAssertion": [
+            "67",
+            "80"
+          ]
+        }
+      ],
+      "maskedBoundary": "Only each first failing assertion is directly observed in this RED body. Later assertions/iterations are masked; restored GREEN separately verifies the complete bodies.",
+      "unitTierBoundary": null
+    }
+  ],
+  "allFourExactRestorations": true,
+  "allFourRestoredRuns88Of88": true,
+  "hookFailures": 0,
+  "unhandledErrors": [],
+  "lateDiagnostics": [],
+  "sourceCompiledPairsActuallyBound": 8,
+  "compiledMutation": false,
+  "nativeMutation": false,
+  "physicalCheckBoundary": "Target lstat/regular/single-link root check first recorded after M1 restore, then after M2/M3 and final. No retrospective pre-M1 physical capture or continuous isolation claim.",
+  "scopeBoundary": "Typed already-derived unit evidence only. Real provenance, signed-plan/report integration, raw operator metadata mutation, whole-issue checks and all held decisions remain open. The inherited source-literal census reads R/src."
+}

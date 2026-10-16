@@ -1,0 +1,91 @@
+{
+  "at": "2026-10-16T19:30:28.765164+00:00",
+  "paths": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "website/index.html",
+    "website/lite.html",
+    "website/i18n.js",
+    "docs/content/show-hn-draft.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "whitepaper/AMC_WHITEPAPER_v1.md",
+    "tests/catalog/evidence/decisive.test.ts"
+  ],
+  "closedGreenChecks": [
+    {
+      "phase": "p111-test-types",
+      "exit": 0,
+      "durationMs": 35323
+    },
+    {
+      "phase": "p111-source-types",
+      "exit": 0,
+      "durationMs": 25113
+    },
+    {
+      "phase": "p111-lint",
+      "exit": 0,
+      "durationMs": 2821
+    },
+    {
+      "phase": "p111-build",
+      "exit": 0,
+      "durationMs": 29149
+    },
+    {
+      "phase": "p111-counts-after",
+      "exit": 0,
+      "durationMs": 499
+    },
+    {
+      "phase": "p111-gates",
+      "exit": 0,
+      "durationMs": 428
+    },
+    {
+      "phase": "p111-threat-model",
+      "exit": 0,
+      "durationMs": 297
+    },
+    {
+      "phase": "p111-architecture",
+      "exit": 0,
+      "durationMs": 1619
+    },
+    {
+      "phase": "p111-docs",
+      "exit": 0,
+      "durationMs": 381
+    },
+    {
+      "phase": "p111-freeze",
+      "exit": 0,
+      "durationMs": 1196
+    }
+  ],
+  "quality": {
+    "duplicates-before": {
+      "exit": 1,
+      "findings": 1268
+    },
+    "duplicates-after": {
+      "exit": 1,
+      "findings": 1268
+    },
+    "dead-code-before": {
+      "exit": 1,
+      "findings": 2724
+    },
+    "dead-code-after": {
+      "exit": 1,
+      "findings": 2724
+    }
+  },
+  "all88ProtectedPinsExact": true,
+  "allOtherAuthoredBytesExact": true,
+  "wholeIssueDone": false,
+  "qualityWaived": false,
+  "holdsRetained": true
+}

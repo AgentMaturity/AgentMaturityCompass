@@ -1,0 +1,1095 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 20187,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "failed",
+  "files": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/compliance/complianceFailClosed.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/compliance/coverageScorer.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/compliance/evidenceBinding.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/catalog/evidence/decisive.test.ts"
+  ],
+  "testCount": 88,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "14228632",
+      "name": "tests/compliance/complianceFailClosed.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/compliance/complianceFailClosed.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "14228632_0",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17)",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_0",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) empty ledger with signed maps: every category NOT_EVALUATED, evidence incomplete, score null",
+      "fullName": "compliance fails closed (P0-17) empty ledger with signed maps: every category NOT_EVALUATED, evidence incomplete, score null",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_1",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) runtime events for agent A and no denied audits: requires_no_audit has sufficient evidence, applicability unresolved",
+      "fullName": "compliance fails closed (P0-17) runtime events for agent A and no denied audits: requires_no_audit has sufficient evidence, applicability unresolved",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_2",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) imported review rows carrying agent A's id are not agent activity for requires_no_audit",
+      "fullName": "compliance fails closed (P0-17) imported review rows carrying agent A's id are not agent activity for requires_no_audit",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_3",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) synthetic rows leave the report's trust-tier coverage unchanged (P0-18)",
+      "fullName": "compliance fails closed (P0-17) synthetic rows leave the report's trust-tier coverage unchanged (P0-18)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_4",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) no activity for agent A: requires_no_audit is not evaluated, absence of violations proves nothing",
+      "fullName": "compliance fails closed (P0-17) no activity for agent A: requires_no_audit is not evaluated, absence of violations proves nothing",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_5",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) a bound event for agent B only leaves agent A's category NOT_EVALUATED",
+      "fullName": "compliance fails closed (P0-17) a bound event for agent B only leaves agent A's category NOT_EVALUATED",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_6",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) a bound positive event in session system: agent-scoped rejected, workspace-scoped admitted",
+      "fullName": "compliance fails closed (P0-17) a bound positive event in session system: agent-scoped rejected, workspace-scoped admitted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_7",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) a denied audit type in session system fails agent A's requires_no_audit",
+      "fullName": "compliance fails closed (P0-17) a denied audit type in session system fails agent A's requires_no_audit",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_8",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) an event bound to soc2_availability does not satisfy nist_map",
+      "fullName": "compliance fails closed (P0-17) an event bound to soc2_availability does not satisfy nist_map",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_9",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) a bound event from eval_import is NOT_EVALUATED with untrusted evidence",
+      "fullName": "compliance fails closed (P0-17) a bound event from eval_import is NOT_EVALUATED with untrusted evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_10",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) bound events below the observed ratio are NOT_EVALUATED with untrusted evidence",
+      "fullName": "compliance fails closed (P0-17) bound events below the observed ratio are NOT_EVALUATED with untrusted evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_11",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) a bound event without meta.agentId is not credited to default",
+      "fullName": "compliance fails closed (P0-17) a bound event without meta.agentId is not credited to default",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_12",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) an event outside the window is not counted",
+      "fullName": "compliance fails closed (P0-17) an event outside the window is not counted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_13",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) a tampered maps signature makes every category NOT_EVALUATED and untrusted, never PARTIAL",
+      "fullName": "compliance fails closed (P0-17) a tampered maps signature makes every category NOT_EVALUATED and untrusted, never PARTIAL",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_14",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) a hand-written assurance report JSON leaves requires_assurance_pack NOT_EVALUATED and untrusted",
+      "fullName": "compliance fails closed (P0-17) a hand-written assurance report JSON leaves requires_assurance_pack NOT_EVALUATED and untrusted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_15",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) a sealed run below minScore fails requires_assurance_pack",
+      "fullName": "compliance fails closed (P0-17) a sealed run below minScore fails requires_assurance_pack",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_16",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) a sealed passing run of a keyword-graded pack is NOT_EVALUATED and untrusted, never a pass (P0-19)",
+      "fullName": "compliance fails closed (P0-17) a sealed passing run of a keyword-graded pack is NOT_EVALUATED and untrusted, never a pass (P0-19)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_17",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) a sealed run whose pack scenarios were all inconclusive leaves requires_assurance_pack NOT_EVALUATED",
+      "fullName": "compliance fails closed (P0-17) a sealed run whose pack scenarios were all inconclusive leaves requires_assurance_pack NOT_EVALUATED",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_18",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) a passing pack score with inconclusive scenarios is NOT_EVALUATED, not a pass on a partial measurement",
+      "fullName": "compliance fails closed (P0-17) a passing pack score with inconclusive scenarios is NOT_EVALUATED, not a pass on a partial measurement",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_19",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) bound runtime OBSERVED events, a sealed passing run and no violations: sufficient and observed, but not a pass without applicability",
+      "fullName": "compliance fails closed (P0-17) bound runtime OBSERVED events, a sealed passing run and no violations: sufficient and observed, but not a pass without applicability",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "14228632_0_20",
+      "name": "tests/compliance/complianceFailClosed.test.ts compliance fails closed (P0-17) a failing requirement next to a sufficient one fails the category; PARTIAL is never emitted (P1-11)",
+      "fullName": "compliance fails closed (P0-17) a failing requirement next to a sufficient one fails the category; PARTIAL is never emitted (P1-11)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1103646309",
+      "name": "tests/compliance/coverageScorer.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/compliance/coverageScorer.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1103646309_0",
+      "name": "tests/compliance/coverageScorer.test.ts coverageScore (P0-17)",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1103646309_0_0",
+      "name": "tests/compliance/coverageScorer.test.ts coverageScore (P0-17) score is null when nothing was evaluated",
+      "fullName": "coverageScore (P0-17) score is null when nothing was evaluated",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1103646309_0_1",
+      "name": "tests/compliance/coverageScorer.test.ts coverageScore (P0-17) only a pass earns credit; NOT_EVALUATED, UNKNOWN and legacy PARTIAL earn 0 and stay in the denominator",
+      "fullName": "coverageScore (P0-17) only a pass earns credit; NOT_EVALUATED, UNKNOWN and legacy PARTIAL earn 0 and stay in the denominator",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "530969685",
+      "name": "tests/compliance/evidenceBinding.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/compliance/evidenceBinding.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "530969685_0",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_0",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"provenance\":\"dogfood\"} -> synthetic",
+      "fullName": "evidenceProducer {\"provenance\":\"dogfood\"} -> synthetic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_1",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"claimKind\":\"synthetic_example\",\"source\":\"bridge\"} -> synthetic",
+      "fullName": "evidenceProducer {\"claimKind\":\"synthetic_example\",\"source\":\"bridge\"} -> synthetic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_2",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"dogfood-maturity\"} -> synthetic",
+      "fullName": "evidenceProducer {\"source\":\"dogfood-maturity\"} -> synthetic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_3",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"eval_import\"} -> import",
+      "fullName": "evidenceProducer {\"source\":\"eval_import\"} -> import",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_4",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"import\"} -> import",
+      "fullName": "evidenceProducer {\"source\":\"import\"} -> import",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_5",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"watch\"} -> import",
+      "fullName": "evidenceProducer {\"source\":\"watch\"} -> import",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_6",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"attested_ingest\"} -> import",
+      "fullName": "evidenceProducer {\"source\":\"attested_ingest\"} -> import",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_7",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"chatgpt\"} -> import",
+      "fullName": "evidenceProducer {\"source\":\"chatgpt\"} -> import",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_8",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"claude_console\"} -> import",
+      "fullName": "evidenceProducer {\"source\":\"claude_console\"} -> import",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_9",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"gemini_ui\"} -> import",
+      "fullName": "evidenceProducer {\"source\":\"gemini_ui\"} -> import",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_10",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"generic_json\"} -> import",
+      "fullName": "evidenceProducer {\"source\":\"generic_json\"} -> import",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_11",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"generic_text\"} -> import",
+      "fullName": "evidenceProducer {\"source\":\"generic_text\"} -> import",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_12",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"manual\"} -> manual",
+      "fullName": "evidenceProducer {\"source\":\"manual\"} -> manual",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_13",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"operator\"} -> manual",
+      "fullName": "evidenceProducer {\"source\":\"operator\"} -> manual",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_14",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"feedback.ingest\"} -> manual",
+      "fullName": "evidenceProducer {\"source\":\"feedback.ingest\"} -> manual",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_15",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"user\"} -> manual",
+      "fullName": "evidenceProducer {\"source\":\"user\"} -> manual",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_16",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"inferred\"} -> manual",
+      "fullName": "evidenceProducer {\"source\":\"inferred\"} -> manual",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_17",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"carried\"} -> manual",
+      "fullName": "evidenceProducer {\"source\":\"carried\"} -> manual",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_18",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"numeric_self_answer\"} -> manual",
+      "fullName": "evidenceProducer {\"source\":\"numeric_self_answer\"} -> manual",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_19",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"default\"} -> manual",
+      "fullName": "evidenceProducer {\"source\":\"default\"} -> manual",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_20",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"webhook\"} -> external-report",
+      "fullName": "evidenceProducer {\"source\":\"webhook\"} -> external-report",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_21",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"stdin_pipe\"} -> amc-runtime",
+      "fullName": "evidenceProducer {\"source\":\"stdin_pipe\"} -> amc-runtime",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_22",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {\"source\":\"constructor\"} -> amc-runtime",
+      "fullName": "evidenceProducer {\"source\":\"constructor\"} -> amc-runtime",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_23",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer {} -> amc-runtime",
+      "fullName": "evidenceProducer {} -> amc-runtime",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_0_24",
+      "name": "tests/compliance/evidenceBinding.test.ts evidenceProducer unparseable meta is runtime with no claims (it binds to nothing)",
+      "fullName": "evidenceProducer unparseable meta is runtime with no claims (it binds to nothing)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "530969685_1",
+      "name": "tests/compliance/evidenceBinding.test.ts source-literal enumeration",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_1_0",
+      "name": "tests/compliance/evidenceBinding.test.ts source-literal enumeration every source literal in src is classified",
+      "fullName": "source-literal enumeration every source literal in src is classified",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "530969685_2",
+      "name": "tests/compliance/evidenceBinding.test.ts isBoundToControl",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_2_0",
+      "name": "tests/compliance/evidenceBinding.test.ts isBoundToControl binds through meta.controlIds naming the mapping",
+      "fullName": "isBoundToControl binds through meta.controlIds naming the mapping",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_2_1",
+      "name": "tests/compliance/evidenceBinding.test.ts isBoundToControl binds an audit event through the requirement's auditTypes only",
+      "fullName": "isBoundToControl binds an audit event through the requirement's auditTypes only",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "530969685_3",
+      "name": "tests/compliance/evidenceBinding.test.ts subjectRole",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_3_0",
+      "name": "tests/compliance/evidenceBinding.test.ts subjectRole meta {\"agentId\":\"a\"} in session-1 with scope agent -> positive",
+      "fullName": "subjectRole meta {\"agentId\":\"a\"} in session-1 with scope agent -> positive",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_3_1",
+      "name": "tests/compliance/evidenceBinding.test.ts subjectRole meta {\"agentId\":\"b\"} in session-1 with scope agent -> none",
+      "fullName": "subjectRole meta {\"agentId\":\"b\"} in session-1 with scope agent -> none",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_3_2",
+      "name": "tests/compliance/evidenceBinding.test.ts subjectRole meta {} in session-1 with scope agent -> none",
+      "fullName": "subjectRole meta {} in session-1 with scope agent -> none",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_3_3",
+      "name": "tests/compliance/evidenceBinding.test.ts subjectRole meta {} in session-1 with scope workspace -> none",
+      "fullName": "subjectRole meta {} in session-1 with scope workspace -> none",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_3_4",
+      "name": "tests/compliance/evidenceBinding.test.ts subjectRole meta {} in system with scope agent -> violation-only",
+      "fullName": "subjectRole meta {} in system with scope agent -> violation-only",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_3_5",
+      "name": "tests/compliance/evidenceBinding.test.ts subjectRole meta {\"agentId\":\"a\"} in system with scope agent -> violation-only",
+      "fullName": "subjectRole meta {\"agentId\":\"a\"} in system with scope agent -> violation-only",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_3_6",
+      "name": "tests/compliance/evidenceBinding.test.ts subjectRole meta {} in system with scope workspace -> positive",
+      "fullName": "subjectRole meta {} in system with scope workspace -> positive",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_3_7",
+      "name": "tests/compliance/evidenceBinding.test.ts subjectRole a missing agent id is never credited to default",
+      "fullName": "subjectRole a missing agent id is never credited to default",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "530969685_4",
+      "name": "tests/compliance/evidenceBinding.test.ts verifiedAssuranceByPack",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_4_0",
+      "name": "tests/compliance/evidenceBinding.test.ts verifiedAssuranceByPack counts sealed in-window reports, names unverifiable ones and skips insufficient evidence",
+      "fullName": "verifiedAssuranceByPack counts sealed in-window reports, names unverifiable ones and skips insufficient evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_4_1",
+      "name": "tests/compliance/evidenceBinding.test.ts verifiedAssuranceByPack a sealed report the runner marked INVALID (ledger integrity failed) is unverifiable, not evidence",
+      "fullName": "verifiedAssuranceByPack a sealed report the runner marked INVALID (ledger integrity failed) is unverifiable, not evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_4_2",
+      "name": "tests/compliance/evidenceBinding.test.ts verifiedAssuranceByPack only an evidence status of MEASURED counts: a missing or unknown status is not evidence",
+      "fullName": "verifiedAssuranceByPack only an evidence status of MEASURED counts: a missing or unknown status is not evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "530969685_4_3",
+      "name": "tests/compliance/evidenceBinding.test.ts verifiedAssuranceByPack an agent without a reports folder has no verified packs",
+      "fullName": "verifiedAssuranceByPack an agent without a reports folder has no verified packs",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "130790381",
+      "name": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/catalog/evidence/decisive.test.ts",
+      "state": "fail",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "130790381_0",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs",
+      "fullName": null,
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_0",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs returns all five dimensions for fresh bound observed evidence at its enforcement point",
+      "fullName": "catalog evidence decisions on already-derived unit inputs returns all five dimensions for fresh bound observed evidence at its enforcement point",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_1",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs withholds a pass from an empty stream",
+      "fullName": "catalog evidence decisions on already-derived unit inputs withholds a pass from an empty stream",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_2",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs requires every declared binding field",
+      "fullName": "catalog evidence decisions on already-derived unit inputs requires every declared binding field",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_3",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs refuses individually changed subject, control, version, policy and scope bindings",
+      "fullName": "catalog evidence decisions on already-derived unit inputs refuses individually changed subject, control, version, policy and scope bindings",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_4",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs refuses another tenant and treats its evidence as untrusted",
+      "fullName": "catalog evidence decisions on already-derived unit inputs refuses another tenant and treats its evidence as untrusted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_5",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs requires an available producer named by the contract",
+      "fullName": "catalog evidence decisions on already-derived unit inputs requires an available producer named by the contract",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_6",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs requires verified provenance proving the claimed producer and a derived tier",
+      "fullName": "catalog evidence decisions on already-derived unit inputs requires verified provenance proving the claimed producer and a derived tier",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_7",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs uses recorded time for freshness even when claimed time looks fresh",
+      "fullName": "catalog evidence decisions on already-derived unit inputs uses recorded time for freshness even when claimed time looks fresh",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_8",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs admits the exact freshness boundary despite an old claimed time",
+      "fullName": "catalog evidence decisions on already-derived unit inputs admits the exact freshness boundary despite an old claimed time",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_9",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs refuses recorded times outside either window boundary or with invalid syntax",
+      "fullName": "catalog evidence decisions on already-derived unit inputs refuses recorded times outside either window boundary or with invalid syntax",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_10",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs refuses prefixed ref and receipt identities previously used in another window",
+      "fullName": "catalog evidence decisions on already-derived unit inputs refuses prefixed ref and receipt identities previously used in another window",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_11",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs admits a receipt identity once per evaluation",
+      "fullName": "catalog evidence decisions on already-derived unit inputs admits a receipt identity once per evaluation",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_12",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs refuses the loader's derived foreign-receipt decision",
+      "fullName": "catalog evidence decisions on already-derived unit inputs refuses the loader's derived foreign-receipt decision",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_13",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs invalidates evidence only for a listed trigger after its recorded time",
+      "fullName": "catalog evidence decisions on already-derived unit inputs invalidates evidence only for a listed trigger after its recorded time",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_14",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs withholds passes for absent, unresolved and not-applicable plan decisions",
+      "fullName": "catalog evidence decisions on already-derived unit inputs withholds passes for absent, unresolved and not-applicable plan decisions",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_15",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs withholds a pass when admitted nonviolating observations contradict each other",
+      "fullName": "catalog evidence decisions on already-derived unit inputs withholds a pass when admitted nonviolating observations contradict each other",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_16",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs preserves trusted violation failure despite incomplete sampling",
+      "fullName": "catalog evidence decisions on already-derived unit inputs preserves trusted violation failure despite incomplete sampling",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_17",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs lets an unadmitted violation block a pass without crediting its provenance",
+      "fullName": "catalog evidence decisions on already-derived unit inputs lets an unadmitted violation block a pass without crediting its provenance",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_18",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs rejects system-session positives but retains their violation-only agent rule",
+      "fullName": "catalog evidence decisions on already-derived unit inputs rejects system-session positives but retains their violation-only agent rule",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_19",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs consumes the derived SELF_REPORTED tier despite an ignored OBSERVED attribute label",
+      "fullName": "catalog evidence decisions on already-derived unit inputs consumes the derived SELF_REPORTED tier despite an ignored OBSERVED attribute label",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'OBSERVED' to be 'SELF_REPORTED' // Object.is equality",
+          "actual": "OBSERVED",
+          "expected": "SELF_REPORTED",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"SELF_REPORTED\"\nReceived: \"OBSERVED\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'OBSERVED' to be 'SELF_REPORTED' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/catalog/evidence/decisive.test.ts:266:42\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/tests/catalog/evidence/decisive.test.ts",
+              "line": 266,
+              "column": 42
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_20",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs caps observed provenance at the producer's self-reported or synthetic maximum",
+      "fullName": "catalog evidence decisions on already-derived unit inputs caps observed provenance at the producer's self-reported or synthetic maximum",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_21",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs withholds a pass when the required observed sampling ratio is not met",
+      "fullName": "catalog evidence decisions on already-derived unit inputs withholds a pass when the required observed sampling ratio is not met",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_22",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs distinguishes advisory and observed behavior from enforcement at the binding point",
+      "fullName": "catalog evidence decisions on already-derived unit inputs distinguishes advisory and observed behavior from enforcement at the binding point",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_23",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs keeps input order and input objects unchanged while binding the result digest to admitted refs",
+      "fullName": "catalog evidence decisions on already-derived unit inputs keeps input order and input objects unchanged while binding the result digest to admitted refs",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "130790381_0_24",
+      "name": "tests/catalog/evidence/decisive.test.ts catalog evidence decisions on already-derived unit inputs binds already-verified review decisions to the digest without promoting claim kind",
+      "fullName": "catalog evidence decisions on already-derived unit inputs binds already-verified review decisions to the digest without promoting claim kind",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}
