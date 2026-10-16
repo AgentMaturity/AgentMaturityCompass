@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-07",
+  "date": "2026-10-16",
+  "commit": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+  "branch": "codex/p2-07-oidc-qualification",
+  "node": "22.23.3 (ABI127)",
+  "pnpm": "10.33.0",
+  "os": "macOS (darwin)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/identity/jwtVerify.test.ts",
+      "exit": 0,
+      "durationMs": 179
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-existing-identity-baseline.raw.json",
+      "exit": 0,
+      "durationMs": 8554
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths README.md CONTRIBUTING.md website/index.html website/lite.html website/i18n.js docs/content/show-hn-draft.md docs/content/reddit-launch-drafts.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md whitepaper/AMC_WHITEPAPER_v1.md",
+      "exit": 0,
+      "durationMs": 317
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node --max-old-space-size=8192 node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
+      "exit": 0,
+      "durationMs": 26630
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm run lint",
+      "exit": 0,
+      "durationMs": 2875
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm run build",
+      "exit": 0,
+      "durationMs": 31056
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/identity/jwtVerify.test.ts",
+      "exit": 0,
+      "durationMs": 186
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-v2-four-files.raw.json",
+      "exit": 1,
+      "durationMs": 10945
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths README.md CONTRIBUTING.md website/index.html website/lite.html website/i18n.js docs/content/show-hn-draft.md docs/content/reddit-launch-drafts.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md whitepaper/AMC_WHITEPAPER_v1.md",
+      "exit": 0,
+      "durationMs": 186
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 283
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 212
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+      "exit": 0,
+      "durationMs": 1284
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+      "exit": 0,
+      "durationMs": 176
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+      "exit": 0,
+      "durationMs": 1544
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-v3-four-files.raw.json",
+      "exit": 0,
+      "durationMs": 11048
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 38104
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm run lint",
+      "exit": 0,
+      "durationMs": 2940
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
+      "exit": 1,
+      "durationMs": 441
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p2-07-oidc-qualification-20261016/deadcode-delta.mjs",
+      "exit": 1,
+      "durationMs": 2893
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 47169
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-fresh-canonical.raw.json",
+      "exit": 0,
+      "durationMs": 11968
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-mutant-signature.raw.json",
+      "exit": 1,
+      "durationMs": 10875
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-restored-signature.raw.json",
+      "exit": 0,
+      "durationMs": 11019
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-mutant-exp.raw.json",
+      "exit": 1,
+      "durationMs": 11194
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-restored-exp.raw.json",
+      "exit": 0,
+      "durationMs": 11088
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths qualification/2026-10-16-P2-07",
+      "exit": 0,
+      "durationMs": 254
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node -p 'JSON.stringify({node:process.version,abi:process.versions.modules,platform:process.platform,arch:process.arch})'",
+      "exit": 0,
+      "durationMs": 138
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --version",
+      "exit": 0,
+      "durationMs": 191
+    }
+  ],
+  "tests": {
+    "total": 150,
+    "passed": 150,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "M1.observer.json",
+      "sha256": "3e604d956b707abfe05dab0a7d9914ba379a9ce59983c1bdfcead932f0ce398e"
+    },
+    {
+      "path": "M1.raw.json",
+      "sha256": "03ba4733015c86091e08fa8441b6b212697cd4c83ef8d2e85ee3ae09a5054830"
+    },
+    {
+      "path": "M2.observer.json",
+      "sha256": "ec9606a2895a660c2b83d72121e4d43702325895ed2f4cac00f6deaf01649c18"
+    },
+    {
+      "path": "M2.raw.json",
+      "sha256": "3f0727853176ea92e0ef1dcd8e1c0808c856ba0123252df338d1ff3e9c66b15c"
+    },
+    {
+      "path": "README.md",
+      "sha256": "8cafe43cc5f8d8195b82b0c0332b424baeaaba62b98660fa13fd0ea7c470769f"
+    },
+    {
+      "path": "canonical.observer.json",
+      "sha256": "58a8e23441f2816ab504c84900b06e4de4d5ffff0d29299ed7bc0f48f397793f"
+    },
+    {
+      "path": "canonical.raw.json",
+      "sha256": "0b2364ebfc1a5675835a93ad4c5b64256eeb7c6eab8d993cd2315812be948e80"
+    },
+    {
+      "path": "commands.json",
+      "sha256": "b3a0f78dc5400a9e04b10e349c77b201de96f2ab2bfff61d56e264bd27ea0bcb"
+    },
+    {
+      "path": "evidence.json",
+      "sha256": "c3ecf4a45909795d3798579c843d98b5801997bb6c6615d0b5bf05b71d4b1f5a"
+    },
+    {
+      "path": "independent-review.json",
+      "sha256": "5620415488a854a79541d22541bedfebb3caa53c509dd53f2e6ebe09b868eb0c"
+    },
+    {
+      "path": "ownership.json",
+      "sha256": "1c8af3ac0881d6e17ef72c8c80eccc340f9d1dad8687cf9b353547a70787c334"
+    },
+    {
+      "path": "private-references.json",
+      "sha256": "7c2c7073654bee6203d4fac96bb1c2a7885c8fa6ec7c1b431a01ef5617c721f0"
+    },
+    {
+      "path": "public-fresh-algorithm-ES256.json",
+      "sha256": "394f0ac5e24af11ec4d104f7b3714b93cf9d0d985da04903ccc4a8d5648b974b"
+    },
+    {
+      "path": "public-fresh-algorithm-PS256.json",
+      "sha256": "a2c0abb5350064245e9b91bc31cda60569817e2d80843e58a80282aeaf974fed"
+    },
+    {
+      "path": "public-fresh-algorithm-RS256.json",
+      "sha256": "ce24ae42eb05038c3e473728509cfcc9f095c3501c890174b21da9582e6bd067"
+    },
+    {
+      "path": "public-fresh-failed-refresh.json",
+      "sha256": "fdfab89806e2761f717d88bab747381cbf4c9c7ee6f9b3bedc20d84c3cf188af"
+    },
+    {
+      "path": "public-fresh-real-ten-second-timeout.json",
+      "sha256": "7892d7f5dc20dc8d8aa300cbca32351a3a8a21eed88fc636ab429262271147c0"
+    },
+    {
+      "path": "public-fresh-rotation-real-clock.json",
+      "sha256": "6f39aa3ac7555c98b5b72646afd799926fd721b4ab20a18512c28ac6caf1cbd3"
+    },
+    {
+      "path": "quality-and-freeze.json",
+      "sha256": "44632f9dd1f465c5970d1258437d51b19c162869559f35f0322e8f6b3279a1c2"
+    },
+    {
+      "path": "red-v2.observer.json",
+      "sha256": "149a1b6bb9acdb19a1067fd58dda344fee8bfaabfa949e8be7b2590bc026ba8f"
+    },
+    {
+      "path": "red-v2.raw.json",
+      "sha256": "313873d10a2d5adbe972be76c7bdb8550a739373a626d428d91ac8219c009f80"
+    },
+    {
+      "path": "sensitivity.json",
+      "sha256": "efc584a254d545105136a127fcab01011ec76455a7f4d9d894e11e73ec7b890d"
+    },
+    {
+      "path": "source-inputs.json",
+      "sha256": "ee570d78e220e798fcf857af1484dacf2c8ac5e7a3fa37ad3a3f481d8abc3f5a"
+    },
+    {
+      "path": "test-corrections.json",
+      "sha256": "dd6d159df4add0464ef5c06f3d34974415514bd35f78efa4c93b7cb3c7acb7b3"
+    }
+  ],
+  "notes": "The fresh canonical run passed 150/150 cases, comprising 128 new verifier cases and 22 existing cases. Related runs overlap and are not summed. The unexecuted v1 blocker and real v2 cleanup failure (149/150) are preserved. Source-only M1 and M2 intentionally failed 2 and 1 body assertions; both exact restorations passed 150/150. Duplicates and dead code remain failed at 1,268 and 2,729 findings with no waiver or baseline adoption. No full P2-07, external IdP, independent JWT replay, compiled-mutant, full-suite or release acceptance is claimed. Actual held decisions and Claude ownership are preserved; F37 remains skipped."
+}
