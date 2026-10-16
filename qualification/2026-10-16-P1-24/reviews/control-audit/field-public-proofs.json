@@ -1,0 +1,1545 @@
+{
+  "schema": "p124-five-phase-field-public-proofs/1",
+  "baselineBinding": {
+    "path": "/private/tmp/p1-24-qualification-20261016/fresh-source-binding.json",
+    "bytes": 16233,
+    "sha256": "55c4855511c5f64907090ca2bf2994c2d17f2ada66e6d3d7615306c1acf3c729"
+  },
+  "commonSelectedBuildNodeNativePins": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/dist/workspace.js",
+      "bytes": 28184,
+      "sha256": "5b50d81f0ba2619bc7a6b5651f0e6179d542d7febbbfa513a30e218ea2215c06"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/dist/gateway/config.js",
+      "bytes": 18972,
+      "sha256": "547764852b6b03015647bfefaf42f7bfef04ea4943cd76f373ba92396e6a1f77"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/dist/gateway/requestFieldGuard.js",
+      "bytes": 8227,
+      "sha256": "f4b9dba0e146a2a6569fa2a32324fdfbfa5f67645f61dc9fddda25e59bda08ee"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/dist/gateway/server.js",
+      "bytes": 71716,
+      "sha256": "90eb2eba4fe32e83657d7667f15323ca244d1d36514478d8463409c06d026457"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/dist/enforce/egressAllowlist.js",
+      "bytes": 7433,
+      "sha256": "651ae93ead241db5080bb223666c05c86bae5634393d98d0375f32216c5b0fa3"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/dist/leases/leaseCli.js",
+      "bytes": 4322,
+      "sha256": "4397c309ffe7cb608ddf4a15422277fdbae5c4867a968c85e42aa24e3c661bfc"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/dist/leases/leaseSigner.js",
+      "bytes": 1462,
+      "sha256": "a45e067d2d1b9869bb89ddec9f9b5bab595902f51f482546e119aa555d25f77f"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/dist/leases/leaseVerifier.js",
+      "bytes": 3865,
+      "sha256": "cd608aa3472f2d1bdef671e773bc3ac781902013b6e8430100a54a0e36e4ea1f"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/dist/ledger/ledger.js",
+      "bytes": 40649,
+      "sha256": "b555d1a81c0033f2af9a5004e209eae0f11ceb46f665b9f52b17cf9978796da2"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/dist/ledger/ledgerVerification.js",
+      "bytes": 31436,
+      "sha256": "3590018e331851153403757b6e2a7e9ff3f4f44814b212939e9dff85f109074b"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/dist/storage/sqlitePool.js",
+      "bytes": 5308,
+      "sha256": "b30b74682cc61bd1d03d08cced571cfc7ee2fcd0f43105965346d4fff80be55e"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/dist/crypto/keys.js",
+      "bytes": 8403,
+      "sha256": "33c4b7aef14b5794cd59f7300c6672e499ae308e6f0ef2c9ab32e89acbe8b4ee"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/dist/vault/vault.js",
+      "bytes": 27868,
+      "sha256": "f1152e1ace9f772e01a9c3720c66f39fef60ba30f4e3269bba35dc4b2d0e6545"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "bytes": 67024,
+      "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    }
+  ],
+  "nativePreservation": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "dev": 16777231,
+    "inode": 542078588,
+    "nlink": 1,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+  },
+  "phases": [
+    {
+      "phase": "p124-fresh-canonical",
+      "fixtureRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF",
+      "sourceRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout",
+      "children": [
+        {
+          "stage": "init",
+          "pid": 33930,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/init-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/init-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/init-result.json",
+            "bytes": 541,
+            "sha256": "063ca064f06802fb1eb4d55e121808c463a5bf6bf785f6939debb384a4f87ff5"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/init-child.json",
+            "bytes": 673,
+            "sha256": "a141f2e57df2b2ddb108d3e91180bab87467fd3e9b109c354d306535caaa2098"
+          }
+        },
+        {
+          "stage": "http",
+          "pid": 33964,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/http-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/http-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/http-result.json",
+            "bytes": 4006,
+            "sha256": "aed1583af71274d34a995ebd3a4b8ccc06a64d6f5dde29f4a9b74fd401775c80"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/http-child.json",
+            "bytes": 673,
+            "sha256": "d9ac9661b773fc20bf06bcc07d8830a5fe04915aa8f1a6980759dffd0a903688"
+          }
+        },
+        {
+          "stage": "read",
+          "pid": 33965,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/read-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/read-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/read-result.json",
+            "bytes": 19318,
+            "sha256": "a1761515ea39952dfa8c2c64f450911a91f498c8f8866ec69003fc986d17101e"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/read-child.json",
+            "bytes": 673,
+            "sha256": "6050a3ca63eb0edb78ac47a57c96653804c5e86904acff911433c715dcc55aee"
+          }
+        }
+      ],
+      "capturesChecked": 6,
+      "anchors": {
+        "monitor": {
+          "sha256": "db868eef1b04481c1746f0dd509ebf0b585a909fd9f3feda1b2d2a73f118b09f"
+        },
+        "auditor": {
+          "sha256": "726b51d4a6fff810b7611b2e45af57f8a6d8f5d65430099d31485b61b6976739"
+        },
+        "lease": {
+          "sha256": "25e095ad6af4f2a3da2e0eb43fd28a4049aed411b3f396d1d87eb49e0ee3c2c0"
+        }
+      },
+      "forwards": 2,
+      "refusals": 3,
+      "upstreamCapturedBodiesBeforeAfterRefusals": [
+        2,
+        2
+      ],
+      "auditFacts": [
+        {
+          "id": "25b24473-f9be-4a1f-b6b3-fe2b61feb273",
+          "eventHash": "35093c1c563a1cab59487711ea9a73602f3634350d203fda54857f324231b1f5",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/guarded",
+          "reason": "refused-field",
+          "fields": [
+            "dsh_session_log"
+          ],
+          "requestBytes": 67
+        },
+        {
+          "id": "92965257-c879-44e9-b121-f8c94e72088e",
+          "eventHash": "e0522ca112785224760cc8565c86d894fd8fc25cc5efc53318f9de5549dacf97",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/alias",
+          "reason": "refused-field",
+          "fields": [
+            "dsh_session_log"
+          ],
+          "requestBytes": 73
+        },
+        {
+          "id": "ec196e11-1f14-43d9-a6fe-42ff63f92ee0",
+          "eventHash": "088fa46861a7a17d4a6b9277898430a1f525c2e4ef137773facd4014681017f9",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/guarded",
+          "reason": "content-encoding",
+          "fields": [],
+          "requestBytes": 2
+        }
+      ],
+      "eventTypes": {
+        "gateway": 2,
+        "llm_request": 2,
+        "llm_response": 2,
+        "audit": 3
+      },
+      "independentSignatureChecks": [
+        {
+          "kind": "gateway-config",
+          "id": "owned",
+          "digest": "46edc19ed6dbca7267867d1cbac37167b5bb452004bda40cee256541407eb397",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "25b24473-f9be-4a1f-b6b3-fe2b61feb273",
+          "digest": "35093c1c563a1cab59487711ea9a73602f3634350d203fda54857f324231b1f5",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "92965257-c879-44e9-b121-f8c94e72088e",
+          "digest": "e0522ca112785224760cc8565c86d894fd8fc25cc5efc53318f9de5549dacf97",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "ec196e11-1f14-43d9-a6fe-42ff63f92ee0",
+          "digest": "088fa46861a7a17d4a6b9277898430a1f525c2e4ef137773facd4014681017f9",
+          "valid": true
+        },
+        {
+          "kind": "gateway-seal",
+          "id": "14e8bd7f-d35c-40e2-8317-857a946aae31",
+          "digest": "59d3cf4cc28a632f046a0b21d76c0b14f414273e15bf04d5072ca56b0859445d",
+          "valid": true
+        }
+      ],
+      "coldProductVerifierOk": true,
+      "coldVerifierMonitorAnchor": {
+        "anchored": true,
+        "monitorFingerprint": "db868eef1b04481c1746f0dd509ebf0b585a909fd9f3feda1b2d2a73f118b09f",
+        "expectedFingerprint": "db868eef1b04481c1746f0dd509ebf0b585a909fd9f3feda1b2d2a73f118b09f"
+      },
+      "successSecretRootsAbsent": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/workspaces/p124-owned",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/home",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/tmp",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/operator",
+          "absent": true
+        }
+      ],
+      "actualDriverMatchesTestLiteral": true,
+      "publicInputPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/public-observation.json",
+          "bytes": 30289,
+          "sha256": "9ed5597c0c299f06df90fb5f79902ade87b3f6d74a1911b1c69e493f8d8b2881"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/pre-request-public-anchors.json",
+          "bytes": 724,
+          "sha256": "511e1b93ae1ca631bc3a97f46024c0755a7a2f50dac4fed86608f1fb485b1d24"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/selected-inputs.json",
+          "bytes": 3591,
+          "sha256": "406de18b1efd4dba959efeda5aac26bc110cd9aa6c6381f22f06c80560352c26"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/driver.mjs",
+          "bytes": 6812,
+          "sha256": "5b01b4dbb9c788f7b1786e45ea2d1c99b394e56611a89f575b05f497a5c823e8"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/init-result.json",
+          "bytes": 541,
+          "sha256": "063ca064f06802fb1eb4d55e121808c463a5bf6bf785f6939debb384a4f87ff5"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/http-result.json",
+          "bytes": 4006,
+          "sha256": "aed1583af71274d34a995ebd3a4b8ccc06a64d6f5dde29f4a9b74fd401775c80"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-sq7RKF/read-result.json",
+          "bytes": 19318,
+          "sha256": "a1761515ea39952dfa8c2c64f450911a91f498c8f8866ec69003fc986d17101e"
+        }
+      ]
+    },
+    {
+      "phase": "p124-mutant-format-message",
+      "fixtureRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF",
+      "sourceRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout",
+      "children": [
+        {
+          "stage": "init",
+          "pid": 34108,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/init-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/init-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/init-result.json",
+            "bytes": 541,
+            "sha256": "da9d926d9230d1ec582646f08e9b1320e4be1a693127ed5efa58a7ac0c527749"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/init-child.json",
+            "bytes": 673,
+            "sha256": "2ebce48469be9e4561893da2ad8182577148627648c6b36cd3845e3b7b9ef1a0"
+          }
+        },
+        {
+          "stage": "http",
+          "pid": 34109,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/http-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/http-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/http-result.json",
+            "bytes": 4006,
+            "sha256": "dacdd246621c5c798c942cf314091f0fb869fe54f946ecfa21d0d40b8a235018"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/http-child.json",
+            "bytes": 673,
+            "sha256": "947dbeea30cc7057d688edf5accbd325377e4673f25a122a444eba5cdce60883"
+          }
+        },
+        {
+          "stage": "read",
+          "pid": 34111,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/read-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/read-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/read-result.json",
+            "bytes": 19318,
+            "sha256": "f9d8900c3fb0dabaca920b747d18db324d34e9ae031e7d4865bd1f83f15daa77"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/read-child.json",
+            "bytes": 673,
+            "sha256": "e2900c1caf71df5923e10c0e25b2fd7cc97fcb62b566c280c794670a956b5788"
+          }
+        }
+      ],
+      "capturesChecked": 6,
+      "anchors": {
+        "monitor": {
+          "sha256": "1fe085a1c699d06985c57129c91d5e2838d42c591590d7abcbc3cd0aa846ae4b"
+        },
+        "auditor": {
+          "sha256": "060a4857582c8878618e701c4a41520487ebdff86b90da1bd99dc6093a01d615"
+        },
+        "lease": {
+          "sha256": "81f5c3a8d513bcc43607c3899371a6022ae4fd6296cfaeb3ae48b20995878dfe"
+        }
+      },
+      "forwards": 2,
+      "refusals": 3,
+      "upstreamCapturedBodiesBeforeAfterRefusals": [
+        2,
+        2
+      ],
+      "auditFacts": [
+        {
+          "id": "729a202d-edaa-40c5-8ff1-d01fd7e49fbc",
+          "eventHash": "37647398269f927a3b62bf12d47a9c1bb39277975860674b8c34d7a27d021072",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/guarded",
+          "reason": "refused-field",
+          "fields": [
+            "dsh_session_log"
+          ],
+          "requestBytes": 67
+        },
+        {
+          "id": "7d119eb9-5189-47ba-8644-ab9d78baa3e3",
+          "eventHash": "a34560b234e6db774bc52397a50d0da54791116c5e12aa8140fda887c090575c",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/alias",
+          "reason": "refused-field",
+          "fields": [
+            "dsh_session_log"
+          ],
+          "requestBytes": 73
+        },
+        {
+          "id": "27458dfe-ce44-49f3-ba9f-324b5df976d3",
+          "eventHash": "e0edd10d80e1f827765b5f57f4f4e2d51c950cdcc1235791c48fcae1588dc71d",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/guarded",
+          "reason": "content-encoding",
+          "fields": [],
+          "requestBytes": 2
+        }
+      ],
+      "eventTypes": {
+        "gateway": 2,
+        "llm_request": 2,
+        "llm_response": 2,
+        "audit": 3
+      },
+      "independentSignatureChecks": [
+        {
+          "kind": "gateway-config",
+          "id": "owned",
+          "digest": "c4ef52feb6d7121ee2495b50fcdf084877af92c1966112c484bbae742eeb957d",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "729a202d-edaa-40c5-8ff1-d01fd7e49fbc",
+          "digest": "37647398269f927a3b62bf12d47a9c1bb39277975860674b8c34d7a27d021072",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "7d119eb9-5189-47ba-8644-ab9d78baa3e3",
+          "digest": "a34560b234e6db774bc52397a50d0da54791116c5e12aa8140fda887c090575c",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "27458dfe-ce44-49f3-ba9f-324b5df976d3",
+          "digest": "e0edd10d80e1f827765b5f57f4f4e2d51c950cdcc1235791c48fcae1588dc71d",
+          "valid": true
+        },
+        {
+          "kind": "gateway-seal",
+          "id": "8129322d-001f-4e18-a1f1-e00b28d64f37",
+          "digest": "9a22c02cb38a49ad3c1e774aa62c82eae7146fc8e8bd1ef2ba611090618d04e5",
+          "valid": true
+        }
+      ],
+      "coldProductVerifierOk": true,
+      "coldVerifierMonitorAnchor": {
+        "anchored": true,
+        "monitorFingerprint": "1fe085a1c699d06985c57129c91d5e2838d42c591590d7abcbc3cd0aa846ae4b",
+        "expectedFingerprint": "1fe085a1c699d06985c57129c91d5e2838d42c591590d7abcbc3cd0aa846ae4b"
+      },
+      "successSecretRootsAbsent": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/workspaces/p124-owned",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/home",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/tmp",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/operator",
+          "absent": true
+        }
+      ],
+      "actualDriverMatchesTestLiteral": true,
+      "publicInputPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/public-observation.json",
+          "bytes": 30289,
+          "sha256": "c85393f76a4af4bb8aa5fda68f1601826fc20c1b41cd8f8ff47df9965d6158a8"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/pre-request-public-anchors.json",
+          "bytes": 724,
+          "sha256": "d5a9b1eb3c16836281067bb35fe3b1856b45e0bdc01bae9a3e3911515b903e1b"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/selected-inputs.json",
+          "bytes": 3591,
+          "sha256": "406de18b1efd4dba959efeda5aac26bc110cd9aa6c6381f22f06c80560352c26"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/driver.mjs",
+          "bytes": 6812,
+          "sha256": "5b01b4dbb9c788f7b1786e45ea2d1c99b394e56611a89f575b05f497a5c823e8"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/init-result.json",
+          "bytes": 541,
+          "sha256": "da9d926d9230d1ec582646f08e9b1320e4be1a693127ed5efa58a7ac0c527749"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/http-result.json",
+          "bytes": 4006,
+          "sha256": "dacdd246621c5c798c942cf314091f0fb869fe54f946ecfa21d0d40b8a235018"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eHbgtF/read-result.json",
+          "bytes": 19318,
+          "sha256": "f9d8900c3fb0dabaca920b747d18db324d34e9ae031e7d4865bd1f83f15daa77"
+        }
+      ]
+    },
+    {
+      "phase": "p124-restored-format-message",
+      "fixtureRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd",
+      "sourceRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout",
+      "children": [
+        {
+          "stage": "init",
+          "pid": 34160,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/init-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/init-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/init-result.json",
+            "bytes": 541,
+            "sha256": "e35094326350ac55784e7496b9bf167366e8296b81be38da31037f65872e5d64"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/init-child.json",
+            "bytes": 673,
+            "sha256": "bd2167ad25ae15d8d7007ed94ab195003bd0af07e87345c320eaeee1df53fa04"
+          }
+        },
+        {
+          "stage": "http",
+          "pid": 34162,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/http-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/http-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/http-result.json",
+            "bytes": 4006,
+            "sha256": "41ce276989256945f82c6d1c97c8576749ea714f3eeae8f5750886a181958d8a"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/http-child.json",
+            "bytes": 673,
+            "sha256": "822d5408bea39411f2172ea78b50a22e71b3bf083d8f75171d54a14f557728e6"
+          }
+        },
+        {
+          "stage": "read",
+          "pid": 34163,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/read-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/read-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/read-result.json",
+            "bytes": 19318,
+            "sha256": "719a6ca377e84673b0c1db41bf306726d88d5b7134f11a008bb55b05fe930357"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/read-child.json",
+            "bytes": 673,
+            "sha256": "0828017640ded8b1ee83e7f771a8681d1c8e15d642a9a0550644c92e72170d8e"
+          }
+        }
+      ],
+      "capturesChecked": 6,
+      "anchors": {
+        "monitor": {
+          "sha256": "5ed1e21bb082d2a6b27c8ea5ace1dd539f3f02da4139090251deba95a030bd9a"
+        },
+        "auditor": {
+          "sha256": "217a1726c90448a8f02d2eacee99b0c67efbfce9059c84991c8994e2e8e9f1ba"
+        },
+        "lease": {
+          "sha256": "ef15b18c3a523bc243505220549554172928f35788f448ac6e951ff7d2ce2321"
+        }
+      },
+      "forwards": 2,
+      "refusals": 3,
+      "upstreamCapturedBodiesBeforeAfterRefusals": [
+        2,
+        2
+      ],
+      "auditFacts": [
+        {
+          "id": "8568181c-aabe-4581-821f-77163a772e01",
+          "eventHash": "8326b18023984ebb5a2c1799ff382e58fc6632d53e14e033676c4b0bef1f592c",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/guarded",
+          "reason": "refused-field",
+          "fields": [
+            "dsh_session_log"
+          ],
+          "requestBytes": 67
+        },
+        {
+          "id": "5eb3a85b-841b-490d-ad91-af6f5edab61c",
+          "eventHash": "a86d4f4edf0fca9ffa938287d50fbfddaa9ff5be88c20238adb482875692303f",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/alias",
+          "reason": "refused-field",
+          "fields": [
+            "dsh_session_log"
+          ],
+          "requestBytes": 73
+        },
+        {
+          "id": "64be4f27-60f0-4986-a023-a4ccbb02ea25",
+          "eventHash": "342a445ad6de4f199112be11c650c8263699ad6a669edbff40a3963602609161",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/guarded",
+          "reason": "content-encoding",
+          "fields": [],
+          "requestBytes": 2
+        }
+      ],
+      "eventTypes": {
+        "gateway": 2,
+        "llm_request": 2,
+        "llm_response": 2,
+        "audit": 3
+      },
+      "independentSignatureChecks": [
+        {
+          "kind": "gateway-config",
+          "id": "owned",
+          "digest": "9e251e3574f9dd277e713e5e4822c6ef41f239acfc5722674fd1c1b50f6e2c64",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "8568181c-aabe-4581-821f-77163a772e01",
+          "digest": "8326b18023984ebb5a2c1799ff382e58fc6632d53e14e033676c4b0bef1f592c",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "5eb3a85b-841b-490d-ad91-af6f5edab61c",
+          "digest": "a86d4f4edf0fca9ffa938287d50fbfddaa9ff5be88c20238adb482875692303f",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "64be4f27-60f0-4986-a023-a4ccbb02ea25",
+          "digest": "342a445ad6de4f199112be11c650c8263699ad6a669edbff40a3963602609161",
+          "valid": true
+        },
+        {
+          "kind": "gateway-seal",
+          "id": "d18bdbb1-ff69-4536-a8e5-6ea96453fa36",
+          "digest": "f1e1e3409d7cb66f93d63ceae6fe47e57ee74d240a3b05caf247b5f56926d5d5",
+          "valid": true
+        }
+      ],
+      "coldProductVerifierOk": true,
+      "coldVerifierMonitorAnchor": {
+        "anchored": true,
+        "monitorFingerprint": "5ed1e21bb082d2a6b27c8ea5ace1dd539f3f02da4139090251deba95a030bd9a",
+        "expectedFingerprint": "5ed1e21bb082d2a6b27c8ea5ace1dd539f3f02da4139090251deba95a030bd9a"
+      },
+      "successSecretRootsAbsent": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/workspaces/p124-owned",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/home",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/tmp",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/operator",
+          "absent": true
+        }
+      ],
+      "actualDriverMatchesTestLiteral": true,
+      "publicInputPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/public-observation.json",
+          "bytes": 30289,
+          "sha256": "da5d131769eeded881e0d8cbaf91b282ee0e67cfa857e50f9297949e0fd269eb"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/pre-request-public-anchors.json",
+          "bytes": 724,
+          "sha256": "05f6903ee91c660007b9dd634eb1e23c96784b5fdb1c542c49fb9470f3aa83d4"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/selected-inputs.json",
+          "bytes": 3591,
+          "sha256": "406de18b1efd4dba959efeda5aac26bc110cd9aa6c6381f22f06c80560352c26"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/driver.mjs",
+          "bytes": 6812,
+          "sha256": "5b01b4dbb9c788f7b1786e45ea2d1c99b394e56611a89f575b05f497a5c823e8"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/init-result.json",
+          "bytes": 541,
+          "sha256": "e35094326350ac55784e7496b9bf167366e8296b81be38da31037f65872e5d64"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/http-result.json",
+          "bytes": 4006,
+          "sha256": "41ce276989256945f82c6d1c97c8576749ea714f3eeae8f5750886a181958d8a"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-eKVSJd/read-result.json",
+          "bytes": 19318,
+          "sha256": "719a6ca377e84673b0c1db41bf306726d88d5b7134f11a008bb55b05fe930357"
+        }
+      ]
+    },
+    {
+      "phase": "p124-mutant-original-sha",
+      "fixtureRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec",
+      "sourceRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout",
+      "children": [
+        {
+          "stage": "init",
+          "pid": 34229,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/init-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/init-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/init-result.json",
+            "bytes": 541,
+            "sha256": "92bff9a29ac36e3897207b643a0055bb339278d5dbc75d8f3c7e934f8f1ce310"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/init-child.json",
+            "bytes": 673,
+            "sha256": "53d6175017e89a2d006ac4f71218cacc2d5e9c410bfee53c1f2b56835ca0108e"
+          }
+        },
+        {
+          "stage": "http",
+          "pid": 34235,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/http-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/http-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/http-result.json",
+            "bytes": 4006,
+            "sha256": "635655b23df0ad540869d1ccde145c6ce62bdfe1874512a3e1086a8b055efd2b"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/http-child.json",
+            "bytes": 673,
+            "sha256": "06542e34e83fd27ab7bf64be8eb832c0ca177a444f60c335e5515d3971ece90b"
+          }
+        },
+        {
+          "stage": "read",
+          "pid": 34244,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/read-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/read-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/read-result.json",
+            "bytes": 19318,
+            "sha256": "a44325b7f3909d9cfe829b98e7206196713d3d884e8bddb58e937c067cca7cca"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/read-child.json",
+            "bytes": 673,
+            "sha256": "677250a260859b053e20e91c74ca209100264bac0b449f36eea058b3187707cf"
+          }
+        }
+      ],
+      "capturesChecked": 6,
+      "anchors": {
+        "monitor": {
+          "sha256": "771160da2650eaacec148507ad06ea5be624d72e8d814a849300c41cf66da023"
+        },
+        "auditor": {
+          "sha256": "4b73d2dfe7bd8c51c23ad1126dd3f5b539dd18bfbbaa9c1aa21056d3c0b5b005"
+        },
+        "lease": {
+          "sha256": "02fb051b7402a6135b658db369acbf8991f77f8938853cffdee87cfef786d5f2"
+        }
+      },
+      "forwards": 2,
+      "refusals": 3,
+      "upstreamCapturedBodiesBeforeAfterRefusals": [
+        2,
+        2
+      ],
+      "auditFacts": [
+        {
+          "id": "e438351e-e454-4565-a482-3a48fac13ea2",
+          "eventHash": "4a89055998ab17f142c323978d140c72a108491a8bb538eb107deec9e8fb6edf",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/guarded",
+          "reason": "refused-field",
+          "fields": [
+            "dsh_session_log"
+          ],
+          "requestBytes": 67
+        },
+        {
+          "id": "a184a24c-ad20-4bb1-8816-29dcd3bf79c1",
+          "eventHash": "913dc2843ef155c427cc81f681934c5a450eabd178e2ca9255276ef0ac23f9d3",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/alias",
+          "reason": "refused-field",
+          "fields": [
+            "dsh_session_log"
+          ],
+          "requestBytes": 73
+        },
+        {
+          "id": "2d505ace-6eb8-427a-a41e-ff6a837046dd",
+          "eventHash": "dbc229484d16f9e01abb6a96d88c63fc2532162dd4b0cc40b91a3a5c17d70bbb",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/guarded",
+          "reason": "content-encoding",
+          "fields": [],
+          "requestBytes": 2
+        }
+      ],
+      "eventTypes": {
+        "gateway": 2,
+        "llm_request": 2,
+        "llm_response": 2,
+        "audit": 3
+      },
+      "independentSignatureChecks": [
+        {
+          "kind": "gateway-config",
+          "id": "owned",
+          "digest": "096bdf807a31c51d25621cae9297bd2c3abf4a3b407dc354375cc8bbb3654709",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "e438351e-e454-4565-a482-3a48fac13ea2",
+          "digest": "4a89055998ab17f142c323978d140c72a108491a8bb538eb107deec9e8fb6edf",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "a184a24c-ad20-4bb1-8816-29dcd3bf79c1",
+          "digest": "913dc2843ef155c427cc81f681934c5a450eabd178e2ca9255276ef0ac23f9d3",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "2d505ace-6eb8-427a-a41e-ff6a837046dd",
+          "digest": "dbc229484d16f9e01abb6a96d88c63fc2532162dd4b0cc40b91a3a5c17d70bbb",
+          "valid": true
+        },
+        {
+          "kind": "gateway-seal",
+          "id": "5764c931-3899-41f4-96ec-20f66b912841",
+          "digest": "80e9beffd4e9768e6cd76baaf8c778f9088fa1184c3f6b17c1aafa377a8711fc",
+          "valid": true
+        }
+      ],
+      "coldProductVerifierOk": true,
+      "coldVerifierMonitorAnchor": {
+        "anchored": true,
+        "monitorFingerprint": "771160da2650eaacec148507ad06ea5be624d72e8d814a849300c41cf66da023",
+        "expectedFingerprint": "771160da2650eaacec148507ad06ea5be624d72e8d814a849300c41cf66da023"
+      },
+      "successSecretRootsAbsent": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/workspaces/p124-owned",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/home",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/tmp",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/operator",
+          "absent": true
+        }
+      ],
+      "actualDriverMatchesTestLiteral": true,
+      "publicInputPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/public-observation.json",
+          "bytes": 30289,
+          "sha256": "9ac1add83f681f08fec6cfe5ed8032873ccf0021d121881fa8a8bab98967b50c"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/pre-request-public-anchors.json",
+          "bytes": 724,
+          "sha256": "4df390a5245022e62ac3f0272528122f550d9f889f0312dafb86b3a24a1a688c"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/selected-inputs.json",
+          "bytes": 3591,
+          "sha256": "406de18b1efd4dba959efeda5aac26bc110cd9aa6c6381f22f06c80560352c26"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/driver.mjs",
+          "bytes": 6812,
+          "sha256": "5b01b4dbb9c788f7b1786e45ea2d1c99b394e56611a89f575b05f497a5c823e8"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/init-result.json",
+          "bytes": 541,
+          "sha256": "92bff9a29ac36e3897207b643a0055bb339278d5dbc75d8f3c7e934f8f1ce310"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/http-result.json",
+          "bytes": 4006,
+          "sha256": "635655b23df0ad540869d1ccde145c6ce62bdfe1874512a3e1086a8b055efd2b"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-WF6Oec/read-result.json",
+          "bytes": 19318,
+          "sha256": "a44325b7f3909d9cfe829b98e7206196713d3d884e8bddb58e937c067cca7cca"
+        }
+      ]
+    },
+    {
+      "phase": "p124-restored-original-sha",
+      "fixtureRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8",
+      "sourceRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout",
+      "children": [
+        {
+          "stage": "init",
+          "pid": 34288,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/init-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/init-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/init-result.json",
+            "bytes": 541,
+            "sha256": "20fd36c9b029078c6b4d0f8e645bd8de19dc9a4fb57e0904176769ecaa308ca6"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/init-child.json",
+            "bytes": 673,
+            "sha256": "aa5a1985e1921e7595ba7f7ba4c2f3a8ed67efe5d5d7d1d542c9e8da49f1bb34"
+          }
+        },
+        {
+          "stage": "http",
+          "pid": 34289,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/http-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/http-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/http-result.json",
+            "bytes": 4006,
+            "sha256": "5efa50804fd964a525cf356ea74ae2b967b735bc3813e77962cd9d9820a4a5dc"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/http-child.json",
+            "bytes": 673,
+            "sha256": "26802ff17586992f7b6498ce39cdf85e956de371695072c427fd8f63367e73be"
+          }
+        },
+        {
+          "stage": "read",
+          "pid": 34290,
+          "code": 0,
+          "signal": null,
+          "errors": [],
+          "recordedPidAbsent": true,
+          "streams": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/read-stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/read-stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "resultPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/read-result.json",
+            "bytes": 19318,
+            "sha256": "df69dc395890a3d154598c3f10d636a0425b7b320bed16f8a2002ee574137839"
+          },
+          "childPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/read-child.json",
+            "bytes": 673,
+            "sha256": "d5a67b9bde3c67e8c7d9184ef0a9c54a1ab3ffc460b290a45b74bb7b2b95dbb2"
+          }
+        }
+      ],
+      "capturesChecked": 6,
+      "anchors": {
+        "monitor": {
+          "sha256": "4f5db538a7d9688179dfc8855076dfdccbd41ce66dff5984c1ad44859baab7ac"
+        },
+        "auditor": {
+          "sha256": "99e181e9e36658386aa5971c64791c4779a975f86b532dc8c57e26f91c40220a"
+        },
+        "lease": {
+          "sha256": "f864ff60f67a6dd0a5eeb0ffa0512f4dced88a4680540b1f957fe6f7b7fe9ef5"
+        }
+      },
+      "forwards": 2,
+      "refusals": 3,
+      "upstreamCapturedBodiesBeforeAfterRefusals": [
+        2,
+        2
+      ],
+      "auditFacts": [
+        {
+          "id": "6b6cddfc-3c6f-4a11-8818-6dad6ce70e4c",
+          "eventHash": "29de2a96a57e3a6221ae123be8b4f3975edaf5da0b6a49b33258496a1418eabf",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/guarded",
+          "reason": "refused-field",
+          "fields": [
+            "dsh_session_log"
+          ],
+          "requestBytes": 67
+        },
+        {
+          "id": "2c4bf2e6-9d24-4f13-9e96-94b91d312b93",
+          "eventHash": "f73424e21da691ef1bd9ea35112c4ed2888688a630db51c30a527e56f1a3f4d2",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/alias",
+          "reason": "refused-field",
+          "fields": [
+            "dsh_session_log"
+          ],
+          "requestBytes": 73
+        },
+        {
+          "id": "9ee0485f-1caf-458f-abfa-af9958103b6e",
+          "eventHash": "944fa20c15780102628bec2f7050739ecbefe9ff5433a1097015575a1f5c09e7",
+          "payloadKeys": [
+            "auditType",
+            "severity",
+            "request_id",
+            "route",
+            "upstreamId",
+            "agentId",
+            "reason",
+            "fields",
+            "requestBytes"
+          ],
+          "auditType": "REQUEST_FIELD_REFUSED",
+          "upstreamId": "owned",
+          "agentId": "p124-agent",
+          "route": "/guarded",
+          "reason": "content-encoding",
+          "fields": [],
+          "requestBytes": 2
+        }
+      ],
+      "eventTypes": {
+        "gateway": 2,
+        "llm_request": 2,
+        "llm_response": 2,
+        "audit": 3
+      },
+      "independentSignatureChecks": [
+        {
+          "kind": "gateway-config",
+          "id": "owned",
+          "digest": "e763c2953c79d07f41685275161db05dd1aa45291c2b787ea2b97c60da847a82",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "6b6cddfc-3c6f-4a11-8818-6dad6ce70e4c",
+          "digest": "29de2a96a57e3a6221ae123be8b4f3975edaf5da0b6a49b33258496a1418eabf",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "2c4bf2e6-9d24-4f13-9e96-94b91d312b93",
+          "digest": "f73424e21da691ef1bd9ea35112c4ed2888688a630db51c30a527e56f1a3f4d2",
+          "valid": true
+        },
+        {
+          "kind": "refusal-event",
+          "id": "9ee0485f-1caf-458f-abfa-af9958103b6e",
+          "digest": "944fa20c15780102628bec2f7050739ecbefe9ff5433a1097015575a1f5c09e7",
+          "valid": true
+        },
+        {
+          "kind": "gateway-seal",
+          "id": "98afd5b4-06bf-41f9-a34e-f84b1abd8e8d",
+          "digest": "ec2d4aa59cccbdee50ace9bae842f095b8b836aa68cb3de75d0fa360b4657aae",
+          "valid": true
+        }
+      ],
+      "coldProductVerifierOk": true,
+      "coldVerifierMonitorAnchor": {
+        "anchored": true,
+        "monitorFingerprint": "4f5db538a7d9688179dfc8855076dfdccbd41ce66dff5984c1ad44859baab7ac",
+        "expectedFingerprint": "4f5db538a7d9688179dfc8855076dfdccbd41ce66dff5984c1ad44859baab7ac"
+      },
+      "successSecretRootsAbsent": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/workspaces/p124-owned",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/home",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/tmp",
+          "absent": true
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/operator",
+          "absent": true
+        }
+      ],
+      "actualDriverMatchesTestLiteral": true,
+      "publicInputPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/public-observation.json",
+          "bytes": 30289,
+          "sha256": "9c3f8ea7d395f2602968b7dc48f65d084c062aedf624c5e830ce13ec070dd8d5"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/pre-request-public-anchors.json",
+          "bytes": 724,
+          "sha256": "796814027de32fb0c0cc774b56f79ff97d2b3a65874c442dcf8c3400fd876d1e"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/selected-inputs.json",
+          "bytes": 3591,
+          "sha256": "406de18b1efd4dba959efeda5aac26bc110cd9aa6c6381f22f06c80560352c26"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/driver.mjs",
+          "bytes": 6812,
+          "sha256": "5b01b4dbb9c788f7b1786e45ea2d1c99b394e56611a89f575b05f497a5c823e8"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/init-result.json",
+          "bytes": 541,
+          "sha256": "20fd36c9b029078c6b4d0f8e645bd8de19dc9a4fb57e0904176769ecaa308ca6"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/http-result.json",
+          "bytes": 4006,
+          "sha256": "5efa50804fd964a525cf356ea74ae2b967b735bc3813e77962cd9d9820a4a5dc"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p124-field-szWsb8/read-result.json",
+          "bytes": 19318,
+          "sha256": "df69dc395890a3d154598c3f10d636a0425b7b320bed16f8a2002ee574137839"
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "fieldFixtures": 5,
+    "naturallyClosedChildren": 15,
+    "fullEmptyCaptures": 30,
+    "independentSignatureChecks": 25,
+    "forwards": 10,
+    "refusals": 15
+  },
+  "limits": [
+    "Only Node builtin files/crypto were used. No AMC import, SQL, network or new signal probe. Recorded PID absence is not a new process probe.",
+    "Five independent digest signatures do not replace the canonical ledger/chain/payload/governance verifier. That cold verification remains actual product evidence.",
+    "Actual lease verification is recorded by the genuine child; no public token is retained for an independent offline token-signature check.",
+    "The parent Vitest runner and outer CWD are R; actual test and worker modules are Q/Q-dist. No independent runner/dependency isolation claim.",
+    "Successful workspace/vault roots are deleted; only public observations/captures remain, not retained independent SQLite proof.",
+    "Local fixture signatures and canary bodies do not prove operator truth, legal identity, deployment-wide no upload or all socket-attempt absence."
+  ]
+}
