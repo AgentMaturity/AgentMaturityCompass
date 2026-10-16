@@ -1,0 +1,272 @@
+
+ RUN  v4.1.11 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout
+
+stderr | tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > uses the exact threshold at 8000 measured prompt tokens
+[amc-p137-retained] {"workspace":"/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-bsYyRf","home":"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-home-Dk8zu3","surviving":{"workspace":true,"home":true},"cleanupErrors":[]}
+
+stderr | tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > prunes only old results at 8500, protects the recent two before counts and records the next measured effect
+[amc-p137-retained] {"workspace":"/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-vL1fqt","home":"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-home-kQsg4S","surviving":{"workspace":true,"home":true},"cleanupErrors":[]}
+
+ ✓ tests/surfaceCompaction.test.ts (6 tests) 1538ms
+     ✓ shrinks the projection  311ms
+stderr | tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > orders eligible large outputs by measured bytes then original order, leaving small and recent outputs intact
+[amc-p137-retained] {"workspace":"/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-a2cMgU","home":"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-home-Q37MIm","surviving":{"workspace":true,"home":true},"cleanupErrors":[]}
+
+stderr | tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > retains the actual encrypted spill object and measures the signed preview rather than full-output tokens
+[amc-p137-retained] {"workspace":"/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-orxzIp","home":"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-home-LdAydv","surviving":{"workspace":true,"home":true},"cleanupErrors":[]}
+
+stderr | tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > caps successful compaction boundaries at three in one turn and resets the count on the next turn
+[amc-p137-retained] {"workspace":"/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-9ol6wh","home":"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-home-aNOO2w","surviving":{"workspace":true,"home":true},"cleanupErrors":[]}
+
+ ✓ tests/surfaceHistoryCompaction.test.ts (14 tests) 3391ms
+     ✓ measures current authenticated bytes, preserves the origin and reconstructs both cutoffs  320ms
+stderr | tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > uses a real no-tools summary request at the next high boundary, preserves user authority and exports public signed evidence
+[amc-p137-retained] {"workspace":"/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-hDuC89","home":"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-home-0VAVn0","surviving":{"workspace":true,"home":true},"cleanupErrors":[]}
+
+ ❯ tests/autoCompaction.test.ts (31 tests | 7 failed) 3905ms
+     ✓ uses the exact threshold at 7000 measured prompt tokens  460ms
+     ✓ uses the exact threshold at 7999 measured prompt tokens  381ms
+     × uses the exact threshold at 8000 measured prompt tokens 300ms
+     × prunes only old results at 8500, protects the recent two before counts and records the next measured effect 287ms
+     × orders eligible large outputs by measured bytes then original order, leaving small and recent outputs intact 280ms
+     × retains the actual encrypted spill object and measures the signed preview rather than full-output tokens 280ms
+     ✓ does not compact with unset and reports unmeasured usage only when enabled  330ms
+     ✓ does not compact with null and reports unmeasured usage only when enabled  325ms
+     ✓ refuses a successful provider finish without usage before the integrated compactor hook 236ms
+     ✓ reports null usage without edits at the public AutoCompactor class boundary over a genuine signed step end 223ms
+     × caps successful compaction boundaries at three in one turn and resets the count on the next turn 264ms
+     × uses a real no-tools summary request at the next high boundary, preserves user authority and exports public signed evidence 278ms
+     ✓ replays a genuine manual v1 receipt and reconstructs a later real request 255ms
+     × requires a trigger on an otherwise complete synthetic v2 structural negative 0ms
+     ✓ fills literal defaults and freezes the declared policy 0ms
+     ✓ refuses zero window instead of silently changing policy 0ms
+     ✓ refuses negative window instead of silently changing policy 0ms
+     ✓ refuses unsafe window instead of silently changing policy 0ms
+     ✓ refuses low threshold instead of silently changing policy 0ms
+     ✓ refuses high threshold instead of silently changing policy 0ms
+     ✓ refuses NaN threshold instead of silently changing policy 0ms
+     ✓ refuses zero recent steps instead of silently changing policy 0ms
+     ✓ refuses fractional recent steps instead of silently changing policy 0ms
+     ✓ refuses excessive recent steps instead of silently changing policy 0ms
+     ✓ refuses zero prune size instead of silently changing policy 0ms
+     ✓ refuses excessive prune size instead of silently changing policy 0ms
+     ✓ refuses zero per-turn limit instead of silently changing policy 0ms
+     ✓ refuses excessive per-turn limit instead of silently changing policy 0ms
+     ✓ refuses non-boolean summary instead of silently changing policy 0ms
+     ✓ threads CLI options without ignoring flags that lack a context window 0ms
+     ✓ uses disjoint input/cache counts, not output counts or payload-byte estimates 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > uses the exact threshold at 8000 measured prompt tokens
+AssertionError: expected [ { kind: 'error', turn: 1, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "error": Error {
++       "message": "compaction requires a supported, complete measurement receipt",
++     },
++     "kind": "error",
++     "step": 3,
++     "turn": 1,
++   },
++ ]
+
+ ❯ turn tests/autoCompaction.test.ts:134:65
+    132|   await f.h.driver.whenIdle();
+    133|   expect(f.h.driver.status).toBe("idle");
+    134|   expect(f.notifications.filter(item => item.kind === "error")).toEqua…
+       |                                                                 ^
+    135| }
+    136| function replay(rows: readonly EvidenceEvent[]): readonly SurfaceEntry…
+ ❯ tests/autoCompaction.test.ts:265:7
+ ❯ withFixture tests/autoCompaction.test.ts:98:5
+ ❯ tests/autoCompaction.test.ts:264:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > prunes only old results at 8500, protects the recent two before counts and records the next measured effect
+AssertionError: expected [ { kind: 'error', turn: 1, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "error": Error {
++       "message": "compaction requires a supported, complete measurement receipt",
++     },
++     "kind": "error",
++     "step": 3,
++     "turn": 1,
++   },
++ ]
+
+ ❯ turn tests/autoCompaction.test.ts:134:65
+    132|   await f.h.driver.whenIdle();
+    133|   expect(f.h.driver.status).toBe("idle");
+    134|   expect(f.notifications.filter(item => item.kind === "error")).toEqua…
+       |                                                                 ^
+    135| }
+    136| function replay(rows: readonly EvidenceEvent[]): readonly SurfaceEntry…
+ ❯ tests/autoCompaction.test.ts:281:7
+ ❯ withFixture tests/autoCompaction.test.ts:98:5
+ ❯ tests/autoCompaction.test.ts:280:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > orders eligible large outputs by measured bytes then original order, leaving small and recent outputs intact
+AssertionError: expected [ { kind: 'error', turn: 1, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "error": Error {
++       "message": "compaction requires a supported, complete measurement receipt",
++     },
++     "kind": "error",
++     "step": 3,
++     "turn": 1,
++   },
++ ]
+
+ ❯ turn tests/autoCompaction.test.ts:134:65
+    132|   await f.h.driver.whenIdle();
+    133|   expect(f.h.driver.status).toBe("idle");
+    134|   expect(f.notifications.filter(item => item.kind === "error")).toEqua…
+       |                                                                 ^
+    135| }
+    136| function replay(rows: readonly EvidenceEvent[]): readonly SurfaceEntry…
+ ❯ tests/autoCompaction.test.ts:320:7
+ ❯ withFixture tests/autoCompaction.test.ts:98:5
+ ❯ tests/autoCompaction.test.ts:317:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > retains the actual encrypted spill object and measures the signed preview rather than full-output tokens
+AssertionError: expected [ { kind: 'error', turn: 1, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "error": Error {
++       "message": "compaction requires a supported, complete measurement receipt",
++     },
++     "kind": "error",
++     "step": 3,
++     "turn": 1,
++   },
++ ]
+
+ ❯ turn tests/autoCompaction.test.ts:134:65
+    132|   await f.h.driver.whenIdle();
+    133|   expect(f.h.driver.status).toBe("idle");
+    134|   expect(f.notifications.filter(item => item.kind === "error")).toEqua…
+       |                                                                 ^
+    135| }
+    136| function replay(rows: readonly EvidenceEvent[]): readonly SurfaceEntry…
+ ❯ tests/autoCompaction.test.ts:336:7
+ ❯ withFixture tests/autoCompaction.test.ts:98:5
+ ❯ tests/autoCompaction.test.ts:335:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > caps successful compaction boundaries at three in one turn and resets the count on the next turn
+AssertionError: expected [ { kind: 'error', turn: 1, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "error": Error {
++       "message": "compaction requires a supported, complete measurement receipt",
++     },
++     "kind": "error",
++     "step": 3,
++     "turn": 1,
++   },
++ ]
+
+ ❯ turn tests/autoCompaction.test.ts:134:65
+    132|   await f.h.driver.whenIdle();
+    133|   expect(f.h.driver.status).toBe("idle");
+    134|   expect(f.notifications.filter(item => item.kind === "error")).toEqua…
+       |                                                                 ^
+    135| }
+    136| function replay(rows: readonly EvidenceEvent[]): readonly SurfaceEntry…
+ ❯ tests/autoCompaction.test.ts:437:7
+ ❯ withFixture tests/autoCompaction.test.ts:98:5
+ ❯ tests/autoCompaction.test.ts:434:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > uses a real no-tools summary request at the next high boundary, preserves user authority and exports public signed evidence
+AssertionError: expected [ { kind: 'error', turn: 2, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "error": Error {
++       "message": "compaction requires a supported, complete measurement receipt",
++     },
++     "kind": "error",
++     "step": 1,
++     "turn": 2,
++   },
++ ]
+
+ ❯ turn tests/autoCompaction.test.ts:134:65
+    132|   await f.h.driver.whenIdle();
+    133|   expect(f.h.driver.status).toBe("idle");
+    134|   expect(f.notifications.filter(item => item.kind === "error")).toEqua…
+       |                                                                 ^
+    135| }
+    136| function replay(rows: readonly EvidenceEvent[]): readonly SurfaceEntry…
+ ❯ tests/autoCompaction.test.ts:466:7
+ ❯ withFixture tests/autoCompaction.test.ts:98:5
+ ❯ tests/autoCompaction.test.ts:460:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/autoCompaction.test.ts > automatic compaction admission and measurement bounds > requires a trigger on an otherwise complete synthetic v2 structural negative
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/autoCompaction.test.ts:576:69
+    574|       sources: [{ originEventId: "origin", sourceEventId: "origin", so…
+    575|       replacedBytes: 8192, replacementBytes: 192, savedBytes: 8000, me…
+    576|     expect(surfaceCompactionReceiptSchema.safeParse(input).success).to…
+       |                                                                     ^
+    577|   });
+    578|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  7 failed | 44 passed (51)
+   Start at  16:31:54
+   Duration  6.70s (transform 5.70s, setup 64ms, import 7.91s, tests 8.83s, environment 0ms)
+
+JSON report written to /private/tmp/p1-37-post-typecheck-20261016/p137-mutant-trigger.raw.json

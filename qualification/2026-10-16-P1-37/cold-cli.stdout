@@ -1,0 +1,61 @@
+{
+  "sessionId": "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+  "ok": true,
+  "integrityOk": true,
+  "ledgerOk": true,
+  "ledgerErrors": [],
+  "sessionChainErrors": [],
+  "unsignedRowIds": [],
+  "requests": [
+    {
+      "headerEventId": "d3b3ce3e-3eb7-4cd1-a273-068a61ef5687",
+      "status": "reconstructed",
+      "detail": null
+    },
+    {
+      "headerEventId": "131e2b4b-0b73-46bb-9900-b06b2c4ab7d9",
+      "status": "reconstructed",
+      "detail": null
+    },
+    {
+      "headerEventId": "5396c643-c194-4d31-8282-e1468109ccc0",
+      "status": "reconstructed",
+      "detail": null
+    },
+    {
+      "headerEventId": "533752a7-9016-4749-a6ca-c1c39c81eab6",
+      "status": "reconstructed",
+      "detail": null
+    },
+    {
+      "headerEventId": "2cb8b0e3-7c70-4530-b845-bdf424773ec9",
+      "status": "reconstructed",
+      "detail": null
+    },
+    {
+      "headerEventId": "830afb49-3d52-4357-97c0-9847829cd30d",
+      "status": "reconstructed",
+      "detail": null
+    },
+    {
+      "headerEventId": "452cbc2e-a1a8-4378-93af-170459ccf0dc",
+      "status": "reconstructed",
+      "detail": null
+    }
+  ],
+  "trustRoot": {
+    "anchored": true,
+    "monitorFingerprint": "6d333261bf9aefbefe1a8bebbd370a29ef5f585f1daf34b7a5f371b69ddd4d00",
+    "expectedFingerprint": null,
+    "monitorAdmission": {
+      "signature": "ledger monitor key",
+      "purpose": "ledger-row",
+      "keyId": "6d333261bf9aefbefe1a8bebbd370a29ef5f585f1daf34b7a5f371b69ddd4d00",
+      "status": "admitted",
+      "source": "explicit-key",
+      "listId": null,
+      "timeBasis": null,
+      "detail": null
+    }
+  }
+}
