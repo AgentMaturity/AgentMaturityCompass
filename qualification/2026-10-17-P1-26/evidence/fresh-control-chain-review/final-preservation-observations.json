@@ -1,0 +1,204 @@
+{
+  "schema": "p126-final-independent-preservation-observations/1",
+  "sourceCommit": "32435b41d59e651ad2b259a59703cd137e5c925a",
+  "selectedPaths65PairsRegularSingleLinkDistinct": true,
+  "all113PreferredPinsExact": true,
+  "sixNativePinsExact": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 542501039,
+      "nlink": 1,
+      "readScope": "final native bytes/identity, never loaded"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 539175547,
+      "nlink": 1,
+      "readScope": "final native bytes/identity, never loaded"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543125595,
+      "nlink": 1,
+      "readScope": "final native bytes/identity, never loaded"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543200130,
+      "nlink": 1,
+      "readScope": "final native bytes/identity, never loaded"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543305423,
+      "nlink": 1,
+      "readScope": "final native bytes/identity, never loaded"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543396326,
+      "nlink": 1,
+      "readScope": "final native bytes/identity, never loaded"
+    }
+  ],
+  "targetRegularSingleLinkInode": 543356676,
+  "states": [
+    {
+      "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "head": {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit": 0,
+        "stdout": "32435b41d59e651ad2b259a59703cd137e5c925a\n",
+        "stderr": ""
+      },
+      "status": {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=all"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "index": {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+          "diff",
+          "--cached",
+          "--name-only"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout",
+      "head": {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit": 0,
+        "stdout": "32435b41d59e651ad2b259a59703cd137e5c925a\n",
+        "stderr": ""
+      },
+      "status": {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=all"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "index": {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout",
+          "diff",
+          "--cached",
+          "--name-only"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "root": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "head": {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit": 0,
+        "stdout": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d\n",
+        "stderr": ""
+      },
+      "status": {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=all"
+        ],
+        "exit": 0,
+        "stdout": " M CONTRIBUTING.md\n M README.md\n M docs/SSO_OIDC.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M src/identity/identityConfig.ts\n M src/identity/oidc/jwtVerify.ts\n M src/identity/oidc/oidcRoutes.ts\n M tests/identity/jwtVerify.test.ts\n M unused-code/plan-edits/manifest.json\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? .changeset/p2-07-oidc-validation-policy.md\n?? tests/identity/oidcValidationConfig.test.ts\n",
+        "stderr": ""
+      },
+      "index": {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "diff",
+          "--cached",
+          "--name-only"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    }
+  ],
+  "boundary": "Current selected-time read-only snapshots only. No retrospective/continuous isolation or universal descendant proof."
+}

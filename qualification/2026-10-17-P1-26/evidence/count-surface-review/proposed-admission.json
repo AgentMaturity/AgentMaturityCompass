@@ -1,0 +1,666 @@
+{
+  "schema": "p126-private-generated-count-surface-admission/1",
+  "at": "2026-10-16T20:36:07.072025+00:00",
+  "state": "UNEXECUTED_PROSPECTIVE_NUMERIC_SCOPE_ONLY",
+  "blockers": [],
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "headAtObservation": "2aa32d5e436e789037c6a8a161d6cf0424b4f4ac",
+    "branchAtObservation": "codex/p1-26-tree-qualification",
+    "tenCountSurfaceStatusClean": true,
+    "indexAtObservation": {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "wholeTreeStatusNotClaimed": true,
+    "metadataRepairMayAdvanceHead": "Root must bind the actual post-repair source commit and exact original count-file bytes before later admission; this proposal does not require or infer global cleanliness during admitted metadata work."
+  },
+  "expectedInventory": {
+    "readOnlyFilesystemTestPathCount": 1689,
+    "publishedBefore": 1689,
+    "anticipatedAfter": 1691,
+    "additionalFiles": [
+      "tests/transparency/rfc9162.test.ts",
+      "tests/transparency/legacyAmbiguity.test.ts"
+    ],
+    "reason": "Two new .test.ts files add2 source paths;13 cases do not count as13 files. Qualification artifacts and the licence text are outside generator tests-path counting.",
+    "generatorExecuted": false,
+    "currentCheckCountsRedClaimed": false,
+    "passingTestCountClaimed": false
+  },
+  "generator": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+    "bytes": 9141,
+    "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f"
+  },
+  "generatorFullSourceRead": true,
+  "generatorSemantics": "collectCounts walks tests and counts file names ending.test.ts; it imports built registries for unrelated counts. --write may manage19 current-facing paths and CLI/adapter/other markers. No generator or imported product artifact was executed here.",
+  "candidateDelta": {
+    "paths": 10,
+    "formattedSpans": 14,
+    "encodedBadgeSpans": 1,
+    "totalNumericSpans": 15,
+    "allCurrentBeforePinsMatchB32ActualAfter": true,
+    "surfaces": [
+      {
+        "relativePath": "README.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/README.md",
+          "bytes": 59828,
+          "sha256": "3b39cfb5d8279b295afe74fd89db694e2d2f210b430be3644935619368d5f44a"
+        },
+        "matchesB32ActualAfter": true,
+        "beforePrivateCopy": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/README.md",
+          "bytes": 59828,
+          "sha256": "3b39cfb5d8279b295afe74fd89db694e2d2f210b430be3644935619368d5f44a"
+        },
+        "onlyAllowedSpans": [
+          {
+            "kind": "encoded-badge",
+            "line": 17,
+            "byteStart": 1345,
+            "byteEnd": 1352,
+            "before": "1%2C689",
+            "anticipatedAfter": "1%2C691"
+          },
+          {
+            "kind": "marker-testFiles",
+            "line": 918,
+            "byteStart": 58651,
+            "byteEnd": 58656,
+            "before": "1,689",
+            "anticipatedAfter": "1,691"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 59828,
+          "sha256": "8952f99d0c69024745a3c361a0d3f8c83b90ed07d8a654e7c65c7710b13e1139"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/README.md",
+              "bytes": 62243,
+              "sha256": "0910c215e07741fbb32b4752f1c215f3e1d19a5dee7dfc57bc14bf3420e9159d"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": null,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+              "bytes": 59828,
+              "sha256": "c98011ad0705131dd25e177526fbc319c245e264511098278af366ef0fa2e4c6"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "CONTRIBUTING.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/CONTRIBUTING.md",
+          "bytes": 16220,
+          "sha256": "94da70f37fc7181a806b93b80c027042f7c215d8b5d65727eaff2d608ecc6ba6"
+        },
+        "matchesB32ActualAfter": true,
+        "beforePrivateCopy": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/CONTRIBUTING.md",
+          "bytes": 16220,
+          "sha256": "94da70f37fc7181a806b93b80c027042f7c215d8b5d65727eaff2d608ecc6ba6"
+        },
+        "onlyAllowedSpans": [
+          {
+            "kind": "marker-testFiles",
+            "line": 54,
+            "byteStart": 1886,
+            "byteEnd": 1891,
+            "before": "1,689",
+            "anticipatedAfter": "1,691"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 16220,
+          "sha256": "e326da4767b404a0be570ddb4ff8e43ff7730be5bd9be87aa1e57156e4762123"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/CONTRIBUTING.md",
+              "bytes": 19504,
+              "sha256": "7a0a6aab4e90b94bf2442229cda181e52264ea0acb21ce9a9bc965927daf1174"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": null,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+              "bytes": 16220,
+              "sha256": "a817d07bd625ead95a0bfdf41e12cc8d3f95f6e67b364555da1b7ca49561155b"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "website/index.html",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/index.html",
+          "bytes": 43520,
+          "sha256": "3eb4d3313271913abb81ac391084aec461628132be9687ab4c927e232de8d4a4"
+        },
+        "matchesB32ActualAfter": true,
+        "beforePrivateCopy": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/website/index.html",
+          "bytes": 43520,
+          "sha256": "3eb4d3313271913abb81ac391084aec461628132be9687ab4c927e232de8d4a4"
+        },
+        "onlyAllowedSpans": [
+          {
+            "kind": "website-stat",
+            "line": 90,
+            "byteStart": 5872,
+            "byteEnd": 5877,
+            "before": "1,689",
+            "anticipatedAfter": "1,691"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 43520,
+          "sha256": "4bd7e2f981a5eca31bb60e4bb00a3c07567cd0aa1ab291eadc3b590b26686beb"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/index.html",
+              "bytes": 44023,
+              "sha256": "285d6a2105bb73375ecfff6e7f1f97a818f34bc0b304506092666f883e8521e8"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": null,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+              "bytes": 43520,
+              "sha256": "0ba594cb3596def6823a57a7dc8154c6220e197c525e833ee9f8dee299db2886"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "website/lite.html",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/lite.html",
+          "bytes": 11197,
+          "sha256": "d71d1fbd6d0a13fa42cd7be83b4d25c6a5eeec21dd1343d7a723582221196370"
+        },
+        "matchesB32ActualAfter": true,
+        "beforePrivateCopy": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/website/lite.html",
+          "bytes": 11197,
+          "sha256": "d71d1fbd6d0a13fa42cd7be83b4d25c6a5eeec21dd1343d7a723582221196370"
+        },
+        "onlyAllowedSpans": [
+          {
+            "kind": "lite-stat",
+            "line": 74,
+            "byteStart": 4426,
+            "byteEnd": 4431,
+            "before": "1,689",
+            "anticipatedAfter": "1,691"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 11197,
+          "sha256": "990616966fc7419c8c70aa99384f46ad93a0e48c376fb758279776320c2babbc"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/lite.html",
+              "bytes": 11197,
+              "sha256": "990616966fc7419c8c70aa99384f46ad93a0e48c376fb758279776320c2babbc"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+              "bytes": 11197,
+              "sha256": "abbafaf85e349a46bbd50981a28ee8e6e174f0c9d50eeac94ae8023fdc7154e5"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "website/i18n.js",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/i18n.js",
+          "bytes": 44169,
+          "sha256": "413ed4eaba823bd0c0a1ad77422662f4ee8d5a221b9a95d19a2f95e113726433"
+        },
+        "matchesB32ActualAfter": true,
+        "beforePrivateCopy": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/website/i18n.js",
+          "bytes": 44169,
+          "sha256": "413ed4eaba823bd0c0a1ad77422662f4ee8d5a221b9a95d19a2f95e113726433"
+        },
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 17,
+            "byteStart": 789,
+            "byteEnd": 794,
+            "before": "1,689",
+            "anticipatedAfter": "1,691"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 44169,
+          "sha256": "ae50801c6b0b67be2cf7d80bc2658577c0dcddfb9545a68cf370d235a863d7c9"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/i18n.js",
+              "bytes": 44169,
+              "sha256": "bef816e6b82f9be94abf597d4787bd4a66e441a2a19a985999fac59c2a783bef"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": false,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+              "bytes": 44169,
+              "sha256": "5d84d23da19c1d2bbeb125b7ae229e3658a70dacfd49e94ff037d23c819006dc"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "docs/content/show-hn-draft.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/show-hn-draft.md",
+          "bytes": 1951,
+          "sha256": "def5e0e91b20400671f5c40d2069cdabd090afb5b2cac40d4663bf74e8104a8f"
+        },
+        "matchesB32ActualAfter": true,
+        "beforePrivateCopy": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/docs/content/show-hn-draft.md",
+          "bytes": 1951,
+          "sha256": "def5e0e91b20400671f5c40d2069cdabd090afb5b2cac40d4663bf74e8104a8f"
+        },
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 33,
+            "byteStart": 1734,
+            "byteEnd": 1739,
+            "before": "1,689",
+            "anticipatedAfter": "1,691"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 1951,
+          "sha256": "f78e4a2f89289588f6505cfc238feabdaabcb3966502a89946e6b1e26b6819b2"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/content/show-hn-draft.md",
+              "bytes": 1951,
+              "sha256": "f78e4a2f89289588f6505cfc238feabdaabcb3966502a89946e6b1e26b6819b2"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+              "bytes": 1951,
+              "sha256": "01ff38f30497000d9f6de81b300f878e2bbb1266096f5f453c0585af96e4993f"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "docs/content/reddit-launch-drafts.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+          "bytes": 3075,
+          "sha256": "af0c5f47077494b8cc2106d63c5849223f210f470263de8b09a59d5479f92065"
+        },
+        "matchesB32ActualAfter": true,
+        "beforePrivateCopy": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/docs/content/reddit-launch-drafts.md",
+          "bytes": 3075,
+          "sha256": "af0c5f47077494b8cc2106d63c5849223f210f470263de8b09a59d5479f92065"
+        },
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 25,
+            "byteStart": 1341,
+            "byteEnd": 1346,
+            "before": "1,689",
+            "anticipatedAfter": "1,691"
+          },
+          {
+            "kind": "prose-source-inventory",
+            "line": 49,
+            "byteStart": 2892,
+            "byteEnd": 2897,
+            "before": "1,689",
+            "anticipatedAfter": "1,691"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 3075,
+          "sha256": "e3cae816274d07d4746c18bcbef7da203c333338b2d117a4e07c90f799ead010"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/content/reddit-launch-drafts.md",
+              "bytes": 3075,
+              "sha256": "e3cae816274d07d4746c18bcbef7da203c333338b2d117a4e07c90f799ead010"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+              "bytes": 3075,
+              "sha256": "1f602ebcb718c77b0a51418b423f18f14b4bf127516717ac59012df508d410c4"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "docs/internal/competitive-landscape.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+          "bytes": 3880,
+          "sha256": "97ca78747fcbab5faa9630ba4bff8cb1e8b3aec265976c38ce247c75df053db9"
+        },
+        "matchesB32ActualAfter": true,
+        "beforePrivateCopy": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/docs/internal/competitive-landscape.md",
+          "bytes": 3880,
+          "sha256": "97ca78747fcbab5faa9630ba4bff8cb1e8b3aec265976c38ce247c75df053db9"
+        },
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 57,
+            "byteStart": 2871,
+            "byteEnd": 2876,
+            "before": "1,689",
+            "anticipatedAfter": "1,691"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 3880,
+          "sha256": "65f3be7f143513b0d0e9f860b5fca395e5bf3e32bf62020eebf900a270bc1a7b"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/internal/competitive-landscape.md",
+              "bytes": 3880,
+              "sha256": "65f3be7f143513b0d0e9f860b5fca395e5bf3e32bf62020eebf900a270bc1a7b"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+              "bytes": 3880,
+              "sha256": "96f6d68b97f1672774b7fbc1e72f65d065bc0d72a26773954a8436c5a6eeb13f"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "docs/internal/mirofish-simulation-council.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+          "bytes": 2489,
+          "sha256": "5c0a952587cf63ed23e58262bff6d9dba08286715defd2fee2dd56d25423dad5"
+        },
+        "matchesB32ActualAfter": true,
+        "beforePrivateCopy": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/docs/internal/mirofish-simulation-council.md",
+          "bytes": 2489,
+          "sha256": "5c0a952587cf63ed23e58262bff6d9dba08286715defd2fee2dd56d25423dad5"
+        },
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 6,
+            "byteStart": 206,
+            "byteEnd": 211,
+            "before": "1,689",
+            "anticipatedAfter": "1,691"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 2489,
+          "sha256": "5afea81c8279023750c20ef6fdd9c5015dd15ee0f2023989127b0db9233feb30"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/internal/mirofish-simulation-council.md",
+              "bytes": 2489,
+              "sha256": "5afea81c8279023750c20ef6fdd9c5015dd15ee0f2023989127b0db9233feb30"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+              "bytes": 2489,
+              "sha256": "508f14a2e92fe79a5510820a7341ad2cc26ef75a8809ce22b392f015f67f6778"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+          "bytes": 107509,
+          "sha256": "e300a8c31c72767655c974f4642a9a8ebc45588416043b6ee7ed90c0548e87f2"
+        },
+        "matchesB32ActualAfter": true,
+        "beforePrivateCopy": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/whitepaper/AMC_WHITEPAPER_v1.md",
+          "bytes": 107509,
+          "sha256": "e300a8c31c72767655c974f4642a9a8ebc45588416043b6ee7ed90c0548e87f2"
+        },
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 22,
+            "byteStart": 3964,
+            "byteEnd": 3969,
+            "before": "1,689",
+            "anticipatedAfter": "1,691"
+          },
+          {
+            "kind": "prose-source-inventory",
+            "line": 415,
+            "byteStart": 42275,
+            "byteEnd": 42280,
+            "before": "1,689",
+            "anticipatedAfter": "1,691"
+          },
+          {
+            "kind": "prose-source-inventory",
+            "line": 423,
+            "byteStart": 42797,
+            "byteEnd": 42802,
+            "before": "1,689",
+            "anticipatedAfter": "1,691"
+          },
+          {
+            "kind": "prose-source-inventory",
+            "line": 873,
+            "byteStart": 88911,
+            "byteEnd": 88916,
+            "before": "1,689",
+            "anticipatedAfter": "1,691"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 107509,
+          "sha256": "10bc89bdcc14e2e13a50808a261cb98c67f887d52410b75bb9ede761c7e6f664"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/whitepaper/AMC_WHITEPAPER_v1.md",
+              "bytes": 108101,
+              "sha256": "0ac4f3ecaf64118437c54c0f40a5982ce1606c3f1a66dda3bcaf41fbe5e8e202"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": null,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+              "bytes": 107509,
+              "sha256": "6c37880867226216d2b6cf9d2b84472a190668854dc28d1f10e77577594bea25"
+            },
+            "matchesPriorB32Allocation": true,
+            "sameOutsideExactCountOffsets": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      }
+    ],
+    "anticipatedAfterHashesNotMaterialized": true,
+    "allOtherAuthoredBytesExact": true
+  },
+  "ownership": {
+    "inventorySource": "Reused B33 known180 physical roots (170registered+10retained), with fresh exact ten-path file/hash/status observations in every known root. No new registry membership query or release inference.",
+    "physicalRoots": 180,
+    "exactFilePins": 1800,
+    "allStatusExit0": true,
+    "statusStderrNonempty": [],
+    "dirtyCountSurfaceRoots": [
+      {
+        "root": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "status": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n"
+      }
+    ],
+    "variantCounts": {
+      "README.md": 63,
+      "CONTRIBUTING.md": 62,
+      "website/index.html": 62,
+      "website/lite.html": 60,
+      "website/i18n.js": 60,
+      "docs/content/show-hn-draft.md": 59,
+      "docs/content/reddit-launch-drafts.md": 59,
+      "docs/internal/competitive-landscape.md": 59,
+      "docs/internal/mirofish-simulation-council.md": 59,
+      "whitepaper/AMC_WHITEPAPER_v1.md": 61
+    },
+    "comparedToB32": {
+      "old179RootsPreserved": true,
+      "currentKnownChanges": 10,
+      "newRootPins": 10,
+      "unexpectedNonSChanges": []
+    },
+    "ownershipReleaseInferred": false
+  },
+  "preservation": {
+    "all20ClaudeAndHeldRPinsMatchPriorB32": true,
+    "ClaudeAuthoredVariantPaths": [
+      "README.md",
+      "CONTRIBUTING.md",
+      "website/index.html",
+      "website/i18n.js",
+      "whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "candidateUsesOnlyCurrentSOriginalBytes": true,
+    "all10OriginalsRetainedPrivately": true,
+    "noDonorCopy": true,
+    "missingRES": "Reuse B33 exact missing-live-file limitation and last-known reservation binding; no new search/recreation/append or Claude message.",
+    "held": "All prior decisions, provider archive, Knip/D15 hold, R dirty overlays, F37 skip and Claude work remain protected."
+  },
+  "rootOwnsNext": [
+    "Finish own metadata repair and bind actual post-repair HEAD.",
+    "After actual new-test materialization, retain ordinary check:counts RED; this proposal supplies no RED or pass.",
+    "Refresh hosted full-path/WIP and ordinary D15 for exactly these10 surfaces; Dependabot exclusion is WIP-only.",
+    "Admit unchanged generator, compare actual changed paths and all10 whole hashes against this15-span projection. Any additional actual delta needs separate review.",
+    "Run unchanged post-count/freeze/quality checks; preserve all actual failures and held decisions."
+  ],
+  "receiptRepresentation": "Never publish these candidate .test.ts sources as executable qualification evidence. Use inert source-text suffix or the existing exact lossless-original JSON envelope; retain original name/bytes/hash and raw producers.",
+  "executionBoundary": "Read-only local files/hash/literal templates plus180 exact-path git status and S HEAD/branch/index observations. Private original copies/report only. No product/generator/compiler/test/native/SQL/network/hosted/D15/freeze/source/index/QA writes or Claude contact.",
+  "fullIssueDone": false
+}

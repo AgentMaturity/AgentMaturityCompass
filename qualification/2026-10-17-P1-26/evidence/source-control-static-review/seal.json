@@ -1,0 +1,48 @@
+{
+  "schema": "p126-source-control-static-review-seal/1",
+  "at": "2026-10-16T20:44:31.075826+00:00",
+  "blockers": [],
+  "inputCount": 13,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-control-static-review/README.md",
+      "bytes": 1972,
+      "sha256": "e1acc0f35996ae2f77dc4b40bc381091ae808f6090a11eec6232c6ea04d251b2",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-control-static-review/README.md",
+      "dev": 16777231,
+      "inode": 543344039,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-control-static-review/review.json",
+      "bytes": 8143,
+      "sha256": "c5447c87525d4178c73c0f155ecf222cc2508ffe7532e5a4405ea968af7e23a2",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-control-static-review/review.json",
+      "dev": 16777231,
+      "inode": 543344038,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-control-static-review/adaptation.patch",
+      "bytes": 5439,
+      "sha256": "1f023f74f84a09266b0e93600502044299a223e47ab88054426fc4e4b53e5246",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-control-static-review/adaptation.patch",
+      "dev": 16777231,
+      "inode": 543344037,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-control-static-review/input-pins.json",
+      "bytes": 5062,
+      "sha256": "e968c71532bc5fad88fe21494644c61907891eef74aff23cea8b2fefc5b0f5ed",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-control-static-review/input-pins.json",
+      "dev": 16777231,
+      "inode": 543344040,
+      "nlink": 1
+    }
+  ],
+  "allInputOutputPinsRechecked": true,
+  "helperExecuted": false,
+  "futureBindingValidated": false,
+  "privateOnly": true
+}
