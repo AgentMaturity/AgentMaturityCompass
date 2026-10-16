@@ -336,6 +336,20 @@
     "envelope": "evidence/contract-review/M2-inclusion-terminal-size.patch.lossless.json"
   },
   {
+    "source": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/website/lite.html",
+    "relativePath": "evidence/count-surface-review/before-originals/website/lite.html",
+    "bytes": 11197,
+    "sha256": "d71d1fbd6d0a13fa42cd7be83b4d25c6a5eeec21dd1343d7a723582221196370",
+    "envelope": "evidence/count-surface-review/before-originals/website/lite.html.lossless.json"
+  },
+  {
+    "source": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/whitepaper/AMC_WHITEPAPER_v1.md",
+    "relativePath": "evidence/count-surface-review/before-originals/whitepaper/AMC_WHITEPAPER_v1.md",
+    "bytes": 107509,
+    "sha256": "e300a8c31c72767655c974f4642a9a8ebc45588416043b6ee7ed90c0548e87f2",
+    "envelope": "evidence/count-surface-review/before-originals/whitepaper/AMC_WHITEPAPER_v1.md.lossless.json"
+  },
+  {
     "source": "/private/tmp/p1-26-tree-qualification-20261017/source-control-static-review/adaptation.patch",
     "relativePath": "evidence/source-control-static-review/adaptation.patch",
     "bytes": 5439,

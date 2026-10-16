@@ -1088,14 +1088,6 @@
       "sha256": "def5e0e91b20400671f5c40d2069cdabd090afb5b2cac40d4663bf74e8104a8f"
     },
     {
-      "path": "evidence/count-surface-review/before-originals/docs/internal/competitive-landscape.md",
-      "sha256": "97ca78747fcbab5faa9630ba4bff8cb1e8b3aec265976c38ce247c75df053db9"
-    },
-    {
-      "path": "evidence/count-surface-review/before-originals/docs/internal/mirofish-simulation-council.md",
-      "sha256": "5c0a952587cf63ed23e58262bff6d9dba08286715defd2fee2dd56d25423dad5"
-    },
-    {
       "path": "evidence/count-surface-review/before-originals/website/i18n.js",
       "sha256": "413ed4eaba823bd0c0a1ad77422662f4ee8d5a221b9a95d19a2f95e113726433"
     },
@@ -1104,12 +1096,12 @@
       "sha256": "3eb4d3313271913abb81ac391084aec461628132be9687ab4c927e232de8d4a4"
     },
     {
-      "path": "evidence/count-surface-review/before-originals/website/lite.html",
-      "sha256": "d71d1fbd6d0a13fa42cd7be83b4d25c6a5eeec21dd1343d7a723582221196370"
+      "path": "evidence/count-surface-review/before-originals/website/lite.html.lossless.json",
+      "sha256": "b7df4b32a8f08207a18a012ca2cb08816d3ab5a53dd94cb13b61e6516c907121"
     },
     {
-      "path": "evidence/count-surface-review/before-originals/whitepaper/AMC_WHITEPAPER_v1.md",
-      "sha256": "e300a8c31c72767655c974f4642a9a8ebc45588416043b6ee7ed90c0548e87f2"
+      "path": "evidence/count-surface-review/before-originals/whitepaper/AMC_WHITEPAPER_v1.md.lossless.json",
+      "sha256": "cb2667080e284b5146fe39baa161eba0a8fbe9ee7dde5336001a94cb496b1476"
     },
     {
       "path": "evidence/count-surface-review/pins.json",
@@ -1760,17 +1752,21 @@
       "sha256": "83d6393cff4f579b3f62ce9a9fbbeb8d9e627d2dc7c8332395bf2ee48769a8df"
     },
     {
+      "path": "evidence/ignored-private-inputs.json",
+      "sha256": "758efd950ef35d100e18740d850faf4202f697a39177371344cad5608b23328c"
+    },
+    {
       "path": "evidence/representations.json",
-      "sha256": "c0abd6cf966b6c3f4dfadb52a3c3351be5a10980591abcc99d9052d816e5ff5c"
+      "sha256": "6f2137542582aca98bfbbb76911e48465f26d94a854c054c9dd11053b50bad1a"
     },
     {
       "path": "evidence/assembly-inputs.json",
-      "sha256": "5e55632efc2557c4187dbd2f69668cb9cdcdefbf0974e17c13b93802e1875a98"
+      "sha256": "9cc2d1b38c255684fccf76d9b92fcbc116d7e3ee0c09bed84ac1d5014abd6857"
     },
     {
       "path": "README.md",
-      "sha256": "7e9fe11a8ff324948a1936fdc61634ad2a021c383b84c04d509d491e18aed20b"
+      "sha256": "ac4955653dbbed2cd1d1f72ae8806eed67fb359320b2f3e677ab3a712c4d47ee"
     }
   ],
-  "notes": "Bounded offline tree qualification only. Source, fresh and two restored54-case runs are separate observations; M1/M2 actual semantic controls have11/1failed bodies, fully classified and explicitly restored. Whole P1-26 and all held decisions remain open. Duplicates1268 and deadcode2723 remain RED and unwaived. Earlier2728deadcode included five own P112 evidence-import errors repaired by inert byte-preserving V3 metadata; the resulting2723set is unchanged by the P126tests. Initial counts check, mistaken nonexistent gen:counts command, two quality gates and intentional M1/M2 failures remain recorded nonzero commands; existing gen-counts and checks subsequently passed. Diagnostic completion is not qualitypass. No fullsuite/coverage/publicanchor/library/PR/push/merge/release/Done credit. See README, source stage ignored-hint record and exact evidence."
+  "notes": "Bounded offline tree qualification only. Source, fresh and two restored54-case runs are separate observations; M1/M2 actual semantic controls have11/1failed bodies, fully classified and explicitly restored. Whole P1-26 and all held decisions remain open. Duplicates1268 and deadcode2723 remain RED and unwaived. Earlier2728deadcode included five own P112 evidence-import errors repaired by inert byte-preserving V3 metadata; the resulting2723set is unchanged by the P126tests. Initial counts check, mistaken nonexistent gen:counts command, two quality gates and intentional M1/M2 failures remain recorded nonzero commands; existing gen-counts and checks subsequently passed. Diagnostic completion is not qualitypass. No fullsuite/coverage/publicanchor/library/PR/push/merge/release/Done credit. See README, source stage ignored-hint record and exact evidence. Ordinary staging omitted two ignored historical payloads; the expected382 assertion failed but a dependent commit still ran. Partial commit973172121 has380files and an incomplete index. This revision keeps those2payloads private/pinned, adds provenance and publishes381files/380artifacts without force/unignore/relocation; prior packet and history preserved. See ignored-private-inputs.json and separate actual validation/commit closure. Full metadata-range default whitespace exposed13lines in2nonignored historical raw snapshots already in973; V3 preserves exact bytes using2more existing-format envelopes (55total). No source/ignore/config/held-private-byte changes. Final full-range check and committed export are separately recorded."
 }
