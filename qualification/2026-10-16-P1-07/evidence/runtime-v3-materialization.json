@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-16T18:04:17.265452+00:00",
+  "finiteRowsVerified": 180,
+  "target": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+  "preferredSha256": "5eb353a14bdaebf8cef9d14c1dec266c0deeb239c696eb3e3ca32fc250434714",
+  "v2PreservedAndFailureRetained": true,
+  "noAssertionsRelaxed": true,
+  "productionAndExistingTestsUntouched": true
+}

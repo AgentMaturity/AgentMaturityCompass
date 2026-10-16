@@ -1,0 +1,173 @@
+{
+  "schema": "p107-runtime-source-run-input-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v2/command.json",
+      "bytes": 2714,
+      "sha256": "eb69b6b875e84fb5da19a3d9cc51d4c84df12d88e058b3af73ab9a177e88c9f5",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v2/raw.json",
+      "bytes": 2386,
+      "sha256": "94db801554162a8d81132e40e31b852bba1c72d39d6f46153fe2354a5d6323dc",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v2/observer.json",
+      "bytes": 13715,
+      "sha256": "c022a68299d4f7aff8f648100612a232025c39b5a1c84e1ffb8031f515f4581f",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v2/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "d48a8f7b878a5910b37d17e82519d7bc42eb2758812963a9de563954f12130ef",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v2/stdout-stderr.log",
+      "bytes": 3715,
+      "sha256": "e7a84a68a146ad0b60cfef2c311289750e5de571c7c5bbbd399ebb06c6a62543",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/p107-runtime-v2-outcome.json",
+      "bytes": 17747,
+      "sha256": "bdb531244876917dcd7412f3b6b89bcc1a5200a25694f757db31ad30810e0dfb",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/public-evidence.json",
+      "bytes": 27690,
+      "sha256": "5f0bed636d7cd4cab32707130171c0ab6e061292c1de38154cc022852d76a09b",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/pre-call-public-pins.json",
+      "bytes": 4387,
+      "sha256": "17c96453601cab0632a42b4527670020a5892f80cc4f8fcafbf41fa51c571b51",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-v2-materialization.json",
+      "bytes": 528,
+      "sha256": "1dce14167efc38b149edae316365900dad173f09ca7086d123f5c206af1dbef8",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v2/runtimeEvidenceEndToEnd.test.ts",
+      "bytes": 28111,
+      "sha256": "4dfc2dc3a9c96a900286a728d5c2e0bace934a37c4ec549d45ef49486509c8ed",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v2/seal.json",
+      "bytes": 2027,
+      "sha256": "d991aeb111ad789ad8043e7eaa5d461fd959cd1df2c14b2374a9de70af56aa6e",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v3/command.json",
+      "bytes": 2713,
+      "sha256": "79ecb2b456cb3541127c9bc7d30b1345705f01f9d1c5810db0471ac37559fe37",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v3/raw.json",
+      "bytes": 1051,
+      "sha256": "d0b93601a176d66987df7ae274ba9bab7da6f947c165e927afbcaa505a341139",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v3/observer.json",
+      "bytes": 1396,
+      "sha256": "52f3624c99caabcd91e780d43edc7fb193dabd68d645fe75d499d5788ce04e10",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v3/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "1404a7d82e1acfb0eb3a4f16dd0ea14e310ce4c5149b3a886f32ca96e11e4e68",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v3/stdout-stderr.log",
+      "bytes": 816,
+      "sha256": "afa6ec6608903038e67dc12abab2c5258457da8dc77dd741af394b78cd96574a",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/p107-runtime-v3-outcome.json",
+      "bytes": 2759,
+      "sha256": "c9344a4fa35dd7182c39f8f655287d2af80f7eee72f375f6a834c43066fab6ec",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/public-evidence.json",
+      "bytes": 29024,
+      "sha256": "67a33986b5fe6c905638d550f968c9d89ddce99d0ed01d0d47a798f5f0de80df",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/pre-call-public-pins.json",
+      "bytes": 5352,
+      "sha256": "7c75db8ce4f0496a58a62bba7c48c256191f724bcce02d761140204d881e80b9",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-v3-materialization.json",
+      "bytes": 422,
+      "sha256": "359efb676098b51028109ecfe8c081513026761c60db12e4796d0389a25aaa4d",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v3/runtimeEvidenceEndToEnd.test.ts",
+      "bytes": 28819,
+      "sha256": "5eb353a14bdaebf8cef9d14c1dec266c0deeb239c696eb3e3ca32fc250434714",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v3/seal.json",
+      "bytes": 1109,
+      "sha256": "26dd244c06bc69d07176ba1c3e4b129ce4a5ad0c783ae07e8a8ddd3f2d973c0b",
+      "readScope": "Full actual machine/log/public artifact read; candidate and seal previously full static read, now rehashed."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-v2-failure-classification.json",
+      "bytes": 1946,
+      "sha256": "bb112f4d9e247f8f0687b73be502e12bf7b5e34b89f6b58cd68d98d9631aa9d6",
+      "readScope": "Exact source admission/retained diagnosis/static review provenance; current candidate bytes read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-v2-public-mirror-diagnosis/review.json",
+      "bytes": 11518,
+      "sha256": "bd914a92d366ee3d9579fbdc52b7516c710ae4830043df5edb27769235163208",
+      "readScope": "Exact source admission/retained diagnosis/static review provenance; current candidate bytes read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-v2-public-mirror-diagnosis/seal.json",
+      "bytes": 1044,
+      "sha256": "61f38e39d42c8d736a4aed2265f413e559d9d1b4dfe1c728bce57da4b2de8625",
+      "readScope": "Exact source admission/retained diagnosis/static review provenance; current candidate bytes read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-static-review-v3/review.json",
+      "bytes": 4401,
+      "sha256": "d17e25f6a282f575277d1a443f6e05469bd8d1fd5c5f807f5f7b918e38469e7b",
+      "readScope": "Exact source admission/retained diagnosis/static review provenance; current candidate bytes read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-static-review-v3/seal.json",
+      "bytes": 1069,
+      "sha256": "cf9cb05e8a12ef219285e11d8b31992002efc8b36d98ce4f3e8c0475d3b59883",
+      "readScope": "Exact source admission/retained diagnosis/static review provenance; current candidate bytes read."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+      "bytes": 28819,
+      "sha256": "5eb353a14bdaebf8cef9d14c1dec266c0deeb239c696eb3e3ca32fc250434714",
+      "readScope": "Exact source admission/retained diagnosis/static review provenance; current candidate bytes read."
+    }
+  ]
+}

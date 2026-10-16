@@ -1,0 +1,30 @@
+{
+  "schema": "p107-runtime-static-review-seal/1",
+  "state": "STATIC_BLOCKED_UNEXECUTED_V1",
+  "blockers": [
+    "TURN_SEAL_MISSING"
+  ],
+  "inputCount": 70,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-static-review/review.json",
+      "bytes": 6038,
+      "sha256": "7a7ee852ecae960f96ed48a7b2d39e6cb597f2eb023b3276f356c528687895d7",
+      "readScope": "Exact private review output."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-static-review/README.md",
+      "bytes": 909,
+      "sha256": "22c3307e24afc2747c2c970055a6ee8765602d144e47a74e9b93d99b33d28205",
+      "readScope": "Exact private review output."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-static-review/pins.json",
+      "bytes": 25615,
+      "sha256": "1d2d97d4960a4037d46ce00dee13c2807e04ae6deaef116de3d8409bacbe1563",
+      "readScope": "Exact private review output."
+    }
+  ],
+  "noExecution": true,
+  "checkoutWrites": false
+}

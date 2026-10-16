@@ -1,0 +1,73 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass
+
+stdout | tests/diagnostic/runtimeEvidenceEndToEnd.test.ts > binds real allowed and denied native reads from two sealed sessions to the shipped AMC-5.29 gates
+PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/public-evidence.json
+
+ ❯ tests/diagnostic/runtimeEvidenceEndToEnd.test.ts (1 test | 1 failed) 398ms
+   × binds real allowed and denied native reads from two sealed sessions to the shipped AMC-5.29 gates 395ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/diagnostic/runtimeEvidenceEndToEnd.test.ts > binds real allowed and denied native reads from two sealed sessions to the shipped AMC-5.29 gates
+AssertionError: expected [ { …(7) }, { …(7) }, { …(7) }, …(5) ] to deeply equal [ { …(7) }, { …(7) }, { …(7) }, …(5) ]
+
+- Expected
++ Received
+
+@@ -54,20 +54,20 @@
+      "sha256": "474df779c4bf417cbfbede70118bc2dbdaa16dc7843f69d7cc9e1b679d971b67",
+    },
+    {
+      "bytes": 113,
+      "dev": 16777231,
+-     "inode": 542975566,
++     "inode": 542975703,
+      "nlink": 1,
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/monitor_ed25519.pub",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/monitor_ed25519.pub",
+      "sha256": "1f65860e5ec91826f7a8eaca7e437f2584988e10456de336ce2c7f806f122e17",
+    },
+    {
+      "bytes": 113,
+      "dev": 16777231,
+-     "inode": 542975568,
++     "inode": 542975704,
+      "nlink": 1,
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/auditor_ed25519.pub",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/auditor_ed25519.pub",
+      "sha256": "80dddeea1bddd4fbeb6b890d67601eedbf13591d73d681d51f2be61dc7c4e40a",
+    },
+
+ ❯ tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:365:31
+    363|       expect(evaluation.level).toBe(expectedL2Pass ? 2 : 1);
+    364|       expect(evaluation.perLevel.filter((entry) => entry.level >= 3).e…
+    365|       expect(facts.afterPins).toEqual(beforePins);
+       |                               ^
+    366|       expect(facts.nativeAfter).toEqual(capturedNative);
+    367|     });
+ ❯ tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:181:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/diagnostic/runtimeEvidenceEndToEnd.test.ts > binds real allowed and denied native reads from two sealed sessions to the shipped AMC-5.29 gates
+Error: captured input preservation: captured owned file/policy/public-key pin changed
+ ❯ tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:392:58
+    390|         if (facts.nativeUnchanged !== true) throw new Error("source na…
+    391|       }
+    392|       if (facts.protectedInputsUnchanged !== true) throw new Error("ca…
+       |                                                          ^
+    393|     });
+    394|     cleanup("exact environment restore", () => {
+ ❯ cleanup tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:123:11
+ ❯ tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:383:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  23:29:14
+   Duration  2.87s (transform 1.78s, setup 19ms, import 2.35s, tests 398ms, environment 0ms)
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p107-runtime-v2.raw.json

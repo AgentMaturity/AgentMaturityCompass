@@ -1,0 +1,248 @@
+{
+  "at": "2026-10-16T18:07:04.921356+00:00",
+  "actualCommands": [
+    {
+      "phase": "p107-typecheck",
+      "exit": 0,
+      "durationMs": 25094,
+      "pgid": 3566,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-typecheck/stdout-stderr.log",
+        "bytes": 149,
+        "sha256": "ffc3342aa63f1c01882b849ff8dd0a3cd4e7b509f07c4fb8c69713242b5a98d5"
+      }
+    },
+    {
+      "phase": "p107-tests-typecheck",
+      "exit": 0,
+      "durationMs": 35789,
+      "pgid": 3898,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-tests-typecheck/stdout-stderr.log",
+        "bytes": 161,
+        "sha256": "fb4ed4c9025dd5e6271e65a32d037c413d19a08be3c3b2a5cac093c68f75f865"
+      }
+    },
+    {
+      "phase": "p107-lint",
+      "exit": 0,
+      "durationMs": 2907,
+      "pgid": 3681,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-lint/stdout-stderr.log",
+        "bytes": 447,
+        "sha256": "22a03ddf6f49358fb4bcfe04bd56da9a1a9e26cc5aa8ffde1b5892abef468b95"
+      }
+    },
+    {
+      "phase": "p107-build",
+      "exit": 0,
+      "durationMs": 29455,
+      "pgid": 3717,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-build/stdout-stderr.log",
+        "bytes": 955,
+        "sha256": "e6e36dcd7bda0fc5d63469c9f1781ef19fe59c3a49afbf5d2c7c6c0c8dd1acce"
+      }
+    },
+    {
+      "phase": "p107-count-check-before-update",
+      "exit": 1,
+      "durationMs": 526,
+      "pgid": 4003,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-check-before-update/stdout-stderr.log",
+        "bytes": 1436,
+        "sha256": "96fd6a707769192ec8e0ab5c651bb489482286ffdd8382591d803b43302a05d5"
+      }
+    },
+    {
+      "phase": "p107-count-needs-snapshot",
+      "exit": 0,
+      "durationMs": 436,
+      "pgid": 3514,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-needs-snapshot/stdout-stderr.log",
+        "bytes": 5,
+        "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345"
+      }
+    },
+    {
+      "phase": "p107-count-update",
+      "exit": 0,
+      "durationMs": 450,
+      "pgid": 4048,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-update/stdout-stderr.log",
+        "bytes": 20,
+        "sha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d"
+      }
+    },
+    {
+      "phase": "p107-count-check",
+      "exit": 0,
+      "durationMs": 438,
+      "pgid": 4141,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-check/stdout-stderr.log",
+        "bytes": 239,
+        "sha256": "82ac60039fcf8bc00dc663aabd78dcafc658cffc866e81929505bb199e8df7e4"
+      }
+    },
+    {
+      "phase": "p107-gates",
+      "exit": 0,
+      "durationMs": 450,
+      "pgid": 4158,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-gates/stdout-stderr.log",
+        "bytes": 821,
+        "sha256": "5664206ddf6d3b7a49d53c87907f78750517c4c583479f77268a1da353dba4ed"
+      }
+    },
+    {
+      "phase": "p107-threat-model",
+      "exit": 0,
+      "durationMs": 273,
+      "pgid": 4175,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-threat-model/stdout-stderr.log",
+        "bytes": 294,
+        "sha256": "d8a37764ab52c8fe6a84b8aaf1de67c240c7f01698f2abf5b1a802764503d3f4"
+      }
+    },
+    {
+      "phase": "p107-architecture",
+      "exit": 0,
+      "durationMs": 1744,
+      "pgid": 4190,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-architecture/stdout-stderr.log",
+        "bytes": 95863,
+        "sha256": "b087df083209af89c9f69496ec867445d1dd69fb2b68b44665ac280965341751"
+      }
+    },
+    {
+      "phase": "p107-docs-drift",
+      "exit": 0,
+      "durationMs": 331,
+      "pgid": 4209,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-docs-drift/stdout-stderr.log",
+        "bytes": 205,
+        "sha256": "ff57cb43abfed0a3cdba4ccb780bf3ee40b5fe7ddb1345e712cb8ca9a6e5461a"
+      }
+    },
+    {
+      "phase": "p107-final-freeze",
+      "exit": 0,
+      "durationMs": 1201,
+      "pgid": 4224,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-final-freeze/stdout-stderr.log",
+        "bytes": 268,
+        "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad"
+      }
+    },
+    {
+      "phase": "p107-duplicates",
+      "exit": 1,
+      "durationMs": 587,
+      "pgid": 4281,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-duplicates/stdout-stderr.log",
+        "bytes": 2064,
+        "sha256": "62545f898b95ab3125616ea8bf2872244314dd98d3db67b8ff58c707e6d31e29"
+      }
+    },
+    {
+      "phase": "p107-dead-code",
+      "exit": 1,
+      "durationMs": 2877,
+      "pgid": 4306,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-dead-code/stdout-stderr.log",
+        "bytes": 1207,
+        "sha256": "ac0b3f8267fa0fa6ae81a88f85239c55077fbc6ba9e9664393058d2567b4bd8f"
+      }
+    }
+  ],
+  "freezeCounts": {
+    "cliCommandPaths": 1236,
+    "cliInventoryPaths": 1236,
+    "stationPacks": 41,
+    "stationPackQuestions": 632
+  },
+  "quality": {
+    "duplicates": {
+      "status": "failed",
+      "tool": "jscpd",
+      "version": "5.4.0",
+      "findingCount": 1268,
+      "statistics": {
+        "clones": 1268,
+        "duplicatedLines": 14771,
+        "duplicatedTokens": 95635,
+        "lines": 527385,
+        "newClones": 0,
+        "newDuplicatedLines": 0,
+        "percentage": 2.8008001744456137,
+        "percentageTokens": 2.9093467803857673,
+        "sources": 2146,
+        "tokens": 3287164
+      },
+      "representativeFindings": [
+        "[[\"a4/a4Router.ts\",\"a4/a4RouterStages.ts\"],\"typescript\",\"fbe506ebc7c545b7dcbf8bb34ca36814d6c2a7268dcea84a0126d45dcbf500de\"]",
+        "[[\"a4/a4Router.ts\",\"api/nativeTasksRouter.ts\"],\"typescript\",\"2d212c944cd82cd8804351171f9dd363da57ad9b7faccc2e163cdabb3c10b1a1\"]",
+        "[[\"a4/a4Router.ts\",\"mcp/a4Tools.ts\"],\"typescript\",\"df7ee641bc3ded1aec920ce188369e3c83b53b537e2a80387db9ef467a4a89aa\"]",
+        "[[\"a4/a4RouterStages.ts\",\"a4/spec/adapt.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+        "[[\"a4/a4RouterStages.ts\",\"a4/spec/aspire.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+        "[[\"a4/a4RouterStages.ts\",\"a4/spec/assemble.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+        "[[\"a4/adaptContextPlugin.ts\",\"a4/spec/assemble.ts\"],\"typescript\",\"324a2b47f6016f4093a5592c7ab29c67ba6eb9678640c4f1318bca92b62895ed\"]",
+        "[[\"a4/adaptPolicy.ts\",\"a4/stages/assemble.ts\"],\"typescript\",\"cdf8e0a57471dcc73b0808ed9fe7c69923343f7ab0ec1f773048e799d5e241d7\"]",
+        "[[\"a4/assembleBuild.ts\",\"a4/stages/adapt.ts\"],\"typescript\",\"d873f32d3eb5d538f041c3ebdf2e06ebc2edb70cec8839efc1ae78ee961c7c15\"]",
+        "[[\"a4/assembleResolve.ts\",\"a4/assembleResolve.ts\"],\"typescript\",\"58209a897c4b1182be8679b674d36d6b86046e208a3418b47250e958f32a0afe\"]"
+      ]
+    },
+    "dead-code": {
+      "status": "failed",
+      "tool": "knip",
+      "version": "6.39.0",
+      "findingCount": 2724,
+      "representativeFindings": [
+        "[\"examples/score-history-example.ts\",\"files\",{\"name\":\"examples/score-history-example.ts\"}]",
+        "[\"package.json\",\"binaries\",{\"name\":\"graphify\"}]",
+        "[\"package.json\",\"devDependencies\",{\"name\":\"date-fns\"}]",
+        "[\"scripts/make-legacy-fixtures.mjs\",\"files\",{\"name\":\"scripts/make-legacy-fixtures.mjs\"}]",
+        "[\"scripts/program-metrics.mjs\",\"files\",{\"name\":\"scripts/program-metrics.mjs\"}]",
+        "[\"scripts/vendor/build-workspace.mjs\",\"files\",{\"name\":\"scripts/vendor/build-workspace.mjs\"}]",
+        "[\"src/a4/a4Binder.ts\",\"files\",{\"name\":\"src/a4/a4Binder.ts\"}]",
+        "[\"src/a4/a4Blobs.ts\",\"exports\",{\"name\":\"destroyProjectKey\"}]",
+        "[\"src/a4/a4Conformance.ts\",\"exports\",{\"name\":\"checkControlResults\"}]",
+        "[\"src/a4/a4Conformance.ts\",\"exports\",{\"name\":\"recheckedConformance\"}]"
+      ]
+    }
+  },
+  "previousP135DeadCodeCount": 2727,
+  "deadCodeDifference": -3,
+  "exactDeadCodeDeltaCauseNotClaimed": true,
+  "qualityGreen": false,
+  "qualityWaived": false,
+  "heldKnipD15ChangeStillUnapplied": true,
+  "noFullSuiteOrFreshCheckoutCredit": true
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "p107-owned-source-control-operation/1",
+  "at": "2026-10-16T18:17:24.797890+00:00",
+  "operation": "restore",
+  "number": 3,
+  "name": "M3-remove-denied",
+  "freshCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "target": "src/diagnostic/evidenceEmitters.ts",
+  "actualBytes": 12985,
+  "actualSha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+  "expected": {
+    "bytes": 12985,
+    "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+  },
+  "otherBound32InputsExactExceptOwnedTarget": true,
+  "allThreeNativePinsExact": true,
+  "sourceAndBorrowedCheckoutUnmodified": true,
+  "compiledOutputMutation": false,
+  "forceResetRestoreNoVerifyBaselineOrWaiver": false
+}

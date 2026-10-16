@@ -1,0 +1,5 @@
+V3 has no remaining static blocker. It completes ordinary signed blob-key initialization before trust/input capture, verifies genuine version1 metadata and its signature, then includes both metadata files in the unchanged full physical pin contract. The pre-call monitor fingerprint and all prior native/file/policy/public-key assertions remain intact. The first exact four-ID mapping witness is line364.
+
+The full candidate and exact V2→V3 patch were read; patch equality is exact. All82 preferred input pins and4 declared outputs match. Existing public APIs and the independently diagnosed first-use vault write support this narrow setup change. No fake evidence, dummy blob, source/policy/offload change, key-material read or assertion relaxation is introduced. V1/V2 and the actual RED V2 body/cleanup failures remain preserved.
+
+This is static review only. No parser, compiler, helper, product/test, native, SQL, network or probe ran; no checkout, index or QA file changed. Root owns actual materialization/qualification. No V3 pass, control result, fresh-Q or full P1-07 completion is claimed.

@@ -1,0 +1,218 @@
+{
+  "schema": "p107-fresh-source-binding/1",
+  "at": "2026-10-16T18:12:07.399450+00:00",
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk",
+  "freshCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+  "helperActualExit": 0,
+  "helperDurationMs": 45308,
+  "ownedPgid": 4948,
+  "groupAbsentByESRCH": true,
+  "checkoutClean": true,
+  "sourceCompiledConfigAndNewFilesExact": [
+    {
+      "relativePath": "src/diagnostic/evidenceEmitters.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/src/diagnostic/evidenceEmitters.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+    },
+    {
+      "relativePath": "src/diagnostic/levelSemantics.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+    },
+    {
+      "relativePath": "src/diagnostic/gates.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+    },
+    {
+      "relativePath": "src/diagnostic/questionBank.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/src/diagnostic/questionBank.ts",
+      "bytes": 287500,
+      "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a"
+    },
+    {
+      "relativePath": "src/diagnostic/evidenceMaps/index.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/src/diagnostic/evidenceMaps/index.ts",
+      "bytes": 3431,
+      "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec"
+    },
+    {
+      "relativePath": "dist/diagnostic/evidenceEmitters.js",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/dist/diagnostic/evidenceEmitters.js",
+      "bytes": 10877,
+      "sha256": "30734f2d5ece2ad6ae597eb05ef9b36aebd10db3b6364378e774b2f97d6531d1"
+    },
+    {
+      "relativePath": "dist/diagnostic/levelSemantics.js",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/dist/diagnostic/levelSemantics.js",
+      "bytes": 11020,
+      "sha256": "614c7b14826adc97a32a96e982abb59dc77217ae5966d2ef484efcc6a29d76ef"
+    },
+    {
+      "relativePath": "dist/diagnostic/gates.js",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/dist/diagnostic/gates.js",
+      "bytes": 9269,
+      "sha256": "88eaf2578733685a307512a54dea7b0508d37d8c1c8e17cb7372f061e54fff98"
+    },
+    {
+      "relativePath": "dist/diagnostic/questionBank.js",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/dist/diagnostic/questionBank.js",
+      "bytes": 304412,
+      "sha256": "2e31419be55be2bed7fdc4369b96040b458eb8227edd344e548fee902c13493f"
+    },
+    {
+      "relativePath": "dist/diagnostic/evidenceMaps/index.js",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/dist/diagnostic/evidenceMaps/index.js",
+      "bytes": 2392,
+      "sha256": "0390f2409fec897db17a5c52fa74d1d893be84921e30ed4e8bceebc81364d16a"
+    },
+    {
+      "relativePath": "scripts/clean-source-check.mjs",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/scripts/clean-source-check.mjs",
+      "bytes": 7910,
+      "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b"
+    },
+    {
+      "relativePath": "scripts/source-quality.mjs",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
+      "relativePath": "knip.json",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/knip.json",
+      "bytes": 1928,
+      "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1"
+    },
+    {
+      "relativePath": "package.json",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "relativePath": "pnpm-lock.yaml",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "relativePath": "vitest.config.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "relativePath": "tsconfig.tests.json",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "relativePath": "docs/SCORING_METHODOLOGY.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/docs/SCORING_METHODOLOGY.md",
+      "bytes": 828603,
+      "sha256": "c19cbb4f8afefedc79e5b73cab15463b311e1035a326251af4cdf619aa88bf80"
+    },
+    {
+      "relativePath": "src/methodology/publicMethodology.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/src/methodology/publicMethodology.ts",
+      "bytes": 930822,
+      "sha256": "a86de215883618469ed69872823a8ad194b52290145427b3f66592c05b1df97a"
+    },
+    {
+      "relativePath": "tests/diagnostic/levelCumulative.test.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts",
+      "bytes": 10722,
+      "sha256": "1265e5715bd3ceb3c342c44e3a65681f8d32d74dd962ede9e7f64c8227575c78"
+    },
+    {
+      "relativePath": "tests/diagnostic/evidenceEmitterRegistry.test.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/evidenceEmitterRegistry.test.ts",
+      "bytes": 10448,
+      "sha256": "01ba46f55bf1135306e8e55d9b8c41a4b106ced58aa3a9a5463557fede001061"
+    },
+    {
+      "relativePath": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+      "bytes": 28819,
+      "sha256": "5eb353a14bdaebf8cef9d14c1dec266c0deeb239c696eb3e3ca32fc250434714"
+    },
+    {
+      "relativePath": "README.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/README.md",
+      "bytes": 59828,
+      "sha256": "fc8e82e4cbff27fd6ac308062343e2ebf2da7978ec67905b5389105fa4fa1571"
+    },
+    {
+      "relativePath": "CONTRIBUTING.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "04ec7a6f7a8fa7df105e65122c593bd08fd24bafb2f0c54ad7edc17a8923a69c"
+    },
+    {
+      "relativePath": "website/index.html",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/website/index.html",
+      "bytes": 43520,
+      "sha256": "44ee4804dfeefdb726e262c1beabfded1595ba1b7b0e4dfd0533941fd464bad8"
+    },
+    {
+      "relativePath": "website/lite.html",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/website/lite.html",
+      "bytes": 11197,
+      "sha256": "6fc9ccb3d7fa8e869dc162e4066e92ddf04f2653c0e4f7bbe0b2f18e8a8e24db"
+    },
+    {
+      "relativePath": "website/i18n.js",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "6c89dca1e3164179c606f610b9bf511075fdef223b8fd15d6ca8d474364897e4"
+    },
+    {
+      "relativePath": "docs/content/show-hn-draft.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "2b71a6b832ebdbcb8bab72a5cb0ab5078dc006061a976253239eaf6d1e284e6b"
+    },
+    {
+      "relativePath": "docs/content/reddit-launch-drafts.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "c3fcb3921c819287f2f4b4eacf3a96b2a98aa3df7b2f12a1cbfcef6c4d3b5c62"
+    },
+    {
+      "relativePath": "docs/internal/competitive-landscape.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "46f9b94a81e6dd4fbb576bfa2424e0bc59ea08545f3aff58eee969e236a503b0"
+    },
+    {
+      "relativePath": "docs/internal/mirofish-simulation-council.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "7e61a026c779d0fff7910b4e82b7090c304765cf34061756e1efc427305f300f"
+    },
+    {
+      "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "2895b4b277268192dfa36a1b55a4bb5426c0cfb9062a03644663fc5786da750b"
+    }
+  ],
+  "freshNative": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 543031862,
+    "nlink": 1
+  },
+  "sourceAndBorrowedNativePreserved": true,
+  "helperIncludesVitest": false,
+  "canonicalAndControlsPending": true
+}

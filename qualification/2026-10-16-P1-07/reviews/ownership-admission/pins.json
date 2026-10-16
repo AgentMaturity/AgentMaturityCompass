@@ -1,0 +1,252 @@
+{
+  "schema": "p107-finite-ownership-input-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/observations.json",
+      "bytes": 1410359,
+      "sha256": "f56ba25b9921d373c4d70e2c6a4977bde1eb2650e37a249a86ee301b486aca05",
+      "readScope": "complete JSON metadata analysis; no product execution"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/observations.compact.json",
+      "bytes": 1052084,
+      "sha256": "b8fa145ce84f356ef67e0ecfe270c4431da9795de0d0352d6aefeff9d1a305a2",
+      "readScope": "same complete observations with JSON whitespace removed; preserved alongside original"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AGENTS.md",
+      "bytes": 3253,
+      "sha256": "bf107a8b97dfece520387c0dc74af20d150352f5ceaf6f1ba52e8f2535bcbe1b",
+      "readScope": "full small prose/source where read; relevant reservations/spec spans and prior finite metadata projection"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/ROLEBOOKS/00_GLOBAL_STANDARDS.md",
+      "bytes": 1169,
+      "sha256": "f544938641e9c4af67aa65d07eac0ac10122b4ca5cd3f5f424487e936bc17813",
+      "readScope": "full small prose/source where read; relevant reservations/spec spans and prior finite metadata projection"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/ROLEBOOKS/10_REVENUE_DELIVERY.md",
+      "bytes": 1059,
+      "sha256": "15a7272cc7d93543b78cd535eecc0faa0c166cc43fe8d412fff3b27bd7de80e2",
+      "readScope": "full small prose/source where read; relevant reservations/spec spans and prior finite metadata projection"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-07.md",
+      "bytes": 16067,
+      "sha256": "59ee0fa85c0bb14c39eb9cecdecfd66df9ec64a44c1f9c0c42764a2e45692236",
+      "readScope": "full small prose/source where read; relevant reservations/spec spans and prior finite metadata projection"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+      "readScope": "full small prose/source where read; relevant reservations/spec spans and prior finite metadata projection"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/ownership-audit/observations.json",
+      "bytes": 914012,
+      "sha256": "bb6a32fd82c87b49193b53029ca7c51238d5b69ea9cd0ad7db448cd437ce6c8f",
+      "readScope": "full small prose/source where read; relevant reservations/spec spans and prior finite metadata projection"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/ownership-audit/review.json",
+      "bytes": 9371,
+      "sha256": "fb40c36fdef635d5b78b1e8037831997ea2e03db4bc87d61705e5a9d51d188a5",
+      "readScope": "full small prose/source where read; relevant reservations/spec spans and prior finite metadata projection"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/fresh-source-binding.json",
+      "bytes": 12790,
+      "sha256": "b6a867781d9a38eb633bc66937b8f3eebea111bd7878ad47e1217ba7be09a18f",
+      "readScope": "full small prose/source where read; relevant reservations/spec spans and prior finite metadata projection"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/next-plan-routing2/routing.json",
+      "bytes": 13613,
+      "sha256": "8548f63873e1401989b7216243edab60d7d74e8d4cb6cd560eeeb23080feb0ff",
+      "readScope": "full small prose/source where read; relevant reservations/spec spans and prior finite metadata projection"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/canonical-source-review/review.json",
+      "bytes": 11797,
+      "sha256": "83e4ea6e884e7523caca2a25b1944e567967066a745e1fbccd67bb46960221d4",
+      "readScope": "full small prose/source where read; relevant reservations/spec spans and prior finite metadata projection"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+      "bytes": 3431,
+      "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-gate-reachability.mjs",
+      "bytes": 9077,
+      "sha256": "e98e01722fd4cafcde62f49859d4ebf8ac6935c74a37343f3d8e9aa2921323ff",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/types.ts",
+      "bytes": 124482,
+      "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/contracts/v1/evidenceEvent.ts",
+      "bytes": 2639,
+      "sha256": "7ce34caf58283938fea6343768cc519a108da9932a99fad63a2e055ccba1c97a",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+      "bytes": 3431,
+      "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-gate-reachability.mjs",
+      "bytes": 9077,
+      "sha256": "e98e01722fd4cafcde62f49859d4ebf8ac6935c74a37343f3d8e9aa2921323ff",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/types.ts",
+      "bytes": 124482,
+      "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/contracts/v1/evidenceEvent.ts",
+      "bytes": 2639,
+      "sha256": "7ce34caf58283938fea6343768cc519a108da9932a99fad63a2e055ccba1c97a",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/diagnostic/evidenceEmitters.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/diagnostic/evidenceMaps/index.ts",
+      "bytes": 3431,
+      "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/scripts/check-gate-reachability.mjs",
+      "bytes": 9077,
+      "sha256": "e98e01722fd4cafcde62f49859d4ebf8ac6935c74a37343f3d8e9aa2921323ff",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/types.ts",
+      "bytes": 124508,
+      "sha256": "8a3392b07a0bb284fc59802d46fc779d48175ef216e9ebf30570350c76240a5b",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/claims/evidenceProvenance.ts",
+      "bytes": 12350,
+      "sha256": "0a11f57f0638db632c31ba58e9c725c9317252d0eaa63f024ab3436edff8b18a",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/contracts/v1/evidenceEvent.ts",
+      "bytes": 2639,
+      "sha256": "7ce34caf58283938fea6343768cc519a108da9932a99fad63a2e055ccba1c97a",
+      "readScope": "complete pure levels/registry/maps/gates source read; selected provenance/contract spans; others exact ownership byte pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/antiGaming.test.ts",
+      "bytes": 10023,
+      "sha256": "c5e70a5f43aa752951fea0986fd968dc9478d988db515a7ca7f9edd17eb9f7b0",
+      "readScope": "unchanged regression source pin; selected antiGaming/gating behavior reviewed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/evidenceGatingCorrection.test.ts",
+      "bytes": 9177,
+      "sha256": "a011916db822f3cbcd46139655c9cfe180a881edb966d2c944e30c21c25cfa7d",
+      "readScope": "unchanged regression source pin; selected antiGaming/gating behavior reviewed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/questionBank.test.ts",
+      "bytes": 1661,
+      "sha256": "819e864bb0a79353b8fb2999fccf1aa10d4e172a42e3ec0d3fd9022d67b997bc",
+      "readScope": "unchanged regression source pin; selected antiGaming/gating behavior reviewed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/spineEvidenceProjection.test.ts",
+      "bytes": 7475,
+      "sha256": "ae4e3281620d152a4772a0fa0f5957dfef00a4708bd1ab568e6a1102406d9341",
+      "readScope": "unchanged regression source pin; selected antiGaming/gating behavior reviewed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/liveEvidenceProjection.test.ts",
+      "bytes": 13578,
+      "sha256": "55add524d7bf97f8df043f6e5a5f48d8ee004521c2137070fbdd839b9fd9bb99",
+      "readScope": "unchanged regression source pin; selected antiGaming/gating behavior reviewed"
+    }
+  ],
+  "embeddedAllRootSourcePins": "observations.json rows[].source/regressions; semantic-equivalent observations.compact.json"
+}
