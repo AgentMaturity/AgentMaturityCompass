@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-16T22:11:39.081088+00:00",
+  "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaFallback.test.ts",
+  "bytes": 16974,
+  "sha256": "3f3eb0f312d18eef34d9625fe725b385ad29ff9d2042c533a1a41acdb2c1c5a0",
+  "fixedLiteralBodies": 4,
+  "regularSingleLink": true,
+  "onlyUntrackedSourceTest": true,
+  "indexUntouched": true,
+  "actualRuntimeCredit": false
+}

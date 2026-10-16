@@ -1,0 +1,16 @@
+{
+  "schema": "p125f-before-source-quality-baseline-adoption/1",
+  "at": "2026-10-16T22:09:34.659873+00:00",
+  "sourceBase": "a0cfbc280f2b11207205541ba89112c125c29895",
+  "priorActualReport": {
+    "path": "/private/tmp/p1-25-client-qualification-20261017/after-metadata-full.json",
+    "bytes": 247902,
+    "sha256": "5279fd99df8c6cf6052cd16f7dac47ed481d2207ea367b6637e881945caa9edb"
+  },
+  "priorStoredRole": "after-metadata",
+  "nextSemanticRole": "before-source",
+  "findings": 2720,
+  "reportCopiedEditedRelabelledOrScannerRerun": false,
+  "rootRebindRequiredIfSourceChanges": "Use this exact prior snapshot as the parent baseline only; after-source and after-metadata require their actual separate captures.",
+  "qualityGatePassClaim": false
+}

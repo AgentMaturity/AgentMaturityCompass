@@ -1,0 +1,53 @@
+{
+  "schema": "p125f-builder-preparation-seal/1",
+  "at": "2026-10-16T22:32:59.573205+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/manifest-builder-preparation/build-extension-inputs.py",
+      "bytes": 7506,
+      "sha256": "cfbf12df8ff1c6b27c521bdf7b0b45edf56f582f08ce4fd45545d68ef1da7ec3"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/manifest-builder-preparation/artifact-selection.json",
+      "bytes": 156595,
+      "sha256": "f0c9ea07c7acc04c04ac727d675ae8505dfb3f391cedfd214329675d2f183cea"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/manifest-builder-preparation/builder-admission-template.json",
+      "bytes": 1461,
+      "sha256": "af7b1e71a768de6741b0fc227487009533f4f65e4b38d5aaabc727115bfe0570"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/manifest-builder-preparation/README.md",
+      "bytes": 2864,
+      "sha256": "58156422ea6f8a3bd0154ff557a6a092b64758e3463f00ae6b5b52c2cafbaf55"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/manifest-builder-preparation/author-static-review.json",
+      "bytes": 981,
+      "sha256": "e4c76512d87016425401de9ffaaf6bf946e5ea0b8fdedee4de0f3440d4d14fd7"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/manifest-builder-preparation/input-pins.json",
+      "bytes": 3919,
+      "sha256": "2d4675eb6afbf72983d949066547414a8713141e12ee0edb62944eac038ce43c"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/README-fallback-extension.md",
+      "bytes": 20240,
+      "sha256": "0e06dd9663a62f3f861ead994abede47c20083ea35c48e30ee08bed85f559072"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/notes-fallback-extension.txt",
+      "bytes": 1606,
+      "sha256": "07af49c40713cdfc4859100aad00cf7d493393fd85d3a816d19056f722031c99"
+    }
+  ],
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "commandRowsAtFixedBoundary": 34,
+  "artifactRecipes": 282,
+  "builderOrAssemblerExecution": false,
+  "actualManifestOrAdmissionWritten": false,
+  "sourceIndexQaWrites": false,
+  "rootFullReadRequired": true
+}

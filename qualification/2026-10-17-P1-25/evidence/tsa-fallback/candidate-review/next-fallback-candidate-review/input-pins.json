@@ -1,0 +1,331 @@
+{
+  "schema": "p125-next-fallback-independent-review-pins/1",
+  "inputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/enforce/egressAllowlist.ts",
+      "bytes": 8093,
+      "sha256": "db66259630b75151ba90d87577a3f5afd56e4ea2d957b4fb7fd3a2434c4c7c99",
+      "readScope": "current source/API/default/setup contract read where relevant; exact bytes"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/enforce/evidenceEmitter.ts",
+      "bytes": 24443,
+      "sha256": "fc6885586da01b60ce062dedce3d6fde872fd87ae2919ae08e92d280d4190b41",
+      "readScope": "current source/API/default/setup contract read where relevant; exact bytes"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/residency/checkEgress.ts",
+      "bytes": 10311,
+      "sha256": "5ac226f5479a8b441738221c247b094ceb51a975af1252b82c9ded782b00d9af",
+      "readScope": "current source/API/default/setup contract read where relevant; exact bytes"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/residency/destinationRegistry.ts",
+      "bytes": 9134,
+      "sha256": "9cc37a4acb4eea64a0e93280d0a6727fba3d5574ccbc1414e223bd71a71ff21d",
+      "readScope": "current source/API/default/setup contract read where relevant; exact bytes"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/der.ts",
+      "bytes": 5959,
+      "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6",
+      "readScope": "current source/API/default/setup contract read where relevant; exact bytes"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+      "readScope": "current source/API/default/setup contract read where relevant; exact bytes"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+      "bytes": 10927,
+      "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "readScope": "current source/API/default/setup contract read where relevant; exact bytes"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+      "bytes": 16478,
+      "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89",
+      "readScope": "current source/API/default/setup contract read where relevant; exact bytes"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+      "bytes": 10386,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/README.md",
+      "bytes": 784,
+      "sha256": "1ac37a60cabc739bfa0a0f8489f20346e3d4ba23789e918d54d85b667783eef8",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/expired.token.der",
+      "bytes": 2356,
+      "sha256": "1baf6dd1c9d9601c98bf47506563b0226bfb132a884f674dad9eb641e3420d3a",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/missing-eku.token.der",
+      "bytes": 2332,
+      "sha256": "264ca611164421a268c868d0631660cbfc3423873cd9231514e7b9fd64280ec8",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/noncritical-eku.token.der",
+      "bytes": 2353,
+      "sha256": "84e186ce834f2a9f30a87a1b8ba722c95517c9e110a922ce72c72c67677d6896",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/provenance.json",
+      "bytes": 80160,
+      "sha256": "3c38fe129eecdd32d9f8cd2d89028dbe73e17ad5634ffd7b0667e0eef0c32366",
+      "readScope": "exact byte/hash input pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/public-certificates.json",
+      "bytes": 10021,
+      "sha256": "430746b4e4e721616a57bbec9d8b8a950cdd3b2631d51dc4925d263cb1642b52",
+      "readScope": "exact byte/hash input pin"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/query.der",
+      "bytes": 76,
+      "sha256": "6c039cf80c0e99b576a1802d7916835d5c11f85998c60ea866dc02a1403051c7",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/tampered-attribute.token.der",
+      "bytes": 2356,
+      "sha256": "fc6ac617be35765b6038bd928ec00d09de02cffbee88c6e99341d697517cfd1d",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/tstinfo.der",
+      "bytes": 93,
+      "sha256": "98e46babfb8aa4a7ba99eb4fd4976feca3f23a3e8cb6992ae93c435d6542ba35",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/valid.response.der",
+      "bytes": 2365,
+      "sha256": "cf14b113569a5be83fd3491938f5cb650724fffef7c0a946edb09fb62c1fdc31",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/valid.token.der",
+      "bytes": 2356,
+      "sha256": "d45216b462f9286af58ab5a3694c82b3b1675959a45011ec9c35eef1e4973912",
+      "readScope": "original public fixture bytes checked against provenance; no ASN.1/X509/verifier execution"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+      "readScope": "current source/API/default/setup contract read where relevant; exact bytes"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaClient.test.ts",
+      "bytes": 15569,
+      "sha256": "2e70ff1d331f9ec7263dc437119ce9ab505fc1e39c5fbbb27592569cad6c1cb8",
+      "readScope": "current source/API/default/setup contract read where relevant; exact bytes"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/verifyTimestamp.test.ts",
+      "bytes": 11425,
+      "sha256": "47f9aa1984cf61ae0d1192d2c04d4f3138c0fa42d32145124552bd648eddeb31",
+      "readScope": "current source/API/default/setup contract read where relevant; exact bytes"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+      "readScope": "current source/API/default/setup contract read where relevant; exact bytes"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "readScope": "current source/API/default/setup contract read where relevant; exact bytes"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-25.md",
+      "bytes": 12911,
+      "sha256": "db346645bc6ac0b783f22bbba50cb07b36e74832507218e4a2488a6d8b68f279",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447",
+      "readScope": "finite route/qualified-pattern/harness input; not executed"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-evidence-review/review.json",
+      "bytes": 8216,
+      "sha256": "28bdf11188e0a656d9208a89d8374a60f5ef31341ed99cfd7dda45eb4b1fd18e",
+      "readScope": "finite route/qualified-pattern/harness input; not executed"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-test-design/README.md",
+      "bytes": 3062,
+      "sha256": "575c1d5457baf0d06b243d12343ebef13cdd1c97596889e81c7a8479ee421c3c",
+      "readScope": "full candidate/README/matrix/author-review and pin metadata read"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-test-design/author-static-review.json",
+      "bytes": 1742,
+      "sha256": "66730365bf85ae1398d2edf5b16a2f682a938317a251895f9e594e95cf9f39f0",
+      "readScope": "full candidate/README/matrix/author-review and pin metadata read"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-test-design/input-pins.json",
+      "bytes": 14801,
+      "sha256": "c4dce3f64410fa3bdd37f67542a8ab89802d4dc3dc95d77fcfa9c5a603b6a016",
+      "readScope": "exact byte/hash input pin"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-test-design/matrix.json",
+      "bytes": 4886,
+      "sha256": "e160d9ae06b6c6395557795f1ef398feb971c69f77f06c890e5f2de8fb029cd0",
+      "readScope": "full candidate/README/matrix/author-review and pin metadata read"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-test-design/seal.json",
+      "bytes": 1774,
+      "sha256": "5ae3948e60616f0878389758b906c6addd5ee688397b22806ec498b35a0a35ef",
+      "readScope": "exact byte/hash input pin"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-test-design/tsaFallback.test.ts",
+      "bytes": 16974,
+      "sha256": "3f3eb0f312d18eef34d9625fe725b385ad29ff9d2042c533a1a41acdb2c1c5a0",
+      "readScope": "all candidate lines fully read; no parser/import/execution"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-p125-routing/README.md",
+      "bytes": 7366,
+      "sha256": "990f4daf012eacd5d868c88cca25fed924a7aa5ca7605d446ee5f6dc3f0b1efb",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-p125-routing/acceptance-and-controls.json",
+      "bytes": 4666,
+      "sha256": "a36065a5c04bf16495f9bd51058eb353495964ece4c2166541aae8a2cc6c4a60",
+      "readScope": "finite route/qualified-pattern/harness input; not executed"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-p125-routing/graph-query-tsa.json",
+      "bytes": 210,
+      "sha256": "ffb202bf0deacc898c34e1db13f637122cc456112f3035414999d175ef1b2c38",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-p125-routing/graph-query.json",
+      "bytes": 5843,
+      "sha256": "231d4870c73814debcfafce508ba105ca301b1e85979294d3383cb55525c62f9",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-p125-routing/ownership-observations.json",
+      "bytes": 804127,
+      "sha256": "f06649b940487f01c8abc465967bf2d308d1893beff82775c95775d73c2afd44",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-p125-routing/ownership-summary.json",
+      "bytes": 884,
+      "sha256": "b019510bee181398b6c8ee66265e95bba0d282e3da72894424b79f301d8464e0",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-p125-routing/pins.json",
+      "bytes": 19708,
+      "sha256": "2ff6a15f719b6a21b59866f704c42a4e245e94ef596178cc8324c79acb0265cf",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-p125-routing/private-sealing-stop.json",
+      "bytes": 567,
+      "sha256": "9911b3ca09a7e8e5e534b389332019caf14d614937275053b66f31e730fdd964",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-p125-routing/routing.json",
+      "bytes": 14622,
+      "sha256": "c9c9f879ab4d7447f2281f40d5a4943f2d21619db1e3a9cb765063ec402b0164",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-p125-routing/seal.json",
+      "bytes": 2723,
+      "sha256": "6d997436bcf89e2c2e9f826f520e9857d4b33f4bfd9e0951318f5c90d07b5489",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-p125-routing/source-evidence.json",
+      "bytes": 10933,
+      "sha256": "b0208b78c78b1be066b4abf0467b6aa24980799a0304b6e114469fdec70537e6",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-p125-routing/static-navigation-results.json",
+      "bytes": 1628,
+      "sha256": "2c9dbcce413dc31b6779c901f0f87a13bf8d0682de2e3685b2ac5887700bc111",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/scope-review/review.json",
+      "bytes": 5638,
+      "sha256": "9e75e7374ddb99670b4e3ee4b8d3cd745b2f97aafa04d2c4502e614d9da4f421",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/scope-review/seal.json",
+      "bytes": 2637,
+      "sha256": "4ab2ce6a6a42524287c6efdfa5c63515824bd309f28390b31cba008afec56b1f",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/source-checkpoint.json",
+      "bytes": 2242,
+      "sha256": "01dc7ee1acc35115f38f00ebc919c22b7805a21e78e1d65a60aaf5ae938b5315",
+      "readScope": "author finite input byte pin independently verified; semantic review only where noted below"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-run-prepared.py",
+      "bytes": 14874,
+      "sha256": "abbda23f645d38e643133ebbb4a9b19dc4f9bad5cab20d098c02449c6d3885e6",
+      "readScope": "finite route/qualified-pattern/harness input; not executed"
+    }
+  ],
+  "allRehashed": true,
+  "reservationProbe": false
+}

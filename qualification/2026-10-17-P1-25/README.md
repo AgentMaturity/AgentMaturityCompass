@@ -1,3 +1,33 @@
+# P1-25 fallback continuation qualification — 17 October 2026
+
+This extension qualifies the component's offline default, unmatched-anchor skip, ordered refusals and default-abort continuation. Source d8b5c3250138a10078c21886642595f669c4a73c adds four fallback test bodies and fifteen numeric spans across ten inventory surfaces. Production code and existing verifier tests are unchanged. This bounded checkpoint leaves full P1-25 and the plan open.
+
+The actual source and fresh canonical cohort passed 21/21: four fallback cases and seventeen unchanged verifier cases. This is one canonical inventory, not a sum of earlier 28/47-case lanes or repeated runs. The retained clean-source helper closed 0 in 47,211 ms and supplies no Vitest credit.
+
+| Actual fresh phase | Passed / total | Failed | First project assertion lines |
+| --- | --- | --- | --- |
+| Canonical | 21/21 | 0 | None |
+| F1: reverse TSA iteration | 18/21 | 3 | 239, 261, 287 |
+| Explicit restoration 1 | 21/21 | 0 | None |
+| F2: stop after caught error | 19/21 | 2 | 261, 287 |
+| Explicit restoration 2 | 21/21 | 0 | None |
+| F3: dispatch unmatched anchor | 20/21 | 1 | 237 |
+| Explicit restoration 3 | 21/21 | 0 | None |
+
+F1's unmatched-anchor zero-wire and route assertions at 237–238 pass before failure ordering fails at 239. Its order assertion at 261 and timeout route assertion at 287 precede later result assertions. F2 prevents continuation after actual HTTP 500 and after the real default abort; the same route assertions fail before later results. F3 reaches the missing-anchor route after the genuine matching-anchor positive at 231, then fails the zero-wire assertion at 237. Later 238–241 assertions are masked. Every actual failure, earlier positive and mask is retained; manual source/operator/outcome-bound classifications precede the separate byte-exact restorations.
+
+Each source/fresh run retained two passing hook entries with three hook values, joined ordered raw/observer identities, natural owned-PGID ESRCH closure and no nonzero signals, unhandled, late, hook or cleanup errors. Four finite lifecycle records per run preserve request/response/socket terminal observations. The unchanged 10,000 ms production timeout executes; the original path reaches the next HTTP 500 after the actual abort. The message is string evidence, not a typed AbortError/code contract or universal resource isolation. No guard, environment, clock, test deadline, native, package or policy bypass was used.
+
+The source and runtime reviews bind 72 selected paths in each checkout, eight original compiled pairs, all 128 protected inputs, eight distinct native physical identities and held R's unchanged HEAD/eighteen status rows/empty index. Source-only controls give no modified compiled-output sensitivity credit. All three original metadata pins remain protected through runtime; later metadata successors need separate exact root admission.
+
+All eleven scoped source checks passed, including freeze. The inventory change is 1,692 to 1,693 files; all other authored bytes and twenty Claude/R count variants remain exact. Global quality remains RED: 1,268 duplicate findings and 2,719 dead-code findings, without waiver or baseline changes. Only requestTimestamp's unused-export finding disappears through test reachability.
+
+A fresh-query successful grant, ordered fallback to a successful genuine grant, signed trust-list admission, required-time callers, checkpoint windows/integration, sealing, issuance and report/CLI integration remain open. No independent TTL contract was found; checkpoint cadence and certificate validity are not TTL coverage. Held package/generator/report decisions, P1-01 gaps and F37's explicit skip remain intact. No public TSA submission, full-suite/coverage, CI, release, tracker or plan completion is claimed. Later private/source validation, Git publication/index/whitespace checks, committed-only export and QA closure are separate actual records.
+
+The current evidence is indexed under evidence/tsa-fallback, including source-evidence-review/review.json, fresh-control-runtime-review/review.json and whole-issue-gaps.json. The earlier receipt text below is retained verbatim as historical evidence for its own source checkpoints and cohorts.
+
+---
+
 # P1-25 client request and raw HTTP qualification extension
 
 The current client checkpoint is source `5beb3eae69b08f2e895520c7f459e1465780beeb` on `codex/p1-25-client-qualification`. Its source and retained fresh checkout each pass the same 28 cases: 11 new request/HTTP cases and 17 unchanged genuine-token verifier cases. Each exact restoration also passes 28/28. The active receipt selects this single fresh canonical cohort; baseline, historical, control and restoration counts are not added together. Whole P1-25, P1-01, global quality, CI, release and the plan remain open.
