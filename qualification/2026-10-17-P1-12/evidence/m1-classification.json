@@ -1,0 +1,18 @@
+{
+  "phase": "p112-m1",
+  "rootAllFailuresRead": true,
+  "sourceCommit": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+  "operator": "visibility-refusal",
+  "outcomeSha256": "b2da655c01d46dca232e362e9fa67c74fda72bd9652c42918fa39e665a6f0462",
+  "noHookOrEnvironmentFailure": true,
+  "classification": "Semantic assertion RED: removing the hidden-tool refusal returns undefined for unit.hidden instead of the exact visibleTools denial. The earlier listed-tool neutral positive and visible-name checks passed.",
+  "firstFailure": {
+    "file": "tests/policy/compiledPolicyGuard.test.ts",
+    "line": 80,
+    "test": "shows listed names and names a hidden-tool refusal",
+    "received": "undefined",
+    "expected": "compiled policy denied this call (toolPipeline.visibleTools): \"unit.hidden\" is not a visible tool"
+  },
+  "maskedAssertions": [],
+  "scope": "Pure denial helper on supplied derived inputs; no destination or signed authority claim."
+}

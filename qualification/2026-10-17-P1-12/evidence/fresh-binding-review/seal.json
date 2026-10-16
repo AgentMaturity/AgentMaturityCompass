@@ -1,0 +1,23 @@
+{
+  "schema": "private-finite-binding-review-seal/1",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-binding-review/review.json",
+      "bytes": 7650,
+      "sha256": "413481581e151a163f37c3ca1acc1453fd262f908b2b98367906509fefaae1a1"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-binding-review/README.md",
+      "bytes": 1035,
+      "sha256": "2aa12dd8a71ddecff96d518ec13c3b185231c025738fab55844a3804cdb761c0"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-binding-review/input-pins.json",
+      "bytes": 74787,
+      "sha256": "aab982a981c2ba344739d8425c7a8d85091722e2d7144eccf9d321bb26064e65"
+    }
+  ],
+  "allReadsFinished": true,
+  "blockers": [],
+  "executionByReviewer": false
+}

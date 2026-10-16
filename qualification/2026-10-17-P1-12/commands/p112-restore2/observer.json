@@ -1,0 +1,492 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 26339,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/toolPipeline.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/toolPolicyGuards.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/policy/compiledPolicyGuard.test.ts"
+  ],
+  "testCount": 35,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "1413766901",
+      "name": "tests/toolPipeline.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/toolPipeline.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1413766901_0",
+      "name": "tests/toolPipeline.test.ts a call traverses the full pipeline",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_0_0",
+      "name": "tests/toolPipeline.test.ts a call traverses the full pipeline is denied, then proceeds once approval is granted",
+      "fullName": "a call traverses the full pipeline is denied, then proceeds once approval is granted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_0_1",
+      "name": "tests/toolPipeline.test.ts a call traverses the full pipeline denies an unanswered approval rather than treating silence as yes",
+      "fullName": "a call traverses the full pipeline denies an unanswered approval rather than treating silence as yes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_0_2",
+      "name": "tests/toolPipeline.test.ts a call traverses the full pipeline denies when approval is required and no answerer is composed at all",
+      "fullName": "a call traverses the full pipeline denies when approval is required and no answerer is composed at all",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_0_3",
+      "name": "tests/toolPipeline.test.ts a call traverses the full pipeline reports an unknown tool as a visibility denial, distinct from a policy one",
+      "fullName": "a call traverses the full pipeline reports an unknown tool as a visibility denial, distinct from a policy one",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1413766901_1",
+      "name": "tests/toolPipeline.test.ts a guard cannot launder a denial by ordering",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_1_0",
+      "name": "tests/toolPipeline.test.ts a guard cannot launder a denial by ordering stays denied no matter where a permissive guard is registered",
+      "fullName": "a guard cannot launder a denial by ordering stays denied no matter where a permissive guard is registered",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_1_1",
+      "name": "tests/toolPipeline.test.ts a guard cannot launder a denial by ordering is not overturned by an approval granted upstream",
+      "fullName": "a guard cannot launder a denial by ordering is not overturned by an approval granted upstream",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_1_2",
+      "name": "tests/toolPipeline.test.ts a guard cannot launder a denial by ordering cannot be cleared by a post-execute filter",
+      "fullName": "a guard cannot launder a denial by ordering cannot be cleared by a post-execute filter",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_1_3",
+      "name": "tests/toolPipeline.test.ts a guard cannot launder a denial by ordering lets a scoped guard deny what the global layer left alone",
+      "fullName": "a guard cannot launder a denial by ordering lets a scoped guard deny what the global layer left alone",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1413766901_2",
+      "name": "tests/toolPipeline.test.ts outcome fields are orthogonal",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_2_0",
+      "name": "tests/toolPipeline.test.ts outcome fields are orthogonal reports a timeout AND an exit code, not one collapsed status",
+      "fullName": "outcome fields are orthogonal reports a timeout AND an exit code, not one collapsed status",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_2_1",
+      "name": "tests/toolPipeline.test.ts outcome fields are orthogonal keeps denial separate from exit status",
+      "fullName": "outcome fields are orthogonal keeps denial separate from exit status",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_2_2",
+      "name": "tests/toolPipeline.test.ts outcome fields are orthogonal distinguishes a tool that threw from a tool that was denied",
+      "fullName": "outcome fields are orthogonal distinguishes a tool that threw from a tool that was denied",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1413766901_3",
+      "name": "tests/toolPipeline.test.ts arguments are frozen",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_3_0",
+      "name": "tests/toolPipeline.test.ts arguments are frozen cannot be mutated by a guard between the decision and the body",
+      "fullName": "arguments are frozen cannot be mutated by a guard between the decision and the body",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_3_1",
+      "name": "tests/toolPipeline.test.ts arguments are frozen is detached from the caller's object",
+      "fullName": "arguments are frozen is detached from the caller's object",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_3_2",
+      "name": "tests/toolPipeline.test.ts arguments are frozen freezes nested structures, not just the top level",
+      "fullName": "arguments are frozen freezes nested structures, not just the top level",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_3_3",
+      "name": "tests/toolPipeline.test.ts arguments are frozen refuses arguments JSON would silently mangle",
+      "fullName": "arguments are frozen refuses arguments JSON would silently mangle",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1413766901_4",
+      "name": "tests/toolPipeline.test.ts restrictions narrow, never widen",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_4_0",
+      "name": "tests/toolPipeline.test.ts restrictions narrow, never widen hides a globally registered tool from a restricted scope",
+      "fullName": "restrictions narrow, never widen hides a globally registered tool from a restricted scope",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_4_1",
+      "name": "tests/toolPipeline.test.ts restrictions narrow, never widen shows only what an allow-list names",
+      "fullName": "restrictions narrow, never widen shows only what an allow-list names",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1413766901_4_2",
+      "name": "tests/toolPipeline.test.ts restrictions narrow, never widen cannot re-admit a name the global layer denied",
+      "fullName": "restrictions narrow, never widen cannot re-admit a name the global layer denied",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "1577872787",
+      "name": "tests/toolPolicyGuards.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/toolPolicyGuards.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1577872787_0",
+      "name": "tests/toolPolicyGuards.test.ts the runtime firewall as a tool guard",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1577872787_0_0",
+      "name": "tests/toolPolicyGuards.test.ts the runtime firewall as a tool guard blocks every call in a workspace with no signed policy",
+      "fullName": "the runtime firewall as a tool guard blocks every call in a workspace with no signed policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1577872787_0_1",
+      "name": "tests/toolPolicyGuards.test.ts the runtime firewall as a tool guard lets calls through once a policy is signed",
+      "fullName": "the runtime firewall as a tool guard lets calls through once a policy is signed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1577872787_1",
+      "name": "tests/toolPolicyGuards.test.ts budgets as a tool guard",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1577872787_1_0",
+      "name": "tests/toolPolicyGuards.test.ts budgets as a tool guard denies the next execute at the limit, on the class that ran out",
+      "fullName": "budgets as a tool guard denies the next execute at the limit, on the class that ran out",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1577872787_1_1",
+      "name": "tests/toolPolicyGuards.test.ts budgets as a tool guard never denies a SIMULATE call for budget",
+      "fullName": "budgets as a tool guard never denies a SIMULATE call for budget",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1577872787_1_2",
+      "name": "tests/toolPolicyGuards.test.ts budgets as a tool guard denies EVERY class when the budgets config cannot be verified",
+      "fullName": "budgets as a tool guard denies EVERY class when the budgets config cannot be verified",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1577872787_2",
+      "name": "tests/toolPolicyGuards.test.ts guards compose without either one weakening the other",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1577872787_2_0",
+      "name": "tests/toolPolicyGuards.test.ts guards compose without either one weakening the other denies when either engine denies, and names which",
+      "fullName": "guards compose without either one weakening the other denies when either engine denies, and names which",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1483117056",
+      "name": "tests/policy/compiledPolicyGuard.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/policy/compiledPolicyGuard.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1483117056_0",
+      "name": "tests/policy/compiledPolicyGuard.test.ts compiled policy guard on already-derived unit inputs",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1483117056_0_0",
+      "name": "tests/policy/compiledPolicyGuard.test.ts compiled policy guard on already-derived unit inputs shows listed names and names a hidden-tool refusal",
+      "fullName": "compiled policy guard on already-derived unit inputs shows listed names and names a hidden-tool refusal",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1483117056_0_1",
+      "name": "tests/policy/compiledPolicyGuard.test.ts compiled policy guard on already-derived unit inputs keeps run_code visible without exempting its call from compiled guards",
+      "fullName": "compiled policy guard on already-derived unit inputs keeps run_code visible without exempting its call from compiled guards",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1483117056_0_2",
+      "name": "tests/policy/compiledPolicyGuard.test.ts compiled policy guard on already-derived unit inputs fails closed on unsupported guard names and identifies each supplied control version",
+      "fullName": "compiled policy guard on already-derived unit inputs fails closed on unsupported guard names and identifies each supplied control version",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1483117056_0_3",
+      "name": "tests/policy/compiledPolicyGuard.test.ts compiled policy guard on already-derived unit inputs requires a lease only for the identity-binding rule's explicit lease requirement",
+      "fullName": "compiled policy guard on already-derived unit inputs requires a lease only for the identity-binding rule's explicit lease requirement",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1483117056_0_4",
+      "name": "tests/policy/compiledPolicyGuard.test.ts compiled policy guard on already-derived unit inputs requires the already-derived authorization to carry its lease identity",
+      "fullName": "compiled policy guard on already-derived unit inputs requires the already-derived authorization to carry its lease identity",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1483117056_0_5",
+      "name": "tests/policy/compiledPolicyGuard.test.ts compiled policy guard on already-derived unit inputs rejects absent and OS-user principals while consuming the authenticated principal methods",
+      "fullName": "compiled policy guard on already-derived unit inputs rejects absent and OS-user principals while consuming the authenticated principal methods",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1483117056_0_6",
+      "name": "tests/policy/compiledPolicyGuard.test.ts compiled policy guard on already-derived unit inputs preserves lease-before-principal refusal when both identity requirements apply",
+      "fullName": "compiled policy guard on already-derived unit inputs preserves lease-before-principal refusal when both identity requirements apply",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1483117056_0_7",
+      "name": "tests/policy/compiledPolicyGuard.test.ts compiled policy guard on already-derived unit inputs leaves identity requirements disabled when neither flag is required",
+      "fullName": "compiled policy guard on already-derived unit inputs leaves identity requirements disabled when neither flag is required",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1483117056_0_8",
+      "name": "tests/policy/compiledPolicyGuard.test.ts compiled policy guard on already-derived unit inputs projects the digest and revision with approval-class control before the guard fallback",
+      "fullName": "compiled policy guard on already-derived unit inputs projects the digest and revision with approval-class control before the guard fallback",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1483117056_0_9",
+      "name": "tests/policy/compiledPolicyGuard.test.ts compiled policy guard on already-derived unit inputs leaves absent admitting controls null and unknown control versions explicitly null",
+      "fullName": "compiled policy guard on already-derived unit inputs leaves absent admitting controls null and unknown control versions explicitly null",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1483117056_0_10",
+      "name": "tests/policy/compiledPolicyGuard.test.ts compiled policy guard on already-derived unit inputs projects only the supplied approval-required action classes without granting authority",
+      "fullName": "compiled policy guard on already-derived unit inputs projects only the supplied approval-required action classes without granting authority",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

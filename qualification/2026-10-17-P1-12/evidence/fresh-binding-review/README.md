@@ -1,0 +1,5 @@
+The actual post-build binding matches 59 selected paths in S and Q at source305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71. All 118 selected files have distinct regular physical identities and equal paired bytes. Eight compiled pairs receive preservation credit only; no prospective count hash was adopted. All 88 protected inputs and five distinct single-link native files match, including new Q inode543305423 and the retained S/R/Q125/Q111 identities. The borrowed R runner pin also matches.
+
+The fresh helper naturally exited0 after46,076ms with owned PGID25433 absent by ESRCH and no nonzero signal. Its actual log passes frozen install/build/doctor and signed keyless one-turn/cross-process two-turn checks. This creates no Vitest or source-control credit. Git cleanliness and held R status/head/index are root-recorded binding facts; this reviewer checked files and metadata only.
+
+No product command or source/index/QA write occurred. Snapshot/isolation limits, full-issue gaps, held decisions and global REDquality remain explicit.

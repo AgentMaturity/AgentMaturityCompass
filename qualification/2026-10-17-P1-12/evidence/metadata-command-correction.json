@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-16T20:15:51.657319+00:00",
+  "phase": "p112-source-receipt-validation",
+  "actualExit": 1,
+  "actualError": "ERR_PNPM_NO_SCRIPT Missing script: check:qualification-receipts",
+  "validatorExecutedByFailedCall": false,
+  "existingScript": "check:qualification",
+  "packageUnchanged": true,
+  "gateBypass": false,
+  "retryPolicy": "Root manually corrects the command after reading the actual error and unchanged package.json. No automatic retry or result normalization.",
+  "proseCorrection": "The stale draft clause about future helper controls is replaced with actual completed control boundaries. Per-run hook wording avoids summed-cohort ambiguity.",
+  "originalPacket": "private-receipt-root/2026-10-17-P1-12",
+  "originalManifest": "actual-receipt-inputs.json",
+  "originalsPreserved": true
+}

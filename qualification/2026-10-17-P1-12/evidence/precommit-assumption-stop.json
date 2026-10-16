@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-16T20:03:40.256937+00:00",
+  "schema": "p112-private-precommit-assumption-stop/1",
+  "attempt": "First private precommit metadata read, before any staging or commit.",
+  "result": "AssertionError at stdin line9 because the copied private predicate assumed dead-code findings stayed2724.",
+  "sourceIndexChanged": false,
+  "sourceChangedByStoppedRead": false,
+  "harnessHaltCreated": false,
+  "qualityGateOutcomesUnchanged": "Both dead-code gate commands retain exit1; duplicate gates retain exit1. No baseline or policy adoption.",
+  "currentActualDiagnostic": "quality-delta.json",
+  "removed": [
+    "[\"src/tools/guards/compiledPolicyGuard.ts\",\"exports\",{\"name\":\"compiledPolicyDenial\"}]"
+  ],
+  "added": [],
+  "next": "Use actual before2724/after2723 in the private checkpoint review; retain both failed gate outcomes and the complete diagnostic sets."
+}

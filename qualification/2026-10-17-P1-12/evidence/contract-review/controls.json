@@ -1,0 +1,49 @@
+{
+  "schema": "p112-static-source-control-design/1",
+  "controls": [
+    {
+      "id": "visibility-refusal",
+      "targetRel": "src/tools/guards/compiledPolicyGuard.ts",
+      "sourceSha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710",
+      "before": "  if (!compiledPolicyShows(policy, execution.name)) {\n    return `compiled policy denied this call (toolPipeline.visibleTools): \"${execution.name}\" is not a visible tool`;\n  }\n",
+      "replacement": "",
+      "matchCount": 1,
+      "proposedBytes": 7509,
+      "proposedSha256ComputedOnly": "3a229eb16191eedd22930ada4f4af5a725aa6e9d42ff7076019c9cdaf0e0880c",
+      "firstMeaningfulWitness": "An otherwise admissible invisible tool must have the exact visibleTools refusal. A listed tool with no guards or approvals must first return undefined. Removing this refusal changes only denial-helper behavior, not destination effects.",
+      "candidateExactIdentity": "Pending sealed author candidate; root chooses after review.",
+      "masking": "Keep earlier visibility and independent identity condition satisfied. No approval rule prevents filesystem/signature errors from becoming an unrelated outcome. First failed assertion only gets RED credit; later assertions/iterations may be masked.",
+      "execution": "Design only. Later one operator at a time in root-owned freshQ, exact original backup and source-only write, actual closed semantic RED classification, exact restore and same-corpus GREEN; no compiled/native mutation or predicted counts."
+    },
+    {
+      "id": "lease-presence",
+      "targetRel": "src/tools/guards/compiledPolicyGuard.ts",
+      "sourceSha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710",
+      "before": "  if (params.requireAgentLease === true && !record?.delegation.leaseId) return \"IDENTITY_UNRESOLVED: the call carries no verified agent lease\";\n",
+      "replacement": "",
+      "matchCount": 1,
+      "proposedBytes": 7541,
+      "proposedSha256ComputedOnly": "03f1c701e6b303252b9efcd2d7000b16df06d68d916fc99471d05a31308f26ba",
+      "firstMeaningfulWitness": "Use a visible tool, only identity-binding requireAgentLease=true, requirePrincipal absent/false, no approval rule, missing authorization or null leaseId. Assert IDENTITY_UNRESOLVED/control naming after an otherwise equivalent supplied nonempty leaseId positive. This proves typed record-field consumption only.",
+      "candidateExactIdentity": "Pending sealed author candidate; root chooses after review.",
+      "masking": "Keep earlier visibility and independent identity condition satisfied. No approval rule prevents filesystem/signature errors from becoming an unrelated outcome. First failed assertion only gets RED credit; later assertions/iterations may be masked.",
+      "execution": "Design only. Later one operator at a time in root-owned freshQ, exact original backup and source-only write, actual closed semantic RED classification, exact restore and same-corpus GREEN; no compiled/native mutation or predicted counts."
+    },
+    {
+      "id": "principal-binding",
+      "targetRel": "src/tools/guards/compiledPolicyGuard.ts",
+      "sourceSha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710",
+      "before": "  if (params.requirePrincipal === true && (!record || record.principal.authenticatedVia === \"cli-os-user\")) {\n    return \"PRINCIPAL_UNRESOLVED: no authenticated principal is bound to the call (an OS user name is self-reported)\";\n  }\n",
+      "replacement": "",
+      "matchCount": 1,
+      "proposedBytes": 7452,
+      "proposedSha256ComputedOnly": "795d017b45195c9579a9e32769d1673d33c3e8ab010d5042bdacba3663df4463",
+      "firstMeaningfulWitness": "Use a visible tool, only identity-binding requirePrincipal=true and lease requirement false, no approval rule; OS-user or missing record must refuse after lease/studio-session/approval-engine typed positives. Assert exact PRINCIPAL_UNRESOLVED/control naming; no real authority verification claim.",
+      "candidateExactIdentity": "Pending sealed author candidate; root chooses after review.",
+      "masking": "Keep earlier visibility and independent identity condition satisfied. No approval rule prevents filesystem/signature errors from becoming an unrelated outcome. First failed assertion only gets RED credit; later assertions/iterations may be masked.",
+      "execution": "Design only. Later one operator at a time in root-owned freshQ, exact original backup and source-only write, actual closed semantic RED classification, exact restore and same-corpus GREEN; no compiled/native mutation or predicted counts."
+    }
+  ],
+  "mutantFilesWritten": false,
+  "executionByReviewer": false
+}
