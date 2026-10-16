@@ -76,7 +76,7 @@ A first line with `type: "session"` and any DSH-only header key (`createdAt`, `i
 
 Other DSH refusals (limits, malformed lines, noncontiguous sequences) are also shown by name in the import plan instead of a generic parse error. A Pi durable-storage header (`kind: "header"` with `v` or `storageVersion`) is refused in the same way: "Pi durable session format v4 is not supported; AMC imports Pi CLI session v3."
 
-**DSH format v4 is refused, not qualified.** Qualifying it needs at least three recorded v4 sessions (a tool call, a tool error and an interruption) from a pinned DSH release with a local scripted provider, and every v4 event type documented at that pin. None have been recorded, and the v4 header shape has not been re-checked against DSH source for this release, so AMC ships the refusal. Re-export such sessions as v2 if your DSH version can, or keep them outside AMC.
+**DSH format v4 is refused, not qualified.** On 2026-10-16, the upstream session types and JSONL physical-header code were checked at the [strategy pin `5badb150`](https://github.com/deepseek-ai/deepseek-harness/blob/5badb15009ae1756c3afe0ae0cef1faafc290ccc/packages/session/session-persistence-jsonl/src/format.ts) (format v4) and [AMC pin `c389f96b`](https://github.com/deepseek-ai/deepseek-harness/blob/c389f96bf3a9b6807cb71ed6bdad5849be0df6d8/packages/session/session-persistence-jsonl/src/format.ts) (format v2). Both use a physical `type: "session"` header with `version`, `createdAt`, `isSeeded` and `delegationDepth`, so AMC recognizes the v4 header and refuses its unsupported version before generic import. This source check does not qualify v4 events. Qualification still needs at least three recorded v4 sessions (a tool call, a tool error and an interruption) from a pinned DSH release with a local scripted provider, with every event type documented at that pin. No such sessions have been recorded for AMC. Re-export as v2 if your DSH version supports it, or keep the sessions outside AMC.
 
 ### Original bytes and losses
 
@@ -90,12 +90,14 @@ A retained original proves the bytes are unchanged since import. It does not pro
 
 ## Session-log uploads to DeepSeek
 
-DSH's `session-log-deepseek` plugin uploads session logs to DeepSeek by default. AMC's reading of that plugin's README at DSH commit 5badb150 is below; it has not been re-checked for this release, so confirm it at the DSH version you deploy:
+The plugin's defaults differ between the two pinned revisions. Its README and configuration schema were rechecked on 2026-10-16:
 
-- The plugin adds a `dsh_session_log` field, up to 8 MiB (setting `maxBytes`), to requests sent to the official DeepSeek API.
-- `enabled: false` stops it. The shipped profiles mount the plugin.
-- Re-enabling it resends events recorded while it was off.
-- OpenTelemetry feedback uploads have a separate setting.
+| Pinned revision | Session-log upload default | Request-field size limit |
+|---|---|---|
+| [Strategy pin `5badb150`](https://github.com/deepseek-ai/deepseek-harness/blob/5badb15009ae1756c3afe0ae0cef1faafc290ccc/packages/session/session-log-deepseek/README.md) | `enabled: true` | `maxBytes` defaults to 8 MiB |
+| [AMC capture/import pin `c389f96b`](https://github.com/deepseek-ai/deepseek-harness/blob/c389f96bf3a9b6807cb71ed6bdad5849be0df6d8/packages/session/session-log-deepseek/README.md) | `enabled: false` | No independent request-field size cap at this pin |
+
+These are package defaults, not proof of a deployment's effective configuration. Both pins mount the plugin in shipped profiles; overlays can enable it. When enabled, it contributes `dsh_session_log` to official DeepSeek API requests. Set `enabled: false` explicitly when session logs must stay local. At the strategy pin, re-enabling resumes the unaccepted suffix, including events recorded while disabled, and OpenTelemetry feedback uploads have a separate setting. Check the settings and source of the exact version you deploy.
 
 A regulated deployment that must keep session logs local can follow this procedure:
 
