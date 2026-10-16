@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "key": "P1-25",
   "date": "2026-10-17",
-  "commit": "188681b32dc472983404dce19e7833cd76ee7576",
-  "branch": "codex/p1-25-grant-qualification",
+  "commit": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+  "branch": "codex/p1-25-checkpoint-qualification",
   "node": "v22.23.3",
   "pnpm": "10.33.0",
-  "os": "darwin",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
   "arch": "arm64",
   "commands": [
     {
@@ -713,22 +713,182 @@
       "cmd": "/opt/homebrew/bin/pnpm --version",
       "exit": 0,
       "durationMs": 225
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1192
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/time/tsaTestFixture.ts tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts",
+      "exit": 0,
+      "durationMs": 353
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125k-source-combined.raw.json",
+      "exit": 0,
+      "durationMs": 3556
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 379
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:counts",
+      "exit": 1,
+      "durationMs": 608
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 37389
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run typecheck",
+      "exit": 0,
+      "durationMs": 25836
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1533
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths README.md CONTRIBUTING.md website/index.html website/lite.html website/i18n.js docs/content/show-hn-draft.md docs/content/reddit-launch-drafts.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md whitepaper/AMC_WHITEPAPER_v1.md",
+      "exit": 0,
+      "durationMs": 322
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run gen-counts",
+      "exit": 0,
+      "durationMs": 487
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run lint",
+      "exit": 0,
+      "durationMs": 2815
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run build",
+      "exit": 0,
+      "durationMs": 29757
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 591
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:gates",
+      "exit": 0,
+      "durationMs": 468
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:threat-model",
+      "exit": 0,
+      "durationMs": 268
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1587
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:docs-drift",
+      "exit": 0,
+      "durationMs": 315
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1178
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:third-party-notices",
+      "exit": 0,
+      "durationMs": 220
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:qualification",
+      "exit": 0,
+      "durationMs": 852
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:duplicates",
+      "exit": 1,
+      "durationMs": 585
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:dead-code",
+      "exit": 1,
+      "durationMs": 2796
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p1-25-checkpoint-qualification-20261017/capture-quality.mjs after-source",
+      "exit": 0,
+      "durationMs": 2587
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths README.md CONTRIBUTING.md website/index.html website/lite.html website/i18n.js docs/content/show-hn-draft.md docs/content/reddit-launch-drafts.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md whitepaper/AMC_WHITEPAPER_v1.md tests/time/tsaGrant.test.ts tests/time/checkpointWindow.test.ts tests/time/tsaTestFixture.ts",
+      "exit": 0,
+      "durationMs": 334
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125k-source-after-eof.raw.json",
+      "exit": 0,
+      "durationMs": 3446
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 48118
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125k-fresh-canonical.raw.json",
+      "exit": 1,
+      "durationMs": 3703
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125k-fresh-canonical-corrected-path.raw.json",
+      "exit": 0,
+      "durationMs": 3426
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125k-m1.raw.json",
+      "exit": 1,
+      "durationMs": 3454
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125k-restore1.raw.json",
+      "exit": 0,
+      "durationMs": 3422
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125k-m2.raw.json",
+      "exit": 1,
+      "durationMs": 3484
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125k-restore2.raw.json",
+      "exit": 0,
+      "durationMs": 3573
     }
   ],
   "tests": {
-    "total": 19,
-    "passed": 19,
+    "total": 21,
+    "passed": 21,
     "failed": 0,
     "skipped": 0
   },
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "e55024763f964239a65fa8b9fb80ff236c26f9ffb21518908b892d195d6ded68"
+      "sha256": "d0ba38b25c4737ff34977213db42847da1bccbdd6f6f1183bce1f33d98b305d9"
     },
     {
       "path": "assembly-inputs.json",
-      "sha256": "308eea402785300a4e2f1cfe7e683ac1af60b9c790181a0584a3600301cbb5e7"
+      "sha256": "ea081b90920f200518c787035f7789a187e80060bc7065b4ea493b617455e88d"
     },
     {
       "path": "commands/p125-architecture/command.json",
@@ -1861,6 +2021,1470 @@
     {
       "path": "evidence/branch-preparation.json",
       "sha256": "4c320d28c40930dc95ccf0949b063b834e21f6f3f7b5bb207e7240101d2f49ba"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/preparation/fresh-control-preparation/check-preservation.py.source.txt",
+      "sha256": "4f06779e8dad11811fc17976651b7d14938f1c093d4534a545f453241f404c7c"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/preparation/fresh-control-preparation/source-control-v2.py.source.txt",
+      "sha256": "585b761a615a4fed59c1961ccd15b353728b73ab8c583dc5d83cbc4df89f6f27"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/preparation/fresh-control-preparation/source-control.py.source.txt",
+      "sha256": "7aecaaa15175013ccf6b2c4d2f54b6a4ca7921a3af407cfed57e0fcbf2c37be0"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/root/audit-observed.py.source.txt",
+      "sha256": "3fa420420119af3654c1fe6e6c4ccccdae7c5a4e7f0e2d51a0bc1229cd2f3c3e"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/root/audit-public.py.source.txt",
+      "sha256": "00bbdd28399cdc07f54701e59afc5424d4c174c9f02c6027875140247052be65"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/root/bind-fresh.py.source.txt",
+      "sha256": "b5728229f2780eff8922655a6e99efa48a4655ef08dc885f20841a6da4e7118d"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/root/capture-quality.mjs.source.txt",
+      "sha256": "66cae1aaf6712d83b23a0b69f74d09edb97edcf264999576ac4dc488830e8dda"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/root/check-preservation.py.source.txt",
+      "sha256": "4f06779e8dad11811fc17976651b7d14938f1c093d4534a545f453241f404c7c"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/root/m1-original.ts.source.txt",
+      "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/root/m2-original.ts.source.txt",
+      "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/root/prepare-public-output.py.source.txt",
+      "sha256": "76c81f1a94d4a0dae684c51bd6d6409e2387585267fe623e790a094d5260bdb7"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/root/source-control.py.source.txt",
+      "sha256": "7aecaaa15175013ccf6b2c4d2f54b6a4ca7921a3af407cfed57e0fcbf2c37be0"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/source/tests/time/tsaGrant.test.ts.source.txt",
+      "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/source/tests/time/tsaTestFixture.ts.source.txt",
+      "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/support/observer-reporter.mjs.source.txt",
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    },
+    {
+      "path": "evidence/checkpoint-window/code/support/post-typecheck-run-prepared.py.source.txt",
+      "sha256": "abbda23f645d38e643133ebbb4a9b19dc4f9bad5cab20d098c02449c6d3885e6"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-clean-source/command.json",
+      "sha256": "7150dc106dcefd006e6efb0841b71926a401c37d25cff37aab124b6401fb7a0f"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-clean-source/stdout-stderr.log.evidence.json",
+      "sha256": "a43783f2e2d202b500f9affa80ccad0f53c38d80ef82bc405e3c4617129db233"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-count-pre-d15/command.json",
+      "sha256": "fd34511f105f8663e3b055e5c4a2ad27534feea1b84362f2b187a34043119410"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-count-pre-d15/stdout-stderr.log.evidence.json",
+      "sha256": "08d80b092f9f4da9bb6a86b1945719b5406a5971ddc4c27984b87aa3d523c8ea"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-count-pre-freeze/command.json",
+      "sha256": "c44da6b1e195916fd4a3f93194e2aa5bbbeef6814affbe818b4469501b97bff6"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-count-pre-freeze/stdout-stderr.log.evidence.json",
+      "sha256": "6d73cbe7ba0d176c16fbf19748cbaa8263c5a4489aec59e647b1888124a1a959"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-counts-before/command.json",
+      "sha256": "10d674981481160954b30f29691c4783fa6142c12f883e4522329d0d6d4d8666"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-counts-before/stdout-stderr.log.evidence.json",
+      "sha256": "20b2ca5bb621998dca21fb4967e84f1cb206829c1e09e2c964688fa3ce236bd0"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-counts-source-before/command.json",
+      "sha256": "be8fec32732ead354cc1b871cd2bbd749f642aaa3138bcb43b529627dc05bbd5"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-counts-source-before/stdout-stderr.log.evidence.json",
+      "sha256": "83da95f2e225f9025265f7a616d545a61feeed7dbc7aeb026a23767a5f3e1791"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-fresh-canonical-corrected-path/command.json",
+      "sha256": "9fd6e043c32743b2cb6c8819e178727cc179d7fe42491e9d21d7e6a00f1f012b"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-fresh-canonical-corrected-path/observer.json",
+      "sha256": "411118a7562a00809670902b0e62845794277d1465aa473036349f04965cd2ce"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-fresh-canonical-corrected-path/raw-producer.json",
+      "sha256": "702355f42390b272895bbcb8c9012c1637649899a2996a12c9da5d2d31049758"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-fresh-canonical-corrected-path/raw.json",
+      "sha256": "702355f42390b272895bbcb8c9012c1637649899a2996a12c9da5d2d31049758"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-fresh-canonical-corrected-path/stdout-stderr.log.evidence.json",
+      "sha256": "8da27d2c8221a30dccf0c520598c780361b87182c379daf3494fd283b62fd685"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-fresh-canonical/command.json",
+      "sha256": "3a64a585f5363b199d531bfb33c99e7e7252915e04dbc1f1758ae97ced544511"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-fresh-canonical/observer.json",
+      "sha256": "ec11d6a945b4421d65e4245ce086a33b4758fa1493976f13192a177a14eecc4d"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-fresh-canonical/raw-producer.json",
+      "sha256": "9cb8f16c1477cc2cc5c9c75176596ac8d57482e63dae4c673864a78bb6f09961"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-fresh-canonical/raw.json",
+      "sha256": "9cb8f16c1477cc2cc5c9c75176596ac8d57482e63dae4c673864a78bb6f09961"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-fresh-canonical/stdout-stderr.log.evidence.json",
+      "sha256": "f37dc2813319ed8be0a3c0296131a460700a80d07b57b616615ce1e63ed4e7c1"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-generate-counts/command.json",
+      "sha256": "8f9af719b91ea41d4ea6d5e922a537a0b922514b7f6d2953283bf6e77f068fe1"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-generate-counts/stdout-stderr.log.evidence.json",
+      "sha256": "7704045ab30fad82facc55cc4b24e6f29e58cfdd666b6578ea8df26fac91912b"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-m1/command.json",
+      "sha256": "845dac8349bbf20160497f9db7d4224ce9809a5bf18352a42e7e075eb3e3b513"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-m1/observer.json",
+      "sha256": "8f1ad52032fc57daf565939fa0e96475d6840b3906c2ec1066414df2bacf7100"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-m1/raw-producer.json",
+      "sha256": "c4060be4d714bc453521d083731a738886e54824b5ef12bc6d815ad317e08400"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-m1/raw.json",
+      "sha256": "c4060be4d714bc453521d083731a738886e54824b5ef12bc6d815ad317e08400"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-m1/stdout-stderr.log.evidence.json",
+      "sha256": "6aa95db86d0546a166cfcd0865f30ade4295e996d6b132e0ee990d552ed3f71f"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-m2/command.json",
+      "sha256": "9f9b5726000bd788475e5d6cf9a9682a561668a28a579aac7c80fd26a35b53f6"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-m2/observer.json",
+      "sha256": "dd8a80a343bb74bfc1e3b9e1042c5e8712ff38f28a8614252bd566a9158f6fc2"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-m2/raw-producer.json",
+      "sha256": "4d5ff1b455992ff1079c1d0647d8820cb2befa5904d9d8f93fa4a4b2127f3329"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-m2/raw.json",
+      "sha256": "4d5ff1b455992ff1079c1d0647d8820cb2befa5904d9d8f93fa4a4b2127f3329"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-m2/stdout-stderr.log.evidence.json",
+      "sha256": "68a666be66a122b709dffb87b999f271ae7eb5febfb5e4451fdd6e8b3b32f55d"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-pre-d15/command.json",
+      "sha256": "7fbcf99bd65ca9bf13b8e99b45fa60ab670b47cb258a9fa7585fe59c5af56c3d"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-pre-d15/stdout-stderr.log.evidence.json",
+      "sha256": "4b7966d69766e42581b99c22fc3ad6b2daf8117ccf79a7baed3d47a8e2faec8c"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-pre-freeze/command.json",
+      "sha256": "ab482dd57344d99b2a3f65e04df173896b3319a6538ad8ef58ba80aae2b0ba92"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-pre-freeze/stdout-stderr.log.evidence.json",
+      "sha256": "4ad5b6625afa900361ea621ec1229d73024a490cf500da8ce339c173a19c56fc"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-restore1/command.json",
+      "sha256": "c6480f51e58c8aa916679657488d3ebc840c14bb95dd51782dbc32af2d8859d5"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-restore1/observer.json",
+      "sha256": "984fe278c4fcc8290bc9d3c2b5a052e00242ace86d8bca2971cf3726fa79c9fe"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-restore1/raw-producer.json",
+      "sha256": "5b88680a1f499dc69c4bfdda816109e3b1790f9021363299c80e2ac1f8a968d2"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-restore1/raw.json",
+      "sha256": "5b88680a1f499dc69c4bfdda816109e3b1790f9021363299c80e2ac1f8a968d2"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-restore1/stdout-stderr.log.evidence.json",
+      "sha256": "81ddf2b2d869577229ff38baf3699c335ff993cda8fd4a8c630be57186724304"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-restore2/command.json",
+      "sha256": "8808109a796b2e207d583a9c48b4e17ff322de7cc79ce60e4ab6c576d01ab58d"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-restore2/observer.json",
+      "sha256": "665cf916db84ec2f6103b03cbabb45b4b2dd0bd5b162469c14423cd73590d0bd"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-restore2/raw-producer.json",
+      "sha256": "7b8572183bfef240761e2d9ae99ba6aa44c433b42a07508db40cf9f0ffcedc03"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-restore2/raw.json",
+      "sha256": "7b8572183bfef240761e2d9ae99ba6aa44c433b42a07508db40cf9f0ffcedc03"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-restore2/stdout-stderr.log.evidence.json",
+      "sha256": "5f461b4db1ed175905e8831983bed5051e06bd31ca7e64c15c39bd4db4a98ad8"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-after-eof/command.json",
+      "sha256": "9ac45e5904bab8987af738f92ca6f27bad2f201d62fa1f8f1c2f7ffd93723305"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-after-eof/observer.json",
+      "sha256": "dfe0f4064c36c329f6bae95c8015ebb4ac13e6e2d08cd5a3ba44d5b318407ca6"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-after-eof/raw-producer.json",
+      "sha256": "168fc75c6fb91578c096e92ffdf64c01826450dcc089ac6ec3fe96702f768543"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-after-eof/raw.json",
+      "sha256": "168fc75c6fb91578c096e92ffdf64c01826450dcc089ac6ec3fe96702f768543"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-after-eof/stdout-stderr.log.evidence.json",
+      "sha256": "d0e784e6e783321e0308dd4aa2e4bb79f7f41be04b165fcd54063610b8b1552d"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-architecture/command.json",
+      "sha256": "2a817113205701b6e0996c39aed46770ac6a16aabb2febe87ff2b02f04c8d173"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-architecture/stdout-stderr.log.evidence.json",
+      "sha256": "3b6fa8cd8aeb91e9322c79dd023a9ea2bd30d5b283abd23fd63dd933986f3c60"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-build/command.json",
+      "sha256": "c22e1193e1e01fcd18aeea90178f3262d5067607ec4bbb216d6bee8137e9d7f6"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-build/stdout-stderr.log.evidence.json",
+      "sha256": "0ea1a969c9a145473383e5e6794d156809eaf1eacd4b6c3de18fe7e16b730fa0"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-checkpoint-d15/command.json",
+      "sha256": "a41efa26ed0ea4d292d5d24d092a24f706b3d9b575f52630bdd3a3c6ad4bcc3e"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-checkpoint-d15/stdout-stderr.log.evidence.json",
+      "sha256": "70a2cc715474097c9edb936197d37222abdf6fd243a4dc14df6f46793198a88a"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-combined/command.json",
+      "sha256": "91eda57c07157f43cff1fbf69939cad7153288184f5887cb33a8e4b998c78348"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-combined/observer.json",
+      "sha256": "0f82e2c90ce2b48ee83f86a3bfb008dc5f755d66eee2b59a8a7747ae99dd7748"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-combined/raw-producer.json",
+      "sha256": "9438fd117025fdcb2c70eb76983e962a2fa4bb47ce7b48deee5a0347489430f2"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-combined/raw.json",
+      "sha256": "9438fd117025fdcb2c70eb76983e962a2fa4bb47ce7b48deee5a0347489430f2"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-combined/stdout-stderr.log.evidence.json",
+      "sha256": "d1744d37f3a049549ee05a2f48d3444473fdf5d7c3840ba84efeb2be4668b25a"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-counts/command.json",
+      "sha256": "faf9c24aea090bfb392f1e7cae8a6e63aa93c71e7a69bce53fdd01ae9741edfa"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-counts/stdout-stderr.log.evidence.json",
+      "sha256": "44d313c3bfeb981da87bf0fa4688465feebd47356f4eb76c543b624f3291a37c"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-dead-code/command.json",
+      "sha256": "fcda74aeb7bd2e514ef3e3a8f4300571c450e1d16ad0d7c75add9168421f8c8a"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-dead-code/stdout-stderr.log.evidence.json",
+      "sha256": "b08fcc0477e4fad8a21c45e8ba8d46d6e47b46ccd47d6fa633bf6247347e30e1"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-docs-drift/command.json",
+      "sha256": "c3e6b2f95381ceb67bb17ece8079f2958dd8c49a0a3c485c8cd4832801130e03"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-docs-drift/stdout-stderr.log.evidence.json",
+      "sha256": "c9a47e2dce02f71621f06f6990f1603aff0e620e5165e7578f18a2d24a0fb693"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-duplicates/command.json",
+      "sha256": "e343f43a490bcaae04d5eab7fe2147fcf3c3b469815d11d1f01def08f9fc5588"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-duplicates/stdout-stderr.log.evidence.json",
+      "sha256": "18d9da2932c2c12e1b5338498a1ad727991a5210e7f607337a1290fd24085baf"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-freeze/command.json",
+      "sha256": "53e27f6442fdf275cb880bf3eea0c4e432fa090b5d52e128301868436e131e20"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-freeze/stdout-stderr.log.evidence.json",
+      "sha256": "8042031f83e087939d9ff568844812fa8ce05f3ce1cbcbc7d8d479d889ad21ca"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-gates/command.json",
+      "sha256": "36a44559f13e9bb2a605d4d7f3e91ad47db6cd46748fabcd6855160bb0ff5306"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-gates/stdout-stderr.log.evidence.json",
+      "sha256": "3e4ac5ecfafc585e7c7486e5046345ce63cea4a2f769146dc43b157c77336286"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-lint/command.json",
+      "sha256": "8980bbec69144115d9644177bbf82d32d8617be3daf659adabed47a1b11e1e96"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-lint/stdout-stderr.log.evidence.json",
+      "sha256": "eb801e8f53c3fa1974c90bec9749b2c653a4f65dda417a98665f8a6a219e98b9"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-notices/command.json",
+      "sha256": "94bab02238cfec30cfc015c986e9b50d8ea8e407688eb0323ca5de053eef0fee"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-notices/stdout-stderr.log.evidence.json",
+      "sha256": "784a5e18c3efe3b8eee489f29f16b51bab285af27533ab58e1d11bec1aa4bfb1"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-qualification/command.json",
+      "sha256": "e9c515c2fdb1ea5d98c279ad5138bc7bd8bb77f80fbcec991a8f14e3655b2746"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-qualification/stdout-stderr.log.evidence.json",
+      "sha256": "3389f34ecf67c389fcac1428d0249e56f4d939daf8edbe5834dfc4d7525e25f0"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-quality-diagnostic/command.json",
+      "sha256": "832c07b289666986c049f9ac4df66c041b923c077a2cc2d8ae8414c2aebf1783"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-quality-diagnostic/stdout-stderr.log.evidence.json",
+      "sha256": "a853a563e016872c2b5d25f385a41c2ae52804b24704912c902c60e649394a92"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-threat-model/command.json",
+      "sha256": "4436a085c149177885cddbd2cea998d4c3e1e3ab8d41a83b448a10ef1217128b"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-threat-model/stdout-stderr.log.evidence.json",
+      "sha256": "09c9c2a2cbb97f108ec8bd5d102b99a707efce3a351cfb511fc1f7040f7f648e"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-types/command.json",
+      "sha256": "ba80b0799aeb35210f8a0009a71a0ea73264cd909a8962d39410e3b392ea37a2"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-source-types/stdout-stderr.log.evidence.json",
+      "sha256": "142323b6a3eb8e315ebd45fb3bdb10a26c571d00585c10993efcb9544e1ddb16"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-test-types/command.json",
+      "sha256": "3f73b564797ad0d78d655e0d7a42bc9aeea2f6dbfa8f207f7d91b11bca7b61b7"
+    },
+    {
+      "path": "evidence/checkpoint-window/commands/p125k-test-types/stdout-stderr.log.evidence.json",
+      "sha256": "9600ed5872247da01f65667cec2cb941bee0538b7b820296bda579402d2a0e0f"
+    },
+    {
+      "path": "evidence/checkpoint-window/extension-manifest.json",
+      "sha256": "260d4ee570d75f95359251c8ed2f9439dee66c2d412267938d7f46ae86581923"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/count-surface-preparation/README.md",
+      "sha256": "ac2612c9eaf20185bbde7a08200e05c7cd80eab2ca5c8805140e540430e89545"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/count-surface-preparation/lookup-limitation.json",
+      "sha256": "79cff381b0d18ef0e96477189084d8cacf4c0e4d82eee3056506c8bcfd95e3e9"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/count-surface-preparation/pins.json",
+      "sha256": "d009b3498f51113b63d7a54f3b70064026cbe2679b434e54ce5db3a93287b210"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/count-surface-preparation/proposed-admission.json",
+      "sha256": "55859dae75a802a467a5d6c73c4af7447508dda71c7269fb384abbc9f37257ff"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/count-surface-preparation/review.json",
+      "sha256": "24972d472a26e386d55ab26cc8eafaf9887c73cd85667bb9391c746dd6429a06"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/count-surface-preparation/seal.json",
+      "sha256": "d778c60fd21c6baa12f49405eac24d2cf143f9a3715bfc4811d9f11a133a1174"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/OMIT-CHECKPOINT-EVENT.patch.txt.evidence.json",
+      "sha256": "84bbdd514fd4991d466cd5c231d9589c678a336cc45535c08c22d6e148fae304"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/OMIT-REQUIRED-PENDING-REFUSAL.patch.txt.evidence.json",
+      "sha256": "6eb9717171c56719899ae1224395f1cba65d5e88462d463bfabf7e0d12059d3f"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/README.md",
+      "sha256": "99e510ac2761285c689a3e4705a3679b4b813d63569e0ffd5da6c1fd21124b1f"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/author-static-review.json",
+      "sha256": "2bb4cf71f23ccb88cceb852877357013bdb8974020b17650ea5c55cc894e23e8"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/check-preservation.py.adaptation.patch.txt.evidence.json",
+      "sha256": "ff4f81a913218c56d055e0d15c09b48c16784d43b1bb9ef9a82bcf226202af28"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/check-preservation.py.source.txt",
+      "sha256": "4f06779e8dad11811fc17976651b7d14938f1c093d4534a545f453241f404c7c"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/controls.json",
+      "sha256": "644668ce2e22a37ec353a2f05a8260bb4005abddc74c4d9b5cc6976ef64796cf"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/input-pins.json",
+      "sha256": "9bb73467e6acb0771cfdf646aeb0e915b1aa1abf048401294d942d42bef4b789"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/plan.json",
+      "sha256": "a3dd0fd3271907ee8c741cbc713455cbe899b283371e74d7dab3b383c2b1e7df"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/seal.json",
+      "sha256": "7302134c49e858f2ada4e3dcdb30ed3a4d5e092a84cd78db2aee63451a27b141"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/source-control-v2-admission-proposal.json",
+      "sha256": "49486f3b16d6a6a92c6143e4e01a33ed4901f20d9e9ffd13b0f57dd84ca69def"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/source-control-v2.patch.txt.evidence.json",
+      "sha256": "b6a358e0525432a42f107970fc5d8f662d777cac94ea1d00c0cdb51027ad3b9d"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/source-control.py.adaptation.patch.txt.evidence.json",
+      "sha256": "ff2fb62a9b23b0892a4883474cd207e5b889a00e1e748d946fb85b8000b37b32"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/source-control.py.source.txt",
+      "sha256": "7aecaaa15175013ccf6b2c4d2f54b6a4ca7921a3af407cfed57e0fcbf2c37be0"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-preparation/source-pinset.json",
+      "sha256": "87d2a39c245dd707529d645416f2e9beb93c6338c34fa868d1f19783e2e131fb"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-runtime-review/README-v2.md",
+      "sha256": "5536635b2817a2a08a20353fac07f6551069b60122093c56cfd6bcb569cbbf5e"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-runtime-review/README.md",
+      "sha256": "50bae5040a0c56066260cfdc19d510c380c955bad75a36d5851956c6f5fb5ae8"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-runtime-review/input-pins.json",
+      "sha256": "f7cf33be34ae48318b7dc9ca4ccdeb6727259096e29ae16cfb536adbe33a9caa"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-runtime-review/joins.json",
+      "sha256": "72b394770248396a0fabadb39d192f675fc9d9ce37c204720f0127aa02176cea"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-runtime-review/review.json",
+      "sha256": "b42777b89714d0266c1cc2b442686b409c4e26e839595c781758f494d8bc7988"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-runtime-review/seal-v2.json",
+      "sha256": "ed5395f7da7360f6328af712ea96973eaccb414b743211092ef3b5ce9c57e7ba"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/fresh-control-runtime-review/seal.json",
+      "sha256": "8476e1ba0cc3cdaff32f575e0a7c92ef98630c417156db19ef843018aa0d8947"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/helper-phase-correction-review/README.md",
+      "sha256": "69c0e8f5434c98be4782e36d121f94eb1da612b266528e654be317dad73d8777"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/helper-phase-correction-review/input-pins.json",
+      "sha256": "85094802276f95ca2b9b9cf3899f45eacaaee76151e265c31d5b30ff855b28c7"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/helper-phase-correction-review/review.json",
+      "sha256": "f4069b68fa9ee8a7c801596a47ac3e8a23d5c2f3d0d9f7b82432a505ac69e878"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/helper-phase-correction-review/seal.json",
+      "sha256": "dfe0a6347a3ffe0a830e53d92e921af0d765c8b57c9f535a8c20c0538280d121"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/helper-static-review/README.md",
+      "sha256": "484a4cdc5eeed82ed1f1d8dd54b051afd7e88fba1824d2516bad7be6618fc5fe"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/helper-static-review/input-pins.json",
+      "sha256": "d550e59f582c15d8c8e28be72abf04cedbbf21b71898d2f7a3d5d56030775110"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/helper-static-review/review.json",
+      "sha256": "8df0b3a546e8d62b14f0aa29dc6cf1b358e7359047f00305479456a8537d35d4"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/helper-static-review/seal.json",
+      "sha256": "9295633e3294aa02e065a9ee9faba7166f71235fd204b82790cd7b28031f82d1"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/README.md",
+      "sha256": "e857f39fce836d083208d92e8802781f386b8548d10225996fe6b9999c6a59c2"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/author-static-review.json",
+      "sha256": "883f8a6283ea1a703986f0bd634661ac12374b115fb034590f16a50a38a551cd"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/input-pins.json",
+      "sha256": "121c1fa9090bcd75138019e09e8ff522eb649d4aabcae5edaa23e468edbdf1c9"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/input-template.json",
+      "sha256": "9e0cda2358e67d4de72a959bed06589e509a06eb05d08ec469365d2e64cca4e9"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/plan.json",
+      "sha256": "c0a372adb30a7127bdcf8c198cc6525dcc907d3640132c0e2918c1f39a6e52ae"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/seal.json",
+      "sha256": "57410faa2ea6b055d34ad205cdb250ee91ed679080c471e8d4ff36d53c297d51"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v2/README.md",
+      "sha256": "aa53839675078ab4b489de3449529b2fe9a5375c12041b31170abe21469ebb04"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v2/author-static-review.json",
+      "sha256": "118ec1ab8d62d41859315d00e58d7edaf6ca49e20e93d5aef1e829b56704f36d"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v2/input-pins.json",
+      "sha256": "9c552a470492e8163b672a236379c427e437c9a7cef9ca3f2a17f1dca860b6a2"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v2/input-template.json",
+      "sha256": "de06cf0c0079614899fd50a504b44c507d5b6f515aee55f6ff765f6c7caa0bd6"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v2/seal.json",
+      "sha256": "4faded5f01c2ba609fefed140c5380dcaaabaf83cf46f7990c9404912fde2daf"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v3/README.md",
+      "sha256": "bf18926e805092a96795e5e13bdc65bab04edf3e49dd0b8f9ecbbccfb8325b09"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v3/author-static-review.json",
+      "sha256": "49bdd99a618c7cb5c06f7501b5fcaf42da9c328331307e3cce0ed328722adfb3"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v3/input-pins.json",
+      "sha256": "22caf7ba229e98934ec73e02f02d449cc736f1ddfe9535b28cb754d0bf3f9fac"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v3/input-template.json",
+      "sha256": "4b2e0965473e477325503bee9e079164380181b964c85d0a913c21f6b90c0c14"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v3/seal.json",
+      "sha256": "a6db800d4e24bd4b9619e642cb8ce4fa272bd5b03545b0b519ae20aa030196dd"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v4/README.md",
+      "sha256": "d0bb755d5819a520805085a019dd9e6bf97888fb4ad4e626bcb0955846f4fb21"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v4/author-static-review.json",
+      "sha256": "dca00cad45081348bdd1582eeb8b85ad816f25c336adf07972faa739ed2b9dd2"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v4/input-pins.json",
+      "sha256": "028c8eecf44504009963f3cdbc6afb4f1e734c0bc2eb53aaf879313981383b3f"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v4/input-template.json",
+      "sha256": "a28006601391aa7aafff55e7c2c31031821b3bb9119f8b8969eea1bf996eba71"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-extension-preparation/v4/seal.json",
+      "sha256": "1122eb25dfcc5a30ea82f5a0177cb2711d17e61b8ea31306859af2e8a0ac340a"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-helper-static-review/README.md",
+      "sha256": "891890972aa8db05bedb5d308e9e3570374ae3709b31e371453387060ac7b416"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-helper-static-review/input-pins.json",
+      "sha256": "c0e15d217da5164b8385628164eb44febb4889d0dd3cd2142d083961fde4dbc8"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-helper-static-review/review.json",
+      "sha256": "09c9cdf02bdc50af5663ff19807516385a76a6d0ba9d6993f0838df9264d9559"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-helper-static-review/seal.json",
+      "sha256": "9fd535e390eb03b335366901d982607335ea933138621f14909c7ef32a8b0fcc"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-scope-preparation/README.md",
+      "sha256": "570ff6096be3ad91e448005d98b0ad92173e9411f741c17e8d9de98ebe8d4920"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-scope-preparation/pins.json",
+      "sha256": "87e18beb75a1d07ea083fc67cad12fa9c1199a21c09b123cbac2cf7b30fead2d"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-scope-preparation/review.json",
+      "sha256": "862243c0fa50a99f1d59284d3856c62da1bb503c3c2f7b1de0470d689be8214a"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/receipt-scope-preparation/seal.json",
+      "sha256": "cd386fec37b205f51a4a60c67b89031457e47c9a916a437d73682407cadc1cd6"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/runtime-audit-preparation/README.md",
+      "sha256": "29149deadce45e006e1fb66aa77f2bc7dd947344cbe866c2451df93421f2c231"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/runtime-audit-preparation/audit-observed.py.adaptation.patch.txt.evidence.json",
+      "sha256": "2ea83c18137fbfc198dcd22625f597dad497104d52d0b0be5cd7a0fcd494b823"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/runtime-audit-preparation/audit-observed.py.source.txt",
+      "sha256": "3fa420420119af3654c1fe6e6c4ccccdae7c5a4e7f0e2d51a0bc1229cd2f3c3e"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/runtime-audit-preparation/author-static-review.json",
+      "sha256": "40fa404ce986c9e96c76a2deb935b85b03e9be2b299b96b52b28e7cbac948aef"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/runtime-audit-preparation/capture-quality.mjs.adaptation.patch.txt.evidence.json",
+      "sha256": "d73cc6ced52c7a97a29f308bd244ec99e6745362f93b6c7ae646671b8e2f5384"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/runtime-audit-preparation/capture-quality.mjs.source.txt",
+      "sha256": "66cae1aaf6712d83b23a0b69f74d09edb97edcf264999576ac4dc488830e8dda"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/runtime-audit-preparation/input-pins.json",
+      "sha256": "1ad270ff7a1f6ec5ff42a33d0dda4ddf2ff92f3a724a4366e1dc1b807ee32607"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/runtime-audit-preparation/seal.json",
+      "sha256": "24a64f9fed1d0c07c55bb6d0253f343c6a123ec2a6c2345f63d2e014758226e9"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/source-evidence-review/README.md",
+      "sha256": "7006024da94a361dfaae72b4d80c3aad4b7d1c283ce0b7cb4c8aef156ca91ff4"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/source-evidence-review/input-pins.json",
+      "sha256": "b53369b8361ff2735e15266b9282306d5613db3f195065688c721bd62077499e"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/source-evidence-review/read-only-authoring-stop.json",
+      "sha256": "d00009ac2b5c5e48cd8b3a43a9df6673ab2a0d3bde4764e408bc861b62d834fe"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/source-evidence-review/review.json",
+      "sha256": "eeb63585618873a6af13bb59ccf01a63699685c406884aaeb75a084056145ea4"
+    },
+    {
+      "path": "evidence/checkpoint-window/preparation/source-evidence-review/seal.json",
+      "sha256": "c825d19a334f2bcc6a3941bb77fbcf8ad02faee3741feefe062734c9dfb8bbf2"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "c8a0aa113aa577fec2e8de7e147198fe4108a67d426e2840dde9972899d85894"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "96ad154d37751bde3cbe161c8d8219aebbfd801dad788148f63a339425963bf2"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "fc1c61ce3a3f65deafd8926077da2bae7a5be36bf3731f9ef559e970476195ee"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "564b2bdbda0def3fc3290354f662b71eb2739414d0581d227dc668baa265f608"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "ec2a3711015b91a459a95fd870df1e0c773eed157acb1f28afcb5b8ed0bac040"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "2ee82bc4b6f489b33656a23dc7b89ce7dbe333061ed8b73aa196e139218b0936"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "bbdaedb6c45237aa45963f4dbfec870158d2c31c8b93fd42fe127eb8e9592c03"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "ea655e635f187f3c6c205a46bb14ac0230ef4c49add5c7c86040d2d2bc3861c4"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/FIRST-GRANT/public-certificates.json",
+      "sha256": "e5209be9bf742a8eac4e3b982f3fd21df420fefb4a7e804e676459564d6012f8"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/FIRST-GRANT/public-evidence.json",
+      "sha256": "de5e9428307d96ea99a170b198e2f1b54cdc8352e9ddcd377159122cd9304b82"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/FIRST-GRANT/request-1.tsq",
+      "sha256": "a91a985798b7223b1acf196a407baee80b44a3dcfa5ce3a3d59a8f71a6d4c1d4"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/FIRST-GRANT/response-1.tsr",
+      "sha256": "8937dc507c0ed5a40912e32da25e9f7f2f8e68339b8bb12bd3f53ed7e6bd142f"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "bf7a9f87721e11c0fa77aff03840418e56bf44245230ca75e0cc1f84f4ff7abb"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "a7ccc4606d4a27f492de3d1418a52ced22dca2544e8605984b7937316cd98aa8"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "2d6673fc9b71ce815c2c51b5560d27ac41f4bb52526c4d741610f42af36663c8"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical-corrected-path/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "43e2e77af68cce7f36375217a2ed9c9825805c1bcc6737d2173724f97eaf7280"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "f723c49687895ae51f9dda6d532109bbf60ed9ebe2b7bd1a0bdbcd0c547f5ca1"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "4defa0973db0e4c586830006abc5add58cb7769554119a260da371e738066c9e"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical/FIRST-GRANT/public-evidence.json",
+      "sha256": "02c11876cfacf508d14ce412ea9fad90d013b48ecebfdb5ca1b940c305b293a2"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-fresh-canonical/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "09a8e5a6ee0b4433faf2a5013d3d78bd313f3ffa4ff1828de0608ccd9e9684e4"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "e8af04b1e8f6a6e7d21a868937e8a8091c07fe84cd0e2bc4cce42f5bcc93fde8"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "6d4c14d5400135aa9bc602935091795186d36ad636abec09462e1d9d0284f004"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "26fb914b2436a18b145efb2cc1aa4362321ac1e3c5f21dce67dd8055e3a229cd"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "fab1313bfaab615ec98da8a7429284412e662d5de97fe968426dd84a248a10b6"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "0f4c23ffc32f815f93b27d9264d6e35b932aa485fd371418de7191b55254740f"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "020e467fb3d257e1cec31ecffd7260e89e3e2da715ee0ea2c7fb378a69f8ab1e"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "25e6c60d006f08596d8e9efd71f0f23aada71d72b7e54530131e0c500b95d280"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "22eb51c6689faa7b5770019faaa54a1bb051c2ab1fec1ea245615405fe359d35"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/FIRST-GRANT/public-certificates.json",
+      "sha256": "ee98ac9461f015d62452f26764de12bc4142cdcf9a79af7cd7f5bc5b0bb78ee3"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/FIRST-GRANT/public-evidence.json",
+      "sha256": "e3787ad38fb76fcebb092c6916e1ca4f04f306048ebb8d4f4a79e684e087dc1a"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/FIRST-GRANT/request-1.tsq",
+      "sha256": "72d45b7edefddf24d55b26b4f879ad22c031f8f96942abf640605339255bcc64"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/FIRST-GRANT/response-1.tsr",
+      "sha256": "978c750a9fcdb9c8f0ad08c89120e63f63ffa8aba83f63a6e5320e9f8ab3f994"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "34636f5ac1e24e274b7a8625c6e04344bece1705d79d32846447402ac0c18b92"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "dc2be3a14d8b59bcc5219426615299e5a8de92170cd90debde0f577729437cc1"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "c8a621c48a68ee67e9ffdedcbce7b80278371dcdc00989309f63e14019ac1b82"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m1/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "898e2e222e62eade70cdb42db9f1c7903ff3ba80c1f0fdb2fcf1d1a405adb92a"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "54fd46348e47d3d26f20825f67873ac6835049759b76d73c10acaa8ea6449e49"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "ed8a20cbd321bcafb9bc9cab77c397ed41efedc2db947d3800413a219fa1c03b"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "ef7b702bbadf009fc857b360fc50df6abb241916f3f2e307c224df9bbb9afb48"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "ac344561b712353041322844a90cd77a5c8133ddb8f2bce575e9fa03370c2610"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "1432b4a0ac20068d48031b539aaf3b54170b635045a1ac6fe15acf4838d55813"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "26f462db669fbde152f387fe1eabac6e8a21cc72f683e4629d245c46bf686cf4"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "a23e1a7b705dca722df814059b3d1ca705db539dfb2fd8f30db588ac0b60db5d"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "6d12cecc90e9bafa09daaea1712e1f7380791c1ae0a0d645665dd23634c202e9"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/FIRST-GRANT/public-certificates.json",
+      "sha256": "34be470498b82ab7bc656d1e1b0b3254bf67e75da25b0a8c3e741a2f34994210"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/FIRST-GRANT/public-evidence.json",
+      "sha256": "efd20e136d13ee6ef20919bb448bade80e42efc97c5c46cd3e66130bdc4369c2"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/FIRST-GRANT/request-1.tsq",
+      "sha256": "fea93946a4bd5ff88323e3d2164e435256896bd7e61577714bf3451fb274548b"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/FIRST-GRANT/response-1.tsr",
+      "sha256": "497b40bc27755da422f98b8f8fcae95b1e5c01d99270c155ff58313b3ff5218a"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "bcc4dd4b554442ab1b800d4eb318dd388142f405a8aa7c2377b153745702b9e7"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "2bd595b4db6baa43d86ea97a86a7727a394cca3e794d8ed5f8b0e6dac1f08b0d"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "f0f4de9bddfb69c77678d3873471808edc275b5e6d90759605962312cf4a4f10"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-m2/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "8f9db5fc5d7bcd9033cadd49a2199c826c6c1ca8c8c4318f47ed3529c4b1e635"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "c130ea431ae14f27ddae8738e92adf59458ad6ded6b0896db234bf29c163aa53"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "6ef6983bfeff8ef998df051135209296443778763f905cdcf827ff0f224466fb"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "77d1683d469c5b099878433a960c1992838939d0b59f7494e21266a1a4d4a589"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "8132d5037807899f4ecfd941af66eb350810614a26cd0deb29817b16f14dc090"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "eeb8c3a715cbdf52957526b235402ccc1ee1935f0922c7f81bc439d5528a1f5c"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "46f471ad8e79bc24403bad03228208ae386bae7b28cc1e6002fa89b400f85d0f"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "d6ebad779f0d027acdf6de149a5f10baa555c52fb18627c9670d7041e56c6bb7"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "188e0b0e9fd7b11aa5b25334bfb1a85ec9835ac8dbd934658e65f4fae0beafe4"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/FIRST-GRANT/public-certificates.json",
+      "sha256": "fd6610552c1fa57009eeeac35eacf3d0ca95b868289926902333d60af1588899"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/FIRST-GRANT/public-evidence.json",
+      "sha256": "d4557f3fac3e78ec4ac117a06dbc051116afa3b1c187ee1782d2048fb97e62ec"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/FIRST-GRANT/request-1.tsq",
+      "sha256": "adb2d5d7579d9d82019577ff32921ab0f250744ffec8a03523a06f985fd94816"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/FIRST-GRANT/response-1.tsr",
+      "sha256": "0f32440ae788fd39ee31eab9b283df423eba49b92ffd87db685e707f762afd9f"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "5a6bb8d66fa8503007ec262b036ff49fc6a57208e200acff1bdc2839e24fa87e"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "7dc6767006f2bbaf0d1b0eebb1c243c1b7729c75279940f11b6afb1466352510"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "fc9a400bf686f0307eaf6e06c8ee9a3abfb6fbc017786a99b2a326698974e2c1"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore1/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "6ab4b2bfd470ca4d76ff81ac265db8a67ce626db0a32a5b42c9ec1a0737321b0"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "c8ca219df2a4caa8dc8f9601cdf4f12ab10ffbd2366ca3734a284f6ed8edd025"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "363c1b47f8ab1f285c87fcccbc82ac5f701588735fd70a749e0e3ad6ff1ded54"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "a097597277609ff68f42fae5f4553e9b89c377fd4a1079a5c0f6383787d9566c"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "395d8b72c3ff66ab7dd4d171e1d037761688ddfdd8758bd4d35487d04b69e723"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "d060e6bfbb9bbe5b6ef3ca8df21125a368944ac2590b16fba6ecd0c252944bde"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "021ebbcb155c0bae2a3f152f59f0a2e4938275998eafd57535fd6b090ad33de3"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "571c8b4dfda571f4da38862b7e0993f705de904500d698f8332ba210240d9639"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "4a3517758b3724859bab4d24da3338a7e45a7245ec1aabca320a4241a2211c9f"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/FIRST-GRANT/public-certificates.json",
+      "sha256": "e8d115fde1d654d70666d59d345eeb70db46233bb94bf64c75a079edc4ecb498"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/FIRST-GRANT/public-evidence.json",
+      "sha256": "809ef5f37d49a86b1f23203a86663b128d4e13384157b89a2df87d17aef80eb4"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/FIRST-GRANT/request-1.tsq",
+      "sha256": "06afad33237ab3354397ef41fff28de5f2aab98e56eb81d98178cfee153c7daa"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/FIRST-GRANT/response-1.tsr",
+      "sha256": "86311f78d71fe250e6d01b4c4f8dd716107f89256cb602d8dc918b788bfa67a0"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "ba3ef0caa8be45493c570cbee9e6434561f7b316199f829abf181390009d39c9"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "7f90bfc8ad9e42f1fbda8cd388dc348f30845801ec83104628796bb64bda8947"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "f05c1229c0352ba74921aca1699f83bf746d71e03bb8d57c7fa9502e3002a647"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-restore2/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "9dfcd94ed54e8cc18e924528bb45e9d8dbb671030857e155881af03e870edb0c"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "55eb5f701dd9c5d81e8b79a48839520ace7f0c530a2e4f2e26790aeb9af80125"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "301852782772132f2629b9f999f162b20272d316f2f2be8856f19cee5672af43"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "58d1eef3be4e82db0fb8d1473ecfa7618c1fdb2a1d987e45deb0880b7e018164"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "a0f0fffe12bcacc189f6268ee3e91b9a5cdcf36fdcbc6c5668c781e0de01abf7"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "05bc563ef10c3964f30f192b50ef403e510dd77b9bbf61184d8468328ccf8f35"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "114c89ce7e6cc142a9233b6590ad526b4c64d38abe6652066ea39383ad0b2688"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "e19ff494f936190304885074ac831f9e214198bd8901c4dc7a8d520c9d6b05b1"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "8570c8c3242e299af525d6d089b1e4e1adc06caa50f7823938342acf8e2f14f9"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/FIRST-GRANT/public-certificates.json",
+      "sha256": "e6a74e1ea613437d2de0c48a9631ae64b52b4464caae237473ba6612ba55845e"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/FIRST-GRANT/public-evidence.json",
+      "sha256": "5b97d2bc55003955bb32aa15f33ab2284b1ef20b9970ed5d699f6300789fc4bc"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/FIRST-GRANT/request-1.tsq",
+      "sha256": "d697e8569a6b527a5877ae0f2dec732f98815e312cc10ede4bcb79b8496a7f47"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/FIRST-GRANT/response-1.tsr",
+      "sha256": "670de3f01a56198d8391efbc484b84731e0a8ad2c9483153a4d63aa7d083d605"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "1b9a884665a9a13b6ecb22c69d8a1c9b74024f9a41f914a513ac249a5610a1cf"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "e4054d5286ee05fdde34ecef3e4b9299580fa7c84d2c2335cf9e5edf58a6faff"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "7fad6d8b17e6700f2dfd67778b05412b78212dc5b4f41da0a9487bc133609b26"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-after-eof/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "f166b0fabe48bdeda474658c1866a5547c5d2ac16f6e1440900cb77e2ab83a0e"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "8d5184a9808014aa618b2f10c567c846ece5daa8edcfeb74caf790da41d6889c"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "6db4973610c63a9d7b4b36a886497760c2531b72d12d8595ff8e3dff9ff87545"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "fa449f4deb970008476f16a0b99333078127084e90af45fabeac0984e83b64ab"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "2f21e8c3a21d19a151e82539b1d97b428fe6aa7f0b5c801e849500beef3569f9"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "67bbbb572e8b48d96b822530dddfb4f11153e6fc3e1a07783c2da74f007365c4"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "3821a53a5f21ca5226a209bbaf2dde71cef6d04fbceadb7489a68c88ead46c39"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "6f1b5aacde121fe260883c6ea44632d270f136284e7d5c3295d92ca2fee91d32"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "02fb76b36466c8ee9bc217d0d532f5128cadf305b23cd9847222c0d6acb78a79"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/FIRST-GRANT/public-certificates.json",
+      "sha256": "85f243a4566bce28e46c0b159d25c276f85525f368cd8ac523cb761c6b24c772"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/FIRST-GRANT/public-evidence.json",
+      "sha256": "44217bfdca6f39a1bb4773b012c6f353dd99cafb9f576dab57bc18685d940184"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/FIRST-GRANT/request-1.tsq",
+      "sha256": "ad72aba764024e9fdc4c72ee537f85ba8bb1e291ea96e5e5df36eb52456f6787"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/FIRST-GRANT/response-1.tsr",
+      "sha256": "163d3a96a528e5502e281f65b1cea8357e66d6e5ad145ae0a1fbedad1e314df5"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "5a3ee805e9179c25fd428b2f46c7a0cd3e1a47927daf9c58f5f3d54c26a4be38"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "506946e30ba5b40d05088b76a7c28cd21aee6f6d6492a4998cc1920189fe7e4c"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "dc9ac12b2e58d215775ced607e41ae04f56f5c591bd72be9b6e43d6d9def463a"
+    },
+    {
+      "path": "evidence/checkpoint-window/public/p125k-source-combined/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "6077347af2f48d70df3a39f7d9e00fb44b331bf3cc707daaa51f64850d188305"
+    },
+    {
+      "path": "evidence/checkpoint-window/representations.json",
+      "sha256": "861fa7524663eaee18d0e6b21d707b11387684d6e8246a3b5de7cbf6dfbe8611"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/actual-environment.json",
+      "sha256": "3fac9c8bf01c27bcb256fde438d46e4f49c8a0c797dccfc22b1891e248471455"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/after-source-full.json",
+      "sha256": "7741a81c44ab4997dcd99ad12de24a8dbf1f85f14d68e0a43f970fce7fe81e13"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/branch-adoption.json",
+      "sha256": "f408f477ec8db5593212e14f04488b2d94a66eec4ed26e4471ada5083630aa2e"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/count-command-root-correction.json",
+      "sha256": "8fdc4dd16e80d2f93de70f95c46c62a42107edada411e6df497593c0d8d7d143"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/count-hosted-admission.json",
+      "sha256": "0425e3de8742562db5cb86977662f47182c588721c36449d025a741eba7b6535"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/count-path-admission.json",
+      "sha256": "4806e5e6fcfa864ecbc0df6397dc61c0c8e016ff0ac271dd58bc6ab4770dfa17"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/final-README.md",
+      "sha256": "d0ba38b25c4737ff34977213db42847da1bccbdd6f6f1183bce1f33d98b305d9"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/final-notes.txt",
+      "sha256": "334421775fff042237df5f58081aecb983c8bc02d42e8536f51486683fa82b0a"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/fresh-control-scope-admission.json",
+      "sha256": "337a56816e925830efbbf02d9d948f77ccdf68a33fdc9d71ff6899cf07982c05"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/fresh-launcher-path-diagnosis.json",
+      "sha256": "b988395576e96f525b6f9891dde570eda8128529c00468013863d22789822cbf"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/fresh-source-binding.json",
+      "sha256": "293fe1f5f9a650148e2b329d966fca27b9a1d48cc54e357eae81e29bd5a693c3"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/generated-counts-output.json",
+      "sha256": "4341500170f5c88936eecba8f47e94d9e9e056c560f373dc1eecad2a5edd9077"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/helper-adoption.json",
+      "sha256": "94e2a5e5ec8825e2656738b9265ea508df79fcbe65bfedaf6d31cbd3c9f77c10"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/helper-eof-successor.json",
+      "sha256": "b6651bb04725d09bdd9ec1515591123d2fbaf7470e2f1f16307d68f334a45a4a"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/hosted-path-admission.json",
+      "sha256": "1d4f0ea42c7be1c1b8b4cd8e72d801bae3617f3c878ee958caee2358da0f492a"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/m1-apply-prepared.json",
+      "sha256": "cedc7892898f350bf079abacb6f3e007c8a4eaf86e37a619f974444c80d30468"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/m1-apply.json",
+      "sha256": "7a691c5801cd31277a3e9461efd38b21507a9f185ea3e135bb6495f9bf57367f"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/m1-classification.json",
+      "sha256": "38a94b1f8fc857e0e1adad6886daeccf10d8993e154102dd4e11721acf4472a8"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/m1-restore-prepared.json",
+      "sha256": "1a94b788e12dde37717cc1a4462b474d2e755fc391c69bb436d5ae6e556a73a7"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/m1-restore.json",
+      "sha256": "35056eb73b5467e6595417ad9d985258cc83c1bacd7f30927d4d39aee24ac466"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/m1.patch.evidence.json",
+      "sha256": "9923bae80d1c70cdc73d1d832810404c3fdb8245e89de5a0d92b3c3ef0781cb9"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/m2-apply-prepared.json",
+      "sha256": "f618f8a98b8468c21b2d9b9696ad6ee2454f3c80d5a58d009bf27259e6cce1be"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/m2-apply.json",
+      "sha256": "1567b84d546a872439b1204a0a8f7591231eccbdb04830da2d28572b89ad5181"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/m2-classification.json",
+      "sha256": "6d696df1eb36215bfe229dab0e8d696068f7501621392ff84facd01d56ef7440"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/m2-restore-prepared.json",
+      "sha256": "057012d8bbb4668defbc5f74514f6b27eee798083999a456c99a34958ffc85b2"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/m2-restore.json",
+      "sha256": "b8ae097d670aa50e1867add4e1dc8eb17569b36eab1eee1ffa94713428716857"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/m2.patch.evidence.json",
+      "sha256": "82983eb335b57d07e000adc9228f0b1f585414d673104ac86523f7c5eedc68b1"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/manifest-builder-target-collision-diagnosis.json",
+      "sha256": "90aa8322d74eb877fa220b49665ea8c698333f651ef3d7ec9b325fdf42ad12d2"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/manifest-bytecode-exclusion-diagnosis.json",
+      "sha256": "5cb29ddbad3f540eeb03db7128da8e5a67b71b64530e6beec39a9c167f1b613d"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/original-p125-packet-pinset.json",
+      "sha256": "738817a08e1e20631b17f7d9ca9dae041f12fd5ffcc06cd67c85e14869284c51"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-fresh-canonical-corrected-path-outcome.json",
+      "sha256": "7769033d3aa5eae403e69239a501de9db75ee251c3c26176aa3a15bea48ee91d"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-fresh-canonical-corrected-path-public-audit.json",
+      "sha256": "308297e99d01b69049242ba65519cbb8b0bae81e6002b93fc8286d71b6b1a015"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-fresh-canonical-outcome.json",
+      "sha256": "8d1ea920cad90d82c68f7453ed939ab278e72b27e6c4de81dcfa000879d51881"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-m1-outcome.json",
+      "sha256": "72b4b7323fa3f16ea203057bda4a9d7038e42436c7a1d97b842b5276e87bd9fe"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-m1-public-audit.json",
+      "sha256": "39a86d0ffaefbb78f9a6c8c224fc25433a066f88433fe2ce30554f7bbd7235d3"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-m2-outcome.json",
+      "sha256": "1aa2de57e93277dbb5d14cea1de821764d3362112fa8bbfe9664d9a077c74835"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-m2-public-audit.json",
+      "sha256": "5dcc3653958b840ec29d3ed841574969bbc658fe5ad275f8502e002da1805c47"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-restore1-outcome.json",
+      "sha256": "fd9437f2c708d808400b13790fd7aff836b6715ca5ebbf82c979ce1e1fc19356"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-restore1-public-audit.json",
+      "sha256": "398eff116b892b7c42d831dc3c39a276078a69954157f890e7416c4b6c93aec5"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-restore2-outcome.json",
+      "sha256": "842e6ae618243a3e4af8f9c5cc77d4bb368b102f68f7891208953a795c98bf07"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-restore2-public-audit.json",
+      "sha256": "d253bca705394b53ed1652a0a0429173f40a7d7a7d3f861d9d38effd63f1bf9f"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-source-after-eof-outcome.json",
+      "sha256": "0dc93322d6312d81632b8c8e1f69d5efa14aa4f3beeb49a32fe5d1556d03f8e1"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-source-after-eof-public-audit.json",
+      "sha256": "4fe198641413bfdaf3daab98ccfed8d61777ed35c540035556de799f559f2a81"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-source-combined-outcome.json",
+      "sha256": "d2aafa5affb0220bf3c68b90785d16a7b28197d110f73251c7aa97704509b8ad"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/p125k-source-combined-public-audit.json",
+      "sha256": "3feb54ff70ba8c153ba255bff14748638911652094e3380aeadf513fe2f69ad2"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/preservation-after-m1.json",
+      "sha256": "5bbc2d07e444672e50e713399fcd8b7bcc8fb74145caaa34f98ef30e621463ca"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/preservation-before-controls.json",
+      "sha256": "afada4d49ff871b274116cb02cf11c20440b2d5562038598be07a0afaacab31e"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/preservation-final.json",
+      "sha256": "0b15c207e4e3f722aaa8d66f8bd1fefa272803409eaa85f32e1d2e8950f489ae"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/protected-inputs.json",
+      "sha256": "de322b4c2df60ad80c736987f24a0b6aa7f46413cacbd7cc7a0573fa1854b8ca"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/public-output-allowlist.json",
+      "sha256": "ab33977579def97401d0695d3965373cd35f85481e8a806852f4c455ccf58d8c"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/quality-before-source-reference.json",
+      "sha256": "daf552128ab3662766d2fc03ee890ea93a3ff5722d21003fa050f699764639c2"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/quality-source-delta.json",
+      "sha256": "782a67753e2062f18c412f2b1d1e7b9773920bb135c0a19a1706d60996d95c5d"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/root-peer-evidence-adoption.json",
+      "sha256": "a63a64638931f850ab981e5f7dbb6fee9802e927b3569c4fd4b850d3349858ff"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/root-runtime-review.json",
+      "sha256": "931ac7f1d3f22b45544288dd17aee1b80ed362489979ea9534698b7889bca9ac"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/runtime-protected-inputs.json",
+      "sha256": "bd1bae1f206edaed9aaac06650c98d0e8dd8e60eef85d986ca44439c4d02afc5"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/source-checkpoint-hosted.json",
+      "sha256": "c18721ed2e4812c163c35130722ecfc393f23e497e9e5e6e1937dc92380b06e1"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/source-checkpoint-prepared.json",
+      "sha256": "3d988a7ec8a30527a2e2d2d0b9e6611c79dc13ec8ef3426a2db280e6133277c8"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/source-checkpoint.json",
+      "sha256": "491a31caa1812c41e322bd0ab40233ce76313251cefa25e0e96577716913a0cf"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/source-commit-command.json",
+      "sha256": "2f95617a5c514ae4c3d56892c0db458e4819c40816cc4b324a8e659a1d430491"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/source-lifecycle-review.json",
+      "sha256": "fa0229a619c84484290b969fab1d72eee3db4666f12e2722f6ec0063b63b6ada"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/source-materialization.json",
+      "sha256": "666dbcb42c48f6966950649fca06cf090155196c853e2f87fe9d38cec6b4ad67"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/source-path-allocation.json",
+      "sha256": "d615c2c79a8689d72b027ebe55afa92069ecae16caa4cdb1236eeac55a403ce7"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/source-review-adoption.json",
+      "sha256": "c1217494e752b614834012ba6711ea24bf72d0aacd2a6ddf6940a9987564208e"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/source-stage-1.json",
+      "sha256": "bda0f33ebc5802b81baaadc7aff6017b07b90b94fec462db48f63f018d4e764d"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/source-stage-2.json",
+      "sha256": "02578d7f7ccf494dfa70128bae3c08dc2a96e71f772675112fc64c1be44e039d"
+    },
+    {
+      "path": "evidence/checkpoint-window/root/whole-issue-gaps.json",
+      "sha256": "6557bff1a0baf9550c4e552ed2bd1ab13a4d9fe0438af3b9c0ace0d6d19f9d28"
     },
     {
       "path": "evidence/client-transport/after-source-full.json",
@@ -5191,5 +6815,5 @@
       "sha256": "a6e327836c39a0657c573c4c638fe365815311caaf03745b37900ac7f5f5c958"
     }
   ],
-  "notes": "Bounded offline verifier/configured-anchor artifactTime qualification only. Canonical47/47 is not a sum of cohorts. Initial count check1 was repaired by the unchanged generator/check0; source-only controls failed1/2 bodies and exact restorations passed47. Global duplicate/dead-code checks remain RED1268/2724, unwaived. OpenSSL expected tampered-CMS child exit4 is deliberate negative proof, not a PKI acceptance result. Full P1-25/P1-01/package/client/checkpoint/issuance/source-generator/full-suite/CI/release and all held decisions remain open. Missing live reservations retains last-known binding/shared append pending. Optional read-only metadata scan natural closure is unestablished and excluded from all evidence credit. Ordinary Git staging warned about ignored docs/internal, but all22 staged blobs were verified and ordinary commit0 used noforce/no-verify; held provider archive unchanged. Source/fresh controls restored; no compiled sensitivity or plan completion. Metadata staging whitespace check exited2 on18 intrinsic log/patch files; exact original bytes are preserved in existing-format lossless JSON envelopes with round-trip hashes, without changing whitespace policy or command outcomes. Historical verifier paragraph retained verbatim. Current client extension source5beb3eae69b08f2e895520c7f459e1465780beeb selects one actual28/28 fresh canonical cohort (11new request/rawHTTP +17unchanged verifier), not the earlier47 or phase sums. Actual source28; C1fails2at193/201 and C2fails1at280 with masked194/282, explicit byte-exact restores and28/28reruns, hook2entries/3values, raw/observer joins/naturalESRCH/no signals/no late errors. Clean-source0/47892ms supplies no Vitest credit. All71source/fresh paths/eight compiledpairs/121protected/seven native physicalpins and heldR18 rows preserved. Source counts15spans/tenfiles1691to1692; ordinaryadd1 stopped beforecommit, trackedadd--update0 and complete11blob/default-fullrange re-admission preceded sourcecommit0. Global quality remains RED1268/2720, no waiver/baseline; three removed findings are test export reachability. This extends the original338payloads/41commands/359inputpins through only three active indexes and client-transport prefix; code inert, logs/patches lossless, raw count originals/large observations private. No CMS grant from five raw bytes, successful matching-nonce fallback, required-time/checkpoint/session/issuance/report, F37, fullsuite/CI/release/wholeP125/P101/plan completion credit. All held decisions and missingRES binding retained. Later actual publication/committed-file/quality/QA closure records are separate. Historical verifier and client notes remain verbatim. The current fallback extension selects one actual 21/21 fresh canonical cohort at source d8b5c3250138a10078c21886642595f669c4a73c: four new fallback bodies and seventeen unchanged verifier bodies. Source passed 21; F1 failed three assertions at 239/261/287, F2 two at 261/287, and F3 one at 237. All three explicit byte-exact restorations passed 21. Earlier positives and later masks are retained, with two hook entries/three values, ordered raw/observer joins, natural ESRCH and no nonzero signals or hook/unhandled/late/cleanup errors. The unchanged default 10000 ms abort reaches a next refusal; its message is string-only. Clean-source 0/47211 ms supplies no Vitest credit. All 72 selected source/fresh paths, eight original compiled pairs, 128 protected inputs, eight native physical identities and held R's eighteen rows remain exact. Counts change fifteen spans across ten files from 1692 to 1693. Global quality remains RED1268/2719, unwaived; only requestTimestamp unused-export reachability changes. This extension preserves 610 prior payloads, 76 old commands, 676 ordered pins and the original manifest, changing only three active indexes plus the fallback prefix after separate admission. No successful fresh-nonce grant, signed-list admission, required-time/checkpoint/sealing/issuance/report, independent TTL contract, F37, full suite/coverage, release or whole-issue/plan completion is claimed. All holds, ignored archives and the missing-reservation limitation remain. Later publication/export/quality/QA closure records are separate. Genuine-grant extension: source188681b32dc472983404dce19e7833cd76ee7576 and fresh checkout pass the same19 executed, zero-skip cases. ORDER fails only route403/424; DROP-VALID-GRANT fails only nonnull406/426 after genuine exact-query oracles; both explicit exact restores pass19. Hook values and ordered identities match; canonical19 is not summed with older47/28/21 or repeated runs. Twelve actual fixture bodies retain72 natural zero children,19 closed sockets and cleanup0;144 private stream byte/hash facts were checked by root, raw streams/keys stay private. Actual OpenSSL4.0.3 optional-field stderr diagnostics remain explicit. Only48 exact public outputs are admitted. All135protected byte inputs/eight old plus distinct fresh ninth native and73selected paths per root/eight compiled pairs stay exact through assembly. Global1268duplicates/2719ordereddeadcode findings remain RED without waiver. Lost initial count scan and V1/V2 outputs remain excluded; distinct closed V3 reads support15numericspans/10files1693to1694. Only current metadata3 plus evidence/tsa-grant may change after separate source admission. WholeP1-25/P1-01 gaps, trust-list/caller/checkpoint/issuance/full-suite/CI/package/generator/report scopes, F37 skip and all held decisions remain open. No PR/push/merge/release or wholeplan completion claim."
+  "notes": "Bounded offline verifier/configured-anchor artifactTime qualification only. Canonical47/47 is not a sum of cohorts. Initial count check1 was repaired by the unchanged generator/check0; source-only controls failed1/2 bodies and exact restorations passed47. Global duplicate/dead-code checks remain RED1268/2724, unwaived. OpenSSL expected tampered-CMS child exit4 is deliberate negative proof, not a PKI acceptance result. Full P1-25/P1-01/package/client/checkpoint/issuance/source-generator/full-suite/CI/release and all held decisions remain open. Missing live reservations retains last-known binding/shared append pending. Optional read-only metadata scan natural closure is unestablished and excluded from all evidence credit. Ordinary Git staging warned about ignored docs/internal, but all22 staged blobs were verified and ordinary commit0 used noforce/no-verify; held provider archive unchanged. Source/fresh controls restored; no compiled sensitivity or plan completion. Metadata staging whitespace check exited2 on18 intrinsic log/patch files; exact original bytes are preserved in existing-format lossless JSON envelopes with round-trip hashes, without changing whitespace policy or command outcomes. Historical verifier paragraph retained verbatim. Current client extension source5beb3eae69b08f2e895520c7f459e1465780beeb selects one actual28/28 fresh canonical cohort (11new request/rawHTTP +17unchanged verifier), not the earlier47 or phase sums. Actual source28; C1fails2at193/201 and C2fails1at280 with masked194/282, explicit byte-exact restores and28/28reruns, hook2entries/3values, raw/observer joins/naturalESRCH/no signals/no late errors. Clean-source0/47892ms supplies no Vitest credit. All71source/fresh paths/eight compiledpairs/121protected/seven native physicalpins and heldR18 rows preserved. Source counts15spans/tenfiles1691to1692; ordinaryadd1 stopped beforecommit, trackedadd--update0 and complete11blob/default-fullrange re-admission preceded sourcecommit0. Global quality remains RED1268/2720, no waiver/baseline; three removed findings are test export reachability. This extends the original338payloads/41commands/359inputpins through only three active indexes and client-transport prefix; code inert, logs/patches lossless, raw count originals/large observations private. No CMS grant from five raw bytes, successful matching-nonce fallback, required-time/checkpoint/session/issuance/report, F37, fullsuite/CI/release/wholeP125/P101/plan completion credit. All held decisions and missingRES binding retained. Later actual publication/committed-file/quality/QA closure records are separate. Historical verifier and client notes remain verbatim. The current fallback extension selects one actual 21/21 fresh canonical cohort at source d8b5c3250138a10078c21886642595f669c4a73c: four new fallback bodies and seventeen unchanged verifier bodies. Source passed 21; F1 failed three assertions at 239/261/287, F2 two at 261/287, and F3 one at 237. All three explicit byte-exact restorations passed 21. Earlier positives and later masks are retained, with two hook entries/three values, ordered raw/observer joins, natural ESRCH and no nonzero signals or hook/unhandled/late/cleanup errors. The unchanged default 10000 ms abort reaches a next refusal; its message is string-only. Clean-source 0/47211 ms supplies no Vitest credit. All 72 selected source/fresh paths, eight original compiled pairs, 128 protected inputs, eight native physical identities and held R's eighteen rows remain exact. Counts change fifteen spans across ten files from 1692 to 1693. Global quality remains RED1268/2719, unwaived; only requestTimestamp unused-export reachability changes. This extension preserves 610 prior payloads, 76 old commands, 676 ordered pins and the original manifest, changing only three active indexes plus the fallback prefix after separate admission. No successful fresh-nonce grant, signed-list admission, required-time/checkpoint/sealing/issuance/report, independent TTL contract, F37, full suite/coverage, release or whole-issue/plan completion is claimed. All holds, ignored archives and the missing-reservation limitation remain. Later publication/export/quality/QA closure records are separate. Genuine-grant extension: source188681b32dc472983404dce19e7833cd76ee7576 and fresh checkout pass the same19 executed, zero-skip cases. ORDER fails only route403/424; DROP-VALID-GRANT fails only nonnull406/426 after genuine exact-query oracles; both explicit exact restores pass19. Hook values and ordered identities match; canonical19 is not summed with older47/28/21 or repeated runs. Twelve actual fixture bodies retain72 natural zero children,19 closed sockets and cleanup0;144 private stream byte/hash facts were checked by root, raw streams/keys stay private. Actual OpenSSL4.0.3 optional-field stderr diagnostics remain explicit. Only48 exact public outputs are admitted. All135protected byte inputs/eight old plus distinct fresh ninth native and73selected paths per root/eight compiled pairs stay exact through assembly. Global1268duplicates/2719ordereddeadcode findings remain RED without waiver. Lost initial count scan and V1/V2 outputs remain excluded; distinct closed V3 reads support15numericspans/10files1693to1694. Only current metadata3 plus evidence/tsa-grant may change after separate source admission. WholeP1-25/P1-01 gaps, trust-list/caller/checkpoint/issuance/full-suite/CI/package/generator/report scopes, F37 skip and all held decisions remain open. No PR/push/merge/release or wholeplan completion claim. Checkpoint extension at e49e21348e454ba8f1556cb6dfd3ed69e0e883c2: final source and corrected fresh21; append and required-refusal omissions each one intended failure, exact restorations21. Initial fresh17/4 LibreSSL launcher failure retained with zero credit; same-source OpenSSL4.0.3 correction and EOF-only helper successor explicit. Global quality remains RED: duplicates1268, dead-code2712 after7 consumed checkpoint export/type removals, no additions or waiver. Complete P1-25/plan, held decisions and F37 remain open. Metadata publication and release are separate actual checks."
 }

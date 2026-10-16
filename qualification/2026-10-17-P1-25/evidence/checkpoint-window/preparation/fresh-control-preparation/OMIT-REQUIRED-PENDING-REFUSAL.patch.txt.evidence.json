@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/checkpoint-window/preparation/fresh-control-preparation/OMIT-REQUIRED-PENDING-REFUSAL.patch.txt",
+    "bytes": 656,
+    "sha256": "11d398c5b5ac9e64079e217bfb241be3ff0e5cb572405fe35a47cc6bb86b7b62"
+  },
+  "dataBase64": "LS0tIGEvc3JjL3RpbWUvY2hlY2twb2ludC50cworKysgYi9zcmMvdGltZS9jaGVja3BvaW50LnRzCkBAIC0xNDksOSArMTQ5LDcgQEAKICAgICBgJHtKU09OLnN0cmluZ2lmeSh7IGNoZWNrcG9pbnQsIHNoYTI1NjogZGlnZXN0LCBzaWduYXR1cmU6IHNpZ25IZXhEaWdlc3QoZGlnZXN0LCBnZXRQcml2YXRlS2V5UGVtKHdvcmtzcGFjZSwgIm1vbml0b3IiKSkgfSwgbnVsbCwgMil9XG5gLAogICAgIHsgZmxhZzogInd4IiwgbW9kZTogMG82NDQgfSk7CiAgIGNvbnN0IHJlc3VsdCA9IGF3YWl0IHN0YW1wQ2hlY2twb2ludCh3b3Jrc3BhY2UsIHsgY2hlY2twb2ludCwgc2hhMjU2OiBkaWdlc3QgfSwgdHJ1c3QpOwotICBpZiAocmVzdWx0LnN0YXR1cyA9PT0gInBlbmRpbmciICYmIGNvbmZpZy5yZXF1aXJlZCkgewotICAgIHRocm93IG5ldyBFcnJvcihgdGltZS5yZXF1aXJlZDogY2hlY2twb2ludCAke2NoZWNrcG9pbnQuc2VxdWVuY2V9IGhhcyBubyB2ZXJpZmllZCB0b2tlbiAoJHtyZXN1bHQuZmFpbHVyZXMuam9pbigiOyAiKSB8fCAibm8gVFNBIGFuc3dlcmVkIn0pYCk7Ci0gIH0KKyAgLy8gU291cmNlLW9ubHkgY29udHJvbDogZGVsaWJlcmF0ZWx5IG9taXQgdGhlIHJlcXVpcmVkIHBlbmRpbmcgcmVmdXNhbC4KICAgcmV0dXJuIHJlc3VsdDsKIH0KIAo=",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "p125-checkpoint-private-receipt-v3-author-static-review/1",
+  "at": "2026-10-16T23:43:29.700681+00:00",
+  "blockers": [],
+  "v1AndV2Preserved": true,
+  "phaseCorrectionOnlyWithMandatoryFailureRetention": true,
+  "originalFailedCanonicalCountsRead": {
+    "total": 21,
+    "passed": 17,
+    "failed": 4,
+    "skipped": 0
+  },
+  "correctedCanonicalActualOutcomeNotInventedOrPinnedHere": true,
+  "operationSourcePointerMatchesActualHelperV2FinalSource": true,
+  "mandatoryFailureArtifactsNotOptionalOrAcceptedAsGreen": true,
+  "readyForPrivateAssembly": false,
+  "helperImportedParsedCompiledExecuted": false,
+  "sourceIndexQaWrites": false
+}

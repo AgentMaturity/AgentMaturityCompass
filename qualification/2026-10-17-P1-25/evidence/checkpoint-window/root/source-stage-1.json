@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-16T23:35:12.536129+00:00",
+  "ordinaryAddExit": 1,
+  "stderr": "The following paths are ignored by one of your .gitignore files: docs/internal; .gitignore:144 internal/",
+  "actualAll13StagedDespiteNonzero": true,
+  "allIndexBlobsExact": true,
+  "status": "M  CONTRIBUTING.md\nM  README.md\nM  docs/content/reddit-launch-drafts.md\nM  docs/content/show-hn-draft.md\nM  docs/internal/competitive-landscape.md\nM  docs/internal/mirofish-simulation-council.md\nA  tests/time/checkpointWindow.test.ts\nM  tests/time/tsaGrant.test.ts\nA  tests/time/tsaTestFixture.ts\nM  website/i18n.js\nM  website/index.html\nM  website/lite.html\nM  whitepaper/AMC_WHITEPAPER_v1.md\n",
+  "noForceOrIgnoreRuleChanges": true
+}
