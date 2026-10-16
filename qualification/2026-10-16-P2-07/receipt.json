@@ -2,140 +2,146 @@
   "schemaVersion": 1,
   "key": "P2-07",
   "date": "2026-10-16",
-  "commit": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
-  "branch": "codex/p2-07-pending-state-qualification",
+  "commit": "5d5604758d5a8cf5a519346c98318667b88059a2",
+  "branch": "codex/p2-07-scim-handler-qualification",
   "node": "22.23.3 (ABI127)",
   "pnpm": "10.33.0",
   "os": "macOS (darwin)",
   "arch": "arm64",
   "commands": [
     {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/identity/pendingLoginStore.test.ts",
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass install --frozen-lockfile",
       "exit": 0,
-      "durationMs": 262
+      "durationMs": 7081
     },
     {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/identity/pendingLoginStore.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-initial-four-cases.raw.json",
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run build",
       "exit": 0,
-      "durationMs": 5583
+      "durationMs": 29780
     },
     {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths src/identity/scim/scimUsers.ts src/identity/scim/scimGroups.ts src/identity/scim/scimPatch.ts tests/identity/scimHardening.test.ts docs/SCIM.md .changeset/p2-07-scim-handler-qualification.md",
       "exit": 0,
-      "durationMs": 32843
+      "durationMs": 353
     },
     {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-five-files.raw.json",
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
       "exit": 0,
-      "durationMs": 10930
+      "durationMs": 1284
     },
     {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node --max-old-space-size=8192 node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
-      "exit": 0,
-      "durationMs": 23801
-    },
-    {
-      "cmd": "/opt/homebrew/bin/pnpm run build",
-      "exit": 0,
-      "durationMs": 27454
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths README.md CONTRIBUTING.md website/index.html website/lite.html website/i18n.js docs/content/show-hn-draft.md docs/content/reddit-launch-drafts.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md whitepaper/AMC_WHITEPAPER_v1.md",
-      "exit": 0,
-      "durationMs": 186
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
-      "exit": 0,
-      "durationMs": 228
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
-      "exit": 0,
-      "durationMs": 205
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
-      "exit": 0,
-      "durationMs": 1033
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
-      "exit": 0,
-      "durationMs": 141
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
-      "exit": 0,
-      "durationMs": 1341
-    },
-    {
-      "cmd": "/opt/homebrew/bin/pnpm run lint",
-      "exit": 0,
-      "durationMs": 2715
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/identity/scimHardening.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207s-six-families-red.raw.json",
       "exit": 1,
-      "durationMs": 399
+      "durationMs": 10588
     },
     {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p2-07-oidc-qualification-20261016/deadcode-delta.mjs",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/identity/scimHardening.test.ts tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207s-initial-six-files.raw.json",
+      "exit": 0,
+      "durationMs": 10976
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node --max-old-space-size=8192 node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
+      "exit": 0,
+      "durationMs": 24949
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node --max-old-space-size=8192 node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 35086
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run build",
+      "exit": 0,
+      "durationMs": 30637
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths README.md CONTRIBUTING.md website/index.html website/lite.html website/i18n.js docs/content/show-hn-draft.md docs/content/reddit-launch-drafts.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md whitepaper/AMC_WHITEPAPER_v1.md",
+      "exit": 0,
+      "durationMs": 356
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run lint",
+      "exit": 0,
+      "durationMs": 4047
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 398
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 415
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+      "exit": 0,
+      "durationMs": 1265
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+      "exit": 0,
+      "durationMs": 308
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+      "exit": 0,
+      "durationMs": 1522
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
       "exit": 1,
-      "durationMs": 2409
+      "durationMs": 1462
     },
     {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
-      "exit": 0,
-      "durationMs": 48791
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p2-07-scim-qualification-20261016/deadcode-delta.mjs",
+      "exit": 1,
+      "durationMs": 3342
     },
     {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-fresh-canonical.raw.json",
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
       "exit": 0,
-      "durationMs": 11881
+      "durationMs": 49150
     },
     {
       "cmd": "/opt/homebrew/opt/node@22/bin/node -p 'JSON.stringify({node:process.version,abi:process.versions.modules,platform:process.platform,arch:process.arch})'",
       "exit": 0,
-      "durationMs": 46
+      "durationMs": 49
     },
     {
       "cmd": "/opt/homebrew/bin/pnpm --version",
       "exit": 0,
-      "durationMs": 161
+      "durationMs": 162
     },
     {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-mutant-consume.raw.json",
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths qualification/2026-10-16-P2-07",
+      "exit": 0,
+      "durationMs": 345
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout tests/identity/scimHardening.test.ts tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207s-fresh-six-files.raw.json",
+      "exit": 0,
+      "durationMs": 11977
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout tests/identity/scimHardening.test.ts tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207s-filtered-remove-control.raw.json",
       "exit": 1,
-      "durationMs": 11077
+      "durationMs": 10916
     },
     {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-restored-consume.raw.json",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout tests/identity/scimHardening.test.ts tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207s-filtered-remove-restored.raw.json",
       "exit": 0,
-      "durationMs": 11012
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-mutant-expiry.raw.json",
-      "exit": 1,
-      "durationMs": 10968
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-restored-expiry.raw.json",
-      "exit": 0,
-      "durationMs": 10900
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths qualification/2026-10-16-P2-07",
-      "exit": 0,
-      "durationMs": 185
+      "durationMs": 10938
     }
   ],
   "tests": {
-    "total": 154,
-    "passed": 154,
+    "total": 160,
+    "passed": 160,
     "failed": 0,
     "skipped": 0
   },
+  "notes": "The fresh canonical run passed 160/160, preserving the prior 154 cases and adding six SCIM HTTP families; repeated invocations are not summed. Original production produced six genuine body failures. A Q-only source control silently retained a filtered member and VIEWER grant after HTTP 200: 159 passed and one reached role assertion failed at line 337; later assertions at lines 338\u2013339 were masked. Exact restoration passed 160/160. All 28 hooks and 16 public closure/environment records passed in each six-file phase. Duplicates (1,268) and dead code (2,727) remain exit 1, unchanged and unwaived. The 46 historical payloads and complete 48-file packet at bf3 retain their original source identities, controls and findings. S/Q source 5d560475 is distinct from held dirty borrowed runner R at bf3. Provider/config/archive staging remains held; no force or ignore change occurred. Ordinary source staging warned about an ignored tracked parent, but all 16 admitted blobs were verified staged before the successful ordinary commit. No compiled-mutant, cold-child SCIM sensitivity, full-P2-07, global-green, release or full-plan acceptance is claimed. Freeze, quality and deadline checks, Claude work and all held decisions remain preserved; F37 stays skipped. Next is P1-39 bounded qualification.",
   "artifacts": [
     {
       "path": "M1.observer.json",
@@ -155,7 +161,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "a1aadea127f546aaa5bfe182d648be31668fe90022f60dac71e3182372de98dd"
+      "sha256": "1eb557af823aac5b2d18f8692786d92cc43144c611c46fdf2d78d58e3e798c48"
     },
     {
       "path": "canonical.observer.json",
@@ -314,6 +320,110 @@
       "sha256": "313873d10a2d5adbe972be76c7bdb8550a739373a626d428d91ac8219c009f80"
     },
     {
+      "path": "scim-M1.observer.json",
+      "sha256": "9f7818af3a1844fbe5940006326ad481ad03744c542b74fe6339606724a67fe6"
+    },
+    {
+      "path": "scim-M1.raw.json",
+      "sha256": "322c9e202209c50718009f3b3c7084f611f66bb6dee8a1c9df695d07d5a09c4f"
+    },
+    {
+      "path": "scim-canonical.observer.json",
+      "sha256": "c67b35de24e0e5c4784c407946d18d6d0a6b35140ff775b7f8489f264136c9ff"
+    },
+    {
+      "path": "scim-canonical.raw.json",
+      "sha256": "0bb0c43bc1ce3615a663346dc89fd7589d3cd9e91bfa06a7ebc8e137664a59ce"
+    },
+    {
+      "path": "scim-commands.json",
+      "sha256": "21077bbb3c691e6e47bb141c4e34454d68f1136750aaf31216acfbbf3a1f9ee4"
+    },
+    {
+      "path": "scim-evidence.json",
+      "sha256": "153d5f490e48fa55eba78a9458bdd0794a02936a190667c538caf05e8444247c"
+    },
+    {
+      "path": "scim-final-independent-review.json",
+      "sha256": "f25d7b6e223e9855863160aeada2b4de58f908337d3d897a733900c2ff494522"
+    },
+    {
+      "path": "scim-initial.observer.json",
+      "sha256": "4e7f5953db2f3f93cbaf6614266a5909715ad452d8b913fc8ca013c7f8dc6dca"
+    },
+    {
+      "path": "scim-initial.raw.json",
+      "sha256": "fb3c00d9c6a6613f3a9371a480775b680dad8170c95e25228d08a341da434621"
+    },
+    {
+      "path": "scim-original-checkpoint.json",
+      "sha256": "bbbc79c604450781f944acd1fe2fe5337831f535f88537b0194d34500c4011dc"
+    },
+    {
+      "path": "scim-ownership.json",
+      "sha256": "f2475c42cdfd8e95a373ec2e7e6b08ab31053053d5bfe320b19e522b20a42bc0"
+    },
+    {
+      "path": "scim-private-references.json",
+      "sha256": "7cacd05e728aab6a3cccb3e07ddd1b0b893cf40616e1f8b7acfce1042c6cb602"
+    },
+    {
+      "path": "scim-public-active-false-existing-session.json",
+      "sha256": "1c8e03f44a66da9448f6df4917c571580302be650b452c211bf505858e6fe5bb"
+    },
+    {
+      "path": "scim-public-filtered-member-role-revocation.json",
+      "sha256": "907785237cc368af0ae717ba3ae9368cb44240a70bf8aef0022cb142c373543d"
+    },
+    {
+      "path": "scim-public-group-patch-validation.json",
+      "sha256": "1803c12f25d7e6badf4218827b9dabd3963a89556cf597919f1234de027297a6"
+    },
+    {
+      "path": "scim-public-patch-parser-wire-and-typed-contract.json",
+      "sha256": "4807b5f4fc8d16bf88fbd7c00b6fa9757576eb70cfd7149919c7ae84abad677d"
+    },
+    {
+      "path": "scim-public-user-filter-contract.json",
+      "sha256": "3a263ca95e73ebd5cdfb99c658bf55d8bcbf240f9c1b09b0e2d82d4bc4af0d38"
+    },
+    {
+      "path": "scim-public-user-patch-values-paths.json",
+      "sha256": "b07b7fb4c1962325a7728750e55c903f09e5c91d416fdabbd7d4e7af68c0153d"
+    },
+    {
+      "path": "scim-quality-and-freeze.json",
+      "sha256": "f4c00a343eff186b2ceb3dbf7e3ee2b0719e424802edf67e5d74fd339e3113ba"
+    },
+    {
+      "path": "scim-red-initial-review.json",
+      "sha256": "e7d2c4a669f494880a9a0b48cc19ad10167de049afde6da5640d747e2e0374b6"
+    },
+    {
+      "path": "scim-red.observer.json",
+      "sha256": "ea29cc8457d392e9dedb7a7f7577751c727dddc2fcac946e47e7ea41083aab27"
+    },
+    {
+      "path": "scim-red.raw.json",
+      "sha256": "a340c1fd431f4a6d71fc0759109d90644348337debcae6b290ff871162dcf3b3"
+    },
+    {
+      "path": "scim-restored-M1.observer.json",
+      "sha256": "3f37f17caf8f31a40c47a98fb394c47f7a4559d74963cb9e2dd96b0d8a4df6a0"
+    },
+    {
+      "path": "scim-restored-M1.raw.json",
+      "sha256": "105496d2d3299723c3c40161b7da0f43cf8681a1a999e4bc36e9ec4564b1d3ef"
+    },
+    {
+      "path": "scim-sensitivity.json",
+      "sha256": "b3fa5c0d6e48c6457060f7fe0104e7cb4cad51810650dd251fd01b9964f74fa5"
+    },
+    {
+      "path": "scim-source-inputs.json",
+      "sha256": "1460545c690f8424ccbe58b235f5c03f585542c0708029a41a7f3b80226797fc"
+    },
+    {
       "path": "sensitivity.json",
       "sha256": "efc584a254d545105136a127fcab01011ec76455a7f4d9d894e11e73ec7b890d"
     },
@@ -325,6 +435,5 @@
       "path": "test-corrections.json",
       "sha256": "dd6d159df4add0464ef5c06f3d34974415514bd35f78efa4c93b7cb3c7acb7b3"
     }
-  ],
-  "notes": "The actual fresh canonical run passed154/154:128 verifier,22 existing identity/security and4 new pending-state cases. Related invocations overlap and are not summed. Source-only M1 retained consumed rows and caused3 reached body AssertionErrors; M2 removed exact-expiry refusal and caused2. Both exact restorations passed154/154. Duplicates1268 and deadcode2727 remain RED exit1/unwaived; zero added deadcode findings, two test-used exports removed from prior2729. The23 historical verifier payloads and original25-file packet at5696 retain their2ca source provenance, fixture failure and controls. No compiled-mutant, full-P2-07, global-green, external IdP, release or full-plan acceptance. Claude work, freeze/quality/deadline checks and held decisions remain preserved; F37 skipped."
+  ]
 }
