@@ -1111,7 +1111,7 @@
       "sha256": "bdc2cd6df14ea3f7dca8fab0197e711e04871e9d5a1f63110c70c6e7b5628735"
     },
     {
-      "path": "evidence/test-design/compiledPolicyGuard.test.ts",
+      "path": "evidence/test-design/compiledPolicyGuard.test.ts.source.txt",
       "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0"
     },
     {
@@ -1299,16 +1299,20 @@
       "sha256": "fa424d07e8695cb36b3e02a5f1e8d44977dfa98721267bd7484f24389366b436"
     },
     {
+      "path": "evidence/discovery-correction.json",
+      "sha256": "0b0d0e09f6136c72877e9b8108808fa793ffcd0c0c816d53b07d65fc33c0502f"
+    },
+    {
       "path": "evidence/representations.json",
       "sha256": "a0f5b290ef34e7e98da13ac8ec01c3f544fee194c43d77f5a714989f247073cb"
     },
     {
       "path": "evidence/assembly-inputs.json",
-      "sha256": "6531c6447eac9e7e4dc69e85e88f0e3f31bff675e3f8a5a27a100bf660992f10"
+      "sha256": "c349098b3a2a9742368fe56920ed6504d3097c2be375ebd71f2feab731d66e0b"
     },
     {
       "path": "README.md",
-      "sha256": "b1dd46c21354c840d85893bd7f1cf73c403bcc33f7059f6ac1d40edd5c4c8685"
+      "sha256": "ba1b43ae1c82df34746ed6132a8907f954874646eb7d3c762e4f6173ff80a546"
     }
   ],
   "notes": "Bounded helper qualification only. Source, fresh and restored 35-case cohorts are separate observations. Three actual semantic source-control RED runs have 1, 2 and 2 failed bodies and exact manual restores. Whole P1-12, held decisions and global quality remain open. Duplicates remain 1268; dead code changes from 2724 to 2723 solely from test export reachability. No waiver, baseline adoption, PR, push, merge, release or tracker Done. See README and exact evidence."
