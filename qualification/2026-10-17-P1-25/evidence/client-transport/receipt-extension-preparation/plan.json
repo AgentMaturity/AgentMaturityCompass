@@ -1,0 +1,65 @@
+{
+  "schema": "p125-client-receipt-extension-preparation/1",
+  "at": "2026-10-16T21:50:35.781096+00:00",
+  "status": "Private unexecuted plan and assembler skeleton only",
+  "currentSourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "parentMetadataCommit": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7",
+  "historicalP125Source": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "historicalP125Metadata": "315bac6aa7fe55596bc9d89ddb32755c9436ceb9",
+  "activeExistingPathsAllowedToChange": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json"
+  ],
+  "onlyNewPacketPrefix": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/evidence/client-transport",
+  "oldPacket": {
+    "files": 341,
+    "artifacts": 340,
+    "payloadsPreservedByteExact": 338,
+    "commandsPreservedInOrder": 41,
+    "assemblyInputPinsPreservedInOrder": 359,
+    "originalAssemblyManifestPreserved": true,
+    "oldLosslessEnvelopesPreserved": 18,
+    "privateV2AndGitHistoryRemainAuthority": true
+  },
+  "knownActualFacts": {
+    "sourceCombined": "Root recorded28/28:11 client plus17 unchanged verifier cases. This preparation is not a fresh/control/runtime audit.",
+    "sourceCheckpoint": "Root recorded clean5beb,11 exact sourceGitblobs and fifteen numeric spans across ten count surfaces plus one new test.",
+    "sourceStageStop": "Ordinary add exited1 on ignored ancestor while staging all11. No dependent commit ran after the failure. Retained source-stage-stop.json precedes ordinary tracked add --update0, complete index/blob/default-delta/full-range/protected re-admission and guarded ordinary commit0. No force or ignore change.",
+    "quality": "Duplicates remain1268; dead-code findings2723 to2720 because the new test reaches TSA_TIMEOUT_MS/buildTimestampRequest/postTimestampQuery. This is reachability, not remediation, a waiver, baseline update or global quality pass."
+  },
+  "privateArtifactSelection": {
+    "include": "Compact source/run/control/classification/preservation/review/gap records, exact command metadata, lossless raw logs/patches, finite numeric/hash count and ownership summaries, inert admitted source/helper copies.",
+    "exclude": "No raw count-surface before-originals, private signing/secret material, native modules, full large ownership observations or recursive directory adoptions. Preserve such originals privately and refer only to their size/hash where needed.",
+    "inert": "Every selected source candidate/script uses .source.txt. Raw log/patch bytes use the existing exact lossless JSON format. The assembler itself is hash-only because it contains the literal secret-marker guard; do not encode or copy it to evade that rule.",
+    "expectedAdditionalCount": "341 plus the actual selected new artifacts and two extension manifest/representation records; no guessed final file count."
+  },
+  "futureActualClosureInputs": [
+    "Actual fresh binding at5beb and clean-source natural closure, with no Vitest credit from that helper.",
+    "Same28 ordered identities in fresh canonical and source outcome; exact hooks, raw/observer joins and no unhandled/late errors.",
+    "Two independent actual source-only RED controls, root all-failure/first-sensitive-assertion/masking classifications, exact apply/restore records and same28 green restoration runs. No predicted failure totals.",
+    "Independent actual chain review, final source/protected/R/native preservation and current whole-issue gaps.",
+    "Root-authored actual final README/notes, exact command inventory, environment, selected artifact pins and closure evidence.",
+    "Actual later private/source validator, publication/index/staged path/default-full-range whitespace, commit and committed-tree export records. These cannot be pre-credited by the assembler."
+  ],
+  "publicationProtocol": [
+    "Fully read/review the filled actual manifest, all new retained originals and compact final prose. Preserve the old341-file packet and all three current metadata originals privately before materialization.",
+    "Assemble into a new exclusive private output directory underB34. Verify every old338payload, all new artifact hashes, all selected lossless roundtrips and complete active file/index set.",
+    "Run unchanged private validator. Materialize only the three admitted active indexes and unique evidence/client-transport descendants; retain any failure and all packet versions.",
+    "Run unchanged source receipt validator and required recorded quality/freeze/D15 checks. Quality stays RED unless independently remediated within an authorized scope; no waiver or config workaround.",
+    "Use one dependent guarded flow for ordinary staging, exact admitted changed paths, every actual Git index blob matched to publication-expectations.json and both default whitespace checks. Full-range base must be5beb, not only an intervening metadataHEAD. Any nonzero/size/path/hash failure stops before commit.",
+    "After fresh held-input/index/HEAD reinspection, ordinary commit only. Inspect actual HEAD-only file set and every publication blob; export only actual committed files and run unchanged validator on that export. A workspace validator pass alone does not prove publication completeness.",
+    "Record actual commit/export/validator/QA append closure separately after it exists. Do not invent those future commands inside the already assembled receipt."
+  ],
+  "boundaries": [
+    "No helper/product/parser/compiler/test/native/SQL/network/process-probe execution or checkout/index/QA writes by this author.",
+    "No new production, package/dependency, existing test, guard, deadline, Knip/scanner/freeze baseline or ignored-path rule changes.",
+    "No whole P1-25/full-suite/CI/public TSA/trust grant/checkpoint/issuance/report integration, release, PR/push/merge or complete-plan claim.",
+    "All held decisions, Claude work, R dirty work, missing-reservation binding, ignored provider archive and F37 skip remain intact without reprobe/search/recreation/message."
+  ],
+  "activeSchemas": {
+    "receipt": "schemaVersion1 unchanged fields; one actual canonical cohort",
+    "assembly": "original manifest plus359 old ordered inputs, followed by actual new pins",
+    "publication": "complete sorted artifact index excluding receipt self"
+  }
+}

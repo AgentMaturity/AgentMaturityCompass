@@ -1,0 +1,45 @@
+{
+  "schema": "p125-client-private-count-surface-seal/1",
+  "at": "2026-10-16T21:41:53.566064+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/README.md",
+      "bytes": 3782,
+      "sha256": "b8e04d7ea76a6de2c7103560381c91963e84a7d2ddcf228b9a1a411c4ed82e5a"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/proposed-admission.json",
+      "bytes": 27641,
+      "sha256": "3aa53ddffba4f8aeb85ab66db101084e5750b564f950d01b75c5e6cbd35cfa53"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/review.json",
+      "bytes": 3071,
+      "sha256": "66083488cbc19ed43321b32440c4dee958e97a44e233e58ef34e5d899b91605e"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/ownership-observations.json",
+      "bytes": 1987921,
+      "sha256": "565699aa878e3d47a0c97681efb8ce2b09f9a4812e84b790c6e26ca72441a5f6"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/pins.json",
+      "bytes": 20750,
+      "sha256": "3507d586a1de11bbb7a1087a3a8fb8860aed8e541214391be109da2826e3f2bd"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/initial-static-preparation-stop.json",
+      "bytes": 433,
+      "sha256": "6d66bf912353a1066c419ee1f015e086f5bb3d0ce0806664d1a2cc5210302c12"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/count-surface-review/static-read-completion.json",
+      "bytes": 276,
+      "sha256": "11ee759eafdc7866e35bf396adc10a4fe3bf72b7fb929ce576fbceb81ed15fd1"
+    }
+  ],
+  "originalsRemainPrivate": true,
+  "sourceWrites": false,
+  "generatorExecuted": false,
+  "blockers": []
+}

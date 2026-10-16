@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/client-transport/commands/p125c-count-scope-freeze/stdout-stderr.log",
+    "bytes": 268,
+    "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad"
+  },
+  "dataBase64": "Cj4gYWdlbnQtbWF0dXJpdHktY29tcGFzc0AxLjIuMCBjaGVjazpmcmVlemUgL1VzZXJzL3NpZC8uY29kZXgvd29ya3RyZWVzL3AyLTA3LXNjaW0tcXVhbGlmaWNhdGlvbi9BZ2VudE1hdHVyaXR5Q29tcGFzcwo+IG5vZGUgc2NyaXB0cy9jaGVjay1mcmVlemUubWpzCgpGcmVlemUgZ3VhcmQgcGFzc2VkOiB7ImNsaUNvbW1hbmRQYXRocyI6MTIzNiwiY2xpSW52ZW50b3J5UGF0aHMiOjEyMzYsInN0YXRpb25QYWNrcyI6NDEsInN0YXRpb25QYWNrUXVlc3Rpb25zIjo2MzJ9Cg==",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

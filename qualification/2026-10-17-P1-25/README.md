@@ -1,3 +1,44 @@
+# P1-25 client request and raw HTTP qualification extension
+
+The current client checkpoint is source `5beb3eae69b08f2e895520c7f459e1465780beeb` on `codex/p1-25-client-qualification`. Its source and retained fresh checkout each pass the same 28 cases: 11 new request/HTTP cases and 17 unchanged genuine-token verifier cases. Each exact restoration also passes 28/28. The active receipt selects this single fresh canonical cohort; baseline, historical, control and restoration counts are not added together. Whole P1-25, P1-01, global quality, CI, release and the plan remain open.
+
+## Current bounded scope
+
+The new fixed test file independently checks full SHA-256 DER request bytes, the captured positive nonce, literal `certReq=true`, an independent literal policy OID and digest refusals. Real HTTP fixtures check POST headers/path/query/body, raw response bytes, MIME normalization, URL credentials, status and redirect refusals, the exact 65,536-byte reply cap, and the unchanged 10,000 ms default against a stalled owned response. The reply is five synthetic public bytes, not CMS or a trust grant. Request encoding and transport behavior do not establish successful `requestTimestamp` issuance, `AttestedTime`, fallback or report integration.
+
+Every listener binds an owned ephemeral `127.0.0.1` port with an explicit private fixture workspace. The normal residency/egress implementation remains in the call path. No guard, environment opt-out, fake timer, mock, deadline or policy was changed. F37 remains skipped and receives no bypass or Unix-socket qualification credit. The fixtures await natural listener, socket, request and response terminals and remove only their owned temporary workspaces. Actual failures preserved their primary assertion through cleanup; no cleanup aggregate, hook, unhandled or late failure occurred. These are finite observations, without universal process, filesystem, environment or native-loader isolation claims.
+
+## Actual sensitivity and restoration
+
+| Phase | Passed | Failed | Exit |
+|---|---:|---:|---:|
+| Source combined | 28 | 0 | 0 |
+| Fresh canonical | 28 | 0 | 0 |
+| C1: certReq changed to false | 26 | 2 | 1 |
+| Exact C1 restoration | 28 | 0 | 0 |
+| C2: response MIME admission omitted | 27 | 1 | 1 |
+| Exact C2 restoration | 28 | 0 | 0 |
+
+All six runs have the same 28 ordered file/title identities, two hook-bearing task entries and three passing hook values, joined raw/observer records, natural owned-group ESRCH and no nonzero signals. C1 reaches line 193 after the full prefix positive at 191 and compares actual `010100` with literal `0101ff`. The later full-wire assertion at 194 is masked. The policy body separately fails at 201, with only the final certReq byte different. C2 reaches the rejecting-promise witness at line 280 after the real positive at 278; removing MIME validation makes the request resolve the five raw bytes. The later request-count assertion at 282 is masked. Every failure and mask was read before explicit restoration.
+
+Both controls modified only `src/time/tsaClient.ts` in the new owned fresh checkout. Neither rebuilt compiled output nor mutated a native binary. The final 71 selected source/config/test/fixture/compiled paths match source and fresh bytes and retain distinct regular single-link identities; eight compiled pairs, 121 protected inputs, six old native identities and the distinct new seventh native remain exact. The held R HEAD, eighteen dirty rows and empty index remain exact. The fresh clean-source helper passed frozen install, build, doctor and ordinary signed one-turn/two-turn checks in 47,892 ms; that helper supplies no Vitest credit.
+
+## Current checks and preserved evidence
+
+Source/test types, lint, build, counts, gate reachability, threat model, architecture boundaries, docs drift, freeze and third-party notices passed. Initial counts naturally failed at 1,691 published versus 1,692 actual files. The unchanged generator changed exactly fifteen numeric spans across ten files; every other authored byte and all twenty Claude/R count variants remain exact. These numbers count source files, not executed tests. Freeze remains 1,236 CLI paths, 1,236 inventory paths, 41 station packs and 632 pack questions.
+
+Global quality remains RED: duplicate findings stay 1,268; source dead-code findings go from 2,723 to 2,720 because this test reaches three existing exports. This is reachability, not product remediation, a waiver or a baseline update. Both gate failures and complete diagnostic deltas remain evidence.
+
+Ordinary source staging exited 1 on the ignored `docs/internal` ancestor despite staging all eleven intended paths. The dependent flow stopped before commit. An ordinary tracked-path `git add --update` then exited 0; all eleven staged blobs, default delta and full-range whitespace checks, protected inputs and native/R state were re-admitted before ordinary commit. No force, ignore change or bypass was used. The separately held ignored provider archive remains held.
+
+The existing packet is extended only through its three active root metadata files and `evidence/client-transport/`. Its prior 338 payloads, 41 command rows and 359 ordered assembly input pins remain exact. The original 341-file packet and three active originals remain pinned privately and in Git history. Selected new code and scripts are inert text; logs and patches use exact lossless envelopes. Raw count originals and large ownership observations stay private. Actual later publication, committed-file validation and append-only QA closure are recorded separately after they occur; assembly itself does not pre-credit them.
+
+The current finite ownership admission covers 181 prior physical roots. Hosted WIP is zero after excluding thirteen verified Dependabot PRs only from WIP; every PR's changed files remains included in overlap checks. Ordinary D15 reports `none`. The missing live reservation file retains its exact last-known binding and gives no ownership release; it was not probed, searched for or recreated. Claude's work, P1-01 gaps and every held decision remain intact. Remaining P1-25 seams are recorded in `evidence/client-transport/whole-issue-gaps.json`; a next fallback test lane is still read-only preparation until separately admitted.
+
+## Historical verifier checkpoint retained below
+
+The following prior README is retained verbatim as historical evidence. Its source, cohorts, quality numbers, next-item routing and limitations describe the earlier verifier checkpoint; they are not the current client extension's results.
+
 # P1-25 bounded offline timestamp verifier qualification
 
 This checkpoint qualifies the existing offline RFC 3161 verifier and its configured-anchor artifact-time seam. The local source commit is `2792ccc6ad68f9ec3df97fbdfc63718727245695` on `codex/p1-25-timestamp-qualification`. Full P1-25 acceptance, global quality, CI, release and plan completion remain open.

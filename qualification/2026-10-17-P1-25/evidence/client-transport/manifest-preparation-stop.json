@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-16T21:57:18.034299+00:00",
+  "kind": "private root manifest-preparation assertion stop",
+  "exit": 1,
+  "reason": "Incorrect expected36 command count; actual finite inventory is35. Assertion stopped before the exclusive final manifest write.",
+  "manifestWritten": false,
+  "assemblyExecuted": false,
+  "sourceIndexMutation": false,
+  "productCommandOrQualificationCredit": false,
+  "correction": "Builder binds the observed35-row finite command inventory. All producer command results remain unchanged."
+}

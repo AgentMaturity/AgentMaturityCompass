@@ -1,0 +1,51 @@
+{
+  "schema": "p125c-root-control-failure-classification/1",
+  "at": "2026-10-16T21:48:56.020185+00:00",
+  "phase": "p125c-m1",
+  "sourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "operator": "C1-certReq-false",
+  "outcomeSha256": "c37dcb8a6a34a7377cdee6e752e337765fca68ad48397c9ed5c40f00a0fd40db",
+  "rootAllFailuresRead": true,
+  "allFailuresClassified": true,
+  "firstSensitiveAssertionRead": true,
+  "noHookOrEnvironmentFailure": true,
+  "firstSensitiveAssertion": "tests/time/tsaClient.test.ts:193:46 checks literal0101ff after the complete version/imprint/positive nonce prefix at191 actually passed. Mutant returns010100.",
+  "masking": [
+    "The same body stops at193, so final full-wire assertion194 is masked and has no separate executed witness credit.",
+    "Policy body independently reaches201 after its nonce shape positive199; expected and actual full wires differ only in the final certReq byte.",
+    "The other26 passing bodies, including same-encoder HTTP body comparisons, do not constitute additional independent certReq sensitivity."
+  ],
+  "actualFailures": [
+    {
+      "test": "P1-25 request DER and configured raw HTTP transport encodes the full SHA-256 request, captured positive nonce and literal certReq true",
+      "firstFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout/tests/time/tsaClient.test.ts",
+        "line": 193,
+        "column": 46
+      },
+      "classification": "intended fixed certReq literal assertion",
+      "actual": "010100",
+      "expected": "0101ff"
+    },
+    {
+      "test": "P1-25 request DER and configured raw HTTP transport inserts the independent literal policy OID without changing the required fields",
+      "firstFrame": {
+        "method": "",
+        "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout/tests/time/tsaClient.test.ts",
+        "line": 201,
+        "column": 33
+      },
+      "classification": "intended fixed certReq literal assertion",
+      "actual": "304a0201013031300d060960864801650304020105000420000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f06042a030401020900c8d39c3e7e978e40010100",
+      "expected": "304a0201013031300d060960864801650304020105000420000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f06042a030401020900c8d39c3e7e978e400101ff"
+    }
+  ],
+  "actualHookTaskEntries": 2,
+  "actualIndividualHookValues": 3,
+  "rawObserverOrderedJoin": true,
+  "unhandledOrLateDiagnostics": [],
+  "resourceFinding": "All eight owned HTTP fixture bodies passed their ordinary resource/cleanup assertions; DER failures have no fixture. No hook or cleanup aggregate failure occurred. This is finite observed closure, not universal isolation.",
+  "compiledOrNativeMutation": false,
+  "automaticRestore": false
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "p125-client-count-surface-static-review/1",
+  "sourceHead": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7",
+  "branch": "codex/p1-25-client-qualification",
+  "generator": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+    "bytes": 9141,
+    "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f"
+  },
+  "actualCountRed": {
+    "phase": "p125c-counts-before",
+    "command": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125c-counts-before/command.json",
+      "bytes": 1358,
+      "sha256": "e3a567782f6d3541a5b075c95ff1e55092071c9a5649cbc856dfba6eeb3d44f0"
+    },
+    "log": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125c-counts-before/stdout-stderr.log",
+      "bytes": 1436,
+      "sha256": "42d2589cdbae8f64deeeb405899d6a9c3d6ead7a530ac3092576f1679e837935"
+    },
+    "ownedGroupRecord": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125c-counts-before/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "00b797d2cf4a50210d5838542171c8cd2507805b0975cbdac26e99aa6a2ce2ab"
+    },
+    "exit": 1,
+    "durationMs": 518,
+    "published": 1691,
+    "actual": 1692
+  },
+  "pathCount": 10,
+  "numericSpans": 15,
+  "formattedSpans": 14,
+  "encodedBadgeSpans": 1,
+  "allOtherAuthoredBytesExact": true,
+  "allTenBeforeHashesMatchB33ActualAfter": true,
+  "allTwentyClaudeHeldRCountPinsExact": true,
+  "allThirtySixHeldPinsExact": true,
+  "heldRunnerHead18RowsAndEmptyIndexExact": true,
+  "all1810TargetPinsRead": true,
+  "all181FullSelectedTargetHistoryReadsRetained": true,
+  "all181StatusReadsRetained": true,
+  "deduplicatedFullHistoryPayloads": 13,
+  "gitFailures": [],
+  "nonemptyCountScopeStatusRoots": [
+    "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass"
+  ],
+  "testCandidate": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaClient.test.ts",
+    "bytes": 15569,
+    "sha256": "2e70ff1d331f9ec7263dc437119ce9ab505fc1e39c5fbbb27592569cad6c1cb8"
+  },
+  "sourceDirtyOnlyAdmittedTest": true,
+  "proposalSchema": {
+    "candidateDelta.paths": "array of ten relative path strings",
+    "candidateDelta.pathCount": "integer 10",
+    "candidateDelta.surfaces": "array of ten before/spans/after records"
+  },
+  "receiptCopyBoundary": "Only compact proposal, pins and review facts may be selected for a receipt; all raw private-originals/before-originals directories and this large ownership observation remain private. Do not publish altered encodings/renamed originals to avoid ignored paths or authored-whitespace rules.",
+  "blockers": [],
+  "rootNext": "Current hosted/D15/freeze and exact root admission precede the ordinary unchanged generator. Compare actual output to all ten anticipated whole-file hashes and fifteen exact numeric spans; preserve authored whitespace and all other source bytes. Any extra delta stops for separate review.",
+  "noExecutionCredit": true,
+  "allHumanHoldsRetained": true
+}
