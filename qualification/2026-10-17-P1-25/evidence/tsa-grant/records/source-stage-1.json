@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "git",
+    "-C",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "add",
+    "--update",
+    "--",
+    "README.md",
+    "CONTRIBUTING.md",
+    "website/index.html",
+    "website/lite.html",
+    "website/i18n.js",
+    "docs/content/show-hn-draft.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "exit": 0,
+  "stdout": "",
+  "stderr": ""
+}

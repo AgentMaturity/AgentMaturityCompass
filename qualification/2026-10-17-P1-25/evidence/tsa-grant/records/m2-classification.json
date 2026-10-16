@@ -1,0 +1,31 @@
+{
+  "phase": "p125g-m2",
+  "sourceCommit": "188681b32dc472983404dce19e7833cd76ee7576",
+  "operator": "DROP-VALID-GRANT",
+  "outcomeSha256": "a6f42405cb4dc76dbdf6412d8e25b38b42ff388d489da5554b90f02603f34cf2",
+  "at": "2026-10-16T22:59:16.560002+00:00",
+  "rootAllFailuresRead": true,
+  "allFailuresClassified": true,
+  "firstSensitiveAssertionRead": true,
+  "noHookOrEnvironmentFailure": true,
+  "firstSensitiveAssertion": "tsaGrant.test.ts:406:32 and426:32 each observe null after independent exact-query OpenSSL and AMC positives, correct route order and exact prior failure assertions.",
+  "allFailures": [
+    {
+      "line": 406,
+      "classification": "Verified first response discarded by sole source mutation, yielding null grant."
+    },
+    {
+      "line": 426,
+      "classification": "Verified second response discarded after retained http-first: HTTP500, yielding null grant."
+    }
+  ],
+  "masking": [
+    "Nonnull failure406 masks conditional safeguard and TSA/attestation/token equality408-410.",
+    "Nonnull failure426 masks conditional safeguard and TSA/attestation/token equality428-430.",
+    "Earlier fixture/oracle/route/failure assertions precede nonnull assertions and all passed in these actual control bodies."
+  ],
+  "actual19CohortAndHooksMatchCanonical": true,
+  "actualChildrenNatural0AndCleanup0": true,
+  "optionalOpenSslConfigDiagnosticsRetained": true,
+  "explicitRestoreAuthorizedWithinControlScope": true
+}

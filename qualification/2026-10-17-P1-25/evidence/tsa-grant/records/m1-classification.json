@@ -1,0 +1,31 @@
+{
+  "phase": "p125g-m1",
+  "sourceCommit": "188681b32dc472983404dce19e7833cd76ee7576",
+  "operator": "ORDER",
+  "outcomeSha256": "a38d161c644cd80152a8869a48967e8a69fd83ed780ccad6bf2038c8da1d0dad",
+  "at": "2026-10-16T22:58:38.910418+00:00",
+  "rootAllFailuresRead": true,
+  "allFailuresClassified": true,
+  "firstSensitiveAssertionRead": true,
+  "noHookOrEnvironmentFailure": true,
+  "firstSensitiveAssertion": "tsaGrant.test.ts:403:61 sees /unused-last before /good-first; second case:424:61 sees /unused-last instead of /http-first. Both genuine reply oracles already pass.",
+  "allFailures": [
+    {
+      "line": 403,
+      "classification": "Reversed TSA iteration dispatches /unused-last first, violating exact first-grant route order."
+    },
+    {
+      "line": 424,
+      "classification": "Reversed TSA iteration dispatches /unused-last instead of the configured /http-first refusal, violating exact fallback route order."
+    }
+  ],
+  "masking": [
+    "Failure at403 masks expected empty failures, nonnull grant and identity/token checks406-410.",
+    "Failure at424 masks expected http-first: HTTP500, nonnull grant and identity/token checks426-430."
+  ],
+  "actual19CohortAndHooksMatchCanonical": true,
+  "actualChildrenNatural0AndCleanup0": true,
+  "optionalOpenSslConfigDiagnosticsRetained": true,
+  "readOnlyLookupFailureDiagnosed": "m1-read-lookup-diagnostic.json",
+  "explicitRestoreAuthorizedWithinControlScope": true
+}

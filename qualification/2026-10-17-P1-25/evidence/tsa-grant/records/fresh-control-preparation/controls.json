@@ -1,0 +1,87 @@
+{
+  "schema": "p125g-future-source-control-recipes/1",
+  "at": "2026-10-16T22:47:04.490767+00:00",
+  "operators": [
+    {
+      "id": "ORDER",
+      "target": "src/time/tsaClient.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387"
+      },
+      "before": "  for (const tsa of tsas) {\n",
+      "after": "  for (const tsa of [...tsas].reverse()) {\n",
+      "matchCountRequired": 1,
+      "beforeLine": 157,
+      "beforeSha256": "8fa0ab0470bf2904e4aef94802b7af71a8e00e465b8b495494569799cbe7b2b1",
+      "afterSha256": "b61489e4e14a6808da56669342d2efea958abd97658c867450716f27465c6b73",
+      "proposedWholeFile": {
+        "bytes": 10942,
+        "sha256": "ff81c88306ad744cdb6efa0011aef214c686733a6ef98e77993fabf0b17d7fc9"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/ORDER.patch",
+        "bytes": 483,
+        "sha256": "188026c7a797e261a231e0a1e7a4fc48b166da6e900de1a3c4ac44423d1fd02b"
+      },
+      "witness": {
+        "candidateLines": [
+          403,
+          424
+        ],
+        "candidatePin": {
+          "path": "/private/tmp/p1-25-fallback-qualification-20261017/next-grant-test-proposal/tsaGrant.test.ts.source.txt",
+          "bytes": 27505,
+          "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc"
+        },
+        "masking": "Independent exact-query OpenSSL/root and actual AMC response positives precede the literal route checks. Later failures/grant assertions are masked after the first route failure.",
+        "actualFailureCount": null
+      },
+      "actualFailureCount": null,
+      "applied": false
+    },
+    {
+      "id": "DROP-VALID-GRANT",
+      "target": "src/time/tsaClient.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387"
+      },
+      "before": "      else return { grant: { tsa: tsa.name, tokenDer: Buffer.from(verified.attested.tokenDerB64, \"base64\"), attested: verified.attested }, failures };\n",
+      "after": "      else return { grant: null, failures };\n",
+      "matchCountRequired": 1,
+      "beforeLine": 169,
+      "beforeSha256": "5dc83c2d34331ad2f4282e32e89e6b37a7653298d9ff43b2c149e89f5b2b5efd",
+      "afterSha256": "0089192342c2e4434ca80a675dd858d19209511b3e294145b78f21d9970ec21b",
+      "proposedWholeFile": {
+        "bytes": 10821,
+        "sha256": "b33e306bcc751815d60ea40d7704aaa4a8b92cf363328647e8d5749768b7167a"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/DROP-VALID-GRANT.patch",
+        "bytes": 876,
+        "sha256": "6c6027557916fb4bc33300fd41a992eb5bd39d7082db73e3669169a08fbb09e2"
+      },
+      "witness": {
+        "candidateLines": [
+          406,
+          426
+        ],
+        "candidatePin": {
+          "path": "/private/tmp/p1-25-fallback-qualification-20261017/next-grant-test-proposal/tsaGrant.test.ts.source.txt",
+          "bytes": 27505,
+          "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc"
+        },
+        "masking": "Actual response positives, literal route checks and exact prior failures precede nonnull grant assertions. Earlier setup/oracle/route/failure assertions mask these.",
+        "actualFailureCount": null
+      },
+      "actualFailureCount": null,
+      "applied": false
+    }
+  ],
+  "noSourceMutantStored": true,
+  "futureQualificationHashesNotPredicted": true,
+  "noPredictedFailuresHooksOrQualificationCredit": true
+}

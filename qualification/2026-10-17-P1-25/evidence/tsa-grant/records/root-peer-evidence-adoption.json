@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-16T23:03:48.666678+00:00",
+  "sourceReview": "source-evidence-review/seal-v2.json",
+  "freshReview": "fresh-control-runtime-review/seal-v2.json",
+  "allSealedOutputsExact": true,
+  "rootReadDetailedSubstantiveSectionsAndIndependentlyQualifiedActualOutcomes": true,
+  "sourceChecks11ActualZero": true,
+  "actual19NotSummed": true,
+  "controls2And2ManuallyClassified": true,
+  "restores19And19Exact": true,
+  "protected135Native9Compiled8Selected73EachExact": true,
+  "rawPrivateStreamsRemainPrivate": true,
+  "allHoldsRetained": true
+}

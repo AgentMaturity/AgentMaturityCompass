@@ -1,0 +1,40 @@
+{
+  "schema": "p125g-source-evidence-independent-preferred-seal/1",
+  "at": "2026-10-16T22:58:44.320915+00:00",
+  "sourceCommit": "188681b32dc472983404dce19e7833cd76ee7576",
+  "blockers": [],
+  "inputPinCount": 292,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-evidence-review/review-v2.json",
+      "bytes": 48906,
+      "sha256": "6b4f358d2503c3c03a1131ff060f139431752b1beabc80204a38e360b6d16d46"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-evidence-review/README-v2.md",
+      "bytes": 3639,
+      "sha256": "5fce2b1f46fc40beade1f79f467e1f27704c39b860eca260a9f22552b87a4ef6"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-evidence-review/input-pins-v2.json",
+      "bytes": 63665,
+      "sha256": "03096f5d1d98ea0cfb1d730fa470d734b7edd1639dee9406d94d9a206b137bed"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-evidence-review/git-read-verification.json",
+      "bytes": 16620,
+      "sha256": "5a64350c39a916b84d750e1fd5edd539ddb011ef487c7916af8bd0869468129e"
+    }
+  ],
+  "actualSource19NoSkip": true,
+  "allElevenSourceChecksActualZero": true,
+  "globalQualityRedUnwaived": true,
+  "noFreshOrControlClaim": true,
+  "privateReadOnlyReview": true,
+  "preservedFirstSeal": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/source-evidence-review/seal.json",
+    "bytes": 1291,
+    "sha256": "d779553450ae4af59c7820522d291c2dc6d9f2bf75190d005dc087318e41bc79"
+  },
+  "proseOnlyCorrectionNoEvidenceOrCodeChange": true
+}
