@@ -2,52 +2,42 @@
   "schemaVersion": 1,
   "key": "P2-07",
   "date": "2026-10-16",
-  "commit": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
-  "branch": "codex/p2-07-oidc-qualification",
+  "commit": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+  "branch": "codex/p2-07-pending-state-qualification",
   "node": "22.23.3 (ABI127)",
   "pnpm": "10.33.0",
   "os": "macOS (darwin)",
   "arch": "arm64",
   "commands": [
     {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/identity/jwtVerify.test.ts",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/identity/pendingLoginStore.test.ts",
       "exit": 0,
-      "durationMs": 179
+      "durationMs": 262
     },
     {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-existing-identity-baseline.raw.json",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/identity/pendingLoginStore.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-initial-four-cases.raw.json",
       "exit": 0,
-      "durationMs": 8554
+      "durationMs": 5583
     },
     {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths README.md CONTRIBUTING.md website/index.html website/lite.html website/i18n.js docs/content/show-hn-draft.md docs/content/reddit-launch-drafts.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md whitepaper/AMC_WHITEPAPER_v1.md",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
       "exit": 0,
-      "durationMs": 317
+      "durationMs": 32843
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-five-files.raw.json",
+      "exit": 0,
+      "durationMs": 10930
     },
     {
       "cmd": "/opt/homebrew/opt/node@22/bin/node --max-old-space-size=8192 node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
       "exit": 0,
-      "durationMs": 26630
-    },
-    {
-      "cmd": "/opt/homebrew/bin/pnpm run lint",
-      "exit": 0,
-      "durationMs": 2875
+      "durationMs": 23801
     },
     {
       "cmd": "/opt/homebrew/bin/pnpm run build",
       "exit": 0,
-      "durationMs": 31056
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/identity/jwtVerify.test.ts",
-      "exit": 0,
-      "durationMs": 186
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-v2-four-files.raw.json",
-      "exit": 1,
-      "durationMs": 10945
+      "durationMs": 27454
     },
     {
       "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths README.md CONTRIBUTING.md website/index.html website/lite.html website/i18n.js docs/content/show-hn-draft.md docs/content/reddit-launch-drafts.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md whitepaper/AMC_WHITEPAPER_v1.md",
@@ -57,102 +47,92 @@
     {
       "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
       "exit": 0,
-      "durationMs": 283
+      "durationMs": 228
     },
     {
       "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
       "exit": 0,
-      "durationMs": 212
+      "durationMs": 205
     },
     {
       "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
       "exit": 0,
-      "durationMs": 1284
+      "durationMs": 1033
     },
     {
       "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
       "exit": 0,
-      "durationMs": 176
+      "durationMs": 141
     },
     {
       "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
       "exit": 0,
-      "durationMs": 1544
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-v3-four-files.raw.json",
-      "exit": 0,
-      "durationMs": 11048
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
-      "exit": 0,
-      "durationMs": 38104
+      "durationMs": 1341
     },
     {
       "cmd": "/opt/homebrew/bin/pnpm run lint",
       "exit": 0,
-      "durationMs": 2940
+      "durationMs": 2715
     },
     {
       "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
       "exit": 1,
-      "durationMs": 441
+      "durationMs": 399
     },
     {
       "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p2-07-oidc-qualification-20261016/deadcode-delta.mjs",
       "exit": 1,
-      "durationMs": 2893
+      "durationMs": 2409
     },
     {
       "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
       "exit": 0,
-      "durationMs": 47169
+      "durationMs": 48791
     },
     {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-fresh-canonical.raw.json",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-fresh-canonical.raw.json",
       "exit": 0,
-      "durationMs": 11968
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-mutant-signature.raw.json",
-      "exit": 1,
-      "durationMs": 10875
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-restored-signature.raw.json",
-      "exit": 0,
-      "durationMs": 11019
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-mutant-exp.raw.json",
-      "exit": 1,
-      "durationMs": 11194
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-restored-exp.raw.json",
-      "exit": 0,
-      "durationMs": 11088
-    },
-    {
-      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths qualification/2026-10-16-P2-07",
-      "exit": 0,
-      "durationMs": 254
+      "durationMs": 11881
     },
     {
       "cmd": "/opt/homebrew/opt/node@22/bin/node -p 'JSON.stringify({node:process.version,abi:process.versions.modules,platform:process.platform,arch:process.arch})'",
       "exit": 0,
-      "durationMs": 138
+      "durationMs": 46
     },
     {
       "cmd": "/opt/homebrew/bin/pnpm --version",
       "exit": 0,
-      "durationMs": 191
+      "durationMs": 161
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-mutant-consume.raw.json",
+      "exit": 1,
+      "durationMs": 11077
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-restored-consume.raw.json",
+      "exit": 0,
+      "durationMs": 11012
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-mutant-expiry.raw.json",
+      "exit": 1,
+      "durationMs": 10968
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-restored-expiry.raw.json",
+      "exit": 0,
+      "durationMs": 10900
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths qualification/2026-10-16-P2-07",
+      "exit": 0,
+      "durationMs": 185
     }
   ],
   "tests": {
-    "total": 150,
-    "passed": 150,
+    "total": 154,
+    "passed": 154,
     "failed": 0,
     "skipped": 0
   },
@@ -175,7 +155,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "8cafe43cc5f8d8195b82b0c0332b424baeaaba62b98660fa13fd0ea7c470769f"
+      "sha256": "a1aadea127f546aaa5bfe182d648be31668fe90022f60dac71e3182372de98dd"
     },
     {
       "path": "canonical.observer.json",
@@ -200,6 +180,98 @@
     {
       "path": "ownership.json",
       "sha256": "1c8af3ac0881d6e17ef72c8c80eccc340f9d1dad8687cf9b353547a70787c334"
+    },
+    {
+      "path": "pending-state-M1.observer.json",
+      "sha256": "cf24de787db84324f7669a3c2dc748cf1e4aa365af5843ba3f5aaec6ac58a5af"
+    },
+    {
+      "path": "pending-state-M1.raw.json",
+      "sha256": "914ba7ac9f270bb0e5f7e2f8963359e2e8ba6c64e931a79361e5e87d1a42daf6"
+    },
+    {
+      "path": "pending-state-M2.observer.json",
+      "sha256": "ce9ee3258cca0529f9dbfcdb18f67799517131490613750fccf96b6e2ea503bc"
+    },
+    {
+      "path": "pending-state-M2.raw.json",
+      "sha256": "18fa565c173524ea7ea53ee9e14e5c611c3038f8425401c573dd448fcaaaac38"
+    },
+    {
+      "path": "pending-state-canonical.observer.json",
+      "sha256": "7fee37bdd4c78b48e9c28408887a6d4ecc1aa1ce027d7bf695900a126a18b509"
+    },
+    {
+      "path": "pending-state-canonical.raw.json",
+      "sha256": "6f425fc46f4d23466026e873fb70233f03185594f14dfdffca4ac84588e34960"
+    },
+    {
+      "path": "pending-state-commands.json",
+      "sha256": "8e35f99c4696225d11aadc61ff4da715b3d7567aa721dcc3bb7231d0381fbe4c"
+    },
+    {
+      "path": "pending-state-evidence.json",
+      "sha256": "6f6dfaec1d6fc3d54e6e114b54a7aeeee233fc9d60c822c1c5dcd471b633686c"
+    },
+    {
+      "path": "pending-state-independent-review.json",
+      "sha256": "216569e98faf87ccbd35c272480e8874fb615c40b8187fd8c87a7ebcdafa6a0e"
+    },
+    {
+      "path": "pending-state-original-checkpoint.json",
+      "sha256": "05c8cbc5f22c8dc27a9bd77c63ab4a86752c1bb5c3dda4a801714121a594ff3a"
+    },
+    {
+      "path": "pending-state-ownership.json",
+      "sha256": "bba6c053847754fdcdae60b87d85bf8f5222ec28df2b8011b8a88eb3e6088a39"
+    },
+    {
+      "path": "pending-state-private-references.json",
+      "sha256": "48b28d68886060b36502ede595f549ede69f6b10c906770ebadbf3f54e4fdc5b"
+    },
+    {
+      "path": "pending-state-public-cold-router-and-replay.json",
+      "sha256": "6166d88608850a73d962e6bbbb5354d0cfe83593f448b9fe911385b6138ee1c4"
+    },
+    {
+      "path": "pending-state-public-public-single-use.json",
+      "sha256": "25687672c3091875a602f6c8b82017dae1ef7b22fe16ce4cbb2ebac364880e3e"
+    },
+    {
+      "path": "pending-state-public-public-ttl-boundary.json",
+      "sha256": "128edd287296a9871c616bd1e885576a57da08d8024fe8769567bbd9ace2fbfc"
+    },
+    {
+      "path": "pending-state-public-router-exact-ttl.json",
+      "sha256": "44a5583e2621e0dc50920d783cc767c09c52b025fec4b5d86f84da0729b45d04"
+    },
+    {
+      "path": "pending-state-quality-and-freeze.json",
+      "sha256": "0deb791478f2dc69a36715d83c40c58bd6cb31aa047fab6ec42e00f8ca882a4b"
+    },
+    {
+      "path": "pending-state-restored-M1.observer.json",
+      "sha256": "0ec45c88f71d3ddf3c71767203801471e839f56c30c56450938b162aac3721fe"
+    },
+    {
+      "path": "pending-state-restored-M1.raw.json",
+      "sha256": "7c8608dd06c0526742456058eb4184df7adbc3b34ba2189ff59fadf9472dbdbb"
+    },
+    {
+      "path": "pending-state-restored-M2.observer.json",
+      "sha256": "7fa978953f6ac898841a61ac4042c9abf66a712fb65933f6db790b9aadaf8055"
+    },
+    {
+      "path": "pending-state-restored-M2.raw.json",
+      "sha256": "7728c6767383db591ff1034b63082e747a4634aba7946ab73b225cbd3f2f3642"
+    },
+    {
+      "path": "pending-state-sensitivity.json",
+      "sha256": "dce62e9456727817bfecf17c3e7b4b78f4ce8bdb4fe42b6bd45a9db7fec8e783"
+    },
+    {
+      "path": "pending-state-source-inputs.json",
+      "sha256": "7818cfd8a2a2834edfd5041b323065887751a40f24f2fa7b543428296fbf9844"
     },
     {
       "path": "private-references.json",
@@ -254,5 +326,5 @@
       "sha256": "dd6d159df4add0464ef5c06f3d34974415514bd35f78efa4c93b7cb3c7acb7b3"
     }
   ],
-  "notes": "The fresh canonical run passed 150/150 cases, comprising 128 new verifier cases and 22 existing cases. Related runs overlap and are not summed. The unexecuted v1 blocker and real v2 cleanup failure (149/150) are preserved. Source-only M1 and M2 intentionally failed 2 and 1 body assertions; both exact restorations passed 150/150. Duplicates and dead code remain failed at 1,268 and 2,729 findings with no waiver or baseline adoption. No full P2-07, external IdP, independent JWT replay, compiled-mutant, full-suite or release acceptance is claimed. Actual held decisions and Claude ownership are preserved; F37 remains skipped."
+  "notes": "The actual fresh canonical run passed154/154:128 verifier,22 existing identity/security and4 new pending-state cases. Related invocations overlap and are not summed. Source-only M1 retained consumed rows and caused3 reached body AssertionErrors; M2 removed exact-expiry refusal and caused2. Both exact restorations passed154/154. Duplicates1268 and deadcode2727 remain RED exit1/unwaived; zero added deadcode findings, two test-used exports removed from prior2729. The23 historical verifier payloads and original25-file packet at5696 retain their2ca source provenance, fixture failure and controls. No compiled-mutant, full-P2-07, global-green, external IdP, release or full-plan acceptance. Claude work, freeze/quality/deadline checks and held decisions remain preserved; F37 skipped."
 }

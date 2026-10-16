@@ -1,0 +1,958 @@
+{
+  "controls": [
+    {
+      "operator": "M1-consume-does-not-delete",
+      "apply": {
+        "action": "apply",
+        "operator": "M1-consume-does-not-delete",
+        "sourceCommit": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+        "targetRel": "src/identity/pendingLoginStore.ts",
+        "before": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/pendingLoginStore.ts",
+          "bytes": 4955,
+          "sha256": "77201a6607e8e105a3a9eb314abbdff07076334f0be538e2b207d56f3e4ac6fd"
+        },
+        "expectedAfter": {
+          "bytes": 4945,
+          "sha256": "3c499837994748f38077e41439ee56e3ccdd330ea3111b060166a3f3ecb54842"
+        },
+        "original": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/executed-controls/originals/M1-consume-does-not-delete/src/identity/pendingLoginStore.ts",
+          "bytes": 4955,
+          "sha256": "77201a6607e8e105a3a9eb314abbdff07076334f0be538e2b207d56f3e4ac6fd"
+        },
+        "prerequisite": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/p207p-fresh-canonical-outcome.json",
+          "bytes": 6094,
+          "sha256": "399825bd33150dde39f0ea279d696d5cafcf2bbaf641859f722f3314b33cdf43"
+        },
+        "admission": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/q-control-write-admission.json",
+          "bytes": 1933,
+          "sha256": "b6df705aecc8a3ae325400dce089cda42286b44ec1a0aa29ffaf17a0c4c36773"
+        },
+        "binding": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/fresh-source-binding.json",
+          "bytes": 134531,
+          "sha256": "277f99a470aae674644bfcb76353c4f2e4aa4fa9193f367cbe5c1e88f76996a3"
+        },
+        "recipes": {
+          "path": "/private/tmp/p2-07-oidc-qualification-20261016/next-pending-state-test-plan/control-recipes.json",
+          "bytes": 3943,
+          "sha256": "455f5815e471e2b2ed6eba9508c764ea7c5785cd346d24597805fa267d9ab861"
+        },
+        "after": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/pendingLoginStore.ts",
+          "bytes": 4945,
+          "sha256": "3c499837994748f38077e41439ee56e3ccdd330ea3111b060166a3f3ecb54842"
+        },
+        "at": "2026-10-16T12:44:30.685926+00:00",
+        "compiledOutputsRebuilt": false,
+        "compilerOrBuildValidityClaim": false,
+        "sourceOnlyMutant": true,
+        "formalDone": false
+      },
+      "failedOutcome": {
+        "schema": "p207p-closed-runtime/1",
+        "at": "2026-10-16T12:44:53.324343+00:00",
+        "phase": "p207p-mutant-consume",
+        "command": {
+          "phase": "p207p-mutant-consume",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-mutant-consume.raw.json",
+          "exit": 1,
+          "durationMs": 11077,
+          "startedUtc": "2026-10-16T12:44:37.578764+00:00",
+          "endedUtc": "2026-10-16T12:44:48.670533+00:00",
+          "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-consume/stdout-stderr.log",
+          "head": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+          "headAfter": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+          "ownedProcess": {
+            "pid": 54254,
+            "ownedPgid": 54254,
+            "observedPgidAfterLaunch": 54254,
+            "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+            "argv": [
+              "/opt/homebrew/opt/node@22/bin/node",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "--root",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+              "tests/identity/pendingLoginStore.test.ts",
+              "tests/identity/jwtVerify.test.ts",
+              "tests/enterpriseSsoScim.test.ts",
+              "tests/security/api-security.test.ts",
+              "tests/security/identityAccountBinding.test.ts",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-mutant-consume.raw.json"
+            ],
+            "startedUtc": "2026-10-16T12:44:37.578764+00:00",
+            "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+            "overriddenEnvironmentKeys": [
+              "PATH",
+              "HOME",
+              "GIT_NO_LAZY_FETCH",
+              "AMC_P021_RUNTIME_OBSERVER_PATH"
+            ]
+          },
+          "groupAbsentByESRCH": true,
+          "signalsOtherThanZeroSent": false,
+          "observed": true,
+          "artifacts": {
+            "rawProducer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/p207p-mutant-consume.raw.json",
+              "bytes": 61076,
+              "sha256": "914ba7ac9f270bb0e5f7e2f8963359e2e8ba6c64e931a79361e5e87d1a42daf6"
+            },
+            "rawSnapshot": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-consume/raw.json",
+              "bytes": 61076,
+              "sha256": "914ba7ac9f270bb0e5f7e2f8963359e2e8ba6c64e931a79361e5e87d1a42daf6"
+            },
+            "observer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-consume/observer.json",
+              "bytes": 83348,
+              "sha256": "cf24de787db84324f7669a3c2dc748cf1e4aa365af5843ba3f5aaec6ac58a5af"
+            },
+            "reporter": {
+              "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "bytes": 2110,
+              "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+            }
+          },
+          "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+        },
+        "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+        "tests": {
+          "total": 154,
+          "passed": 151,
+          "failed": 3,
+          "skipped": 0
+        },
+        "failures": [
+          {
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts",
+            "title": "P2-07 persisted pending OIDC state router rejects state at the exact TTL before token exchange",
+            "messages": [
+              "AssertionError: expected 302 to be 400 // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:416:28\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:48:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:403:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts",
+            "title": "P2-07 persisted pending OIDC state public consume removes a valid state exactly once",
+            "messages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:430:100\n    at withClock (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:83:15)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:425:13\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:48:11)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:423:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26"
+            ]
+          },
+          {
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts",
+            "title": "P2-07 persisted pending OIDC state public consume admits TTL minus one and rejects exact TTL",
+            "messages": [
+              "AssertionError: expected [Function] to throw error matching /^OIDC state mismatch$/ but got 'OIDC state expired'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:448:107\n    at withClock (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:83:15)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:439:13\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:48:11)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:437:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26"
+            ]
+          }
+        ],
+        "identitiesAndStatusesMatch": true,
+        "original22IdentitiesPreserved": true,
+        "hooksPassed": true,
+        "hookCount": 27,
+        "unhandledErrors": [],
+        "lateDiagnosticPatterns": [
+          "Unhandled Errors?",
+          "Unhandled Rejection",
+          "uncaught exception",
+          "Error during teardown",
+          "Tests modified the repository workspace",
+          "Hook timed out",
+          "Error:.*global.?teardown",
+          "ELIFECYCLE",
+          "error during close",
+          "close timed out",
+          "error during global teardown",
+          "Tests closed successfully but something prevents",
+          "test timed out",
+          "failed to load",
+          "worker exited"
+        ],
+        "lateHits": [],
+        "pins": [
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-consume/raw.json",
+            "bytes": 61076,
+            "sha256": "914ba7ac9f270bb0e5f7e2f8963359e2e8ba6c64e931a79361e5e87d1a42daf6"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-consume/observer.json",
+            "bytes": 83348,
+            "sha256": "cf24de787db84324f7669a3c2dc748cf1e4aa365af5843ba3f5aaec6ac58a5af"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-consume/stdout-stderr.log",
+            "bytes": 8183,
+            "sha256": "ba725a54c78e5cf73bed7f3f56abd009d607a0d3597dc72bc3fce7ee52551864"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-consume/command.json",
+            "bytes": 3077,
+            "sha256": "de1be42ebd3b644f9a889b50f69d9c221e38ab70ea52034261d1d8ead26fc78a"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-consume/owned-process.json",
+            "bytes": 1006,
+            "sha256": "6b41500ce917887317e78512a26441e1dd0efa447cf928bfb3b9dc18fb51921e"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-consume/owned-group-after-exit.json",
+            "bytes": 262,
+            "sha256": "1c04bca6d54fcb4656e4f3b55ad7fc817e0cef5aa80c193c2b5eecba6010869b"
+          }
+        ],
+        "boundary": "Actual unfiltered five-file identity corpus only. Root must classify every RED body error and hidden later assertions. No full-suite, canonical independent verifier or release claim.",
+        "formalDone": false
+      },
+      "firstAssertionAndMasking": {
+        "sourceCommit": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+        "phase": "p207p-mutant-consume",
+        "operator": "M1-consume-does-not-delete",
+        "targetRel": "src/identity/pendingLoginStore.ts",
+        "mutationSha256": "3c499837994748f38077e41439ee56e3ccdd330ea3111b060166a3f3ecb54842",
+        "outcome": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/p207p-mutant-consume-outcome.json",
+          "bytes": 10797,
+          "sha256": "411069748df61c03f11457f0cb3a0f49f0f408a8041f42dcfc481faa8778ecd5"
+        },
+        "applyRecord": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/M1-consume-does-not-delete-apply.json",
+          "bytes": 2165,
+          "sha256": "fc795cc3ef8ada908064ee5bd98fcf2b6402ce00767dca776f4a0ca8fefd01b5"
+        },
+        "allFailuresClassified": true,
+        "primarySemanticWitnessReached": true,
+        "failureCount": 3,
+        "firstSensitiveAssertion": "Direct second public consume at pendingLoginStore.test.ts:430:100 returned after the valid first consume; expected exact OIDC state mismatch throw.",
+        "masking": "The same-line JSON mismatch assertion, line417 no-cookie/tokenPOST0 assertions and line418 expired-state-burned milestone were not reached. Line431 second-consume-refused milestone was not reached. Line449 expired-state-burned milestone was not reached.",
+        "classifications": [
+          {
+            "test": "router rejects state at the exact TTL before token exchange",
+            "firstFrame": "pendingLoginStore.test.ts:416:28",
+            "observed": "After exact-TTL 400 state-expired and zero token POST assertions passed, the restored-real-clock retry returned302 instead of400. Public evidence records tokenPOST1 and PKCE1 on retry; state was retained.",
+            "masked": "The same-line JSON mismatch assertion, line417 no-cookie/tokenPOST0 assertions and line418 expired-state-burned milestone were not reached."
+          },
+          {
+            "test": "public consume removes a valid state exactly once",
+            "firstFrame": "pendingLoginStore.test.ts:430:100",
+            "observed": "Valid first consume matched every expected material/timestamp field and recorded the milestone; direct second consume returned instead of throwing OIDC state mismatch. This is the primary single-use witness.",
+            "masked": "Line431 second-consume-refused milestone was not reached."
+          },
+          {
+            "test": "public consume admits TTL minus one and rejects exact TTL",
+            "firstFrame": "pendingLoginStore.test.ts:448:107",
+            "observed": "TTL-minus-one positive and exact-TTL state-expired throw both passed. Reconsuming retained expired state threw OIDC state expired instead of OIDC state mismatch.",
+            "masked": "Line449 expired-state-burned milestone was not reached."
+          }
+        ],
+        "publicPins": [
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-aWGZ8Z/child.stdout.log",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-aWGZ8Z/child.stderr.log",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-aWGZ8Z/observations/public-evidence.json",
+            "bytes": 5337,
+            "sha256": "2c64e982dcf85ff6975574ff77ee728355f2ad7a8551aa38e081b686b8950216"
+          },
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-YYQ1x0/observations/public-evidence.json",
+            "bytes": 3716,
+            "sha256": "34ca7092bcbdab749cf6e0a674b265b5ca76af0c468b5f399fbfdfc362d21cc6"
+          },
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-5jMHeO/observations/public-evidence.json",
+            "bytes": 977,
+            "sha256": "22b42e65ed264d82637f08d830aa5bfc85b0c88db96cf9521f50584f9f5ce349"
+          },
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-SIJFcu/observations/public-evidence.json",
+            "bytes": 1128,
+            "sha256": "f519fab62034b3ca5281e14f3c33c3db1ed5134650df31aee3dbdacee92c8c07"
+          }
+        ],
+        "strictCleanupAndEnvironmentPassed": true,
+        "compiledColdChild": "Original compiled source only; cold-case green receives no TS-mutant sensitivity credit.",
+        "at": "2026-10-16T12:45:35.238080+00:00",
+        "formalDone": false
+      },
+      "restore": {
+        "action": "restore",
+        "operator": "M1-consume-does-not-delete",
+        "sourceCommit": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+        "targetRel": "src/identity/pendingLoginStore.ts",
+        "before": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/pendingLoginStore.ts",
+          "bytes": 4945,
+          "sha256": "3c499837994748f38077e41439ee56e3ccdd330ea3111b060166a3f3ecb54842"
+        },
+        "original": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/executed-controls/originals/M1-consume-does-not-delete/src/identity/pendingLoginStore.ts",
+          "bytes": 4955,
+          "sha256": "77201a6607e8e105a3a9eb314abbdff07076334f0be538e2b207d56f3e4ac6fd"
+        },
+        "outcome": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/p207p-mutant-consume-outcome.json",
+          "bytes": 10797,
+          "sha256": "411069748df61c03f11457f0cb3a0f49f0f408a8041f42dcfc481faa8778ecd5"
+        },
+        "rootSemanticReview": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/M1-root-body-review.json",
+          "bytes": 4391,
+          "sha256": "e06072d5b72e02a57f026f9c3ac46922787ca4e83423f472cc8f7d14cdaebfae"
+        },
+        "admission": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/q-control-write-admission.json",
+          "bytes": 1933,
+          "sha256": "b6df705aecc8a3ae325400dce089cda42286b44ec1a0aa29ffaf17a0c4c36773"
+        },
+        "binding": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/fresh-source-binding.json",
+          "bytes": 134531,
+          "sha256": "277f99a470aae674644bfcb76353c4f2e4aa4fa9193f367cbe5c1e88f76996a3"
+        },
+        "recipes": {
+          "path": "/private/tmp/p2-07-oidc-qualification-20261016/next-pending-state-test-plan/control-recipes.json",
+          "bytes": 3943,
+          "sha256": "455f5815e471e2b2ed6eba9508c764ea7c5785cd346d24597805fa267d9ab861"
+        },
+        "restored": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/pendingLoginStore.ts",
+          "bytes": 4955,
+          "sha256": "77201a6607e8e105a3a9eb314abbdff07076334f0be538e2b207d56f3e4ac6fd"
+        },
+        "at": "2026-10-16T12:45:35.910425+00:00",
+        "compiledOutputsRebuilt": false,
+        "compilerOrBuildValidityClaim": false,
+        "sourceOnlyMutant": true,
+        "formalDone": false
+      },
+      "restoredOutcome": {
+        "schema": "p207p-closed-runtime/1",
+        "at": "2026-10-16T12:46:00.027477+00:00",
+        "phase": "p207p-restored-consume",
+        "command": {
+          "phase": "p207p-restored-consume",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-restored-consume.raw.json",
+          "exit": 0,
+          "durationMs": 11012,
+          "startedUtc": "2026-10-16T12:45:41.980079+00:00",
+          "endedUtc": "2026-10-16T12:45:53.007628+00:00",
+          "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-consume/stdout-stderr.log",
+          "head": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+          "headAfter": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+          "ownedProcess": {
+            "pid": 54416,
+            "ownedPgid": 54416,
+            "observedPgidAfterLaunch": 54416,
+            "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+            "argv": [
+              "/opt/homebrew/opt/node@22/bin/node",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "--root",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+              "tests/identity/pendingLoginStore.test.ts",
+              "tests/identity/jwtVerify.test.ts",
+              "tests/enterpriseSsoScim.test.ts",
+              "tests/security/api-security.test.ts",
+              "tests/security/identityAccountBinding.test.ts",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-restored-consume.raw.json"
+            ],
+            "startedUtc": "2026-10-16T12:45:41.980079+00:00",
+            "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+            "overriddenEnvironmentKeys": [
+              "PATH",
+              "HOME",
+              "GIT_NO_LAZY_FETCH",
+              "AMC_P021_RUNTIME_OBSERVER_PATH"
+            ]
+          },
+          "groupAbsentByESRCH": true,
+          "signalsOtherThanZeroSent": false,
+          "observed": true,
+          "artifacts": {
+            "rawProducer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/p207p-restored-consume.raw.json",
+              "bytes": 57297,
+              "sha256": "7c8608dd06c0526742456058eb4184df7adbc3b34ba2189ff59fadf9472dbdbb"
+            },
+            "rawSnapshot": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-consume/raw.json",
+              "bytes": 57297,
+              "sha256": "7c8608dd06c0526742456058eb4184df7adbc3b34ba2189ff59fadf9472dbdbb"
+            },
+            "observer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-consume/observer.json",
+              "bytes": 74752,
+              "sha256": "0ec45c88f71d3ddf3c71767203801471e839f56c30c56450938b162aac3721fe"
+            },
+            "reporter": {
+              "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "bytes": 2110,
+              "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+            }
+          },
+          "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+        },
+        "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+        "tests": {
+          "total": 154,
+          "passed": 154,
+          "failed": 0,
+          "skipped": 0
+        },
+        "failures": [],
+        "identitiesAndStatusesMatch": true,
+        "original22IdentitiesPreserved": true,
+        "hooksPassed": true,
+        "hookCount": 27,
+        "unhandledErrors": [],
+        "lateDiagnosticPatterns": [
+          "Unhandled Errors?",
+          "Unhandled Rejection",
+          "uncaught exception",
+          "Error during teardown",
+          "Tests modified the repository workspace",
+          "Hook timed out",
+          "Error:.*global.?teardown",
+          "ELIFECYCLE",
+          "error during close",
+          "close timed out",
+          "error during global teardown",
+          "Tests closed successfully but something prevents",
+          "test timed out",
+          "failed to load",
+          "worker exited"
+        ],
+        "lateHits": [],
+        "pins": [
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-consume/raw.json",
+            "bytes": 57297,
+            "sha256": "7c8608dd06c0526742456058eb4184df7adbc3b34ba2189ff59fadf9472dbdbb"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-consume/observer.json",
+            "bytes": 74752,
+            "sha256": "0ec45c88f71d3ddf3c71767203801471e839f56c30c56450938b162aac3721fe"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-consume/stdout-stderr.log",
+            "bytes": 4813,
+            "sha256": "5ac36a4ef4e46821eba0b19e97dd07ce3ae1deb323d8aa3cf96e793bfbb4a776"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-consume/command.json",
+            "bytes": 3091,
+            "sha256": "d7ab8f63e17429e0e9cf9943c02afcc51be45f2728c030b3b64eb15542331741"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-consume/owned-process.json",
+            "bytes": 1008,
+            "sha256": "0dfead6c3ac85c07f32d8b0a3384ebc4754467eb40e57f925f69a5aa259fb45c"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-consume/owned-group-after-exit.json",
+            "bytes": 262,
+            "sha256": "4a2cdc43379658c87d398a00bb616587e22933a8108c4aa3be82a41be50a2e06"
+          }
+        ],
+        "boundary": "Actual unfiltered five-file identity corpus only. Root must classify every RED body error and hidden later assertions. No full-suite, canonical independent verifier or release claim.",
+        "formalDone": false
+      }
+    },
+    {
+      "operator": "M2-expiry-comparison-removed",
+      "apply": {
+        "action": "apply",
+        "operator": "M2-expiry-comparison-removed",
+        "sourceCommit": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+        "targetRel": "src/identity/pendingLoginStore.ts",
+        "before": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/pendingLoginStore.ts",
+          "bytes": 4955,
+          "sha256": "77201a6607e8e105a3a9eb314abbdff07076334f0be538e2b207d56f3e4ac6fd"
+        },
+        "expectedAfter": {
+          "bytes": 4931,
+          "sha256": "75135d94c3f9bfa198551e01042107feda6befa1c9304e46190317ca6db4920a"
+        },
+        "original": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/executed-controls/originals/M2-expiry-comparison-removed/src/identity/pendingLoginStore.ts",
+          "bytes": 4955,
+          "sha256": "77201a6607e8e105a3a9eb314abbdff07076334f0be538e2b207d56f3e4ac6fd"
+        },
+        "prerequisite": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/p207p-restored-consume-outcome.json",
+          "bytes": 6108,
+          "sha256": "937d295d3572b543f9b8bc7a6749476ca50fd9cb151390150644640303ca6aca"
+        },
+        "admission": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/q-control-write-admission.json",
+          "bytes": 1933,
+          "sha256": "b6df705aecc8a3ae325400dce089cda42286b44ec1a0aa29ffaf17a0c4c36773"
+        },
+        "binding": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/fresh-source-binding.json",
+          "bytes": 134531,
+          "sha256": "277f99a470aae674644bfcb76353c4f2e4aa4fa9193f367cbe5c1e88f76996a3"
+        },
+        "recipes": {
+          "path": "/private/tmp/p2-07-oidc-qualification-20261016/next-pending-state-test-plan/control-recipes.json",
+          "bytes": 3943,
+          "sha256": "455f5815e471e2b2ed6eba9508c764ea7c5785cd346d24597805fa267d9ab861"
+        },
+        "after": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/pendingLoginStore.ts",
+          "bytes": 4931,
+          "sha256": "75135d94c3f9bfa198551e01042107feda6befa1c9304e46190317ca6db4920a"
+        },
+        "at": "2026-10-16T12:46:00.741637+00:00",
+        "compiledOutputsRebuilt": false,
+        "compilerOrBuildValidityClaim": false,
+        "sourceOnlyMutant": true,
+        "formalDone": false
+      },
+      "failedOutcome": {
+        "schema": "p207p-closed-runtime/1",
+        "at": "2026-10-16T12:46:21.925936+00:00",
+        "phase": "p207p-mutant-expiry",
+        "command": {
+          "phase": "p207p-mutant-expiry",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-mutant-expiry.raw.json",
+          "exit": 1,
+          "durationMs": 10968,
+          "startedUtc": "2026-10-16T12:46:06.372650+00:00",
+          "endedUtc": "2026-10-16T12:46:17.357535+00:00",
+          "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-expiry/stdout-stderr.log",
+          "head": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+          "headAfter": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+          "ownedProcess": {
+            "pid": 54471,
+            "ownedPgid": 54471,
+            "observedPgidAfterLaunch": 54471,
+            "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+            "argv": [
+              "/opt/homebrew/opt/node@22/bin/node",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "--root",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+              "tests/identity/pendingLoginStore.test.ts",
+              "tests/identity/jwtVerify.test.ts",
+              "tests/enterpriseSsoScim.test.ts",
+              "tests/security/api-security.test.ts",
+              "tests/security/identityAccountBinding.test.ts",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-mutant-expiry.raw.json"
+            ],
+            "startedUtc": "2026-10-16T12:46:06.372650+00:00",
+            "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+            "overriddenEnvironmentKeys": [
+              "PATH",
+              "HOME",
+              "GIT_NO_LAZY_FETCH",
+              "AMC_P021_RUNTIME_OBSERVER_PATH"
+            ]
+          },
+          "groupAbsentByESRCH": true,
+          "signalsOtherThanZeroSent": false,
+          "observed": true,
+          "artifacts": {
+            "rawProducer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/p207p-mutant-expiry.raw.json",
+              "bytes": 59806,
+              "sha256": "18fa565c173524ea7ea53ee9e14e5c611c3038f8425401c573dd448fcaaaac38"
+            },
+            "rawSnapshot": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-expiry/raw.json",
+              "bytes": 59806,
+              "sha256": "18fa565c173524ea7ea53ee9e14e5c611c3038f8425401c573dd448fcaaaac38"
+            },
+            "observer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-expiry/observer.json",
+              "bytes": 80721,
+              "sha256": "ce9ee3258cca0529f9dbfcdb18f67799517131490613750fccf96b6e2ea503bc"
+            },
+            "reporter": {
+              "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "bytes": 2110,
+              "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+            }
+          },
+          "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+        },
+        "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+        "tests": {
+          "total": 154,
+          "passed": 152,
+          "failed": 2,
+          "skipped": 0
+        },
+        "failures": [
+          {
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts",
+            "title": "P2-07 persisted pending OIDC state router rejects state at the exact TTL before token exchange",
+            "messages": [
+              "AssertionError: expected 302 to be 400 // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:412:32\n    at withClock (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:83:9)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:406:7\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:48:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:403:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts",
+            "title": "P2-07 persisted pending OIDC state public consume admits TTL minus one and rejects exact TTL",
+            "messages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:446:107\n    at withClock (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:83:15)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:439:13\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:48:11)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts:437:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26"
+            ]
+          }
+        ],
+        "identitiesAndStatusesMatch": true,
+        "original22IdentitiesPreserved": true,
+        "hooksPassed": true,
+        "hookCount": 27,
+        "unhandledErrors": [],
+        "lateDiagnosticPatterns": [
+          "Unhandled Errors?",
+          "Unhandled Rejection",
+          "uncaught exception",
+          "Error during teardown",
+          "Tests modified the repository workspace",
+          "Hook timed out",
+          "Error:.*global.?teardown",
+          "ELIFECYCLE",
+          "error during close",
+          "close timed out",
+          "error during global teardown",
+          "Tests closed successfully but something prevents",
+          "test timed out",
+          "failed to load",
+          "worker exited"
+        ],
+        "lateHits": [],
+        "pins": [
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-expiry/raw.json",
+            "bytes": 59806,
+            "sha256": "18fa565c173524ea7ea53ee9e14e5c611c3038f8425401c573dd448fcaaaac38"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-expiry/observer.json",
+            "bytes": 80721,
+            "sha256": "ce9ee3258cca0529f9dbfcdb18f67799517131490613750fccf96b6e2ea503bc"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-expiry/stdout-stderr.log",
+            "bytes": 7170,
+            "sha256": "b57b0df618b3f3c43146ce42573390a5ebf12a864cadb01d103d224bddf903d3"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-expiry/command.json",
+            "bytes": 3070,
+            "sha256": "87f34348c513c3c4d15a9df6de778f47ef3a9da44fc6297a16dc6d004094a917"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-expiry/owned-process.json",
+            "bytes": 1005,
+            "sha256": "b8261b98861cb9d49e2f6dc82149b01897b1e757c47913b67e1ea78a44d51169"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-mutant-expiry/owned-group-after-exit.json",
+            "bytes": 262,
+            "sha256": "4b6b68164fb281579e30c1872fb64f49bf986a7e8298663d1b54b0cd81bb8542"
+          }
+        ],
+        "boundary": "Actual unfiltered five-file identity corpus only. Root must classify every RED body error and hidden later assertions. No full-suite, canonical independent verifier or release claim.",
+        "formalDone": false
+      },
+      "firstAssertionAndMasking": {
+        "sourceCommit": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+        "phase": "p207p-mutant-expiry",
+        "operator": "M2-expiry-comparison-removed",
+        "targetRel": "src/identity/pendingLoginStore.ts",
+        "mutationSha256": "75135d94c3f9bfa198551e01042107feda6befa1c9304e46190317ca6db4920a",
+        "outcome": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/p207p-mutant-expiry-outcome.json",
+          "bytes": 9181,
+          "sha256": "6ba18f321c3b012935d21a93e4d16efe3cbf9536799fe88cf28c18211457e75a"
+        },
+        "applyRecord": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/M2-expiry-comparison-removed-apply.json",
+          "bytes": 2170,
+          "sha256": "6bed0b1c75f4c6c646ab462703d1817e243493467be02a0b13225e5683d276a7"
+        },
+        "allFailuresClassified": true,
+        "primarySemanticWitnessReached": true,
+        "failureCount": 2,
+        "firstSensitiveAssertion": "Direct exact-TTL consume at pendingLoginStore.test.ts:446:107 returned after the valid TTL-minus-one positive; expected exact OIDC state expired throw.",
+        "masking": "The same-line state-expired JSON assertion, line413 no-cookie/tokenPOST0 checks and lines415-418 real-clock retry checks/milestone were not reached. Lines447-449 exact-TTL-refused milestone, follow-up consumed-row mismatch assertion and expired-state-burned milestone were not reached.",
+        "classifications": [
+          {
+            "test": "router rejects state at the exact TTL before token exchange",
+            "firstFrame": "pendingLoginStore.test.ts:412:32",
+            "observed": "The TS router exact-TTL callback returned302 instead of400. Public evidence records tokenPOST1 and PKCE1; expiry refusal before exchange was removed.",
+            "masked": "The same-line state-expired JSON assertion, line413 no-cookie/tokenPOST0 checks and lines415-418 real-clock retry checks/milestone were not reached."
+          },
+          {
+            "test": "public consume admits TTL minus one and rejects exact TTL",
+            "firstFrame": "pendingLoginStore.test.ts:446:107",
+            "observed": "Valid TTL-minus-one material/timestamps matched and recorded elapsed599999. Direct consume at600000 returned instead of throwing exact OIDC state expired. This is the primary exact-TTL witness.",
+            "masked": "Lines447-449 exact-TTL-refused milestone, follow-up consumed-row mismatch assertion and expired-state-burned milestone were not reached."
+          }
+        ],
+        "publicPins": [
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-7lt6xV/child.stdout.log",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-7lt6xV/child.stderr.log",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-7lt6xV/observations/public-evidence.json",
+            "bytes": 5337,
+            "sha256": "918a05b2510faed40347093d3b13fafe2b96b7a9de7d49e8243e9a1085d29e54"
+          },
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-PzDV8H/observations/public-evidence.json",
+            "bytes": 3468,
+            "sha256": "66f4424412e455f34dc8a40319b78c24339f70ef60d890bbaa1c9b7b62c3d6cb"
+          },
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-BvT0Uq/observations/public-evidence.json",
+            "bytes": 917,
+            "sha256": "8f540315e6c691f18d029c212997950128c966c0ecd0fbc62cd7ddadd34a8745"
+          },
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-n6IcYm/observations/public-evidence.json",
+            "bytes": 983,
+            "sha256": "07be615496a4767b709b179a2368e1a66ceabc87efb1258183687a3629367d56"
+          }
+        ],
+        "strictCleanupAndEnvironmentPassed": true,
+        "compiledColdChild": "Original compiled source only; cold-case green receives no TS-mutant sensitivity credit.",
+        "at": "2026-10-16T12:46:42.486837+00:00",
+        "formalDone": false
+      },
+      "restore": {
+        "action": "restore",
+        "operator": "M2-expiry-comparison-removed",
+        "sourceCommit": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+        "targetRel": "src/identity/pendingLoginStore.ts",
+        "before": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/pendingLoginStore.ts",
+          "bytes": 4931,
+          "sha256": "75135d94c3f9bfa198551e01042107feda6befa1c9304e46190317ca6db4920a"
+        },
+        "original": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/executed-controls/originals/M2-expiry-comparison-removed/src/identity/pendingLoginStore.ts",
+          "bytes": 4955,
+          "sha256": "77201a6607e8e105a3a9eb314abbdff07076334f0be538e2b207d56f3e4ac6fd"
+        },
+        "outcome": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/p207p-mutant-expiry-outcome.json",
+          "bytes": 9181,
+          "sha256": "6ba18f321c3b012935d21a93e4d16efe3cbf9536799fe88cf28c18211457e75a"
+        },
+        "rootSemanticReview": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/M2-root-body-review.json",
+          "bytes": 4052,
+          "sha256": "ccc47e7b517052546786440c9d1491c76ef6fb1de67512d55c45d609d86a725d"
+        },
+        "admission": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/q-control-write-admission.json",
+          "bytes": 1933,
+          "sha256": "b6df705aecc8a3ae325400dce089cda42286b44ec1a0aa29ffaf17a0c4c36773"
+        },
+        "binding": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/fresh-source-binding.json",
+          "bytes": 134531,
+          "sha256": "277f99a470aae674644bfcb76353c4f2e4aa4fa9193f367cbe5c1e88f76996a3"
+        },
+        "recipes": {
+          "path": "/private/tmp/p2-07-oidc-qualification-20261016/next-pending-state-test-plan/control-recipes.json",
+          "bytes": 3943,
+          "sha256": "455f5815e471e2b2ed6eba9508c764ea7c5785cd346d24597805fa267d9ab861"
+        },
+        "restored": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/pendingLoginStore.ts",
+          "bytes": 4955,
+          "sha256": "77201a6607e8e105a3a9eb314abbdff07076334f0be538e2b207d56f3e4ac6fd"
+        },
+        "at": "2026-10-16T12:46:43.004018+00:00",
+        "compiledOutputsRebuilt": false,
+        "compilerOrBuildValidityClaim": false,
+        "sourceOnlyMutant": true,
+        "formalDone": false
+      },
+      "restoredOutcome": {
+        "schema": "p207p-closed-runtime/1",
+        "at": "2026-10-16T12:47:03.364211+00:00",
+        "phase": "p207p-restored-expiry",
+        "command": {
+          "phase": "p207p-restored-expiry",
+          "major": "22",
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout tests/identity/pendingLoginStore.test.ts tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-restored-expiry.raw.json",
+          "exit": 0,
+          "durationMs": 10900,
+          "startedUtc": "2026-10-16T12:46:48.745814+00:00",
+          "endedUtc": "2026-10-16T12:46:59.660160+00:00",
+          "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-expiry/stdout-stderr.log",
+          "head": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+          "headAfter": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+          "ownedProcess": {
+            "pid": 54567,
+            "ownedPgid": 54567,
+            "observedPgidAfterLaunch": 54567,
+            "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+            "argv": [
+              "/opt/homebrew/opt/node@22/bin/node",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "--root",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+              "tests/identity/pendingLoginStore.test.ts",
+              "tests/identity/jwtVerify.test.ts",
+              "tests/enterpriseSsoScim.test.ts",
+              "tests/security/api-security.test.ts",
+              "tests/security/identityAccountBinding.test.ts",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207p-restored-expiry.raw.json"
+            ],
+            "startedUtc": "2026-10-16T12:46:48.745814+00:00",
+            "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+            "overriddenEnvironmentKeys": [
+              "PATH",
+              "HOME",
+              "GIT_NO_LAZY_FETCH",
+              "AMC_P021_RUNTIME_OBSERVER_PATH"
+            ]
+          },
+          "groupAbsentByESRCH": true,
+          "signalsOtherThanZeroSent": false,
+          "observed": true,
+          "artifacts": {
+            "rawProducer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/p207p-restored-expiry.raw.json",
+              "bytes": 57304,
+              "sha256": "7728c6767383db591ff1034b63082e747a4634aba7946ab73b225cbd3f2f3642"
+            },
+            "rawSnapshot": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-expiry/raw.json",
+              "bytes": 57304,
+              "sha256": "7728c6767383db591ff1034b63082e747a4634aba7946ab73b225cbd3f2f3642"
+            },
+            "observer": {
+              "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-expiry/observer.json",
+              "bytes": 74752,
+              "sha256": "7fa978953f6ac898841a61ac4042c9abf66a712fb65933f6db790b9aadaf8055"
+            },
+            "reporter": {
+              "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+              "bytes": 2110,
+              "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+            }
+          },
+          "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+        },
+        "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+        "tests": {
+          "total": 154,
+          "passed": 154,
+          "failed": 0,
+          "skipped": 0
+        },
+        "failures": [],
+        "identitiesAndStatusesMatch": true,
+        "original22IdentitiesPreserved": true,
+        "hooksPassed": true,
+        "hookCount": 27,
+        "unhandledErrors": [],
+        "lateDiagnosticPatterns": [
+          "Unhandled Errors?",
+          "Unhandled Rejection",
+          "uncaught exception",
+          "Error during teardown",
+          "Tests modified the repository workspace",
+          "Hook timed out",
+          "Error:.*global.?teardown",
+          "ELIFECYCLE",
+          "error during close",
+          "close timed out",
+          "error during global teardown",
+          "Tests closed successfully but something prevents",
+          "test timed out",
+          "failed to load",
+          "worker exited"
+        ],
+        "lateHits": [],
+        "pins": [
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-expiry/raw.json",
+            "bytes": 57304,
+            "sha256": "7728c6767383db591ff1034b63082e747a4634aba7946ab73b225cbd3f2f3642"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-expiry/observer.json",
+            "bytes": 74752,
+            "sha256": "7fa978953f6ac898841a61ac4042c9abf66a712fb65933f6db790b9aadaf8055"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-expiry/stdout-stderr.log",
+            "bytes": 4811,
+            "sha256": "025ebbb1c8f43e1b2b302bb13bf43ede38e2e81df7919fbd1eb5df7ae071bce1"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-expiry/command.json",
+            "bytes": 3084,
+            "sha256": "e9e453209d0ad37462bd2752c4bbdd717c58be19b321a1675b8ed245d1202b6d"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-expiry/owned-process.json",
+            "bytes": 1007,
+            "sha256": "f4106128aadab206721b7233d4197a238e139387bedaa7be2b304961be369370"
+          },
+          {
+            "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-restored-expiry/owned-group-after-exit.json",
+            "bytes": 262,
+            "sha256": "28ffecfdd08fb0236cfea41ff45c1dca2cf27086921936e22cd9a4403564543c"
+          }
+        ],
+        "boundary": "Actual unfiltered five-file identity corpus only. Root must classify every RED body error and hidden later assertions. No full-suite, canonical independent verifier or release claim.",
+        "formalDone": false
+      }
+    }
+  ],
+  "sourceOnly": true,
+  "compiledOutputsRebuilt": false,
+  "formalDone": false
+}
