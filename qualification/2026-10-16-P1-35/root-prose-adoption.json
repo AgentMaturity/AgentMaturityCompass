@@ -1,0 +1,20 @@
+{
+  "originalDraftPins": [
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/receipt-prose-draft-v2/README.md",
+      "bytes": 8066,
+      "sha256": "c91bf25bd8d185fe1f95043c1dd3392623d21303f439a743f277de8cd5fb94d8"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/receipt-prose-draft-v2/acceptance-gaps.json",
+      "bytes": 9616,
+      "sha256": "09e4934ba94edf0f45f7d451bad7d9a58b0ebc9443a3103ac35483f7ff7a8173"
+    }
+  ],
+  "corrections": [
+    "The old post-fix report returned null and called the current callback, rather than entering R1.",
+    "M1 masked assertions do not include a cap assertion.",
+    "Private drafting intro replaced by local checkpoint introduction."
+  ],
+  "sealedDraftPreserved": true
+}

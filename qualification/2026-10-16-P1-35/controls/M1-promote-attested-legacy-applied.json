@@ -1,0 +1,30 @@
+{
+  "name": "M1-promote-attested-legacy",
+  "target": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/migration/legacy/classify.ts",
+  "relative": "src/migration/legacy/classify.ts",
+  "original": {
+    "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/migration/legacy/classify.ts",
+    "bytes": 8769,
+    "sha256": "adfab60d34e85334e82b2ff7ea4e08f0d740b520c88376faf3d203b5d59e29fb"
+  },
+  "frozen": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/M1-promote-attested-legacy.original",
+    "bytes": 8769,
+    "sha256": "adfab60d34e85334e82b2ff7ea4e08f0d740b520c88376faf3d203b5d59e29fb"
+  },
+  "patch": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/runtime-and-control-review/M1-promote-attested-legacy.patch",
+    "bytes": 758,
+    "sha256": "2b59bbb543f76fadacbc239ba69f4d0022421be034d0d6fa7af9aa33d487cb59"
+  },
+  "inode": 542900590,
+  "at": "2026-10-16T17:17:49.041651+00:00",
+  "sourceOnly": true,
+  "compiledOutputRebuilt": false,
+  "mutant": {
+    "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/migration/legacy/classify.ts",
+    "bytes": 8936,
+    "sha256": "dc7b0c2499b068392491fa084382a0a9bfda5d6478d48bc720d6eb7e341f6156"
+  },
+  "mutantInode": 542949508
+}

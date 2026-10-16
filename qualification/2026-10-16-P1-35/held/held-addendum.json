@@ -1,0 +1,74 @@
+{
+  "schema": "p135-knip-manual-entry-held-addendum/1",
+  "supersedesCurrentExecutionRecommendationIn": "review.json only as to proceeding; preserve original ownership/source observations",
+  "state": "HELD_UNAPPLIED",
+  "configUnchanged": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/knip.json",
+    "bytes": 1928,
+    "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1"
+  },
+  "proposalPatch": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/knip-manual-entry-ownership/held-manual-entry.proposed.patch",
+    "bytes": 681,
+    "sha256": "6a783945b7e764ef9aa3725a66874a3a5c53d262f8b68ddcfb7c24a3b0468e27"
+  },
+  "proposedAfter": {
+    "bytes": 1964,
+    "sha256": "b64ce55d72a8167b40a303208e38c85a7461a62cc32239cb1dcb5114c1062539",
+    "applied": false
+  },
+  "exactChange": "One scripts/make-legacy-fixtures.mjs literal in existing root entry array; all surrounding bytes preserved",
+  "ordinaryNeedsSnapshot": {
+    "log": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-knip-needs-snapshot/stdout-stderr.log",
+      "bytes": 10,
+      "sha256": "a595ef320cb1168dc20cd8f35fd2e227897efe65517e326db9f636543f4d0958"
+    },
+    "command": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-knip-needs-snapshot/command.json",
+      "bytes": 1601,
+      "sha256": "31dbc0a0ed427d6f5490c20041f512a0f24ce0940d79ed4022d4e98d16728380"
+    },
+    "exit": 0,
+    "durationMs": 388,
+    "ownedPGID": 92620,
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "rawOutput": "knip.json\n",
+    "wrapperCwdAndHeadAreRNotSourceAuthority": true,
+    "ownedGroupRecord": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-knip-needs-snapshot/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "71f0d57ebcb4cca0d752c66ce79461c65e4bbab62fd34663bc686c7e49896f13"
+    }
+  },
+  "ignore": {
+    "argv": [
+      "git",
+      "-C",
+      "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "check-ignore",
+      "-v",
+      "unused-code/plan-edits/P1-35/knip.json.landed"
+    ],
+    "exit": 0,
+    "stdout": "/Users/sid/AgentMaturityCompass/.git/info/exclude:19:/unused-code/\tunused-code/plan-edits/P1-35/knip.json.landed\n",
+    "stderr": "",
+    "meaning": "Ordinary common exclude matches proposed D15 archive; no force-add/unignore attempted."
+  },
+  "noExistingKnipD15RegistrationInS": true,
+  "userBoundary": "Root conveyed force operations prohibited and D15 archive explicitly held; no new user approval requested. Do not force-add, unignore, write manifest-only registration or alter tests/guards to apply this patch.",
+  "qualityState": {
+    "deadCodePriorRootCount": 2726,
+    "deadCodeCurrentRootCount": 2727,
+    "newGeneratorFinding": 1,
+    "unwaived": true,
+    "fixed": false,
+    "qualityExecutionByReviewer": false,
+    "globalQualityGreenClaim": false
+  },
+  "closedOwnershipOutputsVerifiedUnchanged": true,
+  "noArchiveManifestConfigCheckoutIndexOrGuardWrites": true,
+  "noForcedOperations": true,
+  "noProductHelperParserCompilerNativeSQLNetworkExecution": true
+}
