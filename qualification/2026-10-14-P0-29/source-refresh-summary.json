@@ -1,0 +1,324 @@
+{
+  "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "sourceChanges": [
+    {
+      "reference": "src/ledger/ledger.ts:1268-1295",
+      "priorGitBlob": "a80269b9e855dcd69749f3d457cc6a297995f42b",
+      "currentGitBlob": "aa1d539a15001c827e98af9453cc96c876300fe5"
+    }
+  ],
+  "inventoryChanges": [
+    {
+      "id": "G4-16",
+      "path": "src/ledger/ledger.ts",
+      "priorGitBlob": "a80269b9e855dcd69749f3d457cc6a297995f42b",
+      "currentGitBlob": "aa1d539a15001c827e98af9453cc96c876300fe5"
+    },
+    {
+      "id": "G4-21",
+      "path": "src/enforce/resourceManifest.ts",
+      "priorGitBlob": "c71d6e61bdb734fd90ba07a90faf04569942568a",
+      "currentGitBlob": "811f241d962dd133fdaa9b5c687860e939ceccba"
+    },
+    {
+      "id": "G4-30",
+      "path": "src/bundles/bundle.ts",
+      "priorGitBlob": "6f4a3765a10b8f9674ef78d57ca305bbdb5dee91",
+      "currentGitBlob": "0171a59c571eb814695c30a5803169e09a8a6526"
+    }
+  ],
+  "inventoryResolutionCorrections": [
+    {
+      "id": "G2-02",
+      "priorAbsentNamedPaths": [
+        "src/assurance/packs/do-not-answer-pack.ts",
+        "src/assurance/packs/toxicchat-pack.ts",
+        "src/assurance/packs/selfReportGamingPack.ts",
+        "fixtures/packs/*PackV1.json"
+      ],
+      "directories": [],
+      "unresolvedExpressions": [
+        "fixtures/packs/*PackV1.json"
+      ]
+    },
+    {
+      "id": "G2-41",
+      "priorAbsentNamedPaths": [
+        "src/shield/9"
+      ],
+      "directories": [],
+      "unresolvedExpressions": [
+        "src/shield/9"
+      ]
+    },
+    {
+      "id": "G2-46",
+      "priorAbsentNamedPaths": [
+        "src/harness/"
+      ],
+      "directories": [
+        "src/harness/"
+      ],
+      "unresolvedExpressions": []
+    },
+    {
+      "id": "G3-07",
+      "priorAbsentNamedPaths": [
+        "src/claims/claimExpiry.ts\u2248src/score/claimExpiry.ts",
+        "src/claims/confidenceDrift.ts\u2248src/score/confidenceDrift.ts"
+      ],
+      "directories": [],
+      "unresolvedExpressions": [
+        "src/claims/claimExpiry.ts\u2248src/score/claimExpiry.ts",
+        "src/claims/confidenceDrift.ts\u2248src/score/confidenceDrift.ts"
+      ]
+    },
+    {
+      "id": "G3-25",
+      "priorAbsentNamedPaths": [
+        "src/console/state/"
+      ],
+      "directories": [
+        "src/console/state/"
+      ],
+      "unresolvedExpressions": []
+    },
+    {
+      "id": "G3-30",
+      "priorAbsentNamedPaths": [
+        "scripts/swarm-test.py\u2194swarm-test-v2.py",
+        "internal/debug/test-model-scanner.cjs\u2194.mjs"
+      ],
+      "directories": [],
+      "unresolvedExpressions": [
+        "scripts/swarm-test.py\u2194swarm-test-v2.py",
+        "internal/debug/test-model-scanner.cjs\u2194.mjs"
+      ]
+    },
+    {
+      "id": "G3-26",
+      "priorAbsentNamedPaths": [
+        "platform/python/amc/score",
+        "platform/python/amc/shield",
+        "platform/python/amc/enforce",
+        "platform/python/amc/vault",
+        "platform/python/amc/watch",
+        "platform/python/amc/product"
+      ],
+      "directories": [
+        "platform/python/amc/score",
+        "platform/python/amc/shield",
+        "platform/python/amc/enforce",
+        "platform/python/amc/vault",
+        "platform/python/amc/watch",
+        "platform/python/amc/product"
+      ],
+      "unresolvedExpressions": []
+    },
+    {
+      "id": "G3-27",
+      "priorAbsentNamedPaths": [
+        "platform/python",
+        "sdk/python/amc_sdk",
+        "src/sdk/python/amc_client"
+      ],
+      "directories": [
+        "platform/python",
+        "sdk/python/amc_sdk"
+      ],
+      "unresolvedExpressions": [
+        "src/sdk/python/amc_client"
+      ]
+    },
+    {
+      "id": "G3-29",
+      "priorAbsentNamedPaths": [
+        "docs/docs.js",
+        "docs/research"
+      ],
+      "directories": [
+        "docs/research"
+      ],
+      "unresolvedExpressions": []
+    },
+    {
+      "id": "G4-33",
+      "priorAbsentNamedPaths": [
+        "src/enforce",
+        "src/governor",
+        "src/fleet",
+        "src/api",
+        "src/sdk",
+        "src/ops",
+        "src/claims",
+        "src/score",
+        "src/assurance",
+        "src/observability"
+      ],
+      "directories": [
+        "src/enforce",
+        "src/governor",
+        "src/fleet",
+        "src/api",
+        "src/sdk",
+        "src/ops",
+        "src/claims",
+        "src/score",
+        "src/assurance",
+        "src/observability"
+      ],
+      "unresolvedExpressions": []
+    },
+    {
+      "id": "G4-35",
+      "priorAbsentNamedPaths": [
+        "src/guide",
+        "src/eval"
+      ],
+      "directories": [
+        "src/guide",
+        "src/eval"
+      ],
+      "unresolvedExpressions": []
+    },
+    {
+      "id": "G5-05",
+      "priorAbsentNamedPaths": [
+        "docs/RESEARCH_PAPERS_2026"
+      ],
+      "directories": [],
+      "unresolvedExpressions": [
+        "docs/RESEARCH_PAPERS_2026"
+      ]
+    },
+    {
+      "id": "G5-28",
+      "priorAbsentNamedPaths": [
+        "docs/research/gap-0610\u2194source-reviews/gap-0610"
+      ],
+      "directories": [],
+      "unresolvedExpressions": [
+        "docs/research/gap-0610\u2194source-reviews/gap-0610"
+      ]
+    },
+    {
+      "id": "G6-04",
+      "priorAbsentNamedPaths": [
+        "deploy/compose/secrets/*.txt"
+      ],
+      "directories": [],
+      "unresolvedExpressions": [
+        "deploy/compose/secrets/*.txt"
+      ]
+    },
+    {
+      "id": "G7-13",
+      "priorAbsentNamedPaths": [
+        "src/casebooks",
+        "src/eoc",
+        "src/executive",
+        "src/bootstrap"
+      ],
+      "directories": [
+        "src/casebooks",
+        "src/eoc",
+        "src/executive",
+        "src/bootstrap"
+      ],
+      "unresolvedExpressions": []
+    },
+    {
+      "id": "G7-14",
+      "priorAbsentNamedPaths": [
+        "src/harness/"
+      ],
+      "directories": [
+        "src/harness/"
+      ],
+      "unresolvedExpressions": []
+    },
+    {
+      "id": "G7-22",
+      "priorAbsentNamedPaths": [
+        "scripts/swarm-test*.py"
+      ],
+      "directories": [],
+      "unresolvedExpressions": [
+        "scripts/swarm-test*.py"
+      ]
+    },
+    {
+      "id": "G8-04",
+      "priorAbsentNamedPaths": [
+        ".amc/release/working/npm-cache"
+      ],
+      "directories": [
+        ".amc/release/working/npm-cache"
+      ],
+      "unresolvedExpressions": []
+    },
+    {
+      "id": "G6-18",
+      "priorAbsencePaths": [
+        "--json",
+        "--verbose",
+        ".tmp-a2a-events.json",
+        ".tmp-distributed-events.json",
+        ".tmp-memory-depth-events.json",
+        ".tmp-gap-report.json"
+      ],
+      "unresolvedExpressions": [
+        "--json",
+        "--verbose"
+      ],
+      "reason": "CLI flags are not filesystem leaf paths; their presence requires parsing the command contract."
+    },
+    {
+      "id": "G8-27",
+      "priorAbsencePaths": [
+        "--json",
+        "--verbose",
+        ".tmp-a2a-events.json",
+        ".tmp-distributed-events.json",
+        ".tmp-memory-depth-events.json",
+        ".tmp-gap-report.json"
+      ],
+      "unresolvedExpressions": [
+        "--json",
+        "--verbose"
+      ],
+      "reason": "CLI flags are not filesystem leaf paths; their presence requires parsing the command contract."
+    }
+  ],
+  "sourceSnippets": 275,
+  "sourceFiles": 202,
+  "commits": 64,
+  "unresolvedSuccessors": 38,
+  "originalJsonSha256": "7e25d40365fb187f23f4b646b4dc2c6b0b497ca771e7b52ffb578b6266e1e153",
+  "originalMarkdownSha256": "dcd3d044e34d9b8f5e6fbb97d56f91aab29f66490e304f6d862165c7aaebc980",
+  "jsonSha256": "2ef11713d5863fb57f18032e1e7c73b1bbc96f6ba5654e7c2def6c539b7c99b0",
+  "markdownSha256": "3992fe78ff8958e5ce6132bebc7dd8bed0f3114948e1423cb880854ea8310d8e",
+  "namedInventoryFiles": 480,
+  "citationCorrections": [
+    {
+      "prior": "src/assurance/assuranceRunner.ts:390-440",
+      "current": "src/assurance/assuranceRunner.ts:390-458",
+      "reason": "Extend citation to include the executed behavior verified in independent review."
+    },
+    {
+      "prior": "src/assurance/assuranceRunner.ts:318-338",
+      "current": "src/assurance/assuranceRunner.ts:318-343",
+      "reason": "Extend citation to include the executed behavior verified in independent review."
+    },
+    {
+      "id": "G2-03",
+      "added": "src/assurance/assuranceRunner.ts:632-642",
+      "reason": "Add the actual caller showing persistence or CLI reachability."
+    },
+    {
+      "id": "G1-43",
+      "added": "src/cli.ts:19761-19800",
+      "reason": "Add the actual caller showing persistence or CLI reachability."
+    }
+  ]
+}
