@@ -447,6 +447,7 @@ export class ToolPipeline {
       timedOut: result.timedOut ?? false,
       denied: null,
       output,
+      ...(result.effect === undefined ? {} : { effect: result.effect }),
       bytes: result.bytes ?? Buffer.byteLength(output, "utf8")
     };
   }

@@ -368,7 +368,9 @@ export async function mountNativeMcpServer(options: {
               : callStarted && !notDispatched
                 ? "; the remote tool may have executed. It was not replayed. Inspect the remote service before another invocation."
                 : "";
-            return { ok: false, exitCode: 1, timedOut: (transport instanceof NativeMcpHttpTransport && transport.failureTimedOut)
+            return { ok: false, exitCode: 1,
+              ...(transport instanceof NativeMcpHttpTransport && transport.failureCode === "TOOL_OUTCOME_UNKNOWN" ? { effect: "unknown" as const } : {}),
+              timedOut: (transport instanceof NativeMcpHttpTransport && transport.failureTimedOut)
                 || (error instanceof McpError && error.code === ErrorCode.RequestTimeout),
               output: (signal?.aborted ? "MCP call cancelled; connection and grants disposed"
                 : notDispatched ? error.message : transportFailure(transport, "MCP call failed or catalog changed; review and mount again")) + uncertainty };
