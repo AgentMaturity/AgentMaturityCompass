@@ -10,6 +10,7 @@ import YAML from "yaml";
 import type { z } from "zod";
 import type { CrossStationProfile } from "../domains/stations.js";
 import { sha256Hex } from "../utils/hash.js";
+import { jurisdictionProfilesSchema, registerFileSchema, type JurisdictionProfile, type RegisterFile } from "./register.js";
 import {
   catalogManifestSchema, controlRecordSchema, crossStationProfilesSchema, fixtureEnvelopeSchema, packManifestSchema, producersFileSchema,
   publisherHostsSchema, vocabularySchema, zodToCatalogIssues, type CatalogIssue, type CatalogManifest, type Vocabulary
@@ -41,6 +42,10 @@ export interface LoadedCatalog {
   issues: CatalogIssue[];
   /** Descriptive composition templates, not additional controls or legal coverage. */
   crossStationProfiles?: CrossStationProfile[];
+  /** Law-as-data registers keyed by register id (`registers/<id>.json`, P1-18). */
+  registers?: Map<string, RegisterFile>;
+  /** Jurisdiction profiles keyed by folder (`jurisdictions/<folder>/profiles.json`, P1-18). */
+  jurisdictionProfiles?: Map<string, JurisdictionProfile[]>;
 }
 
 const TOP_FILES = new Set(["README.md", "LICENSE.md", "catalog.yaml", "vocabulary.yaml", "producers.yaml", "publisher-hosts.yaml"]);
@@ -106,6 +111,22 @@ function hasFloat(value: unknown): boolean {
   return false;
 }
 
+/** A JSON file parsed with `schema`, or null with issues. */
+function readJson<S extends z.ZodType>(root: string, rel: string, schema: S, issues: CatalogIssue[]): z.output<S> | null {
+  let value: unknown;
+  try {
+    value = JSON.parse(readFileSync(join(root, rel), "utf8"));
+  } catch (err) {
+    issues.push(issue("CAT_SCHEMA", rel, `not JSON: ${(err as Error).message}`));
+    return null;
+  }
+  if (hasFloat(value)) {
+    issues.push(issue("CAT_SCHEMA", rel, "integers only (no floats in catalog content)"));
+    return null;
+  }
+  return parseWith(schema, value, rel, issues);
+}
+
 function loadFixture(root: string, rel: string, issues: CatalogIssue[]): LoadedFixture {
   const bytes = readFileSync(join(root, rel));
   let value: unknown;
@@ -151,12 +172,14 @@ export function loadCatalog(opts: { root?: string } = {}): LoadedCatalog {
       else if (rel === "producers.yaml") cat.producers = parseWith(producersFileSchema, read(rel), rel, issues)?.producers ?? [];
       else if (rel === "publisher-hosts.yaml") cat.publisherHosts = parseWith(publisherHostsSchema, read(rel), rel, issues)?.hosts.map((h) => h.host) ?? [];
     } else if (rel === "profiles/cross-station.json") {
-      try {
-        const value: unknown = JSON.parse(readFileSync(join(root, rel), "utf8"));
-        cat.crossStationProfiles = parseWith(crossStationProfilesSchema, value, rel, issues) ?? [];
-      } catch (err) {
-        issues.push(issue("CAT_SCHEMA", rel, `not JSON: ${(err as Error).message}`));
-      }
+      cat.crossStationProfiles = readJson(root, rel, crossStationProfilesSchema, issues) ?? [];
+    } else if (parts.length === 2 && parts[0] === "registers" && rel.endsWith(".json")) {
+      const register = readJson(root, rel, registerFileSchema, issues);
+      if (register && parts[1] !== `${register.id}.json`) issues.push(issue("CAT_SCHEMA", rel, `file name must be ${register.id}.json`, "id"));
+      else if (register) (cat.registers ??= new Map()).set(register.id, register);
+    } else if (parts.length === 3 && parts[0] === "jurisdictions" && parts[2] === "profiles.json") {
+      const profiles = readJson(root, rel, jurisdictionProfilesSchema, issues);
+      if (profiles) (cat.jurisdictionProfiles ??= new Map()).set(parts[1] as string, profiles);
     } else if (parts.length === 3 && parts[0] === "layers" && parts[2] === "pack.yaml") {
       const manifest = parseWith(packManifestSchema, read(rel), rel, issues);
       if (!manifest) continue;

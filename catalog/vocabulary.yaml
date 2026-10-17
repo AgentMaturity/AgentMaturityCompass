@@ -1,10 +1,11 @@
 # Terms that predicates, citations, packs, owners and crosswalks may use. A term outside this file is CAT_VOCAB.
-# Seeded by P1-09 for L0-IDN-01 and extended by P1-14 for the Layer 0 baseline; add terms with the content that needs them.
+# Seeded by P1-09 for L0-IDN-01, extended by P1-14 for the Layer 0 baseline and by P1-18 for the US register and the
+# Wealth overlay; add terms with the content that needs them.
 stations: [education, environment, health, wealth, technology, mobility, governance]
-jurisdictions: [US, US-CA, US-CO, US-NYC, EU]
+jurisdictions: [US, US-CA, US-CO, US-NYC, US-NY, US-TX, US-IL, EU]
 # EU AI Act roles.
 roles: [provider, deployer]
-entityTypes: [hipaa_covered_entity, hipaa_business_associate, non_bank_financial_institution, eu_financial_entity]
+entityTypes: [hipaa_covered_entity, hipaa_business_associate, non_bank_financial_institution, bank, eu_financial_entity]
 riskClasses: []
 useCases:
   - consequential_decision_about_people

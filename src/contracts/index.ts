@@ -5,6 +5,7 @@
  */
 import { z } from "zod";
 import { catalogLockSchema } from "../catalog/lockfile.js";
+import { registerEntrySchema } from "../catalog/register.js";
 import { controlRecordSchema, packManifestSchema } from "../catalog/schema.js";
 import { claimEnvelopeSchema } from "../claims/eligibility/schemas.js";
 import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
@@ -80,6 +81,8 @@ export const CONTRACTS = {
   "control-record": { title: "AMC Control Record", schema: controlRecordSchema },
   "pack-manifest": { title: "AMC Catalog Pack Manifest", schema: packManifestSchema },
   "catalog-lock": { title: "AMC Catalog Lockfile", schema: catalogLockSchema },
+  // Law-as-data register entries (P1-18); refinements are in docs/catalog/REGISTER.md.
+  "register-entry": { title: "AMC Register Entry", schema: registerEntrySchema },
   // A4 Forge (P1-56); refinements are in spec/ACCEPTANCE_RULES.md "A4 project record" (P1-63).
   "a4-project": { title: "AMC A4 Project", schema: a4ProjectV1Schema },
   "a4-revision": { title: "AMC A4 Revision", schema: a4RevisionV1Schema },

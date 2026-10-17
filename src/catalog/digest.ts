@@ -34,12 +34,15 @@ export function producersDigest(cat: LoadedCatalog): string {
   return digestOf([...cat.producers].sort(byKey((p) => p.id)));
 }
 
-/** Covers the catalog manifest, every pack digest, and the producer and vocabulary digests. */
+/** Covers the catalog manifest, every pack digest, the producer and vocabulary digests, and any registers and profiles. */
 export function catalogDigest(cat: LoadedCatalog): string {
   const packs = [...cat.packs.values()]
     .map(({ manifest }) => ({ id: manifest.id, version: manifest.version, digest: packDigest(cat, manifest) }))
     .sort(byKey((p) => p.id));
   const profiles = cat.crossStationProfiles?.map((p) => ({ ...p, stations: [...p.stations].sort() })).sort(byKey((p) => p.id));
+  const registers = [...(cat.registers?.values() ?? [])].map((r) => ({ id: r.id, digest: digestOf(r) })).sort(byKey((r) => r.id));
+  const jurisdictions = [...(cat.jurisdictionProfiles ?? [])].map(([id, p]) => ({ id, digest: digestOf(p) })).sort(byKey((r) => r.id));
   return digestOf({ manifest: cat.manifest, packs, producers: producersDigest(cat), vocabulary: digestOf(cat.vocabulary),
-    ...(profiles?.length ? { crossStationProfiles: profiles } : {}) });
+    ...(profiles?.length ? { crossStationProfiles: profiles } : {}),
+    ...(registers.length ? { registers } : {}), ...(jurisdictions.length ? { jurisdictionProfiles: jurisdictions } : {}) });
 }

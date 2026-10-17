@@ -1,0 +1,21 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-01",
+  "polarity": "negative",
+  "evidenceClass": "stale",
+  "setup": {
+    "harness": "lease",
+    "actionClass": "FINANCIAL",
+    "lease": {
+      "state": "expired",
+      "agentId": "default",
+      "scopes": [
+        "toolhub:execute"
+      ]
+    }
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "authorization_denied:capability_expired"
+  }
+}

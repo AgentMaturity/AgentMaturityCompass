@@ -1,0 +1,6 @@
+entries=183 verified=108 unverified=75 asOf=2026-10-12
+exit 0
+entries=183 verified=108 unverified=75 asOf=2027-01-02
+  FAIL eu-ai-act: lastReviewed 2026-10-03 is 91 days old; policy window is 90 days
+  FAIL eu-gdpr: lastReviewed 2026-10-03 is 91 days old; policy window is 90 days
+(--as-of 2027-01-02: the 176 entries last reviewed 2026-10-03 are then past their 90-day window, so the dated gate fails as designed; P1-18's seven entries are not among them.)
