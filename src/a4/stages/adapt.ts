@@ -182,12 +182,12 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
           + "completion then leaves this plan signed, not activated. "
           : `Not regulated: completion leaves the plan signed, not activated; an owner may open ${ACTIVATE_PLAN_EFFECT_ID} before completing. `}`
         + "Under an active plan with L0-IDN-01 every native tool call needs a verified lease: Studio native tasks with workspace tools started after activation get one (P1-67), "
-        + "and CLI agent runs (amc agent-loop run), SDK native client sessions and amc acp sessions with workspace tools mint their own (P1-79); "
-        + "tasks started before it, delegated children and an in-process openAgentSession caller that passes no lease do not and are denied. "
+        + "and CLI agent runs (amc agent-loop run), SDK native client sessions, amc acp sessions and an in-process openAgentSession given none, with workspace tools, "
+        + "mint their own, which their delegated children inherit (P1-79); tasks started before it do not and are denied. "
         + "L0-IDN-01 also requires a principal, and the lease names the task's signed-in principal, so a task whose principal is not an active local users.yaml user (a workspace-router session or the admin token included) is refused at start, 409 PRINCIPAL_UNRESOLVED (P1-78). "
-        + "A run's lease names the active users.yaml user whose username is the OS account, so a run whose OS account is not one is refused PRINCIPAL_UNRESOLVED before its session opens: the CLI exits non-zero and ACP answers -32602.",
+        + "A run's lease names the active users.yaml user whose username is the OS account, so a run whose OS account is not one is refused PRINCIPAL_UNRESOLVED before its session opens or a delegated child starts: the CLI exits non-zero and ACP answers -32602.",
       expert: "signPlan({ reviewAgentId, quorumFloor }) files the SECURITY review when the effect gate opens; activateControlPlan verifies it and consumes it as activate-<digest32>; compiledPolicyGuard denies any session whose pinned head differs from the journal's; "
-        + "runLease (src/leases/runLease.ts) mints a run's lease through issueLeaseForPrincipal when planRequiresPrincipal holds." },
+        + "runLease (src/leases/runLease.ts) mints a run's lease through issueLeaseForPrincipal when planRequiresPrincipal holds; createDriverRunner composes each delegated child with it." },
     { id: "memory", sources: ["src/a4/adaptMemoryPolicy.ts", "ReasoningMemoryItem (src/learning/reasoningMemory.ts)"], dataStatus: null,
       novice: `The agent may remember items classed ${memory.privacyClass} for up to ${memory.expiresAfterDays} days, reviewed after ${memory.reviewAfterDays}, `
         + `read by ${memory.allowedConsumers.join(", ")}. AMC records this policy but does not enforce it yet.`,

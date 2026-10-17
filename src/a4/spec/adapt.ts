@@ -76,7 +76,10 @@ export const CATALOG_EXPERIMENTAL_NOTICE = "Every record here is `experimental`:
 export const ACTIVATE_PLAN_EFFECT_ID = "a4.adapt.activate_plan";
 /** The native task lease (P1-67): a Studio workspace-tools task started after activation runs under one. */
 export const NATIVE_LEASE_KEY = "P1-67";
-/** The run lease (P1-79): a CLI agent run, an SDK native client session or an ACP session with workspace tools mints its own. */
+/**
+ * The run lease (P1-79): a CLI agent run, an SDK native client session, an ACP session or an in-process openAgentSession
+ * given none, with workspace tools, mints its own; its delegated children inherit it.
+ */
 export const RUN_LEASE_KEY = "P1-79";
 
 const load = () => import("../stages/adapt.js");
@@ -440,14 +443,15 @@ function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Re
  * them. Since P1-78 that lease names the task's signed-in principal, and L0-IDN-01 also requires a principal, so Studio
  * refuses at start (409 PRINCIPAL_UNRESOLVED) a task whose principal is not an active local users.yaml user, a
  * workspace-router session or the admin token included (PRINCIPAL_REQUIRED, NON_LOCAL_USER_SESSIONS_DENIED). Since P1-79
- * a CLI agent run, an SDK native client session and an ACP session with workspace tools mint their own lease while the
- * plan requires a principal (RUN_LEASE), naming the active users.yaml user whose username is the OS account; a run whose
- * OS account is not one is refused PRINCIPAL_UNRESOLVED before its session opens. Tasks started before activation,
- * delegated children and an in-process openAgentSession caller that passes no lease carry none. Studio refuses to start
- * any workspace-tools task when no lease can be minted (LEASE_UNAVAILABLE), and a run's lease needs the same key, so a
- * locked vault keeps the item WAITING (LEASE_NOT_ISSUED) and an unread vault state is NOT_EVALUATED, never READY. The head revision's bound
- * journal head decides only while it is current: a head moved since (an activation from the CLI or another project), a
- * journal that no longer verifies (every session refused) or an unread slot is NOT_EVALUATED, never NO_ACTIVE_PLAN.
+ * a CLI agent run, an SDK native client session, an ACP session and an in-process openAgentSession given no lease, with
+ * workspace tools, mint their own lease while the plan requires a principal (RUN_LEASE), naming the active users.yaml
+ * user whose username is the OS account, and their delegated children inherit it (DELEGATED_CHILDREN_INHERIT_LEASE); a
+ * run whose OS account is not one is refused PRINCIPAL_UNRESOLVED before its session opens or a child starts. Tasks
+ * started before activation carry none. Studio refuses to start any workspace-tools task when no lease can be minted
+ * (LEASE_UNAVAILABLE), and a run's lease needs the same key, so a locked vault keeps the item WAITING (LEASE_NOT_ISSUED)
+ * and an unread vault state is NOT_EVALUATED, never READY. The head revision's bound journal head decides only while it
+ * is current: a head moved since (an activation from the CLI or another project), a journal that no longer verifies
+ * (every session refused) or an unread slot is NOT_EVALUATED, never NO_ACTIVE_PLAN.
  */
 function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery, regulated: boolean): A4ReadinessItem {
   const drifted = query.live.driftedSlots;
@@ -462,21 +466,21 @@ function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery, regulated
   const active = head !== null || state.chain.some((link) => link.kind === "EFFECT_FINISHED" && link.body.effect === ACTIVATE_PLAN_EFFECT_ID);
   if (!active && !regulated) return item("adapt.plan.nativeSessionsAllowed", "READY", { section: "governance", mandatory: false, reasonCodes: ["NO_ACTIVE_PLAN"] });
   const codes = [active ? "PLAN_ACTIVE" : "PLAN_ACTIVATED_AT_COMPLETION", "PLAN_DENIES_NATIVE_SESSION", `NATIVE_TASK_LEASE:${NATIVE_LEASE_KEY}`,
-    `RUN_LEASE:${RUN_LEASE_KEY}`, "PRE_ACTIVATION_SESSIONS_DENIED", "DELEGATED_CHILDREN_DENIED", "PRINCIPAL_REQUIRED", "NON_LOCAL_USER_SESSIONS_DENIED"];
-  const denied = "tasks started before it, delegated children and an in-process openAgentSession caller that passes no lease carry none and are denied every "
-    + "call; a task whose signed-in principal is not an active local users.yaml user (a workspace-router session or the admin token included) is refused "
-    + "at start, 409 PRINCIPAL_UNRESOLVED (P1-78), and so is a CLI, SDK or ACP run whose OS account is not one, PRINCIPAL_UNRESOLVED before its session opens (P1-79)";
+    `RUN_LEASE:${RUN_LEASE_KEY}`, "PRE_ACTIVATION_SESSIONS_DENIED", "DELEGATED_CHILDREN_INHERIT_LEASE", "PRINCIPAL_REQUIRED", "NON_LOCAL_USER_SESSIONS_DENIED"];
+  const denied = "tasks started before it carry none and are denied every call; a task whose signed-in principal is not an active local users.yaml user "
+    + "(a workspace-router session or the admin token included) is refused at start, 409 PRINCIPAL_UNRESOLVED (P1-78), and so is a run whose OS account "
+    + "is not one, PRINCIPAL_UNRESOLVED before its session opens or a delegated child starts (P1-79)";
   const vault = query.live.vaultUnlocked;
   if (active && vault !== true) {
     return item("adapt.plan.nativeSessionsAllowed", vault === null ? "NOT_EVALUATED" : "WAITING", { section: "governance", mandatory: false,
       kind: vault === null ? "source_unavailable" : "plan_denies_native_session", reasonCodes: [...codes, "LEASE_NOT_ISSUED", "VAULT_LOCKED"],
-      nextAction: { label: "Studio mints a native task's lease, and a CLI, SDK or ACP run with workspace tools its own, with the workspace lease key, which the "
+      nextAction: { label: "Studio mints a native task's lease, and a CLI, SDK, ACP or in-process run with workspace tools its own, with the workspace lease key, which the "
         + `vault holds: unlock it, or every native start that needs one is refused; ${denied}` } });
   }
   return item("adapt.plan.nativeSessionsAllowed", "READY", { section: "governance", mandatory: false, kind: "plan_denies_native_session", reasonCodes: codes,
     nextAction: { label: "Under an active plan, Studio native tasks with workspace tools started after activation run under a lease (P1-67), and CLI agent "
-      + "runs, SDK native client sessions and ACP sessions with workspace tools mint their own, naming the active users.yaml user whose username is the OS "
-      + `account (P1-79); ${denied}` } });
+      + "runs, SDK native client sessions, ACP sessions and in-process sessions with workspace tools mint their own, naming the active users.yaml user whose "
+      + `username is the OS account, which their delegated children inherit (P1-79); ${denied}` } });
 }
 
 /**

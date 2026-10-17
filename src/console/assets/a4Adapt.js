@@ -99,10 +99,10 @@ function renderActivation(ctx) {
     statement records that acknowledgement.</p>
     <p><strong>Lockout.</strong> An active compiled plan with <code>L0-IDN-01</code> denies every native tool call that carries no verified lease. Studio
       native tasks with workspace tools started after activation run under a lease Studio mints (P1-67), and CLI agent runs, SDK native client
-      sessions and ACP sessions with workspace tools mint their own, naming the active <code>users.yaml</code> user whose username is the OS account
-      (P1-79); a run whose OS account is not one is refused <code>PRINCIPAL_UNRESOLVED</code> before its session opens. Tasks started before
-      activation, delegated children and in-process sessions opened without a lease carry none and are denied. A non-regulated project therefore
-      completes with the plan signed and not activated.</p>
+      sessions, ACP sessions and in-process sessions with workspace tools mint their own, naming the active <code>users.yaml</code> user whose
+      username is the OS account, which their delegated children inherit (P1-79); a run whose OS account is not one is refused
+      <code>PRINCIPAL_UNRESOLVED</code> before its session opens or a child starts. Tasks started before activation carry none and are denied.
+      A non-regulated project therefore completes with the plan signed and not activated.</p>
     ${["plan_signed", "plan_activated", "plan_review_opened", "adapt.plan.nativeSessionsAllowed"].map((id) => status(ctx, id)).join("")}
     <div class="row wrap">${view.actionButton(request ? "Re-open the plan review" : "Open the plan review", "open-effect", openable,
       `data-gate="${esc(completion?.gateId ?? "")}"`)}</div>
