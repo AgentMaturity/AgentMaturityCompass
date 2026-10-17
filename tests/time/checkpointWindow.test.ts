@@ -1,16 +1,18 @@
 import { createHash, randomUUID } from "node:crypto";
-import { existsSync, lstatSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect } from "vitest";
 import { cleanSourceRuntimeEnvironment } from "../../scripts/clean-source-check.mjs";
+import { resolveAmcHome } from "../../src/credentials/credentialsPaths.js";
 import { getPublicKeyPem, verifyHexDigest } from "../../src/crypto/keys.js";
 import { closeGuardDb, withWorkspaceScope } from "../../src/enforce/evidenceEmitter.js";
 import { hashBinaryOrPath, openLedger, verifyLedgerIntegrity } from "../../src/ledger/ledger.js";
 import { closeSqlitePool, sqlitePoolStats } from "../../src/storage/sqlitePool.js";
-import { checkpointLedger, checkpointsDir, completePendingCheckpoints, ledgerTimeline, readCheckpointChain } from "../../src/time/checkpoint.js";
+import { checkpointLedger, checkpointsDir, completePendingCheckpoints, ledgerTimeline, readCheckpointChain, timeCheckpointTick } from "../../src/time/checkpoint.js";
 import { loadTimeConfig } from "../../src/time/tsaClient.js";
+import { loadTransparencyConfig } from "../../src/transparency/anchors/anchor.js";
 import { loadTrustContext, type TrustContext } from "../../src/trust/trustContext.js";
 import type { EvidenceEvent } from "../../src/types.js";
 import { lockVault, vaultStatus } from "../../src/vault/vault.js";
@@ -19,7 +21,7 @@ import { rawSignature, testKey, trustList } from "../trust/trustFixtures.js";
 import { ANCHOR_ID, POLICY, optionalTsaTest, withGrantFixture, type Fixture } from "./tsaTestFixture.js";
 
 const CHECKOUT = realpathSync(fileURLToPath(new URL("../../", import.meta.url)));
-const optionalCheckpointTest = optionalTsaTest(["CHECKPOINT-PENDING-GRANT", "CHECKPOINT-REQUIRED-REFUSAL", "CHECKPOINT-TWO-BOUND-WINDOW"]);
+const optionalCheckpointTest = optionalTsaTest(["CHECKPOINT-PENDING-GRANT", "CHECKPOINT-REQUIRED-REFUSAL", "CHECKPOINT-TWO-BOUND-WINDOW", "CHECKPOINT-EVENT-CADENCE"]);
 const sha256 = (bytes: string | Buffer): string => createHash("sha256").update(bytes).digest("hex");
 
 function filePin(path: string) {
@@ -148,6 +150,33 @@ async function withCheckpointWorkspace(caseId: string, tsa: Fixture, body: (fixt
       expect(trust.mode === "pinned" && trust.lists.length === 1 && trust.lists[0]!.timestampAuthorities?.[0]?.anchorId === ANCHOR_ID).toBe(true);
       immutablePins = [filePin(join(tsa.workspace, ".amc", "keys", "monitor_ed25519.pub")),
         filePin(join(tsa.workspace, ".amc", "keys", "auditor_ed25519.pub")), filePin(signedListPath)];
+      if (caseId === "CHECKPOINT-EVENT-CADENCE") {
+        const amcHome = resolveAmcHome();
+        const overridesAbsent = ["AMC_HOME", "AMC_TRUST_LIST", "AMC_TRUST_ROOT", "AMC_EXPECTED_MONITOR_FINGERPRINT"].every(key => process.env[key] === undefined);
+        expect(overridesAbsent && process.env.HOME === tsa.home).toBe(true);
+        expect(amcHome).toBe(join(tsa.home, ".config", "amc"));
+        const trustDirectory = join(amcHome, "trust");
+        const defaultListPath = join(trustDirectory, "amc-trust-list.json");
+        const defaultRootsPath = join(trustDirectory, "trust-roots.json");
+        expect(existsSync(defaultListPath) || existsSync(defaultRootsPath)).toBe(false);
+        mkdirSync(trustDirectory, { recursive: true, mode: 0o700 });
+        writeFileSync(defaultListPath, readFileSync(signedListPath), { flag: "wx", mode: 0o600 });
+        writeFileSync(defaultRootsPath, JSON.stringify({ type: "amc.trust-roots", version: 1, roots: [listRoot.keyId] }, null, 2), { flag: "wx", mode: 0o600 });
+        const defaultTrust = loadTrustContext();
+        expect(defaultTrust.mode).toBe("pinned");
+        expect(defaultTrust.lists).toEqual([list]);
+        expect(defaultTrust.explicitPins).toEqual([]);
+        expect(defaultTrust.allowUnpinned || defaultTrust.allowUnanchored).toBe(false);
+        const trustFiles = [filePin(defaultListPath), filePin(defaultRootsPath)];
+        expect(trustFiles.every(pin => pin.nlink === 1 && (lstatSync(pin.path).mode & 0o777) === 0o600)).toBe(true);
+        immutablePins.push(...trustFiles);
+        facts.defaultHome = { resolved: amcHome, expected: join(tsa.home, ".config", "amc"), overridesAbsent,
+          noOptionsLoaderUsed: true, mode: defaultTrust.mode, signatureVerifiedListCount: defaultTrust.lists.length,
+          listId: defaultTrust.lists[0]!.listId, listEqualsOwnSignedList: true, explicitPinCount: defaultTrust.explicitPins.length,
+          allowUnpinned: defaultTrust.allowUnpinned, allowUnanchored: defaultTrust.allowUnanchored, rootKeyId: listRoot.keyId,
+          tsaAnchorIds: defaultTrust.lists.flatMap(row => row.timestampAuthorities?.map(anchor => anchor.anchorId) ?? []), trustFiles };
+        facts.windowBoundary = "default-argument event cadence only; no elapsed-minute, Studio interval, session-seal or certificate qualification";
+      }
       const sessionId = randomUUID();
       const seedEventId = useLedger(false, ledger => {
         ledger.startSession({ sessionId, runtime: "unknown", binaryPath: "amc-p125-checkpoint-fixture",
@@ -462,6 +491,148 @@ describe("P1-25 real signed ledger checkpoint transitions", () => {
         }
         expect(actualMiddle.findings).toEqual([]);
         expect(afterReads).toEqual(events);
+      });
+    });
+  });
+
+  optionalCheckpointTest("uses the default signed trust home and checkpoints after exactly two new audit events", async () => {
+    await withGrantFixture("CHECKPOINT-EVENT-CADENCE", "/cadence-good", async tsa => {
+      await withCheckpointWorkspace("CHECKPOINT-EVENT-CADENCE", tsa, async fixture => {
+        const config = loadAMCConfig(tsa.workspace);
+        const requestedTime = { required: false, tsa: [{ name: "checkpoint-tsa", url: tsa.url("/cadence-good"), anchorIds: [ANCHOR_ID], reqPolicy: POLICY }],
+          checkpoint: { everyEvents: 2 } };
+        config.time = requestedTime; // everyMinutes is absent, so the actual loader must supply its default.
+        saveAMCConfig(tsa.workspace, config);
+        signAmcConfig(tsa.workspace);
+        expect(verifyAmcConfigSignature(tsa.workspace).valid).toBe(true);
+        expect(loadAMCConfig(tsa.workspace).time).toEqual(requestedTime);
+        const loaded = loadTimeConfig(tsa.workspace);
+        expect(loaded.checkpoint).toEqual({ everyEvents: 2, everyMinutes: 15 });
+        expect(loaded.required).toBe(false);
+        expect(loaded.tsa).toEqual(requestedTime.tsa);
+        const transparency = loadTransparencyConfig(tsa.workspace);
+        expect(transparency.anchors).toEqual([]);
+        const configPin = filePin(join(tsa.workspace, ".amc", "amc.config.yaml"));
+        const stages: Array<Record<string, unknown>> = [];
+        const independentGrants: Array<Record<string, unknown>> = [];
+        const cadence: Record<string, unknown> = { configured: requestedTime, loadedCheckpoint: loaded.checkpoint,
+          emptyTransparencyAnchors: transparency.anchors, defaultArgumentsOnly: true, noClockOrRowEdit: true,
+          elapsedMinuteOrStudioCredit: false, configPin, stages, independentGrants };
+        fixture.facts.eventCadence = cadence;
+        const recordGrant = (attested: Awaited<ReturnType<Fixture["verifyReply"]>>): void => {
+          independentGrants.push({ genTime: attested.genTime, accuracyMs: attested.accuracyMs, digest: attested.messageImprint.digest,
+            anchorId: attested.tsa.anchorId, signerCertSha256: attested.tsa.certSha256,
+            tokenSha256: sha256(Buffer.from(attested.tokenDerB64, "base64")), revocationChecked: attested.revocationChecked });
+        };
+        const capture = (id: string, result: Awaited<ReturnType<typeof timeCheckpointTick>>) => {
+          const events = fixture.events();
+          const chain = readCheckpointChain(tsa.workspace);
+          stages.push({ id, result, observedAtMs: Date.now(), requestPaths: tsa.requests.map(request => request.path),
+            events: events.map(event => ({ id: event.id, eventType: event.event_type, ts: event.ts, eventHash: event.event_hash,
+              meta: JSON.parse(event.meta_json) as unknown })), chain,
+            checkpointPins: chain.map(row => filePin(join(checkpointsDir(tsa.workspace), `${row.checkpoint.sequence}.json`))),
+            tokenPins: chain.map(row => { const path = join(checkpointsDir(tsa.workspace), `${row.checkpoint.sequence}.tsr`); return existsSync(path) ? filePin(path) : null; }) });
+          return { result, events, chain };
+        };
+        const beforeFirst = fixture.events();
+        expect(beforeFirst.map(event => ({ id: event.id, type: event.event_type }))).toEqual([{ id: fixture.seedEventId, type: "audit" }]);
+        expect(readCheckpointChain(tsa.workspace)).toEqual([]);
+        expect(tsa.requests).toHaveLength(0);
+        const initial = capture("initial", await timeCheckpointTick(tsa.workspace));
+        expect(initial.result).toEqual({ ran: true, anchors: [] });
+        expect(initial.chain).toHaveLength(1);
+        const first = initial.chain[0]!;
+        const firstGrant = await tsa.verifyReply("/cadence-good", first.sha256);
+        recordGrant(firstGrant);
+        const firstPath = join(checkpointsDir(tsa.workspace), "1.json");
+        const firstTokenPath = join(checkpointsDir(tsa.workspace), "1.tsr");
+        const firstBytes = readFileSync(firstPath);
+        const firstToken = readFileSync(firstTokenPath);
+        const firstRows = initial.events.filter(event => event.event_type === "time/checkpoint");
+        const firstVerification = fixture.verify();
+        cadence.firstLedger = { ok: firstVerification.ok, chain: firstVerification.chain.ok, governance: firstVerification.governance.ok,
+          anchored: firstVerification.trustRoot.anchored, errors: firstVerification.errors.length };
+        expect(tsa.requests.map(request => request.path)).toEqual(["/cadence-good"]);
+        expect(checkpointSignatureValid(firstPath, first.sha256, fixture.monitorPem)).toBe(true);
+        expect(first.checkpoint.previousCheckpointSha256).toBeNull();
+        expect(first.checkpoint.ledger).toEqual({ eventCount: beforeFirst.length, headEventHash: beforeFirst[beforeFirst.length - 1]!.event_hash });
+        expect(firstToken.equals(Buffer.from(firstGrant.tokenDerB64, "base64"))).toBe(true);
+        expect(firstRows).toHaveLength(1);
+        expect(JSON.parse(firstRows[0]!.meta_json)).toEqual({ checkpointSequence: 1, checkpointSha256: first.sha256, tokenSha256: sha256(firstToken) });
+        expect(initial.events.slice(0, beforeFirst.length)).toEqual(beforeFirst);
+        expect(initial.events).toHaveLength(beforeFirst.length + 1);
+        expect(firstVerification.ok && firstVerification.chain.ok && firstVerification.governance.ok && firstVerification.trustRoot.anchored).toBe(true);
+
+        const checkpointOnly = capture("checkpoint-only", await timeCheckpointTick(tsa.workspace));
+        expect(checkpointOnly.result).toEqual({ ran: false, anchors: [] });
+        expect(checkpointOnly.events).toEqual(initial.events);
+        expect(checkpointOnly.chain).toEqual(initial.chain);
+        expect(tsa.requests.map(request => request.path)).toEqual(["/cadence-good"]);
+        expect(readFileSync(firstPath).equals(firstBytes) && readFileSync(firstTokenPath).equals(firstToken)).toBe(true);
+
+        const firstAuditId = fixture.appendSealedAudit("cadence-first-audit");
+        const beforeOne = fixture.events();
+        const afterFirstHead = beforeOne.slice(first.checkpoint.ledger.eventCount);
+        cadence.oneEventBeforeTick = { firstAuditId, afterHeadIds: afterFirstHead.map(event => event.id), afterHeadTypes: afterFirstHead.map(event => event.event_type) };
+        expect(afterFirstHead.map(event => event.event_type)).toEqual(["time/checkpoint", "audit"]);
+        expect(afterFirstHead.filter(event => event.event_type !== "time/checkpoint").map(event => event.id)).toEqual([firstAuditId]);
+        expect(Date.now() - Date.parse(first.checkpoint.claimedAt)).toBeLessThan(15 * 60_000);
+        const one = capture("one-new-audit", await timeCheckpointTick(tsa.workspace));
+        // First checkpoint-row-count control witness follows the genuine first checkpoint and independent grant.
+        expect(one.result).toEqual({ ran: false, anchors: [] });
+        expect(one.events).toEqual(beforeOne);
+        expect(one.chain).toEqual(initial.chain);
+        expect(tsa.requests.map(request => request.path)).toEqual(["/cadence-good"]);
+        expect(readFileSync(firstPath).equals(firstBytes) && readFileSync(firstTokenPath).equals(firstToken)).toBe(true);
+
+        const secondAuditId = fixture.appendSealedAudit("cadence-second-audit");
+        const beforeSecond = fixture.events();
+        const afterFirstHeadAtTwo = beforeSecond.slice(first.checkpoint.ledger.eventCount);
+        cadence.twoEventsBeforeTick = { secondAuditId, afterHeadIds: afterFirstHeadAtTwo.map(event => event.id), afterHeadTypes: afterFirstHeadAtTwo.map(event => event.event_type) };
+        expect(afterFirstHeadAtTwo.map(event => event.event_type)).toEqual(["time/checkpoint", "audit", "audit"]);
+        expect(afterFirstHeadAtTwo.filter(event => event.event_type !== "time/checkpoint").map(event => event.id)).toEqual([firstAuditId, secondAuditId]);
+        expect(Date.now() - Date.parse(first.checkpoint.claimedAt)).toBeLessThan(15 * 60_000);
+        const two = capture("two-new-audits", await timeCheckpointTick(tsa.workspace));
+        // First exact-threshold control witness; the elapsed-minute path has not become due.
+        expect(two.result).toEqual({ ran: true, anchors: [] });
+        expect(two.chain).toHaveLength(2);
+        expect(tsa.requests.map(request => request.path)).toEqual(["/cadence-good", "/cadence-good"]);
+        const second = two.chain[1]!;
+        const secondGrant = await tsa.verifyReply("/cadence-good", second.sha256, 1);
+        recordGrant(secondGrant);
+        const secondPath = join(checkpointsDir(tsa.workspace), "2.json");
+        const secondTokenPath = join(checkpointsDir(tsa.workspace), "2.tsr");
+        const secondBytes = readFileSync(secondPath);
+        const secondToken = readFileSync(secondTokenPath);
+        expect(two.chain[0]).toEqual(first);
+        expect(second.checkpoint.previousCheckpointSha256).toBe(first.sha256);
+        expect(second.checkpoint.ledger).toEqual({ eventCount: beforeSecond.length, headEventHash: beforeSecond[beforeSecond.length - 1]!.event_hash });
+        expect(secondToken.equals(Buffer.from(secondGrant.tokenDerB64, "base64"))).toBe(true);
+        expect(two.events.slice(0, beforeSecond.length)).toEqual(beforeSecond);
+        expect(two.events).toHaveLength(beforeSecond.length + 1);
+        const reset = capture("reset", await timeCheckpointTick(tsa.workspace));
+        expect(reset.result).toEqual({ ran: false, anchors: [] });
+        expect(reset.events).toEqual(two.events);
+        expect(reset.chain).toEqual(two.chain);
+        expect(tsa.requests.map(request => request.path)).toEqual(["/cadence-good", "/cadence-good"]);
+        const checkpointRows = reset.events.filter(event => event.event_type === "time/checkpoint");
+        const finalVerification = fixture.verify();
+        const signaturesValid = checkpointSignatureValid(firstPath, first.sha256, fixture.monitorPem)
+          && checkpointSignatureValid(secondPath, second.sha256, fixture.monitorPem);
+        const oldFilesUnchanged = readFileSync(firstPath).equals(firstBytes) && readFileSync(firstTokenPath).equals(firstToken)
+          && readFileSync(secondPath).equals(secondBytes) && readFileSync(secondTokenPath).equals(secondToken);
+        cadence.final = { signaturesValid, oldFilesUnchanged, configUnchanged: JSON.stringify(filePin(configPin.path)) === JSON.stringify(configPin),
+          checkpointRows: checkpointRows.map(event => ({ id: event.id, eventHash: event.event_hash, meta: JSON.parse(event.meta_json) as unknown })),
+          ledger: { ok: finalVerification.ok, chain: finalVerification.chain.ok, governance: finalVerification.governance.ok,
+            anchored: finalVerification.trustRoot.anchored, errors: finalVerification.errors.length } };
+        expect(signaturesValid && oldFilesUnchanged).toBe(true);
+        expect(filePin(configPin.path)).toEqual(configPin);
+        expect(checkpointRows).toHaveLength(2);
+        expect(checkpointRows.map(event => JSON.parse(event.meta_json))).toEqual([
+          { checkpointSequence: 1, checkpointSha256: first.sha256, tokenSha256: sha256(firstToken) },
+          { checkpointSequence: 2, checkpointSha256: second.sha256, tokenSha256: sha256(secondToken) }
+        ]);
+        expect(finalVerification.ok && finalVerification.chain.ok && finalVerification.governance.ok && finalVerification.trustRoot.anchored).toBe(true);
       });
     });
   });
