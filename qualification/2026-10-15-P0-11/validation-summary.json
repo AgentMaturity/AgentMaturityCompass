@@ -1,0 +1,105 @@
+{
+  "source": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+  "metadataCommands": [
+    {
+      "phase": "freeze-evidence",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "python3 /private/tmp/p0-11-freeze-qualified-evidence-v2-20261015.py",
+      "exit": 0,
+      "durationMs": 3412,
+      "startedUtc": "2026-10-15T06:50:25.369041+00:00",
+      "log": "/private/tmp/p0-11-freeze-evidence-20261015.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e"
+    },
+    {
+      "phase": "build-canonical",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "python3 /private/tmp/p0-11-build-canonical-packet-v2-20261015.py",
+      "exit": 0,
+      "durationMs": 1639,
+      "startedUtc": "2026-10-15T07:00:20.315126+00:00",
+      "log": "/private/tmp/p0-11-build-canonical-20261015.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e"
+    },
+    {
+      "phase": "canonical-qualification-first",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:qualification",
+      "exit": 0,
+      "durationMs": 524,
+      "startedUtc": "2026-10-15T07:00:32.691547+00:00",
+      "log": "/private/tmp/p0-11-canonical-qualification-first-20261015.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e"
+    },
+    {
+      "phase": "precommit-normal-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1693,
+      "startedUtc": "2026-10-15T07:00:33.341792+00:00",
+      "log": "/private/tmp/p0-11-precommit-normal-freeze-20261015.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e"
+    },
+    {
+      "phase": "staged-diff-check",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "git diff --cached --check",
+      "exit": 2,
+      "durationMs": 32,
+      "startedUtc": "2026-10-15T07:00:35.370185+00:00",
+      "log": "/private/tmp/p0-11-staged-diff-check-20261015.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e"
+    }
+  ],
+  "qualificationGuardPassed": true,
+  "normalFreezePassed": true,
+  "stagedWhitespaceCheck": {
+    "exit": 2,
+    "log": {
+      "path": "/private/tmp/p0-11-staged-diff-check-20261015.log",
+      "bytes": 571,
+      "sha256": "4355bb4db2c1163fde81e90f41918df906f7cef68ba9ea9e26862c32fda55073"
+    },
+    "diagnostics": [
+      {
+        "copy": "evidence/3d6471987a90a4c050dc6d71311a52628fb1bd7676332747d17782289ce30288-stdout-stderr.log",
+        "line": 21,
+        "diagnostic": "new blank line at EOF",
+        "immutableOriginal": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-build/stdout-stderr.log",
+          "bytes": 945,
+          "sha256": "3d6471987a90a4c050dc6d71311a52628fb1bd7676332747d17782289ce30288"
+        }
+      },
+      {
+        "copy": "evidence/5c1981f23721d88c490c80f2e6c1f2324898f3f7acee719c8ece8c8c1f90e878-controller.py",
+        "line": 40,
+        "diagnostic": "trailing whitespace",
+        "immutableOriginal": {
+          "path": "/private/tmp/p0-11-causal-qualification-20261015/driver/controller.py",
+          "bytes": 28317,
+          "sha256": "5c1981f23721d88c490c80f2e6c1f2324898f3f7acee719c8ece8c8c1f90e878"
+        }
+      },
+      {
+        "copy": "evidence/5c1981f23721d88c490c80f2e6c1f2324898f3f7acee719c8ece8c8c1f90e878-p0-11-causal-controller-prepared-20261015.py",
+        "line": 40,
+        "diagnostic": "trailing whitespace",
+        "immutableOriginal": {
+          "path": "/private/tmp/p0-11-causal-controller-prepared-20261015.py",
+          "bytes": 28317,
+          "sha256": "5c1981f23721d88c490c80f2e6c1f2324898f3f7acee719c8ece8c8c1f90e878"
+        }
+      }
+    ],
+    "interpretation": "Every recorded whitespace diagnostic is individually matched to a byte-exact copied immutable evidence body. Original bytes and the ordinary nonzero result remain unchanged; no trim, ignore flag, source guard change or bypass was used."
+  },
+  "formalAcceptanceClosed": false,
+  "countBoundary": "Packaging/validation commands are separate from frozen20 original root records and9 causal processes. Primary receipt tests is9 aggregated across separate originalmap7+telemetry2, never one9-case run."
+}

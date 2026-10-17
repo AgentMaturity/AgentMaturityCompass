@@ -1,0 +1,102 @@
+{
+  "schema": "p125pc-inert-receipt-helper-actual-action-contract-successor/1",
+  "at": "2026-10-17T02:06:18.087552+00:00",
+  "parentPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+    "bytes": 40872,
+    "sha256": "4d825f2a41ae308837c1093c1db4636677b897e906aed3a9a98a6980b914f733",
+    "dev": 16777231,
+    "inode": 543992025,
+    "nlink": 1
+  },
+  "rootActualRuntimeReviewPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/root-runtime-review.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/root-runtime-review.json",
+    "bytes": 30212,
+    "sha256": "88b6051dab7a11566c43f22b12a1ae5f362bf2b4a39815f799f2936a0d66d214",
+    "dev": 16777231,
+    "inode": 543998886,
+    "nlink": 1
+  },
+  "immutableActionPins": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-action-apply1.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-action-apply1.json",
+      "bytes": 3851,
+      "sha256": "93b81a8340a2fe10428494477a2d45c6ccd4f9df1b3869b1f8b24823060eb0ec",
+      "dev": 16777231,
+      "inode": 543992223,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-action-restore1.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-action-restore1.json",
+      "bytes": 5835,
+      "sha256": "acb452e7a46b8b3d38f05e0878242718318d80058df739ce8a3cf10df7162e73",
+      "dev": 16777231,
+      "inode": 543993884,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-action-apply2.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-action-apply2.json",
+      "bytes": 4243,
+      "sha256": "e3ecf474031cd0e25aa1f02a24abe493af2f79fd408931cf2e2b236ad71f6b3b",
+      "dev": 16777231,
+      "inode": 543995540,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-action-restore2.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-action-restore2.json",
+      "bytes": 5843,
+      "sha256": "62e7e01be57b4558e629607603c423b84d6b22a8f1f98fc3a826229b675fee3c",
+      "dev": 16777231,
+      "inode": 543997199,
+      "nlink": 1
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/assemble-extension.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/assemble-extension.py.source.txt",
+      "bytes": 41612,
+      "sha256": "00144c15ee50956f0ef82ddabe1a9e70f6ffdc161390c72ac48120cd24d1cc23",
+      "dev": 16777231,
+      "inode": 543998944,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/v2-to-v3.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/v2-to-v3.patch.txt",
+      "bytes": 2422,
+      "sha256": "28fb8de5c6ae428a050d5b8ca9b2277f9a2f1d59767dd06829dabdda766bda27",
+      "dev": 16777231,
+      "inode": 543998945,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/c39-to-producer.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/c39-to-producer.patch.txt",
+      "bytes": 30254,
+      "sha256": "3f7af53dff15e017bfe0d59a297735ce8597d70c00604677f51db9acb5d887d1",
+      "dev": 16777231,
+      "inode": 543998946,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/README.md",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/README.md",
+      "bytes": 882,
+      "sha256": "fb007b7a366299cfbe98f40fdeb9a97660d3de70f8354590517273ed6ba59014",
+      "dev": 16777231,
+      "inode": 543998947,
+      "nlink": 1
+    }
+  ],
+  "reason": "V2 assumed an absent action flag. Preserve immutable action evidence and require four exact-pinned actual root closure attestations with argv/times/exit/dependent phase, in addition to unchanged operation and chronology checks.",
+  "noExecutionOrSourceMutation": true,
+  "rootFullReadPending": true,
+  "independentReviewPending": true
+}

@@ -1,0 +1,219 @@
+{
+  "schema": "p119-oracle-security-peer-audit/1",
+  "capturedUtc": "2026-10-15T22:39:57.585677+00:00",
+  "scope": "Closed original oracle19409B + evidence27458B and independent closed test/helper v1 only, checked against actual public source. No later active drafts read.",
+  "sourcePins": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19409,
+      "sha256": "f238a3dddc0f9aa5079ef1c8c859a5620948272fafefca5ca3081462a1d0eded"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 27458,
+      "sha256": "3a988d22647c9be6499b8df5c08fc3dde1d0281f1b1da4bda71c3f41e21b04f7"
+    }
+  ],
+  "findings": [
+    {
+      "id": "Q1",
+      "severity": "blocking for a claim of policy-backed default quorum; unmeasured static counterexample",
+      "source": "oracleEvidence.mjs:183-224,287-293",
+      "problem": "The helper verifies signed policy bytes and recounts signatures without the product CONSUMED shortcut, but quorum strength still comes from request.requiredApprovals/rolesAllowed/requireDistinctUsers. The approval-policy file is hashed and signed, not decoded or matched to its FINANCIAL rule. A consistently signed weaker one-vote/non-distinct request and matching record can therefore satisfy this verifier under the signed default two-distinct OWNER/AUDITOR policy. Signing request-authored fields is not a policy-strength derivation.",
+      "minimumDirection": "For this explicitly finite default-policy fixture, bind the exact reviewed default FINANCIAL tuple or independently pinned exact rule/policy bytes and reject weaker/mismatched request fields. A generic YAML policy engine is not required. Root owns scope/admission and the original measured baseline.",
+      "notClaimed": "No forged signature, arbitrary outside signer, runtime exploit or existing genuine producer failure was demonstrated."
+    },
+    {
+      "id": "Q2",
+      "severity": "small contract-validation defect; unmeasured static counterexample",
+      "source": "oracle.mjs:214-223",
+      "problem": "payload-minimal checks each bodyFields member is allowlisted and each normalized body key occurs in that list. It does not require unique strings or equal cardinality/exact set. A list with duplicated allowed names passes those checks, although actual provider Object.keys output cannot have duplicates.",
+      "minimumDirection": "Require a string array with no duplicates and exact equality/cardinality against the normalized body own-key set, while retaining all current field/value/digest and wire-completeness checks.",
+      "boundary": "This does not recover duplicate raw JSON keys or overwritten free-text wire bytes. The provider stores only normalized body, bodyFields, byte count and raw hash; the source already states raw wire bytes are not reconstructed."
+    }
+  ],
+  "validatedBoundaries": [
+    {
+      "topic": "nonvacuous complete result",
+      "source": "oracle.mjs:10-16,185-195,240-243",
+      "result": "Fixed16 IDs are always emitted; unavailable checks default false. Pass requires every fixed check true. Action chain needs selectedCount>0 and all selected views verified. No empty-check-array pass found."
+    },
+    {
+      "topic": "operator trust and scope",
+      "source": "oracle.mjs:26-63; oracleEvidence.mjs:22-52,59-69",
+      "result": "Manifest is environment-selected outside both roots; four actual argv scope fields match it. Real directory paths, public key PEM byte hashes, Node/CLI/case pins and strict beneath-workspace preimages/approvals are checked. JSON and final data files reject symlinks. External manifest/anchor provenance remains an operator assumption, not a signature produced by driver stdout. Directory UID/write permissions and full executable import closure are not proven by these checks."
+    },
+    {
+      "topic": "stable cold proof",
+      "source": "oracle.mjs:87-129,174-191,236-237; oracleEvidence.mjs:43-57,297-320; src/ledger/ledgerVerification.ts:199-218,294-339,663-741",
+      "result": "Cold child naturally closes, bounded fatal-decoded output, exact anchored monitor fields and empty top/chain/governance errors are required; no allow flags. Same DB/WAL presence, regular-file identity, size/hash and key-directory inputs are captured before CLI and after readonly extraction. SHM is separate coordination. Independently signed policies/approval/preimages are tracked stable during their later extraction. These are boundary snapshots, not an atomic adversarial multi-file snapshot or same-UID isolation."
+    },
+    {
+      "topic": "ledger versus action proof",
+      "source": "oracleEvidence.mjs:106-153; src/actions/actionJournal.ts:166-234,351-398,440-453",
+      "result": "Does not pretend session verify checks action tables. Independently checks canonical receipt hashes, seq0 onward, state/link rules, unique evidence-event use, index/head, intent digest, scope and authenticated v2 action members. It uses the cold CLI for unchanged ledger/v2/session cryptography. Complete inline action payload is required; archived/pruned action proof is refused. Literal installed action-state CLI acceptance remains open."
+    },
+    {
+      "topic": "three digests",
+      "source": "oracleEvidence.mjs:169-181,258-295; src/actions/authorizationRecord.ts:33-56; src/actions/normalizeArguments.ts:69-116",
+      "result": "Authorization record digest uses AMC_AUTHZ_V1 plus NUL; generic envelope uses canonical amc.args/v1 wrapper; provider body projection gets a separate canonical digest. Exact canonical amount from safe cents, USD, payee version/destination and record/intent protected bindings join them. No false equality is used. The finite envelope deliberately rejects noncanonical variants that the generic normalizer might otherwise normalize."
+    },
+    {
+      "topic": "approval decisions and consumed ordering",
+      "source": "oracleEvidence.mjs:189-224; src/approvals/approvalChainStore.ts:102-105; src/actions/authorize.ts:290 onward; src/tools/toolPipeline.ts:547-552",
+      "result": "Signatures bind request/decision/consumption bytes; status-normalized binding digest, exact intent, policy hashes, signed EXECUTE modes/roles, distinctness, identities and consumed execution ID are checked. Recheck consumes before journal.start constructs intent.startedAt, so consumedTs<=startedAt is supported by actual normal source order. Exact TTL equality is stricter than product now>expiresTs semantics and remains outside current finite positive tests. Q1 still prevents an unconditional policy-strength conclusion."
+    },
+    {
+      "topic": "effect-set selection",
+      "source": "oracle.mjs:135-160,199-237; oracleEvidence.mjs:303-318",
+      "result": "Receipt selection is scoped to pinned agent/tool/FINANCIAL. Other action rows are not independently authorized by this oracle. All provider commit-kind rows remain in the comparison; a foreign/unmatched commit cannot be silently omitted and fails proof/counts. Unknown provider kinds fail chain validation. Commit-to-receipt correlation is one-way; this finite slice does not qualify all F31 inverse contradiction/control cases."
+    },
+    {
+      "topic": "test producer and negatives",
+      "source": "tests-proposal helper v1:61-184,187-223,225-350; test v1:4-72",
+      "result": "Public APIs and genuine generated role keys/default two bound OWNER/AUDITOR decisions are source-compatible. Exact real record/envelope is fsynced before actual POST; async GET facts are kept by execution WeakMap; actual journal/recorder/session seals and cold child cleanup are used. No parent SQLite import. Eight cases use literal fixed check IDs and targeted negative criteria rather than importing the oracle verifier. Parent separately identified provider-only empty approval subdirs and type-of-evidence holes; closed v1 is preserved and parent is preparing later test versions."
+    },
+    {
+      "topic": "secrets and lifecycle",
+      "source": "oracle.mjs:87-129; test helper v1:187-223,250-255,277-301,338-350",
+      "result": "Nested children inherit outer PGID and prove PID ESRCH only; no detach/kill/retry or early success resolution. Test helper retains raw private streams/config keys/tokens under0600/private roots while public child projections contain hashes/metadata, not those streams or config bytes. Failed fixtures retain private secrets locally and require private handling; no external publication is authorized. Uncertain/hanging children are not transformed into a pass."
+    }
+  ],
+  "runtimeEvidence": "None from this review. Static counterexamples are not measured failures. Root owns missing-oracle RED and later source qualification.",
+  "admission": "Private source-only/test-only draft review. No repository/source/runtime admission is granted by this report.",
+  "limits": [
+    "No runtime, product import, parser/typecheck, SQL, network, R/source write or external message.",
+    "No actual baseline exploit, passing test claim, full F01-F38, policy/control result, source integration, external trust or formal completion.",
+    "Source author and independent test author remain separate; reviewer did not author either verifier implementation or these oracle expected cases.",
+    "Current v1 files/pins remain immutable; future corrections require new attributed closed candidates and separate delta review."
+  ],
+  "allReadsFinished": true,
+  "allWritesFinished": true,
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19409,
+      "sha256": "f238a3dddc0f9aa5079ef1c8c859a5620948272fafefca5ca3081462a1d0eded"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 27458,
+      "sha256": "3a988d22647c9be6499b8df5c08fc3dde1d0281f1b1da4bda71c3f41e21b04f7"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/interface-admission.json",
+      "bytes": 2562,
+      "sha256": "c37e2cd57f679c3b51b8b3705e6572e58fd9c514b488f2fe3b8c86bd1fe0bbbb"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/interface-proposal.json",
+      "bytes": 7286,
+      "sha256": "009727dbbcd6f2196b96a0122a3c7fc89094da6401adbc3965ffcca5e99520ce"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/interface-clarification.json",
+      "bytes": 1367,
+      "sha256": "9fc44bcbeb75f6d078979a7cced7e34bd3e8d7f6a2369e5a60a0b778a0128ae0"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/interface-proposal.json",
+      "bytes": 6339,
+      "sha256": "45554f7dd7a58af479e767b6a2659636b869c33060eb048705138d2691071578"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/tests/helpers/financeOracleQualification.ts",
+      "bytes": 28312,
+      "sha256": "e05d08d0c9b96edd241e07e431ee888ddaf7883b6a6af863713698e396ead66f"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/tests/lighthouse/financeOracle.test.ts",
+      "bytes": 4248,
+      "sha256": "6eb27cc9f186720bd2836e6a018607ddae85308d6a8ee762eca72ae9796a662d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionJournal.ts",
+      "bytes": 33320,
+      "sha256": "b42e3b88bc1a849d4c5409259a4328ea4f1a29a660bf9e0e4f55e1d96916e1b4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/receiptStates.ts",
+      "bytes": 7612,
+      "sha256": "7df3a6cf1e7f4a54e384ede867577dcf184c669e607ce164a578f72a93d25446"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/authorizationRecord.ts",
+      "bytes": 4176,
+      "sha256": "03707d72dfecef59af3e003dcbca4a675b06dffd5f568bada178d171f446150d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/authorize.ts",
+      "bytes": 20450,
+      "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/normalizeArguments.ts",
+      "bytes": 6300,
+      "sha256": "4efdbc0db4e4926c87509754e94867b1eafd45b13a2d14dca9a79749dbe81908"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/contracts/v1/authorizationRecord.ts",
+      "bytes": 3279,
+      "sha256": "2e67a443157adabbcd05ab47f52619a26a93c4edf5bcb2a2da4c1e9deccab953"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalQuorum.ts",
+      "bytes": 4388,
+      "sha256": "0f2c806ee6bb748f209f649b1c19092ec93bfe75b349c8a0aa381a90549e62a8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalChainStore.ts",
+      "bytes": 26341,
+      "sha256": "72f14a9fe4a01375ab20a4129f05a7ef8c2ccd6959cdc2777a87f429d7f443ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalEngine.ts",
+      "bytes": 21065,
+      "sha256": "a2257cea092960d8815e6608e4d2cd416cba5d429eabb6e3a1147d7902e91b06"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-session-commands.ts",
+      "bytes": 17552,
+      "sha256": "c640189b30cecb2539e59cb2f088d3a4a8277f3431cc2a145c88706694e015ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+      "bytes": 35501,
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/vault/vault.ts",
+      "bytes": 29540,
+      "sha256": "f37212a91c1e9ea1f35dac7bcfd03481e5ce26a1fe80a56f6843e3fbb8e02e84"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/toolhub/toolhubValidators.ts",
+      "bytes": 14760,
+      "sha256": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolRegistry.ts",
+      "bytes": 8048,
+      "sha256": "450c22e67f490d19fb7e90236c7240090ed05b4366e31eb179bde4384f8eae7c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "bytes": 32498,
+      "sha256": "185437847aef58288e7d56601d8fef7d47de3fbbbb9ec0e6adf51d23a92d429b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/fleet/paths.ts",
+      "bytes": 5396,
+      "sha256": "3afaf4c383ddf5c5d6faeb383bc4e6db3f2f250457a23e142a7ed28b4506a1e9"
+    }
+  ]
+}

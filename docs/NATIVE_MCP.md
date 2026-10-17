@@ -106,3 +106,45 @@ amc agent-loop mcp-catalog --config mcp.json --authorize
 AMC discovers the authorization server from the server's protected-resource metadata, checks that the metadata names this server, that the authorization server's metadata names the same issuer and that it supports S256 PKCE, then prints an authorization URL on stderr. Open it in a browser; AMC never opens one. The loopback callback checks `state` and the issuer (`iss`), exchanges the code with the PKCE verifier and the server's resource indicator, stores the grant in the AMC credential store under the issuer and resource, and reads the catalog. If the server answers `insufficient_scope`, AMC asks for the union of the granted and challenged scopes, at most twice. Server error text, codes and tokens are never printed.
 
 Later `agent-loop run` and `chat` invocations and ACP sessions rediscover the server's current issuer, use only the grant stored for that issuer and resource, refresh it when it is due, and send the token only in the `Authorization` header to the pinned endpoint. Without a usable grant they fail with `AUTH_REQUIRED` and the `--authorize` command. A token is never refreshed during a mount: if the server rejects it, the mount is disposed and the next mount refreshes or asks for `--authorize`. The `mcp-catalog` output and mount receipt record `auth: { issuer, scopes, tokenExpiresAt }`, never a token. Authorization-server endpoints must be HTTPS; literal loopback HTTP is accepted only for a loopback development MCP endpoint. Stdio servers keep using `envRefs`. Applications that call `mountNativeMcpServer` directly supply the resolved `Authorization` header themselves.
+
+## Local qualification checkpoint (2026-10-16)
+
+The local source candidate passed 30 focused fixture cases in separate bounded runs:
+
+| Fixture | Passed cases | Reached scope |
+| --- | ---: | --- |
+| [Legacy fallback](../tests/mcp/mcpLegacyFallback.test.ts) | 5 | Unpinned fallback, exact version pins and refusal, reviewed version-bound catalog and mount receipts |
+| [Stateless client](../tests/mcp/mcp20260728.test.ts) | 13 | Per-request metadata/headers, no sessions, one read reissue with a new id, exhaustion, catalog/grant refusal and fresh reads despite TTL hints, result types, response ids and typed unknown outcomes |
+| [OAuth client](../tests/mcp/mcpOauth.test.ts) | 12 | Discovery, issuer/state/S256 checks, registration/redirect refusals, real grant storage/refresh and issuer/resource separation, two scope step-ups, governed output/evidence redaction and a mount receipt |
+
+The original three-case stateless run passed two cases and failed the strict session `tool/result` assertion: it recorded `ERROR` where `TOOL_OUTCOME_UNKNOWN` was required. A four-file repair in `nativeMcpClient.ts`, `toolTypes.ts`, `toolPipeline.ts` and `pipelineToolSeam.ts` carries the transport's classified unknown outcome through existing typed effect metadata to the loop and committed result row. It does not infer unknown from remote diagnostic text. The unchanged three cases then passed 3/3, including the strict typed row; the expanded stateless cohort also checks that untrusted error text containing the marker remains an ordinary error. Existing cancellation, denial and journal receipt precedence is retained.
+
+A broader 27-file MCP/pipeline/journal regression run remains RED at 425/428. Its three failures match the earlier held P1-02 post-grant cancellation and diagnostic cases; the relevant authorization source and test bytes were unchanged. They remain unresolved and unwaived. These local fixture results do not close whole P1-39 qualification. Fresh-source qualification, the required replay/issuer causal controls and final quality gates remain open at this checkpoint; no release or live-vendor TLS result is claimed.
+
+ADR 010's documented choices remain in force: every invocation rereads the catalog rather than using TTL/cache hints or `subscriptions/listen`; `input_required` fails closed without sampling, roots or elicitation; stdio termination requires a new reviewed mount. The protected-resource same-origin path-prefix relaxation and lack of a pinned authorization issuer in config remain documented limitations.
+
+Fixture-owned HTTP servers and callback-driver clients have observed request/response/socket closure. The product OAuth callback still calls `closeAllConnections()` and nonawaited `close()`; its internal server-close event was not observed. Public configuration resolution also retains its normal inherited environment and user dotenv layers, even with explicit credential paths. Direct fixture stores disable those layers. The evidence claims stay within those boundaries.
+
+This actual synthetic loopback mount receipt came from the governed OAuth fixture on 2026-10-16. The issuer port belongs to that run, and the grant declared no expiry. The sample contains the reviewed protocol/catalog and issuer/scope/expiry facts without a token:
+
+```json
+{
+  "serverId": "oauth_fixture",
+  "catalogDigest": "25592d15431056566b4dde61e8de7fa3ceabbf6c4a25d497b21cb49446d11d48",
+  "protocol": {
+    "negotiatedVersion": "2026-07-28",
+    "mode": "stateless",
+    "serverInfo": {
+      "name": "synthetic-oauth-catalog",
+      "version": "1"
+    }
+  },
+  "auth": {
+    "issuer": "http://127.0.0.1:50185/issuer/path",
+    "scopes": [
+      "read"
+    ],
+    "tokenExpiresAt": null
+  }
+}
+```

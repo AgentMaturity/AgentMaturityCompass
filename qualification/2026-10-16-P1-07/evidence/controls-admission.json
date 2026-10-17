@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-16T18:13:45.170861+00:00",
+  "rootControlPatchesAndReviewRead": true,
+  "canonicalActualTests": 971,
+  "canonicalActualFiles": 17,
+  "canonicalJoinAndHooksReviewed": true,
+  "freshFreezePassed": true,
+  "onlyOwnedFreshCheckoutSourceTargets": true,
+  "sourceOnlyNoCompiledSensitivity": true,
+  "preserveAllHeldSourceAndNoBaselineChanges": true,
+  "eachControlRequiresOwnActualFailureClassificationAndExactRestorationRun": true
+}

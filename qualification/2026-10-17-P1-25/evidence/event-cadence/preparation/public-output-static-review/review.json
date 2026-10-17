@@ -1,0 +1,240 @@
+{
+  "schema": "p125ec-independent-public-output-curator-static-review/1",
+  "at": "2026-10-17T01:21:04.268657+00:00",
+  "blockers": [],
+  "helperPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/prepare-public-output.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/prepare-public-output.py.source.txt",
+    "bytes": 17505,
+    "sha256": "2b454cbdc55233c54cbf4cb9b34ed1f1c2aaeb5dcfdfe7bb094bb9d45705be14",
+    "dev": 16777231,
+    "inode": 543909091,
+    "nlink": 1
+  },
+  "full161LineHelperBaseAndCompleteDeltaRead": true,
+  "publishedDeltaRecomputedExactly": true,
+  "oldWindowProofBlockAndNonwindowReplyGuardByteExact": true,
+  "allFiveSealedOutputsAndSixteenAuthorInputPinsExact": true,
+  "allSixPhaseSelectorsRootReviewAndActualOutcomeAuditMetadataConsistent": true,
+  "actualPublicJsonFilesVerified": 60,
+  "phaseMetadataFindings": [
+    {
+      "phase": "p125ec-source-combined",
+      "tests": {
+        "total": 23,
+        "passed": 23,
+        "failed": 0,
+        "skipped": 0
+      },
+      "publicCounts": {
+        "grantPublicCount": 6,
+        "checkpointPublicCount": 4,
+        "children": 38,
+        "explicitChildStreamHashCount": 76,
+        "closedSockets": 10,
+        "closedLedgerOwners": 28
+      },
+      "cadence": {
+        "completeBody": true,
+        "capturedRequests": 2,
+        "independentProofs": 2,
+        "observationalUnverifiedRequests": 0,
+        "stageIds": [
+          "initial",
+          "checkpoint-only",
+          "one-new-audit",
+          "two-new-audits",
+          "reset"
+        ],
+        "lastReplyMatchesLastIndependentProofOnly": true,
+        "defaultHomeFactsExactProjection": true
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "tests": {
+        "total": 23,
+        "passed": 23,
+        "failed": 0,
+        "skipped": 0
+      },
+      "publicCounts": {
+        "grantPublicCount": 6,
+        "checkpointPublicCount": 4,
+        "children": 38,
+        "explicitChildStreamHashCount": 76,
+        "closedSockets": 10,
+        "closedLedgerOwners": 28
+      },
+      "cadence": {
+        "completeBody": true,
+        "capturedRequests": 2,
+        "independentProofs": 2,
+        "observationalUnverifiedRequests": 0,
+        "stageIds": [
+          "initial",
+          "checkpoint-only",
+          "one-new-audit",
+          "two-new-audits",
+          "reset"
+        ],
+        "lastReplyMatchesLastIndependentProofOnly": true,
+        "defaultHomeFactsExactProjection": true
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "tests": {
+        "total": 23,
+        "passed": 22,
+        "failed": 1,
+        "skipped": 0
+      },
+      "publicCounts": {
+        "grantPublicCount": 6,
+        "checkpointPublicCount": 4,
+        "children": 37,
+        "explicitChildStreamHashCount": 74,
+        "closedSockets": 10,
+        "closedLedgerOwners": 24
+      },
+      "cadence": {
+        "completeBody": false,
+        "capturedRequests": 2,
+        "independentProofs": 1,
+        "observationalUnverifiedRequests": 1,
+        "stageIds": [
+          "initial",
+          "checkpoint-only",
+          "one-new-audit"
+        ],
+        "lastReplyMatchesLastIndependentProofOnly": true,
+        "defaultHomeFactsExactProjection": true
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "tests": {
+        "total": 23,
+        "passed": 23,
+        "failed": 0,
+        "skipped": 0
+      },
+      "publicCounts": {
+        "grantPublicCount": 6,
+        "checkpointPublicCount": 4,
+        "children": 38,
+        "explicitChildStreamHashCount": 76,
+        "closedSockets": 10,
+        "closedLedgerOwners": 28
+      },
+      "cadence": {
+        "completeBody": true,
+        "capturedRequests": 2,
+        "independentProofs": 2,
+        "observationalUnverifiedRequests": 0,
+        "stageIds": [
+          "initial",
+          "checkpoint-only",
+          "one-new-audit",
+          "two-new-audits",
+          "reset"
+        ],
+        "lastReplyMatchesLastIndependentProofOnly": true,
+        "defaultHomeFactsExactProjection": true
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "tests": {
+        "total": 23,
+        "passed": 22,
+        "failed": 1,
+        "skipped": 0
+      },
+      "publicCounts": {
+        "grantPublicCount": 6,
+        "checkpointPublicCount": 4,
+        "children": 36,
+        "explicitChildStreamHashCount": 72,
+        "closedSockets": 9,
+        "closedLedgerOwners": 27
+      },
+      "cadence": {
+        "completeBody": false,
+        "capturedRequests": 1,
+        "independentProofs": 1,
+        "observationalUnverifiedRequests": 0,
+        "stageIds": [
+          "initial",
+          "checkpoint-only",
+          "one-new-audit",
+          "two-new-audits"
+        ],
+        "lastReplyMatchesLastIndependentProofOnly": true,
+        "defaultHomeFactsExactProjection": true
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "tests": {
+        "total": 23,
+        "passed": 23,
+        "failed": 0,
+        "skipped": 0
+      },
+      "publicCounts": {
+        "grantPublicCount": 6,
+        "checkpointPublicCount": 4,
+        "children": 38,
+        "explicitChildStreamHashCount": 76,
+        "closedSockets": 10,
+        "closedLedgerOwners": 28
+      },
+      "cadence": {
+        "completeBody": true,
+        "capturedRequests": 2,
+        "independentProofs": 2,
+        "observationalUnverifiedRequests": 0,
+        "stageIds": [
+          "initial",
+          "checkpoint-only",
+          "one-new-audit",
+          "two-new-audits",
+          "reset"
+        ],
+        "lastReplyMatchesLastIndependentProofOnly": true,
+        "defaultHomeFactsExactProjection": true
+      }
+    }
+  ],
+  "metadataDerivedCandidateInventory": {
+    "uniqueDestinations": 178,
+    "explicitLifecycleJson": 36,
+    "explicitCheckpointJson": 24,
+    "prospectivePublicCertificateJsonBundles": 36,
+    "notMaterializedOutputCount": true
+  },
+  "guardFindings": [
+    "The exact six current phase inputs and root review schema/source commit are required. Historical diagnostic evidence stays in the unchanged earlier base; none is newly selected.",
+    "The checkpoint fact comparison adds defaultHome/eventCadence and retains all previous fact fields. Public default-home trust file pins are metadata only and raw trust JSON is never selected.",
+    "Each appended cadence proof uses its own query/response and named natural verification child, exact PID/argv/cwd, sequence/digest/token and semantic audit proof. The signer hash must equal the DER SHA of exactly named public tsa.pem when root executes.",
+    "M1 has two captured pairs but one independent proof; the later pair receives observational-unverified, proof null and signer hash null. M2 has one captured pair and one independent proof. Shared replyObservation matches only the last independent proof.",
+    "The window proof block and old non-window last-reply branch remain byte-exact.",
+    "Only explicit emitted lifecycle/checkpoint JSON, named queries/replies and exactly named root.pem/tsa.pem certificates may be read by the curator. No traversal, private key, child-stream, raw PEM or default-home trust JSON publication is introduced.",
+    "Before/after public PEM pins and exactly one certificate plus no PRIVATE KEY marker gate DER conversion. Certificate output contains public DER and source PEM hashes only.",
+    "Directories and files use exclusive creation. Source paths and destinations are unique; counts and resources derive from selected actual metadata. Canonical cases are not summed."
+  ],
+  "limitations": [
+    "Static helper and JSON metadata review only. The helper was not imported, parsed, compiled or executed.",
+    "No PEM, DER certificate, query, response, trust JSON, private key, child stream, source, index, QA, network or reservation path was opened.",
+    "Declared binary proof hashes were compared as metadata. Actual binary hashing, leaf DER conversion and output materialization remain root execution checks.",
+    "No cryptographic, whole dependency/isolation, receipt assembly, source admission, publication, whole-issue or plan completion credit."
+  ],
+  "reviewerInspectionDiagnosis": {
+    "initialFailure": "A reviewer-side exact-text assertion had one extra leading indentation space in its non-window comparison literal. It failed before output files were written.",
+    "correction": "Both actual blocks were read and shown identical; the comparison literal was corrected to their exact four/five/five-space indentation. No helper/product execution or input mutation occurred."
+  },
+  "allHeldDecisionsClaudeWorkF37SkipD15HoldFreezeAndGlobalQualityRedIntact": true,
+  "rootSoleExecutorAndExplicitAdopter": true
+}

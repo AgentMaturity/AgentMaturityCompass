@@ -12,8 +12,8 @@ import {
   writeFileSync
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, isAbsolute, join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
+import { dirname, isAbsolute, join } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { afterEach, describe, expect, test } from "vitest";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
 import { observedAepActionEventSchema } from "../src/bridge/hookIngress.js";
@@ -659,7 +659,7 @@ describe("AMC provider hook integration", () => {
     expect(() => amcCliScriptPath("control", npxModuleUrl))
       .toThrowError(expect.objectContaining<Partial<HookIntegrationError>>({ code: "HOOK_PATH_UNSAFE" }));
     expect(amcCliScriptPath("observe", npxModuleUrl)).toBe(join(npxPackage, "dist", "cli.js"));
-    expect(amcCliScriptPath("control")).toBe(resolve("dist", "cli.js"));
+    expect(amcCliScriptPath("control")).toBe(fileURLToPath(new URL("../dist/cli.js", import.meta.url)));
   });
 
   test("recovers a stale installer lock but serializes a current writer", () => {

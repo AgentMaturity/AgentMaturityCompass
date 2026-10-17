@@ -38,6 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     strategy:
+      fail-fast: false
       matrix:
         node-version: ["22", "24"]
     steps:
@@ -156,6 +157,11 @@ jobs:
       # non-synthetic emitter; prints the per-level reachability table.
       - name: Diagnostic gate reachability
         run: npm run check:gates
+
+      - name: Set up Helm for full test suite
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5
+        with:
+          version: "v4.3.0"
 
       # Both gates existed as npm scripts that no workflow ran, so docs drift
       # and incident-readiness regressions could merge and ship unchecked.

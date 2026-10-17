@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-54",
+  "date": "2026-10-17",
+  "commit": "b1164c97420a4b11393ff4ebf48be264bb164d93",
+  "branch": "codex/p1-54-qualification",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass/tests/toolhubJournal.test.ts /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass/tests/toolhubPipelineTools.test.ts /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass/tests/governorToolhubWorkorders.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p154-post-one-test.raw.json",
+      "exit": 0,
+      "durationMs": 6828
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run lint",
+      "exit": 0,
+      "durationMs": 4568
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run typecheck",
+      "exit": 0,
+      "durationMs": 25613
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 37185
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run build",
+      "exit": 0,
+      "durationMs": 30346
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1796
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:counts",
+      "exit": 1,
+      "durationMs": 497
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:docs-drift",
+      "exit": 0,
+      "durationMs": 320
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:gates",
+      "exit": 0,
+      "durationMs": 328
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:threat-model",
+      "exit": 0,
+      "durationMs": 268
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:third-party-notices",
+      "exit": 0,
+      "durationMs": 253
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:qualification",
+      "exit": 0,
+      "durationMs": 1062
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:duplicates",
+      "exit": 1,
+      "durationMs": 614
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:dead-code",
+      "exit": 1,
+      "durationMs": 2796
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1189
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run gen-counts",
+      "exit": 0,
+      "durationMs": 598
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 574
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:docs-drift",
+      "exit": 0,
+      "durationMs": 333
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1543
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:qualification",
+      "exit": 0,
+      "durationMs": 978
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass diff --check",
+      "exit": 0,
+      "durationMs": 28
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass add -- tests/toolhubJournal.test.ts README.md CONTRIBUTING.md website/index.html website/lite.html website/i18n.js docs/content/show-hn-draft.md docs/content/reddit-launch-drafts.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md whitepaper/AMC_WHITEPAPER_v1.md",
+      "exit": 1,
+      "durationMs": 27
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass commit -m 'test(toolhub): qualify journal helper contracts'",
+      "exit": 0,
+      "durationMs": 58
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass run check:clean-source -- --keep",
+      "exit": 0,
+      "durationMs": 58722
+    },
+    {
+      "cmd": "python3 -c 'import json,subprocess,sys\nout={}\nfor name,root in [('\"'\"'source'\"'\"',sys.argv[1]),('\"'\"'fresh'\"'\"',sys.argv[2])]:\n    data={}\n    for key,args in [('\"'\"'head'\"'\"',['\"'\"'rev-parse'\"'\"','\"'\"'HEAD'\"'\"']),('\"'\"'branch'\"'\"',['\"'\"'branch'\"'\"','\"'\"'--show-current'\"'\"']),('\"'\"'status'\"'\"',['\"'\"'status'\"'\"','\"'\"'--porcelain=v1'\"'\"','\"'\"'--untracked-files=all'\"'\"','\"'\"'-z'\"'\"']),('\"'\"'index'\"'\"',['\"'\"'diff'\"'\"','\"'\"'--cached'\"'\"','\"'\"'--name-only'\"'\"','\"'\"'-z'\"'\"'])]:\n        r=subprocess.run(['\"'\"'git'\"'\"','\"'\"'--no-optional-locks'\"'\"','\"'\"'-C'\"'\"',root,*args],capture_output=True)\n        assert r.returncode==0 and r.stderr==b'\"'\"''\"'\"'\n        data[key]=r.stdout.decode()\n    out[name]={'\"'\"'root'\"'\"':root,**data}\nassert out['\"'\"'source'\"'\"']['\"'\"'head'\"'\"']==out['\"'\"'fresh'\"'\"']['\"'\"'head'\"'\"']=='\"'\"'b1164c97420a4b11393ff4ebf48be264bb164d93\\n'\"'\"'\nassert out['\"'\"'source'\"'\"']['\"'\"'branch'\"'\"']=='\"'\"'codex/p1-54-qualification\\n'\"'\"' and out['\"'\"'fresh'\"'\"']['\"'\"'branch'\"'\"']=='\"'\"'\\n'\"'\"'\nassert all(out[x]['\"'\"'status'\"'\"']==out[x]['\"'\"'index'\"'\"']=='\"'\"''\"'\"' for x in out)\nprint(json.dumps(out,indent=2))' /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-wIbOm0/checkout",
+      "exit": 1,
+      "durationMs": 531
+    },
+    {
+      "cmd": "python3 -c 'import json,subprocess,sys\nout={}\nfor name,root in [('\"'\"'source'\"'\"',sys.argv[1]),('\"'\"'fresh'\"'\"',sys.argv[2])]:\n    data={}\n    for key,args in [('\"'\"'head'\"'\"',['\"'\"'rev-parse'\"'\"','\"'\"'HEAD'\"'\"']),('\"'\"'branch'\"'\"',['\"'\"'branch'\"'\"','\"'\"'--show-current'\"'\"']),('\"'\"'status'\"'\"',['\"'\"'status'\"'\"','\"'\"'--porcelain=v1'\"'\"','\"'\"'--untracked-files=all'\"'\"','\"'\"'-z'\"'\"']),('\"'\"'index'\"'\"',['\"'\"'diff'\"'\"','\"'\"'--cached'\"'\"','\"'\"'--name-only'\"'\"','\"'\"'-z'\"'\"'])]:\n        r=subprocess.run(['\"'\"'git'\"'\"','\"'\"'--no-optional-locks'\"'\"','\"'\"'-C'\"'\"',root,*args],capture_output=True)\n        data[key]={'\"'\"'exit'\"'\"':r.returncode,'\"'\"'stdout'\"'\"':r.stdout.decode(),'\"'\"'stderr'\"'\"':r.stderr.decode()}\n    out[name]={'\"'\"'root'\"'\"':root,**data}\nprint(json.dumps(out,indent=2),flush=True)\nassert all(out[x][k]['\"'\"'exit'\"'\"']==0 and out[x][k]['\"'\"'stderr'\"'\"']=='\"'\"''\"'\"' for x in out for k in ['\"'\"'head'\"'\"','\"'\"'branch'\"'\"','\"'\"'status'\"'\"','\"'\"'index'\"'\"'])\nassert out['\"'\"'source'\"'\"']['\"'\"'head'\"'\"']['\"'\"'stdout'\"'\"']==out['\"'\"'fresh'\"'\"']['\"'\"'head'\"'\"']['\"'\"'stdout'\"'\"']=='\"'\"'b1164c97420a4b11393ff4ebf48be264bb164d93\\n'\"'\"'\nassert out['\"'\"'source'\"'\"']['\"'\"'branch'\"'\"']['\"'\"'stdout'\"'\"']=='\"'\"'codex/p1-54-qualification\\n'\"'\"' and out['\"'\"'fresh'\"'\"']['\"'\"'branch'\"'\"']['\"'\"'stdout'\"'\"']=='\"'\"''\"'\"'\nassert all(out[x]['\"'\"'status'\"'\"']['\"'\"'stdout'\"'\"']==out[x]['\"'\"'index'\"'\"']['\"'\"'stdout'\"'\"']=='\"'\"''\"'\"' for x in out)\n' /Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-wIbOm0/checkout",
+      "exit": 0,
+      "durationMs": 557
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-wIbOm0/checkout /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-wIbOm0/checkout/tests/toolhubJournal.test.ts /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-wIbOm0/checkout/tests/toolhubPipelineTools.test.ts /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-wIbOm0/checkout/tests/governorToolhubWorkorders.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p154-fresh-cohort.raw.json",
+      "exit": 1,
+      "durationMs": 1214
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-wIbOm0/checkout /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-wIbOm0/checkout/tests/toolhubJournal.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-wIbOm0/checkout/tests/toolhubPipelineTools.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-wIbOm0/checkout/tests/governorToolhubWorkorders.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p154-fresh-canonical-cohort.raw.json",
+      "exit": 0,
+      "durationMs": 7585
+    },
+    {
+      "cmd": "'git' '-C' '/Users/sid/.codex/worktrees/p1-54-qualification/AgentMaturityCompass' 'check-ignore' '--no-index' '-v' '-z' '--' 'qualification/2026-10-17-P1-54/README.md' 'qualification/2026-10-17-P1-54/receipt.json' 'qualification/2026-10-17-P1-54/ordered-case-audit.json'",
+      "exit": 128,
+      "durationMs": 12
+    }
+  ],
+  "tests": {
+    "total": 58,
+    "passed": 58,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "c9d6fd7309ab7b2d279516cba3ee77ca5753036928df3f94307f6ca5d9ed64de"
+    },
+    {
+      "path": "ordered-case-audit.json",
+      "sha256": "5e55f97a1c5d6277e89705e0efb7e16a16ca3e088d9e5c040eff7d8c742bf9bd"
+    }
+  ],
+  "notes": "This is bounded helper-contract qualification. Complete P1-54 acceptance, formal dependencies and the full plan remain open. One population of 58 cases passed in both ordinary and fresh runs; the counts are not summed. The source-count check first exited 1; the unchanged generator repaired only numeric inventory tokens and the later check passed. Dead-code and duplicate gates remain RED at 2,712 and 1,268 findings. Complete source finding identities and multiplicity are unchanged; no waiver was used. Git add exited 1 with an ignored-parent warning while staging all 11 exact files. Complete staged blobs were verified before the ordinary local commit, without force, retry or ignore changes. A read-only provenance assertion exited 1 because it expected a newline for a detached branch; corrected observations retain the actual empty output. The first fresh command exited 1 with zero collected cases because /var filters differed from the canonical /private/var root. The later distinct command executed the same three physical files and passed. A later invalid ignore-check invocation used -z without --stdin: Git exited 128 and the unchanged wrapper returned 70, retaining both stop markers and three failed artifacts. Its receipt row uses the recorded child duration of 12 ms, not a fabricated normal command.json. No receipt files were copied into the source tree during that stop. The wrapper working directory and HEAD refer to the retained P1-09 root; explicit source bindings identify tested commit b1164c97420a4b11393ff4ebf48be264bb164d93. Observer and owned-group evidence does not prove universal cleanup or isolation. All Claude work and explicit holds remain preserved, including F37, the ignored D15 archive, P1-25 publication and P1-01 gaps. No push, merge, release, or freeze or quality policy change occurred."
+}

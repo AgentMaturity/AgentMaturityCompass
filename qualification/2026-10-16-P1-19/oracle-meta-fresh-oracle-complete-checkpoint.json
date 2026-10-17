@@ -1,0 +1,46 @@
+{
+  "capturedUtc": "2026-10-15T22:59:05.682145+00:00",
+  "head": "2e136618b1b011a7269f37f8c2715b180b5b5a46",
+  "Rclean": true,
+  "sealedComponentFiles": {
+    "evidence.json": {
+      "bytes": 164462,
+      "sha256": "d5083491b84693d0fc1ddc47b5d9108ed82cf913efd32a0b22eda42e3b4bdf46"
+    },
+    "fresh-components.observer.json": {
+      "bytes": 59827,
+      "sha256": "89c18a7c1a8a7a280110de96ba239b0cde0863219ecfe1e66d02e72479b93c18"
+    },
+    "fresh-components.raw.json": {
+      "bytes": 45656,
+      "sha256": "75648cf514242ed13cb3c504167439ba18194fc66551bddf85bd7049365d8e24"
+    },
+    "README.md": {
+      "bytes": 8496,
+      "sha256": "b25a234319ae2148ec794e27d9db426d6880879aef36ade0e1331cf07d31486e"
+    },
+    "original-components.raw.json": {
+      "bytes": 42304,
+      "sha256": "2c120b24d0281bca053e24b876f64548d88797ffd9a7973f08e8407d88397951"
+    },
+    "receipt.json": {
+      "bytes": 8265,
+      "sha256": "9525e5ce3be3759dbddf59e37fc40f0195333f5e1459c4ffd7de808a32ab55ba"
+    }
+  },
+  "oracleFreshTests": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0
+  },
+  "privateFreshAudit": {
+    "path": "/private/tmp/p1-19-oracle-implementation-20261016/fresh-oracle-audit/review.json",
+    "sha256": "eadebbac70f07a4b588518b1af8b19245ac6a581b8a45c0af978e4cf400d7647"
+  },
+  "oracleRuntimePhasesClosed": 16,
+  "qualificationSupplementPending": true,
+  "nextPrivateToolsAdmission": "/private/tmp/p1-19-finance-tools-implementation-20261016/prospective-admission.json",
+  "formalP119Complete": false,
+  "completePlanGoal": "active"
+}

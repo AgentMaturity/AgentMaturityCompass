@@ -1,0 +1,155 @@
+{
+  "schema": "p125k-root-actual-runtime-review/1",
+  "at": "2026-10-16T23:47:54.155625+00:00",
+  "sourceCommit": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout",
+  "blockers": [],
+  "phases": [
+    {
+      "phase": "p125k-source-combined",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hooks": [
+        3,
+        4
+      ],
+      "children": 22,
+      "streams": 44,
+      "sockets": 6,
+      "ledgerOwners": 9,
+      "outcomeSha256": "d2aafa5affb0220bf3c68b90785d16a7b28197d110f73251c7aa97704509b8ad"
+    },
+    {
+      "phase": "p125k-source-after-eof",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hooks": [
+        3,
+        4
+      ],
+      "children": 22,
+      "streams": 44,
+      "sockets": 6,
+      "ledgerOwners": 9,
+      "outcomeSha256": "0dc93322d6312d81632b8c8e1f69d5efa14aa4f3beeb49a32fe5d1556d03f8e1"
+    },
+    {
+      "phase": "p125k-fresh-canonical-corrected-path",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hooks": [
+        3,
+        4
+      ],
+      "children": 22,
+      "streams": 44,
+      "sockets": 6,
+      "ledgerOwners": 9,
+      "outcomeSha256": "7769033d3aa5eae403e69239a501de9db75ee251c3c26176aa3a15bea48ee91d"
+    },
+    {
+      "phase": "p125k-m1",
+      "tests": {
+        "total": 21,
+        "passed": 20,
+        "failed": 1,
+        "skipped": 0
+      },
+      "hooks": [
+        3,
+        4
+      ],
+      "children": 22,
+      "streams": 44,
+      "sockets": 6,
+      "ledgerOwners": 9,
+      "outcomeSha256": "72b4b7323fa3f16ea203057bda4a9d7038e42436c7a1d97b842b5276e87bd9fe"
+    },
+    {
+      "phase": "p125k-restore1",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hooks": [
+        3,
+        4
+      ],
+      "children": 22,
+      "streams": 44,
+      "sockets": 6,
+      "ledgerOwners": 9,
+      "outcomeSha256": "fd9437f2c708d808400b13790fd7aff836b6715ca5ebbf82c979ce1e1fc19356"
+    },
+    {
+      "phase": "p125k-m2",
+      "tests": {
+        "total": 21,
+        "passed": 20,
+        "failed": 1,
+        "skipped": 0
+      },
+      "hooks": [
+        3,
+        4
+      ],
+      "children": 22,
+      "streams": 44,
+      "sockets": 6,
+      "ledgerOwners": 9,
+      "outcomeSha256": "1aa2de57e93277dbb5d14cea1de821764d3362112fa8bbfe9664d9a077c74835"
+    },
+    {
+      "phase": "p125k-restore2",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hooks": [
+        3,
+        4
+      ],
+      "children": 22,
+      "streams": 44,
+      "sockets": 6,
+      "ledgerOwners": 9,
+      "outcomeSha256": "842e6ae618243a3e4af8f9c5cc77d4bb368b102f68f7891208953a795c98bf07"
+    }
+  ],
+  "same21CaseCohortNotSummed": true,
+  "manualControlClassifications": [
+    "m1-classification.json",
+    "m2-classification.json"
+  ],
+  "sourceOnlyControlTargetsRestored": true,
+  "finalPreservation": "preservation-final.json",
+  "failedOriginalFresh": "p125k-fresh-canonical",
+  "failedOriginalCounts": {
+    "total": 21,
+    "passed": 17,
+    "failed": 4,
+    "skipped": 0
+  },
+  "failedOriginalNotControlOrAcceptanceCredit": true,
+  "launcherDiagnosis": "fresh-launcher-path-diagnosis.json",
+  "quality": "RED",
+  "wholeIssueComplete": false,
+  "allHoldsRetained": true
+}

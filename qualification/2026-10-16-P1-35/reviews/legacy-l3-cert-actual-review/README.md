@@ -1,0 +1,11 @@
+# Actual historical certificate and storage outcome
+
+The attempt succeeded in issuing a genuine historical diagnostic certificate under the unchanged signed default policy. It completed all stages without a failure object: init0, API1 and launcher1. Exit1 records exactL3=false, not certificate-gate refusal. The244-question seeder emitted3272 events across7 sessions; the actual report is VALID, integrity1, HIGH TRUST and arithmetic mean3.9229999999999996. The certificate records maturity3.923. ExactL3 remains unmet.
+
+The untouched actual.amccert is1,996,064 bytes, SHA2568d1ec6ad5e4048ef0aec7bb0c15df6644f2f0b1b1defb257f7afbed925701384. Static in-memory inspection found40 members/34 files and11,383,254 declared file bytes. The embedded run.json exactly matches the4,698,880-byte original. Certificate digest and report/policy reference bindings match. This audit did not run current certificate verification or independently verify the Ed25519 signature. The private-PEM marker scan was clear and is not a complete secrets audit.
+
+The current four-file corpus remains byte-exact at776,167 bytes, leaving223,833 bytes under its exclusive1,000,000-byte cap. Adding the certificate would total2,772,231 bytes. Lossless outer wrapping still uses1,980,555 bytes with gzip,1,996,018 with bz2 or1,979,244 with xz. None fits; report gzip alone916,655 bytes also exceeds the remaining budget and still does not supply exactL3. No encoded file was saved or original modified.
+
+Keep the whole certificate privately and qualify that exact input separately with actual trust/legacy labels and before/after hashes. The normal qualification validator has a1,048,576-byte per-file ceiling and permits concise evidence plus hashes; preserve the full private artifact and use small actual records rather than copying, splitting or repacking the certificate into the corpus. The committed genuine-certificate corpus and exactL3 acceptance gaps remain open.
+
+Only standard-library reads, tar-member hashing and reversible in-memory compression measurements ran here. No product/helper/compiler/native/SQL/network/runtime or process probe, extraction to disk, checkout/index/QA write, certificate change or new acceptance claim occurred.

@@ -1,0 +1,254 @@
+{
+  "schema": "p125c-root-actual-final-runtime-review/1",
+  "at": "2026-10-16T21:51:00.901783+00:00",
+  "sourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "sourceBranch": "codex/p1-25-client-qualification",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+  "blockers": [],
+  "rootReadActualWholeFailureLogsAndAllErrorObjects": true,
+  "reviewedActualRuns": [
+    {
+      "phase": "p125c-source-combined",
+      "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "tests": {
+        "total": 28,
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "durationMs": 11811,
+      "timeoutObservation": {
+        "configuredMs": 10000,
+        "elapsedMs": 10004.961125
+      },
+      "outcome": {
+        "path": "/private/tmp/p1-25-client-qualification-20261017/p125c-source-combined-outcome.json",
+        "bytes": 5432,
+        "sha256": "4f40f22dd614d169ff8f2e0b73dfc490c708fc8b82689ecf3862809d505d65ce"
+      },
+      "command": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125c-source-combined/command.json",
+        "bytes": 2793,
+        "sha256": "ee122948301542e290028b64ea67e3c8da608dd85aa7c98cff1f0c7fb311f01e"
+      },
+      "rawObserverOrderedJoin": true,
+      "naturalESRCH": true,
+      "nonzeroSignals": false
+    },
+    {
+      "phase": "p125c-fresh-canonical",
+      "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+      "tests": {
+        "total": 28,
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "durationMs": 12574,
+      "timeoutObservation": {
+        "configuredMs": 10000,
+        "elapsedMs": 10004.194500000001
+      },
+      "outcome": {
+        "path": "/private/tmp/p1-25-client-qualification-20261017/p125c-fresh-canonical-outcome.json",
+        "bytes": 5464,
+        "sha256": "84d3a315b96018518bbb033a0e5ce3d572e1840090545394280b93e0ceacd4a6"
+      },
+      "command": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125c-fresh-canonical/command.json",
+        "bytes": 2825,
+        "sha256": "00774f59174dc977f2856e697c428c39f5c94df67713c19a24b9356a94941dd1"
+      },
+      "rawObserverOrderedJoin": true,
+      "naturalESRCH": true,
+      "nonzeroSignals": false
+    },
+    {
+      "phase": "p125c-m1",
+      "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+      "tests": {
+        "total": 28,
+        "passed": 26,
+        "failed": 2,
+        "skipped": 0
+      },
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "durationMs": 11664,
+      "timeoutObservation": {
+        "configuredMs": 10000,
+        "elapsedMs": 10002.808292
+      },
+      "outcome": {
+        "path": "/private/tmp/p1-25-client-qualification-20261017/p125c-m1-outcome.json",
+        "bytes": 10539,
+        "sha256": "c37dcb8a6a34a7377cdee6e752e337765fca68ad48397c9ed5c40f00a0fd40db"
+      },
+      "command": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125c-m1/command.json",
+        "bytes": 2736,
+        "sha256": "e9c3e448d2c5836d85384d36fab1ac92b27c1fd4cd8355c014d147862bf371ec"
+      },
+      "rawObserverOrderedJoin": true,
+      "naturalESRCH": true,
+      "nonzeroSignals": false
+    },
+    {
+      "phase": "p125c-restore1",
+      "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+      "tests": {
+        "total": 28,
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "durationMs": 11664,
+      "timeoutObservation": {
+        "configuredMs": 10000,
+        "elapsedMs": 10004.193707999999
+      },
+      "outcome": {
+        "path": "/private/tmp/p1-25-client-qualification-20261017/p125c-restore1-outcome.json",
+        "bytes": 5450,
+        "sha256": "0f2757433c7f6035920236f2eec0f018d6bbce2b83b639afa83d0ca2b9b368bb"
+      },
+      "command": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125c-restore1/command.json",
+        "bytes": 2776,
+        "sha256": "e2e8d0d5aa9b8dfd64ef3b8c11120cd479697468f13be375059b849b5a007bd4"
+      },
+      "rawObserverOrderedJoin": true,
+      "naturalESRCH": true,
+      "nonzeroSignals": false
+    },
+    {
+      "phase": "p125c-m2",
+      "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+      "tests": {
+        "total": 28,
+        "passed": 27,
+        "failed": 1,
+        "skipped": 0
+      },
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "durationMs": 11643,
+      "timeoutObservation": {
+        "configuredMs": 10000,
+        "elapsedMs": 10004.915083
+      },
+      "outcome": {
+        "path": "/private/tmp/p1-25-client-qualification-20261017/p125c-m2-outcome.json",
+        "bytes": 8302,
+        "sha256": "136eeb32d61d5142d3621f24f2453c20b77f2b0d54e7658de25df321c35a0536"
+      },
+      "command": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125c-m2/command.json",
+        "bytes": 2736,
+        "sha256": "169aab724e9086bd94a5d150a30ed85bfea54401e5357358c67930c3985a9087"
+      },
+      "rawObserverOrderedJoin": true,
+      "naturalESRCH": true,
+      "nonzeroSignals": false
+    },
+    {
+      "phase": "p125c-restore2",
+      "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+      "tests": {
+        "total": 28,
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "durationMs": 11676,
+      "timeoutObservation": {
+        "configuredMs": 10000,
+        "elapsedMs": 10004.199
+      },
+      "outcome": {
+        "path": "/private/tmp/p1-25-client-qualification-20261017/p125c-restore2-outcome.json",
+        "bytes": 5450,
+        "sha256": "d8d476ef5577fd12cf728861383d7ddc889340bee2e32aafb7d6a95bc360ec29"
+      },
+      "command": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125c-restore2/command.json",
+        "bytes": 2776,
+        "sha256": "2a8e5682549f2426a5925a12d76aae229df1b0268eb98c090e6279a50d8ca587"
+      },
+      "rawObserverOrderedJoin": true,
+      "naturalESRCH": true,
+      "nonzeroSignals": false
+    }
+  ],
+  "canonicalTests": {
+    "total": 28,
+    "passed": 28,
+    "failed": 0,
+    "skipped": 0
+  },
+  "baseline17NotAddedToCanonical28": true,
+  "oldHistoricalCanonical47NotAddedOrRequalifiedHere": true,
+  "same28InventoryAcrossAllSixRuns": true,
+  "sourceOnlyControls": {
+    "C1-certReq-false": {
+      "failed": 2,
+      "frames": [
+        193,
+        201
+      ],
+      "classification": {
+        "path": "/private/tmp/p1-25-client-qualification-20261017/m1-classification.json",
+        "bytes": 2876,
+        "sha256": "c81a40c4f91308dec648688c1a2e04a756fc6f73538ceaf98dbce4f0ba234ad0"
+      },
+      "explicitRestoreExact": true,
+      "restorationRun28Passed": true
+    },
+    "C2-ignore-response-MIME": {
+      "failed": 1,
+      "firstProjectFrame": 280,
+      "classification": {
+        "path": "/private/tmp/p1-25-client-qualification-20261017/m2-classification.json",
+        "bytes": 2056,
+        "sha256": "e561c3e268c7f89f441ad19ae3134af1324a7083234776ec4303018fde303453"
+      },
+      "explicitRestoreExact": true,
+      "restorationRun28Passed": true
+    }
+  },
+  "preservation": {
+    "path": "/private/tmp/p1-25-client-qualification-20261017/preservation-final.json",
+    "bytes": 1635,
+    "sha256": "fa87138ec735e92711586a61676a339d80dd65651e90585032efe55f33b64585"
+  },
+  "selectedSourceFreshPaths": 71,
+  "compiledPairs": 8,
+  "protectedInputs": 121,
+  "nativePhysicalPins": 7,
+  "allHumanOwnershipExternalDecisionsRetained": true,
+  "quality": {
+    "duplicates": 1268,
+    "deadCodeBefore": 2723,
+    "deadCodeAfter": 2720,
+    "state": "RED unwaived",
+    "onlyThreeExportReachabilityFindingsRemovedNoProdRemediation": true
+  },
+  "noCredit": [
+    "CMS/grant/AttestedTime from five synthetic response bytes",
+    "requestTimestamp successful grants or ordered fallback",
+    "timestampDigest/checkpoint/session/required-time/issuance/report consumers",
+    "F37 raw-array guard bypass or intended Unix sockets",
+    "universal descendant/filesystem/environment/native-loader isolation",
+    "public TSA/deploy/CI/release/full suite/coverage/whole P1-25/P1-01/complete plan"
+  ],
+  "receiptNext": "Extend exact existing P125 packet in place using three active metadata files and evidence/client-transport; preserve338 old payloads and all old command rows/ordered assembly inputs; no raw count originals or executable test/script copies."
+}

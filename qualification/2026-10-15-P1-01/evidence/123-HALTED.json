@@ -1,0 +1,6 @@
+{
+  "utc": "2026-10-15T08:34:16.607839+00:00",
+  "errorType": "RuntimeError",
+  "message": "Child result uncertain/unexpected: mutant-compile",
+  "policy": "Retain ACTIVE and bytes; no automatic retry/restoration/signals."
+}

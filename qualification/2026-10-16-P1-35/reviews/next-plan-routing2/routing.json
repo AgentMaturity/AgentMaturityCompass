@@ -1,0 +1,197 @@
+{
+  "schema": "amc-p135-next-plan-routing/2",
+  "at": "2026-10-16T17:22:10.059632+00:00",
+  "allReadsFinished": true,
+  "readMeaning": "Selected finite plan/spec/report/source spans and declared hash-only inputs; no claim to reread entire plan, large private payloads, all reservations or 175 worktrees.",
+  "formalDone": false,
+  "selectedNext": "P1-07 bounded component qualification after root closes P1-35 checkpoint; production remains read-only.",
+  "selectionCorrection": "Initial P1-25 lead was premature before reviewing P1-07 dependency112. The same component-qualification rule must apply consistently: earlier Urgent P1-07 has useful disjoint tests that do not require manufacturing missing P1-35 artifacts. This sealed recommendation supersedes the preliminary queue only.",
+  "planRule": {
+    "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+    "lines": "169\u2013177",
+    "rule": "earliest open gate, priority, due date, dependent depth; missing decisions never worked around",
+    "scope": "Eligibility here means useful bounded source-component qualification, not whole issue definition-of-ready or dependency Done."
+  },
+  "nextThree": [
+    {
+      "order": 1,
+      "key": "P1-07",
+      "eligibility": "First useful bounded current-source qualification lane, subject to root ordinary admission; whole issue remains open.",
+      "priority": "Urgent",
+      "due": "2027-01-15",
+      "depth": 5,
+      "indexLine": 85,
+      "specSpans": [
+        "1\u20135",
+        "72\u201380",
+        "95\u2013104",
+        "110\u2013120"
+      ],
+      "namedDependencies": [
+        "P0-18",
+        "P1-01",
+        "P1-35"
+      ],
+      "boundedDependencyFit": "Spec112 identifies the needed P1-35 interface as the relabel notice for earlier scores. Current notice/classifier public flows are exercised by the closed 10 migration cases inside canonical85. Current evidence-event and claim-kind contracts exist; P1-01 publication/permanent-test gaps remain. This admits meaningful component tests, not whole dependency completion.",
+      "firstMinimalScope": [
+        "New tests/diagnostic/levelCumulative.test.ts: direct evaluateLevels synthetic unit gates; a higher passing gate must not bridge a failed/missing lower gate; unordered level declarations, duplicate rejection, contiguous positive control. Clearly label these algorithm-unit fixtures; do not call them emitted runtime evidence.",
+        "New tests/diagnostic/evidenceEmitterRegistry.test.ts: read actual registry/map and public emitterAdmits/fromRegisteredEmitter behavior; reject shape-only source/tier mismatches and synthetic/import elevation, check source module/literal presence. Use existing provenance APIs and explicit synthetic unit inputs; do not fabricate signed runtime admission.",
+        "Run unchanged antiGaming, evidenceGatingCorrection, questionBank and spine/live projection regressions first; collect actual counts rather than predicting them. Existing opt-out cases already assert refusal/warning; preserve those bodies."
+      ],
+      "nextWithinItem": "Only after static source-fit design, add a real owned governed allow/deny fixture for AMC-5.29 at the level its current map allows; validate retained rows/seals/trust rather than stubbing a successful native run. Record the existing reachability script result separately after actual source build; it imports cwd/dist, so use S as execution/source authority, not borrowed R cwd.",
+      "currentTechnicalBounds": [
+        "All four current evidence maps have empty L3 lists; no current registry entry declares L3 use. Preserve not_evaluated; do not invent a valid real L3 fixture or change maps to pass a test.",
+        "Historical spec74 fixture wording precedes the current map-bound implementation. A synthetic contiguous-gate witness proves ordering, while actual mapped/runtime cases must retain current admitted levels; any semantic mismatch is recorded.",
+        "Full acceptance still needs source-based reachability, meaningful governed runtime, methodology/doc parity, three controls and full checks; no result is claimed now.",
+        "P1-35 exact-L3, committed genuine certificate and certificate711-missing-payload failure remain open and are not silently consumed or waived."
+      ],
+      "ownership": "levelSemantics, emitters, maps, gates, runner and check-gate script byte-match S/R/Claude. evidenceEmitters is explicitly Claude-protected at reservations17 and scoped instructions69/284/317/387; production and methodology stay read-only. New specified test paths are absent in S only; root must refresh full exact-path allocation before authoring.",
+      "excludedWrites": [
+        "src/diagnostic/**",
+        "scripts/check-gate-reachability.mjs",
+        "src/types.ts",
+        "src/contracts/**",
+        "src/claims/**",
+        "docs/SCORING_METHODOLOGY.md",
+        "src/methodology/publicMethodology.ts",
+        "package.json",
+        "CI",
+        "existing tests",
+        "all held variants"
+      ]
+    },
+    {
+      "order": 2,
+      "key": "P1-25",
+      "eligibility": "Next High bounded existing-time verifier/client qualifier after the earlier P1-07 checkpoint.",
+      "priority": "High",
+      "due": "2026-12-11",
+      "depth": 4,
+      "indexLine": 103,
+      "specSpans": [
+        "29\u201343",
+        "108\u2013112",
+        "125\u2013141"
+      ],
+      "namedDependencies": [
+        "P1-01"
+      ],
+      "firstMinimalScope": [
+        "New tests/time/verifyTimestamp.test.ts and finite independently generated test-only RFC3161 fixtures: valid signature/imprint/nonce/anchor positive then exact required refusal codes; real signature verification, not fake attested objects.",
+        "After that, tests/time/tsaClient.test.ts local literal-loopback TSA HTTP and tests/time/checkpointWindow.test.ts owned initialized checkpoint lifecycle; no external TSA or package addition."
+      ],
+      "currentSource": "verifyTimestampToken188; buildTimestampRequest58; requestTimestamp143; checkpointLedger128, completePendingCheckpoints159 and ledgerTimeline306; timeEvidence/report shapes are present. tests/time is absent.",
+      "remaining": [
+        "P1-01 published-schema acceptance remains open; current source fields do not close it.",
+        "Spec33/127 requires Sid package approval; dependency review explicitly says no dependency added/decision pending. Qualify the installed builtin subset without adding a package or pretending that acceptance criterion is met.",
+        "Current docs disclose no checkpoint at each synchronous seal, no timestamps on non-certificate attestations, missing per-event verify output, no name/policy constraints and no revocation. These remain technical gaps, not approvals.",
+        "Interop/real configured required-TSA failure/issuance and two actual source controls remain unproven."
+      ],
+      "ownership": "Reservations1188\u20131194 explicitly release TSA/Rekor/checkpoint to Codex and preserve independently gated configured fallback/timer notes. Scope here remains new tests; ledger, signing/trust, Studio, package and index edits require separate exact admission."
+    },
+    {
+      "order": 3,
+      "key": "P1-11",
+      "eligibility": "Next High/8-Jan bounded evidence-admission/evaluator qualifier after P1-25; exact root allocation is still required.",
+      "priority": "High",
+      "due": "2027-01-08",
+      "depth": 5,
+      "indexLine": 89,
+      "specSpans": [
+        "73\u201398",
+        "103\u2013124",
+        "136\u2013157"
+      ],
+      "namedDependencies": [
+        "P0-08",
+        "P0-17",
+        "P1-09"
+      ],
+      "firstMinimalScope": [
+        "New tests/catalog/evidence/decisive.test.ts, explicit synthetic unit input matrix against public evaluateControl/admitEvidence with positive controls; do not call caller-supplied verified facts cryptographic producer proof.",
+        "Follow with real owned ledger/receipt/import fixtures through generateComplianceReport for stale/replay/cross-tenant/forged-producer/operator-tier behavior; keep end-to-end producer verification distinct from the pure evaluator seam."
+      ],
+      "currentSource": "evaluateControl25 derives claims through current claim service, consumes existing catalog evidence contracts and returns five dimensions; specified tests/catalog/evidence directory absent.",
+      "remaining": [
+        "Formal P1-09/P1-01/catalog content acceptance remains open; the current source inputs are available for finite test qualification only.",
+        "Replay use tracking is instantiated per evaluateControl invocation, so cross-window replay must exercise the actual cross-call persistence/source contract and retain any failure; do not predeclare pass from one-call unit rows.",
+        "Spec requires actual generateComplianceReport before/after evidence, all surfaces, four controls and full checks; direct evaluator coverage alone cannot close it."
+      ],
+      "ownership": "catalog/evidence/evaluate.ts remains explicitly protected at reservations38/47 and inherited P0-55 scope. Tests may read it; fixes to evaluator/compliance/Studio/schema index require separate root admission and any required coordination. No owner release is inferred."
+    }
+  ],
+  "laterAlternatives": [
+    {
+      "key": "P1-12",
+      "rankReason": "High15-Jan depth5, after P1-11; before same-date P1-26 depth3 when its bounded lane is admissible.",
+      "sourceFit": "compiledPolicyDenial/compiledPolicyGuard and build/writeEffectivePolicyReceipt exist. Existing receipt source declares strict binding always on after P1-07.",
+      "limits": "P1-02 held cancellation/approval/freeze identities and P1-10 held F1/activation source remain. Pure guard/receipt tests need not consume those gaps; full native enforcement route/source edits do. Spec98 regulated refusal is superseded in current source by deleted opt-out, but qualifying that current behavior must not silently revise acceptance.",
+      "notANewHold": true
+    },
+    {
+      "key": "P1-26",
+      "rankReason": "High15-Jan depth3; finite pure tree/note/offline verification fallback after P1-25.",
+      "limits": "Formal trusted-time prerequisite open. SCITT absent, public recorded Rekor fixtures need maintainer written approval per spec step7; do not submit externally. No new permission required to inspect/test pure tree.",
+      "notANewHold": true
+    }
+  ],
+  "earlierExclusions": [
+    {
+      "keys": "P1-01/P1-09/P1-02/P1-03/P1-10/P1-05/P1-04",
+      "reason": "Preserve completed bounded checkpoints and recorded remaining gaps; user explicitly left P1-01 and P1-02 decision-sensitive failures open. Do not repeat them merely because whole issues are not Done."
+    },
+    {
+      "keys": "P1-06",
+      "reason": "Claude-owned pinned verifier; no transfer inferred."
+    },
+    {
+      "keys": "P1-19/F37",
+      "reason": "Explicit user skip remains; no F37 fix or runner qualifier is resumed."
+    },
+    {
+      "keys": "earlier High A4/landing/release/key/content scopes",
+      "reason": "Preserve detailed B27 routing reasons: Claude/E17 ownership, P0-24 citation-dependent P1-15\u2192P1-13/P1-16, release/publication, D06 commercial decision and key lifecycle. This audit does not create a new source allocation."
+    }
+  ],
+  "P135PreservedOpen": {
+    "sourceCommit": "88e0dbdef8871f119325d289757ad1de38b88a1a",
+    "boundedCanonical": "85/85 six files,20 hook entries; root fresh/control/metadata work underway and not credited by this routing",
+    "gaps": [
+      "exact genuine L3 absent (actual separate certificate run mean3.923)",
+      "committed genuine certificate fixture exceeds strict corpus/per-file budget",
+      "current ordinary certificate integrity attempt failed with711 missing payload files while issuer/anchoring passed",
+      "manual Knip entry HELD_UNAPPLIED under ordinary D15 ignored archive boundary; dead-code2727vs2726 unwaived",
+      "full acceptance/global quality/release not Done"
+    ]
+  },
+  "preservation": {
+    "sourceContext": "S clean at observed88e0; source/status observation is temporal, root continues work",
+    "selectedThreeRootByteComparisons": 12,
+    "differences": [
+      "Claude types.ts retains additional pi runtime variant",
+      "Claude evidenceProvenance.ts has reordered mapping/comments; preserve whole file rather than transplant it"
+    ],
+    "held": [
+      "P1-01 gaps",
+      "P0-09 precedence",
+      "P0-22 empty results",
+      "P0-29 successors",
+      "P0-24 citation/expert decisions",
+      "P0-51 follow-up",
+      "P1-02/P1-03 held diagnosis/cancellation",
+      "P1-06 Claude verifier",
+      "P2-02 pause",
+      "P2-27 expert work",
+      "P2-07 provider/config/archive",
+      "F37 skip"
+    ],
+    "readOnlyUniverseAudit": "Not refreshed; previous175-root audit not reused as current new-test ownership clearance."
+  },
+  "rootBeforeMaterialization": [
+    "Close current root-owned P1-35 checkpoint without calling Done.",
+    "Refresh current exact test-path ownership/reservations/history, hosted full changed paths/WIP (Dependabot excluded only from WIP), ordinary D15/freeze and unchanged harness.",
+    "Admit one minimal new-test cohort, run unchanged regressions then actual new cases; classify failures before any separately admitted repair.",
+    "Keep all source, held variants, quality failures and control/fresh-source claims exact; no assumed future pass."
+  ],
+  "writes": "Private report only. No product/helper/compiler/parser/tests/native/SQL/network/process probes; no checkout/index/QA/guard/hosted/Claude mutation or message."
+}

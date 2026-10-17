@@ -1,0 +1,46 @@
+{
+  "schema": "p125pc-preservation-adapter-static-successor-seal/2",
+  "at": "2026-10-17T02:16:56.152373+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/v2/review.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/v2/review.json",
+      "bytes": 3097,
+      "sha256": "834b7dd9c716fb1686286e45bc34001ae9952c069ce339925e47c0a3c18b1d69",
+      "dev": 16777231,
+      "inode": 544002769,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/v2/pins.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/v2/pins.json",
+      "bytes": 5350,
+      "sha256": "5ef34db95cf242116c51a38da2ac1ec8430e7fe8c8972d6cb855b1698fd13c90",
+      "dev": 16777231,
+      "inode": 544002770,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/v2/README.md",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/v2/README.md",
+      "bytes": 907,
+      "sha256": "83d0ed5ccede0224a89bfc88126c513823f87b3a71355e0aee58234617c45157",
+      "dev": 16777231,
+      "inode": 544002771,
+      "nlink": 1
+    }
+  ],
+  "candidate": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/check-preservation.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/check-preservation.py.source.txt",
+    "bytes": 7209,
+    "sha256": "ed81b906b74b7a8c548bdb786ce39dbae8804398a88b7c10e814ec7e40e2e98a",
+    "dev": 16777231,
+    "inode": 544002640,
+    "nlink": 1
+  },
+  "inputCount": 12,
+  "blockers": [],
+  "resolvedFinding": "READONLY_GIT_OPTIONAL_LOCKS",
+  "noExecutionOrSourceEvidenceMutation": true
+}

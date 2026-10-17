@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-45",
+  "preparedUtc": "2026-10-15T06:04:08.279060+00:00",
+  "preparationOnly": true,
+  "parentRoot": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+  "parentSource": "2024f25c79973987b44a4a1298488d55ee0d6227",
+  "productionSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "closureRoot": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+  "copyKind": "Independent physical filesystem copy, not a Git clone; no.git.",
+  "trackedCopied": 8205,
+  "compiledCopied": 4529,
+  "totalPhysicalCopied": 12734,
+  "allContentExactNow": true,
+  "allParentAndPrivateSingleLink": true,
+  "allPhysicalInodesDistinct": true,
+  "nodeModulesLink": {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/closure/node_modules",
+    "target": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules",
+    "resolved": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules"
+  },
+  "borrowedNative": {
+    "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "device": 16777231,
+    "inode": 538734665,
+    "nlink": 1,
+    "mode": 493
+  },
+  "borrowedRuntimeHelpers": "Actual selected installed Vitest/Vite/runner files and Node executable pinned through preservation. Parent dependency tree is borrowed, not independently installed.",
+  "rootRuntimeReference": {
+    "path": "/private/tmp/p0-45-qualification-20261015/command-runtime-fingerprint/stdout-stderr.log",
+    "bytes": 737,
+    "sha256": "3ae66ce5aaad4b10408d753fff1f21029e64e76d540f0a8f2f12fbb7f4fea0bc"
+  },
+  "runtimeReferenceLimit": "Actual parent Node22.23.3 ABI127/SQLiteSELECT1 belongs to the recorded root fingerprint process. No private-copy runtime or per-future-child native observation occurred.",
+  "frozenOwnInputs": [
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/README.md",
+      "bytes": 2778,
+      "sha256": "69e06da2596cf4f9643b14ada562923e5efe56a2a2cf77dba1fc1c3f56862b33"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/copy-stage.json",
+      "bytes": 1006,
+      "sha256": "f7ec3355ff69f541660ed419596aefd1ab2d405e0ebb12b8da38ffaceb47ca3c"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/driver/controller.py",
+      "bytes": 22514,
+      "sha256": "9479a7a7186ce97e740dad14fda9c0244f3f3173d8d41a30b659de8e5e40e192"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/driver/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/inputs/case-identities.json",
+      "bytes": 1766,
+      "sha256": "1e9ecabdc7c3700a9f7a661a33fdf2a71eb509cf81eb70f1bf969cde84dc7070"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/inputs/compiled-manifest.json",
+      "bytes": 485185,
+      "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/inputs/physical-copy-manifest.json",
+      "bytes": 4083433,
+      "sha256": "9f398a6bc849138253bb0e4fafe920891a40b63ea18d46db463cad84297a18ea"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/inputs/preservation.json",
+      "bytes": 24811,
+      "sha256": "cfaadfe1062c5cd94cf0b692f32d0baf6d8a3236807508ec202aaff3345c391e"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/inputs/source-manifest.json",
+      "bytes": 999893,
+      "sha256": "1d2ae6b2a90b8e4c9e10de35b8bc870d87e0e784fabbdba6914d9fc5423a963b"
+    },
+    {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015/proposal.json",
+      "bytes": 3767,
+      "sha256": "5161f783b18396d03d1c4d4e18dc6b196f282aa33b394a0b8f6c6952cf76612f"
+    }
+  ],
+  "controlIds": [
+    "P045-C1-fail-closed-hold-admission",
+    "P045-C2-forward-copy-then-unlink"
+  ],
+  "recipesAreDataOnly": true,
+  "noMutantWritten": true,
+  "testExecutionPerformed": false,
+  "controllerExecuted": false,
+  "controllerImportedOrSyntaxCompiled": false,
+  "originalCoreCases": 12,
+  "sameSourceTestsAndSetup": [
+    "tests/verifyRepair.test.ts"
+  ],
+  "originalBaselines": {
+    "summary": {
+      "path": "/private/tmp/p0-45-qualification-20261015/original-corpora-summary.json",
+      "bytes": 24298,
+      "sha256": "571e35ee51bbe85e25dbc9c7a852d6275eeaf11f686b16445112219914a8f6b3"
+    },
+    "separateMeasuredCounts": [
+      12,
+      5,
+      4,
+      10
+    ],
+    "independentReview": {
+      "path": "/private/tmp/p0-45-original-corpora-independent-review-20261015.json",
+      "bytes": 44245,
+      "sha256": "699e0c65ac32bfc9705ad4c978d12494e0f49ce699e24da188ef29504914c939"
+    },
+    "meaning": "Prerequisite baselines remain separate; not causal runtime or full acceptance."
+  },
+  "controllerCodeStaticReview": {
+    "path": "/private/tmp/p0-45-controller-code-static-review-20261015.json",
+    "bytes": 9129,
+    "sha256": "725d5b9b832baf828de85f884eaf5ed0c92ff8692751e13f01ab7cf4bf1bd013"
+  },
+  "recipePeerReview": {
+    "path": "/private/tmp/p0-45-recipes-static-review-20261015.json",
+    "bytes": 15708,
+    "sha256": "6ae309898f6b772144c7b24120800c3c94db85d034788cb570739bcb33697a46"
+  },
+  "executionPlan": "One exact released control per invocation, same original12 baseline/mutant/restored. Both controls affect only one private TS file. All4529 compiled files remain unchanged.",
+  "releaseRule": "No release exists. Root must independently review this sealed setup/index and create exact START_P045_CAUSAL_<control> with actual eight hash and path bindings before any execution.",
+  "processPolicy": "420-second supervisor wait, no termination signal/retry. Then bounded5-second/50ms signal0 polling, positiveESRCH and retained raw/observer/stream/error facts. ACTIVE/HALTED persists on uncertainty; no exception-driven restoration/new runtime. No universal detached-descendant absence.",
+  "classificationPolicy": "Same12 raw/observer identities, states, structured body AssertionErrors and actual process0/1. Pending/hook/unhandled/known late errors are incomplete, not kills. Survivors stay survivors; root semantic attribution is separate.",
+  "environmentPolicy": "Future causal child uses the same seven-key explicit allowlist, privateHOME/TMPDIR and pinnedNode. Reporter bytes remain exact with legacy AMC_P021_RUNTIME_OBSERVER_PATH. This preparation executes no child and establishes no OS/network/cache isolation.",
+  "inboxBoundary": {
+    "path": "/Users/sid/AgentMaturityCompass/AMC_OS/INBOX/REV_QA_LEAD.md",
+    "bytes": 874516,
+    "sha256": "dba692880d341de24dc509103e446bf27d7487ed980d46bab5379809b40c130c"
+  },
+  "inboxMeaning": "Current approved primary inbox boundary; old point-in-time index bodies are preserved without recursive stale full-file pin requirements.",
+  "allPreparationReadsFinished": true,
+  "controller": {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/driver/controller.py",
+    "bytes": 22514,
+    "sha256": "9479a7a7186ce97e740dad14fda9c0244f3f3173d8d41a30b659de8e5e40e192"
+  },
+  "proposal": {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/proposal.json",
+    "bytes": 3767,
+    "sha256": "5161f783b18396d03d1c4d4e18dc6b196f282aa33b394a0b8f6c6952cf76612f"
+  },
+  "physicalManifest": {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/inputs/physical-copy-manifest.json",
+    "bytes": 4083433,
+    "sha256": "9f398a6bc849138253bb0e4fafe920891a40b63ea18d46db463cad84297a18ea"
+  },
+  "parentStatusAtSeal": "clean",
+  "formalAcceptanceClosed": false,
+  "noUserApprovalClaim": true
+}

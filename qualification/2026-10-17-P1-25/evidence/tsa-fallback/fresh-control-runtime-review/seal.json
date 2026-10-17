@@ -1,0 +1,25 @@
+{
+  "schema": "p125f-independent-runtime-review-seal/1",
+  "at": "2026-10-16T22:29:09.592209+00:00",
+  "blockers": [],
+  "allReadsFinished": true,
+  "inputCount": 374,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-runtime-review/review.json",
+      "bytes": 41823,
+      "sha256": "8547b43159a2b68e61abd481cc6d7ced4610dd3638d28747a064c4868d4c80a4"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-runtime-review/README.md",
+      "bytes": 2058,
+      "sha256": "4465fe575ecda00683510a4bad6ff1a601a572206ed0c8e7c4c1d71a675c9055"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-runtime-review/input-pins.json",
+      "bytes": 158395,
+      "sha256": "0e13261af6ca944cd9d3dcabe049d0f5755e164424a78f0e5533e980aef01cf0"
+    }
+  ],
+  "executionBoundary": "Independent stdlib file reads, hashing, physical stat checks and Git --no-optional-locks observations only. No AMC/helper/test/compiler/parser/native/SQL/network/process-probe execution, source/index/QA edits, RES probe or messages to Claude."
+}

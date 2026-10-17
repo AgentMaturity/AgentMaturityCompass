@@ -1,0 +1,35 @@
+{
+  "schema": "p125ec-v2-provenance-delta-independent-review-seal/1",
+  "at": "2026-10-17T01:22:11.529232+00:00",
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/v2/review.json",
+      "bytes": 2565,
+      "sha256": "4e6fcf8083d206a1c63dd89cd0480a1d486ac9085b5f00e1c1770986aad3f69d",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/v2/review.json",
+      "dev": 16777231,
+      "inode": 543909551,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/v2/README.md",
+      "bytes": 865,
+      "sha256": "9293569248eaa013838d92669a3e51cc8f952113d1e1d730060d671956496066",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/v2/README.md",
+      "dev": 16777231,
+      "inode": 543909552,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/v2/input-pins.json",
+      "bytes": 7993,
+      "sha256": "d20328d7a0aab6bc4ab932aa1231c6460c3cbaf41a8bd63ba551839d43ff09f7",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/v2/input-pins.json",
+      "dev": 16777231,
+      "inode": 543909553,
+      "nlink": 1
+    }
+  ],
+  "boundary": "Static exact-delta and actual JSON-input compatibility only; no helper execution or source/index changes."
+}

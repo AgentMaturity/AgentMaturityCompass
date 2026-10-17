@@ -18,6 +18,19 @@ interface ScimUserRecord {
   emails: Array<{ value: string; primary: boolean }>;
 }
 
+function parseActive(value: unknown): boolean {
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (typeof value === "string") {
+    const active = value.toLowerCase();
+    if (active === "true" || active === "false") {
+      return active === "true";
+    }
+  }
+  throw new Error("invalidValue");
+}
+
 function toScimUser(row: {
   userId: string;
   username: string;
@@ -51,24 +64,24 @@ export function scimListUsers(params: {
 }) {
   const start = Math.max(1, params.startIndex || 1);
   const limit = Math.max(1, Math.min(200, params.count || 100));
+  let where = "";
+  const args: unknown[] = [];
+  if (params.filter && params.filter.trim().length > 0) {
+    const filter = params.filter.trim();
+    const userNameEq = /^userName\s+eq\s+"([^"]+)"$/i.exec(filter);
+    const externalEq = /^externalId\s+eq\s+"([^"]+)"$/i.exec(filter);
+    if (userNameEq) {
+      where = "WHERE username_lc = ?";
+      args.push(userNameEq[1]!.toLowerCase());
+    } else if (externalEq) {
+      where = "WHERE external_id = ?";
+      args.push(externalEq[1]!);
+    } else {
+      throw new Error("invalidFilter");
+    }
+  }
   const handle = openHostDb(params.hostDir);
   try {
-    let where = "";
-    const args: unknown[] = [];
-    if (params.filter && params.filter.trim().length > 0) {
-      const filter = params.filter.trim();
-      const userNameEq = /^userName\s+eq\s+"([^"]+)"$/i.exec(filter);
-      const externalEq = /^externalId\s+eq\s+"([^"]+)"$/i.exec(filter);
-      if (userNameEq) {
-        where = "WHERE username_lc = ?";
-        args.push(userNameEq[1]!.toLowerCase());
-      } else if (externalEq) {
-        where = "WHERE external_id = ?";
-        args.push(externalEq[1]!);
-      } else {
-        where = "WHERE 1 = 0";
-      }
-    }
     const total = handle.db
       .prepare(`SELECT COUNT(*) AS n FROM users ${where}`)
       .get(...args) as { n: number };
@@ -225,28 +238,62 @@ export function scimPatchUser(params: {
   operations: Array<{ op: "add" | "remove" | "replace"; path?: string; value?: unknown }>;
   actorTokenId: string;
 }): ScimUserRecord {
+  if (!Array.isArray(params.operations) || params.operations.length === 0) {
+    throw new Error("invalidValue");
+  }
+  let nextActive: boolean | undefined;
+  let nextDisplayName: string | null | undefined;
+  // Validate every received operation before opening the host database.
+  for (const op of params.operations) {
+    if (!op || typeof op !== "object" || Array.isArray(op) || !["add", "remove", "replace"].includes(op.op)) {
+      throw new Error("invalidValue");
+    }
+    if (op.path !== undefined && typeof op.path !== "string") {
+      throw new Error("invalidPath");
+    }
+    const path = (op.path ?? "").toLowerCase();
+    if (path !== "active" && path !== "displayname" && path !== "") {
+      throw new Error("invalidPath");
+    }
+    if (op.op === "remove") {
+      if (op.value !== undefined) {
+        throw new Error("invalidValue");
+      }
+      if (path === "displayname") {
+        nextDisplayName = null;
+      } else {
+        nextActive = false;
+      }
+    } else if (path === "displayname") {
+      if (typeof op.value !== "string") {
+        throw new Error("invalidValue");
+      }
+      nextDisplayName = op.value;
+    } else if (path === "" && op.value && typeof op.value === "object" && !Array.isArray(op.value)) {
+      const attributes = Object.entries(op.value);
+      if (attributes.length === 0) {
+        throw new Error("invalidValue");
+      }
+      for (const [attribute, value] of attributes) {
+        const field = attribute.toLowerCase();
+        if (field === "active") {
+          nextActive = parseActive(value);
+        } else if (field === "displayname") {
+          if (typeof value !== "string") {
+            throw new Error("invalidValue");
+          }
+          nextDisplayName = value;
+        } else {
+          throw new Error("invalidPath");
+        }
+      }
+    } else {
+      nextActive = parseActive(op.value);
+    }
+  }
   const current = scimGetUser(params.hostDir, params.userId);
   if (!current) {
     throw new Error("SCIM user not found");
-  }
-  let nextActive = current.active;
-  let nextDisplayName = current.displayName ?? null;
-  for (const op of params.operations) {
-    const path = (op.path ?? "").toLowerCase();
-    if (path === "active" || path === "") {
-      if (op.op === "remove") {
-        nextActive = false;
-      } else if (typeof op.value === "boolean") {
-        nextActive = op.value;
-      } else if (op.value && typeof op.value === "object" && typeof (op.value as { active?: unknown }).active === "boolean") {
-        nextActive = Boolean((op.value as { active: boolean }).active);
-      }
-    }
-    if (path === "displayname" && (op.op === "replace" || op.op === "add")) {
-      if (typeof op.value === "string") {
-        nextDisplayName = op.value;
-      }
-    }
   }
   const user = findHostUserById(params.hostDir, params.userId);
   if (!user) {
@@ -256,9 +303,9 @@ export function scimPatchUser(params: {
     hostDir: params.hostDir,
     username: user.username,
     email: user.email ?? user.username,
-    displayName: nextDisplayName,
+    displayName: nextDisplayName === undefined ? current.displayName ?? null : nextDisplayName,
     authType: "SCIM",
-    disabled: !nextActive
+    disabled: !(nextActive ?? current.active)
   });
   appendHostAudit(params.hostDir, "SCIM_USER_UPDATED", null, {
     actorTokenId: params.actorTokenId,

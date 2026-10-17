@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-41",
+  "reviewer": "/root/failure_diagnosis",
+  "capturedUtc": "2026-10-15T07:16:39.710528+00:00",
+  "reviewType": "Independent full-source static review of a newly authored, unexecuted private fixture",
+  "decision": "NO_BLOCKING_STATIC_FINDINGS",
+  "findings": [],
+  "blockingFindings": [],
+  "candidate": {
+    "path": "/private/tmp/p0-41-program-metrics-qualification-prepared.test.ts",
+    "bytes": 37984,
+    "sha256": "98ed903d584d706f08323abbd4b584350f5c5a8dd18587dca93ee5ea178049f0"
+  },
+  "preparation": {
+    "path": "/private/tmp/p0-41-program-metrics-qualification-preparation-20261015.json",
+    "bytes": 15654,
+    "sha256": "2418e9c90d9ce911e250eeecf4a525c19fd6be60d84c1ffa3da385e6c3577d59"
+  },
+  "reviewedReferencePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/scripts/program-metrics.mjs",
+      "bytes": 23978,
+      "sha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/docs/program/gaps.json",
+      "bytes": 16375,
+      "sha256": "bb7eded5387d9b4bb1782b23720042b7c5b26d7fbff119cefc9ceefe7095f006"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/docs/program/metrics.json",
+      "bytes": 5866,
+      "sha256": "541373a8e5ddb8ba1dfe4581f72d371afa7cdc4885ad25077def2ed85e8955ed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/docs/program/metrics-manual.json",
+      "bytes": 20,
+      "sha256": "364b37738032a28a72829f4d2192b70bd9353c9ee8dddfc5b70c2785f995d6ac"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/docs/program/status-update-template.md",
+      "bytes": 6702,
+      "sha256": "34686a67909e18f776fb7054e5824a2c9f33689a05c10179b4af78eebb84898e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/private/tmp/p0-41-readonly-readiness-20261015.json",
+      "bytes": 31386,
+      "sha256": "d140b27cb51b6b6f30fb5bdec2a8ca9e8eacdf138c58e563866f5e217031ff83"
+    },
+    {
+      "path": "/private/tmp/p0-41-readonly-readiness-20261015.md",
+      "bytes": 3989,
+      "sha256": "d644f6b9856c6359778cd5f9c37578764771e4bd44429c1434f74345f308a659"
+    },
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    }
+  ],
+  "additionalImportContext": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/yaml/package.json",
+      "bytes": 3254,
+      "sha256": "20b8b197cbd10dad245d45e463dfe58e4c8c25a47e24bc4256ad9ab58bf35683"
+    }
+  ],
+  "registration": {
+    "method": "Literal declaration and name comparison only; no parser or collection",
+    "definitions": 27,
+    "pureInputDefinitions": 12,
+    "localCliDefinitions": 15,
+    "namesMatchPreparation": true,
+    "measuredPasses": null
+  },
+  "sensitivityAnchors": [
+    {
+      "case": "Q2 missing evidence stays null before any status or current-value assertions",
+      "line": 248,
+      "firstAssertion": "expect(missing.value).toBeNull()"
+    },
+    {
+      "case": "Q6a an empty assertion list stays null before later nonvacuity checks",
+      "line": 300,
+      "firstAssertion": "expect(empty.value).toBeNull()"
+    }
+  ],
+  "checks": {
+    "importsAndTypes": "Actual .mjs named exports, ESM package, existing allowJs:true and YAML installation support the proposed source route. No import, typecheck or compilation result is claimed.",
+    "planAndRegistration": "Literal 15-row/90-target-cell table matches the directly read Plan; exact historical G1-G26 and seven/fifteen/four severity declarations remain assertions, not new measurements.",
+    "genuineGit": "Owned native init/local config/add/commit/rev-parse/checkout/cat-file/merge-base commands and genuine branch topology; no fake Git, remote, reset, force, hook bypass or shared repository writes.",
+    "childArgvAndDeadlines": "process.execPath invokes exact copied script; Git uses scoped PATH. File-backed streams avoid pipe maxBuffer termination. No command timeout, retry, signal or test timeout override; existing 30-second config and product five-second Git limit retained.",
+    "effectScope": "Only new owned fixture paths are written. Borrowed node_modules link is unstaged and no dependency command runs. No cleanup of shared data or fixture roots.",
+    "evidenceContract": "Optional external artifact root is absolute, non-symlink and source-disjoint. wx records retain selected exact input bytes, supplied outputs, argv, env keys, commits/parents, child status and raw streams before assertions.",
+    "environment": "Eight explicitly supplied child keys; only PATH value is inherited. No environment values recorded. This is distinct from outer inherited environment and future causal seven-key policy."
+  },
+  "runtimePrerequisites": [
+    "Root separately authorizes runtime.",
+    "Later setup binds a fresh owned private artifact root with appropriate ownership/mode and exact environment value; omission is insufficient for qualification.",
+    "Outer wrapper/controller and eventual actual post-exit audit remain required; this fixture supplies no process-group or complete-teardown proof."
+  ],
+  "limits": [
+    "Static authored definitions are not collected or passed cases.",
+    "TypeScript correctness and actual module loading are unmeasured.",
+    "The artifact-root helper does not independently enforce ownership/mode/freshness/emptiness.",
+    "Synchronous child completion is unbounded by the helper; original Vitest deadline is not an OS process termination guarantee.",
+    "Selected snapshots and tagged non-JSON values do not establish exhaustive filesystem preservation or generic independent replay.",
+    "Local synthetic history is not merge approval, signature trust, actual program measurement or a truthful gap closure.",
+    "Later assertions may be masked by the first failing assertion.",
+    "No online query, external post, target decision, full suite, Node24, release, Done or inherited-debt waiver is asserted."
+  ],
+  "performed": {
+    "fullFixtureAndSourceRead": true,
+    "referenceHashesVerified": true,
+    "productImport": false,
+    "codeParserOrSyntaxCheck": false,
+    "typecheckOrCollection": false,
+    "testsOrGitExecution": false,
+    "fixtureCopyOrSetup": false,
+    "repositoryOrGuardChanges": false
+  },
+  "runtimeAuthorizationProvided": false,
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true,
+  "markdown": {
+    "path": "/private/tmp/p0-41-new-fixture-static-review-20261015.md",
+    "bytes": 4412,
+    "sha256": "28d7f85e58a5e0f95e57dd110fc522a67497b3fb1236c9d9dbe2bd0b035c87ab"
+  }
+}

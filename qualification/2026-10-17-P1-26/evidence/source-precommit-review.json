@@ -1,0 +1,98 @@
+{
+  "at": "2026-10-16T20:46:17.156721+00:00",
+  "sourceHeadBefore": "2aa32d5e436e789037c6a8a161d6cf0424b4f4ac",
+  "paths": [
+    "tests/transparency/rfc9162.test.ts",
+    "tests/transparency/legacyAmbiguity.test.ts",
+    "tests/transparency/LICENSE.transparency-dev-merkle",
+    "README.md",
+    "CONTRIBUTING.md",
+    "website/index.html",
+    "website/lite.html",
+    "website/i18n.js",
+    "docs/content/show-hn-draft.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "greenChecks": [
+    {
+      "phase": "p126-test-types",
+      "exit": 0,
+      "durationMs": 35139
+    },
+    {
+      "phase": "p126-source-types",
+      "exit": 0,
+      "durationMs": 25002
+    },
+    {
+      "phase": "p126-lint",
+      "exit": 0,
+      "durationMs": 2944
+    },
+    {
+      "phase": "p126-build",
+      "exit": 0,
+      "durationMs": 28820
+    },
+    {
+      "phase": "p126-counts-after",
+      "exit": 0,
+      "durationMs": 527
+    },
+    {
+      "phase": "p126-gates",
+      "exit": 0,
+      "durationMs": 566
+    },
+    {
+      "phase": "p126-threat-model",
+      "exit": 0,
+      "durationMs": 305
+    },
+    {
+      "phase": "p126-architecture",
+      "exit": 0,
+      "durationMs": 1637
+    },
+    {
+      "phase": "p126-docs",
+      "exit": 0,
+      "durationMs": 341
+    },
+    {
+      "phase": "p126-freeze",
+      "exit": 0,
+      "durationMs": 1273
+    },
+    {
+      "phase": "p126-third-party-notices",
+      "exit": 0,
+      "durationMs": 228
+    }
+  ],
+  "scopedTests": {
+    "total": 54,
+    "passed": 54,
+    "failed": 0,
+    "skipped": 0
+  },
+  "baselineTestsSeparate": 41,
+  "quality": {
+    "duplicates": 1268,
+    "deadCodeAfterMetadataRepair": 2723,
+    "deadCodeAfterNewTests": 2723,
+    "fullDeadCodeFindingSetIdentical": true,
+    "bothGatesExit1": true,
+    "waived": false
+  },
+  "all113PreferredProtectedPinsExact": true,
+  "all5ExistingNativePhysicalPinsExact": true,
+  "heldR18RowsHeadAndEmptyIndexExact": true,
+  "allOtherAuthoredCountBytesExact": true,
+  "wholeIssueDone": false,
+  "allHoldsRetained": true,
+  "sourceCheckpointOnly": true
+}

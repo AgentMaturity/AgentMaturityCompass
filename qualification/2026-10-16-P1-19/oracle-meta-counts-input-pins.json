@@ -1,0 +1,67 @@
+{
+  "capturedUtc": "2026-10-15T22:52:31.454480+00:00",
+  "exactD15": "none",
+  "allowedDelta": "test files1666 to1667 only",
+  "files": [
+    {
+      "relativePath": "README.md",
+      "bytes": 59828,
+      "sha256": "b01be3c5427362af3ce5a7fd5ce40525418f67cd693a6d4a1bf4e9b0298d76fe",
+      "snapshot": "/private/tmp/p1-19-oracle-implementation-20261016/counts-before/README.md"
+    },
+    {
+      "relativePath": "CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "a6c037cd1d4e3ed1bb30ab2be804b9fec177da10a5cb037cd5e98f9639812841",
+      "snapshot": "/private/tmp/p1-19-oracle-implementation-20261016/counts-before/CONTRIBUTING.md"
+    },
+    {
+      "relativePath": "website/index.html",
+      "bytes": 43520,
+      "sha256": "b4aa8f4a85f1da0780a3b5b79a01131c93d492b0e070957e8e7f2bee33613138",
+      "snapshot": "/private/tmp/p1-19-oracle-implementation-20261016/counts-before/website/index.html"
+    },
+    {
+      "relativePath": "website/lite.html",
+      "bytes": 11197,
+      "sha256": "34b1599a67adf7df8cfcdda12449acf2cd280daa9204a0e398d72b0c31a7bd67",
+      "snapshot": "/private/tmp/p1-19-oracle-implementation-20261016/counts-before/website/lite.html"
+    },
+    {
+      "relativePath": "website/i18n.js",
+      "bytes": 44169,
+      "sha256": "2ab9c7b1881c4b4fc478ee41fac9b513c9f18f69bb643220ffc991a47923dced",
+      "snapshot": "/private/tmp/p1-19-oracle-implementation-20261016/counts-before/website/i18n.js"
+    },
+    {
+      "relativePath": "docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "f9ffc3591360efb0c8883d1123bf1d03f2145f8d1a1eff0210d8201a13de7c65",
+      "snapshot": "/private/tmp/p1-19-oracle-implementation-20261016/counts-before/docs/content/show-hn-draft.md"
+    },
+    {
+      "relativePath": "docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "d578ff0264fcea39734183b56bd8539b02a05b2a85ac2e1cf44934a73f88dfdd",
+      "snapshot": "/private/tmp/p1-19-oracle-implementation-20261016/counts-before/docs/content/reddit-launch-drafts.md"
+    },
+    {
+      "relativePath": "docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "4623c66bc5ee6a1b68c24baa7e5878e26b05bb3001201f4d6412a4fc2389303b",
+      "snapshot": "/private/tmp/p1-19-oracle-implementation-20261016/counts-before/docs/internal/competitive-landscape.md"
+    },
+    {
+      "relativePath": "docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "1038d17c84d5adeae35f4f1cc67e11ec03b0cdfcd2befed280debeb93e091d0e",
+      "snapshot": "/private/tmp/p1-19-oracle-implementation-20261016/counts-before/docs/internal/mirofish-simulation-council.md"
+    },
+    {
+      "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "f900ab60fcef222efb208a706913e25d2b22c483baf816fd2037eeda1cf8a181",
+      "snapshot": "/private/tmp/p1-19-oracle-implementation-20261016/counts-before/whitepaper/AMC_WHITEPAPER_v1.md"
+    }
+  ]
+}

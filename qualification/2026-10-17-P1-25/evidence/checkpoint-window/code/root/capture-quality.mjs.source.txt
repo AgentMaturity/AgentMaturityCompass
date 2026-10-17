@@ -1,0 +1,9 @@
+// Collect one actual report with the unchanged scanner. Completion does not pass a quality gate.
+import { writeFileSync } from "node:fs";
+import { scanSourceQuality } from "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/source-quality.mjs";
+const role = process.argv[2];
+if (!["before-source", "after-source", "after-metadata"].includes(role)) throw new Error("Choose an explicit snapshot role");
+const root = "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass";
+const report = scanSourceQuality("dead-code", root);
+writeFileSync(`/private/tmp/p1-25-checkpoint-qualification-20261017/${role}-full.json`, JSON.stringify({ role, root, ...report }, null, 2) + "\n", { flag: "wx", mode: 0o600 });
+console.log(JSON.stringify({ role, tool: report.tool, version: report.version, findings: report.findings.length, diagnosticOnly: true, qualityGatePassed: false }));

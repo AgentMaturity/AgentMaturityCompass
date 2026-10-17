@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-16T20:45:01.053597+00:00",
+  "beforeRole": "After the owned metadata repair, before new P1-26 test materialization.",
+  "beforeReport": "metadata-discovery/after-full.json",
+  "afterReport": "current-source-full.json",
+  "beforeFindings": 2723,
+  "afterFindings": 2723,
+  "removed": [],
+  "added": [],
+  "fullNormalizedFindingSetIdentical": true,
+  "qualityRemainsRed": true,
+  "baselineAdopted": false,
+  "diagnosticExit0IsNotQualityPass": true
+}

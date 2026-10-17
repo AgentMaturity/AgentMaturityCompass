@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-16T18:39:57.872949+00:00",
+  "proposedSourceScope": [
+    "tests/time/verifyTimestamp.test.ts",
+    "tests/fixtures/rfc3161/",
+    "qualification/2026-10-17-P1-25/"
+  ],
+  "allocatedYet": false,
+  "existingProductionAndTestsReadOnly": true,
+  "generatorSourcePathExcluded": "scripts/fixtures/gen-rfc3161.mjs",
+  "reproducibilityBoundary": "Private reviewed OpenSSL orchestrator can generate independently signed test corpus. No persisted source generator allocation or full reproducibility acceptance credit is implied. Do not relocate a manual generator to evade Knip/D15/package or ownership rules.",
+  "reservedHold": "Last-known reservation binding remains; no deletion/release/coordination inferred from missing live path.",
+  "fullIssueRemainsOpen": [
+    "P1-01 schemas",
+    "dependency approval",
+    "TSA client integration",
+    "checkpoint windows/session sealing",
+    "issuance/report integration",
+    "source generator/CI interoperability",
+    "full suite/global quality/CI/release"
+  ]
+}

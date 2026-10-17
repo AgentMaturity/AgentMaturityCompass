@@ -1,0 +1,205 @@
+{
+  "pins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/a4/stages/assemble.ts",
+      "bytes": 35883,
+      "sha256": "da35505bc530e591c08293f7330561e40a84db779cad929c6e936da0887e25ee"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorizationRecord.ts",
+      "bytes": 4176,
+      "sha256": "03707d72dfecef59af3e003dcbca4a675b06dffd5f568bada178d171f446150d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorize.ts",
+      "bytes": 20450,
+      "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/agent/agentToolset.ts",
+      "bytes": 29046,
+      "sha256": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+      "bytes": 12366,
+      "sha256": "19b046e71142f66a5ba514bb1ea8bb1d26bbc39ddd15cfb882bab253d3c517c5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/approvals/approvalPolicySchema.ts",
+      "bytes": 2472,
+      "sha256": "fb7f5bbe8f1711d994e20a982a73c817a6f0651873b9ad091cc9b3d19f2d1456"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/activate.ts",
+      "bytes": 9250,
+      "sha256": "09bcf8d146e417a70b73b7333da60761d730805afc0bd481916e75ccf2731fc0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/runtimePolicy.ts",
+      "bytes": 11453,
+      "sha256": "293ce8862991a5a15c9f6e25be84e0746e05cac4d205b91819c5ce33b1d473fa"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/types.ts",
+      "bytes": 10272,
+      "sha256": "c9bbf1dd73d3b37309b19d18af17021190ce11a7a150291a3a80f6bc17e92827"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/contracts/v1/authorizationRecord.ts",
+      "bytes": 3279,
+      "sha256": "2e67a443157adabbcd05ab47f52619a26a93c4edf5bcb2a2da4c1e9deccab953"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/kernel/services/toolServices.ts",
+      "bytes": 4729,
+      "sha256": "ff4027cf862d1363d93e3fe25d21122a3db0272def9114e9acdac216d9d619d0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/studio/nativeTaskService.ts",
+      "bytes": 50275,
+      "sha256": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/guards/compiledPolicyGuard.ts",
+      "bytes": 7685,
+      "sha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "bytes": 32571,
+      "sha256": "1fe7a8eab3a954ff876c780c373c4fb3243abc8652561cda3af2c53fc4a755f9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolTypes.ts",
+      "bytes": 8042,
+      "sha256": "2f9d346695b05d83f045a9ac5ad1689ddd83032a5444d088ed6665aa026c3d03"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/types.ts",
+      "bytes": 124482,
+      "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/authorizationRecheck.test.ts",
+      "bytes": 28977,
+      "sha256": "297e55b5dd88e7adea27c9f9c6189b78115821de5a5f56ff944f9c7dcb4bf375"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/toolPipeline.test.ts",
+      "bytes": 13997,
+      "sha256": "c172a33f5605a939ca9504a3f2a3eb594cd5dece890467dcb16456bb49d8e7c9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-12.md",
+      "bytes": 13970,
+      "sha256": "5628e7b045ac658ca36544ddb02454c5eb6efd0a86c62f17f1cafa61ebb2747d"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/README-v2.md",
+      "bytes": 2588,
+      "sha256": "c0ec77a4f91319da191b72761e607ecd6a1a07a7471704914c4cef93f126f59d"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/README.md",
+      "bytes": 1577,
+      "sha256": "6236643145e29bc8cdebaf82d2c45114b373c82d3df2f188578d184e9fdb43b7"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/review.json",
+      "bytes": 5801,
+      "sha256": "09e92c155ab416a35edaf58c930dcb931c7c7c0c9efddb2405a090b4471360ad"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/seal.json",
+      "bytes": 1289,
+      "sha256": "e87884b5c0498b03dfdbd94451c4a06ab30d7a5edae2c1c66cd4d2f94bb0e8fc"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/graph-navigation.json",
+      "bytes": 810,
+      "sha256": "be7ff2c6f76aefca3cba03be8d70eb97d5c48df2eae4e2e86569a083044ac959"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/review.json",
+      "bytes": 10189,
+      "sha256": "dd4767117dd66c42658ef10ac5ab0c6b9d5d44b1903021886407efb451d40525"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/seal.json",
+      "bytes": 1482,
+      "sha256": "b3a86dfcbd45ba61e2f3a44e82630165f080b13f3cd7a2a871489b2335b89757"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/branch-adoption.json",
+      "bytes": 559,
+      "sha256": "649b101ee360584de6a082cca28794ab67888d5fea1e477b0c6ccfd4f999a3ba"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/contract-review/controls.json",
+      "bytes": 4715,
+      "sha256": "77004cfb385395daca564a826acd68a62caf5de4b5eec3b0bca6e919dd2a3226"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/contract-review/review.json",
+      "bytes": 7917,
+      "sha256": "8b01ba979a46c5f960272854bed53da5d341f1bf3ad421abc61093bbb60538b2"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/README.md",
+      "bytes": 3068,
+      "sha256": "4db49ae1b6fac7782c552a81d2761504c666181f1225fa67bee67d23644e2798"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/author-review.json",
+      "bytes": 1497,
+      "sha256": "bdc2cd6df14ea3f7dca8fab0197e711e04871e9d5a1f63110c70c6e7b5628735"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/compiledPolicyGuard.test.ts",
+      "bytes": 11155,
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/input-pins.json",
+      "bytes": 13665,
+      "sha256": "f2e56c9427d3479e12e8f6f1b6817f4ff4c9c8a9f4e31e8a2ec4ead469e74ca9"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/matrix.json",
+      "bytes": 1831,
+      "sha256": "872e1140f5c883c4bde3e9e3c56557e2e0b14d64ff9a4fcacb6123a291ce4214"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/seal.json",
+      "bytes": 3192,
+      "sha256": "75c7ef2627f91fecde4fa45f32cbb9588d4c06076417e08d35a110c135bc17bb"
+    }
+  ],
+  "allReadsFinished": true
+}

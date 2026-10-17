@@ -1,0 +1,49 @@
+{
+  "schema": "p125f-runtime-audit-preparation-seal/1",
+  "at": "2026-10-16T22:09:34.659873+00:00",
+  "status": "sealed private unexecuted proposal",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/runtime-audit-preparation/audit-observed.py",
+      "bytes": 1570,
+      "sha256": "7b3aeb694dff1f326bdd6d015d1400d56ed306519c1d091108e9a44396238330"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/runtime-audit-preparation/capture-quality.mjs",
+      "bytes": 916,
+      "sha256": "58b3d29954367bc121f075621f57a276237d60d320438eb4ec4e2e81194e600b"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/runtime-audit-preparation/audit-observed.py.patch",
+      "bytes": 1515,
+      "sha256": "756b47edc1f9782cc4e1bdacd0cd56121765a3a3d1192ccb6b29f7a779c4b1af"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/runtime-audit-preparation/capture-quality.mjs.patch",
+      "bytes": 879,
+      "sha256": "f8b4b2957c61d93fa4a68d2daf839eb157b4025c906c018e9548f9ff3d5ee88a"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/runtime-audit-preparation/before-source-baseline-adoption.json",
+      "bytes": 750,
+      "sha256": "30fca473161326b323dd28b3f28ad87ca922c4b55168009e65d70dcbd81337f8"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/runtime-audit-preparation/README.md",
+      "bytes": 1672,
+      "sha256": "6ba03b61ae021ff7bd36cb848d173beb6aaf4137b59fb1e02fc6b07f6dd14fe6"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/runtime-audit-preparation/author-static-review.json",
+      "bytes": 3004,
+      "sha256": "e88830c01f729d2e9a7612721617ec7f876310ac0e70f3b8bfa6e0847c5d5d61"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/runtime-audit-preparation/input-pins.json",
+      "bytes": 3574,
+      "sha256": "6973a204be230da2e690449411593c96a3be38ad989a772caadf009e20767902"
+    }
+  ],
+  "executedImportedParsedOrCompiled": false,
+  "productOrCheckoutIndexWrites": false
+}

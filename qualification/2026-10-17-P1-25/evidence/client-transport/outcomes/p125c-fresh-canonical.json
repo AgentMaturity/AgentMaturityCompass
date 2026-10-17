@@ -1,0 +1,139 @@
+{
+  "phase": "p125c-fresh-canonical",
+  "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+  "tests": {
+    "total": 28,
+    "passed": 28,
+    "failed": 0,
+    "skipped": 0
+  },
+  "hookTaskEntries": 2,
+  "individualHookValues": 3,
+  "orderedIdentities": [
+    [
+      "tests/time/tsaClient.test.ts",
+      "P1-25 request DER and configured raw HTTP transport encodes the full SHA-256 request, captured positive nonce and literal certReq true"
+    ],
+    [
+      "tests/time/tsaClient.test.ts",
+      "P1-25 request DER and configured raw HTTP transport inserts the independent literal policy OID without changing the required fields"
+    ],
+    [
+      "tests/time/tsaClient.test.ts",
+      "P1-25 request DER and configured raw HTTP transport rejects invalid digest strings beside a real valid request"
+    ],
+    [
+      "tests/time/tsaClient.test.ts",
+      "P1-25 request DER and configured raw HTTP transport POSTs the real request with exact headers/path/body and returns only raw reply bytes"
+    ],
+    [
+      "tests/time/tsaClient.test.ts",
+      "P1-25 request DER and configured raw HTTP transport normalizes response MIME case and parameters"
+    ],
+    [
+      "tests/time/tsaClient.test.ts",
+      "P1-25 request DER and configured raw HTTP transport refuses configured URL credentials before a second request reaches the listener"
+    ],
+    [
+      "tests/time/tsaClient.test.ts",
+      "P1-25 request DER and configured raw HTTP transport refuses finite non-200 statuses before MIME admission"
+    ],
+    [
+      "tests/time/tsaClient.test.ts",
+      "P1-25 request DER and configured raw HTTP transport refuses a same-listener redirect without requesting its target"
+    ],
+    [
+      "tests/time/tsaClient.test.ts",
+      "P1-25 request DER and configured raw HTTP transport refuses wrong response MIME after the adjacent real positive"
+    ],
+    [
+      "tests/time/tsaClient.test.ts",
+      "P1-25 request DER and configured raw HTTP transport returns exactly 65536 bytes and refuses a finite 65537-byte reply"
+    ],
+    [
+      "tests/time/tsaClient.test.ts",
+      "P1-25 request DER and configured raw HTTP transport uses the unchanged 10000 ms client default against an owned stalled response"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "verifies the granted response and returns its exact signed CMS token bytes"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a different expected digest for the unchanged genuine signed token"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a different expected nonce for the unchanged genuine signed token"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses the independently located signed-attribute corruption"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses the genuine token under a different real root with the same permitted policy"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a policy excluded by the correctly pinned real root"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a genuinely signed TSA certificate without an EKU extension"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a genuinely signed TSA certificate with noncritical timestamping EKU"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a genuinely signed TSA certificate expired at the fixed signed genTime"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses explicit rejection status before requiring a timestamp token"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a truncated copy of the genuine token"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses 65537 bytes at the token size boundary before DER parsing"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "keeps claimed time separate from the genuine attested upper bound"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "keeps an artifact without a timestamp at claimed time"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "reports an untrusted TSA as a warning while the artifact time stays claimed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "reports a broken supplied token as an artifact integrity error"
+    ]
+  ],
+  "taskErrors": [],
+  "rawObserverOrderedJoin": true,
+  "unhandledErrors": [],
+  "lateDiagnostics": [],
+  "command": {
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout tests/time/tsaClient.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125c-fresh-canonical.raw.json",
+    "exit": 0,
+    "durationMs": 12574
+  },
+  "groupAbsentByESRCH": true,
+  "signalsOtherThanZeroSent": false,
+  "publicEvidencePaths": [],
+  "reuseBoundary": "Read-only import of the pinned existing ordered raw/observer/hook/late-error audit; only the finite cohort is selected here. No test execution or evidence rewriting."
+}

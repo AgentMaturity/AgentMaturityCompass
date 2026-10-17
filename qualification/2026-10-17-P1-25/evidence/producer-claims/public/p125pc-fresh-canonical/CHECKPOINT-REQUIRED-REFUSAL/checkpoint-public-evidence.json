@@ -1,0 +1,137 @@
+{
+  "schema": "amc-p125-checkpoint-owned-fixture/1",
+  "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout",
+  "workspace": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-QyG8Ih",
+  "privateHome": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-cXpaMP/home",
+  "noClockRowGateOrPolicyBypass": true,
+  "trustBoundary": "the signed own trust list and captured monitor pin are controlled fixture authority, not an independent production issuer",
+  "windowBoundary": "one checkpoint supplies an upper bound; no lower-window, scheduler, seal or certificate qualification",
+  "environment": {
+    "helper": "scripts/clean-source-check.mjs#cleanSourceRuntimeEnvironment",
+    "privateHome": true,
+    "signingEnabled": true,
+    "storageOverrideAbsent": true,
+    "trustOverridesAbsent": true,
+    "loaderOverridesAbsent": true
+  },
+  "nativeBefore": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 543985064,
+    "nlink": 1
+  },
+  "trust": {
+    "mode": "pinned",
+    "signatureVerifiedListCount": 1,
+    "rootKeyId": "d8498619d6cb79d8c7eea24bc6a8b0af07ee161bfb8ba007f68cf460b886fc41",
+    "monitorFingerprint": "0f5e876998f5eb6ffc8675901059c5d6618f0d5bca6e371252a88918e8896800",
+    "tsaLoaded": true,
+    "signedList": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-cXpaMP/home/checkpoint-trust-list.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-cXpaMP/home/checkpoint-trust-list.json",
+      "bytes": 1993,
+      "sha256": "8bbfa2155e7cf129fd62fb3188329b8384f1f2edb56178fca8a66b1ed31559de",
+      "dev": 16777231,
+      "inode": 543991437,
+      "nlink": 1
+    }
+  },
+  "initialLedger": {
+    "ok": true,
+    "chain": true,
+    "governance": true,
+    "anchored": true,
+    "errors": 0,
+    "seedEventId": "14c22192-7e0c-47af-a4f3-6b1f39988cf2",
+    "sessionId": "5c203453-f52f-444c-882f-bead777480b7",
+    "eventCount": 1
+  },
+  "required": {
+    "rejected": true,
+    "rejectionName": "Error",
+    "expectedRejection": true,
+    "signatureValid": true,
+    "tokenAbsent": true,
+    "sequenceCount": 1,
+    "signedCheckpoint": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-QyG8Ih/.amc/time/checkpoints/1.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-QyG8Ih/.amc/time/checkpoints/1.json",
+      "bytes": 704,
+      "sha256": "4c2eef1824ac8a4ef650bb0058c29b07bdb2c4ad843416c4a315a1674eea0d19",
+      "dev": 16777231,
+      "inode": 543991442,
+      "nlink": 1
+    },
+    "eventCount": 1,
+    "checkpointRowCount": 0,
+    "ledger": {
+      "ok": true,
+      "chain": true,
+      "governance": true,
+      "anchored": true,
+      "errors": 0
+    },
+    "timeline": [
+      {
+        "sequence": 1,
+        "genTime": null,
+        "detail": null,
+        "status": "pending"
+      }
+    ]
+  },
+  "ownedGuardCloseInvoked": true,
+  "poolBeforeClose": {
+    "key": "ledger:/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-QyG8Ih:/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-QyG8Ih/.amc/evidence.sqlite",
+    "dbPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-QyG8Ih/.amc/evidence.sqlite",
+    "maxSize": 4,
+    "idle": 1,
+    "active": 0,
+    "pooledConnections": 1,
+    "initialized": true
+  },
+  "poolClosed": true,
+  "vaultLocked": true,
+  "immutableInputCount": 3,
+  "immutableInputsUnchanged": true,
+  "nativeAfter": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 543985064,
+    "nlink": 1
+  },
+  "nativeUnchanged": true,
+  "environmentRestored": true,
+  "ledgerOwners": [
+    {
+      "readonly": false,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    }
+  ],
+  "bodyFailed": false,
+  "bodyErrorName": null,
+  "cleanupErrorNames": []
+}

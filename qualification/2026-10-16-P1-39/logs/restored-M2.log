@@ -1,0 +1,149 @@
+
+ RUN  v4.1.11 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 first local OAuth qualification > discovers explicit and fallback protected-resource metadata and ordered issuer metadata
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-tsvt0R/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 first local OAuth qualification > refuses a literal issuer mismatch after a matching issuer positive
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-A5aMRI/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 first local OAuth qualification > requires advertised S256 without masking its finite negative rows
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-U4sQnV/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 first local OAuth qualification > validates the public RFC9207 iss table, exact state and fixed errors
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-hITm7E/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 first local OAuth qualification > performs real S256 resource-bound authorization and persists the real grant
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-dYT0Rx/public-evidence.json
+
+stdout | tests/mcp/mcpLegacyFallback.test.ts > P1-39 explicit legacy MCP discovery > unpinned method-not-found probe discovers the negotiated legacy catalog
+AMC_P139_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-Hat0gs/public-evidence.json
+
+stdout | tests/mcp/mcpLegacyFallback.test.ts > P1-39 explicit legacy MCP discovery > an exact modern pin refuses the same legacy endpoint before initialization
+AMC_P139_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-f7XGy8/public-evidence.json
+
+stdout | tests/mcp/mcpLegacyFallback.test.ts > P1-39 explicit legacy MCP discovery > an exact supported legacy pin initializes without a discover probe
+AMC_P139_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-BFwKpd/public-evidence.json
+
+stdout | tests/mcp/mcpLegacyFallback.test.ts > P1-39 explicit legacy MCP discovery > a different supported initialize version refuses an exact legacy pin before catalog discovery
+AMC_P139_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-Z2CaS1/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 OAuth registration and redirect qualification > honors client priority and explicit dynamic registration opt-in
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-J8jSab/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 OAuth registration and redirect qualification > refuses OAuth redirects and forbidden non-loopback HTTP URLs before target fetch
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-SUjEsB/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 OAuth registration and redirect qualification > refuses OAuth redirects and forbidden non-loopback HTTP URLs before target fetch
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-QFYxLI/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 OAuth real-store refresh and binding qualification > refreshes an expired real grant with resource binding, preserves an omitted refresh token and refuses unusable refresh
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-YNHDfE/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 OAuth real-store refresh and binding qualification > separates real issuer and resource entries and resolves the selected token only into the MCP Authorization header
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-WPmwq3/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 OAuth real-store refresh and binding qualification > separates real issuer and resource entries and resolves the selected token only into the MCP Authorization header
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-lMYQq8/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 OAuth real catalog scope qualification > unions operator, granted and new challenge scopes through two real catalog step-ups
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-0d0wK3/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 OAuth real catalog scope qualification > stops after two real catalog reauthorizations when another scope challenge remains
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-5zt5AI/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > reviews a version-bound catalog and executes one granted call without a session
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-j164ge/public-evidence.json
+
+stdout | tests/mcp/mcpLegacyFallback.test.ts > P1-39 explicit legacy MCP discovery > legacy mount receipts bind the reviewed version and a version-only change requires a new digest
+AMC_P139_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-jJhhmg/public-evidence.json
+
+ ✓ tests/mcp/mcpLegacyFallback.test.ts (5 tests) 584ms
+     ✓ legacy mount receipts bind the reviewed version and a version-only change requires a new digest  481ms
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > a finite broken tools/call response is not replayed and disposes its grant
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-xwCN5f/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 OAuth governed evidence secrecy qualification > redacts a real header token echoed by a governed tool from the outcome and committed evidence payloads
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-bBoXRS/public-evidence.json
+
+ ✓ tests/mcp/mcpOauth.test.ts (12 tests) 1129ms
+     ✓ redacts a real header token echoed by a governed tool from the outcome and committed evidence payloads  615ms
+ ✓ tests/reconciliationDefectsMcpHttp.test.ts (2 tests) 1040ms
+     ✓ a non-EXECUTE call with schema-invalid arguments is refused without a remote call  474ms
+     ✓ a result received after grant disposal is reported as executed and discarded  561ms
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > a broken tools/call is recorded with strict typed unknown evidence
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-664ejY/public-evidence.json
+
+ ✓ tests/reconciliationDefectsMcp.test.ts (2 tests) 1234ms
+     ✓ a discarded received result says the remote tool executed and was not replayed  704ms
+     ✓ simulation refuses arguments that the reviewed schema refuses  524ms
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > one finite tools/list EOF is reissued once with a new wire id
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-6XHDVl/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > two finite tools/list EOFs exhaust the single reissue allowance
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-m5FHzE/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > catalog and explicit grant admission refuse before dispatch and ignore a long TTL after catalog drift
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-RyjsRb/public-evidence.json
+
+ ✓ tests/toolEvidenceRecording.test.ts (8 tests) 2102ms
+     ✓ records an ALLOWED call  515ms
+     ✓ records a DENIED call, with which guard refused and why  462ms
+     ✓ writes an audit row AND a metric row per call  326ms
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > missing resultType remains complete for the real catalog and governed call
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-5aLraO/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > tools/list input_required resultType is refused before a catalog or tool call
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-FG8MP3/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > tools/list invalid resultType is refused before a catalog or tool call
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-Y7tUWl/public-evidence.json
+
+ ✓ tests/workflowTool.test.ts (9 tests) 2774ms
+     ✓ is not offered unless the integrator composed the capability  394ms
+     ✓ is denied by the signed allowlist even when the capability is granted  404ms
+     ✓ runs once both parties have agreed  426ms
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > tools/call input_required resultType cannot complete or trigger a replay
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-rvIiPk/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > tools/call invalid resultType cannot complete or trigger a replay
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-OuQyRD/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > a tools/list response for another id is refused without response remapping
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-YIm5tC/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > untrusted unknown-marker text in a received tool error stays ERROR
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-3G0rBb/public-evidence.json
+
+ ✓ tests/mcp/mcp20260728.test.ts (13 tests) 3597ms
+     ✓ reviews a version-bound catalog and executes one granted call without a session  558ms
+     ✓ a finite broken tools/call response is not replayed and disposes its grant  466ms
+     ✓ a broken tools/call is recorded with strict typed unknown evidence  325ms
+ ✓ tests/nativeMcpClient.test.ts (15 tests) 7964ms
+     ✓ valid schemas execute through the signed allowlist; invalid arguments never reach the server  864ms
+     ✓ a mounted capability cannot bypass the independent signed allowlist  472ms
+     ✓ wrong catalog pins and absent remote grants leave no mounted capability  431ms
+     ✓ catalog drift is refused before dispatch and list-change notifications revoke active grants  506ms
+     ✓ output schemas on earlier catalog pages are enforced  384ms
+     ✓ input schemas sharing an id cannot reuse another tool's validator  361ms
+     ✓ output schemas sharing an id stay independent of SDK cache state  373ms
+     ✓ remote errors retain structured details and timeouts retain their separate failure fact  2370ms
+     ✓ explicit secrets are child-only, scrubbed from results and catalog leakage refuses  457ms
+     ✓ cancellation disposes the connection and prevents later calls  389ms
+     ✓ output schema validation precedes secret redaction  327ms
+     ✓ a reviewed MCP-only policy is ready and late mounting still exposes and executes its pinned tool  391ms
+ ✓ tests/nativeMcpHttp.test.ts (15 tests) 8087ms
+     ✓ executes false SSE with pinned origin/session and private header redaction  613ms
+     ✓ executes true SSE with pinned origin/session and private header redaction  451ms
+     ✓ redirects never send credentials to a second origin  398ms
+     ✓ catalog notifications dispose the grant without automatic reconnect  353ms
+     ✓ idle notifications outlive request timeout, then expire at the independently configured bound  2713ms
+     ✓ cancellation aborts the active stream, terminates the session and removes the grant  364ms
+     ✓ timeouts and remote error results retain distinct failure facts  1466ms
+
+ Test Files  9 passed (9)
+      Tests  81 passed (81)
+   Start at  21:38:20
+   Duration  11.17s (transform 15.64s, setup 210ms, import 25.75s, tests 28.51s, environment 1ms)
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p139-replay-restored-nine-files.raw.json

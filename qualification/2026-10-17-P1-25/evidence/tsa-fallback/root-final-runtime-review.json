@@ -1,0 +1,1472 @@
+{
+  "schema": "p125f-root-final-runtime-review/1",
+  "at": "2026-10-16T22:28:10.982013+00:00",
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "rootAllFullLogsAndActualFailuresRead": true,
+  "orderedActualRuns": [
+    {
+      "phase": "p125f-source-combined",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 11769,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "ownedPgid": 49481,
+      "rawObserverOrderedJoin": true,
+      "lifecycle": [
+        {
+          "caseId": "OFFLINE",
+          "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+          "listenerStarted": false,
+          "listenerClosed": false,
+          "requests": [],
+          "socketCount": 0,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "NO-ANCHOR",
+          "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/anchor-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/after-skip",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "ORDER",
+          "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/single-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/http-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/malformed-second",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/genuine-third",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 4,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "TIMEOUT-CONTINUE",
+          "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/stall-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": false,
+              "responseClosed": true,
+              "replyEndCalled": false,
+              "allowPeerAbort": true,
+              "stall": true
+            },
+            {
+              "method": "POST",
+              "path": "/after-timeout",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        }
+      ],
+      "defaultAbort": {
+        "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "configuredMs": 10000,
+        "elapsedMs": 10013.574583000001,
+        "failures": [
+          "stall-first: The operation was aborted",
+          "after-timeout: HTTP 500"
+        ],
+        "routes": [
+          "/stall-first",
+          "/after-timeout"
+        ]
+      }
+    },
+    {
+      "phase": "p125f-fresh-canonical",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 12329,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "ownedPgid": 51695,
+      "rawObserverOrderedJoin": true,
+      "lifecycle": [
+        {
+          "caseId": "OFFLINE",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": false,
+          "listenerClosed": false,
+          "requests": [],
+          "socketCount": 0,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "NO-ANCHOR",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/anchor-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/after-skip",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "ORDER",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/single-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/http-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/malformed-second",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/genuine-third",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 4,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "TIMEOUT-CONTINUE",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/stall-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": false,
+              "responseClosed": true,
+              "replyEndCalled": false,
+              "allowPeerAbort": true,
+              "stall": true
+            },
+            {
+              "method": "POST",
+              "path": "/after-timeout",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        }
+      ],
+      "defaultAbort": {
+        "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+        "configuredMs": 10000,
+        "elapsedMs": 10011.649333,
+        "failures": [
+          "stall-first: The operation was aborted",
+          "after-timeout: HTTP 500"
+        ],
+        "routes": [
+          "/stall-first",
+          "/after-timeout"
+        ]
+      }
+    },
+    {
+      "phase": "p125f-m1",
+      "tests": {
+        "total": 21,
+        "passed": 18,
+        "failed": 3,
+        "skipped": 0
+      },
+      "exit": 1,
+      "durationMs": 11534,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "ownedPgid": 51819,
+      "rawObserverOrderedJoin": true,
+      "lifecycle": [
+        {
+          "caseId": "OFFLINE",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": false,
+          "listenerClosed": false,
+          "requests": [],
+          "socketCount": 0,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "NO-ANCHOR",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/anchor-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/after-skip",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": true,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "ORDER",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/single-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/genuine-third",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/malformed-second",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/http-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 4,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": true,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "TIMEOUT-CONTINUE",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/after-timeout",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/stall-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": false,
+              "responseClosed": true,
+              "replyEndCalled": false,
+              "allowPeerAbort": true,
+              "stall": true
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": true,
+          "cleanupErrorCount": 0
+        }
+      ],
+      "defaultAbort": {
+        "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+        "configuredMs": 10000,
+        "elapsedMs": 10003.394124999999,
+        "failures": [
+          "after-timeout: HTTP 500",
+          "stall-first: The operation was aborted"
+        ],
+        "routes": [
+          "/after-timeout",
+          "/stall-first"
+        ]
+      }
+    },
+    {
+      "phase": "p125f-restore1",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 11525,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "ownedPgid": 51945,
+      "rawObserverOrderedJoin": true,
+      "lifecycle": [
+        {
+          "caseId": "OFFLINE",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": false,
+          "listenerClosed": false,
+          "requests": [],
+          "socketCount": 0,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "NO-ANCHOR",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/anchor-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/after-skip",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "ORDER",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/single-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/http-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/malformed-second",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/genuine-third",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 4,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "TIMEOUT-CONTINUE",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/stall-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": false,
+              "responseClosed": true,
+              "replyEndCalled": false,
+              "allowPeerAbort": true,
+              "stall": true
+            },
+            {
+              "method": "POST",
+              "path": "/after-timeout",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        }
+      ],
+      "defaultAbort": {
+        "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+        "configuredMs": 10000,
+        "elapsedMs": 10012.591957999999,
+        "failures": [
+          "stall-first: The operation was aborted",
+          "after-timeout: HTTP 500"
+        ],
+        "routes": [
+          "/stall-first",
+          "/after-timeout"
+        ]
+      }
+    },
+    {
+      "phase": "p125f-m2",
+      "tests": {
+        "total": 21,
+        "passed": 19,
+        "failed": 2,
+        "skipped": 0
+      },
+      "exit": 1,
+      "durationMs": 11512,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "ownedPgid": 52054,
+      "rawObserverOrderedJoin": true,
+      "lifecycle": [
+        {
+          "caseId": "OFFLINE",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": false,
+          "listenerClosed": false,
+          "requests": [],
+          "socketCount": 0,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "NO-ANCHOR",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/anchor-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/after-skip",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "ORDER",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/single-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/http-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": true,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "TIMEOUT-CONTINUE",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/stall-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": false,
+              "responseClosed": true,
+              "replyEndCalled": false,
+              "allowPeerAbort": true,
+              "stall": true
+            }
+          ],
+          "socketCount": 1,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": true,
+          "cleanupErrorCount": 0
+        }
+      ],
+      "defaultAbort": {
+        "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+        "configuredMs": 10000,
+        "elapsedMs": 10003.507834,
+        "failures": [
+          "stall-first: The operation was aborted"
+        ],
+        "routes": [
+          "/stall-first"
+        ]
+      }
+    },
+    {
+      "phase": "p125f-restore2",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 11606,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "ownedPgid": 52133,
+      "rawObserverOrderedJoin": true,
+      "lifecycle": [
+        {
+          "caseId": "OFFLINE",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": false,
+          "listenerClosed": false,
+          "requests": [],
+          "socketCount": 0,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "NO-ANCHOR",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/anchor-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/after-skip",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "ORDER",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/single-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/http-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/malformed-second",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/genuine-third",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 4,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "TIMEOUT-CONTINUE",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/stall-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": false,
+              "responseClosed": true,
+              "replyEndCalled": false,
+              "allowPeerAbort": true,
+              "stall": true
+            },
+            {
+              "method": "POST",
+              "path": "/after-timeout",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        }
+      ],
+      "defaultAbort": {
+        "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+        "configuredMs": 10000,
+        "elapsedMs": 10010.687125,
+        "failures": [
+          "stall-first: The operation was aborted",
+          "after-timeout: HTTP 500"
+        ],
+        "routes": [
+          "/stall-first",
+          "/after-timeout"
+        ]
+      }
+    },
+    {
+      "phase": "p125f-m3",
+      "tests": {
+        "total": 21,
+        "passed": 20,
+        "failed": 1,
+        "skipped": 0
+      },
+      "exit": 1,
+      "durationMs": 11607,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "ownedPgid": 52256,
+      "rawObserverOrderedJoin": true,
+      "lifecycle": [
+        {
+          "caseId": "OFFLINE",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": false,
+          "listenerClosed": false,
+          "requests": [],
+          "socketCount": 0,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "NO-ANCHOR",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/anchor-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/missing-anchor",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/after-skip",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 3,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": true,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "ORDER",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/single-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/http-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/malformed-second",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/genuine-third",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 4,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "TIMEOUT-CONTINUE",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/stall-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": false,
+              "responseClosed": true,
+              "replyEndCalled": false,
+              "allowPeerAbort": true,
+              "stall": true
+            },
+            {
+              "method": "POST",
+              "path": "/after-timeout",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        }
+      ],
+      "defaultAbort": {
+        "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+        "configuredMs": 10000,
+        "elapsedMs": 10008.821667,
+        "failures": [
+          "stall-first: The operation was aborted",
+          "after-timeout: HTTP 500"
+        ],
+        "routes": [
+          "/stall-first",
+          "/after-timeout"
+        ]
+      }
+    },
+    {
+      "phase": "p125f-restore3",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 11564,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "ownedPgid": 52977,
+      "rawObserverOrderedJoin": true,
+      "lifecycle": [
+        {
+          "caseId": "OFFLINE",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": false,
+          "listenerClosed": false,
+          "requests": [],
+          "socketCount": 0,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "NO-ANCHOR",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/anchor-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/after-skip",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "ORDER",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/single-positive",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/http-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/malformed-second",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            },
+            {
+              "method": "POST",
+              "path": "/genuine-third",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 4,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        },
+        {
+          "caseId": "TIMEOUT-CONTINUE",
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "listenerStarted": true,
+          "listenerClosed": true,
+          "requests": [
+            {
+              "method": "POST",
+              "path": "/stall-first",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": false,
+              "responseClosed": true,
+              "replyEndCalled": false,
+              "allowPeerAbort": true,
+              "stall": true
+            },
+            {
+              "method": "POST",
+              "path": "/after-timeout",
+              "bodyBytes": 70,
+              "ended": true,
+              "aborted": false,
+              "closed": true,
+              "responseFinished": true,
+              "responseClosed": true,
+              "replyEndCalled": true,
+              "allowPeerAbort": false,
+              "stall": false
+            }
+          ],
+          "socketCount": 2,
+          "socketsClosed": true,
+          "ownedErrors": [],
+          "bodyFailed": false,
+          "cleanupErrorCount": 0
+        }
+      ],
+      "defaultAbort": {
+        "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+        "configuredMs": 10000,
+        "elapsedMs": 10009.9475,
+        "failures": [
+          "stall-first: The operation was aborted",
+          "after-timeout: HTTP 500"
+        ],
+        "routes": [
+          "/stall-first",
+          "/after-timeout"
+        ]
+      }
+    }
+  ],
+  "canonicalCohortOnly": 21,
+  "notAnAggregateTestCount": true,
+  "allClassificationsManualBeforeExplicitRestores": true,
+  "allOriginalAssertionErrorsPreserved": true,
+  "allFourCasesEveryRunCleanupZero": true,
+  "sourceAndFreshResourcesClosedAtObservedBoundaries": true,
+  "finalPreservation": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/preservation-final.json",
+    "sha256": "cf1ffc8fc90587a9d7608738d1f0a6d5f193d878634f4e24197db1b4fc4add78"
+  },
+  "noTypedAbortOrUniversalIsolationClaim": true,
+  "allHeldDecisionsAndF37SkipRetained": true
+}

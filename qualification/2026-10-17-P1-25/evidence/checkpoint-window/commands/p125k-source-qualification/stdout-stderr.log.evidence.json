@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/checkpoint-window/commands/p125k-source-qualification/stdout-stderr.log",
+    "bytes": 240,
+    "sha256": "c187c36d52bda87a6242be711ca8e430d76356675865f941d921c3a603aa494d"
+  },
+  "dataBase64": "Cj4gYWdlbnQtbWF0dXJpdHktY29tcGFzc0AxLjIuMCBjaGVjazpxdWFsaWZpY2F0aW9uIC9Vc2Vycy9zaWQvLmNvZGV4L3dvcmt0cmVlcy9wMi0wNy1zY2ltLXF1YWxpZmljYXRpb24vQWdlbnRNYXR1cml0eUNvbXBhc3MKPiBub2RlIHNjcmlwdHMvY2hlY2stcXVhbGlmaWNhdGlvbi1yZWNlaXB0cy5tanMKClF1YWxpZmljYXRpb24gcmVjZWlwdHMgdmFsaWQ6IDI5IHJlY2VpcHQocykgdW5kZXIgcXVhbGlmaWNhdGlvbi4K",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

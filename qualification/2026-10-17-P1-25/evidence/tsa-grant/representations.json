@@ -1,0 +1,247 @@
+[
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-openssl-version/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-openssl-version/stdout-stderr.log",
+    "bytes": 410,
+    "sha256": "20048b8aed3f93ac2be0b5311b6403716a73cde9b20d6789e2bce263a884b811",
+    "envelope": "evidence/tsa-grant/commands/p125g-openssl-version/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-pre-freeze/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-pre-freeze/stdout-stderr.log",
+    "bytes": 268,
+    "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad",
+    "envelope": "evidence/tsa-grant/commands/p125g-pre-freeze/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-pre-d15/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-pre-d15/stdout-stderr.log",
+    "bytes": 5,
+    "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345",
+    "envelope": "evidence/tsa-grant/commands/p125g-pre-d15/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-unchanged-verifier/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-unchanged-verifier/stdout-stderr.log",
+    "bytes": 414,
+    "sha256": "b1e6876292cda04a69c42063bcdb94024a10365fd341c0f8ea85fd6eccf56a83",
+    "envelope": "evidence/tsa-grant/commands/p125g-unchanged-verifier/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-combined/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-source-combined/stdout-stderr.log",
+    "bytes": 20452,
+    "sha256": "77c37a58fedd643017d21b04d6b5fce875a99fd20d40038fd13ce809dd947175",
+    "envelope": "evidence/tsa-grant/commands/p125g-source-combined/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-counts-before/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-counts-before/stdout-stderr.log",
+    "bytes": 1436,
+    "sha256": "1e8dbf860104a0d98edde26793d535a89b9acaf1cfbf3cd2acdb0b75f879f3cb",
+    "envelope": "evidence/tsa-grant/commands/p125g-counts-before/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-test-types/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-test-types/stdout-stderr.log",
+    "bytes": 161,
+    "sha256": "fb4ed4c9025dd5e6271e65a32d037c413d19a08be3c3b2a5cac093c68f75f865",
+    "envelope": "evidence/tsa-grant/commands/p125g-test-types/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-types/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-source-types/stdout-stderr.log",
+    "bytes": 149,
+    "sha256": "ffc3342aa63f1c01882b849ff8dd0a3cd4e7b509f07c4fb8c69713242b5a98d5",
+    "envelope": "evidence/tsa-grant/commands/p125g-source-types/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-lint/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-lint/stdout-stderr.log",
+    "bytes": 447,
+    "sha256": "22a03ddf6f49358fb4bcfe04bd56da9a1a9e26cc5aa8ffde1b5892abef468b95",
+    "envelope": "evidence/tsa-grant/commands/p125g-lint/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-build/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-build/stdout-stderr.log",
+    "bytes": 955,
+    "sha256": "e6e36dcd7bda0fc5d63469c9f1781ef19fe59c3a49afbf5d2c7c6c0c8dd1acce",
+    "envelope": "evidence/tsa-grant/commands/p125g-build/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-duplicates-after/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-duplicates-after/stdout-stderr.log",
+    "bytes": 2064,
+    "sha256": "62545f898b95ab3125616ea8bf2872244314dd98d3db67b8ff58c707e6d31e29",
+    "envelope": "evidence/tsa-grant/commands/p125g-duplicates-after/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-dead-code-after/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-dead-code-after/stdout-stderr.log",
+    "bytes": 1207,
+    "sha256": "770a8a1d051a73cff8ccc73804b660ff07ced6240ab077a2ae0a6f516c784043",
+    "envelope": "evidence/tsa-grant/commands/p125g-dead-code-after/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-quality-after-diagnostic/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-quality-after-diagnostic/stdout-stderr.log",
+    "bytes": 121,
+    "sha256": "306de4fc2d96e0d9d44a4aa59f3764830f719cbf336f2f37be06eee6f4130f90",
+    "envelope": "evidence/tsa-grant/commands/p125g-quality-after-diagnostic/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-count-freeze/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-count-freeze/stdout-stderr.log",
+    "bytes": 268,
+    "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad",
+    "envelope": "evidence/tsa-grant/commands/p125g-count-freeze/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-count-d15/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-count-d15/stdout-stderr.log",
+    "bytes": 5,
+    "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345",
+    "envelope": "evidence/tsa-grant/commands/p125g-count-d15/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-gen-counts/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-gen-counts/stdout-stderr.log",
+    "bytes": 176,
+    "sha256": "01c62fa9c66c468bd10c769615d94804a36d50969143b181132a836158ebfbc4",
+    "envelope": "evidence/tsa-grant/commands/p125g-gen-counts/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-counts/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-source-counts/stdout-stderr.log",
+    "bytes": 239,
+    "sha256": "82ac60039fcf8bc00dc663aabd78dcafc658cffc866e81929505bb199e8df7e4",
+    "envelope": "evidence/tsa-grant/commands/p125g-source-counts/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-gates/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-source-gates/stdout-stderr.log",
+    "bytes": 821,
+    "sha256": "5664206ddf6d3b7a49d53c87907f78750517c4c583479f77268a1da353dba4ed",
+    "envelope": "evidence/tsa-grant/commands/p125g-source-gates/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-threat/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-source-threat/stdout-stderr.log",
+    "bytes": 294,
+    "sha256": "d8a37764ab52c8fe6a84b8aaf1de67c240c7f01698f2abf5b1a802764503d3f4",
+    "envelope": "evidence/tsa-grant/commands/p125g-source-threat/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-architecture/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-source-architecture/stdout-stderr.log",
+    "bytes": 95863,
+    "sha256": "b087df083209af89c9f69496ec867445d1dd69fb2b68b44665ac280965341751",
+    "envelope": "evidence/tsa-grant/commands/p125g-source-architecture/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-docs/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-source-docs/stdout-stderr.log",
+    "bytes": 205,
+    "sha256": "ff57cb43abfed0a3cdba4ccb780bf3ee40b5fe7ddb1345e712cb8ca9a6e5461a",
+    "envelope": "evidence/tsa-grant/commands/p125g-source-docs/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-freeze/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-source-freeze/stdout-stderr.log",
+    "bytes": 268,
+    "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad",
+    "envelope": "evidence/tsa-grant/commands/p125g-source-freeze/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-notices/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-source-notices/stdout-stderr.log",
+    "bytes": 246,
+    "sha256": "b08a81bb4bc0bf41a60819f50f08086ced4d2a2e97ae8676d4948ca3695ecb00",
+    "envelope": "evidence/tsa-grant/commands/p125g-source-notices/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-clean-source/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-clean-source/stdout-stderr.log",
+    "bytes": 852,
+    "sha256": "4897241c03b2cdb25b29abb9a43f9c53d9134b78db2f0d714f40f96869f8fd31",
+    "envelope": "evidence/tsa-grant/commands/p125g-clean-source/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-fresh-canonical/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-fresh-canonical/stdout-stderr.log",
+    "bytes": 20497,
+    "sha256": "d6158c09c207b58fba1a29860702f21a7b18c1979718898d9e0d7c4071d61144",
+    "envelope": "evidence/tsa-grant/commands/p125g-fresh-canonical/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-m1/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-m1/stdout-stderr.log",
+    "bytes": 23099,
+    "sha256": "c6a75c8f010da00f49feab43bd1d817618ceef83ecbc0a72590fd6808d66154e",
+    "envelope": "evidence/tsa-grant/commands/p125g-m1/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-restore1/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-restore1/stdout-stderr.log",
+    "bytes": 20482,
+    "sha256": "5325dfa79fe70fb78407d855b1950134ac416d33703a78056e3ebee52c71946a",
+    "envelope": "evidence/tsa-grant/commands/p125g-restore1/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-m2/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-m2/stdout-stderr.log",
+    "bytes": 21459,
+    "sha256": "8916665f5c2790d09ebce870a1f5aa7e415aa769e5aeb579ecd5ca107057054a",
+    "envelope": "evidence/tsa-grant/commands/p125g-m2/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-restore2/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-restore2/stdout-stderr.log",
+    "bytes": 20490,
+    "sha256": "ff447d7f1fa60a96130f3f301dc16130376d9f70022362487384744ba83038e6",
+    "envelope": "evidence/tsa-grant/commands/p125g-restore2/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-node-environment/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-node-environment/stdout-stderr.log",
+    "bytes": 49,
+    "sha256": "e8be1a8773f0cd760c13d91edfe516b462e26f10d3e380e29b9b585053e10f5b",
+    "envelope": "evidence/tsa-grant/commands/p125g-node-environment/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-pnpm-version/stdout-stderr.log",
+    "relativePath": "evidence/tsa-grant/commands/p125g-pnpm-version/stdout-stderr.log",
+    "bytes": 8,
+    "sha256": "62c33a14fe98185100efaeadf9bc76d70d6b76f1c026b4f7ead06cd6d417aacf",
+    "envelope": "evidence/tsa-grant/commands/p125g-pnpm-version/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-25-grant-qualification-20261017/m1.patch",
+    "relativePath": "evidence/tsa-grant/records/m1.patch",
+    "bytes": 624,
+    "sha256": "c62b9a4a7d71807af886c065889b1448cc9b6167711bcb0f21806a7c96fbdd22",
+    "envelope": "evidence/tsa-grant/records/m1.patch.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-25-grant-qualification-20261017/m2.patch",
+    "relativePath": "evidence/tsa-grant/records/m2.patch",
+    "bytes": 1017,
+    "sha256": "88dc42851df1155f12c35a0b61b15ce688ca12d0b52bf569bd339b7198db58a5",
+    "envelope": "evidence/tsa-grant/records/m2.patch.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/ORDER.patch",
+    "relativePath": "evidence/tsa-grant/records/fresh-control-preparation/ORDER.patch",
+    "bytes": 483,
+    "sha256": "188026c7a797e261a231e0a1e7a4fc48b166da6e900de1a3c4ac44423d1fd02b",
+    "envelope": "evidence/tsa-grant/records/fresh-control-preparation/ORDER.patch.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/DROP-VALID-GRANT.patch",
+    "relativePath": "evidence/tsa-grant/records/fresh-control-preparation/DROP-VALID-GRANT.patch",
+    "bytes": 876,
+    "sha256": "6c6027557916fb4bc33300fd41a992eb5bd39d7082db73e3669169a08fbb09e2",
+    "envelope": "evidence/tsa-grant/records/fresh-control-preparation/DROP-VALID-GRANT.patch.evidence.json"
+  }
+]

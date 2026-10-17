@@ -1,0 +1,7 @@
+No concrete new overlap was observed for the existing owned checkpoint test in this finite snapshot. Three registries retain 170 logical registered roots, all 187 physical roots and twenty Git authorities. All 595 read-only Git children naturally exited 0. The thirteen scoped paths have no dirty status; this is a scoped status fact, not a claim that every tree is clean.
+
+The test exists in S and three retained owned checkouts, with three preserved versions. S is clean at metadata commit 8889784782c8f7413e1cccab579ae4b8b6f21cc1 on the producer branch. Its current 48,568-byte e5a7 file equals both the source 802 and metadata 888 Git blobs. The proposed private 61,752-byte 36ba6394 candidate preserves all four preceding test bodies exactly. No candidate was copied or qualified.
+
+All 175 preferred V3 active inputs and twelve native physical identities match. All 171 V1 input rows remain exact, with four read-only source dependencies added. The four dist/ledger files are observations only, outside active V3 pins. Production, compiled, helper, grant and Claude variants remain untouched. Full variants and histories stay in private observations.
+
+The missing reservation file was not probed, searched, recreated or contacted. Its last known binding is preserved. Absence, clean state and history authorship do not release ownership or create a new approval hold. Root must run its hosted, freeze and D15 admission checks before the one-test successor. All held decisions, F37 skip, ignored D15 archive and quality checks remain intact.

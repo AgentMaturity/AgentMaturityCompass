@@ -1,0 +1,167 @@
+{
+  "phase": "p112-restore2",
+  "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout",
+  "tests": {
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "skipped": 0
+  },
+  "hookTaskEntries": 3,
+  "individualHookValues": 3,
+  "orderedIdentities": [
+    [
+      "tests/toolPipeline.test.ts",
+      "a call traverses the full pipeline is denied, then proceeds once approval is granted"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "a call traverses the full pipeline denies an unanswered approval rather than treating silence as yes"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "a call traverses the full pipeline denies when approval is required and no answerer is composed at all"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "a call traverses the full pipeline reports an unknown tool as a visibility denial, distinct from a policy one"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "a guard cannot launder a denial by ordering stays denied no matter where a permissive guard is registered"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "a guard cannot launder a denial by ordering is not overturned by an approval granted upstream"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "a guard cannot launder a denial by ordering cannot be cleared by a post-execute filter"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "a guard cannot launder a denial by ordering lets a scoped guard deny what the global layer left alone"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "outcome fields are orthogonal reports a timeout AND an exit code, not one collapsed status"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "outcome fields are orthogonal keeps denial separate from exit status"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "outcome fields are orthogonal distinguishes a tool that threw from a tool that was denied"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "arguments are frozen cannot be mutated by a guard between the decision and the body"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "arguments are frozen is detached from the caller's object"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "arguments are frozen freezes nested structures, not just the top level"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "arguments are frozen refuses arguments JSON would silently mangle"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "restrictions narrow, never widen hides a globally registered tool from a restricted scope"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "restrictions narrow, never widen shows only what an allow-list names"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "restrictions narrow, never widen cannot re-admit a name the global layer denied"
+    ],
+    [
+      "tests/toolPolicyGuards.test.ts",
+      "the runtime firewall as a tool guard blocks every call in a workspace with no signed policy"
+    ],
+    [
+      "tests/toolPolicyGuards.test.ts",
+      "the runtime firewall as a tool guard lets calls through once a policy is signed"
+    ],
+    [
+      "tests/toolPolicyGuards.test.ts",
+      "budgets as a tool guard denies the next execute at the limit, on the class that ran out"
+    ],
+    [
+      "tests/toolPolicyGuards.test.ts",
+      "budgets as a tool guard never denies a SIMULATE call for budget"
+    ],
+    [
+      "tests/toolPolicyGuards.test.ts",
+      "budgets as a tool guard denies EVERY class when the budgets config cannot be verified"
+    ],
+    [
+      "tests/toolPolicyGuards.test.ts",
+      "guards compose without either one weakening the other denies when either engine denies, and names which"
+    ],
+    [
+      "tests/policy/compiledPolicyGuard.test.ts",
+      "compiled policy guard on already-derived unit inputs shows listed names and names a hidden-tool refusal"
+    ],
+    [
+      "tests/policy/compiledPolicyGuard.test.ts",
+      "compiled policy guard on already-derived unit inputs keeps run_code visible without exempting its call from compiled guards"
+    ],
+    [
+      "tests/policy/compiledPolicyGuard.test.ts",
+      "compiled policy guard on already-derived unit inputs fails closed on unsupported guard names and identifies each supplied control version"
+    ],
+    [
+      "tests/policy/compiledPolicyGuard.test.ts",
+      "compiled policy guard on already-derived unit inputs requires a lease only for the identity-binding rule's explicit lease requirement"
+    ],
+    [
+      "tests/policy/compiledPolicyGuard.test.ts",
+      "compiled policy guard on already-derived unit inputs requires the already-derived authorization to carry its lease identity"
+    ],
+    [
+      "tests/policy/compiledPolicyGuard.test.ts",
+      "compiled policy guard on already-derived unit inputs rejects absent and OS-user principals while consuming the authenticated principal methods"
+    ],
+    [
+      "tests/policy/compiledPolicyGuard.test.ts",
+      "compiled policy guard on already-derived unit inputs preserves lease-before-principal refusal when both identity requirements apply"
+    ],
+    [
+      "tests/policy/compiledPolicyGuard.test.ts",
+      "compiled policy guard on already-derived unit inputs leaves identity requirements disabled when neither flag is required"
+    ],
+    [
+      "tests/policy/compiledPolicyGuard.test.ts",
+      "compiled policy guard on already-derived unit inputs projects the digest and revision with approval-class control before the guard fallback"
+    ],
+    [
+      "tests/policy/compiledPolicyGuard.test.ts",
+      "compiled policy guard on already-derived unit inputs leaves absent admitting controls null and unknown control versions explicitly null"
+    ],
+    [
+      "tests/policy/compiledPolicyGuard.test.ts",
+      "compiled policy guard on already-derived unit inputs projects only the supplied approval-required action classes without granting authority"
+    ]
+  ],
+  "taskErrors": [],
+  "rawObserverOrderedJoin": true,
+  "unhandledErrors": [],
+  "lateDiagnostics": [],
+  "command": {
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout tests/policy/compiledPolicyGuard.test.ts tests/toolPipeline.test.ts tests/toolPolicyGuards.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p112-restore2.raw.json",
+    "exit": 0,
+    "durationMs": 3803
+  },
+  "groupAbsentByESRCH": true,
+  "signalsOtherThanZeroSent": false,
+  "publicEvidencePaths": [],
+  "reuseBoundary": "Read-only import of the pinned existing ordered raw/observer/hook/late-error audit; only the finite cohort is selected here. No test execution or evidence rewriting."
+}

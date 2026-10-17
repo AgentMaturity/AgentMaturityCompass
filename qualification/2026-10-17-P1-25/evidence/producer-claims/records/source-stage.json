@@ -1,0 +1,7 @@
+{
+  "at": "2026-10-17T01:54:06.233118+00:00",
+  "exactOneStagedTest": "tests/time/checkpointWindow.test.ts",
+  "indexBytes": 61752,
+  "indexSha256": "36ba6394d4c8b824e2fbe9e2d2b5c1729431bf0206c9d5d08c357ca70a33082a",
+  "noOtherWorkingOrIndexChanges": true
+}

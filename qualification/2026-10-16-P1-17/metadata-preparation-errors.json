@@ -1,0 +1,16 @@
+[
+  {
+    "action": "inspect-phase-v1 p117-mutant-nydfs-71",
+    "failure": "Static recipe omitted parameter quotes in one title; actual Vitest title has single quotes around nydfs-500-17-notice. Parser asserted before any restoration or outcome write.",
+    "actualRuntimeUnchanged": true,
+    "runtimeRerun": false,
+    "correction": "v2 exact title alias only; design and raw preserved",
+    "v1Sha256": "f8ca16a507de5727f4583c46153b656a323368de2c6df62a7dd118d834149641"
+  },
+  {
+    "action": "p117-private-receipt-validation",
+    "failure": "The supplied proposed-parent root did not yet exist; unchanged validator correctly returned0 for empty/missingroot, so that exit provides no receipt validation.",
+    "runtimeRerun": false,
+    "correction": "Prepare actualparent/datefolder, assertitexists, and run a new distinct actualvalidationphase. Do not credit earlieremptyrootresult."
+  }
+]

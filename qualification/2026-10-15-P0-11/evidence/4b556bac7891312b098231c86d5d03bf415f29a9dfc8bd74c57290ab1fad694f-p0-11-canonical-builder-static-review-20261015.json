@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "capturedUtc": "2026-10-15T06:59:44.503901+00:00",
+  "scope": "Independent full prepared-source plus complete bound-v2 diff and actual pin/field/copy/schema static review. Not enactment or repeat runtime audit.",
+  "decision": "NO_BLOCKING_STATIC_FINDINGS",
+  "findings": [],
+  "blockingFindings": [],
+  "reviewedBuilder": {
+    "path": "/private/tmp/p0-11-build-canonical-packet-v2-20261015.py",
+    "bytes": 37821,
+    "sha256": "5ed7878e2175b143472943959283e37638d8de7a5ccbaf9f97f6acc4822d65be"
+  },
+  "preparedBuilder": {
+    "path": "/private/tmp/p0-11-build-canonical-packet-prepared-20261015.py",
+    "bytes": 28675,
+    "sha256": "2d2e5dd9c63e14c3cf45d3fee975b339e0283c3ca5ab916877947b738dcdf6dd"
+  },
+  "boundDiffOnly": [
+    "13EXPECTED",
+    "RUNTIME",
+    "13CURATED_COMPACT_INPUTS",
+    "29ADDITIONAL_PRIVATE_REFERENCES"
+  ],
+  "expectedInputPinsMatched": [
+    {
+      "path": "/private/tmp/p0-11-bounded-qualification-20261015.json",
+      "bytes": 70959,
+      "sha256": "b6aa7d4281ea76cce222dc4186d985efb837936910bac1ae5783153f2bd8d26d"
+    },
+    {
+      "path": "/private/tmp/p0-11-bounded-qualification-20261015.md",
+      "bytes": 3853,
+      "sha256": "9e12c11b37e5f00598a8fd435ad318b701e94a8e1a78b8572f8e236c7cd93793"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015.json",
+      "bytes": 88229,
+      "sha256": "86a94bff3755d5856808fb5c0f7edfe7cbc21605355030a4e5eb6482678f4d17"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015.md",
+      "bytes": 3958,
+      "sha256": "d4677cdceea01637b2eab7ce1b313eacf21f1818a0818a057dafdb3b2e5e3754"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/runtime-artifact-index.json",
+      "bytes": 83753,
+      "sha256": "cbb4b53af633b4879df157c1357df1c325310c64980f83cc7dd02f240ba874ed"
+    },
+    {
+      "path": "/private/tmp/p0-11-bounded-independent-review-20261015.json",
+      "bytes": 25410,
+      "sha256": "a7f2f420e7b92a9030ebfff6efbdb56f21bb7b9d7b3286da83130adc6ae86a1d"
+    },
+    {
+      "path": "/private/tmp/p0-11-bounded-independent-review-20261015.md",
+      "bytes": 3607,
+      "sha256": "686b6dd0c9023af386d95150f3f1b5c14b723b623f9a671a771eb0eb84ee174e"
+    },
+    {
+      "path": "/private/tmp/p0-11-root-bounded-outcome-20261015.json",
+      "bytes": 10705,
+      "sha256": "de2b6cdd947be8551cc27b3c9c168bce5f91de91143192d8eaf51e75731ed034"
+    },
+    {
+      "path": "/private/tmp/p0-11-freezer-v2-static-review-20261015.json",
+      "bytes": 11714,
+      "sha256": "13487e2d64722a73ac5e6a0ff54f614937bba7b304138055a27e8c1e4deb88f8"
+    },
+    {
+      "path": "/private/tmp/p0-41-readonly-readiness-20261015.json",
+      "bytes": 31386,
+      "sha256": "d140b27cb51b6b6f30fb5bdec2a8ca9e8eacdf138c58e563866f5e217031ff83"
+    },
+    {
+      "path": "/private/tmp/p0-41-readonly-readiness-20261015.md",
+      "bytes": 3989,
+      "sha256": "d644f6b9856c6359778cd5f9c37578764771e4bd44429c1434f74345f308a659"
+    },
+    {
+      "path": "/private/tmp/amc-next-after-p0-11-readonly-routing-20261015.json",
+      "bytes": 19261,
+      "sha256": "304e5211228163818bcda63f8a9583ebf8a19f47db290e04e52ea1abc66b7116"
+    },
+    {
+      "path": "/private/tmp/amc-next-after-p0-11-readonly-routing-20261015.md",
+      "bytes": 5042,
+      "sha256": "e8227e6e11e174ca14994ceb0aee7d89027439c8ca14f87b9e1515ec75a62677"
+    }
+  ],
+  "curatedCompactPinsMatched": [
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/initial-preflight.json",
+      "bytes": 26306,
+      "sha256": "23f1964928e523777c6f61b1a733011318427abfcf2ad9b25c3703e20590cbba"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/post-build-provenance.json",
+      "bytes": 1251,
+      "sha256": "e984f1f5c1d819e86ad21d13d7d8378a9dc03a15389874fc30a29323781f73fb"
+    },
+    {
+      "path": "/private/tmp/p0-11-run-command-prepared-20261015.py",
+      "bytes": 10488,
+      "sha256": "b28dec64355192e41615628c8219fe831b83a62f8ee709834844a962301e079a"
+    },
+    {
+      "path": "/private/tmp/p0-11-wrapper-static-review-20261015.json",
+      "bytes": 3720,
+      "sha256": "43390cccbc1f122267cd822f5f72b107759dc51fd66363636471605459006fcf"
+    },
+    {
+      "path": "/private/tmp/p0-11-wrapper-static-review-20261015.md",
+      "bytes": 2275,
+      "sha256": "9124f50fd6356f32c5be27cb6d89f416a91bd933e72d8b0613b5f9559e9055a4"
+    },
+    {
+      "path": "/private/tmp/p0-11-copy-helper-authoring-issue-20261015.json",
+      "bytes": 488,
+      "sha256": "c9ba516b4082c5415977261f7693bc381e4dfcb46ec380e36621fbe4df4d55a8"
+    },
+    {
+      "path": "/private/tmp/p0-11-prepare-causal-copy-20261015.py",
+      "bytes": 12636,
+      "sha256": "a34e4f0491272921aa871a8c04443a4711e46f198e61b9a5da3fd8ed324e18da"
+    },
+    {
+      "path": "/private/tmp/p0-11-freezer-v2-binding-note-20261015.json",
+      "bytes": 995,
+      "sha256": "7bcaa1d1b5da29eaf493a26694e9eb399d4bed2b4f60ed05b4dd95672ffaf75c"
+    },
+    {
+      "path": "/private/tmp/p0-11-freezer-v2-static-review-20261015.md",
+      "bytes": 4505,
+      "sha256": "9bc2c1209a3e6fb08a218e8ddbf4da8959462fa28c91041474b3b57c39bbcbb7"
+    },
+    {
+      "path": "/private/tmp/p0-11-canonical-builder-preparation-20261015.json",
+      "bytes": 5334,
+      "sha256": "ad65048696f7385ac9fe33c55d4b806af5293bcd66589d9899b3a63b04ba62f5"
+    },
+    {
+      "path": "/private/tmp/p0-11-canonical-validation-helper-static-review-20261015.json",
+      "bytes": 3509,
+      "sha256": "93b9a6f5358b82cb9e1675e7199ff2b0748e99a55e98d0468c25b3a430fc8435"
+    },
+    {
+      "path": "/private/tmp/p0-11-canonical-validation-helper-static-review-20261015.md",
+      "bytes": 2945,
+      "sha256": "650aadaccc32cde6f119331929fa61009c1eb899fe4684b0dfd60d834a523cb6"
+    },
+    {
+      "path": "/private/tmp/p0-11-build-canonical-packet-prepared-20261015.py",
+      "bytes": 28675,
+      "sha256": "2d2e5dd9c63e14c3cf45d3fee975b339e0283c3ca5ab916877947b738dcdf6dd"
+    }
+  ],
+  "additionalPrivateReferenceCount": 29,
+  "additionalPrivateReferences": "Exact union of13 expected,13 curated and3 runtime/finalwrapper/augmentation helper references; all matched by bounded hash inspection.",
+  "additionalThreePins": [
+    {
+      "path": "/private/tmp/p0-11-root-runtime-attribution-20261015.json",
+      "bytes": 920,
+      "sha256": "9a2c12d209e85a4d5f1a72997cce3fd2fb21a745653797be3156daf5c4da6f32"
+    },
+    {
+      "path": "/private/tmp/p0-11-run-final-command-20261015.py",
+      "bytes": 1148,
+      "sha256": "bd36de3d82cb46994f05df616e9e93db44d06d3b30fc78693f4586314f9e64f9"
+    },
+    {
+      "path": "/private/tmp/p0-11-append-canonical-validation-prepared-20261015.py",
+      "bytes": 4356,
+      "sha256": "6c369654a0eba1cb7ed2f2e58e17d82959c8de6c887a3100372725a714484a5a"
+    }
+  ],
+  "actualContracts": {
+    "source": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+    "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "runtimeIndex": {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/runtime-artifact-index.json",
+      "bytes": 83753,
+      "sha256": "cbb4b53af633b4879df157c1357df1c325310c64980f83cc7dd02f240ba874ed"
+    },
+    "runtimeReferences": 359,
+    "privateOnlyManifests": [
+      {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/inputs/source-manifest.json",
+        "bytes": 1031176,
+        "sha256": "757fc432259404ed8b4db216b0627e07ac60159aea801dd9dc3b6c129048871e"
+      },
+      {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/inputs/compiled-manifest.json",
+        "bytes": 485185,
+        "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48"
+      },
+      {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/inputs/physical-copy-manifest.json",
+        "bytes": 5036200,
+        "sha256": "75ee14d53d89d3552fa8a48d6a6c57102cf782fed90e1483c61be58551813bb8"
+      }
+    ],
+    "originalSeparateCounts": [
+      7,
+      2,
+      5,
+      7
+    ],
+    "originalDistinctRegistrations": 21,
+    "primaryAggregateAcrossTwoRuns": {
+      "total": 9,
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "pending": 0,
+      "todo": 0,
+      "single9CaseRunClaimed": false
+    },
+    "causalExecutionCounts": {
+      "total": 63,
+      "passed": 60,
+      "failed": 3,
+      "pending": 0,
+      "todo": 0
+    },
+    "failureKinds": {
+      "body-assertion": 2,
+      "exact-genuine-recorder-error-propagation": 1
+    },
+    "distinctFailedCases": 2,
+    "mutantPassCounts": [
+      6,
+      6,
+      6
+    ],
+    "survivors": [],
+    "rootCommands": 20,
+    "causalCommands": 9,
+    "allNonFixtureGuardsRequireZero": true
+  },
+  "actualBlockingDisposition": {
+    "decision": "BOUNDED_ACTUAL_EVIDENCE_VERIFIED_WITH_OPEN_ACCEPTANCE_GAPS",
+    "blockingFindings": [],
+    "blockingPacketFindings": [],
+    "allReadsFinished": true,
+    "formalAcceptanceClosed": false
+  },
+  "actualOutcomeDisposition": {
+    "decision": "BOUND_EXISTING_SOURCE_EVIDENCE_AND_CONTINUE_WITH_FORMAL_GAPS_OPEN",
+    "blockingPacketFindings": [],
+    "formalAcceptanceClosed": false,
+    "dependencyReady": false,
+    "done": false
+  },
+  "bindingAndCycleChecks": [
+    "Final review contains exact packet/index pins; outcome contains exact packet/review pins.",
+    "Outcome does not pin future bound-builder body; static review remains separate.",
+    "Receipt hashes every prior artifact and excludes itself.",
+    "All three manifest bodies excluded regardless of cap; all managed product-root bodies excluded."
+  ],
+  "copyAndCapChecks": [
+    "Explicit curation and fixed selected body list; runtime references alone confer no copy permission.",
+    "Resolved private-root/name exclusions, lstat regular/no symlink,1MiB and split-marker checks before Qmkdir.",
+    "Current curated13 bodies and bound builder source scanner-clean/within cap.",
+    "Content-addressed exclusive evidence writes and byte equality; originalEOF whitespace unchanged.",
+    "New summaries/map/refs and last receipt are nontransactional; late cap/scanner failure retains partial output without retry/trimming."
+  ],
+  "schemaAndCheckerPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/qualification/receipt.schema.json",
+      "bytes": 2315,
+      "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    }
+  ],
+  "canonicalDestination": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-11",
+  "canonicalDestinationAbsentAtCheck": true,
+  "limits": [
+    "No359-index/full12891source/native or phase raw rehash repeated; actual reviewa7f2f420 retains its own methods and limits.",
+    "No current canonical enactment/validation/check/stageddiff result is claimed.",
+    "Later helper augmentation needs its own serial inputs and actual validation; this review does not execute it.",
+    "All source/human/quality/ownership/formal/residual gaps retained."
+  ],
+  "performed": {
+    "fullPreparedSourceAndV2DiffRead": true,
+    "boundedActualMetadataPinsAndSchemaInspected": true,
+    "targetImportedParsedSyntaxCompiledExecuted": false,
+    "globalIndexSourceNativePhaseAuditRepeated": false,
+    "canonicalSourceGitOrProducerChanges": false,
+    "productRuntimeTestsBuildInstall": false,
+    "writes": "Only NEW canonical-builder static review JSON/MD pair."
+  },
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true,
+  "markdown": {
+    "path": "/private/tmp/p0-11-canonical-builder-static-review-20261015.md",
+    "bytes": 3969,
+    "sha256": "36886c551d887382ed12f456dbafd5bc59027f03bf9e9093bb37da4d13bb1da8"
+  }
+}

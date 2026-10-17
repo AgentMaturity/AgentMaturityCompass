@@ -1,0 +1,137 @@
+{
+  "head": "a0cfbc280f2b11207205541ba89112c125c29895",
+  "branch": "codex/p1-25-fallback-qualification",
+  "SStatus": "",
+  "SIndex": "",
+  "roots": 182,
+  "newPathAbsenceChecks": 364,
+  "presentNewPaths": [],
+  "nonemptyStatuses": [],
+  "newTargetHistoryAuthorities": 15,
+  "newTargetHistoriesNonempty": [],
+  "prior181SourceDeltas": 0,
+  "presentSelectedSourcePins": 827,
+  "protected128Exact": true,
+  "prior121PinsRetainedInOrder": true,
+  "held36Exact": true,
+  "native7ExactRegularDistinctSingleLink": true,
+  "heldRExact": true,
+  "candidate45CurrentMatches": 43,
+  "candidate45ExpectedMetadataSuccessors": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json"
+  ],
+  "candidate45UnexpectedDrift": [],
+  "oldP125GitFiles": 613,
+  "oldP125Artifacts": 612,
+  "oldP125CompleteByteExact": true,
+  "qaHandsOff": {
+    "record": {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/qa-handoff-append.json",
+      "regular": true,
+      "bytes": 613,
+      "sha256": "5e6922ae44d8629f3f7b83e2be89bd9770d1538d311bb7c183ff00130c318ae7"
+    },
+    "path": "/Users/sid/AgentMaturityCompass/AMC_OS/INBOX/REV_QA_LEAD.md",
+    "currentBytes": 1009429,
+    "currentSha256": "e13e3dc94dcb894e0527e1b0a8cfb74676962f36f3ed2bc9ebd3d487cb9f59ec",
+    "recordedOldPrefixExact": true,
+    "recordedOwnSuffixExact": true,
+    "currentExactRecordedNewFile": true,
+    "qaWrittenOrCopied": false
+  },
+  "gitFailures": [],
+  "schema": "p125f-focused182-scope-admission-review/1",
+  "blockers": [],
+  "verdict": "No concrete overlap observed for the exact new fallback test and evidence prefix in182 reused physical roots. Current owned P1-25 metadata and prior checkpoints remain protected; root retains actual admission and all runtime/source work.",
+  "sourceCommitSourceCode": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "currentMetadataCommit": "a0cfbc280f2b11207205541ba89112c125c29895",
+  "sourceRuntimeUnchangedByMetadataCommit": true,
+  "metadataDiffPaths": 275,
+  "retainedClientBranchExact": true,
+  "clientQOriginalClean": true,
+  "sourceVariantCounts": {
+    "src/time/tsaClient.ts": 2,
+    "src/time/checkpoint.ts": 3,
+    "src/time/timeEvidence.ts": 1,
+    "src/time/verifyTimestamp.ts": 1,
+    "src/trust/verifierReport.ts": 3,
+    "src/assurance/certificate.ts": 6,
+    "src/session/sessionService.ts": 8,
+    "docs/TRUSTED_TIME.md": 2,
+    "tests/time/tsaClient.test.ts": 1,
+    "tests/time/verifyTimestamp.test.ts": 1
+  },
+  "allTenSourceVariantCountsUnchanged": true,
+  "allFifteenNewAndMetadataHistoryReadsCompleted": true,
+  "historicalCandidateMetadataGitProof": [
+    {
+      "relativePath": "qualification/2026-10-17-P1-25/README.md",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "5beb3eae69b08f2e895520c7f459e1465780beeb:qualification/2026-10-17-P1-25/README.md"
+      ],
+      "exit": 0,
+      "bytes": 9421,
+      "sha256": "d3b5255d6679c1d00494ade4b4818dbe2c5c97a786879de3ae4f1ca6545e7127",
+      "matchesOldCandidate": true
+    },
+    {
+      "relativePath": "qualification/2026-10-17-P1-25/receipt.json",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "5beb3eae69b08f2e895520c7f459e1465780beeb:qualification/2026-10-17-P1-25/receipt.json"
+      ],
+      "exit": 0,
+      "bytes": 66214,
+      "sha256": "c2064956af3bcde63fa631bfb20aa63250e2fd68e94aa055da70ceffc9b10496",
+      "matchesOldCandidate": true
+    }
+  ],
+  "activeOwnMetadata": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+      "pin": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+        "bytes": 15980,
+        "sha256": "14ff4c7747694485db980c0041a210ccf1335271641d22f3ec1df40215438a7e"
+      }
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+      "pin": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+        "bytes": 126991,
+        "sha256": "1fcef2ee2271e19e5f39aff0d97052c432bb7f923955d18d41d36749c774d7e9"
+      }
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+      "pin": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+        "bytes": 150409,
+        "sha256": "6261cf6f1fd22ab71cbb5f9ec611809f6d96b00ae20013cb673b099247ec3b72"
+      }
+    }
+  ],
+  "futureMetadataBoundary": "These three current own metadata inputs remain exact through source/fresh/control qualification. A separately admitted later extension may replace them only with complete original preservation and exact documented successor bytes. No other protected input is released.",
+  "qaFileHandsOff": true,
+  "missingReservationLimitation": {
+    "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "bytes": 275376,
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+  },
+  "noReservationProbeSearchRecreationAppendOrMessage": true,
+  "allHoldsIncludingF37AndProviderArchivePreserved": true,
+  "sourceAllocatedByReviewer": false,
+  "runtimeOrProductExecuted": false,
+  "largeObservationPrivateOnly": true
+}

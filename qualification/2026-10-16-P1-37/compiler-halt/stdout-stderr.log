@@ -1,0 +1,2 @@
+tests/autoCompaction.test.ts(345,42): error TS2339: Property 'encodedSha256' does not exist on type 'SpillRef'.
+  Property 'encodedSha256' does not exist on type 'SpillRefV1'.

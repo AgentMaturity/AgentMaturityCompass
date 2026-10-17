@@ -1,6 +1,7 @@
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync, realpathSync } from "node:fs";
+import { randomUUID } from "node:crypto";
+import { appendFileSync, chmodSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import Database from "better-sqlite3";
 import { afterEach, describe, expect, it } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
@@ -12,6 +13,20 @@ import { ToolRegistry, defineTool } from "../src/tools/toolRegistry.js";
 import { ToolPipeline } from "../src/tools/toolPipeline.js";
 import { toolEvidenceFor } from "../src/tools/toolEvidence.js";
 import { NATIVE_BUDGET_RESERVATION } from "../src/budgets/nativeBudgetUsage.js";
+import { openActionJournal, type ActionJournal } from "../src/actions/actionJournal.js";
+import { authorizationIntentFor } from "../src/actions/authorize.js";
+import { createApprovalForIntent, decideApprovalForIntent, verifyApprovalForExecution } from "../src/approvals/approvalEngine.js";
+import { loadApprovalConsumed } from "../src/approvals/approvalChainStore.js";
+import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
+import { getPublicKeyPem, verifyHexDigest } from "../src/crypto/keys.js";
+import { initActionPolicy } from "../src/governor/actionPolicyEngine.js";
+import { verifyReceipt } from "../src/receipts/receipt.js";
+import { closeSqlitePool } from "../src/storage/sqlitePool.js";
+import { initToolsConfig } from "../src/toolhub/toolhubValidators.js";
+import type { ToolOutcome } from "../src/tools/toolTypes.js";
+import { sha256Hex } from "../src/utils/hash.js";
+import { canonicalize } from "../src/utils/json.js";
+import { lockVault } from "../src/vault/vault.js";
 
 /**
  * Every governed tool call lands in the signed spine (P5.1 remainder).
@@ -242,4 +257,173 @@ describe("the projection itself", () => {
     // would credit the guards with stopping something they allowed.
     expect(failed[0]?.meta["auditType"]).toBe("TOOL_CALL_FAILED");
   });
+});
+
+it("keeps a real journaled effect when recording fails, signs the gap and blocks the next financial call", async () => {
+  // Local journal composition only: these fixture decisions do not authenticate
+  // a person, invoke HTTP, or exercise a payment provider.
+  const root = realpathSync(mkdtempSync(join(tmpdir(), "amc-journaled-recorder-")));
+  chmodSync(root, 0o700);
+  const workspace = join(root, "workspaces", randomUUID());
+  const home = join(root, "operator-home");
+  mkdirSync(home, { mode: 0o700 });
+  const environment = {
+    HOME: home, AMC_HOME: home, AMC_CONTROL_CHECKPOINT_DIR: join(root, "checkpoints"),
+    AMC_VAULT_PASSPHRASE: "owned-journaled-recorder-pass", AMC_NO_SIGN: "0",
+    AMC_LEDGER_SQLITE_SYNCHRONOUS: "FULL", AMC_OTEL_ENABLED: "false"
+  };
+  const prior = new Map(Object.keys(environment).map(key => [key, process.env[key]]));
+  let journal: ActionJournal | undefined;
+  try {
+    for (const [key, value] of Object.entries(environment)) process.env[key] = value;
+    initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
+    // Pin before producing the policies, approvals and action receipts below.
+    const monitorPem = getPublicKeyPem(workspace, "monitor");
+    const auditorPem = getPublicKeyPem(workspace, "auditor");
+    const signedArtifact = (path: string): void => {
+      const bytes = readFileSync(path);
+      const signature = JSON.parse(readFileSync(`${path}.sig`, "utf8")) as {
+        signer: string; digestSha256: string; signature: string
+      };
+      expect(signature.signer).toBe("auditor");
+      expect(signature.digestSha256).toBe(sha256Hex(bytes));
+      expect(verifyHexDigest(signature.digestSha256, signature.signature, auditorPem)).toBe(true);
+    };
+    initActionPolicy(workspace);
+    initBudgets(workspace, "default");
+    initApprovalPolicy(workspace);
+    const financial = "fixture.financial";
+    const readOnly = "fixture.read";
+    const args = { amount: "100.00", currency: "USD", recipient: "owned-recipient" };
+    initToolsConfig(workspace, { tools: { version: 1, denyByDefault: true, allowedTools: [
+      { name: financial, actionClass: "FINANCIAL", bindingFields: { amount: "amount", currency: "currency", recipient: "recipient" } },
+      { name: readOnly, actionClass: "READ_ONLY" }
+    ] } });
+    for (const name of ["action-policy.yaml", "budgets.yaml", "approval-policy.yaml", "tools.yaml"]) {
+      signedArtifact(join(workspace, ".amc", name));
+    }
+    let grantNumber = 0;
+    const approvedAuthority = () => {
+      const intent = authorizationIntentFor({ workspace, name: financial, actionClass: "FINANCIAL", effectiveMode: "EXECUTE", arguments: args });
+      if (!intent.ok) throw new Error(`Owned financial intent refused: ${intent.reason}`);
+      const created = createApprovalForIntent({ workspace, agentId: "default", intentId: `owned-recorder-${++grantNumber}`,
+        toolName: financial, actionClass: "FINANCIAL", requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: "high", intentPayload: intent.payload });
+      signedArtifact(created.filePath);
+      const reviewers = [{ id: "owned-owner", role: "OWNER" as const }, { id: "owned-auditor", role: "AUDITOR" as const }];
+      expect(created.request.requiredApprovals).toBeGreaterThan(0);
+      expect(created.request.requiredApprovals).toBeLessThanOrEqual(reviewers.length);
+      for (const reviewer of reviewers.slice(0, created.request.requiredApprovals)) decideApprovalForIntent({
+        workspace, agentId: "default", approvalId: created.request.approvalRequestId, decision: "APPROVED", mode: "EXECUTE",
+        reason: "Approve only the owned local file effect", userId: reviewer.id, username: reviewer.id, userRoles: [reviewer.role]
+      });
+      signedArtifact(created.filePath);
+      expect(verifyApprovalForExecution({ workspace, approvalId: created.request.approvalRequestId, expectedAgentId: "default",
+        expectedToolName: financial, expectedActionClass: "FINANCIAL", expectedIntentHash: created.request.boundHashes.intentHash }))
+        .toMatchObject({ ok: true, status: "QUORUM_MET" });
+      return { approvalRequestIds: [created.request.approvalRequestId] };
+    };
+    journal = openActionJournal(workspace);
+    const activeJournal = journal;
+    const effectPath = join(root, "effect.jsonl");
+    let financialCalls = 0;
+    let readCalls = 0;
+    const recorded: Array<{ name: string; outcome: ToolOutcome }> = [];
+    const registry = new ToolRegistry();
+    registry.define(defineTool({ name: financial, description: "Append to the owned effect file", actionClass: "FINANCIAL", body: execution => {
+      financialCalls++;
+      appendFileSync(effectPath, `${JSON.stringify({ callId: execution.callId, authorizationId: execution.authorization?.authorizationId })}\n`, { mode: 0o600 });
+      return { output: "real owned effect", effect: "applied", externalRef: "owned-effect-1" };
+    } }));
+    registry.define(defineTool({ name: readOnly, description: "Read the owned effect file", actionClass: "READ_ONLY", body: () => {
+      readCalls++;
+      return { output: readFileSync(effectPath, "utf8") };
+    } }));
+    const pipeline = new ToolPipeline({ workspace, registry, journal: () => activeJournal,
+      boundApprovalRequiredFor: new Set(["FINANCIAL"]), record(execution, outcome) {
+        recorded.push({ name: execution.name, outcome });
+        throw new Error("the owned recorder is unreachable after the effect");
+      }
+    });
+    const firstAuthority = approvedAuthority();
+    const outcome = await pipeline.execute({ name: financial, agentId: "default", arguments: args, requestedMode: "EXECUTE",
+      callId: "owned-effect-first", authority: firstAuthority });
+    expect(financialCalls).toBe(1);
+    expect(recorded).toHaveLength(1);
+    expect(recorded[0]?.name).toBe(financial);
+    expect(recorded[0]?.outcome.action).toMatchObject({ state: "completed", evidenceComplete: true });
+    expect(outcome).toMatchObject({ ok: true, output: "real owned effect", denied: null,
+      action: { state: "completed", evidenceComplete: false } });
+    const effectBytes = readFileSync(effectPath, "utf8");
+    expect(effectBytes.trim().split("\n")).toHaveLength(1);
+    expect(JSON.parse(effectBytes)).toMatchObject({ callId: "owned-effect-first" });
+    const executionId = outcome.action!.executionId;
+    const view = activeJournal.get(executionId)!;
+    expect(view).toMatchObject({ state: "completed", effect: "applied", evidenceComplete: false });
+    expect(view.receipts.map(receipt => receipt.state)).toEqual(["requested", "authorized", "started", "completed", "completed"]);
+    const completed = view.receipts.at(-2)!;
+    const incomplete = view.receipts.at(-1)!;
+    const expectedOutcomeDigest = sha256Hex(canonicalize({ ok: outcome.ok, exitCode: outcome.exitCode, timedOut: outcome.timedOut,
+      bytes: outcome.bytes, outputSha256: sha256Hex(outcome.output) }));
+    expect(completed).toMatchObject({ evidenceComplete: true, effect: "applied", externalRef: "owned-effect-1", outcomeDigest: expectedOutcomeDigest });
+    expect(incomplete).toMatchObject({ reasonCode: "evidence_incomplete:recorder_failed", evidenceComplete: false,
+      effect: "applied", externalRef: "owned-effect-1", outcomeDigest: expectedOutcomeDigest });
+    expect(activeJournal.verifyReceiptChain(executionId)).toMatchObject({ ok: true, errors: [] });
+    const db = new Database(join(workspace, ".amc", "evidence.sqlite"), { readonly: true });
+    try {
+      const transitions = db.prepare(`SELECT t.receipt_json, t.receipt_digest, e.payload_inline, e.meta_json, e.event_hash, e.writer_sig
+        FROM action_transitions t JOIN evidence_events e ON e.id = t.evidence_event_id WHERE t.execution_id = ? ORDER BY t.seq`)
+        .all(executionId) as Array<{ receipt_json: string; receipt_digest: string; payload_inline: string; meta_json: string; event_hash: string; writer_sig: string }>;
+      expect(transitions).toHaveLength(5);
+      for (const transition of transitions) {
+        expect(transition.payload_inline).toBe(transition.receipt_json);
+        expect(sha256Hex(transition.receipt_json)).toBe(transition.receipt_digest);
+        expect(verifyHexDigest(transition.event_hash, transition.writer_sig, monitorPem)).toBe(true);
+        const meta = JSON.parse(transition.meta_json) as { receipt: string };
+        const signed = verifyReceipt(meta.receipt, [monitorPem]);
+        expect(signed.ok).toBe(true);
+        expect(signed.payload).toMatchObject({ v: 2, kind: "action_state", executionId,
+          body_sha256: transition.receipt_digest, event_hash: transition.event_hash });
+      }
+    } finally { db.close(); }
+    expect(activeJournal.blockingExecutions({ workspaceId: activeJournal.workspaceId, agentId: "default" })).toContain(executionId);
+    // A fresh genuine grant rules out replay/missing authority as the reason
+    // this later financial body is refused. It must remain unconsumed.
+    const nextAuthority = approvedAuthority();
+    const blocked = await pipeline.execute({ name: financial, agentId: "default", arguments: args, requestedMode: "EXECUTE",
+      callId: "owned-effect-blocked", authority: nextAuthority });
+    expect(blocked.ok).toBe(false);
+    expect(blocked.denied?.stage).toBe("authorization");
+    expect(blocked.denied?.reason).toContain(`blocked_by_unreconciled:${executionId}:`);
+    expect(blocked.action).toMatchObject({ state: "denied", evidenceComplete: true });
+    expect(loadApprovalConsumed({ workspace, agentId: "default", approvalRequestId: nextAuthority.approvalRequestIds[0]! })).toBeNull();
+    expect(financialCalls).toBe(1);
+    expect(readFileSync(effectPath, "utf8")).toBe(effectBytes);
+    const read = await pipeline.execute({ name: readOnly, agentId: "default", arguments: {}, requestedMode: "EXECUTE", callId: "owned-read" });
+    expect(read).toMatchObject({ ok: true, denied: null, output: effectBytes });
+    expect(read.action).toBeUndefined();
+    expect(readCalls).toBe(1);
+    expect(recorded.map(record => record.name)).toEqual([financial, financial, readOnly]);
+    expect(financialCalls).toBe(1);
+    expect(readFileSync(effectPath, "utf8")).toBe(effectBytes);
+    expect(getPublicKeyPem(workspace, "monitor")).toBe(monitorPem);
+    expect(getPublicKeyPem(workspace, "auditor")).toBe(auditorPem);
+  } finally {
+    const errors: unknown[] = [];
+    try {
+      try { journal?.close(); } catch (error) { errors.push(error); }
+      try { closeSqlitePool(`ledger:${resolve(workspace)}:${join(workspace, ".amc", "evidence.sqlite")}`); }
+      catch (error) { errors.push(error); }
+      try { lockVault(workspace); } catch (error) { errors.push(error); }
+      // Keep a failed-to-close fixture intact rather than delete an open DB.
+      if (errors.length === 0) {
+        try { rmSync(root, { recursive: true, force: true }); } catch (error) { errors.push(error); }
+      }
+    } finally {
+      for (const [key, value] of prior) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
+    }
+    if (errors.length > 0) throw new AggregateError(errors, "Owned journaled recorder fixture cleanup failed");
+  }
 });

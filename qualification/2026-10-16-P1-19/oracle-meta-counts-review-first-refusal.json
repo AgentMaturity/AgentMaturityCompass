@@ -1,0 +1,8 @@
+{
+  "capturedUtc": "2026-10-15T22:52:46.725268+00:00",
+  "state": "Filesystem comparison refused README because expected transform omitted percent-encoded badge count",
+  "actualGeneratorExit": 0,
+  "repositoryRestorationOrRepeat": false,
+  "missingAllowedForm": "1%2C666 to1%2C667",
+  "actualDiffReviewed": true
+}

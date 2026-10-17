@@ -133,6 +133,12 @@ Lists are checked against `--trust-root <sha256>` (repeatable), else `<AMC home>
 
 Every refusal names the key id, so you can pin the right key.
 
+The current ordered rules admit a matching explicit pin before considering a trust-list `key-compromise` revocation. This conflicts with P0-09's broader goal that an admitted key is neither revoked nor distrusted. P0-51's bounded qualification retains three failing refusal cases for this conflict; no precedence change or waiver is approved. Distrust continues to override an explicit pin.
+
+Request-supplied trust fields must be refused even when their values are `false` or `null`. Bounded checks confirm this for the Merkle-proof and trust-token handlers. The formal-certificate handler instead strips all 15 tested trust-field names and returns 200 with an untrusted result; 30 strict refusal cases remain active. Reserved API source is unchanged, and these checks do not establish complete route coverage or HTTP authentication.
+
+For portable `domain pack verify`, the verifier can locate the Ed25519 signing key in an operator-verified trust list without a separate PEM flag or environment key. Locating a verifying key does not pin it: the existing admission rules still decide its purpose, validity, distrust and revocation status. Paid activation and shared-secret or legacy license behavior are separate from portable issuer admission.
+
 ### Signing times are claims
 
 Issuer admission still uses the signing time the artifact claims. Since P1-25 a certificate can also carry an RFC 3161 token, and its verifier report states the attested time separately in `time` ([TRUSTED_TIME.md](TRUSTED_TIME.md)); admission does not use it yet. A claim later than the verification time is refused, but a leaked key can backdate a signature to before its revocation or expiry, so treat `timeBasis: "claimed"` admissions as weaker than unconditional ones, and use `key-compromise` when a key leaked.

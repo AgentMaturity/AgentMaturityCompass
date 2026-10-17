@@ -288,7 +288,7 @@ function hashChainStatus(rows: EvidenceRow[]): Map<string, { index: number; vali
   return status;
 }
 
-// The shared "system" session is never owned by one agent, so its rows enter an agent's export only by naming the agent.
+// Named-agent exports exclude the shared "system" session, even when a row directly names the agent.
 const OWNED_SESSIONS_SQL =
   "SELECT session_id FROM evidence_events WHERE event_type = 'session/open' AND session_id <> 'system' AND json_extract(meta_json, '$.agentId') = ?";
 
@@ -298,7 +298,7 @@ function activeAgentFilterClause(agentId: string | undefined): { sql: string; pa
   }
   const normalized = agentId.trim();
   return {
-    sql: ` WHERE json_extract(meta_json, '$.agentId') = ? OR json_extract(meta_json, '$.agent_id') = ? OR session_id IN (${OWNED_SESSIONS_SQL})`,
+    sql: ` WHERE session_id <> 'system' AND (json_extract(meta_json, '$.agentId') = ? OR json_extract(meta_json, '$.agent_id') = ? OR session_id IN (${OWNED_SESSIONS_SQL}))`,
     params: [normalized, normalized, normalized]
   };
 }

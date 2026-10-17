@@ -1,0 +1,12 @@
+{
+  "privateOriginal": {
+    "path": "/private/tmp/p2-07-pending-state-qualification-20261016/causal-chain-independent-audit/review.json",
+    "bytes": 17374,
+    "sha256": "2c58b6d7d9b13f18c2b5f75e74e52ed88ce3aa4fa507e83e59a215893c8cdacd"
+  },
+  "sourceCommit": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+  "allReadsFinished": true,
+  "blockingFindings": [],
+  "formalAcceptanceClosed": false,
+  "boundary": "Compact actual closure projection; the entire root-pinned independent review remains private."
+}

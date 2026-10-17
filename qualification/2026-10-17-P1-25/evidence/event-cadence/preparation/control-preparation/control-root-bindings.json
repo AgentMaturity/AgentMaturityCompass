@@ -1,0 +1,126 @@
+{
+  "schema": "p125ec-control-root-bindings/1",
+  "readyForControls": true,
+  "sourceParent": "8506539fe11a6e3eb7e964c5fcfd88b6c7d9a615",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceCommit": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+  "runtimeProtectedInputsPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-protected-inputs.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-protected-inputs.json",
+    "bytes": 80498,
+    "sha256": "78523e735a11a6aef300a4609d2ee79f45a1b56a0edc1bfd8536bb52b7abb49f",
+    "dev": 16777231,
+    "inode": 543829387,
+    "nlink": 1
+  },
+  "sourceSelectionPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+    "bytes": 8137,
+    "sha256": "02552fd970f0aff01496e9d954da4f554275a0aec076a461087c156662ce6083",
+    "dev": 16777231,
+    "inode": 543835908,
+    "nlink": 1
+  },
+  "freshSourceBindingPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-source-binding.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-source-binding.json",
+    "bytes": 122294,
+    "sha256": "48baa36cfc416eac9c71d6af072eeac7847cd2516c7e48a5cfc777f4fa3ec935",
+    "dev": 16777231,
+    "inode": 543898614,
+    "nlink": 1
+  },
+  "observedAuditPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py",
+    "bytes": 2197,
+    "sha256": "1d72bdb7d77cbff0251219cf33884e51c24bff5862cffeb052c1bf24124a58be",
+    "dev": 16777231,
+    "inode": 543829389,
+    "nlink": 1
+  },
+  "sourceOutcomePin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-source-combined-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-source-combined-outcome.json",
+    "bytes": 7255,
+    "sha256": "2847c63bd72828703121ab2446666e27e68083daab7940bb3dbbf75c3df3b530",
+    "dev": 16777231,
+    "inode": 543835862,
+    "nlink": 1
+  },
+  "freshOutcomePin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-fresh-canonical-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-fresh-canonical-outcome.json",
+    "bytes": 7287,
+    "sha256": "5918838b7ce27c61d646e41382f2e9c5d543a1e914cd42bf6fddb4179e6a8cef",
+    "dev": 16777231,
+    "inode": 543900103,
+    "nlink": 1
+  },
+  "sourceSuccessors": [
+    {
+      "old": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "bytes": 34549,
+        "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+        "dev": 16777231,
+        "inode": 543658576,
+        "nlink": 1
+      },
+      "new": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "bytes": 48568,
+        "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7",
+        "dev": 16777231,
+        "inode": 543658576,
+        "nlink": 1
+      },
+      "originalPreservedPin": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/original-owned-source/checkpointWindow.test.ts.source.txt",
+        "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/original-owned-source/checkpointWindow.test.ts.source.txt",
+        "bytes": 34549,
+        "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+        "dev": 16777231,
+        "inode": 543829328,
+        "nlink": 1
+      },
+      "originalGitCommits": [
+        "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+        "8506539fe11a6e3eb7e964c5fcfd88b6c7d9a615"
+      ]
+    }
+  ],
+  "phases": {
+    "source": "p125ec-source-combined",
+    "fresh": "p125ec-fresh-canonical",
+    "mutants": [
+      "p125ec-m1",
+      "p125ec-m2"
+    ],
+    "restorations": [
+      "p125ec-restore1",
+      "p125ec-restore2"
+    ]
+  },
+  "rootReviewedActualSourceAndFreshOutcomes": true,
+  "rootReviewedActualSourceAndFreshPublicEvidence": true,
+  "noFutureOutcomeHashesAdopted": true,
+  "directActionNaturalClosureBeforeDependentTestsRequired": true,
+  "actualActionRecordsNotFuturePins": {
+    "pattern": "/private/tmp/p1-25-cadence-qualification-20261017/control-action-<apply-or-restore><1-or-2>.json",
+    "createdByRootOnlyAfterActualNaturalReturn": true,
+    "fields": [
+      "argv",
+      "startedUtc",
+      "endedUtc",
+      "exit",
+      "stdout",
+      "stderr"
+    ],
+    "futureActionHashes": null
+  },
+  "boundary": "Root reviewed actual committed source80268079, complete source/fresh23-case outcomes and ordered hooks, both successful public audits including genuine five-stage cadence and separate per-query grant proofs. Ready only for the two fixed future fresh-source controls with explicit classified restorations. Future phase names are prospective identifiers; no control outcome or action hash is supplied. Preserve all unchanged guards,161 inputs,12 natives,98pairs/21compiled,heldR18,allholds,F37skip and global quality RED."
+}

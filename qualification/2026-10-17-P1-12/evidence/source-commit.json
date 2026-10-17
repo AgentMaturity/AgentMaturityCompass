@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-16T20:04:29.505969+00:00",
+  "argv": [
+    "git",
+    "commit",
+    "-m",
+    "test(P1-12): qualify compiled policy helper refusals"
+  ],
+  "exit": 0,
+  "stdout": "[codex/p1-12-compiled-guard-qualification 305aba3d0] test(P1-12): qualify compiled policy helper refusals\n 11 files changed, 189 insertions(+), 15 deletions(-)\n create mode 100644 tests/policy/compiledPolicyGuard.test.ts\n",
+  "stderr": "",
+  "head": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+  "status": "",
+  "noForceOrNoVerify": true
+}

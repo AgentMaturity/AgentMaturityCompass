@@ -1,0 +1,91 @@
+{
+  "source": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+  "capturedUtc": "2026-10-15T06:33:55.663691+00:00",
+  "standaloneCheckerProbes": [
+    {
+      "phase": "checker-valid",
+      "actualExit": 0,
+      "command": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-checker-valid/command.json",
+        "bytes": 1307,
+        "sha256": "9b2be20a44990616c389360c5fe78547b26fb275c324d76c4074d8efc4c503b5"
+      },
+      "stream": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-checker-valid/stdout-stderr.log",
+        "bytes": 133,
+        "sha256": "2855a40016b4002c42eba6f24b025089e336873e0ef98a892ebf371c0bd1e5bd"
+      },
+      "expectedDiagnosticPresent": true
+    },
+    {
+      "phase": "checker-missing-path",
+      "actualExit": 1,
+      "command": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-checker-missing-path/command.json",
+        "bytes": 1335,
+        "sha256": "ca60b975b2802a07152d88854a91d98ddc7e093ff806c09283a65298cc4ba98b"
+      },
+      "stream": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-checker-missing-path/stdout-stderr.log",
+        "bytes": 83,
+        "sha256": "3584434118294b14e0b03d5aaeda5374f9c637570789fb1c252c09491352e070"
+      },
+      "expectedDiagnosticPresent": true
+    },
+    {
+      "phase": "checker-missing-symbol",
+      "actualExit": 1,
+      "command": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-checker-missing-symbol/command.json",
+        "bytes": 1342,
+        "sha256": "72def6f0f17797f8fe87deced30edee29caeaf4d18662311b543e1e7984485db"
+      },
+      "stream": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-checker-missing-symbol/stdout-stderr.log",
+        "bytes": 97,
+        "sha256": "894a8067728629ff29ec3e78fe7cd4dba34d43a32675cc14333dfda5db877c8c"
+      },
+      "expectedDiagnosticPresent": true
+    },
+    {
+      "phase": "checker-bad-owner",
+      "actualExit": 1,
+      "command": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-checker-bad-owner/command.json",
+        "bytes": 1322,
+        "sha256": "69784e2550f3f2e1d1db1fd9f09b06b1dfc02a5d60cb0bb89d74e36751691205"
+      },
+      "stream": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-checker-bad-owner/stdout-stderr.log",
+        "bytes": 137,
+        "sha256": "4202a86d6f6f8743744b2ae786b70fc931ef364bdf7da997ac3af11224d94a47"
+      },
+      "expectedDiagnosticPresent": true
+    },
+    {
+      "phase": "checker-orphan-failure",
+      "actualExit": 1,
+      "command": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-checker-orphan-failure/command.json",
+        "bytes": 1351,
+        "sha256": "ad3f1483664f95d0e1a57a1082937d62dc270ea43b84b717eb3c0d9d627419ef"
+      },
+      "stream": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-checker-orphan-failure/stdout-stderr.log",
+        "bytes": 84,
+        "sha256": "8c3ab254682eb091a3d5204fe5e4f3198926e6693ad31cfcd8981d73936d97ef"
+      },
+      "expectedDiagnosticPresent": true
+    }
+  ],
+  "counts": {
+    "channels": 16,
+    "failureRows": 8
+  },
+  "mapStamp": {
+    "verifiedAt": "2026-10-07",
+    "commit": "e25cce1a03b17a023d4aadfbcdb71dfe653db87a"
+  },
+  "formalAcceptanceClosed": false,
+  "meaning": "Actual source-script CLI executions and diagnostics, separate from six map-test children and unchanged tests. Four intentional fixture refusals exit1; no sourceguardfailure waiver. Text/schema/existence checks do not establish16channel enforcement. Current16 includes legitimate later native-tool-breadth coverage, not deletion-to-historical15. Sid residualrisk/status review, ASIreverify, stale map stamp, historicalfollowupkeycollisions and fullsuite/hosted/quality/priorholds remainopen."
+}

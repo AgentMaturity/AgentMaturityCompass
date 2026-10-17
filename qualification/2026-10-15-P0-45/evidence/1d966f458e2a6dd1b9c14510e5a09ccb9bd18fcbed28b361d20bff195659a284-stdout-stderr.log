@@ -1,0 +1,11 @@
+
+ RUN  v4.1.11 /private/tmp/p0-45-causal-qualification-20261015/closure
+
+ ✓ tests/verifyRepair.test.ts (12 tests) 2767ms
+
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+   Start at  11:44:39
+   Duration  5.28s (transform 1.78s, setup 24ms, import 2.38s, tests 2.77s, environment 0ms)
+
+JSON report written to /private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--restored/raw.json

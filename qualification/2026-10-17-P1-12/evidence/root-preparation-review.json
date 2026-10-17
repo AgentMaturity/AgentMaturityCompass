@@ -1,0 +1,94 @@
+{
+  "schema": "p112-root-preparation-review/1",
+  "at": "2026-10-16T19:53:03.198252+00:00",
+  "sourceHead": "85dd9d9bda246a78407bb06c9123e78c1745ea15",
+  "sourceBranch": "codex/p1-12-compiled-guard-qualification",
+  "proposedScope": [
+    "tests/policy/compiledPolicyGuard.test.ts",
+    "qualification/2026-10-17-P1-12/"
+  ],
+  "sourceAllocationMade": false,
+  "sourceProtected": true,
+  "currentHosted": "hosted-path-admission.json",
+  "ownership": "scope-review/README.md",
+  "protectedPins": "protected-inputs.json",
+  "closedCommands": [
+    {
+      "phase": "p112-pre-d15",
+      "exit": 0,
+      "durationMs": 321,
+      "pin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-pre-d15/command.json",
+        "bytes": 1704,
+        "sha256": "ab890d8f74e590259c26bee20009c13e531ca20548c16c025ee4a568883d7db3"
+      }
+    },
+    {
+      "phase": "p112-pre-freeze",
+      "exit": 0,
+      "durationMs": 1188,
+      "pin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-pre-freeze/command.json",
+        "bytes": 1351,
+        "sha256": "b717e31f35afd2edfeb93d612f64053b12673a257f2a9d7a1dd37967cf3a1546"
+      }
+    },
+    {
+      "phase": "p112-duplicates-before",
+      "exit": 1,
+      "durationMs": 599,
+      "pin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-duplicates-before/command.json",
+        "bytes": 1372,
+        "sha256": "2ad510a30d792cdccc659592efe3000269109b3d8df610ad25200f6f8372c669"
+      }
+    },
+    {
+      "phase": "p112-dead-code-before",
+      "exit": 1,
+      "durationMs": 2941,
+      "pin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-dead-code-before/command.json",
+        "bytes": 1369,
+        "sha256": "b3f891e049f2a9fcb81d90058651c2e41347f5f6ccab7fab40a215f154592c84"
+      }
+    },
+    {
+      "phase": "p112-unchanged-tool-guards",
+      "exit": 0,
+      "durationMs": 4236,
+      "pin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-unchanged-tool-guards/command.json",
+        "bytes": 2815,
+        "sha256": "0853efe815194e45c58f8e34ab71a45c4095d16b8daa017144828f23be31f72e"
+      }
+    }
+  ],
+  "unchangedCohort": {
+    "files": [
+      "tests/toolPipeline.test.ts",
+      "tests/toolPolicyGuards.test.ts"
+    ],
+    "tests": {
+      "total": 24,
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0
+    },
+    "hooks": 2,
+    "unhandledOrLateErrors": [],
+    "authority": "Explicit --root S selects imported source modules. Process cwd and Vitest executable remain borrowed R. This cohort adds no R/src source census."
+  },
+  "qualityBefore": {
+    "duplicates": {
+      "exit": 1,
+      "findings": 1268
+    },
+    "deadCode": {
+      "exit": 1,
+      "findings": 2724
+    },
+    "waiverOrBaselineAdoption": false
+  },
+  "boundary": "The proposed cohort consumes typed already-derived policy and authorization inputs. It does not verify signed activation, active-head integrity, live signed approval policy, authentic principal or lease verification, effective-policy receipts or the amount-sensitive destination scenario. No production/old-test/package/docs/guard change is allocated. Existing strict-binding closure, held authorization combinations, provider archive staging, F37 skip and every earlier decision remain intact."
+}

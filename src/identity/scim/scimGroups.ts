@@ -151,38 +151,74 @@ export function scimPatchGroup(params: {
   operations: Array<{ op: "add" | "remove" | "replace"; path?: string; value?: unknown }>;
   actorTokenId: string;
 }): ScimGroupRecord {
+  if (!Array.isArray(params.operations) || params.operations.length === 0) {
+    throw new Error("invalidValue");
+  }
+  // Keep the original path for case-sensitive member IDs; validate before database access.
+  const operations = params.operations.map((op) => {
+    if (!op || typeof op !== "object" || Array.isArray(op) || !["add", "remove", "replace"].includes(op.op)) {
+      throw new Error("invalidValue");
+    }
+    if (op.path !== undefined && typeof op.path !== "string") {
+      throw new Error("invalidPath");
+    }
+    const path = op.path ?? "";
+    const member = /^members\s*\[\s*value\s+eq\s+"([^"]+)"\s*\]$/i.exec(path);
+    if (member && member[0] === path) {
+      if (op.op !== "remove") {
+        throw new Error("invalidPath");
+      }
+      if (op.value !== undefined) {
+        throw new Error("invalidValue");
+      }
+      return { op: op.op, ids: [member[1]!] };
+    }
+    if (path.toLowerCase() !== "members" && path !== "") {
+      throw new Error("invalidPath");
+    }
+    if (op.op === "remove" && op.value === undefined) {
+      return { op: op.op, ids: [] };
+    }
+    const values = Array.isArray(op.value) ? op.value : [op.value];
+    const ids = values.map((item) => {
+      if (!item || typeof item !== "object" || Array.isArray(item)) {
+        throw new Error("invalidValue");
+      }
+      const value = (item as { value?: unknown }).value;
+      if (typeof value !== "string" || !value.trim()) {
+        throw new Error("invalidValue");
+      }
+      return value;
+    });
+    if (op.op === "add" && ids.length === 0) {
+      throw new Error("invalidValue");
+    }
+    return { op: op.op, ids };
+  });
   const current = scimGetGroup(params.hostDir, params.groupId);
   if (!current) {
     throw new Error("SCIM group not found");
   }
   let members = new Set(current.members.map((member) => member.value));
-  for (const op of params.operations) {
-    const path = (op.path ?? "").toLowerCase();
-    if (path === "members" || path === "") {
-      const values = Array.isArray(op.value) ? op.value : op.value && typeof op.value === "object" ? [op.value] : [];
-      const ids = values
-        .map((item) => {
-          if (!item || typeof item !== "object") {
-            return null;
-          }
-          const value = (item as { value?: unknown }).value;
-          return typeof value === "string" && value.length > 0 ? value : null;
-        })
-        .filter((value): value is string => value !== null);
-      if (op.op === "replace") {
-        members = new Set(ids);
-      } else if (op.op === "add") {
-        for (const id of ids) {
-          members.add(id);
+  for (const { op, ids } of operations) {
+    if (op !== "remove") {
+      for (const id of ids) {
+        if (!findHostUserById(params.hostDir, id)) {
+          throw new Error("invalidValue");
         }
-      } else if (op.op === "remove") {
-        if (ids.length === 0) {
-          members = new Set();
-        } else {
-          for (const id of ids) {
-            members.delete(id);
-          }
-        }
+      }
+    }
+    if (op === "replace") {
+      members = new Set(ids);
+    } else if (op === "add") {
+      for (const id of ids) {
+        members.add(id);
+      }
+    } else if (ids.length === 0) {
+      members.clear();
+    } else {
+      for (const id of ids) {
+        members.delete(id);
       }
     }
   }

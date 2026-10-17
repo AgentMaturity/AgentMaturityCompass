@@ -1,0 +1,13 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass
+
+ ✓ tests/trust/verifierReport.test.ts (5 tests) 9ms
+ ✓ tests/trust/trustList.test.ts (25 tests) 572ms
+     ✓ accepts 4,096 distinct entries and refuses 4,097 on the size limit  538ms
+
+ Test Files  2 passed (2)
+      Tests  30 passed (30)
+   Start at  00:08:44
+   Duration  941ms (transform 192ms, setup 131ms, import 296ms, tests 581ms, environment 0ms)
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p125-unchanged-trust.raw.json

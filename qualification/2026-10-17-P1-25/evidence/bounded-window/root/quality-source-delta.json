@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-17T00:09:25.276378+00:00",
+  "before": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/after-metadata-full.json",
+    "bytes": 247260,
+    "sha256": "3f7df6574a5bfc8ad4d7cd3d73081074a411a41463e66c8c2325727be8ccab00"
+  },
+  "after": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/after-source-full.json",
+    "bytes": 247258,
+    "sha256": "7741a81c44ab4997dcd99ad12de24a8dbf1f85f14d68e0a43f970fce7fe81e13"
+  },
+  "beforeFindingCount": 2712,
+  "afterFindingCount": 2712,
+  "removed": [],
+  "added": [],
+  "allRemainingFindingsOrderedExact": true,
+  "fullDuplicatePublishedResultExact": true,
+  "duplicateFindingCount": 1268,
+  "globalGatesStillFailedUnwaived": true,
+  "noBaselinesAdopted": true
+}

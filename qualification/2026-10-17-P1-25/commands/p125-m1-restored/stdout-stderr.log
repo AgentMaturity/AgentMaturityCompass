@@ -1,0 +1,14 @@
+
+ RUN  v4.1.11 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout
+
+ ✓ tests/time/verifyTimestamp.test.ts (17 tests) 25ms
+ ✓ tests/trust/verifierReport.test.ts (5 tests) 9ms
+ ✓ tests/trust/trustList.test.ts (25 tests) 556ms
+     ✓ accepts 4,096 distinct entries and refuses 4,097 on the size limit  533ms
+
+ Test Files  3 passed (3)
+      Tests  47 passed (47)
+   Start at  00:28:24
+   Duration  821ms (transform 191ms, setup 65ms, import 297ms, tests 590ms, environment 0ms)
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p125-m1-restored.raw.json

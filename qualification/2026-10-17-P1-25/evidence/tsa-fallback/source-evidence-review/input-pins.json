@@ -1,0 +1,1819 @@
+{
+  "schema": "p125f-source-evidence-review-pins/1",
+  "inputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/p2-07-oidc-validation-policy.md",
+      "bytes": 672,
+      "sha256": "808776f4676986361dc85c9fbf30a21f66a3fb7f823b10b2d11da63453bf1bee",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "a817d07bd625ead95a0bfdf41e12cc8d3f95f6e67b364555da1b7ca49561155b",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+      "bytes": 59828,
+      "sha256": "c98011ad0705131dd25e177526fbc319c245e264511098278af366ef0fa2e4c6",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/SSO_OIDC.md",
+      "bytes": 7630,
+      "sha256": "8eb9a7b8e856a4d0a6219788596164138abae2d67278c69df856ff7e40c820e9",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/TRUSTED_TIME.md",
+      "bytes": 7104,
+      "sha256": "31028027dbd972b8eb8999ff52900c157cc9c1158bc6841adab0f7bbe7ba48d4",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "1f602ebcb718c77b0a51418b423f18f14b4bf127516717ac59012df508d410c4",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "01ff38f30497000d9f6de81b300f878e2bbb1266096f5f453c0585af96e4993f",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "96f6d68b97f1672774b7fbc1e72f65d065bc0d72a26773954a8436c5a6eeb13f",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "508f14a2e92fe79a5510820a7341ad2cc26ef75a8809ce22b392f015f67f6778",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/security/dependency-reviews/rfc3161.md",
+      "bytes": 2428,
+      "sha256": "abcca570b46810af858131ca1be3d994c8e4e1c828172540521e8dda314f1cce",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/identityConfig.ts",
+      "bytes": 13743,
+      "sha256": "bc1bdcfea46856cab6569ee7df78e9f4323d9821a8130158fb7b23c525be9b41",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/jwtVerify.ts",
+      "bytes": 13771,
+      "sha256": "6505b2e201bba6b0d450f7d1760a2c4bad30dac2ea604930877973f113c84847",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/oidcRoutes.ts",
+      "bytes": 6089,
+      "sha256": "9fb46be0392a1164d6de12a32468c59dfc6c7840e4883e8f5d37ef933c091cf9",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/checkpoint.ts",
+      "bytes": 21005,
+      "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/der.ts",
+      "bytes": 5959,
+      "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/tsaClient.ts",
+      "bytes": 10927,
+      "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+      "bytes": 16478,
+      "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts",
+      "bytes": 47452,
+      "sha256": "79776f1dfd4657b5bd28a0de3397ed333a7b3833f9c1f3ff2c619adf79b6c458",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/oidcValidationConfig.test.ts",
+      "bytes": 25711,
+      "sha256": "e0f92ce9257eda0a436b27e4ce60da948c4b73e2c8349fe85f0dd15031dca253",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/P2-07/src/identity/identityConfig.ts.landed",
+      "bytes": 13501,
+      "sha256": "0ffce36a3bf6c7ed6ea81b4f3024314ec6f1ecbd10058bf73e16a3888820659c",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "bytes": 18504,
+      "sha256": "6c8bbf1605de739c13c1645640f825af67edbf4ca1420d1718a55f453570cdf2",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "5d84d23da19c1d2bbeb125b7ae229e3658a70dacfd49e94ff037d23c819006dc",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+      "bytes": 43520,
+      "sha256": "0ba594cb3596def6823a57a7dc8154c6220e197c525e833ee9f8dee299db2886",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+      "bytes": 11197,
+      "sha256": "abbafaf85e349a46bbd50981a28ee8e6e174f0c9d50eeac94ae8023fdc7154e5",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "6c37880867226216d2b6cf9d2b84472a190668854dc28d1f10e77577594bea25",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "f251e3bd5071672598a90cc71064e41c3143fef495b6ed0c2f74e4860c7a269a",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/README.md",
+      "bytes": 59828,
+      "sha256": "4d39403454d0af139a177a6ec531c33e2aa2023278d874119e00e4f9c2aec60d",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/enforce/egressAllowlist.js",
+      "bytes": 7433,
+      "sha256": "651ae93ead241db5080bb223666c05c86bae5634393d98d0375f32216c5b0fa3",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/residency/checkEgress.js",
+      "bytes": 9405,
+      "sha256": "77befb2fd7332d20afd098cb28c5ca60e654066ed4f3143da50d06f3eb48804f",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/residency/destinationRegistry.js",
+      "bytes": 9345,
+      "sha256": "729b18a842f3864ff033d66e9fb6d64459567cef7574757e70b6768620c4732c",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/time/der.js",
+      "bytes": 5518,
+      "sha256": "1ed3e62994bc5d7aad45e721ca73234c5c1e4069a81fa271adb3e7f894c2a89e",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/time/timeEvidence.js",
+      "bytes": 2973,
+      "sha256": "4157ecf0aa60813bea6335f4a26fb13f7cb5b4ed4c3b86c6515b90b8295c1829",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/time/tsaClient.js",
+      "bytes": 10436,
+      "sha256": "8b6faba60532929264ec200c1692f1c3df7257298058f2e1e799b601087fc670",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/time/verifyTimestamp.js",
+      "bytes": 14777,
+      "sha256": "914d44693865680b1e3123255dfe4f393930ccbf2f418b3b8302b9c3cc942afa",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/trust/trustContext.js",
+      "bytes": 5605,
+      "sha256": "846b794fdcde123feda47f36b371891bcbdb5f8a5086fb2aaaaf8df73c618390",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/PUBLIC_ANCHORING.md",
+      "bytes": 7258,
+      "sha256": "9a7d2e945ff7c69c9a612b2ae9a71d256c1daf1ca36dcef74ea7e77a81d4ac13",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/TRANSPARENCY_MERKLE.md",
+      "bytes": 8897,
+      "sha256": "f574cd353b05ce8ca8ecd9fcffbe2496c2645c671316f99876cfeb1459f38bf1",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/TRUSTED_TIME.md",
+      "bytes": 7104,
+      "sha256": "31028027dbd972b8eb8999ff52900c157cc9c1158bc6841adab0f7bbe7ba48d4",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "edb78bf0e80c8c052b41c16102c0c087590f2b81f73d235699870995b6360556",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "e1a87d7a073be86e3657d3bdd2b992d5b677a8b9f865e7288f3ac34d0f640884",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "76cd549bcf137cf62614d52574c9cb0744afd99498e2f4c1be878a92362d5852",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "80fd75e6bddd9c58f8af50c564d3f0d0eb7315f851284b1490b9c58f1a1eb2e2",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/security/dependency-reviews/anchoring.md",
+      "bytes": 3300,
+      "sha256": "e1d68dc78c3d4ba0e3ec6c41445236bdd770107face10799f6c7cdcb3f758dc7",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/security/dependency-reviews/rfc3161.md",
+      "bytes": 2428,
+      "sha256": "abcca570b46810af858131ca1be3d994c8e4e1c828172540521e8dda314f1cce",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/knip.json",
+      "bytes": 1928,
+      "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-12/README.md",
+      "bytes": 5426,
+      "sha256": "ba1b43ae1c82df34746ed6132a8907f954874646eb7d3c762e4f6173ff80a546",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-12/receipt.json",
+      "bytes": 55097,
+      "sha256": "2b9726cf2604d24f1764066e5285841d0d31b140fdc54cce36a92d99699b92b7",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+      "bytes": 15980,
+      "sha256": "14ff4c7747694485db980c0041a210ccf1335271641d22f3ec1df40215438a7e",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+      "bytes": 150409,
+      "sha256": "6261cf6f1fd22ab71cbb5f9ec611809f6d96b00ae20013cb673b099247ec3b72",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+      "bytes": 126991,
+      "sha256": "1fcef2ee2271e19e5f39aff0d97052c432bb7f923955d18d41d36749c774d7e9",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-26/README.md",
+      "bytes": 8871,
+      "sha256": "ac4955653dbbed2cd1d1f72ae8806eed67fb359320b2f3e677ab3a712c4d47ee",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-26/evidence/assembly-inputs.json",
+      "bytes": 70376,
+      "sha256": "9cc2d1b38c255684fccf76d9b92fcbc116d7e3ee0c09bed84ac1d5014abd6857",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-26/evidence/ignored-private-inputs.json",
+      "bytes": 4812,
+      "sha256": "758efd950ef35d100e18740d850faf4202f697a39177371344cad5608b23328c",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-26/evidence/representations.json",
+      "bytes": 20129,
+      "sha256": "6f2137542582aca98bfbbb76911e48465f26d94a854c054c9dd11053b50bad1a",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-26/receipt.json",
+      "bytes": 76388,
+      "sha256": "507904051f964a73d4d8b66aaa71e683adc1a6dbbdfc2dd86233b5b9c4851f78",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/receipt.schema.json",
+      "bytes": 2315,
+      "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/clean-source-check.mjs",
+      "bytes": 7910,
+      "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+      "bytes": 9141,
+      "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/graphify-navigation.py",
+      "bytes": 23480,
+      "sha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/snapshot-plan-edit.mjs",
+      "bytes": 7012,
+      "sha256": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/bench/benchProofs.ts",
+      "bytes": 10578,
+      "sha256": "1df60fe2be9ae8583b2661a8646954405939b64f7049d8f6f4c40f6c307d3b16",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/activate.ts",
+      "bytes": 9250,
+      "sha256": "09bcf8d146e417a70b73b7333da60761d730805afc0bd481916e75ccf2731fc0",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/compile.ts",
+      "bytes": 6400,
+      "sha256": "53a9813fc1a6c5fd4b0fa851ae3d556a5c3496a9b43674aff6f1ba3a73bac82b",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/crypto/signing/signatureEnvelope.ts",
+      "bytes": 2237,
+      "sha256": "586626d236555f99ce51a53a8e438814f376ad5af2ac5b82bb6b1fb3fa16b6e7",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/crypto/signing/signer.ts",
+      "bytes": 7862,
+      "sha256": "88579bba0833ce86dd3fcfac8ea6ccf068772b4a5273ef7bc7b87b1c77a2ef09",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/enforce/egressAllowlist.ts",
+      "bytes": 8093,
+      "sha256": "db66259630b75151ba90d87577a3f5afd56e4ea2d957b4fb7fd3a2434c4c7c99",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/enforce/evidenceEmitter.ts",
+      "bytes": 24443,
+      "sha256": "fc6885586da01b60ce062dedce3d6fde872fd87ae2919ae08e92d280d4190b41",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+      "bytes": 3137,
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/residency/checkEgress.ts",
+      "bytes": 10311,
+      "sha256": "5ac226f5479a8b441738221c247b094ceb51a975af1252b82c9ded782b00d9af",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/residency/destinationRegistry.ts",
+      "bytes": 9134,
+      "sha256": "9cc37a4acb4eea64a0e93280d0a6727fba3d5574ccbc1414e223bd71a71ff21d",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/residency/types.ts",
+      "bytes": 4406,
+      "sha256": "50ac0fbcd78b521afa81177834463f26648cf047429cf743d4c4cd5bb7d3babe",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "bytes": 21005,
+      "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/der.ts",
+      "bytes": 5959,
+      "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+      "bytes": 10927,
+      "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+      "bytes": 16478,
+      "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/anchors/anchor.ts",
+      "bytes": 11596,
+      "sha256": "40ff44361f223e7e6451e8e4882963c8be115899c1ab43d752d4e8de95c21aa8",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/anchors/rekorV2.ts",
+      "bytes": 7057,
+      "sha256": "d3cda5e3cb88f2b4317ca90e5435f883338ff6cc5869fe2564f9e9129071426c",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/checkpointNote.ts",
+      "bytes": 7111,
+      "sha256": "513d398719ebd2be0aac627ba93631cf97b6735b0710ea280fcf5b428d694aab",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/merkle.ts",
+      "bytes": 5703,
+      "sha256": "09769ff79c9eba6d06c841dc9cc87b5f83a04520e0ed9756f861a55106c69468",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/merkleFrontier.ts",
+      "bytes": 5224,
+      "sha256": "7d5ed84bf1520545b0407d662f0f8468862a2ce32ceb3e34675fec1b52fb0305",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/merkleIndexState.ts",
+      "bytes": 8424,
+      "sha256": "d4abea140254dbcc96d86c8394ccfe050721e82d7726acf073d9f48b4fd79401",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/merkleIndexStore.ts",
+      "bytes": 35332,
+      "sha256": "f59f267bd79bfa35ab20601f126e4bf8f7283eef629454ddd171ae2ee3d8c7df",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/merklePaths.ts",
+      "bytes": 1835,
+      "sha256": "ede584e29366a1a6c4e4d1193c74b83028214f81f692a8bfbef2c60a9e01a9a5",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/rfc9162.ts",
+      "bytes": 6476,
+      "sha256": "053b6ffe1edc13fe8d604a2cedeae4872b802c3ebdade7234e1fe1b3875e6e35",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/sessionAnchorSchema.ts",
+      "bytes": 5740,
+      "sha256": "2215ce787faf281a96fc186820c90f044ba6c271bbcfa19873dca2c41ed54c23",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/sessionAnchorVerify.ts",
+      "bytes": 11674,
+      "sha256": "b0925fb77901172d7bb524521b147d61a043e076093452319787be213e6d5871",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/keyPurposes.ts",
+      "bytes": 604,
+      "sha256": "525e2f0d8b01b34891a1693f6f770b70c14819cb15c60f6f25589c35027253bd",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+      "bytes": 7037,
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+      "bytes": 10386,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/verifierReport.ts",
+      "bytes": 6887,
+      "sha256": "e1d0cf40a349af2f2490b652f516f04b43a97f38c7043eb640ffbe12c39f2af2",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/fs.ts",
+      "bytes": 1006,
+      "sha256": "e83f9f76ed73987babd3ef62aaf5281dd0d3a9ac5f55075f283c3fb123fa02e4",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/hash.ts",
+      "bytes": 259,
+      "sha256": "1507e34cf2dcc614e9b7bf05a790806a18ab878e8d282c16cb673718f92a6601",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/workspace.ts",
+      "bytes": 27587,
+      "sha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/README.md",
+      "bytes": 784,
+      "sha256": "1ac37a60cabc739bfa0a0f8489f20346e3d4ba23789e918d54d85b667783eef8",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/expired.token.der",
+      "bytes": 2356,
+      "sha256": "1baf6dd1c9d9601c98bf47506563b0226bfb132a884f674dad9eb641e3420d3a",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/missing-eku.token.der",
+      "bytes": 2332,
+      "sha256": "264ca611164421a268c868d0631660cbfc3423873cd9231514e7b9fd64280ec8",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/noncritical-eku.token.der",
+      "bytes": 2353,
+      "sha256": "84e186ce834f2a9f30a87a1b8ba722c95517c9e110a922ce72c72c67677d6896",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/provenance.json",
+      "bytes": 80160,
+      "sha256": "3c38fe129eecdd32d9f8cd2d89028dbe73e17ad5634ffd7b0667e0eef0c32366",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/public-certificates.json",
+      "bytes": 10021,
+      "sha256": "430746b4e4e721616a57bbec9d8b8a950cdd3b2631d51dc4925d263cb1642b52",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/query.der",
+      "bytes": 76,
+      "sha256": "6c039cf80c0e99b576a1802d7916835d5c11f85998c60ea866dc02a1403051c7",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/tampered-attribute.token.der",
+      "bytes": 2356,
+      "sha256": "fc6ac617be35765b6038bd928ec00d09de02cffbee88c6e99341d697517cfd1d",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/tstinfo.der",
+      "bytes": 93,
+      "sha256": "98e46babfb8aa4a7ba99eb4fd4976feca3f23a3e8cb6992ae93c435d6542ba35",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/valid.response.der",
+      "bytes": 2365,
+      "sha256": "cf14b113569a5be83fd3491938f5cb650724fffef7c0a946edb09fb62c1fdc31",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/fixtures/rfc3161/valid.token.der",
+      "bytes": 2356,
+      "sha256": "d45216b462f9286af58ab5a3694c82b3b1675959a45011ec9c35eef1e4973912",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/policy/compiledPolicyGuard.test.ts",
+      "bytes": 11155,
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/sessionAnchorOfflineProof.test.ts",
+      "bytes": 20097,
+      "sha256": "b14a6a44d4f6aef9cd7f6241cb23655e94c01cbb8a5b93f74ffedbef9f089dde",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaClient.test.ts",
+      "bytes": 15569,
+      "sha256": "2e70ff1d331f9ec7263dc437119ce9ab505fc1e39c5fbbb27592569cad6c1cb8",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaFallback.test.ts",
+      "bytes": 16974,
+      "sha256": "3f3eb0f312d18eef34d9625fe725b385ad29ff9d2042c533a1a41acdb2c1c5a0",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/verifyTimestamp.test.ts",
+      "bytes": 11425,
+      "sha256": "47f9aa1984cf61ae0d1192d2c04d4f3138c0fa42d32145124552bd648eddeb31",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparency/LICENSE.transparency-dev-merkle",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparency/legacyAmbiguity.test.ts",
+      "bytes": 3053,
+      "sha256": "6accfff0a621a3dac27bf63ad2cfcfdc18bfb0a8f99647a0f65fb2a5dc5f7349",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparency/rfc9162.test.ts",
+      "bytes": 18552,
+      "sha256": "bd5b0eca45ad2ff59a19a50c9947225c316fbce078bad94d249cdd9981ea3999",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparencyMerkleFailLoud.test.ts",
+      "bytes": 7925,
+      "sha256": "4a161131357ddc30f42a530c31076b83b6a8529b0983976d5e52ca6acc4f9c4e",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparencyMerkleIncremental.test.ts",
+      "bytes": 13968,
+      "sha256": "aa5ef81844a0cf8e72b6484b57a061171b3889cdc750952711b9f3b73dd6da14",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustFixtures.ts",
+      "bytes": 2312,
+      "sha256": "da8626dc36baf6756414f921450228cf780327e6dd24793a2e35c1de16fdb61d",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "bytes": 8031,
+      "sha256": "c953d12203c9ec6cbdab8ec14c3c2c827774f6afdb80aba3f33cf4644157c807",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/verifierReport.test.ts",
+      "bytes": 3844,
+      "sha256": "fb0a60cf941af3c124923f91d114aa80a2355a8c44eeb37f27e61b6ed6e05ad7",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "82a6b652ec3942844a2aada509b7256e973093f1617e37da6bd04fadeb847060",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/index.html",
+      "bytes": 43520,
+      "sha256": "4468804cbaceb41ff376a7e155e434c597996f42026642afb09897d8dbb6e75d",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/lite.html",
+      "bytes": 11197,
+      "sha256": "f69082f63720bb53bd9aa313903050321707bc90efc80d3bd3f6166e61dd0ee0",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "48aaf1ca1121c9e88a9849d3dcefcdb5de865b3ab85f9245d7d1cd81cc25b5a6",
+      "readScope": "actual current source/build/config/test bytes, not future fresh evidence"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/CONTRIBUTING.md",
+      "bytes": 19504,
+      "sha256": "7a0a6aab4e90b94bf2442229cda181e52264ea0acb21ce9a9bc965927daf1174",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/README.md",
+      "bytes": 62243,
+      "sha256": "0910c215e07741fbb32b4752f1c215f3e1d19a5dee7dfc57bc14bf3420e9159d",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/TRUSTED_TIME.md",
+      "bytes": 7310,
+      "sha256": "ec74d153256f572aa03fa62a29a4435d7fb309d2e64f03b71fa3ef531c6d264f",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "e3cae816274d07d4746c18bcbef7da203c333338b2d117a4e07c90f799ead010",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "f78e4a2f89289588f6505cfc238feabdaabcb3966502a89946e6b1e26b6819b2",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "65f3be7f143513b0d0e9f860b5fca395e5bf3e32bf62020eebf900a270bc1a7b",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "5afea81c8279023750c20ef6fdd9c5015dd15ee0f2023989127b0db9233feb30",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/migration/LEGACY_RESULTS.md",
+      "bytes": 10048,
+      "sha256": "2602db07712be8b6e84acfe552bf2932d83a4ec20531cce3a482a72fba07b309",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/security/dependency-reviews/rfc3161.md",
+      "bytes": 2428,
+      "sha256": "abcca570b46810af858131ca1be3d994c8e4e1c828172540521e8dda314f1cce",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/cli.ts",
+      "bytes": 1064495,
+      "sha256": "c4627270c37e5fe7e9314df604c01c0155f566df90e32a29ac690cb26113e5cb",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/crypto/signing/signerTypes.ts",
+      "bytes": 880,
+      "sha256": "4b9def9a2d936e47cd1e52467fb34992cca62fbbe8226bfb50bc842b2a386ad4",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/classify.ts",
+      "bytes": 8451,
+      "sha256": "da93bdaf7af938ce1c75323440cd3c4be5c97e92f6bcb87b1509d9c228c324a0",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/notices.ts",
+      "bytes": 1187,
+      "sha256": "91380ebd370671d953181bac6ef2370091644fd36abf22a91d91366ed691d023",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/notices/AMC-LEGACY-2026-001.json",
+      "bytes": 1876,
+      "sha256": "165b430d830da41eb845144daa9fd151983516bbf7ccc95162da77dd186bebe4",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/receipt.ts",
+      "bytes": 4086,
+      "sha256": "0a3e40ddd273ae16e3503c1c0f7c58323d406b7f52315078dfda432bf40c9a89",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/relabelLog.ts",
+      "bytes": 5262,
+      "sha256": "8a6496aa3c1e6785ba27d74000251d5f4114f8a7ee3ecba8e2a2468c6f8cec39",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/scan.ts",
+      "bytes": 16329,
+      "sha256": "a857c9dc27a993db83036a2044a5de7da5d1b262d3ac60ec2840e6950d87f272",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/checkpoint.ts",
+      "bytes": 21005,
+      "sha256": "5ad270cb43b734c9e7cf32f3b2a2329c43d5fe3e17ef657c444de0c8b8f530a5",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/der.ts",
+      "bytes": 5959,
+      "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/tsaClient.ts",
+      "bytes": 10927,
+      "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/verifyTimestamp.ts",
+      "bytes": 16478,
+      "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/trust/trustConfig.ts",
+      "bytes": 14680,
+      "sha256": "39c8b85eda085b68984a52ca4e306b26f86eaee798730a60a33df95003e5039e",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "bef816e6b82f9be94abf597d4787bd4a66e441a2a19a985999fac59c2a783bef",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/index.html",
+      "bytes": 44023,
+      "sha256": "285d6a2105bb73375ecfff6e7f1f97a818f34bc0b304506092666f883e8521e8",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/lite.html",
+      "bytes": 11197,
+      "sha256": "990616966fc7419c8c70aa99384f46ad93a0e48c376fb758279776320c2babbc",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 108101,
+      "sha256": "0ac4f3ecaf64118437c54c0f40a5982ce1606c3f1a66dda3bcaf41fbe5e8e202",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-11.md",
+      "bytes": 16438,
+      "sha256": "410ddda0cdd3731fdc7ea3d6edb542bedf6ed3e7402a9ac5708178048266e7c5",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-25.md",
+      "bytes": 12911,
+      "sha256": "db346645bc6ac0b783f22bbba50cb07b36e74832507218e4a2488a6d8b68f279",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-26.md",
+      "bytes": 12893,
+      "sha256": "fffd189dcd70286906ed3f4e4f84944e7208d73bb9595e71d004871be1120300",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/graphify-out/manifest.json",
+      "bytes": 697781,
+      "sha256": "c0976d8b42699a5c169fbb2f089418083eccbec3fe40a00cb5814b4fae879838",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/graphify-out/navigation/summary.json",
+      "bytes": 36920,
+      "sha256": "82e79208a9a7415b15f77e93c8e73e338859399bad1b41ad6c152e0abebb0ecb",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447",
+      "readScope": "exact private evidence/helper/runtime byte pin; no import/execution"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/bounded-closure.json",
+      "bytes": 1622,
+      "sha256": "b3f116c938e9f91eeb73ec4cba74f27c0b410a355d29f51a58940d5dce12ed87",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/final-preservation.json",
+      "bytes": 2158,
+      "sha256": "b5990312dfcb50aaa828a8a731d292932aa2acb352723fdbe0f8c2497f3c5ae7",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-source-binding.json",
+      "bytes": 11026,
+      "sha256": "8b2dfb76a10435847b92e768b6eac044a012bf73c7184345d515cb0e3b3c7af7",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/graph-freshness.json",
+      "bytes": 1273,
+      "sha256": "ee7b3f6a10b91b01019c520109a4cd1adbb4b4488870088de52ccb56b0fcb797",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/ownership-facts.json",
+      "bytes": 48112,
+      "sha256": "ea3112ff7c487dc4a696dd4748b3ebfb47e708dfff7873b7ad0989ea14deb99a",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/ownership-observations.json",
+      "bytes": 486198,
+      "sha256": "110a8eb14275715bb2f6a3b5a61a4643f7494808137562fb12e253e3427ae2a7",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/source-history.json",
+      "bytes": 3152,
+      "sha256": "4ec793790fb372d4e30fb0f524cd6f26fe8a4e9d3ed5f2c9baa6f9749749fc7a",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/root-final-review.json",
+      "bytes": 3363,
+      "sha256": "2e8df42109331e180ff5885309c65734817c157d851b8f44f7b851406016a806",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-evidence-design/ownership.json",
+      "bytes": 140164,
+      "sha256": "d3dcd561d6be4e3e2583d55e4eaa1cbc4e1f0a4b7999fe60523fc0e6e2672556",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/after-metadata-full.json",
+      "bytes": 247902,
+      "sha256": "5279fd99df8c6cf6052cd16f7dac47ed481d2207ea367b6637e881945caa9edb",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/bounded-closure.json",
+      "bytes": 13394,
+      "sha256": "48df6ed2897d9f8e980029089eb0d4a669f5ffc992be7a79df80368c06614d3b",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/metadata-commit-and-export.json",
+      "bytes": 723,
+      "sha256": "8e49261fcf26ba66a1a76f7db68feb9ffb2393232612d5742d24e500e09cafdb",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-candidate-review/review.json",
+      "bytes": 9413,
+      "sha256": "76455309fe4dbdc932a26c6f85bcb714d986acbdaae367611c7e94666ec67bdc",
+      "readScope": "exact private evidence/helper/runtime byte pin; no import/execution"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/qa-handoff-append.json",
+      "bytes": 613,
+      "sha256": "5e6922ae44d8629f3f7b83e2be89bd9770d1538d311bb7c183ff00130c318ae7",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/after-source-full.json",
+      "bytes": 247821,
+      "sha256": "0c0ad51bb621ff2208fab191e0e431f01b7086c5ca80230ae407572825f91a5d",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/audit-observed.py",
+      "bytes": 1570,
+      "sha256": "7b3aeb694dff1f326bdd6d015d1400d56ed306519c1d091108e9a44396238330",
+      "readScope": "exact private evidence/helper/runtime byte pin; no import/execution"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/private-originals/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "49837eb4b3cea2bbf03c46244d370dc80c72c0dec6e78cad7dbc426ef3896c9e",
+      "readScope": "private original hash/bytes only, never published"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/private-originals/README.md",
+      "bytes": 59828,
+      "sha256": "1cf5097efb8c894746065edb1ef625fc21f616c76060fc4bd2c0011eadbc5826",
+      "readScope": "private original hash/bytes only, never published"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/private-originals/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "45b32dc7ffb39cb808b59f72da39cded0a59c4feeca5bddf0f4c8e5e2e9eea02",
+      "readScope": "private original hash/bytes only, never published"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/private-originals/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "950a26cb53c37c58e98d298878f9219a448cccdc74511e23ba0ebda2e0ab70b5",
+      "readScope": "private original hash/bytes only, never published"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/private-originals/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "ce8d53e766334530a3d89f0b30a4ed12db3696eec72e900bb956c521321783dd",
+      "readScope": "private original hash/bytes only, never published"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/private-originals/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "06ae59f494f5fe76df76c5be54a94d11ea7fbbce4cd60cec4d8be4c8330d7551",
+      "readScope": "private original hash/bytes only, never published"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/private-originals/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "d8385bdeacd02b68add2930d54bc3578fa5d256d0020b5b245462be6eff900c1",
+      "readScope": "private original hash/bytes only, never published"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/private-originals/website/index.html",
+      "bytes": 43520,
+      "sha256": "0bf924630aac6ffc3666ed5b899c493c7abbbf16cdbba4ebc1d793893d06ea53",
+      "readScope": "private original hash/bytes only, never published"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/private-originals/website/lite.html",
+      "bytes": 11197,
+      "sha256": "85a23bdc6aa1890627afb0c57562aca3aa2479f0764c0f771d92e03576704db3",
+      "readScope": "private original hash/bytes only, never published"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/private-originals/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "f980b8c42da97ea010b88408b2114d60330040c75be2753be856083c945f9e01",
+      "readScope": "private original hash/bytes only, never published"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/proposed-admission.json",
+      "bytes": 21664,
+      "sha256": "66a680c76e57fc50af5e77cc4fd201ca6a547ee514f2a47092cd276211bbae52",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-helper-static-review/review.json",
+      "bytes": 4555,
+      "sha256": "7403620f55dfb70e8c32b833c5daf828fbfb1fa2433d3c5fbe38ca677e2a0aa2",
+      "readScope": "exact private evidence/helper/runtime byte pin; no import/execution"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/check-preservation.py",
+      "bytes": 1472,
+      "sha256": "894a259f41e243002fcf44f73ee07ed607b39a89bb3e92f3d45cc44bd9bcc7ac",
+      "readScope": "exact private evidence/helper/runtime byte pin; no import/execution"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/source-control.py",
+      "bytes": 15955,
+      "sha256": "d8788251c7481baccea9bd7dba4da5e43fc2649e22393b5542c64d779b6c0ef7",
+      "readScope": "exact private evidence/helper/runtime byte pin; no import/execution"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/source-pinset.json",
+      "bytes": 7309,
+      "sha256": "2f8c857afc3e9c7e63919d83cf63529ff6ee9ddd4b6f33f0cfef469da0bb431c",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/generated-counts-actual.json",
+      "bytes": 6079,
+      "sha256": "9472949583890d2623194bba147f44c4bb6ec2e285936103f4ebc7fcbf32dc5b",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/p125f-source-combined-outcome.json",
+      "bytes": 4249,
+      "sha256": "dc9f1e951177a6eb15ba853f65ef35afd94f9b6f9be75b5dceab637543b55cdd",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/protected-inputs.json",
+      "bytes": 35693,
+      "sha256": "ec3c07063b0334bea701ca69a880c1399f46ffe4d859a1aa3181f5002428b897",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/quality-source-delta.json",
+      "bytes": 597,
+      "sha256": "c489e998393a3c72038c2f60005a4971dae2ce2afff7e7692c49d2b918b4e0a8",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/runtime-audit-preparation/audit-observed.py",
+      "bytes": 1570,
+      "sha256": "7b3aeb694dff1f326bdd6d015d1400d56ed306519c1d091108e9a44396238330",
+      "readScope": "exact private evidence/helper/runtime byte pin; no import/execution"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/runtime-audit-preparation/before-source-baseline-adoption.json",
+      "bytes": 750,
+      "sha256": "30fca473161326b323dd28b3f28ad87ca922c4b55168009e65d70dcbd81337f8",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/source-checkpoint-prepared.json",
+      "bytes": 3169,
+      "sha256": "b1bb9e7eb4988587409d878b9170590844bb266548ff0260e6e028ebcf30625f",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/source-checkpoint.json",
+      "bytes": 2294,
+      "sha256": "137d1f277bc2565791fd6311694623b444912d99ea07b2f23bf9660aa8ae60c6",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/source-commit-command.json",
+      "bytes": 393,
+      "sha256": "17686f5d5e5c2ef9cad9434ec7c9bffa52707d316ccec559aaf22edb8856dbc1",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/source-evidence-review/private-review-preparation-stop.json",
+      "bytes": 671,
+      "sha256": "a7765ed5432603e0664107b7788d3453b2e6a2326fc7302f6cd0395e15c34eaa",
+      "readScope": "exact private evidence/helper/runtime byte pin; no import/execution"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/source-lifecycle-review.json",
+      "bytes": 5048,
+      "sha256": "2828e8cdad426374f0005874f6e97637c7c904d14e319c963b512d38ddb1a22c",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/branch-preparation.json",
+      "bytes": 616,
+      "sha256": "4c320d28c40930dc95ccf0949b063b834e21f6f3f7b5bb207e7240101d2f49ba",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/next-plan-routing2/routing.json",
+      "bytes": 13613,
+      "sha256": "8548f63873e1401989b7216243edab60d7d74e8d4cb6cd560eeeb23080feb0ff",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-run-prepared.py",
+      "bytes": 14874,
+      "sha256": "abbda23f645d38e643133ebbb4a9b19dc4f9bad5cab20d098c02449c6d3885e6",
+      "readScope": "exact private evidence/helper/runtime byte pin; no import/execution"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-build/command.json",
+      "bytes": 1330,
+      "sha256": "5063153140dc306197a22dfa176e43e37940896a02dc4b72a1848d38935c4a0d",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-build/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "2a7791e1a4fed7891dc3ee1c4ef66ece8c68935fb595a7c2dcce3551a0f16094",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-build/owned-process.json",
+      "bytes": 502,
+      "sha256": "7b8faee94b28ce6b349273a040abd45b3b940e3e150d92686a7fc08959566cf5",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-build/stdout-stderr.log",
+      "bytes": 955,
+      "sha256": "e6e36dcd7bda0fc5d63469c9f1781ef19fe59c3a49afbf5d2c7c6c0c8dd1acce",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-counts-before/command.json",
+      "bytes": 1358,
+      "sha256": "b0f134061014699d40730751b1e3c881f779613cb94d0d6b4ccc7b73f73d6163",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-counts-before/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "5549302a861f149e8ada2b2a5008458dd2aade2846d866bae5b9121560b9c54b",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-counts-before/owned-process.json",
+      "bytes": 509,
+      "sha256": "b42cfb698193a33cc9f9385ad81ce2b8611a1351df593e07fd43ca75a7e04676",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-counts-before/stdout-stderr.log",
+      "bytes": 1436,
+      "sha256": "e688944294e77493bcfdb36adbb6cbf3e6178b9a6ceed2587bce68213b653d9a",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-dead-code-after/command.json",
+      "bytes": 1369,
+      "sha256": "d7ca613baaa52c3012186f58b4e0e8b237e8de080323ee2070636c1097381994",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-dead-code-after/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "312dd52d22da5f9e3afed1635c7f86b1e19a38e72f1b295bc02a0dedb3c92a0f",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-dead-code-after/owned-process.json",
+      "bytes": 512,
+      "sha256": "3db85ba473c8a3d3e7d0d4624d218d802b3859d4217f239ff8b6cd14bd88e45c",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-dead-code-after/stdout-stderr.log",
+      "bytes": 1207,
+      "sha256": "770a8a1d051a73cff8ccc73804b660ff07ced6240ab077a2ae0a6f516c784043",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-duplicates-after/command.json",
+      "bytes": 1372,
+      "sha256": "650072878d2753b03dce2136dc0909c8ce0d6fb034a475d5f3c1fddb98d42e0d",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-duplicates-after/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "8a76f123214626226301bd17345a4c3c9c98e678b687e749b0b050d3e0981eaf",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-duplicates-after/owned-process.json",
+      "bytes": 513,
+      "sha256": "28b5840dd498d7d72355cee3ba513fe3f2f37f0df258b5e99c026039acca4f72",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-duplicates-after/stdout-stderr.log",
+      "bytes": 2064,
+      "sha256": "62545f898b95ab3125616ea8bf2872244314dd98d3db67b8ff58c707e6d31e29",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-generate-counts/command.json",
+      "bytes": 1358,
+      "sha256": "7d6b912cda430f5e0fa3d355faa6da90d991299cfe31168a8c5abb02add6aeb3",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-generate-counts/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "01236856de3f8de5e07688598bc52ef30363a8db4f9d32ffe72b28f873a1b639",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-generate-counts/owned-process.json",
+      "bytes": 507,
+      "sha256": "0bd12c697ebf8f59f8b0c0906001274e53dca98d149f1cf3b6ca9036b0dad325",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-generate-counts/stdout-stderr.log",
+      "bytes": 176,
+      "sha256": "01c62fa9c66c468bd10c769615d94804a36d50969143b181132a836158ebfbc4",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-lint/command.json",
+      "bytes": 1325,
+      "sha256": "127646b391ac71cb0940b1e1f05bc2469d36babaab0582fdb18d1285a5bd6cab",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-lint/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "f2aa54ff21f0dfa2afc2d03a018d4d2f60435f1260271aa696ac3e5116a35146",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-lint/owned-process.json",
+      "bytes": 501,
+      "sha256": "16924354bca7766aec56fd5c25cf276a6351adf2a71624ca683ff9b23065341f",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-lint/stdout-stderr.log",
+      "bytes": 447,
+      "sha256": "22a03ddf6f49358fb4bcfe04bd56da9a1a9e26cc5aa8ffde1b5892abef468b95",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-quality-after-diagnostic/command.json",
+      "bytes": 1373,
+      "sha256": "56293958863ef9e1a49942f181cfe70256fc1144f4954538b101bd5609988adb",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-quality-after-diagnostic/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "04263dbe1812e4ebe4d885a8cb7fbe88e6024a34f29045332be25adec570d9cc",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-quality-after-diagnostic/owned-process.json",
+      "bytes": 502,
+      "sha256": "b5468b99380c68a8829b21c36bdba11e6ddca5e2fea079a25113fdaf3830c299",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-quality-after-diagnostic/stdout-stderr.log",
+      "bytes": 121,
+      "sha256": "306de4fc2d96e0d9d44a4aa59f3764830f719cbf336f2f37be06eee6f4130f90",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-architecture/command.json",
+      "bytes": 1405,
+      "sha256": "03103dd54732952c7050e2d10d440527e4938031e96409039159f7010e773a3f",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-architecture/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "f0a984cd3adf37a9aaebfc8407282966756346b5c91a31db5b77573cc064a6c3",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-architecture/owned-process.json",
+      "bytes": 526,
+      "sha256": "009fa56a35dc8f64f99529a7da0cc87f3716dd68efdf6111a91afbecba833061",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-architecture/stdout-stderr.log",
+      "bytes": 95863,
+      "sha256": "b087df083209af89c9f69496ec867445d1dd69fb2b68b44665ac280965341751",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/command.json",
+      "bytes": 2796,
+      "sha256": "1d2b4d18151b7bf943ddf916016538c44f523dad4c26bf5868011ce11d153bc6",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/observer.json",
+      "bytes": 9761,
+      "sha256": "c8a77aa54eca56efaee29984af2c9de6fc2d610b8a5efc2e1d6473509a3d429a",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "9a67a0701261977ba7badb93e4dd25e9c15dc89a7c6fd851312b9bcba67ef8e8",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/owned-process.json",
+      "bytes": 860,
+      "sha256": "1718bf4bda3c3136c6a7e768f4684979b2f6a9aa33cf81ab47f2ff1b5db59491",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/raw.json",
+      "bytes": 7189,
+      "sha256": "4bb86592657d20cd4c95d20198411ffdeee127e748c1a46308349245f5ab8617",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/stdout-stderr.log",
+      "bytes": 4581,
+      "sha256": "cc4fee427d9d010a54f3f789ce0f3249177b8197aba1264c2636072a16816a47",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-counts/command.json",
+      "bytes": 1358,
+      "sha256": "b9064738ea1dbb2c62879799e36763c1908e9a1f1a3bf06e59cf9b73a82c06c1",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-counts/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "84fc7b6702f3754e29e7b080e44c1440f3a5cb17e5cc6efa97a6b91ef03b5b9b",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-counts/owned-process.json",
+      "bytes": 509,
+      "sha256": "7741888acbed19ce0a268bcd195ec030861beb3bd302b51d40342cbf83b2ae0d",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-counts/stdout-stderr.log",
+      "bytes": 239,
+      "sha256": "82ac60039fcf8bc00dc663aabd78dcafc658cffc866e81929505bb199e8df7e4",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-docs/command.json",
+      "bytes": 1362,
+      "sha256": "b6b5ef4b88f0d4b92018587c181c9de795a4d94f2459cb5b305b0165c6abac27",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-docs/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "f215f5909deb7438a7a2f1dd5d08757b475edb3238cd2d4a381c8ac62e4f6778",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-docs/owned-process.json",
+      "bytes": 513,
+      "sha256": "98fcf76955cee6e2181cebbf0ab0fd61ea2c2b34e1fcb6378ae7b82f5e964208",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-docs/stdout-stderr.log",
+      "bytes": 205,
+      "sha256": "ff57cb43abfed0a3cdba4ccb780bf3ee40b5fe7ddb1345e712cb8ca9a6e5461a",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-freeze/command.json",
+      "bytes": 1359,
+      "sha256": "5e6a2a8dfbc039c5111bc54dcb7bcccc81f7e9e30f623fd54edd62fe07b16b44",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-freeze/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "f91d825b6f8c442bbc931cf959992f871c96db309cfaa03f43f3340608b7e37a",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-freeze/owned-process.json",
+      "bytes": 509,
+      "sha256": "9407e7ef8e3b6ecf11bad401f45dce602242b9f492765a48022d4f261dfd960f",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-freeze/stdout-stderr.log",
+      "bytes": 268,
+      "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-gates/command.json",
+      "bytes": 1354,
+      "sha256": "93a9121a10c086942167d0be789898833d3128ddb44e2070cdd53fe324329b11",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-gates/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "86e3b68788efb723de65a49e89fa844551c8c65a1c4a1a6eb979bdac9084089c",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-gates/owned-process.json",
+      "bytes": 508,
+      "sha256": "9d510b70fbf98895930cdcb634f55d8ab57fdee3d751c84c4881590dbec5bfbd",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-gates/stdout-stderr.log",
+      "bytes": 821,
+      "sha256": "5664206ddf6d3b7a49d53c87907f78750517c4c583479f77268a1da353dba4ed",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-notices/command.json",
+      "bytes": 1386,
+      "sha256": "b2cf6692d3bd589b34583af1b0c4d7d52b03e6e92d85ea0b17319936abd56a4e",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-notices/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "b126d5f77ad993a077468eed21bde72e4e09f6f67bfce0826206d17a9ff087dc",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-notices/owned-process.json",
+      "bytes": 522,
+      "sha256": "134e31b50319c3620aa9466dec7393e89215b314bb789fbc81371f51d585a764",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-notices/stdout-stderr.log",
+      "bytes": 246,
+      "sha256": "b08a81bb4bc0bf41a60819f50f08086ced4d2a2e97ae8676d4948ca3695ecb00",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-threat/command.json",
+      "bytes": 1370,
+      "sha256": "3f7f8299730cb4794efa12f1f63737a8bf334171658f24c08dfc6b49dee33709",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-threat/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "ec770dd5b4c6c036a123be6fa186744458287f79c616eb4ed3e09155e3a4f1a1",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-threat/owned-process.json",
+      "bytes": 515,
+      "sha256": "03e330d6205378c812392e92e54b811beea5d5345ec2f6db601b5142e2dc8086",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-threat/stdout-stderr.log",
+      "bytes": 294,
+      "sha256": "d8a37764ab52c8fe6a84b8aaf1de67c240c7f01698f2abf5b1a802764503d3f4",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-types/command.json",
+      "bytes": 1352,
+      "sha256": "fb519cb6daf7543c2de28189114aca6d0242ae088c20f6f979c56e1db34444d8",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-types/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "35b95d9a29d29d68a16a06313fe3a2fd11840f2f992780da98e73548809a09b0",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-types/owned-process.json",
+      "bytes": 506,
+      "sha256": "ff84c8460cdacd1eae0df9010efdfacf28c31d4ce50d5c7d34e7052ce0950da8",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-types/stdout-stderr.log",
+      "bytes": 149,
+      "sha256": "ffc3342aa63f1c01882b849ff8dd0a3cd4e7b509f07c4fb8c69713242b5a98d5",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-test-types/command.json",
+      "bytes": 1360,
+      "sha256": "bf7901f81041b08dc76aa86cbab364d9ca69552b5830cf38171e8150ff37effc",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-test-types/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "a4e1c66f15379fcb14f9fbb24b91fc227ac2795e70c9cfd3a1381b6b83ef01db",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-test-types/owned-process.json",
+      "bytes": 512,
+      "sha256": "1a75885c400b00122242da0e60f50adcfb306b167f7c1836e7eb3a6253882ea2",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-test-types/stdout-stderr.log",
+      "bytes": 161,
+      "sha256": "fb4ed4c9025dd5e6271e65a32d037c413d19a08be3c3b2a5cac093c68f75f865",
+      "readScope": "closed result log and error fields inspected"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p125f-source-combined.raw.json",
+      "bytes": 7189,
+      "sha256": "4bb86592657d20cd4c95d20198411ffdeee127e748c1a46308349245f5ab8617",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p2-07-provider-validation-20261016/count-overlay-result.json",
+      "bytes": 3952,
+      "sha256": "8380ef85741b16eff973fb2851cdb2cf247ad881fbe489524a12255a69465546",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/tmp/p2-07-provider-validation-20261016/preserved-tracked-candidate.patch",
+      "bytes": 47279,
+      "sha256": "edda17505b7c80a22561c35753f9051cf1ff80b731f145671f5e437150367129",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "readScope": "finite source/evidence byte read"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "readScope": "finite source/evidence byte read"
+    }
+  ],
+  "allRehashed": true,
+  "reservationProbe": false
+}

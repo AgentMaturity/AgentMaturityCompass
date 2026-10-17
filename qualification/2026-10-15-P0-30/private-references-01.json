@@ -1,0 +1,2505 @@
+{
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "references": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/.github/workflows/ci.yml",
+      "bytes": 14134,
+      "sha256": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/.github/workflows/npm-publish.yml",
+      "bytes": 8368,
+      "sha256": "3c4bb58c740409850865514f3d07fe60efb115f471aa5aa2f307f28344e2f5f1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/docs/CITATIONS.md",
+      "bytes": 6066,
+      "sha256": "f714f3a0b646e07c07b3d4506583f40f96b53f4cd18b467ac59823e937fdc463"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/qualification/2026-10-05-P0-01/receipt.json",
+      "bytes": 4215,
+      "sha256": "e6779a8f6a79aeceba66267e6402741ffacd7a33ac9015b4380af7273da3ec25"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/qualification/2026-10-06-P0-12/receipt.json",
+      "bytes": 8514,
+      "sha256": "3cea93f4be694bf7b8296d8955bb9476894e3a88bd8fd008bf003e6ec603eb6d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/qualification/2026-10-06-P0-13/receipt.json",
+      "bytes": 7226,
+      "sha256": "3d44149114433388e2b7a139d89a7866dcda4409ea7232042ba14cb3b0cee2bd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/scripts/check-citations.mjs",
+      "bytes": 14165,
+      "sha256": "300f7be119ae2289774fdc90ddaafbdd6ee1a1da3a020de1d6dd8ec9743bca6d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/scripts/check-regulatory-currency.mjs",
+      "bytes": 10338,
+      "sha256": "2e86a6035a4c389e498bbcaa92a21bfa671d4611fb66ffd7edfcd9de2fc1aff3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/scripts/citations-baseline.json",
+      "bytes": 2413,
+      "sha256": "31d07b0f9ea2022e1994f0b9692a3a55c87271d4aaf5e645d9b68a3583d69f59"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/scripts/lib/gateDag.mjs",
+      "bytes": 1712,
+      "sha256": "846ad3e74df8210ef04bd1d3ddb36702f3a28b50d84235b8e570a92249adc2bb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/scripts/release-gate.mjs",
+      "bytes": 17338,
+      "sha256": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/adapters/deepseekHarnessLaunch.ts",
+      "bytes": 5777,
+      "sha256": "e26b0afc745b7d3dbc55a8e97e1f17fb6d5c8c841d41b4a91c5ebd743be38791"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/agent/agentToolset.ts",
+      "bytes": 29046,
+      "sha256": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/api/productRouter.ts",
+      "bytes": 4349,
+      "sha256": "14327afcd9fed2440c0f8c6d97a04f7095053220699a937c596564b77c0e3a4d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/assurance/certificate.ts",
+      "bytes": 29327,
+      "sha256": "9dbc1bdefa17f2c2081ee5959cd47bebf36b39efecedcf7c7c46208e1c3b5c2d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/benchmarks/harnessComparison.ts",
+      "bytes": 21750,
+      "sha256": "2dd5576765c7fa7614b2e6f7e92ba33e5d718fecc35b199e85a92b4eebc04d95"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/bridge/bridgeAuth.ts",
+      "bytes": 8116,
+      "sha256": "0ad1e674fd5f40de8b2a34414d2d37050697a52720d560eee2bcdce56038d3be"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/budgets/nativeBudgetAdmission.ts",
+      "bytes": 5574,
+      "sha256": "5c39db72dffdb8b4d3fe08119bc6e17b1ff0abced55b725c731c9c06a93642db"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/bundles/bundle.ts",
+      "bytes": 42233,
+      "sha256": "a28de38c02c4c748de0c81c925b655b274ce287b72db9e834823b41375d78894"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/cli-import-commands.ts",
+      "bytes": 13369,
+      "sha256": "5d79d48e1e6389687f137c52372642aea576e9b852eada833186d98159944641"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/cli/claimOutput.ts",
+      "bytes": 10568,
+      "sha256": "1abdc50016d1b45d4cfc1b50217e715194133256cb4427823a89793045437686"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/compliance/builtInMappings.ts",
+      "bytes": 71290,
+      "sha256": "6d0a44c467ec7a918b4fbd56f911cf897463b393bc2b2f46fc1bedf5278d73b5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/compliance/citations/citationRecord.ts",
+      "bytes": 1708,
+      "sha256": "5e62a8c868bfffdb952055e408eea1b8c81db78cf151b30d7213a9771fc0f6f9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/compliance/citations/frameworkIds.ts",
+      "bytes": 2061,
+      "sha256": "a17b09ea9c8c7fa4459ae0cd9efdb8849009fd3638140c11a71f9f93f86b640f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/compliance/citations/lint.ts",
+      "bytes": 7865,
+      "sha256": "35cc58ee94b64c32ad7aa9719dc61134384cd4a3677070c4ae02ab3b88cacf7f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/compliance/citations/officialHosts.ts",
+      "bytes": 1932,
+      "sha256": "da2d28e320495df599cc87fcbf356faa6796a8f5d18fef8bda8893115761ba36"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/compliance/citations/reference/atlas.json",
+      "bytes": 16945,
+      "sha256": "472ed81c037c7fadd3b29d5ef995abba8f111ad3a58f16dcf9876985e294a4f9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/compliance/citations/reference/iso42001AnnexA.json",
+      "bytes": 278,
+      "sha256": "415c9c5aa7c51f2e9b519a6c90dccfe9664e0ec57089281612125ba63a5fa545"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/compliance/citations/reference/nistAiRmf.json",
+      "bytes": 17818,
+      "sha256": "3dc23935f3c7dc4a31357277854dcc28d4196fbea078dd7a20f3f9c6c2360aa1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/compliance/citations/supersededInstruments.ts",
+      "bytes": 2171,
+      "sha256": "cacff8b81e91e18c1c19af36d3919fd0bcaf8da43e9779194d197c399dc5b899"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/compliance/regulatory/register.json",
+      "bytes": 458334,
+      "sha256": "95e254f9d96b4908746fcc7147596682e9c968613db070ede3cc301a8b23b6e2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/crypto/keyHistoryEnvelope.ts",
+      "bytes": 4788,
+      "sha256": "80162fd555f9972792406846fd987f4290242c0149861388549c402b184a33f4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/domains/industryPackAudit.ts",
+      "bytes": 26330,
+      "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/domains/packs/regulatorySchema.ts",
+      "bytes": 12723,
+      "sha256": "61aaa47c94a3ba537390e1409de7d117211915d020bf1ca98bd2cf8b43762d61"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/gateway/server.ts",
+      "bytes": 68401,
+      "sha256": "aa01863e5ce19eb441c2253f5f7af829c43597ed575b1affcf1699204a746cb5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/importers/callbackTelemetryCapture.ts",
+      "bytes": 14035,
+      "sha256": "bcfb468560feb46c296d28176c384c63420a88ae97eaea1e1c852c839a82c366"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/importers/externalEvidenceExport.ts",
+      "bytes": 5230,
+      "sha256": "a65b88a8dfb6885305c06d5f2ec0617f31fdeae299deddae8f094ec571d86392"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/leases/leaseStore.ts",
+      "bytes": 7095,
+      "sha256": "9a5bb71d2295610d8686d87d5b87681f575743cdea1d36a82a8038c581818378"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+      "bytes": 35501,
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/notary/notaryAuth.ts",
+      "bytes": 3821,
+      "sha256": "cfbfee8ce9e6dcd4b623a1f666d63f61e9aebebcba7f5dafa0306fb7b7abe959"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/sandbox/bwrapBackend.ts",
+      "bytes": 14615,
+      "sha256": "dadcb2049afa2d8e5fcae366c2db4fb26e0c1503971b975e7a87cbc0bc35aa21"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/sdk/nativeAgentClient.ts",
+      "bytes": 47921,
+      "sha256": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/session/spill/spillEncryption.ts",
+      "bytes": 8324,
+      "sha256": "fa366ad9e5fc9e5e30ae67953eb8aa1704fcb446114223c08815939185fb953c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/session/spill/spillEvidence.ts",
+      "bytes": 12273,
+      "sha256": "9833f26b8360107dd83763f3189d757f4a2cc8c45c6d4b1182a00b4baa4c1c69"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/session/spill/spillLifecycle.ts",
+      "bytes": 21179,
+      "sha256": "427675f54afd0efa4d2b9a2d173f81d032291d27cd257f39e3f6494b578cb235"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/session/spill/spillStore.ts",
+      "bytes": 17533,
+      "sha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/session/spill/spillTypes.ts",
+      "bytes": 11981,
+      "sha256": "20f7135239a5bd1ed419194e869b450334bd92a2a04f57fc89a6ea8ca523dd8a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/standard/externalEvidenceProfile.ts",
+      "bytes": 16961,
+      "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/studio/agentCredentialAuth.ts",
+      "bytes": 4279,
+      "sha256": "bd3243a7d0c068476d4ab61300e98a0c78926a146708a8081378a62a183eb06d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/studio/studioServer.ts",
+      "bytes": 323521,
+      "sha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/vault/vault.ts",
+      "bytes": 29540,
+      "sha256": "f37212a91c1e9ea1f35dac7bcfd03481e5ce26a1fe80a56f6843e3fbb8e02e84"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/wire/wireDispatcher.ts",
+      "bytes": 8019,
+      "sha256": "e1842e5eda8d563f6aaf288491e1f23cb57f0d65f18135375ed6b9791103cc3b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/workspaces/workspaceRouter.ts",
+      "bytes": 65262,
+      "sha256": "c06242bc22da1063a69649d6cdaf7e11d06e6c853df7845bb376a1ca8167560e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/bwrapBackendPure.test.ts",
+      "bytes": 4284,
+      "sha256": "ddeb3ba27ab6699864dc092081b485abef54039f52958e3b02224000de2b763e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/callbackTelemetryCapture.test.ts",
+      "bytes": 2255,
+      "sha256": "daa2618daec4398f248d4dc5561cfc1a2294133e1410f820d8ba5f8807b423f7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/citations/checkCitationsCli.test.ts",
+      "bytes": 5280,
+      "sha256": "033144efd88c3c8e0693394dd5d77447d05fa4a178078c0cd54829afe38ff927"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/citations/lintCitations.test.ts",
+      "bytes": 5086,
+      "sha256": "d8ac693789c976e7cc84fe1ad020c4513f517d51c2188499315e8bc054c426ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/cliImportCommands.test.ts",
+      "bytes": 5307,
+      "sha256": "d99cdfb29c886a81df24afc0361c487c71d7793201b5af70029abeb54def0ed6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/cliSpillCommands.test.ts",
+      "bytes": 42242,
+      "sha256": "48052126e2370583276c167d5a2f1d9086acac88b3614769261446a21d9d5d08"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/compliance/mappingPackRefs.test.ts",
+      "bytes": 1171,
+      "sha256": "1be04f21bdce6ea977d83751a29121f595b04bc5fb1286a4a97564c2839ca614"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/cosProduct07NativeSdk.test.ts",
+      "bytes": 22018,
+      "sha256": "3519c88f0185a2df780f16e2748c87c3bf48d1c1c794864669e9febdaaa4900e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/cosProduct07NativeSdkProcess.test.ts",
+      "bytes": 15876,
+      "sha256": "63e9c5de4a9b8c1fbdebe6ed9ce03ec5c6c1a49393558f1dcaa378606d52cb0f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/crypto/keyHistoryAdmission.test.ts",
+      "bytes": 13739,
+      "sha256": "7131f574d427bfe60b40962eb354d73e2911da79ed4fcd0734e6444981572a5b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/crypto/keyHistoryForgery.test.ts",
+      "bytes": 4118,
+      "sha256": "00e1e3accf649aee74250670326b9ea2dbde7b8d89253291ac0ca5f56f6282f4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/deepseekHarnessLaunch.test.ts",
+      "bytes": 3032,
+      "sha256": "5420ffc2d5666263223c4f642789e9eec3a313232c3174c84227dfceb6099289"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/deepseekPublicSurface.test.ts",
+      "bytes": 15191,
+      "sha256": "1e4878e435d478392acbda4dde9a9112a1b44a990f8c27f7a204e400e6eba506"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/dshCaptureInterruption.test.ts",
+      "bytes": 8844,
+      "sha256": "3586375ee6ae9727140305047348bc818fc99ce9abc21e9928b717ebc1466c88"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/externalEvidenceExport.test.ts",
+      "bytes": 5707,
+      "sha256": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "bytes": 7956,
+      "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/harnessComparison.test.ts",
+      "bytes": 21910,
+      "sha256": "1d549869339f05696b397462760e68a77cb4fc298c86fc7f4ecdf16a73fd7a4d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/harnessComparisonOutputOwnership.test.ts",
+      "bytes": 10431,
+      "sha256": "92a6a30486902e8fa106129f8bfd78a411a272893c45371ebe92052dd28ee43a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/importProvenance.test.ts",
+      "bytes": 6256,
+      "sha256": "37e5534c65b181b55140b4c402aceb44e25358b57df9e2af6896ba3bc04e43c4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/keyHistoryBundleCertificate.test.ts",
+      "bytes": 13129,
+      "sha256": "e9ee19e2a185caad0b857fd6168de1dc41c07203d64bb2b4e2d74c9076f46b68"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/leaseRevocationFailClosed.test.ts",
+      "bytes": 18011,
+      "sha256": "c5be48644617b3f492dc1b55d48fca7c230d822b259ea63c626e13803283f839"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/leaseRevocationWriterIntegrity.test.ts",
+      "bytes": 5267,
+      "sha256": "61e0ce7fc90b9371e6bd2c90b1898b6d3c8d19c9233a0c30d4bbbf193fd229d2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/ledgerVerificationReadOnly.test.ts",
+      "bytes": 9057,
+      "sha256": "4190737d0e35f10c8bd909294017071933156d90d9ebcb79189973ea52521d96"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/nativeAgentClientVerify.test.ts",
+      "bytes": 4258,
+      "sha256": "11304292e426d294dbeb5b9db17f53a2bd53226a859866d192acd38cf9e862f8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/nativeBudgets.test.ts",
+      "bytes": 22957,
+      "sha256": "62f8aa98b6dd62d0b699107a7794ff906245e964d8d954963dae49bafdbb64c0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/nativePinnedToolSchemas.test.ts",
+      "bytes": 9756,
+      "sha256": "10cb9ddd0ea6f480d593e7ebd618a0e8e81183f238146009a7d18359bbe7f0d1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/neutralImportMapping.test.ts",
+      "bytes": 12916,
+      "sha256": "9510fb35a0003e4f0049b5d2284a6bbbc00ab4584302fdd5e4bd6b6b7ecd5421"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/neutralImporter.test.ts",
+      "bytes": 16811,
+      "sha256": "99164c15364cee66ee2e33e539d7fe1b9c197816ce3f22550e4b470e01e01421"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/notaryAuthReplay.test.ts",
+      "bytes": 5441,
+      "sha256": "65c0a32f30d749de35db511627de90ed7b86cae91c03dbe029add14bf41a35ab"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/notaryComposeIntegration.test.ts",
+      "bytes": 12882,
+      "sha256": "8d21aa14b5ecc6247e415f7d679c4f1c05065d5d82f8def20f9b68883ba3410c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/portalAttribution.test.ts",
+      "bytes": 9290,
+      "sha256": "ce02dbd776fa32448d0623bc45411c9df7ca6775b194d05a67fde7c5fe389b3a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/reconciliationDefectsReleaseGate.test.ts",
+      "bytes": 2829,
+      "sha256": "69d67bf9015fb918f577c1870649e296d3f79854f638e9c9aab648809c889397"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/retentionSpill.test.ts",
+      "bytes": 12572,
+      "sha256": "fdd5bd0db414d9a31243465df7913661fbb63553b47cbd2fff2bf9a477cd7fec"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/sandboxConfinement.test.ts",
+      "bytes": 13945,
+      "sha256": "91fc5694bc307bb0f51f13f8332da8e149b7c72f9f2876dfa43ac224440d5bf8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/sessionAttachmentSpill.test.ts",
+      "bytes": 26818,
+      "sha256": "a4f8d9a02278f43ca66c8c0a5cb66a9603bb4c1c9f15445b088161842ed993d8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/sessionInboxSpill.test.ts",
+      "bytes": 21614,
+      "sha256": "721a79b3779ee9239b5f58e6c8618c8cb82efee37a6498c2de6540433fb3ee05"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/sessionSpill.test.ts",
+      "bytes": 24230,
+      "sha256": "77833f479bda592350b0650896b77675e42f2b329f4aeb85805fb0fe1244395a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/sessionSpillCommitment.test.ts",
+      "bytes": 15452,
+      "sha256": "670573fc1067a06dfe9acdc8d460a2f2fcf1069f71b9a885b90ffd0fadde0366"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/spillEncryption.test.ts",
+      "bytes": 18262,
+      "sha256": "e5c26cf351a194f32b33a6dc1af20bbfbb31521a6a478bf7dfb85e270c17c2dc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/spillLifecycle.test.ts",
+      "bytes": 16924,
+      "sha256": "4891b925666850485a56e17c21ef80ee260e4262b3e39633e369f7f73b351f78"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/studioAgentCredentialBinding.test.ts",
+      "bytes": 25124,
+      "sha256": "ae9eb796f2e0e8fc8591fbbccb9b2ae1559ee7de09a06f5ddd88581d09186697"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/vaultUnlockCaching.test.ts",
+      "bytes": 9632,
+      "sha256": "06ce4b80128ae2b946ae9597f79d0a6d548d3193ef657218e028076625f50356"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/wireDispatcher.test.ts",
+      "bytes": 13460,
+      "sha256": "db019b3770d6d1d10887644d136e6d03e4834b16b702abef9ae9f38f66993d5e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "bytes": 18181,
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/docs/EVIDENCE_TRUST.md",
+      "bytes": 10946,
+      "sha256": "7067bd5b2f680bdac17abd8cdab4660b39e713564fdf7b6466cbf4cb4873c499"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-24/receipt.json",
+      "bytes": 15337,
+      "sha256": "e3e402795e871ae768acb8ec6d41f418aac318c681754b442db4056fe256d79f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/assurance/agentResponder.ts",
+      "bytes": 21889,
+      "sha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/cli.ts",
+      "bytes": 1064339,
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/compliance/complianceEngine.ts",
+      "bytes": 14631,
+      "sha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/dogfood/maturityEvidence.ts",
+      "bytes": 15973,
+      "sha256": "e7d6b3361ca8742abbcf8b1a78831f3fac255c9ff714b22ba14c5b2bc4e9c779"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/eval/evalCli.ts",
+      "bytes": 1521,
+      "sha256": "ef95b4fbfad07f30808e5765c8ada43678c5de26d00fd43182cc453067b42ac6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/eval/evalImporters.ts",
+      "bytes": 70432,
+      "sha256": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/ingest/ingest.ts",
+      "bytes": 10253,
+      "sha256": "7c3a64aae2b6c61c63e001547b2f4274bf5b2e133b977aec8b841f62bfec14c5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/ledger/trustTierValidation.ts",
+      "bytes": 3447,
+      "sha256": "fb2a00e5225ea7a7952e380d7780d2431a531b587bb700022a8a95ebeb72a00c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/outcomes/outcomeCli.ts",
+      "bytes": 5678,
+      "sha256": "38dcc1d75e13b884071feeb6019f8aa06bc5244a8c42db3f63b8e873b6a78b19"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/standard/externalEvidenceProfile.ts",
+      "bytes": 16961,
+      "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/trust/admission.ts",
+      "bytes": 9401,
+      "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/trust/keyPurposes.ts",
+      "bytes": 604,
+      "sha256": "525e2f0d8b01b34891a1693f6f770b70c14819cb15c60f6f25589c35027253bd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+      "bytes": 7037,
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+      "bytes": 10386,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts",
+      "bytes": 10628,
+      "sha256": "c184101b8dc302cfaf2980b6b2900cac26bbe9965d2f5ba3dbc68f2468bd0712"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/claims/evidenceProvenance.test.ts",
+      "bytes": 17646,
+      "sha256": "e569221799c6a5b5198f88919e57b81996f30ec5dd952f133172a77c8bea2212"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/compliance/evidenceBinding.test.ts",
+      "bytes": 11569,
+      "sha256": "413979d7258ec7327bbedbbd43066d2f4a58066041a9a4a5dd133fee97526c9a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/dogfoodMaturityEvidence.test.ts",
+      "bytes": 4544,
+      "sha256": "e62f8b05c4a385a9535efeaa99373e6aeded460e9a0b9d319b0cfd4e549ce33c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/evalImportTrust.test.ts",
+      "bytes": 5728,
+      "sha256": "f046a9565ef5925a19b22826337c94634c7eb525f7185f1e4a84bcd8664743f4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/externalEvidenceExport.test.ts",
+      "bytes": 5707,
+      "sha256": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "bytes": 7956,
+      "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/helpers/trustContext.ts",
+      "bytes": 4280,
+      "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/ingestAttestation.test.ts",
+      "bytes": 15700,
+      "sha256": "216bdc61130878be53a1f4f34be16a5ef06bb07e0875d3ddd02f66ccf82a69aa"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/trust/trustFixtures.ts",
+      "bytes": 2312,
+      "sha256": "da8626dc36baf6756414f921450228cf780327e6dd24793a2e35c1de16fdb61d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/trustTierWriteGuard.test.ts",
+      "bytes": 5739,
+      "sha256": "6dc75c6c3b45b329f5c88db18db702b40848df9638cbc73add14e288e949cf62"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "bytes": 18181,
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass/tests/budgetIntegrityQualification.test.ts",
+      "bytes": 10458,
+      "sha256": "1e3eae62d2c49bccafd36f9ae0a6a3e442cfa57c27f8be217a08b1c1f55dfff8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/.gitignore",
+      "bytes": 3760,
+      "sha256": "c3f0b53b9b7f694035cd1598b887266a5e4da3fb1ef609953f6e559a1a4929f5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-14-fleet-sequential/reconcile/AMC-1508.json",
+      "bytes": 15819,
+      "sha256": "331f7ee239202a7e4a6a1ab1092d5dc617d8277e1765a62cdf5c5d9e4fc48247"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/deploy/compose/Caddyfile",
+      "bytes": 753,
+      "sha256": "6cab9dd5b61e68a45af3975c42aa7c0da6fe6c117ae97d856c9c24aa505069b2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/deploy/compose/README.md",
+      "bytes": 6197,
+      "sha256": "d75b20b3758fa3e811c696c9745c05893a0aadf592a486522cd2efc6ba15d092"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/deploy/compose/docker-compose.tls.yml",
+      "bytes": 3617,
+      "sha256": "bc598ed09c8e0eaf8d4541e38358d3bcb1aa7fb7e1bfe99df15b1fa9b78d6ea7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/acp/acpAgentServer.js",
+      "bytes": 28771,
+      "sha256": "60393f26653a3e4d186f9998b32c5f342dcc09c58fd136c43a97acb1ee7017f5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/acp/acpCli.js",
+      "bytes": 7042,
+      "sha256": "efc6c8a8c5cb84ae54a10198c6f2fbc32f48606ed56d48d26172f1190ac6a7c0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/acp/acpNativeSession.js",
+      "bytes": 5121,
+      "sha256": "f33ef0a405ae2d1544ba007f834ca8c3dbe4947c74ef3a882105624a1ead90ea"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/acp/acpStdioMain.js",
+      "bytes": 13182,
+      "sha256": "c881db5ca818b957f9b374f84f7b2f6ec1d4f8a6e5245d26cbc9a0fb03a7c60f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/agent/agentSession.js",
+      "bytes": 10307,
+      "sha256": "99a4d545a65bfb79eaaee3db4e91211b6f8280f41c9dd72cc1187d4228f5db26"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/agent/agentToolset.js",
+      "bytes": 22695,
+      "sha256": "18d6af3de82b14f324aa38d365ec597b37df835a353848b3687c04866ac3abca"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/api/accessPolicy.d.ts",
+      "bytes": 1040,
+      "sha256": "e2db2b78c8d121bcf5d0e027639d026064a631c7a836a107b497ddd2104d909f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/api/accessPolicy.js",
+      "bytes": 7791,
+      "sha256": "b87fdcd33b91f83c6b6dfe41a7c2110d5722da6cacfd879c9216eb51351b9345"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/api/index.d.ts",
+      "bytes": 1846,
+      "sha256": "0f46d9a9196fbf73b26a09dd49e5226e31c6347fcc9c8b9559c1a391d41d37d3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/api/index.js",
+      "bytes": 19253,
+      "sha256": "0300a842d39eb3c28ffef16cc03283c3def44d01549e709c79db3dc1c01f2aca"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/api/productRouter.d.ts",
+      "bytes": 354,
+      "sha256": "ebe409a87e364346d895addd17816f351ac07cbfb89ba6def1c01772f58bf214"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/api/productRouter.js",
+      "bytes": 4541,
+      "sha256": "63041cecd777bbd32a6f61609bdeec617840b300cfa3d8872197f3f9a1856739"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/budgets/nativeBudgetAdmission.js",
+      "bytes": 5567,
+      "sha256": "f8e13b09915961e23a940a79ba3be9b254d22d1269def85a913134dcb9021a0d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/budgets/nativeBudgetUsage.js",
+      "bytes": 17494,
+      "sha256": "8511dbaf3dee568533643bb889fc0eb273534ae74bcb3f72c46a9af406eb7ada"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/bundles/bundle.js",
+      "bytes": 41843,
+      "sha256": "76cfac360546e078e4cb6f6ad4f54644b3ee55afa10d36ffb41275100831e883"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/cli-agent-commands.js",
+      "bytes": 48429,
+      "sha256": "315b02f9a5ccda05bd37ccca6e1476e732774c5e8fe7110139c47cdaa81745e2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/cli-budget-commands.js",
+      "bytes": 2743,
+      "sha256": "696105f307af5f55eea9e6d08348120885d7922ad81220a528f3c9bcbdf58e00"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/cli-notary-commands.js",
+      "bytes": 1262,
+      "sha256": "65c5cdcc12b2cc90f3c4b4f025edf2590b9e1b0f4824d5e03f53fb659470f2ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/cli.js",
+      "bytes": 1054087,
+      "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/crypto/signing/signer.js",
+      "bytes": 7558,
+      "sha256": "d2af0078d6d98ae77382bfd17527d315f35eef9a6e8523a57fe4fe96ae63cd9e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/kernel/agentLoopRunner.js",
+      "bytes": 24905,
+      "sha256": "4f235e74529b2901ef4a07b89b53f8e883a9e839725144da720b9e2b2088dea3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/kernel/amcRuntime.bundle.json",
+      "bytes": 2486,
+      "sha256": "439956e1ee3cdb6327a4a03fd9c4ca4e99d0d5dd78a40c91ec547bd365781ef5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/kernel/amcRuntime.js",
+      "bytes": 394335,
+      "sha256": "501cb8767e687f8b029ae872ab9583c115de89f4224a848bb0ca49d2a7a4d726"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/leases/leaseStore.d.ts",
+      "bytes": 1371,
+      "sha256": "588dfda1f505d36e7feacbba2680012a171f0ccb4cc0905616b723b23f8b671d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/leases/leaseStore.js",
+      "bytes": 7082,
+      "sha256": "d68b15e9d7b75dfc07e2632748984f2e7aa1e2c6729016bba91108b11d171ab5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/ledger/ledgerConnection.js",
+      "bytes": 3070,
+      "sha256": "0dbf42f44099d70defdf362bd58a8489053ba3257b5af6b908d611a0144ca121"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/llm/request/deriveRequest.js",
+      "bytes": 6191,
+      "sha256": "a27e9757918026e86278652ead4caf3ab1ed80460833335c4ae54aab716edbd9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/mcp/nativeMcpClient.js",
+      "bytes": 24059,
+      "sha256": "daefe810fc0f837580b5fa0536a72b41c6f5ff179bbb64cb59ee5b07304d35a0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/mcp/nativeMcpHttpTransport.js",
+      "bytes": 43195,
+      "sha256": "27c58b65b26db58e3ab142d3d97611a30a742bc45ec6e4dc38b77e89201cf260"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/notary/notaryAuth.js",
+      "bytes": 3252,
+      "sha256": "cad38aba20033e94f87086908d1be4741936ad4bc2b675dcc768656d74accbc3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/notary/notaryCli.js",
+      "bytes": 7360,
+      "sha256": "1424b3b7add49106074212a596c4b17541b8a1165f4f2f206071ac6d96fbd37c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/notary/notaryServer.js",
+      "bytes": 14503,
+      "sha256": "8b9e0618e6dad01c793b2442da491041990929903f6bc806b9ad35bf3fbc3cbb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/ops/retention/retentionEngine.js",
+      "bytes": 18877,
+      "sha256": "2671e63b259feeb1cd6d6055048bd60011e622b4a5db9e7d9b24252cf069110e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/persistence/sqliteSessionEventStore.js",
+      "bytes": 4327,
+      "sha256": "b3e1315c62064d928d1595757409689769ab57c9ed3ca4dff51bbed98dc6baa6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/product/portal.d.ts",
+      "bytes": 1811,
+      "sha256": "30625afef0c1eb47e203095c9d7b8ef3c1dc4dac5d17f512d160b973b5e34f95"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/product/portal.js",
+      "bytes": 10551,
+      "sha256": "6ff353007ebfbce1c6aaff52ced3f0ac00ebd8cefd8c18f494c302a9e8cb7baf"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/product/productDb.d.ts",
+      "bytes": 704,
+      "sha256": "68bf72cea9194ad088342fd1a8dd03432a9f7b42dccd63ced4de8a5bbf276ea6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/product/productDb.js",
+      "bytes": 1697,
+      "sha256": "d54f352e2764d60bb356f3eff0a486845278beca16443ac4b51ceae057c3c16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/residency/deletionGate.js",
+      "bytes": 6360,
+      "sha256": "ab25b04f73630d1bed5754836fa5492842e104970a5984e61efb6d835be91f5c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/sdk/nativeAgentClient.js",
+      "bytes": 45651,
+      "sha256": "6dead15ddabfc163b56c687d311cda2ffbdc4af6870d78e14b9e85a760ed93d1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillEncryption.d.ts",
+      "bytes": 735,
+      "sha256": "72e77e104e0b083c6eac9c6e62ebe2c39822ce734f188e5c5feafc241d384b46"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillEncryption.js",
+      "bytes": 8385,
+      "sha256": "5c07fe06e13c5053ed925e4baa2d1828a35abf034c23f016de09069227e8ed84"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillEvidence.d.ts",
+      "bytes": 5423,
+      "sha256": "e88a2245598aae977113168e8aca9d3f3ea4f33fde4e68aea59b25933922d6e6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillEvidence.js",
+      "bytes": 8127,
+      "sha256": "bf316043d64f151d2ed6a66f0efc62d74f7f1f641e4b739d1f81fbe00d2a7d38"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillInput.d.ts",
+      "bytes": 7424,
+      "sha256": "70b6d3a9b26435064a982fb99104b994f81c71cf63810185e06a79446a7e302c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillInput.js",
+      "bytes": 10988,
+      "sha256": "2fe979a789b07c4e0bbf486c3b1852822901d8301c3da56cfc842f1feaad0d5e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillLifecycle.d.ts",
+      "bytes": 3858,
+      "sha256": "b17c9317c5f08ba9a6a8fedcbde25778072a7647cca4f480d701cd2c2983472c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillLifecycle.js",
+      "bytes": 18866,
+      "sha256": "0d71e71c1ac955e4678c621afccfaa927f203a720b6539630bd4210f8a10356d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillPolicy.d.ts",
+      "bytes": 2150,
+      "sha256": "3e364c6bb87aa3bdbcbbd653039132499e7fe90c80f4e4064d54f54791f36271"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillPolicy.js",
+      "bytes": 9048,
+      "sha256": "b49fe40f21bda69ba36901bfc4e7ab9fa784b5c09d77d0a096c6dbb7a923d598"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillRead.d.ts",
+      "bytes": 1416,
+      "sha256": "bde32ceebdbd6c324f4c390434e9cf0f7b2133f6ea51910ce8aa46b0132f151d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillRead.js",
+      "bytes": 3598,
+      "sha256": "5e15c944507dad9fcae6994c2510f8322bea9c62e6bfcbb851dd967c0be9e37a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillStore.d.ts",
+      "bytes": 2968,
+      "sha256": "b23ce7fec7bfd596f6d6c7c50cb930e3f6ba1b1619a06fc85e8aed1b9bcf4d0f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillStore.js",
+      "bytes": 16769,
+      "sha256": "fb64f446d49ca93105ec9ce0a6280d36e6a329689eb748e696583706613dfb24"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillTypes.d.ts",
+      "bytes": 7918,
+      "sha256": "c832ec7b6b0d32c532d6695f698caf8cf767befb40f068952fbff16ef2d4cc0a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillTypes.js",
+      "bytes": 8206,
+      "sha256": "6300e33687c0f3b863f025b92174546c4f7bd55562188c75dff70b6bf187e747"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/storage/sqlitePool.js",
+      "bytes": 5308,
+      "sha256": "b30b74682cc61bd1d03d08cced571cfc7ee2fcd0f43105965346d4fff80be55e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/studio/agentCredentialAuth.d.ts",
+      "bytes": 660,
+      "sha256": "c6f2b0adc9dbaccdc20fb0921f92b5c26f70428fb5b0603622a6f00574d5b921"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/studio/agentCredentialAuth.js",
+      "bytes": 4290,
+      "sha256": "e2e5d453ae87797199dc6d3d72c709488c2b40d3c3c4bb0cf912b5fc361dd3a1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/studio/agentTokenScopeGuard.d.ts",
+      "bytes": 858,
+      "sha256": "bdc9cf1218ec2319c1b3edecdc323cacd21ee29f98dfc5961f37c5836e10b49a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/studio/agentTokenScopeGuard.js",
+      "bytes": 3065,
+      "sha256": "6ca9b726814da748d010a708fe2a5b0f8b1d7c5f76e809342f825bb524bfd058"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/studio/apiDelegation.d.ts",
+      "bytes": 2169,
+      "sha256": "ac99c8dcc8ab9c530cd6c5f001fff31ad40e1a2199dc8cb49da4d8a106360b7c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/studio/apiDelegation.js",
+      "bytes": 4304,
+      "sha256": "c1eb5977b450ef33126da4f06bdfde23803949f21332e7cdc8110fa3b3c7cc60"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/studio/studioServer.d.ts",
+      "bytes": 588,
+      "sha256": "9825e76dbe53876d019e1d6af9595c940c32be02aeb26b314567939ed6e956e7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/studio/studioServer.js",
+      "bytes": 372813,
+      "sha256": "0c3152544b1d63dfa84fc0a8a5b381a3e29ce4faf9c22c2eb5e7222d7d7c144e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@types/better-sqlite3/index.d.ts",
+      "bytes": 5626,
+      "sha256": "c2a6a737189ced24ffe0634e9239b087e4c26378d0490f95141b9b9b042b746c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@types/node/module.d.ts",
+      "bytes": 34491,
+      "sha256": "c1fa52b3d014001e8662fa2669d90ea15373958a288e3b83a3b621733d25292a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js",
+      "bytes": 72296,
+      "sha256": "b177ca97952f1d65d3d2691edbc31ab1af56ac36b3cf08d7f56ad0ca69f07a45"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js",
+      "bytes": 119176,
+      "sha256": "bf6af6d2f4469911879a67e83b8f9e7b20332cf42795032c53457b10ccc1c617"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/lib/database.js",
+      "bytes": 4149,
+      "sha256": "02ea23bdd23d7ac5de0675a2f32fc686e76d5c6a32bd3e3891f360e72e07f61f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/package.json",
+      "bytes": 1436,
+      "sha256": "4665126292eff5dffe6c0ffabf98c4de18e479aa0b53edd775028eb567b3ecc1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/src/objects/statement.cpp",
+      "bytes": 13173,
+      "sha256": "4875a4d1942b89b1dc715b50f3f01e0899530a0772d0fef6f26c358d7e3d12a3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/src/util/helpers.cpp",
+      "bytes": 4439,
+      "sha256": "7b763d2caa40f70bf6726c0f70ea50c1db69c7fa453b3bc2ec19577e99800984"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/esbuild/lib/main.js",
+      "bytes": 97463,
+      "sha256": "61ec0ba144ff93f4bf0e96ad6fab6f430ede0aa13e27ace8063ed63ba416b3cd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/tsx/package.json",
+      "bytes": 1601,
+      "sha256": "96aee9fd252d0cc31f3c01468250961f5b338c797bc208700d7db926450c7659"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/cac.uFydS1Z4.js",
+      "bytes": 96007,
+      "sha256": "27cc9365d180bee3da005fe6c4d485868caf9d8f54280759eea28842836af549"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js",
+      "bytes": 498779,
+      "sha256": "a236001d048380e2c67d05423fc9ea3f26b07ee019ba8d6e622082f29d49102e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/defaults.9aQKnqFk.js",
+      "bytes": 2190,
+      "sha256": "e500ba917d0d320a037b4ad92ae691462b50a939e21b1f98d0073c45d55466ab"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/index.UpGiHP7g.js",
+      "bytes": 151531,
+      "sha256": "cdafaf8e508042dddba72f8c7bbae84e2836ddb6b06c7026520c35d91af4e798"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/init-forks.H5ZuobOQ.js",
+      "bytes": 1624,
+      "sha256": "63acb3b402c59fa17a271f20c9436e487cdcbab48114a431b30a03df93509cd0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/init.k9zZ9sLh.js",
+      "bytes": 13919,
+      "sha256": "1590c223a08e12f898d2db14b21a044abdcc917a9456d720f1f4677c59daa5bf"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/reporters.d.DtoKVV2s.d.ts",
+      "bytes": 113407,
+      "sha256": "7fa6fdc6eeeb3850e6b3166836f8c9199594c4f4bed3cee02cac0ca33d71894d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/dist/workers/forks.js",
+      "bytes": 1918,
+      "sha256": "b461149b7a4488ff72f90af16d900ad9c8c410e1b8ddb2c443d49f6cd1aa7206"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/package.json",
+      "bytes": 5932,
+      "sha256": "a28126d97bcaf567da5bed69443b7f3bcd9a7a8c38c8b66e554686b6bb2c10e0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/build-standalone-api.mjs",
+      "bytes": 784,
+      "sha256": "1ad87b1d3b577ef298454c24376c4bea5a0a9645165e2e8bb1d4f0bb94789c7f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/bundle-kernel.mjs",
+      "bytes": 5519,
+      "sha256": "2a7e9124d730a95d43df9ef2ca527d93dae6af74281fc15627b82661493b1597"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/clean-dist.mjs",
+      "bytes": 1089,
+      "sha256": "930b4d5e479e6b4959c22fdfb28c1ae082c70c7aa4f1ef567ae830493e73a1b6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/copy-build-assets.mjs",
+      "bytes": 1049,
+      "sha256": "374cf85253043443738fb55643f61e6bf683b29174a559b9ee9275381ac0a72b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/installed-crash-recovery-check.mjs",
+      "bytes": 20508,
+      "sha256": "5d7e87682ff6bfc9db5cfdc399999156d4a151a435f8bf56d8104dbc0ac1c1a7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/lib/installedCrashMcpServer.mjs",
+      "bytes": 2503,
+      "sha256": "1ce79eba9a6db019b6054e909453ba055d43c72e23e652036f1f582e677e611c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/lib/ownedProcessCommand.mjs",
+      "bytes": 4006,
+      "sha256": "cad3be3fdb81c13b74b6650a8fa719677d97333ac447a9d76538e855364ea560"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/packed-install-check.mjs",
+      "bytes": 9562,
+      "sha256": "d83ede99025cacf1c84b061be9f236022d67cf929afab8e28d6824fe7e5ce318"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/postinstall.js",
+      "bytes": 1020,
+      "sha256": "73c4c9530dbb3ea064113901077cf8cf74c440658f5aea304fd57ab349bb9ed6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/prepack-release-check.mjs",
+      "bytes": 3362,
+      "sha256": "bae5a46e9f0f958cace9778ab95760a844c38b00192a477bab5507e9caf5d0f0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/acp/acpAgentServer.ts",
+      "bytes": 30835,
+      "sha256": "610e6133606ed5bda3cf141f9eaac3c0a01f6f329e051e14c85a23ecc12451e5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/acp/acpCli.ts",
+      "bytes": 7577,
+      "sha256": "4fd7e43b0d2364d3da9b0326140e8759fd82a218a6e0f9c4bff344cb85143468"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/acp/acpNativeSession.ts",
+      "bytes": 5540,
+      "sha256": "31413a691f4fd70597751218201cb2daad0b2fb49fddfcf069eaee655b75b04c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/acp/acpStdioMain.ts",
+      "bytes": 17338,
+      "sha256": "1353ca068a8a62c8e914fe876c90f003cc0277ab80ee39f485397091b38a4850"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/agent/agentSession.ts",
+      "bytes": 15415,
+      "sha256": "1666d867b67779f89d878990c85c945b524ce890d04e2655646eecc21c1b54f4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/agent/agentToolset.ts",
+      "bytes": 29046,
+      "sha256": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/agent/nativeFailureGuidance.ts",
+      "bytes": 10904,
+      "sha256": "e797ef59196351467b5fd8e41e0ce2fc81936e19ffda50f6afef4a0c05f0b01b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/agent/nativeToolCapabilities.ts",
+      "bytes": 3510,
+      "sha256": "40266971f3e6feafc6924a04da62789fe8374cc07dc2d168d5d47d894dca7a44"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/agent/stepRunner.ts",
+      "bytes": 8399,
+      "sha256": "49faf852d7927fa4020d4df9d3ad5b8cec214d312d86510cd2a0bb7f1015ac45"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/api/accessPolicy.ts",
+      "bytes": 8057,
+      "sha256": "3472bd7573ee644aea651fbc44e5890a7abbb8e3fc299f57450e32a6ff445bde"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/api/index.ts",
+      "bytes": 19070,
+      "sha256": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/api/productRouter.ts",
+      "bytes": 4349,
+      "sha256": "14327afcd9fed2440c0f8c6d97a04f7095053220699a937c596564b77c0e3a4d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/assurance/certificate.ts",
+      "bytes": 29327,
+      "sha256": "9dbc1bdefa17f2c2081ee5959cd47bebf36b39efecedcf7c7c46208e1c3b5c2d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/auth/authApi.ts",
+      "bytes": 15848,
+      "sha256": "bb0481156d7d5958910030f6183e498c29e65ddbc898e3197467e9198ee9f137"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/auth/rbac.ts",
+      "bytes": 1468,
+      "sha256": "a2bfad9168deba43e9e4ae539812ad29e58ce5ddc1b8812d2a34b9ca3020dbe8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/auth/roles.ts",
+      "bytes": 629,
+      "sha256": "70bc95aa15d85a2f1f50e8af6acd8b697809f2fe4906c066809b3940fac23c75"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/auth/sessionTokens.ts",
+      "bytes": 3213,
+      "sha256": "c0e42fd336bb67112a048773bb159cc40e57470a463d7043f3bbf7b3179126bb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/auth/userSchema.ts",
+      "bytes": 1405,
+      "sha256": "6f6e8a900cbfbe62931bad5666ab46d121c98fb88adf022773311e5986885f3c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/benchmarks/harnessComparison.ts",
+      "bytes": 21750,
+      "sha256": "2dd5576765c7fa7614b2e6f7e92ba33e5d718fecc35b199e85a92b4eebc04d95"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/benchmarks/harnessComparisonSchema.ts",
+      "bytes": 9945,
+      "sha256": "c89ba633e5afbf2090db3a272519a3a23b9eebfcef518ee335102216f89ac7ea"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/budgets/budgets.ts",
+      "bytes": 10695,
+      "sha256": "bae506f230b0511759f795cb0099f9b8d3fdb77aa42789e70658e4f84d15243c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/budgets/nativeBudgetAdmission.ts",
+      "bytes": 5574,
+      "sha256": "5c39db72dffdb8b4d3fe08119bc6e17b1ff0abced55b725c731c9c06a93642db"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/budgets/nativeBudgetUsage.ts",
+      "bytes": 17516,
+      "sha256": "45f561f1116d0f55f98439508a573b0a586ed060b3c6948d86b1240a50d5e980"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/bundles/bundle.ts",
+      "bytes": 42233,
+      "sha256": "a28de38c02c4c748de0c81c925b655b274ce287b72db9e834823b41375d78894"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/cli-agent-commands.ts",
+      "bytes": 48184,
+      "sha256": "616e0c6888f8a50b3a0bb82269a29f370e74d58f3bfbb53fd97b528fa9b76582"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/cli-budget-commands.ts",
+      "bytes": 2698,
+      "sha256": "aeda2609dc394b6228b7d394806cb63a2ae859413456b8849b3265404466019a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/cli-notary-commands.ts",
+      "bytes": 1446,
+      "sha256": "112b56d4eccdc093643559cff2f0db8f84721a03bce23a14e8a09334e7400902"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/cli-spill-commands.ts",
+      "bytes": 27672,
+      "sha256": "b9e9931f20748e487f72ca9980bebde68dab7d933368935552b3923e57336956"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/cli.ts",
+      "bytes": 1064339,
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/crypto/keyHistoryEnvelope.ts",
+      "bytes": 4788,
+      "sha256": "80162fd555f9972792406846fd987f4290242c0149861388549c402b184a33f4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/crypto/signing/signer.ts",
+      "bytes": 7862,
+      "sha256": "88579bba0833ce86dd3fcfac8ea6ccf068772b4a5273ef7bc7b87b1c77a2ef09"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/exec/processTree.ts",
+      "bytes": 5023,
+      "sha256": "45202007c5ccd2c7142281bf0477b55b47c1a61ac20d04ad7048db83fd60c472"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/exec/processTypes.ts",
+      "bytes": 4234,
+      "sha256": "2f4b6bb87c8ebffbdcd21fb078914d5c3838415c71037b1777a800312b2318bb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/exec/runProcess.ts",
+      "bytes": 6066,
+      "sha256": "6b935b66b4daf959551a63da5b7a9d24f88a48abcf834235f9e375a8e45caf96"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/kernel/agentLoopRunner.ts",
+      "bytes": 34406,
+      "sha256": "de4d3771597e7f625e2d27e562ebf9d1a4ba9f9cf456f90b419a4e254958b2ef"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/kernel/amcRuntime.ts",
+      "bytes": 1003,
+      "sha256": "7960e3a179f94a8ed511eb24176d49da67e8e162919e71878b4cc14c514e14d1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/leases/leaseStore.ts",
+      "bytes": 7095,
+      "sha256": "9a5bb71d2295610d8686d87d5b87681f575743cdea1d36a82a8038c581818378"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ledger/eventHash.ts",
+      "bytes": 1726,
+      "sha256": "da31a26164e9fee0752619a67e7f78790082d5a1c14cf95e72f716192b6ca06a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+      "bytes": 3137,
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ledger/ledgerSchema.ts",
+      "bytes": 22470,
+      "sha256": "8375975c42861af68a69ba33e367f8f03a9b691155a9e974152916da90c0df25"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ledger/ledgerSessionTransactions.ts",
+      "bytes": 3032,
+      "sha256": "0bba4d284e53916f52981b5ea0bd534ac4c77938dbe72970d26ab09c0bc6ed72"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+      "bytes": 35501,
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/llm/adapter/llmRuntime.ts",
+      "bytes": 22504,
+      "sha256": "6ffc6892a8ed3e94ac931fe7472a6268ddaad9f665fd365e68972b2e6edebf1c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/llm/request/deriveRequest.ts",
+      "bytes": 10626,
+      "sha256": "37cdbd9eb18d1d98f533c4a4a93c6a299e8f9a95742cd2d2b66b0e82ff42de50"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/mcp/nativeMcpClient.ts",
+      "bytes": 25454,
+      "sha256": "d04eb8783176416a84f559c20d024a84823553888549d9f558a4347fadb50666"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/mcp/nativeMcpHttpTransport.ts",
+      "bytes": 41548,
+      "sha256": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/notary/notaryAuth.ts",
+      "bytes": 3821,
+      "sha256": "cfbfee8ce9e6dcd4b623a1f666d63f61e9aebebcba7f5dafa0306fb7b7abe959"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/notary/notaryCli.ts",
+      "bytes": 8187,
+      "sha256": "62200fe85329faf2477334788d25e37f83863aefecd3a64f482330a86c0a2f51"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/notary/notaryConfigStore.ts",
+      "bytes": 3406,
+      "sha256": "6c8197bdb07fa7e039c44fb9f7c98d2490a0e2754fdfbd3a0b681ee254b0157c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/notary/notaryLog.ts",
+      "bytes": 5990,
+      "sha256": "71ae01cea6e4eff4a2c817f9ebd9966aad068b2bc9e83455d70ba3978f211e7d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/notary/notaryServer.ts",
+      "bytes": 13001,
+      "sha256": "f97c992ca0043e0b8fcf8c7e2a3f2048b5284b8729efc91f0e0aa96e7308f120"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/notary/notaryVerify.ts",
+      "bytes": 2012,
+      "sha256": "9d21b74c8ea4d0dd2fcfad51d250a10ff6b0a3792691a2c9a4f5c5054a68ca07"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ops/policy.ts",
+      "bytes": 6472,
+      "sha256": "cd0cee51e3207c191d74acedbed08579396a5d11c63d5c430b1384d94fe92b44"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ops/retention/retentionEngine.ts",
+      "bytes": 18582,
+      "sha256": "ffccb6aa0122309049af5202ed3cb196c8ccf1a53b52da3fbf300c9f44e37e48"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/persistence/openSessionEventStore.ts",
+      "bytes": 4197,
+      "sha256": "6acc86f7b20c0fd13ec20600bb8aba44c3ffaf0b5fdee22abf41327d061a8970"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/persistence/sqliteSessionEventStore.ts",
+      "bytes": 5575,
+      "sha256": "a7670667f4ddf2db4fc82b3328139eb160048882e077b0412675126fd76257d4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/product/portal.ts",
+      "bytes": 11842,
+      "sha256": "d59fa7e26e712a06de09170839d5bccbaca1b9e86130323ce1083853559d6f33"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/product/productDb.ts",
+      "bytes": 1716,
+      "sha256": "16227dd98c41d6813bcb2a84b338a78fd055830cafa2cbec1bc2311ca015fe03"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/residency/deletionGate.ts",
+      "bytes": 6568,
+      "sha256": "e6158c7b2e2aa699d54e5b6147cb2cadbf8471003b46112be4a0fbd59716c9e5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/sdk/nativeAgentClient.ts",
+      "bytes": 47921,
+      "sha256": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/sessionApiTypes.ts",
+      "bytes": 9452,
+      "sha256": "cf2a35849a23a0088743ebceb4f32a312c421b485e1e4e6106752852969f47f1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/sessionRecovery.ts",
+      "bytes": 30627,
+      "sha256": "01df1193bc877123c170b98b791bdd33c6239fbebc8072e8e367dd080e98452d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/sessionResume.ts",
+      "bytes": 15864,
+      "sha256": "e3e8816d4eff762eb38712d8a9aad2bd1b959188aa29912c3398690ed634e131"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/sessionService.ts",
+      "bytes": 36194,
+      "sha256": "748ea18097b8fd2cbd5b5636d2e13ad78e98b8cd5b1e2a8e972c6cb407d5ee28"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/sessionSpine.ts",
+      "bytes": 14439,
+      "sha256": "a5bf435606892bb27645b0c7629bf20b0dc6207fdbbfc14e226cbcb854989641"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillEncryption.ts",
+      "bytes": 8324,
+      "sha256": "fa366ad9e5fc9e5e30ae67953eb8aa1704fcb446114223c08815939185fb953c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillEvidence.ts",
+      "bytes": 12273,
+      "sha256": "9833f26b8360107dd83763f3189d757f4a2cc8c45c6d4b1182a00b4baa4c1c69"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillInput.ts",
+      "bytes": 15244,
+      "sha256": "e5dc9ea26b33c4c336491d04c20062c59c949aef881ccd51e3b3b88cc65d93a4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillLifecycle.ts",
+      "bytes": 21179,
+      "sha256": "427675f54afd0efa4d2b9a2d173f81d032291d27cd257f39e3f6494b578cb235"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillPolicy.ts",
+      "bytes": 9984,
+      "sha256": "813d7233b609a2787c32da1317eceea7ec205bc176fb4389b5727e82dc636296"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillRead.ts",
+      "bytes": 4313,
+      "sha256": "527c7e157c5a54ba22ce8a978f168eba34ce05da82fd21ba91ed05348a36a2e8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillStore.ts",
+      "bytes": 17533,
+      "sha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillTypes.ts",
+      "bytes": 11981,
+      "sha256": "20f7135239a5bd1ed419194e869b450334bd92a2a04f57fc89a6ea8ca523dd8a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/setup/nativeMcpConfig.ts",
+      "bytes": 18690,
+      "sha256": "501c1076399b06878e14e7dabbcf3b0436648e0f1a9f9dc65c35151fc69a71a1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/standard/externalEvidenceProfile.ts",
+      "bytes": 16961,
+      "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/storage/blobs/blobEncryptor.ts",
+      "bytes": 4408,
+      "sha256": "1fbb25cd436a3d78ef9f2477a24eefb674eff96206b4d3c59a97b4dbc9cf449a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/storage/blobs/blobKeys.ts",
+      "bytes": 9331,
+      "sha256": "621760aae5d6439e8bf25e01220ad0bd9f0c50684fc6cfda48ed05c35552dd93"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/storage/sqlitePool.ts",
+      "bytes": 5804,
+      "sha256": "021dfe8f275c90273d1821d36431f182bbde538a3417f2375e96013c91867bfc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/studio/agentCredentialAuth.ts",
+      "bytes": 4279,
+      "sha256": "bd3243a7d0c068476d4ab61300e98a0c78926a146708a8081378a62a183eb06d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/studio/agentTokenScopeGuard.ts",
+      "bytes": 3390,
+      "sha256": "8fd429da7eb226cb0f4175ed3657e488d8e214735575fa9fa5bae3da96d06274"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/studio/apiDelegation.ts",
+      "bytes": 5670,
+      "sha256": "fcf33617981088c66f3b6c8620948dc016eea953ca65fb942af294dbcfa0c38a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/studio/studioServer.ts",
+      "bytes": 323521,
+      "sha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/toolhub/toolhubValidators.ts",
+      "bytes": 14760,
+      "sha256": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/toolhub/toolsSchema.ts",
+      "bytes": 8719,
+      "sha256": "20b0bb72942c67d7ca36a9070edc30cba11eab0693ddf6077e6ed98bea63bc05"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/tools/guards/policyGuards.ts",
+      "bytes": 10949,
+      "sha256": "60ef9aa1db917a75a7bf9df75606b8b0383b3197e87d7f560aeb307708074658"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/tools/toolTypes.ts",
+      "bytes": 7901,
+      "sha256": "e8b2c56d487a091506369fcf6d11db91fe1030957494bfc7d5bb04058f75077a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/trust/admission.ts",
+      "bytes": 9401,
+      "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/trust/keyPurposes.ts",
+      "bytes": 604,
+      "sha256": "525e2f0d8b01b34891a1693f6f770b70c14819cb15c60f6f25589c35027253bd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+      "bytes": 7037,
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+      "bytes": 10386,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/vault/vault.ts",
+      "bytes": 29540,
+      "sha256": "f37212a91c1e9ea1f35dac7bcfd03481e5ce26a1fe80a56f6843e3fbb8e02e84"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/workspace.ts",
+      "bytes": 27587,
+      "sha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/bundleSpill.test.ts",
+      "bytes": 12342,
+      "sha256": "f579bf6500cc452c9ce8d98efb27e2eb4dac8cb09d357a95b4af96755bb694eb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/callbackTelemetryCapture.test.ts",
+      "bytes": 2255,
+      "sha256": "daa2618daec4398f248d4dc5561cfc1a2294133e1410f820d8ba5f8807b423f7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/cliAgentLoopCommands.test.ts",
+      "bytes": 16872,
+      "sha256": "e80e6f8bfee373a97a02330f63d8c9f5cfc30d86e3603ac32ee7a0a4cf02d1ef"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/cliSignedToolSubset.test.ts",
+      "bytes": 13252,
+      "sha256": "8adb51ab0f11f01227f124cfc204ba8ea695ff902a6120385e49cc911020492f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/cliSpillCommands.test.ts",
+      "bytes": 42242,
+      "sha256": "48052126e2370583276c167d5a2f1d9086acac88b3614769261446a21d9d5d08"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/crypto/keyHistoryAdmission.test.ts",
+      "bytes": 13739,
+      "sha256": "7131f574d427bfe60b40962eb354d73e2911da79ed4fcd0734e6444981572a5b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/crypto/keyHistoryForgery.test.ts",
+      "bytes": 4118,
+      "sha256": "00e1e3accf649aee74250670326b9ea2dbde7b8d89253291ac0ca5f56f6282f4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/externalEvidenceExport.test.ts",
+      "bytes": 5707,
+      "sha256": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "bytes": 7956,
+      "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/fixtures/nativeSignedImageCold.ts",
+      "bytes": 501,
+      "sha256": "e191bb30be1103444c45b3da08ecdd6b251b15eecc4baef137b16b7226ea8b3a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/harnessComparison.test.ts",
+      "bytes": 21910,
+      "sha256": "1d549869339f05696b397462760e68a77cb4fc298c86fc7f4ecdf16a73fd7a4d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/helpers/llmStubUpstream.ts",
+      "bytes": 4815,
+      "sha256": "6d50b22b356de4447ead7826c55af66e0d68d2f581eeafd121a1a84f7fa6bc00"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/helpers/trustContext.ts",
+      "bytes": 4280,
+      "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/keyHistoryBundleCertificate.test.ts",
+      "bytes": 13129,
+      "sha256": "e9ee19e2a185caad0b857fd6168de1dc41c07203d64bb2b4e2d74c9076f46b68"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/ledgerVerificationReadOnly.test.ts",
+      "bytes": 9057,
+      "sha256": "4190737d0e35f10c8bd909294017071933156d90d9ebcb79189973ea52521d96"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/nativeBudgets.test.ts",
+      "bytes": 22957,
+      "sha256": "62f8aa98b6dd62d0b699107a7794ff906245e964d8d954963dae49bafdbb64c0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/nativePinnedToolSchemas.test.ts",
+      "bytes": 9756,
+      "sha256": "10cb9ddd0ea6f480d593e7ebd618a0e8e81183f238146009a7d18359bbe7f0d1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/nativeSignedToolSubset.test.ts",
+      "bytes": 8452,
+      "sha256": "1241dd5c0601a6ad91296821727c74c4d2b85e21b9438ab5551cf7eaecb1bf7b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/notaryAuthReplay.test.ts",
+      "bytes": 5441,
+      "sha256": "65c0a32f30d749de35db511627de90ed7b86cae91c03dbe029add14bf41a35ab"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/notaryComposeIntegration.test.ts",
+      "bytes": 12882,
+      "sha256": "8d21aa14b5ecc6247e415f7d679c4f1c05065d5d82f8def20f9b68883ba3410c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/portalAttribution.test.ts",
+      "bytes": 9290,
+      "sha256": "ce02dbd776fa32448d0623bc45411c9df7ca6775b194d05a67fde7c5fe389b3a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/retentionSpill.test.ts",
+      "bytes": 12572,
+      "sha256": "fdd5bd0db414d9a31243465df7913661fbb63553b47cbd2fff2bf9a477cd7fec"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/sessionAttachmentSpill.test.ts",
+      "bytes": 26818,
+      "sha256": "a4f8d9a02278f43ca66c8c0a5cb66a9603bb4c1c9f15445b088161842ed993d8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/sessionInboxSpill.test.ts",
+      "bytes": 21614,
+      "sha256": "721a79b3779ee9239b5f58e6c8618c8cb82efee37a6498c2de6540433fb3ee05"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/sessionSpill.test.ts",
+      "bytes": 24230,
+      "sha256": "77833f479bda592350b0650896b77675e42f2b329f4aeb85805fb0fe1244395a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/sessionSpillCommitment.test.ts",
+      "bytes": 15452,
+      "sha256": "670573fc1067a06dfe9acdc8d460a2f2fcf1069f71b9a885b90ffd0fadde0366"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/sessionSpillRead.test.ts",
+      "bytes": 12293,
+      "sha256": "fb889d8f1346fb77dd2fc81d72f29403bc39c90eba092b9bec74aeb2a1d97423"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/spillEncryption.test.ts",
+      "bytes": 18262,
+      "sha256": "e5c26cf351a194f32b33a6dc1af20bbfbb31521a6a478bf7dfb85e270c17c2dc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/spillLifecycle.test.ts",
+      "bytes": 16924,
+      "sha256": "4891b925666850485a56e17c21ef80ee260e4262b3e39633e369f7f73b351f78"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/studioAgentCredentialBinding.test.ts",
+      "bytes": 25124,
+      "sha256": "ae9eb796f2e0e8fc8591fbbccb9b2ae1559ee7de09a06f5ddd88581d09186697"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/studioAgentTokenScopes.test.ts",
+      "bytes": 18146,
+      "sha256": "7bed2e206ea6a664e3cb0d2fe6f1a4a5eb75b8b0fd593748762305d3b3ab5a6d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/studioApiAuthorization.test.ts",
+      "bytes": 6138,
+      "sha256": "7a65c3470b02156f66705cbd97d7a9ad6ac7c990f12b5049c4b4900f82450e4c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/vaultUnlockCaching.test.ts",
+      "bytes": 9632,
+      "sha256": "06ce4b80128ae2b946ae9597f79d0a6d548d3193ef657218e028076625f50356"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/unused-code/plan-edits/README.md",
+      "bytes": 3324,
+      "sha256": "713815b36d9b347a701f0275e041987d049c434760313f8a55da096809e63d91"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "bytes": 18181,
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/.github/workflows/ci.yml",
+      "bytes": 19724,
+      "sha256": "0125f65bd49f526fd6467d9c9c0f0ddcd9ae8ef84a8626f0f9aa474faa85ff9b"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/.github/workflows/npm-publish.yml",
+      "bytes": 5254,
+      "sha256": "18563445d2d011c13a8d209b827c060ff1fab26d774d8a5addb0b17b30cf1026"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/CITATIONS.md",
+      "bytes": 6066,
+      "sha256": "f714f3a0b646e07c07b3d4506583f40f96b53f4cd18b467ac59823e937fdc463"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/archive/README.md",
+      "bytes": 3692,
+      "sha256": "3b0323268c4936f8a023cff24fbf3d10047e77ba952ac98a8c1a6eb79ca20fa5"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/program/f5-drop-review.md",
+      "bytes": 69390,
+      "sha256": "d1558832c1138f1a183cc6b6eb906dc682ff48c92cb88c665ad71d98bcad6c78"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/program/f5/decisions.json",
+      "bytes": 3512,
+      "sha256": "e77e25ab90891505cf8f251d8fed403af635fae2e299a8d46306f30496d7e261"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/package.json",
+      "bytes": 9978,
+      "sha256": "9f8564637dc89040431465e4aee8962e6835148b31d0574d837f6e59c1fc4473"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/pnpm-lock.yaml",
+      "bytes": 155457,
+      "sha256": "f6fdc2192f562bef934b5d95da384e646c356d4e4baa9098d07bc592c6058b2d"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/qualification/2026-10-11-P0-30/README.md",
+      "bytes": 12077,
+      "sha256": "b445b1f0e7ceec11858833fb57456af4f56074246f1d762b0955521a658104a3"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/qualification/2026-10-11-P0-30/installed-subset.json",
+      "bytes": 3293,
+      "sha256": "0d7321a52b3bc9513333e55bbf5877d7c2837c4bd9a6595e6e3f0f80d6156227"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/qualification/2026-10-11-P0-30/mutations.batch.json",
+      "bytes": 41729,
+      "sha256": "8ad278b32edbe6555170568451923a52dac97e90dcf7dbaf1af04860ba62b3d1"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/qualification/2026-10-11-P0-30/mutations.json",
+      "bytes": 91056,
+      "sha256": "ab96f23b2bb2d7741225e8f98b7287f0980f02c1aaa1dd7527407c17be3f6649"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/qualification/2026-10-11-P0-30/mutations.rerun.json",
+      "bytes": 29699,
+      "sha256": "f5f203ad1aa4752ca799dea0dc91f4b2908c6e5375b75868dbae3af595d79afb"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/qualification/2026-10-11-P0-30/outcomes.json",
+      "bytes": 4857,
+      "sha256": "59079096310c41a4897a4ae547ff2001c41d7b66e03355e4374950822170f0f8"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/qualification/2026-10-11-P0-30/receipt.json",
+      "bytes": 7877,
+      "sha256": "3c0d65f829251b7ca28ae435238578c002324bb61e7bb636c482bae7ceddf18b"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/scripts/check-citations.mjs",
+      "bytes": 14169,
+      "sha256": "0e8454817268fb43761f147c1fadf903111d64738e107076b939f7cc473874c0"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/scripts/check-regulatory-currency.mjs",
+      "bytes": 10342,
+      "sha256": "de4b17ae744da6999e4e9ea1bdb6c3e7307218274616243c507b1cce416b187f"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/scripts/citations-baseline.json",
+      "bytes": 2413,
+      "sha256": "31d07b0f9ea2022e1994f0b9692a3a55c87271d4aaf5e645d9b68a3583d69f59"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/scripts/freeze-baseline.json",
+      "bytes": 567,
+      "sha256": "58e2947e1841bac02d119827c08ee01477f345fc9f63131d569ed1637483eab7"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/scripts/lib/gateDag.mjs",
+      "bytes": 1712,
+      "sha256": "846ad3e74df8210ef04bd1d3ddb36702f3a28b50d84235b8e570a92249adc2bb"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/scripts/mutation-batch.mjs",
+      "bytes": 11280,
+      "sha256": "7c556bbbf070a78cc7521d2126682ad8e6521c8a9c7b3c6a6d88b27de901fd54"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/scripts/release-gate.mjs",
+      "bytes": 17338,
+      "sha256": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/adapters/deepseekHarnessLaunch.ts",
+      "bytes": 5777,
+      "sha256": "e26b0afc745b7d3dbc55a8e97e1f17fb6d5c8c841d41b4a91c5ebd743be38791"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/agent/agentToolset.ts",
+      "bytes": 32078,
+      "sha256": "40e300ded073f92e16d44c38969d5a798f87fbd087984126039ccab1db25a4ff"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/api/productRouter.ts",
+      "bytes": 4349,
+      "sha256": "14327afcd9fed2440c0f8c6d97a04f7095053220699a937c596564b77c0e3a4d"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/assurance/certificate.ts",
+      "bytes": 29403,
+      "sha256": "eb9cdf8b2a4ea2733934318b4a02fb61c77bba0e4f158255b8cf78110b572e49"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/benchmarks/harnessComparison.ts",
+      "bytes": 21750,
+      "sha256": "2dd5576765c7fa7614b2e6f7e92ba33e5d718fecc35b199e85a92b4eebc04d95"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/bridge/bridgeAuth.ts",
+      "bytes": 7983,
+      "sha256": "3fa37b9dd35a64e499ca5b5a608008701e93236cc6e8028dc34eb967a8b9faf4"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/budgets/nativeBudgetAdmission.ts",
+      "bytes": 5574,
+      "sha256": "5c39db72dffdb8b4d3fe08119bc6e17b1ff0abced55b725c731c9c06a93642db"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/bundles/bundle.ts",
+      "bytes": 42466,
+      "sha256": "5a31e42403345567faeb96c984f04ceaf2eaf418663fbd32677d9c2b7d282d1e"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/cli-import-commands.ts",
+      "bytes": 13369,
+      "sha256": "5d79d48e1e6389687f137c52372642aea576e9b852eada833186d98159944641"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/cli/claimOutput.ts",
+      "bytes": 10795,
+      "sha256": "1ffc5a10ab1c7d0936e46692db48bda13d8b0ba596bb57a3b9b2067e9c54686e"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/compliance/builtInMappings.ts",
+      "bytes": 71290,
+      "sha256": "6d0a44c467ec7a918b4fbd56f911cf897463b393bc2b2f46fc1bedf5278d73b5"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/compliance/citations/citationRecord.ts",
+      "bytes": 1708,
+      "sha256": "5e62a8c868bfffdb952055e408eea1b8c81db78cf151b30d7213a9771fc0f6f9"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/compliance/citations/frameworkIds.ts",
+      "bytes": 2061,
+      "sha256": "a17b09ea9c8c7fa4459ae0cd9efdb8849009fd3638140c11a71f9f93f86b640f"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/compliance/citations/lint.ts",
+      "bytes": 7865,
+      "sha256": "35cc58ee94b64c32ad7aa9719dc61134384cd4a3677070c4ae02ab3b88cacf7f"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/compliance/citations/officialHosts.ts",
+      "bytes": 1932,
+      "sha256": "da2d28e320495df599cc87fcbf356faa6796a8f5d18fef8bda8893115761ba36"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/compliance/citations/reference/atlas.json",
+      "bytes": 16945,
+      "sha256": "472ed81c037c7fadd3b29d5ef995abba8f111ad3a58f16dcf9876985e294a4f9"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/compliance/citations/reference/iso42001AnnexA.json",
+      "bytes": 278,
+      "sha256": "415c9c5aa7c51f2e9b519a6c90dccfe9664e0ec57089281612125ba63a5fa545"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/compliance/citations/reference/nistAiRmf.json",
+      "bytes": 17818,
+      "sha256": "3dc23935f3c7dc4a31357277854dcc28d4196fbea078dd7a20f3f9c6c2360aa1"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/compliance/citations/supersededInstruments.ts",
+      "bytes": 2171,
+      "sha256": "cacff8b81e91e18c1c19af36d3919fd0bcaf8da43e9779194d197c399dc5b899"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/compliance/regulatory/register.json",
+      "bytes": 458334,
+      "sha256": "95e254f9d96b4908746fcc7147596682e9c968613db070ede3cc301a8b23b6e2"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/crypto/keyHistoryEnvelope.ts",
+      "bytes": 5611,
+      "sha256": "8a1ffa9943820fcd720dcc51a0070967df773d67b5d5e0dcd2f859d401667f37"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/crypto/keys.ts",
+      "bytes": 12282,
+      "sha256": "3db513fd23463f47fae6de6520dd106dd47bfa9df4ac47bb7fd0af83ad035b3f"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/domains/industryPackAudit.ts",
+      "bytes": 26330,
+      "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/domains/packs/regulatorySchema.ts",
+      "bytes": 12723,
+      "sha256": "61aaa47c94a3ba537390e1409de7d117211915d020bf1ca98bd2cf8b43762d61"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/gateway/server.ts",
+      "bytes": 68264,
+      "sha256": "05ac5750f856d85185acfa9f5f590963372cbd09150245dbdef5764c23bc6c50"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/importers/callbackTelemetryCapture.ts",
+      "bytes": 14035,
+      "sha256": "bcfb468560feb46c296d28176c384c63420a88ae97eaea1e1c852c839a82c366"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/importers/externalEvidenceExport.ts",
+      "bytes": 5230,
+      "sha256": "a65b88a8dfb6885305c06d5f2ec0617f31fdeae299deddae8f094ec571d86392"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/leases/leaseStore.ts",
+      "bytes": 15973,
+      "sha256": "9ef59e921b29870af54c21f51f923a8988744aeb25c82f52a2647668ef436fa5"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/ledger/ledgerVerification.ts",
+      "bytes": 35604,
+      "sha256": "d26b8ff4674fd5a5d153788b1b4671d9db2cb32cb386a9c8364ad22a162d9a67"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/notary/notaryAuth.ts",
+      "bytes": 3821,
+      "sha256": "cfbfee8ce9e6dcd4b623a1f666d63f61e9aebebcba7f5dafa0306fb7b7abe959"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/sandbox/bwrapBackend.ts",
+      "bytes": 14615,
+      "sha256": "dadcb2049afa2d8e5fcae366c2db4fb26e0c1503971b975e7a87cbc0bc35aa21"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/sdk/nativeAgentClient.ts",
+      "bytes": 47921,
+      "sha256": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/session/spill/spillEncryption.ts",
+      "bytes": 8324,
+      "sha256": "fa366ad9e5fc9e5e30ae67953eb8aa1704fcb446114223c08815939185fb953c"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/session/spill/spillEvidence.ts",
+      "bytes": 12273,
+      "sha256": "9833f26b8360107dd83763f3189d757f4a2cc8c45c6d4b1182a00b4baa4c1c69"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/session/spill/spillLifecycle.ts",
+      "bytes": 21179,
+      "sha256": "427675f54afd0efa4d2b9a2d173f81d032291d27cd257f39e3f6494b578cb235"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/session/spill/spillStore.ts",
+      "bytes": 17533,
+      "sha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/session/spill/spillTypes.ts",
+      "bytes": 11981,
+      "sha256": "20f7135239a5bd1ed419194e869b450334bd92a2a04f57fc89a6ea8ca523dd8a"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/standard/externalEvidenceProfile.ts",
+      "bytes": 16961,
+      "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/studio/agentCredentialAuth.ts",
+      "bytes": 4279,
+      "sha256": "bd3243a7d0c068476d4ab61300e98a0c78926a146708a8081378a62a183eb06d"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/studio/studioServer.ts",
+      "bytes": 323593,
+      "sha256": "97b19dd529ffcdcaef52aa38eeb192141e5070914f5ab0bcbc97eaa694a46cca"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/vault/vault.ts",
+      "bytes": 37996,
+      "sha256": "e0c0e70a8bbbd6b43c723811f46f3ebe9b5a063e33b1a08a0e65d982a691cb70"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/wire/wireDispatcher.ts",
+      "bytes": 7679,
+      "sha256": "f766a810252ef0a77b8201c5d2879e1474728fca68771bfa4407f7df5d1b9171"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/workspaces/workspaceRouter.ts",
+      "bytes": 65120,
+      "sha256": "eb8c9f70ae412264624eb33a84af5403026acf786f0b013671d5260169f68c3d"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/bwrapBackendPure.test.ts",
+      "bytes": 4284,
+      "sha256": "ddeb3ba27ab6699864dc092081b485abef54039f52958e3b02224000de2b763e"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/callbackTelemetryCapture.test.ts",
+      "bytes": 2255,
+      "sha256": "daa2618daec4398f248d4dc5561cfc1a2294133e1410f820d8ba5f8807b423f7"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/citations/checkCitationsCli.test.ts",
+      "bytes": 5280,
+      "sha256": "033144efd88c3c8e0693394dd5d77447d05fa4a178078c0cd54829afe38ff927"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/citations/lintCitations.test.ts",
+      "bytes": 5086,
+      "sha256": "d8ac693789c976e7cc84fe1ad020c4513f517d51c2188499315e8bc054c426ae"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/cliAgentLoopCommands.test.ts",
+      "bytes": 18103,
+      "sha256": "471fc667657ff88616d038afd54f65107633471c13b81a4aaa25b43761215ba2"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/cliImportCommands.test.ts",
+      "bytes": 5307,
+      "sha256": "d99cdfb29c886a81df24afc0361c487c71d7793201b5af70029abeb54def0ed6"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/cliSignedToolSubset.test.ts",
+      "bytes": 13252,
+      "sha256": "8adb51ab0f11f01227f124cfc204ba8ea695ff902a6120385e49cc911020492f"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/cliSpillCommands.test.ts",
+      "bytes": 42242,
+      "sha256": "48052126e2370583276c167d5a2f1d9086acac88b3614769261446a21d9d5d08"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/compliance/mappingPackRefs.test.ts",
+      "bytes": 1171,
+      "sha256": "1be04f21bdce6ea977d83751a29121f595b04bc5fb1286a4a97564c2839ca614"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/cosProduct07NativeSdk.test.ts",
+      "bytes": 22018,
+      "sha256": "3519c88f0185a2df780f16e2748c87c3bf48d1c1c794864669e9febdaaa4900e"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/cosProduct07NativeSdkProcess.test.ts",
+      "bytes": 15876,
+      "sha256": "63e9c5de4a9b8c1fbdebe6ed9ce03ec5c6c1a49393558f1dcaa378606d52cb0f"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/crypto/keyHistoryAdmission.test.ts",
+      "bytes": 13785,
+      "sha256": "1fa1c015391c1c0c08f48cb58a3fb439504ac93288f0c28c80730f12f760105a"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/crypto/keyHistoryForgery.test.ts",
+      "bytes": 4118,
+      "sha256": "00e1e3accf649aee74250670326b9ea2dbde7b8d89253291ac0ca5f56f6282f4"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/crypto/keyHistoryMutationGuards.test.ts",
+      "bytes": 8773,
+      "sha256": "585d3a1fd59380b07df0b884bc53d26c88b0b4c7c8c390b0fd51bedc2caaea53"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/deepseekHarnessLaunch.test.ts",
+      "bytes": 3032,
+      "sha256": "5420ffc2d5666263223c4f642789e9eec3a313232c3174c84227dfceb6099289"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/deepseekPublicSurface.test.ts",
+      "bytes": 15191,
+      "sha256": "1e4878e435d478392acbda4dde9a9112a1b44a990f8c27f7a204e400e6eba506"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/docsTruthReset.test.ts",
+      "bytes": 5553,
+      "sha256": "5ebffa9a140114cea00db11c9f27a59b23167333551fa0777c14cf7ad95b8bfc"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/dshCaptureInterruption.test.ts",
+      "bytes": 8844,
+      "sha256": "3586375ee6ae9727140305047348bc818fc99ce9abc21e9928b717ebc1466c88"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/externalEvidenceExport.test.ts",
+      "bytes": 5707,
+      "sha256": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/externalEvidenceProfile.test.ts",
+      "bytes": 7956,
+      "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/f5DropDecisions.test.ts",
+      "bytes": 2569,
+      "sha256": "394f56ba1f046c346a2ef4b8f58cd5fae41d38cd9eeb19223a302302736da289"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/fixtures/nativeBudgetReserveWorker.ts",
+      "bytes": 2011,
+      "sha256": "9eb0bb27455e909e51f9bae5cb2fe73ee9757e3056ce7404e90c46a56a3ed455"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/harnessComparison.test.ts",
+      "bytes": 21910,
+      "sha256": "1d549869339f05696b397462760e68a77cb4fc298c86fc7f4ecdf16a73fd7a4d"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/harnessComparisonOutputOwnership.test.ts",
+      "bytes": 10431,
+      "sha256": "92a6a30486902e8fa106129f8bfd78a411a272893c45371ebe92052dd28ee43a"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/importProvenance.test.ts",
+      "bytes": 6256,
+      "sha256": "37e5534c65b181b55140b4c402aceb44e25358b57df9e2af6896ba3bc04e43c4"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/keyHistoryBundleCertificate.test.ts",
+      "bytes": 13134,
+      "sha256": "335e7909c28f785e2219669b3328b6f27ad6be4d8ac7c516f7361d9566c68ca1"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/leaseRevocationConsumers.test.ts",
+      "bytes": 13902,
+      "sha256": "57c5a77f413c3d60c91573f18ace5b06bd9b4df2c0fbd2261a847dd5654f8acf"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/leaseRevocationFailClosed.test.ts",
+      "bytes": 20878,
+      "sha256": "a6004bc25178e31710aab79ab8b3454a762fcbec8b481319f1e9b581eeaa734f"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/leaseRevocationWriterIntegrity.test.ts",
+      "bytes": 10196,
+      "sha256": "b2edf4d5086d6125c341d96829f35b80988ab5c0530dbcd4bb5be578d6b0be44"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/ledgerVerificationReadOnly.test.ts",
+      "bytes": 9247,
+      "sha256": "77818d93760c88fac14da1a7d345e63623d9f11492f8080477f51a963ea4fb55"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/mutationBatch.test.ts",
+      "bytes": 7305,
+      "sha256": "f6d2f9ff4b927cafa3c8a7ab510da6046163ed7c6b31afa5da2326c0b96494c1"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/nativeAgentClientVerify.test.ts",
+      "bytes": 4258,
+      "sha256": "11304292e426d294dbeb5b9db17f53a2bd53226a859866d192acd38cf9e862f8"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/nativeBudgets.test.ts",
+      "bytes": 27191,
+      "sha256": "14575a5d2ed903d360f9fbbb5699df78c1ba4a9c43a75e46f065687dc148c79d"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/nativePinnedToolSchemas.test.ts",
+      "bytes": 9756,
+      "sha256": "10cb9ddd0ea6f480d593e7ebd618a0e8e81183f238146009a7d18359bbe7f0d1"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/nativeSignedToolSubset.test.ts",
+      "bytes": 8452,
+      "sha256": "1241dd5c0601a6ad91296821727c74c4d2b85e21b9438ab5551cf7eaecb1bf7b"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/neutralImportMapping.test.ts",
+      "bytes": 12916,
+      "sha256": "9510fb35a0003e4f0049b5d2284a6bbbc00ab4584302fdd5e4bd6b6b7ecd5421"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/neutralImporter.test.ts",
+      "bytes": 16811,
+      "sha256": "99164c15364cee66ee2e33e539d7fe1b9c197816ce3f22550e4b470e01e01421"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/notaryAuthReplay.test.ts",
+      "bytes": 5441,
+      "sha256": "65c0a32f30d749de35db511627de90ed7b86cae91c03dbe029add14bf41a35ab"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/notaryComposeIntegration.test.ts",
+      "bytes": 12882,
+      "sha256": "8d21aa14b5ecc6247e415f7d679c4f1c05065d5d82f8def20f9b68883ba3410c"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/portalAttribution.test.ts",
+      "bytes": 10327,
+      "sha256": "6a6b1a43415006516064c59d272436bdb70e05c4524322606e1a5bf0e200c001"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/reconciliationDefectsReleaseGate.test.ts",
+      "bytes": 2341,
+      "sha256": "3c2eb86cdb3ec4bd101ec1ed8ba9b16d49c9e4606bf3c462baddad7906f98179"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/retentionSpill.test.ts",
+      "bytes": 12572,
+      "sha256": "fdd5bd0db414d9a31243465df7913661fbb63553b47cbd2fff2bf9a477cd7fec"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/sandboxConfinement.test.ts",
+      "bytes": 13945,
+      "sha256": "91fc5694bc307bb0f51f13f8332da8e149b7c72f9f2876dfa43ac224440d5bf8"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/sessionAttachmentSpill.test.ts",
+      "bytes": 26818,
+      "sha256": "a4f8d9a02278f43ca66c8c0a5cb66a9603bb4c1c9f15445b088161842ed993d8"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/sessionInboxSpill.test.ts",
+      "bytes": 21614,
+      "sha256": "721a79b3779ee9239b5f58e6c8618c8cb82efee37a6498c2de6540433fb3ee05"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/sessionSpill.test.ts",
+      "bytes": 24230,
+      "sha256": "77833f479bda592350b0650896b77675e42f2b329f4aeb85805fb0fe1244395a"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/sessionSpillCommitment.test.ts",
+      "bytes": 15452,
+      "sha256": "670573fc1067a06dfe9acdc8d460a2f2fcf1069f71b9a885b90ffd0fadde0366"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/setup/guardWorkspace.ts",
+      "bytes": 2333,
+      "sha256": "1a8186e622c1d4b1898391a410f5837eafa5c300ec06cfbef2da4e7d881def5e"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/spillEncryption.test.ts",
+      "bytes": 18262,
+      "sha256": "e5c26cf351a194f32b33a6dc1af20bbfbb31521a6a478bf7dfb85e270c17c2dc"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/spillLifecycle.test.ts",
+      "bytes": 18675,
+      "sha256": "4d2691ac3a9d3648ce4f849cce71208fbd7ad8912c551b4257ee8bb45aaad271"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/studioAgentCredentialBinding.test.ts",
+      "bytes": 25124,
+      "sha256": "ae9eb796f2e0e8fc8591fbbccb9b2ae1559ee7de09a06f5ddd88581d09186697"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/studioCredentialBindingHttp.test.ts",
+      "bytes": 10723,
+      "sha256": "faa993f2b4918305d01afa2727dc7b25324fbaed5efabf9599ca2e151cb18147"
+    }
+  ]
+}

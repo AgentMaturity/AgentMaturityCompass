@@ -1,0 +1,113 @@
+{
+  "quality": {
+    "at": "2026-10-16T11:38:15.313167+00:00",
+    "duplicates": {
+      "findingCount": 1268,
+      "byteEqualPriorP137Summary": true,
+      "sha256": "1b1ba849c8834dbaae46182c501fe720fb6fb86d5f953ab27cd83fd01b4ba50d",
+      "actualExit": 1
+    },
+    "deadCode": {
+      "previousCount": 2729,
+      "currentCount": 2729,
+      "added": [],
+      "removed": [],
+      "actualExit": 1,
+      "fullFindingsCount": 2729,
+      "logSha256": "46c480ec68158ced194bfb6cbd3c74dd2d80a5148c4ac618c549f2326a3cd6db"
+    },
+    "architecture": {
+      "status": "passed",
+      "failures": [],
+      "prefixBranchCount": 2,
+      "entireJsonParsed": true,
+      "sha256": "789916e57e4e08b7f22e5c0c287cbfdff07ecf79231fbce1b97389a590c7e500"
+    },
+    "noRatchetOrBaselineAdoption": true,
+    "qualityChecksGreen": false,
+    "scope": "No production source changed. Existing source-quality failures remain actual RED and unwaived; this is not global acceptance.",
+    "formalDone": false
+  },
+  "freezeLog": "Freeze guard passed: {\"cliCommandPaths\":1236,\"cliInventoryPaths\":1236,\"stationPacks\":41,\"stationPackQuestions\":632}\n",
+  "countOnlyOverlays": {
+    "at": "2026-10-16T11:33:49.959688+00:00",
+    "files": [
+      {
+        "path": "README.md",
+        "beforeSha256": "ccd0c1404c37fc70022968a28fe58c7199f470e45ab07b756816291ba686288a",
+        "afterSha256": "8a52a6a6afe6daf12baf7592c14ac1989c31c4c1f854dbee8d1b2d5ca45ae0d0",
+        "literalOnly": true
+      },
+      {
+        "path": "CONTRIBUTING.md",
+        "beforeSha256": "afc55d16c70d6b3a5a4bf68fbe071d902cf6d7853bb90db92e03a44c22415fe6",
+        "afterSha256": "0b4f97f04273ad9a4f56b3c76885fa509cec5561469df280b2a52e2a0b68c8f4",
+        "literalOnly": true
+      },
+      {
+        "path": "website/index.html",
+        "beforeSha256": "531623bbee6cef5529e60d4d385781292afab4b2f58123d9662df8cd3a7e2022",
+        "afterSha256": "bbc4bdc8d1cd0b48615d94eaec076a6e729324648e38a8605ef3063bed0a18d6",
+        "literalOnly": true
+      },
+      {
+        "path": "website/lite.html",
+        "beforeSha256": "3a946fe5aa9d6ec644b86f6ca8c0d501632b29891c1d8d0d7e8e70a7fe29ab3f",
+        "afterSha256": "363d2774efe084ee9ab2268137b63e1891359c1ccfb0eeb232b1331e53ba7495",
+        "literalOnly": true
+      },
+      {
+        "path": "website/i18n.js",
+        "beforeSha256": "d9ac61410f8fb2c23d8e91dd66dfc50bff9b7d2f187647b282978d6353810c79",
+        "afterSha256": "ffc3b0592652abc1d035c6f6f3f9676ceb3eca4a4e6c23a4911313df103bec8f",
+        "literalOnly": true
+      },
+      {
+        "path": "docs/content/show-hn-draft.md",
+        "beforeSha256": "25c52168c201bff93fa61ea6932de0ac6d23a75cadc760306b3eb9dbf32316fa",
+        "afterSha256": "076d36ceb0088e42708452ae7099dd7167f916e4e744d4ad444103aa08cb29a6",
+        "literalOnly": true
+      },
+      {
+        "path": "docs/content/reddit-launch-drafts.md",
+        "beforeSha256": "4531d5a2ccd8d164bc27d306588cc7efe92509447920f7ff66ceb45d1907b710",
+        "afterSha256": "8b1c5c5ecaf1208325874c33cb04cd4f5e543e987f20bf2b88862fa849e4968b",
+        "literalOnly": true
+      },
+      {
+        "path": "docs/internal/competitive-landscape.md",
+        "beforeSha256": "79c12a5ecda93fb303b2a6eee2848165c8ce053a639b38d95b05a83cde2977f3",
+        "afterSha256": "3a71a0327379df0b8890447e6f74dcd522deb0b83a56f5d1ccb690a61accd72a",
+        "literalOnly": true
+      },
+      {
+        "path": "docs/internal/mirofish-simulation-council.md",
+        "beforeSha256": "16b4d8f7abf5c56280d0d13d6b0ef7050e214090c042567bde83372aedd781dd",
+        "afterSha256": "f959dec7c78e43f19551f7ea2c9a0efe27e34a0176fc98233d59ca9d0495bb01",
+        "literalOnly": true
+      },
+      {
+        "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "beforeSha256": "3f1983cb7f5474b53ee195ff509cd7763c0784a08473d072b9e08ce7cae66c39",
+        "afterSha256": "1e79645aed3834bf0e5417d0e8e08b52b06da410952da682a08e4016e9e9827f",
+        "literalOnly": true
+      }
+    ],
+    "onlyTrackedChangesAreTenCountSurfaces": true,
+    "newTestRemainsUntrackedUntilOrdinaryCommit": true,
+    "passingResultsInvented": false
+  },
+  "fullQualityLogsPrivatePins": [
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-duplicates/stdout-stderr.log",
+      "bytes": 1845,
+      "sha256": "1b1ba849c8834dbaae46182c501fe720fb6fb86d5f953ab27cd83fd01b4ba50d"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-deadcode-delta/stdout-stderr.log",
+      "bytes": 248838,
+      "sha256": "46c480ec68158ced194bfb6cbd3c74dd2d80a5148c4ac618c549f2326a3cd6db"
+    }
+  ],
+  "baselineAdoptionOrWaiver": false
+}

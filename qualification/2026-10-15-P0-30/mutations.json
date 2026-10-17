@@ -1,0 +1,2140 @@
+{
+  "schemaVersion": 1,
+  "candidateSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "recordedMainBatchCommit": null,
+  "fullHeldBatchRun": false,
+  "series": [
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+        "bytes": 93748,
+        "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+      },
+      "guardResultFields": [
+        "controls"
+      ],
+      "perGuardResults": [
+        {
+          "id": "S7-M01-bwrap-child-guard",
+          "pointer": "/controls/0",
+          "actualCountsAsRecorded": [
+            21,
+            17,
+            21
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+            "bytes": 93748,
+            "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+          }
+        },
+        {
+          "id": "S7-M02-bwrap-exit-before-child",
+          "pointer": "/controls/1",
+          "actualCountsAsRecorded": [
+            21,
+            20,
+            21
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+            "bytes": 93748,
+            "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+          }
+        },
+        {
+          "id": "S7-M03-bwrap-exit-dup",
+          "pointer": "/controls/2",
+          "actualCountsAsRecorded": [
+            21,
+            20,
+            21
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+            "bytes": 93748,
+            "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+          }
+        },
+        {
+          "id": "S7-M04-bwrap-exit-range",
+          "pointer": "/controls/3",
+          "actualCountsAsRecorded": [
+            21,
+            20,
+            21
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+            "bytes": 93748,
+            "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+          }
+        },
+        {
+          "id": "S7-M05-bwrap-nonobject-row",
+          "pointer": "/controls/4",
+          "actualCountsAsRecorded": [
+            21,
+            20,
+            21
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+            "bytes": 93748,
+            "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+          }
+        },
+        {
+          "id": "S7-M06-bwrap-child-positive",
+          "pointer": "/controls/5",
+          "actualCountsAsRecorded": [
+            21,
+            19,
+            21
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+            "bytes": 93748,
+            "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+          }
+        },
+        {
+          "id": "S7-M07-bpf-arch-check",
+          "pointer": "/controls/6",
+          "actualCountsAsRecorded": [
+            21,
+            19,
+            21
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+            "bytes": 93748,
+            "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+          }
+        },
+        {
+          "id": "S7-M08-bpf-x32-rule",
+          "pointer": "/controls/7",
+          "actualCountsAsRecorded": [
+            21,
+            20,
+            21
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+            "bytes": 93748,
+            "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+          }
+        },
+        {
+          "id": "S7-M09-bpf-io-uring",
+          "pointer": "/controls/8",
+          "actualCountsAsRecorded": [
+            21,
+            19,
+            21
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+            "bytes": 93748,
+            "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+          }
+        },
+        {
+          "id": "S7-M10-bpf-connect",
+          "pointer": "/controls/9",
+          "actualCountsAsRecorded": [
+            21,
+            20,
+            21
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+            "bytes": 93748,
+            "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+          }
+        },
+        {
+          "id": "S7-M26-sdk-close-before-verify-753",
+          "pointer": "/controls/10",
+          "actualCountsAsRecorded": [
+            4,
+            3,
+            4
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+            "bytes": 93748,
+            "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+          }
+        },
+        {
+          "id": "S7-M27-sdk-trust-anchor-789",
+          "pointer": "/controls/11",
+          "actualCountsAsRecorded": [
+            4,
+            2,
+            4
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+            "bytes": 93748,
+            "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+          }
+        },
+        {
+          "id": "S7-M28-sdk-trust-anchor-mismatch-only-789",
+          "pointer": "/controls/12",
+          "actualCountsAsRecorded": [
+            4,
+            3,
+            4
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+            "bytes": 93748,
+            "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+          }
+        },
+        {
+          "id": "S7-M29-sdk-trust-anchor-missing-only-789",
+          "pointer": "/controls/13",
+          "actualCountsAsRecorded": [
+            4,
+            3,
+            4
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+            "bytes": 93748,
+            "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+          }
+        }
+      ],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.json",
+        "bytes": 39183,
+        "sha256": "6b847d4156cfbb76674d38faccd6e2a998adcba5fed5b9aa355181f3f5f0c08e"
+      },
+      "guardResultFields": [
+        "controls"
+      ],
+      "perGuardResults": [
+        {
+          "id": "P30-1508-M1-role-principal-current-reanchored",
+          "pointer": "/controls/0",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 21,
+              "numPassedTests": 21,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 21,
+              "numPassedTests": 20,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 21,
+              "numPassedTests": 21,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.json",
+            "bytes": 39183,
+            "sha256": "6b847d4156cfbb76674d38faccd6e2a998adcba5fed5b9aa355181f3f5f0c08e"
+          }
+        },
+        {
+          "id": "P30-1508-M2-portal-strict-schema-current-reanchored",
+          "pointer": "/controls/1",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 21,
+              "numPassedTests": 21,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 21,
+              "numPassedTests": 17,
+              "numFailedTests": 4,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 21,
+              "numPassedTests": 21,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.json",
+            "bytes": 39183,
+            "sha256": "6b847d4156cfbb76674d38faccd6e2a998adcba5fed5b9aa355181f3f5f0c08e"
+          }
+        },
+        {
+          "id": "P30-1508-M3-no-anonymous-principal-current-reanchored",
+          "pointer": "/controls/2",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 21,
+              "numPassedTests": 21,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 21,
+              "numPassedTests": 18,
+              "numFailedTests": 3,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 21,
+              "numPassedTests": 21,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.json",
+            "bytes": 39183,
+            "sha256": "6b847d4156cfbb76674d38faccd6e2a998adcba5fed5b9aa355181f3f5f0c08e"
+          }
+        },
+        {
+          "id": "P30-1508-M4-agent-lease-internal-api-current-reanchored",
+          "pointer": "/controls/3",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 21,
+              "numPassedTests": 21,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 21,
+              "numPassedTests": 19,
+              "numFailedTests": 2,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 21,
+              "numPassedTests": 21,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.json",
+            "bytes": 39183,
+            "sha256": "6b847d4156cfbb76674d38faccd6e2a998adcba5fed5b9aa355181f3f5f0c08e"
+          }
+        },
+        {
+          "id": "P30-1508-submittedby-from-body",
+          "pointer": "/controls/4",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 21,
+              "numPassedTests": 21,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 21,
+              "numPassedTests": 17,
+              "numFailedTests": 4,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 21,
+              "numPassedTests": 21,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.json",
+            "bytes": 39183,
+            "sha256": "6b847d4156cfbb76674d38faccd6e2a998adcba5fed5b9aa355181f3f5f0c08e"
+          }
+        }
+      ],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015.json",
+        "bytes": 48220,
+        "sha256": "f33581d913273e0ae0b2cf5048b35850df6a9429581959d5e1a8bca8bc313c3a"
+      },
+      "guardResultFields": [
+        "controls"
+      ],
+      "perGuardResults": [
+        {
+          "id": "P30-1508-M2-portal-strict-schema-current-reanchored",
+          "pointer": "/controls/0",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 1,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 1,
+              "numPassedTests": 0,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 1,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015.json",
+            "bytes": 48220,
+            "sha256": "f33581d913273e0ae0b2cf5048b35850df6a9429581959d5e1a8bca8bc313c3a"
+          }
+        },
+        {
+          "id": "P30-1508-submittedby-from-body",
+          "pointer": "/controls/1",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 1,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 1,
+              "numPassedTests": 0,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 1,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015.json",
+            "bytes": 48220,
+            "sha256": "f33581d913273e0ae0b2cf5048b35850df6a9429581959d5e1a8bca8bc313c3a"
+          }
+        }
+      ],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+        "bytes": 103946,
+        "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+      },
+      "guardResultFields": [
+        "matrices"
+      ],
+      "perGuardResults": [
+        {
+          "id": "S7-M11-profile-import-gate-221",
+          "pointer": "/matrices/0",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 18,
+              "numPassedTests": 18,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 18,
+              "numPassedTests": 17,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 18,
+              "numPassedTests": 18,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+            "bytes": 103946,
+            "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+          }
+        },
+        {
+          "id": "S7-M12-profile-lower-clamp-230",
+          "pointer": "/matrices/1",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 18,
+              "numPassedTests": 18,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 18,
+              "numPassedTests": 17,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 18,
+              "numPassedTests": 18,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+            "bytes": 103946,
+            "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+          }
+        },
+        {
+          "id": "S7-M13-export-chunk-bound",
+          "pointer": "/matrices/2",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 26,
+              "numPassedTests": 26,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 26,
+              "numPassedTests": 25,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 26,
+              "numPassedTests": 26,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+            "bytes": 103946,
+            "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+          }
+        },
+        {
+          "id": "S7-M14-export-callback-cancel",
+          "pointer": "/matrices/3",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 26,
+              "numPassedTests": 26,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 26,
+              "numPassedTests": 25,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 26,
+              "numPassedTests": 26,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+            "bytes": 103946,
+            "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+          }
+        },
+        {
+          "id": "S7-M15-export-unicode-replace",
+          "pointer": "/matrices/4",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 26,
+              "numPassedTests": 26,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 26,
+              "numPassedTests": 25,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 26,
+              "numPassedTests": 26,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+            "bytes": 103946,
+            "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+          }
+        },
+        {
+          "id": "S7-M16-export-time-range",
+          "pointer": "/matrices/5",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 26,
+              "numPassedTests": 26,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 26,
+              "numPassedTests": 25,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 26,
+              "numPassedTests": 26,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+            "bytes": 103946,
+            "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+          }
+        },
+        {
+          "id": "S7-M17-export-duration-loss",
+          "pointer": "/matrices/6",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 26,
+              "numPassedTests": 26,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 26,
+              "numPassedTests": 25,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 26,
+              "numPassedTests": 26,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+            "bytes": 103946,
+            "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+          }
+        },
+        {
+          "id": "S7-M18-export-redaction-loss",
+          "pointer": "/matrices/7",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 26,
+              "numPassedTests": 26,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 26,
+              "numPassedTests": 25,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 26,
+              "numPassedTests": 26,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+            "bytes": 103946,
+            "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+          }
+        },
+        {
+          "id": "S7-M19-export-time-loss",
+          "pointer": "/matrices/8",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 26,
+              "numPassedTests": 26,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 26,
+              "numPassedTests": 25,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 26,
+              "numPassedTests": 26,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+            "bytes": 103946,
+            "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+          }
+        }
+      ],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+        "bytes": 189825,
+        "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+      },
+      "guardResultFields": [
+        "originalMatrices"
+      ],
+      "perGuardResults": [
+        {
+          "id": "S7-M20-callback-allowlist-66",
+          "pointer": "/originalMatrices/0",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 13,
+              "numPassedTests": 13,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 13,
+              "numPassedTests": 12,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 13,
+              "numPassedTests": 13,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+            "bytes": 189825,
+            "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+          }
+        },
+        {
+          "id": "S7-M21-callback-sensitive-extension-66",
+          "pointer": "/originalMatrices/1",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 13,
+              "numPassedTests": 13,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 13,
+              "numPassedTests": 12,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 13,
+              "numPassedTests": 13,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+            "bytes": 189825,
+            "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+          }
+        },
+        {
+          "id": "S7-M22-callback-token-counter-exemption-66",
+          "pointer": "/originalMatrices/2",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 13,
+              "numPassedTests": 13,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 13,
+              "numPassedTests": 12,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 13,
+              "numPassedTests": 13,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+            "bytes": 189825,
+            "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+          }
+        },
+        {
+          "id": "S7-M23-callback-closed-113-equivalent",
+          "pointer": "/originalMatrices/3",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 13,
+              "numPassedTests": 13,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 13,
+              "numPassedTests": 13,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "restored": {
+              "numTotalTests": 13,
+              "numPassedTests": 13,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+            "bytes": 189825,
+            "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+          }
+        }
+      ],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+        "bytes": 95234,
+        "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+      },
+      "guardResultFields": [
+        "matrices"
+      ],
+      "perGuardResults": [
+        {
+          "id": "P30-1525-envelope-signature",
+          "pointer": "/matrices/0",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 62,
+              "numPassedTests": 62,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 62,
+              "numPassedTests": 55,
+              "numFailedTests": 7,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 62,
+              "numPassedTests": 62,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+            "bytes": 95234,
+            "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+          }
+        },
+        {
+          "id": "P30-1525-unsigned-migration",
+          "pointer": "/matrices/1",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 62,
+              "numPassedTests": 62,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 62,
+              "numPassedTests": 60,
+              "numFailedTests": 2,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 62,
+              "numPassedTests": 62,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+            "bytes": 95234,
+            "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+          }
+        },
+        {
+          "id": "P30-1525-bundle-raw-history",
+          "pointer": "/matrices/2",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 62,
+              "numPassedTests": 62,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 62,
+              "numPassedTests": 59,
+              "numFailedTests": 3,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 62,
+              "numPassedTests": 62,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+            "bytes": 95234,
+            "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+          }
+        },
+        {
+          "id": "P30-1525-certificate-raw-history",
+          "pointer": "/matrices/3",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 62,
+              "numPassedTests": 62,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 62,
+              "numPassedTests": 59,
+              "numFailedTests": 3,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 62,
+              "numPassedTests": 62,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+            "bytes": 95234,
+            "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+          }
+        },
+        {
+          "id": "P30-1525-cold-vault-initializes",
+          "pointer": "/matrices/4",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 62,
+              "numPassedTests": 62,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 62,
+              "numPassedTests": 44,
+              "numFailedTests": 3,
+              "numPendingTests": 15,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 62,
+              "numPassedTests": 62,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+            "bytes": 95234,
+            "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+          }
+        }
+      ],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015.json",
+        "bytes": 21149,
+        "sha256": "e3bb16af1d94f4a6d8d7ba5c29710ca19dccd5b2de02b33fa397edb9469714ad"
+      },
+      "guardResultFields": [],
+      "perGuardResults": [],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-portable-delegation-qualification-20261015.json",
+        "bytes": 66869,
+        "sha256": "3f8e97550ba11716f63e34bce9157e17dc20e6b96a32a239b585977871217ceb"
+      },
+      "guardResultFields": [],
+      "perGuardResults": [],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015.json",
+        "bytes": 18352,
+        "sha256": "b163c11f374ac9c9fff4e307f2ee6b0b4889b8b0ce47f4dee7780a162d6858ff"
+      },
+      "guardResultFields": [
+        "controls"
+      ],
+      "perGuardResults": [
+        {
+          "id": "P30-1529-replay-bytes-binding",
+          "pointer": "/controls/0",
+          "actualCountsAsRecorded": [
+            16,
+            13,
+            16
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015.json",
+            "bytes": 18352,
+            "sha256": "b163c11f374ac9c9fff4e307f2ee6b0b4889b8b0ce47f4dee7780a162d6858ff"
+          }
+        },
+        {
+          "id": "P30-1529-replay-lifetime",
+          "pointer": "/controls/1",
+          "actualCountsAsRecorded": [
+            6,
+            5,
+            6
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015.json",
+            "bytes": 18352,
+            "sha256": "b163c11f374ac9c9fff4e307f2ee6b0b4889b8b0ce47f4dee7780a162d6858ff"
+          }
+        }
+      ],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015.json",
+        "bytes": 12191,
+        "sha256": "388932daefcc227c4a99c7a8227751a6f356c7b9744fdfeca4aa8074f791760c"
+      },
+      "guardResultFields": [],
+      "perGuardResults": [],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.json",
+        "bytes": 15816,
+        "sha256": "748c1796cdfd0f3bb843f04e5fb33f55d26786e4d96b8f072db96b601be5580b"
+      },
+      "guardResultFields": [
+        "controls"
+      ],
+      "perGuardResults": [
+        {
+          "id": "P30-1534-budget-compare",
+          "pointer": "/controls/0",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 25,
+              "numPassedTests": 25,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 25,
+              "numPassedTests": 23,
+              "numFailedTests": 2,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 25,
+              "numPassedTests": 25,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.json",
+            "bytes": 15816,
+            "sha256": "748c1796cdfd0f3bb843f04e5fb33f55d26786e4d96b8f072db96b601be5580b"
+          }
+        },
+        {
+          "id": "P30-1534-no-transaction",
+          "pointer": "/controls/1",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 25,
+              "numPassedTests": 25,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 25,
+              "numPassedTests": 25,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "restored": {
+              "numTotalTests": 25,
+              "numPassedTests": 25,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.json",
+            "bytes": 15816,
+            "sha256": "748c1796cdfd0f3bb843f04e5fb33f55d26786e4d96b8f072db96b601be5580b"
+          }
+        }
+      ],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015.json",
+        "bytes": 22735,
+        "sha256": "01d0925418ca9ae46c177728693c8c1f7ffa417bce7ce00ab98fed851efaa0fd"
+      },
+      "guardResultFields": [],
+      "perGuardResults": [],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.json",
+        "bytes": 142868,
+        "sha256": "662259e4a654d757576bb3fe70c75a820bcc302469ef0b6f3cbb5776c8b8280f"
+      },
+      "guardResultFields": [
+        "matrices"
+      ],
+      "perGuardResults": [
+        {
+          "id": "P30-1542-current-empty-set",
+          "pointer": "/matrices/0",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 35,
+              "numPassedTests": 35,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 35,
+              "numPassedTests": 15,
+              "numFailedTests": 20,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 35,
+              "numPassedTests": 35,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.json",
+            "bytes": 142868,
+            "sha256": "662259e4a654d757576bb3fe70c75a820bcc302469ef0b6f3cbb5776c8b8280f"
+          }
+        },
+        {
+          "id": "P30-1542-revoke-snapshot",
+          "pointer": "/matrices/1",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 10,
+              "numPassedTests": 10,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 10,
+              "numPassedTests": 5,
+              "numFailedTests": 5,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 10,
+              "numPassedTests": 10,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.json",
+            "bytes": 142868,
+            "sha256": "662259e4a654d757576bb3fe70c75a820bcc302469ef0b6f3cbb5776c8b8280f"
+          }
+        }
+      ],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015.json",
+        "bytes": 8254,
+        "sha256": "f45962ff6d63a7e05610eaecd839ec6c6fbfe6847ca73bd16c30eb38b2a72ee8"
+      },
+      "guardResultFields": [],
+      "perGuardResults": [],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.json",
+        "bytes": 67992,
+        "sha256": "f742eb98000b34cc74e4933798ffc2f02d23580d422d9f53dead91c4e533dbdc"
+      },
+      "guardResultFields": [
+        "controls"
+      ],
+      "perGuardResults": [
+        {
+          "id": "P30-1542-current-empty-set-seven-consumer-supplement",
+          "pointer": "/controls/0",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 7,
+              "numPassedTests": 7,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 7,
+              "numPassedTests": 5,
+              "numFailedTests": 2,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 7,
+              "numPassedTests": 7,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.json",
+            "bytes": 67992,
+            "sha256": "f742eb98000b34cc74e4933798ffc2f02d23580d422d9f53dead91c4e533dbdc"
+          }
+        },
+        {
+          "id": "P30-1542-current-consumer-bridge",
+          "pointer": "/controls/1",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 7,
+              "numPassedTests": 7,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 7,
+              "numPassedTests": 6,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 7,
+              "numPassedTests": 7,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.json",
+            "bytes": 67992,
+            "sha256": "f742eb98000b34cc74e4933798ffc2f02d23580d422d9f53dead91c4e533dbdc"
+          }
+        },
+        {
+          "id": "P30-1542-current-consumer-gateway",
+          "pointer": "/controls/2",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 7,
+              "numPassedTests": 7,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 7,
+              "numPassedTests": 6,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 7,
+              "numPassedTests": 7,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.json",
+            "bytes": 67992,
+            "sha256": "f742eb98000b34cc74e4933798ffc2f02d23580d422d9f53dead91c4e533dbdc"
+          }
+        },
+        {
+          "id": "P30-1542-current-consumer-router",
+          "pointer": "/controls/3",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 7,
+              "numPassedTests": 7,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 7,
+              "numPassedTests": 6,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 7,
+              "numPassedTests": 7,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.json",
+            "bytes": 67992,
+            "sha256": "f742eb98000b34cc74e4933798ffc2f02d23580d422d9f53dead91c4e533dbdc"
+          }
+        },
+        {
+          "id": "P30-1542-current-consumer-studio",
+          "pointer": "/controls/4",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 7,
+              "numPassedTests": 7,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 7,
+              "numPassedTests": 6,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 7,
+              "numPassedTests": 7,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.json",
+            "bytes": 67992,
+            "sha256": "f742eb98000b34cc74e4933798ffc2f02d23580d422d9f53dead91c4e533dbdc"
+          }
+        },
+        {
+          "id": "P30-1542-current-consumer-wire",
+          "pointer": "/controls/5",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 7,
+              "numPassedTests": 7,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 7,
+              "numPassedTests": 6,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 7,
+              "numPassedTests": 7,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.json",
+            "bytes": 67992,
+            "sha256": "f742eb98000b34cc74e4933798ffc2f02d23580d422d9f53dead91c4e533dbdc"
+          }
+        }
+      ],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015.json",
+        "bytes": 31431,
+        "sha256": "7f3268cc7bdbe333255c956631e6ed55df9fc536b1976de17fe5248c6f3e0275"
+      },
+      "guardResultFields": [
+        "controls"
+      ],
+      "perGuardResults": [
+        {
+          "id": "P30-1546-mixed-credentials",
+          "pointer": "/controls/0",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 20,
+              "numPassedTests": 20,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 20,
+              "numPassedTests": 17,
+              "numFailedTests": 3,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 20,
+              "numPassedTests": 20,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015.json",
+            "bytes": 31431,
+            "sha256": "7f3268cc7bdbe333255c956631e6ed55df9fc536b1976de17fe5248c6f3e0275"
+          }
+        },
+        {
+          "id": "P30-1546-lease-narrowing",
+          "pointer": "/controls/1",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 20,
+              "numPassedTests": 20,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 20,
+              "numPassedTests": 13,
+              "numFailedTests": 7,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 20,
+              "numPassedTests": 20,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015.json",
+            "bytes": 31431,
+            "sha256": "7f3268cc7bdbe333255c956631e6ed55df9fc536b1976de17fe5248c6f3e0275"
+          }
+        }
+      ],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+        "bytes": 64984,
+        "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+      },
+      "guardResultFields": [
+        "controls"
+      ],
+      "perGuardResults": [
+        {
+          "id": "P30-1547-write-before-commit",
+          "pointer": "/controls/0",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 55,
+              "numPassedTests": 55,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 55,
+              "numPassedTests": 42,
+              "numFailedTests": 13,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 55,
+              "numPassedTests": 55,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+            "bytes": 64984,
+            "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+          }
+        },
+        {
+          "id": "P30-1547-default-key",
+          "pointer": "/controls/1",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 50,
+              "numPassedTests": 50,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 50,
+              "numPassedTests": 40,
+              "numFailedTests": 10,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 50,
+              "numPassedTests": 50,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+            "bytes": 64984,
+            "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+          }
+        },
+        {
+          "id": "P30-1547-skip-verify",
+          "pointer": "/controls/2",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 25,
+              "numPassedTests": 25,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 25,
+              "numPassedTests": 21,
+              "numFailedTests": 4,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 25,
+              "numPassedTests": 25,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+            "bytes": 64984,
+            "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+          }
+        },
+        {
+          "id": "P30-1547-dotdot-path",
+          "pointer": "/controls/3",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 15,
+              "numPassedTests": 15,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 15,
+              "numPassedTests": 14,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 15,
+              "numPassedTests": 15,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+            "bytes": 64984,
+            "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+          }
+        },
+        {
+          "id": "P30-1547-export-unauthenticated",
+          "pointer": "/controls/4",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 15,
+              "numPassedTests": 15,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 15,
+              "numPassedTests": 14,
+              "numFailedTests": 1,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 15,
+              "numPassedTests": 15,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+            "bytes": 64984,
+            "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+          }
+        },
+        {
+          "id": "P30-1547-erase-scope",
+          "pointer": "/controls/5",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 85,
+              "numPassedTests": 85,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 85,
+              "numPassedTests": 80,
+              "numFailedTests": 5,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": false,
+              "exit": 1
+            },
+            "restored": {
+              "numTotalTests": 85,
+              "numPassedTests": 85,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+            "bytes": 64984,
+            "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+          }
+        },
+        {
+          "id": "P30-1547-store-root",
+          "pointer": "/controls/6",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 15,
+              "numPassedTests": 15,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 15,
+              "numPassedTests": 15,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "restored": {
+              "numTotalTests": 15,
+              "numPassedTests": 15,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+            "bytes": 64984,
+            "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+          }
+        },
+        {
+          "id": "P30-1547-transport-dotdot",
+          "pointer": "/controls/7",
+          "actualCountsAsRecorded": {
+            "baseline": {
+              "numTotalTests": 30,
+              "numPassedTests": 30,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "mutant": {
+              "numTotalTests": 30,
+              "numPassedTests": 30,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            },
+            "restored": {
+              "numTotalTests": 30,
+              "numPassedTests": 30,
+              "numFailedTests": 0,
+              "numPendingTests": 0,
+              "numTodoTests": 0,
+              "success": true,
+              "exit": 0
+            }
+          },
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+            "bytes": 64984,
+            "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+          }
+        }
+      ],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015.json",
+        "bytes": 10348,
+        "sha256": "9ef02732d6e61939bcebeb072aab5ee7d7e64d385878fcfeecbb87f129ca1a56"
+      },
+      "guardResultFields": [],
+      "perGuardResults": [],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    },
+    {
+      "packet": {
+        "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015.json",
+        "bytes": 72597,
+        "sha256": "de1a9ea9b169e10c44cc3e827c48b09a131191a2448b77744f3c8fc7ba04f3cb"
+      },
+      "guardResultFields": [
+        "controls"
+      ],
+      "perGuardResults": [
+        {
+          "id": "S7-M24-harness-secret-manifest-112",
+          "pointer": "/controls/0",
+          "actualCountsAsRecorded": [
+            43,
+            41,
+            43
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015.json",
+            "bytes": 72597,
+            "sha256": "de1a9ea9b169e10c44cc3e827c48b09a131191a2448b77744f3c8fc7ba04f3cb"
+          }
+        },
+        {
+          "id": "S7-M25-harness-fixture-tamper-248",
+          "pointer": "/controls/1",
+          "actualCountsAsRecorded": [
+            43,
+            42,
+            43
+          ],
+          "firstFailureAndMaskingAuthority": {
+            "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015.json",
+            "bytes": 72597,
+            "sha256": "de1a9ea9b169e10c44cc3e827c48b09a131191a2448b77744f3c8fc7ba04f3cb"
+          }
+        }
+      ],
+      "context": "Copied original packet is the authority for executed route, counts, first failures, partial/incomplete attempts, aliases, masking and supplemental limitations. Prepared/historical recipe labels inside it do not replace actual results."
+    }
+  ],
+  "boundary": "Per-guard source controls and separate supplements. No aggregate unique test/kill count across overlaps, repeated recipes, historical aliases, compiler-limited sensitivity, body errors or original survivors. Root outcomes retain all qualifications."
+}

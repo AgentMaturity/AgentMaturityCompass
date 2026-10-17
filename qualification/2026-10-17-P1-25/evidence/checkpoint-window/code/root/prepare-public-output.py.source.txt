@@ -1,0 +1,42 @@
+"""Copy no signing directories; admit exact public JSON, request/reply files and public certificate bundles."""
+from pathlib import Path
+import json,hashlib,ssl,base64,datetime
+B=Path('/private/tmp/p1-25-checkpoint-qualification-20261017')
+PHASES=['p125k-source-combined','p125k-source-after-eof','p125k-fresh-canonical','p125k-fresh-canonical-corrected-path','p125k-m1','p125k-restore1','p125k-m2','p125k-restore2']
+D=B/'public-certificate-bundles';D.mkdir(exist_ok=False)
+def pin(p):
+ p=Path(p);assert p.is_file() and not p.is_symlink() and p.resolve()==p;d=p.read_bytes();return {'path':str(p),'bytes':len(d),'sha256':hashlib.sha256(d).hexdigest()}
+rows=[];seen=set();certs=[]
+def add(path,role,dest):
+ p=pin(path);assert p['path'] not in seen;seen.add(p['path']);rows.append({**p,'role':role,'relativeDestination':dest})
+for phase in PHASES:
+ out=json.loads((B/(phase+'-outcome.json')).read_text());assert out['phase']==phase
+ for i,s in enumerate(out['grantPublicEvidencePaths'],1):
+  path=Path(s);pub=json.loads(path.read_text());assert path.name=='public-evidence.json';case=pub['caseId'];dest=f'public/{phase}/{case}'
+  add(path,'public-lifecycle',dest+'/public-evidence.json')
+  if phase=='p125k-fresh-canonical':
+   assert len(pub['children'])==1 and not pub['listenerStarted'] and pub['socketCount']==0
+   continue
+  assert pub['tool']['version']=='4.0.3' and pub['tool']['sha256']=='bdeb769587e68e47dad86b42c2ea9758c5560ef6376eb69c18b85cf0c66ea36c'
+  certificates=[]
+  for name in ('root.pem','tsa.pem'):
+   pem=path.parent/name;raw=pem.read_bytes();assert raw.count(b'-----BEGIN CERTIFICATE-----')==raw.count(b'-----END CERTIFICATE-----')==1 and b'PRIVATE KEY' not in raw
+   der=ssl.PEM_cert_to_DER_cert(raw.decode('ascii'));certificates.append({'role':name.removesuffix('.pem'),'sourcePemPin':pin(pem),'derBytes':len(der),'derSha256':hashlib.sha256(der).hexdigest(),'derBase64':base64.b64encode(der).decode('ascii')})
+  bundle=D/(phase+'-'+case+'.json')
+  with bundle.open('x') as f:json.dump({'schema':'amc-public-certificate-bundle/1','phase':phase,'caseId':case,'certificates':certificates,'onlyPublicCertificates':True,'noPrivateKeysRead':True},f,indent=2);f.write('\n')
+  certs.append(pin(bundle));add(bundle,'public-certificates',dest+'/public-certificates.json')
+  for req in pub['requests']:
+   for field,role,bytefield in [('queryFile','public-query','queryBytes'),('responseFile','public-response','responseBytes')]:
+    s=req[field]
+    if s is None:continue
+    q=Path(s);assert q.parent==path.parent and q.name.startswith(('request-','response-'));actual=pin(q);assert actual['bytes']==req[bytefield]
+    if field=='queryFile':assert actual['sha256']==req['querySha256']
+    reply=pub['replyObservation'];assert reply is not None
+    assert actual['sha256']==reply['querySha256' if field=='queryFile' else 'responseSha256']
+    add(q,role,dest+'/'+q.name)
+ for s in out['checkpointPublicEvidencePaths']:
+  path=Path(s);pub=json.loads(path.read_text());assert path.name=='checkpoint-public-evidence.json';add(path,'public-checkpoint',f"public/{phase}/{pub['caseId']}/checkpoint-public-evidence.json")
+assert len(rows)==len({r['relativeDestination'] for r in rows})
+value={'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'onlyTheseExplicitPublicFilesMayBeCopied':True,'noDirectoryTraversalOrRawPemPublication':True,'count':len(rows),'entries':rows,'certificateBundleCount':len(certs),'noPrivateKeyOrChildStreamRead':True,'failedOriginalFreshPublicRecordsRetainedWithoutAcceptanceCredit':True}
+with (B/'public-output-allowlist.json').open('x') as f:json.dump(value,f,indent=2);f.write('\n')
+print(json.dumps({'count':len(rows),'roles':{role:sum(r['role']==role for r in rows) for role in sorted({r['role'] for r in rows})},'certificateBundles':len(certs),'noSigningRootTraversalPrivateKeyOrChildStreamRead':True}))

@@ -1,0 +1,32 @@
+{
+  "at": "2026-10-16T22:43:27.932183+00:00",
+  "method": "Read-only filesystem reproduction of sealed candidate absolute-PATH lookup under frozen Node22 prepend; no OpenSSL or candidate execution.",
+  "selected": {
+    "invoked": "/opt/homebrew/bin/openssl",
+    "physical": "/opt/homebrew/Cellar/openssl@4/4.0.3/bin/openssl",
+    "bytes": 881424,
+    "sha256": "bdeb769587e68e47dad86b42c2ea9758c5560ef6376eb69c18b85cf0c66ea36c"
+  },
+  "candidates": [
+    {
+      "invoked": "/opt/homebrew/bin/openssl",
+      "physical": "/opt/homebrew/Cellar/openssl@4/4.0.3/bin/openssl",
+      "bytes": 881424,
+      "sha256": "bdeb769587e68e47dad86b42c2ea9758c5560ef6376eb69c18b85cf0c66ea36c"
+    },
+    {
+      "invoked": "/usr/bin/openssl",
+      "physical": "/usr/bin/openssl",
+      "bytes": 1130832,
+      "sha256": "f81b4fcec5048ea1eceb40fc08f4e06f1668181f0b5bacfa8be27d0da181dcb7"
+    },
+    {
+      "invoked": "/opt/homebrew/bin/openssl",
+      "physical": "/opt/homebrew/Cellar/openssl@4/4.0.3/bin/openssl",
+      "bytes": 881424,
+      "sha256": "bdeb769587e68e47dad86b42c2ea9758c5560ef6376eb69c18b85cf0c66ea36c"
+    }
+  ],
+  "parentEnvironmentMutated": false,
+  "qualificationCredit": false
+}

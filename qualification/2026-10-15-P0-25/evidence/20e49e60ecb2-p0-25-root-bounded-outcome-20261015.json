@@ -1,0 +1,83 @@
+{
+  "key": "P0-25",
+  "source": "2d552741d727aaf3a26759b9df9343f7804d157a",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T04:49:51.915085+00:00",
+  "state": "BOUNDED_EXISTING_SOURCE_EVIDENCE_REVIEWED_FORMAL_ACCEPTANCE_OPEN",
+  "packet": {
+    "path": "/private/tmp/p0-25-bounded-qualification-20261015.json",
+    "bytes": 18330,
+    "sha256": "7575816b0d993a8327039bbe9d904271d1e2c5937d91d27f03e83ab2d2c36ae6"
+  },
+  "index": {
+    "path": "/private/tmp/p0-25-qualification-20261015/artifact-index.json",
+    "bytes": 29617,
+    "sha256": "c652dff2952703b79bde504c8367be90cc67201dd5535d6ea910ba58ff134127"
+  },
+  "review": {
+    "path": "/private/tmp/p0-25-bounded-independent-review-20261015.json",
+    "bytes": 31742,
+    "sha256": "edcb1b6f29516e66a22f0ceb115ca421ddf3aae4e3734360d06123b645891e11"
+  },
+  "rootReview": "Root read the frozen actual review and original source flow, verified actual collector/npm semantics and source58 equivalence. The only source58-to-source2d552 differences are149 prior P030 qualification files. No blocking evidence contradiction remains. This is a bounded evidence outcome, not issue acceptance.",
+  "actualMeaning": {
+    "primaryOriginalRun": {
+      "total": 32,
+      "passed": 32,
+      "failed": 0,
+      "pending": 0
+    },
+    "separateInjectedExecutorRun": {
+      "total": 22,
+      "passed": 22,
+      "failed": 0,
+      "pending": 0
+    },
+    "realCollectorAndPackage": {
+      "processes": 2,
+      "exit": 0,
+      "ok": true,
+      "errors": 0,
+      "ratcheted": 623,
+      "baseline": 623
+    },
+    "realArgumentRefusals": {
+      "processes": 3,
+      "exit": 1,
+      "projectBaselineUnchanged": true
+    }
+  },
+  "historicalCausalReuse": {
+    "source": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+    "resolver": [
+      30,
+      26,
+      30
+    ],
+    "resolverFailures": "Three direct AssertionErrors and one downstream TypeError at original lintCitations.test.ts71:20 after the mutated resolver removed the finding; later message assertion masked. Not four AssertionErrors.",
+    "ratchet": [
+      30,
+      29,
+      30
+    ],
+    "ratchetFailure": "One direct return-code AssertionError at original checkCitationsCli.test.ts41:18; later text assertions masked.",
+    "equivalence": "Current2471 protected and4529 compiled inputs match the old immutable manifests; the two current mapping cases were not under old mutations. No current mutation/newkill/all32-under-mutation claim."
+  },
+  "preservation": "7888 tracked files and4529 compiled files exact; independent native inode and original P030 inode unchanged. Frozen12-row journal/index/packet/generator preserved. No production/test/data/reference/baseline/workflow/guard/counter changes.",
+  "limits": [
+    "CIT0023 and CIT004620 baseline findings unchanged; strict prior P024 ISO23/22/1 remains unresolved and ISO reference table/expert31 remain empty. No expert/legal truth approval.",
+    "Catalogue and linter share the host array; register checker still reads its separate JSON policy list, with subset asserted. Literal one-list acceptance is not established.",
+    "Source workflow after-build citations step is blocking and release DAG requires build; real collector/package and parser refusal processes are measured.22release contracts use injected execute fixture; no complete release gate or hosted CI run.",
+    "Required duplicate1269/dead2751 prerequisites remain unwaived. Exact-source type/lint/other prior validation is reused atcode58, not newP025 executions; fullsuite/Node24/coverage/hosted/PR+merge/G0/Done and formal dependency acceptance remain open.",
+    "All earlier unresolved/skipped/paused/ownership scopes and pendingP052/P020/P019 transfers remain untouched; D03 skip remains only untilP206.",
+    "Inherited environment plus private HOME/Node22PATH is not credential/network/OS isolation. Observer precedes global teardown; combined post-exit known-diagnostic checks are bounded, not universal descendant or filesystem absence."
+  ],
+  "canonicalBuilder": {
+    "path": "/private/tmp/p0-25-build-canonical-packet-20261015.py",
+    "bytes": 9622,
+    "sha256": "c38a0eea4dbd0d66f81f728bc0d251d1b143c575a4f3971f2b07914fbc1c8b47"
+  },
+  "formalAcceptanceClosed": false,
+  "nextLane": "P0-21",
+  "allRootReadsFinished": true
+}

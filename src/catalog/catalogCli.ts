@@ -10,7 +10,7 @@ import { cliInitiator } from "../approvals/approvalEngine.js";
 import { dirname, join, resolve } from "node:path";
 import chalk from "chalk";
 import type { Command } from "commander";
-import { assertOutsideSignedConfigTree } from "../domains/operatingProfiles/operatingProfileEmit.js";
+import { assertCompilerOutputOutsideSignedConfigTree } from "./compiler/outputPath.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { loadTrustContext } from "../trust/trustContext.js";
@@ -53,7 +53,7 @@ export function runCatalogCompile(workspace: string, opts: CompileFlags): number
     ...(profile.mergeExceptions?.length ? { mergeExceptionTrust: loadTrustContext({ now }) } : {}) });
   const outDir = resolve(workspace, opts.out ?? join("amc-control-plans", plan.profile.profileId, plan.digest.slice("sha256:".length, "sha256:".length + 12)));
   try {
-    assertOutsideSignedConfigTree(workspace, outDir);
+    assertCompilerOutputOutsideSignedConfigTree(workspace, outDir);
   } catch {
     throw new Error(`Refusing to write a control plan under ${join(resolve(workspace), ".amc")}: .amc/** is reserved for signed configs.`);
   }

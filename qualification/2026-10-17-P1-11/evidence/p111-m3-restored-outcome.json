@@ -1,0 +1,379 @@
+{
+  "phase": "p111-m3-restored",
+  "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout",
+  "tests": {
+    "total": 88,
+    "passed": 88,
+    "failed": 0,
+    "skipped": 0
+  },
+  "hookTaskEntries": 29,
+  "individualHookValues": 29,
+  "orderedIdentities": [
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) empty ledger with signed maps: every category NOT_EVALUATED, evidence incomplete, score null"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) runtime events for agent A and no denied audits: requires_no_audit has sufficient evidence, applicability unresolved"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) imported review rows carrying agent A's id are not agent activity for requires_no_audit"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) synthetic rows leave the report's trust-tier coverage unchanged (P0-18)"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) no activity for agent A: requires_no_audit is not evaluated, absence of violations proves nothing"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) a bound event for agent B only leaves agent A's category NOT_EVALUATED"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) a bound positive event in session system: agent-scoped rejected, workspace-scoped admitted"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) a denied audit type in session system fails agent A's requires_no_audit"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) an event bound to soc2_availability does not satisfy nist_map"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) a bound event from eval_import is NOT_EVALUATED with untrusted evidence"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) bound events below the observed ratio are NOT_EVALUATED with untrusted evidence"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) a bound event without meta.agentId is not credited to default"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) an event outside the window is not counted"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) a tampered maps signature makes every category NOT_EVALUATED and untrusted, never PARTIAL"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) a hand-written assurance report JSON leaves requires_assurance_pack NOT_EVALUATED and untrusted"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) a sealed run below minScore fails requires_assurance_pack"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) a sealed passing run of a keyword-graded pack is NOT_EVALUATED and untrusted, never a pass (P0-19)"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) a sealed run whose pack scenarios were all inconclusive leaves requires_assurance_pack NOT_EVALUATED"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) a passing pack score with inconclusive scenarios is NOT_EVALUATED, not a pass on a partial measurement"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) bound runtime OBSERVED events, a sealed passing run and no violations: sufficient and observed, but not a pass without applicability"
+    ],
+    [
+      "tests/compliance/complianceFailClosed.test.ts",
+      "compliance fails closed (P0-17) a failing requirement next to a sufficient one fails the category; PARTIAL is never emitted (P1-11)"
+    ],
+    [
+      "tests/compliance/coverageScorer.test.ts",
+      "coverageScore (P0-17) score is null when nothing was evaluated"
+    ],
+    [
+      "tests/compliance/coverageScorer.test.ts",
+      "coverageScore (P0-17) only a pass earns credit; NOT_EVALUATED, UNKNOWN and legacy PARTIAL earn 0 and stay in the denominator"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"provenance\":\"dogfood\"} -> synthetic"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"claimKind\":\"synthetic_example\",\"source\":\"bridge\"} -> synthetic"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"dogfood-maturity\"} -> synthetic"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"eval_import\"} -> import"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"import\"} -> import"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"watch\"} -> import"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"attested_ingest\"} -> import"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"chatgpt\"} -> import"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"claude_console\"} -> import"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"gemini_ui\"} -> import"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"generic_json\"} -> import"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"generic_text\"} -> import"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"manual\"} -> manual"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"operator\"} -> manual"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"feedback.ingest\"} -> manual"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"user\"} -> manual"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"inferred\"} -> manual"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"carried\"} -> manual"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"numeric_self_answer\"} -> manual"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"default\"} -> manual"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"webhook\"} -> external-report"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"stdin_pipe\"} -> amc-runtime"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {\"source\":\"constructor\"} -> amc-runtime"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer {} -> amc-runtime"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "evidenceProducer unparseable meta is runtime with no claims (it binds to nothing)"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "source-literal enumeration every source literal in src is classified"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "isBoundToControl binds through meta.controlIds naming the mapping"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "isBoundToControl binds an audit event through the requirement's auditTypes only"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "subjectRole meta {\"agentId\":\"a\"} in session-1 with scope agent -> positive"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "subjectRole meta {\"agentId\":\"b\"} in session-1 with scope agent -> none"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "subjectRole meta {} in session-1 with scope agent -> none"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "subjectRole meta {} in session-1 with scope workspace -> none"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "subjectRole meta {} in system with scope agent -> violation-only"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "subjectRole meta {\"agentId\":\"a\"} in system with scope agent -> violation-only"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "subjectRole meta {} in system with scope workspace -> positive"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "subjectRole a missing agent id is never credited to default"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "verifiedAssuranceByPack counts sealed in-window reports, names unverifiable ones and skips insufficient evidence"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "verifiedAssuranceByPack a sealed report the runner marked INVALID (ledger integrity failed) is unverifiable, not evidence"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "verifiedAssuranceByPack only an evidence status of MEASURED counts: a missing or unknown status is not evidence"
+    ],
+    [
+      "tests/compliance/evidenceBinding.test.ts",
+      "verifiedAssuranceByPack an agent without a reports folder has no verified packs"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs returns all five dimensions for fresh bound observed evidence at its enforcement point"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs withholds a pass from an empty stream"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs requires every declared binding field"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs refuses individually changed subject, control, version, policy and scope bindings"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs refuses another tenant and treats its evidence as untrusted"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs requires an available producer named by the contract"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs requires verified provenance proving the claimed producer and a derived tier"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs uses recorded time for freshness even when claimed time looks fresh"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs admits the exact freshness boundary despite an old claimed time"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs refuses recorded times outside either window boundary or with invalid syntax"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs refuses prefixed ref and receipt identities previously used in another window"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs admits a receipt identity once per evaluation"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs refuses the loader's derived foreign-receipt decision"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs invalidates evidence only for a listed trigger after its recorded time"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs withholds passes for absent, unresolved and not-applicable plan decisions"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs withholds a pass when admitted nonviolating observations contradict each other"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs preserves trusted violation failure despite incomplete sampling"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs lets an unadmitted violation block a pass without crediting its provenance"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs rejects system-session positives but retains their violation-only agent rule"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs consumes the derived SELF_REPORTED tier despite an ignored OBSERVED attribute label"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs caps observed provenance at the producer's self-reported or synthetic maximum"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs withholds a pass when the required observed sampling ratio is not met"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs distinguishes advisory and observed behavior from enforcement at the binding point"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs keeps input order and input objects unchanged while binding the result digest to admitted refs"
+    ],
+    [
+      "tests/catalog/evidence/decisive.test.ts",
+      "catalog evidence decisions on already-derived unit inputs binds already-verified review decisions to the digest without promoting claim kind"
+    ]
+  ],
+  "taskErrors": [],
+  "rawObserverOrderedJoin": true,
+  "unhandledErrors": [],
+  "lateDiagnostics": [],
+  "command": {
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout tests/catalog/evidence/decisive.test.ts tests/compliance/complianceFailClosed.test.ts tests/compliance/evidenceBinding.test.ts tests/compliance/coverageScorer.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p111-m3-restored.raw.json",
+    "exit": 0,
+    "durationMs": 6885
+  },
+  "groupAbsentByESRCH": true,
+  "signalsOtherThanZeroSent": false,
+  "publicEvidencePaths": [],
+  "reuseBoundary": "Read-only import of the pinned existing ordered raw/observer/hook/late-error audit; only the finite cohort is selected here. No test execution or evidence rewriting."
+}

@@ -1,0 +1,396 @@
+{
+  "schema": "amc-p137-causal-chain-independent-audit/1",
+  "capturedUtc": "2026-10-16T11:06:43.096173+00:00",
+  "scope": "Offline filesystem/JSON/hash/stat review of the five closed Q source-Vitest phases. No AMC execution, imports, SQL/native load, network, R/Q or receipt writes.",
+  "sourceCommit": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "qualifiedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout",
+  "blockingFindings": [],
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "phases": [
+    {
+      "phase": "p137-fresh-canonical",
+      "total": 51,
+      "passed": 51,
+      "failed": 0,
+      "skipped": 0,
+      "tasks": 59,
+      "hooks": {
+        "beforeEach": 14,
+        "afterEach": 20,
+        "afterAll": 3,
+        "allPassed": true
+      },
+      "exit": 0,
+      "durationMs": 9806,
+      "ownedPid": 40300,
+      "ownedPgid": 40300,
+      "groupAbsentByESRCH": true,
+      "nonTestOwnedErrors": 0,
+      "unhandledErrors": 0,
+      "nonterminalTasks": 0,
+      "lateDiagnosticHits": [],
+      "rawObserverErrorStacksEqual": true,
+      "retainedFailureMarkers": 0,
+      "actualFirstAssertions": []
+    },
+    {
+      "phase": "p137-mutant-recent",
+      "total": 51,
+      "passed": 48,
+      "failed": 3,
+      "skipped": 0,
+      "tasks": 59,
+      "hooks": {
+        "beforeEach": 14,
+        "afterEach": 20,
+        "afterAll": 3,
+        "allPassed": true
+      },
+      "exit": 1,
+      "durationMs": 9064,
+      "ownedPid": 40421,
+      "ownedPgid": 40421,
+      "groupAbsentByESRCH": true,
+      "nonTestOwnedErrors": 0,
+      "unhandledErrors": 0,
+      "nonterminalTasks": 0,
+      "lateDiagnosticHits": [],
+      "rawObserverErrorStacksEqual": true,
+      "retainedFailureMarkers": 3,
+      "actualFirstAssertions": [
+        {
+          "title": "uses the exact threshold at 8000 measured prompt tokens",
+          "frame": "267:33",
+          "callerFrames": [
+            "98:5",
+            "264:5"
+          ],
+          "errorKind": "AssertionError",
+          "message": "expected [ { …(20) }, { …(20) }, { …(20) } ] to have a length of 1 but got 3"
+        },
+        {
+          "title": "prunes only old results at 8500, protects the recent two before counts and records the next measured effect",
+          "frame": "286:36",
+          "callerFrames": [
+            "98:5",
+            "280:5"
+          ],
+          "errorKind": "AssertionError",
+          "message": "expected '4516236f-60e2-4586-a21f-c91ed4958c5c' to be '9e1b3099-0dd4-4c4d-b174-750fce8f643a' // Object.is equality"
+        },
+        {
+          "title": "orders eligible large outputs by measured bytes then original order, leaving small and recent outputs intact",
+          "frame": "323:10",
+          "callerFrames": [
+            "98:5",
+            "317:5"
+          ],
+          "errorKind": "AssertionError",
+          "message": "expected [ …(5) ] to deeply equal [ …(3) ]"
+        }
+      ]
+    },
+    {
+      "phase": "p137-restored-recent",
+      "total": 51,
+      "passed": 51,
+      "failed": 0,
+      "skipped": 0,
+      "tasks": 59,
+      "hooks": {
+        "beforeEach": 14,
+        "afterEach": 20,
+        "afterAll": 3,
+        "allPassed": true
+      },
+      "exit": 0,
+      "durationMs": 9469,
+      "ownedPid": 40529,
+      "ownedPgid": 40529,
+      "groupAbsentByESRCH": true,
+      "nonTestOwnedErrors": 0,
+      "unhandledErrors": 0,
+      "nonterminalTasks": 0,
+      "lateDiagnosticHits": [],
+      "rawObserverErrorStacksEqual": true,
+      "retainedFailureMarkers": 0,
+      "actualFirstAssertions": []
+    },
+    {
+      "phase": "p137-mutant-trigger",
+      "total": 51,
+      "passed": 44,
+      "failed": 7,
+      "skipped": 0,
+      "tasks": 59,
+      "hooks": {
+        "beforeEach": 14,
+        "afterEach": 20,
+        "afterAll": 3,
+        "allPassed": true
+      },
+      "exit": 1,
+      "durationMs": 7055,
+      "ownedPid": 40681,
+      "ownedPgid": 40681,
+      "groupAbsentByESRCH": true,
+      "nonTestOwnedErrors": 0,
+      "unhandledErrors": 0,
+      "nonterminalTasks": 0,
+      "lateDiagnosticHits": [],
+      "rawObserverErrorStacksEqual": true,
+      "retainedFailureMarkers": 6,
+      "actualFirstAssertions": [
+        {
+          "title": "uses the exact threshold at 8000 measured prompt tokens",
+          "frame": "134:65",
+          "callerFrames": [
+            "265:7",
+            "98:5",
+            "264:5"
+          ],
+          "errorKind": "AssertionError",
+          "message": "expected [ { kind: 'error', turn: 1, …(2) } ] to deeply equal []"
+        },
+        {
+          "title": "prunes only old results at 8500, protects the recent two before counts and records the next measured effect",
+          "frame": "134:65",
+          "callerFrames": [
+            "281:7",
+            "98:5",
+            "280:5"
+          ],
+          "errorKind": "AssertionError",
+          "message": "expected [ { kind: 'error', turn: 1, …(2) } ] to deeply equal []"
+        },
+        {
+          "title": "orders eligible large outputs by measured bytes then original order, leaving small and recent outputs intact",
+          "frame": "134:65",
+          "callerFrames": [
+            "320:7",
+            "98:5",
+            "317:5"
+          ],
+          "errorKind": "AssertionError",
+          "message": "expected [ { kind: 'error', turn: 1, …(2) } ] to deeply equal []"
+        },
+        {
+          "title": "retains the actual encrypted spill object and measures the signed preview rather than full-output tokens",
+          "frame": "134:65",
+          "callerFrames": [
+            "336:7",
+            "98:5",
+            "335:5"
+          ],
+          "errorKind": "AssertionError",
+          "message": "expected [ { kind: 'error', turn: 1, …(2) } ] to deeply equal []"
+        },
+        {
+          "title": "caps successful compaction boundaries at three in one turn and resets the count on the next turn",
+          "frame": "134:65",
+          "callerFrames": [
+            "437:7",
+            "98:5",
+            "434:5"
+          ],
+          "errorKind": "AssertionError",
+          "message": "expected [ { kind: 'error', turn: 1, …(2) } ] to deeply equal []"
+        },
+        {
+          "title": "uses a real no-tools summary request at the next high boundary, preserves user authority and exports public signed evidence",
+          "frame": "134:65",
+          "callerFrames": [
+            "466:7",
+            "98:5",
+            "460:5"
+          ],
+          "errorKind": "AssertionError",
+          "message": "expected [ { kind: 'error', turn: 2, …(2) } ] to deeply equal []"
+        },
+        {
+          "title": "requires a trigger on an otherwise complete synthetic v2 structural negative",
+          "frame": "576:69",
+          "callerFrames": [],
+          "errorKind": "AssertionError",
+          "message": "expected true to be false // Object.is equality"
+        }
+      ]
+    },
+    {
+      "phase": "p137-restored-trigger",
+      "total": 51,
+      "passed": 51,
+      "failed": 0,
+      "skipped": 0,
+      "tasks": 59,
+      "hooks": {
+        "beforeEach": 14,
+        "afterEach": 20,
+        "afterAll": 3,
+        "allPassed": true
+      },
+      "exit": 0,
+      "durationMs": 9310,
+      "ownedPid": 40764,
+      "ownedPgid": 40764,
+      "groupAbsentByESRCH": true,
+      "nonTestOwnedErrors": 0,
+      "unhandledErrors": 0,
+      "nonterminalTasks": 0,
+      "lateDiagnosticHits": [],
+      "rawObserverErrorStacksEqual": true,
+      "retainedFailureMarkers": 0,
+      "actualFirstAssertions": []
+    }
+  ],
+  "identityAgreement": {
+    "uniqueCases": 51,
+    "files": {
+      "tests/autoCompaction.test.ts": 31,
+      "tests/surfaceCompaction.test.ts": 6,
+      "tests/surfaceHistoryCompaction.test.ts": 14
+    },
+    "sameExactPhysicalQPathsAndFullNamesAcrossAllFive": true,
+    "caseIdentitySha256": "d0a426f4c38d4fb3651a797bdc9c5624064e9ba65088ac9d23b98300168cf25e",
+    "same59ObserverTaskIdentities": true,
+    "all51StatesPassedInBaselineAndBothRestorations": true,
+    "rawObserverStatusesAndAllErrorStacksMatch": true,
+    "bodyAssertionFailuresInMutants": 10,
+    "distinctFailingCaseIdentitiesAcrossBothMutants": 7,
+    "countingBoundary": "Five invocations of the same 51-case corpus; repeated executions are not distinct tests."
+  },
+  "controlProof": [
+    {
+      "id": "M1-ignore-recent-exclusion",
+      "relativeSource": "src/agent/compaction/autoCompact.ts",
+      "findCount": 1,
+      "originalSha256": "18c7389dd676b3fea419b1f326f75c5bcf586886eddf8edb87a87f9ee35c70bb",
+      "mutantSha256": "484b02f48d6b58a025415ba4a75f689211c23fdaae4721f5ad79fd3db22467d2",
+      "mutantBytes": 14998,
+      "exactRecipeReconstructedInMemory": true,
+      "restoredBytesEqualOriginalAtRAndQ": true,
+      "restorationAfterClosedMutantAndBeforeNextRun": true,
+      "sourceOnly": true,
+      "compiledOutputsRebuilt": false,
+      "compilerOrBuildValidityClaim": false
+    },
+    {
+      "id": "M2-drop-v2-trigger-schema-field",
+      "relativeSource": "src/session/surfaceCompactionValidation.ts",
+      "findCount": 1,
+      "originalSha256": "447f32b89135f0485f931a64c19c9492f59d2d732ab119fc6d4f55a2fa24a883",
+      "mutantSha256": "d0fee8c5ce9ed6319672d9308e2d10855b60059678d2b2d6c7d9b43952ef289c",
+      "mutantBytes": 11338,
+      "exactRecipeReconstructedInMemory": true,
+      "restoredBytesEqualOriginalAtRAndQ": true,
+      "restorationAfterClosedMutantAndBeforeNextRun": true,
+      "sourceOnly": true,
+      "compiledOutputsRebuilt": false,
+      "compilerOrBuildValidityClaim": false
+    }
+  ],
+  "failureAttribution": {
+    "M1": [
+      {
+        "frame": "267:33",
+        "actual": "3 compaction rows",
+        "expected": "1",
+        "masked": "The later receipt v2/ratio/origin assertions, measured provenance and four-request verification in this threshold body."
+      },
+      {
+        "frame": "286:36",
+        "decisive": true,
+        "actual": "The first recent result live source event ID differs from its original tool-result ID.",
+        "expected": "The original recent-result event ID.",
+        "masked": "The immediately following SHA/payload assertion, the second recent result, old-result receipt counts, tool pairing, effect observation, measured provenance and four-request verification."
+      },
+      {
+        "frame": "323:10",
+        "actual": "5 compacted source IDs",
+        "expected": "3 IDs in b,c,a order",
+        "masked": "The later origin-order, small/recent identity, original payload, measured provenance and four-request verification assertions."
+      }
+    ],
+    "M2": {
+      "decisive": {
+        "frame": "576:69",
+        "actual": true,
+        "expected": false,
+        "check": "surfaceCompactionReceiptSchema.safeParse(completeSyntheticV2WithoutTrigger).success",
+        "boundary": "Standalone structural schema admission. It has no live producer/positive receipt setup dependency."
+      },
+      "sixEarlierRefusals": {
+        "frame": "134:65",
+        "actual": "A nonempty error-notification list containing compaction requires a supported, complete measurement receipt.",
+        "expected": [],
+        "callerFrames": [
+          "265:7",
+          "281:7",
+          "320:7",
+          "336:7",
+          "437:7",
+          "466:7"
+        ],
+        "mechanism": "The field deletion removes trigger from strict v2 schemas, so genuine trigger-bearing producer receipts are refused. These are six test-body AssertionErrors at the shared turn check, not hook, collection, spawn or generic exit failures.",
+        "maskedByCase": {
+          "threshold8000": "Receipt count/ratio/source/provenance and request verification.",
+          "recentRetention": "All direct recent source identity/SHA, count, effect and replay assertions.",
+          "eligibleOrdering": "All candidate order/small/recent/payload/provenance assertions.",
+          "encryptedSpill": "All spill-reference/ciphertext/full-content retention assertions.",
+          "perTurnCap": "All first-turn cap and next-turn reset assertions.",
+          "summary": "Second-turn summary/header/fencing/user/reconstruction/cold-CLI/public-export assertions; no public summary marker for this failed case."
+        }
+      },
+      "typeBoundary": "M2 was not typechecked or rebuilt. Removing trigger also removes an inferred property used by production types, so this is not a demonstrated build-valid mutant. The decisive assertion proves source-schema sensitivity, not unsafe admission of a genuine live automatic receipt."
+    }
+  },
+  "restoration": {
+    "selectedSourcePinsMatchedAtREnd": 57,
+    "selectedSourcePinsMatchedAtQEnd": 57,
+    "selectedQCompiledPinsMatched": 5,
+    "nativeR": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 539175547,
+      "nlink": 1
+    },
+    "nativeQ": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 542184874,
+      "nlink": 1
+    },
+    "nodeAndBorrowedRRunnerIdentityMatched": true,
+    "originalTwoSourceSnapshotsAndBothDerivedMutantHashesVerified": true,
+    "rootRecordedGitStatusesClean": true,
+    "independentWholeGitTreeCleanAuditPerformed": false,
+    "compiledBoundary": "Only the five selected compiled artifacts were rehashed. Mutations targeted Q TypeScript only, with no rebuild recorded. Passing compiled CLI witnesses use unchanged Q compiled code; they are not compiled-mutant coverage."
+  },
+  "lifecycleAndHistoricalTruth": {
+    "actualOwnedPgidESRCHInAllFive": true,
+    "signalsOtherThanZeroSent": false,
+    "oldCompilerHaltSixPinsRehashedUnchanged": true,
+    "oldCompilerChildExit": 2,
+    "oldCompilerWrapperExit": 70,
+    "oldMissingUsageInitialRedPreservedByPinnedReview": true,
+    "interpretationOfNoRetries": "No automatic or unreviewed retry. The separately admitted compiler type repair and continuation namespace are historical facts; no claim is made that no command was ever rerun. Original ACTIVE/HALTED evidence remains unchanged. Control restorations were explicit recorded actions after closed mutant phases.",
+    "rootOriginalFailureAndHoldRecordsNotRewritten": true
+  },
+  "limits": [
+    "This audit rechecked root-outcome assertions against full raw/observer/log/closure bytes and final selected files. It did not rerun tests, import product code, open SQLite, query the native addon or independently prove the whole filesystem/process universe.",
+    "R Vitest entry was used with explicit physical Q root/config/source/dependencies. This is not an independent Q runner invocation. The command inherits an environment with listed overrides, not universal OS/environment isolation.",
+    "Synthetic provider usage and owned fixtures exercise bounded local semantics. No live provider behavior, all adapter/CLI/ACP/SDK option threading, budget-refusal seam, current full suite/global coverage, release, hosted behavior, downstream dependency closure or formal P1-37 Done is established.",
+    "Public evidence markers appear in passing summary cases. Public cryptographic packets were not reverified in this causal-chain audit; earlier corrected-public-example audit remains separately pinned. Local included-key digest signatures and cold product verification are not an independent canonical-chain implementation or external authorship proof.",
+    "All existing human holds, Claude ownership, skipped F37, paused work and baseline/quality gaps remain in force."
+  ],
+  "inputIndexFile": "pins.json",
+  "calculationMethod": "Python standard-library filesystem/JSON/SHA-256/stat only. Full inputs read before emitting this new private report; source mutation bytes reconstructed in memory, never applied."
+}

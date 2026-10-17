@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`executive brief artifact > the html brief does not promote an unsealed current run 1`] = `"  <p><span class="amc-claim-label"><strong>Claim:</strong> Self-reported · <strong>Result:</strong> not evaluated (the signature does not verify) · <strong>Evidence:</strong> untrusted · <strong>Enforcement:</strong> none · <strong>Review:</strong> pending · <strong>Applicability:</strong> applicable</span></p>"`;
+
+exports[`executive brief artifact > the html brief preserves a 1.1.1 run's legacy claim and legend 1`] = `"  <p><span class="amc-claim-label"><strong>Claim:</strong> Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1) · <strong>Result:</strong> not evaluated · <strong>Evidence:</strong> sufficient · <strong>Enforcement:</strong> none · <strong>Review:</strong> pending · <strong>Applicability:</strong> applicable</span></p>"`;
+
+exports[`executive brief artifact > the markdown brief does not promote an unsealed current run 1`] = `"**Claim:** Self-reported · **Result:** not evaluated (the signature does not verify) · **Evidence:** untrusted · **Enforcement:** none · **Review:** pending · **Applicability:** applicable"`;
+
+exports[`executive brief artifact > the markdown brief preserves a 1.1.1 run's legacy claim and legend 1`] = `"**Claim:** Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1) · **Result:** not evaluated · **Evidence:** sufficient · **Enforcement:** none · **Review:** pending · **Applicability:** applicable"`;

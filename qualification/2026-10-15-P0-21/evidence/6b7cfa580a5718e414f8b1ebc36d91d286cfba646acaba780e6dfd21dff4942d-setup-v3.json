@@ -1,0 +1,340 @@
+{
+  "schemaVersion": 1,
+  "preparedUtc": "2026-10-15T05:08:47.216237+00:00",
+  "key": "P0-21",
+  "parentRoot": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+  "parentSource": "f58d88d80ab490490184354cc8665631d6999cc1",
+  "productionSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "closureRoot": "/private/tmp/p0-21-causal-qualification-20261015/closure",
+  "copyKind": "Fresh independent physical filesystem copy; not a clone and no .git present.",
+  "trackedCopied": 7945,
+  "compiledCopied": 4529,
+  "totalPhysicalCopied": 12474,
+  "allContentExactNow": true,
+  "allPhysicalInodesDistinctAndSingleLink": true,
+  "nodeModulesLink": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/closure/node_modules",
+    "target": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules",
+    "resolved": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules"
+  },
+  "borrowedNative": {
+    "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "device": 16777231,
+    "inode": 538645305,
+    "nlink": 1,
+    "mode": 493
+  },
+  "borrowedRuntimeHelpers": "Selected actual installed Vitest/Vite/runner files and Node executable are pinned; parent dependency tree is borrowed, not independently installed.",
+  "rootRuntimeReference": {
+    "path": "/private/tmp/p0-21-runtime-fingerprint-20261015.log",
+    "bytes": 737,
+    "sha256": "46cb7ab921acf2c641d081efbcc470ca2783e8c0949c2def46411f657ae666a8"
+  },
+  "runtimeReferenceLimit": "The retained root probe observed Node22.23.3 ABI127/SQLiteSELECT1. No private runtime probe or per-future-child ABI observation has occurred.",
+  "frozenOwnInputs": [
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller.py",
+      "bytes": 18783,
+      "sha256": "df22405c146c82099182f19e4f3aa8b9200103ed2b518cdf8842c430776158c8"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/proposal.json",
+      "bytes": 11790,
+      "sha256": "fa4c77f0bbcbb976cd8d7a505eae72db7689888f145154b9c1af76900e0645d2"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/source-manifest.json",
+      "bytes": 948064,
+      "sha256": "33488a499321073557a83b7a4e8446f1c7e4744f0c05fbc6edf27fb26f9c4caf"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/compiled-manifest.json",
+      "bytes": 485185,
+      "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/physical-copy-manifest.json",
+      "bytes": 3978574,
+      "sha256": "58ef19180c72f3818b797f6e37de6b7700d07604d6be019f3df05211c8547416"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/preservation.json",
+      "bytes": 8436,
+      "sha256": "c91b8b4d0663f0a69510e5384559abad6305096510b164a8b260dcae21d993a3"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/case-identities.json",
+      "bytes": 6257,
+      "sha256": "a820cd5df029a9481785484541f6c5f1ca1b8e3bbfd0cc0a3483209931d2921d"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup.json",
+      "bytes": 6837,
+      "sha256": "d7511c53ff825e7897b89af9327e91ee17301c4b6831ab2a7310789bbca4e246"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index.json",
+      "bytes": 3131,
+      "sha256": "cc36bfc5492d94d192cd7fe85a71d8efe22d916c19b94f1753e8c4809fc38129"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-summary.json",
+      "bytes": 1945,
+      "sha256": "ab1f9b7e7b7f00a6fdea2580f58c3eaef323d129dcb044badcef0a00f8427bba"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/release-template.json",
+      "bytes": 1142,
+      "sha256": "28069f891808c6f636d8788fb3fa4c9397aa011011f66ef67cb98f40409e8bcd"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/README.md",
+      "bytes": 2408,
+      "sha256": "c8a21161af01abc0ee862c74c67474cc983c5c9465506a55e554f71b3e74ffe7"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-v2.json",
+      "bytes": 11235,
+      "sha256": "97c93d1f7bbbce3355dca17100e99ac13dd9aebc62b4c2c49c515720ddfe5069"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index-v2.json",
+      "bytes": 3937,
+      "sha256": "9649af436870ee038f022c14e3d24695c072465d2e636c12883c77cffba43c90"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-summary-v2.json",
+      "bytes": 2275,
+      "sha256": "2742d75e0507197cc4c37f54a03ff9e309727fbb4aa3e7358528981c415bc5b6"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/release-template-v2.json",
+      "bytes": 1425,
+      "sha256": "8463a9fc5477b006b9021fa299655072eb478e148d8eba3c88698615d8935490"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/README-v2.md",
+      "bytes": 1404,
+      "sha256": "c44541f58745c8cfb19bbdaeacd5b3c8bd67e93f0c07a72b919cbec57d17d6cd"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-v2-change-note.json",
+      "bytes": 2440,
+      "sha256": "c777a5c0b0ab09166bbfaa5ae1c6183d3121366707e51c12702a7d06fd75b12d"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller-v2.py",
+      "bytes": 19778,
+      "sha256": "5b90ef9ba51eecbb58456d164a351f862a47088fdd85879125c84bfc8fc4c3ba"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller-v3.py",
+      "bytes": 19822,
+      "sha256": "b43db98145e32451f5552ec56cd9a407bda1118bc1fb10cd07f8ae5ae863ed68"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-v3-change-note.json",
+      "bytes": 3507,
+      "sha256": "b3d54ca7895f0a03888a5d3fc6987cdc74d847085f2b199dfd955f484512bd15"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/README-v3.md",
+      "bytes": 1387,
+      "sha256": "8d4553fb18818dce26f8131167b77feddcfac762da76bb2feb4dbf3022fe997e"
+    }
+  ],
+  "controlIds": [
+    "P021-C1-likert-origin",
+    "P021-C2-L2-threshold",
+    "P021-C3-numeric-self-eligible-cap",
+    "P021-C4-base-L3-self-tier",
+    "P021-C5-default-gate-self-tier",
+    "P021-C6-representative-raw-size"
+  ],
+  "recipesAreDataOnly": true,
+  "noMutantWritten": true,
+  "testExecutionPerformed": false,
+  "controllerExecuted": false,
+  "controllerImportedOrSyntaxCompiled": false,
+  "originalCoreCases": 37,
+  "sameSourceTestsAndSetup": [
+    "tests/scoreUnits.test.ts",
+    "tests/domainAssessmentUnits.test.ts",
+    "tests/noCertificationFromSelfAssessment.test.ts",
+    "tests/selfReportedLevelCap.test.ts",
+    "tests/logisticsIndustryPack.test.ts",
+    "tests/transparencyReport.test.ts"
+  ],
+  "executionPlan": "One root-released control per controller invocation, baseline\u2192one target TS mutation\u2192restored original37. C6 has two exact anchors in one target file. All4,529 compiled files remain unchanged.",
+  "releaseRule": "Exact per-control START_P021_CAUSAL_<control-id> plus setup/controller/proposal/source/compiled/preservation/observer/setup-index hashes required. No release exists now.",
+  "processPolicy": "Direct pinned Node22 Vitest CLI, ownedPID/cwd/newsession,90second wait without TERM/KILL/retry. After outer exit, poll signal0 at50ms up to5seconds, retaining every observation; require positiveESRCH. ACTIVE/HALTED persists on uncertainty, with no exception-driven restoration/newruntime. No universal detached-descendant absence claim.",
+  "classificationPolicy": "Raw37 and copied observer37 identities/states/errors must match. Baseline/restored require actual process0, success and37pass/no pending/todo. Mutant body AssertionErrors/process1 are retained for root attribution; a fully valid process0/37pass survivor stays a survivor. File/suite/hook/unhandled/known late diagnostics or timeout are not kills.",
+  "cachePolicy": "--cache=false follows root instruction and avoids normal Vitest results-cache writes where supported. No claim that all tool/dependency caches are universally absent or unchanged.",
+  "environmentPolicy": "Planned future child uses an explicit short environment allowlist and privateHOME/TMPDIR. No child has run; no OS, provider or network-isolation result is asserted.",
+  "oldArtifactsBoundary": "Old source/compiled files, prior readiness/causal pairs, original raw reports and copied reporter bytes are preserved. No old packet is edited or transitive point-in-time hash silently refreshed.",
+  "inboxBoundary": {
+    "path": "/Users/sid/AgentMaturityCompass/AMC_OS/INBOX/REV_QA_LEAD.md",
+    "prefixBytes": 869806,
+    "prefixSha256": "d262c7c652d0b2791a8da350f5c999933fef11038e419939eae23244b69710f7",
+    "appendBytes": 2248,
+    "appendSha256": "377de81b549049c22b7d75b32e0d55d056bb8fdf5681100f441368ae6f783de6",
+    "newBytes": 872054,
+    "newSha256": "dd1c3388ae4ad7906c87911576900af023d19701bae42c4e6128c79f776a5dd3",
+    "prefixPreservedExact": true
+  },
+  "inboxMeaning": "The P0-25 recorded append is current truth. Frozen older packet references retain their earlier prefix hash; this setup does not incorrectly require the pre-append role inbox bytes. Current inbox is separately pinned and its869806-byte prefix is verified through the signed-off handoff metadata.",
+  "allPreparationReadsFinished": true,
+  "preparationVersion": 3,
+  "controller": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller-v3.py",
+    "bytes": 19822,
+    "sha256": "b43db98145e32451f5552ec56cd9a407bda1118bc1fb10cd07f8ae5ae863ed68"
+  },
+  "supersededPreparedPins": [
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup.json",
+      "bytes": 6837,
+      "sha256": "d7511c53ff825e7897b89af9327e91ee17301c4b6831ab2a7310789bbca4e246"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index.json",
+      "bytes": 3131,
+      "sha256": "cc36bfc5492d94d192cd7fe85a71d8efe22d916c19b94f1753e8c4809fc38129"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-summary.json",
+      "bytes": 1945,
+      "sha256": "ab1f9b7e7b7f00a6fdea2580f58c3eaef323d129dcb044badcef0a00f8427bba"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/release-template.json",
+      "bytes": 1142,
+      "sha256": "28069f891808c6f636d8788fb3fa4c9397aa011011f66ef67cb98f40409e8bcd"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/README.md",
+      "bytes": 2408,
+      "sha256": "c8a21161af01abc0ee862c74c67474cc983c5c9465506a55e554f71b3e74ffe7"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller.py",
+      "bytes": 18783,
+      "sha256": "df22405c146c82099182f19e4f3aa8b9200103ed2b518cdf8842c430776158c8"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-v2.json",
+      "bytes": 11235,
+      "sha256": "97c93d1f7bbbce3355dca17100e99ac13dd9aebc62b4c2c49c515720ddfe5069"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index-v2.json",
+      "bytes": 3937,
+      "sha256": "9649af436870ee038f022c14e3d24695c072465d2e636c12883c77cffba43c90"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-summary-v2.json",
+      "bytes": 2275,
+      "sha256": "2742d75e0507197cc4c37f54a03ff9e309727fbb4aa3e7358528981c415bc5b6"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/release-template-v2.json",
+      "bytes": 1425,
+      "sha256": "8463a9fc5477b006b9021fa299655072eb478e148d8eba3c88698615d8935490"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/README-v2.md",
+      "bytes": 1404,
+      "sha256": "c44541f58745c8cfb19bbdaeacd5b3c8bd67e93f0c07a72b919cbec57d17d6cd"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-v2-change-note.json",
+      "bytes": 2440,
+      "sha256": "c777a5c0b0ab09166bbfaa5ae1c6183d3121366707e51c12702a7d06fd75b12d"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller-v2.py",
+      "bytes": 19778,
+      "sha256": "5b90ef9ba51eecbb58456d164a351f862a47088fdd85879125c84bfc8fc4c3ba"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-v2.json",
+      "bytes": 11235,
+      "sha256": "97c93d1f7bbbce3355dca17100e99ac13dd9aebc62b4c2c49c515720ddfe5069"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index-v2.json",
+      "bytes": 3937,
+      "sha256": "9649af436870ee038f022c14e3d24695c072465d2e636c12883c77cffba43c90"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-summary-v2.json",
+      "bytes": 2275,
+      "sha256": "2742d75e0507197cc4c37f54a03ff9e309727fbb4aa3e7358528981c415bc5b6"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/release-template-v2.json",
+      "bytes": 1425,
+      "sha256": "8463a9fc5477b006b9021fa299655072eb478e148d8eba3c88698615d8935490"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/README-v2.md",
+      "bytes": 1404,
+      "sha256": "c44541f58745c8cfb19bbdaeacd5b3c8bd67e93f0c07a72b919cbec57d17d6cd"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-v2-change-note.json",
+      "bytes": 2440,
+      "sha256": "c777a5c0b0ab09166bbfaa5ae1c6183d3121366707e51c12702a7d06fd75b12d"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller-v2.py",
+      "bytes": 19778,
+      "sha256": "5b90ef9ba51eecbb58456d164a351f862a47088fdd85879125c84bfc8fc4c3ba"
+    }
+  ],
+  "workerFlags": [
+    "--maxWorkers=1",
+    "--no-file-parallelism",
+    "--cache=false"
+  ],
+  "environmentKeys": [
+    "PATH",
+    "HOME",
+    "TMPDIR",
+    "NODE_ENV",
+    "NO_COLOR",
+    "GIT_NO_LAZY_FETCH",
+    "AMC_P021_RUNTIME_OBSERVER_PATH"
+  ],
+  "lateDiagnosticGuards": [
+    "Unhandled errors/rejection",
+    "uncaught exception",
+    "Error during teardown",
+    "Tests modified the repository workspace",
+    "Hook timed out",
+    "Error: global teardown",
+    "ELIFECYCLE",
+    "error during close",
+    "close timed out",
+    "Tests closed successfully but something prevents",
+    "error during global teardown"
+  ],
+  "blockedPreparedContext": null,
+  "readme": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/README-v3.md",
+    "bytes": 1387,
+    "sha256": "8d4553fb18818dce26f8131167b77feddcfac762da76bb2feb4dbf3022fe997e"
+  },
+  "preparationChangeNote": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/preparation-v3-change-note.json",
+    "bytes": 3507,
+    "sha256": "b3d54ca7895f0a03888a5d3fc6987cdc74d847085f2b199dfd955f484512bd15"
+  }
+}

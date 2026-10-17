@@ -1,0 +1,5 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`generateTransparencyReport > does not promote an unsealed current transparency run to observed 1`] = `"Claim: Self-reported · Result: not evaluated (the signature does not verify) · Evidence: untrusted · Enforcement: none · Review: pending · Applicability: applicable"`;
+
+exports[`generateTransparencyReport > renders markdown with expected sections 1`] = `"Claim: Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1) · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable"`;

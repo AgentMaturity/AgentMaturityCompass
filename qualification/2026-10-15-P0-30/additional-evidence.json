@@ -1,0 +1,43 @@
+{
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T04:27:28.142677+00:00",
+  "initialCanonicalReceipt": {
+    "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-30/receipt.json",
+    "bytes": 172943,
+    "sha256": "d043cf6168deffd01e18d5c39722b36e5b98f2aeb2978b490bb305fc28251c40"
+  },
+  "initialFiles": 144,
+  "initialCommandRecords": 349,
+  "additionalEvidence": [
+    {
+      "path": "/private/tmp/p0-30-canonical-builder-static-review-20261015.json",
+      "bytes": 3905,
+      "sha256": "82a8121e13e2dd7a9c973e35f9e2027521cd0e60a6260994eeefb8fc35235d5c",
+      "canonicalCopy": "evidence/82a8121e13e2-p0-30-canonical-builder-static-review-20261015.json"
+    },
+    {
+      "path": "/private/tmp/p0-30-canonical-builder-static-review-20261015.md",
+      "bytes": 1301,
+      "sha256": "06bf79696638eb08e3e6e5a4edeca2a5d0c9e27b37c9e036dd4439327682e2ff",
+      "canonicalCopy": "evidence/06bf79696638-p0-30-canonical-builder-static-review-20261015.md"
+    },
+    {
+      "path": "/private/tmp/p0-30-canonical-qualification-first-20261015.log",
+      "bytes": 234,
+      "sha256": "9d5c69ad8b4cc6ec85bedcdeb849f7880caa13b8b622c48dcef7a1f4c4cc6f80",
+      "canonicalCopy": "evidence/9d5c69ad8b4c-p0-30-canonical-qualification-first-20261015.log"
+    }
+  ],
+  "actualValidation": {
+    "phase": "canonical-qualification-first",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+    "cmd": "pnpm run check:qualification",
+    "exit": 0,
+    "durationMs": 491,
+    "startedUtc": "2026-10-15T04:26:53.319379+00:00",
+    "log": "/private/tmp/p0-30-canonical-qualification-first-20261015.log",
+    "head": "58e91dcef111bf02f773dcbfd1921d428cf75e34"
+  },
+  "scope": "Canonical metadata only; no source/compiled/original-test edit or repeated product corpus. Final ordinary validator will check this augmented packet again before commit."
+}

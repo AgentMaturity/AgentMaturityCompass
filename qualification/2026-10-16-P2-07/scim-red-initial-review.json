@@ -1,0 +1,1475 @@
+{
+  "schema": "amc-p207-scim-red-initial-green-independent-audit/1",
+  "atUtc": "2026-10-16T14:11:17.576018+00:00",
+  "auditor": "/root/pending_test_author",
+  "allReadsFinished": true,
+  "blockers": [],
+  "staticEvidenceAuditOnly": true,
+  "auditorExecutedProductOrProbes": false,
+  "preSourcePreservation": {
+    "capturePin": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/red-initial-runtime-independent-audit/pre-source-capture.json",
+      "physicalPath": "/private/tmp/p2-07-scim-qualification-20261016/red-initial-runtime-independent-audit/pre-source-capture.json",
+      "bytes": 35397,
+      "sha256": "31b08002696964d00a5dcc97d220cdde5520df410ff1389a2e06a9912553264b",
+      "dev": 16777231,
+      "inode": 542510338,
+      "nlink": 1
+    },
+    "allFourOriginalSourceDocPinsMatchAtCapture": true,
+    "all29SelectedInputPinsMatchAtCapture": true,
+    "materializedTestMatchesSealedCandidate": true,
+    "nativeBeforeMatchesBytesDevInodeNlink": true,
+    "gitObservation": "Read-only before-source Git status showed only untracked new test at bf3. A later read-only diff HEAD for the five old tests, guards/wiring, config/OIDC, hostDb/roleMapping/session/router was empty; cached diff was empty. No Git mutation performed.",
+    "temporalBoundary": "Capture preceded root production materialization; no claim that the three SCIM source files remain at their original bytes afterward."
+  },
+  "redFirstFailureAndMasks": [
+    {
+      "line": 276,
+      "firstFailure": "PATCH200 but active remains true",
+      "masked": "Later fetched/store-disabled/session/HTTP401 assertions; actual gathered direct session remains valid and HTTP remains200."
+    },
+    {
+      "line": 318,
+      "firstFailure": "Success-vector mismatch: TrUe fails to reactivate; pathless False/displayName ignored",
+      "masked": "Refusal vector and remove-displayName assertions; six invalid requests returned200, later invalid list changed the name, remove left it set."
+    },
+    {
+      "line": 337,
+      "firstFailure": "After HTTP200, target retains VIEWER beside AUDITOR",
+      "masked": "Survivor/member assertions; both members remain and survivor keeps VIEWER in gathered data."
+    },
+    {
+      "line": 376,
+      "firstFailure": "Group refusal-vector mismatch; initial unknown path accepted200",
+      "masked": "Supported replacement/remove assertions. All six refusal rows were gathered; last absent add500 removed SCIM-backed roles. Supported controls also gathered, not independently asserted after vector failure."
+    },
+    {
+      "line": 409,
+      "firstFailure": "Unsupported filter returns200 empty ListResponse",
+      "masked": "Remaining row predicates belong to the same failed vector. Three supported equality/no-match observations were gathered, not separate passing tests."
+    },
+    {
+      "line": 460,
+      "firstFailure": "Malformed/wire-path vector mismatch",
+      "masked": "Typed compatibility assertion at464. Missing/nonarrayOperations500, empty200, echoed op canary, five raw paths changed active; typed compatibility gathered but unasserted in red."
+    }
+  ],
+  "cohortIdentityRelation": {
+    "priorIdentityCount": 154,
+    "initialGreenIdentityCount": 160,
+    "priorIdentitiesPreserved": true,
+    "addedScimIdentities": 6,
+    "doNotSumCohorts": true
+  },
+  "initialGreenSemanticChecks": {
+    "allSixScimFamiliesUnmaskedAndPassed": true,
+    "existingSessionDeniedAfterFalse": true,
+    "targetScimGrantRevokedManualAndSurvivorPreserved": true,
+    "allFixedRefusalEnvelopesAndStatePreservationObserved": true,
+    "supportedEqualityAndNoMatchObserved": true,
+    "typedCompatibilityObservedAndItsAssertionReached": true,
+    "all16PublicRecordsReadAndClosureReviewed": true
+  },
+  "productionCopyChecks": {
+    "allFiveMatchActualRootProposals": true,
+    "threeSourceFilesMatchPreservedDonorBytes": true,
+    "threeSourceFilesPhysicallyDistinctFromDonor": true,
+    "newTestUnchanged": true,
+    "currentMaterializedTestPin": {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/identity/scimHardening.test.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/identity/scimHardening.test.ts",
+      "bytes": 32636,
+      "sha256": "21492d477c3500e0fbde2e136b0557a01cb04e6fbff7f1b94156493250fce28b",
+      "dev": 16777231,
+      "inode": 542507593,
+      "nlink": 1
+    },
+    "currentTestMatchesSealedCandidate": true
+  },
+  "limits": [
+    "Initial TypeScript-source green only; baseline-built pending cold child does not prove rebuilt SCIM code.",
+    "No mutation-control, fresh-source qualification, full-suite, final quality, deployment, release, or whole-P2-07 completion credit.",
+    "Run-end observer precedes global teardown; recorded outer exit, post-exit streams and late-pattern scan checked separately.",
+    "Recorded PID/PGID absence is bounded owner evidence, not universal descendant or filesystem isolation; auditor performed no probe.",
+    "R held/provider/archive preservation outside selected comparisons remains root-owned."
+  ],
+  "formalDone": false,
+  "red": {
+    "phase": "p207s-six-families-red",
+    "command": {
+      "exit": 1,
+      "durationMs": 10588,
+      "startedUtc": "2026-10-16T14:03:20.756091+00:00",
+      "endedUtc": "2026-10-16T14:03:31.358438+00:00",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+      "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    "actualSourceTestRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "commandArtifacts": {
+      "rawProducer": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/p207s-six-families-red.raw.json",
+        "bytes": 6720,
+        "sha256": "a340c1fd431f4a6d71fc0759109d90644348337debcae6b290ff871162dcf3b3"
+      },
+      "rawSnapshot": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207s-six-families-red/raw.json",
+        "bytes": 6720,
+        "sha256": "a340c1fd431f4a6d71fc0759109d90644348337debcae6b290ff871162dcf3b3"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207s-six-families-red/observer.json",
+        "bytes": 71880,
+        "sha256": "ea29cc8457d392e9dedb7a7f7577751c727dddc2fcac946e47e7ea41083aab27"
+      },
+      "reporter": {
+        "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "bytes": 2110,
+        "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+      }
+    },
+    "tests": {
+      "total": 6,
+      "passed": 0,
+      "failed": 6,
+      "skipped": 0
+    },
+    "fileCounts": [
+      {
+        "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/identity/scimHardening.test.ts",
+        "tests": 6
+      }
+    ],
+    "hooksPassed": 1,
+    "rawAndObserverIdentitiesAndStatusesMatch": true,
+    "unhandledErrors": [],
+    "lateHits": [],
+    "public": [
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-UnhJ87/observations/public-evidence.json",
+          "bytes": 7126,
+          "sha256": "f74006d257f71de5962e916d1b19421f2c4a54f9d35cf670d237a87fee3407e3"
+        },
+        "schema": "amc-p207-scim-hardening/1",
+        "label": "active-false-existing-session",
+        "httpObservations": 7,
+        "strictNaturalClientAndRouterClosure": true,
+        "environmentRestored": true,
+        "firstFailure": {
+          "title": "PATCH False disables a SCIM user and refuses its existing identity session",
+          "line": 276,
+          "name": "AssertionError",
+          "message": "expected true to be false // Object.is equality"
+        },
+        "semanticProjection": {
+          "before": {
+            "directOk": true,
+            "directUserId": "4be868ee-0527-4d55-984e-0737fcd33931",
+            "httpStatus": 200,
+            "httpUserId": "4be868ee-0527-4d55-984e-0737fcd33931"
+          },
+          "patchStatus": 200,
+          "patchActive": true,
+          "fetchedActive": true,
+          "storedDisabled": false,
+          "directSession": {
+            "ok": true,
+            "userId": "4be868ee-0527-4d55-984e-0737fcd33931",
+            "error": null
+          },
+          "httpSessionStatus": 200
+        }
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-ZlvUmi/observations/public-evidence.json",
+          "bytes": 23690,
+          "sha256": "abd2a9f2f5c0cfb186a80a6112b56247f4aeb285b720bfa31a7df0e706155fe3"
+        },
+        "schema": "amc-p207-scim-hardening/1",
+        "label": "user-patch-values-paths",
+        "httpObservations": 28,
+        "strictNaturalClientAndRouterClosure": true,
+        "environmentRestored": true,
+        "firstFailure": {
+          "title": "user PATCH validates all values and paths before applying a change",
+          "line": 318,
+          "name": "AssertionError",
+          "message": "expected [ \u2026(5) ] to deeply equal [ \u2026(5) ]"
+        },
+        "semanticProjection": {
+          "successRows": [
+            {
+              "label": "boolean-false",
+              "patchStatus": 200,
+              "patchActive": false,
+              "patchDisplayName": "Synthetic user-values",
+              "getStatus": 200,
+              "active": false,
+              "displayName": "Synthetic user-values"
+            },
+            {
+              "label": "mixed-case-true",
+              "patchStatus": 200,
+              "patchActive": false,
+              "patchDisplayName": "Synthetic user-values",
+              "getStatus": 200,
+              "active": false,
+              "displayName": "Synthetic user-values"
+            },
+            {
+              "label": "boolean-true",
+              "patchStatus": 200,
+              "patchActive": true,
+              "patchDisplayName": "Synthetic user-values",
+              "getStatus": 200,
+              "active": true,
+              "displayName": "Synthetic user-values"
+            },
+            {
+              "label": "pathless-supported-object",
+              "patchStatus": 200,
+              "patchActive": true,
+              "patchDisplayName": "Synthetic user-values",
+              "getStatus": 200,
+              "active": true,
+              "displayName": "Synthetic user-values"
+            },
+            {
+              "label": "reset-active-true",
+              "patchStatus": 200,
+              "patchActive": true,
+              "patchDisplayName": "Synthetic user-values",
+              "getStatus": 200,
+              "active": true,
+              "displayName": "Synthetic user-values"
+            }
+          ],
+          "refusalRows": [
+            {
+              "label": "invalid-active-string",
+              "status": 200,
+              "detail": null,
+              "activeAfter": true,
+              "displayNameAfter": "Synthetic user-values"
+            },
+            {
+              "label": "invalid-active-number",
+              "status": 200,
+              "detail": null,
+              "activeAfter": true,
+              "displayNameAfter": "Synthetic user-values"
+            },
+            {
+              "label": "invalid-active-null",
+              "status": 200,
+              "detail": null,
+              "activeAfter": true,
+              "displayNameAfter": "Synthetic user-values"
+            },
+            {
+              "label": "unknown-user-path",
+              "status": 200,
+              "detail": null,
+              "activeAfter": true,
+              "displayNameAfter": "Synthetic user-values"
+            },
+            {
+              "label": "unknown-pathless-attribute",
+              "status": 200,
+              "detail": null,
+              "activeAfter": true,
+              "displayNameAfter": "Synthetic user-values"
+            },
+            {
+              "label": "later-invalid-operation",
+              "status": 200,
+              "detail": null,
+              "activeAfter": true,
+              "displayNameAfter": "Must not apply"
+            }
+          ],
+          "beforeRefusalDisplayName": "Synthetic user-values",
+          "removeStatus": 200,
+          "displayNameAfterRemove": "Must not apply"
+        }
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-YVxjUa/observations/public-evidence.json",
+          "bytes": 7881,
+          "sha256": "e0e91d32b5a0e815424b2b11025fd74ae9958df03b1c650fec91e20ff69f6b45"
+        },
+        "schema": "amc-p207-scim-hardening/1",
+        "label": "filtered-member-role-revocation",
+        "httpObservations": 7,
+        "strictNaturalClientAndRouterClosure": true,
+        "environmentRestored": true,
+        "firstFailure": {
+          "title": "filtered removal revokes only the removed member's SCIM group grant",
+          "line": 337,
+          "name": "AssertionError",
+          "message": "expected [ 'AUDITOR', 'VIEWER' ] to deeply equal [ 'AUDITOR' ]"
+        },
+        "semanticProjection": {
+          "patchStatus": 200,
+          "targetRetained": true,
+          "survivorRetained": true,
+          "patchAndGetMembersMatch": true,
+          "roles": {
+            "target": [
+              "AUDITOR",
+              "VIEWER"
+            ],
+            "survivor": [
+              "VIEWER"
+            ]
+          }
+        }
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-M36tCx/observations/public-evidence.json",
+          "bytes": 24446,
+          "sha256": "20637614faa4985d2562f631aa32057291f480b73d0f1d558538034747d50dae"
+        },
+        "schema": "amc-p207-scim-hardening/1",
+        "label": "group-patch-validation",
+        "httpObservations": 23,
+        "strictNaturalClientAndRouterClosure": true,
+        "environmentRestored": true,
+        "firstFailure": {
+          "title": "group PATCH rejects unsupported paths and malformed values without changing grants",
+          "line": 376,
+          "name": "AssertionError",
+          "message": "expected [ { \u2026(4) }, { \u2026(4) }, { \u2026(4) }, \u2026(3) ] to deeply equal [ { \u2026(4) }, { \u2026(4) }, { \u2026(4) }, \u2026(3) ]"
+        },
+        "semanticProjection": {
+          "missingUserStatus": 404,
+          "refusalRows": [
+            {
+              "label": "unknown-group-path",
+              "status": 200,
+              "detail": null,
+              "membersUnchanged": true,
+              "roles": {
+                "target": [
+                  "AUDITOR",
+                  "VIEWER"
+                ],
+                "survivor": [
+                  "VIEWER"
+                ]
+              }
+            },
+            {
+              "label": "unsupported-member-filter",
+              "status": 200,
+              "detail": null,
+              "membersUnchanged": true,
+              "roles": {
+                "target": [
+                  "AUDITOR",
+                  "VIEWER"
+                ],
+                "survivor": [
+                  "VIEWER"
+                ]
+              }
+            },
+            {
+              "label": "filtered-add",
+              "status": 200,
+              "detail": null,
+              "membersUnchanged": true,
+              "roles": {
+                "target": [
+                  "AUDITOR",
+                  "VIEWER"
+                ],
+                "survivor": [
+                  "VIEWER"
+                ]
+              }
+            },
+            {
+              "label": "filtered-remove-with-value",
+              "status": 200,
+              "detail": null,
+              "membersUnchanged": true,
+              "roles": {
+                "target": [
+                  "AUDITOR",
+                  "VIEWER"
+                ],
+                "survivor": [
+                  "VIEWER"
+                ]
+              }
+            },
+            {
+              "label": "invalid-member-id-value",
+              "status": 200,
+              "detail": null,
+              "membersUnchanged": true,
+              "roles": {
+                "target": [
+                  "AUDITOR",
+                  "VIEWER"
+                ],
+                "survivor": [
+                  "VIEWER"
+                ]
+              }
+            },
+            {
+              "label": "absent-member-add",
+              "status": 500,
+              "detail": "Internal SCIM error",
+              "membersUnchanged": true,
+              "roles": {
+                "target": [
+                  "AUDITOR"
+                ],
+                "survivor": []
+              }
+            }
+          ],
+          "supportedControls": {
+            "replaceStatus": 200,
+            "replacementMemberCount": 1,
+            "replacementRoles": {
+              "target": [
+                "AUDITOR"
+              ],
+              "survivor": [
+                "VIEWER"
+              ]
+            },
+            "removeStatus": 200,
+            "removedMembers": [],
+            "removedRoles": {
+              "target": [
+                "AUDITOR"
+              ],
+              "survivor": []
+            }
+          }
+        }
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-icERuJ/observations/public-evidence.json",
+          "bytes": 8244,
+          "sha256": "66d8aa27ddceb0c3e3c29de05c7feb7d94895edce4ce02cea48ba5da4320daa8"
+        },
+        "schema": "amc-p207-scim-hardening/1",
+        "label": "user-filter-contract",
+        "httpObservations": 8,
+        "strictNaturalClientAndRouterClosure": true,
+        "environmentRestored": true,
+        "firstFailure": {
+          "title": "user filters reject unsupported expressions and retain supported equality results",
+          "line": 409,
+          "name": "AssertionError",
+          "message": "expected [ { \u2026(2) }, { \u2026(7) }, { \u2026(7) }, \u2026(1) ] to deeply equal [ { \u2026(2) }, { \u2026(7) }, { \u2026(7) }, \u2026(1) ]"
+        },
+        "semanticProjection": {
+          "rows": [
+            {
+              "label": "unsupported-contains",
+              "response": {
+                "status": 200,
+                "contentType": "application/scim+json",
+                "body": {
+                  "schemas": [
+                    "urn:ietf:params:scim:api:messages:2.0:ListResponse"
+                  ],
+                  "totalResults": 0,
+                  "Resources": [],
+                  "startIndex": 1,
+                  "itemsPerPage": 0
+                }
+              }
+            },
+            {
+              "label": "username-equality",
+              "status": 200,
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:ListResponse"
+              ],
+              "totalResults": 1,
+              "startIndex": 1,
+              "itemsPerPage": 1,
+              "ids": [
+                "79aae92e-f47a-4aaa-930b-f36d7c193ec6"
+              ]
+            },
+            {
+              "label": "external-id-equality",
+              "status": 200,
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:ListResponse"
+              ],
+              "totalResults": 1,
+              "startIndex": 1,
+              "itemsPerPage": 1,
+              "ids": [
+                "79aae92e-f47a-4aaa-930b-f36d7c193ec6"
+              ]
+            },
+            {
+              "label": "supported-equality-no-match",
+              "status": 200,
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:ListResponse"
+              ],
+              "totalResults": 0,
+              "startIndex": 1,
+              "itemsPerPage": 0,
+              "ids": []
+            }
+          ]
+        }
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-iJZVQa/observations/public-evidence.json",
+          "bytes": 27787,
+          "sha256": "0ef9484e93afbf4f341b60d24a1cfcb00d7a88f1416a7d24902d78d2954d6cdb"
+        },
+        "schema": "amc-p207-scim-hardening/1",
+        "label": "patch-parser-wire-and-typed-contract",
+        "httpObservations": 28,
+        "strictNaturalClientAndRouterClosure": true,
+        "environmentRestored": true,
+        "firstFailure": {
+          "title": "PATCH parser refuses malformed operations and raw non-string paths while preserving typed compatibility",
+          "line": 460,
+          "name": "AssertionError",
+          "message": "expected [ { \u2026(4) }, { \u2026(4) }, { \u2026(4) }, \u2026(9) ] to deeply equal [ { \u2026(4) }, { \u2026(4) }, { \u2026(4) }, \u2026(9) ]"
+        },
+        "semanticProjection": {
+          "refusalRows": [
+            {
+              "label": "missing-operations",
+              "status": 500,
+              "detail": "Internal SCIM error",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "non-array-operations",
+              "status": 500,
+              "detail": "Internal SCIM error",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "empty-operations",
+              "status": 200,
+              "detail": null,
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "null-operation",
+              "status": 400,
+              "detail": "invalid PATCH operation",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "array-operation",
+              "status": 400,
+              "detail": "unsupported PATCH op: undefined",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "missing-op",
+              "status": 400,
+              "detail": "unsupported PATCH op: undefined",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "unsupported-op",
+              "status": 400,
+              "detail": "unsupported PATCH op: synthetic-unsupported-op-canary",
+              "reflectedCanary": true,
+              "activeAfter": true
+            },
+            {
+              "label": "non-string-path-0",
+              "status": 200,
+              "detail": null,
+              "reflectedCanary": false,
+              "activeAfter": false
+            },
+            {
+              "label": "non-string-path-1",
+              "status": 200,
+              "detail": null,
+              "reflectedCanary": false,
+              "activeAfter": false
+            },
+            {
+              "label": "non-string-path-2",
+              "status": 200,
+              "detail": null,
+              "reflectedCanary": false,
+              "activeAfter": false
+            },
+            {
+              "label": "non-string-path-3",
+              "status": 200,
+              "detail": null,
+              "reflectedCanary": false,
+              "activeAfter": false
+            },
+            {
+              "label": "non-string-path-4",
+              "status": 200,
+              "detail": null,
+              "reflectedCanary": false,
+              "activeAfter": false
+            }
+          ],
+          "typedCompatibility": [
+            {
+              "label": "omitted-path",
+              "count": 1,
+              "op": "replace",
+              "path": null,
+              "pathIsUndefined": true,
+              "valueSameObject": true,
+              "error": null
+            },
+            {
+              "label": "empty-string-path",
+              "count": 1,
+              "op": "replace",
+              "path": "",
+              "pathIsUndefined": false,
+              "valueSameObject": true,
+              "error": null
+            },
+            {
+              "label": "explicit-undefined-path",
+              "count": 1,
+              "op": "replace",
+              "path": null,
+              "pathIsUndefined": true,
+              "valueSameObject": true,
+              "error": null
+            },
+            {
+              "label": "mixed-case-member-id",
+              "count": 1,
+              "op": "remove",
+              "path": "members[value eq \"UserCaseA\"]",
+              "pathIsUndefined": false,
+              "valueSameObject": true,
+              "error": null
+            }
+          ]
+        }
+      }
+    ],
+    "scimHttpObservationRows": 101,
+    "recordedProcessExitAndGroupClosure": true
+  },
+  "initialGreen": {
+    "phase": "p207s-initial-six-files",
+    "command": {
+      "exit": 0,
+      "durationMs": 10976,
+      "startedUtc": "2026-10-16T14:06:09.597541+00:00",
+      "endedUtc": "2026-10-16T14:06:20.589120+00:00",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+      "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    "actualSourceTestRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "commandArtifacts": {
+      "rawProducer": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/p207s-initial-six-files.raw.json",
+        "bytes": 59696,
+        "sha256": "fb3c00d9c6a6613f3a9371a480775b680dad8170c95e25228d08a341da434621"
+      },
+      "rawSnapshot": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207s-initial-six-files/raw.json",
+        "bytes": 59696,
+        "sha256": "fb3c00d9c6a6613f3a9371a480775b680dad8170c95e25228d08a341da434621"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207s-initial-six-files/observer.json",
+        "bytes": 78131,
+        "sha256": "4e7f5953db2f3f93cbaf6614266a5909715ad452d8b913fc8ca013c7f8dc6dca"
+      },
+      "reporter": {
+        "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "bytes": 2110,
+        "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+      }
+    },
+    "tests": {
+      "total": 160,
+      "passed": 160,
+      "failed": 0,
+      "skipped": 0
+    },
+    "fileCounts": [
+      {
+        "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/enterpriseSsoScim.test.ts",
+        "tests": 10
+      },
+      {
+        "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/identity/jwtVerify.test.ts",
+        "tests": 128
+      },
+      {
+        "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/identity/pendingLoginStore.test.ts",
+        "tests": 4
+      },
+      {
+        "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/identity/scimHardening.test.ts",
+        "tests": 6
+      },
+      {
+        "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/security/api-security.test.ts",
+        "tests": 8
+      },
+      {
+        "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/security/identityAccountBinding.test.ts",
+        "tests": 4
+      }
+    ],
+    "hooksPassed": 28,
+    "rawAndObserverIdentitiesAndStatusesMatch": true,
+    "unhandledErrors": [],
+    "lateHits": [],
+    "public": [
+      {
+        "pin": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-F6tGL7/observations/public-evidence.json",
+          "bytes": 1458,
+          "sha256": "dd05f05d6423749290b7ba8e35d2874756ebf95d4e6c02eff39dcabfd9e6a3b8"
+        },
+        "schema": "amc-p207-local-oidc/2",
+        "label": "algorithm-RS256",
+        "requestObservations": 1,
+        "lifecycle": {
+          "inProcessServer": true,
+          "closed": true,
+          "listening": false,
+          "openSockets": 0,
+          "connectionCount": 1,
+          "childProcessCreated": false,
+          "signalsSent": false,
+          "exactOptInRestored": true
+        }
+      },
+      {
+        "pin": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-LmdweS/observations/public-evidence.json",
+          "bytes": 1458,
+          "sha256": "bf88a99b13f09e8c6b356d95f6c29bd9865b9915c17459182db132a2cf57ec3d"
+        },
+        "schema": "amc-p207-local-oidc/2",
+        "label": "algorithm-PS256",
+        "requestObservations": 1,
+        "lifecycle": {
+          "inProcessServer": true,
+          "closed": true,
+          "listening": false,
+          "openSockets": 0,
+          "connectionCount": 1,
+          "childProcessCreated": false,
+          "signalsSent": false,
+          "exactOptInRestored": true
+        }
+      },
+      {
+        "pin": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-VWAhtK/observations/public-evidence.json",
+          "bytes": 1458,
+          "sha256": "d12681f634fe75dfd09d57ba76b720efb629663dea8a16023044a303c69c089a"
+        },
+        "schema": "amc-p207-local-oidc/2",
+        "label": "algorithm-ES256",
+        "requestObservations": 1,
+        "lifecycle": {
+          "inProcessServer": true,
+          "closed": true,
+          "listening": false,
+          "openSockets": 0,
+          "connectionCount": 1,
+          "childProcessCreated": false,
+          "signalsSent": false,
+          "exactOptInRestored": true
+        }
+      },
+      {
+        "pin": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-wzANPU/observations/public-evidence.json",
+          "bytes": 1688,
+          "sha256": "706b36599dd9f95a500a82f093c7ae4987c07f72a44f19a1666f7d1736e9d23a"
+        },
+        "schema": "amc-p207-local-oidc/2",
+        "label": "rotation-real-clock",
+        "requestObservations": 2,
+        "lifecycle": {
+          "inProcessServer": true,
+          "closed": true,
+          "listening": false,
+          "openSockets": 0,
+          "connectionCount": 2,
+          "childProcessCreated": false,
+          "signalsSent": false,
+          "exactOptInRestored": true
+        }
+      },
+      {
+        "pin": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-OgIdQ8/observations/public-evidence.json",
+          "bytes": 1616,
+          "sha256": "ccddf1768af9302d255127ec57014c1b59d86b58104d189abf3fb10e3fc387d4"
+        },
+        "schema": "amc-p207-local-oidc/2",
+        "label": "failed-refresh",
+        "requestObservations": 2,
+        "lifecycle": {
+          "inProcessServer": true,
+          "closed": true,
+          "listening": false,
+          "openSockets": 0,
+          "connectionCount": 2,
+          "childProcessCreated": false,
+          "signalsSent": false,
+          "exactOptInRestored": true
+        }
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-6xRHTH/observations/public-evidence.json",
+          "bytes": 6364,
+          "sha256": "9aaf277a15aedd56bde6f3eb02f7a0359bff97d477629fede227f461033e044e"
+        },
+        "schema": "amc-p207-scim-hardening/1",
+        "label": "active-false-existing-session",
+        "httpObservations": 7,
+        "strictNaturalClientAndRouterClosure": true,
+        "environmentRestored": true,
+        "semanticProjection": {
+          "before": {
+            "directOk": true,
+            "directUserId": "fdaaf540-fa35-40fb-8f41-4c8c6b67b00a",
+            "httpStatus": 200,
+            "httpUserId": "fdaaf540-fa35-40fb-8f41-4c8c6b67b00a"
+          },
+          "patchStatus": 200,
+          "patchActive": false,
+          "fetchedActive": false,
+          "storedDisabled": true,
+          "directSession": {
+            "ok": false,
+            "userId": null,
+            "error": "user disabled"
+          },
+          "httpSessionStatus": 401
+        }
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-DeEUPU/observations/public-evidence.json",
+          "bytes": 5257,
+          "sha256": "b9784c22c0c80551d2f8a0883c2f3d01f0b693c231e2caff4a7420601232a22c"
+        },
+        "schema": "amc-p207-pending/1",
+        "label": "cold-router-and-replay",
+        "clientObservations": 5,
+        "naturalClosureAndEnvironment": true,
+        "compiledChildBoundary": "Existing baseline-built pending/OIDC child only; no rebuilt-SCIM or fresh-compiled SCIM qualification credit.",
+        "children": [
+          {
+            "pid": 67313,
+            "ready": true,
+            "closed": true,
+            "outcome": {
+              "code": 0,
+              "signal": null
+            },
+            "events": [
+              {
+                "type": "ready",
+                "pid": 67313,
+                "host": "127.0.0.1",
+                "port": 52143,
+                "hostDir": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-DeEUPU/host",
+                "routerUrl": "file:///Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/workspaces/workspaceRouter.js",
+                "vaultUrl": "file:///Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/identity/hostVault.js"
+              },
+              {
+                "type": "close",
+                "code": 0,
+                "signal": null
+              },
+              {
+                "type": "pid-probe",
+                "pid": 67313,
+                "absent": true,
+                "elapsedMs": 0.14566699999977573
+              },
+              {
+                "type": "streams",
+                "stdoutBytes": 0,
+                "stderrBytes": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-IRC6zQ/observations/public-evidence.json",
+          "bytes": 2956,
+          "sha256": "7051731faf9cfcf245fa28cffc7920edd68313b7a5f04d30d4d2b9e43cbfbb9c"
+        },
+        "schema": "amc-p207-pending/1",
+        "label": "router-exact-ttl",
+        "clientObservations": 4,
+        "naturalClosureAndEnvironment": true,
+        "compiledChildBoundary": "Existing baseline-built pending/OIDC child only; no rebuilt-SCIM or fresh-compiled SCIM qualification credit.",
+        "children": []
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-VMuT3B/observations/public-evidence.json",
+          "bytes": 869,
+          "sha256": "7cad55ba47766fc8ac2354bcc6329b83422d671e90f78bd3acb5e7f2fd52a1a9"
+        },
+        "schema": "amc-p207-pending/1",
+        "label": "public-single-use",
+        "clientObservations": 0,
+        "naturalClosureAndEnvironment": true,
+        "compiledChildBoundary": "Existing baseline-built pending/OIDC child only; no rebuilt-SCIM or fresh-compiled SCIM qualification credit.",
+        "children": []
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-xrQDWA/observations/public-evidence.json",
+          "bytes": 959,
+          "sha256": "9f0ee7a78a8dbe5897770c521d91884ffa25b9827d764dc451861146d9e2b235"
+        },
+        "schema": "amc-p207-pending/1",
+        "label": "public-ttl-boundary",
+        "clientObservations": 0,
+        "naturalClosureAndEnvironment": true,
+        "compiledChildBoundary": "Existing baseline-built pending/OIDC child only; no rebuilt-SCIM or fresh-compiled SCIM qualification credit.",
+        "children": []
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-7zFMAb/observations/public-evidence.json",
+          "bytes": 20738,
+          "sha256": "31c3f2009f92bfcfad9f5a9aac1f5a5fead44ea390cd8b7f4efa3f6f4b46b5dd"
+        },
+        "schema": "amc-p207-scim-hardening/1",
+        "label": "user-patch-values-paths",
+        "httpObservations": 28,
+        "strictNaturalClientAndRouterClosure": true,
+        "environmentRestored": true,
+        "semanticProjection": {
+          "successRows": [
+            {
+              "label": "boolean-false",
+              "patchStatus": 200,
+              "patchActive": false,
+              "patchDisplayName": "Synthetic user-values",
+              "getStatus": 200,
+              "active": false,
+              "displayName": "Synthetic user-values"
+            },
+            {
+              "label": "mixed-case-true",
+              "patchStatus": 200,
+              "patchActive": true,
+              "patchDisplayName": "Synthetic user-values",
+              "getStatus": 200,
+              "active": true,
+              "displayName": "Synthetic user-values"
+            },
+            {
+              "label": "boolean-true",
+              "patchStatus": 200,
+              "patchActive": true,
+              "patchDisplayName": "Synthetic user-values",
+              "getStatus": 200,
+              "active": true,
+              "displayName": "Synthetic user-values"
+            },
+            {
+              "label": "pathless-supported-object",
+              "patchStatus": 200,
+              "patchActive": false,
+              "patchDisplayName": "Changed",
+              "getStatus": 200,
+              "active": false,
+              "displayName": "Changed"
+            },
+            {
+              "label": "reset-active-true",
+              "patchStatus": 200,
+              "patchActive": true,
+              "patchDisplayName": "Changed",
+              "getStatus": 200,
+              "active": true,
+              "displayName": "Changed"
+            }
+          ],
+          "refusalRows": [
+            {
+              "label": "invalid-active-string",
+              "status": 400,
+              "detail": "invalidValue",
+              "activeAfter": true,
+              "displayNameAfter": "Changed"
+            },
+            {
+              "label": "invalid-active-number",
+              "status": 400,
+              "detail": "invalidValue",
+              "activeAfter": true,
+              "displayNameAfter": "Changed"
+            },
+            {
+              "label": "invalid-active-null",
+              "status": 400,
+              "detail": "invalidValue",
+              "activeAfter": true,
+              "displayNameAfter": "Changed"
+            },
+            {
+              "label": "unknown-user-path",
+              "status": 400,
+              "detail": "invalidPath",
+              "activeAfter": true,
+              "displayNameAfter": "Changed"
+            },
+            {
+              "label": "unknown-pathless-attribute",
+              "status": 400,
+              "detail": "invalidPath",
+              "activeAfter": true,
+              "displayNameAfter": "Changed"
+            },
+            {
+              "label": "later-invalid-operation",
+              "status": 400,
+              "detail": "invalidPath",
+              "activeAfter": true,
+              "displayNameAfter": "Changed"
+            }
+          ],
+          "beforeRefusalDisplayName": "Changed",
+          "removeStatus": 200,
+          "displayNameAfterRemove": null
+        }
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-aq87ea/observations/public-evidence.json",
+          "bytes": 6990,
+          "sha256": "932314e6c546f5fa9a80112ebbdf56853d694d20fd743abd15698d64c4b53a59"
+        },
+        "schema": "amc-p207-scim-hardening/1",
+        "label": "filtered-member-role-revocation",
+        "httpObservations": 7,
+        "strictNaturalClientAndRouterClosure": true,
+        "environmentRestored": true,
+        "semanticProjection": {
+          "patchStatus": 200,
+          "targetRetained": false,
+          "survivorRetained": true,
+          "patchAndGetMembersMatch": true,
+          "roles": {
+            "target": [
+              "AUDITOR"
+            ],
+            "survivor": [
+              "VIEWER"
+            ]
+          }
+        }
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-lXsq5v/observations/public-evidence.json",
+          "bytes": 21338,
+          "sha256": "a2eeb58f27c521d6450997ffdf64a31853b73e57754886d29f4c54a07ba2ddb8"
+        },
+        "schema": "amc-p207-scim-hardening/1",
+        "label": "group-patch-validation",
+        "httpObservations": 23,
+        "strictNaturalClientAndRouterClosure": true,
+        "environmentRestored": true,
+        "semanticProjection": {
+          "missingUserStatus": 404,
+          "refusalRows": [
+            {
+              "label": "unknown-group-path",
+              "status": 400,
+              "detail": "invalidPath",
+              "membersUnchanged": true,
+              "roles": {
+                "target": [
+                  "AUDITOR",
+                  "VIEWER"
+                ],
+                "survivor": [
+                  "VIEWER"
+                ]
+              }
+            },
+            {
+              "label": "unsupported-member-filter",
+              "status": 400,
+              "detail": "invalidPath",
+              "membersUnchanged": true,
+              "roles": {
+                "target": [
+                  "AUDITOR",
+                  "VIEWER"
+                ],
+                "survivor": [
+                  "VIEWER"
+                ]
+              }
+            },
+            {
+              "label": "filtered-add",
+              "status": 400,
+              "detail": "invalidPath",
+              "membersUnchanged": true,
+              "roles": {
+                "target": [
+                  "AUDITOR",
+                  "VIEWER"
+                ],
+                "survivor": [
+                  "VIEWER"
+                ]
+              }
+            },
+            {
+              "label": "filtered-remove-with-value",
+              "status": 400,
+              "detail": "invalidValue",
+              "membersUnchanged": true,
+              "roles": {
+                "target": [
+                  "AUDITOR",
+                  "VIEWER"
+                ],
+                "survivor": [
+                  "VIEWER"
+                ]
+              }
+            },
+            {
+              "label": "invalid-member-id-value",
+              "status": 400,
+              "detail": "invalidValue",
+              "membersUnchanged": true,
+              "roles": {
+                "target": [
+                  "AUDITOR",
+                  "VIEWER"
+                ],
+                "survivor": [
+                  "VIEWER"
+                ]
+              }
+            },
+            {
+              "label": "absent-member-add",
+              "status": 400,
+              "detail": "invalidValue",
+              "membersUnchanged": true,
+              "roles": {
+                "target": [
+                  "AUDITOR",
+                  "VIEWER"
+                ],
+                "survivor": [
+                  "VIEWER"
+                ]
+              }
+            }
+          ],
+          "supportedControls": {
+            "replaceStatus": 200,
+            "replacementMemberCount": 1,
+            "replacementRoles": {
+              "target": [
+                "AUDITOR"
+              ],
+              "survivor": [
+                "VIEWER"
+              ]
+            },
+            "removeStatus": 200,
+            "removedMembers": [],
+            "removedRoles": {
+              "target": [
+                "AUDITOR"
+              ],
+              "survivor": []
+            }
+          }
+        }
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-w6exmw/observations/public-evidence.json",
+          "bytes": 7298,
+          "sha256": "757e2f59453669d49a64509b0f2c1e9c506ea3f585681834c22e7d6ce0c55e39"
+        },
+        "schema": "amc-p207-scim-hardening/1",
+        "label": "user-filter-contract",
+        "httpObservations": 8,
+        "strictNaturalClientAndRouterClosure": true,
+        "environmentRestored": true,
+        "semanticProjection": {
+          "rows": [
+            {
+              "label": "unsupported-contains",
+              "response": {
+                "status": 400,
+                "contentType": "application/scim+json",
+                "body": {
+                  "schemas": [
+                    "urn:ietf:params:scim:api:messages:2.0:Error"
+                  ],
+                  "status": "400",
+                  "detail": "invalidFilter"
+                }
+              }
+            },
+            {
+              "label": "username-equality",
+              "status": 200,
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:ListResponse"
+              ],
+              "totalResults": 1,
+              "startIndex": 1,
+              "itemsPerPage": 1,
+              "ids": [
+                "58408252-0949-42f7-bfb5-9aad4bbd1276"
+              ]
+            },
+            {
+              "label": "external-id-equality",
+              "status": 200,
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:ListResponse"
+              ],
+              "totalResults": 1,
+              "startIndex": 1,
+              "itemsPerPage": 1,
+              "ids": [
+                "58408252-0949-42f7-bfb5-9aad4bbd1276"
+              ]
+            },
+            {
+              "label": "supported-equality-no-match",
+              "status": 200,
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:ListResponse"
+              ],
+              "totalResults": 0,
+              "startIndex": 1,
+              "itemsPerPage": 0,
+              "ids": []
+            }
+          ]
+        }
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-XVyWsT/observations/public-evidence.json",
+          "bytes": 24740,
+          "sha256": "ce29c2578b505769d755a40c761d7306d1411963fe1d1f5597e48a215186efe0"
+        },
+        "schema": "amc-p207-scim-hardening/1",
+        "label": "patch-parser-wire-and-typed-contract",
+        "httpObservations": 28,
+        "strictNaturalClientAndRouterClosure": true,
+        "environmentRestored": true,
+        "semanticProjection": {
+          "refusalRows": [
+            {
+              "label": "missing-operations",
+              "status": 400,
+              "detail": "invalidValue",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "non-array-operations",
+              "status": 400,
+              "detail": "invalidValue",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "empty-operations",
+              "status": 400,
+              "detail": "invalidValue",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "null-operation",
+              "status": 400,
+              "detail": "invalidValue",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "array-operation",
+              "status": 400,
+              "detail": "invalidValue",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "missing-op",
+              "status": 400,
+              "detail": "invalidValue",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "unsupported-op",
+              "status": 400,
+              "detail": "invalidValue",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "non-string-path-0",
+              "status": 400,
+              "detail": "invalidPath",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "non-string-path-1",
+              "status": 400,
+              "detail": "invalidPath",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "non-string-path-2",
+              "status": 400,
+              "detail": "invalidPath",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "non-string-path-3",
+              "status": 400,
+              "detail": "invalidPath",
+              "reflectedCanary": false,
+              "activeAfter": true
+            },
+            {
+              "label": "non-string-path-4",
+              "status": 400,
+              "detail": "invalidPath",
+              "reflectedCanary": false,
+              "activeAfter": true
+            }
+          ],
+          "typedCompatibility": [
+            {
+              "label": "omitted-path",
+              "count": 1,
+              "op": "replace",
+              "path": null,
+              "pathIsUndefined": true,
+              "valueSameObject": true,
+              "error": null
+            },
+            {
+              "label": "empty-string-path",
+              "count": 1,
+              "op": "replace",
+              "path": "",
+              "pathIsUndefined": false,
+              "valueSameObject": true,
+              "error": null
+            },
+            {
+              "label": "explicit-undefined-path",
+              "count": 1,
+              "op": "replace",
+              "path": null,
+              "pathIsUndefined": true,
+              "valueSameObject": true,
+              "error": null
+            },
+            {
+              "label": "mixed-case-member-id",
+              "count": 1,
+              "op": "remove",
+              "path": "members[value eq \"UserCaseA\"]",
+              "pathIsUndefined": false,
+              "valueSameObject": true,
+              "error": null
+            }
+          ]
+        }
+      },
+      {
+        "pin": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-Y18EeE/observations/public-evidence.json",
+          "bytes": 1121,
+          "sha256": "759903cecdcb33605d594699ff2fd3570c444ee01f40be0743e216d88b63bd03"
+        },
+        "schema": "amc-p207-local-oidc/2",
+        "label": "real-ten-second-timeout",
+        "requestObservations": 1,
+        "lifecycle": {
+          "inProcessServer": true,
+          "closed": true,
+          "listening": false,
+          "openSockets": 0,
+          "connectionCount": 1,
+          "childProcessCreated": false,
+          "signalsSent": false,
+          "exactOptInRestored": true
+        }
+      }
+    ],
+    "scimHttpObservationRows": 101,
+    "recordedProcessExitAndGroupClosure": true
+  },
+  "observedRecordDetails": {
+    "path": "/private/tmp/p2-07-scim-qualification-20261016/red-initial-runtime-independent-audit/observed-record-details.json",
+    "bytes": 167802,
+    "sha256": "f361425673e4840e9254b2dcbd0f39e893782de2209d8e6c57eb8e9724842697",
+    "purpose": "Preserved full finite audit projection including all 160 green identities and every reviewed public semantic record. Original artifacts remain authoritative."
+  }
+}

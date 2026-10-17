@@ -1,0 +1,432 @@
+{
+  "caseId": "HTTP500-THEN-GRANT",
+  "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "workspace": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-XmYRq4",
+  "retainedPrivateRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa",
+  "tool": {
+    "invoked": "/opt/homebrew/bin/openssl",
+    "physical": "/opt/homebrew/Cellar/openssl@4/4.0.3/bin/openssl",
+    "sha256": "bdeb769587e68e47dad86b42c2ea9758c5560ef6376eb69c18b85cf0c66ea36c",
+    "version": "4.0.3"
+  },
+  "reviewedDocumentation": {
+    "version": "3.6.5",
+    "path": "/opt/homebrew/Cellar/openssl@3/3.6.5/share/man/man1/openssl-ts.1ssl"
+  },
+  "resultObservation": {
+    "failures": [
+      "http-first: HTTP 500"
+    ],
+    "grantPresent": true,
+    "grant": {
+      "tsa": "good-second",
+      "tokenDerBytes": 2298,
+      "tokenDerSha256": "033500de7cddaea5e6e1d5a6bd3c82941b226c8e3dc19a5325395a44d77d49de",
+      "genTime": "2026-10-16T23:35:58.000Z",
+      "anchorId": "amc-p125-grant-test-root",
+      "signerCertSha256": "5d5a8b262cc797ba307ce7ea18d9695b252d23b910cfb5c43fb935f9b97fd480",
+      "policyOid": "1.2.3.4.1",
+      "messageImprint": {
+        "hashAlgorithm": "sha256",
+        "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+      },
+      "revocationChecked": false
+    }
+  },
+  "replyObservation": {
+    "path": "/good-second",
+    "querySha256": "7fad6d8b17e6700f2dfd67778b05412b78212dc5b4f41da0a9487bc133609b26",
+    "responseSha256": "f166b0fabe48bdeda474658c1866a5547c5d2ac16f6e1440900cb77e2ab83a0e",
+    "queryBoundOpenSslVerified": true,
+    "amcVerified": true,
+    "refusalCode": null
+  },
+  "listenerStarted": true,
+  "listenerClosed": true,
+  "socketCount": 2,
+  "socketsClosed": true,
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/http-first",
+      "ended": true,
+      "aborted": false,
+      "closed": true,
+      "responseFinished": true,
+      "responseClosed": true,
+      "replyEndCalled": true,
+      "queryFile": null,
+      "responseFile": null,
+      "responseBytes": 0,
+      "queryBytes": 76,
+      "querySha256": "0635b1728cd8c418c0052f7c1114a04e05b52364e566167489bfe963f428f5d2",
+      "contentType": "application/timestamp-query",
+      "accept": "application/timestamp-reply"
+    },
+    {
+      "method": "POST",
+      "path": "/good-second",
+      "ended": true,
+      "aborted": false,
+      "closed": true,
+      "responseFinished": true,
+      "responseClosed": true,
+      "replyEndCalled": true,
+      "queryFile": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/request-2.tsq",
+      "responseFile": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/response-2.tsr",
+      "responseBytes": 2307,
+      "queryBytes": 76,
+      "querySha256": "7fad6d8b17e6700f2dfd67778b05412b78212dc5b4f41da0a9487bc133609b26",
+      "contentType": "application/timestamp-query",
+      "accept": "application/timestamp-reply"
+    }
+  ],
+  "children": [
+    {
+      "id": "tool-version",
+      "argv": [
+        "/opt/homebrew/bin/openssl",
+        "version"
+      ],
+      "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa",
+      "pid": 64992,
+      "startIso": "2026-10-16T23:35:58.351Z",
+      "startMs": 1315.788167,
+      "spawned": true,
+      "exitSeen": true,
+      "exitCode": 0,
+      "exitSignal": null,
+      "closeSeen": true,
+      "closeCode": 0,
+      "closeSignal": null,
+      "stdoutBytes": 63,
+      "stderrBytes": 0,
+      "stdoutSha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "events": [
+        {
+          "event": "spawn",
+          "atMs": 1316.147958,
+          "errorName": null
+        },
+        {
+          "event": "exit",
+          "atMs": 1319.816792,
+          "code": 0,
+          "signal": null,
+          "errorName": null
+        },
+        {
+          "event": "close",
+          "atMs": 1319.834792,
+          "code": 0,
+          "signal": null,
+          "errorName": null
+        }
+      ],
+      "errors": [],
+      "stdoutArtifact": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/child-1.stdout",
+      "stderrArtifact": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/child-1.stderr"
+    },
+    {
+      "id": "create-root",
+      "argv": [
+        "/opt/homebrew/bin/openssl",
+        "req",
+        "-new",
+        "-x509",
+        "-newkey",
+        "rsa:2048",
+        "-noenc",
+        "-sha256",
+        "-days",
+        "2",
+        "-set_serial",
+        "1",
+        "-subj",
+        "/CN=AMC TSA GRANT ROOT TEST ONLY",
+        "-config",
+        "root.cnf",
+        "-extensions",
+        "root_ca",
+        "-keyout",
+        "root.key",
+        "-out",
+        "root.pem"
+      ],
+      "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa",
+      "pid": 64993,
+      "startIso": "2026-10-16T23:35:58.356Z",
+      "startMs": 1320.436333,
+      "spawned": true,
+      "exitSeen": true,
+      "exitCode": 0,
+      "exitSignal": null,
+      "closeSeen": true,
+      "closeCode": 0,
+      "closeSignal": null,
+      "stdoutBytes": 0,
+      "stderrBytes": 1152,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "ade1860d982096cbd0502cf8b9a4b44e82184ef939b16eab487a6ad2734aa588",
+      "events": [
+        {
+          "event": "spawn",
+          "atMs": 1320.705625,
+          "errorName": null
+        },
+        {
+          "event": "exit",
+          "atMs": 1353.020125,
+          "code": 0,
+          "signal": null,
+          "errorName": null
+        },
+        {
+          "event": "close",
+          "atMs": 1353.039875,
+          "code": 0,
+          "signal": null,
+          "errorName": null
+        }
+      ],
+      "errors": [],
+      "stdoutArtifact": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/child-2.stdout",
+      "stderrArtifact": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/child-2.stderr"
+    },
+    {
+      "id": "create-tsa-csr",
+      "argv": [
+        "/opt/homebrew/bin/openssl",
+        "req",
+        "-new",
+        "-newkey",
+        "rsa:2048",
+        "-noenc",
+        "-sha256",
+        "-subj",
+        "/CN=AMC TSA GRANT SIGNER TEST ONLY",
+        "-config",
+        "req.cnf",
+        "-keyout",
+        "tsa.key",
+        "-out",
+        "tsa.csr"
+      ],
+      "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa",
+      "pid": 64994,
+      "startIso": "2026-10-16T23:35:58.389Z",
+      "startMs": 1353.528625,
+      "spawned": true,
+      "exitSeen": true,
+      "exitCode": 0,
+      "exitSignal": null,
+      "closeSeen": true,
+      "closeCode": 0,
+      "closeSignal": null,
+      "stdoutBytes": 0,
+      "stderrBytes": 1020,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "daee0858c9b3b6ffdd6732e732bb48e77a75b0f135390a7d1dde5860b431d862",
+      "events": [
+        {
+          "event": "spawn",
+          "atMs": 1354.021458,
+          "errorName": null
+        },
+        {
+          "event": "exit",
+          "atMs": 1381.895667,
+          "code": 0,
+          "signal": null,
+          "errorName": null
+        },
+        {
+          "event": "close",
+          "atMs": 1381.902625,
+          "code": 0,
+          "signal": null,
+          "errorName": null
+        }
+      ],
+      "errors": [],
+      "stdoutArtifact": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/child-3.stdout",
+      "stderrArtifact": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/child-3.stderr"
+    },
+    {
+      "id": "issue-tsa",
+      "argv": [
+        "/opt/homebrew/bin/openssl",
+        "x509",
+        "-req",
+        "-in",
+        "tsa.csr",
+        "-CA",
+        "root.pem",
+        "-CAkey",
+        "root.key",
+        "-set_serial",
+        "2",
+        "-days",
+        "1",
+        "-sha256",
+        "-extfile",
+        "extensions.cnf",
+        "-extensions",
+        "tsa_leaf",
+        "-out",
+        "tsa.pem"
+      ],
+      "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa",
+      "pid": 64995,
+      "startIso": "2026-10-16T23:35:58.418Z",
+      "startMs": 1382.396458,
+      "spawned": true,
+      "exitSeen": true,
+      "exitCode": 0,
+      "exitSignal": null,
+      "closeSeen": true,
+      "closeCode": 0,
+      "closeSignal": null,
+      "stdoutBytes": 0,
+      "stderrBytes": 80,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3",
+      "events": [
+        {
+          "event": "spawn",
+          "atMs": 1382.744958,
+          "errorName": null
+        },
+        {
+          "event": "exit",
+          "atMs": 1394.292,
+          "code": 0,
+          "signal": null,
+          "errorName": null
+        },
+        {
+          "event": "close",
+          "atMs": 1394.313667,
+          "code": 0,
+          "signal": null,
+          "errorName": null
+        }
+      ],
+      "errors": [],
+      "stdoutArtifact": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/child-4.stdout",
+      "stderrArtifact": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/child-4.stderr"
+    },
+    {
+      "id": "sign-captured-query",
+      "argv": [
+        "/opt/homebrew/bin/openssl",
+        "ts",
+        "-reply",
+        "-config",
+        "tsa.cnf",
+        "-section",
+        "tsa_local",
+        "-queryfile",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/request-2.tsq",
+        "-out",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/response-2.tsr"
+      ],
+      "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa",
+      "pid": 64996,
+      "startIso": "2026-10-16T23:35:58.435Z",
+      "startMs": 1399.326792,
+      "spawned": true,
+      "exitSeen": true,
+      "exitCode": 0,
+      "exitSignal": null,
+      "closeSeen": true,
+      "closeCode": 0,
+      "closeSignal": null,
+      "stdoutBytes": 0,
+      "stderrBytes": 354,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b",
+      "events": [
+        {
+          "event": "spawn",
+          "atMs": 1399.658125,
+          "errorName": null
+        },
+        {
+          "event": "exit",
+          "atMs": 1405.342292,
+          "code": 0,
+          "signal": null,
+          "errorName": null
+        },
+        {
+          "event": "close",
+          "atMs": 1405.354083,
+          "code": 0,
+          "signal": null,
+          "errorName": null
+        }
+      ],
+      "errors": [],
+      "stdoutArtifact": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/child-5.stdout",
+      "stderrArtifact": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/child-5.stderr"
+    },
+    {
+      "id": "verify-query-bound-reply",
+      "argv": [
+        "/opt/homebrew/bin/openssl",
+        "ts",
+        "-verify",
+        "-queryfile",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/request-2.tsq",
+        "-in",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/response-2.tsr",
+        "-CAfile",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/root.pem"
+      ],
+      "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa",
+      "pid": 64997,
+      "startIso": "2026-10-16T23:35:58.442Z",
+      "startMs": 1406.694792,
+      "spawned": true,
+      "exitSeen": true,
+      "exitCode": 0,
+      "exitSignal": null,
+      "closeSeen": true,
+      "closeCode": 0,
+      "closeSignal": null,
+      "stdoutBytes": 17,
+      "stderrBytes": 120,
+      "stdoutSha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f",
+      "stderrSha256": "7e87222f689ae049a2448f0aff9d93d143f16c5378e05a8142f1e416c4365346",
+      "events": [
+        {
+          "event": "spawn",
+          "atMs": 1407.003333,
+          "errorName": null
+        },
+        {
+          "event": "exit",
+          "atMs": 1411.486917,
+          "code": 0,
+          "signal": null,
+          "errorName": null
+        },
+        {
+          "event": "close",
+          "atMs": 1411.497542,
+          "code": 0,
+          "signal": null,
+          "errorName": null
+        }
+      ],
+      "errors": [],
+      "stdoutArtifact": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/child-6.stdout",
+      "stderrArtifact": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tLq0Oa/child-6.stderr"
+    }
+  ],
+  "ownedErrors": [],
+  "bodyFailed": false,
+  "cleanupErrorCount": 0
+}

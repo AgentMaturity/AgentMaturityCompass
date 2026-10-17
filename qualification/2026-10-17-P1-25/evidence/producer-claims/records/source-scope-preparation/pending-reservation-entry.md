@@ -1,0 +1,5 @@
+Private pending reservation intent; no shared reservation has been appended.
+
+Proposed scope: only `tests/time/checkpointWindow.test.ts` in the owned S checkout, for the bounded P1-25 persisted-producer timestamp test successor. Current source metadata is `8889784782c8f7413e1cccab579ae4b8b6f21cc1`; original file is 48,568 bytes with SHA-256 `e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7`. The private proposed file is 61,752 bytes with SHA-256 `36ba6394d4c8b824e2fbe9e2d2b5c1729431bf0206c9d5d08c357ca70a33082a`.
+
+All twelve consumed source/compiled/helper/grant paths listed in the sealed review are read-only. Preserve all retained variants, four prior case bodies, 175 active inputs, twelve native identities, held R state and every held decision. Compiled pre-build observations are not protection/admission baselines. No reservation release, source allocation, implementation acceptance or future fresh checkout is inferred. Root alone performs hosted/freeze/D15 and exact successor admission.

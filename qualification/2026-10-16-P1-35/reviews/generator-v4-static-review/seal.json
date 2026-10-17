@@ -1,0 +1,24 @@
+{
+  "schema": "p135-generator-v4-static-review-seal/1",
+  "files": [
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generator-v4-static-review/review.json",
+      "bytes": 4573,
+      "sha256": "5d5f7c22fd5990f5861f050655600c7db948a32dc72ae25c0359158ab949f559"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generator-v4-static-review/README.md",
+      "bytes": 1870,
+      "sha256": "030fa63d76cef92f5d46f7e0f997b4c027d7bedf418f2bf3a40566e75293370f"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generator-v4-static-review/pins.json",
+      "bytes": 3870,
+      "sha256": "f18932e7af249c3ea1c1e1049d517b202d84546b8855f07eb91d09bcd9933b62"
+    }
+  ],
+  "candidateSha256": "0d756ecec2b9f95520b38ac8a54a4fe22a26843aa0df338f4ef4ac426b6ba9cb",
+  "blockers": [],
+  "noExecution": true,
+  "noCheckoutWrites": true
+}

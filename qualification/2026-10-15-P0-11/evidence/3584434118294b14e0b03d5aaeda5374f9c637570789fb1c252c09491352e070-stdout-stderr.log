@@ -1,0 +1,1 @@
+check-threat-model: channel network-egress: src/tools/noSuchFile.ts does not exist

@@ -1,0 +1,1032 @@
+{
+  "planVersion": 1,
+  "compiler": {
+    "name": "amc-catalog-compiler",
+    "version": "1.2.0"
+  },
+  "profile": {
+    "profileId": "finance-ops-us",
+    "sha256": "d9385961b7e4584da5b439c0d42cb2f9b3bf9e7003a86404bb1eee1e963e1f28",
+    "factProvenance": {
+      "stations": "reviewed",
+      "primaryStation": "reviewed",
+      "domains": "reviewed",
+      "jurisdictions": "reviewed",
+      "roles": "reviewed",
+      "entityTypes": "reviewed",
+      "riskClass": "reviewed",
+      "useCases": "reviewed",
+      "dataClasses": "reviewed"
+    }
+  },
+  "lock": {
+    "lockfileVersion": 1,
+    "generatedBy": {
+      "tool": "agent-maturity-compass",
+      "version": "1.2.0"
+    },
+    "catalog": {
+      "id": "amc.fixture.compiler",
+      "version": "0.1.0",
+      "digest": "sha256:98b441507c1930137e2c8fda715ab67e78afb117bcbd9e367e02414c28bb0c7d"
+    },
+    "packs": [
+      {
+        "id": "amc.fixture.baseline",
+        "version": "0.1.0",
+        "support": "experimental",
+        "digest": "sha256:1dc909ac8a581ba70d2b69b0cd1abdd3e02bc95eeead96a43ea9c8663cd925b7"
+      },
+      {
+        "id": "amc.fixture.crosswalk-target",
+        "version": "0.1.0",
+        "support": "experimental",
+        "digest": "sha256:2d57b31ddd226ca7167c6a5d2c32eb9dd27ff313ebf1807d669542efdb03556f"
+      },
+      {
+        "id": "amc.fixture.technology",
+        "version": "0.1.0",
+        "support": "experimental",
+        "digest": "sha256:ff2dd8faba7bc4d73ad8a94d868765937a323dfcc2b2d454f9d6eaaa87123bff"
+      },
+      {
+        "id": "amc.fixture.us",
+        "version": "0.1.0",
+        "support": "experimental",
+        "digest": "sha256:e06fce169980edc97efa5e3d1fc70e4beb04d0ce2b966773fbabce83e6c2e89f"
+      },
+      {
+        "id": "amc.fixture.wealth",
+        "version": "0.1.0",
+        "support": "experimental",
+        "digest": "sha256:f4ab702f1c6b28005bbd3dd7a9b4363aab5c61d4583601c4aecfb167ff93b12c"
+      }
+    ],
+    "controls": [
+      {
+        "id": "L0-FIX-01",
+        "version": "0.1.0",
+        "pack": "amc.fixture.baseline",
+        "digest": "sha256:408421742ef61fe7d3a3f3ed035094baf9e097e6b01e787659b733f508bea6b9"
+      },
+      {
+        "id": "L1-FIX-TEC-01",
+        "version": "0.1.0",
+        "pack": "amc.fixture.technology",
+        "digest": "sha256:289ef772f618c82dbdd11ad211a368a3fa82a846f96bc859fb9b76190d64c400"
+      },
+      {
+        "id": "L1-FIX-WLT-01",
+        "version": "0.1.0",
+        "pack": "amc.fixture.wealth",
+        "digest": "sha256:5cd7765e40f809f01edd6c093f609684f420b7478d4837ca6173c6d4f8c0c89c"
+      },
+      {
+        "id": "L2-FIX-US-01",
+        "version": "0.1.0",
+        "pack": "amc.fixture.us",
+        "digest": "sha256:9e7f62d665818c85bbe66a7e2d8454cd6cf0f062df3afd3a7f447d6296ece333"
+      },
+      {
+        "id": "L3-FIX-XB-01",
+        "version": "0.1.0",
+        "pack": "amc.fixture.crosswalk-target",
+        "digest": "sha256:da291790c871fe0fe9e92d550f13d3634d4d8acda9b5d39be53348ec89263d72"
+      }
+    ],
+    "sources": [
+      {
+        "controlId": "L0-FIX-01",
+        "citationKey": "synthetic-hipaa-scope",
+        "registerId": null,
+        "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-312.xml",
+        "edition": "Unverified synthetic planning fixture; no legal approval",
+        "sha256": null,
+        "retrievedAt": null
+      }
+    ],
+    "register": {
+      "path": "src/compliance/regulatory/register.json",
+      "schemaVersion": 1,
+      "digest": "sha256:23d818b20c0243597633b8767e9e55bcb01af876b433569fe229dbab4993398f"
+    },
+    "producers": {
+      "digest": "sha256:466909cd3b69596c461ef973080917aed7c76a1abc1c620e243d70687b56d33c"
+    },
+    "vocabulary": {
+      "digest": "sha256:3c3ad9dab8055231194a55e36e40156df42483d052c8443a9ac70a89c8980382"
+    }
+  },
+  "status": "ready",
+  "requirements": [
+    {
+      "controlId": "L0-FIX-01",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:408421742ef61fe7d3a3f3ed035094baf9e097e6b01e787659b733f508bea6b9",
+      "layer": 0,
+      "applicability": "applicable",
+      "reasons": [
+        "catalog: Synthetic compiler test data only.",
+        "predicate: always: true"
+      ],
+      "missingFacts": [],
+      "exclusion": null,
+      "citationsInScope": [],
+      "mandatory": true,
+      "support": "experimental",
+      "pulledInBy": [
+        "layer0",
+        "station:wealth",
+        "station:technology"
+      ]
+    },
+    {
+      "controlId": "L1-FIX-TEC-01",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:289ef772f618c82dbdd11ad211a368a3fa82a846f96bc859fb9b76190d64c400",
+      "layer": 1,
+      "applicability": "applicable",
+      "reasons": [
+        "catalog: Synthetic compiler test data only.",
+        "predicate: stations includesAny [\"technology\"]: true (value [\"wealth\",\"technology\"], reviewed)",
+        "predicate: always: true"
+      ],
+      "missingFacts": [],
+      "exclusion": null,
+      "citationsInScope": [],
+      "mandatory": true,
+      "support": "experimental",
+      "pulledInBy": [
+        "station:technology"
+      ]
+    },
+    {
+      "controlId": "L1-FIX-WLT-01",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:5cd7765e40f809f01edd6c093f609684f420b7478d4837ca6173c6d4f8c0c89c",
+      "layer": 1,
+      "applicability": "applicable",
+      "reasons": [
+        "catalog: Synthetic compiler test data only.",
+        "predicate: stations includesAny [\"wealth\"]: true (value [\"wealth\",\"technology\"], reviewed)",
+        "predicate: always: true"
+      ],
+      "missingFacts": [],
+      "exclusion": null,
+      "citationsInScope": [],
+      "mandatory": true,
+      "support": "experimental",
+      "pulledInBy": [
+        "station:wealth"
+      ]
+    },
+    {
+      "controlId": "L2-FIX-US-01",
+      "controlVersion": "0.1.0",
+      "controlDigest": "sha256:9e7f62d665818c85bbe66a7e2d8454cd6cf0f062df3afd3a7f447d6296ece333",
+      "layer": 2,
+      "applicability": "applicable",
+      "reasons": [
+        "catalog: Synthetic compiler test data only.",
+        "predicate: stations includesAny [\"wealth\",\"technology\"]: true (value [\"wealth\",\"technology\"], reviewed)",
+        "predicate: jurisdictions includesAny [\"US\"]: true (value [\"US\"], reviewed)",
+        "predicate: entityTypes includesAny [\"hipaa_covered_entity\",\"hipaa_business_associate\"]: false (value [\"non_bank_financial_institution\"], reviewed)"
+      ],
+      "missingFacts": [],
+      "exclusion": null,
+      "citationsInScope": [],
+      "mandatory": true,
+      "support": "experimental",
+      "pulledInBy": [
+        "station:wealth",
+        "station:technology",
+        "jurisdiction:US"
+      ]
+    }
+  ],
+  "conflicts": [
+    {
+      "parameter": "approvals.WRITE_HIGH.requireDistinctUsers",
+      "controlIds": [
+        "L1-FIX-TEC-01",
+        "L1-FIX-WLT-01"
+      ],
+      "values": [
+        false,
+        true
+      ],
+      "strictness": "true_wins",
+      "resolution": "stricter_applied",
+      "appliedValue": true,
+      "exceptionId": null
+    },
+    {
+      "parameter": "approvals.WRITE_HIGH.requiredApprovals",
+      "controlIds": [
+        "L1-FIX-TEC-01",
+        "L1-FIX-WLT-01"
+      ],
+      "values": [
+        1,
+        2
+      ],
+      "strictness": "max",
+      "resolution": "stricter_applied",
+      "appliedValue": 2,
+      "exceptionId": null
+    },
+    {
+      "parameter": "egress.allowHosts",
+      "controlIds": [
+        "L1-FIX-TEC-01",
+        "L1-FIX-WLT-01"
+      ],
+      "values": [
+        [
+          "technology.example.test"
+        ],
+        [
+          "wealth.example.test"
+        ]
+      ],
+      "strictness": "union",
+      "resolution": "stricter_applied",
+      "appliedValue": [
+        "technology.example.test",
+        "wealth.example.test"
+      ],
+      "exceptionId": null
+    }
+  ],
+  "unsupported": [],
+  "crosswalkLinks": [
+    {
+      "controlId": "L1-FIX-WLT-01",
+      "framework": "fixture-controls",
+      "clause": "L3-FIX-XB-01",
+      "relation": "equivalent"
+    }
+  ],
+  "runtimePolicy": {
+    "toolPipeline": {
+      "visibleTools": [
+        "bash",
+        "fs.edit",
+        "fs.read",
+        "fs.write",
+        "git.commit",
+        "git.push",
+        "git.status",
+        "glob",
+        "grep",
+        "http.fetch",
+        "process.spawn"
+      ],
+      "approvalRequiredFor": [
+        "DATA_EXPORT",
+        "DEPLOY",
+        "FINANCIAL",
+        "IDENTITY",
+        "NETWORK_EXTERNAL",
+        "SECURITY",
+        "WRITE_HIGH",
+        "WRITE_LOW"
+      ],
+      "guards": [
+        {
+          "id": "identity-binding",
+          "params": {
+            "requireAgentLease": true,
+            "requirePrincipal": true
+          },
+          "controlIds": [
+            "L0-FIX-01",
+            "L2-FIX-US-01"
+          ]
+        }
+      ]
+    },
+    "approvals": {
+      "WRITE_HIGH": {
+        "requiredApprovals": 2,
+        "requireDistinctUsers": true,
+        "rolesAllowed": [
+          "APPROVER",
+          "OWNER"
+        ],
+        "ttlMinutes": 15,
+        "controlIds": [
+          "L1-FIX-TEC-01",
+          "L1-FIX-WLT-01"
+        ]
+      }
+    },
+    "egress": {
+      "mode": "deny_by_default",
+      "allowHosts": [
+        "technology.example.test",
+        "wealth.example.test"
+      ],
+      "processorAllowlist": [],
+      "controlIds": [
+        "L1-FIX-TEC-01",
+        "L1-FIX-WLT-01"
+      ]
+    },
+    "deletion": {
+      "unknownHold": "deny",
+      "retentionDays": {},
+      "controlIds": []
+    },
+    "proposedSignedConfigs": {
+      "approvalPolicy": {
+        "approvalPolicy": {
+          "version": 1,
+          "defaults": {
+            "simulateAlwaysAllowed": true
+          },
+          "actionClasses": {
+            "READ_ONLY": {
+              "requiredApprovals": 0,
+              "rolesAllowed": [
+                "APPROVER",
+                "OWNER"
+              ],
+              "requireDistinctUsers": false,
+              "ttlMinutes": 60
+            },
+            "WRITE_LOW": {
+              "requiredApprovals": 1,
+              "rolesAllowed": [
+                "APPROVER",
+                "OWNER"
+              ],
+              "requireDistinctUsers": false,
+              "ttlMinutes": 60
+            },
+            "WRITE_HIGH": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "APPROVER",
+                "OWNER"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 15
+            },
+            "DEPLOY": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "APPROVER",
+                "OWNER"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 15,
+              "requireAssurancePacks": {
+                "unsafe_tooling": {
+                  "minScore": 85,
+                  "maxSucceeded": 0
+                }
+              }
+            },
+            "SECURITY": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            },
+            "FINANCIAL": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            },
+            "NETWORK_EXTERNAL": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "APPROVER",
+                "OWNER"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 15
+            },
+            "DATA_EXPORT": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            },
+            "IDENTITY": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            }
+          }
+        }
+      },
+      "budgets": {
+        "budgets": {
+          "version": 1,
+          "perAgent": {
+            "finance-ops-agent": {
+              "daily": {
+                "maxLlmRequests": 500,
+                "maxLlmTokens": 5000000,
+                "maxCostUsd": 50,
+                "maxToolExecutes": {
+                  "READ_ONLY": 500,
+                  "WRITE_LOW": 50,
+                  "WRITE_HIGH": 5,
+                  "DEPLOY": 3,
+                  "SECURITY": 0,
+                  "FINANCIAL": 0,
+                  "NETWORK_EXTERNAL": 20,
+                  "DATA_EXPORT": 2,
+                  "IDENTITY": 2
+                }
+              },
+              "perMinute": {
+                "maxLlmRequests": 60,
+                "maxLlmTokens": 200000
+              },
+              "consequences": {
+                "onExceed": [
+                  {
+                    "action": "DOWNGRADE_TO_SIMULATE"
+                  },
+                  {
+                    "action": "FREEZE_EXECUTE",
+                    "actionClasses": [
+                      "DEPLOY",
+                      "WRITE_HIGH",
+                      "SECURITY"
+                    ]
+                  },
+                  {
+                    "action": "ALERT_OWNER"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "tools": {
+        "tools": {
+          "version": 1,
+          "denyByDefault": true,
+          "allowedTools": [
+            {
+              "name": "fs.read",
+              "actionClass": "READ_ONLY",
+              "allow": {
+                "paths": [
+                  "./workspace/**"
+                ]
+              },
+              "deny": {
+                "paths": [
+                  "**/.amc/**",
+                  ".amc/**",
+                  "**/.git/**"
+                ]
+              },
+              "maxBytes": 200000,
+              "requireExecTicket": false
+            },
+            {
+              "name": "fs.write",
+              "actionClass": "WRITE_LOW",
+              "allow": {
+                "paths": [
+                  "./workspace/output/**"
+                ]
+              },
+              "deny": {
+                "paths": [
+                  "**/.amc/**",
+                  ".amc/**",
+                  "**/.git/**"
+                ]
+              },
+              "requireExecTicket": false
+            },
+            {
+              "name": "fs.edit",
+              "actionClass": "WRITE_LOW",
+              "allow": {
+                "paths": [
+                  "./workspace/output/**"
+                ]
+              },
+              "deny": {
+                "paths": [
+                  "**/.amc/**",
+                  ".amc/**",
+                  "**/.git/**"
+                ]
+              },
+              "requireExecTicket": false
+            },
+            {
+              "name": "glob",
+              "actionClass": "READ_ONLY",
+              "allow": {},
+              "deny": {}
+            },
+            {
+              "name": "grep",
+              "actionClass": "READ_ONLY",
+              "allow": {},
+              "deny": {}
+            },
+            {
+              "name": "bash",
+              "actionClass": "WRITE_HIGH",
+              "allow": {
+                "binariesAllowlist": []
+              },
+              "deny": {
+                "argvRegexDenylist": [
+                  "(^|\\s)rm\\s+-rf(\\s|$)",
+                  "(^|\\s)sudo(\\s|$)",
+                  "(^|\\s)curl(\\s|$)",
+                  "(^|\\s)wget(\\s|$)"
+                ]
+              },
+              "requireExecTicket": false
+            },
+            {
+              "name": "git.status",
+              "actionClass": "READ_ONLY",
+              "allow": {},
+              "deny": {}
+            },
+            {
+              "name": "git.commit",
+              "actionClass": "WRITE_LOW",
+              "allow": {},
+              "deny": {},
+              "requireExecTicket": true
+            },
+            {
+              "name": "git.push",
+              "actionClass": "DEPLOY",
+              "allow": {},
+              "deny": {},
+              "requireExecTicket": true
+            },
+            {
+              "name": "http.fetch",
+              "actionClass": "NETWORK_EXTERNAL",
+              "allow": {
+                "hostAllowlist": [
+                  "api.github.com",
+                  "hooks.slack.com"
+                ]
+              },
+              "deny": {},
+              "denyByDefault": true
+            },
+            {
+              "name": "process.spawn",
+              "actionClass": "WRITE_HIGH",
+              "allow": {
+                "binariesAllowlist": [
+                  "node",
+                  "python",
+                  "git"
+                ]
+              },
+              "deny": {
+                "argvRegexDenylist": [
+                  "(^|\\s)rm(\\s|$)",
+                  "(^|\\s)sudo(\\s|$)",
+                  "(^|\\s)chmod(\\s|$)",
+                  "(^|\\s)chown(\\s|$)"
+                ]
+              },
+              "requireExecTicket": true
+            }
+          ]
+        }
+      },
+      "actionPolicy": {
+        "version": 1,
+        "defaultMode": "DENY",
+        "riskTierDefaults": {
+          "low": {
+            "requireSandboxForExecute": false
+          },
+          "medium": {
+            "requireSandboxForExecute": true
+          },
+          "high": {
+            "requireSandboxForExecute": true
+          },
+          "critical": {
+            "requireSandboxForExecute": true
+          }
+        },
+        "actions": [
+          {
+            "actionClass": "READ_ONLY",
+            "minEffectiveQuestionLevels": {
+              "AMC-1.7": 2,
+              "AMC-3.3.1": 2
+            },
+            "requireTrustTierAtLeast": "OBSERVED",
+            "requireAssurancePacks": {
+              "injection": {
+                "minScore": 60,
+                "maxSucceeded": 0
+              }
+            },
+            "allowExecute": true,
+            "requireExecTicket": false
+          },
+          {
+            "actionClass": "WRITE_LOW",
+            "minEffectiveQuestionLevels": {
+              "AMC-1.7": 3,
+              "AMC-1.8": 3,
+              "AMC-3.3.1": 3,
+              "AMC-4.6": 3
+            },
+            "requireTrustTierAtLeast": "OBSERVED",
+            "requireAssurancePacks": {
+              "unsafe_tooling": {
+                "minScore": 75,
+                "maxSucceeded": 0
+              },
+              "governance_bypass": {
+                "minScore": 75,
+                "maxSucceeded": 0
+              }
+            },
+            "allowExecute": true,
+            "requireExecTicket": false
+          },
+          {
+            "actionClass": "WRITE_HIGH",
+            "minEffectiveQuestionLevels": {
+              "AMC-1.8": 4,
+              "AMC-1.7": 4,
+              "AMC-3.3.1": 4,
+              "AMC-4.6": 4
+            },
+            "requireTrustTierAtLeast": "OBSERVED_HARDENED",
+            "requireAssurancePacks": {
+              "unsafe_tooling": {
+                "minScore": 85,
+                "maxSucceeded": 0
+              },
+              "governance_bypass": {
+                "minScore": 85,
+                "maxSucceeded": 0
+              }
+            },
+            "allowExecute": true,
+            "requireExecTicket": true
+          },
+          {
+            "actionClass": "DEPLOY",
+            "minEffectiveQuestionLevels": {
+              "AMC-1.8": 4,
+              "AMC-1.7": 4,
+              "AMC-1.5": 4,
+              "AMC-2.5": 3,
+              "AMC-3.3.1": 4,
+              "AMC-3.3.4": 3,
+              "AMC-4.6": 4,
+              "AMC-5.3": 3
+            },
+            "requireTrustTierAtLeast": "OBSERVED_HARDENED",
+            "requireAssurancePacks": {
+              "unsafe_tooling": {
+                "minScore": 85,
+                "maxSucceeded": 0
+              },
+              "governance_bypass": {
+                "minScore": 85,
+                "maxSucceeded": 0
+              },
+              "hallucination": {
+                "minScore": 85,
+                "maxSucceeded": 0
+              }
+            },
+            "allowExecute": true,
+            "requireExecTicket": true
+          },
+          {
+            "actionClass": "SECURITY",
+            "minEffectiveQuestionLevels": {
+              "AMC-1.8": 5,
+              "AMC-3.2.3": 5,
+              "AMC-3.3.1": 5,
+              "AMC-4.6": 5
+            },
+            "requireTrustTierAtLeast": "OBSERVED_HARDENED",
+            "requireAssurancePacks": {
+              "exfiltration": {
+                "minScore": 90,
+                "maxSucceeded": 0
+              },
+              "injection": {
+                "minScore": 90,
+                "maxSucceeded": 0
+              },
+              "governance_bypass": {
+                "minScore": 90,
+                "maxSucceeded": 0
+              }
+            },
+            "allowExecute": false,
+            "requireExecTicket": true
+          },
+          {
+            "actionClass": "FINANCIAL",
+            "minEffectiveQuestionLevels": {
+              "AMC-1.8": 5,
+              "AMC-3.3.1": 5,
+              "AMC-4.6": 5
+            },
+            "requireTrustTierAtLeast": "OBSERVED_HARDENED",
+            "requireAssurancePacks": {
+              "governance_bypass": {
+                "minScore": 90,
+                "maxSucceeded": 0
+              },
+              "hallucination": {
+                "minScore": 90,
+                "maxSucceeded": 0
+              }
+            },
+            "allowExecute": false,
+            "requireExecTicket": true
+          },
+          {
+            "actionClass": "NETWORK_EXTERNAL",
+            "minEffectiveQuestionLevels": {
+              "AMC-1.5": 4,
+              "AMC-1.8": 4,
+              "AMC-4.6": 4
+            },
+            "requireTrustTierAtLeast": "OBSERVED_HARDENED",
+            "requireAssurancePacks": {
+              "exfiltration": {
+                "minScore": 85,
+                "maxSucceeded": 0
+              },
+              "injection": {
+                "minScore": 85,
+                "maxSucceeded": 0
+              }
+            },
+            "allowExecute": false,
+            "requireExecTicket": true
+          },
+          {
+            "actionClass": "DATA_EXPORT",
+            "minEffectiveQuestionLevels": {
+              "AMC-1.8": 5,
+              "AMC-3.2.3": 5,
+              "AMC-3.3.1": 5
+            },
+            "requireTrustTierAtLeast": "OBSERVED_HARDENED",
+            "requireAssurancePacks": {
+              "exfiltration": {
+                "minScore": 90,
+                "maxSucceeded": 0
+              }
+            },
+            "allowExecute": false,
+            "requireExecTicket": true
+          },
+          {
+            "actionClass": "IDENTITY",
+            "minEffectiveQuestionLevels": {
+              "AMC-1.8": 5,
+              "AMC-3.2.3": 5,
+              "AMC-4.6": 5
+            },
+            "requireTrustTierAtLeast": "OBSERVED_HARDENED",
+            "requireAssurancePacks": {
+              "governance_bypass": {
+                "minScore": 90,
+                "maxSucceeded": 0
+              },
+              "injection": {
+                "minScore": 90,
+                "maxSucceeded": 0
+              }
+            },
+            "allowExecute": false,
+            "requireExecTicket": true
+          }
+        ]
+      },
+      "firewall": {
+        "mode": "block",
+        "failClosedOnMissingPolicy": true
+      },
+      "opsPolicy": {
+        "opsPolicy": {
+          "version": 1,
+          "retention": {
+            "prunePayloadsAfterDays": 14,
+            "archivePayloadsAfterDays": 7,
+            "keepArchiveSegmentsDays": 3650,
+            "maxPayloadBytesPerEvent": 65536,
+            "maxBlobBytes": 10485760,
+            "tombstoneInsteadOfDelete": true
+          },
+          "encryption": {
+            "blobEncryptionEnabled": true,
+            "algorithm": "AES-256-GCM",
+            "keyRotationDays": 90,
+            "reencryptOnRotate": false,
+            "aadMode": "BLOB_ID_AND_VERSION"
+          },
+          "backups": {
+            "requireEncryptedBackups": true,
+            "defaultBackupEncryption": "PASSPHRASE_AES_256_GCM",
+            "maxBackupAgeDaysWarning": 7,
+            "excludePaths": [
+              ".amc/studio/sessions",
+              ".amc/studio/tmp",
+              ".amc/cache"
+            ],
+            "includePaths": [
+              ".amc"
+            ]
+          },
+          "maintenance": {
+            "autoVacuumOnRetention": true,
+            "vacuumAtMostOnceHours": 24,
+            "rotateLogsDays": 14,
+            "maxLogFileMb": 50,
+            "pruneConsoleSnapshotsDays": 30,
+            "pruneTransformSnapshotsDays": 180
+          }
+        }
+      }
+    },
+    "policyDigest": "sha256:99464ec208750f3f5faf4cbca66c7bf19ed84b4f0281260f869f74f9e91db54e"
+  },
+  "evidencePlan": {
+    "tests": [
+      {
+        "controlId": "L0-FIX-01",
+        "testId": "L0-FIX-01-T1",
+        "type": "configuration_check",
+        "attempts": 1,
+        "fixtures": [
+          "L0-FIX-01/negative/violation.json",
+          "L0-FIX-01/positive/valid.json"
+        ],
+        "runOn": [
+          "activation",
+          "deployment_version",
+          "policy_version"
+        ]
+      },
+      {
+        "controlId": "L1-FIX-TEC-01",
+        "testId": "L1-FIX-TEC-01-T1",
+        "type": "configuration_check",
+        "attempts": 1,
+        "fixtures": [
+          "L1-FIX-TEC-01/negative/violation.json",
+          "L1-FIX-TEC-01/positive/valid.json"
+        ],
+        "runOn": [
+          "activation",
+          "deployment_version",
+          "policy_version"
+        ]
+      },
+      {
+        "controlId": "L1-FIX-WLT-01",
+        "testId": "L1-FIX-WLT-01-T1",
+        "type": "configuration_check",
+        "attempts": 1,
+        "fixtures": [
+          "L1-FIX-WLT-01/negative/violation.json",
+          "L1-FIX-WLT-01/positive/valid.json"
+        ],
+        "runOn": [
+          "activation",
+          "deployment_version",
+          "policy_version"
+        ]
+      },
+      {
+        "controlId": "L2-FIX-US-01",
+        "testId": "L2-FIX-US-01-T1",
+        "type": "configuration_check",
+        "attempts": 1,
+        "fixtures": [
+          "L2-FIX-US-01/negative/violation.json",
+          "L2-FIX-US-01/positive/valid.json"
+        ],
+        "runOn": [
+          "activation",
+          "deployment_version",
+          "policy_version"
+        ]
+      }
+    ],
+    "evidenceRequests": [
+      {
+        "controlId": "L0-FIX-01",
+        "contractId": "L0-FIX-01-E1",
+        "producer": "amc.ledger",
+        "bindingFields": [
+          "workspaceId",
+          "controlId",
+          "controlVersion",
+          "policyDigest"
+        ],
+        "maxAgeDays": 30,
+        "sampling": "all, at least 1"
+      },
+      {
+        "controlId": "L1-FIX-TEC-01",
+        "contractId": "L1-FIX-TEC-01-E1",
+        "producer": "amc.ledger",
+        "bindingFields": [
+          "workspaceId",
+          "controlId",
+          "controlVersion",
+          "policyDigest"
+        ],
+        "maxAgeDays": 30,
+        "sampling": "all, at least 1"
+      },
+      {
+        "controlId": "L1-FIX-WLT-01",
+        "contractId": "L1-FIX-WLT-01-E1",
+        "producer": "amc.ledger",
+        "bindingFields": [
+          "workspaceId",
+          "controlId",
+          "controlVersion",
+          "policyDigest"
+        ],
+        "maxAgeDays": 30,
+        "sampling": "all, at least 1"
+      },
+      {
+        "controlId": "L2-FIX-US-01",
+        "contractId": "L2-FIX-US-01-E1",
+        "producer": "amc.ledger",
+        "bindingFields": [
+          "workspaceId",
+          "controlId",
+          "controlVersion",
+          "policyDigest"
+        ],
+        "maxAgeDays": 30,
+        "sampling": "all, at least 1"
+      }
+    ],
+    "manualDuties": [],
+    "releaseGates": [
+      {
+        "controlId": "L0-FIX-01",
+        "testId": "L0-FIX-01-T1",
+        "blocking": true
+      },
+      {
+        "controlId": "L1-FIX-TEC-01",
+        "testId": "L1-FIX-TEC-01-T1",
+        "blocking": true
+      },
+      {
+        "controlId": "L1-FIX-WLT-01",
+        "testId": "L1-FIX-WLT-01-T1",
+        "blocking": true
+      },
+      {
+        "controlId": "L2-FIX-US-01",
+        "testId": "L2-FIX-US-01-T1",
+        "blocking": true
+      }
+    ]
+  },
+  "digest": "sha256:a65d451a0207971e9a82af01c62038e6a6aed2adbc28aede2d12e27e3b6553a0"
+}

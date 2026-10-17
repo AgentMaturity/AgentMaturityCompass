@@ -1,0 +1,241 @@
+{
+  "versions": [
+    {
+      "path": "/private/tmp/p1-37-qualification-20261016/test-proposal/autoCompaction.test.ts",
+      "bytes": 39289,
+      "sha256": "7fb0cc7de917a802bdd9cad2621c840685a17b4b348d30c9e53957abdb7e5adb"
+    },
+    {
+      "path": "/private/tmp/p1-37-qualification-20261016/test-proposal-v2/autoCompaction.test.ts",
+      "bytes": 39301,
+      "sha256": "457ecf2d60ffe83577ae500c89b40d446d94697c33367bb3e2e2b12c9a8d3e1a"
+    },
+    {
+      "path": "/private/tmp/p1-37-qualification-20261016/test-proposal-v3/autoCompaction.test.ts",
+      "bytes": 44169,
+      "sha256": "de82e627018a708ea131fa7a23ac0a02d21413e88cf09fa11e759283ee4ea6c9"
+    },
+    {
+      "path": "/private/tmp/p1-37-qualification-20261016/test-proposal-v4/autoCompaction.test.ts",
+      "bytes": 44184,
+      "sha256": "f81a60b6b46acc37f4003bd76d384e22637225100a7b805623db540ea8bc0f48"
+    }
+  ],
+  "v2Correction": {
+    "capturedUtc": "2026-10-16T10:39:27.743367+00:00",
+    "sourceHead": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+    "parent": {
+      "path": "/private/tmp/p1-37-qualification-20261016/test-proposal/autoCompaction.test.ts",
+      "bytes": 39289,
+      "sha256": "7fb0cc7de917a802bdd9cad2621c840685a17b4b348d30c9e53957abdb7e5adb"
+    },
+    "corrected": {
+      "path": "/private/tmp/p1-37-qualification-20261016/test-proposal-v2/autoCompaction.test.ts",
+      "bytes": 39301,
+      "sha256": "457ecf2d60ffe83577ae500c89b40d446d94697c33367bb3e2e2b12c9a8d3e1a"
+    },
+    "changes": [
+      {
+        "before": "}))).toThrow(/sources/);",
+        "after": "}))).toThrow(/source commitment/);"
+      },
+      {
+        "before": "}))).toThrow(/bytes|savings/);",
+        "after": "}))).toThrow(/byte accounting/);"
+      }
+    ],
+    "reason": "Exact current validator messages use singular source commitment and byte accounting. Match the intended validation error instead of an unrelated failure. No criterion, product, guard or deadline change.",
+    "sourceInputPinsRechecked": 45,
+    "oldProposalPreserved": true,
+    "runtimeExecuted": false
+  },
+  "v3CorrectionPrivatePin": {
+    "path": "/private/tmp/p1-37-qualification-20261016/test-proposal-v3/correction.json",
+    "bytes": 9596,
+    "sha256": "cd0feaa6c846433413f89e9348637f47d09df9603c68652c947457c9a2fe16c7"
+  },
+  "v4Correction": {
+    "reason": "TS2339: Vitest expect(v).toBe(2) does not narrow SpillRef union. The real fixture guard now requires v2 and a locator before encodedSha256; no cast or compiler change.",
+    "before": {
+      "bytes": 44169,
+      "sha256": "de82e627018a708ea131fa7a23ac0a02d21413e88cf09fa11e759283ee4ea6c9"
+    },
+    "after": {
+      "bytes": 44184,
+      "sha256": "f81a60b6b46acc37f4003bd76d384e22637225100a7b805623db540ea8bc0f48"
+    },
+    "singleLineOnly": true,
+    "productionChanged": false,
+    "testIdentitiesChanged": false,
+    "materialized": false
+  },
+  "firstRuntimeFailure": {
+    "capturedUtc": "2026-10-16T10:42:24.301102+00:00",
+    "sourceHead": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+    "testCandidate": "test-proposal-v2/autoCompaction.test.ts",
+    "tests": {
+      "total": 50,
+      "passed": 49,
+      "failed": 1,
+      "skipped": 0
+    },
+    "failures": [
+      {
+        "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/autoCompaction.test.ts",
+        "title": "automatic compaction: synthetic provider usage, real signed loop evidence does not compact with missing-usage and reports unmeasured usage only when enabled",
+        "messages": [
+          "AssertionError: expected [ { kind: 'error', turn: 1, \u2026(2) } ] to deeply equal []\n    at turn (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/autoCompaction.test.ts:126:65)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/autoCompaction.test.ts:352:7\n    at withFixture (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/autoCompaction.test.ts:93:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/autoCompaction.test.ts:350:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      }
+    ],
+    "original20IdentitiesPreserved": true,
+    "hooksPassed": true,
+    "unhandledErrors": [],
+    "command": {
+      "phase": "p137-first-complete-three-files",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p137-first-complete-three-files.raw.json",
+      "exit": 1,
+      "durationMs": 9420,
+      "startedUtc": "2026-10-16T10:39:39.560361+00:00",
+      "endedUtc": "2026-10-16T10:39:48.994385+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-first-complete-three-files/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 37198,
+        "ownedPgid": 37198,
+        "observedPgidAfterLaunch": 37198,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/autoCompaction.test.ts",
+          "tests/surfaceCompaction.test.ts",
+          "tests/surfaceHistoryCompaction.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p137-first-complete-three-files.raw.json"
+        ],
+        "startedUtc": "2026-10-16T10:39:39.560361+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p137-first-complete-three-files.raw.json",
+          "bytes": 21366,
+          "sha256": "e27d2d79bc53336532e853bb2b509a3f7f4cee2cbebee75e1d53e929463ef040"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-first-complete-three-files/raw.json",
+          "bytes": 21366,
+          "sha256": "e27d2d79bc53336532e853bb2b509a3f7f4cee2cbebee75e1d53e929463ef040"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-first-complete-three-files/observer.json",
+          "bytes": 31101,
+          "sha256": "6436d2b75b64404ee64e8630a54ef4afca6a8a30609b5be5835b09bdeedb445b"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    "classification": "The drafted fixture expected a successful response with absent usage. Current stream grammar deliberately refuses it before the compactor hook. Keep the guard; correct the test and separately probe the public null-usage boundary.",
+    "failedFixture": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-osSU2r",
+    "productEdits": false,
+    "formalDone": false
+  },
+  "failedMissingUsageInspection": {
+    "database": {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-osSU2r/.amc/evidence.sqlite",
+      "bytes": 569344,
+      "sha256": "829aa0b5614697f2b798acaac72eb830a128c34891a4e30b05175cde813aa852"
+    },
+    "readOnlyImmutable": true,
+    "walAbsentOrEmpty": true,
+    "eventCounts": {
+      "audit": 1,
+      "loop/inbox": 2,
+      "request/failure": 1,
+      "request/header": 1,
+      "request/tools": 1,
+      "session/close": 1,
+      "session/open": 1,
+      "step/end": 1,
+      "step/start": 1,
+      "system/prompt": 1,
+      "tool/call": 1,
+      "turn/end": 1,
+      "turn/seal": 1,
+      "turn/start": 1,
+      "user/message": 1
+    },
+    "selected": [
+      {
+        "id": "b195591d-5967-49f2-918e-c5864fb89f05",
+        "type": "audit",
+        "fields": {
+          "auditType": "NATIVE_BUDGET_RESERVATION",
+          "kind": "llm"
+        }
+      },
+      {
+        "id": "36fb0362-170d-40e4-bdd8-61020dc0b76f",
+        "type": "request/failure",
+        "fields": {
+          "failure": {
+            "message": "stream finished with reason \"tool_calls\" before emitting usage; token accounting must precede a successful finish",
+            "code": "AMC_LLM_STREAM_USAGE_MISSING",
+            "status": null,
+            "providerRetryAfterMs": null,
+            "requestId": null
+          },
+          "usage": {
+            "reported": false,
+            "complete": false,
+            "inputTokens": 0,
+            "outputTokens": 0,
+            "cacheReadTokens": null,
+            "cacheWriteTokens": null,
+            "reasoningTokens": null
+          }
+        }
+      },
+      {
+        "id": "44286ee3-ab0f-481d-ae0e-ebebeedfc66b",
+        "type": "step/end",
+        "fields": {
+          "stopReason": "error",
+          "usage": null
+        }
+      },
+      {
+        "id": "3dbface5-3331-49aa-a6bb-055ad4ff6798",
+        "type": "turn/end",
+        "fields": {
+          "reason": "error"
+        }
+      }
+    ],
+    "noDatabaseByteChange": true,
+    "notAnAmcVerification": true
+  },
+  "productionChanged": false,
+  "formalDone": false
+}

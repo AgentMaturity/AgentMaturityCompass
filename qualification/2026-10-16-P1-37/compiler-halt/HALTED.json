@@ -1,0 +1,1 @@
+{"phase": "p137-tests-typecheck", "capturedUtc": "2026-10-16T10:47:17.847576+00:00", "errorType": "RuntimeError", "message": "Normal exit0/1 and owned-group absence were not established; stop", "boundary": "ACTIVE and owned artifacts retained; no signals, retries, cleanup or restoration."}

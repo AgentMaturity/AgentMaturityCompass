@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-17T01:00:55.362370+00:00",
+  "beforeFindingCount": 2712,
+  "afterFindingCount": 2712,
+  "removed": [],
+  "added": [],
+  "allRemainingFindingsOrderedExact": true,
+  "fullDuplicatePublishedResultExact": true,
+  "duplicateFindingCount": 1268,
+  "globalGatesStillFailedUnwaived": true,
+  "noBaselinesAdopted": true
+}

@@ -1,0 +1,96 @@
+{
+  "at": "2026-10-17T00:06:41.044146+00:00",
+  "sourceHead": "ac7759702ecbfda304b57e78eb1bd946340adc0f",
+  "successors": [
+    {
+      "old": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+        "bytes": 24967,
+        "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c",
+        "dev": 16777231,
+        "inode": 543658575,
+        "nlink": 1
+      },
+      "new": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+        "bytes": 25255,
+        "sha256": "72cff741f404bf83e49816be2141dad55042f037bf086b165381e344d47dddf1",
+        "dev": 16777231,
+        "inode": 543658575,
+        "nlink": 1
+      },
+      "original": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/original-own-source/tsaTestFixture.ts.source.txt",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/original-own-source/tsaTestFixture.ts.source.txt",
+        "bytes": 24967,
+        "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c",
+        "dev": 16777231,
+        "inode": 543741685,
+        "nlink": 1
+      },
+      "candidate": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/tsaTestFixture.ts.source.txt",
+        "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/tsaTestFixture.ts.source.txt",
+        "bytes": 25255,
+        "sha256": "72cff741f404bf83e49816be2141dad55042f037bf086b165381e344d47dddf1",
+        "dev": 16777231,
+        "inode": 543667802,
+        "nlink": 1
+      }
+    },
+    {
+      "old": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "bytes": 22649,
+        "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7",
+        "dev": 16777231,
+        "inode": 543658576,
+        "nlink": 1
+      },
+      "new": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "bytes": 34549,
+        "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+        "dev": 16777231,
+        "inode": 543658576,
+        "nlink": 1
+      },
+      "original": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/original-own-source/checkpointWindow.test.ts.source.txt",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/original-own-source/checkpointWindow.test.ts.source.txt",
+        "bytes": 22649,
+        "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7",
+        "dev": 16777231,
+        "inode": 543741686,
+        "nlink": 1
+      },
+      "candidate": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+        "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+        "bytes": 34549,
+        "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+        "dev": 16777231,
+        "inode": 543727816,
+        "nlink": 1
+      }
+    }
+  ],
+  "runtimePinset": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-protected-inputs.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-protected-inputs.json",
+    "bytes": 78069,
+    "sha256": "f84cd7442210621575ebb659e8fb783fc5764dea3222b7aa5bdccefc0473b725",
+    "dev": 16777231,
+    "inode": 543741688,
+    "nlink": 1
+  },
+  "allOther149Exact": true,
+  "tenNativesExact": true,
+  "heldRExact": true,
+  "indexEmpty": true,
+  "noProductExecutionOrQualificationYet": true
+}

@@ -1,0 +1,124 @@
+{
+  "schema": "p125-control-chain-summary/1",
+  "at": "2026-10-16T19:02:15.827177+00:00",
+  "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "actualPhases": [
+    {
+      "phase": "p125-fresh-canonical",
+      "exit": 0,
+      "tests": {
+        "numTotalTests": 47,
+        "numPassedTests": 47,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "durationMs": 2042,
+      "ownedPgid": 12223,
+      "groupAbsentByESRCH": true,
+      "observerUniqueIds": 47,
+      "hookTaskEntries": 28,
+      "individualHookValues": 29,
+      "hooksAllPass": true,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "bodyTaskErrorEntries": 0
+    },
+    {
+      "phase": "p125-m1",
+      "exit": 1,
+      "tests": {
+        "numTotalTests": 47,
+        "numPassedTests": 46,
+        "numFailedTests": 1,
+        "numPendingTests": 0
+      },
+      "durationMs": 1143,
+      "ownedPgid": 12415,
+      "groupAbsentByESRCH": true,
+      "observerUniqueIds": 47,
+      "hookTaskEntries": 28,
+      "individualHookValues": 29,
+      "hooksAllPass": true,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "bodyTaskErrorEntries": 1
+    },
+    {
+      "phase": "p125-m1-restored",
+      "exit": 0,
+      "tests": {
+        "numTotalTests": 47,
+        "numPassedTests": 47,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "durationMs": 1126,
+      "ownedPgid": 12479,
+      "groupAbsentByESRCH": true,
+      "observerUniqueIds": 47,
+      "hookTaskEntries": 28,
+      "individualHookValues": 29,
+      "hooksAllPass": true,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "bodyTaskErrorEntries": 0
+    },
+    {
+      "phase": "p125-m2",
+      "exit": 1,
+      "tests": {
+        "numTotalTests": 47,
+        "numPassedTests": 45,
+        "numFailedTests": 2,
+        "numPendingTests": 0
+      },
+      "durationMs": 1203,
+      "ownedPgid": 12570,
+      "groupAbsentByESRCH": true,
+      "observerUniqueIds": 47,
+      "hookTaskEntries": 28,
+      "individualHookValues": 29,
+      "hooksAllPass": true,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "bodyTaskErrorEntries": 2
+    },
+    {
+      "phase": "p125-m2-restored",
+      "exit": 0,
+      "tests": {
+        "numTotalTests": 47,
+        "numPassedTests": 47,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "durationMs": 1133,
+      "ownedPgid": 12637,
+      "groupAbsentByESRCH": true,
+      "observerUniqueIds": 47,
+      "hookTaskEntries": 28,
+      "individualHookValues": 29,
+      "hooksAllPass": true,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "bodyTaskErrorEntries": 0
+    }
+  ],
+  "canonicalTests": 47,
+  "canonicalFiles": 3,
+  "newFixedTimestampCases": 17,
+  "unchangedTrustCases": 30,
+  "allFiveSame47OrderedFileTitleOccurrences": true,
+  "uniqueTestsNotRunTotalsAdded": true,
+  "allSourceControlsExactlyRestored": true,
+  "m1SemanticWitness": "line127 wrongly returnsok:true after comparison removal",
+  "m2SemanticWitness": "line143 wrongly returnsok:true under unrelatedroot; secondaryline199 changesclaimedtoattested-upper-bound",
+  "m2SecondaryLaterAssertionsMasked": [
+    200,
+    201,
+    202
+  ],
+  "compiledSensitivityClaim": false,
+  "fullSuiteOrFullIssueOrPlanCompletion": false,
+  "quality": "RED1268/2724,unwaived"
+}

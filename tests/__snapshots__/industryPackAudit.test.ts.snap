@@ -1,0 +1,45 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`industry pack audit > a real auditor signature never promotes self-assessment report claims 1`] = `
+[
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+]
+`;
+
+exports[`industry pack audit > renders an auditor-ready markdown report 1`] = `
+[
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (self-reported answers cannot pass a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+]
+`;

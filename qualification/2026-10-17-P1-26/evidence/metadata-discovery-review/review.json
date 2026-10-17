@@ -1,0 +1,118 @@
+{
+  "schema": "p126-p112-evidence-discovery-static-review/1",
+  "at": "2026-10-16T20:30:21.393835+00:00",
+  "blockersToMinimalInertRepresentation": [],
+  "allReadsFinishedForDeclaredScope": true,
+  "sourceHeadFromRoot": "fc2e64eb6ea0cf092c7a6ea86229f9628083eb35",
+  "sourceOrIndexWritten": false,
+  "productOrScannerExecuted": false,
+  "actualBefore": {
+    "command": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-dead-code-before/command.json",
+      "bytes": 1369,
+      "sha256": "d2d396d540189c389f3f6c0cd92b0d1ce54656ef741cf00b7f59bb76e7759c78",
+      "readScope": "actual closure"
+    },
+    "exit": 1,
+    "durationMs": 2977,
+    "ownedPgid": 30048,
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "qualityGatePassed": false,
+    "tool": "knip",
+    "version": "6.39.0",
+    "findingCount": 2728,
+    "diagnosticCaptureIsNotQualityPass": true
+  },
+  "actualHistoricalComparison": {
+    "priorFindingCount": 2723,
+    "currentFindingCount": 2728,
+    "added": [
+      [
+        "qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts",
+        "unresolved",
+        {
+          "name": "../../src/actions/authorizationRecord.js"
+        }
+      ],
+      [
+        "qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts",
+        "unresolved",
+        {
+          "name": "../../src/catalog/compiler/activate.js"
+        }
+      ],
+      [
+        "qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts",
+        "unresolved",
+        {
+          "name": "../../src/catalog/compiler/types.js"
+        }
+      ],
+      [
+        "qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts",
+        "unresolved",
+        {
+          "name": "../../src/tools/guards/compiledPolicyGuard.js"
+        }
+      ],
+      [
+        "qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts",
+        "unresolved",
+        {
+          "name": "../../src/tools/toolTypes.js"
+        }
+      ]
+    ],
+    "removed": [],
+    "exactSetDifference": true,
+    "sameScannerVersion": true,
+    "meaning": "The complete retained sets differ only by these five unresolved imports. This comparison does not independently prove all scanner/project/environment inputs equivalent or predict a repaired run."
+  },
+  "artifact": {
+    "original": {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts",
+      "bytes": 11155,
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0",
+      "readScope": "full raw evidence source; exact hash checked against receipt/manifest/current real test"
+    },
+    "equalsRealTestBytes": true,
+    "activeReceiptRecord": {
+      "path": "evidence/test-design/compiledPolicyGuard.test.ts",
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0"
+    },
+    "historicalAssemblerCause": "adopt emits manifest target verbatim when envelope is false; the manifest supplied evidence/test-design/compiledPolicyGuard.test.ts with envelope:false. The content was correctly copied but its executable extension was inappropriate for passive qualification evidence."
+  },
+  "discoveryContracts": {
+    "normalVitest": {
+      "include": "tests/**/*.test.ts",
+      "qualificationCopyIncluded": false,
+      "meaning": "The current normal explicit config does not discover this qualification path. No actual Vitest discovery/execution hazard is established for this exact configuration."
+    },
+    "testCompiler": {
+      "include": "tests/**/*.ts",
+      "qualificationCopyIncluded": false
+    },
+    "knip": {
+      "projectGlobsExcludeQualificationDirectly": true,
+      "installedVitestPluginDefaultEntry": "**/*.{bench,test,test-d,spec,spec-d}.?(c|m)[jt]s?(x)",
+      "defaultEntryCondition": "WorkspaceWorker conditionally chooses plugin entry defaults or resolved config inputs. Branch selection was not dynamically traced.",
+      "claim": "Actual retained Knip output proves the copy was analyzed and its five relocated relative imports were unresolved. The broad plugin entry pattern is compatible with that observation, but this static review does not invent a complete dynamic causality trace."
+    }
+  },
+  "minimalRepair": {
+    "preferredArtifactPath": "evidence/test-design/compiledPolicyGuard.test.ts.artifact.txt",
+    "content": "Preserve the same11155 bytes and SHA256; this is inert source evidence, not an executable test.",
+    "originalSha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0",
+    "receipt": "Update the one active artifact path; unchanged content keeps its SHA256. Append a factual representation correction to README/notes and pin that updated README as required. Preserve original receipt/manifests/seals privately and in ordinary Git history.",
+    "historicalInputs": "Do not rewrite archived assembly-inputs.json or author input/output seals to pretend the original target was inert. Preserve them as actual historical records; a new small mapping can explicitly link the old target to the new path/hash.",
+    "alternative": "The existing amc-qualification-lossless-original/1 JSON codec can also preserve exact bytes, with verified decoding and explicit original path/size/hash, but it adds unnecessary representation work for an already whitespace-clean11155-byte source file.",
+    "prohibited": [
+      "No scanner/Vitest/TypeScript config, ignore, ratchet, baseline, guard, source test or command-result edits.",
+      "No interpretation of existing quality RED as waived or green.",
+      "No deletion of original evidence or retrospective fabricated source result."
+    ],
+    "actualAfter": "PENDING; root owns ordinary follow-up metadata changes, complete before/after finding sets and validator/whitespace/freeze checks."
+  },
+  "remaining": "P126 source admission is paused by root for this own metadata regression; this review adds no human approval hold. Original P112 qualification remains bounded and all held decisions remain open."
+}

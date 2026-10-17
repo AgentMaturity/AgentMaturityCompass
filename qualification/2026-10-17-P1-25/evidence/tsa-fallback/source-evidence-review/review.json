@@ -1,0 +1,351 @@
+{
+  "schema": "p125f-source-evidence-independent-review/1",
+  "at": "2026-10-16T22:23:20.323379+00:00",
+  "blockers": [],
+  "allReadsFinished": true,
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "parent": "a0cfbc280f2b11207205541ba89112c125c29895",
+  "checkpoint": {
+    "exactElevenCommittedWorkingPreparedBlobs": [
+      {
+        "relativePath": "README.md",
+        "bytes": 59828,
+        "sha256": "4d39403454d0af139a177a6ec531c33e2aa2023278d874119e00e4f9c2aec60d",
+        "workingCommitPreparedExact": true
+      },
+      {
+        "relativePath": "CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "f251e3bd5071672598a90cc71064e41c3143fef495b6ed0c2f74e4860c7a269a",
+        "workingCommitPreparedExact": true
+      },
+      {
+        "relativePath": "website/index.html",
+        "bytes": 43520,
+        "sha256": "4468804cbaceb41ff376a7e155e434c597996f42026642afb09897d8dbb6e75d",
+        "workingCommitPreparedExact": true
+      },
+      {
+        "relativePath": "website/lite.html",
+        "bytes": 11197,
+        "sha256": "f69082f63720bb53bd9aa313903050321707bc90efc80d3bd3f6166e61dd0ee0",
+        "workingCommitPreparedExact": true
+      },
+      {
+        "relativePath": "website/i18n.js",
+        "bytes": 44169,
+        "sha256": "82a6b652ec3942844a2aada509b7256e973093f1617e37da6bd04fadeb847060",
+        "workingCommitPreparedExact": true
+      },
+      {
+        "relativePath": "docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "e1a87d7a073be86e3657d3bdd2b992d5b677a8b9f865e7288f3ac34d0f640884",
+        "workingCommitPreparedExact": true
+      },
+      {
+        "relativePath": "docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "edb78bf0e80c8c052b41c16102c0c087590f2b81f73d235699870995b6360556",
+        "workingCommitPreparedExact": true
+      },
+      {
+        "relativePath": "docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "76cd549bcf137cf62614d52574c9cb0744afd99498e2f4c1be878a92362d5852",
+        "workingCommitPreparedExact": true
+      },
+      {
+        "relativePath": "docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "80fd75e6bddd9c58f8af50c564d3f0d0eb7315f851284b1490b9c58f1a1eb2e2",
+        "workingCommitPreparedExact": true
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "48aaf1ca1121c9e88a9849d3dcefcdb5de865b3ab85f9245d7d1cd81cc25b5a6",
+        "workingCommitPreparedExact": true
+      },
+      {
+        "relativePath": "tests/time/tsaFallback.test.ts",
+        "bytes": 16974,
+        "sha256": "3f3eb0f312d18eef34d9625fe725b385ad29ff9d2042c533a1a41acdb2c1c5a0",
+        "workingCommitPreparedExact": true
+      }
+    ],
+    "actualHeadCleanIndexEmpty": true,
+    "exactChangedPathSet": true,
+    "ordinaryCommittedRangeWhitespaceExit": 0,
+    "historicalDefaultDeltaFullRangeRecordExit": 0,
+    "ordinaryStaging": "Tracked add--update for ten count files0, then ordinary add of unignored new test0; complete11-index/defaultdelta/fullrange/protected re-admission precedes ordinary commit0. No force/ignore/reset/no-verify/baseline change."
+  },
+  "actualSourceRun": {
+    "tests": {
+      "total": 21,
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0
+    },
+    "files": 2,
+    "newFallbackBodies": 4,
+    "unchangedVerifierBodies": 17,
+    "orderedRawObserverUniqueJoin": true,
+    "hookTaskEntries": 2,
+    "individualHookValues": 3,
+    "taskUnhandledLateOrHookErrors": [],
+    "exit": 0,
+    "durationMs": 11769,
+    "ownedPgid": 49481,
+    "naturalESRCH": true,
+    "nonzeroSignalsSent": false,
+    "safeLifecycleRecords": 4,
+    "recordedClosedSocketObservations": 8,
+    "offlineNeverListens": true,
+    "actualRoutes": {
+      "OFFLINE": [],
+      "NO-ANCHOR": [
+        "/anchor-positive",
+        "/after-skip"
+      ],
+      "ORDER": [
+        "/single-positive",
+        "/http-first",
+        "/malformed-second",
+        "/genuine-third"
+      ],
+      "TIMEOUT-CONTINUE": [
+        "/stall-first",
+        "/after-timeout"
+      ]
+    },
+    "allRequestResponseTerminalsClosed": true,
+    "allRequestsEnded": true,
+    "bodyOwnedCleanupErrors": [],
+    "actualDefaultTimeout": {
+      "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "configuredMs": 10000,
+      "elapsedMs": 10013.574583000001,
+      "failures": [
+        "stall-first: The operation was aborted",
+        "after-timeout: HTTP 500"
+      ],
+      "routes": [
+        "/stall-first",
+        "/after-timeout"
+      ]
+    },
+    "typedAbortErrorClaim": false,
+    "genuinePositiveBoundary": "Passing network bodies include the original genuine token/digest/nonce/root positive before later deterministic different-imprint refusal. This is existing offline fixture verification and supplied anchor selection, not signed-list admission or a fresh-nonce grant."
+  },
+  "counts": {
+    "from": 1692,
+    "to": 1693,
+    "paths": 10,
+    "numericSpans": 15,
+    "fourteenCommaOneEncodedBadge": true,
+    "allOtherAuthoredBytesExact": true,
+    "allTwentyClaudeRVariantPinsExact": true,
+    "surfaces": [
+      {
+        "relativePath": "README.md",
+        "numericSpans": 2,
+        "allOtherBytesExact": true,
+        "sha256": "4d39403454d0af139a177a6ec531c33e2aa2023278d874119e00e4f9c2aec60d"
+      },
+      {
+        "relativePath": "CONTRIBUTING.md",
+        "numericSpans": 1,
+        "allOtherBytesExact": true,
+        "sha256": "f251e3bd5071672598a90cc71064e41c3143fef495b6ed0c2f74e4860c7a269a"
+      },
+      {
+        "relativePath": "website/index.html",
+        "numericSpans": 1,
+        "allOtherBytesExact": true,
+        "sha256": "4468804cbaceb41ff376a7e155e434c597996f42026642afb09897d8dbb6e75d"
+      },
+      {
+        "relativePath": "website/lite.html",
+        "numericSpans": 1,
+        "allOtherBytesExact": true,
+        "sha256": "f69082f63720bb53bd9aa313903050321707bc90efc80d3bd3f6166e61dd0ee0"
+      },
+      {
+        "relativePath": "website/i18n.js",
+        "numericSpans": 1,
+        "allOtherBytesExact": true,
+        "sha256": "82a6b652ec3942844a2aada509b7256e973093f1617e37da6bd04fadeb847060"
+      },
+      {
+        "relativePath": "docs/content/show-hn-draft.md",
+        "numericSpans": 1,
+        "allOtherBytesExact": true,
+        "sha256": "e1a87d7a073be86e3657d3bdd2b992d5b677a8b9f865e7288f3ac34d0f640884"
+      },
+      {
+        "relativePath": "docs/content/reddit-launch-drafts.md",
+        "numericSpans": 2,
+        "allOtherBytesExact": true,
+        "sha256": "edb78bf0e80c8c052b41c16102c0c087590f2b81f73d235699870995b6360556"
+      },
+      {
+        "relativePath": "docs/internal/competitive-landscape.md",
+        "numericSpans": 1,
+        "allOtherBytesExact": true,
+        "sha256": "76cd549bcf137cf62614d52574c9cb0744afd99498e2f4c1be878a92362d5852"
+      },
+      {
+        "relativePath": "docs/internal/mirofish-simulation-council.md",
+        "numericSpans": 1,
+        "allOtherBytesExact": true,
+        "sha256": "80fd75e6bddd9c58f8af50c564d3f0d0eb7315f851284b1490b9c58f1a1eb2e2"
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "numericSpans": 4,
+        "allOtherBytesExact": true,
+        "sha256": "48aaf1ca1121c9e88a9849d3dcefcdb5de865b3ab85f9245d7d1cd81cc25b5a6"
+      }
+    ],
+    "actualCountRedRetainedThenOrdinaryGeneratorCheckGreen": true
+  },
+  "elevenSourceChecks": [
+    {
+      "phase": "p125f-test-types",
+      "exit": 0,
+      "durationMs": 36406,
+      "ownedPgid": 49602,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false
+    },
+    {
+      "phase": "p125f-source-types",
+      "exit": 0,
+      "durationMs": 25354,
+      "ownedPgid": 49701,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false
+    },
+    {
+      "phase": "p125f-lint",
+      "exit": 0,
+      "durationMs": 2786,
+      "ownedPgid": 49760,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false
+    },
+    {
+      "phase": "p125f-build",
+      "exit": 0,
+      "durationMs": 29638,
+      "ownedPgid": 49787,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false
+    },
+    {
+      "phase": "p125f-source-counts",
+      "exit": 0,
+      "durationMs": 361,
+      "ownedPgid": 50692,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false
+    },
+    {
+      "phase": "p125f-source-gates",
+      "exit": 0,
+      "durationMs": 327,
+      "ownedPgid": 50707,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false
+    },
+    {
+      "phase": "p125f-source-threat",
+      "exit": 0,
+      "durationMs": 263,
+      "ownedPgid": 50722,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false
+    },
+    {
+      "phase": "p125f-source-architecture",
+      "exit": 0,
+      "durationMs": 1503,
+      "ownedPgid": 50746,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false,
+      "result": {
+        "status": "passed",
+        "failures": []
+      }
+    },
+    {
+      "phase": "p125f-source-docs",
+      "exit": 0,
+      "durationMs": 309,
+      "ownedPgid": 50765,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false
+    },
+    {
+      "phase": "p125f-source-freeze",
+      "exit": 0,
+      "durationMs": 1125,
+      "ownedPgid": 50782,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false,
+      "result": {
+        "cliCommandPaths": 1236,
+        "cliInventoryPaths": 1236,
+        "stationPacks": 41,
+        "stationPackQuestions": 632
+      }
+    },
+    {
+      "phase": "p125f-source-notices",
+      "exit": 0,
+      "durationMs": 217,
+      "ownedPgid": 50839,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false
+    }
+  ],
+  "quality": {
+    "globalStatus": "RED",
+    "duplicates": 1268,
+    "currentDuplicatesGateExit": 1,
+    "deadCodePriorParentSnapshot": 2720,
+    "deadCodeAfterSource": 2719,
+    "currentDeadCodeGateExit": 1,
+    "removed": [
+      "[\"src/time/tsaClient.ts\",\"exports\",{\"name\":\"requestTimestamp\"}]"
+    ],
+    "added": [],
+    "priorBaseline": "The exact prior parenta0cf after-metadata snapshot is adopted as the before-source baseline, not copied/relabelled or presented as a newly run scanner.",
+    "scanner": "unchangedknip6.39.0",
+    "cause": "Only the existing requestTimestamp unused-export finding disappears through the admitted test import; no product/scanner/config/baseline remediation.",
+    "diagnostic0NotQualityPass": true,
+    "waiver": false
+  },
+  "preservation": {
+    "protectedBytePinsExact": 128,
+    "priorNativeBytePhysicalPinsExact": 7,
+    "currentSourcePathsExact": 72,
+    "compiledPairsSelected": 8,
+    "oldSourceOldTestsUnchangedInCommit": true,
+    "heldRHead18StatusRowsEmptyIndexExact": true,
+    "reservationReprobe": false,
+    "allHoldsClaudeAndF37SkipPreserved": true
+  },
+  "freshOrControlCredit": false,
+  "wholeIssueDone": false,
+  "fullSuiteCoverageGlobalGreenOrPlanCompletion": false,
+  "privateReviewPreparationStop": "A KeyError on an assumed prior proposal key stopped only the first private comparison. The actual fallback proposal schema and retained private-originals paths were read; comparison then completed exactly. No source checker/product/helper was run or changed. Stop retained adjacent.",
+  "limits": [
+    "Fresh helper/clone/binding and controls/restorations require separate actual evidence, never inferred from this source audit.",
+    "Finite recorded owned resources only, not universal descendant/environment/native-loader/hidden-handle isolation.",
+    "The abort message now has actual source evidence but the public seam remains string-only, not typed AbortError/code.",
+    "No matching fresh-nonce grant, successful ordered grant fallback, required-time/checkpoint/session/issuance/report/public TSA/library approval or held-decision resolution."
+  ],
+  "execution": "Private JSON/text/hash/stat comparisons and read-only Git --no-optional-locks only. No product/helper/parser/import/compiler/native/SQL/network/process probe execution, checkout/index/Git mutation, RES probe or QA write."
+}

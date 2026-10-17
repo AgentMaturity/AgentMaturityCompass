@@ -13,6 +13,8 @@
  */
 
 import { randomUUID } from "node:crypto";
+import { resolve } from "node:path";
+import { z } from "zod";
 import { envelopeForSyntheticExample } from "../claims/eligibility/adapters.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
@@ -23,6 +25,7 @@ import {
 
 /** Where lab experiments live under .amc/. */
 const EXPERIMENTS_AT = { area: ["lab"], kind: "experiments" };
+const PROBE_RESULTS_AT = { area: ["lab"], kind: "probe-results" };
 
 // ---------------------------------------------------------------------------
 // Types
@@ -96,6 +99,18 @@ export interface LabProbeResult {
   metadata: Record<string, unknown>;
   ts: number;
 }
+
+const labProbeIdentitySchema = z.object({ experimentId: z.string().refine((id) => id.trim().length > 0, "experiment identity must be nonempty") });
+const labProbeResultSchema = z.object({
+  ...labProbeIdentitySchema.shape,
+  probeId: z.string().refine((id) => id.trim().length > 0, "probe identity must be nonempty"),
+  responseText: z.string(),
+  scores: z.record(z.string(), z.number().finite().min(0).max(1)),
+  latencyMs: z.number().finite().nonnegative(),
+  tokenCount: z.number().int().nonnegative(),
+  metadata: z.record(z.string(), z.unknown()),
+  ts: z.number().finite().nonnegative()
+}).passthrough();
 
 export interface LabComparisonPair {
   pairId: string;
@@ -347,6 +362,12 @@ export function listLabExperiments(kind?: LabExperimentKind, workspace?: string)
   return kind ? all.filter((e) => e.kind === kind) : all;
 }
 
+/** Old cached callers remain memory-only; a cold CLI invocation reads its workspace's durable experiment. */
+function experimentWorkspace(experimentId: string, workspace?: string): string | undefined {
+  if (workspace) return resolve(workspace);
+  return experiments.some((experiment) => experiment.experimentId === experimentId) ? undefined : process.cwd();
+}
+
 /** Applies a status transition in memory and in the store. */
 function transitionExperiment(
   experimentId: string,
@@ -378,8 +399,11 @@ export function startLabExperiment(experimentId: string, workspace?: string): La
 /**
  * Record a probe result for an experiment.
  */
-export function recordLabProbeResult(result: Omit<LabProbeResult, "ts">): LabProbeResult {
+export function recordLabProbeResult(result: Omit<LabProbeResult, "ts">, workspace?: string): LabProbeResult {
   const full: LabProbeResult = { ...result, ts: Date.now() };
+  if (workspace) {
+    saveWorkspaceRecord(workspace, PROBE_RESULTS_AT, randomUUID(), { ...full }, full.ts);
+  }
   probeResults.push(full);
   return full;
 }
@@ -419,12 +443,13 @@ export function cancelLabExperiment(experimentId: string, workspace?: string): L
  * Use this to exercise the lab workflow (wiring, reporting, storage), not to
  * evaluate a model.
  */
-export function simulateExperiment(experimentId: string): LabProbeResult[] {
-  const experiment = getLabExperiment(experimentId);
+export function simulateExperiment(experimentId: string, workspace?: string): LabProbeResult[] {
+  const resolvedWorkspace = experimentWorkspace(experimentId, workspace);
+  const experiment = getLabExperiment(experimentId, resolvedWorkspace);
   if (!experiment) return [];
 
   if (experiment.status === "draft") {
-    startLabExperiment(experimentId);
+    startLabExperiment(experimentId, resolvedWorkspace);
   }
 
   const results: LabProbeResult[] = [];
@@ -448,11 +473,11 @@ export function simulateExperiment(experimentId: string): LabProbeResult[] {
       latencyMs: Math.floor(100 + seed * 900),
       tokenCount: Math.floor(50 + seed * 450),
       metadata: { simulated: true, modelId: experiment.modelId, envelope: envelopeForSyntheticExample({ producer: "lab:simulate", now: Date.now() }) },
-    });
+    }, resolvedWorkspace);
     results.push(result);
   }
 
-  completeLabExperiment(experimentId);
+  completeLabExperiment(experimentId, resolvedWorkspace);
   return results;
 }
 
@@ -547,14 +572,42 @@ export function getSignalImports(experimentId?: string): ModelSignalImport[] {
 // Report generation
 // ---------------------------------------------------------------------------
 
+/** Validate only the requested experiment's payload; a record without an identity cannot be safely scoped away. */
+function storedProbeResults(workspace: string, experimentId: string): LabProbeResult[] {
+  const invalid = (error: z.ZodError): Error => {
+    const issue = error.issues[0];
+    return new Error(`Invalid persisted lab probe result at ${issue?.path.join(".") || "record"}: ${issue?.message || "invalid record shape"}`);
+  };
+  const results: LabProbeResult[] = [];
+  for (const record of loadWorkspaceRecords<unknown>(workspace, PROBE_RESULTS_AT)) {
+    const identity = labProbeIdentitySchema.safeParse(record);
+    if (!identity.success) throw invalid(identity.error);
+    if (identity.data.experimentId !== experimentId) continue;
+    const parsed = labProbeResultSchema.safeParse(record);
+    if (!parsed.success) throw invalid(parsed.error);
+    const result = record as LabProbeResult;
+    // Record validators can skip reserved own keys; validate every raw dimension before retaining its value.
+    for (const [dimension, score] of Object.entries(result.scores)) {
+      if (typeof score !== "number" || !Number.isFinite(score) || score < 0 || score > 1) {
+        throw new Error(`Invalid persisted lab probe result at scores.${dimension}: expected a finite number between 0 and 1`);
+      }
+    }
+    // The schema validates without coercion; retain raw own keys that the validator's clone can omit.
+    results.push(result);
+  }
+  return results;
+}
+
 /**
  * Generate a lab experiment report.
  */
-export function generateLabReport(experimentId: string): LabExperimentReport | null {
-  const experiment = getLabExperiment(experimentId);
+export function generateLabReport(experimentId: string, workspace?: string): LabExperimentReport | null {
+  const resolvedWorkspace = experimentWorkspace(experimentId, workspace);
+  const experiment = getLabExperiment(experimentId, resolvedWorkspace);
   if (!experiment) return null;
 
-  const results = probeResults.filter((r) => r.experimentId === experimentId);
+  const results = resolvedWorkspace ? storedProbeResults(resolvedWorkspace, experimentId)
+    : probeResults.filter((r) => r.experimentId === experimentId);
 
   // Aggregate scores by dimension
   const dimensionSums = new Map<string, number[]>();
@@ -566,10 +619,8 @@ export function generateLabReport(experimentId: string): LabExperimentReport | n
     }
   }
 
-  const aggregateScores: Record<string, number> = {};
-  for (const [dim, scores] of dimensionSums) {
-    aggregateScores[dim] = parseFloat((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(3));
-  }
+  const aggregateScores: Record<string, number> = Object.fromEntries([...dimensionSums].map(([dim, scores]) =>
+    [dim, parseFloat((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(3))]));
 
   // Find comparisons involving this experiment
   const comparisons = probeResults.length > 0 ? [] : []; // comparisons must be computed separately

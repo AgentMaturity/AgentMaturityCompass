@@ -1,0 +1,1676 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1547",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "reviewKind": "Independent actual frozen original-corpus receipt review",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "findings": [],
+  "conclusion": "The bounded original-corpus counts, exact source controls, retained failure classifications, assertion masking and restoration claims agree with raw reporters and direct source. The two surviving controls provide bounded corpus observations and do not establish global equivalence. Registered-case counting requires the explicit rendered-title distinction below.",
+  "artifactVerification": {
+    "artifactReferences": 2091,
+    "uniquePaths": 2091,
+    "allRecordedBytesAndHashesMatch": true,
+    "frozenCommands": 28,
+    "appendableJournalsNotUsed": true
+  },
+  "actualProof": {
+    "journalCommands": 28,
+    "corpusProcesses": 25,
+    "repeatedCaseExecutions": 1040,
+    "initialCaseEntries": 170,
+    "formalSevenSubset": 140,
+    "recipeEightUnionSubset": 155,
+    "rawFailureTypeCounts": {
+      "SpilledInputRetentionError": 2,
+      "AssertionError": 30,
+      "Error": 2
+    },
+    "allOriginalRawCountsNamesAndMatricesAgree": true,
+    "allRecordedLaunchesAllowlistAnd0700": true,
+    "noSurfacedSetupTransformChildTarTimeoutOrCleanupFailure": true,
+    "launcherFingerprintOnly": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "rootReadOnlyHeadAndCleanStatusReceipts": true,
+    "initialBaseline": {
+      "phase": "combined-original-ten-file-baseline",
+      "counts": {
+        "numTotalTests": 170,
+        "numPassedTests": 170,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true
+      },
+      "exit": 0,
+      "durationMs": 44721,
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/combined-original-ten-file-baseline/raw-tests.json",
+        "bytes": 70358,
+        "sha256": "95cadc21104236ac53f1c568045950b8c9ea6b8518ba5bc2e8839423ebd20660"
+      },
+      "perFileRegistered": {
+        "tests/bundleSpill.test.ts": 4,
+        "tests/cliSpillCommands.test.ts": 65,
+        "tests/retentionSpill.test.ts": 5,
+        "tests/sessionAttachmentSpill.test.ts": 10,
+        "tests/sessionInboxSpill.test.ts": 5,
+        "tests/sessionSpill.test.ts": 15,
+        "tests/sessionSpillCommitment.test.ts": 15,
+        "tests/sessionSpillRead.test.ts": 11,
+        "tests/spillEncryption.test.ts": 25,
+        "tests/spillLifecycle.test.ts": 15
+      },
+      "failures": []
+    },
+    "matrices": [
+      {
+        "id": "P30-1547-write-before-commit",
+        "files": [
+          "tests/spillEncryption.test.ts",
+          "tests/sessionSpillCommitment.test.ts",
+          "tests/sessionAttachmentSpill.test.ts",
+          "tests/sessionInboxSpill.test.ts"
+        ],
+        "sameExactNamedEntriesAsInitialBaseline": true,
+        "passedSequence": [
+          55,
+          42,
+          55
+        ],
+        "failures": [
+          {
+            "name": "user attachments above the per-event cap are retained through the signed spill store a signed commitment row is durable before any object exists; the attachment row carries a descriptor and the same reference",
+            "kind": "SpilledInputRetentionError",
+            "firstLine": "SpilledInputRetentionError: Attachment \"large.png\" is 65537 bytes, above the 65536-byte limit for one signed session event, and the encrypted spill store could not retain it (commit: expected [ Array(1) ] to deeply equal []). No object was published and no attachment row was recorded; if the commitment append itself was durable it remains as an explicitly missing object. Retaining oversize input needs vault-backed blob keys and a signed ops policy with blob encryption enabled; otherwise attach smaller media or split the input across turns.",
+            "locations": [
+              "src/session/spill/spillPolicy.ts:197:13",
+              "src/session/spill/spillPolicy.ts:230:14",
+              "src/session/sessionService.ts:536:32",
+              "src/session/sessionService.ts:511:41",
+              "tests/sessionAttachmentSpill.test.ts:133:26"
+            ],
+            "fullFailureMessageSha256": "3ac3e1a280f37a38e0f45be1196e8a2b6b4ac7c8438f5f80ccef845d52fe07ec"
+          },
+          {
+            "name": "user attachments above the per-event cap are retained through the signed spill store a commitment refused at admission never publishes an object or an attachment row",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected [ Array(1) ] to deeply equal []",
+            "locations": [
+              "tests/sessionAttachmentSpill.test.ts:367:42"
+            ],
+            "fullFailureMessageSha256": "5ba7e157c036b1881afbc94a362ee1df676fee0c303ae694e0c42cd579065742"
+          },
+          {
+            "name": "queued inputs above the per-event cap are retained through the signed spill store the loop/inbox commitment is durable before any object exists; the inbox row carries a descriptor and keeps its format; replay, claim, continuity and projection carry the original bytes",
+            "kind": "SpilledInputRetentionError",
+            "firstLine": "SpilledInputRetentionError: The queued input (text plus encoded media) is 87538 bytes, above the 65536-byte limit for one signed session event, and the encrypted spill store could not retain it (commit: expected [ Array(1) ] to deeply equal []). No object was published and no attachment row was recorded; if the commitment append itself was durable it remains as an explicitly missing object. Retaining oversize input needs vault-backed blob keys and a signed ops policy with blob encryption enabled; otherwise attach smaller media or split the input across turns.",
+            "locations": [
+              "src/session/spill/spillPolicy.ts:197:13",
+              "src/session/spill/spillPolicy.ts:230:14",
+              "src/session/sessionService.ts:536:32",
+              "src/agent/inbox.ts:93:49",
+              "tests/sessionInboxSpill.test.ts:131:27"
+            ],
+            "fullFailureMessageSha256": "6958709fd4e5ee2e648d64f86593d0b3560a6f13dc35b966580c7c94740f0331"
+          },
+          {
+            "name": "signed spill commitment precedes encrypted persistence admits the signed non-surface commitment before any spill file, then admits the result after persistence",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected [ Array(1) ] to deeply equal []",
+            "locations": [
+              "tests/sessionSpillCommitment.test.ts:129:51",
+              "tests/sessionSpillCommitment.test.ts:87:11",
+              "src/session/sessionSpine.ts:190:31",
+              "src/session/sessionService.ts:633:12",
+              "src/session/spill/spillPolicy.ts:158:35",
+              "src/session/sessionService.ts:632:41",
+              "tests/sessionSpillCommitment.test.ts:151:12"
+            ],
+            "fullFailureMessageSha256": "f0b9a29135ff2004328fdaeb5c8beebb116a6d56503754b24894ac5c4d34a7b3"
+          },
+          {
+            "name": "signed spill commitment precedes encrypted persistence a commitment failure at before-admission never persists an object or publishes a result",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected [Function] to throw error including 'synthetic commitment admission failure' but got 'expected [ Array(1) ] to deeply equal\u2026'",
+            "locations": [
+              "tests/sessionSpillCommitment.test.ts:181:53"
+            ],
+            "fullFailureMessageSha256": "865d8d730f05e2409867d91279c68c74d97bb7fbd2eaf271faaa630a9bfb346b"
+          },
+          {
+            "name": "signed spill commitment precedes encrypted persistence a commitment failure at after-commit-return-lost never persists an object or publishes a result",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected [Function] to throw error including 'synthetic commitment admission failure' but got 'expected [ Array(1) ] to deeply equal\u2026'",
+            "locations": [
+              "tests/sessionSpillCommitment.test.ts:181:53"
+            ],
+            "fullFailureMessageSha256": "865d8d730f05e2409867d91279c68c74d97bb7fbd2eaf271faaa630a9bfb346b"
+          },
+          {
+            "name": "retained spill encryption and publication prepares only in memory and publishes encrypted bytes from the input snapshot",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected true to be false // Object.is equality",
+            "locations": [
+              "tests/spillEncryption.test.ts:72:46"
+            ],
+            "fullFailureMessageSha256": "444b8d8afe51cea872465c38d1e320198288eb58630039b636e576155ab0835c"
+          },
+          {
+            "name": "retained spill encryption and publication requires a completed commitment callback before any publication",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected true to be false // Object.is equality",
+            "locations": [
+              "tests/spillEncryption.test.ts:93:46"
+            ],
+            "fullFailureMessageSha256": "e222370f43e28313928626881759f14438adef7e769dfced9664f90347561ed1"
+          },
+          {
+            "name": "retained spill encryption and publication refuses asynchronous commitment callbacks without writing",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected true to be false // Object.is equality",
+            "locations": [
+              "tests/spillEncryption.test.ts:104:46"
+            ],
+            "fullFailureMessageSha256": "d9e262a3604c6e75f8cbb1d5f8eee7dc9f678e83740b118ab62e2988779a246f"
+          },
+          {
+            "name": "retained spill encryption and publication finishes short writes instead of publishing a truncated object",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 0 to be greater than 1",
+            "locations": [
+              "tests/spillEncryption.test.ts:115:20"
+            ],
+            "fullFailureMessageSha256": "2af25b503f0f9dd13400e65dc194714cc68b61eb4b6271d54feda9b0c2f8075c"
+          },
+          {
+            "name": "retained spill encryption and publication removes its partial file when a write makes no progress",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected [Function] to throw an error",
+            "locations": [
+              "tests/spillEncryption.test.ts:122:38"
+            ],
+            "fullFailureMessageSha256": "9699929cf829d7a1241e2adf28e2845cbe198bc5a89c2928a827b53827b42b01"
+          },
+          {
+            "name": "retained spill encryption and publication does not overwrite a name planted after preparation",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected [Function] to throw an error",
+            "locations": [
+              "tests/spillEncryption.test.ts:130:38"
+            ],
+            "fullFailureMessageSha256": "e57b4dfd1c633030968847379d4b249ee93c0eac6bbec42e8188f06654172d32"
+          },
+          {
+            "name": "retained spill encryption and publication refuses a linked parent and an exposed private directory",
+            "kind": "Error",
+            "firstLine": "Error: EEXIST: file already exists, symlink '/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-write-before-commit-mutant/amc-spill-encryption-pDbyfS/elsewhere' -> '/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-write-before-commit-mutant/amc-spill-encryption-pDbyfS/.amc/spill'",
+            "locations": [
+              "tests/spillEncryption.test.ts:282:5"
+            ],
+            "fullFailureMessageSha256": "448f54bf063c93f8418099c685ab5ffff905de2f54625f5d6295cebd8aa28963"
+          }
+        ]
+      },
+      {
+        "id": "P30-1547-default-key",
+        "files": [
+          "tests/spillEncryption.test.ts",
+          "tests/sessionSpillCommitment.test.ts",
+          "tests/sessionAttachmentSpill.test.ts"
+        ],
+        "sameExactNamedEntriesAsInitialBaseline": true,
+        "passedSequence": [
+          50,
+          40,
+          50
+        ],
+        "failures": [
+          {
+            "name": "user attachments above the per-event cap are retained through the signed spill store before any blob has provisioned the workspace key, the spill store cannot prepare and the attachment is refused with nothing recorded",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected undefined to be an instance of SpilledInputRetentionError",
+            "locations": [
+              "tests/sessionAttachmentSpill.test.ts:343:21"
+            ],
+            "fullFailureMessageSha256": "e4d251afeab5426044f71cb0591cddf252d2d2fa54397eb93570f865f8e1b5b6"
+          },
+          {
+            "name": "signed spill commitment precedes encrypted persistence missing current-key signature produces only an explicit unretrievable preview and creates no key",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected { v: 2, format: 'amc-blob-v1', \u2026(10) } to match object { v: 2, format: 'amc-blob-v1', \u2026(4) }",
+            "locations": [
+              "tests/sessionSpillCommitment.test.ts:224:17"
+            ],
+            "fullFailureMessageSha256": "420ae3af051f0a0b8eb45e1c49c9096f74bb1ab8b9ef647eaa33e6d40925a164"
+          },
+          {
+            "name": "signed spill commitment precedes encrypted persistence unavailable vault cannot produce a signed result or spill plaintext, fallback keys or replacement material",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected [ Array(1) ] to deeply equal []",
+            "locations": [
+              "tests/sessionSpillCommitment.test.ts:242:47"
+            ],
+            "fullFailureMessageSha256": "017e1318aa60b4a9380bcc2d74a743348b5893dab66b6ff4462499252aaf02e4"
+          },
+          {
+            "name": "retained spill encryption and publication refuses no-sign mode without creating an unvaulted spill key",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected function to throw an error, but it didn't",
+            "locations": [
+              "tests/spillEncryption.test.ts:136:65"
+            ],
+            "fullFailureMessageSha256": "b11882c12e6aaf3e7514ac12cf47a4d125fe192d9ba0cf2ec31f088079c4e452"
+          },
+          {
+            "name": "retained spill encryption and publication does not repair missing current key metadata",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected function to throw an error, but it didn't",
+            "locations": [
+              "tests/spillEncryption.test.ts:144:65"
+            ],
+            "fullFailureMessageSha256": "4a88914f0f15666487e8d805d6e2682e4b3f5c731087256f6db7ff6be2b33fcf"
+          },
+          {
+            "name": "retained spill encryption and publication does not repair missing current key signature",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected function to throw an error, but it didn't",
+            "locations": [
+              "tests/spillEncryption.test.ts:144:65"
+            ],
+            "fullFailureMessageSha256": "4a88914f0f15666487e8d805d6e2682e4b3f5c731087256f6db7ff6be2b33fcf"
+          },
+          {
+            "name": "retained spill encryption and publication rejects tampered current metadata instead of selecting its unverified version",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected [Function] to throw an error",
+            "locations": [
+              "tests/spillEncryption.test.ts:154:65"
+            ],
+            "fullFailureMessageSha256": "e8745c5fff4fb18ad5177889cc36a3c4282bcc401479f9e57e36b05f78f52b07"
+          },
+          {
+            "name": "retained spill encryption and publication refuses signed unsupported key version 0 before encoding",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected [Function] to throw an error",
+            "locations": [
+              "tests/spillEncryption.test.ts:180:65"
+            ],
+            "fullFailureMessageSha256": "3c2074239b4f16cd2776d99b1f92176ecdf0134c7e65e6a74cb593fa7e4a4c25"
+          },
+          {
+            "name": "retained spill encryption and publication refuses signed unsupported key version 4294967296 before encoding",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected [Function] to throw an error",
+            "locations": [
+              "tests/spillEncryption.test.ts:180:65"
+            ],
+            "fullFailureMessageSha256": "3c2074239b4f16cd2776d99b1f92176ecdf0134c7e65e6a74cb593fa7e4a4c25"
+          },
+          {
+            "name": "retained spill encryption and publication uses read-only vault access when supplied, then refuses after credentials disappear",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected function to throw an error, but it didn't",
+            "locations": [
+              "tests/spillEncryption.test.ts:201:66"
+            ],
+            "fullFailureMessageSha256": "1bea3e6841f7d4840a57bc5579be8702115406ce292259f36a9a7d7502db2498"
+          }
+        ]
+      },
+      {
+        "id": "P30-1547-skip-verify",
+        "files": [
+          "tests/sessionSpill.test.ts",
+          "tests/sessionAttachmentSpill.test.ts"
+        ],
+        "sameExactNamedEntriesAsInitialBaseline": true,
+        "passedSequence": [
+          25,
+          21,
+          25
+        ],
+        "failures": [
+          {
+            "name": "user attachments above the per-event cap are retained through the signed spill store retention, erasure and export already cover the spilled attachment through its signed references",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected [] to have a length of 2 but got +0",
+            "locations": [
+              "tests/sessionAttachmentSpill.test.ts:289:58"
+            ],
+            "fullFailureMessageSha256": "529078b1ccd4c596d59a60f7719d26236a93b2622c2c11a01df923c24524c16d"
+          },
+          {
+            "name": "spill \u2014 oversized tool output leaves the ledger, its commitment does not detects a tampered spill file whose length is unchanged",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected true to be false // Object.is equality",
+            "locations": [
+              "tests/sessionSpill.test.ts:276:22"
+            ],
+            "fullFailureMessageSha256": "8e36391a7da382d92b1eaf068750f4ae4dfabcf2ae6785e0a001432228415a23"
+          },
+          {
+            "name": "spill \u2014 oversized tool output leaves the ledger, its commitment does not reports a deleted spill object as missing, not as tampering",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected '' to contain '1113270a-4a75-4bbf-aa12-2704d788edab'",
+            "locations": [
+              "tests/sessionSpill.test.ts:302:38"
+            ],
+            "fullFailureMessageSha256": "be909a75dfe8626899e6a75cf7193c50f864bc6c8e7c4c4cb9e6ddaa81ad7984"
+          },
+          {
+            "name": "spill \u2014 oversized tool output leaves the ledger, its commitment does not degrades honestly when the spill store cannot write: no locator, but still a commitment",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: an unavailable result cannot excuse an unsafe commitment path: expected true to be false // Object.is equality",
+            "locations": [
+              "tests/sessionSpill.test.ts:477:87"
+            ],
+            "fullFailureMessageSha256": "58e09c5ee94c4d021ff29fede06db231c6b7f4a8ae71a9e763b62cb149233067"
+          }
+        ]
+      },
+      {
+        "id": "P30-1547-dotdot-path",
+        "files": [
+          "tests/sessionSpill.test.ts"
+        ],
+        "sameExactNamedEntriesAsInitialBaseline": true,
+        "passedSequence": [
+          15,
+          14,
+          15
+        ],
+        "failures": [
+          {
+            "name": "spill \u2014 oversized tool output leaves the ledger, its commitment does not rejects a locator that tries to name a path outside the session directory",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: amc-spill:v2:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:../../../../etc/passwd: expected '/private/tmp/p0-30-AMC-1547-qualifica\u2026' to be null",
+            "locations": [
+              "tests/sessionSpill.test.ts:445:55"
+            ],
+            "fullFailureMessageSha256": "64f75086f5387700bbea582fb8be2561d391155972d22f3861a46d0de36552b0"
+          }
+        ]
+      },
+      {
+        "id": "P30-1547-export-unauthenticated",
+        "files": [
+          "tests/spillLifecycle.test.ts"
+        ],
+        "sameExactNamedEntriesAsInitialBaseline": true,
+        "passedSequence": [
+          15,
+          14,
+          15
+        ],
+        "failures": [
+          {
+            "name": "authenticated spill inventory distinguishes missing encrypted objects from modified ciphertext",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected true to be false // Object.is equality",
+            "locations": [
+              "tests/spillLifecycle.test.ts:101:37"
+            ],
+            "fullFailureMessageSha256": "c9d728a92570685a62254feacceda9fb4812c6c940d6039c64bdc00772e19370"
+          }
+        ]
+      },
+      {
+        "id": "P30-1547-erase-scope",
+        "files": [
+          "tests/spillLifecycle.test.ts",
+          "tests/retentionSpill.test.ts",
+          "tests/cliSpillCommands.test.ts"
+        ],
+        "sameExactNamedEntriesAsInitialBaseline": true,
+        "passedSequence": [
+          85,
+          80,
+          85
+        ],
+        "failures": [
+          {
+            "name": "native spill commands over sqlite history plans read-only, canonicalizes repeated exact IDs, then calls native intent/unlink/outcome for only the reviewed scope",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected [ { \u2026(4) }, { \u2026(4) } ] to match object [ { \u2026(3) } ]",
+            "locations": [
+              "tests/cliSpillCommands.test.ts:259:37"
+            ],
+            "fullFailureMessageSha256": "bb873ef62c837bb6185934eabbd266586576a215da0e31e2d613ad83c276fe91"
+          },
+          {
+            "name": "native spill commands over jsonl history plans read-only, canonicalizes repeated exact IDs, then calls native intent/unlink/outcome for only the reviewed scope",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected [ { \u2026(4) }, { \u2026(4) } ] to match object [ { \u2026(3) } ]",
+            "locations": [
+              "tests/cliSpillCommands.test.ts:259:37"
+            ],
+            "fullFailureMessageSha256": "bb873ef62c837bb6185934eabbd266586576a215da0e31e2d613ad83c276fe91"
+          },
+          {
+            "name": "retention reaches committed spill objects without selecting active sessions makes retention progress when a backlog exceeds one signed audit payload while keeping every locator's exact references together",
+            "kind": "Error",
+            "firstLine": "Error: Spill erasure selection exceeds the signed audit payload limit; select a smaller batch of exact event IDs",
+            "locations": [
+              "src/session/spill/spillLifecycle.ts:146:11",
+              "src/ops/retention/retentionEngine.ts:335:22",
+              "tests/retentionSpill.test.ts:147:20"
+            ],
+            "fullFailureMessageSha256": "6d68cb1b2d838a194f7318cd424925a6ff8469e4a15fe3eda284626a1a2357e8"
+          },
+          {
+            "name": "explicit local spill erasure rejects empty scope and scope that leaves another signed reference outside it",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected [Function] to throw an error",
+            "locations": [
+              "tests/spillLifecycle.test.ts:109:115"
+            ],
+            "fullFailureMessageSha256": "351dfebc11e074aa17caeb47f40ba6b8b434a9579833461ba8d5a63995bc9321"
+          },
+          {
+            "name": "explicit local spill erasure signs intention before real unlink and records exact outcomes while preserving other sessions",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected false to be true // Object.is equality",
+            "locations": [
+              "tests/spillLifecycle.test.ts:124:23"
+            ],
+            "fullFailureMessageSha256": "da8cd3d0538bf4d23bab34e02043c27246c56419d6ea32d029676680fd89401e"
+          }
+        ]
+      },
+      {
+        "id": "P30-1547-store-root",
+        "files": [
+          "tests/spillLifecycle.test.ts"
+        ],
+        "sameExactNamedEntriesAsInitialBaseline": true,
+        "passedSequence": [
+          15,
+          15,
+          15
+        ],
+        "failures": []
+      },
+      {
+        "id": "P30-1547-transport-dotdot",
+        "files": [
+          "tests/spillLifecycle.test.ts",
+          "tests/sessionSpill.test.ts"
+        ],
+        "sameExactNamedEntriesAsInitialBaseline": true,
+        "passedSequence": [
+          30,
+          30,
+          30
+        ],
+        "failures": []
+      }
+    ],
+    "phases": [
+      {
+        "phase": "combined-original-ten-file-baseline",
+        "counts": {
+          "numTotalTests": 170,
+          "numPassedTests": 170,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 44721,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/combined-original-ten-file-baseline/raw-tests.json",
+          "bytes": 70358,
+          "sha256": "95cadc21104236ac53f1c568045950b8c9ea6b8518ba5bc2e8839423ebd20660"
+        },
+        "perFileRegistered": {
+          "tests/bundleSpill.test.ts": 4,
+          "tests/cliSpillCommands.test.ts": 65,
+          "tests/retentionSpill.test.ts": 5,
+          "tests/sessionAttachmentSpill.test.ts": 10,
+          "tests/sessionInboxSpill.test.ts": 5,
+          "tests/sessionSpill.test.ts": 15,
+          "tests/sessionSpillCommitment.test.ts": 15,
+          "tests/sessionSpillRead.test.ts": 11,
+          "tests/spillEncryption.test.ts": 25,
+          "tests/spillLifecycle.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-write-before-commit-baseline",
+        "counts": {
+          "numTotalTests": 55,
+          "numPassedTests": 55,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 19227,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-baseline/raw-tests.json",
+          "bytes": 24746,
+          "sha256": "d8311505a7f95d8af2f254b2a8adcf411d0befd8ff7f1deea825012e5862e1d5"
+        },
+        "perFileRegistered": {
+          "tests/sessionAttachmentSpill.test.ts": 10,
+          "tests/sessionInboxSpill.test.ts": 5,
+          "tests/sessionSpillCommitment.test.ts": 15,
+          "tests/spillEncryption.test.ts": 25
+        }
+      },
+      {
+        "phase": "P30-1547-write-before-commit-mutant",
+        "counts": {
+          "numTotalTests": 55,
+          "numPassedTests": 42,
+          "numFailedTests": 13,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false
+        },
+        "exit": 1,
+        "durationMs": 19124,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json",
+          "bytes": 43179,
+          "sha256": "022cd8e839dc8a849e2b6194238ced9989c68125a10eb36d2a396c8c11aabdc7"
+        },
+        "perFileRegistered": {
+          "tests/sessionAttachmentSpill.test.ts": 10,
+          "tests/sessionInboxSpill.test.ts": 5,
+          "tests/sessionSpillCommitment.test.ts": 15,
+          "tests/spillEncryption.test.ts": 25
+        }
+      },
+      {
+        "phase": "P30-1547-write-before-commit-restored",
+        "counts": {
+          "numTotalTests": 55,
+          "numPassedTests": 55,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 19668,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-restored/raw-tests.json",
+          "bytes": 24740,
+          "sha256": "8b257164a2303f8c76a7ba81012e0eadb96778804a8a77d5a2ae3df90486f36e"
+        },
+        "perFileRegistered": {
+          "tests/sessionAttachmentSpill.test.ts": 10,
+          "tests/sessionInboxSpill.test.ts": 5,
+          "tests/sessionSpillCommitment.test.ts": 15,
+          "tests/spillEncryption.test.ts": 25
+        }
+      },
+      {
+        "phase": "P30-1547-default-key-baseline",
+        "counts": {
+          "numTotalTests": 50,
+          "numPassedTests": 50,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 16437,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-baseline/raw-tests.json",
+          "bytes": 21687,
+          "sha256": "918a7280025204f9308fc1ddd6a8a4da88c4e1c3871e533e66cbc0d310d95dc5"
+        },
+        "perFileRegistered": {
+          "tests/sessionAttachmentSpill.test.ts": 10,
+          "tests/sessionSpillCommitment.test.ts": 15,
+          "tests/spillEncryption.test.ts": 25
+        }
+      },
+      {
+        "phase": "P30-1547-default-key-mutant",
+        "counts": {
+          "numTotalTests": 50,
+          "numPassedTests": 40,
+          "numFailedTests": 10,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false
+        },
+        "exit": 1,
+        "durationMs": 16807,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-mutant/raw-tests.json",
+          "bytes": 35080,
+          "sha256": "2b4a6ab67f6284c5af0c850ff1b69f71245c0140fca68e044e82935e5eb6a306"
+        },
+        "perFileRegistered": {
+          "tests/sessionAttachmentSpill.test.ts": 10,
+          "tests/sessionSpillCommitment.test.ts": 15,
+          "tests/spillEncryption.test.ts": 25
+        }
+      },
+      {
+        "phase": "P30-1547-default-key-restored",
+        "counts": {
+          "numTotalTests": 50,
+          "numPassedTests": 50,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 16988,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-restored/raw-tests.json",
+          "bytes": 21703,
+          "sha256": "5fcc886701f8c890e249bea8199688dafc2000569a6290834198831f6f74ecc4"
+        },
+        "perFileRegistered": {
+          "tests/sessionAttachmentSpill.test.ts": 10,
+          "tests/sessionSpillCommitment.test.ts": 15,
+          "tests/spillEncryption.test.ts": 25
+        }
+      },
+      {
+        "phase": "P30-1547-skip-verify-baseline",
+        "counts": {
+          "numTotalTests": 25,
+          "numPassedTests": 25,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 10646,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-baseline/raw-tests.json",
+          "bytes": 12449,
+          "sha256": "6491ce10eadacb441b458d91b1c7b200650d62c4ebbfefeb2a3eb19580391080"
+        },
+        "perFileRegistered": {
+          "tests/sessionAttachmentSpill.test.ts": 10,
+          "tests/sessionSpill.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-skip-verify-mutant",
+        "counts": {
+          "numTotalTests": 25,
+          "numPassedTests": 21,
+          "numFailedTests": 4,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false
+        },
+        "exit": 1,
+        "durationMs": 10613,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-mutant/raw-tests.json",
+          "bytes": 17723,
+          "sha256": "446e10bd8dab884ffe252cb492c31d6ea6837e5ab431692cb02eeab5f2104cca"
+        },
+        "perFileRegistered": {
+          "tests/sessionAttachmentSpill.test.ts": 10,
+          "tests/sessionSpill.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-skip-verify-restored",
+        "counts": {
+          "numTotalTests": 25,
+          "numPassedTests": 25,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 10513,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-restored/raw-tests.json",
+          "bytes": 12448,
+          "sha256": "28472e9f1d6052318f023dc7470e363d6b7cca5b7769be79c3012545d8bbde5a"
+        },
+        "perFileRegistered": {
+          "tests/sessionAttachmentSpill.test.ts": 10,
+          "tests/sessionSpill.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-dotdot-path-baseline",
+        "counts": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 5808,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-dotdot-path-baseline/raw-tests.json",
+          "bytes": 6978,
+          "sha256": "490779580c9793f62500d8238970a14765c26f13e4cec36c572663a174288d29"
+        },
+        "perFileRegistered": {
+          "tests/sessionSpill.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-dotdot-path-mutant",
+        "counts": {
+          "numTotalTests": 15,
+          "numPassedTests": 14,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false
+        },
+        "exit": 1,
+        "durationMs": 5827,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-dotdot-path-mutant/raw-tests.json",
+          "bytes": 8379,
+          "sha256": "b8d04d0e8c8e069e477511616120ff70566933eebf14b05d95ad05395857164d"
+        },
+        "perFileRegistered": {
+          "tests/sessionSpill.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-dotdot-path-restored",
+        "counts": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 5906,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-dotdot-path-restored/raw-tests.json",
+          "bytes": 6993,
+          "sha256": "023a43428f8539232d01c370140e68606513263f4d4ea34b1d8d8532fcd47cea"
+        },
+        "perFileRegistered": {
+          "tests/sessionSpill.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-export-unauthenticated-baseline",
+        "counts": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 5272,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-export-unauthenticated-baseline/raw-tests.json",
+          "bytes": 5939,
+          "sha256": "cb496c88e9f3244dd6a186570282efaaa3291152946a9b442d0349e7fc795fb0"
+        },
+        "perFileRegistered": {
+          "tests/spillLifecycle.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-export-unauthenticated-mutant",
+        "counts": {
+          "numTotalTests": 15,
+          "numPassedTests": 14,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false
+        },
+        "exit": 1,
+        "durationMs": 5275,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-export-unauthenticated-mutant/raw-tests.json",
+          "bytes": 7199,
+          "sha256": "c417d195faad1e94fb783da120f55abc060cd6fb417eec767655090b71855ab3"
+        },
+        "perFileRegistered": {
+          "tests/spillLifecycle.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-export-unauthenticated-restored",
+        "counts": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 5279,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-export-unauthenticated-restored/raw-tests.json",
+          "bytes": 5937,
+          "sha256": "167045d696ec697071bacc108bd6248af18705b5166b2f266a2ff714d65c040e"
+        },
+        "perFileRegistered": {
+          "tests/spillLifecycle.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-erase-scope-baseline",
+        "counts": {
+          "numTotalTests": 85,
+          "numPassedTests": 85,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 17102,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-baseline/raw-tests.json",
+          "bytes": 33038,
+          "sha256": "949c7965c44dc9ead1bbd8308329aedf408476bf737c189aefc0c388f58fd3da"
+        },
+        "perFileRegistered": {
+          "tests/cliSpillCommands.test.ts": 65,
+          "tests/retentionSpill.test.ts": 5,
+          "tests/spillLifecycle.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-erase-scope-mutant",
+        "counts": {
+          "numTotalTests": 85,
+          "numPassedTests": 80,
+          "numFailedTests": 5,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false
+        },
+        "exit": 1,
+        "durationMs": 17396,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-mutant/raw-tests.json",
+          "bytes": 38683,
+          "sha256": "c43f5dc7fede74db038a061dd7378ac833bdead3c1ed65894b2d697c67aab6f1"
+        },
+        "perFileRegistered": {
+          "tests/cliSpillCommands.test.ts": 65,
+          "tests/retentionSpill.test.ts": 5,
+          "tests/spillLifecycle.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-erase-scope-restored",
+        "counts": {
+          "numTotalTests": 85,
+          "numPassedTests": 85,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 17283,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-restored/raw-tests.json",
+          "bytes": 33042,
+          "sha256": "e6d102f939a9df67cf6e7a8bd5f73d34ffcaaf22133519fc88e4629cb0674b4f"
+        },
+        "perFileRegistered": {
+          "tests/cliSpillCommands.test.ts": 65,
+          "tests/retentionSpill.test.ts": 5,
+          "tests/spillLifecycle.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-store-root-baseline",
+        "counts": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 5459,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-store-root-baseline/raw-tests.json",
+          "bytes": 5937,
+          "sha256": "2205a5b467eb49406bc86982f2f79cd58111db2779b15295964a3900cb65b9fb"
+        },
+        "perFileRegistered": {
+          "tests/spillLifecycle.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-store-root-mutant",
+        "counts": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 5270,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-store-root-mutant/raw-tests.json",
+          "bytes": 5941,
+          "sha256": "da2c0485355f56caa12d8722d885bf388f5575eee138501e908843f37b0cdd70"
+        },
+        "perFileRegistered": {
+          "tests/spillLifecycle.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-store-root-restored",
+        "counts": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 5317,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-store-root-restored/raw-tests.json",
+          "bytes": 5928,
+          "sha256": "4f1dda60288e3a74c4221ee95fb68e63983ef29d1dd0c14ad3b92ff5e19d5874"
+        },
+        "perFileRegistered": {
+          "tests/spillLifecycle.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-transport-dotdot-baseline",
+        "counts": {
+          "numTotalTests": 30,
+          "numPassedTests": 30,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 9264,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-transport-dotdot-baseline/raw-tests.json",
+          "bytes": 12425,
+          "sha256": "5903a42fd68e0d4298d1f1f4c95deedebcc6c1ffddf4d044d8c6f00d325b6bc5"
+        },
+        "perFileRegistered": {
+          "tests/sessionSpill.test.ts": 15,
+          "tests/spillLifecycle.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-transport-dotdot-mutant",
+        "counts": {
+          "numTotalTests": 30,
+          "numPassedTests": 30,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 9259,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-transport-dotdot-mutant/raw-tests.json",
+          "bytes": 12408,
+          "sha256": "7a8b780c13a3e74fa7e95b148805e66203dc72931b0ad6a3bc30c242ca62a05b"
+        },
+        "perFileRegistered": {
+          "tests/sessionSpill.test.ts": 15,
+          "tests/spillLifecycle.test.ts": 15
+        }
+      },
+      {
+        "phase": "P30-1547-transport-dotdot-restored",
+        "counts": {
+          "numTotalTests": 30,
+          "numPassedTests": 30,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 9223,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-transport-dotdot-restored/raw-tests.json",
+          "bytes": 12443,
+          "sha256": "c51adee5df68bff7ba23cacb2f9fb04e2f23fdd69276d9e4fe3bdc947ffdb430"
+        },
+        "perFileRegistered": {
+          "tests/sessionSpill.test.ts": 15,
+          "tests/spillLifecycle.test.ts": 15
+        }
+      }
+    ]
+  },
+  "preservationProof": {
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "completePrivateClosureFiles": 12268,
+    "newCasesStaged": 0,
+    "storeRootProposalNotStaged": true,
+    "allRootAndPrivateBytesExact": true,
+    "privateFileInodesIndependent": true,
+    "beforeAfterPinGroups": {
+      "protected-pins": 156,
+      "prior-reference-pins": 1795,
+      "runtime-input-pins": 2
+    },
+    "priorFinalClosuresDirectlyVerified": [
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/full-closure-final.json",
+          "bytes": 1399899,
+          "sha256": "dda63cf4e8b307c8297550cb97a0ff4fd6510321c4cd160e0a35317bc723d4d9"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      }
+    ],
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "dependencyLinksVerified": 307,
+    "privateViteDirectories": true,
+    "controls": [
+      {
+        "id": "P30-1547-write-before-commit",
+        "target": "src/session/spill/spillStore.ts",
+        "heldExactRecipeAndFixedFileListMatch": true,
+        "sourceAndCompiledAnchorsMatchOnce": true,
+        "frozenMutant": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-write-before-commit-mutant-source.ts",
+          "bytes": 17529,
+          "sha256": "97444b0532d13757b034726b2c8d83b2f4be10c93655e17a7070a37f036ab3e2"
+        },
+        "soleSourceDeltaAndPatchExact": true,
+        "distNeverChanged": true,
+        "fullRestorationExact": true
+      },
+      {
+        "id": "P30-1547-default-key",
+        "target": "src/session/spill/spillEncryption.ts",
+        "heldExactRecipeAndFixedFileListMatch": true,
+        "sourceAndCompiledAnchorsMatchOnce": true,
+        "frozenMutant": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-default-key-mutant-source.ts",
+          "bytes": 8419,
+          "sha256": "8baf914e2fd299fe643f08f875392863d39b5074c437f294b6a514afa437477f"
+        },
+        "soleSourceDeltaAndPatchExact": true,
+        "distNeverChanged": true,
+        "fullRestorationExact": true
+      },
+      {
+        "id": "P30-1547-skip-verify",
+        "target": "src/session/spill/spillEvidence.ts",
+        "heldExactRecipeAndFixedFileListMatch": true,
+        "sourceAndCompiledAnchorsMatchOnce": true,
+        "frozenMutant": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-skip-verify-mutant-source.ts",
+          "bytes": 12278,
+          "sha256": "51bc2d25a4110be441f307f4746e01002f5d40ba1bd0a38f50b3cba1b41fdac5"
+        },
+        "soleSourceDeltaAndPatchExact": true,
+        "distNeverChanged": true,
+        "fullRestorationExact": true
+      },
+      {
+        "id": "P30-1547-dotdot-path",
+        "target": "src/session/spill/spillTypes.ts",
+        "heldExactRecipeAndFixedFileListMatch": true,
+        "sourceAndCompiledAnchorsMatchOnce": true,
+        "frozenMutant": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-dotdot-path-mutant-source.ts",
+          "bytes": 12015,
+          "sha256": "826ed00025ffb1c1881d5408bb9da7a3e3a87bf99f2d96b52167e1eb4f5ec351"
+        },
+        "soleSourceDeltaAndPatchExact": true,
+        "distNeverChanged": true,
+        "fullRestorationExact": true
+      },
+      {
+        "id": "P30-1547-export-unauthenticated",
+        "target": "src/session/spill/spillLifecycle.ts",
+        "heldExactRecipeAndFixedFileListMatch": true,
+        "sourceAndCompiledAnchorsMatchOnce": true,
+        "frozenMutant": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-export-unauthenticated-mutant-source.ts",
+          "bytes": 21185,
+          "sha256": "7b79a164b1da5847d12c1bbc855b0a7e76b87ca70ecdcab24769ae2e2911c60b"
+        },
+        "soleSourceDeltaAndPatchExact": true,
+        "distNeverChanged": true,
+        "fullRestorationExact": true
+      },
+      {
+        "id": "P30-1547-erase-scope",
+        "target": "src/session/spill/spillLifecycle.ts",
+        "heldExactRecipeAndFixedFileListMatch": true,
+        "sourceAndCompiledAnchorsMatchOnce": true,
+        "frozenMutant": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-erase-scope-mutant-source.ts",
+          "bytes": 21124,
+          "sha256": "9ff836d8ea53460b5afcd7f7823dea158409f592758483d42d793ca5d1439c60"
+        },
+        "soleSourceDeltaAndPatchExact": true,
+        "distNeverChanged": true,
+        "fullRestorationExact": true
+      },
+      {
+        "id": "P30-1547-store-root",
+        "target": "src/session/spill/spillStore.ts",
+        "heldExactRecipeAndFixedFileListMatch": true,
+        "sourceAndCompiledAnchorsMatchOnce": true,
+        "frozenMutant": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-store-root-mutant-source.ts",
+          "bytes": 17455,
+          "sha256": "f50e0a95f00a2eda5a30c1488ffff86f24e31f0d44115a990592f552aeaecd4a"
+        },
+        "soleSourceDeltaAndPatchExact": true,
+        "distNeverChanged": true,
+        "fullRestorationExact": true
+      },
+      {
+        "id": "P30-1547-transport-dotdot",
+        "target": "src/session/spill/spillLifecycle.ts",
+        "heldExactRecipeAndFixedFileListMatch": true,
+        "sourceAndCompiledAnchorsMatchOnce": true,
+        "frozenMutant": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-transport-dotdot-mutant-source.ts",
+          "bytes": 21114,
+          "sha256": "34ce2a5fa45a3a8151b74973f4bede9d7dcb47f1450692de999b5523805bdf02"
+        },
+        "soleSourceDeltaAndPatchExact": true,
+        "distNeverChanged": true,
+        "fullRestorationExact": true
+      }
+    ]
+  },
+  "registrationPrecision": {
+    "registeredOriginalCaseEntries": 170,
+    "distinctRenderedFileAndFullNameValues": 164,
+    "repeatedCaseExecutionsAcross25CorpusProcesses": 1040,
+    "duplicateTitle": {
+      "file": "tests/cliSpillCommands.test.ts",
+      "sourceLines": [
+        358,
+        364
+      ],
+      "fullName": "read-only admission and honest failures rejects malformed erase options with a repair example before opening history",
+      "registeredRowsSharingTitle": 7
+    },
+    "sourceExplanation": "The malformed-options it.each table contains 10 vectors and substitutes only the command into the title. Export, restore and inventory render once; seven different erase vectors render the same name. They remain seven registered parameterized cases. Do not call the 170 entries 170 unique literal test definitions or 170 distinct rendered names.",
+    "sevenEraseVectors": [
+      [
+        "--reason",
+        "REASON"
+      ],
+      [
+        "--session",
+        " ",
+        "--reason",
+        "REASON"
+      ],
+      [
+        "--session",
+        "s",
+        "--reason",
+        " "
+      ],
+      [
+        "--session",
+        "s",
+        "--reason",
+        "x repeated 2049 times"
+      ],
+      [
+        "--session",
+        "s",
+        "--reason",
+        "REASON",
+        "--apply"
+      ],
+      [
+        "--session",
+        "s",
+        "--reason",
+        "REASON",
+        "--expect-plan",
+        "0 repeated 64 times"
+      ],
+      [
+        "--session",
+        "s",
+        "--reason",
+        "REASON",
+        "--apply",
+        "--expect-plan",
+        "bad"
+      ]
+    ],
+    "sourceLiteralNote": "The listed vectors describe original selection() expansion with symbolic REASON, not new executed argv or retained iteration telemetry. The source table is the authority for the exact values. This review preserves duplicate raw entries rather than deduplicating their counts.",
+    "producerMetadataBoundary": "The frozen producer inventory labels a field distinctOriginalDefinitions=170 and its prose says distinct definitions. Preserve the original receipt, while subsequent summaries use 170 registered parameterized cases and 164 distinct rendered file/title values. This counting precision does not invalidate the 170 registrations or change any runtime result."
+  },
+  "independentMeaning": [
+    {
+      "control": "P30-1547-write-before-commit",
+      "passed": [
+        55,
+        42,
+        55
+      ],
+      "meaning": "The literal mutation publishes during prepare, before commitment admission. The 13 failed entries comprise 10 direct AssertionErrors, two SpilledInputRetentionError wrappers around early nonempty-object assertions, and one body EEXIST collision; they are not 13 independent security assertions.",
+      "masking": "Commitment line 129 stops before commit at 133; fault variants stop inside 175 before their intended commit/throw at 176\u2013177. Their later expected-error mismatch does not exercise the two intended failure timings. Attachment line 367 masks later row-count checks. Encryption lines 72/93/104 mask later positives; line 115 sees zero spy writes because publication preceded spy installation; failed throws at 122/130 mask partial-file/owner-data checks. The original linked-parent body collides at 282 before its intended link/permission guards. The wrapper's fixed no-object-published prose is contradicted by the observed early publication and is not treated as evidence."
+    },
+    {
+      "control": "P30-1547-default-key",
+      "passed": [
+        50,
+        40,
+        50
+      ],
+      "meaning": "Ten direct original assertions detect lost key-refusal/retention behavior. The signed operations policy check still precedes the mutated writerKey fallback.",
+      "masking": "Seven low-level failed expected-throw assertions at 136, 144 twice, 154, 180 twice and 201 mask their later no-repair/no-object comparisons. The commitment reference mismatch at 224 masks unretrievable/preview/object/key checks. The unavailable-vault case still throws at 241 before finding an object at 242; it does not show successful signed result admission. Attachment refusal at 343 masks later no-row/no-object/provisioning/retry assertions. Same-process fresh fixtures do not establish a fully cold credential-absence process."
+    },
+    {
+      "control": "P30-1547-skip-verify",
+      "passed": [
+        25,
+        21,
+        25
+      ],
+      "meaning": "Only the sweep switches from inspectWithContext to authenticateWithContext. Reference shape, signed-row authentication and session binding remain; ciphertext reading is omitted from this sweep.",
+      "masking": "Direct tamper/missing/unsafe-parent refusals still pass before the failed sweep assertions. Tamper ok at 276 masks ID 277; deleted-object ok remains true before missing-ID failure at 302. Attachment's actual export/erase and direct payload-missing checks pass before empty missing list at 289. Unsafe-parent failure at 477 masks later ID/gap/whole-ledger checks through 493. No direct retrieval acceptance of damaged bytes or removal of row authentication is inferred."
+    },
+    {
+      "control": "P30-1547-dotdot-path",
+      "passed": [
+        15,
+        14,
+        15
+      ],
+      "meaning": "One original registered case fails path resolution for its second hostile vector at 445. The first invalid-session-hash vector completes both checks.",
+      "masking": "The path string failure precedes the second vector's readSpilled check at 446 and the remaining six vectors. No actual external-file read is observed. Remaining file owner/type/link/stability checks are not removed by this literal grammar mutation."
+    },
+    {
+      "control": "P30-1547-export-unauthenticated",
+      "passed": [
+        15,
+        14,
+        15
+      ],
+      "meaning": "The test retains inventory not-ok and missing/tampered distinction at 96\u201398, and still receives the expected refused throw at 100. Only final destination absence at 101 fails.",
+      "masking": "The mutated export creates destination/objects at source 242\u2013243 before reinspection at 251\u2013255 refuses modified ciphertext. This is an observed pre-refusal directory effect, not successful tampered export or a retained empty index. The separate missing current conflicting/unauthentic-row export case is not supplied by this result."
+    },
+    {
+      "control": "P30-1547-erase-scope",
+      "passed": [
+        85,
+        80,
+        85
+      ],
+      "meaning": "Four direct assertions plus one production signed-audit-size Error demonstrate overbroad selection and progress/outcome sensitivity, while the explicit empty-scope and payload-size controls remain.",
+      "masking": "Incomplete-reference scope at 109 no longer throws after empty-scope refusal at 108 passes, masking 110\u2013111. Lifecycle ok=false at 124 masks later exact outcomes, other-file preservation, audit and whole-ledger checks. Its removal spy at 120 can itself refuse an attempted second removal after selected was removed; caught failed outcome does not prove other-file deletion. Both CLI backends reach native invocation, history and closed-handle/audit-boundary checks before two outcomes fail at 259; 260\u2013271 effects are masked. Retention's initial aggregate-size refusal and unchanged bytes/no-intent checks at 141\u2013145 pass; runRetention at 147 then hits the retained production audit-size bound before later progress assertions."
+    },
+    {
+      "control": "P30-1547-store-root",
+      "passed": [
+        15,
+        15,
+        15
+      ],
+      "meaning": "A bounded original-corpus survivor. The current lifecycle15 source never supplies parent/sibling storage options.root; source/destination alias tests are transport roots. The exact mutant still rejects the empty suffix.",
+      "limit": "No parent/sibling storage-root confinement result or equivalence follows. The separately proposed two-case supplement was not staged or executed in this packet."
+    },
+    {
+      "control": "P30-1547-transport-dotdot",
+      "passed": [
+        30,
+        30,
+        30
+      ],
+      "meaning": "A bounded current survivor with unchanged public upstream constraints. transportDirectory is called only by readTransportFile. Public restore reads fixed index.json or an objectFile already validated to exactly objects/<sha256(locator)>.blob at parseIndex before reading.",
+      "limit": "The selected root remains realpath-owned, and bounded single-link/NOFOLLOW/stability and signed-reference authorization remain. This source reasoning explains the selected public paths, without inheriting historical equivalence as a fresh universal result or confusing it with the store-root coverage gap."
+    }
+  ],
+  "runtimeAndEffects": {
+    "sourceMode": "All original files, criteria, setup, guards and deadlines remain byte exact. No adapter, compiler/build or dist mutation is introduced. The current launcher fingerprint is Node v22.23.3/ABI 127; original workers and the image child do not print direct ABI observations.",
+    "mechanisms": "The corpus combines actual crypto, local files and unlink with original explicit admission and node:fs fault controls, canned provider transport and in-process Commander. It is not mock-free, actual provider measurement or installed CLI evidence.",
+    "ciphertext": "Lifecycle/CLI ciphertext uses a known synthetic key distinct from workspace decryption material. Ciphertext integrity and not-decrypted/plaintextVerified=false flags do not establish plaintext decryption.",
+    "childAndTar": "The retained source keeps the actual attachment Node/tsx image child and bundle tar calls. The child is a fresh reader after writer.close, but normal writer closure can retain a parent pool; same-process coldRows is not a cold process. Bundle cases retain 60-second deadlines, tar 10-second calls and child 30 seconds/32 MiB, alongside ordinary 30-second cases.",
+    "filesystemBoundary": "CLI snapshots exclude WAL/SHM. Original cleanup and observed assertions do not establish universal physical-close/no-effects intervals, concurrent confinement or a repaired prior P0-27 pooled-parent corruption cause.",
+    "trustAndErasure": "Local signed fixture rows and workspace-consistency monitor trust are not independent external person/agent truth or full history completeness. Local erasure can remain partial when final audit fails after unlink; it does not cover remote copies/backups or all-or-nothing cross-store deletion."
+  },
+  "graphNavigation": "The existing stale AMC-1547 graph-navigation/readiness evidence was reused before direct source checks. No graph refresh, query, watcher or server was run.",
+  "operations": {
+    "standardFilesystemJsonHashReadsOnly": true,
+    "productImports": 0,
+    "testsOrReruns": 0,
+    "parserOrSyntaxChecks": 0,
+    "typeChecks": 0,
+    "compilersBuilds": 0,
+    "installs": 0,
+    "network": 0,
+    "gitCommands": 0,
+    "sourceOrInputEdits": 0,
+    "writeOnlyAssignedReviewPair": true
+  },
+  "limits": [
+    "Source-control failure or survival is bounded to exact original files and reached assertions. Body errors and masked checks are classified explicitly; nonzero exit alone is not accepted as a guard kill.",
+    "The seven-file 140 and eight-file 155 subsets overlap inside the original ten-file 170 baseline. They are not added into extra distinct cases.",
+    "No unexecuted store-root supplement, held19 lifecycle content, missing held test or helper was transferred or credited with current runtime proof.",
+    "Prior packet hashes and ten final file manifests were checked for preservation; their semantics were not re-audited or combined into a current whole-batch result.",
+    "No full cold/race/tenant/provider/installed/whole P0-30/old batch/Node24/full suite/coverage/hosted/G0/release/Done or AMC-1522/P0-32 dependency closure is established."
+  ],
+  "allReadsFinished": true,
+  "capturedUtc": "2026-10-15T01:58:53.777142+00:00",
+  "inputPins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+      "bytes": 64984,
+      "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.md",
+      "bytes": 10127,
+      "sha256": "933a9fb3fb42918d3002162495e414d8a5672954a8e032d90e79337d7e3bb557"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/artifact-index.json",
+      "bytes": 503425,
+      "sha256": "546348ba9dab584c48e0ffacd628216fc338b92db0976196041327629bded9dc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 43219,
+      "sha256": "82c19408be255dc690885a921d40bf98de8ca86aff5a6aace07649ac90eb0441"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/controller.py",
+      "bytes": 9764,
+      "sha256": "c82196d203e207087bcce97bdf891746f60691ee8a5248328c5d3030e66a941a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/prepare.py",
+      "bytes": 9433,
+      "sha256": "fbde0edd03dac66c70b67c0672e53825b6a687d8cf47dc28165b326f1a0241f2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/semantic-classification.json",
+      "bytes": 57529,
+      "sha256": "515b508070320e4d1988b9b5d815a76935b56a843c24894864cb8b724c6757c6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/case-status-inventory.json",
+      "bytes": 227260,
+      "sha256": "aed887038d2e0b6e346ed5fe4157c3cb0361e046d61307cb83a9510c9c5f8596"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/analyst-notes.json",
+      "bytes": 8658,
+      "sha256": "c6dd3858c1a51b57edaf634ce46f9bd1b91ecf6361d19d917ec4fd64860f7872"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/bounded-static-subreview.json",
+      "bytes": 1353,
+      "sha256": "efecc128e3b7906b299430652de8673acba3c12087986b6d024cbd054ee48326"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/setup-prepared.json",
+      "bytes": 6708,
+      "sha256": "208d82506a28d82b08eb05513cb9b7411a48c134ab15391d9c5f686a84ddef71"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/setup-prepared.md",
+      "bytes": 2042,
+      "sha256": "8ea2cc01e3bfefb7e0f06b34e9773048490a081707d8f31c7995beb191cce76a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/index/setup-artifact-index.json",
+      "bytes": 452921,
+      "sha256": "b4abba9d0e96a71317bb298278f6a325b5387dc03fae3747e84c2fed6a0a5af8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/root-runtime-release.json",
+      "bytes": 278,
+      "sha256": "af2e49875b85685be633c324148dd5d8289bff41d9a44ad04b872f4434fda1e0"
+    }
+  ],
+  "all25CaseStatusInventoryPhasesCheckedAgainstRaw": true,
+  "currentSourceEvidencePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/spillEncryption.test.ts",
+      "bytes": 18262,
+      "sha256": "e5c26cf351a194f32b33a6dc1af20bbfbb31521a6a478bf7dfb85e270c17c2dc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/sessionSpillCommitment.test.ts",
+      "bytes": 15452,
+      "sha256": "670573fc1067a06dfe9acdc8d460a2f2fcf1069f71b9a885b90ffd0fadde0366"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/sessionAttachmentSpill.test.ts",
+      "bytes": 26818,
+      "sha256": "a4f8d9a02278f43ca66c8c0a5cb66a9603bb4c1c9f15445b088161842ed993d8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/sessionInboxSpill.test.ts",
+      "bytes": 21614,
+      "sha256": "721a79b3779ee9239b5f58e6c8618c8cb82efee37a6498c2de6540433fb3ee05"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/sessionSpill.test.ts",
+      "bytes": 24230,
+      "sha256": "77833f479bda592350b0650896b77675e42f2b329f4aeb85805fb0fe1244395a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/spillLifecycle.test.ts",
+      "bytes": 16924,
+      "sha256": "4891b925666850485a56e17c21ef80ee260e4262b3e39633e369f7f73b351f78"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/retentionSpill.test.ts",
+      "bytes": 12572,
+      "sha256": "fdd5bd0db414d9a31243465df7913661fbb63553b47cbd2fff2bf9a477cd7fec"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/cliSpillCommands.test.ts",
+      "bytes": 42242,
+      "sha256": "48052126e2370583276c167d5a2f1d9086acac88b3614769261446a21d9d5d08"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/bundleSpill.test.ts",
+      "bytes": 12342,
+      "sha256": "f579bf6500cc452c9ce8d98efb27e2eb4dac8cb09d357a95b4af96755bb694eb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/sessionSpillRead.test.ts",
+      "bytes": 12293,
+      "sha256": "fb889d8f1346fb77dd2fc81d72f29403bc39c90eba092b9bec74aeb2a1d97423"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/fixtures/nativeSignedImageCold.ts",
+      "bytes": 501,
+      "sha256": "e191bb30be1103444c45b3da08ecdd6b251b15eecc4baef137b16b7226ea8b3a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillStore.ts",
+      "bytes": 17533,
+      "sha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillTypes.ts",
+      "bytes": 11981,
+      "sha256": "20f7135239a5bd1ed419194e869b450334bd92a2a04f57fc89a6ea8ca523dd8a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillEncryption.ts",
+      "bytes": 8324,
+      "sha256": "fa366ad9e5fc9e5e30ae67953eb8aa1704fcb446114223c08815939185fb953c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillEvidence.ts",
+      "bytes": 12273,
+      "sha256": "9833f26b8360107dd83763f3189d757f4a2cc8c45c6d4b1182a00b4baa4c1c69"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillPolicy.ts",
+      "bytes": 9984,
+      "sha256": "813d7233b609a2787c32da1317eceea7ec205bc176fb4389b5727e82dc636296"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillLifecycle.ts",
+      "bytes": 21179,
+      "sha256": "427675f54afd0efa4d2b9a2d173f81d032291d27cd257f39e3f6494b578cb235"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ops/retention/retentionEngine.ts",
+      "bytes": 18582,
+      "sha256": "ffccb6aa0122309049af5202ed3cb196c8ccf1a53b52da3fbf300c9f44e37e48"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/storage/sqlitePool.ts",
+      "bytes": 5804,
+      "sha256": "021dfe8f275c90273d1821d36431f182bbde538a3417f2375e96013c91867bfc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+      "bytes": 3137,
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    }
+  ]
+}

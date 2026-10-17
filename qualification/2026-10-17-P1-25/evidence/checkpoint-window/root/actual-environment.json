@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-16T23:46:18.607214+00:00",
+  "environment": {
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "arch": "arm64"
+  },
+  "metadataOnly": true
+}

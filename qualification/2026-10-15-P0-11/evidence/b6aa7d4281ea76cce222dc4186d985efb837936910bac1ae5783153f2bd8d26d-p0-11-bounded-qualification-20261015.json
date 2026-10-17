@@ -1,0 +1,1679 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "source": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T06:50:28.771545+00:00",
+  "state": "complete-pending-independent-review",
+  "formalAcceptanceClosed": false,
+  "originalCorpora": {
+    "source": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+    "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "capturedUtc": "2026-10-15T06:33:01.801592+00:00",
+    "separateOriginalRuns": [
+      {
+        "corpus": "map",
+        "file": "tests/threatModelMap.test.ts",
+        "registered": 7,
+        "passed": 7,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "durationMs": 1697,
+        "identities": [
+          {
+            "file": "tests/threatModelMap.test.ts",
+            "fullName": "check-threat-model a valid map passes"
+          },
+          {
+            "file": "tests/threatModelMap.test.ts",
+            "fullName": "check-threat-model a cited path that does not exist fails and names the entry"
+          },
+          {
+            "file": "tests/threatModelMap.test.ts",
+            "fullName": "check-threat-model a symbol absent from its file fails"
+          },
+          {
+            "file": "tests/threatModelMap.test.ts",
+            "fullName": "check-threat-model an owner that is not a plan key fails"
+          },
+          {
+            "file": "tests/threatModelMap.test.ts",
+            "fullName": "check-threat-model a failure row with no test and no owner fails"
+          },
+          {
+            "file": "tests/threatModelMap.test.ts",
+            "fullName": "check-threat-model the real channel map passes with 16 channels and 8 failure rows"
+          },
+          {
+            "file": "tests/threatModelMap.test.ts",
+            "fullName": "check-threat-model the threat model document names every channel, failure row and ASI id in the map"
+          }
+        ],
+        "raw": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/raw.json",
+          "bytes": 2588,
+          "sha256": "c8cdbcb952f46d7012a4dfaf6a5cf937c364a39056f3bfb1f3fb16083747640e"
+        },
+        "rawProducer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/raw-producer.json",
+          "bytes": 2588,
+          "sha256": "c8cdbcb952f46d7012a4dfaf6a5cf937c364a39056f3bfb1f3fb16083747640e"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/observer.json",
+          "bytes": 3613,
+          "sha256": "a4a5d185446cbb3194e7ad41d25cd5b435a88162e4b965c3db13d0c39c340e2d"
+        },
+        "combinedStream": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/stdout-stderr.log",
+          "bytes": 104,
+          "sha256": "b3e53395437e2728e9dbf8f777708d22109bc2007bd63e2e65037511ec6c50c2"
+        },
+        "command": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/command.json",
+          "bytes": 2479,
+          "sha256": "c8cc3e0ffd9c31be3eb2554ae36177f730ef078582f35810754b6b5f7d1f45e8"
+        },
+        "ownedProcess": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/owned-process.json",
+          "bytes": 712,
+          "sha256": "0a0021aa08824629a319bcc76810d2c700a4d83a5f07ef6daef5ad5326a8c300"
+        },
+        "ownedGroupAfterExit": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "a0dcb3c454626415570a53d3be10edfba33d5650e62b51ab263ea7c9f41095f4"
+        },
+        "knownLateDiagnostics": []
+      },
+      {
+        "corpus": "telemetry",
+        "file": "tests/telemetryExporterFailure.test.ts",
+        "registered": 2,
+        "passed": 2,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "durationMs": 3701,
+        "identities": [
+          {
+            "file": "tests/telemetryExporterFailure.test.ts",
+            "fullName": "a failing telemetry exporter (failure policy: telemetry-exporter-down) does not fail a governed tool call or drop its ledger row when recording throws"
+          },
+          {
+            "file": "tests/telemetryExporterFailure.test.ts",
+            "fullName": "a failing telemetry exporter (failure policy: telemetry-exporter-down) does not fail a governed tool call or drop its ledger row when the collector is unreachable"
+          }
+        ],
+        "raw": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/raw.json",
+          "bytes": 1605,
+          "sha256": "8cfaf43a295ddbbdb2918cd51a1633b3d2dbbd07495d371ac242f525cf2cf4da"
+        },
+        "rawProducer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/raw-producer.json",
+          "bytes": 1605,
+          "sha256": "8cfaf43a295ddbbdb2918cd51a1633b3d2dbbd07495d371ac242f525cf2cf4da"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/observer.json",
+          "bytes": 2441,
+          "sha256": "4af18c3feb880bd07bdb3bc264c365732799177175ed5696b16cd251e37ca696"
+        },
+        "combinedStream": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/stdout-stderr.log",
+          "bytes": 110,
+          "sha256": "8524cdd48ddfd44de4971ca4b8916fe6ab4fea3f67471bed7a2a04a9ea7f3135"
+        },
+        "command": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/command.json",
+          "bytes": 2541,
+          "sha256": "35b1dd1afcf43f750ab8df6f4aa8150966dca3a410e2f30f7a62bd32e85f95b0"
+        },
+        "ownedProcess": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/owned-process.json",
+          "bytes": 728,
+          "sha256": "dfd1fc7a764a562329f3509cca02186a8c134f1f945b3eb2eed4ac4bd48619aa"
+        },
+        "ownedGroupAfterExit": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "a5542226806908342290cc83a3f41da88eec16143cad24e39b40fd887c4f6fe0"
+        },
+        "knownLateDiagnostics": []
+      },
+      {
+        "corpus": "preview",
+        "file": "tests/observabilityOtelExporter.test.ts",
+        "registered": 5,
+        "passed": 5,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "durationMs": 1541,
+        "identities": [
+          {
+            "file": "tests/observabilityOtelExporter.test.ts",
+            "fullName": "observability otel exporter exports evidence events as OTLP spans"
+          },
+          {
+            "file": "tests/observabilityOtelExporter.test.ts",
+            "fullName": "observability otel exporter exports score computations as OTLP metrics"
+          },
+          {
+            "file": "tests/observabilityOtelExporter.test.ts",
+            "fullName": "observability otel exporter exports incidents as OTLP logs"
+          },
+          {
+            "file": "tests/observabilityOtelExporter.test.ts",
+            "fullName": "observability otel exporter supports Zipkin exporter by converting all signals to spans"
+          },
+          {
+            "file": "tests/observabilityOtelExporter.test.ts",
+            "fullName": "observability otel exporter supports Jaeger OTLP endpoints for traces, metrics, and logs"
+          }
+        ],
+        "raw": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/raw.json",
+          "bytes": 2131,
+          "sha256": "5ff58729ce2475abe249733a1f1a78a4afabc0af9a2bf4cc6fa9a2607d1a3293"
+        },
+        "rawProducer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/raw-producer.json",
+          "bytes": 2131,
+          "sha256": "5ff58729ce2475abe249733a1f1a78a4afabc0af9a2bf4cc6fa9a2607d1a3293"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/observer.json",
+          "bytes": 3072,
+          "sha256": "f9a98c1982c64a0ae9882e08f19af7f89636c98e02d7178e46228de41dc5d591"
+        },
+        "combinedStream": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/stdout-stderr.log",
+          "bytes": 108,
+          "sha256": "51e57a55f0933f47e2cd0f965776b950898d8e4ae88473c15200001d5053049b"
+        },
+        "command": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/command.json",
+          "bytes": 2529,
+          "sha256": "f8440944db61b6a78cee7b9de5866280a2d1451eb633c6a555d19e86fc933d00"
+        },
+        "ownedProcess": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/owned-process.json",
+          "bytes": 727,
+          "sha256": "aa51a865855c90107e77dff0220f7e87989d7e2f20e8e7000e3a0dbb221ababc"
+        },
+        "ownedGroupAfterExit": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "c24c3335f9df85e2219d523198b856b22329d836e29b911fd8b0d183dfa2845d"
+        },
+        "knownLateDiagnostics": []
+      },
+      {
+        "corpus": "recording",
+        "file": "tests/toolEvidenceRecording.test.ts",
+        "registered": 7,
+        "passed": 7,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "durationMs": 4257,
+        "identities": [
+          {
+            "file": "tests/toolEvidenceRecording.test.ts",
+            "fullName": "a governed call leaves evidence records an ALLOWED call"
+          },
+          {
+            "file": "tests/toolEvidenceRecording.test.ts",
+            "fullName": "a governed call leaves evidence records a DENIED call, with which guard refused and why"
+          },
+          {
+            "file": "tests/toolEvidenceRecording.test.ts",
+            "fullName": "a governed call leaves evidence writes an audit row AND a metric row per call"
+          },
+          {
+            "file": "tests/toolEvidenceRecording.test.ts",
+            "fullName": "a governed call leaves evidence correlates a call to its token, so a denial can be traced"
+          },
+          {
+            "file": "tests/toolEvidenceRecording.test.ts",
+            "fullName": "a governed call leaves evidence does NOT copy the arguments into the audit row"
+          },
+          {
+            "file": "tests/toolEvidenceRecording.test.ts",
+            "fullName": "recording never breaks the call returns the tool's real outcome when the recorder throws"
+          },
+          {
+            "file": "tests/toolEvidenceRecording.test.ts",
+            "fullName": "the projection itself labels the three outcomes distinctly"
+          }
+        ],
+        "raw": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/raw.json",
+          "bytes": 2720,
+          "sha256": "5fa08197911d76ad188fd610118cadf4e4c89c7cbf25dd1bc95c319a99e904cb"
+        },
+        "rawProducer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/raw-producer.json",
+          "bytes": 2720,
+          "sha256": "5fa08197911d76ad188fd610118cadf4e4c89c7cbf25dd1bc95c319a99e904cb"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/observer.json",
+          "bytes": 4571,
+          "sha256": "b1c5b110d44c753c98b499f29d6b18e76fb471d762ccd6c3fd5155779073bdff"
+        },
+        "combinedStream": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/stdout-stderr.log",
+          "bytes": 110,
+          "sha256": "121b5970746ca295cd5475302c44863c64244f5a903f3a458d812a2d15d48d01"
+        },
+        "command": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/command.json",
+          "bytes": 2535,
+          "sha256": "7c460aecc801449c22a6f7091350c4df0f5e079256fa1d9fc86f30a56e11c966"
+        },
+        "ownedProcess": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/owned-process.json",
+          "bytes": 725,
+          "sha256": "b902306524508eec65ddb8196d5e34638212bd73077a8f0ca56f461276c53f8f"
+        },
+        "ownedGroupAfterExit": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "5596c1272c4dbe3b280efba43c49d7758f8fddba34ec69701cbe92bef709f929"
+        },
+        "knownLateDiagnostics": []
+      }
+    ],
+    "distinctOriginalFileTitleRegistrations": 21,
+    "originalFileCount": 4,
+    "primaryDefinitionsAcrossTwoSeparateRuns": 9,
+    "adjacentDefinitionsAcrossTwoSeparateRuns": 12,
+    "single21CaseRunClaimed": false,
+    "single9CaseRunClaimed": false,
+    "runtime": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "sqliteSelected": 1,
+      "native": {
+        "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "device": 16777231,
+        "inode": 538824643,
+        "nlink": 1
+      },
+      "boundary": "Fresh owned source-install native load and in-memory query. No shared native rebuild, product model call, OS isolation or per-other-child ABI inference."
+    },
+    "sourcePreserved8362": true,
+    "formalAcceptanceClosed": false,
+    "meaning": [
+      "Six actual source-checker children are exercised by map cases; no separately retained product-child PIDs or streams. Doc case checks strings, not channel control enforcement.",
+      "Telemetry uses actual owned workspace/vault/governed fs.read/SQLite and injected throwing exporter/canned fetch rejection. Batch transaction completes before queue for ordinary fixtures; nested caller transactions use savepoints, so no universal commit guarantee. No independent seal or true collector outage proof.",
+      "Preview tests exercise disabled-mode serialization; recording cases use actual persisted audit/metric rows plus a direct READ_ONLY echo with genuinely throwing recorder callback. No genuine durable-store outage/reconciliation proof.",
+      "Original wrappers inherit environment and tests retain all guards,30-second deadlines and cleanup. Absent endpoint overrides/defaultloopback is staticpreflight, not zero-network/credential/OS isolation. Observer precedes globalteardown; actual normal exits/streams/ownedPGIDabsence separately retained. No universal detacheddescendant proof.",
+      "16channels/8failure rows are current latercoverage; Sidreview/ASIreverify/mapstamp/followupkeys/fullsuite/hosted/quality/priorholds remainopen."
+    ]
+  },
+  "originalCorporaSummary": {
+    "path": "/private/tmp/p0-11-qualification-20261015/original-corpora-summary.json",
+    "bytes": 14279,
+    "sha256": "820707b3b52608f9659db54f06da636dd5a8b52123d489ff6a166a10a13d20e9"
+  },
+  "primaryOriginalTestsAcrossTwoRuns": {
+    "total": 9,
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0,
+    "pending": 0,
+    "todo": 0,
+    "single9CaseRunClaimed": false
+  },
+  "priorReviewContracts": [
+    {
+      "role": "original",
+      "pin": {
+        "path": "/private/tmp/p0-11-original-corpora-independent-review-20261015.json",
+        "bytes": 23426,
+        "sha256": "ad9128b687def99c672387e0c33ab1926a53082bb0b5087fa8a28905cb1d537a"
+      },
+      "blockingField": "blockingFindings",
+      "requiredFields": {
+        "allReadsFinished": true,
+        "formalAcceptanceClosed": false
+      },
+      "companionPins": [
+        {
+          "path": "/private/tmp/p0-11-original-corpora-independent-review-20261015.md",
+          "bytes": 3460,
+          "sha256": "1b42150ef1a54466cd24f81c739e506d103219e056c8bd00b4e09c0766cc95df"
+        }
+      ]
+    },
+    {
+      "role": "recipe",
+      "pin": {
+        "path": "/private/tmp/p0-11-recipes-static-review-20261015.json",
+        "bytes": 21585,
+        "sha256": "b7619c6e45d47c4782a6cd7be7607f4debc8a8180c649aa16e99a8b7a9b7b278"
+      },
+      "blockingField": "blockingFindings",
+      "requiredFields": {
+        "allReadsFinished": true,
+        "formalAcceptanceClosed": false
+      },
+      "companionPins": [
+        {
+          "path": "/private/tmp/p0-11-recipes-static-review-20261015.md",
+          "bytes": 5159,
+          "sha256": "8d86900942fd1dc460012bc27b75aab1d2d57633ea6aa39d90ef32ce5b40aee0"
+        }
+      ]
+    },
+    {
+      "role": "code",
+      "pin": {
+        "path": "/private/tmp/p0-11-controller-code-static-review-20261015.json",
+        "bytes": 5353,
+        "sha256": "94899d5f0c2c54ba5625432c1a24942102f447a946f34e0a30b7e940d2323aba"
+      },
+      "blockingField": "blockingFindings",
+      "requiredFields": {
+        "allReadsFinished": true,
+        "formalAcceptanceClosed": false
+      },
+      "companionPins": [
+        {
+          "path": "/private/tmp/p0-11-controller-code-static-review-20261015.md",
+          "bytes": 4118,
+          "sha256": "7c337761b5d9dae852ec2f75e42959f350e624778b8878162dfe3e48578b7413"
+        }
+      ]
+    },
+    {
+      "role": "sealed",
+      "pin": {
+        "path": "/private/tmp/p0-11-controller-sealed-setup-review-20261015.json",
+        "bytes": 15390,
+        "sha256": "17782c03541ccfe9be068809b2b25a1a4ffbba2d4bc0dde0b76354848b5ab76c"
+      },
+      "blockingField": "blockingFindings",
+      "requiredFields": {
+        "allReadsFinished": true,
+        "formalAcceptanceClosed": false
+      },
+      "companionPins": [
+        {
+          "path": "/private/tmp/p0-11-controller-sealed-setup-review-20261015.md",
+          "bytes": 3178,
+          "sha256": "5c7976bf076d45f9bf08adec369b8ca768252a1e7f115471ce813812987bf370"
+        }
+      ]
+    }
+  ],
+  "latePreparationHistory": [
+    {
+      "role": "release-helper-v1",
+      "pin": {
+        "path": "/private/tmp/p0-11-author-causal-release-20261015.py",
+        "bytes": 5152,
+        "sha256": "23eebeb4e9decca89cc5b6452ab2144a7d69d71b0374338cf4fbac4186c70475"
+      }
+    },
+    {
+      "role": "release-helper-v2",
+      "pin": {
+        "path": "/private/tmp/p0-11-author-causal-release-v2-20261015.py",
+        "bytes": 5153,
+        "sha256": "fbd1c829fd98444d69f913d45ecddd65e31581395c344ef7e661398ca13b817c"
+      }
+    },
+    {
+      "role": "release-helper-count-issue",
+      "pin": {
+        "path": "/private/tmp/p0-11-release-helper-count-issue-20261015.json",
+        "bytes": 975,
+        "sha256": "134ae70f43e5c702c71461e0e8541824f39905589c603989e5269f2549433eed"
+      }
+    },
+    {
+      "role": "root-causal-attribution",
+      "pin": {
+        "path": "/private/tmp/p0-11-root-causal-attribution-20261015.json",
+        "bytes": 4543,
+        "sha256": "275a99bc5f718abdfedd3d3688d99fc8645e4e0b47c2e859b5036f89b9e2a564"
+      }
+    }
+  ],
+  "causalSummary": {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015.json",
+    "bytes": 88229,
+    "sha256": "86a94bff3755d5856808fb5c0f7edfe7cbc21605355030a4e5eb6482678f4d17"
+  },
+  "causalMarkdown": {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015.md",
+    "bytes": 3958,
+    "sha256": "d4677cdceea01637b2eab7ce1b313eacf21f1818a0818a057dafdb3b2e5e3754"
+  },
+  "runtimeArtifactIndex": {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/runtime-artifact-index.json",
+    "bytes": 83753,
+    "sha256": "cbb4b53af633b4879df157c1357df1c325310c64980f83cc7dd02f240ba874ed"
+  },
+  "finalSourcePreservation": {
+    "path": "/private/tmp/p0-11-qualification-20261015/final-source-preservation.json",
+    "bytes": 2832,
+    "sha256": "f3cd8c9a030493ef686ca1caabbf02372723660f1154041c5d042a646a360e53"
+  },
+  "commandsFrozen": {
+    "path": "/private/tmp/p0-11-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 29638,
+    "sha256": "f1d769c08ecc1948a2cc3ffbed391ab22e7dbc53f260e0225b66a7f4406e7176"
+  },
+  "rootCommandCount": 20,
+  "rootCommands": [
+    {
+      "phase": "install",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "pnpm install --frozen-lockfile --store-dir /private/tmp/p0-11-qualification-20261015/store",
+      "exit": 0,
+      "durationMs": 5190,
+      "startedUtc": "2026-10-15T06:29:06.474851+00:00",
+      "endedUtc": "2026-10-15T06:29:11.679785+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-install/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 21426,
+        "ownedPgid": 21426,
+        "observedPgidAfterLaunch": 21426,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "install",
+          "--frozen-lockfile",
+          "--store-dir",
+          "/private/tmp/p0-11-qualification-20261015/store"
+        ],
+        "startedUtc": "2026-10-15T06:29:06.474851+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "build",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 31132,
+      "startedUtc": "2026-10-15T06:29:21.590013+00:00",
+      "endedUtc": "2026-10-15T06:29:52.723078+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-build/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 21496,
+        "ownedPgid": 21496,
+        "observedPgidAfterLaunch": 21496,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "build"
+        ],
+        "startedUtc": "2026-10-15T06:29:21.590013+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "runtime-fingerprint",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-11-qualification-20261015/runtime-fingerprint.cjs",
+      "exit": 0,
+      "durationMs": 78,
+      "startedUtc": "2026-10-15T06:30:21.874140+00:00",
+      "endedUtc": "2026-10-15T06:30:21.969498+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-runtime-fingerprint/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 21723,
+        "ownedPgid": 21723,
+        "observedPgidAfterLaunch": 21723,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/private/tmp/p0-11-qualification-20261015/runtime-fingerprint.cjs"
+        ],
+        "startedUtc": "2026-10-15T06:30:21.874140+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "normal-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1444,
+      "startedUtc": "2026-10-15T06:30:22.238075+00:00",
+      "endedUtc": "2026-10-15T06:30:23.694511+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-normal-freeze/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 21730,
+        "ownedPgid": 21730,
+        "observedPgidAfterLaunch": 21730,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "check:freeze"
+        ],
+        "startedUtc": "2026-10-15T06:30:22.238075+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "original-map",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/threatModelMap.test.ts --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p0-11-qualification-20261015/command-original-map/raw-producer.json",
+      "exit": 0,
+      "durationMs": 1697,
+      "startedUtc": "2026-10-15T06:31:08.463480+00:00",
+      "endedUtc": "2026-10-15T06:31:10.173555+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-original-map/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 21896,
+        "ownedPgid": 21896,
+        "observedPgidAfterLaunch": 21896,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/threatModelMap.test.ts",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p0-11-qualification-20261015/command-original-map/raw-producer.json"
+        ],
+        "startedUtc": "2026-10-15T06:31:08.463480+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/raw-producer.json",
+          "bytes": 2588,
+          "sha256": "c8cdbcb952f46d7012a4dfaf6a5cf937c364a39056f3bfb1f3fb16083747640e"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/raw.json",
+          "bytes": 2588,
+          "sha256": "c8cdbcb952f46d7012a4dfaf6a5cf937c364a39056f3bfb1f3fb16083747640e"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/observer.json",
+          "bytes": 3613,
+          "sha256": "a4a5d185446cbb3194e7ad41d25cd5b435a88162e4b965c3db13d0c39c340e2d"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "original-telemetry",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/telemetryExporterFailure.test.ts --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p0-11-qualification-20261015/command-original-telemetry/raw-producer.json",
+      "exit": 0,
+      "durationMs": 3701,
+      "startedUtc": "2026-10-15T06:31:24.774724+00:00",
+      "endedUtc": "2026-10-15T06:31:28.499727+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 21954,
+        "ownedPgid": 21954,
+        "observedPgidAfterLaunch": 21954,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/telemetryExporterFailure.test.ts",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p0-11-qualification-20261015/command-original-telemetry/raw-producer.json"
+        ],
+        "startedUtc": "2026-10-15T06:31:24.774724+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/raw-producer.json",
+          "bytes": 1605,
+          "sha256": "8cfaf43a295ddbbdb2918cd51a1633b3d2dbbd07495d371ac242f525cf2cf4da"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/raw.json",
+          "bytes": 1605,
+          "sha256": "8cfaf43a295ddbbdb2918cd51a1633b3d2dbbd07495d371ac242f525cf2cf4da"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/observer.json",
+          "bytes": 2441,
+          "sha256": "4af18c3feb880bd07bdb3bc264c365732799177175ed5696b16cd251e37ca696"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "original-preview",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/observabilityOtelExporter.test.ts --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p0-11-qualification-20261015/command-original-preview/raw-producer.json",
+      "exit": 0,
+      "durationMs": 1541,
+      "startedUtc": "2026-10-15T06:31:59.182305+00:00",
+      "endedUtc": "2026-10-15T06:32:00.739631+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-original-preview/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 22068,
+        "ownedPgid": 22068,
+        "observedPgidAfterLaunch": 22068,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/observabilityOtelExporter.test.ts",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p0-11-qualification-20261015/command-original-preview/raw-producer.json"
+        ],
+        "startedUtc": "2026-10-15T06:31:59.182305+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/raw-producer.json",
+          "bytes": 2131,
+          "sha256": "5ff58729ce2475abe249733a1f1a78a4afabc0af9a2bf4cc6fa9a2607d1a3293"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/raw.json",
+          "bytes": 2131,
+          "sha256": "5ff58729ce2475abe249733a1f1a78a4afabc0af9a2bf4cc6fa9a2607d1a3293"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/observer.json",
+          "bytes": 3072,
+          "sha256": "f9a98c1982c64a0ae9882e08f19af7f89636c98e02d7178e46228de41dc5d591"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "original-recording",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/toolEvidenceRecording.test.ts --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p0-11-qualification-20261015/command-original-recording/raw-producer.json",
+      "exit": 0,
+      "durationMs": 4257,
+      "startedUtc": "2026-10-15T06:32:28.243359+00:00",
+      "endedUtc": "2026-10-15T06:32:32.514016+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-original-recording/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 22144,
+        "ownedPgid": 22144,
+        "observedPgidAfterLaunch": 22144,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/toolEvidenceRecording.test.ts",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p0-11-qualification-20261015/command-original-recording/raw-producer.json"
+        ],
+        "startedUtc": "2026-10-15T06:32:28.243359+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/raw-producer.json",
+          "bytes": 2720,
+          "sha256": "5fa08197911d76ad188fd610118cadf4e4c89c7cbf25dd1bc95c319a99e904cb"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/raw.json",
+          "bytes": 2720,
+          "sha256": "5fa08197911d76ad188fd610118cadf4e4c89c7cbf25dd1bc95c319a99e904cb"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/observer.json",
+          "bytes": 4571,
+          "sha256": "b1c5b110d44c753c98b499f29d6b18e76fb471d762ccd6c3fd5155779073bdff"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "threat-model",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:threat-model",
+      "exit": 0,
+      "durationMs": 450,
+      "startedUtc": "2026-10-15T06:33:27.174275+00:00",
+      "endedUtc": "2026-10-15T06:33:27.637800+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-threat-model/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 22259,
+        "ownedPgid": 22259,
+        "observedPgidAfterLaunch": 22259,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "check:threat-model"
+        ],
+        "startedUtc": "2026-10-15T06:33:27.174275+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "checker-valid",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-threat-model.mjs tests/fixtures/threat-model/valid.json",
+      "exit": 0,
+      "durationMs": 100,
+      "startedUtc": "2026-10-15T06:33:27.761292+00:00",
+      "endedUtc": "2026-10-15T06:33:27.877035+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-checker-valid/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 22277,
+        "ownedPgid": 22277,
+        "observedPgidAfterLaunch": 22277,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/check-threat-model.mjs",
+          "tests/fixtures/threat-model/valid.json"
+        ],
+        "startedUtc": "2026-10-15T06:33:27.761292+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "checker-missing-path",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-threat-model.mjs tests/fixtures/threat-model/missing-path.json",
+      "exit": 1,
+      "durationMs": 291,
+      "startedUtc": "2026-10-15T06:33:28.011376+00:00",
+      "endedUtc": "2026-10-15T06:33:28.317734+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-checker-missing-path/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 22282,
+        "ownedPgid": 22282,
+        "observedPgidAfterLaunch": 22282,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/check-threat-model.mjs",
+          "tests/fixtures/threat-model/missing-path.json"
+        ],
+        "startedUtc": "2026-10-15T06:33:28.011376+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "checker-missing-symbol",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-threat-model.mjs tests/fixtures/threat-model/missing-symbol.json",
+      "exit": 1,
+      "durationMs": 97,
+      "startedUtc": "2026-10-15T06:33:28.449969+00:00",
+      "endedUtc": "2026-10-15T06:33:28.562268+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-checker-missing-symbol/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 22287,
+        "ownedPgid": 22287,
+        "observedPgidAfterLaunch": 22287,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/check-threat-model.mjs",
+          "tests/fixtures/threat-model/missing-symbol.json"
+        ],
+        "startedUtc": "2026-10-15T06:33:28.449969+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "checker-bad-owner",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-threat-model.mjs tests/fixtures/threat-model/bad-owner.json",
+      "exit": 1,
+      "durationMs": 99,
+      "startedUtc": "2026-10-15T06:33:28.751546+00:00",
+      "endedUtc": "2026-10-15T06:33:28.865574+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-checker-bad-owner/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 22292,
+        "ownedPgid": 22292,
+        "observedPgidAfterLaunch": 22292,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/check-threat-model.mjs",
+          "tests/fixtures/threat-model/bad-owner.json"
+        ],
+        "startedUtc": "2026-10-15T06:33:28.751546+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "checker-orphan-failure",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-threat-model.mjs tests/fixtures/threat-model/orphan-failure-row.json",
+      "exit": 1,
+      "durationMs": 133,
+      "startedUtc": "2026-10-15T06:33:28.994137+00:00",
+      "endedUtc": "2026-10-15T06:33:29.153511+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-checker-orphan-failure/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 22297,
+        "ownedPgid": 22297,
+        "observedPgidAfterLaunch": 22297,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/check-threat-model.mjs",
+          "tests/fixtures/threat-model/orphan-failure-row.json"
+        ],
+        "startedUtc": "2026-10-15T06:33:28.994137+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "no-fabrication",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:no-fabrication",
+      "exit": 0,
+      "durationMs": 2085,
+      "startedUtc": "2026-10-15T06:33:39.683568+00:00",
+      "endedUtc": "2026-10-15T06:33:41.781422+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-no-fabrication/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 22322,
+        "ownedPgid": 22322,
+        "observedPgidAfterLaunch": 22322,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "check:no-fabrication"
+        ],
+        "startedUtc": "2026-10-15T06:33:39.683568+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "architecture",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1916,
+      "startedUtc": "2026-10-15T06:33:41.900023+00:00",
+      "endedUtc": "2026-10-15T06:33:43.828926+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-architecture/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 22341,
+        "ownedPgid": 22341,
+        "observedPgidAfterLaunch": 22341,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "check:architecture-boundaries"
+        ],
+        "startedUtc": "2026-10-15T06:33:41.900023+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "docs",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 388,
+      "startedUtc": "2026-10-15T06:33:43.951276+00:00",
+      "endedUtc": "2026-10-15T06:33:44.352843+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-docs/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 22363,
+        "ownedPgid": 22363,
+        "observedPgidAfterLaunch": 22363,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "check:docs-drift"
+        ],
+        "startedUtc": "2026-10-15T06:33:43.951276+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "counts",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:counts",
+      "exit": 0,
+      "durationMs": 507,
+      "startedUtc": "2026-10-15T06:33:44.473639+00:00",
+      "endedUtc": "2026-10-15T06:33:44.993711+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-counts/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 22379,
+        "ownedPgid": 22379,
+        "observedPgidAfterLaunch": 22379,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "check:counts"
+        ],
+        "startedUtc": "2026-10-15T06:33:44.473639+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "pre-causal-normal-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1611,
+      "startedUtc": "2026-10-15T06:38:43.767433+00:00",
+      "endedUtc": "2026-10-15T06:38:45.393511+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-pre-causal-normal-freeze/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 22896,
+        "ownedPgid": 22896,
+        "observedPgidAfterLaunch": 22896,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "check:freeze"
+        ],
+        "startedUtc": "2026-10-15T06:38:43.767433+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "final-normal-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1782,
+      "startedUtc": "2026-10-15T06:45:23.057413+00:00",
+      "endedUtc": "2026-10-15T06:45:24.852503+00:00",
+      "log": "/private/tmp/p0-11-qualification-20261015/command-final-normal-freeze/stdout-stderr.log",
+      "head": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "headAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+      "ownedProcess": {
+        "pid": 23679,
+        "ownedPgid": 23679,
+        "observedPgidAfterLaunch": 23679,
+        "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "check:freeze"
+        ],
+        "startedUtc": "2026-10-15T06:45:23.057413+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    }
+  ],
+  "rootCommandLogPins": [
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-install/stdout-stderr.log",
+      "bytes": 2707,
+      "sha256": "525eb9983390956197a12a869903170715c51b3b2dab9ad656aa2f03cb5ba126"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-build/stdout-stderr.log",
+      "bytes": 945,
+      "sha256": "3d6471987a90a4c050dc6d71311a52628fb1bd7676332747d17782289ce30288"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-runtime-fingerprint/stdout-stderr.log",
+      "bytes": 737,
+      "sha256": "dcf620b6a846d8c2b3cc181d8685332012c3d7219b26a566f773885438aa9cc5"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-normal-freeze/stdout-stderr.log",
+      "bytes": 263,
+      "sha256": "17ac9e80ad69ccdd78e618bf1d34e73bf6af2bd517f757ff24c2ec9131ea06d3"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/stdout-stderr.log",
+      "bytes": 104,
+      "sha256": "b3e53395437e2728e9dbf8f777708d22109bc2007bd63e2e65037511ec6c50c2"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/stdout-stderr.log",
+      "bytes": 110,
+      "sha256": "8524cdd48ddfd44de4971ca4b8916fe6ab4fea3f67471bed7a2a04a9ea7f3135"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/stdout-stderr.log",
+      "bytes": 108,
+      "sha256": "51e57a55f0933f47e2cd0f965776b950898d8e4ae88473c15200001d5053049b"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/stdout-stderr.log",
+      "bytes": 110,
+      "sha256": "121b5970746ca295cd5475302c44863c64244f5a903f3a458d812a2d15d48d01"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-threat-model/stdout-stderr.log",
+      "bytes": 284,
+      "sha256": "cde7a9ec2f1a45cd89c92defa538cc4cf6411475f1a461dab9a3a6269e6f4c33"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-checker-valid/stdout-stderr.log",
+      "bytes": 133,
+      "sha256": "2855a40016b4002c42eba6f24b025089e336873e0ef98a892ebf371c0bd1e5bd"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-checker-missing-path/stdout-stderr.log",
+      "bytes": 83,
+      "sha256": "3584434118294b14e0b03d5aaeda5374f9c637570789fb1c252c09491352e070"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-checker-missing-symbol/stdout-stderr.log",
+      "bytes": 97,
+      "sha256": "894a8067728629ff29ec3e78fe7cd4dba34d43a32675cc14333dfda5db877c8c"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-checker-bad-owner/stdout-stderr.log",
+      "bytes": 137,
+      "sha256": "4202a86d6f6f8743744b2ae786b70fc931ef364bdf7da997ac3af11224d94a47"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-checker-orphan-failure/stdout-stderr.log",
+      "bytes": 84,
+      "sha256": "8c3ab254682eb091a3d5204fe5e4f3198926e6693ad31cfcd8981d73936d97ef"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-no-fabrication/stdout-stderr.log",
+      "bytes": 281,
+      "sha256": "4f99491dd3d1f07d2e352b25ac935546f8d8aaba70f6c11ad5c67fc737d553fd"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-architecture/stdout-stderr.log",
+      "bytes": 95608,
+      "sha256": "8442e840c9aeeedf55a4c15646dc4973df2c8377fe76d2bedc695f9c6893cfdb"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-docs/stdout-stderr.log",
+      "bytes": 200,
+      "sha256": "4603dd2bfae810deb6e2dec31c39b89f471a276dafa9b3275c200283b1319734"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-counts/stdout-stderr.log",
+      "bytes": 234,
+      "sha256": "f9ee92c195e02d46d10a79facec48fb8205131b768e728fc99da8c16af27d94a"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-pre-causal-normal-freeze/stdout-stderr.log",
+      "bytes": 263,
+      "sha256": "17ac9e80ad69ccdd78e618bf1d34e73bf6af2bd517f757ff24c2ec9131ea06d3"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-final-normal-freeze/stdout-stderr.log",
+      "bytes": 263,
+      "sha256": "17ac9e80ad69ccdd78e618bf1d34e73bf6af2bd517f757ff24c2ec9131ea06d3"
+    }
+  ],
+  "rootJournalContract": [
+    {
+      "role": "install",
+      "phase": "install",
+      "argv": [
+        "pnpm",
+        "install",
+        "--frozen-lockfile",
+        "--store-dir",
+        "/private/tmp/p0-11-qualification-20261015/store"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "build",
+      "phase": "build",
+      "argv": [
+        "pnpm",
+        "run",
+        "build"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "fingerprint",
+      "phase": "runtime-fingerprint",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/private/tmp/p0-11-qualification-20261015/runtime-fingerprint.cjs"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "initial-freeze",
+      "phase": "normal-freeze",
+      "argv": [
+        "pnpm",
+        "run",
+        "check:freeze"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "original-map",
+      "phase": "original-map",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/threatModelMap.test.ts",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "--outputFile=/private/tmp/p0-11-qualification-20261015/command-original-map/raw-producer.json"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "original-telemetry",
+      "phase": "original-telemetry",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/telemetryExporterFailure.test.ts",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "--outputFile=/private/tmp/p0-11-qualification-20261015/command-original-telemetry/raw-producer.json"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "original-preview",
+      "phase": "original-preview",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/observabilityOtelExporter.test.ts",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "--outputFile=/private/tmp/p0-11-qualification-20261015/command-original-preview/raw-producer.json"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "original-recording",
+      "phase": "original-recording",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/toolEvidenceRecording.test.ts",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "--outputFile=/private/tmp/p0-11-qualification-20261015/command-original-recording/raw-producer.json"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "threat-model",
+      "phase": "threat-model",
+      "argv": [
+        "pnpm",
+        "run",
+        "check:threat-model"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "fixture-valid",
+      "phase": "checker-valid",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/check-threat-model.mjs",
+        "tests/fixtures/threat-model/valid.json"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "fixture-missing-path",
+      "phase": "checker-missing-path",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/check-threat-model.mjs",
+        "tests/fixtures/threat-model/missing-path.json"
+      ],
+      "expectedExit": 1
+    },
+    {
+      "role": "fixture-missing-symbol",
+      "phase": "checker-missing-symbol",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/check-threat-model.mjs",
+        "tests/fixtures/threat-model/missing-symbol.json"
+      ],
+      "expectedExit": 1
+    },
+    {
+      "role": "fixture-bad-owner",
+      "phase": "checker-bad-owner",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/check-threat-model.mjs",
+        "tests/fixtures/threat-model/bad-owner.json"
+      ],
+      "expectedExit": 1
+    },
+    {
+      "role": "fixture-orphan-failure-row",
+      "phase": "checker-orphan-failure",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/check-threat-model.mjs",
+        "tests/fixtures/threat-model/orphan-failure-row.json"
+      ],
+      "expectedExit": 1
+    },
+    {
+      "role": "no-fabrication",
+      "phase": "no-fabrication",
+      "argv": [
+        "pnpm",
+        "run",
+        "check:no-fabrication"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "architecture",
+      "phase": "architecture",
+      "argv": [
+        "pnpm",
+        "run",
+        "check:architecture-boundaries"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "docs",
+      "phase": "docs",
+      "argv": [
+        "pnpm",
+        "run",
+        "check:docs-drift"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "counts",
+      "phase": "counts",
+      "argv": [
+        "pnpm",
+        "run",
+        "check:counts"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "pre-causal-freeze",
+      "phase": "pre-causal-normal-freeze",
+      "argv": [
+        "pnpm",
+        "run",
+        "check:freeze"
+      ],
+      "expectedExit": 0
+    },
+    {
+      "role": "final-freeze",
+      "phase": "final-normal-freeze",
+      "argv": [
+        "pnpm",
+        "run",
+        "check:freeze"
+      ],
+      "expectedExit": 0
+    }
+  ],
+  "expectedNegativeCheckerRoles": [
+    "fixture-bad-owner",
+    "fixture-missing-path",
+    "fixture-missing-symbol",
+    "fixture-orphan-failure-row"
+  ],
+  "separateCausalCommandCount": 9,
+  "causalExecutionCounts": {
+    "total": 63,
+    "passed": 60,
+    "failed": 3,
+    "pending": 0,
+    "todo": 0
+  },
+  "countingRule": "20 root commands include four originals 7 / 2 / 5 / 7, 21 distinct registrations across 4 files. Primary 9 is 7 + 2 across two runs, never one 9-case process. Nine separate causal commands repeat 14 existing registrations over 63 executions, no new unique tests.",
+  "acceptanceStaticInventory": {
+    "path": "/private/tmp/p0-11-qualification-20261015/acceptance-static-and-checker-inventory.json",
+    "bytes": 3818,
+    "sha256": "b80a39f7212d1bb2de2afa5e8eb159ad858a56f22837f55cd5589bb9e6b63dea"
+  },
+  "rootSealedInputProof": {
+    "path": "/private/tmp/p0-11-causal-root-sealed-input-verification-20261015.json",
+    "bytes": 2515,
+    "sha256": "f0e93980ecf307cc50ac8fa74b85d8d8b87839fcfaa3fe7b0d31ff50e2d2fce0"
+  },
+  "exactSourceValidationContext": {
+    "path": "/private/tmp/p0-11-qualification-20261015/exact-source-validation-context.json",
+    "bytes": 3444,
+    "sha256": "8da5cb92cd12460dfc38c7572b1d6f2b74eb078f0032f6c38c28f533b2b82ffe"
+  },
+  "unwaivedSourceQuality": {
+    "duplicateFindings": 1269,
+    "deadCodeFindings": 2751,
+    "status": "failed, not rerun or waived in P011"
+  },
+  "limits": [
+    "Formal acceptance is false; bounded evidence awaits independent actual review after freezing.",
+    "Original map 7 / telemetry 2 / preview 5 / recording 7 are four separate runs, 21 distinct registrations across 4 files. Primary 9 aggregates two runs, not one 9-case process. Nine causal phases repeat 14 distinct existing registrations: 63 executions, no new tests.",
+    "C1 semantic missing-path error removal retains continue. Status assertion 29 can mask diagnostic assertions 30-31. C1 is not historical literal L1.",
+    "L1 whole-branch removal can still refuse through ENOENT while changed text fails an output assertion. No invalid-map admission or historical pass-after-removal acceptance follows from nonzero/diagnostic sensitivity.",
+    "C2 rethrows the SAME original callback Error, possibly rejecting at await 206 before assertions 210-213. Preserve callback202/body-await 206/record306 frames, not inserted throwline. This is not a genuine durable-store outage, policy denial or journaled-effect reconciliation.",
+    "Actual AssertionErrors, exact C2 Error and survivors are derived from finished records. Generic setup/native/timeout/hook/late/pending/process uncertainty is never a kill; masked later assertions remain unobserved.",
+    "Map tests invoke actual Node MJS checker, not built amc. Text/schema/path checks are not sixteen-channel enforcement. Original checker children inherit environment, have no explicit timeout and no separately retained child PID/streams.",
+    "Telemetry has genuine workspace/vault/governed fs.read/SQLite plus throwing-exporter/canned-fetch seams. Ordinary fixture batch transaction completes before queue; nested callers may use savepoints, not universal outer durable commits. No real collector outage, independent seal or fully cold/WAL-free proof.",
+    "Preview 5 observes disabled serialization. Recording 7 uses local audit/metric rows plus direct READ_ONLY echo and genuinely throwing callback. No protected-effect or actual evidence-store failure claim.",
+    "Original wrappers inherit environment. Absent endpoint overrides/default loopback is preflight, not zero network/credential/OS isolation. Causal seven-key environment borrows parent dependencies, not complete dependency/cache/transport isolation.",
+    "Only owned process groups receive signal 0 probes after normal exits. Reporter precedes global teardown; full exits/streams/known banners are checked. The 420s supervisor sends no terminating signal and preserves original 30s deadlines; detached descendants are not universally excluded.",
+    "Current 16 channels / 8 failure rows are legitimate later coverage. Sid residual-risk/status review, ASI experimental/re-verify titles, stale stamp, occupied P1-56/57/58 proposed keys and complete behavioral truth remain open.",
+    "Required duplicate 1269 / dead 2751 source-quality debt remains failed/unwaived with prior exact-code attribution. Fullsuite/coverage/Node24/hosted/PR+merge/release/formal dependency/G0/Done are not established.",
+    "All earlier strict gaps/user skips, shared/Claude/A4/paused P2-02 holds and pending transfers remain intact. Historical Done is not acceptance or ownership clearance."
+  ]
+}

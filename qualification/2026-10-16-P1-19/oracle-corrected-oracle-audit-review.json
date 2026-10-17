@@ -1,0 +1,3160 @@
+{
+  "schema": "p119-corrected-oracle-independent-audit/1",
+  "capturedUtc": "2026-10-15T22:56:21.955048+00:00",
+  "conclusion": "Focused positive and full ten-case suite pass as recorded. Five actual positive invocations pass all16 checks, exact negatives refuse, and all3 mutations are reached after positives. Finite local Node22 evidence only; full P1-19 is not Done.",
+  "scope": "Closed reports/streams/command/group/public markers and source/test hashes only. No product runtime, imports, parser, SQL, network, secret config reads or R writes.",
+  "summary": {
+    "emptyWalCreated": 10,
+    "coldChildren": 13,
+    "fixtures": 11,
+    "providerRows": 116,
+    "paymentPosts": 12,
+    "commits": 12,
+    "launcherChildren": 36,
+    "providerChildren": 11,
+    "oracleOutputs": 14,
+    "passVerdicts": 5,
+    "failVerdicts": 9,
+    "walUnchanged": 3
+  },
+  "runs": [
+    {
+      "phase": "p119-oracle-v4-positive",
+      "command": {
+        "phase": "p119-oracle-v4-positive",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOracle.test.ts -t 'a real completed journaled payment passes every mandatory oracle check' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v4-positive.producer.json",
+        "exit": 0,
+        "durationMs": 3369,
+        "startedUtc": "2026-10-15T22:51:00.514526+00:00",
+        "endedUtc": "2026-10-15T22:51:03.896368+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/stdout-stderr.log",
+        "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+        "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+        "ownedProcess": {
+          "pid": 4196,
+          "ownedPgid": 4196,
+          "observedPgidAfterLaunch": 4196,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+            "run",
+            "tests/lighthouse/financeOracle.test.ts",
+            "-t",
+            "a real completed journaled payment passes every mandatory oracle check",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v4-positive.producer.json"
+          ],
+          "startedUtc": "2026-10-15T22:51:00.514526+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v4-positive.producer.json",
+            "bytes": 4794,
+            "sha256": "7aa8a0a6b885d51f2c98cc5360aa8a9e5d2cdd6f23dbb8c9144ca8842b47ebcb"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/raw.json",
+            "bytes": 4794,
+            "sha256": "7aa8a0a6b885d51f2c98cc5360aa8a9e5d2cdd6f23dbb8c9144ca8842b47ebcb"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/observer.json",
+            "bytes": 6486,
+            "sha256": "9f4f6f88886582872ac6cba363ab1df301d0939121c203117bc534e8244ad3f0"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "ownedGroupAfterExit": {
+        "exit": 0,
+        "processDurationMs": 3369,
+        "observations": [
+          {
+            "capturedUtc": "2026-10-15T22:51:03.884573+00:00",
+            "pgid": 4196,
+            "signal": 0,
+            "absentByESRCH": true,
+            "errno": 3
+          }
+        ],
+        "maxPollingSeconds": 5,
+        "pollIntervalSeconds": 0.05,
+        "signalsOtherThanZeroSent": false
+      },
+      "exactJournalEntry": true,
+      "reportAgreement": {
+        "uniqueIdentities": 10,
+        "multiplicity": 1,
+        "passed": 1,
+        "filtered": 9,
+        "failed": 0,
+        "todo": 0,
+        "unexpectedPendingOrNonterminal": 0,
+        "afterAll": "pass",
+        "unhandled": [],
+        "errors": [],
+        "knownLate": []
+      },
+      "cases": [
+        {
+          "identity": "P1-19 finite independent oracle with genuine signed action producers a real completed journaled payment passes every mandatory oracle check",
+          "mode": "completed",
+          "root": "/private/tmp/lhfo-J5n3vG",
+          "stage": "before-disposable-launcher-root-removal",
+          "publicSuccessful": true,
+          "providerRoot": "/private/tmp/lhf-Hh4XLN",
+          "providerRows": 11,
+          "providerRowDigestsIndependentlyRecomputed": true,
+          "checkpoint": {
+            "hash": "91248a94110a557a1f31e8d444491394e1d534dc2d07e89d27611a818e996124",
+            "seq": 11
+          },
+          "reconstructedTxlogBytes": 5415,
+          "reconstructedTxlogSha256": "bd5662897615c49fd1fcf4205f9784eb6471867399c2cf21e5f6d1689d122b05",
+          "copy": {
+            "actualProviderDir": "/private/tmp/lhf-Hh4XLN/run",
+            "oracleInputDir": "/private/tmp/lhfo-J5n3vG/provider-evidence",
+            "files": [
+              {
+                "name": "txlog.jsonl",
+                "original": "/private/tmp/lhf-Hh4XLN/run/txlog.jsonl",
+                "copied": "/private/tmp/lhfo-J5n3vG/provider-evidence/txlog.jsonl",
+                "bytes": 5415,
+                "sha256": "bd5662897615c49fd1fcf4205f9784eb6471867399c2cf21e5f6d1689d122b05",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541770223,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541770408,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                }
+              },
+              {
+                "name": "txlog-head.json",
+                "original": "/private/tmp/lhf-Hh4XLN/run/txlog-head.json",
+                "copied": "/private/tmp/lhfo-J5n3vG/provider-evidence/txlog-head.json",
+                "bytes": 85,
+                "sha256": "72514510498e6cd3a79bfa46ce10d9ba7d9b802421e31de1023716b12e7e0c72",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541770407,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541770409,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                }
+              }
+            ]
+          },
+          "producerResult": {
+            "schema": "finance-oracle-producer/1",
+            "mode": "completed",
+            "executionId": "exec_54cc6a47-980b-4af0-9e9e-4bcc7d0dd734",
+            "paymentId": "pay_932274d2316f45499f0ce4bb25e1cf65",
+            "idempotencyKey": "amc1_2CEJ9NY0JE772TJSG84RDM998Y",
+            "approvalRequestId": "apprreq_38366e6d7b8f49149108226239b0a895",
+            "sessionId": "finance-oracle-recorder-00f81649-742c-4a88-920a-e1fc9c7b85be",
+            "authorizationDigest": "8314fc75bdcef932031abaa142299a834c4555483b55bc283bf3395949d6868f",
+            "genericArgumentsDigest": "c4e9b76ef0f9699a8c877a79a98f3e2e15467d37a9522fd1ab29c0d1055f8963",
+            "providerBodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+            "decisionIds": [
+              "apprdec_cf17f01abcb54d1abbf5adc4486f82ff",
+              "apprdec_1c705a543d0c476699f23c1f887eee14"
+            ]
+          },
+          "defaultPolicyProfile": {
+            "defaultApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "actualApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "financialRule": {
+              "requiredApprovals": 2,
+              "requireDistinctUsers": true,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "ttlMinutes": 10
+            },
+            "actualFinancialRule": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            }
+          },
+          "children": [
+            {
+              "label": "initializer",
+              "pid": 4199,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "producer",
+              "pid": 4210,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "oracle-1",
+              "pid": 4211,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            }
+          ],
+          "providerChild": {
+            "pid": 4198,
+            "exit": 0,
+            "streamsClosed": true,
+            "pidESRCH": true
+          },
+          "outputs": [
+            {
+              "verdict": "pass",
+              "falseIds": [],
+              "checks": [
+                {
+                  "id": "inputs",
+                  "passed": true,
+                  "evidence": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority."
+                },
+                {
+                  "id": "txlog-chain",
+                  "passed": true,
+                  "evidence": "{\"head\":{\"hash\":\"91248a94110a557a1f31e8d444491394e1d534dc2d07e89d27611a818e996124\",\"seq\":11},\"log\":{\"path\":\"/private/tmp/lhfo-J5n3vG/provider-evidence/txlog.jsonl\",\"dev\":16777231,\"ino\":541770408,\"bytes\":5415,\"sha256\":\"bd5662897615c49fd1fcf4205f9784eb6471867399c2cf21e5f6d1689d122b05\"},\"checkpoint\":{\"path\":\"/private/tmp/lhfo-J5n3vG/provider-evidence/txlog-head.json\",\"dev\":16777231,\"ino\":541770409,\"bytes\":85,\"sha256\":\"72514510498e6cd3a79bfa46ce10d9ba7d9b802421e31de1023716b12e7e0c72\"}}"
+                },
+                {
+                  "id": "post-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "commit-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "no-duplicate",
+                  "passed": true,
+                  "evidence": "{\"commits\":1,\"uniqueTenantReferences\":1,\"uniqueTenantKeys\":1}"
+                },
+                {
+                  "id": "no-dispatch-on-deny",
+                  "passed": true,
+                  "evidence": "{\"expectedDecision\":\"completed\",\"posts\":1,\"commits\":1}"
+                },
+                {
+                  "id": "payload-bound",
+                  "passed": true,
+                  "evidence": "{\"matched\":1,\"commits\":1,\"problems\":[],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}"
+                },
+                {
+                  "id": "payload-minimal",
+                  "passed": true,
+                  "evidence": "{\"paymentRequests\":1,\"scope\":\"actual provider bodyFields/normalized body; raw wire bytes are represented by hash and bytesRead, not reconstructed\"}"
+                },
+                {
+                  "id": "receipt-state",
+                  "passed": true,
+                  "evidence": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_54cc6a47-980b-4af0-9e9e-4bcc7d0dd734\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}"
+                },
+                {
+                  "id": "unauthorized-effects",
+                  "passed": true,
+                  "evidence": "{\"actualCommits\":1,\"authenticCompletedMatches\":1,\"unauthorizedOrUnproven\":0}"
+                },
+                {
+                  "id": "action-evidence-coverage",
+                  "passed": true,
+                  "evidence": "{\"numerator\":1,\"denominator\":1,\"fraction\":1,\"limit\":\"explicit authentic unknown can contribute coverage but cannot satisfy the matching-completed-receipt check\"}"
+                },
+                {
+                  "id": "control-result",
+                  "passed": true,
+                  "evidence": "Not requested by this finite case; no compliance status inferred."
+                },
+                {
+                  "id": "cold-ledger-verifier",
+                  "passed": true,
+                  "evidence": "{\"ok\":true,\"pid\":4212,\"pgid\":\"inherited outer guarded group; not claimed equal to child PID\",\"code\":0,\"signal\":null,\"spawnError\":null,\"streamError\":null,\"overflow\":false,\"late\":false,\"capturedStdoutSha256\":\"2cda99aa72cf32f8785736c336380390d84cb4e9c19b01d0e952be2f7559f693\",\"capturedStderrSha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"capturedBytes\":{\"stdout\":1232,\"stderr\":0},\"pidProbes\":[{\"absent\":true,\"code\":\"ESRCH\"}],\"errors\":[],\"trustRoot\":{\"anchored\":true,\"monitorFingerprint\":\"2b0ec115af2fc86314c31337a22ce633836dfca44339502d4da4da486b595650\",\"expectedFingerprint\":\"2b0ec115af2fc86314c31337a22ce633836dfca44339502d4da4da486b595650\",\"monitorAdmission\":{\"signature\":\"ledger monitor key\",\"purpose\":\"ledger-row\",\"keyId\":\"2b0ec115af2fc86314c31337a22ce633836dfca44339502d4da4da486b595650\",\"status\":\"admitted\",\"source\":\"explicit-key\",\"listId\":null,\"timeBasis\":null,\"detail\":null}}}"
+                },
+                {
+                  "id": "snapshot-stable",
+                  "passed": true,
+                  "evidence": "{\"dataAndKeysBefore\":\"5c05ecd6361c98286109f55fed19e2024535b8ad7ae11054d2391330a5b3ba7d\",\"dataAndKeysAfter\":\"5c05ecd6361c98286109f55fed19e2024535b8ad7ae11054d2391330a5b3ba7d\",\"readerPreparation\":{\"readonly\":true,\"inTransaction\":true,\"initialSchemaRows\":179,\"dataAndKeysUnchanged\":true,\"walUnchanged\":false,\"emptyWalCreated\":true,\"beforePreparationSha256\":\"32c2682c587efefb5ebf422721502f3b839c8930880b4bd4c00f012ca8b4ff28\",\"walBeforePreparation\":{\"path\":\"/private/tmp/lhfo-J5n3vG/workspaces/p119-oracle-2a3a84bc-85e5-46f0-aea9-ca80fa7c879c/.amc/evidence.sqlite-wal\",\"absent\":true},\"walAtBaseline\":{\"path\":\"/private/tmp/lhfo-J5n3vG/workspaces/p119-oracle-2a3a84bc-85e5-46f0-aea9-ca80fa7c879c/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541770411,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAfterRead\":{\"path\":\"/private/tmp/lhfo-J5n3vG/workspaces/p119-oracle-2a3a84bc-85e5-46f0-aea9-ca80fa7c879c/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541770411,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}},\"shmBefore\":{\"path\":\"/private/tmp/lhfo-J5n3vG/workspaces/p119-oracle-2a3a84bc-85e5-46f0-aea9-ca80fa7c879c/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541770412,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-J5n3vG/workspaces/p119-oracle-2a3a84bc-85e5-46f0-aea9-ca80fa7c879c/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541770412,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual readonly read transaction through baseline, cold CLI, action extraction and afterpins; DB/WAL/key bytes remain exact; SHM is coordination only\"}"
+                },
+                {
+                  "id": "action-chain",
+                  "passed": true,
+                  "evidence": "{\"selectedCount\":1,\"errors\":[]}"
+                },
+                {
+                  "id": "authorization",
+                  "passed": true,
+                  "evidence": "{\"errors\":[],\"preimages\":1,\"independentlySignedFiles\":17,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+                }
+              ]
+            }
+          ],
+          "controlledMutationCount": 0
+        }
+      ]
+    },
+    {
+      "phase": "p119-oracle-v4-all",
+      "command": {
+        "phase": "p119-oracle-v4-all",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOracle.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v4-all.producer.json",
+        "exit": 0,
+        "durationMs": 26394,
+        "startedUtc": "2026-10-15T22:51:18.609232+00:00",
+        "endedUtc": "2026-10-15T22:51:45.017029+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/stdout-stderr.log",
+        "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+        "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+        "ownedProcess": {
+          "pid": 4240,
+          "ownedPgid": 4240,
+          "observedPgidAfterLaunch": 4240,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+            "run",
+            "tests/lighthouse/financeOracle.test.ts",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v4-all.producer.json"
+          ],
+          "startedUtc": "2026-10-15T22:51:18.609232+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v4-all.producer.json",
+            "bytes": 5041,
+            "sha256": "c371c63275f24e01ed89218cf994a1dae60a30dd449e227539c8ba5e4b502392"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/raw.json",
+            "bytes": 5041,
+            "sha256": "c371c63275f24e01ed89218cf994a1dae60a30dd449e227539c8ba5e4b502392"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/observer.json",
+            "bytes": 6504,
+            "sha256": "3741aa933153a06f73080f7e6859592c36e093b79c58cb0f85c9db97816767f8"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "ownedGroupAfterExit": {
+        "exit": 0,
+        "processDurationMs": 26394,
+        "observations": [
+          {
+            "capturedUtc": "2026-10-15T22:51:45.003645+00:00",
+            "pgid": 4240,
+            "signal": 0,
+            "absentByESRCH": true,
+            "errno": 3
+          }
+        ],
+        "maxPollingSeconds": 5,
+        "pollIntervalSeconds": 0.05,
+        "signalsOtherThanZeroSent": false
+      },
+      "exactJournalEntry": true,
+      "reportAgreement": {
+        "uniqueIdentities": 10,
+        "multiplicity": 1,
+        "passed": 10,
+        "filtered": 0,
+        "failed": 0,
+        "todo": 0,
+        "unexpectedPendingOrNonterminal": 0,
+        "afterAll": "pass",
+        "unhandled": [],
+        "errors": [],
+        "knownLate": []
+      },
+      "cases": [
+        {
+          "identity": "P1-19 finite independent oracle with genuine signed action producers a real completed journaled payment passes every mandatory oracle check",
+          "mode": "completed",
+          "root": "/private/tmp/lhfo-Ue6zjx",
+          "stage": "before-disposable-launcher-root-removal",
+          "publicSuccessful": true,
+          "providerRoot": "/private/tmp/lhf-ZNdZQW",
+          "providerRows": 11,
+          "providerRowDigestsIndependentlyRecomputed": true,
+          "checkpoint": {
+            "hash": "17355f2751c6a42f5f4c4c75523c06b88245f3b0ec55472867fdb648604ff9dc",
+            "seq": 11
+          },
+          "reconstructedTxlogBytes": 5415,
+          "reconstructedTxlogSha256": "9afdf0cc061781cba5244009da90dd0b9d4484e4abeb7e8ca629542fb56eb281",
+          "copy": {
+            "actualProviderDir": "/private/tmp/lhf-ZNdZQW/run",
+            "oracleInputDir": "/private/tmp/lhfo-Ue6zjx/provider-evidence",
+            "files": [
+              {
+                "name": "txlog.jsonl",
+                "original": "/private/tmp/lhf-ZNdZQW/run/txlog.jsonl",
+                "copied": "/private/tmp/lhfo-Ue6zjx/provider-evidence/txlog.jsonl",
+                "bytes": 5415,
+                "sha256": "9afdf0cc061781cba5244009da90dd0b9d4484e4abeb7e8ca629542fb56eb281",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541770481,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541770666,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                }
+              },
+              {
+                "name": "txlog-head.json",
+                "original": "/private/tmp/lhf-ZNdZQW/run/txlog-head.json",
+                "copied": "/private/tmp/lhfo-Ue6zjx/provider-evidence/txlog-head.json",
+                "bytes": 85,
+                "sha256": "9c6d2aa4bc1a1f29bdb4023daca4c64a200b4cc9ca89635c2b6dda421fa8c010",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541770665,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541770667,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                }
+              }
+            ]
+          },
+          "producerResult": {
+            "schema": "finance-oracle-producer/1",
+            "mode": "completed",
+            "executionId": "exec_7294761b-ba51-4c6e-8821-834165bd5dc9",
+            "paymentId": "pay_2c556d326a1d4eb38e8f55b04724d1c3",
+            "idempotencyKey": "amc1_0S5JR8T87SB3TA6GF66DNVC0KX",
+            "approvalRequestId": "apprreq_afe177d7d4f34618ae905844588b0d7b",
+            "sessionId": "finance-oracle-recorder-a02b7092-cc09-440c-8a79-91fa44fe5913",
+            "authorizationDigest": "eea5f87dcd46f5e202e369b077d0cf321f50b2a63111e12d4c81e37eedbb9106",
+            "genericArgumentsDigest": "c4e9b76ef0f9699a8c877a79a98f3e2e15467d37a9522fd1ab29c0d1055f8963",
+            "providerBodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+            "decisionIds": [
+              "apprdec_db420133e4d641e68791bec1c0c45121",
+              "apprdec_716ef96c882b4b729817f6a08510bb71"
+            ]
+          },
+          "defaultPolicyProfile": {
+            "defaultApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "actualApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "financialRule": {
+              "requiredApprovals": 2,
+              "requireDistinctUsers": true,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "ttlMinutes": 10
+            },
+            "actualFinancialRule": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            }
+          },
+          "children": [
+            {
+              "label": "initializer",
+              "pid": 4243,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "producer",
+              "pid": 4247,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "oracle-1",
+              "pid": 4248,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            }
+          ],
+          "providerChild": {
+            "pid": 4242,
+            "exit": 0,
+            "streamsClosed": true,
+            "pidESRCH": true
+          },
+          "outputs": [
+            {
+              "verdict": "pass",
+              "falseIds": [],
+              "checks": [
+                {
+                  "id": "inputs",
+                  "passed": true,
+                  "evidence": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority."
+                },
+                {
+                  "id": "txlog-chain",
+                  "passed": true,
+                  "evidence": "{\"head\":{\"hash\":\"17355f2751c6a42f5f4c4c75523c06b88245f3b0ec55472867fdb648604ff9dc\",\"seq\":11},\"log\":{\"path\":\"/private/tmp/lhfo-Ue6zjx/provider-evidence/txlog.jsonl\",\"dev\":16777231,\"ino\":541770666,\"bytes\":5415,\"sha256\":\"9afdf0cc061781cba5244009da90dd0b9d4484e4abeb7e8ca629542fb56eb281\"},\"checkpoint\":{\"path\":\"/private/tmp/lhfo-Ue6zjx/provider-evidence/txlog-head.json\",\"dev\":16777231,\"ino\":541770667,\"bytes\":85,\"sha256\":\"9c6d2aa4bc1a1f29bdb4023daca4c64a200b4cc9ca89635c2b6dda421fa8c010\"}}"
+                },
+                {
+                  "id": "post-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "commit-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "no-duplicate",
+                  "passed": true,
+                  "evidence": "{\"commits\":1,\"uniqueTenantReferences\":1,\"uniqueTenantKeys\":1}"
+                },
+                {
+                  "id": "no-dispatch-on-deny",
+                  "passed": true,
+                  "evidence": "{\"expectedDecision\":\"completed\",\"posts\":1,\"commits\":1}"
+                },
+                {
+                  "id": "payload-bound",
+                  "passed": true,
+                  "evidence": "{\"matched\":1,\"commits\":1,\"problems\":[],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}"
+                },
+                {
+                  "id": "payload-minimal",
+                  "passed": true,
+                  "evidence": "{\"paymentRequests\":1,\"scope\":\"actual provider bodyFields/normalized body; raw wire bytes are represented by hash and bytesRead, not reconstructed\"}"
+                },
+                {
+                  "id": "receipt-state",
+                  "passed": true,
+                  "evidence": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_7294761b-ba51-4c6e-8821-834165bd5dc9\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}"
+                },
+                {
+                  "id": "unauthorized-effects",
+                  "passed": true,
+                  "evidence": "{\"actualCommits\":1,\"authenticCompletedMatches\":1,\"unauthorizedOrUnproven\":0}"
+                },
+                {
+                  "id": "action-evidence-coverage",
+                  "passed": true,
+                  "evidence": "{\"numerator\":1,\"denominator\":1,\"fraction\":1,\"limit\":\"explicit authentic unknown can contribute coverage but cannot satisfy the matching-completed-receipt check\"}"
+                },
+                {
+                  "id": "control-result",
+                  "passed": true,
+                  "evidence": "Not requested by this finite case; no compliance status inferred."
+                },
+                {
+                  "id": "cold-ledger-verifier",
+                  "passed": true,
+                  "evidence": "{\"ok\":true,\"pid\":4249,\"pgid\":\"inherited outer guarded group; not claimed equal to child PID\",\"code\":0,\"signal\":null,\"spawnError\":null,\"streamError\":null,\"overflow\":false,\"late\":false,\"capturedStdoutSha256\":\"60af7c5e4da578d9037349669f74251e953d93a17be923d6ff5e1b8cc12152c8\",\"capturedStderrSha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"capturedBytes\":{\"stdout\":1232,\"stderr\":0},\"pidProbes\":[{\"absent\":true,\"code\":\"ESRCH\"}],\"errors\":[],\"trustRoot\":{\"anchored\":true,\"monitorFingerprint\":\"6b75f1495019b453f23cd4137b1b97affc68478d3b082c511b2f992eaaae92e1\",\"expectedFingerprint\":\"6b75f1495019b453f23cd4137b1b97affc68478d3b082c511b2f992eaaae92e1\",\"monitorAdmission\":{\"signature\":\"ledger monitor key\",\"purpose\":\"ledger-row\",\"keyId\":\"6b75f1495019b453f23cd4137b1b97affc68478d3b082c511b2f992eaaae92e1\",\"status\":\"admitted\",\"source\":\"explicit-key\",\"listId\":null,\"timeBasis\":null,\"detail\":null}}}"
+                },
+                {
+                  "id": "snapshot-stable",
+                  "passed": true,
+                  "evidence": "{\"dataAndKeysBefore\":\"e5acc7309f0c4c5a1945e67d80a39c32bc76989aed14c9025ad1a3f5d4977c2c\",\"dataAndKeysAfter\":\"e5acc7309f0c4c5a1945e67d80a39c32bc76989aed14c9025ad1a3f5d4977c2c\",\"readerPreparation\":{\"readonly\":true,\"inTransaction\":true,\"initialSchemaRows\":179,\"dataAndKeysUnchanged\":true,\"walUnchanged\":false,\"emptyWalCreated\":true,\"beforePreparationSha256\":\"b2145f95a8faa19d37ae14fbe5220dee634f29f64e4a9859e4f500bd2987531a\",\"walBeforePreparation\":{\"path\":\"/private/tmp/lhfo-Ue6zjx/workspaces/p119-oracle-420698b2-f70d-44a8-a94e-161e8d6c6275/.amc/evidence.sqlite-wal\",\"absent\":true},\"walAtBaseline\":{\"path\":\"/private/tmp/lhfo-Ue6zjx/workspaces/p119-oracle-420698b2-f70d-44a8-a94e-161e8d6c6275/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541770668,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAfterRead\":{\"path\":\"/private/tmp/lhfo-Ue6zjx/workspaces/p119-oracle-420698b2-f70d-44a8-a94e-161e8d6c6275/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541770668,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}},\"shmBefore\":{\"path\":\"/private/tmp/lhfo-Ue6zjx/workspaces/p119-oracle-420698b2-f70d-44a8-a94e-161e8d6c6275/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541770669,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-Ue6zjx/workspaces/p119-oracle-420698b2-f70d-44a8-a94e-161e8d6c6275/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541770669,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual readonly read transaction through baseline, cold CLI, action extraction and afterpins; DB/WAL/key bytes remain exact; SHM is coordination only\"}"
+                },
+                {
+                  "id": "action-chain",
+                  "passed": true,
+                  "evidence": "{\"selectedCount\":1,\"errors\":[]}"
+                },
+                {
+                  "id": "authorization",
+                  "passed": true,
+                  "evidence": "{\"errors\":[],\"preimages\":1,\"independentlySignedFiles\":17,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+                }
+              ]
+            }
+          ],
+          "controlledMutationCount": 0
+        },
+        {
+          "identity": "P1-19 finite independent oracle with genuine signed action producers a second real payment under another key and the same reference specifically fails no-duplicate",
+          "mode": "duplicate",
+          "root": "/private/tmp/lhfo-2eCc3n",
+          "stage": "before-disposable-launcher-root-removal",
+          "publicSuccessful": true,
+          "providerRoot": "/private/tmp/lhf-6SyXw6",
+          "providerRows": 14,
+          "providerRowDigestsIndependentlyRecomputed": true,
+          "checkpoint": {
+            "hash": "7ce85fc3483d89193747f5a95b3bd6a8ef25a147cc1888a2e32711cc1e25e566",
+            "seq": 14
+          },
+          "reconstructedTxlogBytes": 7425,
+          "reconstructedTxlogSha256": "89efb37ebebc7e8775ac6bcaa1f4e93caa7e4ce358e944f5eb39dc0792e5bda0",
+          "copy": {
+            "actualProviderDir": "/private/tmp/lhf-6SyXw6/run",
+            "oracleInputDir": "/private/tmp/lhfo-2eCc3n/provider-evidence",
+            "files": [
+              {
+                "name": "txlog.jsonl",
+                "original": "/private/tmp/lhf-6SyXw6/run/txlog.jsonl",
+                "copied": "/private/tmp/lhfo-2eCc3n/provider-evidence/txlog.jsonl",
+                "bytes": 7425,
+                "sha256": "89efb37ebebc7e8775ac6bcaa1f4e93caa7e4ce358e944f5eb39dc0792e5bda0",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541770693,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 7425
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541770879,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 7425
+                }
+              },
+              {
+                "name": "txlog-head.json",
+                "original": "/private/tmp/lhf-6SyXw6/run/txlog-head.json",
+                "copied": "/private/tmp/lhfo-2eCc3n/provider-evidence/txlog-head.json",
+                "bytes": 85,
+                "sha256": "9af8e317165326e43654591d36ca7cca2ff29729fe6e59f671b0b5c2608c4dd0",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541770878,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541770880,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                }
+              }
+            ]
+          },
+          "producerResult": {
+            "schema": "finance-oracle-producer/1",
+            "mode": "duplicate",
+            "executionId": "exec_ad4e5289-60d6-4b75-b0e3-ba8101af2e22",
+            "paymentId": "pay_6ad4dc99d3d4407fb47ba819f1e17848",
+            "idempotencyKey": "amc1_6GSVN5V87NC8PQ8GGV0AA4K23E",
+            "approvalRequestId": "apprreq_da28de396acc4226a5a98413b801fcb3",
+            "sessionId": "finance-oracle-recorder-70bc3482-0156-41c9-8658-1c54d5c3f36a",
+            "authorizationDigest": "4104f0a34339796f8dcb35ff8228a05cbdf65ffe19ec6a01d405160180ab0fae",
+            "genericArgumentsDigest": "c4e9b76ef0f9699a8c877a79a98f3e2e15467d37a9522fd1ab29c0d1055f8963",
+            "providerBodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+            "decisionIds": [
+              "apprdec_e731514a20c14b5e920b535f1fd5dea9",
+              "apprdec_323b38ccaff6435f805a9a8f144a6565"
+            ]
+          },
+          "defaultPolicyProfile": {
+            "defaultApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "actualApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "financialRule": {
+              "requiredApprovals": 2,
+              "requireDistinctUsers": true,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "ttlMinutes": 10
+            },
+            "actualFinancialRule": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            }
+          },
+          "children": [
+            {
+              "label": "initializer",
+              "pid": 4252,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "producer",
+              "pid": 4253,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "oracle-1",
+              "pid": 4254,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            }
+          ],
+          "providerChild": {
+            "pid": 4251,
+            "exit": 0,
+            "streamsClosed": true,
+            "pidESRCH": true
+          },
+          "outputs": [
+            {
+              "verdict": "fail",
+              "falseIds": [
+                "no-duplicate",
+                "payload-bound",
+                "unauthorized-effects",
+                "action-evidence-coverage"
+              ],
+              "checks": [
+                {
+                  "id": "inputs",
+                  "passed": true,
+                  "evidence": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority."
+                },
+                {
+                  "id": "txlog-chain",
+                  "passed": true,
+                  "evidence": "{\"head\":{\"hash\":\"7ce85fc3483d89193747f5a95b3bd6a8ef25a147cc1888a2e32711cc1e25e566\",\"seq\":14},\"log\":{\"path\":\"/private/tmp/lhfo-2eCc3n/provider-evidence/txlog.jsonl\",\"dev\":16777231,\"ino\":541770879,\"bytes\":7425,\"sha256\":\"89efb37ebebc7e8775ac6bcaa1f4e93caa7e4ce358e944f5eb39dc0792e5bda0\"},\"checkpoint\":{\"path\":\"/private/tmp/lhfo-2eCc3n/provider-evidence/txlog-head.json\",\"dev\":16777231,\"ino\":541770880,\"bytes\":85,\"sha256\":\"9af8e317165326e43654591d36ca7cca2ff29729fe6e59f671b0b5c2608c4dd0\"}}"
+                },
+                {
+                  "id": "post-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":2,\"actual\":2}"
+                },
+                {
+                  "id": "commit-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":2,\"actual\":2}"
+                },
+                {
+                  "id": "no-duplicate",
+                  "passed": false,
+                  "evidence": "{\"commits\":2,\"uniqueTenantReferences\":1,\"uniqueTenantKeys\":2}"
+                },
+                {
+                  "id": "no-dispatch-on-deny",
+                  "passed": true,
+                  "evidence": "{\"expectedDecision\":\"completed\",\"posts\":2,\"commits\":2}"
+                },
+                {
+                  "id": "payload-bound",
+                  "passed": false,
+                  "evidence": "{\"matched\":1,\"commits\":2,\"problems\":[{\"seq\":10,\"message\":\"commit has no unique authenticated authorization preimage\"}],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}"
+                },
+                {
+                  "id": "payload-minimal",
+                  "passed": true,
+                  "evidence": "{\"paymentRequests\":2,\"scope\":\"actual provider bodyFields/normalized body; raw wire bytes are represented by hash and bytesRead, not reconstructed\"}"
+                },
+                {
+                  "id": "receipt-state",
+                  "passed": true,
+                  "evidence": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_ad4e5289-60d6-4b75-b0e3-ba8101af2e22\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}"
+                },
+                {
+                  "id": "unauthorized-effects",
+                  "passed": false,
+                  "evidence": "{\"actualCommits\":2,\"authenticCompletedMatches\":1,\"unauthorizedOrUnproven\":1}"
+                },
+                {
+                  "id": "action-evidence-coverage",
+                  "passed": false,
+                  "evidence": "{\"numerator\":1,\"denominator\":2,\"fraction\":0.5,\"limit\":\"explicit authentic unknown can contribute coverage but cannot satisfy the matching-completed-receipt check\"}"
+                },
+                {
+                  "id": "control-result",
+                  "passed": true,
+                  "evidence": "Not requested by this finite case; no compliance status inferred."
+                },
+                {
+                  "id": "cold-ledger-verifier",
+                  "passed": true,
+                  "evidence": "{\"ok\":true,\"pid\":4255,\"pgid\":\"inherited outer guarded group; not claimed equal to child PID\",\"code\":0,\"signal\":null,\"spawnError\":null,\"streamError\":null,\"overflow\":false,\"late\":false,\"capturedStdoutSha256\":\"2a6cdea5863657e80697a0fd4dae876514e12d49071f0d238aef96e90231f0eb\",\"capturedStderrSha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"capturedBytes\":{\"stdout\":1232,\"stderr\":0},\"pidProbes\":[{\"absent\":true,\"code\":\"ESRCH\"}],\"errors\":[],\"trustRoot\":{\"anchored\":true,\"monitorFingerprint\":\"504c24fef15a61eaad7db8eb3a1c2e47634ad2e3d338d5f6e30300160f8dc96a\",\"expectedFingerprint\":\"504c24fef15a61eaad7db8eb3a1c2e47634ad2e3d338d5f6e30300160f8dc96a\",\"monitorAdmission\":{\"signature\":\"ledger monitor key\",\"purpose\":\"ledger-row\",\"keyId\":\"504c24fef15a61eaad7db8eb3a1c2e47634ad2e3d338d5f6e30300160f8dc96a\",\"status\":\"admitted\",\"source\":\"explicit-key\",\"listId\":null,\"timeBasis\":null,\"detail\":null}}}"
+                },
+                {
+                  "id": "snapshot-stable",
+                  "passed": true,
+                  "evidence": "{\"dataAndKeysBefore\":\"89a994a64e380aaff713b6465e070459d3be793c7558c951e1a83f08628217c5\",\"dataAndKeysAfter\":\"89a994a64e380aaff713b6465e070459d3be793c7558c951e1a83f08628217c5\",\"readerPreparation\":{\"readonly\":true,\"inTransaction\":true,\"initialSchemaRows\":179,\"dataAndKeysUnchanged\":true,\"walUnchanged\":false,\"emptyWalCreated\":true,\"beforePreparationSha256\":\"320af947e7186870fce16e0eace762196549ac1554745a4ea08f39244e32e3e9\",\"walBeforePreparation\":{\"path\":\"/private/tmp/lhfo-2eCc3n/workspaces/p119-oracle-d5f63b5d-d347-421e-b78d-67c82c64219d/.amc/evidence.sqlite-wal\",\"absent\":true},\"walAtBaseline\":{\"path\":\"/private/tmp/lhfo-2eCc3n/workspaces/p119-oracle-d5f63b5d-d347-421e-b78d-67c82c64219d/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541770881,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAfterRead\":{\"path\":\"/private/tmp/lhfo-2eCc3n/workspaces/p119-oracle-d5f63b5d-d347-421e-b78d-67c82c64219d/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541770881,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}},\"shmBefore\":{\"path\":\"/private/tmp/lhfo-2eCc3n/workspaces/p119-oracle-d5f63b5d-d347-421e-b78d-67c82c64219d/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541770882,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-2eCc3n/workspaces/p119-oracle-d5f63b5d-d347-421e-b78d-67c82c64219d/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541770882,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual readonly read transaction through baseline, cold CLI, action extraction and afterpins; DB/WAL/key bytes remain exact; SHM is coordination only\"}"
+                },
+                {
+                  "id": "action-chain",
+                  "passed": true,
+                  "evidence": "{\"selectedCount\":1,\"errors\":[]}"
+                },
+                {
+                  "id": "authorization",
+                  "passed": true,
+                  "evidence": "{\"errors\":[],\"preimages\":1,\"independentlySignedFiles\":17,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+                }
+              ]
+            }
+          ],
+          "controlledMutationCount": 0
+        },
+        {
+          "identity": "P1-19 finite independent oracle with genuine signed action producers an actual post-authorization amount corruption specifically fails payload-bound",
+          "mode": "body-mismatch",
+          "root": "/private/tmp/lhfo-ubcxYq",
+          "stage": "before-disposable-launcher-root-removal",
+          "publicSuccessful": true,
+          "providerRoot": "/private/tmp/lhf-yoAkFv",
+          "providerRows": 11,
+          "providerRowDigestsIndependentlyRecomputed": true,
+          "checkpoint": {
+            "hash": "015f63ea9bf927c4f1422712b04aeec0a96255d775301a1a67aebec0206380f9",
+            "seq": 11
+          },
+          "reconstructedTxlogBytes": 5415,
+          "reconstructedTxlogSha256": "69691a662f617806b7a3854582ec9466ff46cfba97f111e76ea6c8b3eafb85f8",
+          "copy": {
+            "actualProviderDir": "/private/tmp/lhf-yoAkFv/run",
+            "oracleInputDir": "/private/tmp/lhfo-ubcxYq/provider-evidence",
+            "files": [
+              {
+                "name": "txlog.jsonl",
+                "original": "/private/tmp/lhf-yoAkFv/run/txlog.jsonl",
+                "copied": "/private/tmp/lhfo-ubcxYq/provider-evidence/txlog.jsonl",
+                "bytes": 5415,
+                "sha256": "69691a662f617806b7a3854582ec9466ff46cfba97f111e76ea6c8b3eafb85f8",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541770909,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541771093,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                }
+              },
+              {
+                "name": "txlog-head.json",
+                "original": "/private/tmp/lhf-yoAkFv/run/txlog-head.json",
+                "copied": "/private/tmp/lhfo-ubcxYq/provider-evidence/txlog-head.json",
+                "bytes": 85,
+                "sha256": "e5319db625dcad52c7635b75ecf4f5024b74042841d94de6f3dcc6da08ca9c48",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541771092,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541771094,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                }
+              }
+            ]
+          },
+          "producerResult": {
+            "schema": "finance-oracle-producer/1",
+            "mode": "body-mismatch",
+            "executionId": "exec_dff218c1-fe51-4de5-bab6-509700f9bc4e",
+            "paymentId": "pay_b1b6d0f44104441b866b9fc422e4abd7",
+            "idempotencyKey": "amc1_1KX9T706J3WR61XMCR7XG64RZ6",
+            "approvalRequestId": "apprreq_2f18baac70694749b15fb35008bfeca4",
+            "sessionId": "finance-oracle-recorder-0ad40087-5114-4b5d-9476-566f6fe67948",
+            "authorizationDigest": "c9cc21276f548838b3ba3a44bba7025fb461a6f95aeec781b6f911969ca8d610",
+            "genericArgumentsDigest": "c4e9b76ef0f9699a8c877a79a98f3e2e15467d37a9522fd1ab29c0d1055f8963",
+            "providerBodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+            "decisionIds": [
+              "apprdec_d62567e8988c4043929a88790714417e",
+              "apprdec_6de12d687b5c4c969c51264e5da13e4b"
+            ]
+          },
+          "defaultPolicyProfile": {
+            "defaultApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "actualApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "financialRule": {
+              "requiredApprovals": 2,
+              "requireDistinctUsers": true,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "ttlMinutes": 10
+            },
+            "actualFinancialRule": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            }
+          },
+          "children": [
+            {
+              "label": "initializer",
+              "pid": 4258,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "producer",
+              "pid": 4261,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "oracle-1",
+              "pid": 4262,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            }
+          ],
+          "providerChild": {
+            "pid": 4257,
+            "exit": 0,
+            "streamsClosed": true,
+            "pidESRCH": true
+          },
+          "outputs": [
+            {
+              "verdict": "fail",
+              "falseIds": [
+                "payload-bound",
+                "unauthorized-effects",
+                "action-evidence-coverage"
+              ],
+              "checks": [
+                {
+                  "id": "inputs",
+                  "passed": true,
+                  "evidence": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority."
+                },
+                {
+                  "id": "txlog-chain",
+                  "passed": true,
+                  "evidence": "{\"head\":{\"hash\":\"015f63ea9bf927c4f1422712b04aeec0a96255d775301a1a67aebec0206380f9\",\"seq\":11},\"log\":{\"path\":\"/private/tmp/lhfo-ubcxYq/provider-evidence/txlog.jsonl\",\"dev\":16777231,\"ino\":541771093,\"bytes\":5415,\"sha256\":\"69691a662f617806b7a3854582ec9466ff46cfba97f111e76ea6c8b3eafb85f8\"},\"checkpoint\":{\"path\":\"/private/tmp/lhfo-ubcxYq/provider-evidence/txlog-head.json\",\"dev\":16777231,\"ino\":541771094,\"bytes\":85,\"sha256\":\"e5319db625dcad52c7635b75ecf4f5024b74042841d94de6f3dcc6da08ca9c48\"}}"
+                },
+                {
+                  "id": "post-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "commit-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "no-duplicate",
+                  "passed": true,
+                  "evidence": "{\"commits\":1,\"uniqueTenantReferences\":1,\"uniqueTenantKeys\":1}"
+                },
+                {
+                  "id": "no-dispatch-on-deny",
+                  "passed": true,
+                  "evidence": "{\"expectedDecision\":\"completed\",\"posts\":1,\"commits\":1}"
+                },
+                {
+                  "id": "payload-bound",
+                  "passed": false,
+                  "evidence": "{\"matched\":0,\"commits\":1,\"problems\":[{\"seq\":7,\"message\":\"provider payload differs from approved facts\"}],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}"
+                },
+                {
+                  "id": "payload-minimal",
+                  "passed": true,
+                  "evidence": "{\"paymentRequests\":1,\"scope\":\"actual provider bodyFields/normalized body; raw wire bytes are represented by hash and bytesRead, not reconstructed\"}"
+                },
+                {
+                  "id": "receipt-state",
+                  "passed": true,
+                  "evidence": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_dff218c1-fe51-4de5-bab6-509700f9bc4e\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}"
+                },
+                {
+                  "id": "unauthorized-effects",
+                  "passed": false,
+                  "evidence": "{\"actualCommits\":1,\"authenticCompletedMatches\":0,\"unauthorizedOrUnproven\":1}"
+                },
+                {
+                  "id": "action-evidence-coverage",
+                  "passed": false,
+                  "evidence": "{\"numerator\":0,\"denominator\":1,\"fraction\":0,\"limit\":\"explicit authentic unknown can contribute coverage but cannot satisfy the matching-completed-receipt check\"}"
+                },
+                {
+                  "id": "control-result",
+                  "passed": true,
+                  "evidence": "Not requested by this finite case; no compliance status inferred."
+                },
+                {
+                  "id": "cold-ledger-verifier",
+                  "passed": true,
+                  "evidence": "{\"ok\":true,\"pid\":4263,\"pgid\":\"inherited outer guarded group; not claimed equal to child PID\",\"code\":0,\"signal\":null,\"spawnError\":null,\"streamError\":null,\"overflow\":false,\"late\":false,\"capturedStdoutSha256\":\"7e549dfa9c90768359cc1a7c8c258a8c8ebf84ad102305d0ac2a66ccdaf1fe31\",\"capturedStderrSha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"capturedBytes\":{\"stdout\":1232,\"stderr\":0},\"pidProbes\":[{\"absent\":true,\"code\":\"ESRCH\"}],\"errors\":[],\"trustRoot\":{\"anchored\":true,\"monitorFingerprint\":\"0140300f7684933ca8e9c577124a1b6886b04e1f765ac4c9046b36516ed80ca9\",\"expectedFingerprint\":\"0140300f7684933ca8e9c577124a1b6886b04e1f765ac4c9046b36516ed80ca9\",\"monitorAdmission\":{\"signature\":\"ledger monitor key\",\"purpose\":\"ledger-row\",\"keyId\":\"0140300f7684933ca8e9c577124a1b6886b04e1f765ac4c9046b36516ed80ca9\",\"status\":\"admitted\",\"source\":\"explicit-key\",\"listId\":null,\"timeBasis\":null,\"detail\":null}}}"
+                },
+                {
+                  "id": "snapshot-stable",
+                  "passed": true,
+                  "evidence": "{\"dataAndKeysBefore\":\"93ffc31fe0d65eb90888400a4a501097f748839228a1dc5aba6608ff12237c19\",\"dataAndKeysAfter\":\"93ffc31fe0d65eb90888400a4a501097f748839228a1dc5aba6608ff12237c19\",\"readerPreparation\":{\"readonly\":true,\"inTransaction\":true,\"initialSchemaRows\":179,\"dataAndKeysUnchanged\":true,\"walUnchanged\":false,\"emptyWalCreated\":true,\"beforePreparationSha256\":\"ba6691aea31d4eb386aac3a20e20952b61fdb86c28564628793d5c1129279b85\",\"walBeforePreparation\":{\"path\":\"/private/tmp/lhfo-ubcxYq/workspaces/p119-oracle-741077fa-a95c-47f4-9e63-9cc5d5ae3117/.amc/evidence.sqlite-wal\",\"absent\":true},\"walAtBaseline\":{\"path\":\"/private/tmp/lhfo-ubcxYq/workspaces/p119-oracle-741077fa-a95c-47f4-9e63-9cc5d5ae3117/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771095,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAfterRead\":{\"path\":\"/private/tmp/lhfo-ubcxYq/workspaces/p119-oracle-741077fa-a95c-47f4-9e63-9cc5d5ae3117/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771095,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}},\"shmBefore\":{\"path\":\"/private/tmp/lhfo-ubcxYq/workspaces/p119-oracle-741077fa-a95c-47f4-9e63-9cc5d5ae3117/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541771096,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-ubcxYq/workspaces/p119-oracle-741077fa-a95c-47f4-9e63-9cc5d5ae3117/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541771096,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual readonly read transaction through baseline, cold CLI, action extraction and afterpins; DB/WAL/key bytes remain exact; SHM is coordination only\"}"
+                },
+                {
+                  "id": "action-chain",
+                  "passed": true,
+                  "evidence": "{\"selectedCount\":1,\"errors\":[]}"
+                },
+                {
+                  "id": "authorization",
+                  "passed": true,
+                  "evidence": "{\"errors\":[],\"preimages\":1,\"independentlySignedFiles\":17,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+                }
+              ]
+            }
+          ],
+          "controlledMutationCount": 0
+        },
+        {
+          "identity": "P1-19 finite independent oracle with genuine signed action producers a genuine provider-only commit has no matching completed AMC receipt",
+          "mode": "provider-only",
+          "root": "/private/tmp/lhfo-PrELGI",
+          "stage": "before-disposable-launcher-root-removal",
+          "publicSuccessful": true,
+          "providerRoot": "/private/tmp/lhf-BDV9Vc",
+          "providerRows": 7,
+          "providerRowDigestsIndependentlyRecomputed": true,
+          "checkpoint": {
+            "hash": "8d37c99e692bb79a1158e5e897b544c49132f61496dbccf099ce3f6caa99ff41",
+            "seq": 7
+          },
+          "reconstructedTxlogBytes": 3545,
+          "reconstructedTxlogSha256": "dc9a02392cdd9c077118ffcc7de471f6c0b6aeeaa24da4e2ba2b1270847e83aa",
+          "copy": {
+            "actualProviderDir": "/private/tmp/lhf-BDV9Vc/run",
+            "oracleInputDir": "/private/tmp/lhfo-PrELGI/provider-evidence",
+            "files": [
+              {
+                "name": "txlog.jsonl",
+                "original": "/private/tmp/lhf-BDV9Vc/run/txlog.jsonl",
+                "copied": "/private/tmp/lhfo-PrELGI/provider-evidence/txlog.jsonl",
+                "bytes": 3545,
+                "sha256": "dc9a02392cdd9c077118ffcc7de471f6c0b6aeeaa24da4e2ba2b1270847e83aa",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541771120,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 3545
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541771282,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 3545
+                }
+              },
+              {
+                "name": "txlog-head.json",
+                "original": "/private/tmp/lhf-BDV9Vc/run/txlog-head.json",
+                "copied": "/private/tmp/lhfo-PrELGI/provider-evidence/txlog-head.json",
+                "bytes": 84,
+                "sha256": "cf73b1478ee9144d4990bd829c0cca8ad9f68880eb8e6399e5e6064039ea7196",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541771281,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 84
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541771283,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 84
+                }
+              }
+            ]
+          },
+          "producerResult": {
+            "schema": "finance-oracle-producer/1",
+            "mode": "provider-only",
+            "paymentId": "pay_0750ce6cf09d48428596c822713c984e",
+            "executionId": null
+          },
+          "defaultPolicyProfile": {
+            "defaultApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "actualApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "financialRule": {
+              "requiredApprovals": 2,
+              "requireDistinctUsers": true,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "ttlMinutes": 10
+            },
+            "actualFinancialRule": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            }
+          },
+          "children": [
+            {
+              "label": "initializer",
+              "pid": 4269,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "producer",
+              "pid": 4270,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "oracle-1",
+              "pid": 4271,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            }
+          ],
+          "providerChild": {
+            "pid": 4268,
+            "exit": 0,
+            "streamsClosed": true,
+            "pidESRCH": true
+          },
+          "outputs": [
+            {
+              "verdict": "fail",
+              "falseIds": [
+                "payload-bound",
+                "receipt-state",
+                "unauthorized-effects",
+                "action-evidence-coverage",
+                "action-chain",
+                "authorization"
+              ],
+              "checks": [
+                {
+                  "id": "inputs",
+                  "passed": true,
+                  "evidence": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority."
+                },
+                {
+                  "id": "txlog-chain",
+                  "passed": true,
+                  "evidence": "{\"head\":{\"hash\":\"8d37c99e692bb79a1158e5e897b544c49132f61496dbccf099ce3f6caa99ff41\",\"seq\":7},\"log\":{\"path\":\"/private/tmp/lhfo-PrELGI/provider-evidence/txlog.jsonl\",\"dev\":16777231,\"ino\":541771282,\"bytes\":3545,\"sha256\":\"dc9a02392cdd9c077118ffcc7de471f6c0b6aeeaa24da4e2ba2b1270847e83aa\"},\"checkpoint\":{\"path\":\"/private/tmp/lhfo-PrELGI/provider-evidence/txlog-head.json\",\"dev\":16777231,\"ino\":541771283,\"bytes\":84,\"sha256\":\"cf73b1478ee9144d4990bd829c0cca8ad9f68880eb8e6399e5e6064039ea7196\"}}"
+                },
+                {
+                  "id": "post-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "commit-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "no-duplicate",
+                  "passed": true,
+                  "evidence": "{\"commits\":1,\"uniqueTenantReferences\":1,\"uniqueTenantKeys\":1}"
+                },
+                {
+                  "id": "no-dispatch-on-deny",
+                  "passed": true,
+                  "evidence": "{\"expectedDecision\":\"completed\",\"posts\":1,\"commits\":1}"
+                },
+                {
+                  "id": "payload-bound",
+                  "passed": false,
+                  "evidence": "{\"matched\":0,\"commits\":1,\"problems\":[{\"seq\":3,\"message\":\"commit has no unique authenticated authorization preimage\"}],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}"
+                },
+                {
+                  "id": "payload-minimal",
+                  "passed": true,
+                  "evidence": "{\"paymentRequests\":1,\"scope\":\"actual provider bodyFields/normalized body; raw wire bytes are represented by hash and bytesRead, not reconstructed\"}"
+                },
+                {
+                  "id": "receipt-state",
+                  "passed": false,
+                  "evidence": "{\"expected\":\"completed\",\"actual\":[],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}"
+                },
+                {
+                  "id": "unauthorized-effects",
+                  "passed": false,
+                  "evidence": "{\"actualCommits\":1,\"authenticCompletedMatches\":0,\"unauthorizedOrUnproven\":1}"
+                },
+                {
+                  "id": "action-evidence-coverage",
+                  "passed": false,
+                  "evidence": "{\"numerator\":0,\"denominator\":1,\"fraction\":0,\"limit\":\"explicit authentic unknown can contribute coverage but cannot satisfy the matching-completed-receipt check\"}"
+                },
+                {
+                  "id": "control-result",
+                  "passed": true,
+                  "evidence": "Not requested by this finite case; no compliance status inferred."
+                },
+                {
+                  "id": "cold-ledger-verifier",
+                  "passed": true,
+                  "evidence": "{\"ok\":true,\"pid\":4272,\"pgid\":\"inherited outer guarded group; not claimed equal to child PID\",\"code\":0,\"signal\":null,\"spawnError\":null,\"streamError\":null,\"overflow\":false,\"late\":false,\"capturedStdoutSha256\":\"56dd2544a07d461fa1e0777c997788510e9bc0ae49faa7c0927b3dca47e72cd4\",\"capturedStderrSha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"capturedBytes\":{\"stdout\":1232,\"stderr\":0},\"pidProbes\":[{\"absent\":true,\"code\":\"ESRCH\"}],\"errors\":[],\"trustRoot\":{\"anchored\":true,\"monitorFingerprint\":\"5e1c5cda102289b1104cc167c7d301d697d0dda148d5ab29d13c9e8a63035de6\",\"expectedFingerprint\":\"5e1c5cda102289b1104cc167c7d301d697d0dda148d5ab29d13c9e8a63035de6\",\"monitorAdmission\":{\"signature\":\"ledger monitor key\",\"purpose\":\"ledger-row\",\"keyId\":\"5e1c5cda102289b1104cc167c7d301d697d0dda148d5ab29d13c9e8a63035de6\",\"status\":\"admitted\",\"source\":\"explicit-key\",\"listId\":null,\"timeBasis\":null,\"detail\":null}}}"
+                },
+                {
+                  "id": "snapshot-stable",
+                  "passed": true,
+                  "evidence": "{\"dataAndKeysBefore\":\"2480c787968b804bd4344de6df8967efed680ac8a86c7f79a306d6aaef0a83f8\",\"dataAndKeysAfter\":\"2480c787968b804bd4344de6df8967efed680ac8a86c7f79a306d6aaef0a83f8\",\"readerPreparation\":{\"readonly\":true,\"inTransaction\":true,\"initialSchemaRows\":144,\"dataAndKeysUnchanged\":true,\"walUnchanged\":false,\"emptyWalCreated\":true,\"beforePreparationSha256\":\"28012de6b97da8dd50367b2a8a5c5bf37fc7d650c7296e330eea2d44d03adcb7\",\"walBeforePreparation\":{\"path\":\"/private/tmp/lhfo-PrELGI/workspaces/p119-oracle-4048de6f-b294-4df3-aa5f-9cc8ddfd9773/.amc/evidence.sqlite-wal\",\"absent\":true},\"walAtBaseline\":{\"path\":\"/private/tmp/lhfo-PrELGI/workspaces/p119-oracle-4048de6f-b294-4df3-aa5f-9cc8ddfd9773/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771284,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAfterRead\":{\"path\":\"/private/tmp/lhfo-PrELGI/workspaces/p119-oracle-4048de6f-b294-4df3-aa5f-9cc8ddfd9773/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771284,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}},\"shmBefore\":{\"path\":\"/private/tmp/lhfo-PrELGI/workspaces/p119-oracle-4048de6f-b294-4df3-aa5f-9cc8ddfd9773/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541771285,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-PrELGI/workspaces/p119-oracle-4048de6f-b294-4df3-aa5f-9cc8ddfd9773/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541771285,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual readonly read transaction through baseline, cold CLI, action extraction and afterpins; DB/WAL/key bytes remain exact; SHM is coordination only\"}"
+                },
+                {
+                  "id": "action-chain",
+                  "passed": false,
+                  "evidence": "{\"selectedCount\":0,\"errors\":[]}"
+                },
+                {
+                  "id": "authorization",
+                  "passed": false,
+                  "evidence": "{\"errors\":[],\"preimages\":0,\"independentlySignedFiles\":0,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+                }
+              ]
+            }
+          ],
+          "controlledMutationCount": 0
+        },
+        {
+          "identity": "P1-19 finite independent oracle with genuine signed action producers a copied closed log with its final newline removed specifically fails txlog-chain",
+          "mode": "completed",
+          "root": "/private/tmp/lhfo-kna9Pf",
+          "stage": "before-disposable-launcher-root-removal",
+          "publicSuccessful": true,
+          "providerRoot": "/private/tmp/lhf-9YHLKe",
+          "providerRows": 11,
+          "providerRowDigestsIndependentlyRecomputed": true,
+          "checkpoint": {
+            "hash": "899a48f4cbaa3676065c4fa910301d3f9829ddb2803e541b13e15d2fc64b9a92",
+            "seq": 11
+          },
+          "reconstructedTxlogBytes": 5415,
+          "reconstructedTxlogSha256": "e9411263c437f2bd3a861b23465fd997d8bd8ee23809a8e8200194f6217b8f4c",
+          "copy": {
+            "actualProviderDir": "/private/tmp/lhf-9YHLKe/run",
+            "oracleInputDir": "/private/tmp/lhfo-kna9Pf/provider-evidence",
+            "files": [
+              {
+                "name": "txlog.jsonl",
+                "original": "/private/tmp/lhf-9YHLKe/run/txlog.jsonl",
+                "copied": "/private/tmp/lhfo-kna9Pf/provider-evidence/txlog.jsonl",
+                "bytes": 5415,
+                "sha256": "e9411263c437f2bd3a861b23465fd997d8bd8ee23809a8e8200194f6217b8f4c",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541771311,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541771494,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                }
+              },
+              {
+                "name": "txlog-head.json",
+                "original": "/private/tmp/lhf-9YHLKe/run/txlog-head.json",
+                "copied": "/private/tmp/lhfo-kna9Pf/provider-evidence/txlog-head.json",
+                "bytes": 85,
+                "sha256": "6a1292f60943d148ca70b9a229a033dee7d9da07db056a264e7f2f5b8388ccce",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541771493,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541771495,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                }
+              }
+            ]
+          },
+          "producerResult": {
+            "schema": "finance-oracle-producer/1",
+            "mode": "completed",
+            "executionId": "exec_a5a8493b-409e-4b98-b523-ca5cafbac457",
+            "paymentId": "pay_113ad8ee12b149c48a376d3fa9a832bd",
+            "idempotencyKey": "amc1_1WGGDG9WQQM262JE1BMZBDTT0H",
+            "approvalRequestId": "apprreq_73b4206ea2b84c84850da81c8bf49fd8",
+            "sessionId": "finance-oracle-recorder-c03d0a20-23bd-41cb-999b-35bd16911682",
+            "authorizationDigest": "e9528c71deb8c3167194a069b33bf442bc1bc627eabf5c93b2e90b1e221302f6",
+            "genericArgumentsDigest": "c4e9b76ef0f9699a8c877a79a98f3e2e15467d37a9522fd1ab29c0d1055f8963",
+            "providerBodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+            "decisionIds": [
+              "apprdec_33e11c4a2566494a9e96c9fc7151a2fa",
+              "apprdec_40b8e56d9016428ebe3f4895cad0748c"
+            ]
+          },
+          "defaultPolicyProfile": {
+            "defaultApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "actualApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "financialRule": {
+              "requiredApprovals": 2,
+              "requireDistinctUsers": true,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "ttlMinutes": 10
+            },
+            "actualFinancialRule": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            }
+          },
+          "children": [
+            {
+              "label": "initializer",
+              "pid": 4280,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "producer",
+              "pid": 4281,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "oracle-1",
+              "pid": 4282,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "oracle-2",
+              "pid": 4284,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            }
+          ],
+          "providerChild": {
+            "pid": 4279,
+            "exit": 0,
+            "streamsClosed": true,
+            "pidESRCH": true
+          },
+          "outputs": [
+            {
+              "verdict": "pass",
+              "falseIds": [],
+              "checks": [
+                {
+                  "id": "inputs",
+                  "passed": true,
+                  "evidence": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority."
+                },
+                {
+                  "id": "txlog-chain",
+                  "passed": true,
+                  "evidence": "{\"head\":{\"hash\":\"899a48f4cbaa3676065c4fa910301d3f9829ddb2803e541b13e15d2fc64b9a92\",\"seq\":11},\"log\":{\"path\":\"/private/tmp/lhfo-kna9Pf/provider-evidence/txlog.jsonl\",\"dev\":16777231,\"ino\":541771494,\"bytes\":5415,\"sha256\":\"e9411263c437f2bd3a861b23465fd997d8bd8ee23809a8e8200194f6217b8f4c\"},\"checkpoint\":{\"path\":\"/private/tmp/lhfo-kna9Pf/provider-evidence/txlog-head.json\",\"dev\":16777231,\"ino\":541771495,\"bytes\":85,\"sha256\":\"6a1292f60943d148ca70b9a229a033dee7d9da07db056a264e7f2f5b8388ccce\"}}"
+                },
+                {
+                  "id": "post-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "commit-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "no-duplicate",
+                  "passed": true,
+                  "evidence": "{\"commits\":1,\"uniqueTenantReferences\":1,\"uniqueTenantKeys\":1}"
+                },
+                {
+                  "id": "no-dispatch-on-deny",
+                  "passed": true,
+                  "evidence": "{\"expectedDecision\":\"completed\",\"posts\":1,\"commits\":1}"
+                },
+                {
+                  "id": "payload-bound",
+                  "passed": true,
+                  "evidence": "{\"matched\":1,\"commits\":1,\"problems\":[],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}"
+                },
+                {
+                  "id": "payload-minimal",
+                  "passed": true,
+                  "evidence": "{\"paymentRequests\":1,\"scope\":\"actual provider bodyFields/normalized body; raw wire bytes are represented by hash and bytesRead, not reconstructed\"}"
+                },
+                {
+                  "id": "receipt-state",
+                  "passed": true,
+                  "evidence": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_a5a8493b-409e-4b98-b523-ca5cafbac457\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}"
+                },
+                {
+                  "id": "unauthorized-effects",
+                  "passed": true,
+                  "evidence": "{\"actualCommits\":1,\"authenticCompletedMatches\":1,\"unauthorizedOrUnproven\":0}"
+                },
+                {
+                  "id": "action-evidence-coverage",
+                  "passed": true,
+                  "evidence": "{\"numerator\":1,\"denominator\":1,\"fraction\":1,\"limit\":\"explicit authentic unknown can contribute coverage but cannot satisfy the matching-completed-receipt check\"}"
+                },
+                {
+                  "id": "control-result",
+                  "passed": true,
+                  "evidence": "Not requested by this finite case; no compliance status inferred."
+                },
+                {
+                  "id": "cold-ledger-verifier",
+                  "passed": true,
+                  "evidence": "{\"ok\":true,\"pid\":4283,\"pgid\":\"inherited outer guarded group; not claimed equal to child PID\",\"code\":0,\"signal\":null,\"spawnError\":null,\"streamError\":null,\"overflow\":false,\"late\":false,\"capturedStdoutSha256\":\"f93b9232d70b911370fba0a2f16f49a9d34894f9f28df58965fa6ddf6aafb5b7\",\"capturedStderrSha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"capturedBytes\":{\"stdout\":1232,\"stderr\":0},\"pidProbes\":[{\"absent\":true,\"code\":\"ESRCH\"}],\"errors\":[],\"trustRoot\":{\"anchored\":true,\"monitorFingerprint\":\"3680f5919cfeb8b348349f4cf4f6bde1381838f16e2d780ae08da5652fedf347\",\"expectedFingerprint\":\"3680f5919cfeb8b348349f4cf4f6bde1381838f16e2d780ae08da5652fedf347\",\"monitorAdmission\":{\"signature\":\"ledger monitor key\",\"purpose\":\"ledger-row\",\"keyId\":\"3680f5919cfeb8b348349f4cf4f6bde1381838f16e2d780ae08da5652fedf347\",\"status\":\"admitted\",\"source\":\"explicit-key\",\"listId\":null,\"timeBasis\":null,\"detail\":null}}}"
+                },
+                {
+                  "id": "snapshot-stable",
+                  "passed": true,
+                  "evidence": "{\"dataAndKeysBefore\":\"5d48584de588acad5de13ce611d371b7ca6d2c252c4dc418f595b9919d1ee2e8\",\"dataAndKeysAfter\":\"5d48584de588acad5de13ce611d371b7ca6d2c252c4dc418f595b9919d1ee2e8\",\"readerPreparation\":{\"readonly\":true,\"inTransaction\":true,\"initialSchemaRows\":179,\"dataAndKeysUnchanged\":true,\"walUnchanged\":false,\"emptyWalCreated\":true,\"beforePreparationSha256\":\"cd8ea9ef9cf12a282cfa1ddade0713c16b6196e8d200b106335a32e9c0854383\",\"walBeforePreparation\":{\"path\":\"/private/tmp/lhfo-kna9Pf/workspaces/p119-oracle-7e2adfb0-b467-453c-8d84-7bf121cd509d/.amc/evidence.sqlite-wal\",\"absent\":true},\"walAtBaseline\":{\"path\":\"/private/tmp/lhfo-kna9Pf/workspaces/p119-oracle-7e2adfb0-b467-453c-8d84-7bf121cd509d/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771496,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAfterRead\":{\"path\":\"/private/tmp/lhfo-kna9Pf/workspaces/p119-oracle-7e2adfb0-b467-453c-8d84-7bf121cd509d/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771496,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}},\"shmBefore\":{\"path\":\"/private/tmp/lhfo-kna9Pf/workspaces/p119-oracle-7e2adfb0-b467-453c-8d84-7bf121cd509d/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541771497,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-kna9Pf/workspaces/p119-oracle-7e2adfb0-b467-453c-8d84-7bf121cd509d/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541771497,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual readonly read transaction through baseline, cold CLI, action extraction and afterpins; DB/WAL/key bytes remain exact; SHM is coordination only\"}"
+                },
+                {
+                  "id": "action-chain",
+                  "passed": true,
+                  "evidence": "{\"selectedCount\":1,\"errors\":[]}"
+                },
+                {
+                  "id": "authorization",
+                  "passed": true,
+                  "evidence": "{\"errors\":[],\"preimages\":1,\"independentlySignedFiles\":17,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+                }
+              ]
+            },
+            {
+              "verdict": "fail",
+              "falseIds": [
+                "txlog-chain",
+                "post-count",
+                "commit-count",
+                "no-duplicate",
+                "no-dispatch-on-deny",
+                "payload-bound",
+                "payload-minimal",
+                "unauthorized-effects",
+                "action-evidence-coverage"
+              ],
+              "checks": [
+                {
+                  "id": "inputs",
+                  "passed": true,
+                  "evidence": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority."
+                },
+                {
+                  "id": "txlog-chain",
+                  "passed": false,
+                  "evidence": "truncated provider log"
+                },
+                {
+                  "id": "post-count",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable"
+                },
+                {
+                  "id": "commit-count",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable"
+                },
+                {
+                  "id": "no-duplicate",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable"
+                },
+                {
+                  "id": "no-dispatch-on-deny",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable"
+                },
+                {
+                  "id": "payload-bound",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable"
+                },
+                {
+                  "id": "payload-minimal",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable"
+                },
+                {
+                  "id": "receipt-state",
+                  "passed": true,
+                  "evidence": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_a5a8493b-409e-4b98-b523-ca5cafbac457\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}"
+                },
+                {
+                  "id": "unauthorized-effects",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable"
+                },
+                {
+                  "id": "action-evidence-coverage",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable"
+                },
+                {
+                  "id": "control-result",
+                  "passed": true,
+                  "evidence": "Not requested by this finite case; no compliance status inferred."
+                },
+                {
+                  "id": "cold-ledger-verifier",
+                  "passed": true,
+                  "evidence": "{\"ok\":true,\"pid\":4285,\"pgid\":\"inherited outer guarded group; not claimed equal to child PID\",\"code\":0,\"signal\":null,\"spawnError\":null,\"streamError\":null,\"overflow\":false,\"late\":false,\"capturedStdoutSha256\":\"f93b9232d70b911370fba0a2f16f49a9d34894f9f28df58965fa6ddf6aafb5b7\",\"capturedStderrSha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"capturedBytes\":{\"stdout\":1232,\"stderr\":0},\"pidProbes\":[{\"absent\":true,\"code\":\"ESRCH\"}],\"errors\":[],\"trustRoot\":{\"anchored\":true,\"monitorFingerprint\":\"3680f5919cfeb8b348349f4cf4f6bde1381838f16e2d780ae08da5652fedf347\",\"expectedFingerprint\":\"3680f5919cfeb8b348349f4cf4f6bde1381838f16e2d780ae08da5652fedf347\",\"monitorAdmission\":{\"signature\":\"ledger monitor key\",\"purpose\":\"ledger-row\",\"keyId\":\"3680f5919cfeb8b348349f4cf4f6bde1381838f16e2d780ae08da5652fedf347\",\"status\":\"admitted\",\"source\":\"explicit-key\",\"listId\":null,\"timeBasis\":null,\"detail\":null}}}"
+                },
+                {
+                  "id": "snapshot-stable",
+                  "passed": true,
+                  "evidence": "{\"dataAndKeysBefore\":\"5d48584de588acad5de13ce611d371b7ca6d2c252c4dc418f595b9919d1ee2e8\",\"dataAndKeysAfter\":\"5d48584de588acad5de13ce611d371b7ca6d2c252c4dc418f595b9919d1ee2e8\",\"readerPreparation\":{\"readonly\":true,\"inTransaction\":true,\"initialSchemaRows\":179,\"dataAndKeysUnchanged\":true,\"walUnchanged\":true,\"emptyWalCreated\":false,\"beforePreparationSha256\":\"5d48584de588acad5de13ce611d371b7ca6d2c252c4dc418f595b9919d1ee2e8\",\"walBeforePreparation\":{\"path\":\"/private/tmp/lhfo-kna9Pf/workspaces/p119-oracle-7e2adfb0-b467-453c-8d84-7bf121cd509d/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771496,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAtBaseline\":{\"path\":\"/private/tmp/lhfo-kna9Pf/workspaces/p119-oracle-7e2adfb0-b467-453c-8d84-7bf121cd509d/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771496,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAfterRead\":{\"path\":\"/private/tmp/lhfo-kna9Pf/workspaces/p119-oracle-7e2adfb0-b467-453c-8d84-7bf121cd509d/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771496,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}},\"shmBefore\":{\"path\":\"/private/tmp/lhfo-kna9Pf/workspaces/p119-oracle-7e2adfb0-b467-453c-8d84-7bf121cd509d/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541771497,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-kna9Pf/workspaces/p119-oracle-7e2adfb0-b467-453c-8d84-7bf121cd509d/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541771497,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual readonly read transaction through baseline, cold CLI, action extraction and afterpins; DB/WAL/key bytes remain exact; SHM is coordination only\"}"
+                },
+                {
+                  "id": "action-chain",
+                  "passed": true,
+                  "evidence": "{\"selectedCount\":1,\"errors\":[]}"
+                },
+                {
+                  "id": "authorization",
+                  "passed": true,
+                  "evidence": "{\"errors\":[],\"preimages\":1,\"independentlySignedFiles\":17,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+                }
+              ]
+            }
+          ],
+          "controlledMutationCount": 1
+        },
+        {
+          "identity": "P1-19 finite independent oracle with genuine signed action producers adapter stdout pass and verified flags cannot manufacture a receipt or trust anchor",
+          "mode": "provider-only",
+          "root": "/private/tmp/lhfo-P9O44S",
+          "stage": "before-disposable-launcher-root-removal",
+          "publicSuccessful": true,
+          "providerRoot": "/private/tmp/lhf-LDXbOM",
+          "providerRows": 7,
+          "providerRowDigestsIndependentlyRecomputed": true,
+          "checkpoint": {
+            "hash": "88d17a610c24a267afebcdbe70bd7731dc428b1fe6c0915d9a5178e061b8cbaf",
+            "seq": 7
+          },
+          "reconstructedTxlogBytes": 3545,
+          "reconstructedTxlogSha256": "ede796134d9b26b5534691b76e63f678bcf957edcd455da951d531d0fe588f30",
+          "copy": {
+            "actualProviderDir": "/private/tmp/lhf-LDXbOM/run",
+            "oracleInputDir": "/private/tmp/lhfo-P9O44S/provider-evidence",
+            "files": [
+              {
+                "name": "txlog.jsonl",
+                "original": "/private/tmp/lhf-LDXbOM/run/txlog.jsonl",
+                "copied": "/private/tmp/lhfo-P9O44S/provider-evidence/txlog.jsonl",
+                "bytes": 3545,
+                "sha256": "ede796134d9b26b5534691b76e63f678bcf957edcd455da951d531d0fe588f30",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541771526,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 3545
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541771688,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 3545
+                }
+              },
+              {
+                "name": "txlog-head.json",
+                "original": "/private/tmp/lhf-LDXbOM/run/txlog-head.json",
+                "copied": "/private/tmp/lhfo-P9O44S/provider-evidence/txlog-head.json",
+                "bytes": 84,
+                "sha256": "067fbff92700a5cae777c8b52955c9f60726111df421c6417e77fbb71a6fa125",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541771687,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 84
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541771689,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 84
+                }
+              }
+            ]
+          },
+          "producerResult": {
+            "schema": "finance-oracle-producer/1",
+            "mode": "provider-only",
+            "paymentId": "pay_9d8879220e6c4b3d8a9dcf7e5ff00ed9",
+            "executionId": null
+          },
+          "defaultPolicyProfile": {
+            "defaultApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "actualApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "financialRule": {
+              "requiredApprovals": 2,
+              "requireDistinctUsers": true,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "ttlMinutes": 10
+            },
+            "actualFinancialRule": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            }
+          },
+          "children": [
+            {
+              "label": "initializer",
+              "pid": 4287,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "producer",
+              "pid": 4288,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "oracle-1",
+              "pid": 4289,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            }
+          ],
+          "providerChild": {
+            "pid": 4286,
+            "exit": 0,
+            "streamsClosed": true,
+            "pidESRCH": true
+          },
+          "outputs": [
+            {
+              "verdict": "fail",
+              "falseIds": [
+                "payload-bound",
+                "receipt-state",
+                "unauthorized-effects",
+                "action-evidence-coverage",
+                "action-chain",
+                "authorization"
+              ],
+              "checks": [
+                {
+                  "id": "inputs",
+                  "passed": true,
+                  "evidence": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority."
+                },
+                {
+                  "id": "txlog-chain",
+                  "passed": true,
+                  "evidence": "{\"head\":{\"hash\":\"88d17a610c24a267afebcdbe70bd7731dc428b1fe6c0915d9a5178e061b8cbaf\",\"seq\":7},\"log\":{\"path\":\"/private/tmp/lhfo-P9O44S/provider-evidence/txlog.jsonl\",\"dev\":16777231,\"ino\":541771688,\"bytes\":3545,\"sha256\":\"ede796134d9b26b5534691b76e63f678bcf957edcd455da951d531d0fe588f30\"},\"checkpoint\":{\"path\":\"/private/tmp/lhfo-P9O44S/provider-evidence/txlog-head.json\",\"dev\":16777231,\"ino\":541771689,\"bytes\":84,\"sha256\":\"067fbff92700a5cae777c8b52955c9f60726111df421c6417e77fbb71a6fa125\"}}"
+                },
+                {
+                  "id": "post-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "commit-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "no-duplicate",
+                  "passed": true,
+                  "evidence": "{\"commits\":1,\"uniqueTenantReferences\":1,\"uniqueTenantKeys\":1}"
+                },
+                {
+                  "id": "no-dispatch-on-deny",
+                  "passed": true,
+                  "evidence": "{\"expectedDecision\":\"completed\",\"posts\":1,\"commits\":1}"
+                },
+                {
+                  "id": "payload-bound",
+                  "passed": false,
+                  "evidence": "{\"matched\":0,\"commits\":1,\"problems\":[{\"seq\":3,\"message\":\"commit has no unique authenticated authorization preimage\"}],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}"
+                },
+                {
+                  "id": "payload-minimal",
+                  "passed": true,
+                  "evidence": "{\"paymentRequests\":1,\"scope\":\"actual provider bodyFields/normalized body; raw wire bytes are represented by hash and bytesRead, not reconstructed\"}"
+                },
+                {
+                  "id": "receipt-state",
+                  "passed": false,
+                  "evidence": "{\"expected\":\"completed\",\"actual\":[],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}"
+                },
+                {
+                  "id": "unauthorized-effects",
+                  "passed": false,
+                  "evidence": "{\"actualCommits\":1,\"authenticCompletedMatches\":0,\"unauthorizedOrUnproven\":1}"
+                },
+                {
+                  "id": "action-evidence-coverage",
+                  "passed": false,
+                  "evidence": "{\"numerator\":0,\"denominator\":1,\"fraction\":0,\"limit\":\"explicit authentic unknown can contribute coverage but cannot satisfy the matching-completed-receipt check\"}"
+                },
+                {
+                  "id": "control-result",
+                  "passed": true,
+                  "evidence": "Not requested by this finite case; no compliance status inferred."
+                },
+                {
+                  "id": "cold-ledger-verifier",
+                  "passed": true,
+                  "evidence": "{\"ok\":true,\"pid\":4290,\"pgid\":\"inherited outer guarded group; not claimed equal to child PID\",\"code\":0,\"signal\":null,\"spawnError\":null,\"streamError\":null,\"overflow\":false,\"late\":false,\"capturedStdoutSha256\":\"1ce07b08128a327bfa40b4dd6d717ba26c4f7ab070b95da7f2a9238111907195\",\"capturedStderrSha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"capturedBytes\":{\"stdout\":1232,\"stderr\":0},\"pidProbes\":[{\"absent\":true,\"code\":\"ESRCH\"}],\"errors\":[],\"trustRoot\":{\"anchored\":true,\"monitorFingerprint\":\"a7045c4afcfe07a03f7b4e881856d24de8bace2fb28b6e13aa6530796082a6db\",\"expectedFingerprint\":\"a7045c4afcfe07a03f7b4e881856d24de8bace2fb28b6e13aa6530796082a6db\",\"monitorAdmission\":{\"signature\":\"ledger monitor key\",\"purpose\":\"ledger-row\",\"keyId\":\"a7045c4afcfe07a03f7b4e881856d24de8bace2fb28b6e13aa6530796082a6db\",\"status\":\"admitted\",\"source\":\"explicit-key\",\"listId\":null,\"timeBasis\":null,\"detail\":null}}}"
+                },
+                {
+                  "id": "snapshot-stable",
+                  "passed": true,
+                  "evidence": "{\"dataAndKeysBefore\":\"17a1bd89fcce795f0f4b72d64b8d178763b5871aefcd5c82992d7a3bed74de32\",\"dataAndKeysAfter\":\"17a1bd89fcce795f0f4b72d64b8d178763b5871aefcd5c82992d7a3bed74de32\",\"readerPreparation\":{\"readonly\":true,\"inTransaction\":true,\"initialSchemaRows\":144,\"dataAndKeysUnchanged\":true,\"walUnchanged\":false,\"emptyWalCreated\":true,\"beforePreparationSha256\":\"c4eeea9aa738a73e52ec1ec8e83f89b4ab5072c2a64e44768e719a9f1f64cdf1\",\"walBeforePreparation\":{\"path\":\"/private/tmp/lhfo-P9O44S/workspaces/p119-oracle-06040629-3335-449d-8ecf-5a1fa9ab8adf/.amc/evidence.sqlite-wal\",\"absent\":true},\"walAtBaseline\":{\"path\":\"/private/tmp/lhfo-P9O44S/workspaces/p119-oracle-06040629-3335-449d-8ecf-5a1fa9ab8adf/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771690,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAfterRead\":{\"path\":\"/private/tmp/lhfo-P9O44S/workspaces/p119-oracle-06040629-3335-449d-8ecf-5a1fa9ab8adf/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771690,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}},\"shmBefore\":{\"path\":\"/private/tmp/lhfo-P9O44S/workspaces/p119-oracle-06040629-3335-449d-8ecf-5a1fa9ab8adf/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541771691,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-P9O44S/workspaces/p119-oracle-06040629-3335-449d-8ecf-5a1fa9ab8adf/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541771691,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual readonly read transaction through baseline, cold CLI, action extraction and afterpins; DB/WAL/key bytes remain exact; SHM is coordination only\"}"
+                },
+                {
+                  "id": "action-chain",
+                  "passed": false,
+                  "evidence": "{\"selectedCount\":0,\"errors\":[]}"
+                },
+                {
+                  "id": "authorization",
+                  "passed": false,
+                  "evidence": "{\"errors\":[],\"preimages\":0,\"independentlySignedFiles\":0,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+                }
+              ]
+            }
+          ],
+          "controlledMutationCount": 0
+        },
+        {
+          "identity": "P1-19 finite independent oracle with genuine signed action producers changing a genuine pre-dispatch argument preimage cannot preserve authorization",
+          "mode": "completed",
+          "root": "/private/tmp/lhfo-DRptCk",
+          "stage": "before-disposable-launcher-root-removal",
+          "publicSuccessful": true,
+          "providerRoot": "/private/tmp/lhf-RUXnCN",
+          "providerRows": 11,
+          "providerRowDigestsIndependentlyRecomputed": true,
+          "checkpoint": {
+            "hash": "6fd5fb977b6ee61f58407b5326bda62f21b0d2a78c44c35fc6edf8f5ca6878a1",
+            "seq": 11
+          },
+          "reconstructedTxlogBytes": 5415,
+          "reconstructedTxlogSha256": "51562fdde886e1fd8a9bbca16a4b893b3cd5858be4addbbd5fba6e45dca512fe",
+          "copy": {
+            "actualProviderDir": "/private/tmp/lhf-RUXnCN/run",
+            "oracleInputDir": "/private/tmp/lhfo-DRptCk/provider-evidence",
+            "files": [
+              {
+                "name": "txlog.jsonl",
+                "original": "/private/tmp/lhf-RUXnCN/run/txlog.jsonl",
+                "copied": "/private/tmp/lhfo-DRptCk/provider-evidence/txlog.jsonl",
+                "bytes": 5415,
+                "sha256": "51562fdde886e1fd8a9bbca16a4b893b3cd5858be4addbbd5fba6e45dca512fe",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541771715,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541771898,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                }
+              },
+              {
+                "name": "txlog-head.json",
+                "original": "/private/tmp/lhf-RUXnCN/run/txlog-head.json",
+                "copied": "/private/tmp/lhfo-DRptCk/provider-evidence/txlog-head.json",
+                "bytes": 85,
+                "sha256": "e76c30c26b0579913536fc3aab10957fb772616c8dd9f9b90510ad4ed0cd100e",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541771897,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541771899,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                }
+              }
+            ]
+          },
+          "producerResult": {
+            "schema": "finance-oracle-producer/1",
+            "mode": "completed",
+            "executionId": "exec_efb84a52-6a6c-4db9-a0cc-a848ca29223b",
+            "paymentId": "pay_ed408788cc7c42c1be62a32e59d048f2",
+            "idempotencyKey": "amc1_20CC5KQ0S2BV6XWAHDJZJR029Y",
+            "approvalRequestId": "apprreq_0e66faeae0e8422bb406008a9e042e6d",
+            "sessionId": "finance-oracle-recorder-10b04456-9061-4777-aa7d-38e19594ac9c",
+            "authorizationDigest": "8a210f6c7fa9d1c9810be35917a8ccb6fd49c93a11159a66c239b16896295a31",
+            "genericArgumentsDigest": "c4e9b76ef0f9699a8c877a79a98f3e2e15467d37a9522fd1ab29c0d1055f8963",
+            "providerBodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+            "decisionIds": [
+              "apprdec_98eee951c60e4a8d97a004465598b4b9",
+              "apprdec_95d41958973047d59fa2852606c52c3b"
+            ]
+          },
+          "defaultPolicyProfile": {
+            "defaultApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "actualApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "financialRule": {
+              "requiredApprovals": 2,
+              "requireDistinctUsers": true,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "ttlMinutes": 10
+            },
+            "actualFinancialRule": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            }
+          },
+          "children": [
+            {
+              "label": "initializer",
+              "pid": 4294,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "producer",
+              "pid": 4295,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "oracle-1",
+              "pid": 4296,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "oracle-2",
+              "pid": 4298,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            }
+          ],
+          "providerChild": {
+            "pid": 4293,
+            "exit": 0,
+            "streamsClosed": true,
+            "pidESRCH": true
+          },
+          "outputs": [
+            {
+              "verdict": "pass",
+              "falseIds": [],
+              "checks": [
+                {
+                  "id": "inputs",
+                  "passed": true,
+                  "evidence": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority."
+                },
+                {
+                  "id": "txlog-chain",
+                  "passed": true,
+                  "evidence": "{\"head\":{\"hash\":\"6fd5fb977b6ee61f58407b5326bda62f21b0d2a78c44c35fc6edf8f5ca6878a1\",\"seq\":11},\"log\":{\"path\":\"/private/tmp/lhfo-DRptCk/provider-evidence/txlog.jsonl\",\"dev\":16777231,\"ino\":541771898,\"bytes\":5415,\"sha256\":\"51562fdde886e1fd8a9bbca16a4b893b3cd5858be4addbbd5fba6e45dca512fe\"},\"checkpoint\":{\"path\":\"/private/tmp/lhfo-DRptCk/provider-evidence/txlog-head.json\",\"dev\":16777231,\"ino\":541771899,\"bytes\":85,\"sha256\":\"e76c30c26b0579913536fc3aab10957fb772616c8dd9f9b90510ad4ed0cd100e\"}}"
+                },
+                {
+                  "id": "post-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "commit-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "no-duplicate",
+                  "passed": true,
+                  "evidence": "{\"commits\":1,\"uniqueTenantReferences\":1,\"uniqueTenantKeys\":1}"
+                },
+                {
+                  "id": "no-dispatch-on-deny",
+                  "passed": true,
+                  "evidence": "{\"expectedDecision\":\"completed\",\"posts\":1,\"commits\":1}"
+                },
+                {
+                  "id": "payload-bound",
+                  "passed": true,
+                  "evidence": "{\"matched\":1,\"commits\":1,\"problems\":[],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}"
+                },
+                {
+                  "id": "payload-minimal",
+                  "passed": true,
+                  "evidence": "{\"paymentRequests\":1,\"scope\":\"actual provider bodyFields/normalized body; raw wire bytes are represented by hash and bytesRead, not reconstructed\"}"
+                },
+                {
+                  "id": "receipt-state",
+                  "passed": true,
+                  "evidence": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_efb84a52-6a6c-4db9-a0cc-a848ca29223b\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}"
+                },
+                {
+                  "id": "unauthorized-effects",
+                  "passed": true,
+                  "evidence": "{\"actualCommits\":1,\"authenticCompletedMatches\":1,\"unauthorizedOrUnproven\":0}"
+                },
+                {
+                  "id": "action-evidence-coverage",
+                  "passed": true,
+                  "evidence": "{\"numerator\":1,\"denominator\":1,\"fraction\":1,\"limit\":\"explicit authentic unknown can contribute coverage but cannot satisfy the matching-completed-receipt check\"}"
+                },
+                {
+                  "id": "control-result",
+                  "passed": true,
+                  "evidence": "Not requested by this finite case; no compliance status inferred."
+                },
+                {
+                  "id": "cold-ledger-verifier",
+                  "passed": true,
+                  "evidence": "{\"ok\":true,\"pid\":4297,\"pgid\":\"inherited outer guarded group; not claimed equal to child PID\",\"code\":0,\"signal\":null,\"spawnError\":null,\"streamError\":null,\"overflow\":false,\"late\":false,\"capturedStdoutSha256\":\"bed259f75dc85fc741f2ae930cf1a4ec3b481ba9f72f14326ca6071630b65d3e\",\"capturedStderrSha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"capturedBytes\":{\"stdout\":1232,\"stderr\":0},\"pidProbes\":[{\"absent\":true,\"code\":\"ESRCH\"}],\"errors\":[],\"trustRoot\":{\"anchored\":true,\"monitorFingerprint\":\"7dc6cd42004156d28dc3eef219ac18c6816e74d56ae73210dd641eac6f1d7da7\",\"expectedFingerprint\":\"7dc6cd42004156d28dc3eef219ac18c6816e74d56ae73210dd641eac6f1d7da7\",\"monitorAdmission\":{\"signature\":\"ledger monitor key\",\"purpose\":\"ledger-row\",\"keyId\":\"7dc6cd42004156d28dc3eef219ac18c6816e74d56ae73210dd641eac6f1d7da7\",\"status\":\"admitted\",\"source\":\"explicit-key\",\"listId\":null,\"timeBasis\":null,\"detail\":null}}}"
+                },
+                {
+                  "id": "snapshot-stable",
+                  "passed": true,
+                  "evidence": "{\"dataAndKeysBefore\":\"37e81aacaf564cae02a623391ee6f7560984ee9bfdc24b3e91d638db66e58189\",\"dataAndKeysAfter\":\"37e81aacaf564cae02a623391ee6f7560984ee9bfdc24b3e91d638db66e58189\",\"readerPreparation\":{\"readonly\":true,\"inTransaction\":true,\"initialSchemaRows\":179,\"dataAndKeysUnchanged\":true,\"walUnchanged\":false,\"emptyWalCreated\":true,\"beforePreparationSha256\":\"265e96d887ab957017a969358c1b9888adc86506889d50284dcdebc5cbcd51a1\",\"walBeforePreparation\":{\"path\":\"/private/tmp/lhfo-DRptCk/workspaces/p119-oracle-2a705c8b-1e42-424a-969b-a71edd32d170/.amc/evidence.sqlite-wal\",\"absent\":true},\"walAtBaseline\":{\"path\":\"/private/tmp/lhfo-DRptCk/workspaces/p119-oracle-2a705c8b-1e42-424a-969b-a71edd32d170/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771900,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAfterRead\":{\"path\":\"/private/tmp/lhfo-DRptCk/workspaces/p119-oracle-2a705c8b-1e42-424a-969b-a71edd32d170/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771900,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}},\"shmBefore\":{\"path\":\"/private/tmp/lhfo-DRptCk/workspaces/p119-oracle-2a705c8b-1e42-424a-969b-a71edd32d170/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541771901,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-DRptCk/workspaces/p119-oracle-2a705c8b-1e42-424a-969b-a71edd32d170/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541771901,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual readonly read transaction through baseline, cold CLI, action extraction and afterpins; DB/WAL/key bytes remain exact; SHM is coordination only\"}"
+                },
+                {
+                  "id": "action-chain",
+                  "passed": true,
+                  "evidence": "{\"selectedCount\":1,\"errors\":[]}"
+                },
+                {
+                  "id": "authorization",
+                  "passed": true,
+                  "evidence": "{\"errors\":[],\"preimages\":1,\"independentlySignedFiles\":17,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+                }
+              ]
+            },
+            {
+              "verdict": "fail",
+              "falseIds": [
+                "payload-bound",
+                "unauthorized-effects",
+                "action-evidence-coverage",
+                "authorization"
+              ],
+              "checks": [
+                {
+                  "id": "inputs",
+                  "passed": true,
+                  "evidence": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority."
+                },
+                {
+                  "id": "txlog-chain",
+                  "passed": true,
+                  "evidence": "{\"head\":{\"hash\":\"6fd5fb977b6ee61f58407b5326bda62f21b0d2a78c44c35fc6edf8f5ca6878a1\",\"seq\":11},\"log\":{\"path\":\"/private/tmp/lhfo-DRptCk/provider-evidence/txlog.jsonl\",\"dev\":16777231,\"ino\":541771898,\"bytes\":5415,\"sha256\":\"51562fdde886e1fd8a9bbca16a4b893b3cd5858be4addbbd5fba6e45dca512fe\"},\"checkpoint\":{\"path\":\"/private/tmp/lhfo-DRptCk/provider-evidence/txlog-head.json\",\"dev\":16777231,\"ino\":541771899,\"bytes\":85,\"sha256\":\"e76c30c26b0579913536fc3aab10957fb772616c8dd9f9b90510ad4ed0cd100e\"}}"
+                },
+                {
+                  "id": "post-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "commit-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "no-duplicate",
+                  "passed": true,
+                  "evidence": "{\"commits\":1,\"uniqueTenantReferences\":1,\"uniqueTenantKeys\":1}"
+                },
+                {
+                  "id": "no-dispatch-on-deny",
+                  "passed": true,
+                  "evidence": "{\"expectedDecision\":\"completed\",\"posts\":1,\"commits\":1}"
+                },
+                {
+                  "id": "payload-bound",
+                  "passed": false,
+                  "evidence": "{\"matched\":0,\"commits\":1,\"problems\":[{\"seq\":7,\"message\":\"commit has no unique authenticated authorization preimage\"}],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}"
+                },
+                {
+                  "id": "payload-minimal",
+                  "passed": true,
+                  "evidence": "{\"paymentRequests\":1,\"scope\":\"actual provider bodyFields/normalized body; raw wire bytes are represented by hash and bytesRead, not reconstructed\"}"
+                },
+                {
+                  "id": "receipt-state",
+                  "passed": true,
+                  "evidence": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_efb84a52-6a6c-4db9-a0cc-a848ca29223b\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}"
+                },
+                {
+                  "id": "unauthorized-effects",
+                  "passed": false,
+                  "evidence": "{\"actualCommits\":1,\"authenticCompletedMatches\":0,\"unauthorizedOrUnproven\":1}"
+                },
+                {
+                  "id": "action-evidence-coverage",
+                  "passed": false,
+                  "evidence": "{\"numerator\":0,\"denominator\":1,\"fraction\":0,\"limit\":\"explicit authentic unknown can contribute coverage but cannot satisfy the matching-completed-receipt check\"}"
+                },
+                {
+                  "id": "control-result",
+                  "passed": true,
+                  "evidence": "Not requested by this finite case; no compliance status inferred."
+                },
+                {
+                  "id": "cold-ledger-verifier",
+                  "passed": true,
+                  "evidence": "{\"ok\":true,\"pid\":4299,\"pgid\":\"inherited outer guarded group; not claimed equal to child PID\",\"code\":0,\"signal\":null,\"spawnError\":null,\"streamError\":null,\"overflow\":false,\"late\":false,\"capturedStdoutSha256\":\"bed259f75dc85fc741f2ae930cf1a4ec3b481ba9f72f14326ca6071630b65d3e\",\"capturedStderrSha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"capturedBytes\":{\"stdout\":1232,\"stderr\":0},\"pidProbes\":[{\"absent\":true,\"code\":\"ESRCH\"}],\"errors\":[],\"trustRoot\":{\"anchored\":true,\"monitorFingerprint\":\"7dc6cd42004156d28dc3eef219ac18c6816e74d56ae73210dd641eac6f1d7da7\",\"expectedFingerprint\":\"7dc6cd42004156d28dc3eef219ac18c6816e74d56ae73210dd641eac6f1d7da7\",\"monitorAdmission\":{\"signature\":\"ledger monitor key\",\"purpose\":\"ledger-row\",\"keyId\":\"7dc6cd42004156d28dc3eef219ac18c6816e74d56ae73210dd641eac6f1d7da7\",\"status\":\"admitted\",\"source\":\"explicit-key\",\"listId\":null,\"timeBasis\":null,\"detail\":null}}}"
+                },
+                {
+                  "id": "snapshot-stable",
+                  "passed": true,
+                  "evidence": "{\"dataAndKeysBefore\":\"37e81aacaf564cae02a623391ee6f7560984ee9bfdc24b3e91d638db66e58189\",\"dataAndKeysAfter\":\"37e81aacaf564cae02a623391ee6f7560984ee9bfdc24b3e91d638db66e58189\",\"readerPreparation\":{\"readonly\":true,\"inTransaction\":true,\"initialSchemaRows\":179,\"dataAndKeysUnchanged\":true,\"walUnchanged\":true,\"emptyWalCreated\":false,\"beforePreparationSha256\":\"37e81aacaf564cae02a623391ee6f7560984ee9bfdc24b3e91d638db66e58189\",\"walBeforePreparation\":{\"path\":\"/private/tmp/lhfo-DRptCk/workspaces/p119-oracle-2a705c8b-1e42-424a-969b-a71edd32d170/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771900,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAtBaseline\":{\"path\":\"/private/tmp/lhfo-DRptCk/workspaces/p119-oracle-2a705c8b-1e42-424a-969b-a71edd32d170/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771900,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAfterRead\":{\"path\":\"/private/tmp/lhfo-DRptCk/workspaces/p119-oracle-2a705c8b-1e42-424a-969b-a71edd32d170/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541771900,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}},\"shmBefore\":{\"path\":\"/private/tmp/lhfo-DRptCk/workspaces/p119-oracle-2a705c8b-1e42-424a-969b-a71edd32d170/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541771901,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-DRptCk/workspaces/p119-oracle-2a705c8b-1e42-424a-969b-a71edd32d170/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541771901,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual readonly read transaction through baseline, cold CLI, action extraction and afterpins; DB/WAL/key bytes remain exact; SHM is coordination only\"}"
+                },
+                {
+                  "id": "action-chain",
+                  "passed": true,
+                  "evidence": "{\"selectedCount\":1,\"errors\":[]}"
+                },
+                {
+                  "id": "authorization",
+                  "passed": false,
+                  "evidence": "{\"errors\":[{\"executionId\":\"exec_efb84a52-6a6c-4db9-a0cc-a848ca29223b\",\"message\":\"inconsistent amount/resource preimage\"}],\"preimages\":0,\"independentlySignedFiles\":1,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+                }
+              ]
+            }
+          ],
+          "controlledMutationCount": 1
+        },
+        {
+          "identity": "P1-19 finite independent oracle with genuine signed action producers a corrupted genuine decision signature is refused without re-signing authority",
+          "mode": "completed",
+          "root": "/private/tmp/lhfo-EuXcMT",
+          "stage": "before-disposable-launcher-root-removal",
+          "publicSuccessful": true,
+          "providerRoot": "/private/tmp/lhf-L6VqIP",
+          "providerRows": 11,
+          "providerRowDigestsIndependentlyRecomputed": true,
+          "checkpoint": {
+            "hash": "39736c6981f2769116006fe3d2b1c60b0c62c445961d9a4097a657e019d25186",
+            "seq": 11
+          },
+          "reconstructedTxlogBytes": 5415,
+          "reconstructedTxlogSha256": "4bdf8403af23720cd0e20f41722cd1ca6d8c00c7412a7baa4455399032d48ab1",
+          "copy": {
+            "actualProviderDir": "/private/tmp/lhf-L6VqIP/run",
+            "oracleInputDir": "/private/tmp/lhfo-EuXcMT/provider-evidence",
+            "files": [
+              {
+                "name": "txlog.jsonl",
+                "original": "/private/tmp/lhf-L6VqIP/run/txlog.jsonl",
+                "copied": "/private/tmp/lhfo-EuXcMT/provider-evidence/txlog.jsonl",
+                "bytes": 5415,
+                "sha256": "4bdf8403af23720cd0e20f41722cd1ca6d8c00c7412a7baa4455399032d48ab1",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541771933,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541772116,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                }
+              },
+              {
+                "name": "txlog-head.json",
+                "original": "/private/tmp/lhf-L6VqIP/run/txlog-head.json",
+                "copied": "/private/tmp/lhfo-EuXcMT/provider-evidence/txlog-head.json",
+                "bytes": 85,
+                "sha256": "cc74e217489e9d6d07f8cfc46e0859340f17542d18fbb861a8273785b600d02d",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541772115,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541772117,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                }
+              }
+            ]
+          },
+          "producerResult": {
+            "schema": "finance-oracle-producer/1",
+            "mode": "completed",
+            "executionId": "exec_c9d6ccdf-4a9c-4f33-8251-bfc2dfe7ab11",
+            "paymentId": "pay_2b5f3777f35c4fdbbd5fe0a23e8b20c4",
+            "idempotencyKey": "amc1_132AXPN4YFSN3J9DS1WSJ35M7C",
+            "approvalRequestId": "apprreq_d74418fe91bf42489a8708314f41e6d7",
+            "sessionId": "finance-oracle-recorder-994bd790-68b1-408f-a836-620aa531a66b",
+            "authorizationDigest": "fc28791b16ec87128d7587545a3419dd4431ef9b4a90c0fe275efd35dc67c37f",
+            "genericArgumentsDigest": "c4e9b76ef0f9699a8c877a79a98f3e2e15467d37a9522fd1ab29c0d1055f8963",
+            "providerBodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+            "decisionIds": [
+              "apprdec_0c4a223e71144430abc9f723d57cd98f",
+              "apprdec_ff21e6d8778747cbaa7f2fd9c853ad89"
+            ]
+          },
+          "defaultPolicyProfile": {
+            "defaultApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "actualApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "financialRule": {
+              "requiredApprovals": 2,
+              "requireDistinctUsers": true,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "ttlMinutes": 10
+            },
+            "actualFinancialRule": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            }
+          },
+          "children": [
+            {
+              "label": "initializer",
+              "pid": 4301,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "producer",
+              "pid": 4302,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "oracle-1",
+              "pid": 4303,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "oracle-2",
+              "pid": 4306,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            }
+          ],
+          "providerChild": {
+            "pid": 4300,
+            "exit": 0,
+            "streamsClosed": true,
+            "pidESRCH": true
+          },
+          "outputs": [
+            {
+              "verdict": "pass",
+              "falseIds": [],
+              "checks": [
+                {
+                  "id": "inputs",
+                  "passed": true,
+                  "evidence": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority."
+                },
+                {
+                  "id": "txlog-chain",
+                  "passed": true,
+                  "evidence": "{\"head\":{\"hash\":\"39736c6981f2769116006fe3d2b1c60b0c62c445961d9a4097a657e019d25186\",\"seq\":11},\"log\":{\"path\":\"/private/tmp/lhfo-EuXcMT/provider-evidence/txlog.jsonl\",\"dev\":16777231,\"ino\":541772116,\"bytes\":5415,\"sha256\":\"4bdf8403af23720cd0e20f41722cd1ca6d8c00c7412a7baa4455399032d48ab1\"},\"checkpoint\":{\"path\":\"/private/tmp/lhfo-EuXcMT/provider-evidence/txlog-head.json\",\"dev\":16777231,\"ino\":541772117,\"bytes\":85,\"sha256\":\"cc74e217489e9d6d07f8cfc46e0859340f17542d18fbb861a8273785b600d02d\"}}"
+                },
+                {
+                  "id": "post-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "commit-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "no-duplicate",
+                  "passed": true,
+                  "evidence": "{\"commits\":1,\"uniqueTenantReferences\":1,\"uniqueTenantKeys\":1}"
+                },
+                {
+                  "id": "no-dispatch-on-deny",
+                  "passed": true,
+                  "evidence": "{\"expectedDecision\":\"completed\",\"posts\":1,\"commits\":1}"
+                },
+                {
+                  "id": "payload-bound",
+                  "passed": true,
+                  "evidence": "{\"matched\":1,\"commits\":1,\"problems\":[],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}"
+                },
+                {
+                  "id": "payload-minimal",
+                  "passed": true,
+                  "evidence": "{\"paymentRequests\":1,\"scope\":\"actual provider bodyFields/normalized body; raw wire bytes are represented by hash and bytesRead, not reconstructed\"}"
+                },
+                {
+                  "id": "receipt-state",
+                  "passed": true,
+                  "evidence": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_c9d6ccdf-4a9c-4f33-8251-bfc2dfe7ab11\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}"
+                },
+                {
+                  "id": "unauthorized-effects",
+                  "passed": true,
+                  "evidence": "{\"actualCommits\":1,\"authenticCompletedMatches\":1,\"unauthorizedOrUnproven\":0}"
+                },
+                {
+                  "id": "action-evidence-coverage",
+                  "passed": true,
+                  "evidence": "{\"numerator\":1,\"denominator\":1,\"fraction\":1,\"limit\":\"explicit authentic unknown can contribute coverage but cannot satisfy the matching-completed-receipt check\"}"
+                },
+                {
+                  "id": "control-result",
+                  "passed": true,
+                  "evidence": "Not requested by this finite case; no compliance status inferred."
+                },
+                {
+                  "id": "cold-ledger-verifier",
+                  "passed": true,
+                  "evidence": "{\"ok\":true,\"pid\":4304,\"pgid\":\"inherited outer guarded group; not claimed equal to child PID\",\"code\":0,\"signal\":null,\"spawnError\":null,\"streamError\":null,\"overflow\":false,\"late\":false,\"capturedStdoutSha256\":\"b0f47dc5549449188f4e6040df1eba53d57b065c9dac1ab08e837e7e05935fa3\",\"capturedStderrSha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"capturedBytes\":{\"stdout\":1232,\"stderr\":0},\"pidProbes\":[{\"absent\":true,\"code\":\"ESRCH\"}],\"errors\":[],\"trustRoot\":{\"anchored\":true,\"monitorFingerprint\":\"624733ec4f63e417bb26c3621e6f4a97b4ea047f71119f23e474a7ec5d66f792\",\"expectedFingerprint\":\"624733ec4f63e417bb26c3621e6f4a97b4ea047f71119f23e474a7ec5d66f792\",\"monitorAdmission\":{\"signature\":\"ledger monitor key\",\"purpose\":\"ledger-row\",\"keyId\":\"624733ec4f63e417bb26c3621e6f4a97b4ea047f71119f23e474a7ec5d66f792\",\"status\":\"admitted\",\"source\":\"explicit-key\",\"listId\":null,\"timeBasis\":null,\"detail\":null}}}"
+                },
+                {
+                  "id": "snapshot-stable",
+                  "passed": true,
+                  "evidence": "{\"dataAndKeysBefore\":\"b32f99cbce1c0416798cbf93783f0dfaef4a51dc9db79f7fbff73578f97c50be\",\"dataAndKeysAfter\":\"b32f99cbce1c0416798cbf93783f0dfaef4a51dc9db79f7fbff73578f97c50be\",\"readerPreparation\":{\"readonly\":true,\"inTransaction\":true,\"initialSchemaRows\":179,\"dataAndKeysUnchanged\":true,\"walUnchanged\":false,\"emptyWalCreated\":true,\"beforePreparationSha256\":\"ad26c0b632ccdcbd2b86ed94e5a777807c84c291edcd0f859804a7b536c28e8b\",\"walBeforePreparation\":{\"path\":\"/private/tmp/lhfo-EuXcMT/workspaces/p119-oracle-ddfb9ee0-03f4-478b-ac88-5a721e0389e7/.amc/evidence.sqlite-wal\",\"absent\":true},\"walAtBaseline\":{\"path\":\"/private/tmp/lhfo-EuXcMT/workspaces/p119-oracle-ddfb9ee0-03f4-478b-ac88-5a721e0389e7/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541772118,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAfterRead\":{\"path\":\"/private/tmp/lhfo-EuXcMT/workspaces/p119-oracle-ddfb9ee0-03f4-478b-ac88-5a721e0389e7/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541772118,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}},\"shmBefore\":{\"path\":\"/private/tmp/lhfo-EuXcMT/workspaces/p119-oracle-ddfb9ee0-03f4-478b-ac88-5a721e0389e7/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541772119,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-EuXcMT/workspaces/p119-oracle-ddfb9ee0-03f4-478b-ac88-5a721e0389e7/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541772119,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual readonly read transaction through baseline, cold CLI, action extraction and afterpins; DB/WAL/key bytes remain exact; SHM is coordination only\"}"
+                },
+                {
+                  "id": "action-chain",
+                  "passed": true,
+                  "evidence": "{\"selectedCount\":1,\"errors\":[]}"
+                },
+                {
+                  "id": "authorization",
+                  "passed": true,
+                  "evidence": "{\"errors\":[],\"preimages\":1,\"independentlySignedFiles\":17,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+                }
+              ]
+            },
+            {
+              "verdict": "fail",
+              "falseIds": [
+                "payload-bound",
+                "unauthorized-effects",
+                "action-evidence-coverage",
+                "authorization"
+              ],
+              "checks": [
+                {
+                  "id": "inputs",
+                  "passed": true,
+                  "evidence": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority."
+                },
+                {
+                  "id": "txlog-chain",
+                  "passed": true,
+                  "evidence": "{\"head\":{\"hash\":\"39736c6981f2769116006fe3d2b1c60b0c62c445961d9a4097a657e019d25186\",\"seq\":11},\"log\":{\"path\":\"/private/tmp/lhfo-EuXcMT/provider-evidence/txlog.jsonl\",\"dev\":16777231,\"ino\":541772116,\"bytes\":5415,\"sha256\":\"4bdf8403af23720cd0e20f41722cd1ca6d8c00c7412a7baa4455399032d48ab1\"},\"checkpoint\":{\"path\":\"/private/tmp/lhfo-EuXcMT/provider-evidence/txlog-head.json\",\"dev\":16777231,\"ino\":541772117,\"bytes\":85,\"sha256\":\"cc74e217489e9d6d07f8cfc46e0859340f17542d18fbb861a8273785b600d02d\"}}"
+                },
+                {
+                  "id": "post-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "commit-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "no-duplicate",
+                  "passed": true,
+                  "evidence": "{\"commits\":1,\"uniqueTenantReferences\":1,\"uniqueTenantKeys\":1}"
+                },
+                {
+                  "id": "no-dispatch-on-deny",
+                  "passed": true,
+                  "evidence": "{\"expectedDecision\":\"completed\",\"posts\":1,\"commits\":1}"
+                },
+                {
+                  "id": "payload-bound",
+                  "passed": false,
+                  "evidence": "{\"matched\":0,\"commits\":1,\"problems\":[{\"seq\":7,\"message\":\"commit has no unique authenticated authorization preimage\"}],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}"
+                },
+                {
+                  "id": "payload-minimal",
+                  "passed": true,
+                  "evidence": "{\"paymentRequests\":1,\"scope\":\"actual provider bodyFields/normalized body; raw wire bytes are represented by hash and bytesRead, not reconstructed\"}"
+                },
+                {
+                  "id": "receipt-state",
+                  "passed": true,
+                  "evidence": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_c9d6ccdf-4a9c-4f33-8251-bfc2dfe7ab11\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}"
+                },
+                {
+                  "id": "unauthorized-effects",
+                  "passed": false,
+                  "evidence": "{\"actualCommits\":1,\"authenticCompletedMatches\":0,\"unauthorizedOrUnproven\":1}"
+                },
+                {
+                  "id": "action-evidence-coverage",
+                  "passed": false,
+                  "evidence": "{\"numerator\":0,\"denominator\":1,\"fraction\":0,\"limit\":\"explicit authentic unknown can contribute coverage but cannot satisfy the matching-completed-receipt check\"}"
+                },
+                {
+                  "id": "control-result",
+                  "passed": true,
+                  "evidence": "Not requested by this finite case; no compliance status inferred."
+                },
+                {
+                  "id": "cold-ledger-verifier",
+                  "passed": true,
+                  "evidence": "{\"ok\":true,\"pid\":4307,\"pgid\":\"inherited outer guarded group; not claimed equal to child PID\",\"code\":0,\"signal\":null,\"spawnError\":null,\"streamError\":null,\"overflow\":false,\"late\":false,\"capturedStdoutSha256\":\"b0f47dc5549449188f4e6040df1eba53d57b065c9dac1ab08e837e7e05935fa3\",\"capturedStderrSha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"capturedBytes\":{\"stdout\":1232,\"stderr\":0},\"pidProbes\":[{\"absent\":true,\"code\":\"ESRCH\"}],\"errors\":[],\"trustRoot\":{\"anchored\":true,\"monitorFingerprint\":\"624733ec4f63e417bb26c3621e6f4a97b4ea047f71119f23e474a7ec5d66f792\",\"expectedFingerprint\":\"624733ec4f63e417bb26c3621e6f4a97b4ea047f71119f23e474a7ec5d66f792\",\"monitorAdmission\":{\"signature\":\"ledger monitor key\",\"purpose\":\"ledger-row\",\"keyId\":\"624733ec4f63e417bb26c3621e6f4a97b4ea047f71119f23e474a7ec5d66f792\",\"status\":\"admitted\",\"source\":\"explicit-key\",\"listId\":null,\"timeBasis\":null,\"detail\":null}}}"
+                },
+                {
+                  "id": "snapshot-stable",
+                  "passed": true,
+                  "evidence": "{\"dataAndKeysBefore\":\"b32f99cbce1c0416798cbf93783f0dfaef4a51dc9db79f7fbff73578f97c50be\",\"dataAndKeysAfter\":\"b32f99cbce1c0416798cbf93783f0dfaef4a51dc9db79f7fbff73578f97c50be\",\"readerPreparation\":{\"readonly\":true,\"inTransaction\":true,\"initialSchemaRows\":179,\"dataAndKeysUnchanged\":true,\"walUnchanged\":true,\"emptyWalCreated\":false,\"beforePreparationSha256\":\"b32f99cbce1c0416798cbf93783f0dfaef4a51dc9db79f7fbff73578f97c50be\",\"walBeforePreparation\":{\"path\":\"/private/tmp/lhfo-EuXcMT/workspaces/p119-oracle-ddfb9ee0-03f4-478b-ac88-5a721e0389e7/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541772118,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAtBaseline\":{\"path\":\"/private/tmp/lhfo-EuXcMT/workspaces/p119-oracle-ddfb9ee0-03f4-478b-ac88-5a721e0389e7/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541772118,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAfterRead\":{\"path\":\"/private/tmp/lhfo-EuXcMT/workspaces/p119-oracle-ddfb9ee0-03f4-478b-ac88-5a721e0389e7/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541772118,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}},\"shmBefore\":{\"path\":\"/private/tmp/lhfo-EuXcMT/workspaces/p119-oracle-ddfb9ee0-03f4-478b-ac88-5a721e0389e7/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541772119,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-EuXcMT/workspaces/p119-oracle-ddfb9ee0-03f4-478b-ac88-5a721e0389e7/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541772119,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual readonly read transaction through baseline, cold CLI, action extraction and afterpins; DB/WAL/key bytes remain exact; SHM is coordination only\"}"
+                },
+                {
+                  "id": "action-chain",
+                  "passed": true,
+                  "evidence": "{\"selectedCount\":1,\"errors\":[]}"
+                },
+                {
+                  "id": "authorization",
+                  "passed": false,
+                  "evidence": "{\"errors\":[{\"executionId\":\"exec_c9d6ccdf-4a9c-4f33-8251-bfc2dfe7ab11\",\"message\":\"auditor signature refused: /private/tmp/lhfo-EuXcMT/workspaces/p119-oracle-ddfb9ee0-03f4-478b-ac88-5a721e0389e7/.amc/approvals/decisions/apprdec_0c4a223e71144430abc9f723d57cd98f.json\"}],\"preimages\":0,\"independentlySignedFiles\":15,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+                }
+              ]
+            }
+          ],
+          "controlledMutationCount": 1
+        },
+        {
+          "identity": "P1-19 finite independent oracle with genuine signed action producers a genuine signed one-decision policy cannot weaken the external two-decision oracle profile",
+          "mode": "weaker-policy",
+          "root": "/private/tmp/lhfo-JdRepd",
+          "stage": "before-disposable-launcher-root-removal",
+          "publicSuccessful": true,
+          "providerRoot": "/private/tmp/lhf-MBOinR",
+          "providerRows": 11,
+          "providerRowDigestsIndependentlyRecomputed": true,
+          "checkpoint": {
+            "hash": "af5b016f87f81eec0fccf11b2bcb9e7f26abde321ea1935ef98ec927c8ed527f",
+            "seq": 11
+          },
+          "reconstructedTxlogBytes": 5415,
+          "reconstructedTxlogSha256": "ab7b65ed05eaed17e624e192fc836206352d0fd28a35faa3e6d9c4ff70d9cfe2",
+          "copy": {
+            "actualProviderDir": "/private/tmp/lhf-MBOinR/run",
+            "oracleInputDir": "/private/tmp/lhfo-JdRepd/provider-evidence",
+            "files": [
+              {
+                "name": "txlog.jsonl",
+                "original": "/private/tmp/lhf-MBOinR/run/txlog.jsonl",
+                "copied": "/private/tmp/lhfo-JdRepd/provider-evidence/txlog.jsonl",
+                "bytes": 5415,
+                "sha256": "ab7b65ed05eaed17e624e192fc836206352d0fd28a35faa3e6d9c4ff70d9cfe2",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541772148,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541772337,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                }
+              },
+              {
+                "name": "txlog-head.json",
+                "original": "/private/tmp/lhf-MBOinR/run/txlog-head.json",
+                "copied": "/private/tmp/lhfo-JdRepd/provider-evidence/txlog-head.json",
+                "bytes": 85,
+                "sha256": "a8ee8134e87bb41a8e7837666c8e9a883fcf29783361ea15d91181df846a269a",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541772336,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541772338,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                }
+              }
+            ]
+          },
+          "producerResult": {
+            "schema": "finance-oracle-producer/1",
+            "mode": "weaker-policy",
+            "executionId": "exec_b095423e-ff1b-497c-a2d3-8d4172ea9105",
+            "paymentId": "pay_dfa4c79c53244621aa8e5b1e461df523",
+            "idempotencyKey": "amc1_1G5SY539BY01RT62SWXSWWA1N9",
+            "approvalRequestId": "apprreq_d93ecf0f57274d2d922f1886152eebed",
+            "sessionId": "finance-oracle-recorder-d3a9d8cd-48f8-4745-a4c1-50a64ba22746",
+            "authorizationDigest": "4ac8a2971c7c0b9537960279d3c5650069a5ca35969f8b51eddd2b562e6f2114",
+            "genericArgumentsDigest": "c4e9b76ef0f9699a8c877a79a98f3e2e15467d37a9522fd1ab29c0d1055f8963",
+            "providerBodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+            "decisionIds": [
+              "apprdec_c89523171e404a15a2169ff5b7b696ea"
+            ]
+          },
+          "defaultPolicyProfile": {
+            "defaultApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "actualApprovalPolicySha256": "7750e21f49f99d7d3a3a40a21f70e56a42893b5aa4300e2073d68e7d6d9279eb",
+            "financialRule": {
+              "requiredApprovals": 2,
+              "requireDistinctUsers": true,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "ttlMinutes": 10
+            },
+            "actualFinancialRule": {
+              "requiredApprovals": 1,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            }
+          },
+          "children": [
+            {
+              "label": "initializer",
+              "pid": 4313,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "producer",
+              "pid": 4315,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "oracle-1",
+              "pid": 4317,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            }
+          ],
+          "providerChild": {
+            "pid": 4312,
+            "exit": 0,
+            "streamsClosed": true,
+            "pidESRCH": true
+          },
+          "outputs": [
+            {
+              "verdict": "fail",
+              "falseIds": [
+                "payload-bound",
+                "unauthorized-effects",
+                "action-evidence-coverage",
+                "authorization"
+              ],
+              "checks": [
+                {
+                  "id": "inputs",
+                  "passed": true,
+                  "evidence": "Pinned operator scope, public keys, source CLI, Node, exact finite case and default FINANCIAL profile; adapter stdout is not authority."
+                },
+                {
+                  "id": "txlog-chain",
+                  "passed": true,
+                  "evidence": "{\"head\":{\"hash\":\"af5b016f87f81eec0fccf11b2bcb9e7f26abde321ea1935ef98ec927c8ed527f\",\"seq\":11},\"log\":{\"path\":\"/private/tmp/lhfo-JdRepd/provider-evidence/txlog.jsonl\",\"dev\":16777231,\"ino\":541772337,\"bytes\":5415,\"sha256\":\"ab7b65ed05eaed17e624e192fc836206352d0fd28a35faa3e6d9c4ff70d9cfe2\"},\"checkpoint\":{\"path\":\"/private/tmp/lhfo-JdRepd/provider-evidence/txlog-head.json\",\"dev\":16777231,\"ino\":541772338,\"bytes\":85,\"sha256\":\"a8ee8134e87bb41a8e7837666c8e9a883fcf29783361ea15d91181df846a269a\"}}"
+                },
+                {
+                  "id": "post-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "commit-count",
+                  "passed": true,
+                  "evidence": "{\"expected\":1,\"actual\":1}"
+                },
+                {
+                  "id": "no-duplicate",
+                  "passed": true,
+                  "evidence": "{\"commits\":1,\"uniqueTenantReferences\":1,\"uniqueTenantKeys\":1}"
+                },
+                {
+                  "id": "no-dispatch-on-deny",
+                  "passed": true,
+                  "evidence": "{\"expectedDecision\":\"completed\",\"posts\":1,\"commits\":1}"
+                },
+                {
+                  "id": "payload-bound",
+                  "passed": false,
+                  "evidence": "{\"matched\":0,\"commits\":1,\"problems\":[{\"seq\":7,\"message\":\"commit has no unique authenticated authorization preimage\"}],\"digestRule\":\"independent generic envelope and provider-body mapping; the two hashes are not equal\"}"
+                },
+                {
+                  "id": "payload-minimal",
+                  "passed": true,
+                  "evidence": "{\"paymentRequests\":1,\"scope\":\"actual provider bodyFields/normalized body; raw wire bytes are represented by hash and bytesRead, not reconstructed\"}"
+                },
+                {
+                  "id": "receipt-state",
+                  "passed": true,
+                  "evidence": "{\"expected\":\"completed\",\"actual\":[{\"executionId\":\"exec_b095423e-ff1b-497c-a2d3-8d4172ea9105\",\"state\":\"completed\",\"effect\":\"applied\",\"evidenceComplete\":true}],\"boundary\":\"action state is independently read and linked to a cold-authenticated ledger; no installed AMC action-state CLI exists\"}"
+                },
+                {
+                  "id": "unauthorized-effects",
+                  "passed": false,
+                  "evidence": "{\"actualCommits\":1,\"authenticCompletedMatches\":0,\"unauthorizedOrUnproven\":1}"
+                },
+                {
+                  "id": "action-evidence-coverage",
+                  "passed": false,
+                  "evidence": "{\"numerator\":0,\"denominator\":1,\"fraction\":0,\"limit\":\"explicit authentic unknown can contribute coverage but cannot satisfy the matching-completed-receipt check\"}"
+                },
+                {
+                  "id": "control-result",
+                  "passed": true,
+                  "evidence": "Not requested by this finite case; no compliance status inferred."
+                },
+                {
+                  "id": "cold-ledger-verifier",
+                  "passed": true,
+                  "evidence": "{\"ok\":true,\"pid\":4318,\"pgid\":\"inherited outer guarded group; not claimed equal to child PID\",\"code\":0,\"signal\":null,\"spawnError\":null,\"streamError\":null,\"overflow\":false,\"late\":false,\"capturedStdoutSha256\":\"25a3d99e92c1221a6a57a1b7ac18cdec68762a07aa1d32625129ddffe86d211b\",\"capturedStderrSha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"capturedBytes\":{\"stdout\":1232,\"stderr\":0},\"pidProbes\":[{\"absent\":true,\"code\":\"ESRCH\"}],\"errors\":[],\"trustRoot\":{\"anchored\":true,\"monitorFingerprint\":\"973013a9bb6cf4f1f2b7e22fda7a0dd1705e7659af12eadbdff0cc668be0536a\",\"expectedFingerprint\":\"973013a9bb6cf4f1f2b7e22fda7a0dd1705e7659af12eadbdff0cc668be0536a\",\"monitorAdmission\":{\"signature\":\"ledger monitor key\",\"purpose\":\"ledger-row\",\"keyId\":\"973013a9bb6cf4f1f2b7e22fda7a0dd1705e7659af12eadbdff0cc668be0536a\",\"status\":\"admitted\",\"source\":\"explicit-key\",\"listId\":null,\"timeBasis\":null,\"detail\":null}}}"
+                },
+                {
+                  "id": "snapshot-stable",
+                  "passed": true,
+                  "evidence": "{\"dataAndKeysBefore\":\"7764d7a1c73e33712b0310719afec23ac88db3ad6b9634fdac1487825c05f10f\",\"dataAndKeysAfter\":\"7764d7a1c73e33712b0310719afec23ac88db3ad6b9634fdac1487825c05f10f\",\"readerPreparation\":{\"readonly\":true,\"inTransaction\":true,\"initialSchemaRows\":179,\"dataAndKeysUnchanged\":true,\"walUnchanged\":false,\"emptyWalCreated\":true,\"beforePreparationSha256\":\"709b3ba180ae954962f72ba7aa31d5f37b1de13d7aac08ef076e727700b81309\",\"walBeforePreparation\":{\"path\":\"/private/tmp/lhfo-JdRepd/workspaces/p119-oracle-6614540f-70e4-44c9-afca-04c5c0ab4783/.amc/evidence.sqlite-wal\",\"absent\":true},\"walAtBaseline\":{\"path\":\"/private/tmp/lhfo-JdRepd/workspaces/p119-oracle-6614540f-70e4-44c9-afca-04c5c0ab4783/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541772339,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"},\"walAfterRead\":{\"path\":\"/private/tmp/lhfo-JdRepd/workspaces/p119-oracle-6614540f-70e4-44c9-afca-04c5c0ab4783/.amc/evidence.sqlite-wal\",\"dev\":16777231,\"ino\":541772339,\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}},\"shmBefore\":{\"path\":\"/private/tmp/lhfo-JdRepd/workspaces/p119-oracle-6614540f-70e4-44c9-afca-04c5c0ab4783/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541772340,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"shmAfter\":{\"path\":\"/private/tmp/lhfo-JdRepd/workspaces/p119-oracle-6614540f-70e4-44c9-afca-04c5c0ab4783/.amc/evidence.sqlite-shm\",\"dev\":16777231,\"ino\":541772340,\"bytes\":32768,\"sha256\":\"fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb\"},\"scope\":\"same actual readonly read transaction through baseline, cold CLI, action extraction and afterpins; DB/WAL/key bytes remain exact; SHM is coordination only\"}"
+                },
+                {
+                  "id": "action-chain",
+                  "passed": true,
+                  "evidence": "{\"selectedCount\":1,\"errors\":[]}"
+                },
+                {
+                  "id": "authorization",
+                  "passed": false,
+                  "evidence": "{\"errors\":[{\"executionId\":\"exec_b095423e-ff1b-497c-a2d3-8d4172ea9105\",\"message\":\"signed approval policy differs from the external reviewed default FINANCIAL policy pin\"}],\"preimages\":0,\"independentlySignedFiles\":9,\"identity\":\"local fixture auditor signatures; no authenticated-person or real-tenant claim\"}"
+                }
+              ]
+            }
+          ],
+          "controlledMutationCount": 0
+        },
+        {
+          "identity": "P1-19 finite independent oracle with genuine signed action producers unsupported case expectations fail inputs instead of being silently ignored",
+          "mode": "unsupported-expectation",
+          "root": "/private/tmp/lhfo-Ssk0yZ",
+          "stage": "before-disposable-launcher-root-removal",
+          "publicSuccessful": true,
+          "providerRoot": "/private/tmp/lhf-ve5daa",
+          "providerRows": 11,
+          "providerRowDigestsIndependentlyRecomputed": true,
+          "checkpoint": {
+            "hash": "b2092a7da862de8e7a0607db55e147eb51855238777a5775135a1085ab70df86",
+            "seq": 11
+          },
+          "reconstructedTxlogBytes": 5415,
+          "reconstructedTxlogSha256": "b32766edbaa1c82eec8c97310318958dc3d705c23e40fdfdc8183490afb71c95",
+          "copy": {
+            "actualProviderDir": "/private/tmp/lhf-ve5daa/run",
+            "oracleInputDir": "/private/tmp/lhfo-Ssk0yZ/provider-evidence",
+            "files": [
+              {
+                "name": "txlog.jsonl",
+                "original": "/private/tmp/lhf-ve5daa/run/txlog.jsonl",
+                "copied": "/private/tmp/lhfo-Ssk0yZ/provider-evidence/txlog.jsonl",
+                "bytes": 5415,
+                "sha256": "b32766edbaa1c82eec8c97310318958dc3d705c23e40fdfdc8183490afb71c95",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541772364,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541772547,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 5415
+                }
+              },
+              {
+                "name": "txlog-head.json",
+                "original": "/private/tmp/lhf-ve5daa/run/txlog-head.json",
+                "copied": "/private/tmp/lhfo-Ssk0yZ/provider-evidence/txlog-head.json",
+                "bytes": 85,
+                "sha256": "a032a742d569544a8ba395521b5a476cbacd654beb255744529a3dc162fef054",
+                "originalIdentity": {
+                  "device": 16777231,
+                  "inode": 541772546,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                },
+                "copyIdentity": {
+                  "device": 16777231,
+                  "inode": 541772548,
+                  "nlink": 1,
+                  "mode": 384,
+                  "bytes": 85
+                }
+              }
+            ]
+          },
+          "producerResult": {
+            "schema": "finance-oracle-producer/1",
+            "mode": "unsupported-expectation",
+            "executionId": "exec_457dc433-aafe-41a7-8bd6-ff59b5507db2",
+            "paymentId": "pay_3b4fb7de61334b2c99e2a508ba094f01",
+            "idempotencyKey": "amc1_793JG6RCB9BNCTJB6CAACYHS01",
+            "approvalRequestId": "apprreq_ab010e671a7e465a8a24007da75db061",
+            "sessionId": "finance-oracle-recorder-b58a86da-dec9-45f9-8080-2c9c12615a7f",
+            "authorizationDigest": "6ff527ae1bc7900c35e23ee963dfe8aa9d05d5bcdc82c505524b39b07d740e46",
+            "genericArgumentsDigest": "c4e9b76ef0f9699a8c877a79a98f3e2e15467d37a9522fd1ab29c0d1055f8963",
+            "providerBodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+            "decisionIds": [
+              "apprdec_9f59eb02715549bbb9ac2e06ec2fe2a7",
+              "apprdec_3ee41d8a8451437d9b4c5498f5feab92"
+            ]
+          },
+          "defaultPolicyProfile": {
+            "defaultApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "actualApprovalPolicySha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19",
+            "financialRule": {
+              "requiredApprovals": 2,
+              "requireDistinctUsers": true,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "ttlMinutes": 10
+            },
+            "actualFinancialRule": {
+              "requiredApprovals": 2,
+              "rolesAllowed": [
+                "OWNER",
+                "AUDITOR"
+              ],
+              "requireDistinctUsers": true,
+              "ttlMinutes": 10
+            }
+          },
+          "children": [
+            {
+              "label": "initializer",
+              "pid": 4320,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "producer",
+              "pid": 4327,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            },
+            {
+              "label": "oracle-1",
+              "pid": 4330,
+              "exit": 0,
+              "streamsClosed": true,
+              "pidESRCH": true
+            }
+          ],
+          "providerChild": {
+            "pid": 4319,
+            "exit": 0,
+            "streamsClosed": true,
+            "pidESRCH": true
+          },
+          "outputs": [
+            {
+              "verdict": "fail",
+              "falseIds": [
+                "inputs",
+                "txlog-chain",
+                "post-count",
+                "commit-count",
+                "no-duplicate",
+                "no-dispatch-on-deny",
+                "payload-bound",
+                "payload-minimal",
+                "receipt-state",
+                "unauthorized-effects",
+                "action-evidence-coverage",
+                "control-result",
+                "cold-ledger-verifier",
+                "snapshot-stable",
+                "action-chain",
+                "authorization"
+              ],
+              "checks": [
+                {
+                  "id": "inputs",
+                  "passed": false,
+                  "evidence": "Oracle could not establish its complete input/lifecycle proof: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "txlog-chain",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "post-count",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "commit-count",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "no-duplicate",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "no-dispatch-on-deny",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "payload-bound",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "payload-minimal",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "receipt-state",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "unauthorized-effects",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "action-evidence-coverage",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "control-result",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "cold-ledger-verifier",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "snapshot-stable",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "action-chain",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                },
+                {
+                  "id": "authorization",
+                  "passed": false,
+                  "evidence": "Required evidence unavailable: unsupported expected fields: this finite oracle supports only decision, terminalReceiptState, posts, commits"
+                }
+              ]
+            }
+          ],
+          "controlledMutationCount": 0
+        }
+      ]
+    }
+  ],
+  "controlledMutations": [
+    {
+      "phase": "p119-oracle-v4-all",
+      "root": "/private/tmp/lhfo-kna9Pf",
+      "label": "truncated-log",
+      "path": "/private/tmp/lhfo-kna9Pf/provider-evidence/txlog.jsonl",
+      "beforeBytes": 5415,
+      "afterBytes": 5414,
+      "beforeSha256": "e9411263c437f2bd3a861b23465fd997d8bd8ee23809a8e8200194f6217b8f4c",
+      "afterSha256": "215ef1c8724729cdc696b6a4af7a4ea2139f114f4ac010b24782a905a9d9bb4f",
+      "all16PositiveBeforeMutation": true,
+      "change": "Only final newline removed from cold copy; original provider bytes remain reconstructed separately."
+    },
+    {
+      "phase": "p119-oracle-v4-all",
+      "root": "/private/tmp/lhfo-DRptCk",
+      "label": "preimage",
+      "path": "/private/tmp/lhfo-DRptCk/workspaces/p119-oracle-2a705c8b-1e42-424a-969b-a71edd32d170/.amc/finance-oracle-preimages/exec_efb84a52-6a6c-4db9-a0cc-a848ca29223b.json",
+      "beforeBytes": 2818,
+      "afterBytes": 2818,
+      "beforeSha256": "bc8da27ba19408cb15fddc3136a635693df08ec21a8ce31c2a0763454747cf70",
+      "afterSha256": "c7705e841db1e0daedf7fa7b800813aa15728afda2aa2f8fe6191be9b9dc5025",
+      "all16PositiveBeforeMutation": true,
+      "change": "Only amountMinor changes 12000 to12001; authorization record unchanged, its digest matches producer, and generic argument digest changes."
+    },
+    {
+      "phase": "p119-oracle-v4-all",
+      "root": "/private/tmp/lhfo-EuXcMT",
+      "label": "approval-signature",
+      "path": "/private/tmp/lhfo-EuXcMT/workspaces/p119-oracle-ddfb9ee0-03f4-478b-ac88-5a721e0389e7/.amc/approvals/decisions/apprdec_0c4a223e71144430abc9f723d57cd98f.json.sig",
+      "beforeBytes": 247,
+      "afterBytes": 231,
+      "beforeSha256": "a9e37f21b6db68eee0c53bd972a0d8b106e10b701035a8cda654b3be9ff46d98",
+      "afterSha256": "e984d1e26759ac6a085100db63dedaf05ae5fb06321dd1fb0e8d182248d2c279",
+      "all16PositiveBeforeMutation": true,
+      "change": "Only parsed signature changes one base64 character; parsed metadata unchanged; raw JSON whitespace also compacts."
+    }
+  ],
+  "wireOrderDifference": [
+    {
+      "phase": "p119-oracle-v4-all",
+      "providerRoot": "/private/tmp/lhf-6SyXw6",
+      "seq": 9,
+      "fields": [
+        "kind",
+        "sourceAccountId",
+        "payeeId",
+        "amountMinor",
+        "currency",
+        "reference",
+        "originalTxnId"
+      ],
+      "rawSha256": "e4bcf17b4362a69b49415bd6cfd2c7522475170231db95b281886b4748f93064",
+      "normalizedSha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+      "rawBytes": 159
+    }
+  ],
+  "auditMethodCorrection": "An initial metadata assertion incorrectly required sorted inbound field order and identical raw/normalized digests. It stopped on the genuine duplicate helper second POST. Actual recorded key order reconstructs its raw hash, and exact key sets plus canonical normalized hashes validate separately. No product/input/test change or product failure is inferred.",
+  "limits": [
+    "Successful roots are cleanup-published, not claimed retained or reopened.",
+    "Provider row and canonical log/checkpoint hashes were independently reconstructed from published records and matched to published original/copy bytes, sizes and distinct inode/link/mode metadata; these are not new post-cleanup filesystem observations.",
+    "Snapshot composite hash equality, detailed WAL pins, readonly flags and cold CLI outcomes were checked as published. DB/key bytes and SQLite rows were not independently reopened.",
+    "Public default policy bytes/hash/signature metadata match; every deleted approval artifact was not independently cryptographically reverified by this audit.",
+    "The full run contains10 finite tests, not F01-F38, full repository/global quality, external-person authority, kernel isolation, Linux/Node24 or formal completion. Earlier failed evidence remains immutable."
+  ],
+  "sourceAndTestPinsUnchangedAtAudit": true,
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/command.json",
+      "bytes": 2882,
+      "sha256": "133037c1c942ca2aab04db225283be163843245ccbf900e31c184be68763a361",
+      "device": 16777231,
+      "inode": 541770422,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/owned-process.json",
+      "bytes": 892,
+      "sha256": "796bf51af3158cf0b6c483f64d68ff63267ab14977e23aed1247011edf21e4bb",
+      "device": 16777231,
+      "inode": 541770191,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "3cd02b7594bf853357aee209c7c8222fd0b6921161877286a4ba68468070f827",
+      "device": 16777231,
+      "inode": 541770420,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/raw.json",
+      "bytes": 4794,
+      "sha256": "7aa8a0a6b885d51f2c98cc5360aa8a9e5d2cdd6f23dbb8c9144ca8842b47ebcb",
+      "device": 16777231,
+      "inode": 541770421,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/observer.json",
+      "bytes": 6486,
+      "sha256": "9f4f6f88886582872ac6cba363ab1df301d0939121c203117bc534e8244ad3f0",
+      "device": 16777231,
+      "inode": 541770419,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/stdout-stderr.log",
+      "bytes": 28234,
+      "sha256": "c013011b8896212229bd66a9bd793adc606c7957b113e7ed790cf4fdd0a6c913",
+      "device": 16777231,
+      "inode": 541770190,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/command.json",
+      "bytes": 2692,
+      "sha256": "0e61615e1bf20676af4fbfeffd9552d291ffa7ceb11ef65cc4ebfc80bb9c7f40",
+      "device": 16777231,
+      "inode": 541772557,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/owned-process.json",
+      "bytes": 807,
+      "sha256": "b18573ad73fb98676b2195315ee087a574ff1139c0c6fa28ddf5aaeb92d49505",
+      "device": 16777231,
+      "inode": 541770449,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "67f00e60bdef1a101b7c3f9f684786b35fee958350bc3cee3236c1cff985072f",
+      "device": 16777231,
+      "inode": 541772555,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/raw.json",
+      "bytes": 5041,
+      "sha256": "c371c63275f24e01ed89218cf994a1dae60a30dd449e227539c8ba5e4b502392",
+      "device": 16777231,
+      "inode": 541772556,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/observer.json",
+      "bytes": 6504,
+      "sha256": "3741aa933153a06f73080f7e6859592c36e093b79c58cb0f85c9db97816767f8",
+      "device": 16777231,
+      "inode": 541772553,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/stdout-stderr.log",
+      "bytes": 319468,
+      "sha256": "aa7eb1bb57a8cfe661005627d76cc027f95c7c09e234daa313dc10394f9c7bcc",
+      "device": 16777231,
+      "inode": 541770448,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 21328,
+      "sha256": "cd745ddae7cce98a5285be95d4cce815f542d3c9f218e976be5c374d3b5f858f",
+      "device": 16777231,
+      "inode": 541767592,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 29832,
+      "sha256": "92b25937b06aef01367007961944d479cf6febad3e8b3da5d52094d8741ae869",
+      "device": 16777231,
+      "inode": 541767593,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+      "bytes": 33264,
+      "sha256": "71a0979b2408cd6eb77261d184c2248387f5a938e0f95ef315ce465e511d9923",
+      "device": 16777231,
+      "inode": 541766981,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+      "bytes": 5398,
+      "sha256": "080f70bc5ce81013b55735343a3ed7a504a5649f911bc5d05e499af96d3c863d",
+      "device": 16777231,
+      "inode": 541766982,
+      "nlink": 1
+    }
+  ],
+  "allReadsAndWritesFinished": true
+}

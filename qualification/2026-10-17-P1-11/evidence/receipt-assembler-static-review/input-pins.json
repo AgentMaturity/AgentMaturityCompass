@@ -1,0 +1,21 @@
+{
+  "schema": "p111-root-assembler-static-inputs/1",
+  "rows": [
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/assemble-receipt.py",
+      "bytes": 4107,
+      "sha256": "ae3bd8ffd1c3ba50e6925033490c6d0d18270c3bd39069e4b5ec0343e17d9939"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/receipt.schema.json",
+      "bytes": 2315,
+      "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    }
+  ],
+  "allReadsFinished": true
+}

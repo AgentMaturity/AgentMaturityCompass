@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-15T00:04:24.281921+00:00",
+  "key": "P0-30",
+  "oldIssue": "AMC-1517",
+  "sourceCommit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "reviewer": "root independent static review",
+  "findings": [],
+  "status": "Static proposal accepted for later bounded runtime; no product execution or kill measured.",
+  "actualReads": [
+    "Entire 101-line private driver.",
+    "Actual callback start, recordCall, settle, snapshot, flush and close implementation.",
+    "Structural options contract and complete local callback document."
+  ],
+  "checks": [
+    "An object-literal name getter returning a string is structurally compatible with the local options interface; the surveyed local document has no accessor prohibition. This is source reasoning, not upstream conformance or a compiler result.",
+    "The initial closed check precedes the getter read and entry creation. Closing an empty capture cannot end an entry subsequently registered; the original recordCall closed disjunct remains relevant in this static path.",
+    "The driver invokes the actual public close and three actual public recording methods, with no replacement product method, private-state mutation or prototype patch.",
+    "Exact initial span fields, complete stats and source provenance are independently specified; full actual snapshots retain IDs and all semantic fields while excluding only recordedAt.",
+    "All late operations and faithful original value identity are observed before the decisive full-state retention assertion.",
+    "Finally retains chronology, partial snapshots, counters and observer error. The synchronous callback leaves no deferred barrier requiring cleanup.",
+    "The case does not assert general prevention of initial admission after reentry; that actual initial admission is its nonvacuous witness.",
+    "The separate ordinary two-case proposal and historical expected-equivalent classification remain unchanged."
+  ],
+  "futureRuntime": "After current AMC-1516 and original AMC-1517 controls, use a separately owned complete private image and the exact M23 recordCall-only disjunct deletion; record baseline/mutant/restored counts and actual effects before deciding its implication.",
+  "limits": [
+    "No syntax test, product import, compiler, runtime, source edit or new permanent test ran in this review.",
+    "Static predicted counterexample is not a measured mutation kill.",
+    "No full P0-30, current/global equivalence, upstream Pi conformance, real HTTP/tenant, claim truth or issue Done follows."
+  ],
+  "evidence": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-reentrant-proposal-20261015/reentrant.test.mjs",
+      "bytes": 5087,
+      "sha256": "115ba8913e3ceb27bbf64611ab089ad03d6d97ae65152c5214d24b7333601cc0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-reentrant-proposal-20261015/proposal.json",
+      "bytes": 14934,
+      "sha256": "95864ae44de5a24d9ebc2b013edf5a742db82d5d5705cd1b59dce5abf07f9019"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-reentrant-proposal-20261015/README.md",
+      "bytes": 2429,
+      "sha256": "37ff0e68980732b92dc9a280c62a4c623e17e0968f0aff8f4b5311105fd59ddb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/importers/callbackTelemetryCapture.ts",
+      "bytes": 14035,
+      "sha256": "bcfb468560feb46c296d28176c384c63420a88ae97eaea1e1c852c839a82c366"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/importers/callbackTelemetryCapture.js",
+      "bytes": 13856,
+      "sha256": "6f0037d14fc206beea41ece9215e83dd91a04d4e7d569b98ceb145a1e19f193a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/importers/callbackTelemetryContract.ts",
+      "bytes": 4817,
+      "sha256": "bafdef85eee19230c563865f5541b1747c81a5a31c60c573499ae569b6ad6089"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/docs/PI_CALLBACK_TELEMETRY.md",
+      "bytes": 5340,
+      "sha256": "111f60d69a88cc8b7e3cfb25ee581a9451f08b93a47af3702837e90b4caf096f"
+    }
+  ],
+  "allReadsFinished": true
+}

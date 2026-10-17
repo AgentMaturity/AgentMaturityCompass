@@ -1,0 +1,109 @@
+{
+  "schema": "p112-static-scanner-input-equivalence/1",
+  "baselineRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout",
+  "currentRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "configuredProjectExtensions": {
+    "src": [
+      ".ts",
+      ".js"
+    ],
+    "api": [
+      ".ts"
+    ],
+    "scripts": [
+      ".mjs",
+      ".cjs",
+      ".js",
+      ".ts"
+    ],
+    "tests": [
+      ".ts"
+    ],
+    "examples": [
+      ".ts",
+      ".js"
+    ],
+    "integrations": [
+      ".ts",
+      ".js"
+    ],
+    "sdk": [
+      ".ts",
+      ".js"
+    ]
+  },
+  "enumerationExcludedDirectories": [
+    "node_modules",
+    ".git",
+    "dist"
+  ],
+  "projectBeforeFiles": 4108,
+  "projectCurrentFiles": 4109,
+  "added": [
+    "tests/policy/compiledPolicyGuard.test.ts"
+  ],
+  "removed": [],
+  "changedPreexistingFiles": [],
+  "baselineCanonicalPathByteHashMapSha256": "de44fd427e286811e7d0f2319954b4511b9308cd2b6c32ef0f08e085d68a5e34",
+  "currentCanonicalPathByteHashMapSha256": "1ae43ebf224350f7af0f93b376802449afd6f5e709cc5b267aee032c1deff889",
+  "all4108PreexistingProjectBytesEqual": true,
+  "addedFilePin": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/policy/compiledPolicyGuard.test.ts",
+    "bytes": 11155,
+    "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0"
+  },
+  "equalConfigManifestRows": [
+    {
+      "relativePath": "scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
+      "relativePath": "knip.json",
+      "bytes": 1928,
+      "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1"
+    },
+    {
+      "relativePath": ".jscpd.json",
+      "bytes": 126,
+      "sha256": "b0b0290eb79f02e99c8e4c3e0fea8182d56903f2e2512643a783307dac64e209"
+    },
+    {
+      "relativePath": "package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "relativePath": "pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "relativePath": "tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+    },
+    {
+      "relativePath": "tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "relativePath": "vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "relativePath": "pnpm-workspace.yaml",
+      "bytes": 1521,
+      "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23"
+    },
+    {
+      "relativePath": "examples/langchain-node/package.json",
+      "bytes": 391,
+      "sha256": "c928269230358ddfea6cb06cd4e657bf3742818e31e6f24d979420bcfd73038a"
+    }
+  ],
+  "qualificationAndCountBoundary": "Qualification metadata is outside configured project and entry patterns. All ten admitted numeric count surfaces are README/CONTRIBUTING/website/docs/whitepaper paths, also outside those project patterns. No full-tree cleanliness premise is needed.",
+  "limit": "This is direct configured-project/config byte equivalence, not independent reimplementation of all Knip plugin discovery or an environment-isolation claim. Actual two-root same-scanner finding sets supply the diagnostic evidence."
+}

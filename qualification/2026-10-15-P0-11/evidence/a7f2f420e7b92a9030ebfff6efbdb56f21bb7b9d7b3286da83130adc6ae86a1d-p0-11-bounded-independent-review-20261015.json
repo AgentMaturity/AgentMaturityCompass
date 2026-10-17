@@ -1,0 +1,532 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "reviewer": "/root/native_race_static_review",
+  "decision": "BOUNDED_ACTUAL_EVIDENCE_VERIFIED_WITH_OPEN_ACCEPTANCE_GAPS",
+  "source": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "scope": "Independent read-only actual audit of closed originals, three once-completed causal controls, final preservation and frozen metadata. Earlier original/sealed/code/recipe reviews are reused by exact pins. Root executed controls and metadata freezing; this reviewer executed no product runtime or rerun.",
+  "blockingPacketFindings": [],
+  "blockingFindings": [],
+  "formalAcceptanceClosed": false,
+  "packetPins": [
+    {
+      "path": "/private/tmp/p0-11-bounded-qualification-20261015.json",
+      "bytes": 70959,
+      "sha256": "b6aa7d4281ea76cce222dc4186d985efb837936910bac1ae5783153f2bd8d26d"
+    },
+    {
+      "path": "/private/tmp/p0-11-bounded-qualification-20261015.md",
+      "bytes": 3853,
+      "sha256": "9e12c11b37e5f00598a8fd435ad318b701e94a8e1a78b8572f8e236c7cd93793"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015.json",
+      "bytes": 88229,
+      "sha256": "86a94bff3755d5856808fb5c0f7edfe7cbc21605355030a4e5eb6482678f4d17"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015.md",
+      "bytes": 3958,
+      "sha256": "d4677cdceea01637b2eab7ce1b313eacf21f1818a0818a057dafdb3b2e5e3754"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/runtime-artifact-index.json",
+      "bytes": 83753,
+      "sha256": "cbb4b53af633b4879df157c1357df1c325310c64980f83cc7dd02f240ba874ed"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 29638,
+      "sha256": "f1d769c08ecc1948a2cc3ffbed391ab22e7dbc53f260e0225b66a7f4406e7176"
+    },
+    {
+      "path": "/private/tmp/p0-11-qualification-20261015/final-source-preservation.json",
+      "bytes": 2832,
+      "sha256": "f3cd8c9a030493ef686ca1caabbf02372723660f1154041c5d042a646a360e53"
+    }
+  ],
+  "findings": [
+    {
+      "id": "A1",
+      "kind": "bounded-result",
+      "finding": "Originalmap7/telemetry2/preview5/recording7 pass in4separate invocations,21 unique registrations across4files. Primary9 spans2runs. Three controls use map7 or recording7 in9phases:63 repeat executions,60passes,3bodyfailures(2AssertionErrors and1exact original callbackError),2distinct failedfile/titlepairs.14existing registrations repeat; no new tests or whole-control survivor."
+    },
+    {
+      "id": "A2",
+      "kind": "semantic-guard-sensitivity",
+      "finding": "C1 7→6→7 removes missing-path error accumulation while retaining continue. Actual child status0 fails original test29:20 expected1 with AssertionError 'expected +0 to be 1 // Object.is equality'. Diagnostics30–31 are masked. Other6mutant cases pass. This observes invalid-reference admission under that exact semantic control, not16-channel enforcement or the historical literal whole-branch-removal criterion."
+    },
+    {
+      "id": "A3",
+      "kind": "exact-genuine-body-error",
+      "finding": "C2 7→6→7 propagates the original injected callback's Error 'the evidence store is unreachable'. Raw/observer retain matching callback202:15,pipeline306:19,await206:21 frames. The await rejects before outcome assertions210–213; these later values are not observed. Other6cases pass. This is direct READ_ONLY callback propagation, not a policy denial or a genuine durable-store/journaled-effect outage."
+    },
+    {
+      "id": "A4",
+      "kind": "open-literal-mutation-criterion",
+      "finding": "L1 7→6→7 removes the whole missing-file branch. Original status assertion29 passes, establishing child status1; diagnostic assertion30:20 then fails expected 'channel network-egress'. Full observer actual retains caught ENOENT on noSuchFile.ts, while its message is abbreviated. Assertion31 is masked. This is diagnostic sensitivity and continues to refuse the invalid fixture. The strict historical requirement that the missing-path fixture pass after literal removal remains open."
+    },
+    {
+      "id": "A5",
+      "kind": "packet-and-preservation",
+      "finding": "All359 index refs and363 unique recursive pin triples match. Frozen20-row root journal equals the closed original byte-for-byte and the exact phase/argv/exit contract:16zero and4intended checker fixture1. These commands are separate from9causal processes. Final8362source+4529dist=12891 parent/private bytes and recorded lstat fields are exact, with disjoint12891-inode universes,nlink1 and sole borrowedlink. Native538824643,221external+10own pins and current inbox are preserved; noACTIVE/HALTED."
+    },
+    {
+      "id": "A6",
+      "kind": "open-formal-truth-gaps",
+      "finding": "Sid residual-risk/status review, ASI re-verification/experimental labels, stale mapstamp and colliding historical successor keys remain open. Text/schema/path checks do not prove16channel behavioral enforcement. Real local SQLite+stubbed exporter/fetch, disabled preview and direct callback failure retain different meanings.1269duplicate/2751dead-code quality failures and all prior ownership/trust/fullsuite/hosted/PR/merge/release/G0/Done gaps remain unwaived."
+    }
+  ],
+  "reusedReviews": [
+    {
+      "path": "/private/tmp/p0-11-original-corpora-independent-review-20261015.json",
+      "bytes": 23426,
+      "sha256": "ad9128b687def99c672387e0c33ab1926a53082bb0b5087fa8a28905cb1d537a"
+    },
+    {
+      "path": "/private/tmp/p0-11-controller-sealed-setup-review-20261015.json",
+      "bytes": 15390,
+      "sha256": "17782c03541ccfe9be068809b2b25a1a4ffbba2d4bc0dde0b76354848b5ab76c"
+    },
+    {
+      "path": "/private/tmp/p0-11-controller-code-static-review-20261015.json",
+      "bytes": 5353,
+      "sha256": "94899d5f0c2c54ba5625432c1a24942102f447a946f34e0a30b7e940d2323aba"
+    },
+    {
+      "path": "/private/tmp/p0-11-recipes-static-review-20261015.json",
+      "bytes": 21585,
+      "sha256": "b7619c6e45d47c4782a6cd7be7607f4debc8a8180c649aa16e99a8b7a9b7b278"
+    },
+    {
+      "path": "/private/tmp/p0-11-freezer-v2-static-review-20261015.json",
+      "bytes": 11714,
+      "sha256": "13487e2d64722a73ac5e6a0ff54f614937bba7b304138055a27e8c1e4deb88f8"
+    }
+  ],
+  "originalCounts": {
+    "separateInvocations": [
+      7,
+      2,
+      5,
+      7
+    ],
+    "uniqueFileTitleRegistrations": 21,
+    "files": 4,
+    "primaryAcrossTwoRuns": 9,
+    "single9Or21Run": false,
+    "reference": {
+      "path": "/private/tmp/p0-11-qualification-20261015/original-corpora-summary.json",
+      "bytes": 14279,
+      "sha256": "820707b3b52608f9659db54f06da636dd5a8b52123d489ff6a166a10a13d20e9"
+    }
+  },
+  "causal": {
+    "counts": {
+      "total": 63,
+      "passed": 60,
+      "failed": 3,
+      "pending": 0,
+      "todo": 0
+    },
+    "failureKinds": {
+      "body-assertion": 2,
+      "exact-genuine-recorder-error-propagation": 1
+    },
+    "uniqueRepeatedOriginalRegistrations": 14,
+    "distinctFailedFileTitlePairs": 2,
+    "survivingControls": [],
+    "controls": [
+      {
+        "control": "C1-map-missing-path-fail-open",
+        "rows": [
+          {
+            "stage": "baseline",
+            "passed": 7,
+            "failed": 0,
+            "pid": 23367,
+            "exit": 0,
+            "durationMs": 1089,
+            "ESRCH": true
+          },
+          {
+            "stage": "mutant",
+            "passed": 6,
+            "failed": 1,
+            "pid": 23385,
+            "exit": 1,
+            "durationMs": 1003,
+            "ESRCH": true
+          },
+          {
+            "stage": "restored",
+            "passed": 7,
+            "failed": 0,
+            "pid": 23402,
+            "exit": 0,
+            "durationMs": 969,
+            "ESRCH": true
+          }
+        ],
+        "resultPin": {
+          "path": "/private/tmp/p0-11-causal-qualification-20261015/result--C1-map-missing-path-fail-open.json",
+          "bytes": 6106,
+          "sha256": "9ed90044c92da95a0a253ff2f70180d48662112e6fff2c3eed15b95b71c47dfd"
+        },
+        "releasePin": {
+          "path": "/private/tmp/p0-11-causal-qualification-20261015/releases/C1-map-missing-path-fail-open.json",
+          "bytes": 3526,
+          "sha256": "a0edea9a4573b934e17cfdde9275d8d8932cf6ca4f2b83d4cbdeca4ac17345f2"
+        },
+        "errors": [
+          {
+            "fullName": "check-threat-model a cited path that does not exist fails and names the entry",
+            "name": "AssertionError",
+            "message": "expected +0 to be 1 // Object.is equality",
+            "actual": "0",
+            "expected": "1",
+            "sourceFrames": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts",
+                "line": 29,
+                "column": 20
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "control": "C2-tool-recorder-error-propagates",
+        "rows": [
+          {
+            "stage": "baseline",
+            "passed": 7,
+            "failed": 0,
+            "pid": 23479,
+            "exit": 0,
+            "durationMs": 4142,
+            "ESRCH": true
+          },
+          {
+            "stage": "mutant",
+            "passed": 6,
+            "failed": 1,
+            "pid": 23484,
+            "exit": 1,
+            "durationMs": 4088,
+            "ESRCH": true
+          },
+          {
+            "stage": "restored",
+            "passed": 7,
+            "failed": 0,
+            "pid": 23525,
+            "exit": 0,
+            "durationMs": 4262,
+            "ESRCH": true
+          }
+        ],
+        "resultPin": {
+          "path": "/private/tmp/p0-11-causal-qualification-20261015/result--C2-tool-recorder-error-propagates.json",
+          "bytes": 5172,
+          "sha256": "b56fbd50718c0859878e75096f87ca79212aab112a924731a834d9d762599d2d"
+        },
+        "releasePin": {
+          "path": "/private/tmp/p0-11-causal-qualification-20261015/releases/C2-tool-recorder-error-propagates.json",
+          "bytes": 3573,
+          "sha256": "40195ad6903383e4879b9517e16ba7eb23f84dd323ae5c6ab1e83b90b18cfb76"
+        },
+        "errors": [
+          {
+            "fullName": "recording never breaks the call returns the tool's real outcome when the recorder throws",
+            "name": "Error",
+            "message": "the evidence store is unreachable",
+            "actual": null,
+            "expected": null,
+            "frames": [
+              {
+                "method": "Object.record",
+                "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts",
+                "line": 202,
+                "column": 15
+              },
+              {
+                "method": "",
+                "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/toolPipeline.ts",
+                "line": 306,
+                "column": 19
+              },
+              {
+                "method": "",
+                "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts",
+                "line": 206,
+                "column": 21
+              }
+            ],
+            "rawObserverStackExact": true,
+            "rawErrors": 1,
+            "observerErrors": 1
+          }
+        ]
+      },
+      {
+        "control": "L1-optional-historical-literal-whole-branch-removal",
+        "rows": [
+          {
+            "stage": "baseline",
+            "passed": 7,
+            "failed": 0,
+            "pid": 23577,
+            "exit": 0,
+            "durationMs": 943,
+            "ESRCH": true
+          },
+          {
+            "stage": "mutant",
+            "passed": 6,
+            "failed": 1,
+            "pid": 23590,
+            "exit": 1,
+            "durationMs": 938,
+            "ESRCH": true
+          },
+          {
+            "stage": "restored",
+            "passed": 7,
+            "failed": 0,
+            "pid": 23599,
+            "exit": 0,
+            "durationMs": 962,
+            "ESRCH": true
+          }
+        ],
+        "resultPin": {
+          "path": "/private/tmp/p0-11-causal-qualification-20261015/result--L1-optional-historical-literal-whole-branch-removal.json",
+          "bytes": 6848,
+          "sha256": "da63e562496468eccf940f4dac0f7b44f0192c8c4fea648a679ed5a314aa208b"
+        },
+        "releasePin": {
+          "path": "/private/tmp/p0-11-causal-qualification-20261015/releases/L1-optional-historical-literal-whole-branch-removal.json",
+          "bytes": 3650,
+          "sha256": "cde65f6afd39b4815df163a6286d6c2b12af62e56a61b845fd3baafb9d952477"
+        },
+        "errors": [
+          {
+            "fullName": "check-threat-model a cited path that does not exist fails and names the entry",
+            "name": "AssertionError",
+            "message": "expected 'check-threat-model: /private/tmp/p0-1…' to contain 'channel network-egress'",
+            "actual": "check-threat-model: /private/tmp/p0-11-causal-qualification-20261015/closure/tests/fixtures/threat-model/missing-path.json: ENOENT: no such file or directory, open '/private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/noSuchFile.ts'\n",
+            "expected": "channel network-egress",
+            "frames": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts",
+                "line": 30,
+                "column": 20
+              }
+            ],
+            "rawObserverStackExact": true,
+            "rawErrors": 1,
+            "observerErrors": 1
+          }
+        ]
+      }
+    ],
+    "mutantEvidencePins": [
+      {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--mutant/raw.json",
+        "bytes": 3830,
+        "sha256": "2f70aa88bbd88bf2aed2d21fc4670271182f654de96d364076664a3ac7fc7c3b"
+      },
+      {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--mutant/observer.json",
+        "bytes": 5437,
+        "sha256": "3cdc83158fd4ccc7d7159f5de538100cd7436564b8cc098e5fd0659e1bc82659"
+      },
+      {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--mutant/classification.json",
+        "bytes": 3769,
+        "sha256": "ebe4c6e4d92fb00a4b18e7b29173a6d8646a39ddf16a523a7fee4edc5e879701"
+      },
+      {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/raw.json",
+        "bytes": 3299,
+        "sha256": "1c6f5afd33e772f77f8981ef0a0d11f5407561c03bee018035804ddfddb541de"
+      },
+      {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/observer.json",
+        "bytes": 6070,
+        "sha256": "a98eabb5be762caf62ef78da303f75b2c52474059bb53b352f3a832dcef6e47a"
+      },
+      {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/classification.json",
+        "bytes": 2809,
+        "sha256": "6ce1bc36e2cacb9bb6507d26b2b0ea3d3dd8ff75be0dbe5b21f329fa17835b11"
+      },
+      {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/raw.json",
+        "bytes": 3874,
+        "sha256": "e90245b8ef522a819f6d59ecd93fe33de4ee64a31661509b8bffcf99c2f8ae5b"
+      },
+      {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/observer.json",
+        "bytes": 6066,
+        "sha256": "7c6ac02c787c9675dd82cdd74ce7adbec952f5870d858a180ae9382ced8817a6"
+      },
+      {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/classification.json",
+        "bytes": 4453,
+        "sha256": "6dbffaad1b3aaccc4cf931fa1a3bbfec06aaca6e88bf1bc5fabeaffc9408e7e1"
+      }
+    ],
+    "checks": {
+      "exactActual7CaseIdentityMembershipEachPhase": true,
+      "rawObserverStatusErrorMultiplicityAndStacksMatch": true,
+      "allFileSuiteErrorsEmpty": true,
+      "allHooksPass": true,
+      "unhandledPendingTodo": 0,
+      "knownLateGlobalGuardDiagnostics": 0,
+      "normalExitsOnly": [
+        0,
+        1
+      ],
+      "allOwnedPidPgidBound": true,
+      "allRecordedGroupProbesSignalZeroAndPositiveESRCH": true,
+      "nineExactReleaseInputHashesAndPaths": true,
+      "releasePredecessorResultPinsExact": true,
+      "sourceDeltaOnlyNamedRecipeFile": true,
+      "derivedMutantHashesAndPhaseMapSnapshotsMatch": true,
+      "allBaselineRestoredCasesPass": true,
+      "exactRestorationAfterEach": true
+    },
+    "sourceDeltaMeaning": "Each phase kept all fixtures/tests/config/guards/helpers/deadlines and4529compiled files fixed. C1/L1 affect only copied MJS checker; C2 affects only copied toolPipeline.ts. Module-relative/cwd roots remain the genuine copied source routes, not an import adapter or builtCLI mutation."
+  },
+  "frozenMetadata": {
+    "runtimeIndexRefsChecked": 359,
+    "recursivePinTriplesChecked": 363,
+    "allPinsExact": true,
+    "embeddedOriginalSummaryExact": true,
+    "priorReviewApprovalFieldsExact": true,
+    "causalControlsRecipesResultsAndDirectPhaseFilesExact": true,
+    "causalCommandRecordsEqualDirectNineCommands": true,
+    "failuresAndCountsDerivedFromActualCompletedRecords": true,
+    "frozenJournalEqualsClosedLiveBytes": true,
+    "rootCommands": 20,
+    "rootExits": {
+      "0": 16,
+      "1": 4
+    },
+    "negativeCheckerPhases": [
+      "checker-missing-path",
+      "checker-missing-symbol",
+      "checker-bad-owner",
+      "checker-orphan-failure"
+    ],
+    "negativeMeaning": "Each exits1 on original invalid fixture with the named missingpath/missingsymbol/ownerregex/test-or-owner diagnostic. These expected refusals are not four test failures or mutation kills.",
+    "separateCausalProcesses": 9,
+    "finalNormalFreeze": {
+      "exit": 0,
+      "durationMs": 1782,
+      "cliCommandPaths": 1236,
+      "cliInventoryPaths": 1236,
+      "stationPacks": 41,
+      "stationPackQuestions": 632
+    },
+    "excluded": [
+      "causal BASE/closure",
+      "causal BASE/home",
+      "causal BASE/tmp",
+      "PARENT/home",
+      "PARENT/store",
+      "live root journal",
+      "this index",
+      "new causal/lane summaries"
+    ],
+    "physicalManifestPrivateUnsplit": true
+  },
+  "finalPreservation": {
+    "sourceFiles": 8362,
+    "compiledFiles": 4529,
+    "physicalFiles": 12891,
+    "parentUniqueInodes": 12891,
+    "privateUniqueInodes": 12891,
+    "inodeOverlap": 0,
+    "allRegularSingleLinkModesSizesDevicesInodesAndHashesExact": true,
+    "privateAndDistMembershipExact": true,
+    "links": [
+      {
+        "path": "node_modules",
+        "target": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+        "resolved": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules"
+      }
+    ],
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 538824643,
+      "nlink": 1,
+      "mode": 493
+    },
+    "immutableExternalPinsChecked": 221,
+    "frozenOwnInputsChecked": 10,
+    "noActiveOrHalted": true,
+    "method": "Independent read/hash/lstat check after all3controls and finalnormalfreeze completed; freezer subsequently read-only checked the same recorded physical manifest. Finalpreservation fields/pins agree; no product/source mutation occurred between these checks and metadatafreeze."
+  },
+  "preparationHistory": {
+    "releaseHelperIssue": {
+      "path": "/private/tmp/p0-11-release-helper-count-issue-20261015.json",
+      "bytes": 975,
+      "sha256": "134ae70f43e5c702c71461e0e8541824f39905589c603989e5269f2549433eed"
+    },
+    "releaseHelperMeaning": "V1 authored7734 instead of12891 from broad numeric replacement; its assertion stopped before any START/controller invocation. V2 corrects only the count, with v1 and issue retained. No guard relaxation or controller retry.",
+    "freezerV2": {
+      "path": "/private/tmp/p0-11-freeze-qualified-evidence-v2-20261015.py",
+      "bytes": 52709,
+      "sha256": "00c8fd2ef5d934aef19af621e45c07d6266a6bd6609a64a53b50f6ea5086e0fe"
+    },
+    "freezerBindingNote": {
+      "path": "/private/tmp/p0-11-freezer-v2-binding-note-20261015.json",
+      "bytes": 995,
+      "sha256": "7bcaa1d1b5da29eaf493a26694e9eb399d4bed2b4f60ed05b4dd95672ffaf75c"
+    },
+    "freezerMeaning": "Preparedv1 stayed unexecuted. V2 binds actual input pins and corrects pre-causal-normal-freeze spelling and the observed opt/node argv while preserving exact command identity. Peer staticreview has no blocking findings. Metadatafreezer ran once per root record; product/controller was not rerun."
+  },
+  "boundedMeaningAndLimits": [
+    "Map originals invoke6real checker children with status/diagnostic assertions; no separate child PID/full transcripts. Seventhcase is doc headings/ID/ASI string consistency. Whole-identifier text matching and ownerregex are not compiled enforcement/wiring or real plan-key lookup.",
+    "Telemetry2 uses actual owned workspace/vault/governedread/readonlySQLite but injected throwing exporter and canned fetch rejection. Inner queue catch and outer pipeline recorder catch coexist. Ordinary batch transaction completion precedes queue; nested caller owns outercommit and ledger uses savepoint. No universal durability-before-queue or independently isolated inner barrier is proved.",
+    "Preview5 is disabled exporter payload/endpoint projection with hand-shaped hashes/signatures. Recording7 combines5persisted-row cases,1genuine injected callbackthrow and1pure projection case. Temporary darwin/unconfined-shell setup supports allowlist denial, not OSconfinement.",
+    "Ephemeral workspaces/keys/DBs are cleaned by unchanged hooks. Retained raw/observer/outerstreams are assertion evidence, not separately frozen signed rows/seals, fully cold readers, WAL-free proof, livecollector outage or durable-store reconciliation.",
+    "Original wrappers inherit environment; causal phases use7keys/privateHOME/TMPDIR and borrowed parentdependencies. Preflight absent endpointoverrides/defaultloopback prove no zero-network/credential/OS/cache isolation. Native fingerprintNode22.23.3/ABI127/SELECT1 is one actual earlier process, not per-child ABI proof.",
+    "420s causalwait sends no terminating signals/retry; original30s tests and originalchecker helper behavior stay fixed. Signal0ESRCH is ownedgroup absence only, not universal detached-child absence. Runendreporter precedes globalteardown; actualexits/complete streams/knownlate diagnostics were separately reviewed.",
+    "Source stamp2026-10-07/e25cce1a and16channels/8rows coexist with later coverage. Do not refreshstamps, remove labels or assign occupiedP1-56/57/58 to manufacture acceptance. Sidreview/ASIverification and successor attribution remain open.",
+    "1269duplicates/2751dead-code required failures are prior exact-code debt, not fresh P011 runs or waived. P029skip,P022arrays,P023heldAPI/Studio,P051issuer/formal,P024ISO/expert,P021literal20/10outsideR4,P045byteinvariant/receipt/doctor,P019/P020proposals,P030runner/fullbatch/installedpack remain open.",
+    "All Claude/sharedCLI/API/Studio/A4, pausedP202, pendingtransfers and sourceownership holds remain preserved. Fullsuite/coverage/Node24/hosted/PR/merge/release/formaldependencies/G0/Done are not established."
+  ],
+  "method": "Read completed immutable raw/observer/classification/process/stream/release/result artifacts and targeted original source; compare identities/message multiplicity/frames/counts/source-map digests and recorded ESRCH; independently rehash/lstat final12891parent/private files and pinned inputs. Final359index/363recursive pins and frozenjournal were checked after metadatafreeze. Standard-library read-only calculations only; prior detailed original/sealed/code/recipe reviews reused by pins.",
+  "calculationNote": "Local metadata checks distinguish expected failed file/describe ancestor state from non-body errors. L1 ENOENT is checked in full observeractual, not its abbreviated message. All final checks pass; no producer evidence was changed.",
+  "performed": {
+    "productRuntime": false,
+    "rerun": false,
+    "sourceImportsParsersCompilers": false,
+    "testsBuildInstallFingerprint": false,
+    "gitCommands": false,
+    "network": false,
+    "processProbesOrSignals": false,
+    "producerOrRepositoryEdits": false,
+    "activeC2OrL1Reads": false,
+    "mutableCopyReadWhileControlsActive": false,
+    "finalCopyReadOnlyAfterAllControlsClosed": true,
+    "writes": "Only NEW final independent-review JSON/MD pair."
+  },
+  "allReadsFinished": true,
+  "capturedUtc": "2026-10-15T06:53:31.897048+00:00",
+  "markdown": {
+    "path": "/private/tmp/p0-11-bounded-independent-review-20261015.md",
+    "bytes": 3607,
+    "sha256": "686b6dd0c9023af386d95150f3f1b5c14b723b623f9a671a771eb0eb84ee174e"
+  }
+}

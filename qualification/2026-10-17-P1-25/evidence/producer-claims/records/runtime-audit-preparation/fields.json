@@ -1,0 +1,95 @@
+{
+  "schema": "p125pc-inert-runtime-auditor-fields/1",
+  "namespace": {
+    "directory": "/private/tmp/p1-25-producer-qualification-20261017",
+    "phasePrefix": "p125pc-",
+    "publicAuditSchema": "p125pc-explicit-public-record-audit/1",
+    "observedArgs": [
+      "phase",
+      "absolutePhysicalCheckout",
+      "unchanged|combined"
+    ],
+    "publicArgs": [
+      "phase",
+      "green|red"
+    ]
+  },
+  "corpus": {
+    "unchanged": [
+      "tests/time/verifyTimestamp.test.ts"
+    ],
+    "combined": [
+      "tests/time/checkpointWindow.test.ts",
+      "tests/time/tsaGrant.test.ts",
+      "tests/time/verifyTimestamp.test.ts"
+    ],
+    "intendedCandidateInventoryOnly": "Five checkpoint + two grant + seventeen verifier cases; actual ordered raw/observer inventory is derived by the frozen join and never predicted here."
+  },
+  "newPublicCase": "CHECKPOINT-PERSISTED-PRODUCER-CLAIMS",
+  "existingFourSemanticBranchesRetained": true,
+  "producerInputs": {
+    "requiredFlags": [
+      "supportedProducerInputOnly",
+      "noPostAppendRowOrClockEdit",
+      "elapsedMinuteOrStudioCredit"
+    ],
+    "optionalReachedFields": [
+      "first",
+      "requestedClaims",
+      "covered",
+      "observations",
+      "final"
+    ],
+    "orderedStagePrefix": [
+      "first-checkpoint",
+      "backdated-appended",
+      "postdated-appended",
+      "second-checkpoint"
+    ],
+    "perStoredStage": [
+      "requestedTs",
+      "row.id",
+      "row.ts",
+      "row.sessionId",
+      "row.eventType",
+      "row.eventHash",
+      "row.previousHash",
+      "row.index"
+    ],
+    "perGrant": [
+      "genTime",
+      "accuracyMs",
+      "digest",
+      "anchorId",
+      "signerCertSha256",
+      "tokenSha256",
+      "revocationChecked"
+    ]
+  },
+  "green": {
+    "bodyMustComplete": true,
+    "firstAndCoveredActualLedgerResultsRequired": true,
+    "twoQuerySpecificChildArgvRequestResponseGrantTokenProofs": true,
+    "bothActualSignedCheckpointHeadsLinksIndicesAndTokenPins": true,
+    "storedInputClaimsEqualRequestedAndReaderUsesActualStoredTs": true,
+    "independentFiveMinuteAnd24HourClaimMathWithActualSecondBoundPremise": true,
+    "actualFindingsAndAttestedWindowMatchEachStoredClaim": true,
+    "actualFinalLedgerAndCompleteEventAndCheckpointTokenNonmutationRequired": true
+  },
+  "red": {
+    "partialProducerSetupCanRemainAbsent": true,
+    "firstFourStagesArePrefixOnly": true,
+    "storedMismatchRecordedWithoutAcceptance": true,
+    "actualLedgerFalseOrNonzeroErrorFactsRetainedWithoutLiteralSuccess": true,
+    "absentLaterCheckpointsReadersGrantsAndFinalFactsReceiveNoCredit": true,
+    "manualFirstFailureAndMaskClassificationRequired": true
+  },
+  "limits": [
+    "Shared replyObservation is last reply only; first proof uses its named actual verification child/query/response and per-grant facts.",
+    "No public seed hash exists for independent first-head recomputation; the exact first-head equality is a source assertion and GREEN-cohort fact.",
+    "Signature booleans and source-produced ledger verification results are recorded facts, not independent cryptographic re-verification by this Python auditor.",
+    "Null accuracy is zero for bound arithmetic; equal-second genuine grants remain valid.",
+    "Actual child/socket/stream/owner counts derive from unchanged record loops. No test or resource totals are hardcoded.",
+    "The preferred175 pinset is an actual preparation input only. Later runtime/fresh102/23/thirteenth-native bindings remain outside these adapters and must come from actual root records."
+  ]
+}

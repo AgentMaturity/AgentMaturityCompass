@@ -301,7 +301,9 @@ export function verifyIndustryPackLicenseReport(licenseKey: string, trust: Trust
   const operatorKeyId = operatorPem === null ? null : ed25519KeyId(operatorPem);
   const context = operatorKeyId === null ? trust
     : withPins(trust, [{ keyId: operatorKeyId, purposes: ["artifact-seal"], origin: "AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY" }]);
-  const keys = [pubkeyPem, operatorPem].filter((pem): pem is string => typeof pem === "string" && pem.trim().length > 0);
+  // Discovery verifies the signature first; admission still checks purpose, distrust and revocation separately.
+  const keys = [pubkeyPem, operatorPem, ...context.lists.flatMap(list => list.entries.map(entry => entry.publicKeyPem))]
+    .filter((pem): pem is string => typeof pem === "string" && pem.trim().length > 0);
   const [, payloadPart = "", signaturePart = ""] = licenseKey.trim().split(".");
   const signer = keys.find((pem) => verifyPayloadEd25519(payloadPart, signaturePart, pem)) ?? null;
   // The license's own checks (format, signature, payload, status, expiry) against one Ed25519 key, with no HMAC secret or legacy allowlist.

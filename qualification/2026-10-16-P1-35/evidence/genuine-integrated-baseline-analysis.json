@@ -1,0 +1,2061 @@
+{
+  "at": "2026-10-16T16:49:58.350502+00:00",
+  "phase": "p135-genuine-integrated-baseline",
+  "tests": 10,
+  "passed": 9,
+  "failed": 1,
+  "raw": {
+    "numTotalTestSuites": 3,
+    "numPassedTestSuites": 1,
+    "numFailedTestSuites": 2,
+    "numPendingTestSuites": 0,
+    "numTotalTests": 10,
+    "numPassedTests": 9,
+    "numFailedTests": 1,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "snapshot": {
+      "added": 0,
+      "failure": false,
+      "filesAdded": 0,
+      "filesRemoved": 0,
+      "filesRemovedList": [],
+      "filesUnmatched": 0,
+      "filesUpdated": 0,
+      "matched": 0,
+      "total": 0,
+      "unchecked": 0,
+      "uncheckedKeysByFile": [],
+      "unmatched": 0,
+      "updated": 0,
+      "didUpdate": false
+    },
+    "startTime": 1792169252083,
+    "success": false,
+    "testResults": [
+      {
+        "assertionResults": [
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts R2 reads unmarked dogfood metadata conservatively and preserves current marked rows",
+            "status": "passed",
+            "title": "R2 reads unmarked dogfood metadata conservatively and preserves current marked rows",
+            "duration": 4.2830000000003565,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts R4 never promotes operator-chosen ATTESTED legacy provenance",
+            "status": "passed",
+            "title": "R4 never promotes operator-chosen ATTESTED legacy provenance",
+            "duration": 2.9763339999999516,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts current public claim envelopes bypass the legacy classifier",
+            "status": "passed",
+            "title": "current public claim envelopes bypass the legacy classifier",
+            "duration": 2.485584000000017,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts post-fix assurance without an envelope classifies as R5 self-reported",
+            "status": "passed",
+            "title": "post-fix assurance without an envelope classifies as R5 self-reported",
+            "duration": 2.184708000000228,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts post-fix assurance lazy claim stays self-reported instead of using current observed fallback",
+            "status": "passed",
+            "title": "post-fix assurance lazy claim stays self-reported instead of using current observed fallback",
+            "duration": 2.3401249999997162,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+            "status": "passed",
+            "title": "dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+            "duration": 234.58862499999987,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+            "status": "passed",
+            "title": "an edited signed log line refuses further relabelling without changing originals",
+            "duration": 166.9887920000001,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts a tampered migration receipt signature refuses its log and any further append",
+            "status": "passed",
+            "title": "a tampered migration receipt signature refuses its log and any further append",
+            "duration": 162.61145799999986,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 genuine v1.1.1 generated originals"
+            ],
+            "fullName": "P1-35 genuine v1.1.1 generated originals actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+            "status": "passed",
+            "title": "actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+            "duration": 42.883790999999746,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 genuine v1.1.1 generated originals"
+            ],
+            "fullName": "P1-35 genuine v1.1.1 generated originals real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment",
+            "status": "failed",
+            "title": "real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment",
+            "duration": 558.8935409999999,
+            "failureMessages": [
+              "AssertionError: expected false to be true // Object.is equality\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:533:31\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:65:5)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:456:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ],
+            "meta": {},
+            "tags": []
+          }
+        ],
+        "startTime": 1792169254538,
+        "endTime": 1792169255717.8936,
+        "status": "failed",
+        "message": "",
+        "name": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts"
+      }
+    ]
+  },
+  "observer": {
+    "schema": "amc-private-score-qualification-runtime-observer/1",
+    "pid": 90324,
+    "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "reason": "failed",
+    "files": [
+      "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts"
+    ],
+    "testCount": 10,
+    "unhandledErrors": [],
+    "tasks": [
+      {
+        "kind": "file",
+        "id": "1266807446",
+        "name": "tests/migration/legacyRelabel.test.ts",
+        "fullName": null,
+        "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+        "state": "fail",
+        "hooks": {
+          "afterAll": "pass"
+        },
+        "errors": []
+      },
+      {
+        "kind": "suite",
+        "id": "1266807446_0",
+        "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts",
+        "fullName": null,
+        "filepath": null,
+        "state": "pass",
+        "hooks": {},
+        "errors": []
+      },
+      {
+        "kind": "test",
+        "id": "1266807446_0_0",
+        "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts R2 reads unmarked dogfood metadata conservatively and preserves current marked rows",
+        "fullName": "P1-35 synthetic migration source contracts R2 reads unmarked dogfood metadata conservatively and preserves current marked rows",
+        "filepath": null,
+        "state": "pass",
+        "hooks": {},
+        "errors": []
+      },
+      {
+        "kind": "test",
+        "id": "1266807446_0_1",
+        "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts R4 never promotes operator-chosen ATTESTED legacy provenance",
+        "fullName": "P1-35 synthetic migration source contracts R4 never promotes operator-chosen ATTESTED legacy provenance",
+        "filepath": null,
+        "state": "pass",
+        "hooks": {},
+        "errors": []
+      },
+      {
+        "kind": "test",
+        "id": "1266807446_0_2",
+        "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts current public claim envelopes bypass the legacy classifier",
+        "fullName": "P1-35 synthetic migration source contracts current public claim envelopes bypass the legacy classifier",
+        "filepath": null,
+        "state": "pass",
+        "hooks": {},
+        "errors": []
+      },
+      {
+        "kind": "test",
+        "id": "1266807446_0_3",
+        "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts post-fix assurance without an envelope classifies as R5 self-reported",
+        "fullName": "P1-35 synthetic migration source contracts post-fix assurance without an envelope classifies as R5 self-reported",
+        "filepath": null,
+        "state": "pass",
+        "hooks": {},
+        "errors": []
+      },
+      {
+        "kind": "test",
+        "id": "1266807446_0_4",
+        "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts post-fix assurance lazy claim stays self-reported instead of using current observed fallback",
+        "fullName": "P1-35 synthetic migration source contracts post-fix assurance lazy claim stays self-reported instead of using current observed fallback",
+        "filepath": null,
+        "state": "pass",
+        "hooks": {},
+        "errors": []
+      },
+      {
+        "kind": "test",
+        "id": "1266807446_0_5",
+        "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+        "fullName": "P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+        "filepath": null,
+        "state": "pass",
+        "hooks": {},
+        "errors": []
+      },
+      {
+        "kind": "test",
+        "id": "1266807446_0_6",
+        "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+        "fullName": "P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+        "filepath": null,
+        "state": "pass",
+        "hooks": {},
+        "errors": []
+      },
+      {
+        "kind": "test",
+        "id": "1266807446_0_7",
+        "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts a tampered migration receipt signature refuses its log and any further append",
+        "fullName": "P1-35 synthetic migration source contracts a tampered migration receipt signature refuses its log and any further append",
+        "filepath": null,
+        "state": "pass",
+        "hooks": {},
+        "errors": []
+      },
+      {
+        "kind": "suite",
+        "id": "1266807446_1",
+        "name": "tests/migration/legacyRelabel.test.ts P1-35 genuine v1.1.1 generated originals",
+        "fullName": null,
+        "filepath": null,
+        "state": "fail",
+        "hooks": {},
+        "errors": []
+      },
+      {
+        "kind": "test",
+        "id": "1266807446_1_0",
+        "name": "tests/migration/legacyRelabel.test.ts P1-35 genuine v1.1.1 generated originals actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+        "fullName": "P1-35 genuine v1.1.1 generated originals actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+        "filepath": null,
+        "state": "pass",
+        "hooks": {},
+        "errors": []
+      },
+      {
+        "kind": "test",
+        "id": "1266807446_1_1",
+        "name": "tests/migration/legacyRelabel.test.ts P1-35 genuine v1.1.1 generated originals real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment",
+        "fullName": "P1-35 genuine v1.1.1 generated originals real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment",
+        "filepath": null,
+        "state": "fail",
+        "hooks": {},
+        "errors": [
+          {
+            "message": "expected false to be true // Object.is equality",
+            "actual": "false",
+            "expected": "true",
+            "showDiff": true,
+            "operator": "strictEqual",
+            "diff": "- Expected\n+ Received\n\n- true\n+ false",
+            "name": "AssertionError",
+            "ok": false,
+            "stack": "AssertionError: expected false to be true // Object.is equality\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:533:31\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:65:5)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:456:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+            "stacks": [
+              {
+                "method": "",
+                "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+                "line": 533,
+                "column": 31
+              },
+              {
+                "method": "owned",
+                "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+                "line": 65,
+                "column": 5
+              },
+              {
+                "method": "",
+                "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+                "line": 456,
+                "column": 5
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+  },
+  "publics": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-0Cyhn8/public-evidence.json",
+      "bytes": 2669,
+      "sha256": "3b158eddac15a81760edd12648e2f40b361abe0ce67f94e78115d88ef8d638de",
+      "record": {
+        "schema": "amc-p135-legacy-relabel/1",
+        "label": "R2-synthetic-edges",
+        "origin": "synthetic-edge",
+        "genuineHistoricalFixture": false,
+        "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-0Cyhn8",
+        "observations": {
+          "rows": [
+            {
+              "label": "provenance",
+              "classification": {
+                "rule": "R2-dogfood-seeded",
+                "claimKind": "synthetic_example",
+                "levelCap": null,
+                "original": {
+                  "trustTier": "OBSERVED",
+                  "level": null,
+                  "label": null
+                },
+                "noticeId": "AMC-LEGACY-2026-001",
+                "noticeVersion": 1
+              }
+            },
+            {
+              "label": "source",
+              "classification": {
+                "rule": "R2-dogfood-seeded",
+                "claimKind": "synthetic_example",
+                "levelCap": null,
+                "original": {
+                  "trustTier": "OBSERVED",
+                  "level": null,
+                  "label": null
+                },
+                "noticeId": "AMC-LEGACY-2026-001",
+                "noticeVersion": 1
+              }
+            },
+            {
+              "label": "binary",
+              "classification": {
+                "rule": "R2-dogfood-seeded",
+                "claimKind": "synthetic_example",
+                "levelCap": null,
+                "original": {
+                  "trustTier": null,
+                  "level": null,
+                  "label": null
+                },
+                "noticeId": "AMC-LEGACY-2026-001",
+                "noticeVersion": 1
+              }
+            }
+          ],
+          "currentMarkedNotLegacy": true,
+          "ownedLedgerPoolClosed": true
+        },
+        "nativeBefore": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "nativeAfter": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "lifecycle": {
+          "initialized": false,
+          "vaultLocked": true
+        },
+        "environmentUnchanged": true,
+        "childProcessCreatedByFixture": false,
+        "delegatedTarAPIInvoked": false,
+        "signalsSentByFixture": false,
+        "bodyFailed": false,
+        "bodyError": null,
+        "cleanupErrors": [],
+        "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification"
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-aVLknG/public-evidence.json",
+      "bytes": 2535,
+      "sha256": "3ec90e32d3b8dc39767b5c6afeb3cf3665674f96da1e400726ccd2d5619ee575",
+      "record": {
+        "schema": "amc-p135-legacy-relabel/1",
+        "label": "R4-never-promoted",
+        "origin": "synthetic-edge",
+        "genuineHistoricalFixture": false,
+        "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-aVLknG",
+        "observations": {
+          "found": {
+            "rule": "R4-operator-tier",
+            "claimKind": "self_reported",
+            "levelCap": null,
+            "original": {
+              "trustTier": "ATTESTED",
+              "level": null,
+              "label": null
+            },
+            "noticeId": "AMC-LEGACY-2026-001",
+            "noticeVersion": 1
+          },
+          "observed": [
+            {
+              "trustTier": "OBSERVED",
+              "found": {
+                "rule": "R4-operator-tier",
+                "claimKind": "self_reported",
+                "levelCap": null,
+                "original": {
+                  "trustTier": "OBSERVED",
+                  "level": null,
+                  "label": null
+                },
+                "noticeId": "AMC-LEGACY-2026-001",
+                "noticeVersion": 1
+              }
+            },
+            {
+              "trustTier": "OBSERVED_HARDENED",
+              "found": {
+                "rule": "R4-operator-tier",
+                "claimKind": "self_reported",
+                "levelCap": null,
+                "original": {
+                  "trustTier": "OBSERVED_HARDENED",
+                  "level": null,
+                  "label": null
+                },
+                "noticeId": "AMC-LEGACY-2026-001",
+                "noticeVersion": 1
+              }
+            }
+          ],
+          "ownedLedgerPoolClosed": true
+        },
+        "nativeBefore": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "nativeAfter": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "lifecycle": {
+          "initialized": false,
+          "vaultLocked": true
+        },
+        "environmentUnchanged": true,
+        "childProcessCreatedByFixture": false,
+        "delegatedTarAPIInvoked": false,
+        "signalsSentByFixture": false,
+        "bodyFailed": false,
+        "bodyError": null,
+        "cleanupErrors": [],
+        "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification"
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-zplHi7/public-evidence.json",
+      "bytes": 1556,
+      "sha256": "a24e1ad42638b3c845056bd1a15901a418fa28adeabcd728eeee7b3296ce12ea",
+      "record": {
+        "schema": "amc-p135-legacy-relabel/1",
+        "label": "current-envelope-positive",
+        "origin": "synthetic-edge",
+        "genuineHistoricalFixture": false,
+        "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-zplHi7",
+        "observations": {
+          "actualCurrentKind": "observed",
+          "notLegacy": true,
+          "callbacks": 1,
+          "callerEnvelopeRetained": true,
+          "ownedLedgerPoolClosed": true
+        },
+        "nativeBefore": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "nativeAfter": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "lifecycle": {
+          "initialized": false,
+          "vaultLocked": true
+        },
+        "environmentUnchanged": true,
+        "childProcessCreatedByFixture": false,
+        "delegatedTarAPIInvoked": false,
+        "signalsSentByFixture": false,
+        "bodyFailed": false,
+        "bodyError": null,
+        "cleanupErrors": [],
+        "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification"
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-OvXpos/public-evidence.json",
+      "bytes": 1827,
+      "sha256": "2702a8b4f25719779e1cbfdec9144d7a5278a7e5b0e1ddd90c51e303fb812119",
+      "record": {
+        "schema": "amc-p135-legacy-relabel/1",
+        "label": "postfix-assurance-R5-strict",
+        "origin": "synthetic-edge",
+        "genuineHistoricalFixture": false,
+        "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-OvXpos",
+        "observations": {
+          "found": {
+            "rule": "R5-no-claim-envelope",
+            "claimKind": "self_reported",
+            "levelCap": "L1",
+            "original": {
+              "trustTier": "OBSERVED",
+              "level": null,
+              "label": "HIGH TRUST"
+            },
+            "noticeId": "AMC-LEGACY-2026-001",
+            "noticeVersion": 1
+          },
+          "specificationEdge": "MEASURED without claim envelope remains conservative R5",
+          "ownedLedgerPoolClosed": true
+        },
+        "nativeBefore": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "nativeAfter": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "lifecycle": {
+          "initialized": false,
+          "vaultLocked": true
+        },
+        "environmentUnchanged": true,
+        "childProcessCreatedByFixture": false,
+        "delegatedTarAPIInvoked": false,
+        "signalsSentByFixture": false,
+        "bodyFailed": false,
+        "bodyError": null,
+        "cleanupErrors": [],
+        "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification"
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-tmZ7q6/public-evidence.json",
+      "bytes": 1572,
+      "sha256": "0a574e2180e679759633a0e92bbd0656721739918bbab5aa36ce99c5d5f52b6f",
+      "record": {
+        "schema": "amc-p135-legacy-relabel/1",
+        "label": "postfix-assurance-lazy-strict",
+        "origin": "synthetic-edge",
+        "genuineHistoricalFixture": false,
+        "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-tmZ7q6",
+        "observations": {
+          "currentPositiveKind": "observed",
+          "visibleKind": "self_reported",
+          "callbacks": 0,
+          "legacyNoticePresent": true,
+          "ownedLedgerPoolClosed": true
+        },
+        "nativeBefore": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "nativeAfter": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "lifecycle": {
+          "initialized": false,
+          "vaultLocked": true
+        },
+        "environmentUnchanged": true,
+        "childProcessCreatedByFixture": false,
+        "delegatedTarAPIInvoked": false,
+        "signalsSentByFixture": false,
+        "bodyFailed": false,
+        "bodyError": null,
+        "cleanupErrors": [],
+        "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification"
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-ovq8jv/public-evidence.json",
+      "bytes": 5126,
+      "sha256": "45b8301e01ad1bd1f61e3b73529444ba7ba700fd8bb24fd62e3b207cd434272e",
+      "record": {
+        "schema": "amc-p135-legacy-relabel/1",
+        "label": "synthetic-persistent-roundtrip",
+        "origin": "synthetic-edge",
+        "genuineHistoricalFixture": false,
+        "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-ovq8jv",
+        "observations": {
+          "originalHashes": [
+            {
+              "relative": ".amc/runs/synthetic-legacy-diagnostic.json",
+              "bytes": 110,
+              "sha256": "ad887f438e762367a79ceaf44fa2588a0e4bcdffe6befe67673ce161dce841df"
+            },
+            {
+              "relative": ".amc/reports/assurance/synthetic-canned.json",
+              "bytes": 101,
+              "sha256": "870e269aa12eb35f59ed5559bae6c82492555b92a03ff3dcbdb362fc71db1334"
+            },
+            {
+              "relative": ".amc/evidence.sqlite",
+              "bytes": 4096,
+              "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc"
+            }
+          ],
+          "afterDry": [
+            {
+              "relative": ".amc/runs/synthetic-legacy-diagnostic.json",
+              "bytes": 110,
+              "sha256": "ad887f438e762367a79ceaf44fa2588a0e4bcdffe6befe67673ce161dce841df"
+            },
+            {
+              "relative": ".amc/reports/assurance/synthetic-canned.json",
+              "bytes": 101,
+              "sha256": "870e269aa12eb35f59ed5559bae6c82492555b92a03ff3dcbdb362fc71db1334"
+            },
+            {
+              "relative": ".amc/evidence.sqlite",
+              "bytes": 4096,
+              "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc"
+            }
+          ],
+          "afterFirst": [
+            {
+              "relative": ".amc/runs/synthetic-legacy-diagnostic.json",
+              "bytes": 110,
+              "sha256": "ad887f438e762367a79ceaf44fa2588a0e4bcdffe6befe67673ce161dce841df"
+            },
+            {
+              "relative": ".amc/reports/assurance/synthetic-canned.json",
+              "bytes": 101,
+              "sha256": "870e269aa12eb35f59ed5559bae6c82492555b92a03ff3dcbdb362fc71db1334"
+            },
+            {
+              "relative": ".amc/evidence.sqlite",
+              "bytes": 4096,
+              "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc"
+            }
+          ],
+          "changedOriginals": [],
+          "dryWritesAbsent": true,
+          "receiptTimestampSource": "injected public now callback",
+          "actualLedgerVerificationOK": true,
+          "readOnlyLedgerOpened": true,
+          "readOnlyLedgerClosed": true,
+          "rules": [
+            "R5-no-claim-envelope",
+            "R1-assurance-canned-reply"
+          ],
+          "assigned": [
+            {
+              "claimKind": "self_reported",
+              "legacy": true,
+              "levelCap": "L1"
+            },
+            {
+              "claimKind": "synthetic_example",
+              "legacy": true,
+              "levelCap": null
+            }
+          ],
+          "integrity": [
+            {
+              "status": "integrityFailed",
+              "trusted": null,
+              "reasons": [
+                "the run seal does not verify against this workspace's auditor keys"
+              ]
+            },
+            {
+              "status": "integrityFailed",
+              "trusted": null,
+              "reasons": [
+                "the run seal does not verify against this workspace's auditor keys"
+              ]
+            }
+          ],
+          "signatureValid": true,
+          "attested": {
+            "lines": 2,
+            "head": "bdc8be233efa3134c4c45bf23668db773093eb648d50a2466bd92e8e4dd9ce3b"
+          },
+          "eventCount": 0,
+          "originalsDigestMatches": true,
+          "receiptHeadMatches": true,
+          "firstRecordCount": 2,
+          "secondRecordCount": 0,
+          "logUnchangedOnRepeat": true,
+          "priorReceiptCount": 1,
+          "laterReceiptCount": 2,
+          "repeatedLogVerified": true,
+          "afterRepeat": [
+            {
+              "relative": ".amc/runs/synthetic-legacy-diagnostic.json",
+              "bytes": 110,
+              "sha256": "ad887f438e762367a79ceaf44fa2588a0e4bcdffe6befe67673ce161dce841df"
+            },
+            {
+              "relative": ".amc/reports/assurance/synthetic-canned.json",
+              "bytes": 101,
+              "sha256": "870e269aa12eb35f59ed5559bae6c82492555b92a03ff3dcbdb362fc71db1334"
+            },
+            {
+              "relative": ".amc/evidence.sqlite",
+              "bytes": 4096,
+              "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc"
+            }
+          ],
+          "ownedLedgerPoolClosed": true
+        },
+        "nativeBefore": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "nativeAfter": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "lifecycle": {
+          "initialized": true,
+          "vaultLocked": true
+        },
+        "environmentUnchanged": true,
+        "childProcessCreatedByFixture": false,
+        "delegatedTarAPIInvoked": false,
+        "signalsSentByFixture": false,
+        "bodyFailed": false,
+        "bodyError": null,
+        "cleanupErrors": [],
+        "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification"
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-4fMp4T/public-evidence.json",
+      "bytes": 2783,
+      "sha256": "6458318315af50b91844b838166b4e69b853a39029cd7f23eade771073e6903e",
+      "record": {
+        "schema": "amc-p135-legacy-relabel/1",
+        "label": "synthetic-log-tamper",
+        "origin": "synthetic-edge",
+        "genuineHistoricalFixture": false,
+        "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-4fMp4T",
+        "observations": {
+          "signedPositive": true,
+          "tamperRefused": true,
+          "failingLine": 1,
+          "subsequentRelabelRefused": true,
+          "logUnchangedAfterRefusal": true,
+          "receiptsUnchangedAfterRefusal": true,
+          "originalHashes": [
+            {
+              "relative": ".amc/runs/synthetic-legacy-diagnostic.json",
+              "bytes": 110,
+              "sha256": "ad887f438e762367a79ceaf44fa2588a0e4bcdffe6befe67673ce161dce841df"
+            },
+            {
+              "relative": ".amc/reports/assurance/synthetic-canned.json",
+              "bytes": 101,
+              "sha256": "870e269aa12eb35f59ed5559bae6c82492555b92a03ff3dcbdb362fc71db1334"
+            },
+            {
+              "relative": ".amc/evidence.sqlite",
+              "bytes": 4096,
+              "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc"
+            }
+          ],
+          "after": [
+            {
+              "relative": ".amc/runs/synthetic-legacy-diagnostic.json",
+              "bytes": 110,
+              "sha256": "ad887f438e762367a79ceaf44fa2588a0e4bcdffe6befe67673ce161dce841df"
+            },
+            {
+              "relative": ".amc/reports/assurance/synthetic-canned.json",
+              "bytes": 101,
+              "sha256": "870e269aa12eb35f59ed5559bae6c82492555b92a03ff3dcbdb362fc71db1334"
+            },
+            {
+              "relative": ".amc/evidence.sqlite",
+              "bytes": 4096,
+              "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc"
+            }
+          ],
+          "ownedLedgerPoolClosed": true
+        },
+        "nativeBefore": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "nativeAfter": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "lifecycle": {
+          "initialized": true,
+          "vaultLocked": true
+        },
+        "environmentUnchanged": true,
+        "childProcessCreatedByFixture": false,
+        "delegatedTarAPIInvoked": false,
+        "signalsSentByFixture": false,
+        "bodyFailed": false,
+        "bodyError": null,
+        "cleanupErrors": [],
+        "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification"
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-iWKkiR/public-evidence.json",
+      "bytes": 2862,
+      "sha256": "30472911faad45d2f53f09c8140cf1d3a71011f7cf81b97819d7d611bf12e3ef",
+      "record": {
+        "schema": "amc-p135-legacy-relabel/1",
+        "label": "synthetic-receipt-signature-tamper",
+        "origin": "synthetic-edge",
+        "genuineHistoricalFixture": false,
+        "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-iWKkiR",
+        "observations": {
+          "positiveSignedLogReached": true,
+          "logRefused": true,
+          "failingLine": null,
+          "attestedSignatureRefused": true,
+          "subsequentRelabelRefused": true,
+          "logUnchanged": true,
+          "receiptsUnchanged": true,
+          "originalHashes": [
+            {
+              "relative": ".amc/runs/synthetic-legacy-diagnostic.json",
+              "bytes": 110,
+              "sha256": "ad887f438e762367a79ceaf44fa2588a0e4bcdffe6befe67673ce161dce841df"
+            },
+            {
+              "relative": ".amc/reports/assurance/synthetic-canned.json",
+              "bytes": 101,
+              "sha256": "870e269aa12eb35f59ed5559bae6c82492555b92a03ff3dcbdb362fc71db1334"
+            },
+            {
+              "relative": ".amc/evidence.sqlite",
+              "bytes": 4096,
+              "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc"
+            }
+          ],
+          "after": [
+            {
+              "relative": ".amc/runs/synthetic-legacy-diagnostic.json",
+              "bytes": 110,
+              "sha256": "ad887f438e762367a79ceaf44fa2588a0e4bcdffe6befe67673ce161dce841df"
+            },
+            {
+              "relative": ".amc/reports/assurance/synthetic-canned.json",
+              "bytes": 101,
+              "sha256": "870e269aa12eb35f59ed5559bae6c82492555b92a03ff3dcbdb362fc71db1334"
+            },
+            {
+              "relative": ".amc/evidence.sqlite",
+              "bytes": 4096,
+              "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc"
+            }
+          ],
+          "signaturePurposeFieldClaim": false,
+          "ownedLedgerPoolClosed": true
+        },
+        "nativeBefore": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "nativeAfter": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "lifecycle": {
+          "initialized": true,
+          "vaultLocked": true
+        },
+        "environmentUnchanged": true,
+        "childProcessCreatedByFixture": false,
+        "delegatedTarAPIInvoked": false,
+        "signalsSentByFixture": false,
+        "bodyFailed": false,
+        "bodyError": null,
+        "cleanupErrors": [],
+        "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification"
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-oepLyp/public-evidence.json",
+      "bytes": 10586,
+      "sha256": "75f94fe11003e5995a1b6958ef3f6aa3cddb55d06712a7419c24a97aa335dd36",
+      "record": {
+        "schema": "amc-p135-legacy-relabel/1",
+        "label": "genuine-classifier-inputs",
+        "origin": "tag-generated-originals",
+        "genuineHistoricalFixture": true,
+        "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-oepLyp",
+        "observations": {
+          "genuineHistoricalFixture": true,
+          "encodedFixtureBytes": 776167,
+          "encodedFixtureBefore": [
+            {
+              "relative": "README.md",
+              "bytes": 2182,
+              "sha256": "42846ff6c3511a5ecada656e5221d4149d1c27ba0a9e8e900e775ffe0dfcdf3a"
+            },
+            {
+              "relative": "generation.log",
+              "bytes": 3624,
+              "sha256": "9b5f2a997ce534e0cc50bdc62d1071c43e904efd6d1e5a0a9d16f3796aa6ed3a"
+            },
+            {
+              "relative": "originals.tar.gz",
+              "bytes": 713600,
+              "sha256": "a3a33efb527eea56bbc0c1c37b9c19021b7c28862ab4d902a1ef93b33a4e9804"
+            },
+            {
+              "relative": "provenance.json",
+              "bytes": 56761,
+              "sha256": "47a2d2e1567e2201e38c0abb61e4255234e8c2dc5d5dca2e573b7e6e69aae68b"
+            }
+          ],
+          "fixtureTarUsed": true,
+          "decodedOriginalsBefore": [
+            {
+              "relative": "diagnostic-report.json",
+              "bytes": 2311999,
+              "sha256": "7a10ede9e9867d44cb3a08fddb77cfb40641b19b5997282935fccb615ec2408a"
+            },
+            {
+              "relative": "assurance-report.json",
+              "bytes": 26126,
+              "sha256": "92b3815f1466679ade3e004d7a096eab85f59533dd8951ae96c1266e25d1d17e"
+            },
+            {
+              "relative": "trust-certificate.json",
+              "bytes": 3116,
+              "sha256": "f10a89eb2220981b8c4022c5a88b38632057122f2bcbbfa1b7b20271d581ddd3"
+            },
+            {
+              "relative": "passport.amcpass",
+              "bytes": 3700,
+              "sha256": "07971ddc9753fe1dddc6c3d1d0a640a73696735545ecc632accfd45a17274835"
+            },
+            {
+              "relative": "run.amcbundle",
+              "bytes": 344751,
+              "sha256": "aa0582d5a26bf63a75bd6813197c001e98d8ffa2a86ae784eeb6eec4e86fee98"
+            },
+            {
+              "relative": "domain-report.md",
+              "bytes": 29387,
+              "sha256": "f0e8b3a271009fe317329ca16d28886f4fb0450420969a54eb9b4582f33c93c6"
+            },
+            {
+              "relative": "ledger-observation.json",
+              "bytes": 39632,
+              "sha256": "166495059b0ab008cb121f311cc190d150b4593fa45053481f3e984ac34be1f9"
+            },
+            {
+              "relative": "evidence.sqlite",
+              "bytes": 409600,
+              "sha256": "5c5b9026c9f3996595f66c4d85dc2e024e0142ad2bbdac546f91fec70b875a93"
+            }
+          ],
+          "rawOriginalBytes": 3168311,
+          "generationGaps": [
+            {
+              "step": "genuine-L3",
+              "reason": "Actual diagnostic does not have mean level exactly L3; original bytes and seal retained unchanged."
+            },
+            {
+              "step": "diagnostic-certificate",
+              "reason": "Natural exit 1; retained original streams; no success or retry claimed."
+            },
+            {
+              "step": "run.amccert",
+              "reason": "No output file was emitted."
+            }
+          ],
+          "historicalSourceCommit": "ff53902225ff276c55558d5ca17a8fc60b780655",
+          "commandClosures": [
+            {
+              "label": "source-head",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "source-status",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "init",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "diagnostic",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "assurance",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "trust-certificate",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "passport-init",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "passport",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "bundle",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "ci-init",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "diagnostic-certificate",
+              "exitCode": 1,
+              "signal": null
+            },
+            {
+              "label": "operator-import",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "old-source-seed",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "old-source-domain",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "old-source-ledger",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "list-passport.amcpass",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "list-run.amcbundle",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "source-head-final",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "source-status-final",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "pack-originals",
+              "exitCode": 0,
+              "signal": null
+            }
+          ],
+          "assurance": {
+            "rule": "R1-assurance-canned-reply",
+            "claimKind": "synthetic_example",
+            "levelCap": null,
+            "original": {
+              "trustTier": "OBSERVED_HARDENED",
+              "level": null,
+              "label": "HIGH TRUST"
+            },
+            "noticeId": "AMC-LEGACY-2026-001",
+            "noticeVersion": 1
+          },
+          "sessionRows": [
+            {
+              "binaryPath": "amc-diagnostic-audits",
+              "classification": null
+            },
+            {
+              "binaryPath": "amc-assurance-runner",
+              "classification": null
+            },
+            {
+              "binaryPath": "amc-eval-import",
+              "classification": {
+                "rule": "R4-operator-tier",
+                "claimKind": "self_reported",
+                "levelCap": null,
+                "original": {
+                  "trustTier": "OBSERVED",
+                  "level": null,
+                  "label": null
+                },
+                "noticeId": "AMC-LEGACY-2026-001",
+                "noticeVersion": 1
+              }
+            },
+            {
+              "binaryPath": "amc-dogfood-agent",
+              "classification": {
+                "rule": "R2-dogfood-seeded",
+                "claimKind": "synthetic_example",
+                "levelCap": null,
+                "original": {
+                  "trustTier": "OBSERVED",
+                  "level": null,
+                  "label": null
+                },
+                "noticeId": "AMC-LEGACY-2026-001",
+                "noticeVersion": 1
+              }
+            }
+          ],
+          "domain": {
+            "rule": "R3-domain-report",
+            "claimKind": "synthetic_example",
+            "levelCap": null,
+            "original": {
+              "trustTier": null,
+              "level": null,
+              "label": "- Certification Readiness: no"
+            },
+            "noticeId": "AMC-LEGACY-2026-001",
+            "noticeVersion": 1
+          },
+          "diagnostic": {
+            "rule": "R5-no-claim-envelope",
+            "claimKind": "self_reported",
+            "levelCap": "L1",
+            "original": {
+              "trustTier": null,
+              "level": "L0",
+              "label": "UNRELIABLE \u2014 DO NOT USE FOR CLAIMS"
+            },
+            "noticeId": "AMC-LEGACY-2026-001",
+            "noticeVersion": 1
+          },
+          "assuranceLazyKind": "synthetic_example",
+          "assuranceCurrentFallbackCalls": 0,
+          "diagnosticMeanLevel": 0,
+          "genuineL3Produced": false,
+          "diagnosticMethodologyVersion": "1.1.1",
+          "oldObservationDerivedNotIndependent": true,
+          "trustCertificateUnversioned": true,
+          "diagnosticCertificateEmitted": false,
+          "encodedFixtureAfter": [
+            {
+              "relative": "README.md",
+              "bytes": 2182,
+              "sha256": "42846ff6c3511a5ecada656e5221d4149d1c27ba0a9e8e900e775ffe0dfcdf3a"
+            },
+            {
+              "relative": "generation.log",
+              "bytes": 3624,
+              "sha256": "9b5f2a997ce534e0cc50bdc62d1071c43e904efd6d1e5a0a9d16f3796aa6ed3a"
+            },
+            {
+              "relative": "originals.tar.gz",
+              "bytes": 713600,
+              "sha256": "a3a33efb527eea56bbc0c1c37b9c19021b7c28862ab4d902a1ef93b33a4e9804"
+            },
+            {
+              "relative": "provenance.json",
+              "bytes": 56761,
+              "sha256": "47a2d2e1567e2201e38c0abb61e4255234e8c2dc5d5dca2e573b7e6e69aae68b"
+            }
+          ],
+          "decodedOriginalsAfter": [
+            {
+              "relative": "diagnostic-report.json",
+              "bytes": 2311999,
+              "sha256": "7a10ede9e9867d44cb3a08fddb77cfb40641b19b5997282935fccb615ec2408a"
+            },
+            {
+              "relative": "assurance-report.json",
+              "bytes": 26126,
+              "sha256": "92b3815f1466679ade3e004d7a096eab85f59533dd8951ae96c1266e25d1d17e"
+            },
+            {
+              "relative": "trust-certificate.json",
+              "bytes": 3116,
+              "sha256": "f10a89eb2220981b8c4022c5a88b38632057122f2bcbbfa1b7b20271d581ddd3"
+            },
+            {
+              "relative": "passport.amcpass",
+              "bytes": 3700,
+              "sha256": "07971ddc9753fe1dddc6c3d1d0a640a73696735545ecc632accfd45a17274835"
+            },
+            {
+              "relative": "run.amcbundle",
+              "bytes": 344751,
+              "sha256": "aa0582d5a26bf63a75bd6813197c001e98d8ffa2a86ae784eeb6eec4e86fee98"
+            },
+            {
+              "relative": "domain-report.md",
+              "bytes": 29387,
+              "sha256": "f0e8b3a271009fe317329ca16d28886f4fb0450420969a54eb9b4582f33c93c6"
+            },
+            {
+              "relative": "ledger-observation.json",
+              "bytes": 39632,
+              "sha256": "166495059b0ab008cb121f311cc190d150b4593fa45053481f3e984ac34be1f9"
+            },
+            {
+              "relative": "evidence.sqlite",
+              "bytes": 409600,
+              "sha256": "5c5b9026c9f3996595f66c4d85dc2e024e0142ad2bbdac546f91fec70b875a93"
+            }
+          ],
+          "ownedLedgerPoolClosed": true
+        },
+        "nativeBefore": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "nativeAfter": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "lifecycle": {
+          "initialized": false,
+          "vaultLocked": true
+        },
+        "environmentUnchanged": true,
+        "childProcessCreatedByFixture": null,
+        "delegatedTarAPIInvoked": true,
+        "signalsSentByFixture": false,
+        "bodyFailed": false,
+        "bodyError": null,
+        "cleanupErrors": [],
+        "boundary": "Exact tag-generated bytes; imported fixture trust proves only the actual reported integrity result, never historical provenance"
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-WtnFV4/public-evidence.json",
+      "bytes": 24680,
+      "sha256": "a930eff50419eeff77df85c8fb0581d508eae629e7756fac1133ca4946d9ed20",
+      "record": {
+        "schema": "amc-p135-legacy-relabel/1",
+        "label": "genuine-persistent-roundtrip",
+        "origin": "tag-generated-originals",
+        "genuineHistoricalFixture": true,
+        "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-WtnFV4",
+        "observations": {
+          "genuineHistoricalFixture": true,
+          "encodedFixtureBytes": 776167,
+          "encodedFixtureBefore": [
+            {
+              "relative": "README.md",
+              "bytes": 2182,
+              "sha256": "42846ff6c3511a5ecada656e5221d4149d1c27ba0a9e8e900e775ffe0dfcdf3a"
+            },
+            {
+              "relative": "generation.log",
+              "bytes": 3624,
+              "sha256": "9b5f2a997ce534e0cc50bdc62d1071c43e904efd6d1e5a0a9d16f3796aa6ed3a"
+            },
+            {
+              "relative": "originals.tar.gz",
+              "bytes": 713600,
+              "sha256": "a3a33efb527eea56bbc0c1c37b9c19021b7c28862ab4d902a1ef93b33a4e9804"
+            },
+            {
+              "relative": "provenance.json",
+              "bytes": 56761,
+              "sha256": "47a2d2e1567e2201e38c0abb61e4255234e8c2dc5d5dca2e573b7e6e69aae68b"
+            }
+          ],
+          "fixtureTarUsed": true,
+          "decodedOriginalsBefore": [
+            {
+              "relative": "diagnostic-report.json",
+              "bytes": 2311999,
+              "sha256": "7a10ede9e9867d44cb3a08fddb77cfb40641b19b5997282935fccb615ec2408a"
+            },
+            {
+              "relative": "assurance-report.json",
+              "bytes": 26126,
+              "sha256": "92b3815f1466679ade3e004d7a096eab85f59533dd8951ae96c1266e25d1d17e"
+            },
+            {
+              "relative": "trust-certificate.json",
+              "bytes": 3116,
+              "sha256": "f10a89eb2220981b8c4022c5a88b38632057122f2bcbbfa1b7b20271d581ddd3"
+            },
+            {
+              "relative": "passport.amcpass",
+              "bytes": 3700,
+              "sha256": "07971ddc9753fe1dddc6c3d1d0a640a73696735545ecc632accfd45a17274835"
+            },
+            {
+              "relative": "run.amcbundle",
+              "bytes": 344751,
+              "sha256": "aa0582d5a26bf63a75bd6813197c001e98d8ffa2a86ae784eeb6eec4e86fee98"
+            },
+            {
+              "relative": "domain-report.md",
+              "bytes": 29387,
+              "sha256": "f0e8b3a271009fe317329ca16d28886f4fb0450420969a54eb9b4582f33c93c6"
+            },
+            {
+              "relative": "ledger-observation.json",
+              "bytes": 39632,
+              "sha256": "166495059b0ab008cb121f311cc190d150b4593fa45053481f3e984ac34be1f9"
+            },
+            {
+              "relative": "evidence.sqlite",
+              "bytes": 409600,
+              "sha256": "5c5b9026c9f3996595f66c4d85dc2e024e0142ad2bbdac546f91fec70b875a93"
+            }
+          ],
+          "rawOriginalBytes": 3168311,
+          "generationGaps": [
+            {
+              "step": "genuine-L3",
+              "reason": "Actual diagnostic does not have mean level exactly L3; original bytes and seal retained unchanged."
+            },
+            {
+              "step": "diagnostic-certificate",
+              "reason": "Natural exit 1; retained original streams; no success or retry claimed."
+            },
+            {
+              "step": "run.amccert",
+              "reason": "No output file was emitted."
+            }
+          ],
+          "historicalSourceCommit": "ff53902225ff276c55558d5ca17a8fc60b780655",
+          "commandClosures": [
+            {
+              "label": "source-head",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "source-status",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "init",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "diagnostic",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "assurance",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "trust-certificate",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "passport-init",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "passport",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "bundle",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "ci-init",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "diagnostic-certificate",
+              "exitCode": 1,
+              "signal": null
+            },
+            {
+              "label": "operator-import",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "old-source-seed",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "old-source-domain",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "old-source-ledger",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "list-passport.amcpass",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "list-run.amcbundle",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "source-head-final",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "source-status-final",
+              "exitCode": 0,
+              "signal": null
+            },
+            {
+              "label": "pack-originals",
+              "exitCode": 0,
+              "signal": null
+            }
+          ],
+          "fixtureTrustEnrollment": {
+            "source": "imported",
+            "oldMonitorId": "d69f29aa5b63be2d11bb336d5a48cec38757017b95bda4ab92f800ecbf4e30c0",
+            "oldAuditorId": "997d06463950748134b9c006832d116466e607dc6bff090e8e2f6f9c81b3d680",
+            "currentMonitorId": "2339727399ab3960c1cf5f7db8d7457c3be5e8ac9afe198600140e1ee4d1c170",
+            "monitorHistoryVerified": true,
+            "auditorHistoryVerified": true,
+            "activePublicKeysAndVaultUnchanged": true,
+            "independentHistoricalProvenanceClaim": false
+          },
+          "installedOriginalsBefore": [
+            {
+              "relative": ".amc/runs/genuine-v1-1-1-diagnostic.json",
+              "bytes": 2311999,
+              "sha256": "7a10ede9e9867d44cb3a08fddb77cfb40641b19b5997282935fccb615ec2408a"
+            },
+            {
+              "relative": ".amc/reports/assurance/genuine-v1-1-1-assurance.json",
+              "bytes": 26126,
+              "sha256": "92b3815f1466679ade3e004d7a096eab85f59533dd8951ae96c1266e25d1d17e"
+            },
+            {
+              "relative": ".amc/evidence.sqlite",
+              "bytes": 409600,
+              "sha256": "5c5b9026c9f3996595f66c4d85dc2e024e0142ad2bbdac546f91fec70b875a93"
+            }
+          ],
+          "genuineLedgerReadOnlyOpened": true,
+          "genuineLedgerReadOnlyClosed": true,
+          "fixtureTimestampSource": "injected public now callback",
+          "initializedPoolClosedBeforeCopy": true,
+          "actualLedgerVerification": {
+            "ok": false,
+            "errors": [
+              "Missing blob file for event 18b5b7ee-6237-4e74-a273-a8d12b372470",
+              "Missing blob file for event 65a16609-42a4-4c5e-9ce7-b368261a0f00",
+              "Missing blob file for event 43fb444d-3c32-46ae-85ae-3757679fcf34",
+              "Missing blob file for event 481fb311-5050-497b-9500-95bd1ec05111",
+              "Missing blob file for event 30530fb9-4853-4467-a41a-b460b90be3d6",
+              "Missing blob file for event e03aba15-c4d8-4cbb-9fa3-241f74bd7104",
+              "Missing blob file for event cecf7242-455e-42e1-b312-fcdd870a08e8",
+              "Missing blob file for event 048087c5-cfa6-4b63-8457-30c176d503ce",
+              "Missing blob file for event a72e3c26-6802-4781-bfc3-a084f34fdb8f",
+              "Missing blob file for event 2317b6e0-51f4-44e9-98cf-1ffc7c7abed4",
+              "Missing blob file for event 1e12c3a0-2ff6-44fd-9e23-bd2235aad608",
+              "Missing blob file for event b124afd8-3850-4c3a-aa7c-9bc66f00d2bb",
+              "Missing blob file for event fcef4bb8-244c-401d-905b-c91a743a3bb9",
+              "Missing blob file for event 52b12149-00e3-48f1-8312-1a3521a4b2b2",
+              "Missing blob file for event 22906cbc-3bee-4197-a199-ea14578a89cb",
+              "Missing blob file for event 54c51c85-eb83-4085-9b53-096c9e5dd6c9",
+              "Missing blob file for event 17f058f1-3f9b-4cad-a7b0-e4731752fd39",
+              "Missing blob file for event 82550f73-b623-43d0-b557-28801c34b8cb",
+              "Missing blob file for event 5eea2ac2-8641-4a68-87d9-06db473bc907",
+              "Missing blob file for event 8f2ebd3d-cbdb-480d-a315-6e4acfab16ce",
+              "Missing blob file for event f4033a27-17cb-4dec-b318-f1f386b7cc7d",
+              "Missing blob file for event bd9a87f1-2585-4858-9b31-e0a9778510bc",
+              "Missing blob file for event 4e72130b-7337-4a2c-b7d1-aa622f8baf92",
+              "Missing blob file for event ba2462f2-b3d5-48aa-ae6c-778a902e098f",
+              "Missing blob file for event 616c87da-e3db-4cd8-b56b-2d7478aa74d0",
+              "Missing blob file for event 28f42a2b-9ce4-4749-8204-520c4a0d8a34"
+            ],
+            "chain": {
+              "ok": false,
+              "errors": [
+                "Missing blob file for event 18b5b7ee-6237-4e74-a273-a8d12b372470",
+                "Missing blob file for event 65a16609-42a4-4c5e-9ce7-b368261a0f00",
+                "Missing blob file for event 43fb444d-3c32-46ae-85ae-3757679fcf34",
+                "Missing blob file for event 481fb311-5050-497b-9500-95bd1ec05111",
+                "Missing blob file for event 30530fb9-4853-4467-a41a-b460b90be3d6",
+                "Missing blob file for event e03aba15-c4d8-4cbb-9fa3-241f74bd7104",
+                "Missing blob file for event cecf7242-455e-42e1-b312-fcdd870a08e8",
+                "Missing blob file for event 048087c5-cfa6-4b63-8457-30c176d503ce",
+                "Missing blob file for event a72e3c26-6802-4781-bfc3-a084f34fdb8f",
+                "Missing blob file for event 2317b6e0-51f4-44e9-98cf-1ffc7c7abed4",
+                "Missing blob file for event 1e12c3a0-2ff6-44fd-9e23-bd2235aad608",
+                "Missing blob file for event b124afd8-3850-4c3a-aa7c-9bc66f00d2bb",
+                "Missing blob file for event fcef4bb8-244c-401d-905b-c91a743a3bb9",
+                "Missing blob file for event 52b12149-00e3-48f1-8312-1a3521a4b2b2",
+                "Missing blob file for event 22906cbc-3bee-4197-a199-ea14578a89cb",
+                "Missing blob file for event 54c51c85-eb83-4085-9b53-096c9e5dd6c9",
+                "Missing blob file for event 17f058f1-3f9b-4cad-a7b0-e4731752fd39",
+                "Missing blob file for event 82550f73-b623-43d0-b557-28801c34b8cb",
+                "Missing blob file for event 5eea2ac2-8641-4a68-87d9-06db473bc907",
+                "Missing blob file for event 8f2ebd3d-cbdb-480d-a315-6e4acfab16ce",
+                "Missing blob file for event f4033a27-17cb-4dec-b318-f1f386b7cc7d",
+                "Missing blob file for event bd9a87f1-2585-4858-9b31-e0a9778510bc",
+                "Missing blob file for event 4e72130b-7337-4a2c-b7d1-aa622f8baf92",
+                "Missing blob file for event ba2462f2-b3d5-48aa-ae6c-778a902e098f",
+                "Missing blob file for event 616c87da-e3db-4cd8-b56b-2d7478aa74d0",
+                "Missing blob file for event 28f42a2b-9ce4-4749-8204-520c4a0d8a34"
+              ]
+            },
+            "governance": {
+              "ok": true,
+              "errors": []
+            },
+            "trustRoot": {
+              "anchored": true,
+              "monitorFingerprint": "2339727399ab3960c1cf5f7db8d7457c3be5e8ac9afe198600140e1ee4d1c170",
+              "expectedFingerprint": null,
+              "monitorAdmission": {
+                "signature": "ledger monitor key",
+                "purpose": "ledger-row",
+                "keyId": "2339727399ab3960c1cf5f7db8d7457c3be5e8ac9afe198600140e1ee4d1c170",
+                "status": "admitted",
+                "source": "explicit-key",
+                "listId": null,
+                "timeBasis": null,
+                "detail": null
+              }
+            },
+            "sessions": {
+              "open": [],
+              "released": [],
+              "interrupted": [],
+              "closed": []
+            }
+          },
+          "beforeBundle": {
+            "ok": true,
+            "integrity": {
+              "status": "pass",
+              "errors": []
+            },
+            "issuerStatus": "pass",
+            "anchoring": {
+              "status": "anchored",
+              "detail": "monitor key d69f29aa5b63be2d11bb336d5a48cec38757017b95bda4ab92f800ecbf4e30c0 admitted for ledger-row (explicit-key)"
+            },
+            "claim": {
+              "rule": "R5-no-claim-envelope",
+              "claimKind": "self_reported",
+              "levelCap": "L1",
+              "original": {
+                "trustTier": null,
+                "level": "L0",
+                "label": "UNRELIABLE \u2014 DO NOT USE FOR CLAIMS"
+              },
+              "noticeId": "AMC-LEGACY-2026-001",
+              "noticeVersion": 1
+            }
+          },
+          "afterBundle": {
+            "ok": true,
+            "integrity": {
+              "status": "pass",
+              "errors": []
+            },
+            "issuerStatus": "pass",
+            "anchoring": {
+              "status": "anchored",
+              "detail": "monitor key d69f29aa5b63be2d11bb336d5a48cec38757017b95bda4ab92f800ecbf4e30c0 admitted for ledger-row (explicit-key)"
+            },
+            "claim": {
+              "rule": "R5-no-claim-envelope",
+              "claimKind": "self_reported",
+              "levelCap": "L1",
+              "original": {
+                "trustTier": null,
+                "level": "L0",
+                "label": "UNRELIABLE \u2014 DO NOT USE FOR CLAIMS"
+              },
+              "noticeId": "AMC-LEGACY-2026-001",
+              "noticeVersion": 1
+            }
+          },
+          "automaticDomainRecords": 0,
+          "explicitDomainRecords": 1,
+          "dryWritesAbsent": true,
+          "afterDry": [
+            {
+              "relative": ".amc/runs/genuine-v1-1-1-diagnostic.json",
+              "bytes": 2311999,
+              "sha256": "7a10ede9e9867d44cb3a08fddb77cfb40641b19b5997282935fccb615ec2408a"
+            },
+            {
+              "relative": ".amc/reports/assurance/genuine-v1-1-1-assurance.json",
+              "bytes": 26126,
+              "sha256": "92b3815f1466679ade3e004d7a096eab85f59533dd8951ae96c1266e25d1d17e"
+            },
+            {
+              "relative": ".amc/evidence.sqlite",
+              "bytes": 409600,
+              "sha256": "5c5b9026c9f3996595f66c4d85dc2e024e0142ad2bbdac546f91fec70b875a93"
+            }
+          ],
+          "afterFirst": [
+            {
+              "relative": ".amc/runs/genuine-v1-1-1-diagnostic.json",
+              "bytes": 2311999,
+              "sha256": "7a10ede9e9867d44cb3a08fddb77cfb40641b19b5997282935fccb615ec2408a"
+            },
+            {
+              "relative": ".amc/reports/assurance/genuine-v1-1-1-assurance.json",
+              "bytes": 26126,
+              "sha256": "92b3815f1466679ade3e004d7a096eab85f59533dd8951ae96c1266e25d1d17e"
+            },
+            {
+              "relative": ".amc/evidence.sqlite",
+              "bytes": 409600,
+              "sha256": "5c5b9026c9f3996595f66c4d85dc2e024e0142ad2bbdac546f91fec70b875a93"
+            }
+          ],
+          "changedOriginals": [],
+          "records": [
+            {
+              "v": 1,
+              "seq": 1,
+              "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+              "noticeId": "AMC-LEGACY-2026-001",
+              "noticeVersion": 1,
+              "artifact": {
+                "kind": "diagnostic_report",
+                "locator": ".amc/runs/genuine-v1-1-1-diagnostic.json",
+                "sha256": "7a10ede9e9867d44cb3a08fddb77cfb40641b19b5997282935fccb615ec2408a"
+              },
+              "original": {
+                "trustTier": null,
+                "level": "L0",
+                "label": "UNRELIABLE \u2014 DO NOT USE FOR CLAIMS"
+              },
+              "assigned": {
+                "claimKind": "self_reported",
+                "legacy": true,
+                "levelCap": "L1"
+              },
+              "integrity": {
+                "status": "verified",
+                "trusted": null,
+                "reasons": []
+              },
+              "rule": "R5-no-claim-envelope",
+              "recordedAt": "2026-10-16T12:00:00.007Z",
+              "recordedBy": {
+                "tool": "agent-maturity-compass",
+                "version": "1.2.0"
+              }
+            },
+            {
+              "v": 1,
+              "seq": 2,
+              "prevHash": "620d724a65ed49473508ec83e5e9d6fa4af7aca047120718c130cc2899bd4f1d",
+              "noticeId": "AMC-LEGACY-2026-001",
+              "noticeVersion": 1,
+              "artifact": {
+                "kind": "assurance_report",
+                "locator": ".amc/reports/assurance/genuine-v1-1-1-assurance.json",
+                "sha256": "92b3815f1466679ade3e004d7a096eab85f59533dd8951ae96c1266e25d1d17e"
+              },
+              "original": {
+                "trustTier": "OBSERVED_HARDENED",
+                "level": null,
+                "label": "HIGH TRUST"
+              },
+              "assigned": {
+                "claimKind": "synthetic_example",
+                "legacy": true,
+                "levelCap": null
+              },
+              "integrity": {
+                "status": "verified",
+                "trusted": null,
+                "reasons": []
+              },
+              "rule": "R1-assurance-canned-reply",
+              "recordedAt": "2026-10-16T12:00:00.007Z",
+              "recordedBy": {
+                "tool": "agent-maturity-compass",
+                "version": "1.2.0"
+              }
+            },
+            {
+              "v": 1,
+              "seq": 3,
+              "prevHash": "e8f8d871002f7d4256403b50530c939431dad205938148b4b138fd467c9dbcd8",
+              "noticeId": "AMC-LEGACY-2026-001",
+              "noticeVersion": 1,
+              "artifact": {
+                "kind": "bundle",
+                "locator": "decoded-originals/run.amcbundle",
+                "sha256": "aa0582d5a26bf63a75bd6813197c001e98d8ffa2a86ae784eeb6eec4e86fee98"
+              },
+              "original": {
+                "trustTier": null,
+                "level": "L0",
+                "label": "UNRELIABLE \u2014 DO NOT USE FOR CLAIMS"
+              },
+              "assigned": {
+                "claimKind": "self_reported",
+                "legacy": true,
+                "levelCap": "L1"
+              },
+              "integrity": {
+                "status": "verified",
+                "trusted": true,
+                "reasons": []
+              },
+              "rule": "R5-no-claim-envelope",
+              "recordedAt": "2026-10-16T12:00:00.007Z",
+              "recordedBy": {
+                "tool": "agent-maturity-compass",
+                "version": "1.2.0"
+              }
+            },
+            {
+              "v": 1,
+              "seq": 4,
+              "prevHash": "15f392f4dbebb5480dbfac05d7129aab09b4392ec89552096b61f0ca6dc416fe",
+              "noticeId": "AMC-LEGACY-2026-001",
+              "noticeVersion": 1,
+              "artifact": {
+                "kind": "domain_report",
+                "locator": "decoded-originals/domain-report.md",
+                "sha256": "f0e8b3a271009fe317329ca16d28886f4fb0450420969a54eb9b4582f33c93c6"
+              },
+              "original": {
+                "trustTier": null,
+                "level": null,
+                "label": "- Certification Readiness: no"
+              },
+              "assigned": {
+                "claimKind": "synthetic_example",
+                "legacy": true,
+                "levelCap": null
+              },
+              "integrity": {
+                "status": "notChecked",
+                "trusted": null,
+                "reasons": []
+              },
+              "rule": "R3-domain-report",
+              "recordedAt": "2026-10-16T12:00:00.007Z",
+              "recordedBy": {
+                "tool": "agent-maturity-compass",
+                "version": "1.2.0"
+              }
+            }
+          ],
+          "skipped": [
+            {
+              "locator": "ledger-session:5cdbbcd0-b233-4314-a9c9-8b44985165c7",
+              "reason": "integrity check failed: Missing blob file for event 18b5b7ee-6237-4e74-a273-a8d12b372470; Missing blob file for event 65a16609-42a4-4c5e-9ce7-b368261a0f00; Missing blob file for event 43fb444d-3c32-46ae-85ae-3757679fcf34"
+            },
+            {
+              "locator": "ledger-session:a0a3114c-eab6-44e1-bfff-c1ba1d18ad7e",
+              "reason": "integrity check failed: Missing blob file for event 18b5b7ee-6237-4e74-a273-a8d12b372470; Missing blob file for event 65a16609-42a4-4c5e-9ce7-b368261a0f00; Missing blob file for event 43fb444d-3c32-46ae-85ae-3757679fcf34"
+            },
+            {
+              "locator": "ledger-session:audit-08676a38-29eb-4d18-ba1b-de038cb1a12d-bba30258ee8f",
+              "reason": "integrity check failed: Missing blob file for event 18b5b7ee-6237-4e74-a273-a8d12b372470; Missing blob file for event 65a16609-42a4-4c5e-9ce7-b368261a0f00; Missing blob file for event 43fb444d-3c32-46ae-85ae-3757679fcf34"
+            },
+            {
+              "locator": "ledger-session:legacy-seeded-maturity-session-1",
+              "reason": "integrity check failed: Missing blob file for event 18b5b7ee-6237-4e74-a273-a8d12b372470; Missing blob file for event 65a16609-42a4-4c5e-9ce7-b368261a0f00; Missing blob file for event 43fb444d-3c32-46ae-85ae-3757679fcf34"
+            },
+            {
+              "locator": "decoded-originals/passport.amcpass",
+              "reason": "records no AMC version or claim envelope, so 1.x and 1.2 cannot be told apart; readers print it self-reported"
+            },
+            {
+              "locator": "decoded-originals/trust-certificate.json",
+              "reason": "records no AMC version or claim envelope, so 1.x and 1.2 cannot be told apart; readers print it self-reported"
+            }
+          ],
+          "relabelLogVerified": true,
+          "originalsDigestMatches": true,
+          "receiptSignatureVerified": true,
+          "secondRecordCount": 0,
+          "repeatLogUnchanged": true,
+          "receiptCountBeforeRepeat": 1,
+          "receiptCountAfterRepeat": 2,
+          "repeatedLogVerified": true,
+          "encodedFixtureAfter": [
+            {
+              "relative": "README.md",
+              "bytes": 2182,
+              "sha256": "42846ff6c3511a5ecada656e5221d4149d1c27ba0a9e8e900e775ffe0dfcdf3a"
+            },
+            {
+              "relative": "generation.log",
+              "bytes": 3624,
+              "sha256": "9b5f2a997ce534e0cc50bdc62d1071c43e904efd6d1e5a0a9d16f3796aa6ed3a"
+            },
+            {
+              "relative": "originals.tar.gz",
+              "bytes": 713600,
+              "sha256": "a3a33efb527eea56bbc0c1c37b9c19021b7c28862ab4d902a1ef93b33a4e9804"
+            },
+            {
+              "relative": "provenance.json",
+              "bytes": 56761,
+              "sha256": "47a2d2e1567e2201e38c0abb61e4255234e8c2dc5d5dca2e573b7e6e69aae68b"
+            }
+          ],
+          "decodedOriginalsAfter": [
+            {
+              "relative": "diagnostic-report.json",
+              "bytes": 2311999,
+              "sha256": "7a10ede9e9867d44cb3a08fddb77cfb40641b19b5997282935fccb615ec2408a"
+            },
+            {
+              "relative": "assurance-report.json",
+              "bytes": 26126,
+              "sha256": "92b3815f1466679ade3e004d7a096eab85f59533dd8951ae96c1266e25d1d17e"
+            },
+            {
+              "relative": "trust-certificate.json",
+              "bytes": 3116,
+              "sha256": "f10a89eb2220981b8c4022c5a88b38632057122f2bcbbfa1b7b20271d581ddd3"
+            },
+            {
+              "relative": "passport.amcpass",
+              "bytes": 3700,
+              "sha256": "07971ddc9753fe1dddc6c3d1d0a640a73696735545ecc632accfd45a17274835"
+            },
+            {
+              "relative": "run.amcbundle",
+              "bytes": 344751,
+              "sha256": "aa0582d5a26bf63a75bd6813197c001e98d8ffa2a86ae784eeb6eec4e86fee98"
+            },
+            {
+              "relative": "domain-report.md",
+              "bytes": 29387,
+              "sha256": "f0e8b3a271009fe317329ca16d28886f4fb0450420969a54eb9b4582f33c93c6"
+            },
+            {
+              "relative": "ledger-observation.json",
+              "bytes": 39632,
+              "sha256": "166495059b0ab008cb121f311cc190d150b4593fa45053481f3e984ac34be1f9"
+            },
+            {
+              "relative": "evidence.sqlite",
+              "bytes": 409600,
+              "sha256": "5c5b9026c9f3996595f66c4d85dc2e024e0142ad2bbdac546f91fec70b875a93"
+            }
+          ],
+          "installedOriginalsAfter": [
+            {
+              "relative": ".amc/runs/genuine-v1-1-1-diagnostic.json",
+              "bytes": 2311999,
+              "sha256": "7a10ede9e9867d44cb3a08fddb77cfb40641b19b5997282935fccb615ec2408a"
+            },
+            {
+              "relative": ".amc/reports/assurance/genuine-v1-1-1-assurance.json",
+              "bytes": 26126,
+              "sha256": "92b3815f1466679ade3e004d7a096eab85f59533dd8951ae96c1266e25d1d17e"
+            },
+            {
+              "relative": ".amc/evidence.sqlite",
+              "bytes": 409600,
+              "sha256": "5c5b9026c9f3996595f66c4d85dc2e024e0142ad2bbdac546f91fec70b875a93"
+            }
+          ],
+          "ownedLedgerPoolClosed": true
+        },
+        "nativeBefore": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "nativeAfter": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "bytes": 1931552,
+          "dev": 16777231,
+          "inode": 542501039,
+          "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        },
+        "lifecycle": {
+          "initialized": true,
+          "vaultLocked": true
+        },
+        "environmentUnchanged": true,
+        "childProcessCreatedByFixture": null,
+        "delegatedTarAPIInvoked": true,
+        "signalsSentByFixture": false,
+        "bodyFailed": true,
+        "bodyError": {
+          "name": "AssertionError",
+          "message": "expected false to be true // Object.is equality",
+          "stack": "AssertionError: expected false to be true // Object.is equality\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:533:31\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:65:5)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:456:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        },
+        "cleanupErrors": [],
+        "boundary": "Exact tag-generated bytes; imported fixture trust proves only the actual reported integrity result, never historical provenance"
+      }
+    }
+  ],
+  "rootCause": "Final old workspace ledger references26 encrypted blob dependencies omitted from the fixture; actual verification refuses. No verifier bypass, decrypted payload, injected ledgerCheck or waived assertion.",
+  "next": "Generate a genuine naturally closed snapshot with complete inline dependencies before the old assurance run; preserve this original/failure evidence."
+}

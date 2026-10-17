@@ -1,0 +1,141 @@
+{
+  "at": "2026-10-16T18:08:34.290952+00:00",
+  "nativePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 542501039,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 539175547,
+      "nlink": 1
+    }
+  ],
+  "sourceCompiledConfigPins": [
+    {
+      "relativePath": "src/diagnostic/evidenceEmitters.ts",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+    },
+    {
+      "relativePath": "src/diagnostic/levelSemantics.ts",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+    },
+    {
+      "relativePath": "src/diagnostic/gates.ts",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+    },
+    {
+      "relativePath": "src/diagnostic/questionBank.ts",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/questionBank.ts",
+      "bytes": 287500,
+      "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a"
+    },
+    {
+      "relativePath": "src/diagnostic/evidenceMaps/index.ts",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+      "bytes": 3431,
+      "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec"
+    },
+    {
+      "relativePath": "dist/diagnostic/evidenceEmitters.js",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/evidenceEmitters.js",
+      "bytes": 10877,
+      "sha256": "30734f2d5ece2ad6ae597eb05ef9b36aebd10db3b6364378e774b2f97d6531d1"
+    },
+    {
+      "relativePath": "dist/diagnostic/levelSemantics.js",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/levelSemantics.js",
+      "bytes": 11020,
+      "sha256": "614c7b14826adc97a32a96e982abb59dc77217ae5966d2ef484efcc6a29d76ef"
+    },
+    {
+      "relativePath": "dist/diagnostic/gates.js",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/gates.js",
+      "bytes": 9269,
+      "sha256": "88eaf2578733685a307512a54dea7b0508d37d8c1c8e17cb7372f061e54fff98"
+    },
+    {
+      "relativePath": "dist/diagnostic/questionBank.js",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/questionBank.js",
+      "bytes": 304412,
+      "sha256": "2e31419be55be2bed7fdc4369b96040b458eb8227edd344e548fee902c13493f"
+    },
+    {
+      "relativePath": "dist/diagnostic/evidenceMaps/index.js",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/evidenceMaps/index.js",
+      "bytes": 2392,
+      "sha256": "0390f2409fec897db17a5c52fa74d1d893be84921e30ed4e8bceebc81364d16a"
+    },
+    {
+      "relativePath": "scripts/clean-source-check.mjs",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/clean-source-check.mjs",
+      "bytes": 7910,
+      "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b"
+    },
+    {
+      "relativePath": "scripts/source-quality.mjs",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
+      "relativePath": "knip.json",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/knip.json",
+      "bytes": 1928,
+      "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1"
+    },
+    {
+      "relativePath": "package.json",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "relativePath": "pnpm-lock.yaml",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "relativePath": "vitest.config.ts",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "relativePath": "tsconfig.tests.json",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "relativePath": "docs/SCORING_METHODOLOGY.md",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/SCORING_METHODOLOGY.md",
+      "bytes": 828603,
+      "sha256": "c19cbb4f8afefedc79e5b73cab15463b311e1035a326251af4cdf619aa88bf80"
+    },
+    {
+      "relativePath": "src/methodology/publicMethodology.ts",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/methodology/publicMethodology.ts",
+      "bytes": 930822,
+      "sha256": "a86de215883618469ed69872823a8ad194b52290145427b3f66592c05b1df97a"
+    }
+  ],
+  "currentSourceBuildCompleted": true,
+  "futureFreshCheckoutBindingPending": true
+}

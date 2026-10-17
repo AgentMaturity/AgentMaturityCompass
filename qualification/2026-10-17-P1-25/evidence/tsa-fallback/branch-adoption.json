@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-16T22:06:41.373264+00:00",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "head": "a0cfbc280f2b11207205541ba89112c125c29895",
+  "branch": "codex/p1-25-fallback-qualification",
+  "retainedClientBranch": "codex/p1-25-client-qualification",
+  "retainedClientBranchHead": "a0cfbc280f2b11207205541ba89112c125c29895",
+  "sourceCleanIndexEmpty": true,
+  "priorBoundedClosure": {
+    "path": "/private/tmp/p1-25-client-qualification-20261017/bounded-closure.json",
+    "bytes": 13394,
+    "sha256": "48df6ed2897d9f8e980029089eb0d4a669f5ffc992be7a79df80368c06614d3b"
+  },
+  "nextTestPath": "tests/time/tsaFallback.test.ts",
+  "sourceCandidateUnallocated": true
+}

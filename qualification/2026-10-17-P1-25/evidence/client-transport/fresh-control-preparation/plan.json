@@ -1,0 +1,129 @@
+{
+  "schema": "p125c-future-binding-and-control-plan/1",
+  "at": "2026-10-16T21:43:46.053876+00:00",
+  "status": "private unexecuted preparation",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "heldWrapperRoot": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "historicalPreChangeHead": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7",
+  "sourceCommit": null,
+  "freshRoot": null,
+  "bindingRequiredAt": "/private/tmp/p1-25-client-qualification-20261017/fresh-source-binding.json",
+  "bindingSchema": "p125c-actual-fresh-source-binding/1",
+  "bindingFields": [
+    "sourceRoot",
+    "freshRoot",
+    "sourceCommit",
+    "boundPaths",
+    "compiledPairs",
+    "existingNativePins",
+    "freshNative",
+    "helper",
+    "vitestCreditFromHelper",
+    "prospectiveCountOrCompiledHashesAdopted"
+  ],
+  "bindingRows": "boundPaths rows retain relativePath/bytes/sha256 and actual source/fresh physical pin rows path/physicalPath/bytes/sha256/dev/inode/nlink, matching B33. Root refreshes all post-build bytes and identities; no current count/compiled hash is adopted.",
+  "sourcePinset": {
+    "relativePaths": 71,
+    "compiledPairs": 8,
+    "publicOfflineFixtureFiles": 11
+  },
+  "requiredProtection": {
+    "inputs": 121,
+    "existingPhysicalNativePins": 6,
+    "newDistinctPhysicalNativePinRequired": true,
+    "heldRHeadStatusEmptyIndexExact": true,
+    "sourceAndFreshHeadSameActualCommit": true,
+    "sourceCleanAndFreshIndexEmpty": true,
+    "allSelectedRegularSingleLinkDistinctPhysical": true
+  },
+  "sourceOutcome": "p125c-source-combined",
+  "prospectiveCohort": {
+    "files": [
+      "tests/time/tsaClient.test.ts",
+      "tests/time/verifyTimestamp.test.ts"
+    ],
+    "newLiteralBodies": 11,
+    "unchangedLiteralBodies": 17,
+    "prospectiveTotal": 28,
+    "sourceCombinedPassClaim": false
+  },
+  "fiveFreshPhases": [
+    "p125c-fresh-canonical",
+    "p125c-m1",
+    "p125c-restore1",
+    "p125c-m2",
+    "p125c-restore2"
+  ],
+  "orderedInventoryContract": "Actual source and fresh canonical must establish the same 28 unique ordered file/fullName identities. Each actual control and restore keeps that exact inventory. Compare actual hookTaskEntries and individualHookValues separately; no predicted hook or failure totals.",
+  "controls": [
+    {
+      "number": 1,
+      "operator": "C1-certReq-false",
+      "primaryWitness": {
+        "path": "tests/time/tsaClient.test.ts",
+        "line": 193,
+        "precedingPositive": 191,
+        "assertion": "literal final BOOLEAN TLV 0101ff after complete prefix positive"
+      },
+      "otherSensitiveAssertion": "The literal full policy request at line201 may also expose the changed BOOLEAN; actual failures must be read.",
+      "masking": "A constructor/prefix failure masks the bit witness. The final full-wire assertion at194 is masked if193 fails. Never infer all rows reached."
+    },
+    {
+      "number": 2,
+      "operator": "C2-ignore-response-MIME",
+      "primaryWitness": {
+        "path": "tests/time/tsaClient.test.ts",
+        "callLine": 280,
+        "matcherLine": 281,
+        "precedingPositive": 278,
+        "assertion": "wrong-MIME response must reject after adjacent actual positive"
+      },
+      "masking": "Actual stack may identify call or matcher. Later request-count assertion282 is masked by rejection-assertion failure; body and cleanup errors remain distinct."
+    }
+  ],
+  "applyProtocol": [
+    "Read actual binding and current protected/helper/recipe pins; reject ACTIVE/HALTED markers with or without .json.",
+    "Require closed actual green source and fresh canonical outcomes with joined raw/observer artifacts, natural ESRCH/no signals, same ordered 28 cases and actual hooks.",
+    "Require Q pristine, exact selected source/compiled/protected/native state, and target regular single-link/canonical/physically distinct from S. C2 also requires actual C1 restoration plus closed restore1 green.",
+    "Verify exact original SHA/size and one before-text occurrence, compute exact proposed SHA/size, retain exclusive original/prepared record.",
+    "Use guarded descriptor with O_NOFOLLOW, no O_TRUNC on open, fstat/lstat/content/physical checks before truncation; one explicitly requested write, then retain actual live Git patch and apply record."
+  ],
+  "restoreProtocol": [
+    "Root runs the unchanged finite corpus and existing audit adapter; no helper invokes tests.",
+    "Require actual closed RED exit1/failed>0, complete28 inventory, join, actual unchanged hooks, no unhandled/late errors or non-test task errors, ESRCH/no signals.",
+    "Read source-bound manual classification: rootAllFailuresRead/allFailuresClassified/firstSensitiveAssertionRead/noHookOrEnvironmentFailure true; exact outcome SHA, operator, firstSensitiveAssertion and explicit nonempty masking record.",
+    "Verify exact mutant/apply/original bytes, only target changed and all other source/compiled/native/protected state exact. Retain exclusive prepared record, then explicit guarded exact restore.",
+    "Verify Q pristine and all original selected/protected/native bytes/physical identities. Root separately runs identical-corpus actual green restoration; the helper grants no future green credit."
+  ],
+  "classificationFields": [
+    "phase",
+    "sourceCommit",
+    "operator",
+    "outcomeSha256",
+    "rootAllFailuresRead",
+    "allFailuresClassified",
+    "firstSensitiveAssertionRead",
+    "noHookOrEnvironmentFailure",
+    "firstSensitiveAssertion",
+    "masking"
+  ],
+  "privateOutputNames": [
+    "mN-original.ts",
+    "mN.patch",
+    "mN-apply-prepared.json",
+    "mN-apply.json",
+    "mN-restore-prepared.json",
+    "mN-restore.json",
+    "preservation-before-controls.json",
+    "preservation-after-m1.json",
+    "preservation-final.json"
+  ],
+  "failureProtocol": "Any assertion/collision/write or evidence failure stops without retry/automatic restore. Any partial invocation remains root-owned retained evidence; no failed record or backup is deleted or overwritten.",
+  "publication": "Preparation is private. Any eventual helper source must be explicitly reviewed and represented inertly, such as source-control.py.source.txt; any test source or original is inert .source.txt/artifact text or existing lossless JSON, never an executable .test.ts evidence path. No receipt or source generator is authored here.",
+  "boundaries": [
+    "No product/helper/parser/compiler/native/SQL/network/process-probe execution by this author.",
+    "No checkout/index/Git/QA mutation, source allocation, held-work cleanup, deadline/guard/baseline/package/egress repair or F37 resumption.",
+    "A source-only control does not rebuild compiled output or qualify crypto/ordered TSA fallback/trust grants/public TSA/full issue/full suite/global quality/plan completion.",
+    "Current resource closure and actual timeout behavior remain runtime evidence for root to capture. No causal-control outcome/failure count/green restoration is predicted."
+  ]
+}

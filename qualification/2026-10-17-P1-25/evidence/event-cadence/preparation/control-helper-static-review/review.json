@@ -1,0 +1,113 @@
+{
+  "schema": "p125ec-independent-control-helper-static-review/1",
+  "at": "2026-10-17T01:07:01.133214+00:00",
+  "blockers": [],
+  "helperPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/source-control.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/source-control.py.source.txt",
+    "bytes": 26289,
+    "sha256": "a30fa847e29155f851eca012ce4c315729285cc84b34d575cd84d17c64687853",
+    "dev": 16777231,
+    "inode": 543898504,
+    "nlink": 1
+  },
+  "basePin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/source-control.py",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-control.py",
+    "bytes": 21942,
+    "sha256": "73203ebcbe63fcf8273510a79e5b4e72f78656c41c9ffd2c9228e8b266496b32",
+    "dev": 16777231,
+    "inode": 543812593,
+    "nlink": 1
+  },
+  "fullCandidate402LinesAndBase341LinesAndFullDeltaRead": true,
+  "completeDeltaRecomputedExactly": true,
+  "unchangedFunctionsExact": [
+    "sha",
+    "load",
+    "pin",
+    "verify",
+    "git",
+    "inactive",
+    "closed",
+    "green",
+    "write_json"
+  ],
+  "sealAllTenOutputsPhysicalPinsExact": true,
+  "privateInputPinsVerified": 9,
+  "liveSourceInputPinsNotProbed": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts"
+  ],
+  "actualMetadataReviewed": {
+    "sourceCheckpoint": {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-checkpoint.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/source-checkpoint.json",
+      "bytes": 541,
+      "sha256": "987d5d871240290965fb544196d6aba695c38e3ba11737f4b9b29f37d4049103",
+      "dev": 16777231,
+      "inode": 543836072,
+      "nlink": 1
+    },
+    "freshBinding": {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-source-binding.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-source-binding.json",
+      "bytes": 122294,
+      "sha256": "48baa36cfc416eac9c71d6af072eeac7847cd2516c7e48a5cfc777f4fa3ec935",
+      "dev": 16777231,
+      "inode": 543898614,
+      "nlink": 1
+    },
+    "sourceCommit": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+    "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout",
+    "selectedPaths": 98,
+    "compiledPairs": 21,
+    "protectedInputMetadataRows": 161,
+    "oldNativeMetadataRows": 11,
+    "freshNativeMetadataInode": 543893277,
+    "totalDistinctNativeMetadataRows": 12,
+    "notLiveFileOrRuntimeOutcomeRevalidation": true
+  },
+  "operatorReview": {
+    "onlyFreshQSrcTimeCheckpointTarget": true,
+    "sameTargetForBothOperations": true,
+    "countCheckpointRowsRemovesOnly42ByteExclusion": true,
+    "strictThresholdRemovesOneEqualityCharacter": true,
+    "initialNoLastAndActualMinuteBranchesRetainedByLiteralPatches": true,
+    "noSourceMutantAppliedOrStoredByReviewer": true,
+    "proposedWholeFileHashesAreStaticRecipePinsNotRuntimeQualification": true,
+    "prospectiveWitnesses582And597NotAdoptedAsActualFailures": true
+  },
+  "retainedAndAddedGuards": [
+    "Exact frozen active/halted marker checks; no marker changes.",
+    "Exact initial/runtime/selection/controls hashes, one explicit admitted test successor, original f11/850 Git bytes, other160 metadata rows and held R context.",
+    "Consumes the existing sealed source selection and actual binder output; no duplicated binder, guessed Q/native/compiled hash or future outcome authority.",
+    "Source and fresh HEADs/indexes, source branch/clean tree, Q mutation-only status, held R exact HEAD/18 rows/empty index remain gates.",
+    "All98 S/Q selected bytes/physical identities, 21 pairs, all161 protected full physical pins, 11 old plus actual distinct12th native remain execution gates.",
+    "Only two fixed operators may write the actual fresh Q src/time/checkpoint.ts; all S/dist/native identities remain preserved.",
+    "Explicit in-place O_NOFOLLOW write uses exact expected bytes, regular single-link checks, same inode before/after, flush/fsync, and root-binding pin recheck.",
+    "Actual action argv with -B, exit0, empty stderr, exact JSON stdout, timezone-aware started/operation/ended chronology, natural dependent wrapper closure and action-endedUtc before test-start are checked.",
+    "Restore requires actual apply chronology; apply2 requires actual prior restore chronology and identical-cohort GREEN; the action pin is rechecked immediately before the later write.",
+    "Manual classification must match every ordered failure name/message, actual frame, masking, hook/environment/owned-child cleanup reviews; no RED count is guessed.",
+    "Exclusive operation/prepared/original/patch files prevent replay; no automatic restore, retry, timer, signal, compiled/native mutation or source change is introduced."
+  ],
+  "unreadyTemplatePreserved": {
+    "readyForControls": false,
+    "sourceCommitAndFreshBindingAndSourceFreshOutcomesNull": true,
+    "allSixPhaseNamesNull": true,
+    "bothRootReviewFlagsFalse": true,
+    "futureActionHashesNull": true,
+    "noTemplateWrite": true
+  },
+  "limitations": [
+    "Static review only; root must fill and independently admit a separate actual control-root-bindings.json and await each direct helper natural return before dependent tests.",
+    "The actual fresh binding metadata was read; underlying source/fresh/native files, Git indexes and original source bytes were not probed or revalidated here.",
+    "No fresh source/fresh outcome audit or control runtime result is claimed by this review. The parent-reported canonical closure is not independently credited.",
+    "The helper checks recorded actual action chronology retrospectively before restoration or the next apply; outer root sequencing must still prevent starting a dependent test early.",
+    "All file/name/pair sets are finite; no universal loader/environment/filesystem or complete plan claim."
+  ],
+  "noHelperImportParserCompilerProductNativeOpenSSLKeysStreamsNetworkSourceIndexQaReservationProbes": true,
+  "onlyNewPrivateReviewDirectoryWritten": "/private/tmp/p1-25-cadence-qualification-20261017/control-helper-static-review",
+  "allClaudeWorkHeldDecisionsF37SkipD15HoldFreezeAndRedQualityRemainIntact": true,
+  "rootSoleMutatorExecutorAllocator": true
+}

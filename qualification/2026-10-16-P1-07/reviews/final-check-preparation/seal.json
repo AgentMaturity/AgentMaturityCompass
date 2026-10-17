@@ -1,0 +1,38 @@
+{
+  "schema": "p107-final-check-preparation-seal/2",
+  "at": "2026-10-16T18:01:03.451604+00:00",
+  "scope": "private read-only preparation only",
+  "executedChecks": false,
+  "checkoutWrites": false,
+  "inputs": 44,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/final-check-preparation/README.md",
+      "bytes": 3640,
+      "sha256": "060aedd9626db50a87675e761498665bf34cf4588d55234ad7736aba6e592d36",
+      "regular": true,
+      "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/final-check-preparation/README.md"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/final-check-preparation/preparation.json",
+      "bytes": 13858,
+      "sha256": "4a420d8f3b1e19e4edfb4540a745bbe07257b0e8988146907f8862053b2a8319",
+      "regular": true,
+      "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/final-check-preparation/preparation.json"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/final-check-preparation/input-pins.json",
+      "bytes": 16589,
+      "sha256": "c89acb4339ba7f77fc10aee8a3cdd3ef5d6e855304ff61676401e127a46ae01e",
+      "regular": true,
+      "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/final-check-preparation/input-pins.json"
+    }
+  ],
+  "preservedSupersededSeal": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/final-check-preparation/superseded-during-authoring/seal.json",
+    "bytes": 1296,
+    "sha256": "23e3b36b1d5e247426e455915fa3a3b124445cc263ea4148464fa292373dca32",
+    "regular": true,
+    "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/final-check-preparation/superseded-during-authoring/seal.json"
+  }
+}

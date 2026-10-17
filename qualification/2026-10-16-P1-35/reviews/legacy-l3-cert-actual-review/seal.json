@@ -1,0 +1,32 @@
+{
+  "schema": "p135-actual-private-certificate-review-seal/1",
+  "at": "2026-10-16T16:52:31.121201+00:00",
+  "actualOldCertificateCreated": true,
+  "exactL3": false,
+  "corpusAcceptanceComplete": false,
+  "currentVerificationRunHere": false,
+  "privateOnly": true,
+  "inputPins": 22,
+  "files": [
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/legacy-l3-cert-actual-review/observations.json",
+      "bytes": 15107,
+      "sha256": "ca7fb1a3a1028eda1c74c4cda8cc6e70eec0eafdea2560d382d50c7b57e89cf3"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/legacy-l3-cert-actual-review/review.json",
+      "bytes": 8593,
+      "sha256": "83fb61a2206216675bbe59767ac2d8998b01dde8058342397fa65d2898417f14"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/legacy-l3-cert-actual-review/README.md",
+      "bytes": 2224,
+      "sha256": "de7151f31d6d9a47389ec71216b88f6761e700b7a2b8b56ccb89d60c78767b9d"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/legacy-l3-cert-actual-review/pins.json",
+      "bytes": 5877,
+      "sha256": "84cf724a2dc70706302c786bdc9074d0842137747b69d53565f4df2ad78429c2"
+    }
+  ]
+}

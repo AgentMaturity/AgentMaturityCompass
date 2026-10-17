@@ -1,0 +1,35 @@
+{
+  "schema": "p125w-inert-fresh-binding-preparation-seal/1",
+  "at": "2026-10-17T00:10:21.757919+00:00",
+  "preferredBinder": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/bind-fresh.py.source.txt",
+  "preferredDelta": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/b37-to-b38.patch.txt",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/bind-fresh.py.source.txt",
+      "bytes": 4948,
+      "sha256": "aa3eca5d09af75a3c12cc3062a81ae72d091b9da03f49d8c18a04bac05a64898"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/b37-to-b38.patch.txt",
+      "bytes": 6680,
+      "sha256": "c745a868211d674da160d0dbf85852733d06a2768a6a157f3041a5687257927d"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/input-pins.json",
+      "bytes": 1594,
+      "sha256": "bfaeec48c5cbc8fe61d14844b0ce501aec03360f757a8e1d54418e287a985f75"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/README.md",
+      "bytes": 2506,
+      "sha256": "5bf7a3a8ef0221e67d1c3b900e69a6ff368686933d9890c78aeb2bb4b2666295"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/report.json",
+      "bytes": 1524,
+      "sha256": "f3e2a1496fc85917fd94f876b95196b99fd24cfd627ff0d10337f370775e1bff"
+    }
+  ],
+  "noExecutionOrSourceIndexQaWrites": true,
+  "actualCheckpointCleanSourceAndIndependentReviewRequiredBeforeUse": true
+}

@@ -1,0 +1,11 @@
+{
+  "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/adapters/deepseek-harness.md",
+  "oldBytes": 16652,
+  "oldSha256": "a8ad895035c1200be5f4ae34c4a7a77c716c72f1af0766ef89fd68b8545d485c",
+  "bytes": 17959,
+  "sha256": "167fd518b868923c8693c6ee97b808413a029c50c0bd4e1a545a1de51a59df75",
+  "replacements": 2,
+  "upstreamEvidence": "upstream-read/input-pins.json",
+  "runtimeQualificationClaim": false,
+  "sourceOrGuardChanges": false
+}

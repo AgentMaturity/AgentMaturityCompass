@@ -10,6 +10,8 @@ import { listIndustryPacks, scoreIndustryPack, type IndustryPack } from "../src/
 import { getDomainPackQuestions } from "../src/score/domainPacks.js";
 import { level, likert } from "../src/score/units.js";
 import { generateTransparencyReport, renderTransparencyReportMarkdown } from "../src/transparency/transparencyReport.js";
+import { envelopeForSyntheticExample } from "../src/claims/eligibility/adapters.js";
+import { renderClaimLegend } from "../src/claims/eligibility/render.js";
 
 type ToolHandler = (args: Record<string, unknown>) => Promise<{ content: Array<{ text: string }>; isError?: boolean }>;
 const mcpTools = vi.hoisted(() => new Map<string, ToolHandler>());
@@ -107,13 +109,20 @@ describe("no certification from self-assessment (P0-21)", () => {
   });
 
   test("the domain report carries no certification field or wording", () => {
-    const report = buildDomainReport(assessDomain({
+    const assessment = assessDomain({
       agentId: "agent-tech",
       domain: "technology",
       baseScores: { "AMC-1.1": level(5), "AMC-1.2": level(5) },
       domainQuestionScores: Object.fromEntries(getDomainPackQuestions("technology").map((q) => [q.id, likert(5)]))
-    }));
+    });
+    const report = buildDomainReport(assessment);
     expect(certificationWords(JSON.stringify(report))).toEqual([]);
+    expect(report.markdown).toContain("**Claim:** Self-reported · **Result:** not evaluated");
+    expect(report.markdown).toContain(renderClaimLegend("markdown"));
+    const example = buildDomainReport(assessment, envelopeForSyntheticExample({ producer: "domain:example", now: 1_700_000_000_000 }));
+    expect(example.markdown).toContain("**Claim:** Synthetic example (not evidence) · **Result:** not evaluated");
+    expect(example.markdown).toContain(renderClaimLegend("markdown"));
+    expect([report.markdown, example.markdown].map((markdown) => markdown.split("\n").find((line) => line.startsWith("**Claim:**")))).toMatchSnapshot();
   });
 
   test("the transparency report shows evidence standing, never certification", () => {

@@ -1,0 +1,55 @@
+{
+  "schema": "p125-checkpoint-private-receipt-extension-plan/1",
+  "at": "2026-10-16T23:38:51.315898+00:00",
+  "preparationOnly": true,
+  "base": {
+    "metadataCommit": "3468e29027c32209a5f794b7ffea3f1565de490e",
+    "receiptSemanticSource": "188681b32dc472983404dce19e7833cd76ee7576",
+    "files": 1118,
+    "artifacts": 1117,
+    "payloads": 1115,
+    "commands": 141,
+    "orderedAssemblyPins": 1568
+  },
+  "activeReceipt": "qualification/2026-10-17-P1-25",
+  "newPrefix": "evidence/checkpoint-window/",
+  "onlyActiveExistingPaths": [
+    "README.md",
+    "receipt.json",
+    "assembly-inputs.json"
+  ],
+  "runtimeProtection": {
+    "schema": "p125k-runtime-protected-inputs/1",
+    "rows": 142,
+    "priorNativePins": 9,
+    "ownGrantOldToNewOnly": true,
+    "other141InitialRowsUnchanged": true,
+    "metadata3CurrentlyExact": true
+  },
+  "futureBindingContractFromSealedPreparation": {
+    "schema": "p125k-actual-fresh-source-binding/1",
+    "selectedNames": 94,
+    "compiledPairs": 19,
+    "distinctNativesAfterFresh": 10,
+    "sourceCommit": null,
+    "freshRoot": null,
+    "actualBinding": null
+  },
+  "cohortContract": {
+    "fixedTotal": 21,
+    "hooks": null,
+    "controlFailedCounts": null,
+    "actualOutcomes": null
+  },
+  "futureActualPeerPinAndSchema": null,
+  "publicArtifactAllowlistAndCount": null,
+  "actualFullManifest": null,
+  "hashOnly": {
+    "helperAndAdaptationPatch": true,
+    "checkpointLiteralGuardCandidate": true,
+    "anyLiteralGuardSupportBody": true,
+    "noRenamingOrEncodingBypass": true
+  },
+  "allSourceMetadataIndexQaAndRuntimeExecutionByAuthor": false,
+  "rootFactsAndIndependentReviewRequired": true
+}

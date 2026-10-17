@@ -1,0 +1,69 @@
+{
+  "schema": "p125c-actual-source-checkpoint/1",
+  "at": "2026-10-16T21:46:15.588016+00:00",
+  "commit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "parent": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7",
+  "paths": [
+    {
+      "relativePath": "README.md",
+      "bytes": 59828,
+      "sha256": "1cf5097efb8c894746065edb1ef625fc21f616c76060fc4bd2c0011eadbc5826"
+    },
+    {
+      "relativePath": "CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "49837eb4b3cea2bbf03c46244d370dc80c72c0dec6e78cad7dbc426ef3896c9e"
+    },
+    {
+      "relativePath": "website/index.html",
+      "bytes": 43520,
+      "sha256": "0bf924630aac6ffc3666ed5b899c493c7abbbf16cdbba4ebc1d793893d06ea53"
+    },
+    {
+      "relativePath": "website/lite.html",
+      "bytes": 11197,
+      "sha256": "85a23bdc6aa1890627afb0c57562aca3aa2479f0764c0f771d92e03576704db3"
+    },
+    {
+      "relativePath": "website/i18n.js",
+      "bytes": 44169,
+      "sha256": "d8385bdeacd02b68add2930d54bc3578fa5d256d0020b5b245462be6eff900c1"
+    },
+    {
+      "relativePath": "docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "950a26cb53c37c58e98d298878f9219a448cccdc74511e23ba0ebda2e0ab70b5"
+    },
+    {
+      "relativePath": "docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "45b32dc7ffb39cb808b59f72da39cded0a59c4feeca5bddf0f4c8e5e2e9eea02"
+    },
+    {
+      "relativePath": "docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "ce8d53e766334530a3d89f0b30a4ed12db3696eec72e900bb956c521321783dd"
+    },
+    {
+      "relativePath": "docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "06ae59f494f5fe76df76c5be54a94d11ea7fbbce4cd60cec4d8be4c8330d7551"
+    },
+    {
+      "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "f980b8c42da97ea010b88408b2114d60330040c75be2753be856083c945f9e01"
+    },
+    {
+      "relativePath": "tests/time/tsaClient.test.ts",
+      "bytes": 15569,
+      "sha256": "2e70ff1d331f9ec7263dc437119ce9ab505fc1e39c5fbbb27592569cad6c1cb8"
+    }
+  ],
+  "clean": true,
+  "indexEmpty": true,
+  "actualGitBlobsExact": true,
+  "qualityStillRed": true,
+  "allHoldsRetained": true,
+  "noPushPrMergeRelease": true
+}

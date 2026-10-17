@@ -1,0 +1,89 @@
+{
+  "actualCaseCount": null,
+  "caseIdentities": {
+    "bytes": 5880,
+    "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/new-fixture-expected-case-identities.json",
+    "sha256": "556f2b4cefcb37ebd4736bd07160499b601918c0cd5f47a087d4693606bb1f8b"
+  },
+  "compiledCount": 4529,
+  "compiledManifest": {
+    "bytes": 485185,
+    "path": "/private/tmp/p0-41-qualification-20261015/compiled-after-build.json",
+    "sha256": "7366e9fb3ab0c66386420af2a5794f55899a78854aabc7a0a92a17af0b70f879"
+  },
+  "expectedAuthoredCaseCount": 27,
+  "fixture": {
+    "copied": {
+      "bytes": 38030,
+      "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+      "sha256": "21da24dd0de6d5d0d3acb3e7dbd0a30e7edb7ef6220e091abb75344006c4199a"
+    },
+    "prepared": {
+      "bytes": 38030,
+      "path": "/private/tmp/p0-41-program-metrics-qualification-v2-prepared.test.ts",
+      "sha256": "21da24dd0de6d5d0d3acb3e7dbd0a30e7edb7ef6220e091abb75344006c4199a"
+    }
+  },
+  "fixtureOverlayPreparation": {
+    "bytes": 2036,
+    "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/fixture-overlay-preparation.json",
+    "sha256": "f1c04e80fcda4803ea71b03a437711ce7c780cdd02a164f11b87f4fb8f5a6218"
+  },
+  "formalAcceptanceClosed": false,
+  "native": {
+    "bytes": 1931552,
+    "device": 16777231,
+    "inode": 538905647,
+    "mode": 493,
+    "nlink": 1,
+    "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+  },
+  "newFixtureOverlayCount": 1,
+  "node": {
+    "bytes": 67024,
+    "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+  },
+  "nodeModulesLink": {
+    "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/node_modules",
+    "resolved": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules",
+    "target": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules"
+  },
+  "observer": {
+    "bytes": 2110,
+    "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+    "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+  },
+  "parentRoot": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass",
+  "parentSource": "33a8e20bf340f2f9c717bb813f95de3b648a4ad4",
+  "physicalManifest": {
+    "bytes": 4232642,
+    "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/physical-source-dist-manifest.json",
+    "sha256": "7ac31242cbdcde0ded6dc8d8efa65ab02ab458151b3c5191a68c3eaf8c254342"
+  },
+  "priorFailedAttempt": {
+    "bytes": 949,
+    "path": "/private/tmp/p0-41-v1-root-failure-preservation-20261015.json",
+    "sha256": "d3d225b6ca39584da44da60ac91fe420b2630a48307013038971b9449f353e72"
+  },
+  "processBoundary": "Original config/guards30s, product Git5s; future8key runner env distinct from fixture8key childenv and original inherited wrapper. Fresh CLI artifact directory required everyphase. No runtime yet.",
+  "productionSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "root": "/private/tmp/p0-41-causal-qualification-v2-20261015",
+  "runtimeAuthorizedBySetup": false,
+  "schemaVersion": 1,
+  "sourceCopyPreparation": {
+    "bytes": 760,
+    "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/source-copy-preparation.json",
+    "sha256": "8b491428aad4857b8bd3360327c73da628e3a51512498fc00036a36c248af3ae"
+  },
+  "sourceCount": 8574,
+  "sourceManifest": {
+    "bytes": 1073886,
+    "path": "/private/tmp/p0-41-qualification-20261015/tracked-source-before.json",
+    "sha256": "6a87be623c9a996b469a0cee493c308224c6dd338a1e6a8da5f89d9dcc9e80aa"
+  },
+  "sourceRoot": "/private/tmp/p0-41-causal-qualification-v2-20261015/source",
+  "totalSourceCopyRegularFiles": 13104,
+  "v2Boundary": "Corrected synthetic Git absence precondition only; old C/ACTIVE and HALTED remain untouched; no mutant launched there. New physical copy and future reviewed bound release."
+}

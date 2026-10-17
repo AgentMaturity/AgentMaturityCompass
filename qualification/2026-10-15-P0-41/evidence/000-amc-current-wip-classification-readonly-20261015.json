@@ -1,0 +1,566 @@
+{
+  "schemaVersion": 1,
+  "kind": "current-WIP-read-only-classification",
+  "capturedUtc": "2026-10-15T07:37:15.888778+00:00",
+  "scope": "Explicit read-only GitHub review/optional-project query clarification of13 open PRs. No PR/review/action/message/CI/credential/permission change and no P101 runtime.",
+  "decision": {
+    "wipCleared": false,
+    "qualifiedNextRuntimeKey": null,
+    "recommendation": "Retain a conservative hold on admitting an additional item/PR that requires WIP readiness. Continue authorized read-only preparation; do not invent a bot exemption.",
+    "reason": "All13 open non-draft PRs have zero recorded GitHub reviews. No bot exemption was found in the pinned policy. Counting these as awaiting review for conservative capacity accounting yields13 versus cap10; exact policy membership remains an integrator judgment, so this is an explicitly labeled inference rather than GitHub review-required status.",
+    "formalAcceptanceClosed": false,
+    "runtimeAuthorized": false,
+    "existingWork": "This report does not cancel or retroactively reclassify already authorized root-serial qualification; it supplies new admission/routing evidence."
+  },
+  "snapshot": {
+    "repository": "AgentMaturity/AgentMaturityCompass",
+    "asOfUtc": "2026-10-15T07:35:10.298993+00:00",
+    "queryExit": 0,
+    "durationMs": 1275,
+    "openPullRequestTotal": 13,
+    "openPaginationComplete": true,
+    "nonDraft": 13,
+    "draft": 0,
+    "authorTypeBot": 13,
+    "dependabot": 13,
+    "withRecordedReviews": 0,
+    "withoutRecordedReviews": 13,
+    "recordedReviewsTotal": 0,
+    "latestReviewsTotal": 0,
+    "requestedReviewersTotal": 0,
+    "labelsTotal": 0,
+    "allReviewDecisionNull": true,
+    "samePRNumbersAsPriorSnapshot": true,
+    "allCreatedBeforeD09RecordedDate": true,
+    "allUpdatedBeforeD09RecordedDate": true,
+    "ageMeaning": "These are pre-plan backlog PRs by recorded timestamps. Age alone is not an exemption from a policy written for all PRs."
+  },
+  "pullRequests": [
+    {
+      "number": 33,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/33",
+      "headRefOid": "6887e8ebb8ab687930b08c86cc526c961cc89200",
+      "state": "OPEN",
+      "isDraft": false,
+      "author": {
+        "login": "dependabot",
+        "__typename": "Bot"
+      },
+      "createdAt": "2026-07-10T20:33:49Z",
+      "updatedAt": "2026-07-10T20:35:08Z",
+      "reviewDecision": null,
+      "reviewCount": 0,
+      "latestReviewCount": 0,
+      "requestedReviewerCount": 0,
+      "labelCount": 0,
+      "reviewPaginationComplete": true,
+      "latestReviewPaginationComplete": true,
+      "recordedReviewClassification": "no-visible-recorded-GitHub-review",
+      "epic": null,
+      "policyAwaitingReviewClassification": "conservatively-counted; not a GitHub workflow field"
+    },
+    {
+      "number": 28,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/28",
+      "headRefOid": "3972a7db41e3cf42e74e7ebc8257e838cd13d135",
+      "state": "OPEN",
+      "isDraft": false,
+      "author": {
+        "login": "dependabot",
+        "__typename": "Bot"
+      },
+      "createdAt": "2026-06-22T06:24:46Z",
+      "updatedAt": "2026-06-22T06:27:11Z",
+      "reviewDecision": null,
+      "reviewCount": 0,
+      "latestReviewCount": 0,
+      "requestedReviewerCount": 0,
+      "labelCount": 0,
+      "reviewPaginationComplete": true,
+      "latestReviewPaginationComplete": true,
+      "recordedReviewClassification": "no-visible-recorded-GitHub-review",
+      "epic": null,
+      "policyAwaitingReviewClassification": "conservatively-counted; not a GitHub workflow field"
+    },
+    {
+      "number": 27,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/27",
+      "headRefOid": "dd33198fa57262b0e0f60943265bf2430940f725",
+      "state": "OPEN",
+      "isDraft": false,
+      "author": {
+        "login": "dependabot",
+        "__typename": "Bot"
+      },
+      "createdAt": "2026-06-22T06:24:25Z",
+      "updatedAt": "2026-06-22T06:25:16Z",
+      "reviewDecision": null,
+      "reviewCount": 0,
+      "latestReviewCount": 0,
+      "requestedReviewerCount": 0,
+      "labelCount": 0,
+      "reviewPaginationComplete": true,
+      "latestReviewPaginationComplete": true,
+      "recordedReviewClassification": "no-visible-recorded-GitHub-review",
+      "epic": null,
+      "policyAwaitingReviewClassification": "conservatively-counted; not a GitHub workflow field"
+    },
+    {
+      "number": 21,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/21",
+      "headRefOid": "ce407e98715ac4c57cf0fdb8e95b52c1380f957e",
+      "state": "OPEN",
+      "isDraft": false,
+      "author": {
+        "login": "dependabot",
+        "__typename": "Bot"
+      },
+      "createdAt": "2026-06-01T21:12:12Z",
+      "updatedAt": "2026-07-09T20:50:37Z",
+      "reviewDecision": null,
+      "reviewCount": 0,
+      "latestReviewCount": 0,
+      "requestedReviewerCount": 0,
+      "labelCount": 0,
+      "reviewPaginationComplete": true,
+      "latestReviewPaginationComplete": true,
+      "recordedReviewClassification": "no-visible-recorded-GitHub-review",
+      "epic": null,
+      "policyAwaitingReviewClassification": "conservatively-counted; not a GitHub workflow field"
+    },
+    {
+      "number": 20,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/20",
+      "headRefOid": "d532051a6190f8fc061f74f914fb5b70e2cc4a74",
+      "state": "OPEN",
+      "isDraft": false,
+      "author": {
+        "login": "dependabot",
+        "__typename": "Bot"
+      },
+      "createdAt": "2026-06-01T21:12:07Z",
+      "updatedAt": "2026-07-09T20:50:36Z",
+      "reviewDecision": null,
+      "reviewCount": 0,
+      "latestReviewCount": 0,
+      "requestedReviewerCount": 0,
+      "labelCount": 0,
+      "reviewPaginationComplete": true,
+      "latestReviewPaginationComplete": true,
+      "recordedReviewClassification": "no-visible-recorded-GitHub-review",
+      "epic": null,
+      "policyAwaitingReviewClassification": "conservatively-counted; not a GitHub workflow field"
+    },
+    {
+      "number": 19,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/19",
+      "headRefOid": "7cf5803f54e085ca1726ef1a4ac8eda782f11765",
+      "state": "OPEN",
+      "isDraft": false,
+      "author": {
+        "login": "dependabot",
+        "__typename": "Bot"
+      },
+      "createdAt": "2026-05-25T08:57:26Z",
+      "updatedAt": "2026-06-26T16:05:36Z",
+      "reviewDecision": null,
+      "reviewCount": 0,
+      "latestReviewCount": 0,
+      "requestedReviewerCount": 0,
+      "labelCount": 0,
+      "reviewPaginationComplete": true,
+      "latestReviewPaginationComplete": true,
+      "recordedReviewClassification": "no-visible-recorded-GitHub-review",
+      "epic": null,
+      "policyAwaitingReviewClassification": "conservatively-counted; not a GitHub workflow field"
+    },
+    {
+      "number": 17,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/17",
+      "headRefOid": "61b207eecc41d4b1aaed053ad2daaa8d0ab355a4",
+      "state": "OPEN",
+      "isDraft": false,
+      "author": {
+        "login": "dependabot",
+        "__typename": "Bot"
+      },
+      "createdAt": "2026-05-25T08:57:06Z",
+      "updatedAt": "2026-06-26T16:05:35Z",
+      "reviewDecision": null,
+      "reviewCount": 0,
+      "latestReviewCount": 0,
+      "requestedReviewerCount": 0,
+      "labelCount": 0,
+      "reviewPaginationComplete": true,
+      "latestReviewPaginationComplete": true,
+      "recordedReviewClassification": "no-visible-recorded-GitHub-review",
+      "epic": null,
+      "policyAwaitingReviewClassification": "conservatively-counted; not a GitHub workflow field"
+    },
+    {
+      "number": 8,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/8",
+      "headRefOid": "48b8b9edcb1d0e2aaa07d97a527fb6e53cbfea7d",
+      "state": "OPEN",
+      "isDraft": false,
+      "author": {
+        "login": "dependabot",
+        "__typename": "Bot"
+      },
+      "createdAt": "2026-04-07T13:14:20Z",
+      "updatedAt": "2026-05-22T07:31:27Z",
+      "reviewDecision": null,
+      "reviewCount": 0,
+      "latestReviewCount": 0,
+      "requestedReviewerCount": 0,
+      "labelCount": 0,
+      "reviewPaginationComplete": true,
+      "latestReviewPaginationComplete": true,
+      "recordedReviewClassification": "no-visible-recorded-GitHub-review",
+      "epic": null,
+      "policyAwaitingReviewClassification": "conservatively-counted; not a GitHub workflow field"
+    },
+    {
+      "number": 7,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/7",
+      "headRefOid": "1c31cc8c98858192a36db7f55a1d6771a6eab686",
+      "state": "OPEN",
+      "isDraft": false,
+      "author": {
+        "login": "dependabot",
+        "__typename": "Bot"
+      },
+      "createdAt": "2026-04-07T13:14:12Z",
+      "updatedAt": "2026-05-22T07:31:26Z",
+      "reviewDecision": null,
+      "reviewCount": 0,
+      "latestReviewCount": 0,
+      "requestedReviewerCount": 0,
+      "labelCount": 0,
+      "reviewPaginationComplete": true,
+      "latestReviewPaginationComplete": true,
+      "recordedReviewClassification": "no-visible-recorded-GitHub-review",
+      "epic": null,
+      "policyAwaitingReviewClassification": "conservatively-counted; not a GitHub workflow field"
+    },
+    {
+      "number": 6,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/6",
+      "headRefOid": "be4778c0cff73c7bde936b1b0b6e20f007394994",
+      "state": "OPEN",
+      "isDraft": false,
+      "author": {
+        "login": "dependabot",
+        "__typename": "Bot"
+      },
+      "createdAt": "2026-04-07T13:14:08Z",
+      "updatedAt": "2026-05-22T07:31:25Z",
+      "reviewDecision": null,
+      "reviewCount": 0,
+      "latestReviewCount": 0,
+      "requestedReviewerCount": 0,
+      "labelCount": 0,
+      "reviewPaginationComplete": true,
+      "latestReviewPaginationComplete": true,
+      "recordedReviewClassification": "no-visible-recorded-GitHub-review",
+      "epic": null,
+      "policyAwaitingReviewClassification": "conservatively-counted; not a GitHub workflow field"
+    },
+    {
+      "number": 5,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/5",
+      "headRefOid": "737762d1c2de99b529b209c8474f41442986c283",
+      "state": "OPEN",
+      "isDraft": false,
+      "author": {
+        "login": "dependabot",
+        "__typename": "Bot"
+      },
+      "createdAt": "2026-04-07T13:14:03Z",
+      "updatedAt": "2026-05-22T07:31:24Z",
+      "reviewDecision": null,
+      "reviewCount": 0,
+      "latestReviewCount": 0,
+      "requestedReviewerCount": 0,
+      "labelCount": 0,
+      "reviewPaginationComplete": true,
+      "latestReviewPaginationComplete": true,
+      "recordedReviewClassification": "no-visible-recorded-GitHub-review",
+      "epic": null,
+      "policyAwaitingReviewClassification": "conservatively-counted; not a GitHub workflow field"
+    },
+    {
+      "number": 4,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/4",
+      "headRefOid": "38da0eef2bfdffad3bbebf1a7fb28321f0523298",
+      "state": "OPEN",
+      "isDraft": false,
+      "author": {
+        "login": "dependabot",
+        "__typename": "Bot"
+      },
+      "createdAt": "2026-04-07T13:13:58Z",
+      "updatedAt": "2026-05-22T07:31:23Z",
+      "reviewDecision": null,
+      "reviewCount": 0,
+      "latestReviewCount": 0,
+      "requestedReviewerCount": 0,
+      "labelCount": 0,
+      "reviewPaginationComplete": true,
+      "latestReviewPaginationComplete": true,
+      "recordedReviewClassification": "no-visible-recorded-GitHub-review",
+      "epic": null,
+      "policyAwaitingReviewClassification": "conservatively-counted; not a GitHub workflow field"
+    },
+    {
+      "number": 3,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/3",
+      "headRefOid": "4af80b2da042768295f57ded1f5583b9a3cb734d",
+      "state": "OPEN",
+      "isDraft": false,
+      "author": {
+        "login": "dependabot",
+        "__typename": "Bot"
+      },
+      "createdAt": "2026-04-07T13:12:03Z",
+      "updatedAt": "2026-05-22T07:31:22Z",
+      "reviewDecision": null,
+      "reviewCount": 0,
+      "latestReviewCount": 0,
+      "requestedReviewerCount": 0,
+      "labelCount": 0,
+      "reviewPaginationComplete": true,
+      "latestReviewPaginationComplete": true,
+      "recordedReviewClassification": "no-visible-recorded-GitHub-review",
+      "epic": null,
+      "policyAwaitingReviewClassification": "conservatively-counted; not a GitHub workflow field"
+    }
+  ],
+  "recordedFactsVsInference": {
+    "observed": "Exactly13 current OPEN/nonDraft Bot PRs, each with complete zero reviews/latestReviews connections. This establishes no visible recorded GitHub PR review, rather than merely inferring it from null reviewDecision.",
+    "notObserved": [
+      "Whether a person read code offline or has a nonvisible unsubmitted draft review.",
+      "Whether branch protection requires a review.",
+      "That reviewDecisionnull means approved or review-required.",
+      "A project/epic mapping.",
+      "A policy exemption for bot or pre-plan PRs.",
+      "A definitive machine-queryable value for the plan's awaiting-review concept."
+    ],
+    "conservativeInference": "Open, non-draft, zero-review PRs consume unreviewed capacity unless an evidenced policy classification or exception says otherwise. This is a cautious routing interpretation, not an observed GitHub status.",
+    "conservativeWorkingAwaitingCount": 13,
+    "definitivePolicyAwaitingCount": null,
+    "perEpicCounts": null,
+    "policyComparison": {
+      "maximumAwaitingReview": 10,
+      "conservativeExcess": 3,
+      "readinessRequiresCurrentAwaitingBelow": 10,
+      "maximumCurrentBeforeAddingOneUnderReadinessTable": 9,
+      "conditionalReductionFrom13ToAtMost10": 3,
+      "conditionalReductionFrom13ToBelow10": 4,
+      "perEpicMaximumOpen": 3,
+      "readinessRequiresEpicCurrentOpenBelow": 3
+    },
+    "arithmeticLimit": "Reduction numbers are conditional capacity arithmetic only. No review, approval, closure, merge or reassignment was performed or proposed as an automatic cleanup."
+  },
+  "policy": {
+    "bindingSources": [
+      {
+        "path": "/Users/sid/Downloads/Agent contract.md",
+        "lines": "132",
+        "text": "At most3 open PRs per epic and10 PRs awaiting review in total."
+      },
+      {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "lines": "71",
+        "text": "Before starting: epic fewer than3 open PRs and fewer than10 awaiting review."
+      },
+      {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "lines": "145,171,767",
+        "text": "General cap3 per epic/10 awaiting; later-gate work conditional on WIP; exceptions only by a Sid comment."
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-09.md",
+        "lines": "23,39,48",
+        "text": "OptionA limits and dated Sid-comment exception route; no explicit bot exemption."
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/docs/program/READY_TO_DEPLOY.md",
+        "lines": "27–33",
+        "text": "Records D-09 optionA dated5Oct; single agents one issue per branch; general3/10 limits."
+      }
+    ],
+    "explicitBotExemptionFound": false,
+    "searchScope": "Five pinned exports, recovered D09, pinned reservation and current accepted program contract. Word-bounded bot/dependabot/automatedPR terms and WIP/awaiting/openPR/exception language inspected. No claim to have read every remote comment or unrelated chat.",
+    "D22": "Accepted A4 defaults concern E17 coding-only fanout and fleet pause; A4 export169 expressly resumes per-epic PR limit with reviews. No global bot/awaiting-review exemption follows.",
+    "noUnsolicitedOverride": "No rule was changed, no exemption invented and no permission/confirmation question sent."
+  },
+  "projectEpicLimitation": {
+    "attempted": true,
+    "result": "GraphQL project fields rejected with INSUFFICIENT_SCOPES/read:project.",
+    "firstQueryExit": 1,
+    "firstQueryDurationMs": 617,
+    "errorsCount": 7,
+    "dataReturned": false,
+    "permissionChangedOrRequested": false,
+    "fallback": "One narrower batched reviews-only query succeeded with existing repository-read authorization. No per-PR query loop or full PR bodies.",
+    "epicMapping": null,
+    "labelsAllEmpty": true,
+    "consequence": "Do not infer epic from titles or classify all dependency PRs as a release-engineering epic. Project membership/fields remain unknown, not zero."
+  },
+  "queries": {
+    "first": {
+      "commandPin": {
+        "path": "/private/tmp/amc-current-wip-classification-readonly-20261015/command.json",
+        "bytes": 2077,
+        "sha256": "60b0b69371e1cc3fc7f2dd278fb7dffa8f58ba41ed2bd7ad4c3baf1c60bca233"
+      },
+      "startedUtc": "2026-10-15T07:34:44.769483+00:00",
+      "endedUtc": "2026-10-15T07:34:45.386473+00:00",
+      "exit": 1,
+      "result": "Seven insufficient-scope errors; no data. Actual argv/stdout/stderr preserved unchanged."
+    },
+    "reviewsOnly": {
+      "commandPin": {
+        "path": "/private/tmp/amc-current-wip-classification-readonly-20261015/reviews-only/command.json",
+        "bytes": 1526,
+        "sha256": "6819cd137517708a03edb6ee5ee97addfcc4b9a1a6503cae4facbea9ffb7c4aa"
+      },
+      "startedUtc": "2026-10-15T07:35:09.024286+00:00",
+      "endedUtc": "2026-10-15T07:35:10.298993+00:00",
+      "exit": 0,
+      "result": "All open/review/label/request connection pages complete. Exact current review data retained."
+    },
+    "bounded": "At most100 open PRs,100 reviews/latestReviews/requests/labels each; project attempt20 project items/20 fields.55s tool deadline each; both ended normally within1.3s."
+  },
+  "routingImplications": [
+    "Fresh facts narrow the earlier WIP unknown: recorded GitHub review count is now proven zero for all13, so actual unreviewed inventory is13.",
+    "The10-awaiting limit cannot be positively cleared from this evidence. A conservative13-count exceeds it, with no known bot exemption.",
+    "Integrator can reconcile actual queue membership and per-epic mapping, or point to an existing explicit dated exception. If a new exception is wanted, the written policy requires Sid's recorded comment; this report does not request or grant one.",
+    "Do not mark PRs reviewed, approved or not awaiting review merely to make room. Any future review/triage action requires its own authorized scope and evidence.",
+    "Read-only P1-01 source/dependency preparation may continue. No P101 fixture/worktree/runtime/PR, no G1 activation or dependencyDone claim is made."
+  ],
+  "policyAndPriorPins": [
+    {
+      "path": "/Users/sid/Downloads/Agent contract.md",
+      "bytes": 25110,
+      "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f"
+    },
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "bytes": 38227,
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "bytes": 78486,
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04"
+    },
+    {
+      "path": "/Users/sid/Downloads/A4 · Forge.md",
+      "bytes": 47286,
+      "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65"
+    },
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-09.md",
+      "bytes": 4291,
+      "sha256": "35836f2817654e44cb981802bc2869f597acff86928fe0f1baed8d5a49ca5899"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/docs/program/READY_TO_DEPLOY.md",
+      "bytes": 8158,
+      "sha256": "0ad78603fd26bd26d1a106b4a52d31ed382c21c4ab9cce901704c588532aadd4"
+    },
+    {
+      "path": "/private/tmp/amc-g1-next-readonly-routing-20261015.json",
+      "bytes": 77917,
+      "sha256": "929d91632ce41446a7e47969d1ee5ae098b185358a0667564940255cf786028d"
+    }
+  ],
+  "queryArtifactPins": [
+    {
+      "path": "/private/tmp/amc-github-wip-readonly-20261015/command.json",
+      "bytes": 499,
+      "sha256": "d7cabcbc670360d8dbc4f4009b7e69fbe45045d32a1e87d85c2159a18076f880"
+    },
+    {
+      "path": "/private/tmp/amc-github-wip-readonly-20261015/stdout.json",
+      "bytes": 3333,
+      "sha256": "257db5a750e2e70011290661c2f26fda801098938d858b1f343c23de6da1098a"
+    },
+    {
+      "path": "/private/tmp/amc-github-wip-readonly-20261015/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/amc-current-wip-classification-readonly-20261015/command.json",
+      "bytes": 2077,
+      "sha256": "60b0b69371e1cc3fc7f2dd278fb7dffa8f58ba41ed2bd7ad4c3baf1c60bca233"
+    },
+    {
+      "path": "/private/tmp/amc-current-wip-classification-readonly-20261015/stdout.json",
+      "bytes": 2776,
+      "sha256": "2b5549ec9517f045f963566428c9c19b92c0ada89d16ae56621eef594050d39a"
+    },
+    {
+      "path": "/private/tmp/amc-current-wip-classification-readonly-20261015/stderr.log",
+      "bytes": 2200,
+      "sha256": "50e43b562f2d538eeead3bc9029388997b5adcd0c2ed499db6ad8be650ab04ab"
+    },
+    {
+      "path": "/private/tmp/amc-current-wip-classification-readonly-20261015/reviews-only/command.json",
+      "bytes": 1526,
+      "sha256": "6819cd137517708a03edb6ee5ee97addfcc4b9a1a6503cae4facbea9ffb7c4aa"
+    },
+    {
+      "path": "/private/tmp/amc-current-wip-classification-readonly-20261015/reviews-only/stdout.json",
+      "bytes": 8139,
+      "sha256": "3fb9bd0d34bd0ca054382658c8b45053fccc8af49bb0833e88a4f9b55dadad07"
+    },
+    {
+      "path": "/private/tmp/amc-current-wip-classification-readonly-20261015/reviews-only/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "performed": {
+    "readonlyGitHubQueries": 2,
+    "successfulBatchedReviewQueries": 1,
+    "projectPermissionFailure": 1,
+    "PRMutations": false,
+    "reviewPosting": false,
+    "messagesOrComments": false,
+    "CITriggers": false,
+    "credentialValuesLogged": false,
+    "credentialOrPermissionChanges": false,
+    "productImportsParsersTestsOrRuntime": false,
+    "sourceOrTrackerWrites": false,
+    "GitMutation": false,
+    "newFiles": "Only new private query-retention files and this JSON/MD pair.",
+    "allPriorArtifactsImmutable": true
+  },
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "runtimeAuthorized": false,
+  "inputVerification": {
+    "pinChecks": 18,
+    "allMatched": true
+  },
+  "allReadsFinishedAtUtc": "2026-10-15T07:38:44.581187+00:00",
+  "markdown": {
+    "path": "/private/tmp/amc-current-wip-classification-readonly-20261015.md",
+    "bytes": 3136,
+    "sha256": "a0ab2b1ce90c4595e301ea66245eab0b6585a2cec70f5d21fb0ae28d243c0205"
+  }
+}

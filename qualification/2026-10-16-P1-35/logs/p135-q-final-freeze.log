@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:freeze /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout
+> node scripts/check-freeze.mjs
+
+Freeze guard passed: {"cliCommandPaths":1236,"cliInventoryPaths":1236,"stationPacks":41,"stationPackQuestions":632}

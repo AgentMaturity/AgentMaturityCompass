@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/classification.json",
+    "bytes": 4453,
+    "sha256": "6dbffaad1b3aaccc4cf931fa1a3bbfec06aaca6e88bf1bc5fabeaffc9408e7e1"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/command.json",
+    "bytes": 1740,
+    "sha256": "231ddb517b5aa0babece568194986009ea6ba1bac39e62a08a33ee1d67c58fd7"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/inputs-after.json",
+    "bytes": 870,
+    "sha256": "4877a773bbc712492af8519a1376fa3829ebb787f9c4a9a8828e5e84451aed21"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/inputs-before.json",
+    "bytes": 870,
+    "sha256": "9fa59d600565029f02986f22bd4c3b268648780daddd7819cbfdd14193ad634f"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/observer.json",
+    "bytes": 6066,
+    "sha256": "7c6ac02c787c9675dd82cdd74ce7adbec952f5870d858a180ae9382ced8817a6"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "ba65601513bb0e3d66517f5ac4253f5c764fc2dcd2f717964f6a63877192e3bf"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/owned-process.json",
+    "bytes": 1366,
+    "sha256": "33cd14c2358cd130a47d7fd8c938264ef2101f2a4a2d3898b1ed409e7fd20551"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/raw.json",
+    "bytes": 3874,
+    "sha256": "e90245b8ef522a819f6d59ecd93fe33de4ee64a31661509b8bffcf99c2f8ae5b"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/stdout-stderr.log",
+    "bytes": 1913,
+    "sha256": "79b17d463eb5354de8664bfa5c8a4ca7994e06e381879bef6ef2a587039f9b8b"
+  }
+]

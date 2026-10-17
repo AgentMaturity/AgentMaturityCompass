@@ -1,0 +1,55 @@
+"""Read only the explicitly emitted public JSON and explicitly named child streams by hash."""
+from pathlib import Path
+import json,hashlib,sys,datetime
+B=Path('/private/tmp/p1-25-checkpoint-qualification-20261017')
+phase,expected=sys.argv[1:]
+out=json.loads((B/(phase+'-outcome.json')).read_text())
+assert expected in ('green','red')
+assert (out['tests']['failed']==0)==(expected=='green')
+def pin(p):
+ p=Path(p);d=p.read_bytes();return {'path':str(p),'bytes':len(d),'sha256':hashlib.sha256(d).hexdigest()}
+rows=[];children=streams=sockets=owners=0
+for s in out['grantPublicEvidencePaths']:
+ p=Path(s);j=json.loads(p.read_text());assert j['checkout']==out['root']
+ assert j['listenerStarted'] and j['listenerClosed'] and j['socketsClosed']
+ assert j['ownedErrors']==[] and j['cleanupErrorCount']==0
+ if expected=='green': assert j['bodyFailed'] is False
+ assert j['tool']['version']=='4.0.3' and j['tool']['sha256']=='bdeb769587e68e47dad86b42c2ea9758c5560ef6376eb69c18b85cf0c66ea36c'
+ childpins=[]
+ for c in j['children']:
+  assert c['spawned'] and c['exitSeen'] and c['closeSeen']
+  assert c['exitCode']==c['closeCode']==0 and c['exitSignal'] is None and c['closeSignal'] is None and not c['errors']
+  assert [e['event'] for e in c['events']]==['spawn','exit','close']
+  for role in ('stdout','stderr'):
+   q=pin(c[role+'Artifact']);assert q['bytes']==c[role+'Bytes'] and q['sha256']==c[role+'Sha256'];childpins.append(q);streams+=1
+  children+=1
+ for r in j['requests']:
+  assert r['ended'] and r['closed'] and r['responseFinished'] and r['responseClosed'] and r['replyEndCalled'] and not r['aborted']
+  assert r['method']=='POST' and r['queryBytes']>0 and r['contentType']=='application/timestamp-query' and r['accept']=='application/timestamp-reply'
+ reply=j['replyObservation']
+ if reply: assert reply['queryBoundOpenSslVerified'] and reply['amcVerified'] and reply['refusalCode'] is None
+ sockets+=j['socketCount']
+ rows.append({'public':pin(p),'caseId':j['caseId'],'bodyFailed':j['bodyFailed'],'childCount':len(j['children']),'requestPaths':[r['path'] for r in j['requests']],'reply':reply,'childrenAndExplicitStreamPins':childpins,'allChildrenNatural0AndClosed':True,'socketCount':j['socketCount'],'cleanupErrors':0})
+checkpoint=[]
+for s in out['checkpointPublicEvidencePaths']:
+ p=Path(s);j=json.loads(p.read_text());assert j['checkout']==out['root']
+ for k in ('noClockRowGateOrPolicyBypass','ownedGuardCloseInvoked','poolClosed','vaultLocked','immutableInputsUnchanged','nativeUnchanged','environmentRestored'): assert j[k] is True,k
+ assert j['nativeBefore']==j['nativeAfter'] and not j['cleanupErrorNames'] and j['poolBeforeClose']['active']==0
+ assert all(o['closeAttempted'] and o['closed'] for o in j['ledgerOwners']);owners+=len(j['ledgerOwners'])
+ assert j['trust']['mode']=='pinned' and j['trust']['signatureVerifiedListCount']==1 and j['trust']['tsaLoaded']
+ assert j['initialLedger']['ok'] and j['initialLedger']['errors']==0
+ if expected=='green':
+  assert not j['bodyFailed'] and j['bodyErrorName'] is None
+  if j['caseId']=='CHECKPOINT-PENDING-GRANT':
+   a,c=j['pending'],j['completed'];assert a['result']['status']=='pending' and a['signatureValid'] and a['tokenAbsent'] and a['eventCount']==1
+   assert c['result']==[{'sequence':1,'status':'timestamped','failures':[]}]
+   assert c['sequenceCount']==1 and c['checkpointBytesUnchanged'] and c['storedTokenMatchesIndependentGrant'] and len(c['checkpointRows'])==1
+   m=c['checkpointRows'][0]['meta'];assert m['checkpointSequence']==1 and m['checkpointSha256']==c['attested']['messageImprint']['digest'] and m['tokenSha256']==c['token']['sha256']
+   assert c['ledger']['ok'] and c['ledger']['errors']==0 and c['timeline'][0]['status']=='timestamped'
+   t=c['seedTime'];assert t['findings']==[] and t['time']['basis']=='attested-upper-bound' and t['time']['window']=={'notBefore':None,'notAfter':c['attested']['genTime']}
+  else:
+   r=j['required'];assert r['rejected'] and r['expectedRejection'] and r['signatureValid'] and r['tokenAbsent'] and r['sequenceCount']==1 and r['eventCount']==1 and r['checkpointRowCount']==0 and r['ledger']['ok'] and r['ledger']['errors']==0 and r['timeline'][0]['status']=='pending'
+ checkpoint.append({'public':pin(p),'caseId':j['caseId'],'bodyFailed':j['bodyFailed'],'bodyErrorName':j['bodyErrorName'],'ledgerOwners':len(j['ledgerOwners']),'allCleanupEnvironmentNativeImmutableExact':True,'trust':j['trust'],'initialLedger':j['initialLedger'],'checkpointFacts':{k:j[k] for k in ('pending','completed','required') if k in j}})
+facts={'schema':'p125k-explicit-public-record-audit/1','at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'phase':phase,'sourceRoot':out['root'],'expectedPhaseState':expected,'outcome':pin(B/(phase+'-outcome.json')),'grantPublicCount':len(rows),'checkpointPublicCount':len(checkpoint),'children':children,'explicitChildStreamHashCount':streams,'closedSockets':sockets,'closedLedgerOwners':owners,'grantRows':rows,'checkpointRows':checkpoint,'noSigningRootTraversalOrKeyRead':True,'noStreamPublication':True,'boundedObservationNotUniversalIsolation':True}
+with (B/(phase+'-public-audit.json')).open('x') as f:json.dump(facts,f,indent=2);f.write('\n')
+print(json.dumps({k:facts[k] for k in ('phase','grantPublicCount','checkpointPublicCount','children','explicitChildStreamHashCount','closedSockets','closedLedgerOwners')}))

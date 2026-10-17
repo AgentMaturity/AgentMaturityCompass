@@ -1,0 +1,1082 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1508",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "reviewKind": "Independent actual frozen original-corpus and source-control receipt review",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "findings": [],
+  "scope": "Reviewed the original Portal21 baseline and five baseline/mutant/restored source controls after ROOT declared the package frozen. No new HTTP qualification namespace was read.",
+  "conclusion": "The bounded original-corpus claims agree with the raw reporters, command receipts, original source criteria, exact source-only deltas and restoration evidence. Four reconstructed current controls remain distinct from one exact recovered historical composite.",
+  "artifactIndexVerification": {
+    "artifactReferences": 1677,
+    "uniquePaths": 1677,
+    "allBytesAndHashesMatch": true,
+    "frozenJournalCommands": 19,
+    "excludedMutableJournalNotUsed": true
+  },
+  "actualProof": {
+    "journalCommands": 19,
+    "corpusProcesses": 16,
+    "uniqueDefinitions": 21,
+    "repeatedCaseExecutions": 336,
+    "totalOriginalAssertionErrors": 14,
+    "all16RawNamesIdentical": true,
+    "noSetupExecutionPendingOrScannedStreamErrors": true,
+    "matrix": [
+      {
+        "id": "P30-1508-M1-role-principal-current-reanchored",
+        "passed": {
+          "baseline": 21,
+          "mutant": 20,
+          "restored": 21
+        },
+        "failures": [
+          {
+            "phase": "P30-1508-M1-role-principal-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication principal derivation preserves agent identities and bootstrap attribution",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 'agent-token' to be 'agent:agent-7' // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:170:123"
+            ],
+            "failureMessageSha256": "6a6f4d4436e8ec964a02470cc2c887fc04a8e0aefabca49bc191ce3964232f74"
+          }
+        ]
+      },
+      {
+        "id": "P30-1508-M2-portal-strict-schema-current-reanchored",
+        "passed": {
+          "baseline": 21,
+          "mutant": 17,
+          "restored": 21
+        },
+        "failures": [
+          {
+            "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=someone-else without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          },
+          {
+            "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=sid without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          },
+          {
+            "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy= without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          },
+          {
+            "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=null without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          }
+        ]
+      },
+      {
+        "id": "P30-1508-M3-no-anonymous-principal-current-reanchored",
+        "passed": {
+          "baseline": 21,
+          "mutant": 18,
+          "restored": 21
+        },
+        "failures": [
+          {
+            "phase": "P30-1508-M3-no-anonymous-principal-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication 'blank identity' is refused without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 401 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:142:26"
+            ],
+            "failureMessageSha256": "433d16f24e63a4118353b54b21fcab8e697cd7e06661bbbab2a317c3f57468d4"
+          },
+          {
+            "phase": "P30-1508-M3-no-anonymous-principal-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication a direct product route with no principal fails closed",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 401 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:157:26"
+            ],
+            "failureMessageSha256": "4fedaf1109f60d05d13bddf18c6d4b25d2ecb1698db620e05e86a98323970b5e"
+          },
+          {
+            "phase": "P30-1508-M3-no-anonymous-principal-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication the registry cannot manufacture an omitted principal",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 401 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:165:26"
+            ],
+            "failureMessageSha256": "d1936d93b3a5fe7747d9e8b9a26227580536d139d24b3fae376fc0ab4ef2c45c"
+          }
+        ]
+      },
+      {
+        "id": "P30-1508-M4-agent-lease-internal-api-current-reanchored",
+        "passed": {
+          "baseline": 21,
+          "mutant": 19,
+          "restored": 21
+        },
+        "failures": [
+          {
+            "phase": "P30-1508-M4-agent-lease-internal-api-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication 'agent token with OPERATOR role' is refused without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 403 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:142:26"
+            ],
+            "failureMessageSha256": "f5b7c660e6144e1e8fa5b49aae9aa9276b386d2fef5d5b5d391323125019b2d6"
+          },
+          {
+            "phase": "P30-1508-M4-agent-lease-internal-api-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication 'lease with OWNER role' is refused without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 403 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:142:26"
+            ],
+            "failureMessageSha256": "f5b7c660e6144e1e8fa5b49aae9aa9276b386d2fef5d5b5d391323125019b2d6"
+          }
+        ]
+      },
+      {
+        "id": "P30-1508-submittedby-from-body",
+        "passed": {
+          "baseline": 21,
+          "mutant": 17,
+          "restored": 21
+        },
+        "failures": [
+          {
+            "phase": "P30-1508-submittedby-from-body-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=someone-else without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          },
+          {
+            "phase": "P30-1508-submittedby-from-body-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=sid without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          },
+          {
+            "phase": "P30-1508-submittedby-from-body-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy= without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          },
+          {
+            "phase": "P30-1508-submittedby-from-body-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=null without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          }
+        ]
+      }
+    ],
+    "initialBaseline": {
+      "phase": "unchanged-original-portal-twenty-one-baseline",
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true
+      },
+      "exit": 0,
+      "durationMs": 3601,
+      "failed": [],
+      "allSame21Names": true,
+      "executionError": null
+    },
+    "runtimeFingerprint": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "all17LaneProcessEnvironmentsExactAllowlistAnd0700": true,
+    "rootReadOnlyGitReceiptHeadAndCleanStatus": true,
+    "rootIndependentBaseline21SameNamesAllPass": true,
+    "phases": [
+      {
+        "phase": "unchanged-original-portal-twenty-one-baseline",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 21,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 3601,
+        "failed": [],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-M1-role-principal-current-reanchored-baseline",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 21,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 3510,
+        "failed": [],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-M1-role-principal-current-reanchored-mutant",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 20,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false
+        },
+        "exit": 1,
+        "durationMs": 3578,
+        "failed": [
+          {
+            "phase": "P30-1508-M1-role-principal-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication principal derivation preserves agent identities and bootstrap attribution",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 'agent-token' to be 'agent:agent-7' // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:170:123"
+            ],
+            "failureMessageSha256": "6a6f4d4436e8ec964a02470cc2c887fc04a8e0aefabca49bc191ce3964232f74"
+          }
+        ],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-M1-role-principal-current-reanchored-restored",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 21,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 3505,
+        "failed": [],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-baseline",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 21,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 3628,
+        "failed": [],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-mutant",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 17,
+          "numFailedTests": 4,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false
+        },
+        "exit": 1,
+        "durationMs": 3558,
+        "failed": [
+          {
+            "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=someone-else without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          },
+          {
+            "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=sid without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          },
+          {
+            "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy= without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          },
+          {
+            "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=null without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          }
+        ],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-restored",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 21,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 3507,
+        "failed": [],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-M3-no-anonymous-principal-current-reanchored-baseline",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 21,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 3600,
+        "failed": [],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-M3-no-anonymous-principal-current-reanchored-mutant",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 18,
+          "numFailedTests": 3,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false
+        },
+        "exit": 1,
+        "durationMs": 3539,
+        "failed": [
+          {
+            "phase": "P30-1508-M3-no-anonymous-principal-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication 'blank identity' is refused without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 401 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:142:26"
+            ],
+            "failureMessageSha256": "433d16f24e63a4118353b54b21fcab8e697cd7e06661bbbab2a317c3f57468d4"
+          },
+          {
+            "phase": "P30-1508-M3-no-anonymous-principal-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication a direct product route with no principal fails closed",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 401 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:157:26"
+            ],
+            "failureMessageSha256": "4fedaf1109f60d05d13bddf18c6d4b25d2ecb1698db620e05e86a98323970b5e"
+          },
+          {
+            "phase": "P30-1508-M3-no-anonymous-principal-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication the registry cannot manufacture an omitted principal",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 401 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:165:26"
+            ],
+            "failureMessageSha256": "d1936d93b3a5fe7747d9e8b9a26227580536d139d24b3fae376fc0ab4ef2c45c"
+          }
+        ],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-M3-no-anonymous-principal-current-reanchored-restored",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 21,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 3629,
+        "failed": [],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-M4-agent-lease-internal-api-current-reanchored-baseline",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 21,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 3493,
+        "failed": [],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-M4-agent-lease-internal-api-current-reanchored-mutant",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 19,
+          "numFailedTests": 2,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false
+        },
+        "exit": 1,
+        "durationMs": 3609,
+        "failed": [
+          {
+            "phase": "P30-1508-M4-agent-lease-internal-api-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication 'agent token with OPERATOR role' is refused without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 403 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:142:26"
+            ],
+            "failureMessageSha256": "f5b7c660e6144e1e8fa5b49aae9aa9276b386d2fef5d5b5d391323125019b2d6"
+          },
+          {
+            "phase": "P30-1508-M4-agent-lease-internal-api-current-reanchored-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication 'lease with OWNER role' is refused without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 403 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:142:26"
+            ],
+            "failureMessageSha256": "f5b7c660e6144e1e8fa5b49aae9aa9276b386d2fef5d5b5d391323125019b2d6"
+          }
+        ],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-M4-agent-lease-internal-api-current-reanchored-restored",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 21,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 3520,
+        "failed": [],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-submittedby-from-body-baseline",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 21,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 3443,
+        "failed": [],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-submittedby-from-body-mutant",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 17,
+          "numFailedTests": 4,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false
+        },
+        "exit": 1,
+        "durationMs": 3501,
+        "failed": [
+          {
+            "phase": "P30-1508-submittedby-from-body-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=someone-else without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          },
+          {
+            "phase": "P30-1508-submittedby-from-body-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=sid without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          },
+          {
+            "phase": "P30-1508-submittedby-from-body-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy= without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          },
+          {
+            "phase": "P30-1508-submittedby-from-body-mutant",
+            "name": "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=null without changing persisted rows",
+            "kind": "AssertionError",
+            "firstLine": "AssertionError: expected 201 to be 400 // Object.is equality",
+            "locations": [
+              "portalAttribution.test.ts:135:26"
+            ],
+            "failureMessageSha256": "2fb0bd8db5de8e397d085e7169f671ae7e64232e8e49a4c1494526cfffb26b81"
+          }
+        ],
+        "allSame21Names": true,
+        "executionError": null
+      },
+      {
+        "phase": "P30-1508-submittedby-from-body-restored",
+        "counts": {
+          "numTotalTests": 21,
+          "numPassedTests": 21,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "exit": 0,
+        "durationMs": 3564,
+        "failed": [],
+        "allSame21Names": true,
+        "executionError": null
+      }
+    ],
+    "caseNames": [
+      "AMC-1508 \u2014 persisted portal attribution after authentication 'operator' persists the authenticated principal",
+      "AMC-1508 \u2014 persisted portal attribution after authentication 'human owner' persists the authenticated principal",
+      "AMC-1508 \u2014 persisted portal attribution after authentication 'bootstrap admin with AGENT role' persists the authenticated principal",
+      "AMC-1508 \u2014 persisted portal attribution after authentication 'trimmed human identity' persists the authenticated principal",
+      "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=someone-else without changing persisted rows",
+      "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=sid without changing persisted rows",
+      "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy= without changing persisted rows",
+      "AMC-1508 \u2014 persisted portal attribution after authentication rejects client submittedBy=null without changing persisted rows",
+      "AMC-1508 \u2014 persisted portal attribution after authentication 'anonymous' is refused without changing persisted rows",
+      "AMC-1508 \u2014 persisted portal attribution after authentication 'missing identity' is refused without changing persisted rows",
+      "AMC-1508 \u2014 persisted portal attribution after authentication 'blank identity' is refused without changing persisted rows",
+      "AMC-1508 \u2014 persisted portal attribution after authentication 'viewer' is refused without changing persisted rows",
+      "AMC-1508 \u2014 persisted portal attribution after authentication 'approver' is refused without changing persisted rows",
+      "AMC-1508 \u2014 persisted portal attribution after authentication 'auditor' is refused without changing persisted rows",
+      "AMC-1508 \u2014 persisted portal attribution after authentication 'no roles' is refused without changing persisted rows",
+      "AMC-1508 \u2014 persisted portal attribution after authentication 'agent token with OPERATOR role' is refused without changing persisted rows",
+      "AMC-1508 \u2014 persisted portal attribution after authentication 'lease with OWNER role' is refused without changing persisted rows",
+      "AMC-1508 \u2014 persisted portal attribution after authentication an invalid users-config verdict keeps a human operator read-only",
+      "AMC-1508 \u2014 persisted portal attribution after authentication a direct product route with no principal fails closed",
+      "AMC-1508 \u2014 persisted portal attribution after authentication the registry cannot manufacture an omitted principal",
+      "AMC-1508 \u2014 persisted portal attribution after authentication principal derivation preserves agent identities and bootstrap attribution"
+    ]
+  },
+  "preservationProof": {
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "completePrivateClosureFiles": 12268,
+    "allRootAndPrivateFilesExact": true,
+    "allPrivateRegularFilesSeparateInodes": true,
+    "beforeAfterPinGroups": {
+      "protected-pins": 89,
+      "prior-reference-pins": 1515,
+      "runtime-input-pins": 2
+    },
+    "priorFullClosuresDirectlyVerified": [
+      {
+        "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/full-closure-final.json",
+        "files": 12268,
+        "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/full-closure-final.json",
+        "files": 12269,
+        "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/full-closure-final.json",
+        "files": 12269,
+        "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/full-closure-final.json",
+        "files": 12268,
+        "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/full-closure-final.json",
+        "files": 12268,
+        "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/full-closure-final.json",
+        "files": 12268,
+        "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/full-closure-final.json",
+        "files": 12268,
+        "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/full-closure-final.json",
+        "files": 12268,
+        "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+      }
+    ],
+    "priorIndexReferencesPresent": 10,
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "dependencyLinksVerified": 307,
+    "privateViteDirectories": true,
+    "controls": [
+      {
+        "id": "P30-1508-M1-role-principal-current-reanchored",
+        "target": "src/studio/apiDelegation.ts",
+        "sourceFindOccurrences": 1,
+        "exactFrozenReplacementAndPatch": true,
+        "soleChangedManifestEntry": "src/studio/apiDelegation.ts",
+        "mutantSource": {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/P30-1508-M1-role-principal-current-reanchored-mutant-source.ts",
+          "bytes": 5540,
+          "sha256": "974b1611ac301c1433cdc0581c4dad03f8fd980c2a489904c68e6a676d603931"
+        },
+        "allDistHashesUnchanged": true,
+        "restoredManifestEqualsPrepared": true
+      },
+      {
+        "id": "P30-1508-M2-portal-strict-schema-current-reanchored",
+        "target": "src/api/productRouter.ts",
+        "sourceFindOccurrences": 1,
+        "exactFrozenReplacementAndPatch": true,
+        "soleChangedManifestEntry": "src/api/productRouter.ts",
+        "mutantSource": {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/P30-1508-M2-portal-strict-schema-current-reanchored-mutant-source.ts",
+          "bytes": 4340,
+          "sha256": "eaf49d6b069a3a2eb5ebcb84762d7a26fd2d4a17995f4729f59e61ef4662b63f"
+        },
+        "allDistHashesUnchanged": true,
+        "restoredManifestEqualsPrepared": true
+      },
+      {
+        "id": "P30-1508-M3-no-anonymous-principal-current-reanchored",
+        "target": "src/api/productRouter.ts",
+        "sourceFindOccurrences": 1,
+        "exactFrozenReplacementAndPatch": true,
+        "soleChangedManifestEntry": "src/api/productRouter.ts",
+        "mutantSource": {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/P30-1508-M3-no-anonymous-principal-current-reanchored-mutant-source.ts",
+          "bytes": 4364,
+          "sha256": "0875438a03a243ca1ec8f1500c8f8b365cd60cccc19b9c72e800deb2a14c7168"
+        },
+        "allDistHashesUnchanged": true,
+        "restoredManifestEqualsPrepared": true
+      },
+      {
+        "id": "P30-1508-M4-agent-lease-internal-api-current-reanchored",
+        "target": "src/studio/apiDelegation.ts",
+        "sourceFindOccurrences": 1,
+        "exactFrozenReplacementAndPatch": true,
+        "soleChangedManifestEntry": "src/studio/apiDelegation.ts",
+        "mutantSource": {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/P30-1508-M4-agent-lease-internal-api-current-reanchored-mutant-source.ts",
+          "bytes": 5490,
+          "sha256": "f60a9dc61bf1aa023b2b0c6019eb3c95c3081a544898ce3f6f52b3a1daeb3069"
+        },
+        "allDistHashesUnchanged": true,
+        "restoredManifestEqualsPrepared": true
+      },
+      {
+        "id": "P30-1508-submittedby-from-body",
+        "target": "src/api/productRouter.ts",
+        "sourceFindOccurrences": 1,
+        "exactFrozenReplacementAndPatch": true,
+        "soleChangedManifestEntry": "src/api/productRouter.ts",
+        "mutantSource": {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/P30-1508-submittedby-from-body-mutant-source.ts",
+          "bytes": 4461,
+          "sha256": "1728a1fe454e9ac09c172b2e119ae3106aadf7632aafc634bd3afcbc58f6ae85"
+        },
+        "allDistHashesUnchanged": true,
+        "restoredManifestEqualsPrepared": true
+      }
+    ],
+    "proseOnlyFourSpacingCorrectionsExact": true
+  },
+  "staticSourceProof": {
+    "sourceExpandedCount": "4 allowed + 4 submittedBy + 9 denied + 4 singles = 21",
+    "recipeProvenanceAndCorrespondence": [
+      {
+        "id": "P30-1508-M1-role-principal-current-reanchored",
+        "sourceLine": 61,
+        "compiledCorrespondenceLine": 15,
+        "sourceAndCompiledMatchOnce": true,
+        "compiledNotRuntimeMutated": true,
+        "provenance": "Current exact source/compiled reconstruction of a mutation described by the September reconciliation prose; no exact old helper bytes recovered or transferred."
+      },
+      {
+        "id": "P30-1508-M2-portal-strict-schema-current-reanchored",
+        "sourceLine": 21,
+        "compiledCorrespondenceLine": 16,
+        "sourceAndCompiledMatchOnce": true,
+        "compiledNotRuntimeMutated": true,
+        "provenance": "Current exact source/compiled reconstruction of a mutation described by the September reconciliation prose; no exact old helper bytes recovered or transferred."
+      },
+      {
+        "id": "P30-1508-M3-no-anonymous-principal-current-reanchored",
+        "sourceLine": 83,
+        "compiledCorrespondenceLine": 68,
+        "sourceAndCompiledMatchOnce": true,
+        "compiledNotRuntimeMutated": true,
+        "provenance": "Current exact source/compiled reconstruction of a mutation described by the September reconciliation prose; no exact old helper bytes recovered or transferred."
+      },
+      {
+        "id": "P30-1508-M4-agent-lease-internal-api-current-reanchored",
+        "sourceLine": 91,
+        "compiledCorrespondenceLine": 42,
+        "sourceAndCompiledMatchOnce": true,
+        "compiledNotRuntimeMutated": true,
+        "provenance": "Current exact source/compiled reconstruction of a mutation described by the September reconciliation prose; no exact old helper bytes recovered or transferred."
+      },
+      {
+        "id": "P30-1508-submittedby-from-body",
+        "sourceLine": 89,
+        "compiledCorrespondenceLine": 74,
+        "sourceAndCompiledMatchOnce": true,
+        "compiledNotRuntimeMutated": true,
+        "provenance": "Exact historical full-batch recipe, read without execution."
+      }
+    ],
+    "historicalCompositeMatchesHeldBytes": true,
+    "fourCurrentReconstructedRecipesMatchFrozenReadyBrief": true,
+    "startGateChronology": true,
+    "staticSourcePins": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/portalAttribution.test.ts",
+        "bytes": 9290,
+        "sha256": "ce02dbd776fa32448d0623bc45411c9df7ca6775b194d05a67fde7c5fe389b3a"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/studio/apiDelegation.ts",
+        "bytes": 5670,
+        "sha256": "fcf33617981088c66f3b6c8620948dc016eea953ca65fb942af294dbcfa0c38a"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/api/productRouter.ts",
+        "bytes": 4349,
+        "sha256": "14327afcd9fed2440c0f8c6d97a04f7095053220699a937c596564b77c0e3a4d"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/api/index.ts",
+        "bytes": 19070,
+        "sha256": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/product/productDb.ts",
+        "bytes": 1716,
+        "sha256": "16227dd98c41d6813bcb2a84b338a78fd055830cafa2cbec1bc2311ca015fe03"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/product/portal.ts",
+        "bytes": 11842,
+        "sha256": "d59fa7e26e712a06de09170839d5bccbaca1b9e86130323ce1083853559d6f33"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/auth/rbac.ts",
+        "bytes": 1468,
+        "sha256": "a2bfad9168deba43e9e4ae539812ad29e58ce5ddc1b8812d2a34b9ca3020dbe8"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/api/apiHelpers.ts",
+        "bytes": 6027,
+        "sha256": "d645ef39b25422ae3dd2a771c3555daedafe134c07afb6ed9b7508fd30ffc46a"
+      }
+    ],
+    "sourceAndCriteriaNoAdapters": true,
+    "graphNavigationLimit": "Existing recorded stale navigation evidence was consulted before scoped source reads. No graph query, refresh, watcher, or server was executed in this task. Current behavior is inferred only from directly pinned files.",
+    "historicalEvidencePins": [
+      {
+        "path": "/private/tmp/p0-30-AMC-1546-1508-readiness-20261015.json",
+        "bytes": 62033,
+        "sha256": "327e2cf745e8c97144bb6dd3bd26e50c4362049e87f2e018a8191a3ad7859cc3"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1546-1508-execution-brief-20261015.json",
+        "bytes": 51110,
+        "sha256": "06afe84d612a3cc1b4cce09c9294d15aee49a5bae92e71370f514a7aabfe2152"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-30.md",
+        "bytes": 13749,
+        "sha256": "f58d1716546c6f4525c5d9353a07f5e19fcaadd2737ef1d894f97d4dcdd4c97a"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/qualification/2026-10-11-P0-30/mutations.batch.json",
+        "bytes": 41729,
+        "sha256": "8ad278b32edbe6555170568451923a52dac97e90dcf7dbaf1af04860ba62b3d1"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-14-fleet-sequential/reconcile/AMC-1508.json",
+        "bytes": 15819,
+        "sha256": "331f7ee239202a7e4a6a1ab1092d5dc617d8277e1765a62cdf5c5d9e4fc48247"
+      }
+    ]
+  },
+  "independentMeaning": [
+    {
+      "control": "M1 role principal",
+      "firstFailure": "Original portalAttribution.test.ts:170:123 receives agent-token instead of agent:agent-7.",
+      "masking": "The first helper assertion masks the lease, human, bootstrap and null assertions at 171\u2013174. The other 20 original cases pass. This is helper sensitivity, not a real authenticated HTTP agent result."
+    },
+    {
+      "control": "M2 strict schema",
+      "firstFailure": "All four named submittedBy variants receive 201 instead of 400 at original 135:26.",
+      "meaning": "The literal change removes strictness. The current route still supplies the authenticated context principal to submitJob and never reads submittedBy from the parsed body. Accepting or stripping this extra field does not establish a different forged identity.",
+      "masking": "The first status assertion masks persistedRows equality at 136. No post-failure SQL row snapshot was retained or independently reconstructed."
+    },
+    {
+      "control": "M3 anonymous fallback",
+      "firstFailure": "Blank identity at 142:26, direct product route at 157:26 and registry omitted-principal at 165:26 receive 201 instead of 401.",
+      "meaning": "Ordinary anonymous and missing-identity delegated cases remain refused through earlier authentication/RBAC checks. The blank string is truthy at the injected RBAC seam and becomes empty only after trimming; direct route and registry cases isolate the route principal guard.",
+      "masking": "The corresponding row comparisons at 143, 158 and 166 are not reached after these first status failures. No anonymous live HTTP admission is established."
+    },
+    {
+      "control": "M4 internal agent/lease route guard",
+      "firstFailure": "The injected agent OPERATOR and lease OWNER fixtures receive 201 instead of 403 at original 142:26.",
+      "meaning": "Those explicit elevated roles avoid later RBAC masking. Actual AGENT-only HTTP credentials can still be denied by later role checks. These are supported injected-auth seams, not credential-authentication results.",
+      "masking": "The persistedRows equality at 143 is masked in both failing cases."
+    },
+    {
+      "control": "Exact historical submittedBy composite",
+      "firstFailure": "The four named submittedBy variants receive 201 instead of 400 at original 135:26.",
+      "meaning": "The exact recovered replacement extends the body schema and shadows submitter inside the existing try block. The different nonempty someone-else value can select another principal in this source. sid selects the same principal; empty string and null fall back to the authenticated principal. The raw status failures do not show that all four inputs stored a different identity.",
+      "masking": "The row equality at 136 is masked. The four current reconstructed controls are not relabeled as four independently recovered historical recipes."
+    }
+  ],
+  "effectsAndLifecycle": {
+    "baselineAndRestoration": "All intact phases execute the original four allowed-caller assertions for actual SQL submitted_by and nested payload, one added row and retained prior selected rows; all intact refusal cases execute original selected-row equality. The helper verifies the listed identity derivations.",
+    "selectedRows": "persistedRows selects id, name, type, submitted_by and payload. It is not a complete physical SQLite-byte or all-column database comparison.",
+    "database": "The original beforeEach closes the process singleton, primes an owned product.db and inserts a retained row. afterEach calls the original closeProductDb before removal. That function silently catches close errors, so no additional handle.open or cold-process guarantee is inferred from absence of surfaced cleanup errors.",
+    "physicalInputs": "Each process creates fresh temporary workspaces, UUIDs and timestamps. Same 21 definitions and generator criteria do not mean identical physical rows across phases.",
+    "trust": "Authentication/request/response and limiter seams are injected; role enforcement, registry/router, PortalManager and SQLite are real. Unsigned portal accountability rows are not independent operator-identity, model-ability or truth attestations.",
+    "runtime": "The fingerprint is a separate actual launcher process using Node v22.23.3 and ABI 127. Test argv uses the same qualified Node22 path; per-worker ABI was not printed."
+  },
+  "rootAdditionalReceipt": {
+    "path": "/private/tmp/p0-30-AMC-1508-root-baseline-command-20261015.json",
+    "bytes": 1830,
+    "sha256": "36f598f529a344b8872952814110ab1219a12772ea7b63aa025eb282778cf2d9",
+    "relationship": "New root-frozen extraction of the single pre-existing root baseline command. It is an additional review input and is not retroactively included in C's frozen artifact index.",
+    "wrapper": {
+      "path": "/private/tmp/p0-30-run-command-20261015.py",
+      "bytes": 993,
+      "sha256": "88f18f938a0d49b9606beeb8788b43008029ee3c2adb8b07a28699010fa75c01"
+    },
+    "verified": "Read wrapper and exact single-command receipt. Verified wrapper/raw/log pins, Node22 argv, source HEAD, exit zero and raw same-name 21/21 results.",
+    "environmentBoundary": "The wrapper copies os.environ, then sets Node22 PATH, private HOME and GIT_NO_LAZY_FETCH. Exact inherited values were not recorded. No credential-free allowlist or external network isolation claim applies."
+  },
+  "contractDiscrepancy": "P0-30 spec line 60 describes storing the authenticated principal for a differing submittedBy body. The current strict schema instead returns 400 without insertion. This difference is retained; no source or expectation was changed to reconcile it.",
+  "historyPreserved": "The original first-render Markdown and correction receipt are pinned. The final Markdown differs only by exactly four receives201 \u2192 receives 201 spacing corrections. No builder rerun or changed raw/runtime meaning is inferred.",
+  "operations": {
+    "standardFilesystemJsonHashChecksOnly": true,
+    "productImports": 0,
+    "testsOrReruns": 0,
+    "syntaxOrParserChecks": 0,
+    "typeChecks": 0,
+    "buildsOrCompilers": 0,
+    "installs": 0,
+    "network": 0,
+    "gitCommands": 0,
+    "sourceOrInputEdits": 0,
+    "readNewHttpNamespace": false,
+    "writeOnlyAssignedReviewPair": true
+  },
+  "limits": [
+    "This is current source-mode Vitest evidence. No compiled mutant, source-to-dist adapter or compiler result was introduced; dist bytes remain unchanged.",
+    "No listening HTTP, real cookie/session credential authentication, CSRF, installed route or independently established operator identity is qualified by this original corpus.",
+    "The raw reporters retain named AssertionErrors and assertion locations, not independent post-failure operation counters, iteration telemetry or complete mutated SQL snapshots.",
+    "Eight prior final file manifests were checked directly for exact bytes; prior packet semantics were not re-audited or aggregated into this current result.",
+    "No held Claude helper/test/runner/source transfer, ownership clearance, source fix, tenant/race coverage, full P0-30/old batch, Node24, full suite, coverage, hosted CI, G0, release or tracker Done acceptance is claimed."
+  ],
+  "allReadsComplete": true,
+  "capturedUtc": "2026-10-15T01:29:05.056313+00:00",
+  "inputPins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.json",
+      "bytes": 39183,
+      "sha256": "6b847d4156cfbb76674d38faccd6e2a998adcba5fed5b9aa355181f3f5f0c08e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.md",
+      "bytes": 3838,
+      "sha256": "1b719c5480ad8daad9c68a0adcd39aacecd93d0ae622a7b6b8c67fa12f0c17ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/artifact-index.json",
+      "bytes": 407341,
+      "sha256": "99b6cb7958585b0d02ec871cab10a00f8907b27e578d8789d373241f037e3321"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 30770,
+      "sha256": "d79d6c915fc745c4d72915f5bcacf3cb058e1d6e94d94ea2f70d2748b8d0502c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/controller.py",
+      "bytes": 8600,
+      "sha256": "1093c8d7fe9774266dafe0f8099be41f2fc7dd8a269c6e93eff0178fbd37fd09"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/prepare.py",
+      "bytes": 8223,
+      "sha256": "522bca6e058db3d70054cdb2b4461a920781d0aba8972699ed69d047e1302895"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/semantic-classification.json",
+      "bytes": 112144,
+      "sha256": "edeaf600604808cdb57e3abc552127c1c8600d3c5866b8c70cac3f65006cffa9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/setup-prepared.json",
+      "bytes": 11261,
+      "sha256": "f684bb94fd194dd0a251868e8b3b0353e7914828e7b7840309a815210d6de3ac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/setup-prepared.md",
+      "bytes": 1930,
+      "sha256": "a443f9dc24d729d6c803c9fcd65b712eeb715ad401d2b2f7378196af6fef439b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/index/setup-artifact-index.json",
+      "bytes": 2746,
+      "sha256": "6ba9c639fa1b32116446c0f3bf8f72007ce27092c64a890ac5ac7ae05522cb05"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/prose-spacing-correction.json",
+      "bytes": 619,
+      "sha256": "65d50957dcb6974bc76a6a76202ff3313e00343175deb044dc8604b3b6d7e169"
+    }
+  ]
+}

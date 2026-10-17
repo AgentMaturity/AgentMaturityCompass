@@ -1,0 +1,193 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.11 [39m[90m/private/tmp/p0-41-causal-qualification-v2-20261015/source[39m
+
+ [31m❯[39m tests/p041ProgramMetricsQualification.test.ts [2m([22m[2m27 tests[22m[2m | [22m[31m8 failed[39m[2m)[22m[33m 4583[2mms[22m[39m
+     [32m✓[39m Q1 preserves 15 Plan rows, 90 target cells, owners and all 26 historical registrations[32m 5[2mms[22m[39m
+[31m     [31m×[31m Q2 missing evidence stays null before any status or current-value assertions[39m[32m 4[2mms[22m[39m
+     [32m✓[39m Q3 pure closure computation counts only a shaped declaration and does not authenticate it[32m 3[2mms[22m[39m
+[31m     [31m×[31m Q4 absent registered report, workflow and JSON inputs remain pending[39m[32m 1[2mms[22m[39m
+     [32m✓[39m Q5 supplied partial surface report distinguishes two passes, one failure and two missing[32m 1[2mms[22m[39m
+[31m     [31m×[31m Q6a an empty assertion list stays null before later nonvacuity checks[39m[32m 1[2mms[22m[39m
+     [32m✓[39m Q6b a failed registered file outranks its absent sibling[32m 1[2mms[22m[39m
+[31m     [31m×[31m Q6c duplicate matching report paths refuse rather than double count[39m[32m 1[2mms[22m[39m
+     [32m✓[39m Q7a YAML matrices count distinct configured OS families, not versions or containment[32m 7[2mms[22m[39m
+[31m     [31m×[31m Q7b absent, unknown, conflicting and unsupported YAML jobs remain pending[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m Q8a a dated sourced manual zero is measured while malformed provenance refuses[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m Q8b registered JSON zero, escaped pointers, absence and malformed values stay distinct[39m[32m 1[2mms[22m[39m
+     [32m✓[39m Q9a genuine CLI check reports structural validity only[32m 209[2mms[22m[39m
+[31m     [31m×[31m Q9b genuine CLI JSON returns 15 rows, declared seven and fourteen pending values[39m[32m 203[2mms[22m[39m
+     [32m✓[39m Q9c explicit and default markdown agree with 15 rows and funded columns[32m 279[2mms[22m[39m
+     [32m✓[39m Q10a a dirty gap closure cannot override committed open registrations[32m 210[2mms[22m[39m
+     [33m[2m✓[22m[39m Q10b committed registered JSON zero survives changed and deleted working copies [33m 371[2mms[22m[39m
+     [32m✓[39m Q11a a committed closed gap without a closing declaration refuses[32m 263[2mms[22m[39m
+     [33m[2m✓[22m[39m Q11b invalid manual provenance refuses all output modes [33m 371[2mms[22m[39m
+     [33m[2m✓[22m[39m Q11c conflicting modes, unknown flags and invalid report paths refuse [33m 531[2mms[22m[39m
+     [32m✓[39m Q12a a missing qualification path at HEAD refuses a shaped closure[32m 275[2mms[22m[39m
+     [32m✓[39m Q12b untracked-only evidence cannot satisfy the HEAD path check[32m 286[2mms[22m[39m
+     [32m✓[39m Q12c a zero merged SHA refuses even with a committed evidence path[32m 273[2mms[22m[39m
+     [32m✓[39m Q12d a nonexistent full merged SHA refuses with a committed evidence path[32m 299[2mms[22m[39m
+     [33m[2m✓[22m[39m Q12e a genuine sibling commit is not an ancestor of the closure commit [33m 395[2mms[22m[39m
+     [33m[2m✓[22m[39m Q12f a committed synthetic path and real ancestor pass structural checks only [33m 305[2mms[22m[39m
+     [32m✓[39m Q13 only a synthetic singleMaintainer selection adds its column and cells are escaped[32m 281[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 8 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/p041ProgramMetricsQualification.test.ts[2m > [22mP041 supplied-input and genuine local Git qualification[2m > [22mQ2 missing evidence stays null before any status or current-value assertions
+[31m[1mAssertionError[22m: expected +0 to be null[39m
+
+[32m- Expected:[39m
+null
+
+[31m+ Received:[39m
+0
+
+[36m [2m❯[22m tests/p041ProgramMetricsQualification.test.ts:[2m248:27[22m[39m
+    [90m246|[39m     [35mconst[39m result [33m=[39m [34mcalculate[39m([32m"Q2"[39m[33m,[39m [34mfresh[39m())[33m;[39m
+    [90m247|[39m     [35mconst[39m missing [33m=[39m [34mrow[39m(result[33m,[39m [32m"release_cadence"[39m)[33m;[39m
+    [90m248|[39m     expect(missing.value).toBeNull(); // First assertion: planned miss…
+    [90m   |[39m                           [31m^[39m
+    [90m249|[39m     [34mexpect[39m(result[33m.[39mvalid)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m [34mexpect[39m(result[33m.[39merrors)[33m.[39m[34mtoEqual[39m([])[33m;[39m
+    [90m250|[39m     [35mconst[39m critical [33m=[39m [34mrow[39m(result[33m,[39m [32m"critical_gaps_open"[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/p041ProgramMetricsQualification.test.ts[2m > [22mP041 supplied-input and genuine local Git qualification[2m > [22mQ4 absent registered report, workflow and JSON inputs remain pending
+[31m[1mAssertionError[22m: expected +0 to be null[39m
+
+[32m- Expected:[39m
+null
+
+[31m+ Received:[39m
+0
+
+[36m [2m❯[22m tests/p041ProgramMetricsQualification.test.ts:[2m277:37[22m[39m
+    [90m275|[39m     [34mexpect[39m(result[33m.[39merrors)[33m.[39m[34mtoEqual[39m([])[33m;[39m
+    [90m276|[39m     for (const id of ["claim_kind_surfaces", "contained_shell_oses", "…
+    [90m277|[39m       expect(row(result, id).value).toBeNull(); expect(row(result, id)…
+    [90m   |[39m                                     [31m^[39m
+    [90m278|[39m     }
+    [90m279|[39m   })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/p041ProgramMetricsQualification.test.ts[2m > [22mP041 supplied-input and genuine local Git qualification[2m > [22mQ6a an empty assertion list stays null before later nonvacuity checks
+[31m[1mAssertionError[22m: expected +0 to be null[39m
+
+[32m- Expected:[39m
+null
+
+[31m+ Received:[39m
+0
+
+[36m [2m❯[22m tests/p041ProgramMetricsQualification.test.ts:[2m300:25[22m[39m
+    [90m298|[39m     inputs.vitestReport = { testResults: [assertionFile("synthetic/cli…
+    [90m299|[39m     const empty = row(calculate("Q6-empty", inputs), "claim_kind_surfa…
+    [90m300|[39m     expect(empty.value).toBeNull(); // First assertion: planned vacuou…
+    [90m   |[39m                         [31m^[39m
+    [90m301|[39m     expect(empty.status).toBe("not_measured"); expect(empty.surfaceSta…
+    [90m302|[39m     for (const assertions of [undefined, [{ status: "skipped" }], [{ s…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/p041ProgramMetricsQualification.test.ts[2m > [22mP041 supplied-input and genuine local Git qualification[2m > [22mQ6c duplicate matching report paths refuse rather than double count
+[31m[1mAssertionError[22m: expected +0 to be null[39m
+
+[32m- Expected:[39m
+null
+
+[31m+ Received:[39m
+0
+
+[36m [2m❯[22m tests/p041ProgramMetricsQualification.test.ts:[2m325:54[22m[39m
+    [90m323|[39m     [35mconst[39m result [33m=[39m [34mcalculate[39m([32m"Q6-duplicate"[39m[33m,[39m inputs)[33m;[39m
+    [90m324|[39m     expect(result.valid).toBe(false); expect(result.errors).toContain(…
+    [90m325|[39m     [34mexpect[39m([34mrow[39m(result[33m,[39m [32m"claim_kind_surfaces"[39m)[33m.[39mvalue)[33m.[39m[34mtoBeNull[39m()[33m;[39m
+    [90m   |[39m                                                      [31m^[39m
+    [90m326|[39m   })[33m;[39m
+    [90m327|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/p041ProgramMetricsQualification.test.ts[2m > [22mP041 supplied-input and genuine local Git qualification[2m > [22mQ7b absent, unknown, conflicting and unsupported YAML jobs remain pending
+[31m[1mAssertionError[22m: expected +0 to be null[39m
+
+[32m- Expected:[39m
+null
+
+[31m+ Received:[39m
+0
+
+[36m [2m❯[22m tests/p041ProgramMetricsQualification.test.ts:[2m355:92[22m[39m
+    [90m353|[39m       inputs[33m.[39mworkflowYaml [33m=[39m workflowYaml[33m;[39m
+    [90m354|[39m       [35mconst[39m result [33m=[39m [34mcalculate[39m([32m"Q7-pending"[39m[33m,[39m inputs)[33m;[39m
+    [90m355|[39m       expect(result.errors).toEqual([]); expect(row(result, "contained…
+    [90m   |[39m                                                                                            [31m^[39m
+    [90m356|[39m     }
+    [90m357|[39m   })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/p041ProgramMetricsQualification.test.ts[2m > [22mP041 supplied-input and genuine local Git qualification[2m > [22mQ8a a dated sourced manual zero is measured while malformed provenance refuses
+[31m[1mAssertionError[22m: expected +0 to be null[39m
+
+[32m- Expected:[39m
+null
+
+[31m+ Received:[39m
+0
+
+[36m [2m❯[22m tests/p041ProgramMetricsQualification.test.ts:[2m370:53[22m[39m
+    [90m368|[39m       [35mconst[39m invalid [33m=[39m [34mcalculate[39m([32m"Q8-bad-manual"[39m[33m,[39m inputs)[33m;[39m
+    [90m369|[39m       expect(invalid.errors).toContain("manual: invalid value or prove…
+    [90m370|[39m       [34mexpect[39m([34mrow[39m(invalid[33m,[39m [32m"release_cadence"[39m)[33m.[39mvalue)[33m.[39m[34mtoBeNull[39m()[33m;[39m
+    [90m   |[39m                                                     [31m^[39m
+    [90m371|[39m     }
+    [90m372|[39m     [35mfor[39m ([35mconst[39m key [35mof[39m [[32m"source"[39m[33m,[39m [32m"recordedBy"[39m[33m,[39m [32m"asOf"[39m] [35mas[39m [35mconst[39m) {
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/p041ProgramMetricsQualification.test.ts[2m > [22mP041 supplied-input and genuine local Git qualification[2m > [22mQ8b registered JSON zero, escaped pointers, absence and malformed values stay distinct
+[31m[1mAssertionError[22m: expected +0 to be null[39m
+
+[32m- Expected:[39m
+null
+
+[31m+ Received:[39m
+0
+
+[36m [2m❯[22m tests/p041ProgramMetricsQualification.test.ts:[2m392:92[22m[39m
+    [90m390|[39m     [35mfor[39m ([35mconst[39m value [35mof[39m [undefined[33m,[39m [35mnull[39m]) {
+    [90m391|[39m       inputs.jsonSources = { [source.path]: { "a/b": { "~count": value…
+    [90m392|[39m       expect(row(calculate("Q8-json-missing", inputs), "executed_catal…
+    [90m   |[39m                                                                                            [31m^[39m
+    [90m393|[39m     }
+    [90m394|[39m     [35mfor[39m ([35mconst[39m value [35mof[39m [[32m"0"[39m[33m,[39m [33mNumber[39m[33m.[39m[33mPOSITIVE_INFINITY[39m[33m,[39m [35mtrue[39m]) {
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/p041ProgramMetricsQualification.test.ts[2m > [22mP041 supplied-input and genuine local Git qualification[2m > [22mQ9b genuine CLI JSON returns 15 rows, declared seven and fourteen pending values
+[31m[1mAssertionError[22m: expected [] to have a length of 14 but got +0[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 14[39m
+[31m+ 0[39m
+
+[36m [2m❯[22m tests/p041ProgramMetricsQualification.test.ts:[2m415:65[22m[39m
+    [90m413|[39m     [34mexpect[39m([34mrow[39m(output[33m,[39m [32m"critical_gaps_open"[39m)[33m.[39mvalue)[33m.[39m[34mtoBe[39m([34m7[39m)[33m;[39m
+    [90m414|[39m     expect(row(output, "critical_gaps_open").source).toContain("HEAD:d…
+    [90m415|[39m     expect(output.rows.filter(metric => metric.value === null)).toHave…
+    [90m   |[39m                                                                 [31m^[39m
+    [90m416|[39m   })[33m;[39m
+    [90m417|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m8 failed[39m[22m[2m | [22m[1m[32m19 passed[39m[22m[90m (27)[39m
+[2m   Start at [22m 13:04:37
+[2m   Duration [22m 4.77s[2m (transform 36ms, setup 21ms, import 45ms, tests 4.58s, environment 0ms)[22m
+
+JSON report written to /private/tmp/p0-41-causal-qualification-v2-20261015/phases/P041-M1-missing-source-zero--mutant/raw-producer.json
