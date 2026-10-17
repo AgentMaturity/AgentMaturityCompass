@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { resolve as resolvePath } from "node:path";
+import { digestField } from "../../dataflow/tokenizer.js";
+import { outputDigestFor } from "../../dataflow/tokenVault.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { defineTool } from "../toolRegistry.js";
 import type { ToolDefinition } from "../toolTypes.js";
@@ -84,7 +86,7 @@ export function webSearchTool(options: WebSearchToolOptions): ToolDefinition {
       const resource = execution.authorization?.record.resource;
       const egress = { workspace: resolvePath(execution.workspace), agentId: execution.agentId,
         dataClasses: resource ? [...resource.dataClasses] : null, purpose: resource?.purpose ?? null };
-      const requests: { origin: string; address: string; status: number; bytes: number; contentSha256: string }[] = [];
+      const requests: Readonly<Record<string, unknown>>[] = [];
       let spent = 0;
       const get: WebSearchProviderRequest["get"] = async (url) => {
         if (requests.length >= MAX_PROVIDER_REQUESTS) {
@@ -101,7 +103,9 @@ export function webSearchTool(options: WebSearchToolOptions): ToolDefinition {
           ...(execution.signal ? { signal: execution.signal } : {})
         });
         spent += response.body.byteLength;
-        requests.push({ origin: response.origin, address: response.address, status: response.status, bytes: response.body.byteLength, contentSha256: sha256Hex(response.body) });
+        // Keyed in a workspace that opted in to protected-data redaction (P2-02), like web_fetch's digests.
+        requests.push({ origin: response.origin, address: response.address, status: response.status, bytes: response.body.byteLength,
+          ...digestField("content", outputDigestFor(execution.workspace, sha256Hex(response.body))) });
         return { status: response.status, contentType: response.contentType, body: response.body.toString("utf8") };
       };
       const results = (await provider.search({ query: args.query, limit: args.limit, get, ...(execution.signal ? { signal: execution.signal } : {}) }))
@@ -116,7 +120,7 @@ export function webSearchTool(options: WebSearchToolOptions): ToolDefinition {
         querySha256: sha256Hex(args.query),
         requests,
         resultCount: results.length,
-        deliveredSha256: sha256Hex(output),
+        ...digestField("delivered", outputDigestFor(execution.workspace, sha256Hex(output))),
         redactions: redacted.redactions,
         policyDigestSha256: policy.policyDigestSha256,
         searchedAt: Date.now()

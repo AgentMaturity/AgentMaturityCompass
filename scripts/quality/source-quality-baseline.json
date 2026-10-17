@@ -2011,8 +2011,6 @@
     {"id":"75ca4d9177f3c15dac203e9f03a7c9160b84c47e235ba7bbb53377a30043a9e0","file":"src/crypto/signing/signerTypes.ts","kind":"exports"},
     {"id":"8e2829e7b8f14bd389992b030b242b3cdc51fe5452ba679860efa3d0244d4cf8","file":"src/crypto/signing/signerTypes.ts","kind":"types"},
     {"id":"18b78ca67f1123f40f1c9ff7672a3cc52cfd0bc065c59c8791e9beb7b369f339","file":"src/dashboard/components/teamViews.js","kind":"files"},
-    {"id":"eec34f66f6cc217de56fa2bd98a8be1ccded5af9d75359d36279e6bcf2644b0d","file":"src/dataflow/detectors.ts","kind":"exports"},
-    {"id":"b5254765ff2300c271576d1b21aa4b203f0f0e46e491c1e36b01ea43a75c77b6","file":"src/dataflow/detectors.ts","kind":"types"},
     {"id":"207b7eee949e1d0aa8307b0f9900dcc4595f09cee3ceb619255676d3d317e0a6","file":"src/dataflow/processorRegistry.ts","kind":"exports"},
     {"id":"5444af9c9cff178b10218f8984fb0ff0d4117ec75f64a763a05a7f7767cc8f67","file":"src/dataflow/processorRegistry.ts","kind":"exports"},
     {"id":"a2e529b1716f83e6d9d454deeeeddc96b1c45e9363e0fc2a4059962fdf6d55a6","file":"src/dataflow/processorRegistry.ts","kind":"exports"},

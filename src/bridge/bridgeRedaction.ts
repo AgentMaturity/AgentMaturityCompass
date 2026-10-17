@@ -1,5 +1,7 @@
 import { redactSecrets } from "../shield/redaction/redactSecrets.js";
 import { createHash } from "node:crypto";
+import { isPasswordMember, MAX_PROTECTED_TEXT_CHARS, nestedJsonRedactor, redactJsonLeaves, redactProtectedText } from "../dataflow/detectors.js";
+import { protectedDataOptedIn } from "../dataflow/processorRegistry.js";
 import { canonicalize } from "../utils/json.js";
 
 
@@ -24,6 +26,31 @@ function clip(value: string, maxChars: number): string {
  */
 export function redactBridgeText(input: string): string {
   return redactSecrets(input, () => "<AMC_REDACTED>").redacted;
+}
+
+const MARKER = "<AMC_REDACTED>";
+
+/**
+ * Redaction for what the bridge STORES as evidence: telemetry text, telemetry object payloads and `POST /bridge/evidence`
+ * payloads. Secrets always, as `redactBridgeText` (every key and leaf of a JSON payload). In a workspace that opted in to
+ * protected-data redaction (P2-02, read once per call) the protected-data detectors too, with the same anonymous marker:
+ * text over their per-leaf limit is replaced whole, an integer JSON.parse rounded (a card number sent as a number) is
+ * replaced, a `password` member's value is checked with its key beside it, and text that holds JSON (stdout, a string
+ * leaf) is read one level deep, then searched with its escapes decoded (`nestedJsonRedactor`). Text the
+ * bridge hands back to an agent (control responses, deny reasons, `amc wrap`'s terminal output) keeps secrets-only
+ * `redactBridgeText`, so an opted-in workspace's detectors never alter what an agent is told.
+ */
+export function bridgeEvidenceRedactor(workspace: string): { readonly text: (input: string) => string; readonly json: (value: unknown) => unknown } {
+  const protectedData = protectedDataOptedIn(workspace);
+  const scan = (input: string, key?: string): string => {
+    const secretsRedacted = redactBridgeText(input);
+    if (!protectedData) return secretsRedacted;
+    if (secretsRedacted.length > MAX_PROTECTED_TEXT_CHARS || isPasswordMember(key, input)) return MARKER;
+    return redactProtectedText(secretsRedacted, () => MARKER).text;
+  };
+  const opaque = () => MARKER;
+  const text = protectedData ? nestedJsonRedactor(scan, opaque) : scan;
+  return Object.freeze({ text, json: (value: unknown) => redactJsonLeaves(value, text, protectedData ? opaque : undefined) });
 }
 
 export function bridgeSha256(bytes: Buffer | string): string {
