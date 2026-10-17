@@ -47,11 +47,14 @@ function toLoopOutcome(outcome: PipelineOutcome, aborted: boolean): ToolCallOutc
   if (state === undefined ? aborted : state === "cancelled") {
     return { outcome: "CANCELLED", content: "", exitCode: null, timedOut: false, denied: false };
   }
-  if (outcome.denied === null && (state === "outcome_unknown" || state === "started")) {
+  if (outcome.denied === null && (state === "outcome_unknown" || state === "started"
+    || (state === undefined && outcome.effect === "unknown"))) {
     return {
       outcome: "TOOL_OUTCOME_UNKNOWN",
       // Said to the model, so it does not retry on its own an effect that may already have happened.
-      content: `[amc] outcome unknown: the action may have taken effect. It is not retried automatically; it stays unreconciled. ${outcome.output}`,
+      content: state === undefined
+        ? `[amc] outcome unknown: the action may have taken effect. It is not retried automatically. ${outcome.output}`
+        : `[amc] outcome unknown: the action may have taken effect. It is not retried automatically; it stays unreconciled. ${outcome.output}`,
       exitCode: outcome.exitCode,
       timedOut: outcome.timedOut,
       denied: false
