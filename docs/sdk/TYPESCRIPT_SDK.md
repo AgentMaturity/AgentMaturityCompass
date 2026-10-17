@@ -111,8 +111,15 @@ D-08 is open), and a plan is evidence-of-conformity planning, never a compliance
 deployment fact, so the plan stays blocked until you state `useCases` and `jurisdictions` in the profile. Activation
 then follows docs/catalog/COMPILER.md: `amc catalog compile --profile <profile> --request-review`, approval by two
 OWNER or AUDITOR users other than the requester, then `--activate <approvalRequestId>`. Once a plan with L0-IDN-01 is
-active, a tool call needs a lease that names an active `users.yaml` user, which Studio native tasks carry and CLI runs
-do not; run governed tasks from Studio, signed in as the owner.
+active, a tool call needs a lease that names an active `users.yaml` user. Studio native tasks carry one for their
+signed-in user. With workspace tools, `amc agent-loop run`, each `amc acp` session (at `session/new` and `session/load`)
+and so `AMCNativeClient` mint one for the ACTIVE `users.yaml` user whose username is the OS account running them (P1-79).
+When no such user exists, the run is refused with `PRINCIPAL_UNRESOLVED` before a session or lease exists: the CLI
+exits non-zero, and `newSession()` rejects with `AMCNativeRefusedError` (code -32602, `data.reason`
+`PRINCIPAL_UNRESOLVED`). So `amc init` with the owner username set to your OS account (the interactive default) is what
+lets this quickstart run under an active plan; otherwise add that user with `amc user add`. An active plan also needs a
+signed residency destination registry (`.amc/residency/destinations.yaml`, P2-01) before any session opens; see
+docs/OPS_HARDENING.md.
 
 ## Open decision
 
