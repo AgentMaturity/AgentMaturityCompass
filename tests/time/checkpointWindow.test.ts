@@ -21,7 +21,7 @@ import { rawSignature, testKey, trustList } from "../trust/trustFixtures.js";
 import { ANCHOR_ID, POLICY, optionalTsaTest, withGrantFixture, type Fixture } from "./tsaTestFixture.js";
 
 const CHECKOUT = realpathSync(fileURLToPath(new URL("../../", import.meta.url)));
-const optionalCheckpointTest = optionalTsaTest(["CHECKPOINT-PENDING-GRANT", "CHECKPOINT-REQUIRED-REFUSAL", "CHECKPOINT-TWO-BOUND-WINDOW", "CHECKPOINT-EVENT-CADENCE"]);
+const optionalCheckpointTest = optionalTsaTest(["CHECKPOINT-PENDING-GRANT", "CHECKPOINT-REQUIRED-REFUSAL", "CHECKPOINT-TWO-BOUND-WINDOW", "CHECKPOINT-EVENT-CADENCE", "CHECKPOINT-PERSISTED-PRODUCER-CLAIMS"]);
 const sha256 = (bytes: string | Buffer): string => createHash("sha256").update(bytes).digest("hex");
 
 function filePin(path: string) {
@@ -54,7 +54,7 @@ function checkpointSignatureValid(path: string, digest: string, monitorPem: stri
 type LedgerOwner = { handle: ReturnType<typeof openLedger>; readonly: boolean; closeAttempted: boolean; closed: boolean };
 type CheckpointFixture = {
   trust: TrustContext; monitorPem: string; monitorFingerprint: string; seedEventId: string;
-  appendSealedAudit: (label: string) => string;
+  appendSealedAudit: (label: string, ts?: number) => string;
   events: () => EvidenceEvent[];
   verify: () => ReturnType<typeof verifyLedgerIntegrity>;
   configure: (required: boolean, path: string) => void;
@@ -186,12 +186,13 @@ async function withCheckpointWorkspace(caseId: string, tsa: Fixture, body: (fixt
         ledger.sealSession(sessionId);
         return id;
       });
-      const appendSealedAudit = (label: string): string => useLedger(false, ledger => {
+      const appendSealedAudit = (label: string, ts?: number): string => useLedger(false, ledger => {
         const appendedSessionId = randomUUID();
         ledger.startSession({ sessionId: appendedSessionId, runtime: "unknown", binaryPath: "amc-p125-checkpoint-fixture",
           binarySha256: hashBinaryOrPath("amc-p125-checkpoint-fixture", "1") });
         const id = ledger.appendEvidence({ sessionId: appendedSessionId, runtime: "unknown", eventType: "audit", inline: true, payloadExt: "json",
-          payload: JSON.stringify({ schema: "amc-p125-checkpoint-fixture-event/1", caseId, label }), meta: { fixtureCase: caseId, fixtureLabel: label } });
+          payload: JSON.stringify({ schema: "amc-p125-checkpoint-fixture-event/1", caseId, label }), meta: { fixtureCase: caseId, fixtureLabel: label },
+          ...(ts === undefined ? {} : { ts }) });
         ledger.sealSession(appendedSessionId);
         return id;
       });
@@ -632,6 +633,163 @@ describe("P1-25 real signed ledger checkpoint transitions", () => {
           { checkpointSequence: 1, checkpointSha256: first.sha256, tokenSha256: sha256(firstToken) },
           { checkpointSequence: 2, checkpointSha256: second.sha256, tokenSha256: sha256(secondToken) }
         ]);
+        expect(finalVerification.ok && finalVerification.chain.ok && finalVerification.governance.ok && finalVerification.trustRoot.anchored).toBe(true);
+      });
+    });
+  });
+
+  optionalCheckpointTest("persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window", async () => {
+    await withGrantFixture("CHECKPOINT-PERSISTED-PRODUCER-CLAIMS", "/producer-good", async tsa => {
+      await withCheckpointWorkspace("CHECKPOINT-PERSISTED-PRODUCER-CLAIMS", tsa, async fixture => {
+        fixture.facts.windowBoundary = "supported caller input.ts is stored and signed between two genuine checkpoints; no post-append row, clock, scheduler or policy change";
+        const stages: Array<Record<string, unknown>> = [];
+        const independentGrants: Array<Record<string, unknown>> = [];
+        const producer: Record<string, unknown> = { supportedProducerInputOnly: true, noPostAppendRowOrClockEdit: true,
+          elapsedMinuteOrStudioCredit: false, stages, independentGrants };
+        fixture.facts.producerClaims = producer;
+        const recordGrant = (attested: Awaited<ReturnType<Fixture["verifyReply"]>>): void => {
+          independentGrants.push({ genTime: attested.genTime, accuracyMs: attested.accuracyMs, digest: attested.messageImprint.digest,
+            anchorId: attested.tsa.anchorId, signerCertSha256: attested.tsa.certSha256,
+            tokenSha256: sha256(Buffer.from(attested.tokenDerB64, "base64")), revocationChecked: attested.revocationChecked });
+        };
+        fixture.configure(false, "/producer-good");
+        const beforeFirst = fixture.events();
+        const firstResult = await checkpointLedger(tsa.workspace, fixture.trust);
+        const firstChain = readCheckpointChain(tsa.workspace);
+        stages.push({ id: "first-checkpoint", result: firstResult, chain: firstChain, requestPaths: tsa.requests.map(request => request.path) });
+        expect(firstChain).toHaveLength(1);
+        const first = firstChain[0]!;
+        const firstGrant = await tsa.verifyReply("/producer-good", first.sha256);
+        recordGrant(firstGrant);
+        const firstPath = join(checkpointsDir(tsa.workspace), "1.json");
+        const firstTokenPath = join(checkpointsDir(tsa.workspace), "1.tsr");
+        const firstBytes = readFileSync(firstPath);
+        const firstToken = readFileSync(firstTokenPath);
+        const firstSignatureValid = checkpointSignatureValid(firstPath, first.sha256, fixture.monitorPem);
+        const firstEvents = fixture.events();
+        const firstRows = firstEvents.filter(event => event.event_type === "time/checkpoint");
+        const firstVerification = fixture.verify();
+        producer.first = { result: firstResult, checkpoint: first, checkpointPin: filePin(firstPath), tokenPin: filePin(firstTokenPath),
+          signatureValid: firstSignatureValid, tokenMatchesIndependentGrant: firstToken.equals(Buffer.from(firstGrant.tokenDerB64, "base64")),
+          checkpointRows: firstRows.map(event => ({ id: event.id, eventHash: event.event_hash, meta: JSON.parse(event.meta_json) as unknown })),
+          ledger: { ok: firstVerification.ok, chain: firstVerification.chain.ok, governance: firstVerification.governance.ok,
+            anchored: firstVerification.trustRoot.anchored, errors: firstVerification.errors.length } };
+        expect(firstResult).toEqual({ sequence: 1, status: "timestamped", failures: [] });
+        expect(firstSignatureValid).toBe(true);
+        expect(firstToken.equals(Buffer.from(firstGrant.tokenDerB64, "base64"))).toBe(true);
+        expect(first.checkpoint.ledger).toEqual({ eventCount: beforeFirst.length, headEventHash: beforeFirst[beforeFirst.length - 1]!.event_hash });
+        expect(firstRows).toHaveLength(1);
+        expect(JSON.parse(firstRows[0]!.meta_json)).toEqual({ checkpointSequence: 1, checkpointSha256: first.sha256, tokenSha256: sha256(firstToken) });
+        expect(firstVerification.ok && firstVerification.chain.ok && firstVerification.governance.ok && firstVerification.trustRoot.anchored).toBe(true);
+
+        const lowerMs = Date.parse(firstGrant.genTime);
+        const lowerAccuracyMs = firstGrant.accuracyMs ?? 0;
+        const backdatedTs = Math.ceil(lowerMs - lowerAccuracyMs - 5 * 60_000) - 1;
+        const postdatedTs = lowerMs + 24 * 60 * 60_000; // A producer claim, never a clock or row override.
+        producer.requestedClaims = { backdatedTs, postdatedTs, postdateOffsetMs: 24 * 60 * 60_000 };
+        const backdatedId = fixture.appendSealedAudit("producer-backdated", backdatedTs);
+        const afterBackdate = fixture.events();
+        const backdatedStored = afterBackdate.find(event => event.id === backdatedId);
+        stages.push({ id: "backdated-appended", requestedTs: backdatedTs, row: backdatedStored === undefined ? null : {
+          id: backdatedStored.id, ts: backdatedStored.ts, sessionId: backdatedStored.session_id, eventType: backdatedStored.event_type,
+          eventHash: backdatedStored.event_hash, previousHash: backdatedStored.prev_event_hash, index: afterBackdate.indexOf(backdatedStored) } });
+        expect(backdatedStored).toBeDefined();
+        if (backdatedStored === undefined) throw new Error("persisted backdated producer event is absent");
+        expect(backdatedStored.ts).toBe(backdatedTs);
+        const postdatedId = fixture.appendSealedAudit("producer-postdated", postdatedTs);
+        const beforeSecond = fixture.events();
+        const postdatedStored = beforeSecond.find(event => event.id === postdatedId);
+        stages.push({ id: "postdated-appended", requestedTs: postdatedTs, row: postdatedStored === undefined ? null : {
+          id: postdatedStored.id, ts: postdatedStored.ts, sessionId: postdatedStored.session_id, eventType: postdatedStored.event_type,
+          eventHash: postdatedStored.event_hash, previousHash: postdatedStored.prev_event_hash, index: beforeSecond.indexOf(postdatedStored) } });
+        expect(postdatedStored).toBeDefined();
+        if (postdatedStored === undefined) throw new Error("persisted postdated producer event is absent");
+        expect(postdatedStored.ts).toBe(postdatedTs);
+
+        const secondResult = await checkpointLedger(tsa.workspace, fixture.trust);
+        const chain = readCheckpointChain(tsa.workspace);
+        stages.push({ id: "second-checkpoint", result: secondResult, chain, requestPaths: tsa.requests.map(request => request.path) });
+        expect(chain).toHaveLength(2);
+        const second = chain[1]!;
+        expect(tsa.requests.map(request => request.path)).toEqual(["/producer-good", "/producer-good"]);
+        const secondGrant = await tsa.verifyReply("/producer-good", second.sha256, 1);
+        recordGrant(secondGrant);
+        const secondPath = join(checkpointsDir(tsa.workspace), "2.json");
+        const secondTokenPath = join(checkpointsDir(tsa.workspace), "2.tsr");
+        const secondBytes = readFileSync(secondPath);
+        const secondToken = readFileSync(secondTokenPath);
+        const events = fixture.events();
+        const verification = fixture.verify();
+        const checkpointRows = events.filter(event => event.event_type === "time/checkpoint");
+        const backdatedIndex = events.findIndex(event => event.id === backdatedId);
+        const postdatedIndex = events.findIndex(event => event.id === postdatedId);
+        const backdated = events[backdatedIndex];
+        const postdated = events[postdatedIndex];
+        const lowerIndex = events.findIndex(event => event.id === firstRows[0]!.id);
+        const upperIndex = events.findIndex(event => event.id === checkpointRows[1]?.id);
+        const signaturesValid = checkpointSignatureValid(firstPath, first.sha256, fixture.monitorPem)
+          && checkpointSignatureValid(secondPath, second.sha256, fixture.monitorPem);
+        const upperMs = Date.parse(secondGrant.genTime);
+        const upperAccuracyMs = secondGrant.accuracyMs ?? 0;
+        const defaultLowerEdge = Math.ceil(lowerMs - lowerAccuracyMs - 5 * 60_000);
+        const defaultUpperEdge = Math.floor(upperMs + upperAccuracyMs + 5 * 60_000);
+        producer.covered = { results: [firstResult, secondResult], checkpoints: chain,
+          checkpointPins: [filePin(firstPath), filePin(secondPath)], tokenPins: [filePin(firstTokenPath), filePin(secondTokenPath)],
+          signaturesValid, firstCheckpointBytesUnchanged: readFileSync(firstPath).equals(firstBytes),
+          beforeSecondHead: { eventCount: beforeSecond.length, headEventHash: beforeSecond[beforeSecond.length - 1]!.event_hash },
+          checkpointRows: checkpointRows.map(event => ({ id: event.id, eventHash: event.event_hash, meta: JSON.parse(event.meta_json) as unknown })),
+          lowerIndex, backdatedIndex, postdatedIndex, upperIndex, bounds: { lowerMs, upperMs, lowerAccuracyMs, upperAccuracyMs, defaultLowerEdge, defaultUpperEdge },
+          ledger: { ok: verification.ok, chain: verification.chain.ok, governance: verification.governance.ok,
+            anchored: verification.trustRoot.anchored, errors: verification.errors.length } };
+        expect(secondResult).toEqual({ sequence: 2, status: "timestamped", failures: [] });
+        expect(signaturesValid).toBe(true);
+        expect(chain[0]).toEqual(first);
+        expect(second.checkpoint.previousCheckpointSha256).toBe(first.sha256);
+        expect(second.checkpoint.ledger).toEqual({ eventCount: beforeSecond.length, headEventHash: beforeSecond[beforeSecond.length - 1]!.event_hash });
+        expect(secondToken.equals(Buffer.from(secondGrant.tokenDerB64, "base64"))).toBe(true);
+        expect(checkpointRows).toHaveLength(2);
+        expect(checkpointRows.map(event => JSON.parse(event.meta_json))).toEqual([
+          { checkpointSequence: 1, checkpointSha256: first.sha256, tokenSha256: sha256(firstToken) },
+          { checkpointSequence: 2, checkpointSha256: second.sha256, tokenSha256: sha256(secondToken) }
+        ]);
+        expect(verification.ok && verification.chain.ok && verification.governance.ok && verification.trustRoot.anchored).toBe(true);
+        expect(events.slice(0, beforeSecond.length)).toEqual(beforeSecond);
+        expect(backdated !== undefined && postdated !== undefined && lowerIndex >= 0 && lowerIndex < backdatedIndex
+          && backdatedIndex < postdatedIndex && postdatedIndex < upperIndex).toBe(true);
+        if (backdated === undefined || postdated === undefined) throw new Error("covered persisted producer event is absent");
+        expect(backdated.ts).toBe(backdatedTs);
+        expect(postdated.ts).toBe(postdatedTs);
+        expect(lowerMs <= upperMs).toBe(true); // Equal-second genuine tokens are valid; do not wait or change a clock.
+        expect(backdated.ts < defaultLowerEdge).toBe(true);
+        expect(postdated.ts > defaultUpperEdge).toBe(true); // An actual failed premise stays failed; never rewrite or retry it.
+
+        const timeline = ledgerTimeline(tsa.workspace, events, { anchors: [tsa.anchor] });
+        const backdatedTime = timeline.eventTime(backdatedIndex, backdated.ts);
+        const postdatedTime = timeline.eventTime(postdatedIndex, postdated.ts);
+        producer.observations = { checkpoints: timeline.checkpoints,
+          backdated: { id: backdated.id, index: backdatedIndex, requestedTs: backdatedTs, storedTs: backdated.ts, result: backdatedTime },
+          postdated: { id: postdated.id, index: postdatedIndex, requestedTs: postdatedTs, storedTs: postdated.ts, result: postdatedTime } };
+        expect(timeline.checkpoints).toEqual([
+          { sequence: 1, status: "timestamped", genTime: firstGrant.genTime, detail: null },
+          { sequence: 2, status: "timestamped", genTime: secondGrant.genTime, detail: null }
+        ]);
+        for (const [event, result] of [[backdated, backdatedTime], [postdated, postdatedTime]] as const) {
+          expect(result.time.claimedAt).toBe(new Date(event.ts).toISOString());
+          expect(result.time.basis).toBe("attested-window");
+          expect(result.time.window).toEqual({ notBefore: firstGrant.genTime, notAfter: secondGrant.genTime });
+          expect(result.time.attested).toEqual(secondGrant);
+        }
+        expect(backdatedTime.findings).toEqual(["BACKDATED_CLAIM"]);
+        expect(postdatedTime.findings).toEqual(["POSTDATED_CLAIM"]);
+        const afterReads = fixture.events();
+        const finalVerification = fixture.verify();
+        const oldFilesUnchanged = readFileSync(firstPath).equals(firstBytes) && readFileSync(firstTokenPath).equals(firstToken)
+          && readFileSync(secondPath).equals(secondBytes) && readFileSync(secondTokenPath).equals(secondToken);
+        producer.final = { eventsUnchangedByReader: JSON.stringify(afterReads) === JSON.stringify(events), oldFilesUnchanged,
+          ledger: { ok: finalVerification.ok, chain: finalVerification.chain.ok, governance: finalVerification.governance.ok,
+            anchored: finalVerification.trustRoot.anchored, errors: finalVerification.errors.length } };
+        expect(afterReads).toEqual(events);
+        expect(oldFilesUnchanged).toBe(true);
         expect(finalVerification.ok && finalVerification.chain.ok && finalVerification.governance.ok && finalVerification.trustRoot.anchored).toBe(true);
       });
     });
