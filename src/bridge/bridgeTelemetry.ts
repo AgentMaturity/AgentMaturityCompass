@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { openLedger, hashBinaryOrPath } from "../ledger/ledger.js";
-import { redactBridgeText } from "./bridgeRedaction.js";
-import { redactJsonLeaves } from "../dataflow/detectors.js";
+import { bridgeEvidenceRedactor } from "./bridgeRedaction.js";
 
 export const bridgeTelemetryEventSchema = z.object({
   sessionId: z.string().min(1),
@@ -19,6 +18,7 @@ export function appendBridgeTelemetryEvent(params: {
   agentId: string;
   event: BridgeTelemetryEvent;
 }): { eventId: string; sessionId: string } {
+  const redact = bridgeEvidenceRedactor(params.workspace);
   const ledger = openLedger(params.workspace);
   try {
     const sessionId = params.event.sessionId;
@@ -38,7 +38,7 @@ export function appendBridgeTelemetryEvent(params: {
         sessionId,
         runtime: "any",
         eventType: params.event.eventType,
-        payload: redactBridgeText(text),
+        payload: redact.text(text),
         payloadExt: "txt",
         inline: false,
         meta: {
@@ -53,8 +53,8 @@ export function appendBridgeTelemetryEvent(params: {
     }
 
     // Object payloads too (amc wrap's agent_process_started carries the wrapped command's arguments): every key and leaf.
-    const payloadObj = typeof params.event.payload === "string" ? { message: redactBridgeText(params.event.payload) }
-      : redactJsonLeaves(params.event.payload, redactBridgeText);
+    const payloadObj = typeof params.event.payload === "string" ? { message: redact.text(params.event.payload) }
+      : redact.json(params.event.payload);
     const eventId = ledger.appendEvidence({
       sessionId,
       runtime: "any",

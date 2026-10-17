@@ -107,7 +107,8 @@ class ScanBudgetExceeded extends Error {}
  * The protected-data detectors (P2-02), as the native session uses them, over stored gateway evidence, in a workspace that
  * opted in (a processor registry or its `.sig` exists). A detected value becomes `[REDACTED]` (no key or token here, so
  * nothing is restorable). A text over the detectors' per-leaf limit is replaced whole, and once one body's scanned keys and
- * leaves pass the request-wide scan budget the whole body is: never stored unscanned.
+ * leaves pass the request-wide scan budget the whole body is: never stored unscanned. So is a JSON integer that parsing
+ * rounded (a 17-19 digit card number sent as a number), whose digits can no longer be checked.
  * ponytail: the budget is the native path's (16 MiB), so hostile text (IBAN-shaped words) can still hold the event loop
  * for about 10 s per body before the whole body is replaced; a smaller gateway budget trades that for whole-body
  * replacement of large ordinary bodies.
@@ -155,7 +156,8 @@ export function redactBody(
       const protectedReasons = new Set<string>();
       let leaves = pathResult.value;
       if (options.protectedData) {
-        try { leaves = redactJsonLeaves(pathResult.value, protectedRedactor(protectedReasons)); }
+        const opaque = () => { protectedReasons.add("protectedData:unscanned"); return "[REDACTED]"; };
+        try { leaves = redactJsonLeaves(pathResult.value, protectedRedactor(protectedReasons), opaque); }
         catch (error) { if (error instanceof ScanBudgetExceeded) return unscannedJsonBody(); throw error; }
       }
       let text = JSON.stringify(leaves);

@@ -435,7 +435,7 @@ import {
 import { createPairingCode } from "./pairing/pairingCodes.js";
 import { disableLanMode, enableLanMode, lanModePath, loadLanMode, verifyLanModeSignature } from "./pairing/lanMode.js";
 import { createBridgePairingCode } from "./bridge/bridgeAuth.js";
-import { redactBridgeSecrets } from "./bridge/bridgeRedaction.js";
+import { redactBridgeText } from "./bridge/bridgeRedaction.js";
 import { stripProviderKeys } from "./utils/providerKeys.js";
 import {
   exportTransparencyBundle,
@@ -1086,7 +1086,7 @@ async function wrapWithBridgeToken(params: {
   process.stdin.on("data", stdinHandler);
 
   child.stdout.on("data", (chunk: Buffer) => {
-    const text = redactBridgeSecrets(chunk.toString("utf8"));
+    const text = redactBridgeText(chunk.toString("utf8"));
     process.stdout.write(text);
     queueTelemetry(
       postBridgeTelemetry(base, leaseToken, {
@@ -1100,7 +1100,7 @@ async function wrapWithBridgeToken(params: {
     );
   });
   child.stderr.on("data", (chunk: Buffer) => {
-    const text = redactBridgeSecrets(chunk.toString("utf8"));
+    const text = redactBridgeText(chunk.toString("utf8"));
     process.stderr.write(text);
     queueTelemetry(
       postBridgeTelemetry(base, leaseToken, {
