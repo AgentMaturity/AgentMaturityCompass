@@ -126,6 +126,8 @@ describe("amc connect hooks CLI", () => {
       "--mode", "control",
       "--agent", "control-cli-agent",
       "--token-file", ".amc/hooks/claude-code.lease",
+      // As the installer writes it: Claude Code control answers only the hook it is installed for.
+      "--event", "PreToolUse",
     ], JSON.stringify({
       session_id: "cli-outage-session",
       transcript_path: "/private/transcript.jsonl",

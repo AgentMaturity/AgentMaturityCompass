@@ -2,7 +2,7 @@
 
 This page states what AMC claims for each Claude Code hook in control mode, how to install and deliver the hooks, and
 where the claim stops. The Claude Code contract it relies on is pinned in
-[docs/source-reviews/P1-23-claude-code-hooks.md](../source-reviews/P1-23-claude-code-hooks.md).
+`docs/source-reviews/P1-23-claude-code-hooks.md` in the repository.
 
 - Qualified Claude Code release: **2.1.296** (macOS arm64 run against AMC; Linux packages pinned, not run; Windows not verified).
 - Any other release is refused at registration, so its sessions are not governed.
