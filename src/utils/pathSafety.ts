@@ -1,4 +1,5 @@
-import { isAbsolute, relative, resolve, sep } from "node:path";
+import { lstatSync, realpathSync } from "node:fs";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { z } from "zod";
 
 /**
@@ -31,4 +32,27 @@ export function containedPath(root: string, label: string, ...parts: string[]): 
 export function isWithin(root: string, path: string): boolean {
   const rel = relative(root, path);
   return rel === "" || (!isAbsolute(rel) && rel !== ".." && !rel.startsWith(`..${sep}`));
+}
+
+/**
+ * Resolve existing prefixes only; append missing names without hiding errors or dangling links.
+ * This is a point-in-time view, not atomic protection against concurrent filesystem changes.
+ */
+export function physicalPathWithMissingSuffix(target: string): string {
+  let prefix = resolve(target);
+  const suffix: string[] = [];
+  for (;;) {
+    try {
+      lstatSync(prefix);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      const parent = dirname(prefix);
+      if (parent === prefix) throw error;
+      suffix.unshift(basename(prefix));
+      prefix = parent;
+      continue;
+    }
+    // lstat succeeds for a dangling link; realpath then throws instead of walking past it.
+    return join(realpathSync(prefix), ...suffix);
+  }
 }

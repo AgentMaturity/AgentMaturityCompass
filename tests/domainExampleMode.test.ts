@@ -2,9 +2,10 @@ import { execFile, spawnSync } from "node:child_process";
 import { createServer } from "node:http";
 import { promisify } from "node:util";
 import { createHash, generateKeyPairSync } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { assertFileNotExample, assertNotExample, EXAMPLE_BANNER } from "../src/claims/eligibility/exampleMode.js";
 import { assessDomainForAgent, buildDomainReportForAgent, getDomainGaps, getDomainRoadmap } from "../src/domains/domainCliIntegration.js";
@@ -18,7 +19,7 @@ import { openLedger } from "../src/ledger/ledger.js";
  * path that could carry a result.
  */
 
-const CLI = resolve(process.cwd(), "dist/cli.js");
+const CLI = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
 const roots: string[] = [];
 const licenseEnv: Record<string, string> = {};
 const EXAMPLE = { claimKind: "synthetic_example", banner: EXAMPLE_BANNER };
@@ -302,5 +303,102 @@ describe("signing paths refuse a synthetic_example result", () => {
     const { notarySignCli } = await import("../src/notary/notaryCli.js");
     expect(() => notarySignCli({ notaryDir: tempDir("amc-p015-notary-"), kind: "bundle", inFile, outFile: join(workspace, "x.sig") }))
       .toThrow(/synthetic_example results cannot be/);
+  });
+});
+
+// These fixed filesystem fixtures test the output boundary, not races with another writer.
+describe("example report output cannot become AMC state", () => {
+  test.each(["relative", "absolute", "normalized", "case-alias"] as const)("CLI refuses a %s .amc destination before creating state", (form) => {
+    const dir = tempDir("amc-p015-output-refusal-");
+    const state = join(dir, ".amc");
+    const before = treeHash(dir);
+    const output = form === "absolute"
+      ? join(state, "new-parent", "example.md")
+      : form === "normalized" ? "new-parent/../.amc/new-parent/example.md"
+        : form === "case-alias" ? ".AMC/new-parent/example.md" : ".amc/new-parent/example.md";
+    for (const json of [false, true]) {
+      const args = ["domain", "report", "--agent", "a", "--domain", "health", "--example", "--output", output];
+      const result = runCli(dir, json ? [...args, "--json"] : args);
+      expect(result.status, result.stderr).toBe(1);
+      expect(result.stderr).toMatch(/example/i);
+      expect(result.stderr).toContain(".amc");
+      expect(existsSync(state)).toBe(false);
+      expect(existsSync(join(dir, "new-parent"))).toBe(false);
+      expect(treeHash(dir)).toBe(before);
+    }
+  });
+
+  test("CLI refuses a directory alias into existing .amc without changing its contents", () => {
+    const dir = tempDir("amc-p015-output-alias-");
+    const state = join(dir, ".amc");
+    mkdirSync(state);
+    writeFileSync(join(state, "sentinel.txt"), "preserved state\n");
+    symlinkSync(state, join(dir, "state-alias"), "dir");
+    const before = treeHash(dir);
+    const result = runCli(dir, ["domain", "report", "--agent", "a", "--domain", "health", "--example", "--output", "state-alias/new-parent/example.md"]);
+    expect(result.status, result.stderr).toBe(1);
+    expect(result.stderr).toMatch(/example/i);
+    expect(result.stderr).toContain(".amc");
+    expect(existsSync(join(state, "new-parent"))).toBe(false);
+    expect(treeHash(dir)).toBe(before);
+  });
+
+  test("CLI refuses a sibling alias when .amc itself points to external state", () => {
+    const dir = tempDir("amc-p015-external-state-");
+    const external = tempDir("amc-p015-external-target-");
+    writeFileSync(join(external, "sentinel.txt"), "preserved external state\n");
+    symlinkSync(external, join(dir, ".amc"), "dir");
+    symlinkSync(external, join(dir, "sibling-alias"), "dir");
+    const before = treeHash(external);
+    const rootBefore = treeHash(dir);
+    const result = runCli(dir, ["domain", "report", "--agent", "a", "--domain", "health", "--example", "--json", "--output", "sibling-alias/new-parent/example.md"]);
+    expect(result.status, result.stderr).toBe(1);
+    expect(result.stderr).toMatch(/example/i);
+    expect(result.stderr).toContain(".amc");
+    expect(existsSync(join(external, "new-parent"))).toBe(false);
+    expect(treeHash(external)).toBe(before);
+    expect(treeHash(dir)).toBe(rootBefore);
+  });
+
+  test("a direct library call cannot write an example report into the supplied workspace's .amc", () => {
+    const dir = tempDir("amc-p015-library-refusal-");
+    const state = join(dir, ".amc");
+    mkdirSync(state);
+    writeFileSync(join(state, "sentinel.txt"), "preserved library state\n");
+    const before = treeHash(state);
+    expect(() => buildDomainReportForAgent({
+      agentId: "a", domain: "health", workspace: dir, example: true,
+      outputPath: join(state, "new-parent", "example.md")
+    })).toThrow(/example.*\.amc|\.amc.*example/i);
+    expect(existsSync(join(state, "new-parent"))).toBe(false);
+    expect(treeHash(state)).toBe(before);
+  });
+
+  test("an external nested .amc-lookalike output stays allowed and carries both banners", () => {
+    const dir = tempDir("amc-p015-allowed-output-");
+    const external = tempDir("amc-p015-allowed-external-");
+    const output = join(external, ".amc-lookalike", "nested", "example.md");
+    const before = treeHash(dir);
+    const result = runCli(dir, ["domain", "report", "--agent", "a", "--domain", "health", "--example", "--output", output]);
+    expect(result.status, result.stderr).toBe(0);
+    const lines = readFileSync(output, "utf8").trim().split("\n");
+    expect(lines[0]).toBe(EXAMPLE_BANNER);
+    expect(lines.at(-1)).toBe(EXAMPLE_BANNER);
+    expect(existsSync(join(dir, ".amc"))).toBe(false);
+    expect(treeHash(dir)).toBe(before);
+  });
+
+  test("ordinary not-evaluated reports still write to an explicitly requested .amc output", () => {
+    const dir = tempDir("amc-p015-real-output-");
+    const libraryPath = join(dir, ".amc", "reports", "library.md");
+    const report = buildDomainReportForAgent({ agentId: "a", domain: "health", workspace: dir, outputPath: libraryPath });
+    expect(report.assessment.status).toBe("not_evaluated");
+    expect(readFileSync(libraryPath, "utf8")).toContain("## Result: Not evaluated");
+    expect(readFileSync(libraryPath, "utf8")).not.toContain(EXAMPLE_BANNER);
+    const cliPath = join(dir, ".amc", "reports", "cli.md");
+    const result = runCli(dir, ["domain", "report", "--agent", "a", "--domain", "health", "--output", cliPath]);
+    expect(result.status, result.stderr).toBe(0);
+    expect(readFileSync(cliPath, "utf8")).toContain("## Result: Not evaluated");
+    expect(readFileSync(cliPath, "utf8")).not.toContain(EXAMPLE_BANNER);
   });
 });

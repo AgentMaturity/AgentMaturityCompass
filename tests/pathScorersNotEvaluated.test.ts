@@ -2,7 +2,8 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { Readable } from "node:stream";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { handleComplianceRoute } from "../src/api/complianceRouter.js";
@@ -99,7 +100,7 @@ describe("CLI and API report not evaluated", () => {
   test("amc score eu-ai-act, owasp-llm and regulatory-readiness --json", () => {
     const cwd = tempDir("amc-p015-cli-");
     for (const args of [["eu-ai-act"], ["owasp-llm"], ["regulatory-readiness", "--agent", "default"]]) {
-      const run = spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), "score", ...args, "--json"], {
+      const run = spawnSync(process.execPath, [fileURLToPath(new URL("../dist/cli.js", import.meta.url)), "score", ...args, "--json"], {
         cwd, env: { ...process.env, NO_COLOR: "1" }, encoding: "utf8", timeout: 60_000
       });
       expect(run.status, run.stderr).toBe(0);
@@ -172,7 +173,7 @@ describe("gaming resistance", () => {
     for (const group of ["flooding", "selectiveEvidence", "temporal", "context", "formula"]) {
       expect(report.controlInventory[group]).not.toHaveProperty("score");
     }
-    const cli = (extra: string[]) => spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), "score", "gaming-resistance", ...extra], {
+    const cli = (extra: string[]) => spawnSync(process.execPath, [fileURLToPath(new URL("../dist/cli.js", import.meta.url)), "score", "gaming-resistance", ...extra], {
       cwd: root, env: { ...process.env, NO_COLOR: "1" }, encoding: "utf8", timeout: 60_000
     });
     const text = cli([]);
