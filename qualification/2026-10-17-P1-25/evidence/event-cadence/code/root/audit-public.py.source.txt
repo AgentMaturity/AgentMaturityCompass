@@ -1,0 +1,290 @@
+"""Read only the explicitly emitted public JSON and explicitly named child streams by hash."""
+from pathlib import Path
+import json,hashlib,sys,datetime,base64,re,stat
+from decimal import Decimal,ROUND_CEILING,ROUND_FLOOR
+B=Path('/private/tmp/p1-25-cadence-qualification-20261017')
+phase,expected=sys.argv[1:]
+assert phase.startswith('p125ec-')
+out=json.loads((B/(phase+'-outcome.json')).read_text())
+assert expected in ('green','red')
+assert (out['tests']['failed']==0)==(expected=='green')
+def pin(p):
+ p=Path(p);d=p.read_bytes();return {'path':str(p),'bytes':len(d),'sha256':hashlib.sha256(d).hexdigest()}
+
+def timestamp_ms(value):
+ d=datetime.datetime.fromisoformat(value.replace('Z','+00:00'))
+ assert d.tzinfo is not None
+ delta=d.astimezone(datetime.timezone.utc)-datetime.datetime(1970,1,1,tzinfo=datetime.timezone.utc)
+ assert delta.microseconds%1000==0
+ return delta.days*86_400_000+delta.seconds*1000+delta.microseconds//1000
+
+def claimed_iso(value):
+ assert type(value) is int
+ return (datetime.datetime(1970,1,1,tzinfo=datetime.timezone.utc)+datetime.timedelta(milliseconds=value)).isoformat(timespec='milliseconds').replace('+00:00','Z')
+
+def accuracy(value):
+ if value is None:return Decimal(0)
+ assert type(value) in (int,float)
+ n=Decimal(str(value));assert n.is_finite() and n>=0
+ return n
+
+def attested_matches(value,grant):
+ assert value['genTime']==grant['genTime'] and value['accuracyMs']==grant['accuracyMs']
+ assert value['messageImprint']=={'hashAlgorithm':'sha256','digest':grant['digest']}
+ assert value['tsa']['anchorId']==grant['anchorId'] and value['tsa']['certSha256']==grant['signerCertSha256']
+ assert value['revocationChecked'] is False and grant['revocationChecked'] is False
+ assert hashlib.sha256(base64.b64decode(value['tokenDerB64'],validate=True)).hexdigest()==grant['tokenSha256']
+
+def two_bound_window(j,g):
+ w=j['twoBoundWindow'];entries=w['checkpoints'];grants=w['independentGrants']
+ assert len(entries)==len(grants)==len(w['checkpointPins'])==len(w['tokenPins'])==len(w['checkpointRows'])==2
+ assert w['results']==[{'sequence':1,'status':'timestamped','failures':[]},{'sequence':2,'status':'timestamped','failures':[]}]
+ assert w['signaturesValid'] is True and w['firstCheckpointBytesUnchanged'] is True
+ assert w['readerClaimsOnly'] is True and w['persistedRowTimestampsOrClockEdited'] is False and w['eventsUnchangedByReader'] is True
+ ledger=w['ledger'];assert all(ledger[k] is True for k in ('beforeReader','afterReader','chain','governance','anchored')) and ledger['errors']==0
+ assert g['caseId']=='CHECKPOINT-TWO-BOUND-WINDOW' and g['workspace']==j['workspace']
+ assert [r['path'] for r in g['requests']]==['/window-good','/window-good']
+ verifiers=[c for c in g['children'] if c['id']=='verify-query-bound-reply'];assert len(verifiers)==2
+ proofs=[]
+ for index,(entry,grant,request,child) in enumerate(zip(entries,grants,g['requests'],verifiers),1):
+  checkpoint=entry['checkpoint'];assert checkpoint['sequence']==index and checkpoint['type']=='amc.ledger-checkpoint' and checkpoint['version']==1
+  assert re.fullmatch('[0-9a-f]{64}',entry['sha256']) and grant['digest']==entry['sha256']
+  assert checkpoint['previousCheckpointSha256']==(None if index==1 else entries[0]['sha256'])
+  assert checkpoint['workspaceId']==entries[0]['checkpoint']['workspaceId']
+  assert re.fullmatch('[0-9a-f]{64}',checkpoint['ledger']['headEventHash']) and type(checkpoint['ledger']['eventCount']) is int and checkpoint['ledger']['eventCount']>0
+  assert entry['tokenSha256']==grant['tokenSha256']==w['tokenPins'][index-1]['sha256']
+  assert grant['anchorId']=='amc-p125-grant-test-root' and grant['revocationChecked'] is False
+  assert re.fullmatch('[0-9a-f]{64}',grant['tokenSha256']) and re.fullmatch('[0-9a-f]{64}',grant['signerCertSha256'])
+  accuracy(grant['accuracyMs']);timestamp_ms(grant['genTime'])
+  for record,suffix in ((w['checkpointPins'][index-1],'.json'),(w['tokenPins'][index-1],'.tsr')):
+   assert record['path']==record['physicalPath']==str(Path(j['workspace'])/'.amc/time/checkpoints'/(str(index)+suffix)) and record['bytes']>0
+  metadata=w['checkpointRows'][index-1]['meta']
+  assert metadata=={'checkpointSequence':index,'checkpointSha256':entry['sha256'],'tokenSha256':grant['tokenSha256']}
+  assert w['checkpointRows'][index-1]['id'] and re.fullmatch('[0-9a-f]{64}',w['checkpointRows'][index-1]['eventHash'])
+  expected_argv=[g['tool']['invoked'],'ts','-verify','-queryfile',request['queryFile'],'-in',request['responseFile'],'-CAfile',str(Path(g['retainedPrivateRoot'])/'root.pem')]
+  assert child['argv']==expected_argv and child['cwd']==g['retainedPrivateRoot']
+  query=pin(request['queryFile']);response=pin(request['responseFile'])
+  assert query['bytes']==request['queryBytes'] and query['sha256']==request['querySha256'] and response['bytes']==request['responseBytes']
+  proofs.append({'sequence':index,'verificationChildPid':child['pid'],'verificationChildArgv':child['argv'],'query':query,'response':response,'independentGrant':grant})
+ assert grants[0]['anchorId']==grants[1]['anchorId'] and grants[0]['signerCertSha256']==grants[1]['signerCertSha256']
+ first_ms,second_ms=map(lambda x:timestamp_ms(x['genTime']),grants)
+ assert first_ms<=second_ms
+ first_head=entries[0]['checkpoint']['ledger'];second_head=entries[1]['checkpoint']['ledger'];middle=w['middle']
+ assert first_head['eventCount']==j['initialLedger']['eventCount']
+ assert middle['id'] and type(middle['index']) is int and middle['index']>first_head['eventCount']
+ assert second_head['eventCount']==middle['index']+1 and second_head['headEventHash']==middle['eventHash']
+ assert len({middle['id'],*(r['id'] for r in w['checkpointRows'])})==3
+ expected_window={'notBefore':grants[0]['genTime'],'notAfter':grants[1]['genTime']}
+ actual=middle['time'];assert actual['time']['basis']=='attested-window' and actual['time']['window']==expected_window
+ assert actual['time']['claimedAt']==claimed_iso(middle['ts']) and actual['findings']==[]
+ attested_matches(actual['time']['attested'],grants[1])
+ seed=w['seedTime']['time'];assert seed['basis']=='attested-upper-bound'
+ assert seed['window']=={'notBefore':None,'notAfter':grants[0]['genTime']}
+ # Equal-second grants are both earliest upper bounds; no arbitrary token tie-break is required.
+ seed_grants=[x for x in grants if x['genTime']==seed['attested']['genTime'] and x['tokenSha256']==hashlib.sha256(base64.b64decode(seed['attested']['tokenDerB64'],validate=True)).hexdigest()]
+ assert seed_grants and timestamp_ms(seed['attested']['genTime'])==first_ms
+ attested_matches(seed['attested'],seed_grants[0])
+ last=w['lastCheckpointTime']['time'];assert last['basis']=='claimed' and last['attested'] is None and 'window' not in last
+ low_accuracy,high_accuracy=map(lambda x:accuracy(x['accuracyMs']),grants)
+ lower=int((Decimal(first_ms)-low_accuracy-300000).to_integral_value(rounding=ROUND_CEILING))
+ upper=int((Decimal(second_ms)+high_accuracy+300000).to_integral_value(rounding=ROUND_FLOOR))
+ zero_lower=int((Decimal(first_ms)-low_accuracy).to_integral_value(rounding=ROUND_CEILING))
+ zero_upper=int((Decimal(second_ms)+high_accuracy).to_integral_value(rounding=ROUND_FLOOR))
+ default=[('default-lower-inclusive',lower,[]),('default-lower-one-ms-beyond',lower-1,['BACKDATED_CLAIM']),('default-upper-inclusive',upper,[]),('default-upper-one-ms-beyond',upper+1,['POSTDATED_CLAIM'])]
+ zero=[('zero-lower-inclusive',zero_lower,[]),('zero-lower-one-ms-beyond',zero_lower-1,['BACKDATED_CLAIM']),('zero-upper-inclusive',zero_upper,[]),('zero-upper-one-ms-beyond',zero_upper+1,['POSTDATED_CLAIM']),('zero-refuses-default-lower-edge',lower,['BACKDATED_CLAIM']),('zero-refuses-default-upper-edge',upper,['POSTDATED_CLAIM'])]
+ for observations,oracle in ((w['defaultObservations'],default),(w['zeroObservations'],zero)):
+  assert len(observations)==len(oracle)
+  for row,(identity,claimed,findings) in zip(observations,oracle):
+   assert row['id']==identity and type(row['claimedTs']) is int and row['claimedTs']==claimed and row['expected']==findings
+   result=row['result'];assert result['findings']==findings and result['time']['claimedAt']==claimed_iso(claimed)
+   assert result['time']['basis']=='attested-window' and result['time']['window']==expected_window
+   assert result['time']['attested']==actual['time']['attested']
+ reply=g['replyObservation'];assert reply is not None and reply['path']=='/window-good'
+ assert reply['querySha256']==proofs[-1]['query']['sha256'] and reply['responseSha256']==proofs[-1]['response']['sha256']
+ return {'queryBoundVerificationProofs':proofs,'replyObservationScope':'Last reply only; the first proof uses its own named verification child and independent grant.','signedCheckpointHeads':[first_head,second_head],'firstHeadComparisonBoundary':'The public record lacks a separate seed event hash. Its literal comparison remains a source assertion and GREEN-cohort fact; no public recomputation is claimed.','exactWindow':expected_window,'defaultReaderRows':len(default),'zeroReaderRows':len(zero),'literalDefaultToleranceMs':300000,'equalSecondGenTimesAccepted':True,'sourceAssertionLocations':{'window':474,'defaultFindings':481,'zeroLoopHeader':486,'zeroFindings':487},'noReaderClockOrPersistedRowEdit':True}
+
+def cadence_file(row,expected,mode=None):
+ p=Path(row['path']);assert str(p)==row['physicalPath']==expected and p.resolve()==p
+ st=p.lstat();assert stat.S_ISREG(st.st_mode) and not p.is_symlink() and st.st_nlink==1
+ assert (st.st_dev,st.st_ino,st.st_nlink)==(row['dev'],row['inode'],row['nlink'])
+ if mode is not None:assert st.st_mode&0o777==mode
+ current=pin(p);assert all(current[k]==row[k] for k in ('path','bytes','sha256'))
+ return current
+
+
+def event_cadence(j,g):
+ # A failed body supplies observations only. Later assertions/proofs may not have run.
+ complete=j['bodyFailed'] is False
+ home=j.get('defaultHome');w=j.get('eventCadence')
+ result={'completeBody':complete,'cadenceAcceptance':False,'sourceAssertionLocations':{'oneAudit':582,'exactTwoAudits':597},'manualFailureAndMaskClassificationRequired':not complete,'defaultHomePresent':home is not None,'eventCadencePresent':w is not None}
+ if home is None or w is None:
+  assert not complete
+  result['partialBoundary']='Default-home setup or cadence capture did not finish; no cadence acceptance or sensitivity claim.'
+  return result
+ assert g['caseId']==j['caseId']=='CHECKPOINT-EVENT-CADENCE' and g['workspace']==j['workspace']
+ initial_ledger=j['initialLedger'];assert all(initial_ledger[k] is True for k in ('ok','chain','governance','anchored')) and initial_ledger['errors']==0
+ env=j['environment'];assert all(env[k] is True for k in ('privateHome','signingEnabled','storageOverrideAbsent','trustOverridesAbsent','loaderOverridesAbsent'))
+ expected_home=str(Path(j['privateHome'])/'.config/amc')
+ assert home['resolved']==home['expected']==expected_home and home['overridesAbsent'] is True and home['noOptionsLoaderUsed'] is True
+ assert home['mode']=='pinned' and home['signatureVerifiedListCount']==1 and home['listId']=='p125-checkpoint-fixture'
+ assert home['listEqualsOwnSignedList'] is True and home['explicitPinCount']==0 and home['allowUnpinned'] is False and home['allowUnanchored'] is False
+ assert home['rootKeyId']==j['trust']['rootKeyId'] and home['tsaAnchorIds']==['amc-p125-grant-test-root']
+ files=home['trustFiles'];assert len(files)==2
+ trust_pins=[cadence_file(row,str(Path(expected_home)/'trust'/name),0o600) for row,name in zip(files,('amc-trust-list.json','trust-roots.json'))]
+ assert trust_pins[0]['bytes']==j['trust']['signedList']['bytes'] and trust_pins[0]['sha256']==j['trust']['signedList']['sha256']
+ roots=json.loads(Path(files[1]['path']).read_text());assert roots=={'type':'amc.trust-roots','version':1,'roots':[home['rootKeyId']]}
+ result['defaultHomeAudit']={'resolved':expected_home,'publicTrustFiles':trust_pins,'rootKeyId':home['rootKeyId'],'mode0600SingleLinkPhysicalUnchanged':True,'rawTrustFilesNotSelectedForPublication':True}
+ configured=w['configured'];assert set(configured)=={'required','tsa','checkpoint'} and configured['required'] is False and configured['checkpoint']=={'everyEvents':2}
+ assert len(configured['tsa'])==1
+ tsa=configured['tsa'][0];assert tsa['name']=='checkpoint-tsa' and tsa['anchorIds']==['amc-p125-grant-test-root'] and tsa['reqPolicy']=='1.2.3.4.1'
+ assert re.fullmatch(r'http://127\.0\.0\.1:[1-9][0-9]*/cadence-good',tsa['url'])
+ assert w['loadedCheckpoint']=={'everyEvents':2,'everyMinutes':15} and w['emptyTransparencyAnchors']==[]
+ assert w['defaultArgumentsOnly'] is True and w['noClockOrRowEdit'] is True and w['elapsedMinuteOrStudioCredit'] is False
+ cadence_file(w['configPin'],str(Path(j['workspace'])/'.amc/amc.config.yaml'))
+ stages=w['stages'];grants=w['independentGrants'];ids=['initial','checkpoint-only','one-new-audit','two-new-audits','reset'];runs=[True,False,False,True,False]
+ assert len(stages)<=len(ids) and [s['id'] for s in stages]==ids[:len(stages)]
+ assert len(grants)<=2
+ if len(grants)==2:assert grants[0]['signerCertSha256']==grants[1]['signerCertSha256']
+ for stage in stages:
+  assert set(stage['result'])=={'ran','anchors'} and type(stage['result']['ran']) is bool and stage['result']['anchors']==[]
+  assert type(stage['observedAtMs']) is int and all(p=='/cadence-good' for p in stage['requestPaths'])
+  events=stage['events'];chain=stage['chain'];assert len({e['id'] for e in events})==len(events)
+  assert all(re.fullmatch('[0-9a-f]{64}',e['eventHash']) and type(e['ts']) is int for e in events)
+  assert len(chain)==len(stage['checkpointPins'])==len(stage['tokenPins'])
+  previous=None
+  for index,entry in enumerate(chain,1):
+   c=entry['checkpoint'];assert c['type']=='amc.ledger-checkpoint' and c['version']==1 and c['sequence']==index
+   assert c['previousCheckpointSha256']==previous and re.fullmatch('[0-9a-f]{64}',entry['sha256'])
+   assert c['workspaceId']==chain[0]['checkpoint']['workspaceId']
+   head=c['ledger'];assert type(head['eventCount']) is int and 0<head['eventCount']<=len(events)
+   assert events[head['eventCount']-1]['eventHash']==head['headEventHash']
+   cadence_file(stage['checkpointPins'][index-1],str(Path(j['workspace'])/'.amc/time/checkpoints'/(str(index)+'.json')))
+   token=stage['tokenPins'][index-1]
+   if token is not None:
+    cadence_file(token,str(Path(j['workspace'])/'.amc/time/checkpoints'/(str(index)+'.tsr')))
+    rows=[e for e in events if e['eventType']=='time/checkpoint' and e['meta'].get('checkpointSequence')==index]
+    assert len(rows)==1 and rows[0]['meta']=={'checkpointSequence':index,'checkpointSha256':entry['sha256'],'tokenSha256':token['sha256']}
+   previous=entry['sha256']
+ result['observedStagePrefix']=[{'id':s['id'],'result':s['result'],'matchesIntendedResult':s['result']=={'ran':runs[i],'anchors':[]},'events':len(s['events']),'checkpoints':len(s['chain']),'requests':len(s['requestPaths'])} for i,s in enumerate(stages)]
+ if stages:
+  first=stages[0];assert first['result']=={'ran':True,'anchors':[]} and len(first['chain'])==1
+  initial=j['initialLedger'];assert initial['eventCount']==1
+  assert len(first['events'])==initial['eventCount']+1 and first['events'][0]['id']==initial['seedEventId'] and first['events'][0]['eventType']=='audit'
+  assert first['chain'][0]['checkpoint']['ledger']=={'eventCount':initial['eventCount'],'headEventHash':first['events'][0]['eventHash']}
+  assert first['requestPaths']==['/cadence-good'] and first['tokenPins'][0] is not None
+  for stage in stages[1:]:
+   assert stage['chain'][0]==first['chain'][0] and stage['checkpointPins'][0]==first['checkpointPins'][0] and stage['tokenPins'][0]==first['tokenPins'][0]
+   assert stage['events'][:len(first['events'])]==first['events']
+ if len(stages)>=2:
+  assert len(grants)>=1 and 'firstLedger' in w
+  second=stages[1];assert second['result']=={'ran':False,'anchors':[]} and second['events']==first['events'] and second['chain']==first['chain'] and second['requestPaths']==first['requestPaths']
+ if 'firstLedger' in w:
+  ledger=w['firstLedger'];assert all(ledger[k] is True for k in ('ok','chain','governance','anchored')) and ledger['errors']==0
+ if len(stages)>=3:
+  before=w['oneEventBeforeTick'];assert before['afterHeadTypes']==['time/checkpoint','audit']
+  assert before['afterHeadIds']==[first['events'][-1]['id'],before['firstAuditId']]
+  prefix=stages[2]['events'][:len(first['events'])+1]
+  assert [e['id'] for e in prefix]==[e['id'] for e in first['events']]+[before['firstAuditId']] and prefix[-1]['eventType']=='audit'
+  assert stages[2]['observedAtMs']-timestamp_ms(first['chain'][0]['checkpoint']['claimedAt'])<900000
+ if len(stages)>=4:
+  one=stages[2];assert one['result']=={'ran':False,'anchors':[]} and one['chain']==first['chain'] and one['requestPaths']==first['requestPaths']
+  assert [e['id'] for e in one['events']]==[e['id'] for e in first['events']]+[w['oneEventBeforeTick']['firstAuditId']]
+  before=w['twoEventsBeforeTick'];assert before['afterHeadTypes']==['time/checkpoint','audit','audit']
+  assert before['afterHeadIds']==[first['events'][-1]['id'],w['oneEventBeforeTick']['firstAuditId'],before['secondAuditId']]
+  prefix=stages[3]['events'][:len(one['events'])+1]
+  assert [e['id'] for e in prefix]==[e['id'] for e in one['events']]+[before['secondAuditId']] and prefix[-1]['eventType']=='audit'
+  assert stages[3]['observedAtMs']-timestamp_ms(first['chain'][0]['checkpoint']['claimedAt'])<900000
+ requests=g['requests'];assert all(r['path']=='/cadence-good' for r in requests)
+ verifiers=[c for c in g['children'] if c['id']=='verify-query-bound-reply'];assert len(grants)<=len(verifiers) and len(grants)<=len(requests)
+ proofs=[]
+ for index,(grant,request,child) in enumerate(zip(grants,requests,verifiers),1):
+  assert stages
+  entry=next((s['chain'][index-1] for s in stages if len(s['chain'])>=index),None);assert entry is not None
+  assert grant['digest']==entry['sha256'] and grant['anchorId']=='amc-p125-grant-test-root' and grant['revocationChecked'] is False
+  assert re.fullmatch('[0-9a-f]{64}',grant['signerCertSha256']) and re.fullmatch('[0-9a-f]{64}',grant['tokenSha256'])
+  accuracy(grant['accuracyMs']);timestamp_ms(grant['genTime'])
+  token=next(s['tokenPins'][index-1] for s in stages if len(s['tokenPins'])>=index);assert token is not None and token['sha256']==grant['tokenSha256']
+  expected_argv=[g['tool']['invoked'],'ts','-verify','-queryfile',request['queryFile'],'-in',request['responseFile'],'-CAfile',str(Path(g['retainedPrivateRoot'])/'root.pem')]
+  assert child['argv']==expected_argv and child['cwd']==g['retainedPrivateRoot']
+  query=pin(request['queryFile']);response=pin(request['responseFile'])
+  assert query['bytes']==request['queryBytes'] and query['sha256']==request['querySha256'] and response['bytes']==request['responseBytes']
+  proofs.append({'sequence':index,'verificationChildPid':child['pid'],'verificationChildArgv':child['argv'],'query':query,'response':response,'independentGrant':grant})
+ assert len(proofs)==len(grants)
+ if len(stages)>=5:assert stages[3]['result']=={'ran':True,'anchors':[]} and len(grants)==len(verifiers)==len(requests)==2
+ if proofs:
+  reply=g['replyObservation'];assert reply['path']=='/cadence-good'
+  assert reply['querySha256']==proofs[-1]['query']['sha256'] and reply['responseSha256']==proofs[-1]['response']['sha256']
+ if complete:
+  assert len(stages)==5 and [s['result'] for s in stages]==[{'ran':ran,'anchors':[]} for ran in runs]
+  assert len(grants)==len(verifiers)==len(requests)==2 and len(proofs)==2
+  assert 'firstLedger' in w and len(stages[2]['chain'])==1
+  one=stages[2];two=stages[3];reset=stages[4]
+  assert [e['id'] for e in one['events']]==[e['id'] for e in first['events']]+[w['oneEventBeforeTick']['firstAuditId']]
+  assert one['requestPaths']==first['requestPaths'] and len(two['chain'])==2
+  assert [e['id'] for e in two['events'][:-1]]==[e['id'] for e in one['events']]+[w['twoEventsBeforeTick']['secondAuditId']]
+  assert two['chain'][1]['checkpoint']['ledger']=={'eventCount':len(two['events'])-1,'headEventHash':two['events'][-2]['eventHash']}
+  assert reset['events']==two['events'] and reset['chain']==two['chain'] and reset['checkpointPins']==two['checkpointPins'] and reset['tokenPins']==two['tokenPins']
+  assert two['requestPaths']==reset['requestPaths']==['/cadence-good','/cadence-good']
+  final=w['final'];assert final['signaturesValid'] is True and final['oldFilesUnchanged'] is True and final['configUnchanged'] is True
+  assert final['checkpointRows']==[{'id':e['id'],'eventHash':e['eventHash'],'meta':e['meta']} for e in reset['events'] if e['eventType']=='time/checkpoint']
+  assert len(final['checkpointRows'])==2
+  ledger=final['ledger'];assert all(ledger[k] is True for k in ('ok','chain','governance','anchored')) and ledger['errors']==0
+  result['cadenceAcceptance']=True
+ result.update(queryBoundVerificationProofs=proofs,replyObservationScope='Last independently verified reply only; every earlier proof uses its own query and named child.',independentGrantCount=len(grants),capturedUnverifiedRequests=len(requests)-len(grants),finalFactsPresent='final' in w,actualStages=w['stages'],actualBeforeOne=w.get('oneEventBeforeTick'),actualBeforeTwo=w.get('twoEventsBeforeTick'),actualFirstLedger=w.get('firstLedger'),actualFinal=w.get('final'),signedConfigBoundary='The public config pin and source assertion/GREEN cohort retain signature verification; this auditor does not independently verify its signature.',maskBoundary='Captured stages are observations. Only appended independent grants have passed verifyReply; absent later stages/grants/final facts are not credited. Root must read actual task errors and classify every first frame and mask.',resourceCounts='Derived by the unchanged public-record loops; no fixed child/socket/ledger-owner/test totals.',elapsedMinuteOrStudioCredit=False)
+ return result
+
+rows=[];children=streams=sockets=owners=0
+grant_records={}
+for s in out['grantPublicEvidencePaths']:
+ p=Path(s);j=json.loads(p.read_text());assert j['checkout']==out['root']
+ assert (j['workspace'],j['caseId']) not in grant_records
+ grant_records[(j['workspace'],j['caseId'])]=j
+ assert j['listenerStarted'] and j['listenerClosed'] and j['socketsClosed']
+ assert j['ownedErrors']==[] and j['cleanupErrorCount']==0
+ if expected=='green': assert j['bodyFailed'] is False
+ assert j['tool']['version']=='4.0.3' and j['tool']['sha256']=='bdeb769587e68e47dad86b42c2ea9758c5560ef6376eb69c18b85cf0c66ea36c'
+ childpins=[]
+ for c in j['children']:
+  assert c['spawned'] and c['exitSeen'] and c['closeSeen']
+  assert c['exitCode']==c['closeCode']==0 and c['exitSignal'] is None and c['closeSignal'] is None and not c['errors']
+  assert [e['event'] for e in c['events']]==['spawn','exit','close']
+  for role in ('stdout','stderr'):
+   q=pin(c[role+'Artifact']);assert q['bytes']==c[role+'Bytes'] and q['sha256']==c[role+'Sha256'];childpins.append(q);streams+=1
+  children+=1
+ for r in j['requests']:
+  assert r['ended'] and r['closed'] and r['responseFinished'] and r['responseClosed'] and r['replyEndCalled'] and not r['aborted']
+  assert r['method']=='POST' and r['queryBytes']>0 and r['contentType']=='application/timestamp-query' and r['accept']=='application/timestamp-reply'
+ reply=j['replyObservation']
+ if reply: assert reply['queryBoundOpenSslVerified'] and reply['amcVerified'] and reply['refusalCode'] is None
+ sockets+=j['socketCount']
+ rows.append({'public':pin(p),'caseId':j['caseId'],'bodyFailed':j['bodyFailed'],'childCount':len(j['children']),'requestPaths':[r['path'] for r in j['requests']],'reply':reply,'replyScope':'Last verifyReply observation only','childrenAndExplicitStreamPins':childpins,'allChildrenNatural0AndClosed':True,'socketCount':j['socketCount'],'cleanupErrors':0})
+checkpoint=[]
+for s in out['checkpointPublicEvidencePaths']:
+ p=Path(s);j=json.loads(p.read_text());assert j['checkout']==out['root']
+ window_semantics=None
+ assert j['caseId'] in ('CHECKPOINT-PENDING-GRANT','CHECKPOINT-REQUIRED-REFUSAL','CHECKPOINT-TWO-BOUND-WINDOW','CHECKPOINT-EVENT-CADENCE')
+ for k in ('noClockRowGateOrPolicyBypass','ownedGuardCloseInvoked','poolClosed','vaultLocked','immutableInputsUnchanged','nativeUnchanged','environmentRestored'): assert j[k] is True,k
+ assert j['nativeBefore']==j['nativeAfter'] and not j['cleanupErrorNames'] and j['poolBeforeClose']['active']==0
+ assert all(o['closeAttempted'] and o['closed'] for o in j['ledgerOwners']);owners+=len(j['ledgerOwners'])
+ assert j['trust']['mode']=='pinned' and j['trust']['signatureVerifiedListCount']==1 and j['trust']['tsaLoaded']
+ assert j['initialLedger']['ok'] and j['initialLedger']['errors']==0
+ if expected=='green':
+  assert not j['bodyFailed'] and j['bodyErrorName'] is None
+  if j['caseId']=='CHECKPOINT-PENDING-GRANT':
+   a,c=j['pending'],j['completed'];assert a['result']['status']=='pending' and a['signatureValid'] and a['tokenAbsent'] and a['eventCount']==1
+   assert c['result']==[{'sequence':1,'status':'timestamped','failures':[]}]
+   assert c['sequenceCount']==1 and c['checkpointBytesUnchanged'] and c['storedTokenMatchesIndependentGrant'] and len(c['checkpointRows'])==1
+   m=c['checkpointRows'][0]['meta'];assert m['checkpointSequence']==1 and m['checkpointSha256']==c['attested']['messageImprint']['digest'] and m['tokenSha256']==c['token']['sha256']
+   assert c['ledger']['ok'] and c['ledger']['errors']==0 and c['timeline'][0]['status']=='timestamped'
+   t=c['seedTime'];assert t['findings']==[] and t['time']['basis']=='attested-upper-bound' and t['time']['window']=={'notBefore':None,'notAfter':c['attested']['genTime']}
+  elif j['caseId']=='CHECKPOINT-REQUIRED-REFUSAL':
+   r=j['required'];assert r['rejected'] and r['expectedRejection'] and r['signatureValid'] and r['tokenAbsent'] and r['sequenceCount']==1 and r['eventCount']==1 and r['checkpointRowCount']==0 and r['ledger']['ok'] and r['ledger']['errors']==0 and r['timeline'][0]['status']=='pending'
+  elif j['caseId']=='CHECKPOINT-TWO-BOUND-WINDOW':
+   window_semantics=two_bound_window(j,grant_records[(j['workspace'],j['caseId'])])
+ checkpoint.append({'public':pin(p),'caseId':j['caseId'],'bodyFailed':j['bodyFailed'],'bodyErrorName':j['bodyErrorName'],'ledgerOwners':len(j['ledgerOwners']),'allCleanupEnvironmentNativeImmutableExact':True,'trust':j['trust'],'initialLedger':j['initialLedger'],'checkpointFacts':{k:j[k] for k in ('pending','completed','required','twoBoundWindow') if k in j},'windowSemanticAudit':window_semantics})
+ if j['caseId']=='CHECKPOINT-EVENT-CADENCE':
+  checkpoint[-1]['checkpointFacts'].update(defaultHome=j.get('defaultHome'),eventCadence=j.get('eventCadence'))
+  checkpoint[-1]['eventCadenceSemanticAudit']=event_cadence(j,grant_records[(j['workspace'],j['caseId'])])
+facts={'schema':'p125ec-explicit-public-record-audit/1','at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'phase':phase,'sourceRoot':out['root'],'expectedPhaseState':expected,'outcome':pin(B/(phase+'-outcome.json')),'grantPublicCount':len(rows),'checkpointPublicCount':len(checkpoint),'children':children,'explicitChildStreamHashCount':streams,'closedSockets':sockets,'closedLedgerOwners':owners,'grantRows':rows,'checkpointRows':checkpoint,'noSigningRootTraversalOrKeyRead':True,'noStreamPublication':True,'boundedObservationNotUniversalIsolation':True}
+with (B/(phase+'-public-audit.json')).open('x') as f:json.dump(facts,f,indent=2);f.write('\n')
+print(json.dumps({k:facts[k] for k in ('phase','grantPublicCount','checkpointPublicCount','children','explicitChildStreamHashCount','closedSockets','closedLedgerOwners')}))

@@ -1,0 +1,1005 @@
+{
+  "schema": "p125ec-independent-actual-public-output-input-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-allowlist.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-allowlist.json",
+      "bytes": 214801,
+      "sha256": "821bdc341a6e7c953c25b114e777ed10fc26cfb81612a65186bd63950991afe7",
+      "dev": 16777231,
+      "inode": 543909539,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/phase-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/phase-inputs.json",
+      "bytes": 4132,
+      "sha256": "d59c4d21c40a79ca1234bfb143b64e8eff30b21d92105b1ae6dd51e80ef1b428",
+      "dev": 16777231,
+      "inode": 543909090,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/root-runtime-review.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/root-runtime-review.json",
+      "bytes": 6566,
+      "sha256": "94d03fc652ff9b8d791ec59e0f42836e2754382967b2c28081c1cab4fa4c6919",
+      "dev": 16777231,
+      "inode": 543906182,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Mv3R7o/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Mv3R7o/public-evidence.json",
+      "bytes": 12987,
+      "sha256": "a735c27006448b4c0b34f5cde44b54e9e3e9f7adbdd0cb7236a500b966a24aaf",
+      "dev": 16777231,
+      "inode": 543829773,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-source-combined-FIRST-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-source-combined-FIRST-GRANT.json",
+      "bytes": 3268,
+      "sha256": "5b6bba18aa5035adbd86ea1d154d88754bf7af4ba7709e10a164bbfd8ea8fded",
+      "dev": 16777231,
+      "inode": 543909503,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-aI5oa9/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-aI5oa9/public-evidence.json",
+      "bytes": 13548,
+      "sha256": "e616e9d446bf57ce12b42b43152019debc162b6e856fc0fa0759a00d618da732",
+      "dev": 16777231,
+      "inode": 543829810,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-source-combined-HTTP500-THEN-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-source-combined-HTTP500-THEN-GRANT.json",
+      "bytes": 3275,
+      "sha256": "6f0822c44c52e6f6b3a6570de1b274f0bf39a6975a1727c4f82a6f874aa47366",
+      "dev": 16777231,
+      "inode": 543909504,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tKh7Bm/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tKh7Bm/public-evidence.json",
+      "bytes": 12904,
+      "sha256": "7d71aceac603da9e4a58e0ce8fa0b7c1803cee0f48882223d2e2ae9ce5e10e2e",
+      "dev": 16777231,
+      "inode": 543830314,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-source-combined-CHECKPOINT-PENDING-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-source-combined-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3281,
+      "sha256": "767f552d37b028e9505d8a302538fbed98bf1b572a8a5d146299a5dbb4e11f17",
+      "dev": 16777231,
+      "inode": 543909505,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hSO0wk/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hSO0wk/public-evidence.json",
+      "bytes": 8237,
+      "sha256": "84ed34c3fa2bf7ca3493d634f9c8ffcc031c1b2a43255cfffd3805085cd18cb5",
+      "dev": 16777231,
+      "inode": 543830469,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-source-combined-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-source-combined-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3284,
+      "sha256": "8e7a5f120b004c1bca068816d3e4199f861f2c3fa921a73bfab970928d392825",
+      "dev": 16777231,
+      "inode": 543909506,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Yht157/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Yht157/public-evidence.json",
+      "bytes": 16752,
+      "sha256": "bde9081800f973a09957cd2dee00af5946509c7de8f97bee89bbe211f7b3fac5",
+      "dev": 16777231,
+      "inode": 543830644,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-source-combined-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-source-combined-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3284,
+      "sha256": "b3729e5b2bd3ed06bde1f8f20de0cdbcc62951e6cde01df81201b10f1d654498",
+      "dev": 16777231,
+      "inode": 543909507,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-0YH87m/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-0YH87m/public-evidence.json",
+      "bytes": 16749,
+      "sha256": "1c00fc009d10c5ed4af9fdb582cd29fe92279e86583e1c5ee6c7df01a89292f8",
+      "dev": 16777231,
+      "inode": 543830823,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-source-combined-CHECKPOINT-EVENT-CADENCE.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-source-combined-CHECKPOINT-EVENT-CADENCE.json",
+      "bytes": 3281,
+      "sha256": "bb1a93380498e3430b8588fc6d74ae9b1f7bdc75a8ace1462c10efa26641f362",
+      "dev": 16777231,
+      "inode": 543909508,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-bkVwTg/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-bkVwTg/checkpoint-public-evidence.json",
+      "bytes": 10847,
+      "sha256": "8c763b116ce1d21ca4a49499055ad9fc6ed598ce649adb4e27f5c1b26aaf57fb",
+      "dev": 16777231,
+      "inode": 543830312,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-CAOnjo/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-CAOnjo/checkpoint-public-evidence.json",
+      "bytes": 5098,
+      "sha256": "a578225bd271521bc096198942f5883fe2c3c279a8f1692369735ec3a7f9a014",
+      "dev": 16777231,
+      "inode": 543830467,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-n1Tgv4/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-n1Tgv4/checkpoint-public-evidence.json",
+      "bytes": 62146,
+      "sha256": "f3ff0e047d9932bf03184a189d4407bc95f7410f0499a14a9b1b814bf1d4e0bb",
+      "dev": 16777231,
+      "inode": 543830642,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-1RjJ0O/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-1RjJ0O/checkpoint-public-evidence.json",
+      "bytes": 32576,
+      "sha256": "c2c530a35a4e16912f562e509b5781ccfef763827915e56a478730bce8e99fb3",
+      "dev": 16777231,
+      "inode": 543830821,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/public-evidence.json",
+      "bytes": 12998,
+      "sha256": "13f1e7a3b4cadba7703f92b722beb3a1912e1dda4e5cbdcafef8950c421a52a0",
+      "dev": 16777231,
+      "inode": 543899013,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-fresh-canonical-FIRST-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-fresh-canonical-FIRST-GRANT.json",
+      "bytes": 3268,
+      "sha256": "dd9b873e739fe5d2edfc74eab28fab048dbc5978a0166c3d6b96adcb8f8caabb",
+      "dev": 16777231,
+      "inode": 543909509,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/public-evidence.json",
+      "bytes": 13548,
+      "sha256": "8558b43dfb38b00c567891178333881cd006cfb7f2dcd9688c13972d7a9eacbb",
+      "dev": 16777231,
+      "inode": 543899049,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-fresh-canonical-HTTP500-THEN-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-fresh-canonical-HTTP500-THEN-GRANT.json",
+      "bytes": 3275,
+      "sha256": "0edc01b32e3a0d7d231967811fc855551e0e704bc1849a77bf2ef4722e879ac2",
+      "dev": 16777231,
+      "inode": 543909510,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/public-evidence.json",
+      "bytes": 12920,
+      "sha256": "f4284a10eb785394bcbe996692f067250dfec3ff08b927d88b8e85a008c3984b",
+      "dev": 16777231,
+      "inode": 543899554,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-fresh-canonical-CHECKPOINT-PENDING-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-fresh-canonical-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3281,
+      "sha256": "3df661b31e6b8818b36acfdc7e5a9b7a3e2928ed3abc5d923ad042118a46fd0e",
+      "dev": 16777231,
+      "inode": 543909511,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/public-evidence.json",
+      "bytes": 8250,
+      "sha256": "35f197ee17159ca534af1f64ed7312671117582779e5ddb27ca3a8b8172e01b5",
+      "dev": 16777231,
+      "inode": 543899709,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-fresh-canonical-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-fresh-canonical-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3284,
+      "sha256": "62934de3b9b7b364822dff5aede992e028afdfd54eb9a6da4b752ed1b6ce79dc",
+      "dev": 16777231,
+      "inode": 543909512,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/public-evidence.json",
+      "bytes": 16765,
+      "sha256": "d68f64f04bbf90abc8697a92f38225153fb5e848c64ae45220a453bc9a9ff751",
+      "dev": 16777231,
+      "inode": 543899883,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-fresh-canonical-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-fresh-canonical-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3284,
+      "sha256": "9ea0ee84345706c600f39fe0ea9c09400c81feb28ef36b1bdc7b004a5a33a736",
+      "dev": 16777231,
+      "inode": 543909513,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/public-evidence.json",
+      "bytes": 16772,
+      "sha256": "50212df61f6e6c411515d62de4a694e3e07fbc11337417c2b931d3d323093ea7",
+      "dev": 16777231,
+      "inode": 543900063,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-fresh-canonical-CHECKPOINT-EVENT-CADENCE.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-fresh-canonical-CHECKPOINT-EVENT-CADENCE.json",
+      "bytes": 3281,
+      "sha256": "f582eb727b5597615dc54169649642c8d7e9c700a5988b39ac6dcb79d5608ea7",
+      "dev": 16777231,
+      "inode": 543909514,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-iuKLjW/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-iuKLjW/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "f37e9b307182a1c742d18ac3e15d9bff84a1ac237319be0b6858c85f8e253c52",
+      "dev": 16777231,
+      "inode": 543899552,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-6E5dib/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-6E5dib/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "307d6491a2f8378c626b3417565322705a3cba7a301a5a76f34a03298c4d7928",
+      "dev": 16777231,
+      "inode": 543899707,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Jbm5q3/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Jbm5q3/checkpoint-public-evidence.json",
+      "bytes": 62226,
+      "sha256": "033c56176cca3db89bd720d6997eece73a74960f3338bdd614da0e05008ba62e",
+      "dev": 16777231,
+      "inode": 543899881,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/checkpoint-public-evidence.json",
+      "bytes": 32656,
+      "sha256": "8dff6a6a552b7612d02e0f0164e963371137946ded69d12a4403af0c09e4f4b2",
+      "dev": 16777231,
+      "inode": 543900061,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Bnub0/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Bnub0/public-evidence.json",
+      "bytes": 12997,
+      "sha256": "b428e1910c64ccd1ded0a5a327d29766a1b9451f076399bc1853fdb9d26c666e",
+      "dev": 16777231,
+      "inode": 543900662,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m1-FIRST-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m1-FIRST-GRANT.json",
+      "bytes": 3255,
+      "sha256": "07eccc57960547b5f088c0128385d0708430faa1f6b4b0555a69d44709eb0683",
+      "dev": 16777231,
+      "inode": 543909515,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8LMvDk/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8LMvDk/public-evidence.json",
+      "bytes": 13565,
+      "sha256": "77cf869c25568b0c37f3ea44a39910d987f27d071f3b9a44ca23c9e2c3409cf9",
+      "dev": 16777231,
+      "inode": 543900708,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m1-HTTP500-THEN-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m1-HTTP500-THEN-GRANT.json",
+      "bytes": 3262,
+      "sha256": "9d21719324aca15e04ec583e538fd4f7c8700e0e0fc28388aa8b7eef82dff176",
+      "dev": 16777231,
+      "inode": 543909516,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VvnCDa/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VvnCDa/public-evidence.json",
+      "bytes": 12921,
+      "sha256": "9f340bf96e01f082eb3e8cfe850a17bcbf3308ad3c2c34c651065cfbbb6f87f3",
+      "dev": 16777231,
+      "inode": 543901212,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m1-CHECKPOINT-PENDING-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m1-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3268,
+      "sha256": "f3cb95396423d178bd4eac49552b9ab70da207e5879de3fc857e9ba943fc8a65",
+      "dev": 16777231,
+      "inode": 543909517,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-w31FbS/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-w31FbS/public-evidence.json",
+      "bytes": 8253,
+      "sha256": "7805ad8abbe176bde74456c7a848369a142f796f35559d48c107b051dba66e96",
+      "dev": 16777231,
+      "inode": 543901367,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m1-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m1-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3271,
+      "sha256": "1b6d04a7e9d2966556e467f47a42098a0f624b0d67e11f193c1c79885bc4be1b",
+      "dev": 16777231,
+      "inode": 543909518,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ZGpbs3/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ZGpbs3/public-evidence.json",
+      "bytes": 16767,
+      "sha256": "758bc960f58d3c8598b420d9c08846b899115ebb6528adf961547d3a3776dbfe",
+      "dev": 16777231,
+      "inode": 543901541,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m1-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m1-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3271,
+      "sha256": "0b8434071f40a2d8be28f51232472f89c3a2266f8dd62ea59ae9783b15a5aaf5",
+      "dev": 16777231,
+      "inode": 543909519,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-OAwdRD/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-OAwdRD/public-evidence.json",
+      "bytes": 14911,
+      "sha256": "e0efb4978926f5265dd840426fc1ab537bb24127633a01108941809c180a3a6d",
+      "dev": 16777231,
+      "inode": 543901719,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m1-CHECKPOINT-EVENT-CADENCE.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m1-CHECKPOINT-EVENT-CADENCE.json",
+      "bytes": 3268,
+      "sha256": "6321a6458703ba616a2e1597dc7576568586af6e3c4b44478f141bf9a0e79b88",
+      "dev": 16777231,
+      "inode": 543909520,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-ccKzto/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-ccKzto/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "8884df035bf770df3367422f9e48e721d9e0f9018192e3efde3995c3f689991f",
+      "dev": 16777231,
+      "inode": 543901210,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-85aEx6/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-85aEx6/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "853cc31f7e048eb7fe8c56b73d6ee07efa74401b4770f9b314967767af6960c8",
+      "dev": 16777231,
+      "inode": 543901365,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Dtw2Tv/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Dtw2Tv/checkpoint-public-evidence.json",
+      "bytes": 62226,
+      "sha256": "6f1a8b6a8a1ddd1b49b1635d50d3b362625d420919774b3e41b3feaf498affdb",
+      "dev": 16777231,
+      "inode": 543901539,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-KVix9n/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-KVix9n/checkpoint-public-evidence.json",
+      "bytes": 20260,
+      "sha256": "6cb8514eca534c8f16ab8539bf105015c62fae5f55e952deb9d36f3c0ebd5469",
+      "dev": 16777231,
+      "inode": 543901717,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-EjHBVt/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-EjHBVt/public-evidence.json",
+      "bytes": 13001,
+      "sha256": "d6e2bde7adfe04722ec7f27f598d2d68735c7993835285bb7a2bb851fd695947",
+      "dev": 16777231,
+      "inode": 543902155,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore1-FIRST-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore1-FIRST-GRANT.json",
+      "bytes": 3261,
+      "sha256": "d29bb8b132604da740b14ef291c2cd7a88113eba180a97be97e34c5d5307723e",
+      "dev": 16777231,
+      "inode": 543909521,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hJNhIW/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hJNhIW/public-evidence.json",
+      "bytes": 13563,
+      "sha256": "7cff594dbc87a8f6e79955228391ed1b7f54233a64cefeeb8a541eb71be6ac9d",
+      "dev": 16777231,
+      "inode": 543902192,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore1-HTTP500-THEN-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore1-HTTP500-THEN-GRANT.json",
+      "bytes": 3268,
+      "sha256": "744ab7e85358e347efeeee43aaa6865df711a496113ebdd95ac1e8cb6ec7b7cd",
+      "dev": 16777231,
+      "inode": 543909522,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-0jNUQb/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-0jNUQb/public-evidence.json",
+      "bytes": 12921,
+      "sha256": "c1ae14dd0d877cf80462305e67522ebe970599dae09ffbcf88dda5c01d1d9b2a",
+      "dev": 16777231,
+      "inode": 543902696,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore1-CHECKPOINT-PENDING-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore1-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3274,
+      "sha256": "27a934116ee442edc6c4c69dcd9e95c8ef4dcf8cb92ca089c0efef942fcb6766",
+      "dev": 16777231,
+      "inode": 543909523,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ZmQroR/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ZmQroR/public-evidence.json",
+      "bytes": 8257,
+      "sha256": "c80d0f9d11b7b8d7d41f39e15b2bcf4cb3145a4d07739ab6864a05d5273468a2",
+      "dev": 16777231,
+      "inode": 543902854,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore1-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore1-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3277,
+      "sha256": "4fe430e48ed239b030b463e2928d995e4e2a1110c42573cfe099436a4d456e97",
+      "dev": 16777231,
+      "inode": 543909524,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hIUILI/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hIUILI/public-evidence.json",
+      "bytes": 16763,
+      "sha256": "899229a3a44cee733555dbb4e61037cf3ba750b9b2fd5ed442790c509ecb0122",
+      "dev": 16777231,
+      "inode": 543903028,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore1-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore1-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3277,
+      "sha256": "6483c911652b74a5c2baf554e1e8d755f74263fdcb972354964831a80d40d6ae",
+      "dev": 16777231,
+      "inode": 543909525,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-omqcUs/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-omqcUs/public-evidence.json",
+      "bytes": 16766,
+      "sha256": "b0e8fdc82f324d3f2774d3ab69cf968db849e9c2c9b578de3b62f9516426d4da",
+      "dev": 16777231,
+      "inode": 543903209,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore1-CHECKPOINT-EVENT-CADENCE.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore1-CHECKPOINT-EVENT-CADENCE.json",
+      "bytes": 3274,
+      "sha256": "e871cc1a2d0d7a1989ac92ae8965e51870d61f89a0e60df6b244b7f161211b99",
+      "dev": 16777231,
+      "inode": 543909526,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-4BWqwO/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-4BWqwO/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "db4a91668551863455eb086ee89f0d9dcc9e055b44a00938c6d0ce3e46b1b943",
+      "dev": 16777231,
+      "inode": 543902694,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-ifXyZA/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-ifXyZA/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "c3be9927060e42b91b1e7c769f2a5ddb56f8383c5287016eab80017e0e67a223",
+      "dev": 16777231,
+      "inode": 543902852,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-HGq4Ju/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-HGq4Ju/checkpoint-public-evidence.json",
+      "bytes": 62226,
+      "sha256": "9798ec9629a1ee798a81abb3d9a1eaa585c96fe141e6b983747cdec170878d64",
+      "dev": 16777231,
+      "inode": 543903026,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-JCTbSD/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-JCTbSD/checkpoint-public-evidence.json",
+      "bytes": 32656,
+      "sha256": "3403e3a944933ea6b718004be0986da50e811b0e57a51552b5b933c01de54ec0",
+      "dev": 16777231,
+      "inode": 543903207,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-UR5xmo/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-UR5xmo/public-evidence.json",
+      "bytes": 12999,
+      "sha256": "bcfa3e4260c890b181a61d6d1b21819541c69b50a8dc55837b8fccf9553af40a",
+      "dev": 16777231,
+      "inode": 543903617,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m2-FIRST-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m2-FIRST-GRANT.json",
+      "bytes": 3255,
+      "sha256": "b4796d43e1a5b5f01396ac23878320cb3d0cb877ec3beffa5677faab90cf28c1",
+      "dev": 16777231,
+      "inode": 543909527,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-xra6SK/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-xra6SK/public-evidence.json",
+      "bytes": 13561,
+      "sha256": "44a7a0d8fd0222f42879f8290191796892e8222fd5133eae480af1568600017d",
+      "dev": 16777231,
+      "inode": 543903654,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m2-HTTP500-THEN-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m2-HTTP500-THEN-GRANT.json",
+      "bytes": 3262,
+      "sha256": "b35d09d0828cd80cc52955d985efa364bfd5010a8e63acd110855b1e3ff43c2f",
+      "dev": 16777231,
+      "inode": 543909528,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-cImoup/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-cImoup/public-evidence.json",
+      "bytes": 12919,
+      "sha256": "8d7e3ae6fe4642d8f78286ae98f91bca0aadc2bc5611a52f95e4819946672a06",
+      "dev": 16777231,
+      "inode": 543904158,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m2-CHECKPOINT-PENDING-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m2-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3268,
+      "sha256": "3a4a265b9e9c59ad5b71c22c3900c0c1bb782c85106f0b289d6095bfa74d0720",
+      "dev": 16777231,
+      "inode": 543909529,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Oal9Jt/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Oal9Jt/public-evidence.json",
+      "bytes": 8252,
+      "sha256": "dae3ab4022d0f143ff5ecfa74b7ebbf4c32fc8a88e8c11e011c03c9b6b0cf4a9",
+      "dev": 16777231,
+      "inode": 543904313,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m2-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m2-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3271,
+      "sha256": "2efb33da0afd0afd3c72416afb1ab95dc9d70fdd50a5d58cadf043fb1a35ea38",
+      "dev": 16777231,
+      "inode": 543909530,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4sk6rX/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4sk6rX/public-evidence.json",
+      "bytes": 16753,
+      "sha256": "bf5e0ed33fc790bcab972a783647cab923f43dad1e8691f2bf9181762f56699a",
+      "dev": 16777231,
+      "inode": 543904487,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m2-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m2-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3271,
+      "sha256": "ad6cd4db45fc89b2a067e74ef21d5e5cc217a90d5b09780eb1b88733d0ed7889",
+      "dev": 16777231,
+      "inode": 543909531,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Tc4mEN/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Tc4mEN/public-evidence.json",
+      "bytes": 12393,
+      "sha256": "8a73b4d11d390dd99492cfa73be87cd17c6ffc479fe548777bf17cb5f3387e16",
+      "dev": 16777231,
+      "inode": 543904657,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m2-CHECKPOINT-EVENT-CADENCE.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-m2-CHECKPOINT-EVENT-CADENCE.json",
+      "bytes": 3268,
+      "sha256": "010ded313d86884e90a13d48d28da3277139f3f3f3ad8eda4fe2d637a9caacd9",
+      "dev": 16777231,
+      "inode": 543909532,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-ifTPB1/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-ifTPB1/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "3e44ac35de21985551adbb95ca4783d1843fd9602827237a831e7f3bc3aa7fc2",
+      "dev": 16777231,
+      "inode": 543904156,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-k21bLv/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-k21bLv/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "f2d269291b43ca1ae2b45572c378e38063c2cf8a816d8cb0d1e121117bfa32e1",
+      "dev": 16777231,
+      "inode": 543904311,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-JtEMwa/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-JtEMwa/checkpoint-public-evidence.json",
+      "bytes": 62226,
+      "sha256": "10d857dd5b3a617ca70f16b4bfa5de640a2c39bbbd63fbec4b9f45a752d4fe82",
+      "dev": 16777231,
+      "inode": 543904485,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-w6KOUP/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-w6KOUP/checkpoint-public-evidence.json",
+      "bytes": 22277,
+      "sha256": "06342a9f4bdf027cb3f7c6d02f68333a31a8db37ac992ea13fa9e24ed42570b8",
+      "dev": 16777231,
+      "inode": 543904655,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-uHw9kV/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-uHw9kV/public-evidence.json",
+      "bytes": 12998,
+      "sha256": "c8b574656dc9c4595ea2bbe59ced96b5cb718256e6b07a7bc25ef895ea339b01",
+      "dev": 16777231,
+      "inode": 543905082,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore2-FIRST-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore2-FIRST-GRANT.json",
+      "bytes": 3261,
+      "sha256": "9658aee516a1faf529567dc47a1ac59b8fa69c8feccb1880c836c475c7562f30",
+      "dev": 16777231,
+      "inode": 543909533,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-0dA8Vx/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-0dA8Vx/public-evidence.json",
+      "bytes": 13562,
+      "sha256": "ac1cf68f454fd355eb905f376199f27ea19f64e515afd9c6e5bd130e857d4b80",
+      "dev": 16777231,
+      "inode": 543905119,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore2-HTTP500-THEN-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore2-HTTP500-THEN-GRANT.json",
+      "bytes": 3268,
+      "sha256": "8abb33501b6a11c628e8531cfc652cf86eaf9003d59ad61254776928927b3b57",
+      "dev": 16777231,
+      "inode": 543909534,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-n2ay64/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-n2ay64/public-evidence.json",
+      "bytes": 12923,
+      "sha256": "24b18e0a9d1297573c0ba7b19a1ee889de07fab492eb41585baebb5becc7039d",
+      "dev": 16777231,
+      "inode": 543905624,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore2-CHECKPOINT-PENDING-GRANT.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore2-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3274,
+      "sha256": "08edde9122f191fccdd14f231bb16abd877f25e73a0112d769bf80e69a5ac1f5",
+      "dev": 16777231,
+      "inode": 543909535,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ruaM6t/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ruaM6t/public-evidence.json",
+      "bytes": 8252,
+      "sha256": "ac8e0a353783be8ec4ccb0609a05fb228f5a4ff15f8fd195f08691c3470dee57",
+      "dev": 16777231,
+      "inode": 543905779,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore2-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore2-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3277,
+      "sha256": "52e8a23d0baf541588d2ee2d3df36dee67c85f0fc14bbaf36970a93a102662b2",
+      "dev": 16777231,
+      "inode": 543909536,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-wRPVX5/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-wRPVX5/public-evidence.json",
+      "bytes": 16766,
+      "sha256": "f34542cd05b5769130918f18b5c5ae0e71be113d393d3ff7a7e97b592b174dba",
+      "dev": 16777231,
+      "inode": 543905953,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore2-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore2-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3277,
+      "sha256": "7b3142dce553a7a2a9805fd3bb3a615bb2d83e05aa03fd09bc12385ed614dfde",
+      "dev": 16777231,
+      "inode": 543909537,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-toLtcZ/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-toLtcZ/public-evidence.json",
+      "bytes": 16760,
+      "sha256": "2d20df29743054a353d523f04c9357de2822061b1d37a3c61595a3b4ad945647",
+      "dev": 16777231,
+      "inode": 543906132,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore2-CHECKPOINT-EVENT-CADENCE.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-certificate-bundles/p125ec-restore2-CHECKPOINT-EVENT-CADENCE.json",
+      "bytes": 3274,
+      "sha256": "1918dba708de9e5ef0c8704ef6bbf3691ad9be35ca4542bf47497e41cbe99eb0",
+      "dev": 16777231,
+      "inode": 543909538,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-YEJwZP/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-YEJwZP/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "7b0675347aaa9879dcc3682ab47e6c270355fe69cb2644ce38450c900a96634f",
+      "dev": 16777231,
+      "inode": 543905622,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-OIjSnu/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-OIjSnu/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "ec9909f0d7e4e5ef2aad13891f85b5cb759d486e0b6c39ab4ad2a1dfaaa2e7d7",
+      "dev": 16777231,
+      "inode": 543905777,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-rmwAB5/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-rmwAB5/checkpoint-public-evidence.json",
+      "bytes": 62226,
+      "sha256": "422043f53ffc3bafbb8ac564382ee6e1f61b99ee3043efacf01fb48f62a048ca",
+      "dev": 16777231,
+      "inode": 543905951,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-6OfcsE/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-6OfcsE/checkpoint-public-evidence.json",
+      "bytes": 32656,
+      "sha256": "6cf418e22bb36d5ebe028879bcf994bd2841effbfafbd9d6d0b969f08f35c3cf",
+      "dev": 16777231,
+      "inode": 543906130,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-source-combined-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-source-combined-outcome.json",
+      "bytes": 7255,
+      "sha256": "2847c63bd72828703121ab2446666e27e68083daab7940bb3dbbf75c3df3b530",
+      "dev": 16777231,
+      "inode": 543835862,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-source-combined-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-source-combined-public-audit.json",
+      "bytes": 172418,
+      "sha256": "bca42c746df72564357ec3adae673a3935b7fa1442f3c16641dd4e7976b4adc9",
+      "dev": 16777231,
+      "inode": 543835870,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-fresh-canonical-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-fresh-canonical-outcome.json",
+      "bytes": 7287,
+      "sha256": "5918838b7ce27c61d646e41382f2e9c5d543a1e914cd42bf6fddb4179e6a8cef",
+      "dev": 16777231,
+      "inode": 543900103,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-fresh-canonical-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-fresh-canonical-public-audit.json",
+      "bytes": 172436,
+      "sha256": "9f65d1fff003e26b6e683054912e8ec46515eaf654c3792a22d817502eaec3b2",
+      "dev": 16777231,
+      "inode": 543900112,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-m1-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-m1-outcome.json",
+      "bytes": 10830,
+      "sha256": "05591fd30f6df13644c6e19d4f26658146c9c22992353bbddd444431ad54cb96",
+      "dev": 16777231,
+      "inode": 543901748,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-m1-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-m1-public-audit.json",
+      "bytes": 138322,
+      "sha256": "0876c695fe7e757bfcd5d2247d2d57f1c7381fa8e0011058901cbd612238c998",
+      "dev": 16777231,
+      "inode": 543901756,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-restore1-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-restore1-outcome.json",
+      "bytes": 7273,
+      "sha256": "c26baa683c91b668c3ba362ca10afd34658941440dc0b63e86614934d87c13fa",
+      "dev": 16777231,
+      "inode": 543903234,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-restore1-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-restore1-public-audit.json",
+      "bytes": 172421,
+      "sha256": "fe0de03edd25b4970b137f3903a691ae6ebb30d69d7db87224da31efaab1d859",
+      "dev": 16777231,
+      "inode": 543903242,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-m2-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-m2-outcome.json",
+      "bytes": 10754,
+      "sha256": "94130c6533cef3be6155a5565671163f4f7adc9fecae83cdf94e90691886894a",
+      "dev": 16777231,
+      "inode": 543904689,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-m2-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-m2-public-audit.json",
+      "bytes": 142136,
+      "sha256": "a75b1efa30692cfc3a04c087bddf13d0e0c5da8567dd37a888e187a6713a59cd",
+      "dev": 16777231,
+      "inode": 543904697,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-restore2-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-restore2-outcome.json",
+      "bytes": 7273,
+      "sha256": "afd28e893705a21c37a4a9a87b943b7a8d49dede43126cb57a9865beded4842d",
+      "dev": 16777231,
+      "inode": 543906165,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-restore2-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-restore2-public-audit.json",
+      "bytes": 172420,
+      "sha256": "1696bd21c89a0e4c023b46c5337c523366f27a54972425e011c063d26cb89c21",
+      "dev": 16777231,
+      "inode": 543906173,
+      "nlink": 1
+    }
+  ],
+  "noPemQueryResponseKeyOrChildStreamReads": true
+}

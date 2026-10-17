@@ -1,0 +1,13 @@
+{
+  "schema": "p125ec-preservation-after-controls/1",
+  "at": "2026-10-17T01:11:02.295671+00:00",
+  "sourceCommit": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout",
+  "all161BytesAndPhysicalPinsExact": true,
+  "elevenOldAndDistinctTwelfthNativeExact": true,
+  "all98SourceFreshPhysicalPairsAnd21CompiledPairsExact": true,
+  "bothSourceFreshCleanIndexesEmpty": true,
+  "heldRHead18RowsIndexExact": true,
+  "noMutationOfOriginalSourceProductionOrCompiledOrNative": true
+}

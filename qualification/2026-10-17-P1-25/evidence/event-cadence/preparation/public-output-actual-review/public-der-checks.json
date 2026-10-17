@@ -1,0 +1,871 @@
+{
+  "schema": "p125ec-actual-public-der-record-checks/1",
+  "records": [
+    {
+      "phase": "p125ec-source-combined",
+      "caseId": "FIRST-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "5db2bf3ac8982db5f23caab46e9b56b71f3ab9f4d2583de567fd9b345be2ae18",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Mv3R7o/root.pem",
+        "bytes": 1119,
+        "sha256": "5134af32b6b479214be064da85e7d9cb98be211e97492392addf9ef540bdffe0"
+      }
+    },
+    {
+      "phase": "p125ec-source-combined",
+      "caseId": "FIRST-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "e7855c2a0f0ab9c3ef02fd77e4297260f2c907833ead033356e67f5c98e4efd8",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Mv3R7o/tsa.pem",
+        "bytes": 1192,
+        "sha256": "841f5e4ee96b13a87a1826b487355b1a47f0ae348424ca3550722acc41f91232"
+      }
+    },
+    {
+      "phase": "p125ec-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "433ecb19abcb01482043ddca278e7369cc70ac5ed0dab745fc2ce894d59a84af",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-aI5oa9/root.pem",
+        "bytes": 1119,
+        "sha256": "d8861d87db0de1fe0ad2818855735bc6993dcd9421fe887e76d84d59f6ba4162"
+      }
+    },
+    {
+      "phase": "p125ec-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "e24ef922d4e441790e12153ceaae3d5a715b5f058e19b7f1714198678b9ae07d",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-aI5oa9/tsa.pem",
+        "bytes": 1192,
+        "sha256": "298a4d455cdcfc08378c1325b6b84400228c08cf8b6c235075b35bdad73ca936"
+      }
+    },
+    {
+      "phase": "p125ec-source-combined",
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "5ff9c2a899d89a351c434a94c3dc2f765431ef9bc88e75ab53022d87bf68fa0a",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tKh7Bm/root.pem",
+        "bytes": 1119,
+        "sha256": "b6ca135ce1d193f4c72465f008d3458fb2b1e656f8a15210f7722e2836eb578c"
+      }
+    },
+    {
+      "phase": "p125ec-source-combined",
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "114d96d0aa8126832051366a4a282c045696212abd5384a2e7555edc744d2cbb",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-tKh7Bm/tsa.pem",
+        "bytes": 1192,
+        "sha256": "ba4d3ea4bbbeff2a531a34981a2cc44036ff0437cc82385abb072d6613d97b51"
+      }
+    },
+    {
+      "phase": "p125ec-source-combined",
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "70d2d9524b77d1f27264b26b7ec9e9351430bfa07454ccf6098b919f597b3efc",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hSO0wk/root.pem",
+        "bytes": 1119,
+        "sha256": "b50058b79edd4926fe5cfc5d4f006553f3d1807f4e66700e1e23ac557fa7194b"
+      }
+    },
+    {
+      "phase": "p125ec-source-combined",
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "1ef73c2ede15a8f1d1aa3f453e67291c99fde843e3334801f43653e68e5f9b7e",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hSO0wk/tsa.pem",
+        "bytes": 1192,
+        "sha256": "01b1e08876b2b03693db2f3aeeda8d8b3251c5e89aa0988ac445789c90849ee8"
+      }
+    },
+    {
+      "phase": "p125ec-source-combined",
+      "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "5ff9a32d3660ba2b8ccd0e2ca671ef8b4c4e72413c9e9e5d8dbc955ae4d38050",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Yht157/root.pem",
+        "bytes": 1119,
+        "sha256": "282317a430f3d9a8c8cde53eddcdece9820e7737d8726d1b73ff7d9978e0b8a7"
+      }
+    },
+    {
+      "phase": "p125ec-source-combined",
+      "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "9dbf8e160d62813ed5896af78aa98f453b6dff6cdd9a50a8ca2763d95a75d352",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Yht157/tsa.pem",
+        "bytes": 1192,
+        "sha256": "2c3b434e8f694784257dbc22038b5652e35f340a1a05432bbba6ac462205b742"
+      }
+    },
+    {
+      "phase": "p125ec-source-combined",
+      "caseId": "CHECKPOINT-EVENT-CADENCE",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "a314d60a98ad4f9ba8466c0c8dc53eacfce676570f8b2aaabb9ae92a30fabce0",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-0YH87m/root.pem",
+        "bytes": 1119,
+        "sha256": "640c5c588f8c098ea44c737d2eab0d06249f672dc069acd10872ecd61f7bbbd0"
+      }
+    },
+    {
+      "phase": "p125ec-source-combined",
+      "caseId": "CHECKPOINT-EVENT-CADENCE",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "c931b7880cee4ca319051968745e5442694159a3d938519512702a83c14013f1",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-0YH87m/tsa.pem",
+        "bytes": 1192,
+        "sha256": "f3f26f3803748aceddeced1fb45f4685445dc47162d8fc1e522528312f640b90"
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "f9431773d26dced10c5d1d359be14b91b24849e2acc8e640eb3d88c52d40fb7b",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/root.pem",
+        "bytes": 1119,
+        "sha256": "dd5b6e3dc6f47c04239d42c9b2862cdfe24e802f8b2d500a601aedd5fb2671b9"
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "f89ef65471ecdaf54cb2208d67c4a959bf0c10c65e746552af2ee9405edc7e28",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/tsa.pem",
+        "bytes": 1192,
+        "sha256": "7d4a7640d4ecf89efefc0096e07899b6ccddc52a7108d5f033ffde28f9092feb"
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "91185ca0c140d7ca25ba07b2ce38f92ec5318084f50c779b2df53594422e25eb",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/root.pem",
+        "bytes": 1119,
+        "sha256": "ca826494881980eed44f112f57bf289c321602ea7c6da3690a5a1949dacaf8c2"
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "e71fdee72c69ee98f4fe6534a41d7aa43baa810b901d67faa87520253569fc90",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/tsa.pem",
+        "bytes": 1192,
+        "sha256": "694d45cf9bc44b15bde8eb939e57edaa75dac86606549f84371707adda42cbf0"
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "ab552b431107bb10c45f46b06694fe8d3324deba009adb9e2be18d094fde148c",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/root.pem",
+        "bytes": 1119,
+        "sha256": "661098ce7ffd05d646bfdc98561b2fba0f07f5ad40928182cbd91c3843057fb0"
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "4661a555a2d82ab4c8f46ccd7e8731504003015baa05e9b4489bb5c24690013b",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/tsa.pem",
+        "bytes": 1192,
+        "sha256": "2e49c25c9cb66a5dede42ac8b743f86c64eb9f379102a1c9df238d1569d731c9"
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "efea39ab14bdd24978d84106ae7f821d3b726533ae169ca0d899036f067077b5",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/root.pem",
+        "bytes": 1119,
+        "sha256": "89361f8bd68e09af9ed8b5f44ef5e133e2145b8ff8e8d462d1d00f25402fe427"
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "7d2f52003f92ba17200672785629b11843d9214fb6ca808b302ded5a226902c4",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/tsa.pem",
+        "bytes": 1192,
+        "sha256": "346a72b015850cb8f1205a2a2fe016afab673f0494910ed98a5f561d6dfbfb60"
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "1db4803a50ca360589a8e993c0067278140c9e650ea94cb8566aa8d91912d3d0",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/root.pem",
+        "bytes": 1119,
+        "sha256": "2a7fcc921fe0e31d29c6f11e35fc21b42cb847a6f31b3788c03ab11e5ed269a5"
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/tsa.pem",
+        "bytes": 1192,
+        "sha256": "7e7f2a78b60c32a0c1be92c16c8503a02e982c56229058fa0614ba776f79bb65"
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "caseId": "CHECKPOINT-EVENT-CADENCE",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "f6768067e640791aead5a248d920709cf96c5b40c2a2baf7673639b8743a1c0b",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/root.pem",
+        "bytes": 1119,
+        "sha256": "a2ab0b64c2309f962366c48a7ef166c35d2ffa3d5736f745e03ff96c2d170f1e"
+      }
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "caseId": "CHECKPOINT-EVENT-CADENCE",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "7972c28a0bf655eb6d946044bc371cedff79bd23c07b8508fb12e9d41a972b03",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/tsa.pem",
+        "bytes": 1192,
+        "sha256": "897c9aad4162a474625a6813644419abdf1a5ed6cf549b6e94922b43adf3d4f8"
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "caseId": "FIRST-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "8ccb853d9206e2bcca778125b94f949b129f83fd022086142f9d0011b2f10016",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Bnub0/root.pem",
+        "bytes": 1119,
+        "sha256": "21f1fb48a5fe63b5dbcf3e67ddb3f656d4cb88a892a614319dd2b1be96fbad6a"
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "caseId": "FIRST-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "8d9873245ab9b277eaa05e378661400ba0f2c1339a57f8351871c546670acbe4",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Bnub0/tsa.pem",
+        "bytes": 1192,
+        "sha256": "f60c9c2f0f37240aafc505cd6fec15c95f1f1c70cd294408bb125295167c2b48"
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "a936353297bc700d2ba2b5927a6d3e87ea2fc3fcbc7f44b955710d2972dcd994",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8LMvDk/root.pem",
+        "bytes": 1119,
+        "sha256": "73fb7a73f9451acb80c6f5d3196b847101dd9118fe709dfebda8ef2d35f904ae"
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "626df7fb5903f57085cec01583aa0e8c8848deb63d03468a0a2b042eb8de70ee",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8LMvDk/tsa.pem",
+        "bytes": 1192,
+        "sha256": "4cfdc3df7fb4a819abb6fc656c0a6e80e7638b8088353af3a4e73233af19be23"
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "3c41da72d6027209590d24753fe80883cd2c22a087e7cf8c32e585b395726902",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VvnCDa/root.pem",
+        "bytes": 1119,
+        "sha256": "1ce6a12dee12ecc3403f060c0919ab4ebf15bf61b1aa3e710286d81773ba1385"
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "dafb1272b9d420f15bdca4d14e7c328a81077bc80d31e9f0761d31db4eb56bab",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VvnCDa/tsa.pem",
+        "bytes": 1192,
+        "sha256": "f1efff8a9935d6716d5647cd566fb3a3faf68b0c9a29f68a26ffa90515a00744"
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "1471c295ce7971db2207f3c56d7fa871ff812315c0dd7152019983f9376922f5",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-w31FbS/root.pem",
+        "bytes": 1119,
+        "sha256": "509275bf03464f722338ed21c4618dba455741ddf876a908e7774ba3383561de"
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "bdd42f682310c2b6437e3eefeaf55140aca8977989800e844d3343a1f51cabab",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-w31FbS/tsa.pem",
+        "bytes": 1192,
+        "sha256": "2a913dbd4f1ab496b26219f3233d5417861d802becc99729ae5242f82cec8a9f"
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "f74f597a181b6b3e9e54cf593c2ad2c39520bd13887c84a13d302c3c35e034b8",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ZGpbs3/root.pem",
+        "bytes": 1119,
+        "sha256": "fe283da58d6119d5fe1d56dcf76c3417a9a53450c40a0ef93bab6323137be938"
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "3b53c5800bf7780259a9eeefbde4773460ed893eecfc6fcc088450c06460af95",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ZGpbs3/tsa.pem",
+        "bytes": 1192,
+        "sha256": "a5305aa00a780af3a51f9d405ca0058fc9dc1cb533c94d0f0671e114216fbc32"
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "caseId": "CHECKPOINT-EVENT-CADENCE",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "fdfacc3e8b975b9bb96a5269e82be8b4742c66acf7ed87ee45447663d37bb168",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-OAwdRD/root.pem",
+        "bytes": 1119,
+        "sha256": "0a68a4a3a0dc7c74d14aea2db0dd4e45d7a7649f3f835854c2f228ea132f6881"
+      }
+    },
+    {
+      "phase": "p125ec-m1",
+      "caseId": "CHECKPOINT-EVENT-CADENCE",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "ce2eb958503984aad9ab23b9c54664b5f64f6cd476319210e63795f705f38728",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-OAwdRD/tsa.pem",
+        "bytes": 1192,
+        "sha256": "a3c5b69a0d5ab8b7e69c7a2de98fa89e1a066b8a6fe3f4101d3f2bcd57aae887"
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "caseId": "FIRST-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "d38df431a263e60d9a6c95642bd8e491aefa06127e961a307316049413cdc882",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-EjHBVt/root.pem",
+        "bytes": 1119,
+        "sha256": "d23570728bbd003f87c96d3a1c5b5794e4e753a29da435579d49d5d6c56ed68a"
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "caseId": "FIRST-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "99093610af8843b236df902056470248ba3ad4e04985b9d882bde86999771815",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-EjHBVt/tsa.pem",
+        "bytes": 1192,
+        "sha256": "0b041e7cbe073aaf9f5953fe6ac702eb8da1d69625dc62a50ea8e212ac088acc"
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "15c2df8b0effb84b141f76f479f6af505b03344de459df5d3788b16241a02b33",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hJNhIW/root.pem",
+        "bytes": 1119,
+        "sha256": "f851eea1c2e933572c95def40e8d10de873383674c10bda1f2f220e69f829f19"
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "7a3f6f6437aec5ff41c80f046b2da00ba9f1e3b46cdbce8941924cd748d90079",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hJNhIW/tsa.pem",
+        "bytes": 1192,
+        "sha256": "8feb7f19e345ef19259da7258de5f222c4d105e1e672858dc231550c2bbd6ecb"
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "6195eeeb8f2fe3e99b5381319923c4c0c7d3d434e34bf04efcf63f5eb034ce78",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-0jNUQb/root.pem",
+        "bytes": 1119,
+        "sha256": "148640f0456808c9c7cf4f25e872f16d776897d2fdfcac42a9029eafda43ee07"
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "1af30a235bbf4f8a4153850f7557e91496f2310dd0ebaa8a6e843c23e92bb89b",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-0jNUQb/tsa.pem",
+        "bytes": 1192,
+        "sha256": "599ac3a162fd2e2b726dd20148ee17a0eea5fd6f0b94451de15060b1b98d097a"
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "2ecb3443e136a03e6120b1d6b16851b1a066b48a39d834c8eac745dabc49f835",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ZmQroR/root.pem",
+        "bytes": 1119,
+        "sha256": "3654f68084f84332ec29806584f3d1b2c4be11e980f32ef149caf5f5a3659ace"
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "178f2af8a29cd9d362544408b7a514e71835e28af9243d3bd6eb0d1aa9b33201",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ZmQroR/tsa.pem",
+        "bytes": 1192,
+        "sha256": "8aa3adc6d5500315df95ff57a5cc9b4184a7b1677c78be8bfb8e057dbf6ee68a"
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "f93ab03b8ef40ff4797506bfc441eb5bc7a5f90a6f78a97d8a420b420baaa627",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hIUILI/root.pem",
+        "bytes": 1119,
+        "sha256": "49464995e59be8523b418ff2bca68406268a0b186ee46ae07ead420f1d3e7a26"
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "8bb0839935453ba106687bc401495806e4b86ee9a48758cfec1074595fbdd367",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-hIUILI/tsa.pem",
+        "bytes": 1192,
+        "sha256": "0e7f001bc921d2a1c5daf1c8f21e71192c028dd173bd9cfe6ac0731916eb9456"
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "caseId": "CHECKPOINT-EVENT-CADENCE",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "45e7edc5f8b1f4d4b42eea5d76a21a0fe4564e0baf036e056ffad4a7a3f77638",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-omqcUs/root.pem",
+        "bytes": 1119,
+        "sha256": "6c84c7fe86fef4f45dee40ca5ea5222e85e394e519c9a1db93dd66cdc653d947"
+      }
+    },
+    {
+      "phase": "p125ec-restore1",
+      "caseId": "CHECKPOINT-EVENT-CADENCE",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "83ab211a56dca14d0579be38e13350de70405c2e27735854f8bda330ad0f2469",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-omqcUs/tsa.pem",
+        "bytes": 1192,
+        "sha256": "5f45584452f5861a1eae475ed54d08fa4159c379eee43780bc285eed3b8dd166"
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "caseId": "FIRST-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "6081b39a82c4abe5196d3942f8a31c5c8ed2b3f27edd943abb123918abb00a99",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-UR5xmo/root.pem",
+        "bytes": 1119,
+        "sha256": "f233ff3a9a1e790fbd25801920be199c4db1f9d4078fedd5141bcc2527e4c549"
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "caseId": "FIRST-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "6dd714271324ab1c08d7fad89c498724845e501af1a066f4308c0f56537675fb",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-UR5xmo/tsa.pem",
+        "bytes": 1192,
+        "sha256": "7248a5a234eeebcee57de5baf49f9a7bf90e8f7920b67d36498cfe0304dc068b"
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "aea8b86ae05a0c42517ede2b96f505b48c9b2d6f9eb35dc0f5ed34f3579101e3",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-xra6SK/root.pem",
+        "bytes": 1119,
+        "sha256": "387881f1ff6bb7a72f6d233cb9f556e087d3d192ec9ab0c61c5f4750e8600c6e"
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "ee475e4dc72144a3b7750ca055a60a1bc5f5d9291dbd5438453dbcaa6f9a076d",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-xra6SK/tsa.pem",
+        "bytes": 1192,
+        "sha256": "f05978e30c263965a5046f2eeb2889e258a87b7daa29ef22482859927106040d"
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "5fddb583e44a54c07e712c9d1d339fda53df799037fa36893a252f8108efd561",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-cImoup/root.pem",
+        "bytes": 1119,
+        "sha256": "6ea32a1eea0b248a8a97e3d309b87090b6d45acdba213c7623d81f4bed16ef2b"
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "6aadf1037d6eae76e3fa2be776b1fb4d28de6189b58e78e9ea33e89e65d82621",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-cImoup/tsa.pem",
+        "bytes": 1192,
+        "sha256": "86d3c793d664415e82c2e0a531492bd80fe04ee8b7a21f4bca93a0a18c63d3c6"
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "78f10c44b9dfb0c2baaa3d3d441c19c1b3959daf3d161932bdf97d0f7355f5aa",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Oal9Jt/root.pem",
+        "bytes": 1119,
+        "sha256": "c70d4e3114e2ef8587ff251131418f8ccf31451d08ad8f7f94d783e8fa75ef90"
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "12dd2c97ba06519aa2ab9760ac1c7ebd51060ddb8ff8012bf1a32fb4ad33cf7b",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Oal9Jt/tsa.pem",
+        "bytes": 1192,
+        "sha256": "63a94607423e0ab1bc5efa1f27ec0a87b074ca5c88af7c547acd949006b1b692"
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "3fd91e2a6c129da08c69aa0e0d3ccf6dc384c05193faa03240145bd813a90b3c",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4sk6rX/root.pem",
+        "bytes": 1119,
+        "sha256": "8f3f304c73b9bb55e1c45e1fbc9faf25b2842770f34175ae4ad718ba15747e69"
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "418d155ed860a92634c5d4838b697c05e60c72df6ee429ea67c339c0449040d3",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4sk6rX/tsa.pem",
+        "bytes": 1192,
+        "sha256": "1b1aa36000eda6a011ec0902db64d76dc2ccbcb294f450ca42a524b635a342e8"
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "caseId": "CHECKPOINT-EVENT-CADENCE",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "c5b8ada95de3e190b477fbfe015452f974ef21a1b72e9d84a7c509c34ed26ab0",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Tc4mEN/root.pem",
+        "bytes": 1119,
+        "sha256": "48a3f7a24171432d5a68ea07fdba91ee5d14bfbfa59d3ec0f04294af9634daad"
+      }
+    },
+    {
+      "phase": "p125ec-m2",
+      "caseId": "CHECKPOINT-EVENT-CADENCE",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "fb24835233dcb068d6546ac677f7a81c1a7ca1b3f2e1902ebd0cfb09e01468e9",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Tc4mEN/tsa.pem",
+        "bytes": 1192,
+        "sha256": "5cae9b970f3a000f95ab690cd4cd84459dd15b6763cdbe47f12393ab30aa0d2e"
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "caseId": "FIRST-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "538f009f2e7ef83df86e10500d0b4062ea54bd63f97a2211b743a63a97543416",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-uHw9kV/root.pem",
+        "bytes": 1119,
+        "sha256": "1bae667619a0309cad8de8be61f3da470a55000e42bcd0d3f10a629c15bb161e"
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "caseId": "FIRST-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "9c2109e5d031ad3013b0b00c886789d20983aec9f6fa41b9c06a133d50fc789d",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-uHw9kV/tsa.pem",
+        "bytes": 1192,
+        "sha256": "4c2055ba8bfb4ae5a38054752dba4f229783ad0dda20d4259c4329cdbd672747"
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "b7fcaf1362325c6bf6c448c210c843a1b77e4c5bfbe9a1d4c9417e05a97621a4",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-0dA8Vx/root.pem",
+        "bytes": 1119,
+        "sha256": "126157c3b1fbedde3292c63ecae017a7fd985900f158db7d571bc4caf67fbafc"
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "c1fbade7d3402f0849350a196c70892bc27d482648d5054cfdac6f24af941bbe",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-0dA8Vx/tsa.pem",
+        "bytes": 1192,
+        "sha256": "7ae362d77e2260b3db068db9313e67a0fc059341dd8b15068e5e021cff46229f"
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "b46e410e7f808c6bc87c0449d119a23e2422b3e26b53c35c034ed8af9acd1d01",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-n2ay64/root.pem",
+        "bytes": 1119,
+        "sha256": "d7594e3e4ceae4eda540f88a11e302097e273f116e3c9cdb7d7b2a665f347c97"
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "9cfd2366c49511e4b74fd65918500c1db458363d3f197df0c5313d1870dc0e5f",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-n2ay64/tsa.pem",
+        "bytes": 1192,
+        "sha256": "6ffa1369af6d4764e16f8d2c260cfccb2037642e22549f335ac6ca67490a945f"
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "120de2141f5ffcf1d75fa14c4ee121ea0c406d1947186fa2a09020f39c7e54f6",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ruaM6t/root.pem",
+        "bytes": 1119,
+        "sha256": "b2a0dcc29209abd8b5bc7494162f22f3c78dc833cc43653d4c6f9b649c25f010"
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "82c4c4a0e85d017ec92e2e8801479ea313e13bdcaaa69a66606ccafce08b80bc",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ruaM6t/tsa.pem",
+        "bytes": 1192,
+        "sha256": "f9354a187cc96c155e8ff40b2ab0ffe675ebb010ae47f9a72d9ecfe4d3f03345"
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "86a94dfa0b61f6d670c9bb14d2258dd9ae314d6504dd8a0c2bb92d797c112e03",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-wRPVX5/root.pem",
+        "bytes": 1119,
+        "sha256": "8c28237d3bc81613c2ccc47e372e5a7ee6bbff814e44d8f428c22d24181ba858"
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "b0ad145ebaad1a80c6138a49f55dfba903b6b851b57c5d5704598e8b76d847d9",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-wRPVX5/tsa.pem",
+        "bytes": 1192,
+        "sha256": "a0241f3256db97ee2c3ecd100ae19443d0c61d76914b60310569df0dfc4d642c"
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "caseId": "CHECKPOINT-EVENT-CADENCE",
+      "role": "root",
+      "derBytes": 786,
+      "derSha256": "28c9eef1491706f94b37f6f48c1ca55b678fb80c3ab5145d14337e3edbd30657",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-toLtcZ/root.pem",
+        "bytes": 1119,
+        "sha256": "e3ef9910de188b0acad18473a19bb942801f4a1d8e6247e2ca80876349a9ebd7"
+      }
+    },
+    {
+      "phase": "p125ec-restore2",
+      "caseId": "CHECKPOINT-EVENT-CADENCE",
+      "role": "tsa",
+      "derBytes": 839,
+      "derSha256": "50a84dd1f7d22dc82e5ef943725b2a00af00824a9182640baa24622f7373aad5",
+      "sourcePemPinMetadata": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-toLtcZ/tsa.pem",
+        "bytes": 1192,
+        "sha256": "4eb1df33458e8f0d28079d1ab3167cbe03bdefe95c6913e90789a8c6f192259c"
+      }
+    }
+  ],
+  "actualJsonBase64Recomputed": true,
+  "noPemCryptoOperations": true
+}

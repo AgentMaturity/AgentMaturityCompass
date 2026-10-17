@@ -1,0 +1,105 @@
+{
+  "schema": "p125-next-event-cadence-private-acceptance-matrix/1",
+  "caseId": "CHECKPOINT-EVENT-CADENCE",
+  "newLiteralBodies": 1,
+  "sourceTargetOnly": "tests/time/checkpointWindow.test.ts",
+  "sourceCommitFromExistingRootRecord": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+  "noFutureCommitOrQOrOutcome": true,
+  "runtimeResult": null,
+  "defaultHome": {
+    "caseOnlySetup": true,
+    "noOptionsCalls": [
+      "resolveAmcHome()",
+      "loadTrustContext()"
+    ],
+    "paths": [
+      "<own private HOME>/.config/amc/trust/amc-trust-list.json",
+      "<own private HOME>/.config/amc/trust/trust-roots.json"
+    ],
+    "signedListBytesCopiedFromExistingOwnIndependentRawSignatureList": true,
+    "sameOwnRootNoAdditionalKeySet": true,
+    "overrideVariablesAbsent": [
+      "AMC_HOME",
+      "AMC_TRUST_LIST",
+      "AMC_TRUST_ROOT",
+      "AMC_EXPECTED_MONITOR_FINGERPRINT"
+    ],
+    "signedListAndRootFilesFullPinImmutableAtCleanup": true,
+    "explicitMonitorPinOnlyForIndependentLedgerCheck": true,
+    "allowFlagsFalse": true
+  },
+  "configuration": {
+    "everyEvents": 2,
+    "everyMinutesInputOmitted": true,
+    "actualLoadedDefaultMinutesRequired": 15,
+    "signedConfigRequired": true,
+    "actualEmptyTransparencyAnchorsRequired": true,
+    "noPublicAnchor": true
+  },
+  "ticks": [
+    {
+      "id": "initial",
+      "expectedRan": true,
+      "positive": "Actual seed audit, first signed checkpoint/head/token/event and independent captured-query OpenSSL+AMC nonce/digest/root verification plus real ledger check."
+    },
+    {
+      "id": "checkpoint-only",
+      "expectedRan": false,
+      "positive": "No new rows/checkpoints/token bytes/requests."
+    },
+    {
+      "id": "one-new-audit",
+      "expectedRan": false,
+      "sensitiveLine": 582,
+      "positive": "Before tick, exactly one sealed audit and one prior checkpoint event follow the previous covered head. First checkpoint/grant/signature/ledger positives already passed."
+    },
+    {
+      "id": "two-new-audits",
+      "expectedRan": true,
+      "sensitiveLine": 597,
+      "positive": "Two actual sealed audits meet threshold exactly; actual age stays below independent15minute limit; then second signed chain/head/token/event and captured-query verification."
+    },
+    {
+      "id": "reset",
+      "expectedRan": false,
+      "positive": "No third checkpoint/request/event; exact first/second checkpoint/token bytes and config remain, both signatures and final ledger verify."
+    }
+  ],
+  "prospectiveControlsOnly": [
+    {
+      "id": "COUNT-CHECKPOINT-ROWS",
+      "description": "Remove only checkpoint-event exclusion from due query in a later root-adopted fresh source clone.",
+      "intendedWitnessLine": 582,
+      "masking": "Earlier default loader, signing, request, token, chain, event or ledger failures mask cadence sensitivity. If one-event result fails, later equality/reset/two-event assertions are masked; only captured actual stage facts remain. No actual RED/failure count predicted."
+    },
+    {
+      "id": "STRICT-THRESHOLD",
+      "description": "Change only n>=everyEvents to n>everyEvents in a later root-adopted fresh source clone.",
+      "intendedWitnessLine": 597,
+      "masking": "Initial !last checkpoint and one-event negative must pass first. If exact-two result fails, second independent grant and later token/row/reset assertions are masked. All actual failures require root classification; no total predicted."
+    }
+  ],
+  "evidence": {
+    "newFields": [
+      "defaultHome",
+      "eventCadence"
+    ],
+    "actualStageSnapshotsBeforeAssertions": true,
+    "independentGrantSummaryArrayStoredIncrementally": true,
+    "sharedLastReplyNotClaimedAsBothProofs": true,
+    "existingChildHttpSocketLedgerGuardPoolVaultEnvironmentCleanupUnchanged": true,
+    "noOwnedResourceCountsPredicted": true
+  },
+  "gaps": [
+    "Real elapsed-minute/Studio interval and real session-seal integration remain unqualified.",
+    "No production report/certificate/issuance/TTL/package/manual-generator wiring or global quality completion.",
+    "This is private proposal only; current B38 controls/receipt closure, later ownership/hosted/D15/freeze admission and exact source successor rebind remain required.",
+    "Existing source literal private-key redaction guard must stay hash-only if receipt guard rejects it; no encoding bypass."
+  ],
+  "newExplicitDependencyRead": [
+    "src/credentials/credentialsPaths.ts",
+    "src/transparency/anchors/anchor.ts"
+  ],
+  "laterFreshPinsetConsideration": "ResolveAmcHome creates a new explicit import: root must inspect whether to add source/dist credentialsPaths paths to the finite fresh selection. No selected-name/hash/admission changes are made here.",
+  "allHoldsRetained": true
+}

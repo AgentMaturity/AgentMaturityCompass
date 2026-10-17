@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "key": "P1-25",
   "date": "2026-10-17",
-  "commit": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
-  "branch": "codex/p1-25-window-qualification",
+  "commit": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+  "branch": "codex/p1-25-cadence-qualification",
   "node": "v22.23.3",
   "pnpm": "10.33.0",
   "os": "Darwin 25.6.0",
@@ -1078,22 +1078,247 @@
       "cmd": "python3 -B /private/tmp/p1-25-window-qualification-20261017/prepare-public-output.py",
       "exit": 0,
       "durationMs": 121
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1649
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/time/checkpointWindow.test.ts",
+      "exit": 0,
+      "durationMs": 355
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125ec-source-combined.raw.json",
+      "exit": 0,
+      "durationMs": 4348
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 36233
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run typecheck",
+      "exit": 0,
+      "durationMs": 25374
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run lint",
+      "exit": 0,
+      "durationMs": 2933
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run build",
+      "exit": 0,
+      "durationMs": 29760
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 610
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:gates",
+      "exit": 0,
+      "durationMs": 479
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:threat-model",
+      "exit": 0,
+      "durationMs": 294
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1627
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:docs-drift",
+      "exit": 0,
+      "durationMs": 337
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1231
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:third-party-notices",
+      "exit": 0,
+      "durationMs": 241
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:qualification",
+      "exit": 0,
+      "durationMs": 1011
+    },
+    {
+      "cmd": "python3 /private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py p125ec-source-combined /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass combined",
+      "exit": 0,
+      "durationMs": 35
+    },
+    {
+      "cmd": "python3 /private/tmp/p1-25-cadence-qualification-20261017/audit-public.py p125ec-source-combined green",
+      "exit": 0,
+      "durationMs": 59
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:duplicates",
+      "exit": 1,
+      "durationMs": 632
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:dead-code",
+      "exit": 1,
+      "durationMs": 2809
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p1-25-cadence-qualification-20261017/capture-quality.mjs after-source",
+      "exit": 0,
+      "durationMs": 2461
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass add -u -- tests/time/checkpointWindow.test.ts",
+      "exit": 0,
+      "durationMs": 21
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass diff --check",
+      "exit": 0,
+      "durationMs": 28
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass diff --check --cached",
+      "exit": 0,
+      "durationMs": 16
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass diff --check 8506539fe11a6e3eb7e964c5fcfd88b6c7d9a615",
+      "exit": 0,
+      "durationMs": 27
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass commit -m 'test(time): qualify checkpoint event cadence through default trust'",
+      "exit": 0,
+      "durationMs": 47
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 48976
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125ec-fresh-canonical.raw.json",
+      "exit": 0,
+      "durationMs": 4918
+    },
+    {
+      "cmd": "python3 /private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py p125ec-fresh-canonical /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout combined",
+      "exit": 0,
+      "durationMs": 34
+    },
+    {
+      "cmd": "python3 /private/tmp/p1-25-cadence-qualification-20261017/audit-public.py p125ec-fresh-canonical green",
+      "exit": 0,
+      "durationMs": 90
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125ec-m1.raw.json",
+      "exit": 1,
+      "durationMs": 4215
+    },
+    {
+      "cmd": "python3 /private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py p125ec-m1 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout combined",
+      "exit": 0,
+      "durationMs": 53
+    },
+    {
+      "cmd": "python3 /private/tmp/p1-25-cadence-qualification-20261017/audit-public.py p125ec-m1 red",
+      "exit": 0,
+      "durationMs": 40
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125ec-restore1.raw.json",
+      "exit": 0,
+      "durationMs": 4153
+    },
+    {
+      "cmd": "python3 /private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py p125ec-restore1 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout combined",
+      "exit": 0,
+      "durationMs": 32
+    },
+    {
+      "cmd": "python3 /private/tmp/p1-25-cadence-qualification-20261017/audit-public.py p125ec-restore1 green",
+      "exit": 0,
+      "durationMs": 50
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125ec-m2.raw.json",
+      "exit": 1,
+      "durationMs": 4075
+    },
+    {
+      "cmd": "python3 /private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py p125ec-m2 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout combined",
+      "exit": 0,
+      "durationMs": 31
+    },
+    {
+      "cmd": "python3 /private/tmp/p1-25-cadence-qualification-20261017/audit-public.py p125ec-m2 red",
+      "exit": 0,
+      "durationMs": 40
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125ec-restore2.raw.json",
+      "exit": 0,
+      "durationMs": 4075
+    },
+    {
+      "cmd": "python3 /private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py p125ec-restore2 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout combined",
+      "exit": 0,
+      "durationMs": 49
+    },
+    {
+      "cmd": "python3 /private/tmp/p1-25-cadence-qualification-20261017/audit-public.py p125ec-restore2 green",
+      "exit": 0,
+      "durationMs": 40
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p1-25-cadence-qualification-20261017/prepare-public-output.py",
+      "exit": 0,
+      "durationMs": 96
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1738
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths qualification/2026-10-17-P1-25/README.md qualification/2026-10-17-P1-25/receipt.json qualification/2026-10-17-P1-25/assembly-inputs.json qualification/2026-10-17-P1-25/evidence/event-cadence",
+      "exit": 0,
+      "durationMs": 451
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node -e 'const cp=require(\"node:child_process\");const os=require(\"node:os\");const p=cp.spawnSync(\"/opt/homebrew/bin/pnpm\",[\"--version\"],{encoding:\"utf8\"});if(p.status!==0){process.stderr.write(p.stderr);process.exit(p.status??1)}process.stdout.write(JSON.stringify({node:process.version,pnpm:p.stdout.trim(),os:os.type()+\" \"+os.release(),arch:process.arch,abi:process.versions.modules})+\"\\n\")'",
+      "exit": 0,
+      "durationMs": 225
     }
   ],
   "tests": {
-    "total": 22,
-    "passed": 22,
+    "total": 23,
+    "passed": 23,
     "failed": 0,
     "skipped": 0
   },
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "b31bfc9936fa3cd8b3cf11acf80668367d368aa1583f4e2f4f936bb5edc4146e"
+      "sha256": "aba7856d4dd7af0f69ef520cc3c0acb801c4d49c93ab4fe680573fe97483a80b"
     },
     {
       "path": "assembly-inputs.json",
-      "sha256": "31c00e6d3989609474209b6a03e0a402a1e266ae9f26848c696ad3364c1a6d96"
+      "sha256": "b6ccb30242fd6f54ae7490d5d382cd093c0862575c5c88a43deb0996eb069cb0"
     },
     {
       "path": "commands/p125-architecture/command.json",
@@ -6524,6 +6749,1850 @@
       "sha256": "ad6d41df4b0daddebea66444bb4d80dd49b87012ccd5252f890ea8b74f863d9f"
     },
     {
+      "path": "evidence/event-cadence/code/preparation/control-preparation/source-control.py.source.txt",
+      "sha256": "a30fa847e29155f851eca012ce4c315729285cc84b34d575cd84d17c64687853"
+    },
+    {
+      "path": "evidence/event-cadence/code/preparation/fresh-binding-preparation/bind-fresh.py.source.txt",
+      "sha256": "955730b704804f6089fb3d23971092230283ff38d9f0732c2b18cf81fdf24237"
+    },
+    {
+      "path": "evidence/event-cadence/code/preparation/fresh-binding-preparation/v2/bind-fresh.py.source.txt",
+      "sha256": "bda011325cac08d92fcb56ac5314754075920e78d21e7b7a9999df724273fa6a"
+    },
+    {
+      "path": "evidence/event-cadence/code/preparation/public-output-preparation/prepare-public-output.py.source.txt",
+      "sha256": "2b454cbdc55233c54cbf4cb9b34ed1f1c2aaeb5dcfdfe7bb094bb9d45705be14"
+    },
+    {
+      "path": "evidence/event-cadence/code/root/audit-observed.py.source.txt",
+      "sha256": "1d72bdb7d77cbff0251219cf33884e51c24bff5862cffeb052c1bf24124a58be"
+    },
+    {
+      "path": "evidence/event-cadence/code/root/audit-public.py.source.txt",
+      "sha256": "dc346333754ba26c06233ba94719b271645513ecb12856c3a14dd5c1bb27f0eb"
+    },
+    {
+      "path": "evidence/event-cadence/code/root/bind-fresh.py.source.txt",
+      "sha256": "bda011325cac08d92fcb56ac5314754075920e78d21e7b7a9999df724273fa6a"
+    },
+    {
+      "path": "evidence/event-cadence/code/root/capture-quality.mjs.source.txt",
+      "sha256": "31c5a641f799a6231da30161c30889a70b414f5c367fd78b25428156a2f43de6"
+    },
+    {
+      "path": "evidence/event-cadence/code/root/prepare-public-output.py.source.txt",
+      "sha256": "2b454cbdc55233c54cbf4cb9b34ed1f1c2aaeb5dcfdfe7bb094bb9d45705be14"
+    },
+    {
+      "path": "evidence/event-cadence/code/root/source-control.py.source.txt",
+      "sha256": "a30fa847e29155f851eca012ce4c315729285cc84b34d575cd84d17c64687853"
+    },
+    {
+      "path": "evidence/event-cadence/code/support/observer-reporter.mjs.source.txt",
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    },
+    {
+      "path": "evidence/event-cadence/code/support/post-typecheck-run-prepared.py.source.txt",
+      "sha256": "abbda23f645d38e643133ebbb4a9b19dc4f9bad5cab20d098c02449c6d3885e6"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-actual-environment/command.json",
+      "sha256": "3ee125d9877cf3649a646aa7ef68139cbb850facb86c16e13a57253cfe639c26"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-actual-environment/stdout-stderr.log.evidence.json",
+      "sha256": "94a37d6ec3ee4c58c28acacada9bac51836cc49264a85e43d0731ae13f8e61b7"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-fresh-observed/command.json",
+      "sha256": "a4d76db3c834319401f61027e9105945e5050628d96bc1f4023bfd3b99399616"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-fresh-observed/stdout-stderr.log.evidence.json",
+      "sha256": "086c313b1c5dddab44f3c06aa5a2df69ff08f3d3d01662662f8fd3decb3697dc"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-fresh-public/command.json",
+      "sha256": "e9c07e58449b529bb1377366abb25257299f76a36a7b8efdacf93708cdcada15"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-fresh-public/stdout-stderr.log.evidence.json",
+      "sha256": "32498ad6d04a6249dee60f3e0e76649af5c3d6db78b883957ba129060a9f2ff6"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-m1-observed/command.json",
+      "sha256": "7275476819082ce302c4f7b2571da764d6d22d35f3f7c3a0b5ce8ead37dcd748"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-m1-observed/stdout-stderr.log.evidence.json",
+      "sha256": "79417e3c5e003bd7bd5bcad7d4880a0bf57c80fbb2202e55d7207c0c0bc309c9"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-m1-public/command.json",
+      "sha256": "ba27179cc0e3d4c1c2bdddac75ce6d8e86f29f9e308409ffe164f28dd3fc32b1"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-m1-public/stdout-stderr.log.evidence.json",
+      "sha256": "d0deab1c8ba130df9afa45ccdfe777284ac1780d2a03af12fcb74060d734f989"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-m2-observed/command.json",
+      "sha256": "bc9359bd53a92f3921602e098a45c4db43c9639cec7312e85251b95bb7bc3b2a"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-m2-observed/stdout-stderr.log.evidence.json",
+      "sha256": "e9bdc65405e4b044443221e2167112aeb0fcb057f4ea0b9343d43bbb76ce220e"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-m2-public/command.json",
+      "sha256": "71af6aab04cfeb1e86899a4d08001b6cb41cc8b7809d419c9c7a3dd9ae5910a4"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-m2-public/stdout-stderr.log.evidence.json",
+      "sha256": "c78bc91865ab474a7a0bb855d1c1191cf4f13276f22a2a4048139b11f65c1af5"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-restore1-observed/command.json",
+      "sha256": "675ee416a5b6d58217e707b8da38159f15701803e5288c658cb2c353b0685601"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-restore1-observed/stdout-stderr.log.evidence.json",
+      "sha256": "f5f0bd80a1247e2103908c01769b39866567a566efb8fb3a26eed33a280acb12"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-restore1-public/command.json",
+      "sha256": "28b7b4a6a547d7a3548d95a9a57410f6802cef86bc6608eb2880e09a515449b6"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-restore1-public/stdout-stderr.log.evidence.json",
+      "sha256": "ef573a1d0d222a1ab15dd56e6c4c9336692b83678ec768f59ecbe1df702cac39"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-restore2-observed/command.json",
+      "sha256": "f8e7ba28eb3885952d57016443099da46b6356b8cc60e093bd5826839c322c31"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-restore2-observed/stdout-stderr.log.evidence.json",
+      "sha256": "068b5eebfd2a66a52099772d3bf8144af9eab08353094cb5aba800b1828e83f5"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-restore2-public/command.json",
+      "sha256": "835cde24022c7be17e0f550599db4c194994824a55b3c7815d9132347905711d"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-restore2-public/stdout-stderr.log.evidence.json",
+      "sha256": "0071d17ee745f4b0e66e74ee5a1cf3ea0ca82bc5fd7549780e944751b6de426f"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-source-observed/command.json",
+      "sha256": "3f726dd434f7c89c080260b4e61e87dd9442f61adca8369a139f272b57699136"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-source-observed/stdout-stderr.log.evidence.json",
+      "sha256": "5c5073d6f12213344f1a9f16e7fa3da56a6fd4408eb9882df5e9147387e3396c"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-source-public/command.json",
+      "sha256": "06a895954996082e99050d63ad4d5521f64456184fa382b647f2f5564b5c248f"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-audit-source-public/stdout-stderr.log.evidence.json",
+      "sha256": "011056df7393020a1dfe4b48dae279a8fad46e91481d5227d9580771d497641d"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-clean-source/command.json",
+      "sha256": "2bb74f6567c12d9e6b0ce43f0aa2509cfa8acbccc2d4675294d7135cddffa24f"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-clean-source/stdout-stderr.log.evidence.json",
+      "sha256": "775612b0b102d464e03fb938267f3cbffa1c37fb2d3113c2806520064df42ce6"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-fresh-canonical/command.json",
+      "sha256": "c47c93227baa18f08c12ea1093262f61d398c42a91ac5bc88058ec7002f68ef4"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-fresh-canonical/observer.json",
+      "sha256": "a7954caf05bc7c6c006ee6a10ba0b5300885ddbc8dfde575467bf31ed5204b9a"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-fresh-canonical/raw-producer.json",
+      "sha256": "c9a10fad423fd00d9e8e88aa968e45ee4b5bc8f58ab0e464c95dc9fb003da9ee"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-fresh-canonical/raw.json",
+      "sha256": "c9a10fad423fd00d9e8e88aa968e45ee4b5bc8f58ab0e464c95dc9fb003da9ee"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-fresh-canonical/stdout-stderr.log.evidence.json",
+      "sha256": "924fb50a404fbbe560b41e5837887523b39823dbd34c87cc3fc460d20d89616d"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-m1/command.json",
+      "sha256": "1e8ed27fd9a97fe72ea5ba39728cf38ea04723c2989dfb73b2ed85578cf3293a"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-m1/observer.json",
+      "sha256": "b7a95bc131c7247d30dce0eba1e2ed6ac43dfd888c7eaac5fdeece2114803204"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-m1/raw-producer.json",
+      "sha256": "39b65f04b63b34e7e4de9da32191eefbe7b3d850551596a5eb1c4b60c2e4a76a"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-m1/raw.json",
+      "sha256": "39b65f04b63b34e7e4de9da32191eefbe7b3d850551596a5eb1c4b60c2e4a76a"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-m1/stdout-stderr.log.evidence.json",
+      "sha256": "10281a45be8022b59b22ae9fbafe349da33962670e551dbc894fe7bcf07ea7fa"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-m2/command.json",
+      "sha256": "6fb7aaf60427a5bfeea6ae822147418ab346f095ffe857dc89127425c2ab1058"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-m2/observer.json",
+      "sha256": "f6b1a21516feb9ab46a72df5e985d5bfa9553f4246bf3b7915848947936dd246"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-m2/raw-producer.json",
+      "sha256": "eb97e94bd94fcb05c2345d98220d19c6bc482b1c9ca288c02bb0a948753f10e8"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-m2/raw.json",
+      "sha256": "eb97e94bd94fcb05c2345d98220d19c6bc482b1c9ca288c02bb0a948753f10e8"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-m2/stdout-stderr.log.evidence.json",
+      "sha256": "8ce1f3ad986533f4ba7d8119b1ad9d0de4cdd045e3f8b7e9a939f8dd7585b0b2"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-metadata-pre-d15/command.json",
+      "sha256": "ffcb806e416157bdfcb92dde0484da3027e6286f40f9d29b7fc95b4fb07e3c78"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-metadata-pre-d15/stdout-stderr.log.evidence.json",
+      "sha256": "36934e267754528868c848bba0e6f3d0a852892d8e4c66703dff782eb817f29a"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-metadata-pre-freeze/command.json",
+      "sha256": "eb86dd786795ab7561d539e70c34135711631773eee615f521bdf306161ad595"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-metadata-pre-freeze/stdout-stderr.log.evidence.json",
+      "sha256": "e17c9e43c27cdf249b050a5c8df40abebabe0a3f89d73680e84505f162e9a3d1"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-pre-d15/command.json",
+      "sha256": "2e89ccbbfe94ed826ed4317111e0263151bbcb1fabbead4b1996274993d878f2"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-pre-d15/stdout-stderr.log.evidence.json",
+      "sha256": "5b3346bddd08e93e2b8b99f36d0562760bc3ad1e85d962ed881076494b549f8d"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-pre-freeze/command.json",
+      "sha256": "e1fbcdafee125766a545526c36aa71ff9e49812bf3fd4c3f24ada7ca0784a82a"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-pre-freeze/stdout-stderr.log.evidence.json",
+      "sha256": "9519f8baf17872847d9c11b76576d585f368231ac123ff04bb574f6bf01d5886"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-public-curator/command.json",
+      "sha256": "bfdf066fdad5159f5fb8a5c4a2cb1f3148c852ab734448f21fb671fdeaaadab4"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-public-curator/stdout-stderr.log.evidence.json",
+      "sha256": "39ce314254982e3e55c0b493ce38546b683bc14b712b420b848c8fbd697366a5"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-restore1/command.json",
+      "sha256": "f36bc4d6ed95162d256b3cf2d27a55e83267890e7c894ab5e59568ed62d74b28"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-restore1/observer.json",
+      "sha256": "d6cd74b03cec9bdc40749cbfa991acf43774ac85080389ea363b42c65499141f"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-restore1/raw-producer.json",
+      "sha256": "a9265fbc81a780ab9e6651c2bdb61017ab10058e4129766e590c056cd21a3de2"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-restore1/raw.json",
+      "sha256": "a9265fbc81a780ab9e6651c2bdb61017ab10058e4129766e590c056cd21a3de2"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-restore1/stdout-stderr.log.evidence.json",
+      "sha256": "841aa7e2512bb7c93e40bd8d95b12014a4dc6ee179d0777d16204cbd36ae9aa3"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-restore2/command.json",
+      "sha256": "9f5e66b110a02a3cac869196c5d01b33c5b6c0c518d429e2312f5942fbd49c63"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-restore2/observer.json",
+      "sha256": "adfd2127cd82733ac75dd2ec5eb14f132fcb2ad8e9d49953a14b0a8a454fb1c7"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-restore2/raw-producer.json",
+      "sha256": "c269e767bfc985b27e2789d19fd15426b1429bf578d1a59f2f22f234876a603e"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-restore2/raw.json",
+      "sha256": "c269e767bfc985b27e2789d19fd15426b1429bf578d1a59f2f22f234876a603e"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-restore2/stdout-stderr.log.evidence.json",
+      "sha256": "5e37d0e14db769c3e75100502b6db94cb854de67471d14ca6dd46922a2223783"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-architecture/command.json",
+      "sha256": "6814b939b3f8a6d8721c1f157886597ca836836e4739a23d618618a74aa10b38"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-architecture/stdout-stderr.log.evidence.json",
+      "sha256": "881ee992c579bb0b14127667a84871e8e1b009c33c5feaa490a5c3de7dc4380e"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-build/command.json",
+      "sha256": "dde42c15aad88bbc04d020194ce5bbdefb805beb211a4dde848fa60e21a8bd24"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-build/stdout-stderr.log.evidence.json",
+      "sha256": "cbc17bcbf5099049d4b659119f746658d8940daac5addefda15fcd4b9d3fcbaa"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-combined/command.json",
+      "sha256": "b4acb3dd31904f9f7598c9cdb7620b117df97057bb64bce7c9247367b880bb66"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-combined/observer.json",
+      "sha256": "f0fcb3d326dedc1dc4481da8884f289f53770580ffbe634c90ffa3a6c41a898b"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-combined/raw-producer.json",
+      "sha256": "77c35982a80da48d2b6a437ed0d3f7b15a244e343e0f8ce9458f8b6505226e18"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-combined/raw.json",
+      "sha256": "77c35982a80da48d2b6a437ed0d3f7b15a244e343e0f8ce9458f8b6505226e18"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-combined/stdout-stderr.log.evidence.json",
+      "sha256": "9b05ec107f8aa5308a2d120d598a24d2dddf30b80f4dc3e0f3218d90d3f9f72c"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-commit/command.json",
+      "sha256": "64a285b3e70300316abfed7e132557cd6cd0807ca0606dba9c0106fc3adc5ef9"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-commit/stdout-stderr.log.evidence.json",
+      "sha256": "deaec927e978e3b6605cd39f2c997918e37b352115bf5ff1afb84f9f0c3686d9"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-counts/command.json",
+      "sha256": "795d1f17a1c60882c807481f6166d3bc4b0c23537faa1ef2d1737c8806952efb"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-counts/stdout-stderr.log.evidence.json",
+      "sha256": "fb3b919129f176bd421659fc214d319b7933368b9f99692db1858d4eda841e5a"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-dead-code/command.json",
+      "sha256": "daab4b4bb5003630f278f5f68b4cb3b410d6f24d7d3f5677a01f00a8fb9b10fc"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-dead-code/stdout-stderr.log.evidence.json",
+      "sha256": "59950e9fdded8b4ff5f2adb3632661b0fcf20c599be50e7463c7c431deaa7487"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-docs-drift/command.json",
+      "sha256": "ca3504fc277defb3162ccfad4721c8275dd4b200f2799fed31bed5e39ecb1ea6"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-docs-drift/stdout-stderr.log.evidence.json",
+      "sha256": "7076957eefeb77250e420c3d423467ffc8a2eaeee66e589975924757a2d12620"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-duplicates/command.json",
+      "sha256": "f3262127431ec3761050ae1f4c78632aa3ee9001f478394baa36125b11ea9394"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-duplicates/stdout-stderr.log.evidence.json",
+      "sha256": "28e94d9438aef8effcbd1b09a911d292593da27ac85b5be628fdb86b6acc48fe"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-freeze/command.json",
+      "sha256": "0c3f9a25b6fc47800590daa280baf78cf5c0032ae6cc4c734a8a43976dd91611"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-freeze/stdout-stderr.log.evidence.json",
+      "sha256": "74752f707246c1ca9016828a882d09d2ed5ee09d6c05e70f405d53e09d71e7eb"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-gates/command.json",
+      "sha256": "ee8b5d04d5354a9cd04419dafd8cf6b5ba8f6f68b7deb976b2adec589b96fa2d"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-gates/stdout-stderr.log.evidence.json",
+      "sha256": "b8ae67993d74b96f91d3427eea6a9d033628cff6b0cdcf621652e653fdbb7dd0"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-lint/command.json",
+      "sha256": "2e4c281dc70b38e3ca667fec62b1ad4f9085e0fa3f95bb36113680befb9fcf9a"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-lint/stdout-stderr.log.evidence.json",
+      "sha256": "54daa5d1f6621d51236dc5678027ce7d80db378bb9b08dc34e67cc4ec00a69a9"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-notices/command.json",
+      "sha256": "779a17d153ab2995f871859b53c4346f1b9e8da150d2f192573307cc5409eb0d"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-notices/stdout-stderr.log.evidence.json",
+      "sha256": "1df254e3c82e9cc55a54ecb501eb2cbd1f44d2cb57b2d76192fb999fb2a2f1d3"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-qualification/command.json",
+      "sha256": "1c28e53d2fc64875a3c9eff0ebe5ea81903d7182db9a194e946bc6965275a386"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-qualification/stdout-stderr.log.evidence.json",
+      "sha256": "1d7c08f182a7b505f28543e2e004b12b55b18cfcfa10156e33d15b2b515c304e"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-quality-diagnostic/command.json",
+      "sha256": "9b636d929f6ba52811929d9b1e0de04712a288db4eb3d5cce4f3be514a0babca"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-quality-diagnostic/stdout-stderr.log.evidence.json",
+      "sha256": "42447c38744e32fb56d1133173d1bcf822747c27e694d21f08f9e00d65e9732c"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-stage/command.json",
+      "sha256": "a8b0ffc2a5d0b93d952621e2fe11a02cfb2b665e349e0795076be52bcf50718a"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-stage/stdout-stderr.log.evidence.json",
+      "sha256": "7e310d975462c03e1f4c9032d89da739a947cd9711b43105f20828f299cf7e01"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-threat-model/command.json",
+      "sha256": "a817d0d06ddeb95d7abbc554c82cfc8864eb627c364ba44fc8dd61fb6f7c46b0"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-threat-model/stdout-stderr.log.evidence.json",
+      "sha256": "01d818dc9e5c6241efb68ad27c27301ab5ee3668aa0fbb10529018f89b4157a2"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-types/command.json",
+      "sha256": "1507d52a5dcb305a2bb4ce55f08ea1789be0f0cd83ed5ea73bb119642709e775"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-types/stdout-stderr.log.evidence.json",
+      "sha256": "aa2e41bd91ab9cde8664831a3fb4152190a7cae0423d59e42f6d9b9ba6622df3"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-whitespace-default/command.json",
+      "sha256": "fd26495544b03c7599eb7d7f16c9cddf04c40baced07c348e340c40026a1d7d1"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-whitespace-default/stdout-stderr.log.evidence.json",
+      "sha256": "d552108c90a1b6fa1eeae3dc41d7afd4e1e370723e2009337041ae1743b3b39c"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-whitespace-range/command.json",
+      "sha256": "773f02755eacf5f30d08d3dd6dabdf2a740457b823359a65808047ba51e6b282"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-whitespace-range/stdout-stderr.log.evidence.json",
+      "sha256": "b6ca074e9ff851a0d49d6ce64fddc1d68a473051043d60cf2364afdeb9622d37"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-whitespace-staged/command.json",
+      "sha256": "3624ba42937fc5ad1e8901e153c3774c558fc3a4ad09e60656b142d3a1bb21fa"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-source-whitespace-staged/stdout-stderr.log.evidence.json",
+      "sha256": "3420237d8e94965d40098e38e3ed2ba9f1570d41dd7c7d0a3b24483fa40ec195"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-test-types/command.json",
+      "sha256": "0f9c2d3db2001242a44206ecb18a6ef069c26fda17e765eb3a1e9bcb35605195"
+    },
+    {
+      "path": "evidence/event-cadence/commands/p125ec-test-types/stdout-stderr.log.evidence.json",
+      "sha256": "a449ea6a534f13e275e18067d9cec0906c89c802e842ce5bec374d45e9015c8f"
+    },
+    {
+      "path": "evidence/event-cadence/current-cadence-candidate/README.md",
+      "sha256": "e9784a6dc0d3b4a2afbff0af38175decc9b3e5aebab2a14b2640d066750813a1"
+    },
+    {
+      "path": "evidence/event-cadence/current-cadence-candidate/author-static-review.json",
+      "sha256": "d7f1b53f05c9138a86aca90d865a680fce97026f500351c072b27ffc9001d909"
+    },
+    {
+      "path": "evidence/event-cadence/current-cadence-candidate/body-mapping.json",
+      "sha256": "a65a5409308574d7561c6a563fb7d0ab01372c33dc2e44f64fddcb801d43acee"
+    },
+    {
+      "path": "evidence/event-cadence/current-cadence-candidate/checkpointWindow.test.ts.patch.txt.evidence.json",
+      "sha256": "e85afb63853c6ad205ceac136fa3996a401275180b2f92a19b0bc8a8b22d7756"
+    },
+    {
+      "path": "evidence/event-cadence/current-cadence-candidate/input-pins.json",
+      "sha256": "112fa575c59b90ecaca59dd069ca6ce07bb569ddb588c9d2f563aca02432a912"
+    },
+    {
+      "path": "evidence/event-cadence/current-cadence-candidate/matrix.json",
+      "sha256": "16a6b1a2cab0cfd1ae80b46c7ecc5a9a3b2d400ae9158cb8049f48c8c6f4dc0a"
+    },
+    {
+      "path": "evidence/event-cadence/current-cadence-candidate/seal.json",
+      "sha256": "a9ad3b40affe0db301a39e162b0f57f94a7b7b79c91f3a5f99f56887e09b9ae4"
+    },
+    {
+      "path": "evidence/event-cadence/extension-manifest.json",
+      "sha256": "f5437ab77f50354e0c80e5637d180e39f4948c804d2d0109d9edb1fec172c8c8"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-helper-static-review/actual-manifest-addendum-seal.json",
+      "sha256": "e5427ffa29e70fe1f0822896a574651479375d53d6c4e2e7e416a6ab24cf3f46"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-helper-static-review/actual-manifest-projection.json",
+      "sha256": "16ab157365f1b8cc787d15b64ffb7cefa129aac826119d166f7eab82441b1d96"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-helper-static-review/input-pins.json",
+      "sha256": "22c144e604116d6d0f9bc42e68eadd8b5f567877f6222bef947f0a64a6ed543c"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-helper-static-review/review.json",
+      "sha256": "45db44e5f721d0218d2bab2e9c1c9d322fb22100528deacb8875a4bd8d344a16"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-helper-static-review/seal.json",
+      "sha256": "ed2098bc2d08a33db2d5cc35f5c9bd282ed9f673e59ead534dd33d10417b0605"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-preparation/COUNT-CHECKPOINT-ROWS.patch.txt.evidence.json",
+      "sha256": "d332b42580bb17eccf2c02872397dd8a218dfc5db87450b2b2bfd343cb58a0b0"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-preparation/FIELD-INSTRUCTIONS.md",
+      "sha256": "af7f16656ee83f30fa7872f3c7c0038595c085a4097cd9720604320bafb752f9"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-preparation/README.md",
+      "sha256": "a82b619e3236af90f9581aa17922774d25ddf67e29cbd8ff748d9d26f1194fef"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-preparation/STRICT-THRESHOLD.patch.txt.evidence.json",
+      "sha256": "0b283dcf93a1a795e24a2c17e3c9cc5b9bffaae3f2457c9a242ae6fcfa9f651e"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-preparation/author-review.json",
+      "sha256": "059ebaeac7fd9f758cbcce4041c8bf8b1e79663be2ece5d24d928ce751f6d339"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-preparation/b38-to-cadence-control.patch.txt.evidence.json",
+      "sha256": "75235bf138e3b1ffac918520d30949cb21e781003cebada163469a35e43133f2"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-preparation/control-root-bindings.json",
+      "sha256": "fa029df20ab16a0a79c252ebf8efb92008d83d64635558fff36f76876fde9cad"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-preparation/control-root-bindings.template.json",
+      "sha256": "dd12841fe9cd635ce6ccd7b41ce09dfa79a64ab8bdad9fa5f8e71578ef25ff78"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-preparation/controls.json",
+      "sha256": "9d2588dda5a2e723421433baac6a586c0c5711cdb55ca94a69a7161718b45840"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-preparation/input-pins.json",
+      "sha256": "9d583d941d886475196930b22f97b960cc8ec24dcf8f8b36cd7197b5209412ba"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/control-preparation/seal.json",
+      "sha256": "30b017bb2691d409dda2477611ebd010cbc1bf4fa953eb8593c3676f24e39804"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-preparation/README.md",
+      "sha256": "934537f1ebf598a333594212b89983dac07476d709fc8fabeb42e77162ba9261"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-preparation/b38-to-b39.patch.txt.evidence.json",
+      "sha256": "733eb94f755cf5469c1b59c363a9c050f34c078fd11747d70a5efab91a8fca8e"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-preparation/fields.json",
+      "sha256": "b8af2327740b14fb1ae5edbb9e135ccdff26a66602d6e79102cfc4447d725d84"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-preparation/input-pins.json",
+      "sha256": "93e0b130727975de1040947947c9eaeae6e723af77c3556c6a3c5a6fbbbce569"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-preparation/read-only-lookup-diagnosis.json",
+      "sha256": "52ec889c1727dbc28a005d60086f92dea1c3d1d9fd5669bbdc85627822834a86"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-preparation/report.json",
+      "sha256": "34c38f39dbff6e80292c0e1967cc20042c41d27aabaae0de8a3387ae0d0cc0d2"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-preparation/seal.json",
+      "sha256": "010ddd25dac8f9152cc0cfc2331196c4524c8f08ee7f4402a7ec57c10bb27861"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-preparation/source-selection.json",
+      "sha256": "02552fd970f0aff01496e9d954da4f554275a0aec076a461087c156662ce6083"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-preparation/v2/README.md",
+      "sha256": "0346ce2f25aa2c3507cc8dbe2770592d05a070ff05b7eb0c8adf5b70aa286a22"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-preparation/v2/fields.json",
+      "sha256": "b75451d8890643f7b4d3e4abc65b8be89a966e2cc73d5d3ea148cf273c7ef089"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-preparation/v2/input-pins.json",
+      "sha256": "ebc5d6a33c5309b03f655ca77d7ba364de3db414205033b7ecc6882b2ebcbe55"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-preparation/v2/report.json",
+      "sha256": "1d3f996eb4b422d4078b3e83b5132fcd71f0bb18a31462897dac212906469d3e"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-preparation/v2/seal.json",
+      "sha256": "3d0f5d6f9457f73fc5fc30e261c5eec7d3ad60728df8b377039e03c8109864db"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-preparation/v2/v1-to-v2.patch.txt.evidence.json",
+      "sha256": "c685a004d2407e4b5ea576cd8c39bcaa754b3bf6ac15b6f2f38dd4858c45629f"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-static-review/input-pins.json",
+      "sha256": "5bcefccb2617d5c155f3d0390ad29b13aa9461233c24a1fff26c8c50e57cca3e"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-static-review/review.json",
+      "sha256": "250a6e6a9dea9f4da72e7551d673a96d0852ea641dd9b03b75a876ef327c5b91"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-binding-static-review/seal.json",
+      "sha256": "7645b20df5abbf95fa73f6404e9193af6b0ed65e1f8ca3583ece2bac4a82be12"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-control-runtime-review/README.md",
+      "sha256": "cda6d655ead37267af57fc690b9f8e9355433c58ff70f0c507e2b7c22669dff6"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-control-runtime-review/input-pins.json",
+      "sha256": "66fa954047410afc28254074dae8822b120c9f30edf2ec87c804034d1fd8ccc1"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-control-runtime-review/review.json",
+      "sha256": "50e62439cf933124580654d910db988859de02a055995cb1b086611fb87a4619"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/fresh-control-runtime-review/seal.json",
+      "sha256": "91431201e47aa54c261f121849298486b6cc026364d194cdb0a90e68b9aa900e"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/public-output-actual-review/input-pins.json",
+      "sha256": "df1869f70d91802fad3c1649fa986c54d65e7554ab4bf7584f2b82ea194eda03"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/public-output-actual-review/public-der-checks.json",
+      "sha256": "142ef2bf696b7eb384bdadd9c3c58c722387bbdd677022e65a8fc9a9ce7e18d2"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/public-output-actual-review/review.json",
+      "sha256": "38d6baaa1cd9dd1b372d5939143c9b1d40c1334a50ff1442224848ac146604fc"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/public-output-actual-review/seal.json",
+      "sha256": "becaa841a0db6f64bbf54041387b8991bf14d42a9f9cbafe0db115deefe281e4"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/public-output-preparation/README.md",
+      "sha256": "158925d21e1d8d6c54801636020d52a9dcf5315ea3ea26575529c6cc84d6d332"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/public-output-preparation/author-review-addendum.json",
+      "sha256": "254cd6ed950914abbcc2dbfa42e421b73f8290cf401f78038f93a0ee63e6c54f"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/public-output-preparation/input-pins.json",
+      "sha256": "119141daff8867c070c1e469dfff629babbe2c415f34ea3a52dcf7c21fd969ad"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/public-output-preparation/phase-inputs.json",
+      "sha256": "d59c4d21c40a79ca1234bfb143b64e8eff30b21d92105b1ae6dd51e80ef1b428"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/public-output-preparation/prepare-public-output-from-B38.patch.txt.evidence.json",
+      "sha256": "48790c15d63ad868d9704baabdaa29329b476b375e43b20dbe2bafbe676db450"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/public-output-preparation/seal.json",
+      "sha256": "df68a041310a2df1f092b6d620e51cb9b4e6f1f302c106c6b62ba1ad2d49d8b9"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/public-output-static-review/input-pins.json",
+      "sha256": "04c425d9d1c55f5d3fa80f855ad5744bfd9e147819356e0ebf97a26f4e13eb3d"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/public-output-static-review/review.json",
+      "sha256": "2d18949fc9315618e0edcca939611e18accee69bc2353b7bcda2779745967dd9"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/public-output-static-review/seal.json",
+      "sha256": "71d64f7814c00e45d39e3d976034af6a270a8315cd1efff6633ca5971f8bd792"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/README-preferred.md",
+      "sha256": "9f914257e80e7d23592621b73d2989c0a8861a3e55a4d762dd32b57985deec89"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/README.md",
+      "sha256": "5289dbd42cb2cbeb476cb418fae77beb3d21fdf721254b802f5954880b62434d"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/base-observation.json",
+      "sha256": "229c8af2095e0ce01ca9c9ea1ae0fd5324fe843e1c1d5f6d2773e7b85bbad476"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/fields.json",
+      "sha256": "22077806f1239afd926a12008f8ea61259aa6b84b630c3e05cdcbcfc382f3183"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/input-pins.json",
+      "sha256": "ddf68b23c81fd3274e3790b96c73103fd4c4b221b3b326a5228afd9e2d4737bb"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/input-template.json",
+      "sha256": "52eb9cd367fc8afd70ede0b2af337e4917d6d5a4b54dfc802e800033f56ea90a"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/readme-wording-correction.json",
+      "sha256": "6fa059e416bf0a363b3fc47746f1d99ca9bf713dcd4841971bbaeb7bc29a2177"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/report.json",
+      "sha256": "392e3d06dca6753b46d003b78eae1dff2f4efac23a4764b8911c1ee9c2a79c48"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/seal-v2.json",
+      "sha256": "f66174340810708671ab8c6bb8a6aedffcc315197ef969b7e4b1de1806a36015"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/seal.json",
+      "sha256": "394da669e8bf4078a0123f374f94f837a942e4e3a62cdbed4ff406b4a06ff4c9"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/v2/README.md",
+      "sha256": "48858265afcc8a39c72b4d7e51be4cc973151bcd160d08a86ac0789d9383d64a"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/v2/fields.json",
+      "sha256": "aee3ffeae9d08122f65e30bf1cde837d1898fddaae95ef60b2278ce21aa0ea5e"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/v2/input-pins.json",
+      "sha256": "0576b9e2f482625c1a6ef24df99c854313f21fb9f5b9c97e7d24f440943f5cbf"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/v2/report.json",
+      "sha256": "6ad292de9a791d611ea9ee5e25afb3811fdde487d74fe8665cfe3dfd145b34de"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/v2/seal.json",
+      "sha256": "d8557ebbb7d293d9246804f413a910b9fa095cd13b2d73d6be3ba508c60b4d17"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-extension-preparation/v2/v1-to-v2.patch.txt.evidence.json",
+      "sha256": "6cbd320753132d28d0a2854b251ca36d3884e570aecbf744173cb88e0d054b2a"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-helper-static-review/README.md",
+      "sha256": "b9953ee87e146cc42feba880d630a00a5ddca87236b72b30572368393eb7e3a5"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-helper-static-review/input-pins.json",
+      "sha256": "6609314d8930410c3007d6bf863122c2906077e81621c1bb2b78cc0b478eab51"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-helper-static-review/review.json",
+      "sha256": "d6207479fdf85d65e8bf92041bc06fdc4fae675e3e6b87a962216b49182015c9"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-helper-static-review/seal.json",
+      "sha256": "455960c72e75464e4eb5dcd270163af4c1d7fb93d7384fb1693b5bf74b0bdc0e"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-helper-static-review/v2/README.md",
+      "sha256": "9293569248eaa013838d92669a3e51cc8f952113d1e1d730060d671956496066"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-helper-static-review/v2/input-pins.json",
+      "sha256": "d20328d7a0aab6bc4ab932aa1231c6460c3cbaf41a8bd63ba551839d43ff09f7"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-helper-static-review/v2/review.json",
+      "sha256": "4e6fcf8083d206a1c63dd89cd0480a1d486ac9085b5f00e1c1770986aad3f69d"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-helper-static-review/v2/seal.json",
+      "sha256": "eee953943d971155a96cebd6fcd7ed394893ef5c30894097f1b0aa554170d0ee"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-scope-preparation/README.md",
+      "sha256": "7a508c8aa80fe53ef01416555e5205872f05aae7ad558220967b860c3f1c8183"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-scope-preparation/input-pins.json",
+      "sha256": "7c4a451b0d6b846dbdf1e95477fbda61364215179a77d14db0e544759c3df0b6"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-scope-preparation/review.json",
+      "sha256": "103e3ce10dc1eaa7c66a81fc23c915ac12a603bc9da1ec288b1297dd479c5f9a"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/receipt-scope-preparation/seal.json",
+      "sha256": "0f3480b8ac9eb37fef35631fcca14fda1d2d37e2b12f73509863f5ead29c18ba"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/runtime-adapter-review/README.md",
+      "sha256": "1ad65048a41d6c0e4ac01296ec09f350f3f72a246cdd8a61ef71f4bb66eeca60"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/runtime-adapter-review/input-pins.json",
+      "sha256": "b30918bbaea98ded3cf6bd763a9fe93316ecac42917b939d482321c5aa376cf8"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/runtime-adapter-review/review.json",
+      "sha256": "54aa8e63247397d5b453092b20028b0e5aa1df9765d2c880a0d6e5745c7b0947"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/runtime-adapter-review/seal.json",
+      "sha256": "634867f997fe54cbc3696fbb8ce6a8db42e6a8ffcc4de2efff8a8006de2b2672"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/source-evidence-review/README-v2.md",
+      "sha256": "5f2c24e8ae5a338272b5f367bbca4d11ff85de4ac389fd0c95243cb33cc8d545"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/source-evidence-review/README.md",
+      "sha256": "00fd8ec0776dd6020e0a778ffa32cc3f34c7400b167af6f90ec0fb8b624946e8"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/source-evidence-review/input-pins.json",
+      "sha256": "f832cff363bf9595e91fd3c94f338ab8f2c343306534d120e0757f9150393f3e"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/source-evidence-review/review-v2.json",
+      "sha256": "00c481e69752ab26cde6ee8fc969eced0638a5377d2dfb9b733e09e605dd4d5d"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/source-evidence-review/review.json",
+      "sha256": "b94001d9f5e692a1a7e093f5908c98517f974dfc65c4d5ed3fd1f67b1a24782d"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/source-evidence-review/seal-v2.json",
+      "sha256": "268330136c67e962048d3a9adf3820b7407fa5579d0db2e981895244d6f8beed"
+    },
+    {
+      "path": "evidence/event-cadence/preparation/source-evidence-review/seal.json",
+      "sha256": "fcce9aa549730f23cf42695d5752f05f4349f2a6632ba1f17acc403319ae56bd"
+    },
+    {
+      "path": "evidence/event-cadence/provenance-only/branch/command.json",
+      "sha256": "f49277067e4c7124f38347ae8166db111c6c8c4b1214cdf6b485836137c59300"
+    },
+    {
+      "path": "evidence/event-cadence/provenance-only/branch/stdout-stderr.log.evidence.json",
+      "sha256": "a9da8d046c45a73d6a52d56aa9370a977617e824ec5d8f24a0250595b0426ff2"
+    },
+    {
+      "path": "evidence/event-cadence/provenance/author-read-only-environment-lookup-diagnosis.json",
+      "sha256": "613e79b9494da1e998ef38525a42c2f952bd3a654dee0c89fdd728a3a4f3e368"
+    },
+    {
+      "path": "evidence/event-cadence/provenance/environment-from-closed-log.json",
+      "sha256": "ae5c04d7af28ed1f36413eaec50aaecdcd2657c5f8980fd78c8cb9e3a496e651"
+    },
+    {
+      "path": "evidence/event-cadence/provenance/prose-v2-correction.json",
+      "sha256": "fddc913a9b9abed5e7340f1d126d20f4e0c35c846bc24c2dfec579f8533d5543"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-EVENT-CADENCE/checkpoint-public-evidence.json",
+      "sha256": "8dff6a6a552b7612d02e0f0164e963371137946ded69d12a4403af0c09e4f4b2"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-EVENT-CADENCE/public-certificates.json",
+      "sha256": "f582eb727b5597615dc54169649642c8d7e9c700a5988b39ac6dcb79d5608ea7"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-EVENT-CADENCE/public-evidence.json",
+      "sha256": "50212df61f6e6c411515d62de4a694e3e07fbc11337417c2b931d3d323093ea7"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-EVENT-CADENCE/request-1.tsq",
+      "sha256": "65fde4b7134a737f6c4b95dadce7db57231220b886db01aee8c2fcf1135d672c"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-EVENT-CADENCE/request-2.tsq",
+      "sha256": "4f08f51aee6eae27821e6b144c9a2ab7998fceb28176f6cf55d41b7d14cfd2e4"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-EVENT-CADENCE/response-1.tsr",
+      "sha256": "7f9f4d3877f90264a2ab14e97c56abbf2ab1e18cbd896b0c925748e2e9ab6b55"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-EVENT-CADENCE/response-2.tsr",
+      "sha256": "67e5413485d2fdfb33a5f0f2cc129f025870adaa1aafcc2b17c34f853bed4066"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "f37e9b307182a1c742d18ac3e15d9bff84a1ac237319be0b6858c85f8e253c52"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "3df661b31e6b8818b36acfdc7e5a9b7a3e2928ed3abc5d923ad042118a46fd0e"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "f4284a10eb785394bcbe996692f067250dfec3ff08b927d88b8e85a008c3984b"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "d684189a196abad6187b57a89d25429455f13827c7fe7d85b7c57f7e91983b5d"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "e46d7d6c92f1cfc3e39d693cbe6e39fbb6e0598db31c3a93d0532218fbfc1029"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "307d6491a2f8378c626b3417565322705a3cba7a301a5a76f34a03298c4d7928"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "62934de3b9b7b364822dff5aede992e028afdfd54eb9a6da4b752ed1b6ce79dc"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "35f197ee17159ca534af1f64ed7312671117582779e5ddb27ca3a8b8172e01b5"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "sha256": "033c56176cca3db89bd720d6997eece73a74960f3338bdd614da0e05008ba62e"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "sha256": "9ea0ee84345706c600f39fe0ea9c09400c81feb28ef36b1bdc7b004a5a33a736"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "sha256": "d68f64f04bbf90abc8697a92f38225153fb5e848c64ae45220a453bc9a9ff751"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "sha256": "7869a66c6114a7f6ad92feddc0f1b45323e4d536053868d5411f45de8331e31d"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "sha256": "97c0ccef1b8918e5e87ea6b0e983b00ffca0a677d27d851bfcf50be875120f0b"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "sha256": "b704246dd340400945b8fdb13648cd8f8240c38bd82e79d59dcd1cb79484143b"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "sha256": "32e8f2c94c34288a1cd6ae15272a6be8da14357b6bcd7b8dbe83f59d4e4032af"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/FIRST-GRANT/public-certificates.json",
+      "sha256": "dd9b873e739fe5d2edfc74eab28fab048dbc5978a0166c3d6b96adcb8f8caabb"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/FIRST-GRANT/public-evidence.json",
+      "sha256": "13f1e7a3b4cadba7703f92b722beb3a1912e1dda4e5cbdcafef8950c421a52a0"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/FIRST-GRANT/request-1.tsq",
+      "sha256": "c325e44316eb260eb18d450750d78eaa866033ca5ad72646f99df1244d5a9f2f"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/FIRST-GRANT/response-1.tsr",
+      "sha256": "b96ed578c441346951594a77c15d4efadd0add9e5ba502c856923bce7d1573f7"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "0edc01b32e3a0d7d231967811fc855551e0e704bc1849a77bf2ef4722e879ac2"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "8558b43dfb38b00c567891178333881cd006cfb7f2dcd9688c13972d7a9eacbb"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "a7ec7ff644016840382e125eb663f065f8a41e7bb96f3f1d168212801730c45b"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-fresh-canonical/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "e5de175ea62e1d9b7d54ea70caee70cedc344004a9e773ac56ba53ef78adb328"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-EVENT-CADENCE/checkpoint-public-evidence.json",
+      "sha256": "6cb8514eca534c8f16ab8539bf105015c62fae5f55e952deb9d36f3c0ebd5469"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-EVENT-CADENCE/public-certificates.json",
+      "sha256": "6321a6458703ba616a2e1597dc7576568586af6e3c4b44478f141bf9a0e79b88"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-EVENT-CADENCE/public-evidence.json",
+      "sha256": "e0efb4978926f5265dd840426fc1ab537bb24127633a01108941809c180a3a6d"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-EVENT-CADENCE/request-1.tsq",
+      "sha256": "05fcbdf331c3e9164804a39c5acf0cc5cfe9d32cb7926e8ea025c36e2a0578c6"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-EVENT-CADENCE/request-2.tsq",
+      "sha256": "e1ccbd77580356c3d2c6953e174a32320f1e606e9f7dc5d11b7fcc00efaeb7ff"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-EVENT-CADENCE/response-1.tsr",
+      "sha256": "9b4c56d001eef2f124688539a65a16c38955dbd3be7ee25e887132210af40d3b"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-EVENT-CADENCE/response-2.tsr",
+      "sha256": "9b7d0b7aa3093a83bc4b467d398b257e9685cf1dccf04e87933f44c8063ae219"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "8884df035bf770df3367422f9e48e721d9e0f9018192e3efde3995c3f689991f"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "f3cb95396423d178bd4eac49552b9ab70da207e5879de3fc857e9ba943fc8a65"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "9f340bf96e01f082eb3e8cfe850a17bcbf3308ad3c2c34c651065cfbbb6f87f3"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "a46b73d3a3bf4081404c862bf13a43bfe194092852df5aa23099c68e0b7f9864"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "4a7551978c03b72f8255b2abc9d52e447fa18ce00dc8e357c09c7f3e4be09251"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "853cc31f7e048eb7fe8c56b73d6ee07efa74401b4770f9b314967767af6960c8"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "1b6d04a7e9d2966556e467f47a42098a0f624b0d67e11f193c1c79885bc4be1b"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "7805ad8abbe176bde74456c7a848369a142f796f35559d48c107b051dba66e96"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "sha256": "6f1a8b6a8a1ddd1b49b1635d50d3b362625d420919774b3e41b3feaf498affdb"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "sha256": "0b8434071f40a2d8be28f51232472f89c3a2266f8dd62ea59ae9783b15a5aaf5"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "sha256": "758bc960f58d3c8598b420d9c08846b899115ebb6528adf961547d3a3776dbfe"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "sha256": "fe277f97be6f90fa546a55982eb9a3f690f52574dc76372acaaa1ac5b23b6945"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "sha256": "bdfd64509b65c4d98fe275744d98f98d557dfa574f2c6edad0510d9b7eb465c8"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "sha256": "897fefea5d494c8f5a12d8e2d52f7f991d7071d99ae0304a2bd74b24678d42f0"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "sha256": "55107ce4fa9dbee92103d7902caa70ffba3b28aae6d3f6aea22d958c2c4e93d8"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/FIRST-GRANT/public-certificates.json",
+      "sha256": "07eccc57960547b5f088c0128385d0708430faa1f6b4b0555a69d44709eb0683"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/FIRST-GRANT/public-evidence.json",
+      "sha256": "b428e1910c64ccd1ded0a5a327d29766a1b9451f076399bc1853fdb9d26c666e"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/FIRST-GRANT/request-1.tsq",
+      "sha256": "35cec19d7e72c53698612049328d90ecf443eb7e8507e4c540d2dbac71805259"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/FIRST-GRANT/response-1.tsr",
+      "sha256": "1d1d222cbb4fee51c94ab63510338936ff1527324e978f9fc0ae95b6c543d694"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "9d21719324aca15e04ec583e538fd4f7c8700e0e0fc28388aa8b7eef82dff176"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "77cf869c25568b0c37f3ea44a39910d987f27d071f3b9a44ca23c9e2c3409cf9"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "54d8fead2db42f926a8416754546faa1ab71219b74191122c73e5576fd9aca92"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m1/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "f46404d4260ebb009e437c5145d37c624153f613882f5528fc6828c9581d2505"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-EVENT-CADENCE/checkpoint-public-evidence.json",
+      "sha256": "06342a9f4bdf027cb3f7c6d02f68333a31a8db37ac992ea13fa9e24ed42570b8"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-EVENT-CADENCE/public-certificates.json",
+      "sha256": "010ded313d86884e90a13d48d28da3277139f3f3f3ad8eda4fe2d637a9caacd9"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-EVENT-CADENCE/public-evidence.json",
+      "sha256": "8a73b4d11d390dd99492cfa73be87cd17c6ffc479fe548777bf17cb5f3387e16"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-EVENT-CADENCE/request-1.tsq",
+      "sha256": "e17dbd162ca42d0af293db004a598de61913abefed1822c12abea19d10e96dc4"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-EVENT-CADENCE/response-1.tsr",
+      "sha256": "189ee944fa1a1add668dea8e78470afe8a041d7d5bf05552ab7c40ce92bca559"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "3e44ac35de21985551adbb95ca4783d1843fd9602827237a831e7f3bc3aa7fc2"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "3a4a265b9e9c59ad5b71c22c3900c0c1bb782c85106f0b289d6095bfa74d0720"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "8d7e3ae6fe4642d8f78286ae98f91bca0aadc2bc5611a52f95e4819946672a06"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "8a1ca99ec0a899c2587945db879cf350c8e4222b4a481afaa7078e4644a4dfdf"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "909a901bae03ba50c83bad4cf2a4ac14af105b8043c56488c2bd51831b0d88f2"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "f2d269291b43ca1ae2b45572c378e38063c2cf8a816d8cb0d1e121117bfa32e1"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "2efb33da0afd0afd3c72416afb1ab95dc9d70fdd50a5d58cadf043fb1a35ea38"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "dae3ab4022d0f143ff5ecfa74b7ebbf4c32fc8a88e8c11e011c03c9b6b0cf4a9"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "sha256": "10d857dd5b3a617ca70f16b4bfa5de640a2c39bbbd63fbec4b9f45a752d4fe82"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "sha256": "ad6cd4db45fc89b2a067e74ef21d5e5cc217a90d5b09780eb1b88733d0ed7889"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "sha256": "bf5e0ed33fc790bcab972a783647cab923f43dad1e8691f2bf9181762f56699a"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "sha256": "dfed67b402d43d62bd59de255459a25d99c7c989996c8662dc9dbc8f19fa6ad4"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "sha256": "85567167b11008be63f5bce24ece76d509e4a03180610c45944615eaf9391ddd"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "sha256": "35682a882128a003969aa720c5d3e5f805d475d57ba21dc87d275448b375184e"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "sha256": "b06066be30031f0aba9e6458085bb333da356196abe8999d67bf4da5dbb9a9ee"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/FIRST-GRANT/public-certificates.json",
+      "sha256": "b4796d43e1a5b5f01396ac23878320cb3d0cb877ec3beffa5677faab90cf28c1"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/FIRST-GRANT/public-evidence.json",
+      "sha256": "bcfa3e4260c890b181a61d6d1b21819541c69b50a8dc55837b8fccf9553af40a"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/FIRST-GRANT/request-1.tsq",
+      "sha256": "4b3e7ed5f4922c1c63d4a6fe55780aa4a242fe4f871b6a288021a9cbd720523b"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/FIRST-GRANT/response-1.tsr",
+      "sha256": "4d702e5a09318269a3f153be09b048a5000728c296708507d61ff6554a138344"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "b35d09d0828cd80cc52955d985efa364bfd5010a8e63acd110855b1e3ff43c2f"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "44a7a0d8fd0222f42879f8290191796892e8222fd5133eae480af1568600017d"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "c8c7b7a1895a27273e472a06182e7193d70eb612330c042f5fb679de0eb96779"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-m2/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "eda783db93180e4f458acc675bf04338e74a964fce7b58c56f4d7722b08c8856"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-EVENT-CADENCE/checkpoint-public-evidence.json",
+      "sha256": "3403e3a944933ea6b718004be0986da50e811b0e57a51552b5b933c01de54ec0"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-EVENT-CADENCE/public-certificates.json",
+      "sha256": "e871cc1a2d0d7a1989ac92ae8965e51870d61f89a0e60df6b244b7f161211b99"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-EVENT-CADENCE/public-evidence.json",
+      "sha256": "b0e8fdc82f324d3f2774d3ab69cf968db849e9c2c9b578de3b62f9516426d4da"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-EVENT-CADENCE/request-1.tsq",
+      "sha256": "95453e5a8e12e8f4b67d636be1d6edc203a1a6784071f76c331ad1eb8e7d0a06"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-EVENT-CADENCE/request-2.tsq",
+      "sha256": "681ee4bb5d3a739d7c46d499a9ef32a987d6f79267163648753e7d4822fe582e"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-EVENT-CADENCE/response-1.tsr",
+      "sha256": "6113c6431ee6eec3d00ff05d3823cf7297ac86f86d3f97daeb7e71c746b41f14"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-EVENT-CADENCE/response-2.tsr",
+      "sha256": "b1951e0f227cd2e1f57881a810bfffa75cc231fafc705ed95e9adb0d3b0f33df"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "db4a91668551863455eb086ee89f0d9dcc9e055b44a00938c6d0ce3e46b1b943"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "27a934116ee442edc6c4c69dcd9e95c8ef4dcf8cb92ca089c0efef942fcb6766"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "c1ae14dd0d877cf80462305e67522ebe970599dae09ffbcf88dda5c01d1d9b2a"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "cd2e2db26fa9c8155a959aafb65a5726f91205c0f02df2a0a52b095659d23ff3"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "a64f81655b613bf6b0fe1bd3e4a63a1f39f2abe5d14bfbddae7432b002dc907a"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "c3be9927060e42b91b1e7c769f2a5ddb56f8383c5287016eab80017e0e67a223"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "4fe430e48ed239b030b463e2928d995e4e2a1110c42573cfe099436a4d456e97"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "c80d0f9d11b7b8d7d41f39e15b2bcf4cb3145a4d07739ab6864a05d5273468a2"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "sha256": "9798ec9629a1ee798a81abb3d9a1eaa585c96fe141e6b983747cdec170878d64"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "sha256": "6483c911652b74a5c2baf554e1e8d755f74263fdcb972354964831a80d40d6ae"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "sha256": "899229a3a44cee733555dbb4e61037cf3ba750b9b2fd5ed442790c509ecb0122"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "sha256": "561180877f1d6604d57e04570bd81e865b9daea07ccf83134c9023f7ac2f22ec"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "sha256": "069cb0c303d1f7c83c67ed4a930658b2089db0e05ba2a5feee683db5448cfe61"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "sha256": "5404cf757226c003d985b8604c687634c8156a6034a4bab3c5ffc9cfcd3d5248"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "sha256": "72283fb2ae962f4c602a011c5ba39c4903518f4e0b45cf9eebf5c04a347ec27d"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/FIRST-GRANT/public-certificates.json",
+      "sha256": "d29bb8b132604da740b14ef291c2cd7a88113eba180a97be97e34c5d5307723e"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/FIRST-GRANT/public-evidence.json",
+      "sha256": "d6e2bde7adfe04722ec7f27f598d2d68735c7993835285bb7a2bb851fd695947"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/FIRST-GRANT/request-1.tsq",
+      "sha256": "4872fdf426a789b70134fdc53e3300271a88fc3a079332c3f08bbf94d1e312a8"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/FIRST-GRANT/response-1.tsr",
+      "sha256": "4586710523e4eb9f3918ca7ac3af1cee0f3fc74908ce4333b79d98c023409b6f"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "744ab7e85358e347efeeee43aaa6865df711a496113ebdd95ac1e8cb6ec7b7cd"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "7cff594dbc87a8f6e79955228391ed1b7f54233a64cefeeb8a541eb71be6ac9d"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "4f1405c1921588fb5208f8cf40b21805ea31d429817174bf5ae0f064637189eb"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore1/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "fc47fc7fcaa6b09d40c8da2e9fe71ced74512eadb3844d1cd50a54ec46413d26"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-EVENT-CADENCE/checkpoint-public-evidence.json",
+      "sha256": "6cf418e22bb36d5ebe028879bcf994bd2841effbfafbd9d6d0b969f08f35c3cf"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-EVENT-CADENCE/public-certificates.json",
+      "sha256": "1918dba708de9e5ef0c8704ef6bbf3691ad9be35ca4542bf47497e41cbe99eb0"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-EVENT-CADENCE/public-evidence.json",
+      "sha256": "2d20df29743054a353d523f04c9357de2822061b1d37a3c61595a3b4ad945647"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-EVENT-CADENCE/request-1.tsq",
+      "sha256": "db87af2f7b52c6bec69a85bfc0aa5cbc80d700f17729eecd6fb784fbc7b74861"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-EVENT-CADENCE/request-2.tsq",
+      "sha256": "c657e15af68a131bc6c4e5e05f5ba561876cbdf8070f2408dee7d3746c9e6ee6"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-EVENT-CADENCE/response-1.tsr",
+      "sha256": "a392181c5e21fa7559ffd4e04deaaf13484bb9561ae0551ba0caacab446e8983"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-EVENT-CADENCE/response-2.tsr",
+      "sha256": "3ad815c91af3e2495328b0d553eecfe5147a970f7462d1f1c76700957cf8cf33"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "7b0675347aaa9879dcc3682ab47e6c270355fe69cb2644ce38450c900a96634f"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "08edde9122f191fccdd14f231bb16abd877f25e73a0112d769bf80e69a5ac1f5"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "24b18e0a9d1297573c0ba7b19a1ee889de07fab492eb41585baebb5becc7039d"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "6001c84115837312539839d726c1d8373fc365ddd922ba88ee48122ea7481d1d"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "5a4939f3bd09a26737695fcb1c823f832d7793d3c270f6ec4193d0869616f6e3"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "ec9909f0d7e4e5ef2aad13891f85b5cb759d486e0b6c39ab4ad2a1dfaaa2e7d7"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "52e8a23d0baf541588d2ee2d3df36dee67c85f0fc14bbaf36970a93a102662b2"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "ac8e0a353783be8ec4ccb0609a05fb228f5a4ff15f8fd195f08691c3470dee57"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "sha256": "422043f53ffc3bafbb8ac564382ee6e1f61b99ee3043efacf01fb48f62a048ca"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "sha256": "7b3142dce553a7a2a9805fd3bb3a615bb2d83e05aa03fd09bc12385ed614dfde"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "sha256": "f34542cd05b5769130918f18b5c5ae0e71be113d393d3ff7a7e97b592b174dba"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "sha256": "f3ef3ae4b549c842f0465a4d5d78ba3f2c74605cf094e8bec1029cf9a1b4774a"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "sha256": "29c17ffbf2c38a80ea2150cf34ea213e2fd9f29ab1364079ff6d2b1820a89fd3"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "sha256": "7ecb37d4111579237faac58d5b1a3e486c899cad17020805291f532e43afecb0"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "sha256": "7500f1644b30b63de4b0b70515d149755c8e8531b39d16af65439ad6b6db0d6b"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/FIRST-GRANT/public-certificates.json",
+      "sha256": "9658aee516a1faf529567dc47a1ac59b8fa69c8feccb1880c836c475c7562f30"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/FIRST-GRANT/public-evidence.json",
+      "sha256": "c8b574656dc9c4595ea2bbe59ced96b5cb718256e6b07a7bc25ef895ea339b01"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/FIRST-GRANT/request-1.tsq",
+      "sha256": "d1caa57c554b3744540d0a00e031e969d851d88bdf681020a33402e60a6d13b4"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/FIRST-GRANT/response-1.tsr",
+      "sha256": "a9238ee05cabbd0a45a8e7a5c185054b9c87e057f0f451fe77e0e4d4a1113539"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "8abb33501b6a11c628e8531cfc652cf86eaf9003d59ad61254776928927b3b57"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "ac1cf68f454fd355eb905f376199f27ea19f64e515afd9c6e5bd130e857d4b80"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "a931c29b5946c85891784fad335396c37aa01780e1f24ea45df6d083c8370b19"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-restore2/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "84d050a51f5a7bb75f649ab6e7f8d2fd1b0e546578530427c3718f45c5345a22"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-EVENT-CADENCE/checkpoint-public-evidence.json",
+      "sha256": "c2c530a35a4e16912f562e509b5781ccfef763827915e56a478730bce8e99fb3"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-EVENT-CADENCE/public-certificates.json",
+      "sha256": "bb1a93380498e3430b8588fc6d74ae9b1f7bdc75a8ace1462c10efa26641f362"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-EVENT-CADENCE/public-evidence.json",
+      "sha256": "1c00fc009d10c5ed4af9fdb582cd29fe92279e86583e1c5ee6c7df01a89292f8"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-EVENT-CADENCE/request-1.tsq",
+      "sha256": "189d19430ad0b34063774c5acbac4ffeb331bcae0d8a180296ee8b584896a874"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-EVENT-CADENCE/request-2.tsq",
+      "sha256": "fdbdbfd484b40aba12a5fce11af49e4e068f80a12a478de5d3c5e487d5d929bd"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-EVENT-CADENCE/response-1.tsr",
+      "sha256": "8c5e068f11b7d4ee97f5a4948e482a86c743fe7695267bb8c7d8a9d4be13f5f0"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-EVENT-CADENCE/response-2.tsr",
+      "sha256": "fa2ad7ee78d79706b0f10ec22b45a17bf1cf5b96fc9c06f3ac375d7a9f005c4e"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "8c763b116ce1d21ca4a49499055ad9fc6ed598ce649adb4e27f5c1b26aaf57fb"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "767f552d37b028e9505d8a302538fbed98bf1b572a8a5d146299a5dbb4e11f17"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "7d71aceac603da9e4a58e0ce8fa0b7c1803cee0f48882223d2e2ae9ce5e10e2e"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "9e82655747c2c67f03fcfb3f95f6d366879b9319c2ae9dce77401a11d138978e"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "b3506434a49f24cac083f86210bad5dc675c09412d4b88f69b823b12d74b3aec"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "a578225bd271521bc096198942f5883fe2c3c279a8f1692369735ec3a7f9a014"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "8e7a5f120b004c1bca068816d3e4199f861f2c3fa921a73bfab970928d392825"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "84ed34c3fa2bf7ca3493d634f9c8ffcc031c1b2a43255cfffd3805085cd18cb5"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "sha256": "f3ff0e047d9932bf03184a189d4407bc95f7410f0499a14a9b1b814bf1d4e0bb"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "sha256": "b3729e5b2bd3ed06bde1f8f20de0cdbcc62951e6cde01df81201b10f1d654498"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "sha256": "bde9081800f973a09957cd2dee00af5946509c7de8f97bee89bbe211f7b3fac5"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "sha256": "08df1c8e226555d22934c24c84dd44ccf362516653fda04d1772cc585a5bee24"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "sha256": "88bbcd7b67f8078d599cfab797974da81e211854edcb431ab6aba0b78ab9bb55"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "sha256": "1373d006d843cdf5ba4c1aa538932965588c4b7587dc366d2a20267d45a6c561"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "sha256": "0004ab36f4132087354d749febcc31b0718b1db4750cbb4151be8620af3c6533"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/FIRST-GRANT/public-certificates.json",
+      "sha256": "5b6bba18aa5035adbd86ea1d154d88754bf7af4ba7709e10a164bbfd8ea8fded"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/FIRST-GRANT/public-evidence.json",
+      "sha256": "a735c27006448b4c0b34f5cde44b54e9e3e9f7adbdd0cb7236a500b966a24aaf"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/FIRST-GRANT/request-1.tsq",
+      "sha256": "07aeb73b8fb6c30364f6fc950f8efecd01b166310faac51083541379ebf8c075"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/FIRST-GRANT/response-1.tsr",
+      "sha256": "1887da12c4e74f8be6c8b943a81ba066e3f8e44aabe74443c7184705004755d7"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "6f0822c44c52e6f6b3a6570de1b274f0bf39a6975a1727c4f82a6f874aa47366"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "e616e9d446bf57ce12b42b43152019debc162b6e856fc0fa0759a00d618da732"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "e45c045f6f5df4edda6513fec08933192d49bb471d098fc6f87af07347cdf0f9"
+    },
+    {
+      "path": "evidence/event-cadence/public/p125ec-source-combined/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "a417bb5a9a705e801ac41b14406923b2fc75463334108a413634d539190aef0c"
+    },
+    {
+      "path": "evidence/event-cadence/representations.json",
+      "sha256": "f2dbe357134b63debcbd979b9f810510fbd4233feb329e2acfe361351bc48db8"
+    },
+    {
+      "path": "evidence/event-cadence/root/adapter-adoption-intent.json",
+      "sha256": "b1f96f3f7444b84863a11594fcab671c392f3901d0a97de80c5838964a471bd2"
+    },
+    {
+      "path": "evidence/event-cadence/root/adapter-adoption.json",
+      "sha256": "8d4c880d5b8aebcf5a51a449db3950540877fa4643b89ae7cc344f15011598f5"
+    },
+    {
+      "path": "evidence/event-cadence/root/audit-observed.py.adaptation.patch.txt.evidence.json",
+      "sha256": "3ec646c3fc5ac39fc3d45a4ede556c91ce350a4e49c2b13c5c28d3ef99f77c40"
+    },
+    {
+      "path": "evidence/event-cadence/root/audit-public.py.adaptation.patch.txt.evidence.json",
+      "sha256": "193ba834926d17972fc8c564e511bdf8962d1073c1c1d0be25b837b3656efd6b"
+    },
+    {
+      "path": "evidence/event-cadence/root/bind-fresh-command.json",
+      "sha256": "b2a2f561a96693b4228cde0f5d3595341a084c0dd253790bb618ef8077a923ba"
+    },
+    {
+      "path": "evidence/event-cadence/root/binder-adoption.json",
+      "sha256": "f0b26778d09763a4dca0cda889f1d6d828c7cc9cb27d07cc1a724ae1cf1a3271"
+    },
+    {
+      "path": "evidence/event-cadence/root/clean-source-actual-closure.json",
+      "sha256": "0e2aa5776eebf72a668007ee49e26a910ceaaadd90748af6ee6d09d6bf825243"
+    },
+    {
+      "path": "evidence/event-cadence/root/control-action-apply1.json",
+      "sha256": "a136cce533be8851a74291c031b11439c7503df48220cdff258734b2003e9841"
+    },
+    {
+      "path": "evidence/event-cadence/root/control-action-apply2.json",
+      "sha256": "3c8bd2377e3766934fdc1d48b5304fcaf6a788e2f3b29eadb4ba8a98fd36f1b5"
+    },
+    {
+      "path": "evidence/event-cadence/root/control-action-restore1.json",
+      "sha256": "3987772d784550bf9680535be4e1bd6c9585e2d8ab9e591fb241760c6f00c326"
+    },
+    {
+      "path": "evidence/event-cadence/root/control-action-restore2.json",
+      "sha256": "b8bda9ff81f7c41655cf1980a4663c980d402d08a334f336eca9c5c3dabf1614"
+    },
+    {
+      "path": "evidence/event-cadence/root/control-helper-adoption.json",
+      "sha256": "7192c4c5de5110efabc7f5cb7c9333a0ab8fcb0aaa8be9a6e53c89691b0a8290"
+    },
+    {
+      "path": "evidence/event-cadence/root/fresh-control-scope-admission.json",
+      "sha256": "c530561a616e708c3c5a157d97c16c63ff27eef42e415fc16b5c7f4eaa82f086"
+    },
+    {
+      "path": "evidence/event-cadence/root/fresh-source-binding.json",
+      "sha256": "48baa36cfc416eac9c71d6af072eeac7847cd2516c7e48a5cfc777f4fa3ec935"
+    },
+    {
+      "path": "evidence/event-cadence/root/hosted-metadata-admission.json",
+      "sha256": "cc69627b5f2fc88f7a58e386377f64a92cecca0ed46da4f4297fa206c6041322"
+    },
+    {
+      "path": "evidence/event-cadence/root/hosted-source-admission.json",
+      "sha256": "de1dbb1cbbf9bb1fb07f4b5b15e40c85546c1431ed48cecbf93680bad6ac20af"
+    },
+    {
+      "path": "evidence/event-cadence/root/m1-apply-prepared.json",
+      "sha256": "76652cdbea21a60a67fa2dd354e130edae6af711db4bb1655bd5a6e22d6e8f85"
+    },
+    {
+      "path": "evidence/event-cadence/root/m1-apply.json",
+      "sha256": "f55eb129096df52082381ba83988df80cd3aed8be1a77ed2cfa184e82f5d510a"
+    },
+    {
+      "path": "evidence/event-cadence/root/m1-classification.json",
+      "sha256": "a457a2b50af209eab69a23f11fbb2270c9c8848db633be97842cfaf5d0a61611"
+    },
+    {
+      "path": "evidence/event-cadence/root/m1-restore-prepared.json",
+      "sha256": "c8e6e4fe74744857ebece897aa38f5ba60de374bec8775724040afeece517638"
+    },
+    {
+      "path": "evidence/event-cadence/root/m1-restore.json",
+      "sha256": "49c103e0f1fed4f2caa590050abfad6f1c7b7edeabcc92aef115c2d9b73519bf"
+    },
+    {
+      "path": "evidence/event-cadence/root/m1.patch.evidence.json",
+      "sha256": "bafdaad3badcddccd716ad14ee1d45b432872fb2884711943899f041e9c1931f"
+    },
+    {
+      "path": "evidence/event-cadence/root/m2-apply-prepared.json",
+      "sha256": "fc88da37c08d0a8ae961a52c980d4170f1777a5db65df47f8ef7967389fe07cb"
+    },
+    {
+      "path": "evidence/event-cadence/root/m2-apply.json",
+      "sha256": "b3d2b5d48dc303c42d607b9e9ef5fe096516a9ef5c6da05e3970f6af3dfad2ab"
+    },
+    {
+      "path": "evidence/event-cadence/root/m2-classification.json",
+      "sha256": "115c1177725a4ee22b866d6f53dab875f23e9e348d4d8e7cbc49bc28644c1caa"
+    },
+    {
+      "path": "evidence/event-cadence/root/m2-restore-prepared.json",
+      "sha256": "5ab992a8ceba4f0858c24525a6f5bad9e5f25cc4076eff1265e273fc4e6a2a1a"
+    },
+    {
+      "path": "evidence/event-cadence/root/m2-restore.json",
+      "sha256": "a57f480212ab74d8bd8bf4fc4e0f4ef7a6fd5ed424dc0a247ad84c683783eed9"
+    },
+    {
+      "path": "evidence/event-cadence/root/m2.patch.evidence.json",
+      "sha256": "296c01c3f0a889448e1a5ea20d5228d0578b251721fa39b857a1c2f8cc82649d"
+    },
+    {
+      "path": "evidence/event-cadence/root/p125ec-fresh-canonical-outcome.json",
+      "sha256": "5918838b7ce27c61d646e41382f2e9c5d543a1e914cd42bf6fddb4179e6a8cef"
+    },
+    {
+      "path": "evidence/event-cadence/root/p125ec-fresh-canonical-public-audit.json",
+      "sha256": "9f65d1fff003e26b6e683054912e8ec46515eaf654c3792a22d817502eaec3b2"
+    },
+    {
+      "path": "evidence/event-cadence/root/p125ec-m1-outcome.json",
+      "sha256": "05591fd30f6df13644c6e19d4f26658146c9c22992353bbddd444431ad54cb96"
+    },
+    {
+      "path": "evidence/event-cadence/root/p125ec-m1-public-audit.json",
+      "sha256": "0876c695fe7e757bfcd5d2247d2d57f1c7381fa8e0011058901cbd612238c998"
+    },
+    {
+      "path": "evidence/event-cadence/root/p125ec-m2-outcome.json",
+      "sha256": "94130c6533cef3be6155a5565671163f4f7adc9fecae83cdf94e90691886894a"
+    },
+    {
+      "path": "evidence/event-cadence/root/p125ec-m2-public-audit.json",
+      "sha256": "a75b1efa30692cfc3a04c087bddf13d0e0c5da8567dd37a888e187a6713a59cd"
+    },
+    {
+      "path": "evidence/event-cadence/root/p125ec-restore1-outcome.json",
+      "sha256": "c26baa683c91b668c3ba362ca10afd34658941440dc0b63e86614934d87c13fa"
+    },
+    {
+      "path": "evidence/event-cadence/root/p125ec-restore1-public-audit.json",
+      "sha256": "fe0de03edd25b4970b137f3903a691ae6ebb30d69d7db87224da31efaab1d859"
+    },
+    {
+      "path": "evidence/event-cadence/root/p125ec-restore2-outcome.json",
+      "sha256": "afd28e893705a21c37a4a9a87b943b7a8d49dede43126cb57a9865beded4842d"
+    },
+    {
+      "path": "evidence/event-cadence/root/p125ec-restore2-public-audit.json",
+      "sha256": "1696bd21c89a0e4c023b46c5337c523366f27a54972425e011c063d26cb89c21"
+    },
+    {
+      "path": "evidence/event-cadence/root/p125ec-source-combined-outcome.json",
+      "sha256": "2847c63bd72828703121ab2446666e27e68083daab7940bb3dbbf75c3df3b530"
+    },
+    {
+      "path": "evidence/event-cadence/root/p125ec-source-combined-public-audit.json",
+      "sha256": "bca42c746df72564357ec3adae673a3935b7fa1442f3c16641dd4e7976b4adc9"
+    },
+    {
+      "path": "evidence/event-cadence/root/preservation-after-controls.json",
+      "sha256": "a88eb408fce4d2f215ee3ef09620729d5e32ca980af2a488b6c3565cce46e946"
+    },
+    {
+      "path": "evidence/event-cadence/root/preservation-after-source-checks.json",
+      "sha256": "ffc0047ca500f73ffa18090f252d25606a97ce857d3bbd47e99a51be5a3efd41"
+    },
+    {
+      "path": "evidence/event-cadence/root/protected-inputs.json",
+      "sha256": "fba2c86d4c578b729658d50dc26a102d7b00f8b80a4ca392a29071d4b1066c11"
+    },
+    {
+      "path": "evidence/event-cadence/root/public-output-adoption.json",
+      "sha256": "ae662c4ccbdedf18e2a4879490edc25c15838add6f8b9f62955a3af285ffcb3b"
+    },
+    {
+      "path": "evidence/event-cadence/root/public-output-allowlist.json",
+      "sha256": "821bdc341a6e7c953c25b114e777ed10fc26cfb81612a65186bd63950991afe7"
+    },
+    {
+      "path": "evidence/event-cadence/root/quality-source-delta.json",
+      "sha256": "b6d0fbbfc596a2e410a7b2091b531ba0246a52dd771429e162bbbe59c0776441"
+    },
+    {
+      "path": "evidence/event-cadence/root/readonly-dependency-pairs-before-build.json",
+      "sha256": "3f3ff70af2d9ffe63bc268df67b2d14a71634c119343451e11f1bb6144462356"
+    },
+    {
+      "path": "evidence/event-cadence/root/receipt-helper-adoption.json",
+      "sha256": "7dcf8d515eb296d09afaf1d5f17b98750ffe0432f203eb521a51a8c635ea783d"
+    },
+    {
+      "path": "evidence/event-cadence/root/root-peer-runtime-adoption.json",
+      "sha256": "0e1f374b85a347d4d947311f97f6531098cd3bd5488eebc688c71766f2a3c39f"
+    },
+    {
+      "path": "evidence/event-cadence/root/root-runtime-review.json",
+      "sha256": "94d03fc652ff9b8d791ec59e0f42836e2754382967b2c28081c1cab4fa4c6919"
+    },
+    {
+      "path": "evidence/event-cadence/root/root-source-fresh-review.json",
+      "sha256": "b14a9541c99350258d333d95a8e9fedc552341b36983ee66c747bafff2e1d4d6"
+    },
+    {
+      "path": "evidence/event-cadence/root/runtime-protected-inputs.json",
+      "sha256": "78523e735a11a6aef300a4609d2ee79f45a1b56a0edc1bfd8536bb52b7abb49f"
+    },
+    {
+      "path": "evidence/event-cadence/root/selection-cutoff.json",
+      "sha256": "82ffbcf03adbf35da95a7a1bba2549ffb116cbb98e86b655312b984eff440519"
+    },
+    {
+      "path": "evidence/event-cadence/root/source-checkpoint.json",
+      "sha256": "987d5d871240290965fb544196d6aba695c38e3ba11737f4b9b29f37d4049103"
+    },
+    {
+      "path": "evidence/event-cadence/root/source-checks-intent.json",
+      "sha256": "d6a654353ab22f2bdd82a3bc7ad82cea7374b15e2992d3a4ed8ea0e344d23be4"
+    },
+    {
+      "path": "evidence/event-cadence/root/source-checks-review.json",
+      "sha256": "3995d24f3e3303e4c2f0838e4a4e9d8d31af8105d171ee81466ea3e42cf66e5c"
+    },
+    {
+      "path": "evidence/event-cadence/root/source-materialization.json",
+      "sha256": "4a6872ec0b9c513f8e3b9b7f37ae1252e3667bc42198cb8611249a19d83542eb"
+    },
+    {
+      "path": "evidence/event-cadence/root/source-stage.json",
+      "sha256": "3c657f80651ab36b32144b109cd340294793fb7833b10ebc9fba74dccf85d519"
+    },
+    {
+      "path": "evidence/event-cadence/root/source-successor-admission.json",
+      "sha256": "103ba85648aefd7f5cca49e9f03379ea50ea24f7f8d2adbae7c0f6746f413cf7"
+    },
+    {
+      "path": "evidence/event-cadence/root/whole-issue-gaps.json",
+      "sha256": "989ba7da0ce9a821dc3674abb73f56a670c28acefc378f191b24fe8f1da9892c"
+    },
+    {
       "path": "evidence/final-notes.json",
       "sha256": "60a1c6e7cfca95ac13e447e2f2dce89eb3972a5c8e7452d7b33dc10c74aab928"
     },
@@ -8752,5 +10821,5 @@
       "sha256": "a6e327836c39a0657c573c4c638fe365815311caaf03745b37900ac7f5f5c958"
     }
   ],
-  "notes": "Bounded offline verifier/configured-anchor artifactTime qualification only. Canonical47/47 is not a sum of cohorts. Initial count check1 was repaired by the unchanged generator/check0; source-only controls failed1/2 bodies and exact restorations passed47. Global duplicate/dead-code checks remain RED1268/2724, unwaived. OpenSSL expected tampered-CMS child exit4 is deliberate negative proof, not a PKI acceptance result. Full P1-25/P1-01/package/client/checkpoint/issuance/source-generator/full-suite/CI/release and all held decisions remain open. Missing live reservations retains last-known binding/shared append pending. Optional read-only metadata scan natural closure is unestablished and excluded from all evidence credit. Ordinary Git staging warned about ignored docs/internal, but all22 staged blobs were verified and ordinary commit0 used noforce/no-verify; held provider archive unchanged. Source/fresh controls restored; no compiled sensitivity or plan completion. Metadata staging whitespace check exited2 on18 intrinsic log/patch files; exact original bytes are preserved in existing-format lossless JSON envelopes with round-trip hashes, without changing whitespace policy or command outcomes. Historical verifier paragraph retained verbatim. Current client extension source5beb3eae69b08f2e895520c7f459e1465780beeb selects one actual28/28 fresh canonical cohort (11new request/rawHTTP +17unchanged verifier), not the earlier47 or phase sums. Actual source28; C1fails2at193/201 and C2fails1at280 with masked194/282, explicit byte-exact restores and28/28reruns, hook2entries/3values, raw/observer joins/naturalESRCH/no signals/no late errors. Clean-source0/47892ms supplies no Vitest credit. All71source/fresh paths/eight compiledpairs/121protected/seven native physicalpins and heldR18 rows preserved. Source counts15spans/tenfiles1691to1692; ordinaryadd1 stopped beforecommit, trackedadd--update0 and complete11blob/default-fullrange re-admission preceded sourcecommit0. Global quality remains RED1268/2720, no waiver/baseline; three removed findings are test export reachability. This extends the original338payloads/41commands/359inputpins through only three active indexes and client-transport prefix; code inert, logs/patches lossless, raw count originals/large observations private. No CMS grant from five raw bytes, successful matching-nonce fallback, required-time/checkpoint/session/issuance/report, F37, fullsuite/CI/release/wholeP125/P101/plan completion credit. All held decisions and missingRES binding retained. Later actual publication/committed-file/quality/QA closure records are separate. Historical verifier and client notes remain verbatim. The current fallback extension selects one actual 21/21 fresh canonical cohort at source d8b5c3250138a10078c21886642595f669c4a73c: four new fallback bodies and seventeen unchanged verifier bodies. Source passed 21; F1 failed three assertions at 239/261/287, F2 two at 261/287, and F3 one at 237. All three explicit byte-exact restorations passed 21. Earlier positives and later masks are retained, with two hook entries/three values, ordered raw/observer joins, natural ESRCH and no nonzero signals or hook/unhandled/late/cleanup errors. The unchanged default 10000 ms abort reaches a next refusal; its message is string-only. Clean-source 0/47211 ms supplies no Vitest credit. All 72 selected source/fresh paths, eight original compiled pairs, 128 protected inputs, eight native physical identities and held R's eighteen rows remain exact. Counts change fifteen spans across ten files from 1692 to 1693. Global quality remains RED1268/2719, unwaived; only requestTimestamp unused-export reachability changes. This extension preserves 610 prior payloads, 76 old commands, 676 ordered pins and the original manifest, changing only three active indexes plus the fallback prefix after separate admission. No successful fresh-nonce grant, signed-list admission, required-time/checkpoint/sealing/issuance/report, independent TTL contract, F37, full suite/coverage, release or whole-issue/plan completion is claimed. All holds, ignored archives and the missing-reservation limitation remain. Later publication/export/quality/QA closure records are separate. Genuine-grant extension: source188681b32dc472983404dce19e7833cd76ee7576 and fresh checkout pass the same19 executed, zero-skip cases. ORDER fails only route403/424; DROP-VALID-GRANT fails only nonnull406/426 after genuine exact-query oracles; both explicit exact restores pass19. Hook values and ordered identities match; canonical19 is not summed with older47/28/21 or repeated runs. Twelve actual fixture bodies retain72 natural zero children,19 closed sockets and cleanup0;144 private stream byte/hash facts were checked by root, raw streams/keys stay private. Actual OpenSSL4.0.3 optional-field stderr diagnostics remain explicit. Only48 exact public outputs are admitted. All135protected byte inputs/eight old plus distinct fresh ninth native and73selected paths per root/eight compiled pairs stay exact through assembly. Global1268duplicates/2719ordereddeadcode findings remain RED without waiver. Lost initial count scan and V1/V2 outputs remain excluded; distinct closed V3 reads support15numericspans/10files1693to1694. Only current metadata3 plus evidence/tsa-grant may change after separate source admission. WholeP1-25/P1-01 gaps, trust-list/caller/checkpoint/issuance/full-suite/CI/package/generator/report scopes, F37 skip and all held decisions remain open. No PR/push/merge/release or wholeplan completion claim. Checkpoint extension at e49e21348e454ba8f1556cb6dfd3ed69e0e883c2: final source and corrected fresh21; append and required-refusal omissions each one intended failure, exact restorations21. Initial fresh17/4 LibreSSL launcher failure retained with zero credit; same-source OpenSSL4.0.3 correction and EOF-only helper successor explicit. Global quality remains RED: duplicates1268, dead-code2712 after7 consumed checkpoint export/type removals, no additions or waiver. Complete P1-25/plan, held decisions and F37 remain open. Metadata publication and release are separate actual checks.\n\n\n## Bounded genuine two-checkpoint window qualification \u2014 17 October 2026\n\nSource commit `f11a15ae06a318e0ce9a4c778269b2020af4eb7c` adds one real two-bound window case and an explicit same-path reply occurrence selector in the shared test fixture. Only `tests/time/checkpointWindow.test.ts` and `tests/time/tsaTestFixture.ts` changed. The original two checkpoint cases and whole grant test remain preserved. Production, dependencies, deadlines, freeze checks and quality baselines did not change.\n\nTwo real query-bound OpenSSL timestamp grants attest two monitor-signed linked ledger checkpoints around a real sealed middle audit event. The test checks exact stored CMS tokens, both checkpoint signatures and head/previous links, checkpoint-event metadata, verified ledger state, the middle's exact attested window, an upper-only seed and a claimed final checkpoint. Four default and six explicit zero-tolerance reader claims check independent five-minute inclusive boundaries and one millisecond beyond. Reader-supplied claims do not edit persisted ledger timestamps or the clock. Actual issuer accuracy was null, and equal-second genuine genTimes were accepted.\n\nSource and fresh canonical runs each pass the same 22 ordered cases across three files. The fresh clone was created from the committed source by the ordinary clean-source helper, which passed in 49,562 ms; the helper supplies no Vitest credit. All 94 selected source/fresh path pairs and 19 compiled pairs match. The fresh native is a distinct eleventh identity; the ten prior natives remain unchanged. All 151 active protected file pins, the held runner's 18 dirty rows and its empty index remain intact.\n\nThe source-only lower-bound control fails the new window basis assertion at `checkpointWindow.test.ts:445:41`: the middle event becomes `attested-upper-bound`. Its later exact-window and reader assertions are masked. Exact restoration passes all 22 cases. The tolerance-only control produces two actual failures: the prior seed finding at `:290:35` and the new default-lower-inclusive finding at `:452:47`. Both are classified; later old/finding row assertions remain masked. Exact restoration again passes all 22 cases. Precomputed observations are retained as facts and are never promoted to masked assertion passes. These controls establish source-side sensitivity only.\n\nThe original first-control run began 47.099 ms before its apply helper closed. That run remains diagnostic only and supplies no sensitivity credit. Its original binding, command, raw reports, observer, log, public records and chronology diagnosis are preserved. A separate sequential run after actual helper closure supplies the accepted lower-bound control evidence. No automatic restore, signal, retry loop or guard modification was used.\n\nEach actual observed run, including the excluded diagnostic, records five TSA lifecycle and three checkpoint public records, 30 naturally closed child processes, 60 explicitly named child-stream hashes, eight closed sockets and 16 closed ledger owners. All six accepted phases use the same 22 ordered identities, three hook task entries and four hook values, with no skips, unhandled errors or late diagnostics. Cases and resources are not summed across repeated runs. Optional OpenSSL stderr diagnostics remain retained; no all-stderr-zero claim is made. Actual tool version is OpenSSL 4.0.3; the previously reviewed 3.6.5 documentation remains historical provenance.\n\nAll 12 normal compiler, lint, build, count, gate, threat-model, architecture, docs, freeze, notices and qualification checks pass. Counts pass without regeneration. Global quality remains RED and unwaived: 2,712 ordered dead-code findings and the full duplicate result of 1,268 groups match the prior actual report exactly. No quality baseline was adopted.\n\nThe public window record lacks a separate seed event hash operand for the first head. The literal source assertion and actual GREEN cohort retain that comparison; no independent public recomputation is claimed. Public crypto facts are observations of real source execution, not re-executed verification by the metadata auditor. Nonzero issuer accuracy, persisted producer backdate/postdate coverage, event/minute cadence, real Studio scheduling, concurrency/corruption combinations, session/certificate/report/config integration, full-suite/cross-platform/public-issuer and release qualification remain open.\n\nWhole P1-25 and the plan remain open. P1-01 gaps and every human, ownership, provider and external decision remain held as recorded. F37 remains skipped, unfixed and unqualified; these ordinary HTTP fixtures provide no F37 proof. The ignored provider D15 archive stays held without force-add, ignore changes or manifest bypass. No push, PR, merge or release is included.\n"
+  "notes": "Bounded offline verifier/configured-anchor artifactTime qualification only. Canonical47/47 is not a sum of cohorts. Initial count check1 was repaired by the unchanged generator/check0; source-only controls failed1/2 bodies and exact restorations passed47. Global duplicate/dead-code checks remain RED1268/2724, unwaived. OpenSSL expected tampered-CMS child exit4 is deliberate negative proof, not a PKI acceptance result. Full P1-25/P1-01/package/client/checkpoint/issuance/source-generator/full-suite/CI/release and all held decisions remain open. Missing live reservations retains last-known binding/shared append pending. Optional read-only metadata scan natural closure is unestablished and excluded from all evidence credit. Ordinary Git staging warned about ignored docs/internal, but all22 staged blobs were verified and ordinary commit0 used noforce/no-verify; held provider archive unchanged. Source/fresh controls restored; no compiled sensitivity or plan completion. Metadata staging whitespace check exited2 on18 intrinsic log/patch files; exact original bytes are preserved in existing-format lossless JSON envelopes with round-trip hashes, without changing whitespace policy or command outcomes. Historical verifier paragraph retained verbatim. Current client extension source5beb3eae69b08f2e895520c7f459e1465780beeb selects one actual28/28 fresh canonical cohort (11new request/rawHTTP +17unchanged verifier), not the earlier47 or phase sums. Actual source28; C1fails2at193/201 and C2fails1at280 with masked194/282, explicit byte-exact restores and28/28reruns, hook2entries/3values, raw/observer joins/naturalESRCH/no signals/no late errors. Clean-source0/47892ms supplies no Vitest credit. All71source/fresh paths/eight compiledpairs/121protected/seven native physicalpins and heldR18 rows preserved. Source counts15spans/tenfiles1691to1692; ordinaryadd1 stopped beforecommit, trackedadd--update0 and complete11blob/default-fullrange re-admission preceded sourcecommit0. Global quality remains RED1268/2720, no waiver/baseline; three removed findings are test export reachability. This extends the original338payloads/41commands/359inputpins through only three active indexes and client-transport prefix; code inert, logs/patches lossless, raw count originals/large observations private. No CMS grant from five raw bytes, successful matching-nonce fallback, required-time/checkpoint/session/issuance/report, F37, fullsuite/CI/release/wholeP125/P101/plan completion credit. All held decisions and missingRES binding retained. Later actual publication/committed-file/quality/QA closure records are separate. Historical verifier and client notes remain verbatim. The current fallback extension selects one actual 21/21 fresh canonical cohort at source d8b5c3250138a10078c21886642595f669c4a73c: four new fallback bodies and seventeen unchanged verifier bodies. Source passed 21; F1 failed three assertions at 239/261/287, F2 two at 261/287, and F3 one at 237. All three explicit byte-exact restorations passed 21. Earlier positives and later masks are retained, with two hook entries/three values, ordered raw/observer joins, natural ESRCH and no nonzero signals or hook/unhandled/late/cleanup errors. The unchanged default 10000 ms abort reaches a next refusal; its message is string-only. Clean-source 0/47211 ms supplies no Vitest credit. All 72 selected source/fresh paths, eight original compiled pairs, 128 protected inputs, eight native physical identities and held R's eighteen rows remain exact. Counts change fifteen spans across ten files from 1692 to 1693. Global quality remains RED1268/2719, unwaived; only requestTimestamp unused-export reachability changes. This extension preserves 610 prior payloads, 76 old commands, 676 ordered pins and the original manifest, changing only three active indexes plus the fallback prefix after separate admission. No successful fresh-nonce grant, signed-list admission, required-time/checkpoint/sealing/issuance/report, independent TTL contract, F37, full suite/coverage, release or whole-issue/plan completion is claimed. All holds, ignored archives and the missing-reservation limitation remain. Later publication/export/quality/QA closure records are separate. Genuine-grant extension: source188681b32dc472983404dce19e7833cd76ee7576 and fresh checkout pass the same19 executed, zero-skip cases. ORDER fails only route403/424; DROP-VALID-GRANT fails only nonnull406/426 after genuine exact-query oracles; both explicit exact restores pass19. Hook values and ordered identities match; canonical19 is not summed with older47/28/21 or repeated runs. Twelve actual fixture bodies retain72 natural zero children,19 closed sockets and cleanup0;144 private stream byte/hash facts were checked by root, raw streams/keys stay private. Actual OpenSSL4.0.3 optional-field stderr diagnostics remain explicit. Only48 exact public outputs are admitted. All135protected byte inputs/eight old plus distinct fresh ninth native and73selected paths per root/eight compiled pairs stay exact through assembly. Global1268duplicates/2719ordereddeadcode findings remain RED without waiver. Lost initial count scan and V1/V2 outputs remain excluded; distinct closed V3 reads support15numericspans/10files1693to1694. Only current metadata3 plus evidence/tsa-grant may change after separate source admission. WholeP1-25/P1-01 gaps, trust-list/caller/checkpoint/issuance/full-suite/CI/package/generator/report scopes, F37 skip and all held decisions remain open. No PR/push/merge/release or wholeplan completion claim. Checkpoint extension at e49e21348e454ba8f1556cb6dfd3ed69e0e883c2: final source and corrected fresh21; append and required-refusal omissions each one intended failure, exact restorations21. Initial fresh17/4 LibreSSL launcher failure retained with zero credit; same-source OpenSSL4.0.3 correction and EOF-only helper successor explicit. Global quality remains RED: duplicates1268, dead-code2712 after7 consumed checkpoint export/type removals, no additions or waiver. Complete P1-25/plan, held decisions and F37 remain open. Metadata publication and release are separate actual checks.\n\n\n## Bounded genuine two-checkpoint window qualification \u2014 17 October 2026\n\nSource commit `f11a15ae06a318e0ce9a4c778269b2020af4eb7c` adds one real two-bound window case and an explicit same-path reply occurrence selector in the shared test fixture. Only `tests/time/checkpointWindow.test.ts` and `tests/time/tsaTestFixture.ts` changed. The original two checkpoint cases and whole grant test remain preserved. Production, dependencies, deadlines, freeze checks and quality baselines did not change.\n\nTwo real query-bound OpenSSL timestamp grants attest two monitor-signed linked ledger checkpoints around a real sealed middle audit event. The test checks exact stored CMS tokens, both checkpoint signatures and head/previous links, checkpoint-event metadata, verified ledger state, the middle's exact attested window, an upper-only seed and a claimed final checkpoint. Four default and six explicit zero-tolerance reader claims check independent five-minute inclusive boundaries and one millisecond beyond. Reader-supplied claims do not edit persisted ledger timestamps or the clock. Actual issuer accuracy was null, and equal-second genuine genTimes were accepted.\n\nSource and fresh canonical runs each pass the same 22 ordered cases across three files. The fresh clone was created from the committed source by the ordinary clean-source helper, which passed in 49,562 ms; the helper supplies no Vitest credit. All 94 selected source/fresh path pairs and 19 compiled pairs match. The fresh native is a distinct eleventh identity; the ten prior natives remain unchanged. All 151 active protected file pins, the held runner's 18 dirty rows and its empty index remain intact.\n\nThe source-only lower-bound control fails the new window basis assertion at `checkpointWindow.test.ts:445:41`: the middle event becomes `attested-upper-bound`. Its later exact-window and reader assertions are masked. Exact restoration passes all 22 cases. The tolerance-only control produces two actual failures: the prior seed finding at `:290:35` and the new default-lower-inclusive finding at `:452:47`. Both are classified; later old/finding row assertions remain masked. Exact restoration again passes all 22 cases. Precomputed observations are retained as facts and are never promoted to masked assertion passes. These controls establish source-side sensitivity only.\n\nThe original first-control run began 47.099 ms before its apply helper closed. That run remains diagnostic only and supplies no sensitivity credit. Its original binding, command, raw reports, observer, log, public records and chronology diagnosis are preserved. A separate sequential run after actual helper closure supplies the accepted lower-bound control evidence. No automatic restore, signal, retry loop or guard modification was used.\n\nEach actual observed run, including the excluded diagnostic, records five TSA lifecycle and three checkpoint public records, 30 naturally closed child processes, 60 explicitly named child-stream hashes, eight closed sockets and 16 closed ledger owners. All six accepted phases use the same 22 ordered identities, three hook task entries and four hook values, with no skips, unhandled errors or late diagnostics. Cases and resources are not summed across repeated runs. Optional OpenSSL stderr diagnostics remain retained; no all-stderr-zero claim is made. Actual tool version is OpenSSL 4.0.3; the previously reviewed 3.6.5 documentation remains historical provenance.\n\nAll 12 normal compiler, lint, build, count, gate, threat-model, architecture, docs, freeze, notices and qualification checks pass. Counts pass without regeneration. Global quality remains RED and unwaived: 2,712 ordered dead-code findings and the full duplicate result of 1,268 groups match the prior actual report exactly. No quality baseline was adopted.\n\nThe public window record lacks a separate seed event hash operand for the first head. The literal source assertion and actual GREEN cohort retain that comparison; no independent public recomputation is claimed. Public crypto facts are observations of real source execution, not re-executed verification by the metadata auditor. Nonzero issuer accuracy, persisted producer backdate/postdate coverage, event/minute cadence, real Studio scheduling, concurrency/corruption combinations, session/certificate/report/config integration, full-suite/cross-platform/public-issuer and release qualification remain open.\n\nWhole P1-25 and the plan remain open. P1-01 gaps and every human, ownership, provider and external decision remain held as recorded. F37 remains skipped, unfixed and unqualified; these ordinary HTTP fixtures provide no F37 proof. The ignored provider D15 archive stays held without force-add, ignore changes or manifest bypass. No push, PR, merge or release is included.\n\n\n## Bounded checkpoint event-cadence qualification \u2014 17 October 2026\n\nSource `80268079f804ed0ecb7659cd02a75e8b88ee3e0d` adds one literal event-cadence case in the existing owned checkpoint test. The three preceding checkpoint bodies, two grant bodies and whole shared TSA fixture remain exact. Production code, packages, deadlines, freeze guards and quality baselines are unchanged.\n\nThe case reaches the actual no-options signed trust loader through the owned default HOME/.config/amc files. It asserts verified own list/root admission, zero explicit monitor pins and both allow flags false. The signed operator configuration sets everyEvents2, omits everyMinutes and observes the real 15 minute default; public transparency anchors are empty. Five one-argument ticks over real sealed audit rows produce true,false,false,true,false: initial checkpoint, checkpoint-only skip, one-audit skip, exact-two-audit checkpoint and immediate reset skip. No clock or stored row is rewritten. These ticks do not establish that a real minute elapsed or that Studio's timer ran.\n\nTwo real timestamp responses have separate captured-query OpenSSL and AMC verification proofs. Their checkpoint digests, signed chain/head/count/previous links, exact stored tokens, checkpoint-event metadata and initial/first/final ledger checks agree. The public auditor keeps each grant associated with its own named verification child and query/response. It also checks both reported signer fingerprints agree; the actual named leaf DER identity remains the unchanged fixture's verification boundary and the explicit public certificate bundle binding. Controlled own roots do not establish public issuer trust. Actual issuer accuracy remains null.\n\nSource and a newly built committed checkout each pass the same 23 ordered cases. Both explicit restoration runs also pass 23, with no skips, unhandled or late errors and the same three hook entries/four values. The unchanged clean-source helper passed in 48,976 ms and supplies no Vitest credit. All 98 selected paths per checkout and 21 compiled pairs match; 196 selected physical files and 12 native binaries are distinct regular single-link files. All 161 active protected file pins and the held runner's 18 dirty rows/empty index remain exact before metadata admission.\n\nRemoving only checkpoint-row exclusion causes one direct failure at checkpointWindow.test.ts:582:28: one new audit incorrectly triggers an early second checkpoint. Initial genuine grant/head/token/ledger and checkpoint-only positives precede that failure. Its later one-stage equality and all second-audit/grant/reset/final assertions are masked. The captured early second reply has no independent second-grant credit. Exact restoration passes23.\n\nChanging only n>=everyEvents to n>everyEvents causes one direct failure at checkpointWindow.test.ts:597:28: exactly two new audits incorrectly skip the checkpoint. Initial, checkpoint-only and one-audit behavior, exact two audit IDs/types and below 15 minute age precede it. The second grant, later chain/token/event/reset/final assertions are masked and absent. Exact restoration again passes23. Every actual failure and mask was manually classified before restoration. All four direct actions closed naturally before their dependent tests; no retry, signal or automatic restore was used. These are source-only controls, without compiled mutation sensitivity.\n\nAll 12 normal compiler, lint, build, counts, gate, threat-model, architecture, docs, freeze, notices and qualification checks pass; no count regeneration was needed. Global quality remains RED and unwaived: the ordered 2,712 dead-code findings and full published 1,268 duplicate result are unchanged. No baseline was adopted. The independent completed source and six-phase runtime reviews have no bounded blockers.\n\nGreen runs each record 38 natural children, 76 explicit stream hashes, 10 closed sockets and 28 closed ledger owners. The first control records 37/74/10/24; the second 36/72/9/27. Canonical acceptance totals remain separate for each run. Per-run resource counts remain explicit; labelled cross-run resource totals are inventory only. Nonempty OpenSSL stderr diagnostics remain retained. Guard-close invocation and finite physical checks do not prove universal descendant, loader, environment or native-handle isolation. Literal source marker guards, inert code copies, exact lossless log/patch representation and explicit public-only selection remain mandatory.\n\nWhole P1-25 and the plan remain open. Next is separately admitted qualification of deliberately backdated/postdated caller timestamps persisted through the real signed ledger and evaluated using actual stored row.ts. Nonzero signed accuracy, real minute/Studio scheduling, actual session-seal enforcement, existing certificate issuance/archive/verification and report/manifest/schema integration qualification, full suite/cross-platform/public issuer/global quality/release requirements remain open. Existing certificate timestamp/report source paths are already wired; their qualification is still required. No TTL contract is invented.\n\nP1-01 gaps, Claude's work, missing-reservation ownership and every held decision remain intact. F37 stays skipped, unfixed and unqualified. Ignored provider D15 archive staging remains held, with no force-add, ignore change or alternate-manifest bypass. No push, PR, merge or release is included. Metadata assembly, current source-copy admission, validators, full index/whitespace checks, ordinary metadata commit, committed-only export and final QA closure are later actual records, never pre-credited by these notes.\n\nThe preceding receipt is preserved verbatim below.\n"
 }

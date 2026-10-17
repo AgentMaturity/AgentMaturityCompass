@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-17T01:07:01.758649+00:00",
+  "sourceAndFreshSame23IdentitiesAndHooks": true,
+  "bothActualPublicAuditsCompleteCadenceTrue": true,
+  "sourceCommit": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+  "rootBindings": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/control-root-bindings.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/control-root-bindings.json",
+    "bytes": 5634,
+    "sha256": "fa029df20ab16a0a79c252ebf8efb92008d83d64635558fff36f76876fde9cad",
+    "dev": 16777231,
+    "inode": 543900188,
+    "nlink": 1
+  },
+  "template": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/control-root-bindings.template.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/control-root-bindings.template.json",
+    "bytes": 4237,
+    "sha256": "dd12841fe9cd635ce6ccd7b41ce09dfa79a64ab8bdad9fa5f8e71578ef25ff78",
+    "dev": 16777231,
+    "inode": 543898633,
+    "nlink": 1
+  },
+  "futureOutcomesAdopted": false,
+  "helperNotYetAdoptedOrExecuted": true,
+  "independentHelperReviewPending": true
+}
