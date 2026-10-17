@@ -1252,7 +1252,6 @@
     {"id":"bcb5067d192228379bb884364e265672f4e5cca0c16afdb73d37ad5b2912d02e","file":"src/a4/a4Schema.ts","kind":"exports"},
     {"id":"f9ffa370a2d50df388c94a8f0d3ad0370a69d474dbbb6eda49f26bf0bee74783","file":"src/a4/a4Schema.ts","kind":"exports"},
     {"id":"69ecd29b1288b24c3f968b4c0b6e8512fcdfbbc55f3f53a9361ea5ff1c8f604d","file":"src/acp/acpEnvelope.ts","kind":"exports"},
-    {"id":"dc775db79800bd9383d70b3f2312534f868a18eb96953440dbdd688b642a27b9","file":"src/acp/acpRuntimeContracts.ts","kind":"types"},
     {"id":"e8cf6dafbd2fc0d112599a41aaa76d4cadb48a7f44f3484251fffa845406fde5","file":"src/acp/acpSchema.ts","kind":"exports"},
     {"id":"a62068f762cf37f22fe41d23473fdfa1009f81976b30fa2f86c9b619f1ce451a","file":"src/acp/acpStdioMain.ts","kind":"types"},
     {"id":"0a906fb5efb2d9cc5e3f42120ac0ab491a4188a9dd77936a24719a029cd41d8f","file":"src/actions/actionJournal.ts","kind":"exports"},

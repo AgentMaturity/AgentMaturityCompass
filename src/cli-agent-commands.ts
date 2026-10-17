@@ -41,6 +41,7 @@ import {
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
+import { runLease } from "./leases/runLease.js";
 import { selectSupportedNativeTools, type NativeToolCapability } from "./agent/nativeToolCapabilities.js";
 import type { MountedNativeMcpServer, NativeMcpGrant } from "./mcp/nativeMcpClient.js";
 import { resolveNativeValidationSelection } from "./setup/nativeValidationConfig.js";
@@ -486,6 +487,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // Fork chooses a different ID; resume chooses the existing writer.
           get sessionId() { return actualSession().sessionId; },
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable() },
+          // P1-79: under an identity-binding plan, a lease naming the OS user's users.yaml user, or PRINCIPAL_UNRESOLVED before any session row.
+          ...runLease({ workspace: process.cwd(), agentId, model, tools: toolMode }),
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {}),
           ...shellOptIn
         });

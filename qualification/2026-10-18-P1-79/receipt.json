@@ -1,0 +1,244 @@
+{
+ "schemaVersion": 1,
+ "key": "P1-79",
+ "date": "2026-10-18",
+ "commit": "bf92762462a21e7b9fd73fd6d6cb1a2c5d5818f5",
+ "base": "c8677311d775bf0b12b7709ffd5cc40f52a24815",
+ "branch": "rtd/p1-79-run-principal-lease",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "darwin 25.6.0, local macOS arm64, not CI",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 47455,
+   "last": "bundle-kernel: dist/kernel/amcRuntime.js 385 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator"
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 65730
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 58718
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 3238,
+   "last": "check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 10; 16 random marker(s); 0 pending entries."
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 1104,
+   "last": "Published source counts match the repository; this check does not execute tests."
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 463,
+   "last": "Docs drift check passed (336 files scanned; truth claims and commands checked in 248 public files; 4 logged exceptions)."
+  },
+  {
+   "cmd": "npm run -s check:freeze -- --base-ref int",
+   "exit": 0,
+   "durationMs": 2611,
+   "last": "Freeze guard passed: {\"cliCommandPaths\":1255,\"cliInventoryPaths\":1255,\"stationPacks\":41,\"stationPackQuestions\":632}"
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0,
+   "durationMs": 2670,
+   "last": "}"
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 565,
+   "last": "check:gates: every evaluated gate requirement has a registered, non-synthetic emitter."
+  },
+  {
+   "cmd": "npm run -s check:schemas",
+   "exit": 0,
+   "durationMs": 1185,
+   "last": "gen-spec-schemas: 39 schemas current; 80 contract fixtures agree"
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 318,
+   "last": "docs/API_REFERENCE.md matches the source."
+  },
+  {
+   "cmd": "npm run -s check:threat-model",
+   "exit": 0,
+   "durationMs": 408,
+   "last": "check-threat-model: ok (/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-79/docs/security/channel-map.json)"
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 1431,
+   "last": "No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 5743,
+   "last": "No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
+  },
+  {
+   "cmd": "node scripts/check-sdk-api.mjs --base-ref int",
+   "exit": 0,
+   "durationMs": 1083,
+   "last": "SDK API snapshot matches dist/sdk/nativeAgentClient.d.ts."
+  },
+  {
+   "cmd": "npx vitest run tests/runPrincipalLease.test.ts tests/catalog/l0/identity.test.ts tests/cliWorkspaceToolEvidence.test.ts tests/acpStdio.test.ts tests/starterProfiles.test.ts --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-79/qualification/2026-10-18-P1-79/focused-tests.json",
+   "exit": 0,
+   "durationMs": 84271,
+   "last": "JSON report written to /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-79/qualification/2026-10-18-P1-79/focused-tests.json"
+  },
+  {
+   "cmd": "npx vitest run $(cat /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P1-79-related-run.txt | tr '\\n' ' ') --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P1-79-related-final.json",
+   "exit": 1,
+   "durationMs": 721342,
+   "last": "CUSTOM_SUPERVISE_FLAG=enabled"
+  },
+  {
+   "cmd": "node scripts/packed-install-check.mjs --no-build --keep (packed-install.log)",
+   "exit": 0,
+   "durationMs": 40550
+  },
+  {
+   "cmd": "node installed-plan-variant.mjs <kept install> <worktree> (installed-plan-variant.log)",
+   "exit": 0,
+   "durationMs": null
+  }
+ ],
+ "tests": {
+  "focused": {
+   "files": 18,
+   "total": 53,
+   "passed": 53,
+   "failed": 0,
+   "skipped": 0,
+   "failing": []
+  },
+  "related": {
+   "files": 296,
+   "total": 1517,
+   "passed": 1513,
+   "failed": 4,
+   "skipped": 0,
+   "failing": [
+    "tests/acpProvenance.test.ts: a failed turn sends no content refuses before flushing, not after",
+    "tests/nativeValidationOutcomeSurfaces.test.ts: Darwin 'CLI' public validation reports 'budget', preserves its actual output reference and survives cold inspection",
+    "tests/runPrincipalLease.test.ts: CLI and ACP native runs under an activated identity-binding plan (P1-79) amc agent-loop run mints a lease naming the OS user's users.yaml user, and the ledger rows carry it",
+    "tests/runPrincipalLease.test.ts: what a run lease never replaces or requires (P1-79) an ACP session without workspace tools mints no lease and is not refused"
+   ]
+  },
+  "relatedRerun": {
+   "cmd": "npx vitest run tests/acpProvenance.test.ts tests/nativeValidationOutcomeSurfaces.test.ts tests/runPrincipalLease.test.ts tests/nativeClientStartupAbort.test.ts",
+   "files": 10,
+   "total": 30,
+   "passed": 30,
+   "failed": 0,
+   "note": "The related run took 721 s at load average about 20 (other sessions on this machine). Its 4 failures were timing: acpProvenance (fixed 20 ms settle; composes its own session factory, not startAcpStdio), nativeValidationOutcomeSurfaces (Darwin budget/approval race, listed in the session baseline triage), and two runPrincipalLease tests whose beforeEach exceeded the 10 s hook timeout. The new tests now allow 120 s; this rerun of those files and nativeClientStartupAbort (which failed once in an earlier loaded run) passed."
+  }
+ },
+ "mutations": [
+  {
+   "mutation": "M1 composer lease passthrough dropped",
+   "caught": true,
+   "failingTests": [
+    "an ACP process Studio handed a lease keeps it: no second lease, and the task's principal, not the OS user's"
+   ]
+  },
+  {
+   "mutation": "M2 workspace-tools scope dropped",
+   "caught": true,
+   "failingTests": [
+    "an ACP session without workspace tools mints no lease and is not refused"
+   ]
+  },
+  {
+   "mutation": "M3 plan gate dropped (mint without an identity-binding plan)",
+   "caught": true,
+   "failingTests": [
+    "CLI and ACP runs mint no lease, and their tool calls run as before"
+   ]
+  },
+  {
+   "mutation": "M4 OS username match dropped (any active user)",
+   "caught": true,
+   "failingTests": [
+    "amc agent-loop run refuses PRINCIPAL_UNRESOLVED before any session row or lease when the OS user is not active",
+    "an ACP session/new is refused PRINCIPAL_UNRESOLVED, coded, before any session row or lease"
+   ]
+  },
+  {
+   "mutation": "M5 ACP coded refusal dropped",
+   "caught": true,
+   "failingTests": [
+    "an ACP session/new is refused PRINCIPAL_UNRESOLVED, coded, before any session row or lease"
+   ]
+  },
+  {
+   "mutation": "M6 CLI call site removed",
+   "caught": true,
+   "failingTests": [
+    "amc agent-loop run mints a lease naming the OS user's users.yaml user, and the ledger rows carry it",
+    "amc agent-loop run refuses PRINCIPAL_UNRESOLVED before any session row or lease when the OS user is not active"
+   ]
+  },
+  {
+   "mutation": "M7 ACP call site reverted to the handed-down lease only",
+   "caught": true,
+   "failingTests": [
+    "an ACP session (the SDK native client's runtime) mints the lease at session/new and binds it to every call",
+    "an ACP session/new is refused PRINCIPAL_UNRESOLVED, coded, before any session row or lease"
+   ]
+  }
+ ],
+ "artifacts": [
+  {
+   "path": "qualification/2026-10-18-P1-79/red.txt",
+   "sha256": "ca39c245f03528991faa872505bb4277e6e72e23218d9e688a180ace6370cd22"
+  },
+  {
+   "path": "qualification/2026-10-18-P1-79/mutations.json",
+   "sha256": "052dc00103cba4c93fa19322ef8fd4ed72bca829317c1f0e02673c9f251535d9"
+  },
+  {
+   "path": "qualification/2026-10-18-P1-79/packed-install.log",
+   "sha256": "cf60549935dc16e86e68bd22814528e0f6f7fe9a9b23d86b8335714e9e3dc130"
+  },
+  {
+   "path": "qualification/2026-10-18-P1-79/installed-plan-variant.log",
+   "sha256": "77688d86f86d1f7e25e5634cfb7bc5f1696acaf4ff86e248ee20715fe4e46387"
+  },
+  {
+   "path": "qualification/2026-10-18-P1-79/installed-plan-variant.mjs",
+   "sha256": "7d8310d878f2e8e986ecaf02c6a55d63da92e4a930ceb0114c24fdf2e2eb714f"
+  },
+  {
+   "path": "qualification/2026-10-18-P1-79/focused-tests.json",
+   "sha256": "9d4fdf6badb316062d5c40544f320a170c785c37fe5e03ce51b9125f29fa3a28"
+  },
+  {
+   "path": "src/leases/runLease.ts",
+   "sha256": "ad74783c2019c1aaa703e160e765048d27fbf5aeaf810471c6b3bb10863df58c"
+  },
+  {
+   "path": "tests/runPrincipalLease.test.ts",
+   "sha256": "49bf6d5fc4c4fb1c27bfb1e8c870c615d634687647dfb4b88112dd6b98a66ef0"
+  }
+ ],
+ "commitNote": "commit is the head the checks ran on; the follow-up commit only raises tests/runPrincipalLease.test.ts timeouts and adds this receipt"
+}

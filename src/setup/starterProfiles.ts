@@ -187,8 +187,9 @@ function printReport(workspace: string, report: StarterProfileReport): void {
     console.log(`  Plan: ${relative(workspace, plan.outDir)}`);
     console.log("  To activate: amc catalog compile --profile <profile> --request-review; two OWNER or AUDITOR users other than the requester");
     console.log("  approve it (amc approvals approve); then amc catalog compile --profile <profile> --activate <approvalRequestId>.");
-    console.log("  Once active, identity-binding (L0-IDN-01) refuses tool calls without a lease naming an active users.yaml user:");
-    console.log(`  run governed tasks from Studio (amc up) signed in as ${report.owner.username}.`);
+    console.log("  Once active, identity-binding (L0-IDN-01) refuses tool calls without a lease naming an active users.yaml user.");
+    console.log("  CLI, SDK and ACP runs mint it for the active users.yaml user whose username is your OS account, else refuse");
+    console.log(`  PRINCIPAL_UNRESOLVED; Studio tasks (amc up) carry one for their signed-in user, such as ${report.owner.username}.`);
     console.log("  Experimental: the Layer 0 controls are agent-drafted and not independently reviewed (D-08 is open); a plan is not a compliance claim.");
   }
   if (report.kind === "regulated") {
