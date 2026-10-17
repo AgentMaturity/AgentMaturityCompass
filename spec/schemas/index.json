@@ -163,7 +163,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/redaction-receipt.schema.json",
       "name": "redaction-receipt.schema.json",
-      "sha256": "38987e75c1a21924af3db985a9db264eebc8b102da710bda049c45c2a26324f9"
+      "sha256": "a3816ed3a5cb446095d5e96439860663326485bf1dddd89a1333ca6a2df2a84e"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/registry.bench.schema.json",
