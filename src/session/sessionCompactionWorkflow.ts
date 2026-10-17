@@ -59,8 +59,11 @@ export function compactReleasedSession(input: SessionCompactionInput) {
   if (source.record.ended_ts !== null || source.record.session_seal_sig !== null) throw new Error("Closed sessions are immutable; use compaction during an open native conversation");
   if (source.interrupted) throw new Error("This session has an unsealed turn; explicitly recover it before requesting compaction");
   if (source.head.event_hash !== input.expectedHeadHash) throw new Error("Session head changed; list and review its history before creating another summary");
+  // P2-02: operator text becomes model-visible surface content, so an opted-in workspace tokenizes it first, and the
+  // edit is validated on the redacted text; its receipt is written just before the compaction append.
+  const redacted = input.replacement === undefined ? null : redactCompactionReplacement(input.workspace, input.replacement);
   prepareSurfaceCompaction(input.workspace, source.rows, { origins: input.originEventIds, mode: input.mode,
-    reason: input.reason, ...(input.replacement === undefined ? {} : { replacement: input.replacement }),
+    reason: input.reason, ...(redacted === null ? {} : { replacement: redacted.text }),
     ...(input.summaryRole === undefined ? {} : { summaryRole: input.summaryRole }) });
   const opened = source.rows.find(row => row.event_type === "session/open");
   if (!opened) throw new Error("Session has no supported native identity");
@@ -78,8 +81,8 @@ export function compactReleasedSession(input: SessionCompactionInput) {
       claimant: { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Math.round(Date.now() - process.uptime() * 1000) } });
     service = resumed.service;
     if (resumed.report.observedHeadEventId !== source.head.id) throw new Error("Session changed during writer acquisition; no compaction applied, list it again");
-    // P2-02: operator text becomes model-visible surface content, so an opted-in workspace tokenizes it first, with a receipt.
-    const replacement = input.mode === "drop" ? "" : redactCompactionReplacement(service, input.replacement!);
+    redacted?.writeReceipt(service);
+    const replacement = redacted?.text ?? "";
     const ref = input.mode === "drop"
       ? service.dropSurfaceRange({ originEventIds: input.originEventIds, reason: input.reason })
       : input.mode === "replace"

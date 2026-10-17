@@ -198,11 +198,9 @@ function decodeText(content: string | Buffer, refusal: "content_not_text" | "att
   try { return new TextDecoder("utf-8", { fatal: true }).decode(content); } catch { throw new RedactionRefused(refusal); }
 }
 
-/** Redacts `text` and, when anything was found, writes its receipt row on `session` first; any failure refuses. */
-function redactWithReceipt(session: SessionService, redactor: Redactor, text: string, source: RedactionReceiptV1["source"],
-  callId: string | null, declared?: DeclaredFields, unparseable?: "refuse" | "detectors"): string {
-  const result = redactor.redact(text, declared, unparseable);
-  if (result.findings.length === 0) return result.text;
+/** Writes the receipt row for `result` on `session` when anything was found; failure refuses (receipt_failed). */
+function writeReceipt(session: SessionService, result: Redaction, source: RedactionReceiptV1["source"], callId: string | null): void {
+  if (result.findings.length === 0) return;
   try {
     const receipt = redactionReceiptV1Schema.parse({ schema: "amc.redaction-receipt/v1", sessionId: session.sessionId, source, callId,
       detectorsVersion: DETECTOR_SET_DIGEST, findings: result.findings, declaredFields: result.declaredFields, redactedDigest: sha256Hex(result.text) });
@@ -212,6 +210,13 @@ function redactWithReceipt(session: SessionService, redactor: Redactor, text: st
   } catch {
     throw new RedactionRefused("receipt_failed");
   }
+}
+
+/** Redacts `text` and, when anything was found, writes its receipt row on `session` first; any failure refuses. */
+function redactWithReceipt(session: SessionService, redactor: Redactor, text: string, source: RedactionReceiptV1["source"],
+  callId: string | null, declared?: DeclaredFields, unparseable?: "refuse" | "detectors"): string {
+  const result = redactor.redact(text, declared, unparseable);
+  writeReceipt(session, result, source, callId);
   return result.text;
 }
 
@@ -355,8 +360,15 @@ export function redactingSessionFor(session: SessionService): SessionService {
   return createRedactingSession(session, createWorkspaceRedactor(workspace), () => protectedDataOptedIn(workspace));
 }
 
-/** Operator compaction text (`amc session compact`): redacted, with its receipt on `session`, in an opted-in workspace. */
-export function redactCompactionReplacement(session: SessionService, text: string): string {
-  return protectedDataOptedIn(session.workspace)
-    ? redactWithReceipt(session, createWorkspaceRedactor(session.workspace), text, "operator/compaction", null) : text;
+/**
+ * Operator compaction text (`amc session compact`). In an opted-in workspace, the redacted text, which the edit is
+ * validated and committed with (tokens are longer than short values, so validation must see them), and `writeReceipt`,
+ * to call on the writing session immediately before the compaction append, so no receipt describes an edit validation
+ * refused. Elsewhere the text unchanged and no receipt.
+ */
+export function redactCompactionReplacement(workspace: string, text: string):
+  { readonly text: string; readonly writeReceipt: (session: SessionService) => void } {
+  if (!protectedDataOptedIn(workspace)) return { text, writeReceipt: () => undefined };
+  const result = createWorkspaceRedactor(workspace).redact(text);
+  return { text: result.text, writeReceipt: (session) => writeReceipt(session, result, "operator/compaction", null) };
 }
