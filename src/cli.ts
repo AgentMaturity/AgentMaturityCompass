@@ -17189,7 +17189,7 @@ withTrustFlags(auditBinder
   .action((file: string, opts: TrustFlags) => {
     const verify = auditBinderVerifyCli({ workspace: process.cwd(), file, pubkeyPath: opts.pubkey, trust: trustFromFlags(opts, ["artifact-seal"]) });
     if ("audit" in verify) {
-      finishVerify("Industry-pack audit", verify.report, { json: opts.json, result: verify,
+      finishVerify("Industry-pack audit", verify.report, { json: opts.json, result: verify, claim: artifactClaim("audit:industry-pack"),
         details: [`Industry-pack audit verified: signer ${verify.keyFingerprint}, checksum ok`, `sha256: ${verify.fileSha256}`] });
       return;
     }
