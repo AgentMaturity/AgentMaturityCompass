@@ -124,6 +124,28 @@ amc session verify --json --expect-monitor <monitor sha256>
 
 The run summary is a record of the response; verification checks evidence integrity. Neither proves the answer correct or changes an evidence baseline to `READY`. Ctrl-C cancels the active turn; incomplete or failed results remain visible. Existing session continuation is available through `amc agent-loop run --help`.
 
+### TypeScript SDK path (keyless, synthetic)
+
+`amc init --coding` creates a ready, signed workspace in one command: `fs.read`, `fs.write`, `fs.edit` and an
+OS-confined `bash` without network access, a `warn` firewall, signed budgets and config, and you as the ACTIVE OWNER
+in a signed `users.yaml`. It asks for the owner's Studio login (or reads `AMC_BOOTSTRAP_OWNER_USERNAME` and
+`AMC_BOOTSTRAP_OWNER_PASSWORD` in a non-interactive shell) and prints the monitor fingerprint to pin.
+
+```bash
+npm install agent-maturity-compass
+export AMC_VAULT_PASSPHRASE='<a passphrase you keep>'
+npx amc init --coding
+export AMC_EXPECTED_MONITOR_FINGERPRINT=<the fingerprint init printed>
+node quickstart.mjs        # a copy of examples/sdk/quickstart.mjs
+```
+
+The quickstart starts `AMCNativeClient` on the stub provider, makes one governed `fs.write` call (`hello.txt`), then
+`closeAndVerify()` and prints the session id, the verification result and the receipt digest. Every line is labelled
+`[synthetic]`: the stub runs no model, so this is a demonstration of the governed path, never a real-model result.
+For a regulated starting point, `amc init --regulated` adds a `block` firewall, a signed approval preset and a signed,
+not yet active Layer 0 control plan (experimental). See [TypeScript SDK](sdk/TYPESCRIPT_SDK.md) for the API contract,
+the semver policy and both starter profiles.
+
 ---
 
 ## 2. Run AMC in your agent project
