@@ -19,12 +19,9 @@ export function forwardNativeShellWarnings(
         shellWarningAt += 1;
         if (shellWarningAt === shellWarningBytes.length) {
           shellWarningAt = 0;
-          try {
-            if (!process.stderr.write(shellWarning)) {
-              onError(new AMCNativeProtocolError("native shell warning output is backpressured"));
-              return;
-            }
-          } catch { onError(new AMCNativeProtocolError("native shell warning output failed")); return; }
+          // write() returning false only means the bytes are queued (backpressure); the warning is still delivered.
+          try { process.stderr.write(shellWarning); }
+          catch { onError(new AMCNativeProtocolError("native shell warning output failed")); return; }
         }
       } else {
         shellWarningAt = byte === 10 ? 0 : -1;

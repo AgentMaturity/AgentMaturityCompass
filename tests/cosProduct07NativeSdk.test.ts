@@ -410,18 +410,15 @@ describe("P0-06 SDK native-shell warning delivery", () => {
     await client.close();
   });
 
-  test("fails once on operator stderr backpressure and ignores same-chunk and later warnings", async () => {
+  test("operator stderr backpressure queues the warning and keeps the session up", async () => {
+    // write() returning false means the bytes are queued, not lost: a healthy client must not fail on it.
     const output = vi.spyOn(process.stderr, "write").mockReturnValue(false);
-    const { client, peer } = await connect();
+    const { client, peer } = await connect(new ControlledPeer());
     peer.stderr.write(warning + warning);
-    expect(output.mock.calls).toEqual([[warning]]);
-    expect(client.state).toBe("failed");
-    peer.stderr.write(warning); // Delivered before the controlled close microtask.
-    expect(output.mock.calls).toEqual([[warning]]);
-    const failedRequest = client.newSession();
-    await expect(failedRequest).rejects.toBeInstanceOf(AMCNativeProtocolError);
-    await expect(failedRequest).rejects.toThrow("native shell warning output is backpressured");
+    expect(output.mock.calls).toEqual([[warning], [warning]]);
+    expect(client.state).toBe("open");
+    const session = await client.newSession();
+    expect(session.sessionId).toBeTruthy(); expect(client.state).toBe("open");
     await client.close();
-    expect(output.mock.calls).toEqual([[warning]]);
   });
 });
