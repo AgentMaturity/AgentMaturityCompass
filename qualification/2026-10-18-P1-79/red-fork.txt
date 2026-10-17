@@ -1,0 +1,7 @@
+RED for session/fork: npx vitest run tests/runPrincipalLease.test.ts -t session/fork with the two fork tests added and src/acp/acpStdioMain.ts still passing the fork factory through unchanged (on 997d18c73), Node 22, local macOS arm64, not CI
+     × hands the fork factory the child's own lease, naming the OS user's users.yaml user 4681ms
+     × refuses session/fork PRINCIPAL_UNRESOLVED, coded, before the factory runs and before any lease or session row 4527ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: one lease, minted before the factory ran: expected "vi.fn()" to be called 1 times, but got 0 times
+AssertionError: expected 'fixture fork factory composes no child' to match /^PRINCIPAL_UNRESOLVED: /
+      Tests  2 failed | 7 skipped (9)

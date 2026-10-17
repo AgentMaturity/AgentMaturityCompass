@@ -1,7 +1,15 @@
 # P1-79 receipt: CLI, SDK and ACP runs obtain a principal-bound lease under identity-binding plans
 
 Environment: local macOS arm64 (Darwin 25.6.0), Node 22, pnpm 10.33.0. Not CI. `receipt.json` lists every command with
-its exit code and duration, the focused test totals and the artifact hashes.
+its exit code and duration at the receipt's commit, the focused test totals (`focused-tests.json`) and the artifact
+hashes.
+
+- `related-tests.json`: every test file that imports a changed module (1517 tests, 296 suites), run on bf9276246 at load
+  average about 20 from other sessions on this machine. 4 failed on timing: acpProvenance (a fixed 20 ms settle; it
+  composes its own session factory, not startAcpStdio), nativeValidationOutcomeSurfaces (a Darwin budget/approval race
+  listed in the session's baseline triage) and two runPrincipalLease tests whose beforeEach exceeded the 10 s hook
+  timeout. The new tests now allow 120 s, and a rerun of those files passed (`rerun` in the file).
+- `red-fork.txt`: the two session/fork tests failing before the fork call was added.
 
 ## What ran
 
