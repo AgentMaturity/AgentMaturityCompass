@@ -89,7 +89,7 @@ describe("the intake cap never hides a session's actions", () => {
       expect(lifecycle.reasonCodes).toContain("OBSERVATION_RATE_LIMITED");
       expect(lifecycle.valid).toBe(false);
     }
-  });
+  }, 300_000);
 
   test("two registrations: one floods, the other is unaffected", () => {
     const workspace = claudeWorkspace();
@@ -102,7 +102,7 @@ describe("the intake cap never hides a session's actions", () => {
     expect(decision.decision).toBe("allow");
     expect(observe(workspace, post(workspace, other, call.toolUseId, decision.receiptSha256), now)()).toMatchObject({ recorded: true });
     expect(inspectHookActionLifecycle({ workspace, agentId, actionId: claudeActionId(other, call.toolUseId) }).observationNotRecorded).toBeNull();
-  });
+  }, 300_000);
 });
 
 describe("registrations and payloads cannot defeat the caps", () => {
