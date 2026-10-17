@@ -1,0 +1,36 @@
+# Wealth overlay v0.1 (P1-18), wave 1: US banking, lending and finance operations. Every control is experimental,
+# agent-drafted and not independently reviewed; expert sign-off waits for D-08. Citations restate catalog/registers/us.json.
+id: amc.l1.wealth.us
+version: 0.1.0
+layer: 1
+title: Wealth overlay (US finance operations)
+stations: [wealth]
+jurisdictions: [US]
+compilerCompat: ^0.1.0
+publisher: AgentMaturity (agent-maturity-compass)
+maintainers:
+  - { name: Sid, role: maintainer }
+licence: MIT
+support: experimental
+controls: [
+  L1-WLT-US-01,
+  L1-WLT-US-02,
+  L1-WLT-US-03,
+  L1-WLT-US-04,
+  L1-WLT-US-05,
+  L1-WLT-US-06,
+  L1-WLT-US-07,
+  L1-WLT-US-08,
+  L1-WLT-US-09,
+  L1-WLT-US-10,
+  L1-WLT-US-11,
+  L1-WLT-US-12,
+  L1-WLT-US-13,
+  L1-WLT-US-14,
+  L1-WLT-US-15
+]
+stewardship:
+  partner: null
+  updatePlan: null
+  triageTargetDays: null
+  coverageDoc: docs/catalog/WEALTH_US.md

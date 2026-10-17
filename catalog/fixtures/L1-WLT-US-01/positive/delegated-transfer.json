@@ -1,0 +1,21 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-01",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "lease",
+    "actionClass": "FINANCIAL",
+    "lease": {
+      "state": "valid",
+      "agentId": "default",
+      "scopes": [
+        "toolhub:execute"
+      ]
+    }
+  },
+  "expected": {
+    "result": "allow",
+    "reasonCode": null
+  }
+}

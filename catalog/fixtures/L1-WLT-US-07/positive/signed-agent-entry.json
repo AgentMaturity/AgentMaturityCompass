@@ -1,0 +1,15 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-07",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "agent_config",
+    "agentId": "finance-ops-agent",
+    "entry": "signed"
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": null
+  }
+}

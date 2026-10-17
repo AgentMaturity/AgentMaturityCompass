@@ -1,0 +1,36 @@
+{
+  "id": "fixture-status-compliant",
+  "row": "GLBA Safeguards Rule, 16 CFR 314.4",
+  "stations": [
+    "wealth",
+    "technology"
+  ],
+  "meaning": "Log and monitor authorized users, agents included; MFA; oversee service providers; tell the FTC within 30 days when 500 or more consumers are affected",
+  "keyDatesText": "In force",
+  "statusText": "Binding now for non-bank financial firms",
+  "scope": "Non-bank financial firms",
+  "clock": {
+    "duration": "30 days",
+    "trigger": "discovery of a notification event",
+    "threshold": "500 or more consumers affected",
+    "clockId": "glba-314-4j-ftc-notice"
+  },
+  "citation": {
+    "instrument": "GLBA Safeguards Rule (FTC), 16 CFR Part 314",
+    "clause": "16 CFR 314.4(j): notify the FTC within 30 days when 500 or more consumers are affected",
+    "edition": "CFR annual edition 2026, Title 16 Vol. 1 (revised 2026-01-01), GPO govinfo",
+    "jurisdiction": "US",
+    "statusType": "compliant",
+    "effectiveDate": null,
+    "complianceDueDate": null,
+    "url": "https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec314-4.xml",
+    "contentHash": "sha256:78db42ccdd11efa9aacd304e6deb2f9b1008e4af9f3c6d23b1f829fb455cc632",
+    "retrievedAt": "2026-10-07",
+    "legalReviewer": null
+  },
+  "dateNotes": "In force; no source in scope gives the date paragraph (j) took effect (the eCFR version history P1-17 read lists 2024-05-13 as the section's latest amendment, which is not recorded here as (j)'s effective date). The legal reviewer records it.",
+  "sourceKind": "official",
+  "sourceNote": "Bytes fetched and hashed by P1-17 at 2026-10-07T17:10:30Z (qualification/2026-10-07-P1-17/sources.md); paragraph (j) is encoded from that text in docs/REGULATORY_INCIDENT_CLOCKS.md. Not re-fetched in P1-18.",
+  "flags": {},
+  "s5RegisterId": "us-glba-safeguards"
+}
