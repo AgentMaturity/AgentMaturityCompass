@@ -364,10 +364,12 @@ Each `keyDate` also carries the `url` and `retrievedAt` it was read from, or sou
 
 Register as applied on 2026-10-04 from the round-2 EU/international and US batches (`lastReviewed` 2026-10-03 on every entry): 176 entries, 108 verified, 68 unverified, 20 jurisdictions. Counts are from `node scripts/check-regulatory-currency.mjs` on 2026-10-04.
 
+P1-18 (2026-10-12) added seven US entries for the US register as data (`catalog/registers/us.json`, docs/catalog/WEALTH_US.md), all unverified: six US and one US-NY. With them the register holds 183 entries, 108 verified and 75 unverified, in the same 20 jurisdictions, and `policy.officialHosts` gains three regulators awaiting approval (consumerfinance.gov, dfs.ny.gov, cms.gov).
+
 | Jurisdiction | Entries | Verified |
 |---|---|---|
 | EU | 61 | 45 |
-| US | 59 | 52 |
+| US | 65 | 52 |
 | International (ISO) | 22 | 0 |
 | US-CA | 9 | 4 |
 | US-CO | 3 | 3 |
@@ -382,7 +384,7 @@ Register as applied on 2026-10-04 from the round-2 EU/international and US batch
 | UK | 1 | 0 |
 | KR | 1 | 0 |
 | SG | 1 | 0 |
-| US-NY | 1 | 0 |
+| US-NY | 2 | 0 |
 | US-OH | 1 | 0 |
 | US-UT | 1 | 0 |
 | US-NYC | 1 | 1 |
@@ -555,6 +557,13 @@ Register as applied on 2026-10-04 from the round-2 EU/international and US batch
 | The Enhancement and Standardization of Climate-Related Disclosures for Investors — SEC Release 33-11275; Reg. S-K Subpart 1500 (stayed); rescission proposed FR Doc 2026-11091 | US | enacted-not-yet-applicable | 2024-04-12, 2026-06-03, 2026-08-03 | [Office of the Federal Register (NARA/GPO)](https://www.federalregister.gov/api/v1/documents.json?conditions[agencies][]=securities-and-exchange-commission) | 2026-10-04 | yes |
 | Regulation S-P amendments — SEC Regulation S-P amendments (89 FR 47688) | US | in-force | 2025-12-03, 2026-06-03 | [Office of the Federal Register (NARA/GPO)](https://www.federalregister.gov/documents/2024/06/03/2024-11116/regulation-s-p-privacy-of-consumer-financial-information-and-safeguarding-customer-information) | 2026-10-03 | yes |
 | Interagency Revised Guidance on Model Risk Management — Federal Reserve SR 26-2 (with OCC and FDIC) | US | published | 2026-04-17 | [Federal Reserve Board](https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm) | 2026-10-03 | yes |
+| Electronic Fund Transfer Act, Regulation E — 12 CFR Part 1005 (Regulation E): §1005.2(m) and Supplement I comment 2(m)-3 | US | in-force | 2026-10-12 (observation) | [Office of the Federal Register (eCFR)](https://www.ecfr.gov/current/title-12/section-1005.2) | 2026-10-12 | no |
+| GLBA Safeguards Rule (Standards for Safeguarding Customer Information) — 16 CFR Part 314 (FTC), §314.4 | US | in-force | 2024-05-13 (observation) | [U.S. Government Publishing Office](https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec314-4.xml) | 2026-10-07 | no |
+| Bank Secrecy Act: reports by banks of suspicious transactions — 31 CFR 1020.320 | US | in-force | 2016-12-23 (observation) | [U.S. Government Publishing Office](https://www.govinfo.gov/content/pkg/CFR-2025-title31-vol3/xml/CFR-2025-title31-vol3-sec1020-320.xml) | 2026-10-07 | no |
+| NYDFS Cybersecurity Regulation (23 NYCRR Part 500) and its 2024 industry letter on AI — 23 NYCRR Part 500 as amended by the Second Amendment (effective 2023-11-01); NYDFS industry letter of 2024-10-16 | US-NY | in-force | 2023-11-01, 2024-10-16 (unverified), 2025-11-01 (unverified) | [New York State Department of Financial Services](https://www.dfs.ny.gov/system/files/documents/2023/10/rf_fs_2amend23NYCRR500_text_20231101.pdf) | 2026-10-07 | no |
+| Interagency Guidance on Third-Party Relationships: Risk Management — Federal Reserve SR 23-4 (with OCC and FDIC) | US | published | 2023-06-07 (unverified) | [Federal Reserve Board](https://www.federalreserve.gov/supervisionreg/srletters/SR2304.htm) | 2026-10-12 | no |
+| Proposed replacement of the interagency third-party risk management guidance (SR 23-4) — Proposal of 2026-09-15 replacing SR 23-4 (Federal Register document number not recorded) | US | proposed | 2026-09-15 (unverified), 2026-11-16 (unverified) | [Office of the Federal Register (NARA/GPO)](https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=third-party%20relationships&conditions%5Bpublication_date%5D%5Bgte%5D=2026-09-15) | 2026-10-12 | no |
+| HIPAA Privacy, Security and Breach Notification Rules — 45 CFR Parts 160 and 164 (Subparts C, D and E) | US | in-force | 2024-04-26 (observation) | [U.S. Government Publishing Office](https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-404.xml) | 2026-10-03 | no |
 | FINRA Regulatory Notice 24-09 and 2026 Annual Regulatory Oversight Report (GenAI) — FINRA RN 24-09; FINRA Rules 3110, 2210 | US | in-force | 2024-06-27, 2025-12-09 | [FINRA](https://www.finra.org/rules-guidance/notices/24-09) | 2026-10-03 | yes |
 | Texas Responsible Artificial Intelligence Governance Act — Texas HB 149 (89R); Bus. & Com. Code ch. 551-554 | US-TX | in-force | 2025-06-22, 2026-01-01 | [Texas Legislature](https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00149F.htm) | 2026-10-04 | yes |
 | Transparency in Frontier Artificial Intelligence Act — California SB 53 (Ch. 138, Stats. 2025) | US-CA | in-force | 2025-09-29, 2026-01-01 (unverified), 2027-01-01 | [California Legislature](https://leginfo.legislature.ca.gov/faces/billStatusClient.xhtml?bill_id=202520260SB53) | 2026-10-03 | no |

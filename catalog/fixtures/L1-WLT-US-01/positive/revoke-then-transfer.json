@@ -1,0 +1,16 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-01",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "lease_revocation_drill",
+    "actionClass": "FINANCIAL",
+    "mode": "revoke_between_calls",
+    "boundMs": 5000
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": null
+  }
+}

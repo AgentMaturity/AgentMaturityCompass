@@ -1,0 +1,1067 @@
+{
+  "registerVersion": 1,
+  "id": "us",
+  "title": "US register (law as data): experimental, agent-drafted and not independently reviewed",
+  "jurisdiction": "US",
+  "policy": {
+    "litigationRules": [
+      {
+        "jurisdictionPrefix": "US-",
+        "s5RegisterId": "us-eo-14365",
+        "reason": "EO 14365 (11 Dec 2025) set up a DOJ AI Litigation Task Force to challenge state AI laws; only a legal reviewer clears the flag, with a rationale"
+      }
+    ]
+  },
+  "entries": [
+    {
+      "id": "us-reg-e-1005-2-m",
+      "row": "Reg E, 12 CFR 1005.2",
+      "stations": [
+        "wealth",
+        "technology"
+      ],
+      "meaning": "§1005.2(m): a transfer by someone the consumer gave the access device to is authorized until the consumer withdraws that authority; comment 2(m)-3 (device obtained by fraud). Delegation to an agent must be explicit and revocable",
+      "keyDatesText": "In force",
+      "statusText": "Binding now",
+      "citation": {
+        "instrument": "Electronic Fund Transfer Act, Regulation E (12 CFR Part 1005)",
+        "clause": "12 CFR 1005.2(m): a transfer initiated by a person the consumer furnished the access device to is not unauthorized until the consumer tells the institution that transfers by that person are no longer authorized",
+        "edition": "eCFR current text; not yet retrieved",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.ecfr.gov/current/title-12/section-1005.2",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "In force; no source held in the repository gives the date this provision took effect. The legal reviewer records it.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11); the clause wording follows the plan's US register and is checked against the text before review.",
+      "flags": {
+        "reverify": "How Reg E applies to agents holding delegated credentials",
+        "applicationUncertain": "Reg E's application to an agent holding delegated credentials is untested; an agent transfer is never treated as authorized by default."
+      },
+      "s5RegisterId": "us-reg-e"
+    },
+    {
+      "id": "us-reg-e-comment-2-m-3",
+      "row": "Reg E, 12 CFR 1005.2",
+      "stations": [
+        "wealth",
+        "technology"
+      ],
+      "meaning": "§1005.2(m): a transfer by someone the consumer gave the access device to is authorized until the consumer withdraws that authority; comment 2(m)-3 (device obtained by fraud). Delegation to an agent must be explicit and revocable",
+      "keyDatesText": "In force",
+      "statusText": "Binding now",
+      "citation": {
+        "instrument": "Electronic Fund Transfer Act, Regulation E (12 CFR Part 1005), official interpretations",
+        "clause": "Supplement I to Part 1005, comment 2(m)-3: a transfer made with an access device obtained by fraud",
+        "edition": "CFPB Regulation E official interpretations; not yet retrieved",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.consumerfinance.gov/rules-policy/regulations/1005/interp-2/",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "In force; no source held in the repository gives the date this provision took effect. The legal reviewer records it.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11); the comment number follows the plan's US register and the URL is the CFPB's Regulation E interpretation path as P1-18 recorded it; both are confirmed when read and hashed.",
+      "flags": {
+        "reverify": "How Reg E applies to agents holding delegated credentials",
+        "applicationUncertain": "Reg E's application to an agent holding delegated credentials is untested; an agent transfer is never treated as authorized by default."
+      },
+      "s5RegisterId": "us-reg-e"
+    },
+    {
+      "id": "us-glba-314-4-c-5",
+      "row": "GLBA Safeguards Rule, 16 CFR 314.4",
+      "stations": [
+        "wealth",
+        "technology"
+      ],
+      "meaning": "Log and monitor authorized users, agents included; MFA; oversee service providers; tell the FTC within 30 days when 500 or more consumers are affected",
+      "keyDatesText": "In force",
+      "statusText": "Binding now for non-bank financial firms",
+      "scope": "Non-bank financial firms",
+      "citation": {
+        "instrument": "GLBA Safeguards Rule (FTC), 16 CFR Part 314",
+        "clause": "16 CFR 314.4(c)(5): multi-factor authentication for any individual accessing any information system",
+        "edition": "CFR annual edition 2026, Title 16 Vol. 1 (revised 2026-01-01), GPO govinfo",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec314-4.xml",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "In force; no source in scope gives the date this paragraph took effect. The legal reviewer records it.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified for paragraph (c)(5): P1-17 fetched this file at 2026-10-07T17:10:30Z (sha256:78db42ccdd11efa9aacd304e6deb2f9b1008e4af9f3c6d23b1f829fb455cc632, qualification/2026-10-07-P1-17/sources.md) but encoded only paragraph (j); no text held in the repository confirms paragraph (c)(5). Not re-fetched in P1-18 (no network access).",
+      "flags": {},
+      "s5RegisterId": "us-glba-safeguards"
+    },
+    {
+      "id": "us-glba-314-4-c-8",
+      "row": "GLBA Safeguards Rule, 16 CFR 314.4",
+      "stations": [
+        "wealth",
+        "technology"
+      ],
+      "meaning": "Log and monitor authorized users, agents included; MFA; oversee service providers; tell the FTC within 30 days when 500 or more consumers are affected",
+      "keyDatesText": "In force",
+      "statusText": "Binding now for non-bank financial firms",
+      "scope": "Non-bank financial firms",
+      "citation": {
+        "instrument": "GLBA Safeguards Rule (FTC), 16 CFR Part 314",
+        "clause": "16 CFR 314.4(c)(8): monitor and log the activity of authorized users, agents included, and detect unauthorized access to or use of customer information",
+        "edition": "CFR annual edition 2026, Title 16 Vol. 1 (revised 2026-01-01), GPO govinfo",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec314-4.xml",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "In force; no source in scope gives the date this paragraph took effect. The legal reviewer records it.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified for paragraph (c)(8): P1-17 fetched this file at 2026-10-07T17:10:30Z (sha256:78db42ccdd11efa9aacd304e6deb2f9b1008e4af9f3c6d23b1f829fb455cc632, qualification/2026-10-07-P1-17/sources.md) but encoded only paragraph (j); no text held in the repository confirms paragraph (c)(8). Not re-fetched in P1-18 (no network access).",
+      "flags": {},
+      "s5RegisterId": "us-glba-safeguards"
+    },
+    {
+      "id": "us-glba-314-4-f",
+      "row": "GLBA Safeguards Rule, 16 CFR 314.4",
+      "stations": [
+        "wealth",
+        "technology"
+      ],
+      "meaning": "Log and monitor authorized users, agents included; MFA; oversee service providers; tell the FTC within 30 days when 500 or more consumers are affected",
+      "keyDatesText": "In force",
+      "statusText": "Binding now for non-bank financial firms",
+      "scope": "Non-bank financial firms",
+      "citation": {
+        "instrument": "GLBA Safeguards Rule (FTC), 16 CFR Part 314",
+        "clause": "16 CFR 314.4(f): oversee service providers",
+        "edition": "CFR annual edition 2026, Title 16 Vol. 1 (revised 2026-01-01), GPO govinfo",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec314-4.xml",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "In force; no source in scope gives the date this paragraph took effect. The legal reviewer records it.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified for paragraph (f): P1-17 fetched this file at 2026-10-07T17:10:30Z (sha256:78db42ccdd11efa9aacd304e6deb2f9b1008e4af9f3c6d23b1f829fb455cc632, qualification/2026-10-07-P1-17/sources.md) but encoded only paragraph (j); no text held in the repository confirms paragraph (f). Not re-fetched in P1-18 (no network access).",
+      "flags": {},
+      "s5RegisterId": "us-glba-safeguards"
+    },
+    {
+      "id": "us-glba-314-4-j",
+      "row": "GLBA Safeguards Rule, 16 CFR 314.4",
+      "stations": [
+        "wealth",
+        "technology"
+      ],
+      "meaning": "Log and monitor authorized users, agents included; MFA; oversee service providers; tell the FTC within 30 days when 500 or more consumers are affected",
+      "keyDatesText": "In force",
+      "statusText": "Binding now for non-bank financial firms",
+      "scope": "Non-bank financial firms",
+      "clock": {
+        "duration": "30 days",
+        "trigger": "discovery of a notification event",
+        "threshold": "500 or more consumers affected",
+        "clockId": "glba-314-4j-ftc-notice"
+      },
+      "citation": {
+        "instrument": "GLBA Safeguards Rule (FTC), 16 CFR Part 314",
+        "clause": "16 CFR 314.4(j): notify the FTC within 30 days when 500 or more consumers are affected",
+        "edition": "CFR annual edition 2026, Title 16 Vol. 1 (revised 2026-01-01), GPO govinfo",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec314-4.xml",
+        "contentHash": "sha256:78db42ccdd11efa9aacd304e6deb2f9b1008e4af9f3c6d23b1f829fb455cc632",
+        "retrievedAt": "2026-10-07",
+        "legalReviewer": null
+      },
+      "dateNotes": "In force; no source in scope gives the date paragraph (j) took effect (the eCFR version history P1-17 read lists 2024-05-13 as the section's latest amendment, which is not recorded here as (j)'s effective date). The legal reviewer records it.",
+      "sourceKind": "official",
+      "sourceNote": "Bytes fetched and hashed by P1-17 at 2026-10-07T17:10:30Z (qualification/2026-10-07-P1-17/sources.md); paragraph (j) is encoded from that text in docs/REGULATORY_INCIDENT_CLOCKS.md. Not re-fetched in P1-18.",
+      "flags": {},
+      "s5RegisterId": "us-glba-safeguards"
+    },
+    {
+      "id": "us-bsa-1020-320-b-3",
+      "row": "BSA SAR rule, 31 CFR 1020.320",
+      "stations": [
+        "wealth"
+      ],
+      "meaning": "File within 30 days of initial detection; never disclose a SAR or information revealing one; keep the SAR and supporting documents 5 years",
+      "keyDatesText": "In force",
+      "statusText": "Binding now",
+      "scope": "Banks",
+      "clock": {
+        "duration": "30 calendar days",
+        "trigger": "initial detection of facts that may be a basis for filing",
+        "clockId": "bsa-1020-320-sar-filing"
+      },
+      "citation": {
+        "instrument": "Bank Secrecy Act regulations: reports by banks of suspicious transactions (31 CFR 1020.320)",
+        "clause": "31 CFR 1020.320(b)(3): file the SAR no later than 30 calendar days after initial detection of facts that may be a basis for filing",
+        "edition": "CFR annual edition 2025, Title 31 Vol. 3 (revised 2025-07-01), GPO govinfo",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.govinfo.gov/content/pkg/CFR-2025-title31-vol3/xml/CFR-2025-title31-vol3-sec1020-320.xml",
+        "contentHash": "sha256:4d7caea80a6f6d66e6075915a67bf44d59b5bbc67a78539f7a5b87552da1ed43",
+        "retrievedAt": "2026-10-07",
+        "legalReviewer": null
+      },
+      "dateNotes": "In force; the eCFR version history P1-17 read lists 2016-12-23 as the section's latest amendment, which is not recorded here as an effective date. The legal reviewer records it.",
+      "sourceKind": "official",
+      "sourceNote": "Bytes fetched and hashed by P1-17 at 2026-10-07T17:10:02Z (qualification/2026-10-07-P1-17/sources.md); paragraphs (b)(3), (d) and (e) are encoded from that text in docs/REGULATORY_INCIDENT_CLOCKS.md. Not re-fetched in P1-18. The plan left the paragraph letters to a reviewer; these come from P1-17's reading and the reviewer confirms them.",
+      "flags": {},
+      "s5RegisterId": "us-bsa-sar"
+    },
+    {
+      "id": "us-bsa-1020-320-e",
+      "row": "BSA SAR rule, 31 CFR 1020.320",
+      "stations": [
+        "wealth"
+      ],
+      "meaning": "File within 30 days of initial detection; never disclose a SAR or information revealing one; keep the SAR and supporting documents 5 years",
+      "keyDatesText": "In force",
+      "statusText": "Binding now",
+      "scope": "Banks",
+      "citation": {
+        "instrument": "Bank Secrecy Act regulations: reports by banks of suspicious transactions (31 CFR 1020.320)",
+        "clause": "31 CFR 1020.320(e): a SAR, and any information that would reveal its existence, is confidential",
+        "edition": "CFR annual edition 2025, Title 31 Vol. 3 (revised 2025-07-01), GPO govinfo",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.govinfo.gov/content/pkg/CFR-2025-title31-vol3/xml/CFR-2025-title31-vol3-sec1020-320.xml",
+        "contentHash": "sha256:4d7caea80a6f6d66e6075915a67bf44d59b5bbc67a78539f7a5b87552da1ed43",
+        "retrievedAt": "2026-10-07",
+        "legalReviewer": null
+      },
+      "dateNotes": "In force; the eCFR version history P1-17 read lists 2016-12-23 as the section's latest amendment, which is not recorded here as an effective date. The legal reviewer records it.",
+      "sourceKind": "official",
+      "sourceNote": "Bytes fetched and hashed by P1-17 at 2026-10-07T17:10:02Z (qualification/2026-10-07-P1-17/sources.md); paragraphs (b)(3), (d) and (e) are encoded from that text in docs/REGULATORY_INCIDENT_CLOCKS.md. Not re-fetched in P1-18. The plan left the paragraph letters to a reviewer; these come from P1-17's reading and the reviewer confirms them.",
+      "flags": {},
+      "s5RegisterId": "us-bsa-sar"
+    },
+    {
+      "id": "us-bsa-1020-320-d",
+      "row": "BSA SAR rule, 31 CFR 1020.320",
+      "stations": [
+        "wealth"
+      ],
+      "meaning": "File within 30 days of initial detection; never disclose a SAR or information revealing one; keep the SAR and supporting documents 5 years",
+      "keyDatesText": "In force",
+      "statusText": "Binding now",
+      "scope": "Banks",
+      "citation": {
+        "instrument": "Bank Secrecy Act regulations: reports by banks of suspicious transactions (31 CFR 1020.320)",
+        "clause": "31 CFR 1020.320(d): keep a copy of the SAR and its supporting documentation for five years",
+        "edition": "CFR annual edition 2025, Title 31 Vol. 3 (revised 2025-07-01), GPO govinfo",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.govinfo.gov/content/pkg/CFR-2025-title31-vol3/xml/CFR-2025-title31-vol3-sec1020-320.xml",
+        "contentHash": "sha256:4d7caea80a6f6d66e6075915a67bf44d59b5bbc67a78539f7a5b87552da1ed43",
+        "retrievedAt": "2026-10-07",
+        "legalReviewer": null
+      },
+      "dateNotes": "In force; the eCFR version history P1-17 read lists 2016-12-23 as the section's latest amendment, which is not recorded here as an effective date. The legal reviewer records it.",
+      "sourceKind": "official",
+      "sourceNote": "Bytes fetched and hashed by P1-17 at 2026-10-07T17:10:02Z (qualification/2026-10-07-P1-17/sources.md); paragraphs (b)(3), (d) and (e) are encoded from that text in docs/REGULATORY_INCIDENT_CLOCKS.md. Not re-fetched in P1-18. The plan left the paragraph letters to a reviewer; these come from P1-17's reading and the reviewer confirms them.",
+      "flags": {},
+      "s5RegisterId": "us-bsa-sar"
+    },
+    {
+      "id": "us-nydfs-500-17-a",
+      "row": "NYDFS Part 500 and its AI letter",
+      "stations": [
+        "wealth",
+        "technology"
+      ],
+      "meaning": "72-hour incident notice (§500.17); agents and their credentials in the asset inventory; MFA for all users; monitoring for data-extraction prompts",
+      "keyDatesText": "Letter 2024-10-16; MFA and inventory due 2025-11-01; 72-hour notice already in force",
+      "statusText": "Binding now for New York-regulated firms",
+      "scope": "New York-regulated firms",
+      "clock": {
+        "duration": "72 hours",
+        "trigger": "determination that a cybersecurity incident occurred",
+        "clockId": "nydfs-500-17-notice"
+      },
+      "citation": {
+        "instrument": "23 NYCRR Part 500 (NYDFS Cybersecurity Regulation)",
+        "clause": "23 NYCRR 500.17(a)(1): notify the superintendent within 72 hours after determining that a cybersecurity incident occurred",
+        "edition": "Second Amendment as adopted (effective 2023-11-01), NYDFS",
+        "jurisdiction": "US-NY",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.dfs.ny.gov/system/files/documents/2023/10/rf_fs_2amend23NYCRR500_text_20231101.pdf",
+        "contentHash": "sha256:075846139bd36e25659a110325dd5d4b04ef1e052bbf796c512bde59a8b66b33",
+        "retrievedAt": "2026-10-07",
+        "legalReviewer": null
+      },
+      "dateNotes": "Already in force; the text read is the Second Amendment, effective 2023-11-01 (P1-17). The date the 72-hour notice first applied is not recorded; the legal reviewer records it.",
+      "sourceKind": "official",
+      "sourceNote": "Bytes fetched and hashed by P1-17 at 2026-10-07T17:11:34Z (qualification/2026-10-07-P1-17/sources.md); 500.17(a) is encoded from that text in docs/REGULATORY_INCIDENT_CLOCKS.md. Not re-fetched in P1-18.",
+      "flags": {
+        "litigationExposed": true
+      },
+      "s5RegisterId": "us-nydfs-part-500"
+    },
+    {
+      "id": "us-nydfs-500-13-inventory",
+      "row": "NYDFS Part 500 and its AI letter",
+      "stations": [
+        "wealth",
+        "technology"
+      ],
+      "meaning": "72-hour incident notice (§500.17); agents and their credentials in the asset inventory; MFA for all users; monitoring for data-extraction prompts",
+      "keyDatesText": "Letter 2024-10-16; MFA and inventory due 2025-11-01; 72-hour notice already in force",
+      "statusText": "Binding now for New York-regulated firms",
+      "scope": "New York-regulated firms",
+      "citation": {
+        "instrument": "23 NYCRR Part 500 (NYDFS Cybersecurity Regulation)",
+        "clause": "23 NYCRR 500.13 (asset management): the asset inventory, which the AI letter reads to include agents and their credentials",
+        "edition": "Second Amendment as adopted (effective 2023-11-01), NYDFS",
+        "jurisdiction": "US-NY",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": "2025-11-01",
+        "url": "https://www.dfs.ny.gov/system/files/documents/2023/10/rf_fs_2amend23NYCRR500_text_20231101.pdf",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "Due 2025-11-01 per the plan's US register; the effective date of the amended section is not recorded.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: P1-17 fetched the Second Amendment text at 2026-10-07T17:11:34Z (sha256:075846139bd36e25659a110325dd5d4b04ef1e052bbf796c512bde59a8b66b33, qualification/2026-10-07-P1-17/sources.md) but encoded only 500.1, 500.17, 500.19 and 500.22; this section number and its 2025-11-01 date are not confirmed from text held in the repository. Not re-fetched in P1-18 (no network access).",
+      "flags": {
+        "reverify": "The Part 500 section numbers for the asset inventory (500.13) and MFA (500.12) and their 2025-11-01 date",
+        "litigationExposed": true
+      },
+      "s5RegisterId": "us-nydfs-part-500"
+    },
+    {
+      "id": "us-nydfs-500-12-mfa",
+      "row": "NYDFS Part 500 and its AI letter",
+      "stations": [
+        "wealth",
+        "technology"
+      ],
+      "meaning": "72-hour incident notice (§500.17); agents and their credentials in the asset inventory; MFA for all users; monitoring for data-extraction prompts",
+      "keyDatesText": "Letter 2024-10-16; MFA and inventory due 2025-11-01; 72-hour notice already in force",
+      "statusText": "Binding now for New York-regulated firms",
+      "scope": "New York-regulated firms",
+      "citation": {
+        "instrument": "23 NYCRR Part 500 (NYDFS Cybersecurity Regulation)",
+        "clause": "23 NYCRR 500.12: multi-factor authentication for all users",
+        "edition": "Second Amendment as adopted (effective 2023-11-01), NYDFS",
+        "jurisdiction": "US-NY",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": "2025-11-01",
+        "url": "https://www.dfs.ny.gov/system/files/documents/2023/10/rf_fs_2amend23NYCRR500_text_20231101.pdf",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "Due 2025-11-01 per the plan's US register; the effective date of the amended section is not recorded.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: P1-17 fetched the Second Amendment text at 2026-10-07T17:11:34Z (sha256:075846139bd36e25659a110325dd5d4b04ef1e052bbf796c512bde59a8b66b33, qualification/2026-10-07-P1-17/sources.md) but encoded only 500.1, 500.17, 500.19 and 500.22; this section number and its 2025-11-01 date are not confirmed from text held in the repository. Not re-fetched in P1-18 (no network access).",
+      "flags": {
+        "reverify": "The Part 500 section numbers for the asset inventory (500.13) and MFA (500.12) and their 2025-11-01 date",
+        "litigationExposed": true
+      },
+      "s5RegisterId": "us-nydfs-part-500"
+    },
+    {
+      "id": "us-nydfs-ai-letter-extraction",
+      "row": "NYDFS Part 500 and its AI letter",
+      "stations": [
+        "wealth",
+        "technology"
+      ],
+      "meaning": "72-hour incident notice (§500.17); agents and their credentials in the asset inventory; MFA for all users; monitoring for data-extraction prompts",
+      "keyDatesText": "Letter 2024-10-16; MFA and inventory due 2025-11-01; 72-hour notice already in force",
+      "statusText": "Binding now for New York-regulated firms",
+      "scope": "New York-regulated firms",
+      "citation": {
+        "instrument": "NYDFS industry letter: Cybersecurity Risks Arising from Artificial Intelligence and Strategies to Combat Related Risks",
+        "clause": "Industry letter of 2024-10-16: monitor for prompts that try to extract nonpublic information",
+        "edition": "NYDFS industry letter, 16 October 2024",
+        "jurisdiction": "US-NY",
+        "statusType": "binding-now",
+        "effectiveDate": "2024-10-16",
+        "complianceDueDate": null,
+        "url": "https://www.dfs.ny.gov/industry-guidance/industry-letters/il20241016-cyber-risks-ai-and-strategies-combat-related-risks",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "The letter is dated 2024-10-16 (plan's US register); it carries no separate compliance date.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11); the URL is the DFS industry-letter path as P1-18 recorded it and is confirmed when the letter is read and hashed.",
+      "flags": {
+        "reverify": "Whether the AI letter's monitoring expectation is a Part 500 duty or guidance",
+        "litigationExposed": true
+      },
+      "s5RegisterId": "us-nydfs-part-500"
+    },
+    {
+      "id": "us-sr-26-2-models",
+      "row": "SR 26-2",
+      "stations": [
+        "wealth"
+      ],
+      "meaning": "Inventory, validation and effective challenge for the traditional models an agent calls; generative and agentic AI are out of scope",
+      "keyDatesText": "2026-04-17",
+      "statusText": "Supervisory guidance",
+      "citation": {
+        "instrument": "Federal Reserve SR 26-2, Revised Guidance on Model Risk Management (with the OCC and FDIC)",
+        "clause": "SR 26-2: inventory, validation and effective challenge for the traditional models an agent calls; generative and agentic AI models are outside its scope",
+        "edition": "SR 26-2 (17 April 2026)",
+        "jurisdiction": "US",
+        "statusType": "supervisory-guidance",
+        "effectiveDate": "2026-04-17",
+        "complianceDueDate": null,
+        "url": "https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm",
+        "contentHash": null,
+        "retrievedAt": "2026-10-07",
+        "legalReviewer": null
+      },
+      "dateNotes": "Letter dated 2026-04-17; supervisory guidance carries no compliance-due date.",
+      "sourceKind": "official",
+      "sourceNote": "P0-24 read the letter page and its attachment on 2026-10-07 without recording a hash (src/domains/packs/catalogueUs.ts, us-sr-26-2): attachment footnote 3 puts generative and agentic AI models outside the guidance. Not fetched in P1-18.",
+      "flags": {
+        "reverify": "The US banking agencies' AI request for information"
+      },
+      "s5RegisterId": "us-sr-26-2"
+    },
+    {
+      "id": "us-sr-23-4",
+      "row": "SR 23-4 and its replacement proposal",
+      "stations": [
+        "wealth",
+        "technology"
+      ],
+      "meaning": "Due diligence, contracts and monitoring for AI vendors, AMC included",
+      "keyDatesText": "SR 23-4 final in 2023; proposal 2026-09-15, comments due 2026-11-16",
+      "statusText": "SR 23-4 supervisory guidance; the replacement proposal is a draft",
+      "citation": {
+        "instrument": "Federal Reserve SR 23-4, Interagency Guidance on Third-Party Relationships: Risk Management (with the OCC and FDIC)",
+        "clause": "SR 23-4: due diligence, contract negotiation and ongoing monitoring across the third-party relationship life cycle, applied to AI vendors, AMC included",
+        "edition": "SR 23-4 (7 June 2023)",
+        "jurisdiction": "US",
+        "statusType": "supervisory-guidance",
+        "effectiveDate": "2023-06-07",
+        "complianceDueDate": null,
+        "url": "https://www.federalreserve.gov/supervisionreg/srletters/SR2304.htm",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "Issued 2023-06-07 (the plan's research date); supervisory guidance carries no compliance-due date.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11); the URL follows the Federal Reserve SR-letter path S5 records for SR 26-2 (SR2602.htm) and is confirmed when read.",
+      "flags": {
+        "reverify": "SR 23-4's replacement"
+      },
+      "s5RegisterId": "us-sr-23-4"
+    },
+    {
+      "id": "us-tprm-proposal-2026",
+      "row": "SR 23-4 and its replacement proposal",
+      "stations": [
+        "wealth",
+        "technology"
+      ],
+      "meaning": "Due diligence, contracts and monitoring for AI vendors, AMC included",
+      "keyDatesText": "SR 23-4 final in 2023; proposal 2026-09-15, comments due 2026-11-16",
+      "statusText": "SR 23-4 supervisory guidance; the replacement proposal is a draft",
+      "citation": {
+        "instrument": "Proposed replacement of the interagency third-party risk management guidance (SR 23-4)",
+        "clause": "Proposal of 2026-09-15: due diligence, contracts and monitoring for third parties, AI vendors included",
+        "edition": "Federal Register search for the 2026-09-15 proposal; its document number is not recorded",
+        "jurisdiction": "US",
+        "statusType": "draft",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=third-party%20relationships&conditions%5Bpublication_date%5D%5Bgte%5D=2026-09-15",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "Proposal published 2026-09-15 with comments due 2026-11-16 (plan's US register); not final, so it has no effective or compliance date.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11); the proposal's Federal Register document was not identified or read; the URL is a Federal Register search that should list it.",
+      "flags": {
+        "reverify": "SR 23-4's replacement",
+        "pending": true
+      },
+      "s5RegisterId": "us-tprm-proposal-2026"
+    },
+    {
+      "id": "us-hipaa-164-502-b",
+      "row": "HIPAA Privacy, Security and Breach Notification Rules",
+      "stations": [
+        "health",
+        "technology"
+      ],
+      "meaning": "§164.502(b) minimum necessary in prompts, tools and logs; §164.312 unique agent identity and audit controls; endpoints under a BAA only; breach notice within 60 days",
+      "keyDatesText": "In force; a Security Rule update is proposed",
+      "statusText": "Binding now",
+      "scope": "HIPAA covered entities and business associates",
+      "citation": {
+        "instrument": "HIPAA Privacy, Security and Breach Notification Rules (45 CFR Parts 160 and 164)",
+        "clause": "45 CFR 164.502(b): minimum necessary, applied to prompts, tools and logs",
+        "edition": "eCFR current text; not yet retrieved",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.ecfr.gov/current/title-45/section-164.502",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "In force; the legal reviewer records the date this paragraph took effect.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11); the paragraph is the plan's; it is confirmed when read and hashed.",
+      "flags": {},
+      "s5RegisterId": "us-hipaa-rules"
+    },
+    {
+      "id": "us-hipaa-164-312",
+      "row": "HIPAA Privacy, Security and Breach Notification Rules",
+      "stations": [
+        "health",
+        "technology"
+      ],
+      "meaning": "§164.502(b) minimum necessary in prompts, tools and logs; §164.312 unique agent identity and audit controls; endpoints under a BAA only; breach notice within 60 days",
+      "keyDatesText": "In force; a Security Rule update is proposed",
+      "statusText": "Binding now",
+      "scope": "HIPAA covered entities and business associates",
+      "citation": {
+        "instrument": "HIPAA Privacy, Security and Breach Notification Rules (45 CFR Parts 160 and 164)",
+        "clause": "45 CFR 164.312(a)(1) access control, including unique user identification, and 164.312(b) audit controls: a unique identity per agent and audit controls over what it does",
+        "edition": "CFR annual edition 2024, Title 45 Vol. 2 (GPO govinfo)",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-312.xml",
+        "contentHash": null,
+        "retrievedAt": "2026-10-03",
+        "legalReviewer": null
+      },
+      "dateNotes": "In force; the legal reviewer records the date this paragraph took effect.",
+      "sourceKind": "official",
+      "sourceNote": "Read by track F1 on 2026-10-03 without a content hash (as L0-IDN-01 records); not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {},
+      "s5RegisterId": "us-hipaa-rules"
+    },
+    {
+      "id": "us-hipaa-164-502-e",
+      "row": "HIPAA Privacy, Security and Breach Notification Rules",
+      "stations": [
+        "health",
+        "technology"
+      ],
+      "meaning": "§164.502(b) minimum necessary in prompts, tools and logs; §164.312 unique agent identity and audit controls; endpoints under a BAA only; breach notice within 60 days",
+      "keyDatesText": "In force; a Security Rule update is proposed",
+      "statusText": "Binding now",
+      "scope": "HIPAA covered entities and business associates",
+      "citation": {
+        "instrument": "HIPAA Privacy, Security and Breach Notification Rules (45 CFR Parts 160 and 164)",
+        "clause": "45 CFR 164.502(e) and 164.504(e): disclose PHI to a business associate only under a business associate agreement, so agent endpoints run under a BAA",
+        "edition": "eCFR current text; not yet retrieved",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.ecfr.gov/current/title-45/section-164.502",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "In force; the legal reviewer records the date this paragraph took effect.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11); the paragraphs are those L0-DAT-03 cites; they are confirmed when read and hashed.",
+      "flags": {},
+      "s5RegisterId": "us-hipaa-rules"
+    },
+    {
+      "id": "us-hipaa-164-404",
+      "row": "HIPAA Privacy, Security and Breach Notification Rules",
+      "stations": [
+        "health",
+        "technology"
+      ],
+      "meaning": "§164.502(b) minimum necessary in prompts, tools and logs; §164.312 unique agent identity and audit controls; endpoints under a BAA only; breach notice within 60 days",
+      "keyDatesText": "In force; a Security Rule update is proposed",
+      "statusText": "Binding now",
+      "scope": "HIPAA covered entities and business associates",
+      "clock": {
+        "duration": "60 calendar days",
+        "trigger": "discovery of a breach",
+        "clockId": "hipaa-164-404-individual-notice"
+      },
+      "citation": {
+        "instrument": "HIPAA Privacy, Security and Breach Notification Rules (45 CFR Parts 160 and 164)",
+        "clause": "45 CFR 164.404(b): notify affected individuals without unreasonable delay and no later than 60 calendar days after discovering a breach",
+        "edition": "CFR annual edition 2024, Title 45 Vol. 2 (GPO govinfo)",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-404.xml",
+        "contentHash": null,
+        "retrievedAt": "2026-10-03",
+        "legalReviewer": null
+      },
+      "dateNotes": "In force; the legal reviewer records the date this paragraph took effect.",
+      "sourceKind": "official",
+      "sourceNote": "F4 read this text at 2026-10-03T16:38:09Z and encoded the 60-day clock hipaa-164-404-individual-notice (src/incidents/regulatoryClocksTable.ts) without recording a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {},
+      "s5RegisterId": "us-hipaa-rules"
+    },
+    {
+      "id": "us-hipaa-security-nprm-2025",
+      "row": "HIPAA Privacy, Security and Breach Notification Rules",
+      "stations": [
+        "health",
+        "technology"
+      ],
+      "meaning": "§164.502(b) minimum necessary in prompts, tools and logs; §164.312 unique agent identity and audit controls; endpoints under a BAA only; breach notice within 60 days",
+      "keyDatesText": "In force; a Security Rule update is proposed",
+      "statusText": "Binding now",
+      "scope": "HIPAA covered entities and business associates",
+      "citation": {
+        "instrument": "HIPAA Security Rule To Strengthen the Cybersecurity of Electronic Protected Health Information (proposed)",
+        "clause": "NPRM 90 FR 898 (FR Doc 2024-30983): proposed amendments to the Security Rule, 45 CFR Part 164",
+        "edition": "Federal Register, 2025-01-06 (90 FR 898)",
+        "jurisdiction": "US",
+        "statusType": "draft",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.federalregister.gov/documents/2025/01/06/2024-30983/hipaa-security-rule-to-strengthen-the-cybersecurity-of-electronic-protected-health-information",
+        "contentHash": null,
+        "retrievedAt": "2026-10-03",
+        "legalReviewer": null
+      },
+      "dateNotes": "NPRM published 2025-01-06 (90 FR 898); not final, so it has no effective date. S5 records the Fall 2025 Unified Agenda's final-action target of 2027-07.",
+      "sourceKind": "official",
+      "sourceNote": "S5 entry us-hipaa-security-nprm-2025 records this source read on 2026-10-03 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {
+        "pending": true
+      },
+      "s5RegisterId": "us-hipaa-security-nprm-2025"
+    },
+    {
+      "id": "us-aca-1557-92-210-b",
+      "row": "ACA §1557, 45 CFR 92.210",
+      "stations": [
+        "health"
+      ],
+      "meaning": "Identify decision-support tools that use protected traits and mitigate discrimination risk",
+      "keyDatesText": "Paragraphs (b) and (c) due 2025-05-01",
+      "statusText": "Binding now",
+      "scope": "Covered entities under Section 1557",
+      "citation": {
+        "instrument": "ACA Section 1557 final rule (89 FR 37522), 45 CFR 92.210",
+        "clause": "45 CFR 92.210(b): make reasonable efforts to identify decision-support tools whose input variables measure protected characteristics",
+        "edition": "Federal Register, 2024-05-06 (89 FR 37522)",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": "2024-07-05",
+        "complianceDueDate": "2025-05-01",
+        "url": "https://www.federalregister.gov/documents/2024/05/06/2024-08711/nondiscrimination-in-health-programs-and-activities",
+        "contentHash": null,
+        "retrievedAt": "2026-10-03",
+        "legalReviewer": null
+      },
+      "dateNotes": "Rule effective 2024-07-05; paragraphs (b) and (c) apply from 2025-05-01 (S5). S5 also records a 2025-10-22 court vacatur of the rule's gender-identity provisions; the legal reviewer confirms how it bears on 92.210.",
+      "sourceKind": "official",
+      "sourceNote": "S5 entry us-aca-1557-92-210 records this source read on 2026-10-03 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {},
+      "s5RegisterId": "us-aca-1557-92-210"
+    },
+    {
+      "id": "us-aca-1557-92-210-c",
+      "row": "ACA §1557, 45 CFR 92.210",
+      "stations": [
+        "health"
+      ],
+      "meaning": "Identify decision-support tools that use protected traits and mitigate discrimination risk",
+      "keyDatesText": "Paragraphs (b) and (c) due 2025-05-01",
+      "statusText": "Binding now",
+      "scope": "Covered entities under Section 1557",
+      "citation": {
+        "instrument": "ACA Section 1557 final rule (89 FR 37522), 45 CFR 92.210",
+        "clause": "45 CFR 92.210(c): make reasonable efforts to mitigate the discrimination risk of each tool identified",
+        "edition": "Federal Register, 2024-05-06 (89 FR 37522)",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": "2024-07-05",
+        "complianceDueDate": "2025-05-01",
+        "url": "https://www.federalregister.gov/documents/2024/05/06/2024-08711/nondiscrimination-in-health-programs-and-activities",
+        "contentHash": null,
+        "retrievedAt": "2026-10-03",
+        "legalReviewer": null
+      },
+      "dateNotes": "Rule effective 2024-07-05; paragraphs (b) and (c) apply from 2025-05-01 (S5). S5 also records a 2025-10-22 court vacatur of the rule's gender-identity provisions; the legal reviewer confirms how it bears on 92.210.",
+      "sourceKind": "official",
+      "sourceNote": "S5 entry us-aca-1557-92-210 records this source read on 2026-10-03 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {},
+      "s5RegisterId": "us-aca-1557-92-210"
+    },
+    {
+      "id": "us-cms-0057-f-decisions",
+      "row": "CMS-0057-F",
+      "stations": [
+        "health",
+        "wealth"
+      ],
+      "meaning": "Prior-authorization decisions within 72 hours (expedited) or 7 days (standard), with specific denial reasons; the API",
+      "keyDatesText": "Decisions due 2026-01-01; API due 2027-01-01",
+      "statusText": "Binding now",
+      "scope": "Impacted payers: Medicare Advantage organizations and state Medicaid and CHIP fee-for-service programs",
+      "citation": {
+        "instrument": "CMS Interoperability and Prior Authorization final rule (CMS-0057-F, 89 FR 8758)",
+        "clause": "CMS-0057-F: decide prior-authorization requests within 72 hours (expedited) or 7 calendar days (standard) and give a specific reason for each denial",
+        "edition": "Federal Register, 2024-02-08 (89 FR 8758)",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": "2024-04-08",
+        "complianceDueDate": "2026-01-01",
+        "url": "https://www.federalregister.gov/documents/2024/02/08/2024-00895/medicare-and-medicaid-programs-patient-protection-and-affordable-care-act-advancing-interoperability",
+        "contentHash": null,
+        "retrievedAt": "2026-10-03",
+        "legalReviewer": null
+      },
+      "sourceKind": "official",
+      "sourceNote": "S5 entry us-cms-0057-f records this source read on 2026-10-03 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {},
+      "s5RegisterId": "us-cms-0057-f"
+    },
+    {
+      "id": "us-cms-0057-f-api",
+      "row": "CMS-0057-F",
+      "stations": [
+        "health",
+        "wealth"
+      ],
+      "meaning": "Prior-authorization decisions within 72 hours (expedited) or 7 days (standard), with specific denial reasons; the API",
+      "keyDatesText": "Decisions due 2026-01-01; API due 2027-01-01",
+      "statusText": "Binding now",
+      "scope": "Impacted payers: Medicare Advantage organizations and state Medicaid and CHIP fee-for-service programs",
+      "citation": {
+        "instrument": "CMS Interoperability and Prior Authorization final rule (CMS-0057-F, 89 FR 8758)",
+        "clause": "CMS-0057-F: Prior Authorization and Patient Access API changes",
+        "edition": "Federal Register, 2024-02-08 (89 FR 8758)",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": "2024-04-08",
+        "complianceDueDate": "2027-01-01",
+        "url": "https://www.federalregister.gov/documents/2024/02/08/2024-00895/medicare-and-medicaid-programs-patient-protection-and-affordable-care-act-advancing-interoperability",
+        "contentHash": null,
+        "retrievedAt": "2026-10-03",
+        "legalReviewer": null
+      },
+      "sourceKind": "official",
+      "sourceNote": "S5 entry us-cms-0057-f records this source read on 2026-10-03 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {},
+      "s5RegisterId": "us-cms-0057-f"
+    },
+    {
+      "id": "us-ca-ab3030",
+      "row": "California AB 3030 and SB 1120; Texas TRAIGA",
+      "stations": [
+        "health"
+      ],
+      "meaning": "AB 3030: disclose generative AI in clinical messages, with a route to a human. SB 1120: licensed professionals make medical-necessity denials. TRAIGA: disclose AI in care by the first service",
+      "keyDatesText": "AB 3030 and SB 1120 from 2025-01-01; TRAIGA from 2026-01-01",
+      "statusText": "Binding now",
+      "citation": {
+        "instrument": "California AB 3030 (Ch. 848, Stats. 2024)",
+        "clause": "Health and Safety Code §1339.75(a): disclose generative AI in patient clinical communications, with instructions for reaching a human",
+        "edition": "California Legislature bill text, Ch. 848, Stats. 2024",
+        "jurisdiction": "US-CA",
+        "statusType": "binding-now",
+        "effectiveDate": "2025-01-01",
+        "complianceDueDate": null,
+        "url": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240AB3030",
+        "contentHash": null,
+        "retrievedAt": "2026-10-04",
+        "legalReviewer": null
+      },
+      "dateNotes": "From 2025-01-01 per the plan's US register; S5 found no operative date in the bill text it read on 2026-10-04 and did not infer one. No compliance-due date is recorded.",
+      "sourceKind": "official",
+      "sourceNote": "S5 entry us-ca-ab3030 records this source read on 2026-10-04 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {
+        "reverify": "AB 3030's operative date",
+        "litigationExposed": true
+      },
+      "s5RegisterId": "us-ca-ab3030"
+    },
+    {
+      "id": "us-ca-sb1120",
+      "row": "California AB 3030 and SB 1120; Texas TRAIGA",
+      "stations": [
+        "health"
+      ],
+      "meaning": "AB 3030: disclose generative AI in clinical messages, with a route to a human. SB 1120: licensed professionals make medical-necessity denials. TRAIGA: disclose AI in care by the first service",
+      "keyDatesText": "AB 3030 and SB 1120 from 2025-01-01; TRAIGA from 2026-01-01",
+      "statusText": "Binding now",
+      "citation": {
+        "instrument": "California SB 1120 (Ch. 879, Stats. 2024)",
+        "clause": "Health and Safety Code §1367.01(k) and Insurance Code §10123.135(j): only a licensed health care professional makes a medical-necessity denial",
+        "edition": "California Legislature bill text, Ch. 879, Stats. 2024",
+        "jurisdiction": "US-CA",
+        "statusType": "binding-now",
+        "effectiveDate": "2025-01-01",
+        "complianceDueDate": null,
+        "url": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB1120",
+        "contentHash": null,
+        "retrievedAt": "2026-10-04",
+        "legalReviewer": null
+      },
+      "dateNotes": "From 2025-01-01 per the plan's US register; S5 does not verify an operative date for SB 1120. No compliance-due date is recorded.",
+      "sourceKind": "official",
+      "sourceNote": "S5 entry us-ca-sb1120 records this source read on 2026-10-04 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {
+        "reverify": "SB 1120's operative date",
+        "litigationExposed": true
+      },
+      "s5RegisterId": "us-ca-sb1120"
+    },
+    {
+      "id": "us-tx-traiga-552-051",
+      "row": "California AB 3030 and SB 1120; Texas TRAIGA",
+      "stations": [
+        "health"
+      ],
+      "meaning": "AB 3030: disclose generative AI in clinical messages, with a route to a human. SB 1120: licensed professionals make medical-necessity denials. TRAIGA: disclose AI in care by the first service",
+      "keyDatesText": "AB 3030 and SB 1120 from 2025-01-01; TRAIGA from 2026-01-01",
+      "statusText": "Binding now",
+      "citation": {
+        "instrument": "Texas Responsible Artificial Intelligence Governance Act (HB 149, 89R)",
+        "clause": "Business and Commerce Code §552.051: a health care provider discloses AI use by the date the service or treatment is first provided",
+        "edition": "Texas HB 149 enrolled text",
+        "jurisdiction": "US-TX",
+        "statusType": "binding-now",
+        "effectiveDate": "2026-01-01",
+        "complianceDueDate": null,
+        "url": "https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00149F.htm",
+        "contentHash": null,
+        "retrievedAt": "2026-10-04",
+        "legalReviewer": null
+      },
+      "dateNotes": "Effective 2026-01-01 (S5, from the Texas Legislature's bill history). No compliance-due date is recorded.",
+      "sourceKind": "official",
+      "sourceNote": "S5 entry us-tx-traiga records this source read on 2026-10-04 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {
+        "litigationExposed": true
+      },
+      "s5RegisterId": "us-tx-traiga"
+    },
+    {
+      "id": "us-co-sb26-189-deployers",
+      "row": "Colorado SB 26-189; California CCPA rules on automated decisions",
+      "stations": [
+        "education",
+        "environment",
+        "health",
+        "wealth",
+        "technology",
+        "mobility",
+        "governance"
+      ],
+      "meaning": "Notices, risk assessments and records for consequential decisions",
+      "keyDatesText": "Due 2027-01-01",
+      "statusText": "Binding in future",
+      "citation": {
+        "instrument": "Colorado SB26-189, Automated Decision-Making Technology (Part 17 of Article 1 of Title 6, C.R.S.)",
+        "clause": "Deployers: clear notice at points of interaction; a plain-language description of the system's role within 30 days after an adverse consequential decision; meaningful human review on request",
+        "edition": "SB26-189 as signed 2026-05-14",
+        "jurisdiction": "US-CO",
+        "statusType": "binding-future",
+        "effectiveDate": "2027-01-01",
+        "complianceDueDate": "2027-01-01",
+        "url": "https://leg.colorado.gov/bills/sb26-189",
+        "contentHash": null,
+        "retrievedAt": "2026-10-03",
+        "legalReviewer": null
+      },
+      "sourceKind": "official",
+      "sourceNote": "S5 entry us-co-sb26-189 records this source read on 2026-10-03 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {
+        "reverify": "Colorado SB 26-189's final text",
+        "litigationExposed": true
+      },
+      "s5RegisterId": "us-co-sb26-189"
+    },
+    {
+      "id": "us-co-sb26-189-developers",
+      "row": "Colorado SB 26-189; California CCPA rules on automated decisions",
+      "stations": [
+        "education",
+        "environment",
+        "health",
+        "wealth",
+        "technology",
+        "mobility",
+        "governance"
+      ],
+      "meaning": "Notices, risk assessments and records for consequential decisions",
+      "keyDatesText": "Due 2027-01-01",
+      "statusText": "Binding in future",
+      "citation": {
+        "instrument": "Colorado SB26-189, Automated Decision-Making Technology (Part 17 of Article 1 of Title 6, C.R.S.)",
+        "clause": "Developers: give deployers technical documentation, notify them of material updates and keep records for at least 3 years",
+        "edition": "SB26-189 as signed 2026-05-14",
+        "jurisdiction": "US-CO",
+        "statusType": "binding-future",
+        "effectiveDate": "2027-01-01",
+        "complianceDueDate": "2027-01-01",
+        "url": "https://leg.colorado.gov/bills/sb26-189",
+        "contentHash": null,
+        "retrievedAt": "2026-10-03",
+        "legalReviewer": null
+      },
+      "sourceKind": "official",
+      "sourceNote": "S5 entry us-co-sb26-189 records this source read on 2026-10-03 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {
+        "reverify": "Colorado SB 26-189's final text",
+        "litigationExposed": true
+      },
+      "s5RegisterId": "us-co-sb26-189"
+    },
+    {
+      "id": "us-ca-ccpa-admt-notice",
+      "row": "Colorado SB 26-189; California CCPA rules on automated decisions",
+      "stations": [
+        "education",
+        "environment",
+        "health",
+        "wealth",
+        "technology",
+        "mobility",
+        "governance"
+      ],
+      "meaning": "Notices, risk assessments and records for consequential decisions",
+      "keyDatesText": "Due 2027-01-01",
+      "statusText": "Binding in future",
+      "citation": {
+        "instrument": "CCPA regulations on automated decisionmaking technology, risk assessments and cybersecurity audits (11 CCR; CPPA)",
+        "clause": "11 CCR §7220 pre-use notice, and Article 11 opt-out and access rights, for ADMT used for significant decisions",
+        "edition": "CPPA approved regulations text (OAL-approved 2025-09-22)",
+        "jurisdiction": "US-CA",
+        "statusType": "binding-future",
+        "effectiveDate": "2026-01-01",
+        "complianceDueDate": "2027-01-01",
+        "url": "https://cppa.ca.gov/regulations/pdf/ccpa_updates_cyber_risk_admt_appr_text.pdf",
+        "contentHash": null,
+        "retrievedAt": "2026-10-03",
+        "legalReviewer": null
+      },
+      "dateNotes": "Regulations effective 2026-01-01; a business using ADMT for significant decisions before 2027-01-01 complies by that date (§7200(b), per S5).",
+      "sourceKind": "official",
+      "sourceNote": "S5 entry us-ca-cppa-admt records this source read on 2026-10-03 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {
+        "reverify": "The CCPA ADMT and risk-assessment compliance dates and scope, at the 2027-01-01 status review",
+        "litigationExposed": true
+      },
+      "s5RegisterId": "us-ca-cppa-admt"
+    },
+    {
+      "id": "us-ca-ccpa-risk-assessment",
+      "row": "Colorado SB 26-189; California CCPA rules on automated decisions",
+      "stations": [
+        "education",
+        "environment",
+        "health",
+        "wealth",
+        "technology",
+        "mobility",
+        "governance"
+      ],
+      "meaning": "Notices, risk assessments and records for consequential decisions",
+      "keyDatesText": "Due 2027-01-01",
+      "statusText": "Binding in future",
+      "citation": {
+        "instrument": "CCPA regulations on automated decisionmaking technology, risk assessments and cybersecurity audits (11 CCR; CPPA)",
+        "clause": "11 CCR Article 10: a risk assessment before covered processing, including ADMT, with its information submitted from 2028-04-01 (§7157)",
+        "edition": "CPPA approved regulations text (OAL-approved 2025-09-22)",
+        "jurisdiction": "US-CA",
+        "statusType": "binding-future",
+        "effectiveDate": "2026-01-01",
+        "complianceDueDate": "2027-12-31",
+        "url": "https://cppa.ca.gov/regulations/pdf/ccpa_updates_cyber_risk_admt_appr_text.pdf",
+        "contentHash": null,
+        "retrievedAt": "2026-10-03",
+        "legalReviewer": null
+      },
+      "dateNotes": "Regulations effective 2026-01-01; risk assessments for processing that began before then are documented by 2027-12-31 (S5). The legal reviewer confirms whether processing that began after 2026-01-01 is already bound.",
+      "sourceKind": "official",
+      "sourceNote": "S5 entry us-ca-cppa-admt records this source read on 2026-10-03 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {
+        "reverify": "The CCPA ADMT and risk-assessment compliance dates and scope, at the 2027-01-01 status review",
+        "litigationExposed": true
+      },
+      "s5RegisterId": "us-ca-cppa-admt"
+    },
+    {
+      "id": "us-reg-b-1002-9",
+      "row": "ECOA Regulation B, 12 CFR 1002.9",
+      "stations": [
+        "wealth"
+      ],
+      "meaning": "Specific principal reasons for adverse credit action; supports the Wealth overlay's credit-decision controls and is not one of the strategy's 11 US rows",
+      "keyDatesText": "In force; the 2026 amendments took effect 2026-07-21",
+      "statusText": "Binding now",
+      "citation": {
+        "instrument": "Equal Credit Opportunity Act, Regulation B (12 CFR Part 1002)",
+        "clause": "12 CFR 1002.9: a statement of the specific principal reasons for adverse action, including when a decision uses complex models",
+        "edition": "12 CFR Part 1002 as amended by CFPB final rule FR Doc 2026-07804 (91 FR 21620)",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.federalregister.gov/documents/2026/04/22/2026-07804/equal-credit-opportunity-act-regulation-b",
+        "contentHash": null,
+        "retrievedAt": "2026-10-03",
+        "legalReviewer": null
+      },
+      "dateNotes": "In force; the CFPB's 2026 amendments to Part 1002 took effect 2026-07-21 (S5 us-ecoa-reg-b). The date 1002.9 first applied is not recorded.",
+      "sourceKind": "official",
+      "sourceNote": "S5 entry us-ecoa-reg-b records this source read on 2026-10-03 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+      "flags": {},
+      "s5RegisterId": "us-ecoa-reg-b"
+    }
+  ]
+}

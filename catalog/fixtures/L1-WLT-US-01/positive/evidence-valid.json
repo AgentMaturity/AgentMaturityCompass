@@ -1,0 +1,80 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-01",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2025-01-01T00:00:00.000Z",
+      "end": "2026-09-30T23:59:59.000Z"
+    },
+    "subject": {
+      "tenantId": "tenant-a",
+      "workspaceId": "ws-a",
+      "deploymentId": "dep-a",
+      "agentId": "agent-1",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [
+      {
+        "ref": {
+          "kind": "receipt",
+          "id": "L1-WLT-US-01-leases-issuer-1"
+        },
+        "producerId": "amc.leases.issuer",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.leases.issuer",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "workspaceId": "ws-a",
+          "agentId": "agent-1",
+          "controlId": "L1-WLT-US-01"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L1-WLT-US-01-leases-issuer-1-receipt",
+          "observationKey": "L1-WLT-US-01-observation-1",
+          "observation": "conforms"
+        }
+      },
+      {
+        "ref": {
+          "kind": "receipt",
+          "id": "L1-WLT-US-01-authorizationRecord-2"
+        },
+        "producerId": "amc.authorizationRecord",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.authorizationRecord",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "workspaceId": "ws-a",
+          "agentId": "agent-1",
+          "controlId": "L1-WLT-US-01"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L1-WLT-US-01-authorizationRecord-2-receipt",
+          "observationKey": "L1-WLT-US-01-observation-2",
+          "observation": "conforms"
+        }
+      }
+    ],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": null
+  }
+}

@@ -1,0 +1,74 @@
+# Draft (P1-18): wealth.us.approval-binding. Experimental, agent-drafted and not independently reviewed; expert sign-off waits for D-08.
+# Extends L0-OVS-02 (Layer 0, P1-14) with the US finance parameter and citation.
+# A result under this control is evidence of conformity, never proof of compliance.
+
+id: L1-WLT-US-02
+version: "0.1.0"
+support: experimental
+layer: 1
+family: decision-authority
+stations: [wealth]
+title: Payment approval bound to amount and payee
+statement: An approval authorizes a payment only for the amount and payee the approvers saw, and any change to either
+  voids it before the payment runs.
+riskRationale: A payment approval reused for another amount or payee moves money nobody authorized. This extends
+  L0-OVS-02 with the finance parameter that every payment needs a bound approval.
+mandatory: true
+applicability:
+  predicate: {always: true}
+  reasons:
+    - "The Wealth overlay applies to every US deployment in the Wealth station (pack scope: station wealth, jurisdiction
+      US)."
+  exclusions: []
+citations: []
+binding:
+  kind: enforcement_point
+  points: [approvals, tool_pipeline]
+  mechanism: The FINANCIAL action class needs a signed approval bound to the payment's normalized amount, currency and
+    payee; the recheck before the body refuses a changed amount or payee, an expired approval and a second use.
+  parameters:
+    - {name: toolPipeline.approvalRequiredFor, value: [FINANCIAL], strictness: union}
+  manualDuty: null
+tests:
+  - id: L1-WLT-US-02-T1
+    type: runtime_enforced
+    oracle:
+      kind: enforcement_receipt
+      observes: The bind or recheck denial, its receipt and whether the payment body ran.
+    fixtures:
+      positive: [L1-WLT-US-02/positive/evidence-valid.json, L1-WLT-US-02/positive/exact-payment.json]
+      negative:
+        - L1-WLT-US-02/negative/changed-amount.json
+        - L1-WLT-US-02/negative/changed-payee.json
+        - L1-WLT-US-02/negative/evidence-contradictory.json
+        - L1-WLT-US-02/negative/evidence-cross-tenant.json
+        - L1-WLT-US-02/negative/evidence-empty.json
+        - L1-WLT-US-02/negative/evidence-replayed.json
+        - L1-WLT-US-02/negative/evidence-stale.json
+        - L1-WLT-US-02/negative/evidence-violation.json
+    passCriteria: "Signature test (P1-20): the payment the approvers saw runs once; a changed amount or payee is refused
+      before the payment body runs. P1-19 cases F02, F03 and F05 run the same rule against the synthetic payment
+      service."
+    attempts: 1
+evidence:
+  - id: L1-WLT-US-02-E1
+    producer: amc.authorizationRecord
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: {maxAgeDays: 30}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+  - id: L1-WLT-US-02-E2
+    producer: amc.approvals.engine
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: {maxAgeDays: 30}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+invalidatedBy: [tool_version, policy_version, deployment_version]
+owner: {role: senior_manager}
+clock: null
+levels: [L2, L3]
+crosswalk: []
+review: {status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null}
+provenance: {draftedBy: ai, draftedAt: "2026-10-12", approvedBy: null}

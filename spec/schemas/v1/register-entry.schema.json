@@ -1,0 +1,260 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/register-entry.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "citation": {
+      "additionalProperties": false,
+      "properties": {
+        "clause": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "complianceDueDate": {
+          "anyOf": [
+            {
+              "pattern": "^(\\d{4})(?:-(\\d{2})(?:-(\\d{2}))?)?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "contentHash": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dateQualifier": {
+          "const": "about",
+          "type": "string"
+        },
+        "edition": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "effectiveDate": {
+          "anyOf": [
+            {
+              "pattern": "^(\\d{4})(?:-(\\d{2})(?:-(\\d{2}))?)?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "instrument": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "jurisdiction": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "type": "string"
+        },
+        "legalReviewer": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "credential": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "name": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "reviewedAt": {
+                  "format": "date",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "credential",
+                "reviewedAt"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "retrievedAt": {
+          "anyOf": [
+            {
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "statusType": {
+          "enum": [
+            "binding-now",
+            "binding-future",
+            "draft",
+            "supervisory-guidance",
+            "voluntary-standard",
+            "contractual",
+            "conformity-scheme"
+          ],
+          "type": "string"
+        },
+        "url": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "instrument",
+        "clause",
+        "edition",
+        "jurisdiction",
+        "statusType",
+        "effectiveDate",
+        "complianceDueDate",
+        "url",
+        "contentHash",
+        "retrievedAt",
+        "legalReviewer"
+      ],
+      "type": "object"
+    },
+    "clock": {
+      "additionalProperties": false,
+      "properties": {
+        "clockId": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "type": "string"
+        },
+        "duration": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "threshold": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "trigger": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "duration"
+      ],
+      "type": "object"
+    },
+    "dateNotes": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "flags": {
+      "additionalProperties": false,
+      "properties": {
+        "applicationUncertain": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "litigationCleared": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "litigationExposed": {
+          "type": "boolean"
+        },
+        "pending": {
+          "type": "boolean"
+        },
+        "reverify": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+      "type": "string"
+    },
+    "keyDatesText": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "meaning": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "row": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "s5RegisterId": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+      "type": "string"
+    },
+    "scope": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "sourceKind": {
+      "enum": [
+        "official",
+        "secondary"
+      ],
+      "type": "string"
+    },
+    "sourceNote": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "stations": {
+      "items": {
+        "enum": [
+          "education",
+          "environment",
+          "health",
+          "wealth",
+          "technology",
+          "mobility",
+          "governance"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "statusText": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "row",
+    "stations",
+    "meaning",
+    "keyDatesText",
+    "statusText",
+    "citation",
+    "sourceKind",
+    "flags",
+    "s5RegisterId"
+  ],
+  "title": "AMC Register Entry",
+  "type": "object"
+}

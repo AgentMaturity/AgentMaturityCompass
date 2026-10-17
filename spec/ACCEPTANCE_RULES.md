@@ -264,6 +264,18 @@ express, all listed in docs/catalog/CONTROL_RECORD.md:
 - A lock verifies only against a rebuild from the same tree: every digest, source row and the register digest must
   match. A matching lock shows the content is unchanged, not that it is true.
 
+## register-entry
+
+One clause of a jurisdiction register (P1-18; docs/catalog/REGISTER.md). Rules the schema cannot express:
+
+- `sourceKind` is `official` exactly when the url host is on the S5 register's official hosts; a secondary entry names
+  no legal reviewer.
+- A null date has `dateNotes`; an entry without `contentHash` has a `sourceNote`; a hash has its `retrievedAt`.
+- `s5RegisterId` exists and its stations include the entry's; a register's litigation rule flags every matching
+  jurisdiction unless a legal reviewer cleared it with a rationale.
+- A control citation keyed by an entry id restates the entry, and a control citing an unreviewed entry cannot report an
+  approved review.
+
 ## A4 project record
 
 One A4 Forge project (docs/A4_FORGE.md) as the ledger stores it: the head row `a4_projects`, the transition chain

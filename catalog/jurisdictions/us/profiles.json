@@ -1,0 +1,155 @@
+[
+  {
+    "id": "us-federal",
+    "name": "United States: federal",
+    "registerEntryIds": [
+      "us-reg-e-1005-2-m",
+      "us-reg-e-comment-2-m-3",
+      "us-glba-314-4-c-5",
+      "us-glba-314-4-c-8",
+      "us-glba-314-4-f",
+      "us-glba-314-4-j",
+      "us-bsa-1020-320-b-3",
+      "us-bsa-1020-320-e",
+      "us-bsa-1020-320-d",
+      "us-sr-26-2-models",
+      "us-sr-23-4",
+      "us-tprm-proposal-2026",
+      "us-hipaa-164-502-b",
+      "us-hipaa-164-312",
+      "us-hipaa-164-502-e",
+      "us-hipaa-164-404",
+      "us-hipaa-security-nprm-2025",
+      "us-aca-1557-92-210-b",
+      "us-aca-1557-92-210-c",
+      "us-cms-0057-f-decisions",
+      "us-cms-0057-f-api",
+      "us-reg-b-1002-9"
+    ],
+    "otherInstruments": [
+      {
+        "name": "OMB Memorandum M-25-21",
+        "s5RegisterId": "us-omb-m-25-21",
+        "ownerKey": "P3-14"
+      },
+      {
+        "name": "OMB Memorandum M-25-22",
+        "s5RegisterId": "us-omb-m-25-22",
+        "ownerKey": "P3-14"
+      },
+      {
+        "name": "CMMC",
+        "s5RegisterId": null,
+        "ownerKey": "P3-14"
+      }
+    ],
+    "litigationExposed": false
+  },
+  {
+    "id": "us-co",
+    "name": "Colorado",
+    "registerEntryIds": [
+      "us-co-sb26-189-deployers",
+      "us-co-sb26-189-developers"
+    ],
+    "otherInstruments": [
+      {
+        "name": "Colorado Regulation 10-1-1",
+        "s5RegisterId": null,
+        "ownerKey": "P2-31"
+      }
+    ],
+    "litigationExposed": true
+  },
+  {
+    "id": "us-ca",
+    "name": "California",
+    "registerEntryIds": [
+      "us-ca-ab3030",
+      "us-ca-sb1120",
+      "us-ca-ccpa-admt-notice",
+      "us-ca-ccpa-risk-assessment"
+    ],
+    "otherInstruments": [
+      {
+        "name": "California SB 243",
+        "s5RegisterId": "us-ca-sb243",
+        "ownerKey": "P2-04"
+      },
+      {
+        "name": "California Civil Rights Council rules on automated-decision systems",
+        "s5RegisterId": "us-ca-crd-ads",
+        "ownerKey": "P3-13"
+      },
+      {
+        "name": "California AB 302",
+        "s5RegisterId": null,
+        "ownerKey": "P3-14"
+      }
+    ],
+    "litigationExposed": true
+  },
+  {
+    "id": "us-tx",
+    "name": "Texas",
+    "registerEntryIds": [
+      "us-tx-traiga-552-051"
+    ],
+    "otherInstruments": [],
+    "litigationExposed": true
+  },
+  {
+    "id": "us-nyc",
+    "name": "New York City",
+    "registerEntryIds": [],
+    "otherInstruments": [
+      {
+        "name": "NYC Local Law 144",
+        "s5RegisterId": "us-nyc-ll144",
+        "ownerKey": "P3-13"
+      }
+    ],
+    "litigationExposed": true
+  },
+  {
+    "id": "us-il",
+    "name": "Illinois",
+    "registerEntryIds": [],
+    "otherInstruments": [
+      {
+        "name": "Illinois HB 3773",
+        "s5RegisterId": "us-il-hb3773",
+        "ownerKey": "P3-13"
+      },
+      {
+        "name": "Illinois HB 1806",
+        "s5RegisterId": "us-il-pa-104-0054",
+        "ownerKey": "P2-04"
+      }
+    ],
+    "litigationExposed": true
+  },
+  {
+    "id": "us-ny",
+    "name": "New York State",
+    "registerEntryIds": [
+      "us-nydfs-500-17-a",
+      "us-nydfs-500-13-inventory",
+      "us-nydfs-500-12-mfa",
+      "us-nydfs-ai-letter-extraction"
+    ],
+    "otherInstruments": [
+      {
+        "name": "NYDFS Circular Letter 7",
+        "s5RegisterId": null,
+        "ownerKey": "P2-31"
+      },
+      {
+        "name": "New York LOADinG Act",
+        "s5RegisterId": null,
+        "ownerKey": "P3-14"
+      }
+    ],
+    "litigationExposed": true
+  }
+]
