@@ -129,6 +129,8 @@ export interface ToolOutcome {
   readonly denied: ToolDenial | null;
   readonly output: string;
   readonly bytes: number;
+  /** Adapter-declared effect knowledge; this does not create or replace a journal receipt. */
+  readonly effect?: ToolBodyResult["effect"];
   /**
    * A journaled call's receipt state (P1-03), absent for a call outside the journaled classes. `started` means the
    * outcome could not be recorded: the execution stays in the journal for recovery and blocks this agent's journaled
