@@ -330,7 +330,7 @@ export function registerLateStageCliCommands({
         const lease = issueLeaseForCli({
           workspace,
           workspaceId: wsId,
-          agentId: DEMO_AGENT_ID,
+          agentId: DEMO_AGENT_ID, claimKind: "synthetic_example",
           ttl: "15m",
           scopes: "gateway:llm,proxy:connect,toolhub:intent,toolhub:execute,governor:check,receipt:verify",
           routes: "/local",

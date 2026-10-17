@@ -12,6 +12,7 @@ export interface IssueLeaseInput {
   workspace: string;
   workspaceId?: string;
   agentId: string;
+  claimKind?: "synthetic_example";
   ttlMs: number;
   scopes: LeaseScope[];
   routeAllowlist: string[];
@@ -33,6 +34,7 @@ export function issueLeaseToken(input: IssueLeaseInput): { token: string; payloa
     expiresTs: now + Math.max(60_000, input.ttlMs),
     workspaceId: input.workspaceId ?? "default",
     agentId: input.agentId,
+    ...(input.claimKind === undefined ? {} : { claimKind: input.claimKind }),
     workOrderId: input.workOrderId ?? null,
     scopes: input.scopes,
     ...(input.executeActionClasses === undefined ? {} : { executeActionClasses: input.executeActionClasses }),

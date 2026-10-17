@@ -27,6 +27,8 @@ export const leasePayloadSchema = z.object({
   expiresTs: z.number().int(),
   workspaceId: z.string().min(1),
   agentId: z.string().min(1),
+  // A signed synthetic marker can only reduce evidence; omitted leases keep their existing meaning.
+  claimKind: z.literal("synthetic_example").optional(),
   workOrderId: z.string().min(1).nullable().optional(),
   scopes: z.array(leaseScopeSchema).min(1),
   // When present, toolhub:execute covers only these action classes (AMC-1546). Absent keeps the old meaning:
