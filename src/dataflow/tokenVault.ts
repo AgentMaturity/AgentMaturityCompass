@@ -111,6 +111,50 @@ export function storeTokens(workspace: string, keys: TokenKeys, entries: readonl
   }
 }
 
+export interface TokenLookup {
+  /** Whether this workspace issued `token`: its row is in the token vault. */
+  readonly issued: (token: string) => boolean;
+  readonly close: () => void;
+}
+
+/**
+ * Tells tokens this workspace issued from token-shaped text (raw digits in token brackets), so detection skips only the
+ * former. One read-only connection, opened on the first lookup, and each answer cached, so a request looks each distinct
+ * token up once. Nothing is decrypted. A missing or unreadable vault issued nothing: every token-shaped string is then
+ * scanned as text, which can only over-detect.
+ */
+export function openTokenLookup(workspace: string): TokenLookup {
+  const answers = new Map<string, boolean>();
+  let db: Database.Database | null | undefined;
+  let select: Database.Statement | undefined;
+  const connect = (): void => {
+    try {
+      db = new Database(tokenVaultPath(workspace), { readonly: true, fileMustExist: true });
+      select = db.prepare("SELECT 1 FROM tokens WHERE token = ?");
+    } catch {
+      db?.close();
+      db = null;
+      select = undefined;
+    }
+  };
+  return Object.freeze({
+    issued(token: string): boolean {
+      let known = answers.get(token);
+      if (known === undefined) {
+        if (db === undefined) connect();
+        try { known = select?.get(token) !== undefined; } catch { known = false; }
+        answers.set(token, known);
+      }
+      return known;
+    },
+    close(): void {
+      db?.close();
+      db = null;
+      select = undefined;
+    }
+  });
+}
+
 /** Deletes the named tokens' rows through the P2-01 deletion gate, so an active legal hold refuses. Returns rows deleted. */
 export function deleteTokens(workspace: string, executor: string, tokens: readonly string[]): number {
   return withDeletionGate({ workspace, executor, target: { kind: "token-vault" } }, () => {

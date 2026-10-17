@@ -26,8 +26,8 @@ import { canonicalize } from "../utils/json.js";
 import type { ProtectedDataClass } from "../vault/dataClassification.js";
 import { DETECTOR_SET_DIGEST, MAX_PROTECTED_TEXT_CHARS, redactProtectedText } from "./detectors.js";
 import { protectedDataOptedIn } from "./processorRegistry.js";
-import { isShieldingToken, RedactionRefused, TOKEN_PATTERN_SOURCE, tokenFor } from "./tokenizer.js";
-import { loadTokenKeys, storeTokens, type TokenEntry, type TokenKeys } from "./tokenVault.js";
+import { RedactionRefused, TOKEN_PATTERN_SOURCE, tokenFor } from "./tokenizer.js";
+import { loadTokenKeys, openTokenLookup, storeTokens, type TokenEntry, type TokenKeys } from "./tokenVault.js";
 
 export type DeclaredFields = Readonly<Record<string, ProtectedDataClass>>;
 export interface Redaction {
@@ -66,9 +66,12 @@ function parseExact(text: string): unknown {
   return root;
 }
 
-/** Tokenizes declared paths in a JSON document; `tokenize` counts each value. Returns the re-serialized document. */
+/**
+ * Tokenizes declared paths in a JSON document; `tokenize` counts each value. Returns the re-serialized document. A value
+ * that is a token this workspace issued stays as it is, so redacting twice changes nothing.
+ */
 function tokenizeDeclared(text: string, declared: DeclaredFields, tokenize: (dataClass: ProtectedDataClass, value: string) => string,
-  matched: Set<string>): string {
+  matched: Set<string>, issued: (token: string) => boolean): string {
   let root = parseExact(text);
   let tokens = 0;
   const deeper = (depth: number) => { if (depth > MAX_JSON_DEPTH) throw new RedactionRefused("declared_fields_unparseable"); return depth + 1; };
@@ -76,8 +79,7 @@ function tokenizeDeclared(text: string, declared: DeclaredFields, tokenize: (dat
     Object.fromEntries(Object.entries(value).map(([key, item]) => [key, map(item, key)]));
   const cover = (value: unknown, dataClass: ProtectedDataClass, depth: number): unknown => {
     const next = deeper(depth);
-    // A value that already is a token stays as it is, so redacting twice changes nothing.
-    if (typeof value === "string" && WHOLE_TOKEN.test(value) && isShieldingToken(value)) return value;
+    if (typeof value === "string" && WHOLE_TOKEN.test(value) && issued(value)) return value;
     if (typeof value === "string" || typeof value === "number") { tokens += 1; return tokenize(dataClass, String(value)); }
     if (isRawJson(value)) { tokens += 1; return tokenize(dataClass, value.rawJSON); }
     if (Array.isArray(value)) return value.map(item => cover(item, dataClass, next));
@@ -103,10 +105,13 @@ function tokenizeDeclared(text: string, declared: DeclaredFields, tokenize: (dat
 export function createWorkspaceRedactor(workspace: string): Redactor {
   return Object.freeze({
     redact(text: string, declared?: DeclaredFields): Redaction {
+      const lookup = openTokenLookup(workspace);
       try {
         if (typeof text !== "string" || text.length > MAX_PROTECTED_TEXT_CHARS) throw new RedactionRefused("detector_invalid");
         let keys: TokenKeys | undefined;
         const entries = new Map<string, TokenEntry>();
+        // Issued: stored by an earlier redaction, or made by this one (stored only when it returns).
+        const issued = (token: string) => entries.has(token) || lookup.issued(token);
         const counts = new Map<string, { dataClass: ProtectedDataClass; detector: string; count: number }>();
         const tokenize = (dataClass: ProtectedDataClass, detector: string, value: string): string => {
           keys ??= loadTokenKeys(workspace);
@@ -121,10 +126,10 @@ export function createWorkspaceRedactor(workspace: string): Redactor {
         };
         const matched = new Set<string>();
         const declaredText = declared === undefined || Object.keys(declared).length === 0 ? text
-          : tokenizeDeclared(text, declared, (dataClass, value) => tokenize(dataClass, "declared_field", value), matched);
+          : tokenizeDeclared(text, declared, (dataClass, value) => tokenize(dataClass, "declared_field", value), matched, issued);
         let redacted: string;
         try {
-          redacted = redactProtectedText(declaredText, (region, value) => tokenize(region.dataClass, region.detector, value)).text;
+          redacted = redactProtectedText(declaredText, (region, value) => tokenize(region.dataClass, region.detector, value), issued).text;
         } catch (error) {
           throw error instanceof RedactionRefused ? error : new RedactionRefused("detector_invalid");
         }
@@ -133,6 +138,8 @@ export function createWorkspaceRedactor(workspace: string): Redactor {
       } catch (error) {
         // JSON.parse and driver errors can quote input; only a static reason leaves this function.
         throw error instanceof RedactionRefused ? error : new RedactionRefused("redaction_failed");
+      } finally {
+        lookup.close();
       }
     }
   });

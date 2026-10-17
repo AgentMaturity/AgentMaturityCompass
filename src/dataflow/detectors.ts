@@ -4,7 +4,7 @@ import type { ProtectedDataClass } from "../vault/dataClassification.js";
 import { findPIISpans, getPIIDetectorMetadata, PII_SPAN_SCAN_REVISION, type PiiSpan } from "../vault/dlp.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
-import { isShieldingToken, TOKEN_PATTERN_SOURCE } from "./tokenizer.js";
+import { TOKEN_PATTERN_SOURCE } from "./tokenizer.js";
 
 export interface ProtectedDataDetection {
   readonly classes: readonly ProtectedDataClass[];
@@ -17,6 +17,12 @@ export interface ProtectedDataSpan {
   readonly dataClass: ProtectedDataClass;
   readonly detector: string;
 }
+/**
+ * Whether a token-shaped string is a token this workspace issued (`openTokenLookup`). Detection skips only such tokens;
+ * the default, for callers that hold no vault, knows none, so every token-shaped string is scanned as text.
+ */
+export type IssuedToken = (token: string) => boolean;
+const NONE_ISSUED: IssuedToken = () => false;
 
 const CLASSES: readonly ProtectedDataClass[] = ["phi", "pii", "card_number", "bank_account", "credential"];
 const CLASS_BY_TYPE: Readonly<Record<string, ProtectedDataClass>> = Object.freeze({
@@ -56,7 +62,7 @@ export const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   classMapping: CLASS_BY_TYPE,
   noiseFilters: Object.fromEntries(Object.entries(NOISE_FILTERS).map(([type, re]) => [type, re.source])),
   tokenFormat: TOKEN_PATTERN_SOURCE,
-  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-ms-timestamps-not-cards-spans-inside-letter-hex-token-skipped-token-crossing-spans-rechecked-without-tokens-v9",
+  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-ms-timestamps-not-cards-spans-inside-issued-token-hex-skipped-token-crossing-spans-rechecked-without-issued-tokens-password-json-value-span-v10",
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS }
 }));
 function refused(): never { throw new Error("Protected request detection refused unsupported or excessive traversal"); }
@@ -64,17 +70,18 @@ const dataClass = (type: string): ProtectedDataClass => Object.hasOwn(CLASS_BY_T
 
 const TOKEN_HEX_CHARS = 16;
 const tokenPattern = () => new RegExp(TOKEN_PATTERN_SOURCE, "g");
-/** [start, end) of each shielding AMC token (see isShieldingToken) in text order; tokens never overlap. */
-const tokenRanges = (text: string): readonly (readonly [number, number])[] => text.includes("[[amc:")
+/** [start, end) of each issued token in text order; tokens never overlap. */
+const tokenRanges = (text: string, issued: IssuedToken): readonly (readonly [number, number])[] => text.includes("[[amc:")
   ? Array.from(text.matchAll(tokenPattern()), match => [match.index, match.index + match[0].length] as const)
-    .filter(([start, end]) => isShieldingToken(text.slice(start, end))) : [];
-const withoutTokens = (text: string) => text.replace(tokenPattern(), token => isShieldingToken(token) ? "" : token);
+    .filter(([start, end]) => issued(text.slice(start, end))) : [];
+const withoutTokens = (text: string, issued: IssuedToken) => text.replace(tokenPattern(), token => issued(token) ? "" : token);
 /**
- * A span inside a shielding token's hex is the token, not a value. A span that crosses token text (a JSON password value
- * holding a token) stays a detection only if it still is one with the tokens removed, so raw text beside a token is
- * never hidden by it. The last token starting before the span's end is the only one the span can lie inside.
+ * A span inside an issued token's hex is the token, not a value. A span that crosses token text (a JSON password value
+ * holding a token) stays a detection only if it still is one with the issued tokens removed, so raw text beside a token
+ * is never hidden by it. Token-shaped text the workspace did not issue is plain text (a raw card number in token
+ * brackets is detected). The last token starting before the span's end is the only one the span can lie inside.
  */
-function shieldedByToken(text: string, tokens: readonly (readonly [number, number])[], span: PiiSpan): boolean {
+function shieldedByToken(text: string, tokens: readonly (readonly [number, number])[], span: PiiSpan, issued: IssuedToken): boolean {
   let low = 0, high = tokens.length - 1, last = -1;
   while (low <= high) {
     const mid = (low + high) >> 1;
@@ -83,17 +90,22 @@ function shieldedByToken(text: string, tokens: readonly (readonly [number, numbe
   if (last < 0 || tokens[last]![1] <= span.start) return false;
   const hexEnd = tokens[last]![1] - 2;
   if (span.start >= hexEnd - TOKEN_HEX_CHARS && span.end <= hexEnd) return true;
-  return !findPIISpans(withoutTokens(text.slice(span.start, span.end))).some(other => other.type === span.type);
+  return !findPIISpans(withoutTokens(text.slice(span.start, span.end), issued)).some(other => other.type === span.type);
 }
 
+// A JSON password span covers the key, the colon and the quoted value; only the value is the credential. Narrowed to it,
+// a replacement keeps `"password": "<token>"`, so redacted JSON stays JSON. The value holds no quote ([^"]+).
+const valueOnly = (text: string, span: PiiSpan): PiiSpan => span.type !== "password_json" ? span
+  : { ...span, start: text.lastIndexOf("\"", span.end - 2) + 1, end: span.end - 1 };
+
 /** Offsets refer to the original text. No matched values are returned or logged. */
-export function detectProtectedText(text: string): readonly ProtectedDataSpan[] {
+export function detectProtectedText(text: string, issued: IssuedToken = NONE_ISSUED): readonly ProtectedDataSpan[] {
   if (typeof text !== "string" || text.length > MAX_PROTECTED_TEXT_CHARS) return refused();
   // Noise and token hex are rejected inside the scan, so a dropped span cannot hide an overlapping match
   // ("12:34:56.78.90.12").
-  const tokens = tokenRanges(text);
-  const spans = findPIISpans(text, span => isNoise(text, span) || shieldedByToken(text, tokens, span));
-  return Object.freeze(spans.map(span => Object.freeze({
+  const tokens = tokenRanges(text, issued);
+  const spans = findPIISpans(text, span => isNoise(text, span) || shieldedByToken(text, tokens, span, issued));
+  return Object.freeze(spans.map(found => valueOnly(text, found)).map(span => Object.freeze({
     start: span.start, end: span.end, dataClass: dataClass(span.type), detector: span.type
   })));
 }
@@ -103,9 +115,9 @@ export function detectProtectedText(text: string): readonly ProtectedDataSpan[] 
  * the class of the earliest (then longest) span; `spans` lists every detection. Over-long text throws, like
  * detectProtectedText: a caller must refuse or replace it whole, never pass it through.
  */
-export function redactProtectedText(text: string, replace: (region: ProtectedDataSpan, value: string) => string):
-  { readonly text: string; readonly spans: readonly ProtectedDataSpan[] } {
-  const spans = detectProtectedText(text);
+export function redactProtectedText(text: string, replace: (region: ProtectedDataSpan, value: string) => string,
+  issued: IssuedToken = NONE_ISSUED): { readonly text: string; readonly spans: readonly ProtectedDataSpan[] } {
+  const spans = detectProtectedText(text, issued);
   const ordered = [...spans].sort((a, b) => a.start - b.start || b.end - a.end);
   let out = "", cursor = 0;
   for (let index = 0; index < ordered.length;) {
@@ -121,24 +133,27 @@ export function redactProtectedText(text: string, replace: (region: ProtectedDat
 /**
  * Applies `redact` to every key and string leaf of a parsed JSON value, and to each number leaf as text (a number with a
  * detection becomes the redacted string), so the result still serializes as JSON. Stored gateway and bridge evidence use it.
+ * An integer beyond 2^53 with at most 20 digits lost digits when it was parsed (a 17-19 digit card number sent as a JSON
+ * number keeps only its leading ones), so its text cannot be checked: with `opaque` it becomes `opaque()` instead.
  */
-export function redactJsonLeaves(value: unknown, redact: (text: string) => string): unknown {
+export function redactJsonLeaves(value: unknown, redact: (text: string) => string, opaque?: () => string): unknown {
   if (typeof value === "string") return redact(value);
   if (typeof value === "number") {
+    if (opaque !== undefined && Number.isInteger(value) && !Number.isSafeInteger(value) && Math.abs(value) < 1e20) return opaque();
     const text = String(value);
     const redacted = redact(text);
     return redacted === text ? value : redacted;
   }
-  if (Array.isArray(value)) return value.map(item => redactJsonLeaves(item, redact));
+  if (Array.isArray(value)) return value.map(item => redactJsonLeaves(item, redact, opaque));
   if (value === null || typeof value !== "object") return value;
-  return Object.fromEntries(Object.entries(value).map(([key, item]) => [redact(key), redactJsonLeaves(item, redact)]));
+  return Object.fromEntries(Object.entries(value).map(([key, item]) => [redact(key), redactJsonLeaves(item, redact, opaque)]));
 }
 
 /**
  * Read-only inspection, once per text leaf. Counts are heuristic findings, not distinct people or verified data classes.
  * An over-long leaf or request, excessive nesting or an unsupported shape throws; it is never skipped.
  */
-export function detectProtectedRequest(request: EncodableRequest): ProtectedDataDetection {
+export function detectProtectedRequest(request: EncodableRequest, issued: IssuedToken = NONE_ISSUED): ProtectedDataDetection {
   try {
     const counts: Partial<Record<ProtectedDataClass, number>> = {};
     const active = new Set<object>();
@@ -148,14 +163,14 @@ export function detectProtectedRequest(request: EncodableRequest): ProtectedData
     const scan = (text: string, key?: string) => {
       if (typeof text !== "string") refused();
       charge(text.length);
-      const spans = detectProtectedText(text);
+      const spans = detectProtectedText(text, issued);
       for (const span of spans) add(span.dataClass);
       // Keep the existing JSON-password heuristic without rescanning every object or double-counting its credential value.
       if (key?.toLowerCase() === "password" && !spans.some(span => span.dataClass === "credential")) {
         const context = JSON.stringify({ [key]: text });
         if (context.length > MAX_PROTECTED_TEXT_CHARS) refused();
         charge(context.length);
-        if (detectProtectedText(context).some(span => span.detector === "password_json")) add("credential");
+        if (detectProtectedText(context, issued).some(span => span.detector === "password_json")) add("credential");
       }
     };
     const visit = (value: unknown, depth: number, key?: string): void => {
@@ -197,7 +212,7 @@ export function detectProtectedRequest(request: EncodableRequest): ProtectedData
       visit(parsed, 0);
       const raw = decodeJsonEscapes(text);
       charge(raw.length);
-      for (const span of detectProtectedText(raw)) if (!(counts[span.dataClass] ?? 0)) add(span.dataClass);
+      for (const span of detectProtectedText(raw, issued)) if (!(counts[span.dataClass] ?? 0)) add(span.dataClass);
     };
 
     scan(request.model);
