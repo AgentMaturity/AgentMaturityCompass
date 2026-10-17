@@ -169,12 +169,17 @@ function searchReachesAmc(root: string, workspace: string): boolean {
 }
 
 /**
- * Whether a pure-form Bash word names AMC's files: the word, or the value after its `=`, resolved by claudeResolvePath
- * from `cwd`, is in `.amc` or is a settings file; or one of its segments folds to `.amc` (a word that is not a path, such
- * as `host:.amc/x`).
+ * AMC's names anywhere inside a word, after a prefix (`@.amc/…`, `-f.amc/…`, `-C.amc`) or before any character that is
+ * not a letter or digit: `.amc`, `.claude/settings`, and a `.lease` file. Matched on the NFKC, case-folded word.
+ */
+const AMC_NAMES_IN_WORD = /\.amc(?![\p{L}\p{N}])|\.claude[\\/]+settings|\.lease(?![\p{L}\p{N}])/u;
+
+/**
+ * Whether a pure-form Bash word names AMC's files: it holds one of AMC_NAMES_IN_WORD, or the word (or the value after
+ * its `=`) resolved by claudeResolvePath from `cwd` is in `.amc` or is a settings file (a symlink to them included).
  */
 function bashWordNamesAmc(word: string, workspace: string, cwd: string): boolean {
-  if (word.split(/[\\/=:,]/).some((part) => fold(part) === ".amc")) return true;
+  if (AMC_NAMES_IN_WORD.test(word.normalize("NFKC").toLowerCase())) return true;
   return [word, ...(word.includes("=") ? [word.slice(word.indexOf("=") + 1)] : [])].some((value) => {
     const location = claudeResolvePath(value, workspace, cwd);
     return location !== null && amcFile(location, workspace);

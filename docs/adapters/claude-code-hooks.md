@@ -243,7 +243,8 @@ AMC refuses the calls that name or search its own files ("AMC protects its hook 
 any `.claude/settings*.json` or of `.amc/**`; `Read` of `.amc/**`; a `Grep` or `Glob` whose search root is in, or holds,
 the workspace's `.amc` or `.claude` or the user's `~/.claude` (Claude Code 2.1.296 searches hidden directories, so a
 search of the workspace root, its default, is denied: name a subdirectory); and a `Bash` command any of whose words
-names `.amc`, a `.claude/settings*.json` file, or a path that resolves into them. This is not containment: a Bash
+holds `.amc`, `.claude/settings` or a `.lease` file name anywhere (after a prefix such as `@` or `-f`, case-folded), or
+is a path that resolves into them. This is not containment: a Bash
 command can still reach these files through a path it does not name (`'/usr/bin/find' '.'`), and users can edit them
 outside Claude Code (`.claude/settings.local.json` stays user-editable).
 
@@ -303,8 +304,10 @@ recording the observation and the decision; the forwarder entry already skips th
 ## Limits
 
 - Registration is a lease-holder attestation: a process holding the installation's hook lease can register a session
-  without Claude Code running, and AMC cannot prove Claude Code ran a hook. A session's first registration binds its
-  Claude Code configuration directory; a later registration naming another is refused.
+  without Claude Code running, and AMC cannot prove Claude Code ran a hook. A lease holder can also register a session
+  whose own SessionStart registration AMC refused (for example because of a foreign hook). A session's first
+  registration binds its Claude Code configuration directory; a later registration naming another is refused.
+- Hooks in `.claude/commands` frontmatter are not scanned; whether Claude Code 2.1.296 runs them is not confirmed.
 - Observations are authenticated by the lease, not by the session: a lease holder can push another session of the same
   lease into backpressure for a minute.
 - The hook lease allows 120 requests a minute per Bridge route by default (`--rpm` at install); past it, calls are denied.

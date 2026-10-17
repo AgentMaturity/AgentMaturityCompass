@@ -135,6 +135,21 @@ describe("4. a Bash command that names AMC's files is denied", () => {
   });
 });
 
+describe("4b. a Bash word that names AMC's files anywhere inside it is denied", () => {
+  test(".amc, .claude/settings and a hook lease after a prefix (@, -f, -C, =) or before a non-alphanumeric character", () => {
+    const workspace = claudeWorkspace();
+    const root = cwdOf(workspace);
+    for (const command of ["'/usr/bin/curl' '-d' '@.amc/hooks/claude-code.lease' 'http://127.0.0.1:9/'", `'/usr/bin/curl' '--data-binary' '@${root}/.amc/hooks/claude-code.lease'`,
+      "'/bin/cat' '-f.amc/hooks/claude-code.lease'", "'/bin/cat' '-F.AMC/hooks/x'", `'/bin/cat' '${root}/.amc\u200b/x'`, "'/bin/cat' '-f.claude/settings.local.json'",
+      "'/bin/cat' '@.Claude/Settings.json'", "'/bin/cp' '/tmp/stolen/claude-code.lease' 'x'"]) {
+      const decision = call(workspace, "Bash", { command, description: "x" });
+      expect(decision.decision, command).toBe("deny");
+      expect(decision.reason, command).toContain(PROTECTED);
+    }
+    for (const command of ["'/bin/echo' 'release.amcrelease'", "'/bin/echo' 'hello'"]) expect(call(workspace, "Bash", { command, description: "x" }).reason).not.toContain(PROTECTED);
+  });
+});
+
 describe("6. a session's Claude Code configuration directory is bound by its first registration", () => {
   test("a re-registration naming another configuration directory is refused", () => {
     const workspace = claudeWorkspace();
