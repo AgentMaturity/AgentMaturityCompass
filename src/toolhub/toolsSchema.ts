@@ -71,8 +71,9 @@ export const toolDefinitionSchema = z.object({
     resourceVersion: z.string().min(1).max(128).optional()
   }).strict().optional(),
   // Result fields that carry protected data (P2-02), as dot paths into the tool's JSON result: `patient.name: phi`. In a
-  // workspace with a processor registry, a native session tokenizes them before the result is committed. An array
-  // applies the rest of the path to each element; a path ending at an object or array covers every value beneath it.
+  // workspace with a processor registry, a native session tokenizes them before the result is committed, in every
+  // outcome. An array applies the rest of the path to each element; a path ending at an object or array covers every
+  // string, number, boolean and object key beneath it, so declare leaf paths to keep a record's field names.
   protectedFields: z.record(
     z.string().regex(/^[A-Za-z0-9_$-]{1,64}(?:\.[A-Za-z0-9_$-]{1,64}){0,15}$/)
       .refine(path => !path.split(".").some(part => ["__proto__", "constructor", "prototype"].includes(part)), "reserved path segment"),
