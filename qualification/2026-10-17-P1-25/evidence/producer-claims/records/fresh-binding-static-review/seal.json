@@ -1,0 +1,25 @@
+{
+  "schema": "p125pc-independent-fresh-binder-static-review-seal/1",
+  "at": "2026-10-17T01:56:58.322514+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-static-review/review.json",
+      "bytes": 4280,
+      "sha256": "a7b0b1d16eda9eb5f4c88ea108651fb8fe95ebe28d21d807f033606f0a3e6467"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-static-review/README.md",
+      "bytes": 1216,
+      "sha256": "59d74040c4cd996d47cafbebd894067295d346bba4cdd89d655aeab6fd45e9a7"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-static-review/input-pins.json",
+      "bytes": 3627,
+      "sha256": "2c8324213c83af9095ba541ad1be43c7a2d2874510d62f3bc26ee3cd2e6a5c3e"
+    }
+  ],
+  "inputCount": 16,
+  "blockers": [],
+  "helperImportedParsedCompiledOrExecuted": false,
+  "actualFreshResultObserved": false
+}

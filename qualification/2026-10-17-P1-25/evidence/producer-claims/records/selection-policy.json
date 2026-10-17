@@ -1,0 +1,25 @@
+{
+  "schema": "p125pc-root-explicit-artifact-selection-policy/2",
+  "at": "2026-10-17T02:17:18.878952+00:00",
+  "onlyPrefix": "evidence/producer-claims/",
+  "sourceCommands": "Only actual closed command-p125pc-*/command.json before a later frozen cutoff; one exact command/log and each actual rawProducer/rawSnapshot/observer role per command. Branch phase uses the same namespace and is included as actual provenance.",
+  "currentPrivateInputs": "Exact finite C2 root and completed preparation/review file inventory after all required reviews close; exclude the old packet directory, public-certificate-bundles directory (selected only by explicit allowlist), next-accuracy-preparation and any future output/manifest/index/export directories.",
+  "publicFiles": "Exactly218 public-output-allowlist entries, each explicit relative destination and actual bytes/hash. No signing-root traversal or raw PEM/key/private-child-stream publication.",
+  "rawPrivateObservations": "Hash-only; no publication or envelope. All observation/tool-result filenames, full source-quality snapshots and over-limit private reports remain hash-only.",
+  "wholeCodeMarkerCheckBeforeEncoding": "Any whole source/delta/helper containing literal PRIVATE KEY marker bytes is hash-only before any envelope; the active assembler is always hash-only. Safe code is inert .source.txt.",
+  "losslessLogsPatches": "Actual log and patch bytes use the existing lossless base64 envelope only after literal marker check. Original hashes/byte lengths retained and complete round trips required.",
+  "oldPacket": "All2375 existing non-index payloads,259 command rows and3864 ordered pins remain exact; automatic old877972-byte assembly historical payload must not be separately selected at its reserved destination.",
+  "sourceCandidate": "The exact committed checkpointWindow.test.ts source is pinned to source5d4e and its source/candidate/runtime records. Actual61752-byte test contains the literal private-key marker in whole code, so it is mandatory hash-only and is never copied or envelope-encoded. Only marker-free safe code may be selected as inert .source.txt. No production code, dependency, schema, package or quality baseline changes.",
+  "noReadinessOrFutureResultCredit": true,
+  "allFiveManifestFlagsRemainFalseUntilActualInventoryProsePeerAndPreservationReview": true,
+  "priorPolicyPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/selection-policy.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/selection-policy.json",
+    "bytes": 2144,
+    "sha256": "1e7bf5a517530038edfa8e605a2bd0fb1d44a3783f2fa9c35048723aed9c405c",
+    "dev": 16777231,
+    "inode": 544002786,
+    "nlink": 1
+  },
+  "correction": "Prior sourceCandidate wording described inert selection. Actual manifest already correctly placed the marker-bearing test in hashOnlyPins. This prose-only successor matches that existing selection; no code or guard changes."
+}

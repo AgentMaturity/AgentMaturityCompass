@@ -1,0 +1,39 @@
+{
+  "files": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-static-review/review.json",
+      "bytes": 4280,
+      "sha256": "a7b0b1d16eda9eb5f4c88ea108651fb8fe95ebe28d21d807f033606f0a3e6467"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-static-review/seal.json",
+      "bytes": 938,
+      "sha256": "ca9056f008e1c129b514a5795abf53aa41166ce9d399a3c91071a81ec2eb4ced"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/clean-source-actual-closure.json",
+      "bytes": 431,
+      "sha256": "40eb3a57a12ba0dd7eb0d245f04a94612b8ac13efa81f33eb0d12ff9c9c83afa"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-clean-source/command.json",
+      "bytes": 1488,
+      "sha256": "bd15c22e94bc7b4cc8c079ba2c18951066e28fdc24e61c50bda61b8fc617f254"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-clean-source/stdout-stderr.log",
+      "bytes": 852,
+      "sha256": "0e3e1146ce78eef10c832315550ab59464ebe56aec6beff801a3eccaa2c78151"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "bytes": 453,
+      "sha256": "6173074e96a07158d14eea016d3c0d55e1b704d564bb76aed9f159c7f92b8b6f"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 90612,
+      "sha256": "42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59"
+    }
+  ]
+}

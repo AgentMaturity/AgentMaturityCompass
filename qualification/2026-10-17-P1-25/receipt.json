@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "key": "P1-25",
   "date": "2026-10-17",
-  "commit": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
-  "branch": "codex/p1-25-cadence-qualification",
+  "commit": "5d4e9e8d74bef32e68090369223947691c5fea21",
+  "branch": "codex/p1-25-producer-qualification",
   "node": "v22.23.3",
   "pnpm": "10.33.0",
-  "os": "Darwin 25.6.0",
+  "os": "darwin",
   "arch": "arm64",
   "commands": [
     {
@@ -1303,22 +1303,247 @@
       "cmd": "/opt/homebrew/opt/node@22/bin/node -e 'const cp=require(\"node:child_process\");const os=require(\"node:os\");const p=cp.spawnSync(\"/opt/homebrew/bin/pnpm\",[\"--version\"],{encoding:\"utf8\"});if(p.status!==0){process.stderr.write(p.stderr);process.exit(p.status??1)}process.stdout.write(JSON.stringify({node:process.version,pnpm:p.stdout.trim(),os:os.type()+\" \"+os.release(),arch:process.arch,abi:process.versions.modules})+\"\\n\")'",
       "exit": 0,
       "durationMs": 225
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass switch -c codex/p1-25-producer-qualification",
+      "exit": 0,
+      "durationMs": 18
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1661
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/time/checkpointWindow.test.ts",
+      "exit": 0,
+      "durationMs": 444
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125pc-source-combined.raw.json",
+      "exit": 0,
+      "durationMs": 4578
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 36566
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run typecheck",
+      "exit": 0,
+      "durationMs": 25779
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run lint",
+      "exit": 0,
+      "durationMs": 2926
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run build",
+      "exit": 0,
+      "durationMs": 29891
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 562
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:gates",
+      "exit": 0,
+      "durationMs": 475
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:threat-model",
+      "exit": 0,
+      "durationMs": 298
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1768
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:docs-drift",
+      "exit": 0,
+      "durationMs": 340
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1319
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:third-party-notices",
+      "exit": 0,
+      "durationMs": 239
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:qualification",
+      "exit": 0,
+      "durationMs": 1176
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p1-25-producer-qualification-20261017/audit-observed.py p125pc-source-combined /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass combined",
+      "exit": 0,
+      "durationMs": 67
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p1-25-producer-qualification-20261017/audit-public.py p125pc-source-combined green",
+      "exit": 0,
+      "durationMs": 66
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:duplicates",
+      "exit": 1,
+      "durationMs": 734
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:dead-code",
+      "exit": 1,
+      "durationMs": 2795
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p1-25-producer-qualification-20261017/capture-quality.mjs after-source",
+      "exit": 0,
+      "durationMs": 2522
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass add -u -- tests/time/checkpointWindow.test.ts",
+      "exit": 0,
+      "durationMs": 46
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass diff --check",
+      "exit": 0,
+      "durationMs": 26
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass diff --cached --check",
+      "exit": 0,
+      "durationMs": 24
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass diff --check 8889784782c8f7413e1cccab579ae4b8b6f21cc1",
+      "exit": 0,
+      "durationMs": 31
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass commit -m 'test(time): qualify persisted producer timestamp claims'",
+      "exit": 0,
+      "durationMs": 47
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 48817
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125pc-fresh-canonical.raw.json",
+      "exit": 0,
+      "durationMs": 5237
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p1-25-producer-qualification-20261017/audit-observed.py p125pc-fresh-canonical /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout combined",
+      "exit": 0,
+      "durationMs": 33
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p1-25-producer-qualification-20261017/audit-public.py p125pc-fresh-canonical green",
+      "exit": 0,
+      "durationMs": 50
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125pc-m1.raw.json",
+      "exit": 1,
+      "durationMs": 4481
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p1-25-producer-qualification-20261017/audit-observed.py p125pc-m1 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout combined",
+      "exit": 0,
+      "durationMs": 35
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p1-25-producer-qualification-20261017/audit-public.py p125pc-m1 red",
+      "exit": 0,
+      "durationMs": 46
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125pc-restore1.raw.json",
+      "exit": 0,
+      "durationMs": 4559
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p1-25-producer-qualification-20261017/audit-observed.py p125pc-restore1 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout combined",
+      "exit": 0,
+      "durationMs": 48
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p1-25-producer-qualification-20261017/audit-public.py p125pc-restore1 green",
+      "exit": 0,
+      "durationMs": 65
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125pc-m2.raw.json",
+      "exit": 1,
+      "durationMs": 4409
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p1-25-producer-qualification-20261017/audit-observed.py p125pc-m2 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout combined",
+      "exit": 0,
+      "durationMs": 32
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p1-25-producer-qualification-20261017/audit-public.py p125pc-m2 red",
+      "exit": 0,
+      "durationMs": 71
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout tests/time/checkpointWindow.test.ts tests/time/tsaGrant.test.ts tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125pc-restore2.raw.json",
+      "exit": 0,
+      "durationMs": 4639
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p1-25-producer-qualification-20261017/audit-observed.py p125pc-restore2 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout combined",
+      "exit": 0,
+      "durationMs": 34
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p1-25-producer-qualification-20261017/audit-public.py p125pc-restore2 green",
+      "exit": 0,
+      "durationMs": 46
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1912
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths qualification/2026-10-17-P1-25/README.md qualification/2026-10-17-P1-25/receipt.json qualification/2026-10-17-P1-25/assembly-inputs.json qualification/2026-10-17-P1-25/evidence/producer-claims",
+      "exit": 0,
+      "durationMs": 366
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p1-25-producer-qualification-20261017/prepare-public-output.py",
+      "exit": 0,
+      "durationMs": 157
     }
   ],
   "tests": {
-    "total": 23,
-    "passed": 23,
+    "total": 24,
+    "passed": 24,
     "failed": 0,
     "skipped": 0
   },
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "aba7856d4dd7af0f69ef520cc3c0acb801c4d49c93ab4fe680573fe97483a80b"
+      "sha256": "5bb1be6b4a3d6f3083e2bb8b710d0ec8d2b176c407a9a9ee9fd30a5640d869ca"
     },
     {
       "path": "assembly-inputs.json",
-      "sha256": "b6ccb30242fd6f54ae7490d5d382cd093c0862575c5c88a43deb0996eb069cb0"
+      "sha256": "4090fcad8c892389acbf3e7ef9debacde77bc09defd76387ca6cc325fce17da0"
     },
     {
       "path": "commands/p125-architecture/command.json",
@@ -8649,6 +8874,2234 @@
       "sha256": "59892edff5bf811efda6aef46f90b21320c9b300ca814149a243abddfec79c85"
     },
     {
+      "path": "evidence/producer-claims/commands/p125pc-audit-fresh-observed/command.json",
+      "sha256": "dbd3e9b505b56cceadb339ef8564f68243c62a938f0113b15db0ea48073e5677"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-fresh-observed/stdout-stderr.log.evidence.json",
+      "sha256": "4ba0eea33b12669489f2354aa7b5364c3ec74176f079297967760f35d44f487b"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-fresh-public/command.json",
+      "sha256": "482e9dacb81bc4c3c6c8dbbc735bd4bc627b6b3b3efa86aee3513114228ea4b1"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-fresh-public/stdout-stderr.log.evidence.json",
+      "sha256": "a689bbfe806d7e4df305543639bb9f96197c9386f2f7ace4b8ca727cfde290ba"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-m1-observed/command.json",
+      "sha256": "32178b4a69354808a2a78e4b933a6d88c6ad7422b42b0739ce151077d6049fed"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-m1-observed/stdout-stderr.log.evidence.json",
+      "sha256": "0bdf0bd97d54893f766d39efac3b1cb0d44c1406e688a19a323c960ec649aa5b"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-m1-public/command.json",
+      "sha256": "c39f3612f9648914219aaa68a395c3b5d431c3f48026acafe7b092f712c335bb"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-m1-public/stdout-stderr.log.evidence.json",
+      "sha256": "928f00a455a1e247b67463410758b42e463b87e90fd7d0cfa41a3110eb47bc08"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-m2-observed/command.json",
+      "sha256": "0bdd5ec3f79bc7a8be7915b60b9f091e9cfba19179701d4fa35a2dc448f049bb"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-m2-observed/stdout-stderr.log.evidence.json",
+      "sha256": "d08555ea0fa7b10e72948a3850b8c74162da497acaf836fff29ccc62fd392948"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-m2-public/command.json",
+      "sha256": "8eff992930e1992eb7471ee28257ccf2f9c7f3361cf10d4eaca6b48d3d5b3ee0"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-m2-public/stdout-stderr.log.evidence.json",
+      "sha256": "4b11c6f7f181368b599cf66cc969fe0beb5def1c66c09eeaac1038939653ae73"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-restore1-observed/command.json",
+      "sha256": "d7b5a127b4b8f0aa3c27afc9e5deba8a37f62228ee0ae5d97307b01979056b28"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-restore1-observed/stdout-stderr.log.evidence.json",
+      "sha256": "76d72537a7f026e1bcf6dae6f3a9f9680c996eddbd8ea6a1bec1a291be502fb2"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-restore1-public/command.json",
+      "sha256": "ae1fd7d5c21d972f93aa0c2cde68d5a9e6fc428d7bd4c6810e87a364a3882d00"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-restore1-public/stdout-stderr.log.evidence.json",
+      "sha256": "60d9bfc82c53beffbecb8ac89ea43f725fc6018131d3976895a4920a486db967"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-restore2-observed/command.json",
+      "sha256": "240ae4d24e03e988a2bbeb39942ab7d211c538785f27fa8bf05c6d832d57496d"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-restore2-observed/stdout-stderr.log.evidence.json",
+      "sha256": "65091abf0c1ded48ce5e274dcbf568a938fe6c8b660da1306d163cb37be625af"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-restore2-public/command.json",
+      "sha256": "e25d82d7fa7e8dc953304ce17dab24f5ff71791685427d08f88229b9347dbfa1"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-restore2-public/stdout-stderr.log.evidence.json",
+      "sha256": "30e16789f6abc6b34b1b7ef8930aff227eaa6157e5361e842e0025577448f79f"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-source-observed/command.json",
+      "sha256": "f163659a7447d1ed209833f1154a50c5384279e9528380864faa04728af9781d"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-source-observed/stdout-stderr.log.evidence.json",
+      "sha256": "0e492fe5e880aed4e4d6b9ee64cde746f6280747061c9904e4b2827f8b28707d"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-source-public/command.json",
+      "sha256": "f56a4fafb8964bfe609e62b7db64d2b7886087f16a4e7b43d100e66c2bf82b49"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-audit-source-public/stdout-stderr.log.evidence.json",
+      "sha256": "bbaebdb8d9d4aa56331f9c9f5b287f0735f65e282f363518772c08d9cd1d4ca9"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-branch/command.json",
+      "sha256": "e7c9db76433c8517c9a2c6a92da55961e110710a00fbb9addf7765c56a544246"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-branch/stdout-stderr.log.evidence.json",
+      "sha256": "73aa559244d3c9274371d3a4747d3636691d35c39f0651a922d008237d88419e"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-clean-source/command.json",
+      "sha256": "bd15c22e94bc7b4cc8c079ba2c18951066e28fdc24e61c50bda61b8fc617f254"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-clean-source/stdout-stderr.log.evidence.json",
+      "sha256": "c324e03e60035a2a4eb0263ca9008e1c1cc49c6019a5a0cdd0b4b3e344a6ee6e"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-fresh-canonical/command.json",
+      "sha256": "fa26ce9771ddcdf42d4b16a8e097307c91282ac6138dfeef57a359f25ba25159"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-fresh-canonical/observer.json",
+      "sha256": "e7a8036d878904347ae701c4a32a94dac8f79fdd459343efea3d11c531ce3f08"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-fresh-canonical/rawProducer.json",
+      "sha256": "3af9ef8a2bfedbaf4c015400ac51908b47945cf4c7d76ba15a7aa387c79b1ac9"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-fresh-canonical/rawSnapshot.json",
+      "sha256": "3af9ef8a2bfedbaf4c015400ac51908b47945cf4c7d76ba15a7aa387c79b1ac9"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-fresh-canonical/stdout-stderr.log.evidence.json",
+      "sha256": "0fe93a06aec134872237c4a2bc38ce66aa1bbb491758057e0c596aa17b9329c9"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-m1/command.json",
+      "sha256": "c50742de719f803b4e0199e1f2756c4fc644679f5cba717e22b857cb5aaeb3bb"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-m1/observer.json",
+      "sha256": "5bf6ccf55106483054bbea717960b3b9b418616a0b27ea6656046b4db450e4d3"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-m1/rawProducer.json",
+      "sha256": "21a3bf19876612115f23cdde0942e2d7f7df8e78bb1cc731bfa47705123f6a0d"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-m1/rawSnapshot.json",
+      "sha256": "21a3bf19876612115f23cdde0942e2d7f7df8e78bb1cc731bfa47705123f6a0d"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-m1/stdout-stderr.log.evidence.json",
+      "sha256": "497c524af7c0e0af7e51d552c47aef784b54917c30395794789f92525ab65428"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-m2/command.json",
+      "sha256": "4267c3edbbf9c3f489da71c97a2d8fa61a376d1d3d5ce6164ee03eb60033dae1"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-m2/observer.json",
+      "sha256": "ae983f1d10916b4ffe8b5478c05bc7938d69440c624da30dcee11e18f1f326e7"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-m2/rawProducer.json",
+      "sha256": "ea1228f3835699b71cf1cbc40d4aa99bbf629a6d3ce5cce7ff6242413bbac43e"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-m2/rawSnapshot.json",
+      "sha256": "ea1228f3835699b71cf1cbc40d4aa99bbf629a6d3ce5cce7ff6242413bbac43e"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-m2/stdout-stderr.log.evidence.json",
+      "sha256": "0934aa48886a9bb4af88e13ba465d60fe2a95a0b30cb437b01782a8a8986bbf3"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-pre-d15/command.json",
+      "sha256": "3ff4f5e1cd915636704da25b1d90d30c23c7dbe1ad991a835c91b871a08511a8"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-pre-d15/stdout-stderr.log.evidence.json",
+      "sha256": "69731003da9148d0491f812032f41339467567c4cf86ee9144eb4cfe820b1bf8"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-pre-freeze/command.json",
+      "sha256": "7c4e85cf59d3a62cb13c53bd886005a9c242889e0fbccc360066ff8d66745389"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-pre-freeze/stdout-stderr.log.evidence.json",
+      "sha256": "30f8ef3451861b1aea03e204f96626e2b601380a12e0004d7941a92038464b91"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-pre-metadata-d15/command.json",
+      "sha256": "0c115797a38ce0c54774443c3e52f9d24a653de1475c1928ca5249a00888a842"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-pre-metadata-d15/stdout-stderr.log.evidence.json",
+      "sha256": "2ee48d39b0595e745930972ab50bc59170685ed723bb5119c4e8bfb88f9856d4"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-pre-metadata-freeze/command.json",
+      "sha256": "e5c21a0b5213d404995b0be97d53ba9c68eed3cf7d0926905ad63999dd8a7880"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-pre-metadata-freeze/stdout-stderr.log.evidence.json",
+      "sha256": "011ee2ea2f76de1c70b5b02f31147a55808e237f27d5d69279c4257cd0505572"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-public-curation/command.json",
+      "sha256": "a478ebe75851efd0c23093ec205e7c87caf36ac18d434fe47d8781a2b69e5fc4"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-public-curation/stdout-stderr.log.evidence.json",
+      "sha256": "ed663fdbfa980925a784193d516f62fbca739b999f7ebf8e3deef5692cbe86dd"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-restore1/command.json",
+      "sha256": "c506320c6dd2ef206bdeb23580268902e67257b4f5d662c068e55a805e10eae1"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-restore1/observer.json",
+      "sha256": "010a2ad330bc8a1e84362cac9ad4a31de5137849ae051e8a9be7d8215cc8e56b"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-restore1/rawProducer.json",
+      "sha256": "bfccbe34ce539e72a693f72c88e0174e9567e173538d35cb08263b460e1a3d20"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-restore1/rawSnapshot.json",
+      "sha256": "bfccbe34ce539e72a693f72c88e0174e9567e173538d35cb08263b460e1a3d20"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-restore1/stdout-stderr.log.evidence.json",
+      "sha256": "c627da2e9d48df88d3df8e6a7af4041d48c4ac6a9bc6f73ed744a2268b696dac"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-restore2/command.json",
+      "sha256": "50ae4f04653a3da51bfe143aa49a843bc6f66eb582fd33e5c8ac6588fbbe971c"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-restore2/observer.json",
+      "sha256": "6c05b233a3f28fa3261b2a316e2be9120fbce307d3c3415cc8acb8eb03cf5a63"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-restore2/rawProducer.json",
+      "sha256": "94953efd0f27cc38ca30790d67cf8a3c3653eb6d836b825de5df6aef1b74ae8b"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-restore2/rawSnapshot.json",
+      "sha256": "94953efd0f27cc38ca30790d67cf8a3c3653eb6d836b825de5df6aef1b74ae8b"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-restore2/stdout-stderr.log.evidence.json",
+      "sha256": "1909fe6da86665319d92dc6ea84fe919bdd8e3271e078d6192412e09776e29e5"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-architecture/command.json",
+      "sha256": "b541dda227765eff016d15091ce20a9772e41dac9f7fd0b5f10170eefbf428bf"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-architecture/stdout-stderr.log.evidence.json",
+      "sha256": "8785ea2c13f22fe5038f136c598dda45747a220ded18af4bb00d9839a779dc92"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-build/command.json",
+      "sha256": "b6323467cf33bb5847a3bb3968f1e8b960c697f6b0c3d34f03581004dd98ee67"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-build/stdout-stderr.log.evidence.json",
+      "sha256": "de0dd6d24a7530ab0f46adf69d8e01bd7f10dd25f758ca98ac1d4fc286a8a707"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-combined/command.json",
+      "sha256": "072561d385879a59e49615e475f9048d8ef09552b142de1ff548d78ccc66efe4"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-combined/observer.json",
+      "sha256": "52b00ce23bfd11a9487d8690000829e43c833dab65daaf6cc7629459d890f799"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-combined/rawProducer.json",
+      "sha256": "af9e4d82504f850c458a5702ba8653fad7dce6663cb218c4421a77d13717b8dd"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-combined/rawSnapshot.json",
+      "sha256": "af9e4d82504f850c458a5702ba8653fad7dce6663cb218c4421a77d13717b8dd"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-combined/stdout-stderr.log.evidence.json",
+      "sha256": "90b20382abe6dbb1aef0896271ae93417a836718a2deb7dfe91728a8c15b2325"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-commit/command.json",
+      "sha256": "25956c88b27a2722d5ae820641dd40260fbf75a0125edfc5b6aa73c111c101a7"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-commit/stdout-stderr.log.evidence.json",
+      "sha256": "459bd56c613dfe18512ecbb682bbb181959a11a484f9ce224934054428505344"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-counts/command.json",
+      "sha256": "05c0bad6e85035a4f948cc5000b53ff4a86f59d76b18ed1d3804bed305702d7b"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-counts/stdout-stderr.log.evidence.json",
+      "sha256": "584892d3a5ddd0a1f3220680c4d360d9890738670cedd07214cb8f592c177d2e"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-dead-code/command.json",
+      "sha256": "226e8aae035a4f9519f3568b43ddb40916949166f8e62fccad9ca153a9aac575"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-dead-code/stdout-stderr.log.evidence.json",
+      "sha256": "0d1c4d924e85202310632777a6bfe2e50314437d41a7a1dda2ad07bc89732865"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-docs-drift/command.json",
+      "sha256": "72c4c1052ea616854a9202546652db7f819c35161de49e765a7c611ee7a9ab4f"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-docs-drift/stdout-stderr.log.evidence.json",
+      "sha256": "d5106b59b3b7a2c1f172f4ef1f9f1c20e752721b9beccc6c9afab2ab61646295"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-duplicates/command.json",
+      "sha256": "dd8a422b3fbe822eb247f794224a7f0bec04a81e73695813e3d68142dd315b8e"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-duplicates/stdout-stderr.log.evidence.json",
+      "sha256": "57a132920764fac190b3a157b2565f285a30177b786176f30348f417b58e4798"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-freeze/command.json",
+      "sha256": "bae7959c4a70fc1564a919d5f8a1baceb1f0ed2179129283cfcf6adfb28cf58d"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-freeze/stdout-stderr.log.evidence.json",
+      "sha256": "70c13fb22c701a8f26e7c1b56907f82e40cb69188698d60e61a26935c46de140"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-gates/command.json",
+      "sha256": "805abd2e1e2b12848e05924055681df5e5c257091fa6cacc5f51157e99754a98"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-gates/stdout-stderr.log.evidence.json",
+      "sha256": "1035eca9cde2ab5b2bd0084d4b1c952c3fd11c45c3c35f35f6c4c06fea24f40c"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-lint/command.json",
+      "sha256": "dfa87dd5c3fd60543ab7f190fab196436a19564100bd75050845bfb8bad0a460"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-lint/stdout-stderr.log.evidence.json",
+      "sha256": "474e327f8e9039440c88da98c6faa03e3dc1c91c879b96371e70842035ae69d8"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-notices/command.json",
+      "sha256": "6c9eedc20c5f2394d3921b48c6436238b547bf3f4217ed283c2f37068afb305d"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-notices/stdout-stderr.log.evidence.json",
+      "sha256": "5d17f3715efff60ad5158df2160a2873773e79ed960947a6af3363fe2682212f"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-qualification/command.json",
+      "sha256": "a3aaca5f1e54674a32e8279b13d3ea00f27451fa31d4d9803bacf0b7171d2d10"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-qualification/stdout-stderr.log.evidence.json",
+      "sha256": "444578aacb0f3fa5bd94c1b474e9dbd7d7ef7771bc05402ce099e7748ab55d56"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-quality-diagnostic/command.json",
+      "sha256": "65d5fa74a9c47506db3d040bd7fb7cb61d953e3490a5de644dae2560927a7ac5"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-quality-diagnostic/stdout-stderr.log.evidence.json",
+      "sha256": "c8a2a0dbb582449be0b22c842afa16c50f15df7f51d3dc1b50894fcd5450bf2e"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-stage/command.json",
+      "sha256": "e0f4b8e3b64a69c0f75fd6b847569d49da7576b5d78d51bf45f31aa4ce0254e3"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-stage/stdout-stderr.log.evidence.json",
+      "sha256": "3445a6815fd81fa743c81b50d619b3f571c1c2da981a2bf21e8dd619c542c130"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-threat-model/command.json",
+      "sha256": "a7f206aa80ff6c9d0c87477777e059223bbfa22bf8fbe0af399e172efb15e7c9"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-threat-model/stdout-stderr.log.evidence.json",
+      "sha256": "4d2bcf139426745a56edfefa529df88a47cef710523f7e9b4e1688af1a9b8dc0"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-types/command.json",
+      "sha256": "8fb67af1ad8a56c62976c116d276db4cbb2014cafe283d1a31336b780a252a5d"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-types/stdout-stderr.log.evidence.json",
+      "sha256": "1371871dc2b23231181bc383df36e2700496318e59babba6c8c4ee345075c5b7"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-whitespace-default/command.json",
+      "sha256": "a9c8ee893a040454567a421c75b0af1e4054265e2867f95bb01fc5820f4d43f1"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-whitespace-default/stdout-stderr.log.evidence.json",
+      "sha256": "95dcf94468a40e1f2f9e765e76849e80d73372ad25faec4c28487fb8959454a0"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-whitespace-range/command.json",
+      "sha256": "aaeed65441361f4a38af34f75169eae0e827fbd139d18671c88de6fcb06134a6"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-whitespace-range/stdout-stderr.log.evidence.json",
+      "sha256": "7e9bf5bfdfc1f5f62762dbc4cb6c334565e230235b23b29c822c7a170bf559a4"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-whitespace-staged/command.json",
+      "sha256": "6f065f8a7c74c08188cce40d5a01149017dc109c2ecbcad6af6a9a0ce53446f9"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-source-whitespace-staged/stdout-stderr.log.evidence.json",
+      "sha256": "14487ab5cab42e75f51990ee8982d255bbd4ff0def908ecfaaa220376e7f0f95"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-test-types/command.json",
+      "sha256": "b943010e97fe41fefe7bb80955ae55e1bf3e6560817f731c1b7073a4d9e17436"
+    },
+    {
+      "path": "evidence/producer-claims/commands/p125pc-test-types/stdout-stderr.log.evidence.json",
+      "sha256": "c9a5b746001817d4aafc137d95998deebd305c7f0957781f472736a562c44117"
+    },
+    {
+      "path": "evidence/producer-claims/extension-manifest.json",
+      "sha256": "09988a8e799d16050ccabe1d4e865c061c9a43d5cfc3c65751c1ed6b002cf6d8"
+    },
+    {
+      "path": "evidence/producer-claims/historical-base/assembly-inputs.json",
+      "sha256": "b6ccb30242fd6f54ae7490d5d382cd093c0862575c5c88a43deb0996eb069cb0"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-EVENT-CADENCE/checkpoint-public-evidence.json",
+      "sha256": "37d28846bd5493fb7589a47015166fa76db00028dff951bdedd14c787514a63f"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-EVENT-CADENCE/public-certificates.json",
+      "sha256": "c728a06c119b0675f6b6677ce63cdc8f1c6eba601aef8291d68ae6b29b485a13"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-EVENT-CADENCE/public-evidence.json",
+      "sha256": "45b157a251052336eeb3ac28866e27883403807a79479f76dab3a8f46ff388fc"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-EVENT-CADENCE/request-1.tsq",
+      "sha256": "77a4ece748eacc2de952f7e7865012c01ceb768ddeb2af0b6be4d24487bd986e"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-EVENT-CADENCE/request-2.tsq",
+      "sha256": "cbab50a979097c6eb9024b659449df28a014b6cbc78f51e0e7a3a1be5bc387e4"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-EVENT-CADENCE/response-1.tsr",
+      "sha256": "1ffb66dfe73fa81f3b465063b7b8175043f9248df5132365479947a976039d77"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-EVENT-CADENCE/response-2.tsr",
+      "sha256": "fb99ec6bfe0a0ed8c95f52c934b54196a1e298dfa890e62b36785207d752780d"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "6a532ff9dd79cd5e7f9795b2bc40d64b7c6ba7bebfae32b765008f529bb732a7"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "0f54f826fd0479ae63e4d28ca1154ae3810ccb2409a722b56f90d05bd798d912"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "bef0597e3d6c79599e41f27d56f1d81500fe67b8997ff58114624833be22edd7"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "a13794875593a9731a57880bc9a9fb7837dc0416a0eb78a3a9722fcd0b77f114"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "b3adf0f9384fc1adb8ca92c89af46252608c56659631bde57d981fa6817c7317"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/checkpoint-public-evidence.json",
+      "sha256": "eba80e0a46a015bc84d5993701d253788e35e3ffcca55f5615c83aaf20085302"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/public-certificates.json",
+      "sha256": "c09a770a827ba6fa12486f63c68dbfab480d46ae962d0ae7cd899e690cd541b8"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/public-evidence.json",
+      "sha256": "ebd58253f3395362fba5a3ec8849103543cc0d32f50996efac280ea8a7d91df2"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/request-1.tsq",
+      "sha256": "5e1f2ebafae55eed5e316c42814c1774f85dca754bcc0aad76a1f85c545ff51a"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/request-2.tsq",
+      "sha256": "3ba0cc8d1f891f0386c082560306628b55b6337ff93ed52336f136c9aacb17cc"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/response-1.tsr",
+      "sha256": "ccd18e6ee0cd1fbb91f36763cf65bd25186c015a5e3e1c9cde967859d46f220c"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/response-2.tsr",
+      "sha256": "ee7cc393f8111d0763e7b7f0efd51cc7d0d0b5fc91db6f3f6a6dd8b1787cb0c7"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "d9eaa765914000f52e213f94b747d8805acd2724b91f1a5a4d9d377084a2d36f"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "8dc3ea11ccc63be9424e5eaabe0635dd2554ef9ddcb14325c54eb2dde10708e7"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "2a514faf022c7fc5c7bbea3875b8cfc3681df3921485db948b81b5fca9f95f05"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "sha256": "75d01f68bc04139f2e527dc27f50ee1e88878e7cb2e4f8f122342b9ed7244174"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "sha256": "bc86c7b5e12a5cebae00f53ab320f4fa9381aa68e484ee4a6432a3cfed707aa5"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "sha256": "fa7fdbba7080c4aed6fef6dd6c4f7d28979a843a2763908031dc2e4c053c6af9"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "sha256": "7883be150b4d131e84fe32c2c9e1f745ee589dc0809b4c106711ba657360ceee"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "sha256": "7a1896e7ac09321c90c5edeadba7e6ae0427d235a8bc15a6595172518d33aa2d"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "sha256": "c73b9de2469c492776f13c1ca608a439a264a51c40b52c90951b89957461b1da"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "sha256": "ef424f89417e832cd42671430206ed9055e8da1b897373678fef95d1d6944288"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/FIRST-GRANT/public-certificates.json",
+      "sha256": "e023eb215ba517ee326b4ac5a0d02497a133e8cb1cd8bd527e61805a430b931d"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/FIRST-GRANT/public-evidence.json",
+      "sha256": "5eb81876f393d9b7e8a064dd58dd56736ee887ed1333f644b4e92605156d1a2d"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/FIRST-GRANT/request-1.tsq",
+      "sha256": "7b6ee14896e60ee844eeb2c2e3317d49659b45de385e803e6a742348dbb969d9"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/FIRST-GRANT/response-1.tsr",
+      "sha256": "fd2d96f14bfe81fa982a603fa313c51107d7011060e6760993f1266dca59da5e"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "e9c73664003854caa28268bff3b15c861913066224920920a571cea88dabb6d4"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "5f1e131cc1ad64c59549e26910aa231a686fb015f8cdd8f4692946801a493212"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "8c6a01b8622bdd9db8196d72eef08c4d6832c586da51b77d147fb20115ffc988"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-fresh-canonical/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "cdd279b4ba917ff7f1901b410acd13ce36099d4b6d5d6eb9d490ccb5bf57a24b"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-EVENT-CADENCE/checkpoint-public-evidence.json",
+      "sha256": "9f10ace93a18ba2bd477f9eeeef0ebc5259504a48faa73f99548153721902dbd"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-EVENT-CADENCE/public-certificates.json",
+      "sha256": "3856a987e3811fb40043a5aa9ffdd3e95e98caf68dd523dfeaf6b5121f252fb7"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-EVENT-CADENCE/public-evidence.json",
+      "sha256": "53a079a765a4fa5f07afbcbaa0766f5d2192bddd75035c5051e980ad60867445"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-EVENT-CADENCE/request-1.tsq",
+      "sha256": "8e87b6f2edbe3e048f699c17a507209bb8e04bcab66f7db074514ae2f7fe7844"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-EVENT-CADENCE/request-2.tsq",
+      "sha256": "4abca7b9bcdbb93f2e519c30c21865a4c6f008592a334399c17fee643442f27d"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-EVENT-CADENCE/response-1.tsr",
+      "sha256": "062b478c2cf6eb4cea23da6fcda5b0ca219727a32847ad5450f93250360334ed"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-EVENT-CADENCE/response-2.tsr",
+      "sha256": "86b982a55362e8723620f61e415d0930a0666fffe158ba01a1d43b1109faade5"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "d826289cf3395fde463547f8cb3cf7001464a35e913bd7409a1099e87bed2211"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "4797da23fac169a0d335983b0a9c0e7ddecac3c49656fc7401859fb28e1fb4d7"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "0638785da0be0566966873f3e87f6f22c36d7ec5281e259be8811adfdef4ecea"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "5cc6ae36c6a296f632478f53a7430164c3b45f6e051a3546000165207dbdaeb7"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "cfa4c06b0b55a7c87e3a32875eedc65e7071999cbda62b12c6f957fa2376d70b"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/checkpoint-public-evidence.json",
+      "sha256": "77ca13ffb6910de0191b576431dbd057c2db4103e9402eab1534c960a457e3c5"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/public-certificates.json",
+      "sha256": "4427dfcba2daa470eb172eb185e3ca37c657490b6ce353f4070425105a7fccec"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/public-evidence.json",
+      "sha256": "673f96caf4b0c009b869206b13cd94dd311f1d0a8c5698e51cf1930fbc832cd0"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/request-1.tsq",
+      "sha256": "e5c4beb483b7955f695fb6b212c40b843c75745086f73137e388c12109864f77"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/response-1.tsr",
+      "sha256": "fb7ac8e390180d5c939653ff6d4ddf03f2d24d07781f4224152df6b02929b654"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "ef1ffb5f3f289a8f463916a081c9b26d6e3f2dc868a79598a1b51954f094c76b"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "ee9a7cf7557f186a9243ad6a488a7ff12f2fef825992d82cc6b34ac476c8f1d3"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "d397a5aaa87be6a75ede9898c545585ce5735227d09d2f6d26796d0a2b7fb1d4"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "sha256": "f7c9a3d09d0036456d8a1235a879b7d8f271635cf41e88bfe0a58d0616642a77"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "sha256": "67e40944111534fabdfb588a3788bd805bfd3dbce876e7ba9a4f504fc62b8c4f"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "sha256": "2a9ff05a2e3003caad346fbc176de6ed2f48b141f14cd02b56f4189b7326cd1c"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "sha256": "ba876e6424405ec495aead14d31885a5448fcaa488ac9216db1eb23ac5bfb64e"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "sha256": "369a661dfa33e6da4182e8bdd52625f5144b75de76a808c8ed383df657cd4e76"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "sha256": "1f353f5d2b46b719d41d7ff6964626464a999cce82e5f504403d9fe0ccba97d8"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "sha256": "005f98ace83aa4dd27ce766c0021e8aa327c66a85c136013e3593993e0ff4edf"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/FIRST-GRANT/public-certificates.json",
+      "sha256": "42cc47c7e912efdf0c7701bd5820f18aa3ed3d5eddadab784fbb6334fbb030c3"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/FIRST-GRANT/public-evidence.json",
+      "sha256": "34f2aea27bfc4a6732127423cb62e2964fb3fac8afe0d1773dfe6c46ffb56c3c"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/FIRST-GRANT/request-1.tsq",
+      "sha256": "a20732fde72ad528c08ae63be1c97bfc16876343756dacf1dd5bfaf324c7bd7c"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/FIRST-GRANT/response-1.tsr",
+      "sha256": "d931fd927046e4e293531df1c6b96f1d6849fd2aa303be503c5da59d28c8f928"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "f1f76e05282c629c9883fcf5a9ebccd30ee46db2596c5006a79c6028c6ede49f"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "bba14f3b3d0b25eeb442d6d1934899f54ddb8f92629cd059912dc3461854c3e2"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "bd16cb6db41da128f5c0ed4063fc7bae97c6e2cd2a87c8e885b9e4f40ad1ae85"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m1/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "db05f3fad9480802949964986a4a8c8e46973a5c9cd677af04059c4dda3097c0"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-EVENT-CADENCE/checkpoint-public-evidence.json",
+      "sha256": "6454206c29ece0aac6b20a632fb7beb79be2a9b57d5fce82b2a4a07c346a1187"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-EVENT-CADENCE/public-certificates.json",
+      "sha256": "db7f1c63936b9017407274dbf2da44166ff0fa2834000672b993ab199c0db3b9"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-EVENT-CADENCE/public-evidence.json",
+      "sha256": "e2cdc7a35ce1a2b07473afab0fa6d59da552d5cb1cd7b2b0705c9da3932a4249"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-EVENT-CADENCE/request-1.tsq",
+      "sha256": "c6c612f18ce329d675cec49618930a9eba23daaedde626c44052f153afc27c4e"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-EVENT-CADENCE/request-2.tsq",
+      "sha256": "5f656176bda8db7858ed1b3a73b21c2b8e5674ab5e06803f958bc6d8e45ca147"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-EVENT-CADENCE/response-1.tsr",
+      "sha256": "75735df806e7292c8e10f484b3a8be230850f30e81eb7fdf03d7260af03e80c3"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-EVENT-CADENCE/response-2.tsr",
+      "sha256": "7306d3744751e68620059d11c354c179253b1605891206c319de3064fe28cbbe"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "98ab4d67fca3a6c9ee522fa76f1709e40b0dde2e282e3771f4517a13a392fb92"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "8d8367ed4801f682fc4b889f363474e12b09f7a92fad6ec4dffce6ca840b6887"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "288271d6fdc00ec83a16ffdad3975a6cb7e9038f0a95b80d37dcd457875d80a3"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "a73fb97aa912fe60037b401a47ec74154c7478bb8067c697236754aef27b1366"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "dbcaed81e0e3ad1b90f375a1a44c22ba677ff1fa541113af5fc87f1cb7adae9b"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/checkpoint-public-evidence.json",
+      "sha256": "d9faccec1e5dd9481a61aea22850a7c6ecc21bcbc62fa4d0a3fc278711879546"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/public-certificates.json",
+      "sha256": "ca9163da7b35e1d8fe2de80f6c51d7df212ae1a95b2934b2f0b30f1a590734cc"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/public-evidence.json",
+      "sha256": "f6e6d972dc2227eb1fb1bd0efdd06c22256b68ea6f420085894c805122069ff3"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/request-1.tsq",
+      "sha256": "2e670e75f3ce684f32ea936c79fa1af2dc8fdac03a2d58f64850d74a7164f05b"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/response-1.tsr",
+      "sha256": "4879bbdcafdfb6aff7f651bcd37e3d73a044ac46c29981f911b8bbcf22622877"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "d3ad537d14ab33dfda7b4c1d452b69a8f8f5a375fcaee6ac23120fca04ae42c7"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "529b5acec4c1dc65c253a80ee4ed0520dc130429dd6e3700142c7913c211c6de"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "16944c8c43b07afde3bf456340cab660afd91d366dead397257491e3c210f365"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "sha256": "6e669e159dbfbcce7fb6603791c90bb4231f75b5081ab017808ac3cd2e9a152d"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "sha256": "7f1e8bcd723709cf17bfc9f1ee474bd8376defcc98354afe84610fcc1a95ec81"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "sha256": "8800c4753ee456a85b54177ac53e6d3842e424c52facb89961dcafec3598e0b3"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "sha256": "97429e9b103ab2adc4a05191c80875e3e4482e778b64c5431c08d5a58af0b015"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "sha256": "c179a27c85a10b97b4e8294ad4d6b2da49807567cec232cdd5376dcb24384698"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "sha256": "96d0925f7fe6f28a4c4a2030e92b6e124cb70e9c70e86c493d79f2232caaf9c5"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "sha256": "2f8e7718ac10adb0d885d340cea05ba79e5b6cd939e966cb6f47f0089115c823"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/FIRST-GRANT/public-certificates.json",
+      "sha256": "a37bcd51b502bf32c91c8442ce839ba240afb63a1d75dc10a4925e91b10d5984"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/FIRST-GRANT/public-evidence.json",
+      "sha256": "0ac4002d61de7e050e25df8e5a3c32e62ea3665be4346ad6940516a8baade8b3"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/FIRST-GRANT/request-1.tsq",
+      "sha256": "ccd6eb01b4d3fcce3bac845053afbcaa0e9757f850b704d3f97efaff83b27efa"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/FIRST-GRANT/response-1.tsr",
+      "sha256": "34cf44461545c8ba72bfc295fd1b55c504e9f799ae3cde6d8e404fbc3d75a70c"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "bd34cf87d7f6467587ee175f0ab684cedc837fd0aa2a7dc458122899b46af006"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "d3114027e137e321fb803fa8b11f011fbedaf8fa2636b77729ef0f88bb1a4c22"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "fccd4c96b95f9a932f496e7f9142e5355e1989129f7a8d8f377979c2379c8873"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-m2/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "a87c432da1f02367977f26fe5a770f3dcf89feb18a5adc888688bed364d5eb7c"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-EVENT-CADENCE/checkpoint-public-evidence.json",
+      "sha256": "48417138979f40fa85a540d00cfaaf0a3874c8063ce21ffabf05507544c62404"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-EVENT-CADENCE/public-certificates.json",
+      "sha256": "bba6d6ef84030463ae88c68d9b53daf50853424a18ed7ffa91fd35468f427b41"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-EVENT-CADENCE/public-evidence.json",
+      "sha256": "f012812d5453f4ebd4954d1840ddc2953323e023fbb657363fa4238fd60c936b"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-EVENT-CADENCE/request-1.tsq",
+      "sha256": "56541f76a09f5bfbc4728f53cb87eaecb0b1c8e209bd7280c3b51a4ab04e6d1c"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-EVENT-CADENCE/request-2.tsq",
+      "sha256": "80f806521c0550fba5c1ef7d3cf4d939a404b2f07bce8fdfef444e6439df739c"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-EVENT-CADENCE/response-1.tsr",
+      "sha256": "9c121f400a772a235658e0b85f717b05b06b7e2d8306658faa78ba654c563e0f"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-EVENT-CADENCE/response-2.tsr",
+      "sha256": "06abcd9b1234fdab1665ca79f0f40c18e8243a323b1c17fe9f8e1d6e4c3f16da"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "61df24ef45db0c7dfc3a0c46daa5f807c376b49c4735846f67237d6b2ed4021b"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "4366e171affee577004214caa2d027c8f5750427daf388e367cce12dddc66d84"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "c9710d6ed82826b2943f273c041651de2f22eed05c54f726cb673126ca56bc00"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "ca548a5379894d9e26a81f9d7877455595783ac58ed098acccc3cf6a240986ac"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "5f4df9df021a35a7555522325f58d912f10fcb2a9ec4edc63d0541e044255915"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/checkpoint-public-evidence.json",
+      "sha256": "5932f57663369e048754d6cb556c8450dc9d1dffb3272b0f65ad8337ecbb9766"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/public-certificates.json",
+      "sha256": "1911fee1aeca63a7d78e1e24eb06e4f659be76947b0cf6c7a2a943a5f8d171c9"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/public-evidence.json",
+      "sha256": "a135d95ce7d6d4503bc10d66a55714b4368f51f70e24eae14726b1add80c7386"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/request-1.tsq",
+      "sha256": "5664e21292382a0627ebff4cd507c1251e85dd580cc52f2f33a0ebb6cc489c0d"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/request-2.tsq",
+      "sha256": "05bf14b804e1d761dd1881c02dee4948b68a16908a1fb0af8824071a8cbe6c53"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/response-1.tsr",
+      "sha256": "76b617626910325ce893a393a38ce8364c8efdea4931032f9463ca43c5f86c45"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/response-2.tsr",
+      "sha256": "ac2e81726063e6596e76a45fad9365b682bb7b9f59f203a0cd02e834687e218c"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "5de00827091cb44ded86b72a2e9e29204843df624662407067366f14fb16b4cf"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "aae2fa76a8d4f9800d850d41876858d5aa3c9c0fde33313067011c770faa2322"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "695793128c754ad4f920b2565ffe9fc5b264653abf1b4f03fe9ae6aea14481ff"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "sha256": "894a0d8010e20bdede3ecf352471b30c1ea0f8c7aaec6d95923f7b3c0024a3ff"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "sha256": "3a043802caf5c0271547eb2a682032ae0147048234cd0312584e38bbf9ec454d"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "sha256": "9292ad40213366f639463cc6b76e63f812731c3956574c1e053c205c03aa0154"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "sha256": "1ffae96391488c328698059ec342a5e6685aedab02db3db41096b5d81bdda243"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "sha256": "46b23343d3e9b15dbb62d13a0b1cc9cca52b0cc45b1b368b9c16b73441186bf6"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "sha256": "f9e309a19df1241f85666bbff87175ce48b5856646d885239dc220cbcd26e194"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "sha256": "b3fd0987cc01ce2d80fcd223fdbb741ded62c151b05be7b3fc721285523e6ab1"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/FIRST-GRANT/public-certificates.json",
+      "sha256": "c648054474831adf836d43d85f596a6d76ad1106a1d9ea28d8485e656253558d"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/FIRST-GRANT/public-evidence.json",
+      "sha256": "d1332a2ceae8135f8e18ec52eea995aef5503cbc4445a6c814c833183ce7389b"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/FIRST-GRANT/request-1.tsq",
+      "sha256": "ebfd2487db67c5a916f99d3182867439a8d62772845a86fb6bde498eb37bde1e"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/FIRST-GRANT/response-1.tsr",
+      "sha256": "eef48e12087fc53be24db2123943ac5c446030bf5e54ddba9b2abdd2c2f15a45"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "56ec8470b06c2b50890bc034cf8a8b5e7761a7104c19b685df61dc9815f01702"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "270361d18887b280985562d6101aee7b47c2d87a2fc9ec5f2fcc2fb12b4a8ad4"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "46ab9fdea99fbfe53daf48d6b490ff1ab8841280c5e722020dbe06c04bfe0fd4"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore1/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "ec55cef32674850ff1170ac4ec2c4a318d0833815b055dbb93127bad0add6a41"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-EVENT-CADENCE/checkpoint-public-evidence.json",
+      "sha256": "ed72a5c84b1f42c4f235cc993aaa8c27ee1a1b14a2877efd483178b414286b13"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-EVENT-CADENCE/public-certificates.json",
+      "sha256": "3a4ed0f38bdac93e62e52dd9350fcf0c0ab806a19b6e044caac0d00849b24cdc"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-EVENT-CADENCE/public-evidence.json",
+      "sha256": "5071ae64365dbed8ce6fef185d283b8a20e72823ea2efb4e4b2a6667a54a5210"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-EVENT-CADENCE/request-1.tsq",
+      "sha256": "36bf9b87987c2056cfb920620e8aae1055f0d34358265d970a72f4709bce036b"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-EVENT-CADENCE/request-2.tsq",
+      "sha256": "3034346b33bcb9f337548d46d3198d14674fe9597c7d42f5adf11bbd63dd7d95"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-EVENT-CADENCE/response-1.tsr",
+      "sha256": "4664e1e646b3f9522ef3fd9324fb802ab1e9a7034cbe8aa60a06d7f73dcbe3ec"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-EVENT-CADENCE/response-2.tsr",
+      "sha256": "a68f03d5e05d7648b6897de36160678ae60c0a21e8f5194b00212f5113910c58"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "7f9b76844d83cc62129267c7b30f5c6b491e9580a00de65afcc583163c941eaf"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "9d381e6b077173bfd7455969ff79a1465c5e16353be7c97636f78b574b480cde"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "883fda6c32859e29780dafa97b3f4a3ae0da7d2858de2010ed170c9fa19dbff9"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "8c9330fcc1c419ac93a8c6d64216b3e9837dacd119e6b26395aa70f097ca5bd3"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "d4feb7f4f6f428b2eb7b60236113b18ec36c54810892309a4c477ef5bb617c8d"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/checkpoint-public-evidence.json",
+      "sha256": "4da1daffe3efddcf2dac9654337f46d4653f761f0d1cc800766e8d44719bcec5"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/public-certificates.json",
+      "sha256": "c24e31c48f20b385269058ed34b2f27ba16753e35a5fdff75f8e8fca5b1109e3"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/public-evidence.json",
+      "sha256": "2f30957fe63c7af55b5dfd3efb3793869d5fd57b277aa99d0549b05969dd3541"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/request-1.tsq",
+      "sha256": "b0ecdfd9f0244ee57a22e8aec091d022a42133ec79b2de77d30079426c41b3f3"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/request-2.tsq",
+      "sha256": "c96b3edc63650112f7d0c3af82e10f85b996dc97a6d8d3a16f12ef11128992c6"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/response-1.tsr",
+      "sha256": "e0ea8eb374ca5cf1cd293a67c945b80ea0ad1f184d57f1c74488d0c33a611581"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/response-2.tsr",
+      "sha256": "4e4ab59b125ac41cd78ffef4bf307ff01fb714201c19b7111577e1f295e42f16"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "a58a6df29d1fd17f96c8775990c80fbc73efd708535f3f3d74c14e336f284ff4"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "bd6acce5f7459699c777b0c919947a8fc00b641f3504b5a2b78f936466f06031"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "38fe25595d54830ece97a66ba268904eb76146f9a35d33ff0028bf4042ac35e6"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "sha256": "e5457994582933699dc9db8c776b16a06885817fea47c4e625306a34010a89a2"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "sha256": "bb215bf7669292c70d465cce2575d616252a1f791f65cc618d982e41ae18be32"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "sha256": "cd7ec5595208b321ad9373a15b2ba5f42dd30187e3244b8cb9b3d3eb276ae050"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "sha256": "7450827ec3497daa1dea60e32b682572c9b528fae204cb8aa36fff6b58ca3faf"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "sha256": "f86c449a463c682c44e1185ba298b65b1f91af2b303196a0ca1b86a069101929"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "sha256": "38bc2d80e422e9b5baecdee6668c66b0c678850f2c78716957fdf96bb7a2acc1"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "sha256": "e4de3a17904a54b0da48904bfe11b16fb2694d97a9dfa31073acfde68cf201d8"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/FIRST-GRANT/public-certificates.json",
+      "sha256": "4be1f8b4de81fa415e946131c43254753b57133acd270f51306341db9687bac2"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/FIRST-GRANT/public-evidence.json",
+      "sha256": "02afc7daecac898e3a0cd91961af5bea24ac21a6374db736319ed3f4ce89a7f3"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/FIRST-GRANT/request-1.tsq",
+      "sha256": "82408dcd1e3bdbffd472339c2d7df00f3500f11fd62d5a216348ed503d5fc031"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/FIRST-GRANT/response-1.tsr",
+      "sha256": "07b716dc7fd88d12caa5f4b548cec0c22dea8f409e4212f44011dcddcf150b40"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "0ac462f33041e002e2ef3adba2fb90155a7d2c744dd532e891e5bf6960d45cf2"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "96c269aa7f57069ddcf45bcc1baaba573cabbdd18e22aa95702bcbbead662a52"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "985802826067c4ad349abb5e0224beae49c6d9cc76db4aec26c8e503644924d7"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-restore2/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "4cd4f568dd23dc136f1da6436f6f91fe41e5268765ca9683ea1018a20e0bbe4f"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-EVENT-CADENCE/checkpoint-public-evidence.json",
+      "sha256": "a56bfbd0433af66274beeb8d2c309d57396fcb5e790f45fbf3a8a5ae2179d53c"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-EVENT-CADENCE/public-certificates.json",
+      "sha256": "bab7ac06e15d6e9e5f74d0b6ddf8e350ac1703bef1d324baaf5eea8614cd92c1"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-EVENT-CADENCE/public-evidence.json",
+      "sha256": "9d4cd7439c46fa361563dd4b39919830995d0ce90a5398a88f57582a5d9da4a0"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-EVENT-CADENCE/request-1.tsq",
+      "sha256": "e0502bf7e74a20ab5b3e5a3f1f61b667615bdcc17e89aaa0813702c6bb1b0c01"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-EVENT-CADENCE/request-2.tsq",
+      "sha256": "7747d5efb36fbfdfd06f78ad6b81cc40928fb7e3723e852af69562a146c3c27c"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-EVENT-CADENCE/response-1.tsr",
+      "sha256": "b58175bb30b96b7f8f379df8364e3001ffa7637d77209dbb9c78920a28cc73c0"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-EVENT-CADENCE/response-2.tsr",
+      "sha256": "34b495e392714f5f7d7f6a7cdad486ed34862593740eb46180799c715a9fafcd"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "sha256": "39af41f9fc581b333d634ad2bf6c1cb0029fc81cb80b75784306c524c497cfc9"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "sha256": "4e5afc22e4c537445a82a99337f6474efa2528f0f36ad0a55c674523eeee4abc"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "sha256": "706ce6896cd22bfc47e3ef64e60703dd243d69cea511e91dbfdf087b47ff6a67"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "sha256": "f892105f3d8a595abce081983c55bcf008def4f9cd6c6a88a97bc833931cc704"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "sha256": "9ec975ae7002b1babd3b0d20671e5cb11342e0ef796e5ac01203a3b07e8dec05"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/checkpoint-public-evidence.json",
+      "sha256": "cb0e19b1436f90444929267d1b435d142ae703e10759b35a7a166df7e9a9f6a5"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/public-certificates.json",
+      "sha256": "b07031f68de0090529a29e037e38eb7aa8e35bb3e5c0f480325004369657da8f"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/public-evidence.json",
+      "sha256": "027f3f6b0b85653898002f31b122cf38329a805b8748543e6b9df9b2f52a6be4"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/request-1.tsq",
+      "sha256": "925c9e7b3eaac58bda772eb3cbae8961c7ecaa9aac5d52b1f33ba89fbad74150"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/request-2.tsq",
+      "sha256": "1d7c8061efe2d8d3a73cee1ae655bfc43536b468f256162e967cb9fa61a1f684"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/response-1.tsr",
+      "sha256": "bef5a9778fe4f22cf929a1ea1eef807c54968f89536cb0f36786166632f064f6"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-PERSISTED-PRODUCER-CLAIMS/response-2.tsr",
+      "sha256": "87acebd5765e35c48e4897032c2417ebc855613527b0d60e1295e7d045fbf861"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "sha256": "4e848d5f4e5f541951075874f5f5d0d7be26598efbf0d915a50d559f04d41ec6"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "sha256": "b95238c1ce95b16a48243cd242906ddadd48413800977fc0af56b5a811efb598"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "sha256": "f19a3d75cba29b99b35d2609417393cb2b9b52b353928c4d1d60aff9f6bb4bb7"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "sha256": "a2a872669f0cb4c2b90b2a1f51b1431fb5f9ec291e122aa207907b1cdd35fee5"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "sha256": "0a5ed91cff9b98aa2868c3466a4ca4ef59a7ab8109bf832f55bbfd2dea5d7d47"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "sha256": "19aed7c20953afbb602901c9aa025fef220ea302f02935814a100fdc67e8b739"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "sha256": "8d60eb7bf82129e63a4d1e80fcaf6b2af0d8703ef13c068501bfbf3f9da1ce87"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "sha256": "eb8aa15a247d0e2352dd1eda66e354d31f0791b5f0eb24096f11ca3d30bbbe99"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "sha256": "4480b7b351741e31ee711bebdb9d4a7da59efdc2818ea32f996dee64bfe822ff"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "sha256": "1b4883bda11d67641c3f8a9c8dd81f0217d4dbf28d31714f26a76189e428d5f2"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/FIRST-GRANT/public-certificates.json",
+      "sha256": "b67f2341420c2ef44591b0c59d3adf95300db8701e89e6d8adcb73220e37722c"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/FIRST-GRANT/public-evidence.json",
+      "sha256": "e183ce9532dcf19200a0ea17d89391d175288faff24537007a2c70908635563f"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/FIRST-GRANT/request-1.tsq",
+      "sha256": "ea257e2caa81793221458fbca9a3204abad9a2b5327f211563fe80b6dffa9ae2"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/FIRST-GRANT/response-1.tsr",
+      "sha256": "1271d2e883cac35eafe68c7b6d154e8b553bf737fb50d5b70e158c8ebbbfba27"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/HTTP500-THEN-GRANT/public-certificates.json",
+      "sha256": "4fdddeff7034b144a5a1252b9544982451bd6fc917bb941764aa9a015bc1bc47"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/HTTP500-THEN-GRANT/public-evidence.json",
+      "sha256": "0976d94bc443357ebb21fc0614f8c273ff212f3a42d346f97624ae3362f28d0a"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/HTTP500-THEN-GRANT/request-2.tsq",
+      "sha256": "d064e58f3e34bca14ef6c59ad3d1c0f8177dbd3607956c7cc9332cddc14adcbb"
+    },
+    {
+      "path": "evidence/producer-claims/public/p125pc-source-combined/HTTP500-THEN-GRANT/response-2.tsr",
+      "sha256": "ba4f6ce3a0d4dda54479e80ca1bbbdc6bd7167d853748e41db1352bc1f10fb2c"
+    },
+    {
+      "path": "evidence/producer-claims/records/adapter-adoption.json",
+      "sha256": "91c0532f93b327cbd241263947fecf1318f9df87f07f12bdb75938db3f52bc60"
+    },
+    {
+      "path": "evidence/producer-claims/records/assembler-adoption.json",
+      "sha256": "5ce5dd07273ce10f028bcaf97fd7fab50154e8401c700cbf103360f495a4eaea"
+    },
+    {
+      "path": "evidence/producer-claims/records/audit-observed.py.source.txt",
+      "sha256": "468aee0d4ded5290f60e231fa6a94e3617f7a243de96f46f1ac1a77fd73dc439"
+    },
+    {
+      "path": "evidence/producer-claims/records/audit-public.py.source.txt",
+      "sha256": "805a2c8e5c5dc48c0d9f3dae9be5ed02babed5cc5a41fd94ef6bdff619d48a80"
+    },
+    {
+      "path": "evidence/producer-claims/records/bind-fresh-command.json",
+      "sha256": "eb3e2a5a5c847e1ca66537ac7ce04d6b15c745064c849e510a0016d5bf3709c3"
+    },
+    {
+      "path": "evidence/producer-claims/records/bind-fresh.py.source.txt",
+      "sha256": "0ea9b25dc1a08dd53b7ae3b4d98e360e79977ed991c96b46974910def7ed45bb"
+    },
+    {
+      "path": "evidence/producer-claims/records/binder-adoption.json",
+      "sha256": "43e7cdb2c84cca2ca0421dad66b450780a0e1b7eda6ad02cba3da07454a345a5"
+    },
+    {
+      "path": "evidence/producer-claims/records/capture-quality.mjs.source.txt",
+      "sha256": "9a725a770434decf13cb207ff49afd5fc006654a82934c62d58644b1f59508ac"
+    },
+    {
+      "path": "evidence/producer-claims/records/check-preservation.py.source.txt",
+      "sha256": "ed81b906b74b7a8c548bdb786ce39dbae8804398a88b7c10e814ec7e40e2e98a"
+    },
+    {
+      "path": "evidence/producer-claims/records/clean-source-actual-closure.json",
+      "sha256": "40eb3a57a12ba0dd7eb0d245f04a94612b8ac13efa81f33eb0d12ff9c9c83afa"
+    },
+    {
+      "path": "evidence/producer-claims/records/completed-runtime-review/README.md",
+      "sha256": "0a3a1a6ba8e6f486a9c0bb04d3494434f6a8e0513f0ff1eb3438f4779a45d99a"
+    },
+    {
+      "path": "evidence/producer-claims/records/completed-runtime-review/control-reconstruction.json",
+      "sha256": "8ac09a090932131f8ef9be3a49ca8b556e44f449a5a46d9195d8d6df38e7d709"
+    },
+    {
+      "path": "evidence/producer-claims/records/completed-runtime-review/input-pins.json",
+      "sha256": "d0ba3f8b8190b581e6c2df4c54d53ef627a92896ed4dd5c98796556e9be84032"
+    },
+    {
+      "path": "evidence/producer-claims/records/completed-runtime-review/joins.json",
+      "sha256": "b6195cecefdbc1595bb94a3a0f95a8ee344940b5581e0715184a7a4905b6c20f"
+    },
+    {
+      "path": "evidence/producer-claims/records/completed-runtime-review/review.json",
+      "sha256": "e2e0e6abb0e4bf92d0d8299660e3f47e506e6490a9b41a709f7ef374bd39191c"
+    },
+    {
+      "path": "evidence/producer-claims/records/completed-runtime-review/seal.json",
+      "sha256": "26fb99490c91f1347217c3a0fd1456ff71d51e0f70d112f79412a1088cab1869"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-action-apply1.json",
+      "sha256": "93b81a8340a2fe10428494477a2d45c6ccd4f9df1b3869b1f8b24823060eb0ec"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-action-apply2.json",
+      "sha256": "e3ecf474031cd0e25aa1f02a24abe493af2f79fd408931cf2e2b236ad71f6b3b"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-action-restore1.json",
+      "sha256": "acb452e7a46b8b3d38f05e0878242718318d80058df739ce8a3cf10df7162e73"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-action-restore2.json",
+      "sha256": "62e7e01be57b4558e629607603c423b84d6b22a8f1f98fc3a826229b675fee3c"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-helper-adoption.json",
+      "sha256": "258938f0152b6be5932495ba781e0be2b347abeba1199cf50a7327f6f6e1ae4e"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-helper-static-review/README.md",
+      "sha256": "9a8c9dbfb8a52f594a84908ed5d45b0fb2b5237b61f53937d9e82c5d177c74a5"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-helper-static-review/input-pins.json",
+      "sha256": "68999f7b0eeecde5e54a73eae90df355508864f87e51bb87f15fc6fa9047dded"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-helper-static-review/review.json",
+      "sha256": "2097aa093ba9d583f387eb3164ce5140ce72bf79c6d7c8c86f7e5bb94cd995d0"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-helper-static-review/seal.json",
+      "sha256": "0b8a5c101c1bd691fef18a54bb24c239087b378639b2dab41606eeeb302bb163"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/CLAMP-FUTURE-PRODUCER-TS.patch.txt.evidence.json",
+      "sha256": "615c9a537a6fed6195ee4341858ad4742745823612d1fedaff3ec4d197925195"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/DROP-PRODUCER-TS.patch.txt.evidence.json",
+      "sha256": "d0f9727325437529615d2a33da13ffbfcfdf5ea327901767882c9dcac1fd87d2"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/README.md",
+      "sha256": "ecb30c1f3ae7b82150958f2eabee7666df6f1f122656e3bd6e52141052e963b4"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/control-root-bindings.json",
+      "sha256": "1702d0e0ef4a9b37006a7a3107275215629bfede756d45bd132b34d25605e472"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/control-root-bindings.template.json",
+      "sha256": "5c5c3bacf333353073fd1dba2416a3c8d59ee403afe4b267f249a65260419e25"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/controls.json",
+      "sha256": "02db629a3438a38970aabdda2d612a2a216a5d245c2e3b24d6142bea169ede06"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/input-pins.json",
+      "sha256": "5a805febe9a31ac82f7888d7085a320110ff9a5fee75cd0bcf09881d59645af6"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/seal.json",
+      "sha256": "276997dbea9d617775be9429769f3b03cf86843ea1768b9adb2d58313ae57e1e"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/source-control-from-C39.patch.txt.evidence.json",
+      "sha256": "bc1c4fbec65f341f8338d0b43a5f38da4174c9861b3838ce79fbb671b6c8e30e"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/source-control.py.base.source.txt",
+      "sha256": "a30fa847e29155f851eca012ce4c315729285cc84b34d575cd84d17c64687853"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/source-control.py.source.txt",
+      "sha256": "2443ea996758e3fcc557b39ab3474d53abd5bb55ab0a639f7c3b57c19935252a"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/v2/README.md",
+      "sha256": "6cda2e921b26b9bbb1029d30ef1ec726901586130b748c8dbef8f45ac5d81332"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/v2/control-root-bindings.template.json",
+      "sha256": "37db95e678bd505194f3d913d258b1704e38af91b599fe78d2096ab17c47c7e2"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/v2/input-pins.json",
+      "sha256": "c50e28823bff103f48c81c6d371874affc1ff90d872dd6e8ad4ef25a5e65637e"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/v2/seal.json",
+      "sha256": "2f22476d817a92bb58fd57072068f09f56fd5f78b3723bc1fe239042e2996db3"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/v2/source-control-from-C39.patch.txt.evidence.json",
+      "sha256": "1a08a970494d57053385b039f76324f415f325450a069c161eead8590580f0cd"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/v2/source-control.py.source.txt",
+      "sha256": "eb61b029d97844f1edad80895c7c65d0d701a79a9670c80588e88a14ffc6b367"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/v2/v1-to-v2.patch.txt.evidence.json",
+      "sha256": "d6642a4f96893e9d51f4ddc0995018472684a594045ec9ab11857cf7c801e433"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/v3/README.md",
+      "sha256": "a94dc441b0971177c60636c6d3e5808226feced182fc5e6f0b3233415a131b78"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/v3/author-review.json",
+      "sha256": "4d12945441aff1acdb129315547cac7e4088110ab01d0133697e2f224194cab0"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/v3/seal.json",
+      "sha256": "f3e9c73239e5671f8f115ed8dd3810a8deeb4aa7dd3d07bf431e6dd5238fb771"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/v3/source-control-from-C39.patch.txt.evidence.json",
+      "sha256": "a236124e5dee0938a6d02e125db57249693e7f593893abb2a00b7bde1a516b43"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/v3/source-control.py.source.txt",
+      "sha256": "44f1f8e540f111b8dd3a72202930a1a21fcbbf191096424e38cc6a8443c2d2a5"
+    },
+    {
+      "path": "evidence/producer-claims/records/control-preparation/v3/v2-to-v3.patch.txt.evidence.json",
+      "sha256": "765a6b0e3a60270ecd471555af45b3039da2ece77f3fc709f020a90b9176d88c"
+    },
+    {
+      "path": "evidence/producer-claims/records/curator-adoption.json",
+      "sha256": "276ad581a882fca119fbb436a5ead1ef7493e996ac2faec149efcac8bde976f7"
+    },
+    {
+      "path": "evidence/producer-claims/records/final-README-v2.md",
+      "sha256": "5bb1be6b4a3d6f3083e2bb8b710d0ec8d2b176c407a9a9ee9fd30a5640d869ca"
+    },
+    {
+      "path": "evidence/producer-claims/records/final-README.md",
+      "sha256": "ef521dd3f249614cb13579abc4342f68e590207cefaa4a5c8bd3256a4cf2aaaf"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-binding-preparation/README.md",
+      "sha256": "9585a2234a3365081d111c5a6eb52121b765bfde401072010fe450b8f736b682"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-binding-preparation/author-review.json",
+      "sha256": "a5fd3744bdd254669746125fc9b923eb4179ba7312de4402deac206f7d30819e"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-binding-preparation/bind-fresh.delta.patch.txt.evidence.json",
+      "sha256": "4b66a5c7effc37d0d2694d723bf44cefe9b1ea948d2e15f08764480b1b92f10a"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-binding-preparation/bind-fresh.py.source.txt",
+      "sha256": "0ea9b25dc1a08dd53b7ae3b4d98e360e79977ed991c96b46974910def7ed45bb"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-binding-preparation/fields.json",
+      "sha256": "60cf3bc4cd71cfe4380de778f008b10e9b47de776d7a4e31c4497050aeaaa0e5"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-binding-preparation/input-pins.json",
+      "sha256": "32df42ad95875cf75705643ea2bf1f2eaa0a9110a591f2c4b0d90022679aab10"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-binding-preparation/seal.json",
+      "sha256": "8ee4420223ff34f48e9cf626bcfb5bc1c7397d2d14c36495ccf09f1dd5c988b4"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-binding-static-review/README.md",
+      "sha256": "59d74040c4cd996d47cafbebd894067295d346bba4cdd89d655aeab6fd45e9a7"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-binding-static-review/actual-input-compatibility/input-pins.json",
+      "sha256": "cfd5eb97cf87504fa9e0b25cf01da574a294f3293b5df9b029fce5fb8042b167"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-binding-static-review/actual-input-compatibility/review.json",
+      "sha256": "8c065ed97b6dfd7a98e1160917a943946162696cf4504441abacb19150c090fd"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-binding-static-review/actual-input-compatibility/seal.json",
+      "sha256": "b2a5d7089b654e49d360ba17702249778ad88c1ff5ea6ff6706c068404a79b18"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-binding-static-review/input-pins.json",
+      "sha256": "2c8324213c83af9095ba541ad1be43c7a2d2874510d62f3bc26ee3cd2e6a5c3e"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-binding-static-review/review.json",
+      "sha256": "a7b0b1d16eda9eb5f4c88ea108651fb8fe95ebe28d21d807f033606f0a3e6467"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-binding-static-review/seal.json",
+      "sha256": "ca9056f008e1c129b514a5795abf53aa41166ce9d399a3c91071a81ec2eb4ced"
+    },
+    {
+      "path": "evidence/producer-claims/records/fresh-source-binding.json",
+      "sha256": "9aa8dc730a6daaffbaef8f24bf12c9595a4d07c721841fb27a6d874b2cc12980"
+    },
+    {
+      "path": "evidence/producer-claims/records/hosted-metadata-admission.json",
+      "sha256": "d96d33c50fbeba6ac1c3b5c052854f408b3c21b730b83ecdcc1d4c9f7584ee43"
+    },
+    {
+      "path": "evidence/producer-claims/records/hosted-source-admission.json",
+      "sha256": "a60993f571bd9378fb5883482604374461a843baa5042e464f7e45a43fb91a16"
+    },
+    {
+      "path": "evidence/producer-claims/records/m1-apply-prepared.json",
+      "sha256": "06153bbb63412bbf2f896fef2f72eb5217027688173554e964d372097c3cc913"
+    },
+    {
+      "path": "evidence/producer-claims/records/m1-apply.json",
+      "sha256": "ba73a3d0e622b9eaab2ce8470980596916de199b4910848c1d377f0da82e4aa8"
+    },
+    {
+      "path": "evidence/producer-claims/records/m1-classification.json",
+      "sha256": "24cdea4862bd408492df74a6e8bb5be1739e1cd48343618452ea61a0b5d6dd53"
+    },
+    {
+      "path": "evidence/producer-claims/records/m1-original.ts.source.txt",
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "path": "evidence/producer-claims/records/m1-restore-prepared.json",
+      "sha256": "5a20517f4fa5813d349532080bd281e9e30ce55c00f339906a7c2107b78ddc2f"
+    },
+    {
+      "path": "evidence/producer-claims/records/m1-restore.json",
+      "sha256": "29056009024fd1c7f06ea986417faa606e7f4cd7523dcdf1946c5debe32ab311"
+    },
+    {
+      "path": "evidence/producer-claims/records/m1.patch.evidence.json",
+      "sha256": "666487a9b782f3d49db3727adab0b952385ace9ee88795fec720f07bbdcec3dd"
+    },
+    {
+      "path": "evidence/producer-claims/records/m2-apply-prepared.json",
+      "sha256": "daccccad18ba5c191db01d846822726a7f328ff74472be5f7cd43736fe872800"
+    },
+    {
+      "path": "evidence/producer-claims/records/m2-apply.json",
+      "sha256": "d308efcbb510271d63303ec01374f619e0b0c77d188bde5cc00aa81548f3210d"
+    },
+    {
+      "path": "evidence/producer-claims/records/m2-classification.json",
+      "sha256": "eaebe920ab33812ea839ae9f449942fa26ddfb70ecac2c90eef60c85c30bd93d"
+    },
+    {
+      "path": "evidence/producer-claims/records/m2-original.ts.source.txt",
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "path": "evidence/producer-claims/records/m2-restore-prepared.json",
+      "sha256": "77c4af910374fd37f257f1ab6092c05abb43094430750dda496dfe936fc9416f"
+    },
+    {
+      "path": "evidence/producer-claims/records/m2-restore.json",
+      "sha256": "23e6d36d0c2679c9ff7ffc62ef3cca2e93aef076e409f9b3fd10b145beab8bb3"
+    },
+    {
+      "path": "evidence/producer-claims/records/m2.patch.evidence.json",
+      "sha256": "3e1d0ce4a8f6d46586084fb555f18a7378bbcf53a60d7e5c09887782bbae5828"
+    },
+    {
+      "path": "evidence/producer-claims/records/next-accuracy-design-root-read.json",
+      "sha256": "238c2319608fab1a544b09d44d562415d573efa804e20dcc722cdfa8c464eeb1"
+    },
+    {
+      "path": "evidence/producer-claims/records/original-p125-packet-pinset.json",
+      "sha256": "860123709cfd11075a6983574c4ad8cf62bf1d52cd70747b2066b8b514f01117"
+    },
+    {
+      "path": "evidence/producer-claims/records/original-packet-order-diagnosis.json",
+      "sha256": "71e6098a82ef29ddf836b9c5c623cd34d272f52baeca27b6cd64b02baae7a466"
+    },
+    {
+      "path": "evidence/producer-claims/records/p125pc-fresh-canonical-outcome.json",
+      "sha256": "37a6fef970bca7282fecf5593f083bd672c1831f2f0f58b7aa8dec556d91ecac"
+    },
+    {
+      "path": "evidence/producer-claims/records/p125pc-fresh-canonical-public-audit.json",
+      "sha256": "c057c09eed76a6730a9f5bfbf0d41c6116c71e7d531bfc7c700ef416a42a909b"
+    },
+    {
+      "path": "evidence/producer-claims/records/p125pc-m1-outcome.json",
+      "sha256": "246ee26d463193f1b2a3b10d8fc3c5cef9fa6b0faf93787f2167ee6c64121fd0"
+    },
+    {
+      "path": "evidence/producer-claims/records/p125pc-m1-public-audit.json",
+      "sha256": "ea20094c661260d2d57eeb1aab66daf2bca964619b54ca6aa70e2b8bdf8aaa9b"
+    },
+    {
+      "path": "evidence/producer-claims/records/p125pc-m2-outcome.json",
+      "sha256": "58c6ad9a9284c73896311c95ce3bc90c583eb5e647c338bbbf989bf66ee50bda"
+    },
+    {
+      "path": "evidence/producer-claims/records/p125pc-m2-public-audit.json",
+      "sha256": "f4f3060d261bf8d48d19f73700e29aff31594d05d7c132812124e45e4920c890"
+    },
+    {
+      "path": "evidence/producer-claims/records/p125pc-restore1-outcome.json",
+      "sha256": "08b8776018332147b54e73aee8f1ee667aa4ed5d4f1673b67c139c8eec3f327d"
+    },
+    {
+      "path": "evidence/producer-claims/records/p125pc-restore1-public-audit.json",
+      "sha256": "67bb7af19f978ff00c9a17ce07857a7e2da6f71ffcd3d9b3ebbc5b6e6ac6ced7"
+    },
+    {
+      "path": "evidence/producer-claims/records/p125pc-restore2-outcome.json",
+      "sha256": "5c3192efccab323d6db4e958d86222ab982445be8740ba87f86d3c4b70de4a3c"
+    },
+    {
+      "path": "evidence/producer-claims/records/p125pc-restore2-public-audit.json",
+      "sha256": "57f4637cdd9ec37504e18d66be2c906776f693c050c619974cdff0653263aab3"
+    },
+    {
+      "path": "evidence/producer-claims/records/p125pc-source-combined-outcome.json",
+      "sha256": "6cc159f39b6256b255d459f323615b20fed9ce366df06b7c1c58f8dc7b09e045"
+    },
+    {
+      "path": "evidence/producer-claims/records/p125pc-source-combined-public-audit.json",
+      "sha256": "850aa30e16efb39c41b1b8d53c18d1903d5cd63d568f4fbf60d81ec6d426512b"
+    },
+    {
+      "path": "evidence/producer-claims/records/prepare-public-output.py.source.txt",
+      "sha256": "5bd053f7d38cd345bc3cc357c605d2bed450f882695543b126c177a117e58ec7"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-adoption.json",
+      "sha256": "940ab92c15b1c00ea4987fbb31675e6ab622866b0b6acb1dab0281de8f4c1141"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/README.md",
+      "sha256": "f2bb87aa601afb0c0ad813155c45cc7823d7c90dbb84759bfaeee361a8ba4989"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/author-review.json",
+      "sha256": "d035c915fe7b71cd8dd5488f088fdb9e45d3dc0b1cf221db88877fe5d2bc53e3"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/c39-to-producer.patch.txt.evidence.json",
+      "sha256": "b2ca5a856197a393184e55c47d5328a130597f1f7784c097b9b943f91880926e"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/check-preservation.py.base.source.txt",
+      "sha256": "d0d423129073d749b3b05c1c10cf2cb09cfe2c8239b24278277d9bb1a4572bed"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/check-preservation.py.source.txt",
+      "sha256": "c4ae4e33e4182fa2e540fb55f58bcd4af6c648841651468d55096fc978db4aa0"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/input-pins.json",
+      "sha256": "a52c943794a6923be87a60395c892bae4ccc3b44d1d088d6bf6e612cae9f431d"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/root-metadata-admission.template.json",
+      "sha256": "7db5a43a23eac63a07c6802e241274433aba4bad2a2aa58d97a8310cbc065c47"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/seal.json",
+      "sha256": "7fff960589024f152f77fee2c4c492d82b2eec614dd0115bb701ed28077ec5f8"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/v2/README.md",
+      "sha256": "fb7817b9fd69a50f65824223cb37f7bf5ff5be0a0d1b196ae188c33a06182bff"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/v2/author-review.json",
+      "sha256": "97a688d46842a4dad27e938219d230da8a0b1199ec7ea46be0488ed71c7a1336"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/v2/c39-to-producer.patch.txt.evidence.json",
+      "sha256": "84671f614979db9829e3b1bbc5fe45d1c9a8efcfb2a9b06f28393f9ed9b4136b"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/v2/check-preservation.py.source.txt",
+      "sha256": "ed81b906b74b7a8c548bdb786ce39dbae8804398a88b7c10e814ec7e40e2e98a"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/v2/input-pins.json",
+      "sha256": "ccf87bc7d84feb4a394969e2db61ef4109dac4145ae74bdc0066ce5e2b4297d0"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/v2/seal.json",
+      "sha256": "d301823ab4e42ed3bebabcb8f6df3066c9dfe83064f726b8c9795ce83bc7945f"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-preparation/v2/v1-to-v2.patch.txt.evidence.json",
+      "sha256": "3273eeccdd6b1b6de20f69c2ec015566672148442d3c2d7c6eabed0dc7002908"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-static-review/README.md",
+      "sha256": "393366c6acac764fadfe6da24b9610e01fac881082e4e193497d98d54c9940bc"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-static-review/pins.json",
+      "sha256": "270fbcbad940b3bd40788fab795cf17b88889fd17545266c49d02f90491ff60f"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-static-review/review.json",
+      "sha256": "d425c9bdf0956bb59976585d55d1c364584a8ea2b976d91fa440525185410f2f"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-static-review/seal.json",
+      "sha256": "27223ba702cd1801eea0228c326dabd01e0a3f75df7957ea9425fad0c8b98646"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-static-review/v2/README.md",
+      "sha256": "83d0ed5ccede0224a89bfc88126c513823f87b3a71355e0aee58234617c45157"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-static-review/v2/pins.json",
+      "sha256": "5ef34db95cf242116c51a38da2ac1ec8430e7fe8c8972d6cb855b1698fd13c90"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-static-review/v2/review.json",
+      "sha256": "834b7dd9c716fb1686286e45bc34001ae9952c069ce339925e47c0a3c18b1d69"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-adapter-static-review/v2/seal.json",
+      "sha256": "6ce436e88ed95766c87a737eace75d8c39fe9acc1966478b8a989616b632d00f"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-after-controls.json",
+      "sha256": "f731abdeab10d226cfdef73a4dbe25a47684d98e126502678310f112f6f47a41"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-before-assembly-command.json",
+      "sha256": "c06197d6598fd9d47221c700b55b7da9cf9195a7530ca734bae5fbab19fde4aa"
+    },
+    {
+      "path": "evidence/producer-claims/records/preservation-before-assembly.json",
+      "sha256": "1fa7c83c9d4c9816b99a6d5787a8062e7a2865226686da6af3c152f458e714d9"
+    },
+    {
+      "path": "evidence/producer-claims/records/protected-inputs-v2.json",
+      "sha256": "0c5ab9e8c2c6044a4f0de4ea564f09eb23da59ccfb43eb0fa3c2c9f066c72d50"
+    },
+    {
+      "path": "evidence/producer-claims/records/protected-inputs-v3.json",
+      "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac"
+    },
+    {
+      "path": "evidence/producer-claims/records/protected-inputs.json",
+      "sha256": "e0d8150bcb9782c676ded3ee1c1988f0a331929f2aa1dd81feb82296f5cd5a2c"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-and-scope-adoption.json",
+      "sha256": "1f3c1cbd1733ba9b7861bca22c93f147566d4364665c60ccfa1664a30c3f3710"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/README.md",
+      "sha256": "c1271631a8911d2d960b72c7d2c639db60131afc5c05f82c97061c4be4536dbc"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/author-review.json",
+      "sha256": "5dc69fcfdb260e55462351f1bec9a585eff5cfb58651e51bf9a4c80c0e3007f2"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/fields.json",
+      "sha256": "9ed1f21011724fcc5f3ead57dfcda20d6e2ef8dfda321fdecc5ca2db94b52a33"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/input-pins.json",
+      "sha256": "7f337cdcf65af590a003e6c410cd3dba2470940bc26dcc44ff9787f67ac15426"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/phase-inputs.unready.json",
+      "sha256": "4099de26bfa54ddd7f3ba1143306aff2ab83cd37eb98868789ad1549b55630f8"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/prepare-public-output.delta.patch.txt.evidence.json",
+      "sha256": "8e214d559bf392386bf41161d4b2bde88ef7cb310fb6e1bba53d2e9a997a7ddd"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/prepare-public-output.py.source.txt",
+      "sha256": "def0d61dd89744fab2448cb9782b991919297921a21336b3577c6b4dc2f1e0c4"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/seal.json",
+      "sha256": "9ea64e5173aeeeee33cd128af412e50f679b1137623bb2bf362db2c700deb6eb"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/v2/README.md",
+      "sha256": "74bc75810fdd06c5c5be4658ad69f01b568e7a1f28b152d1402654e8867593dc"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/v2/author-review.json",
+      "sha256": "70b3af6ffbe126e72e65ab22b9247b2160b8cae91abe1a4f3eeecf1e352af013"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/v2/input-pins.json",
+      "sha256": "ef81a616885aeae32d02eaa565c270c21f75646f2c8c41c56b4f2d26b86743d0"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/v2/phase-inputs.json",
+      "sha256": "14508ad20b3144681ccd9a0768f981ea68e216fcfe9479ff5b22dcdce5cf1048"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/v2/prepare-public-output.py.source.txt",
+      "sha256": "5bd053f7d38cd345bc3cc357c605d2bed450f882695543b126c177a117e58ec7"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/v2/seal.json",
+      "sha256": "77342bb5ff36b8a0ad9564daf5ac9da133d4aa42facf1355ce5e7b48323cf9ea"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-preparation/v2/v1-to-v2.delta.patch.txt.evidence.json",
+      "sha256": "ae5b92c0362671fc6fb89f76b3d3ea5bde36e7d9ab13d2b34188ee5562babaec"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-static-review/input-pins.json",
+      "sha256": "1b66fda196cbb8a142f2fdf60eeb6382098648b2a5d6eec7c908517a45102a25"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-static-review/review.json",
+      "sha256": "cf34c9d468a602ed71f5a2bd9d6d1879cab39844b81c89e0fea66155e16e9f89"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-static-review/review.md",
+      "sha256": "f4695d9371d7ca4a9bb6d2e9d43f4c6cce7459a10c0dc6d3727bcf257e0bf115"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-curator-static-review/seal.json",
+      "sha256": "6e3e43ea01ecb45b68cd846afdb12c7695315af50fb297334a07e016db56d9c2"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-output-actual-review/certificate-decodes.json",
+      "sha256": "ecf82dd0d388dbff9ae007d5f50b2b122c39352018f7f29ffe1bf60c93acc647"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-output-actual-review/input-pins.json",
+      "sha256": "9eea525efca83493e682032d014578733e6af4de6359840c8841242ee8828845"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-output-actual-review/review.json",
+      "sha256": "c39af30f400890c549687eef090104d005e474fbeaf957f17ac010f92bba6faf"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-output-actual-review/review.md",
+      "sha256": "22b87bc3f7366807b07b600dcd47a3e529b122ce3dd4b26fb3d5e0144a98f839"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-output-actual-review/seal.json",
+      "sha256": "de7967283295af7e5980bbf540dc58f2c3760219f4572a1ae1204dfe9c92ea74"
+    },
+    {
+      "path": "evidence/producer-claims/records/public-output-allowlist.json",
+      "sha256": "923373ef519e24ee9fa25f2f0d63bf60988a52d0fb5896035ad24bf129a8ad91"
+    },
+    {
+      "path": "evidence/producer-claims/records/quality-adapter-adoption.json",
+      "sha256": "d07c54304da1219fee1e4eda39a980c92a2be16b12f4a72852ad39cc5b9a7b30"
+    },
+    {
+      "path": "evidence/producer-claims/records/quality-source-delta.json",
+      "sha256": "a22298720c334ea4bb35f5b10f4b03c9b888eb06ad14bfde73085b4e19bdeb9f"
+    },
+    {
+      "path": "evidence/producer-claims/records/readme-preparation.json",
+      "sha256": "9c54f03e5ecd6a4dfd0ee15eeb05d12fde033e67515686761b3708e1f8f107e0"
+    },
+    {
+      "path": "evidence/producer-claims/records/readonly-compiled-dependencies-before-build.json",
+      "sha256": "bd48098b6b79a3a92da52b1bab4cbb9aa1327c508ffff4e7d6bbf3b2d14eb428"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-extension-preparation/README.md",
+      "sha256": "864edce321d099dfc1fc703edab05b6a72f15e1ba188025abb9c8e99355e3e7b"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-extension-preparation/actual-inputs.template.json",
+      "sha256": "3e0afaeaa110119c14cb24ab57cac6ef268e32925a29a9a0878e22d7192b55cc"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-extension-preparation/input-pins.json",
+      "sha256": "0c80b2e80f20323ec4624b0a5f4bfb6b5bbd3f7a9cc4a9926dfdb5af75b98ee0"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-extension-preparation/seal.json",
+      "sha256": "b07c99c51f32703d8cb67bc1c11ada4d051f86935bd1b5a6fac1f86e1ad8ce72"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-extension-preparation/v2/README.md",
+      "sha256": "125b40d0c549b71b29a9e860ef5ab62cfd26dc8912b1255a087340be5e5135f6"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-extension-preparation/v2/author-review.json",
+      "sha256": "91f2a7ff13cc21c8862f368a756b20680ecb9f243de9e451af17fb14f03b0d05"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-extension-preparation/v2/input-pins.json",
+      "sha256": "5725a0822462489b4df892a9a14e3d3d1a9e1a93aa7d533be306963b2d2025d1"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-extension-preparation/v2/seal.json",
+      "sha256": "80d02b94f4c2c40d2311bcd7b086a93fcbcd448d0ec2803af51194a622aa4de0"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-extension-preparation/v2/v1-to-v2.patch.txt.evidence.json",
+      "sha256": "b25fb3f2a69fb324252a6bf025a549eb8d836ecde6528f4af969575b992aff35"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-extension-preparation/v3/README.md",
+      "sha256": "fb007b7a366299cfbe98f40fdeb9a97660d3de70f8354590517273ed6ba59014"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-extension-preparation/v3/seal.json",
+      "sha256": "89c5a4dbf2aa47348aff69ae97f219a24c0311b982f9b1aded75bab30d602de4"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-extension-preparation/v3/v2-to-v3.patch.txt.evidence.json",
+      "sha256": "ab34f55bffc115290e4f6395ddfb915f14c1a2cae28523287df5e1ad8b987a05"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-helper-static-review/README.md",
+      "sha256": "fce1b79cde4a61a8f9745bbdc21c3a772b5e19ee6c950cd7470c522401ec9adc"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-helper-static-review/input-pins.json",
+      "sha256": "3b2533421cf91e5f925383640188ae3064d936f3f8332ea00a209f452ffb0cee"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-helper-static-review/review.json",
+      "sha256": "f9b20c9a6768a5ab972545215e74bc22e04d250aeab36c8f63a797ef55fe339d"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-helper-static-review/seal.json",
+      "sha256": "ad5e4d2116de0b5466b6605c0e6df483b580374c0b497a7f5342870e6dcac607"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-helper-static-review/v3/input-pins.json",
+      "sha256": "9bcee3ab7ed2bd6cda721e5c47d43bf1c897687e0736602b567729e680283753"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-helper-static-review/v3/review.json",
+      "sha256": "af962b826d89753cc2fc8429c89b2f0782f761e768d1663b2866df8dc51176df"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-helper-static-review/v3/seal.json",
+      "sha256": "b2a0c4fabffd7ba99871c932d61e3d5360e0a3a909e52ff264d2082138598171"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-scope-preparation/README.md",
+      "sha256": "f69b9ff1ba0b011e72d0ff2fcdc6a2b3ecd5a993227afcf621bd6ef06b6894b7"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-scope-preparation/attempt1-read-error.json",
+      "sha256": "8f377ff55fcf64199122646e8bdc298c8cabe162101561e1f60af3f2540e864e"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-scope-preparation/input-pins.json",
+      "sha256": "2b690de94959329b69a843501f3e56d3a101a20141dff176a0ca4f85d1c0a32d"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-scope-preparation/review.json",
+      "sha256": "820ed76a9d349296a5593b58f311a64e0842d1a07e97f0f4e90e2b15869c292f"
+    },
+    {
+      "path": "evidence/producer-claims/records/receipt-scope-preparation/seal.json",
+      "sha256": "43119cbad586ea0761bee7e16baccb8c60d84d93bf5bc8b45c023c529b653bc8"
+    },
+    {
+      "path": "evidence/producer-claims/records/root-public-output-review.json",
+      "sha256": "d0ee7f9edf0d3ab82875c849f952c27924d80f044c273d8ba9a940ed3c48cd35"
+    },
+    {
+      "path": "evidence/producer-claims/records/root-restore1-review.json",
+      "sha256": "0e5d01cc6a539154c475d11456631aa21f7897fa3f559fe69526e6f0f8d8626d"
+    },
+    {
+      "path": "evidence/producer-claims/records/root-runtime-review.json",
+      "sha256": "88b6051dab7a11566c43f22b12a1ae5f362bf2b4a39815f799f2936a0d66d214"
+    },
+    {
+      "path": "evidence/producer-claims/records/root-source-fresh-review.json",
+      "sha256": "f57de8531b02f9c1f742d3ef776228a10b80eca6cf7e876022b18c459ebca368"
+    },
+    {
+      "path": "evidence/producer-claims/records/root-source-review.json",
+      "sha256": "fbbb716dec271d67476298c253dd9e9b17fe2048d1682ac39c98c9127efd71e5"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-adapter-review/README.md",
+      "sha256": "0f49f75fc03375ec31d17da3e277c9e1387a4ee58b301481847d563eb25c4b2e"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-adapter-review/input-pins.json",
+      "sha256": "7307d4af200144b65fb21f573b5a7d14f0bc21849e2ca13d389f1565c30adcc3"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-adapter-review/review.json",
+      "sha256": "0315239cfc8b59072e11d1fb49662f74dcd78c3745836242951d9404dfe79321"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-adapter-review/seal.json",
+      "sha256": "c278fdc46dac11cd8f81e24a2a63a80a43e73d86c13d0dbdfcaa26b4b84e98f2"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-audit-preparation/README.md",
+      "sha256": "5ba1482d76c7ae4fb8f4486d955f13d9a5e630c057090440c6933651e2607439"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-audit-preparation/audit-observed.delta.patch.txt.evidence.json",
+      "sha256": "b8798c8fc48626d1281063cb93c4cca7aaa9fb236f37550aa4e27f16373c7257"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-audit-preparation/audit-observed.py.source.txt",
+      "sha256": "468aee0d4ded5290f60e231fa6a94e3617f7a243de96f46f1ac1a77fd73dc439"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-audit-preparation/audit-public.delta.patch.txt.evidence.json",
+      "sha256": "d6ce3712de342fff09f71061a5d9bfb4ded5e7189813174d0c4093bc6b5fe8ec"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-audit-preparation/audit-public.py.source.txt",
+      "sha256": "805a2c8e5c5dc48c0d9f3dae9be5ed02babed5cc5a41fd94ef6bdff619d48a80"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-audit-preparation/author-review.json",
+      "sha256": "a11647f54ce451972ffafb78484708d2904228ba3c3dc80fc291cf37bfaf2525"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-audit-preparation/fields.json",
+      "sha256": "f13c3859b94bc19c1acf25c9308bd5f0696e494c5768cbc70ba30dfb4aead5c8"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-audit-preparation/input-pins.json",
+      "sha256": "29bf4cbb1f4a188b356ac3969877f617b5f3a89a51fe049daac9cd4ed98fe837"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-audit-preparation/read-only-diagnoses.json",
+      "sha256": "5e3115049a23db67e4e2b62f1dc8c2209ad151a207f7a5f5b27eae8e0043fbfb"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-audit-preparation/seal.json",
+      "sha256": "8975b52c93d09f8ea0cf77b2dc2ef1a397f1b2e61d198acf531cfc4081cf0924"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-peer-adoption.json",
+      "sha256": "fac36ae5b89ced4372e4f22b6383963b895bd84f516938a0579241e0228850dd"
+    },
+    {
+      "path": "evidence/producer-claims/records/runtime-protected-inputs.json",
+      "sha256": "42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59"
+    },
+    {
+      "path": "evidence/producer-claims/records/selection-cutoff.json",
+      "sha256": "0b3c6151cfc8a7889243261659994c09c4753a420d87261566776048a8fce9c1"
+    },
+    {
+      "path": "evidence/producer-claims/records/selection-policy.json",
+      "sha256": "7d36ca3fe6890905db10bd0b7233e8941026f3decc690379b073054001e0f7c6"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-checkpoint.json",
+      "sha256": "6173074e96a07158d14eea016d3c0d55e1b704d564bb76aed9f159c7f92b8b6f"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-checks-intent.json",
+      "sha256": "6629ca5829a45ca889ef31c28c462085ae1620910f51530c5908538ff9f94489"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-checks-review.json",
+      "sha256": "36b70c6bb169e52642a6ea0bf1b74f5fee55a70acd4cc59994a0b8524ee552f5"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-control.py.source.txt",
+      "sha256": "44f1f8e540f111b8dd3a72202930a1a21fcbbf191096424e38cc6a8443c2d2a5"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-evidence-adoption.json",
+      "sha256": "b0b1f587cb7b33c8b1cdb0f1a5f7015edf0a82b8a653cd7820b03a7fa3fc65bc"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-evidence-review/README-v2.md",
+      "sha256": "6c3744420a8b34f6acd60658906fb65b121303c668cb537a1a8c1dd4c4c4bfdb"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-evidence-review/README.md",
+      "sha256": "509bb7c7c7ecbd04f8c6c103aac99645e51ab8277eb58a32d9a105f1308c1ac6"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-evidence-review/input-pins.json",
+      "sha256": "4a1fe4c791bec287b3584e54d4d3e69e76ec7d1f9cb539a3533fec544082e16d"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-evidence-review/review.json",
+      "sha256": "43b11bdfd9c2556cd3f0067d31dfb1f0ab02ec2db0175ff0f5b060baff75bd1c"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-evidence-review/seal-v2.json",
+      "sha256": "8fcc7b0c5b674e211ccfd07fb0c4c975d1fe7536d591561da471c066348ea66d"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-evidence-review/seal.json",
+      "sha256": "8beaf24216baec436bce6cffea3b773edabcbb663981a9fd5d53801b05ff02bf"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-materialization.json",
+      "sha256": "2a52f64ebe6de611a93b6e7396e8868641279e7ec986806d88f0a5ec2346d9af"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-scope-preparation/README.md",
+      "sha256": "7fb46bc66645009b967f9cc88374d91c26ac6dd2b32b5491cdb1b7aaf661f4c4"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-scope-preparation/input-pins.json",
+      "sha256": "c87ee3409f10b1a0a64aac31d73f3bac1dd245cc6d4c0ccfb54722ac378cf908"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-scope-preparation/pending-reservation-entry.md",
+      "sha256": "8c8d2edef8268885b010fe6ea0489cae31a7d581f755bf4f84f292ebc14f32c2"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-scope-preparation/review.json",
+      "sha256": "ad6d0e4eac25a93a28d9f0762afa4a9da4a09a3ddb6f58e91f773aada0201564"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-scope-preparation/seal.json",
+      "sha256": "ca5ae93f70f18ea56e28590429555bdc8e8a0f684a961b119ee22a742f07e914"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-selection.json",
+      "sha256": "40618cf6cd152f4a56319124eb44aa967ae939b1dbdb454f2277634c30cf7431"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-stage.json",
+      "sha256": "c0dbd931ec77877cbec2618199a4f41d48720d84dd82b1358829a1e8d69830c9"
+    },
+    {
+      "path": "evidence/producer-claims/records/source-successor-admission.json",
+      "sha256": "c7224166913d739298cc1e673d8ad77ca13756bf39e7c1a2550a0c901d8da688"
+    },
+    {
+      "path": "evidence/producer-claims/records/whole-issue-gaps.json",
+      "sha256": "acc041aa1514efd452fb05f83b6e57f82bedfbc001c773bef4f9205a67253803"
+    },
+    {
+      "path": "evidence/producer-claims/representations.json",
+      "sha256": "f8284fef9fc4f029f4e0c767c3c69317975da78ca51d4bf4ae5ae0c423d18a69"
+    },
+    {
+      "path": "evidence/producer-claims/support/observer-reporter.mjs.source.txt",
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    },
+    {
       "path": "evidence/q-final-check-outcomes.json",
       "sha256": "bdaed1c042f952cec4fb825eccc65a0743a2715567ce36cbdc50dd525af56aea"
     },
@@ -10821,5 +13274,5 @@
       "sha256": "a6e327836c39a0657c573c4c638fe365815311caaf03745b37900ac7f5f5c958"
     }
   ],
-  "notes": "Bounded offline verifier/configured-anchor artifactTime qualification only. Canonical47/47 is not a sum of cohorts. Initial count check1 was repaired by the unchanged generator/check0; source-only controls failed1/2 bodies and exact restorations passed47. Global duplicate/dead-code checks remain RED1268/2724, unwaived. OpenSSL expected tampered-CMS child exit4 is deliberate negative proof, not a PKI acceptance result. Full P1-25/P1-01/package/client/checkpoint/issuance/source-generator/full-suite/CI/release and all held decisions remain open. Missing live reservations retains last-known binding/shared append pending. Optional read-only metadata scan natural closure is unestablished and excluded from all evidence credit. Ordinary Git staging warned about ignored docs/internal, but all22 staged blobs were verified and ordinary commit0 used noforce/no-verify; held provider archive unchanged. Source/fresh controls restored; no compiled sensitivity or plan completion. Metadata staging whitespace check exited2 on18 intrinsic log/patch files; exact original bytes are preserved in existing-format lossless JSON envelopes with round-trip hashes, without changing whitespace policy or command outcomes. Historical verifier paragraph retained verbatim. Current client extension source5beb3eae69b08f2e895520c7f459e1465780beeb selects one actual28/28 fresh canonical cohort (11new request/rawHTTP +17unchanged verifier), not the earlier47 or phase sums. Actual source28; C1fails2at193/201 and C2fails1at280 with masked194/282, explicit byte-exact restores and28/28reruns, hook2entries/3values, raw/observer joins/naturalESRCH/no signals/no late errors. Clean-source0/47892ms supplies no Vitest credit. All71source/fresh paths/eight compiledpairs/121protected/seven native physicalpins and heldR18 rows preserved. Source counts15spans/tenfiles1691to1692; ordinaryadd1 stopped beforecommit, trackedadd--update0 and complete11blob/default-fullrange re-admission preceded sourcecommit0. Global quality remains RED1268/2720, no waiver/baseline; three removed findings are test export reachability. This extends the original338payloads/41commands/359inputpins through only three active indexes and client-transport prefix; code inert, logs/patches lossless, raw count originals/large observations private. No CMS grant from five raw bytes, successful matching-nonce fallback, required-time/checkpoint/session/issuance/report, F37, fullsuite/CI/release/wholeP125/P101/plan completion credit. All held decisions and missingRES binding retained. Later actual publication/committed-file/quality/QA closure records are separate. Historical verifier and client notes remain verbatim. The current fallback extension selects one actual 21/21 fresh canonical cohort at source d8b5c3250138a10078c21886642595f669c4a73c: four new fallback bodies and seventeen unchanged verifier bodies. Source passed 21; F1 failed three assertions at 239/261/287, F2 two at 261/287, and F3 one at 237. All three explicit byte-exact restorations passed 21. Earlier positives and later masks are retained, with two hook entries/three values, ordered raw/observer joins, natural ESRCH and no nonzero signals or hook/unhandled/late/cleanup errors. The unchanged default 10000 ms abort reaches a next refusal; its message is string-only. Clean-source 0/47211 ms supplies no Vitest credit. All 72 selected source/fresh paths, eight original compiled pairs, 128 protected inputs, eight native physical identities and held R's eighteen rows remain exact. Counts change fifteen spans across ten files from 1692 to 1693. Global quality remains RED1268/2719, unwaived; only requestTimestamp unused-export reachability changes. This extension preserves 610 prior payloads, 76 old commands, 676 ordered pins and the original manifest, changing only three active indexes plus the fallback prefix after separate admission. No successful fresh-nonce grant, signed-list admission, required-time/checkpoint/sealing/issuance/report, independent TTL contract, F37, full suite/coverage, release or whole-issue/plan completion is claimed. All holds, ignored archives and the missing-reservation limitation remain. Later publication/export/quality/QA closure records are separate. Genuine-grant extension: source188681b32dc472983404dce19e7833cd76ee7576 and fresh checkout pass the same19 executed, zero-skip cases. ORDER fails only route403/424; DROP-VALID-GRANT fails only nonnull406/426 after genuine exact-query oracles; both explicit exact restores pass19. Hook values and ordered identities match; canonical19 is not summed with older47/28/21 or repeated runs. Twelve actual fixture bodies retain72 natural zero children,19 closed sockets and cleanup0;144 private stream byte/hash facts were checked by root, raw streams/keys stay private. Actual OpenSSL4.0.3 optional-field stderr diagnostics remain explicit. Only48 exact public outputs are admitted. All135protected byte inputs/eight old plus distinct fresh ninth native and73selected paths per root/eight compiled pairs stay exact through assembly. Global1268duplicates/2719ordereddeadcode findings remain RED without waiver. Lost initial count scan and V1/V2 outputs remain excluded; distinct closed V3 reads support15numericspans/10files1693to1694. Only current metadata3 plus evidence/tsa-grant may change after separate source admission. WholeP1-25/P1-01 gaps, trust-list/caller/checkpoint/issuance/full-suite/CI/package/generator/report scopes, F37 skip and all held decisions remain open. No PR/push/merge/release or wholeplan completion claim. Checkpoint extension at e49e21348e454ba8f1556cb6dfd3ed69e0e883c2: final source and corrected fresh21; append and required-refusal omissions each one intended failure, exact restorations21. Initial fresh17/4 LibreSSL launcher failure retained with zero credit; same-source OpenSSL4.0.3 correction and EOF-only helper successor explicit. Global quality remains RED: duplicates1268, dead-code2712 after7 consumed checkpoint export/type removals, no additions or waiver. Complete P1-25/plan, held decisions and F37 remain open. Metadata publication and release are separate actual checks.\n\n\n## Bounded genuine two-checkpoint window qualification \u2014 17 October 2026\n\nSource commit `f11a15ae06a318e0ce9a4c778269b2020af4eb7c` adds one real two-bound window case and an explicit same-path reply occurrence selector in the shared test fixture. Only `tests/time/checkpointWindow.test.ts` and `tests/time/tsaTestFixture.ts` changed. The original two checkpoint cases and whole grant test remain preserved. Production, dependencies, deadlines, freeze checks and quality baselines did not change.\n\nTwo real query-bound OpenSSL timestamp grants attest two monitor-signed linked ledger checkpoints around a real sealed middle audit event. The test checks exact stored CMS tokens, both checkpoint signatures and head/previous links, checkpoint-event metadata, verified ledger state, the middle's exact attested window, an upper-only seed and a claimed final checkpoint. Four default and six explicit zero-tolerance reader claims check independent five-minute inclusive boundaries and one millisecond beyond. Reader-supplied claims do not edit persisted ledger timestamps or the clock. Actual issuer accuracy was null, and equal-second genuine genTimes were accepted.\n\nSource and fresh canonical runs each pass the same 22 ordered cases across three files. The fresh clone was created from the committed source by the ordinary clean-source helper, which passed in 49,562 ms; the helper supplies no Vitest credit. All 94 selected source/fresh path pairs and 19 compiled pairs match. The fresh native is a distinct eleventh identity; the ten prior natives remain unchanged. All 151 active protected file pins, the held runner's 18 dirty rows and its empty index remain intact.\n\nThe source-only lower-bound control fails the new window basis assertion at `checkpointWindow.test.ts:445:41`: the middle event becomes `attested-upper-bound`. Its later exact-window and reader assertions are masked. Exact restoration passes all 22 cases. The tolerance-only control produces two actual failures: the prior seed finding at `:290:35` and the new default-lower-inclusive finding at `:452:47`. Both are classified; later old/finding row assertions remain masked. Exact restoration again passes all 22 cases. Precomputed observations are retained as facts and are never promoted to masked assertion passes. These controls establish source-side sensitivity only.\n\nThe original first-control run began 47.099 ms before its apply helper closed. That run remains diagnostic only and supplies no sensitivity credit. Its original binding, command, raw reports, observer, log, public records and chronology diagnosis are preserved. A separate sequential run after actual helper closure supplies the accepted lower-bound control evidence. No automatic restore, signal, retry loop or guard modification was used.\n\nEach actual observed run, including the excluded diagnostic, records five TSA lifecycle and three checkpoint public records, 30 naturally closed child processes, 60 explicitly named child-stream hashes, eight closed sockets and 16 closed ledger owners. All six accepted phases use the same 22 ordered identities, three hook task entries and four hook values, with no skips, unhandled errors or late diagnostics. Cases and resources are not summed across repeated runs. Optional OpenSSL stderr diagnostics remain retained; no all-stderr-zero claim is made. Actual tool version is OpenSSL 4.0.3; the previously reviewed 3.6.5 documentation remains historical provenance.\n\nAll 12 normal compiler, lint, build, count, gate, threat-model, architecture, docs, freeze, notices and qualification checks pass. Counts pass without regeneration. Global quality remains RED and unwaived: 2,712 ordered dead-code findings and the full duplicate result of 1,268 groups match the prior actual report exactly. No quality baseline was adopted.\n\nThe public window record lacks a separate seed event hash operand for the first head. The literal source assertion and actual GREEN cohort retain that comparison; no independent public recomputation is claimed. Public crypto facts are observations of real source execution, not re-executed verification by the metadata auditor. Nonzero issuer accuracy, persisted producer backdate/postdate coverage, event/minute cadence, real Studio scheduling, concurrency/corruption combinations, session/certificate/report/config integration, full-suite/cross-platform/public-issuer and release qualification remain open.\n\nWhole P1-25 and the plan remain open. P1-01 gaps and every human, ownership, provider and external decision remain held as recorded. F37 remains skipped, unfixed and unqualified; these ordinary HTTP fixtures provide no F37 proof. The ignored provider D15 archive stays held without force-add, ignore changes or manifest bypass. No push, PR, merge or release is included.\n\n\n## Bounded checkpoint event-cadence qualification \u2014 17 October 2026\n\nSource `80268079f804ed0ecb7659cd02a75e8b88ee3e0d` adds one literal event-cadence case in the existing owned checkpoint test. The three preceding checkpoint bodies, two grant bodies and whole shared TSA fixture remain exact. Production code, packages, deadlines, freeze guards and quality baselines are unchanged.\n\nThe case reaches the actual no-options signed trust loader through the owned default HOME/.config/amc files. It asserts verified own list/root admission, zero explicit monitor pins and both allow flags false. The signed operator configuration sets everyEvents2, omits everyMinutes and observes the real 15 minute default; public transparency anchors are empty. Five one-argument ticks over real sealed audit rows produce true,false,false,true,false: initial checkpoint, checkpoint-only skip, one-audit skip, exact-two-audit checkpoint and immediate reset skip. No clock or stored row is rewritten. These ticks do not establish that a real minute elapsed or that Studio's timer ran.\n\nTwo real timestamp responses have separate captured-query OpenSSL and AMC verification proofs. Their checkpoint digests, signed chain/head/count/previous links, exact stored tokens, checkpoint-event metadata and initial/first/final ledger checks agree. The public auditor keeps each grant associated with its own named verification child and query/response. It also checks both reported signer fingerprints agree; the actual named leaf DER identity remains the unchanged fixture's verification boundary and the explicit public certificate bundle binding. Controlled own roots do not establish public issuer trust. Actual issuer accuracy remains null.\n\nSource and a newly built committed checkout each pass the same 23 ordered cases. Both explicit restoration runs also pass 23, with no skips, unhandled or late errors and the same three hook entries/four values. The unchanged clean-source helper passed in 48,976 ms and supplies no Vitest credit. All 98 selected paths per checkout and 21 compiled pairs match; 196 selected physical files and 12 native binaries are distinct regular single-link files. All 161 active protected file pins and the held runner's 18 dirty rows/empty index remain exact before metadata admission.\n\nRemoving only checkpoint-row exclusion causes one direct failure at checkpointWindow.test.ts:582:28: one new audit incorrectly triggers an early second checkpoint. Initial genuine grant/head/token/ledger and checkpoint-only positives precede that failure. Its later one-stage equality and all second-audit/grant/reset/final assertions are masked. The captured early second reply has no independent second-grant credit. Exact restoration passes23.\n\nChanging only n>=everyEvents to n>everyEvents causes one direct failure at checkpointWindow.test.ts:597:28: exactly two new audits incorrectly skip the checkpoint. Initial, checkpoint-only and one-audit behavior, exact two audit IDs/types and below 15 minute age precede it. The second grant, later chain/token/event/reset/final assertions are masked and absent. Exact restoration again passes23. Every actual failure and mask was manually classified before restoration. All four direct actions closed naturally before their dependent tests; no retry, signal or automatic restore was used. These are source-only controls, without compiled mutation sensitivity.\n\nAll 12 normal compiler, lint, build, counts, gate, threat-model, architecture, docs, freeze, notices and qualification checks pass; no count regeneration was needed. Global quality remains RED and unwaived: the ordered 2,712 dead-code findings and full published 1,268 duplicate result are unchanged. No baseline was adopted. The independent completed source and six-phase runtime reviews have no bounded blockers.\n\nGreen runs each record 38 natural children, 76 explicit stream hashes, 10 closed sockets and 28 closed ledger owners. The first control records 37/74/10/24; the second 36/72/9/27. Canonical acceptance totals remain separate for each run. Per-run resource counts remain explicit; labelled cross-run resource totals are inventory only. Nonempty OpenSSL stderr diagnostics remain retained. Guard-close invocation and finite physical checks do not prove universal descendant, loader, environment or native-handle isolation. Literal source marker guards, inert code copies, exact lossless log/patch representation and explicit public-only selection remain mandatory.\n\nWhole P1-25 and the plan remain open. Next is separately admitted qualification of deliberately backdated/postdated caller timestamps persisted through the real signed ledger and evaluated using actual stored row.ts. Nonzero signed accuracy, real minute/Studio scheduling, actual session-seal enforcement, existing certificate issuance/archive/verification and report/manifest/schema integration qualification, full suite/cross-platform/public issuer/global quality/release requirements remain open. Existing certificate timestamp/report source paths are already wired; their qualification is still required. No TTL contract is invented.\n\nP1-01 gaps, Claude's work, missing-reservation ownership and every held decision remain intact. F37 stays skipped, unfixed and unqualified. Ignored provider D15 archive staging remains held, with no force-add, ignore change or alternate-manifest bypass. No push, PR, merge or release is included. Metadata assembly, current source-copy admission, validators, full index/whitespace checks, ordinary metadata commit, committed-only export and final QA closure are later actual records, never pre-credited by these notes.\n\nThe preceding receipt is preserved verbatim below.\n"
+  "notes": "Bounded offline verifier/configured-anchor artifactTime qualification only. Canonical47/47 is not a sum of cohorts. Initial count check1 was repaired by the unchanged generator/check0; source-only controls failed1/2 bodies and exact restorations passed47. Global duplicate/dead-code checks remain RED1268/2724, unwaived. OpenSSL expected tampered-CMS child exit4 is deliberate negative proof, not a PKI acceptance result. Full P1-25/P1-01/package/client/checkpoint/issuance/source-generator/full-suite/CI/release and all held decisions remain open. Missing live reservations retains last-known binding/shared append pending. Optional read-only metadata scan natural closure is unestablished and excluded from all evidence credit. Ordinary Git staging warned about ignored docs/internal, but all22 staged blobs were verified and ordinary commit0 used noforce/no-verify; held provider archive unchanged. Source/fresh controls restored; no compiled sensitivity or plan completion. Metadata staging whitespace check exited2 on18 intrinsic log/patch files; exact original bytes are preserved in existing-format lossless JSON envelopes with round-trip hashes, without changing whitespace policy or command outcomes. Historical verifier paragraph retained verbatim. Current client extension source5beb3eae69b08f2e895520c7f459e1465780beeb selects one actual28/28 fresh canonical cohort (11new request/rawHTTP +17unchanged verifier), not the earlier47 or phase sums. Actual source28; C1fails2at193/201 and C2fails1at280 with masked194/282, explicit byte-exact restores and28/28reruns, hook2entries/3values, raw/observer joins/naturalESRCH/no signals/no late errors. Clean-source0/47892ms supplies no Vitest credit. All71source/fresh paths/eight compiledpairs/121protected/seven native physicalpins and heldR18 rows preserved. Source counts15spans/tenfiles1691to1692; ordinaryadd1 stopped beforecommit, trackedadd--update0 and complete11blob/default-fullrange re-admission preceded sourcecommit0. Global quality remains RED1268/2720, no waiver/baseline; three removed findings are test export reachability. This extends the original338payloads/41commands/359inputpins through only three active indexes and client-transport prefix; code inert, logs/patches lossless, raw count originals/large observations private. No CMS grant from five raw bytes, successful matching-nonce fallback, required-time/checkpoint/session/issuance/report, F37, fullsuite/CI/release/wholeP125/P101/plan completion credit. All held decisions and missingRES binding retained. Later actual publication/committed-file/quality/QA closure records are separate. Historical verifier and client notes remain verbatim. The current fallback extension selects one actual 21/21 fresh canonical cohort at source d8b5c3250138a10078c21886642595f669c4a73c: four new fallback bodies and seventeen unchanged verifier bodies. Source passed 21; F1 failed three assertions at 239/261/287, F2 two at 261/287, and F3 one at 237. All three explicit byte-exact restorations passed 21. Earlier positives and later masks are retained, with two hook entries/three values, ordered raw/observer joins, natural ESRCH and no nonzero signals or hook/unhandled/late/cleanup errors. The unchanged default 10000 ms abort reaches a next refusal; its message is string-only. Clean-source 0/47211 ms supplies no Vitest credit. All 72 selected source/fresh paths, eight original compiled pairs, 128 protected inputs, eight native physical identities and held R's eighteen rows remain exact. Counts change fifteen spans across ten files from 1692 to 1693. Global quality remains RED1268/2719, unwaived; only requestTimestamp unused-export reachability changes. This extension preserves 610 prior payloads, 76 old commands, 676 ordered pins and the original manifest, changing only three active indexes plus the fallback prefix after separate admission. No successful fresh-nonce grant, signed-list admission, required-time/checkpoint/sealing/issuance/report, independent TTL contract, F37, full suite/coverage, release or whole-issue/plan completion is claimed. All holds, ignored archives and the missing-reservation limitation remain. Later publication/export/quality/QA closure records are separate. Genuine-grant extension: source188681b32dc472983404dce19e7833cd76ee7576 and fresh checkout pass the same19 executed, zero-skip cases. ORDER fails only route403/424; DROP-VALID-GRANT fails only nonnull406/426 after genuine exact-query oracles; both explicit exact restores pass19. Hook values and ordered identities match; canonical19 is not summed with older47/28/21 or repeated runs. Twelve actual fixture bodies retain72 natural zero children,19 closed sockets and cleanup0;144 private stream byte/hash facts were checked by root, raw streams/keys stay private. Actual OpenSSL4.0.3 optional-field stderr diagnostics remain explicit. Only48 exact public outputs are admitted. All135protected byte inputs/eight old plus distinct fresh ninth native and73selected paths per root/eight compiled pairs stay exact through assembly. Global1268duplicates/2719ordereddeadcode findings remain RED without waiver. Lost initial count scan and V1/V2 outputs remain excluded; distinct closed V3 reads support15numericspans/10files1693to1694. Only current metadata3 plus evidence/tsa-grant may change after separate source admission. WholeP1-25/P1-01 gaps, trust-list/caller/checkpoint/issuance/full-suite/CI/package/generator/report scopes, F37 skip and all held decisions remain open. No PR/push/merge/release or wholeplan completion claim. Checkpoint extension at e49e21348e454ba8f1556cb6dfd3ed69e0e883c2: final source and corrected fresh21; append and required-refusal omissions each one intended failure, exact restorations21. Initial fresh17/4 LibreSSL launcher failure retained with zero credit; same-source OpenSSL4.0.3 correction and EOF-only helper successor explicit. Global quality remains RED: duplicates1268, dead-code2712 after7 consumed checkpoint export/type removals, no additions or waiver. Complete P1-25/plan, held decisions and F37 remain open. Metadata publication and release are separate actual checks.\n\n\n## Bounded genuine two-checkpoint window qualification \u2014 17 October 2026\n\nSource commit `f11a15ae06a318e0ce9a4c778269b2020af4eb7c` adds one real two-bound window case and an explicit same-path reply occurrence selector in the shared test fixture. Only `tests/time/checkpointWindow.test.ts` and `tests/time/tsaTestFixture.ts` changed. The original two checkpoint cases and whole grant test remain preserved. Production, dependencies, deadlines, freeze checks and quality baselines did not change.\n\nTwo real query-bound OpenSSL timestamp grants attest two monitor-signed linked ledger checkpoints around a real sealed middle audit event. The test checks exact stored CMS tokens, both checkpoint signatures and head/previous links, checkpoint-event metadata, verified ledger state, the middle's exact attested window, an upper-only seed and a claimed final checkpoint. Four default and six explicit zero-tolerance reader claims check independent five-minute inclusive boundaries and one millisecond beyond. Reader-supplied claims do not edit persisted ledger timestamps or the clock. Actual issuer accuracy was null, and equal-second genuine genTimes were accepted.\n\nSource and fresh canonical runs each pass the same 22 ordered cases across three files. The fresh clone was created from the committed source by the ordinary clean-source helper, which passed in 49,562 ms; the helper supplies no Vitest credit. All 94 selected source/fresh path pairs and 19 compiled pairs match. The fresh native is a distinct eleventh identity; the ten prior natives remain unchanged. All 151 active protected file pins, the held runner's 18 dirty rows and its empty index remain intact.\n\nThe source-only lower-bound control fails the new window basis assertion at `checkpointWindow.test.ts:445:41`: the middle event becomes `attested-upper-bound`. Its later exact-window and reader assertions are masked. Exact restoration passes all 22 cases. The tolerance-only control produces two actual failures: the prior seed finding at `:290:35` and the new default-lower-inclusive finding at `:452:47`. Both are classified; later old/finding row assertions remain masked. Exact restoration again passes all 22 cases. Precomputed observations are retained as facts and are never promoted to masked assertion passes. These controls establish source-side sensitivity only.\n\nThe original first-control run began 47.099 ms before its apply helper closed. That run remains diagnostic only and supplies no sensitivity credit. Its original binding, command, raw reports, observer, log, public records and chronology diagnosis are preserved. A separate sequential run after actual helper closure supplies the accepted lower-bound control evidence. No automatic restore, signal, retry loop or guard modification was used.\n\nEach actual observed run, including the excluded diagnostic, records five TSA lifecycle and three checkpoint public records, 30 naturally closed child processes, 60 explicitly named child-stream hashes, eight closed sockets and 16 closed ledger owners. All six accepted phases use the same 22 ordered identities, three hook task entries and four hook values, with no skips, unhandled errors or late diagnostics. Cases and resources are not summed across repeated runs. Optional OpenSSL stderr diagnostics remain retained; no all-stderr-zero claim is made. Actual tool version is OpenSSL 4.0.3; the previously reviewed 3.6.5 documentation remains historical provenance.\n\nAll 12 normal compiler, lint, build, count, gate, threat-model, architecture, docs, freeze, notices and qualification checks pass. Counts pass without regeneration. Global quality remains RED and unwaived: 2,712 ordered dead-code findings and the full duplicate result of 1,268 groups match the prior actual report exactly. No quality baseline was adopted.\n\nThe public window record lacks a separate seed event hash operand for the first head. The literal source assertion and actual GREEN cohort retain that comparison; no independent public recomputation is claimed. Public crypto facts are observations of real source execution, not re-executed verification by the metadata auditor. Nonzero issuer accuracy, persisted producer backdate/postdate coverage, event/minute cadence, real Studio scheduling, concurrency/corruption combinations, session/certificate/report/config integration, full-suite/cross-platform/public-issuer and release qualification remain open.\n\nWhole P1-25 and the plan remain open. P1-01 gaps and every human, ownership, provider and external decision remain held as recorded. F37 remains skipped, unfixed and unqualified; these ordinary HTTP fixtures provide no F37 proof. The ignored provider D15 archive stays held without force-add, ignore changes or manifest bypass. No push, PR, merge or release is included.\n\n\n## Bounded checkpoint event-cadence qualification \u2014 17 October 2026\n\nSource `80268079f804ed0ecb7659cd02a75e8b88ee3e0d` adds one literal event-cadence case in the existing owned checkpoint test. The three preceding checkpoint bodies, two grant bodies and whole shared TSA fixture remain exact. Production code, packages, deadlines, freeze guards and quality baselines are unchanged.\n\nThe case reaches the actual no-options signed trust loader through the owned default HOME/.config/amc files. It asserts verified own list/root admission, zero explicit monitor pins and both allow flags false. The signed operator configuration sets everyEvents2, omits everyMinutes and observes the real 15 minute default; public transparency anchors are empty. Five one-argument ticks over real sealed audit rows produce true,false,false,true,false: initial checkpoint, checkpoint-only skip, one-audit skip, exact-two-audit checkpoint and immediate reset skip. No clock or stored row is rewritten. These ticks do not establish that a real minute elapsed or that Studio's timer ran.\n\nTwo real timestamp responses have separate captured-query OpenSSL and AMC verification proofs. Their checkpoint digests, signed chain/head/count/previous links, exact stored tokens, checkpoint-event metadata and initial/first/final ledger checks agree. The public auditor keeps each grant associated with its own named verification child and query/response. It also checks both reported signer fingerprints agree; the actual named leaf DER identity remains the unchanged fixture's verification boundary and the explicit public certificate bundle binding. Controlled own roots do not establish public issuer trust. Actual issuer accuracy remains null.\n\nSource and a newly built committed checkout each pass the same 23 ordered cases. Both explicit restoration runs also pass 23, with no skips, unhandled or late errors and the same three hook entries/four values. The unchanged clean-source helper passed in 48,976 ms and supplies no Vitest credit. All 98 selected paths per checkout and 21 compiled pairs match; 196 selected physical files and 12 native binaries are distinct regular single-link files. All 161 active protected file pins and the held runner's 18 dirty rows/empty index remain exact before metadata admission.\n\nRemoving only checkpoint-row exclusion causes one direct failure at checkpointWindow.test.ts:582:28: one new audit incorrectly triggers an early second checkpoint. Initial genuine grant/head/token/ledger and checkpoint-only positives precede that failure. Its later one-stage equality and all second-audit/grant/reset/final assertions are masked. The captured early second reply has no independent second-grant credit. Exact restoration passes23.\n\nChanging only n>=everyEvents to n>everyEvents causes one direct failure at checkpointWindow.test.ts:597:28: exactly two new audits incorrectly skip the checkpoint. Initial, checkpoint-only and one-audit behavior, exact two audit IDs/types and below 15 minute age precede it. The second grant, later chain/token/event/reset/final assertions are masked and absent. Exact restoration again passes23. Every actual failure and mask was manually classified before restoration. All four direct actions closed naturally before their dependent tests; no retry, signal or automatic restore was used. These are source-only controls, without compiled mutation sensitivity.\n\nAll 12 normal compiler, lint, build, counts, gate, threat-model, architecture, docs, freeze, notices and qualification checks pass; no count regeneration was needed. Global quality remains RED and unwaived: the ordered 2,712 dead-code findings and full published 1,268 duplicate result are unchanged. No baseline was adopted. The independent completed source and six-phase runtime reviews have no bounded blockers.\n\nGreen runs each record 38 natural children, 76 explicit stream hashes, 10 closed sockets and 28 closed ledger owners. The first control records 37/74/10/24; the second 36/72/9/27. Canonical acceptance totals remain separate for each run. Per-run resource counts remain explicit; labelled cross-run resource totals are inventory only. Nonempty OpenSSL stderr diagnostics remain retained. Guard-close invocation and finite physical checks do not prove universal descendant, loader, environment or native-handle isolation. Literal source marker guards, inert code copies, exact lossless log/patch representation and explicit public-only selection remain mandatory.\n\nWhole P1-25 and the plan remain open. Next is separately admitted qualification of deliberately backdated/postdated caller timestamps persisted through the real signed ledger and evaluated using actual stored row.ts. Nonzero signed accuracy, real minute/Studio scheduling, actual session-seal enforcement, existing certificate issuance/archive/verification and report/manifest/schema integration qualification, full suite/cross-platform/public issuer/global quality/release requirements remain open. Existing certificate timestamp/report source paths are already wired; their qualification is still required. No TTL contract is invented.\n\nP1-01 gaps, Claude's work, missing-reservation ownership and every held decision remain intact. F37 stays skipped, unfixed and unqualified. Ignored provider D15 archive staging remains held, with no force-add, ignore change or alternate-manifest bypass. No push, PR, merge or release is included. Metadata assembly, current source-copy admission, validators, full index/whitespace checks, ordinary metadata commit, committed-only export and final QA closure are later actual records, never pre-credited by these notes.\n\nThe preceding receipt is preserved verbatim below.\n\n\nB40 persisted producer claims: semantic source5d4e9e8d74bef32e68090369223947691c5fea21. The same24 canonical cases pass source/fresh/both restorations; two source-only controls each fail one intended stored timestamp equality at698:36 and707:36. All12 normal checks pass;175 protected rows/102paths each/23compiled pairs/204physicalfiles/13distinct natives exact. Actual producerGREEN has2 own query-bound grants,RED1 with later covered/reader/final masks retained. Public selector218files/42bundles is explicit. Old2375payloads/259commands/3864orderedpins preserved; only new active assembly serialization compact, old877972raw retained. Quality remainsRED2712dead/1268duplicates exact/unwaived. Allholds/F37skip/D15staginghold/Claude/missingreservation boundaries remain. WholeP1-25/plan/release open; later publication/index/export/QA require actual closure."
 }

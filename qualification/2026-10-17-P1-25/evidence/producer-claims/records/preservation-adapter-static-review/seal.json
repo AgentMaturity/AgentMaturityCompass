@@ -1,0 +1,47 @@
+{
+  "schema": "p125pc-preservation-adapter-independent-static-review-seal/1",
+  "at": "2026-10-17T02:16:05.125517+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/review.json",
+      "bytes": 3957,
+      "sha256": "d425c9bdf0956bb59976585d55d1c364584a8ea2b976d91fa440525185410f2f",
+      "dev": 16777231,
+      "inode": 544002701,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/pins.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/pins.json",
+      "bytes": 8302,
+      "sha256": "270fbcbad940b3bd40788fab795cf17b88889fd17545266c49d02f90491ff60f",
+      "dev": 16777231,
+      "inode": 544002702,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/README.md",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/README.md",
+      "bytes": 1542,
+      "sha256": "393366c6acac764fadfe6da24b9610e01fac881082e4e193497d98d54c9940bc",
+      "dev": 16777231,
+      "inode": 544002703,
+      "nlink": 1
+    }
+  ],
+  "candidate": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/check-preservation.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/check-preservation.py.source.txt",
+    "bytes": 7187,
+    "sha256": "c4ae4e33e4182fa2e540fb55f58bcd4af6c648841651468d55096fc978db4aa0",
+    "dev": 16777231,
+    "inode": 544002325,
+    "nlink": 1
+  },
+  "blockerIds": [
+    "READONLY_GIT_OPTIONAL_LOCKS"
+  ],
+  "inputCount": 20,
+  "noExecutionOrSourceEvidenceMutation": true
+}

@@ -1,0 +1,40 @@
+{
+  "schema": "p125pc-independent-completed-runtime-review-seal/1",
+  "at": "2026-10-17T02:09:20.630196+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/completed-runtime-review/review.json",
+      "bytes": 10143,
+      "sha256": "e2e0e6abb0e4bf92d0d8299660e3f47e506e6490a9b41a709f7ef374bd39191c"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/completed-runtime-review/README.md",
+      "bytes": 2053,
+      "sha256": "0a3a1a6ba8e6f486a9c0bb04d3494434f6a8e0513f0ff1eb3438f4779a45d99a"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/completed-runtime-review/input-pins.json",
+      "bytes": 119924,
+      "sha256": "d0ba3f8b8190b581e6c2df4c54d53ef627a92896ed4dd5c98796556e9be84032"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/completed-runtime-review/observations.json",
+      "bytes": 36347,
+      "sha256": "eb92a12658607ab08bb7df3e06409d41032aa3eea82a159b046701a02b5710e4"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/completed-runtime-review/joins.json",
+      "bytes": 40203,
+      "sha256": "b6195cecefdbc1595bb94a3a0f95a8ee344940b5581e0715184a7a4905b6c20f"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/completed-runtime-review/control-reconstruction.json",
+      "bytes": 715,
+      "sha256": "8ac09a090932131f8ef9be3a49ca8b556e44f449a5a46d9195d8d6df38e7d709"
+    }
+  ],
+  "inputCount": 509,
+  "blockers": [],
+  "productOrHelperExecuted": false,
+  "sourceOrEvidenceMutated": false
+}

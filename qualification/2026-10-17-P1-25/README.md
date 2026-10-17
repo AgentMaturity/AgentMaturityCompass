@@ -1,3 +1,38 @@
+# P1-25 persisted producer timestamp claims — bounded qualification, 17 October 2026
+
+Semantic source: `5d4e9e8d74bef32e68090369223947691c5fea21`, branch `codex/p1-25-producer-qualification`; parent metadata `8889784782c8f7413e1cccab579ae4b8b6f21cc1`. This extension qualifies one additional real-ledger test. Whole P1-25, P1-01 and the complete plan remain open. All held decisions, Claude ownership and work, the F37 skip, the D15 ignored-archive staging hold and the unavailable reservation boundary remain intact.
+
+The added case creates a genuine first checkpoint, appends deliberately backdated and postdated timestamps through supported `appendEvidence(input.ts)`, and reads the actual persisted rows in append order. It checks exact requested versus stored timestamps, signed event links, session seals and ledger integrity. A second genuine signed checkpoint covers those rows. Two distinct captured queries receive independently OpenSSL-verified responses and AMC-verified tokens; each proof binds its own query, response, checkpoint digest, token, signer and event metadata. The timeline reader receives actual stored row timestamps and reports exact `BACKDATED_CLAIM` and `POSTDATED_CLAIM` findings inside the genuine two-checkpoint window. Final reader nonmutation checks preserve the complete event rows, checkpoint bytes and token bytes.
+
+The current issuer has signed accuracy absent (`null`); readers use the existing zero-accuracy fallback. No synthetic attested-time object, clock change, post-append row edit, elapsed-minute or Studio scheduling claim, public issuer trust, certificate artifact qualification, compiled mutation sensitivity, universal loader/environment/descendant isolation or whole-issue completion follows from this case.
+
+The same 24 ordered canonical cases run in source and the fresh checkout, and after both restorations. Counts below are per run; they are not added as additional canonical cases. Each run has three hook entries and four individual hook values, exact ordered raw/observer joins, no skipped case, unhandled error, late diagnostic, nonzero signal or owned hook/environment failure.
+
+| Actual phase | Passed | Failed | Exit | Closed child processes | Closed sockets | Closed ledger owners |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| p125pc-source-combined | 24/24 | 0 | 0 | 46 | 12 | 38 |
+| p125pc-fresh-canonical | 24/24 | 0 | 0 | 46 | 12 | 38 |
+| p125pc-m1 | 23/24 | 1 | 1 | 44 | 11 | 34 |
+| p125pc-restore1 | 24/24 | 0 | 0 | 46 | 12 | 38 |
+| p125pc-m2 | 23/24 | 1 | 1 | 44 | 11 | 36 |
+| p125pc-restore2 | 24/24 | 0 | 0 | 46 | 12 | 38 |
+
+Both controls modify only the uniquely bounded `appendEvidenceDetailed` method in fresh `src/ledger/ledger.ts`. M1 replaces `input.ts` with `Date.now()` and fails exactly at `checkpointWindow.test.ts:698:36`: actual 1792202534624 differs from requested 1792202233999. It never appends the future claim. M2 clamps future input at `Date.now()`, preserves the past claim, then fails exactly at 707:36: actual 1792202619879 differs from requested 1792289019000. In both REDs, the covering second checkpoint/grant, reader assertions 782/783 and final ledger/nonmutation checks are masked and receive no credit. Each RED has only one independently verified producer grant. Every actual error, frame, earlier positive, mask and resource cleanup was read and classified before explicit byte-exact restoration on the original inode. All four direct operations closed naturally before dependent tests; there was no retry, automatic restore or diagnostic product run.
+
+All 12 normal source checks passed: test types, source types, lint, build, counts, gates, threat model, architecture, documentation, freeze, notices and qualification validation. The clean-source helper independently retained a newly installed and built checkout at this exact source commit and completed its doctor/init/keyless session/resume flow; that helper earns no Vitest credit. The fresh canonical cohort was run separately. Actual binding and post-control preservation cover 102 paths in each checkout, 23 source/compiled pairs, 204 distinct regular single-link selected files, 175 active protected byte/physical pins and 12 retained plus one fresh distinct native modules. Source/fresh indexes are empty and trees clean; the borrowed runner retains its exact HEAD, 18 dirty rows and empty index.
+
+Quality remains RED: all 2,712 ordered dead-code findings and the entire duplicate result with 1,268 findings remain exact against the previous actual baseline, excluding only the documented report role label. No finding was waived and no baseline adopted. Freeze, snapshot, marker, privacy, file-size, validator, whitespace, index and ordinary-commit checks retain their existing rules. No push, PR, merge or release is part of this work.
+
+The immutable preceding packet contains 2,378 files, 2,377 artifact entries, 2,375 non-index payloads, 259 command rows and 3,864 ordered assembly pins; every file was copied privately and matched to the actual current source HEAD blob. This extension preserves all old payload bytes, commands and ordered pins, replacing only the three owned metadata files and adding only `evidence/producer-claims/`. The old 877,972-byte assembly metadata is retained raw under the new prefix. Only the newly generated active `assembly-inputs.json` uses compact JSON serialization, with complete parsed-object, original-manifest, old-prefix and full-new-suffix equality checks. The 1,048,576-byte file cap and literal private-key marker checks remain intact. Marker-bearing whole code and the active assembler are hash-only before any encoding; safe source is inert text and logs/patches retain lossless original bytes. Public selection uses only explicit named emitted records, named query/response files and public certificate DER bundles. Raw PEM, private keys, signing directories, private child streams, raw private observations, native binaries and bytecode are excluded.
+
+The companion completed runtime review and final preservation describe actual pre-publication checks. Separate admission, private assembly and validation, independent packet review, source materialization, source checks, staged/full-range whitespace, exact index blobs, ordinary metadata commit, actual HEAD-only export and final QA are later evidence boundaries. Their existence must be verified from the actual closure records; this prose supplies no prospective success. Dependabot is excluded only from WIP: current hosted review read all 13 open PR file lists, including Dependabot, with WIP 0 and no overlapping metadata path.
+
+Remaining work includes genuinely signed nonzero accuracy; real elapsed-minute/default Studio scheduling; recursion-aware session-seal checkpoint/required-token enforcement; genuine qualification of existing certificate issue/archive/verify/report wiring; schema, manifest, report and consumer parity; full suites, cross-platform and public-issuer evidence; global quality; and all other plan items and held decisions. The next bounded technical seam is genuine signed nonzero accuracy after this packet's complete closure and separate source admission. No TTL contract or new source allocation is invented.
+
+The exact prior README follows unchanged.
+
+---
+
 ## Bounded checkpoint event-cadence qualification — 17 October 2026
 
 Source `80268079f804ed0ecb7659cd02a75e8b88ee3e0d` adds one literal event-cadence case in the existing owned checkpoint test. The three preceding checkpoint bodies, two grant bodies and whole shared TSA fixture remain exact. Production code, packages, deadlines, freeze guards and quality baselines are unchanged.
