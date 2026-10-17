@@ -1,7 +1,7 @@
 /**
- * Redaction before commit (P2-02). In a workspace that has opted in (a processor registry file or its `.sig` exists), the
- * native session is wrapped so user messages, queued inbox text, text attachments and tool results are tokenized before
- * the session writes a row, a spill or a model-visible part. Values a signed tool definition declares in
+ * Redaction before commit (P2-02). Every composed native session is wrapped; while its workspace has opted in (a processor
+ * registry file or its `.sig` exists, checked on every record and latched once seen), user messages, queued inbox text,
+ * text attachments and tool results are tokenized before the session writes a row, a spill or a model-visible part. Values a signed tool definition declares in
  * `protectedFields` are tokenized first; the experimental text detectors are the backstop for everything else.
  *
  * Every failure refuses the commit: a locked vault, a vault or receipt write that fails, a token collision, text over the
@@ -188,8 +188,11 @@ function redactWithReceipt(session: SessionService, redactor: Redactor, text: st
 const MEDIA_INPUT_PREFIXES = [NATIVE_IMAGE_INPUT_FORMAT, NATIVE_ORDERED_INPUT_FORMAT, NATIVE_AUDIO_INPUT_FORMAT]
   .map(format => Buffer.from(`{"format":"${format}"`, "utf8"));
 
-/** Wraps `session`: the record methods below redact, then delegate; every other member is the session's own. */
-export function createRedactingSession(session: SessionService, redactor: Redactor): SessionService {
+/**
+ * Wraps `session`: while `active()`, the record methods below redact, then delegate; otherwise they delegate unchanged.
+ * Every other member is the session's own.
+ */
+export function createRedactingSession(session: SessionService, redactor: Redactor, active: () => boolean = () => true): SessionService {
   const toolNames = new Map<string, string>();
   const spilledDescriptors = new Set<string>();
   const redact = (text: string, source: RedactionReceiptV1["source"], callId: string | null, declared?: DeclaredFields): string =>
@@ -223,9 +226,10 @@ export function createRedactingSession(session: SessionService, redactor: Redact
   };
   const overrides = {
     recordUserMessage(text: string, provenance?: Parameters<SessionService["recordUserMessage"]>[1]): SessionEventRef {
-      return session.recordUserMessage(redact(text, "user/message", null), provenance);
+      return session.recordUserMessage(active() ? redact(text, "user/message", null) : text, provenance);
     },
     recordUserAttachment(params: Parameters<SessionService["recordUserAttachment"]>[0]): SessionEventRef {
+      if (!active()) return session.recordUserAttachment(params);
       // ponytail: image and audio bytes are refused outright, whatever the provider's processor contract covers; admitting
       // them under a covering contract needs processors on destinations (P2-02 step 7, slice 3).
       if (params.kind !== "text") throw new RedactionRefused("attachment_not_redactable");
@@ -238,6 +242,7 @@ export function createRedactingSession(session: SessionService, redactor: Redact
       return ref;
     },
     recordToolResult(result: Parameters<SessionService["recordToolResult"]>[0]): SessionEventRef {
+      if (!active()) return session.recordToolResult(result);
       const content = redactOrWithhold(result.toolCallId, () => {
         // Declared fields bind a successful result's JSON; error, denial and cancellation text gets the detectors only,
         // except a Code Mode result, whose text in any outcome can carry what a declaring tool returned.
@@ -253,6 +258,7 @@ export function createRedactingSession(session: SessionService, redactor: Redact
      * would let anyone brute-force; the output it hashed is not retained anyway.
      */
     recordProjectedEvidence(row: Parameters<SessionService["recordProjectedEvidence"]>[0]): SessionEventRef {
+      if (!active()) return session.recordProjectedEvidence(row);
       if (row.eventType === "stdout") {
         let payload: unknown;
         try { payload = JSON.parse(row.payload); } catch { throw new RedactionRefused("redaction_failed"); }
@@ -269,13 +275,13 @@ export function createRedactingSession(session: SessionService, redactor: Redact
     },
     // The inbox row is the queued message's first durable copy, so it is redacted here, before user/message is.
     recordLoopEvent(record: Parameters<SessionService["recordLoopEvent"]>[0]): SessionEventRef {
-      if (record.kind !== "inbox" || record.op !== "insert" || record.text === null) return session.recordLoopEvent(record);
+      if (!active() || record.kind !== "inbox" || record.op !== "insert" || record.text === null) return session.recordLoopEvent(record);
       if (record.payloadFormat !== undefined) throw new RedactionRefused("attachment_not_redactable");
       if (spilledDescriptors.has(record.text)) return session.recordLoopEvent(record);
       return session.recordLoopEvent({ ...record, text: redact(record.text, "loop/inbox", null) });
     },
     retainOversizeInput(...[what, bytes, cap, subject]: Parameters<SessionService["retainOversizeInput"]>): ReturnType<SessionService["retainOversizeInput"]> {
-      if (subject.subject !== "loop/inbox") return session.retainOversizeInput(what, bytes, cap, subject);
+      if (!active() || subject.subject !== "loop/inbox") return session.retainOversizeInput(what, bytes, cap, subject);
       // Media is refused before its spill commitment or object is written, not after.
       if (MEDIA_INPUT_PREFIXES.some(prefix => bytes.subarray(0, prefix.length).equals(prefix))) throw new RedactionRefused("attachment_not_redactable");
       const redacted = Buffer.from(redact(decodeText(bytes, "content_not_text"), "loop/inbox", null), "utf8");
@@ -293,9 +299,14 @@ export function createRedactingSession(session: SessionService, redactor: Redact
   });
 }
 
-/** Opt-in, like admission: with no processor registry file and no `.sig`, the session is returned unchanged. */
+/**
+ * The composition's wrapper. Opt-in, like admission, but read on every record rather than once: a long-lived session
+ * (ACP, the SDK, A4) composed before `.amc/dataflow/processors.yaml` existed redacts from the moment it does. Until then
+ * every record method delegates unchanged.
+ */
 export function redactingSessionFor(session: SessionService): SessionService {
-  return protectedDataOptedIn(session.workspace) ? createRedactingSession(session, createWorkspaceRedactor(session.workspace)) : session;
+  const workspace = session.workspace;
+  return createRedactingSession(session, createWorkspaceRedactor(workspace), () => protectedDataOptedIn(workspace));
 }
 
 /** Operator compaction text (`amc session compact`): redacted, with its receipt on `session`, in an opted-in workspace. */
