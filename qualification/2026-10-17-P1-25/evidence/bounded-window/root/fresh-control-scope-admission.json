@@ -1,0 +1,37 @@
+{
+  "at": "2026-10-17T00:15:21.261540+00:00",
+  "sourceCommit": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout",
+  "onlyOwnedFreshSourceTargets": [
+    "src/time/checkpoint.ts",
+    "src/time/timeEvidence.ts"
+  ],
+  "operators": [
+    "OMIT-LOWER-BOUND-SELECTION",
+    "OMIT-TOLERANCE-CONTRIBUTION"
+  ],
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/source-control.py",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-control.py",
+    "bytes": 21942,
+    "sha256": "73203ebcbe63fcf8273510a79e5b4e72f78656c41c9ffd2c9228e8b266496b32",
+    "dev": 16777231,
+    "inode": 543812593,
+    "nlink": 1
+  },
+  "rootFullReadHelperAndBothDeltasAndRecipesAndIndependentReview": true,
+  "rootBindings": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/control-root-bindings.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/control-root-bindings.json",
+    "bytes": 5670,
+    "sha256": "85a6ba5bad5918d06a6539248349076d7b7b735ca5bb83dfae916d14f449c8dc",
+    "dev": 16777231,
+    "inode": 543812594,
+    "nlink": 1
+  },
+  "sourceAndFresh22SameOrderedIdentitiesAndHooks": true,
+  "all151PhysicalAndElevenNativesAnd188SelectedFilesExact": true,
+  "sourceOnlyNoCompiledNativeOrGuardChange": true,
+  "explicitApplyClassifyAllActualFailuresRestoreThenSameCohortGreenRequired": true,
+  "allHoldsRetained": true
+}

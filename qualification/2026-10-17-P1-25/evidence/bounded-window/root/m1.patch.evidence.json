@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/bounded-window/root/m1.patch",
+    "bytes": 594,
+    "sha256": "c4bac703285ee673a21d56eee49a4c27b9b7c26dfe67838b73c4a233e96db3c7"
+  },
+  "dataBase64": "ZGlmZiAtLWdpdCBhL3NyYy90aW1lL2NoZWNrcG9pbnQudHMgYi9zcmMvdGltZS9jaGVja3BvaW50LnRzCmluZGV4IDBmZWZjNjY1MC4uYjBkOGI5ZDYxIDEwMDY0NAotLS0gYS9zcmMvdGltZS9jaGVja3BvaW50LnRzCisrKyBiL3NyYy90aW1lL2NoZWNrcG9pbnQudHMKQEAgLTMzNiw3ICszMzYsNyBAQCBleHBvcnQgZnVuY3Rpb24gbGVkZ2VyVGltZWxpbmUod29ya3NwYWNlOiBzdHJpbmcsIGV2ZW50czogUmVhZG9ubHlBcnJheTxQaWNrPEV2aQogICAgIGV2ZW50VGltZTogKGluZGV4LCBjbGFpbWVkVHMpID0+IGV2YWx1YXRlVGltZSh7CiAgICAgICBjbGFpbWVkQXQ6IGNsYWltZWRUcywgdG9sZXJhbmNlTWludXRlczogb3B0cy50b2xlcmFuY2VNaW51dGVzLAogICAgICAgdXBwZXI6IHBpY2sodXBwZXIuZmlsdGVyKHJvdyA9PiByb3cuZXZlbnRDb3VudCA+IGluZGV4KS5tYXAocm93ID0+IHJvdy5hdHRlc3RlZCksIDEpLAotICAgICAgbG93ZXI6IHBpY2sobG93ZXIuZmlsdGVyKHJvdyA9PiByb3cuaW5kZXggPCBpbmRleCkubWFwKHJvdyA9PiByb3cuYXR0ZXN0ZWQpLCAtMSkKKyAgICAgIGxvd2VyOiBudWxsCiAgICAgfSkKICAgfTsKIH0K",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "p125w-control-helper-independent-static-seal/1",
+  "at": "2026-10-17T00:14:05.482177+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-helper-static-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-helper-static-review/review.json",
+      "bytes": 9527,
+      "sha256": "cccb445c35641b7aae50cc174a67a6e25d7779548d15687247cc7f15aacf7298",
+      "dev": 16777231,
+      "inode": 543811259,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-helper-static-review/README.md",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-helper-static-review/README.md",
+      "bytes": 3064,
+      "sha256": "f8393932286d308647404a8641cf376462e9f3fbc8f800ca21c69312d0b42ca5",
+      "dev": 16777231,
+      "inode": 543811260,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-helper-static-review/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-helper-static-review/input-pins.json",
+      "bytes": 14072,
+      "sha256": "1021ce5e6e3e678d554f79c47a59ae22a2bc6eeb8b53d789a38e72bd09a34fb5",
+      "dev": 16777231,
+      "inode": 543811261,
+      "nlink": 1
+    }
+  ],
+  "inputCount": 34,
+  "blockers": [],
+  "noExecutionOrSourceAllocation": true
+}

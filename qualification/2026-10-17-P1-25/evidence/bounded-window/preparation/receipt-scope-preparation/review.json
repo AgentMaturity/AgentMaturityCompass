@@ -1,0 +1,282 @@
+{
+  "schema": "p125w-bounded-window-receipt-scope-independent-preparation/1",
+  "at": "2026-10-17T00:30:28.140455+00:00",
+  "blockers": [],
+  "paths": [
+    "qualification/2026-10-17-P1-25/evidence/bounded-window",
+    "qualification/2026-10-17-P1-25/README.md",
+    "qualification/2026-10-17-P1-25/receipt.json",
+    "qualification/2026-10-17-P1-25/assembly-inputs.json"
+  ],
+  "onlyThreeExistingOwnMetadataSuccessors": [
+    "qualification/2026-10-17-P1-25/README.md",
+    "qualification/2026-10-17-P1-25/receipt.json",
+    "qualification/2026-10-17-P1-25/assembly-inputs.json"
+  ],
+  "newEvidencePrefix": "qualification/2026-10-17-P1-25/evidence/bounded-window/",
+  "sourceHeadAtSnapshot": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+  "sourceBranchAtSnapshot": "codex/p1-25-window-qualification",
+  "sourceAndFreshCleanEmptyIndexes": true,
+  "receiptDateKey": {
+    "date": "2026-10-17",
+    "key": "P1-25",
+    "currentSemanticSourceCommitBeforeExtension": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+    "currentMetadataPublicationCommit": "ac7759702ecbfda304b57e78eb1bd946340adc0f"
+  },
+  "ownership": {
+    "registryAuthorities": 3,
+    "registeredLogicalRoots": 170,
+    "physicalRoots": 186,
+    "allPrior185Retained": true,
+    "onlyAdditionalOwnedFreshRoot": [
+      "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout"
+    ],
+    "fourExactPathPresenceChecks": 744,
+    "newPrefixAbsentAcrossAll186": true,
+    "fourPathStatusesAllEmpty": true,
+    "historyAuthorities": 19,
+    "allPrior18Retained": true,
+    "allRefNameStatusHistoryHasNoNewPrefix": true,
+    "activeMetadataPresentInNineRootsWithFivePreservedVersionsPerFile": true,
+    "metadataVariants": {
+      "qualification/2026-10-17-P1-25/README.md": [
+        {
+          "bytes": 28642,
+          "sha256": "d0ba38b25c4737ff34977213db42847da1bccbdd6f6f1183bce1f33d98b305d9",
+          "roots": [
+            "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout"
+          ]
+        },
+        {
+          "bytes": 9421,
+          "sha256": "d3b5255d6679c1d00494ade4b4818dbe2c5c97a786879de3ae4f1ca6545e7127",
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout"
+          ]
+        },
+        {
+          "bytes": 15980,
+          "sha256": "14ff4c7747694485db980c0041a210ccf1335271641d22f3ec1df40215438a7e",
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout"
+          ]
+        },
+        {
+          "bytes": 20240,
+          "sha256": "0e06dd9663a62f3f861ead994abede47c20083ea35c48e30ee08bed85f559072",
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout"
+          ]
+        },
+        {
+          "bytes": 24235,
+          "sha256": "e55024763f964239a65fa8b9fb80ff236c26f9ffb21518908b892d195d6ded68",
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout"
+          ]
+        }
+      ],
+      "qualification/2026-10-17-P1-25/receipt.json": [
+        {
+          "bytes": 320549,
+          "sha256": "74a39b8bc4f6edf5883808fe881b9bfbdd6992718a0e40fa6ac0b79787676f5a",
+          "roots": [
+            "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout"
+          ]
+        },
+        {
+          "bytes": 66214,
+          "sha256": "c2064956af3bcde63fa631bfb20aa63250e2fd68e94aa055da70ceffc9b10496",
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout"
+          ]
+        },
+        {
+          "bytes": 126991,
+          "sha256": "1fcef2ee2271e19e5f39aff0d97052c432bb7f923955d18d41d36749c774d7e9",
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout"
+          ]
+        },
+        {
+          "bytes": 189462,
+          "sha256": "8b65debfaf983bc607529aa87239b845bdcc692e6a33145c97b0db5d46c50cdc",
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout"
+          ]
+        },
+        {
+          "bytes": 238970,
+          "sha256": "730c521699fc442a29a761dadaff43bd1a9ae78def93447aa85cd4ca8440622b",
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout"
+          ]
+        }
+      ],
+      "qualification/2026-10-17-P1-25/assembly-inputs.json": [
+        {
+          "bytes": 492151,
+          "sha256": "ea081b90920f200518c787035f7789a187e80060bc7065b4ea493b617455e88d",
+          "roots": [
+            "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout"
+          ]
+        },
+        {
+          "bytes": 80751,
+          "sha256": "e726c06516d9310170f22dd34ed53b7db02827d80c725875f541ed9ba8dc3df9",
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout"
+          ]
+        },
+        {
+          "bytes": 150409,
+          "sha256": "6261cf6f1fd22ab71cbb5f9ec611809f6d96b00ae20013cb673b099247ec3b72",
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout"
+          ]
+        },
+        {
+          "bytes": 253487,
+          "sha256": "7ba7697de9c12d7990bd635a70656ddde71f44aa4b2e8b8e682075de3acb5b1c",
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout"
+          ]
+        },
+        {
+          "bytes": 350152,
+          "sha256": "308eea402785300a4e2f1cfe7e683ac1af60b9c790181a0584a3600301cbb5e7",
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout"
+          ]
+        }
+      ]
+    },
+    "twoOwnTestSourceVariantsRetainedInRows": true,
+    "noAbsenceCleanStateHistoryOrGenericAuthorStringOwnershipRelease": true
+  },
+  "currentOwnMetadataProvenance": {
+    "currentThreeFilesEqualBothAcMetadataAndF11SourceGitBlobs": true,
+    "entries": [
+      {
+        "relativePath": "qualification/2026-10-17-P1-25/README.md",
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+          "symlink": false,
+          "regular": true,
+          "directory": false,
+          "dev": 16777231,
+          "inode": 543134232,
+          "nlink": 1,
+          "bytes": 28642,
+          "sha256": "d0ba38b25c4737ff34977213db42847da1bccbdd6f6f1183bce1f33d98b305d9"
+        },
+        "equalsGitCommits": [
+          "ac7759702ecbfda304b57e78eb1bd946340adc0f",
+          "f11a15ae06a318e0ce9a4c778269b2020af4eb7c"
+        ]
+      },
+      {
+        "relativePath": "qualification/2026-10-17-P1-25/receipt.json",
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+          "symlink": false,
+          "regular": true,
+          "directory": false,
+          "dev": 16777231,
+          "inode": 543134235,
+          "nlink": 1,
+          "bytes": 320549,
+          "sha256": "74a39b8bc4f6edf5883808fe881b9bfbdd6992718a0e40fa6ac0b79787676f5a"
+        },
+        "equalsGitCommits": [
+          "ac7759702ecbfda304b57e78eb1bd946340adc0f",
+          "f11a15ae06a318e0ce9a4c778269b2020af4eb7c"
+        ]
+      },
+      {
+        "relativePath": "qualification/2026-10-17-P1-25/assembly-inputs.json",
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+          "symlink": false,
+          "regular": true,
+          "directory": false,
+          "dev": 16777231,
+          "inode": 543134234,
+          "nlink": 1,
+          "bytes": 492151,
+          "sha256": "ea081b90920f200518c787035f7789a187e80060bc7065b4ea493b617455e88d"
+        },
+        "equalsGitCommits": [
+          "ac7759702ecbfda304b57e78eb1bd946340adc0f",
+          "f11a15ae06a318e0ce9a4c778269b2020af4eb7c"
+        ]
+      }
+    ],
+    "otherRootVariantsMustNotBeCopiedNormalizedOrReplaced": true
+  },
+  "protectedBoundary": {
+    "runtime151AllByteAndPhysicalExactBeforeAnyMetadataAdmission": true,
+    "tenOldPlusFreshEleventhNativeDistinctRegularSingleLinkBytesAndPhysicalExact": true,
+    "heldRHead18DirtyRowsAndEmptyIndexExact": true,
+    "onlyLaterSeparatelyAdmittedThreeOwnIndexesMayReceiveSuccessors": true,
+    "allOther148MustRemainExactAfterThatAdmission": true,
+    "old1484PacketNeedsCompletePrivateAndGitPreservationBeforeUpdate": true,
+    "sourceProductionTestGuardCompilerNativeBaselinesNotInMetadataScope": true
+  },
+  "oldPacketNumericContextOnly": {
+    "gitAcTrackedFiles": 1484,
+    "artifactRows": 1483,
+    "commandRows": 173,
+    "orderedAssemblyPins": 2188,
+    "notAReauditOfEvery1484Payload": true
+  },
+  "reservationBoundary": {
+    "lastKnownBinding": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "noMissingPathProbeSearchRecreateSharedAppendOrClaudeMessage": true,
+    "currentDeltasAndCompleteRuleTextUnavailable": true,
+    "privatePendingIntentOnly": true,
+    "neitherReleaseNorNewApprovalHoldInferred": true
+  },
+  "closure": {
+    "gitChildren": 227,
+    "all227NaturallyClosedExit0": true,
+    "outerYieldedSessionId": 73442,
+    "explicitWriteStdinObservedNaturalExit0": true,
+    "fullArgvPidTimestampsStdoutStderrExitRetained": true,
+    "outputExistenceNotClosureProof": true,
+    "largeObservationBytes": 4832134,
+    "largeObservationsAndGitBlobSourceTextPrivateOnly": true
+  },
+  "requiredRootActionsBeforeSourceCopy": [
+    "Finish root actual immutable private packet and complete manifest review.",
+    "Root current hosted WIP with Dependabot excluded from WIP but all PR paths checked; ordinary D15 and freeze admission.",
+    "Preserve full old1484 packet and exact three old/new metadata pins under separate exact successor admission.",
+    "Only root may materialize the three reviewed index successors plus the new bounded-window prefix; ordinary validators/index/export/quality checks still apply."
+  ],
+  "allHumanHoldsF37SkipFreezeQualityClaudeProviderArchiveAndPublicEntryBoundaryRetained": true,
+  "sourceMetadataOrIndexAllocationByThisReview": false,
+  "noProductHelperParserCompilerTestOpenSslNativeSqlNetworkProcessProbeOrQaMutation": true,
+  "verdict": "No concrete overlap was observed for the new bounded-window evidence prefix. The three current own metadata files remain protected ac775 bytes and may change only after separate exact root admission; every historical metadata/test/source variant remains owned."
+}
