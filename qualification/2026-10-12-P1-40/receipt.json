@@ -1,0 +1,119 @@
+{
+ "schemaVersion": 1,
+ "key": "P1-40",
+ "date": "2026-10-12",
+ "commit": "b554e3260f469bf764eaa10e792c6e00de715eb8",
+ "branch": "rtd/p1-40-ts-sdk-starter-profiles",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "darwin 25.6.0, local macOS arm64, not CI",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 53422
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 45598
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 51645
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 3593
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 979
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 437
+  },
+  {
+   "cmd": "npm run -s check:freeze -- --base-ref int",
+   "exit": 0,
+   "durationMs": 2293
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0,
+   "durationMs": 2183
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 399
+  },
+  {
+   "cmd": "npm run -s check:schemas",
+   "exit": 0,
+   "durationMs": 790
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 242
+  },
+  {
+   "cmd": "npm run -s check:threat-model",
+   "exit": 0,
+   "durationMs": 263
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 1000
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 5312
+  },
+  {
+   "cmd": "node scripts/check-sdk-api.mjs --base-ref int",
+   "exit": 0,
+   "durationMs": 1034
+  },
+  {
+   "cmd": "npx vitest run tests/starterProfiles.test.ts tests/sdkPublicApi.test.ts tests/sdkQuickstart.test.ts --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-40/qualification/2026-10-12-P1-40/focused-tests.json",
+   "exit": 0,
+   "durationMs": 50635
+  },
+  {
+   "cmd": "node scripts/packed-install-check.mjs --no-build (Node 22; packed-install.log)",
+   "exit": 0,
+   "durationMs": 249150
+  }
+ ],
+ "tests": {
+  "total": 21,
+  "passed": 21,
+  "failed": 0,
+  "skipped": 0
+ },
+ "artifacts": [
+  {
+   "path": "packed-install.log",
+   "sha256": "5323307eaefd32839bcdef8acf46e1b2c06f8701acdbdc409680014f2ab6fba7"
+  },
+  {
+   "path": "mutations.txt",
+   "sha256": "31cbbe644b012aeb56fc35b9242c6c8c488b7851da7a4d61a991313bfb7fdb44"
+  },
+  {
+   "path": "focused-tests.json",
+   "sha256": "0a5a6a0c2c67320b2666b4de1cf1a3a1a0fd583b6b234d81e4634ed9bc2239c1"
+  }
+ ],
+ "notes": "Local macOS arm64, Node 22, not CI. Branch merged with int 06a22aef5. Focused tests: tests/starterProfiles.test.ts, tests/sdkPublicApi.test.ts, tests/sdkQuickstart.test.ts. Related existing tests (92 files incl. tests/catalog) on the merged branch with --maxWorkers=4: 1,449 of 1,453 passed; the 4 failures (nativeShellComposition 1 hook timeout, nativeValidationOutcomeSurfaces 2 Studio cases, publicDocsGraph 1) came under a load average near 17 from other sessions, except publicDocsGraph, which 1246619b3 fixed; all three files pass when run alone (36/36). publicDocsArtifact fails in any git worktree (typedoc needs a .git directory; known in followups). packed-install.log: amc init --coding plus the SDK quickstart reached a verified synthetic action through the installed package in 15.6 s (tarball packed at 1246619b3; b554e3260 only regenerates docs/API_REFERENCE.md). The stub provider runs no model: the action is synthetic. The --regulated Layer 0 plan is compiled and signed, not activated (needs stated facts and two other approvers); Layer 0 controls are experimental (D-08 open). sdk/api/native.api.md (outside this folder) sha256 37c83afb5cd29ea78b635712814a7a098831d625acae7073b40f9b66bc181497."
+}
