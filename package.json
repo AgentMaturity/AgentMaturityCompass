@@ -59,6 +59,7 @@
     "research:amc-landscape:verify": "node scripts/verify-amc-landscape.mjs",
     "audit:runtime": "pnpm audit --prod --audit-level moderate",
     "check:incident-readiness": "node scripts/incident-readiness-check.mjs",
+    "check:credentials-presence": "node scripts/credentials-presence-check.mjs",
     "check:architecture-boundaries": "node scripts/architecture-boundaries-check.mjs",
     "check:docs-drift": "node scripts/docs-drift-check.mjs",
     "check:policy-fixtures": "node scripts/run-policy-fixtures-ci.mjs",
