@@ -11,6 +11,7 @@ import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { listAgents } from "./registry.js";
 import { runDiagnostic } from "../diagnostic/runner.js";
+import { markdownCell } from "../diagnostic/reportMarkdown.js";
 import { openLedger } from "../ledger/ledger.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { parseEvidenceEvent } from "../diagnostic/gates.js";
@@ -714,7 +715,7 @@ export function renderFleetScoringMarkdown(result: FleetScoringResult, claims: R
   lines.push("|-------|--------:|-------------:|-----|----------:|-------|------------------:|--------|-------|");
   for (const a of result.agents) {
     lines.push(
-      `| ${a.agentId} | ${a.overallScore} | ${a.firstResultMs}ms | ${a.slaStatus} | ${a.integrityIndex.toFixed(3)} | ${a.trustLabel} | ${(a.evidenceCoverage * 100).toFixed(1)}% | ${a.status} | ${claims.get(a.agentId)?.claimKind ?? "-"} |`
+      `| ${a.agentId} | ${a.overallScore} | ${a.firstResultMs}ms | ${a.slaStatus} | ${a.integrityIndex.toFixed(3)} | ${a.trustLabel} | ${(a.evidenceCoverage * 100).toFixed(1)}% | ${a.status} | ${claims.has(a.agentId) ? markdownCell(renderClaimLabel(claims.get(a.agentId)!).kindLabel) : "-"} |`
     );
   }
 

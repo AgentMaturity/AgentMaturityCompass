@@ -140,7 +140,8 @@ export async function residencyFetch(workspace: string | undefined, channel: Egr
 }
 /**
  * Refuses regulated session admission unless the pinned profile's declared storage destination passes every applicable
- * rule. Opt-in: a workspace with no active plan and no destination registry returns no_rule, whatever its checkpoint root.
+ * rule. Opt-in: a workspace with no active plan and no destination registry returns no_rule. A workspace that contains
+ * its control checkpoint root is refused by name instead (registry_unverifiable, control_checkpoint_root_in_workspace).
  */
 export function assertStorageAdmission(workspace: string): Accepted {
   if (typeof workspace !== "string" || !workspace.trim()) return block({ workspace, channel: "storage", url: "" }, "registry_unverifiable", "workspace_scope_required");
