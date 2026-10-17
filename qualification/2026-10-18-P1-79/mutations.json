@@ -71,5 +71,15 @@
       "an ACP session/new is refused PRINCIPAL_UNRESOLVED, coded, before any session row or lease"
     ],
     "summary": "2 failed | 5 passed (7)"
+  },
+  {
+    "mutation": "M8 ACP fork factory handed the params without the run lease",
+    "file": "src/acp/acpStdioMain.ts",
+    "exit": 1,
+    "caught": true,
+    "failingTests": [
+      "hands the fork factory the child's own lease, naming the OS user's users.yaml user",
+      "refuses session/fork PRINCIPAL_UNRESOLVED, coded, before the factory runs and before any lease or session row"
+    ]
   }
 ]

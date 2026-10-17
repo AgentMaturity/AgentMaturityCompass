@@ -28,5 +28,8 @@ its exit code and duration, the focused test totals and the artifact hashes.
 ## Not done here
 
 - Registering P1-79 in the plan document (the orchestrator's step).
-- Delegated children, an in-process `openAgentSession` caller that passes no lease, and ACP `session/fork` (served only
-  by an operator-composed fork factory) still mint nothing; see the report's follow-ups.
+- Delegated children (src/agent/subagentRunner.ts, reserved for another session's slice 2) and an in-process
+  `openAgentSession` caller that passes no lease still mint nothing; see the report's follow-ups.
+- ACP `session/fork` (added after the first receipt run): its lease is minted before the operator's fork factory runs
+  and handed to it as `leaseToken`, or the fork is refused PRINCIPAL_UNRESOLVED. Covered by two tests in
+  tests/runPrincipalLease.test.ts and mutation M8 in `mutations.json`; the installed-package runs above predate it.
