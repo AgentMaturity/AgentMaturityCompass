@@ -1,4 +1,5 @@
-import { MAX_PROTECTED_TEXT_CHARS, MAX_REQUEST_SCAN_CHARS, redactJsonLeaves, redactProtectedText } from "../dataflow/detectors.js";
+import { decodeJsonEscapes, MAX_PROTECTED_TEXT_CHARS, MAX_REQUEST_SCAN_CHARS, nestedJsonRedactor, redactJsonLeaves,
+  redactProtectedText } from "../dataflow/detectors.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { GatewayConfig } from "./config.js";
 
@@ -123,7 +124,7 @@ function protectedRedactor(reasons: Set<string>): (text: string) => string {
   };
 }
 
-/** The whole stored JSON body replaced, as a JSON string so it still parses. */
+/** The whole stored body replaced, as a JSON string so a JSON body still parses. */
 function unscannedJsonBody(): RedactionResult {
   return { redactedBytes: Buffer.from(JSON.stringify("[REDACTED]"), "utf8"), wasRedacted: true,
     redactionReasons: ["protectedData:unscanned"], originalPayloadSha256: null, originalHashOmitted: true };
@@ -157,8 +158,7 @@ export function redactBody(
       let leaves = pathResult.value;
       if (options.protectedData) {
         const opaque = () => { protectedReasons.add("protectedData:unscanned"); return "[REDACTED]"; };
-        try { leaves = redactJsonLeaves(pathResult.value, protectedRedactor(protectedReasons), opaque); }
-        catch (error) { if (error instanceof ScanBudgetExceeded) return unscannedJsonBody(); throw error; }
+        leaves = redactJsonLeaves(pathResult.value, nestedJsonRedactor(protectedRedactor(protectedReasons), opaque), opaque);
       }
       let text = JSON.stringify(leaves);
       const regexResult = applyTextRegexRedaction(text, redaction.textRegexDenylist);
@@ -178,14 +178,26 @@ export function redactBody(
         originalHashOmitted: wasRedacted
       };
     } catch {
+      // Where the workspace opted in, a JSON body that does not parse, or whose walk fails (nesting too deep for it, the
+      // scan budget), is replaced whole rather than stored as text: escaped, a value right after \n or \t has no word
+      // boundary, so the text detectors would miss it.
+      if (options.protectedData) return unscannedJsonBody();
       // fall through to text mode
     }
   }
 
   const protectedReasons = new Set<string>();
   const bodyText = body.toString("utf8");
-  const textResult = applyTextRegexRedaction(options.protectedData ? protectedRedactor(protectedReasons)(bodyText) : bodyText,
-    redaction.textRegexDenylist);
+  let stored = bodyText;
+  if (options.protectedData) {
+    const redact = protectedRedactor(protectedReasons);
+    stored = redact(bodyText);
+    // Text can carry JSON escapes too (an event stream of JSON chunks): anything the detectors still find in the stored
+    // text with its escapes decoded replaces the whole body.
+    const decoded = decodeJsonEscapes(stored);
+    if (redact(decoded) !== decoded) return unscannedJsonBody();
+  }
+  const textResult = applyTextRegexRedaction(stored, redaction.textRegexDenylist);
   const wasRedacted = textResult.changed || protectedReasons.size > 0;
   return {
     redactedBytes: Buffer.from(textResult.value, "utf8"),

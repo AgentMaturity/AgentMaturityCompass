@@ -62,7 +62,7 @@ export const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   classMapping: CLASS_BY_TYPE,
   noiseFilters: Object.fromEntries(Object.entries(NOISE_FILTERS).map(([type, re]) => [type, re.source])),
   tokenFormat: TOKEN_PATTERN_SOURCE,
-  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-ms-timestamps-not-cards-spans-inside-issued-token-hex-skipped-token-crossing-spans-rechecked-without-issued-tokens-password-json-escaped-value-span-tool-results-also-escape-decoded-v11",
+  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-ms-timestamps-not-cards-spans-inside-issued-token-hex-skipped-token-crossing-spans-rechecked-without-issued-tokens-password-json-escaped-value-span-tool-results-also-escape-decoded-evidence-leaves-hold-json-one-level-v12",
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS }
 }));
 function refused(): never { throw new Error("Protected request detection refused unsupported or excessive traversal"); }
@@ -139,12 +139,14 @@ export const isRawJson = (value: unknown): value is { readonly rawJSON: string }
 /**
  * Applies `redact` to every key and string leaf of a parsed JSON value, and to each number leaf as text, its source literal
  * where the parse kept one (a number with a detection becomes the redacted string), so the result still serializes as
- * JSON. Stored gateway and bridge evidence and the session redactor use it.
+ * JSON. A string leaf's call also gets the member name it sits under (`key`, set by the recursion). Stored gateway and
+ * bridge evidence and the session redactor use it.
  * An integer beyond 2^53 with at most 20 digits lost digits when it was parsed (a 17-19 digit card number sent as a JSON
  * number keeps only its leading ones), so its text cannot be checked: with `opaque` it becomes `opaque()` instead.
  */
-export function redactJsonLeaves(value: unknown, redact: (text: string) => string, opaque?: () => string): unknown {
-  if (typeof value === "string") return redact(value);
+export function redactJsonLeaves(value: unknown, redact: (text: string, key?: string) => string, opaque?: () => string,
+  key?: string): unknown {
+  if (typeof value === "string") return redact(value, key);
   if (typeof value === "number") {
     if (opaque !== undefined && Number.isInteger(value) && !Number.isSafeInteger(value) && Math.abs(value) < 1e20) return opaque();
     const text = String(value);
@@ -154,7 +156,34 @@ export function redactJsonLeaves(value: unknown, redact: (text: string) => strin
   if (isRawJson(value)) { const redacted = redact(value.rawJSON); return redacted === value.rawJSON ? value : redacted; }
   if (Array.isArray(value)) return value.map(item => redactJsonLeaves(item, redact, opaque));
   if (value === null || typeof value !== "object") return value;
-  return Object.fromEntries(Object.entries(value).map(([key, item]) => [redact(key), redactJsonLeaves(item, redact, opaque)]));
+  return Object.fromEntries(Object.entries(value).map(([name, item]) => [redact(name), redactJsonLeaves(item, redact, opaque, name)]));
+}
+
+const JSON_TEXT = /^\s*[[{]/;
+/**
+ * `redact` for `redactJsonLeaves` over stored evidence (gateway, ToolHub, bridge). Escaped, a value right after \n or \t
+ * has no word boundary, so the patterns would miss it in JSON held as text (an MCP result's text). Text that holds a JSON
+ * object or array is walked like the outer value, one level deep, with the same `redact` and `opaque`; when an inner key
+ * or leaf changed it is re-stringified and scanned whole. Otherwise it is scanned with its escapes decoded (a duplicate
+ * key's earlier value, JSON that does not parse) and stored decoded and redacted when that finds anything. Other text is
+ * `redact`ed as it is.
+ */
+export function nestedJsonRedactor(redact: (text: string) => string, opaque?: () => string): (text: string) => string {
+  return (text) => {
+    if (text.length > MAX_PROTECTED_TEXT_CHARS || !JSON_TEXT.test(text)) return redact(text);
+    let parsed: unknown, isJson = true;
+    try { parsed = JSON.parse(text); } catch (error) { if (!(error instanceof SyntaxError)) throw error; isJson = false; }
+    if (isJson) {
+      let changed = false;
+      const inner = redactJsonLeaves(parsed, leaf => { const out = redact(leaf); changed ||= out !== leaf; return out; },
+        opaque === undefined ? undefined : () => { changed = true; return opaque(); });
+      if (changed) return redact(JSON.stringify(inner));
+    }
+    const decoded = decodeJsonEscapes(text);
+    const scanned = redact(decoded);
+    if (scanned !== decoded) return scanned;
+    return isJson || decoded === text ? text : redact(text);
+  };
 }
 
 /**
