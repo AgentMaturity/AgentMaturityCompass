@@ -114,7 +114,8 @@ because an unknown station may include `wealth`). `amc init --regulated` prints 
 then follows docs/catalog/COMPILER.md: `amc catalog compile --profile <profile> --request-review`, approval by two
 OWNER or AUDITOR users other than the requester, then `--activate <approvalRequestId>`. Once a plan with L0-IDN-01 is
 active, a tool call needs a lease that names an active `users.yaml` user. Studio native tasks carry one for their
-signed-in user. With workspace tools, `amc agent-loop run`, each `amc acp` session (at `session/new` and `session/load`)
+signed-in user. With workspace tools, `amc agent-loop run`, each `amc acp` session (at `session/new`, `session/load`
+and `session/fork`)
 and so `AMCNativeClient` mint one for the ACTIVE `users.yaml` user whose username is the OS account running them (P1-79).
 When no such user exists, the run is refused with `PRINCIPAL_UNRESOLVED` before a session or lease exists: the CLI
 exits non-zero, and `newSession()` rejects with `AMCNativeRefusedError` (code -32602, `data.reason`

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir, userInfo } from "node:os";
@@ -11,7 +12,10 @@ vi.mock("../src/leases/leaseSigner.js", async (importOriginal) => {
   return { ...original, issueLeaseToken: vi.fn(original.issueLeaseToken) };
 });
 
+import { ACP_ERROR, AcpFailure } from "../src/acp/acpErrors.js";
+import type { AcpForkSessionFactory, AcpForkSessionParams } from "../src/acp/acpRuntimeContracts.js";
 import { startAcpStdio } from "../src/acp/acpStdioMain.js";
+import { checkLease } from "../src/actions/authorize.js";
 import type { AgentRunSummary } from "../src/agent/runReport.js";
 import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
@@ -117,12 +121,17 @@ async function cliRun(): Promise<AgentRunSummary> {
 
 type Frame = { id?: number; result?: unknown; error?: { code: number; message: string; data?: { reason?: string } } };
 
-/** One ACP session over in-memory stdio: session/new, then the fs.read prompt when it opened. */
-async function acpRun(options: { tools?: "none" | "workspace"; leaseToken?: string } = {}): Promise<{ created: Frame; sessionId?: string }> {
+/**
+ * One ACP session over in-memory stdio: session/new, then the fs.read prompt when it opened. With `fork`, the operator's
+ * fork factory is composed in and the call is session/fork instead (AMC itself ships no fork factory).
+ */
+async function acpRun(options: { tools?: "none" | "workspace"; leaseToken?: string; fork?: AcpForkSessionFactory } = {}):
+  Promise<{ created: Frame; sessionId?: string }> {
   const stdin = new EventEmitter();
   const frames: Frame[] = [];
   const handle = startAcpStdio({ workspace, agentId: "default", providerId: "stub", systemPrompt: "s", tools: options.tools ?? "workspace",
     ...(options.leaseToken === undefined ? {} : { leaseToken: options.leaseToken }),
+    ...(options.fork === undefined ? {} : { forkSessionFactory: options.fork }),
     credentialsMode: "operator-only", credentialsHome: home, stdin,
     stdout: { write: (bytes) => { frames.push(JSON.parse(bytes.toString("utf8")) as Frame); return true; } },
     stderr: { write: () => true } });
@@ -133,6 +142,7 @@ async function acpRun(options: { tools?: "none" | "workspace"; leaseToken?: stri
   };
   try {
     expect((await call(1, "initialize", { protocolVersion: 1, clientCapabilities: {} })).error).toBeUndefined();
+    if (options.fork !== undefined) return { created: await call(2, "session/fork", { sessionId: randomUUID(), cwd: workspace, mcpServers: [] }) };
     const created = await call(2, "session/new", { cwd: workspace, mcpServers: [] });
     const sessionId = (created.result as { sessionId?: string } | undefined)?.sessionId;
     if (sessionId !== undefined) {
@@ -208,6 +218,39 @@ describe("CLI and ACP native runs under an activated identity-binding plan (P1-7
     expect(sessionId).toBeUndefined();
     expect(created.error?.message).toMatch(/^PRINCIPAL_UNRESOLVED: /);
     expect(created.error?.data?.reason).toBe("PRINCIPAL_UNRESOLVED");
+    expect(minted, "no lease was minted").not.toHaveBeenCalled();
+    expect(ledgerState(), "no session row and no evidence row").toEqual(before);
+  });
+});
+
+describe("ACP session/fork under an activated identity-binding plan (P1-79)", () => {
+  /** An operator fork factory that records what AMC handed it, then composes no child. */
+  const recording = (handed: AcpForkSessionParams[]): AcpForkSessionFactory => (params) => {
+    handed.push(params);
+    throw new AcpFailure(ACP_ERROR.invalidParams, "fixture fork factory composes no child");
+  };
+
+  it("hands the fork factory the child's own lease, naming the OS user's users.yaml user", async () => {
+    const ownerId = activatePlan(OS_USER);
+    const handed: AcpForkSessionParams[] = [];
+    const { created } = await acpRun({ fork: recording(handed) });
+    expect(created.error?.message, "the factory ran").toBe("fixture fork factory composes no child");
+    expect(handed).toHaveLength(1);
+    expect(minted, "one lease, minted before the factory ran").toHaveBeenCalledTimes(1);
+    const lease = checkLease({ workspace, agentId: "default", actionClass: "READ_ONLY" }, handed[0]!.leaseToken!);
+    expect("ok" in lease, JSON.stringify(lease)).toBe(false);
+    expect(!("ok" in lease) && lease.payload.principal).toEqual({ userId: ownerId });
+    expect(!("ok" in lease) && lease.payload.leaseId).toBe(minted.mock.results[0]!.value.payload.leaseId);
+  });
+
+  it("refuses session/fork PRINCIPAL_UNRESOLVED, coded, before the factory runs and before any lease or session row", async () => {
+    activatePlan(`not-${OS_USER}`);
+    const before = ledgerState();
+    const handed: AcpForkSessionParams[] = [];
+    const { created } = await acpRun({ fork: recording(handed) });
+    expect(created.error?.message).toMatch(/^PRINCIPAL_UNRESOLVED: /);
+    expect(created.error?.data?.reason).toBe("PRINCIPAL_UNRESOLVED");
+    expect(handed, "the operator's factory never ran").toEqual([]);
     expect(minted, "no lease was minted").not.toHaveBeenCalled();
     expect(ledgerState(), "no session row and no evidence row").toEqual(before);
   });

@@ -31,6 +31,8 @@ export interface AcpForkSessionParams {
   readonly workspace: string;
   readonly agentId: string;
   readonly signal: AbortSignal;
+  /** The child's own lease (P1-79), minted before the factory runs; compose the child with it (`AgentSessionInit.leaseToken`). */
+  readonly leaseToken?: string;
 }
 export type AcpForkSessionFactory = (params: AcpForkSessionParams) => AgentSession | Promise<AgentSession>;
 

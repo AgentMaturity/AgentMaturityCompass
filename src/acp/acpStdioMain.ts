@@ -211,7 +211,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   // caught: the conversation completed and the agent produced no text at all.
   const transport = route.providerId === STUB_PROVIDER_ID ? stubProviderTransport({}) : undefined;
 
-  // P1-79: each session's lease, minted at session/new or session/load before the session opens; PRINCIPAL_UNRESOLVED is coded.
+  // P1-79: each session's lease, minted at session/new, load or fork before the session opens; PRINCIPAL_UNRESOLVED is coded.
   const sessionLease = (): ReturnType<typeof runLease> => {
     try { return runLease({ workspace: init.workspace, agentId: init.agentId, model: route.models?.[0] ?? route.providerId, tools, ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }) }); }
     catch (error) { throw error instanceof LeasePrincipalRefused ? new AcpFailure(ACP_ERROR.invalidParams, error.message, { reason: error.code }) : error; }
@@ -254,7 +254,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
     promptRoute: registry.pin({ providerId: route.providerId, model: route.models?.[0] ?? "" }),
     orderedImageInput: true,
     audioInput: true,
-    ...(init.forkSessionFactory === undefined ? {} : { forkSessionFactory: init.forkSessionFactory }),
+    ...(init.forkSessionFactory === undefined ? {} : { forkSessionFactory: params => init.forkSessionFactory!({ ...params, ...sessionLease() }) }),
     write: createAcpStdioSink(stdout),
     sessionFactory: params => prepareAcpNativeSession({ session: sessionOptions(params), signal: params.signal,
       ...(approval ? { approval } : {}), ...(mcp ? { mcp } : {}),

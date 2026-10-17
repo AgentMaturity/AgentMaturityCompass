@@ -234,7 +234,8 @@ The `compiled-policy` guard runs first in the native pipeline and fails closed:
   verify or no lease can be minted (the lease signing key is unavailable), the runtime is not started; when the
   previous lease cannot be revoked, the resumed runtime is stopped. Under a plan whose `identity-binding` requires a
   principal, a CLI agent run (`amc agent-loop run`, which `amc agent-loop chat` drives) and each `amc acp` session (at
-  `session/new` and `session/load`; the SDK's `AMCNativeClient` runs `amc acp`) with workspace tools mint their own
+  `session/new`, `session/load` and `session/fork`, where an operator's fork factory receives the child's lease as
+  `leaseToken`; the SDK's `AMCNativeClient` runs `amc acp`) with workspace tools mint their own
   lease through `issueLeaseForPrincipal` (P1-79, `src/leases/runLease.ts`): `toolhub:execute`, at most one hour, naming
   the ACTIVE `users.yaml` user whose username is the OS account running the process, read from the verified file and
   never from a flag, an environment variable or a request body. That is a local binding: whoever runs as that OS
