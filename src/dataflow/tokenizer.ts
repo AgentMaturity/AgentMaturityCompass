@@ -42,3 +42,24 @@ export function tokenFor(hmacKey: Buffer, dataClass: ProtectedDataClass, value: 
   const mac = createHmac("sha256", hmacKey).update(dataClass, "utf8").update("\0", "utf8").update(value, "utf8").digest("hex");
   return `[[amc:${dataClass}:${mac.slice(0, 16)}]]`;
 }
+
+/**
+ * How evidence binds tool output (P2-02). `sha256` is the plain SHA-256 of the output, as before. In an opted-in
+ * workspace it is `hmac-sha256`: HMAC-SHA256 under the workspace token HMAC key over "amc.output-digest/v1", a zero byte
+ * and the output's SHA-256 hex, so a short output (an SSN, a card number) cannot be brute-forced from the digest, while
+ * whoever holds the key and the output can still check it.
+ */
+export interface OutputDigest { readonly kind: "sha256" | "hmac-sha256"; readonly value: string }
+
+export function keyedOutputDigest(hmacKey: Buffer, outputSha256: string): OutputDigest {
+  const value = createHmac("sha256", hmacKey).update("amc.output-digest/v1\0", "utf8").update(outputSha256, "utf8").digest("hex");
+  return Object.freeze({ kind: "hmac-sha256", value });
+}
+
+/**
+ * An evidence field for `digest`, its form explicit in the field: `{ <name>Sha256: hex }` for the plain form (the field
+ * evidence always carried), `{ <name>Digest: { kind, value } }` for the keyed one.
+ */
+export function digestField(name: string, digest: OutputDigest): Readonly<Record<string, unknown>> {
+  return digest.kind === "sha256" ? { [`${name}Sha256`]: digest.value } : { [`${name}Digest`]: { kind: digest.kind, value: digest.value } };
+}

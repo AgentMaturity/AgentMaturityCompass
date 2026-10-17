@@ -17,7 +17,8 @@ import { withDeletionGate } from "../residency/deletionGate.js";
 import { ensureDir } from "../utils/fs.js";
 import type { ProtectedDataClass } from "../vault/dataClassification.js";
 import { getVaultSecret, setVaultSecret, unlockVault, vaultExists, vaultStatus } from "../vault/vault.js";
-import { RedactionRefused } from "./tokenizer.js";
+import { protectedDataOptedIn } from "./processorRegistry.js";
+import { keyedOutputDigest, RedactionRefused, type OutputDigest } from "./tokenizer.js";
 
 export interface TokenKeys { readonly hmac: Buffer; readonly aes: Buffer }
 export interface TokenEntry { readonly token: string; readonly dataClass: ProtectedDataClass; readonly value: string }
@@ -54,6 +55,15 @@ export function loadTokenKeys(workspace: string): TokenKeys {
   } catch {
     throw new RedactionRefused("vault_unavailable");
   }
+}
+
+/**
+ * The digest evidence binds about output whose SHA-256 is `outputSha256`: keyed in an opted-in workspace, plain
+ * elsewhere. Keyed needs the token keys; a locked vault refuses (vault_unavailable) rather than bind nothing.
+ */
+export function outputDigestFor(workspace: string, outputSha256: string): OutputDigest {
+  return protectedDataOptedIn(workspace) ? keyedOutputDigest(loadTokenKeys(workspace).hmac, outputSha256)
+    : Object.freeze({ kind: "sha256", value: outputSha256 });
 }
 
 function openVault(workspace: string): Database.Database {

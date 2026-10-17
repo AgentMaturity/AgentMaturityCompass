@@ -1,5 +1,6 @@
 import type { AuthorizationRecordV1 } from "../actions/authorizationRecord.js";
 import type { ReceiptState } from "../actions/receiptStates.js";
+import type { OutputDigest } from "../dataflow/tokenizer.js";
 import type { ActionClass } from "../types.js";
 
 /**
@@ -135,6 +136,11 @@ export interface ToolOutcome {
    * calls. Reported state, not a claim the effect did or did not happen.
    */
   readonly action?: { readonly executionId: string; readonly state: ReceiptState; readonly evidenceComplete: boolean };
+  /**
+   * How evidence binds `output` (P2-02), decided once per call by the pipeline so the action receipt's outcome digest
+   * and the `stdout` row carry the same form. Absent outside the pipeline: evidence then uses the plain SHA-256.
+   */
+  readonly outputDigest?: OutputDigest;
 }
 
 /** What a tool body receives and returns. */

@@ -27,7 +27,7 @@ import { canonicalize } from "../utils/json.js";
 import type { ProtectedDataClass } from "../vault/dataClassification.js";
 import { DETECTOR_SET_DIGEST, MAX_PROTECTED_TEXT_CHARS, redactProtectedText } from "./detectors.js";
 import { protectedDataOptedIn } from "./processorRegistry.js";
-import { RedactionRefused, TOKEN_PATTERN_SOURCE, tokenFor } from "./tokenizer.js";
+import { digestField, keyedOutputDigest, RedactionRefused, TOKEN_PATTERN_SOURCE, tokenFor } from "./tokenizer.js";
 import { loadTokenKeys, openTokenLookup, storeTokens, type TokenEntry, type TokenKeys } from "./tokenVault.js";
 
 export type DeclaredFields = Readonly<Record<string, ProtectedDataClass>>;
@@ -263,6 +263,12 @@ export function createRedactingSession(session: SessionService, redactor: Redact
     }
     return toolNames.get(callId);
   };
+  const keyedOutput = (fields: Readonly<Record<string, unknown>>): Record<string, unknown> => {
+    if (!Object.hasOwn(fields, "outputSha256")) return { ...fields };
+    const { outputSha256, ...kept } = fields;
+    if (typeof outputSha256 !== "string" || !/^[0-9a-f]{64}$/.test(outputSha256)) throw new RedactionRefused("redaction_failed");
+    return { ...kept, ...digestField("output", keyedOutputDigest(loadTokenKeys(session.workspace).hmac, outputSha256)) };
+  };
   const overrides = {
     recordUserMessage(text: string, provenance?: Parameters<SessionService["recordUserMessage"]>[1]): SessionEventRef {
       return session.recordUserMessage(active() ? redact(text, "user/message", null) : text, provenance);
@@ -293,9 +299,10 @@ export function createRedactingSession(session: SessionService, redactor: Redact
       return session.recordToolResult({ ...result, content });
     },
     /**
-     * Evidence about tool output. A native-validation check's output is redacted like a tool result. A stdout row keeps
-     * its sizes but not `outputSha256`, the plain SHA-256 of the raw output, which a short value (an SSN, a card number)
-     * would let anyone brute-force; the output it hashed is not retained anyway.
+     * Evidence about tool output. A native-validation check's output is redacted like a tool result. A stdout row's plain
+     * `outputSha256`, which a short output (an SSN, a card number) would let anyone brute-force, becomes the keyed
+     * `outputDigest` (`hmac-sha256` over that SHA-256): a delegate's report has one; a tool row already carries the
+     * pipeline's keyed digest, the same one its action receipt binds.
      */
     recordProjectedEvidence(row: Parameters<SessionService["recordProjectedEvidence"]>[0]): SessionEventRef {
       if (!active()) return session.recordProjectedEvidence(row);
@@ -303,9 +310,8 @@ export function createRedactingSession(session: SessionService, redactor: Redact
         let payload: unknown;
         try { payload = JSON.parse(row.payload); } catch { throw new RedactionRefused("redaction_failed"); }
         if (payload === null || typeof payload !== "object" || Array.isArray(payload)) throw new RedactionRefused("redaction_failed");
-        const { outputSha256: _payloadDigest, ...kept } = payload as Record<string, unknown>;
-        const { outputSha256: _metaDigest, ...meta } = row.meta;
-        return session.recordProjectedEvidence({ ...row, payload: JSON.stringify(kept), meta });
+        return session.recordProjectedEvidence({ ...row, payload: JSON.stringify(keyedOutput(payload as Record<string, unknown>)),
+          meta: keyedOutput(row.meta) });
       }
       if (row.meta.kind === "native-validation" && row.meta.phase === "check-result" && row.payload !== "") {
         const callId = typeof row.meta.callId === "string" ? row.meta.callId : "native-validation";
