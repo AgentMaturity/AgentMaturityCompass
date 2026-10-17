@@ -272,24 +272,24 @@ describe("P1-35 synthetic migration source contracts", () => {
     });
   });
 
-  test("post-fix assurance without an envelope classifies as R5 self-reported", async () => {
-    await owned("postfix-assurance-R5-strict", false, f => {
-      const found = classifyLegacyArtifact("assurance_report", postfixReport());
-      f.facts = { found, specificationEdge: "MEASURED without claim envelope remains conservative R5" };
-      expect(found?.rule).toBe("R5-no-claim-envelope");
-      expect(found?.claimKind).toBe("self_reported"); expect(found?.levelCap).toBe("L1");
-    });
-  });
-
-  test("post-fix assurance lazy claim stays self-reported instead of using current observed fallback", async () => {
-    await owned("postfix-assurance-lazy-strict", false, f => {
+  test("a 2.x assurance report shaped like assuranceRunner's output is not legacy and keeps the current claim", async () => {
+    await owned("current-2x-assurance-not-legacy", true, async f => {
+      // The fields assuranceRunner.ts writes into every report since fba5824e, with no claim envelope.
+      const report: AssuranceReport = { ...postfixReport(), sessionId: "synthetic-session", inconclusiveScenarioCount: 0,
+        target: { transport: "direct", endpoint: "http://127.0.0.1:1/v1", model: "synthetic-model", providerTemplateId: "custom" } };
       const envelope = currentEnvelope(); let callbacks = 0;
-      const visible = assuranceReportClaim(postfixReport(), () => { callbacks++; return envelope; }, NOW);
-      f.facts = { currentPositiveKind: envelope.claimKind, visibleKind: visible.claimKind, callbacks,
-        legacyNoticePresent: visible.provenance.legacy !== undefined };
-      expect(envelope.claimKind).toBe("observed");
-      expect(visible.claimKind).toBe("self_reported"); expect(callbacks).toBe(0);
-      expect(visible.provenance.legacy !== undefined).toBe(true);
+      const found = classifyLegacyArtifact("assurance_report", report);
+      const visible = assuranceReportClaim(report, () => { callbacks++; return envelope; }, NOW);
+      const locator = ".amc/reports/assurance/current-2x.json";
+      mkdirSync(join(f.root, ".amc/reports/assurance"), { recursive: true });
+      writeFileSync(join(f.root, locator), JSON.stringify(report) + "\n", { flag: "wx", mode: 0o600 });
+      const dry = await relabelLegacyArtifacts(f.root, { trust: ownTrust(f.root), dryRun: true, now: receiptClock() });
+      f.facts = { found, callbacks, callerEnvelopeRetained: visible === envelope,
+        relabelledLocators: dry.records.map(row => row.artifact.locator) };
+      expect(found).toBeNull(); expect(callbacks).toBe(1); expect(visible === envelope).toBe(true);
+      expect(visible.provenance.legacy).toBeUndefined();
+      expect(dry.receipt.scanned.assurance_report).toBeGreaterThan(0);
+      expect(dry.records.some(row => row.artifact.locator === locator)).toBe(false);
     });
   });
 

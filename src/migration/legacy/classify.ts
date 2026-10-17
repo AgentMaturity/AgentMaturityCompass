@@ -117,11 +117,11 @@ export function classifyLegacyArtifact(kind: LegacyArtifactKind, parsed: unknown
   if (!value || hasClaimEnvelope(value)) return null;
   switch (kind) {
     case "assurance_report":
-      // R1: AMC 1.x graded a canned reply for every scenario; fba5824e added evidenceStatus when it removed it.
-      if (typeof value.assuranceRunId !== "string") return null;
-      return value.evidenceStatus === undefined
+      // R1: AMC 1.x graded a canned reply for every scenario; fba5824e added evidenceStatus when it removed it, and no
+      // 1.x tag contains fba5824e, so a report with evidenceStatus is a 2.x report and current() decides its claim.
+      return typeof value.assuranceRunId === "string" && value.evidenceStatus === undefined
         ? classification("R1-assurance-canned-reply", "synthetic_example", { trustTier: text(value.trustTier), label: text(value.trustLabel) })
-        : classification("R5-no-claim-envelope", "self_reported", { trustTier: text(value.trustTier), label: text(value.trustLabel) }, "L1");
+        : null;
     case "diagnostic_report":
     case "bundle":
     case "trust_certificate":
@@ -140,8 +140,7 @@ export function classifyLegacyArtifact(kind: LegacyArtifactKind, parsed: unknown
 
 /**
  * A stored assurance report's claim: a 1.x report (R1) is a legacy synthetic example through P0-08's legacy adapter,
- * never a pass and never a level, whatever its seal says. A post-fix report without an envelope is conservatively
- * self-reported (R5); a report that carries an envelope gets the caller's current claim.
+ * never a pass and never a level, whatever its seal says; any other report gets the caller's envelope.
  */
 export function assuranceReportClaim(report: AssuranceReport, current: () => ClaimEnvelope, now: number): ClaimEnvelope {
   const found = classifyLegacyArtifact("assurance_report", report);
@@ -149,7 +148,6 @@ export function assuranceReportClaim(report: AssuranceReport, current: () => Cla
   return envelopeForLegacyResult({
     producer: `assurance:${report.assuranceRunId}`, version: "none",
     ...(found.original.trustTier ? { originalTier: found.original.trustTier } : {}),
-    method: found.claimKind === "synthetic_example" ? "synthetic" : "runtime_observation",
-    status: "NOT_EVALUATED", level: null, eventCount: 0, evidenceRefs: [report.assuranceRunId], now
+    method: "synthetic", status: "NOT_EVALUATED", level: null, eventCount: 0, evidenceRefs: [report.assuranceRunId], now
   });
 }
