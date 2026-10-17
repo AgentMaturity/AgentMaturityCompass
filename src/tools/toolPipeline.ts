@@ -1,5 +1,8 @@
 import { randomUUID } from "node:crypto";
-import type { ActionJournal } from "../actions/actionJournal.js";
+import type { ActionJournal, ActionRequest } from "../actions/actionJournal.js";
+import { authorizationRecordDigest } from "../actions/authorizationRecord.js";
+import { mintIdempotencyKey } from "../actions/idempotency.js";
+import { assertContract } from "../contracts/index.js";
 import {
   authorizationIntentFor, bindAuthorization, recheckAuthorization,
   type AuthorizationContext, type AuthorizationIntentResult, type BindResult
@@ -288,15 +291,24 @@ export class ToolPipeline {
         ...(input.signal === undefined ? {} : { signal: input.signal })
       };
 
-      const authorization = await this.enter(draft, input.authority);
-      const bound = authorization.bound;
-      const execution: ToolExecution = bound?.ok ? boundExecution(draft, bound) : draft;
+      const gate = [...this.gates].reverse().find((candidate) => candidate.gates(draft.name));
+      // A journaled sub-call must be admitted before its bound gate can ask. Other paths keep their existing entry order.
+      const deferEntry = this.init.journal !== undefined && this.authorizes(definition.actionClass)
+        && draft.parentToken !== null && gate !== undefined;
+      const authorization = deferEntry ? null : await this.enter(draft, input.authority, gate);
+      const bound = authorization?.bound;
+      let execution: ToolExecution = bound?.ok ? boundExecution(draft, bound) : draft;
       selectedDefinitions.set(execution, definition);
       let outcome: ToolOutcome;
       try {
         outcome = this.init.journal !== undefined && this.authorizes(definition.actionClass)
-          ? await this.runJournaled(this.init.journal, execution, definition.body, authorization)
-          : await this.runStages(execution, definition.body, authorization);
+          ? await this.runJournaled(this.init.journal, execution, definition.body, authorization,
+            () => this.enter(draft, input.authority, gate), (fresh) => {
+              selectedDefinitions.delete(execution);
+              execution = fresh;
+              selectedDefinitions.set(execution, definition);
+            })
+          : await this.runStages(execution, definition.body, authorization!);
       } finally {
         selectedDefinitions.delete(execution);
       }
@@ -369,9 +381,8 @@ export class ToolPipeline {
    * so the human wait is never inside the record's lifetime. Binding failures are held until after the guards, so a
    * guard's denial is still the one reported for a call the guards refuse.
    */
-  private async enter(draft: ToolExecution, supplied: ToolAuthority | undefined): Promise<CallAuthorization> {
+  private async enter(draft: ToolExecution, supplied: ToolAuthority | undefined, gate: BoundApprovalGate | undefined): Promise<CallAuthorization> {
     const authorizes = this.authorizes(draft.actionClass);
-    const gate = [...this.gates].reverse().find((candidate) => candidate.gates(draft.name));
     let authority = supplied;
     if (gate !== undefined && draft.parentToken !== null) {
       const intent = authorizes ? authorizationIntentFor(draft, this.init.authorizationContext?.()) : null;
@@ -387,6 +398,24 @@ export class ToolPipeline {
     const context: AuthorizationContext = { ...(this.init.authorizationContext?.() ?? {}), ...(authority ? { authority } : {}) };
     const required = gate !== undefined || (this.init.boundApprovalRequiredFor?.has(draft.actionClass) ?? false);
     return { refused: null, context, bound: bindAuthorization(draft, context), required };
+  }
+
+  /** Bind the fresh record to this pipeline's already committed reservation; never import caller-supplied IDs. */
+  private bindJournalAdmission(authorization: CallAuthorization, request: ActionRequest): CallAuthorization {
+    const bound = authorization.bound;
+    if (!bound?.ok) return authorization;
+    try {
+      // The request's session/parent attribution is immutable too. A changed composition must not silently relabel it.
+      if (bound.record.session.sessionId !== request.sessionId || bound.record.delegation.parentExecutionId !== request.parentExecutionId) {
+        throw new Error("the authorization context no longer names the requested session and parent");
+      }
+      const record = assertContract("authorization-record", { ...bound.record,
+        executionId: request.executionId, idempotencyKey: request.idempotencyKey });
+      return { ...authorization, bound: { ...bound, record, digest: authorizationRecordDigest(record) } };
+    } catch (error) {
+      return { ...authorization, bound: { ok: false, failures: ["authority_store_unavailable"],
+        reason: `the journal admission could not bind the fresh authorization: ${String(error)}` } };
+    }
   }
 
   /** A record that did not bind, or a required approval that is missing: a denial before anything is authorized. */
@@ -418,6 +447,7 @@ export class ToolPipeline {
       timedOut: result.timedOut ?? false,
       denied: null,
       output,
+      ...(result.effect === undefined ? {} : { effect: result.effect }),
       bytes: result.bytes ?? Buffer.byteLength(output, "utf8")
     };
   }
@@ -449,19 +479,23 @@ export class ToolPipeline {
    * before the wait is read again after it: the block here, the record's facts and approvals by the recheck.
    */
   private async runJournaled(open: () => ActionJournal, execution: ToolExecution, body: ToolBody,
-    authorization: CallAuthorization): Promise<ToolOutcome> {
-    const bound = authorization.bound;
-    const executionId = bound?.ok ? bound.record.executionId : `exec_${randomUUID()}`;
+    authorization: CallAuthorization | null, enter: () => Promise<CallAuthorization>, selectExecution: (execution: ToolExecution) => void): Promise<ToolOutcome> {
+    const initial = authorization?.bound;
+    const executionId = initial?.ok ? initial.record.executionId : `exec_${randomUUID()}`;
+    const idempotencyKey = initial?.ok ? initial.record.idempotencyKey : authorization === null ? mintIdempotencyKey() : null;
     let head: ReceiptState = "requested";
     const action = (state: ReceiptState, evidenceComplete = true) => ({ executionId, state, evidenceComplete });
     const unavailable = (error: unknown): ToolDenial => ({ stage: "authorization", guardLabel: null,
       reason: error instanceof Error && /^journal_(unavailable|integrity_failed)/.test(error.message) ? error.message : `journal_unavailable: ${String(error)}` });
     let journal: ActionJournal;
+    let request: ActionRequest;
     try {
+      const context = authorization === null ? this.init.authorizationContext?.() : authorization.context;
       journal = open();
-      journal.request({ executionId, agentId: execution.agentId, toolName: execution.name, actionClass: execution.actionClass,
-        sessionId: authorization.context?.sessionId ?? null, callId: execution.callId,
-        parentExecutionId: authorization.context?.delegation?.parentExecutionId ?? null, idempotencyKey: bound?.ok ? bound.record.idempotencyKey : null });
+      request = { executionId, agentId: execution.agentId, toolName: execution.name, actionClass: execution.actionClass,
+        sessionId: context?.sessionId ?? null, callId: execution.callId,
+        parentExecutionId: context?.delegation?.parentExecutionId ?? null, idempotencyKey };
+      journal.request(request);
     } catch (error) {
       return denialOutcome(unavailable(error)); // Failure row 1: nothing requested, nothing dispatched.
     }
@@ -476,6 +510,14 @@ export class ToolPipeline {
     };
     const blocked = (blockedBy: string, code: BlockCode = "blocked_by_unreconciled"): ToolOutcome =>
       deny({ stage: "authorization", guardLabel: null, reason: blockReason(code, blockedBy) }, `${code}:${blockedBy}`);
+    const cancelled = (): ToolOutcome => {
+      try {
+        journal.cancel(executionId, "aborted_before_dispatch");
+        return { ok: false, exitCode: null, timedOut: false, denied: null, output: "", bytes: 0, action: action("cancelled") };
+      } catch (error) {
+        return deny(unavailable(error), "journal_unavailable");
+      }
+    };
     /** The block as it is now: an id that blocks this call, null for none, or a denial when the journal cannot say. */
     const blockingNow = (): string | ToolOutcome | null => {
       try {
@@ -486,6 +528,21 @@ export class ToolPipeline {
     };
     const early = blockingNow();
     if (early !== null) return typeof early === "string" ? blocked(early) : early;
+    if (authorization === null) {
+      if (execution.signal?.aborted) return cancelled();
+      try {
+        // No authorization record lives across the bound gate's human wait. All authority, facts and times are fresh.
+        authorization = this.bindJournalAdmission(await enter(), request);
+      } catch (error) {
+        return deny(unavailable(error), "journal_unavailable");
+      }
+      const fresh = authorization.bound;
+      if (fresh?.ok) {
+        execution = boundExecution(execution, fresh);
+        selectExecution(execution); // Guards, body, selected-definition lookup and recorder all use these final IDs/digest.
+      }
+    }
+    const bound = authorization.bound;
     if (authorization.refused !== null) return deny(authorization.refused, "approval_denied");
     const approval = await this.askApproval(execution);
     if (approval?.denied) return deny(approval.denied, "approval_denied");
@@ -496,14 +553,7 @@ export class ToolPipeline {
       return deny({ stage: "authorization", reason: binding?.reason ?? "authorization record missing", guardLabel: null },
         `authorization_denied:${binding?.code ?? "record_missing"}`);
     }
-    if (execution.signal?.aborted) {
-      try {
-        journal.cancel(executionId, "aborted_before_dispatch");
-        return { ok: false, exitCode: null, timedOut: false, denied: null, output: "", bytes: 0, action: action("cancelled") };
-      } catch (error) {
-        return deny(unavailable(error), "journal_unavailable");
-      }
-    }
+    if (execution.signal?.aborted) return cancelled();
     try {
       journal.authorize(executionId, bound.digest);
       head = "authorized";

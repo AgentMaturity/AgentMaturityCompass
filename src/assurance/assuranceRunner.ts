@@ -566,6 +566,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       }
     }
 
+    ledger.sealSession(sessionId);
     const verification = input.noSign
       ? { ok: false, errors: ["unsigned assurance run"] }
       : await verifyLedgerIntegrity(workspace);
@@ -628,8 +629,6 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       run_seal_sig: reportSig,
       status: report.status
     });
-
-    ledger.sealSession(sessionId);
 
     // Persist the v1 artifacts the store, certificates and scheduler read.
     persistV1Artifacts({
