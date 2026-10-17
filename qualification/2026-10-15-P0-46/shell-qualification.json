@@ -1,0 +1,513 @@
+{
+  "issue": "P0-46",
+  "kind": "Bounded actual action-shell control-flow qualification with observation-only commands",
+  "recordedUtc": "2026-10-14T18:48:50.498546+00:00",
+  "repo": "/Users/sid/.codex/worktrees/p0-46-qualification/AgentMaturityCompass",
+  "base": "d8e5168556aeea8e8c12cbc67848839824edbb48",
+  "headAtReceipt": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+  "authoredScope": "Only NEW tests/amcActionLocalPnpmQualification.test.ts was changed by this subagent. Parent owns source finalization, real install/build/private-prefix observation and broader validation.",
+  "test": {
+    "path": "/Users/sid/.codex/worktrees/p0-46-qualification/AgentMaturityCompass/tests/amcActionLocalPnpmQualification.test.ts",
+    "bytes": 9044,
+    "sha256": "a121280c7ec6dcddf8cfe82054720a5919ce850cf23979f9f92c048c32bce717"
+  },
+  "actualTestCounts": {
+    "success": true,
+    "numTotalTests": 13,
+    "numPassedTests": 13,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "rawReport": {
+    "path": "/private/tmp/p0-46-action-shell-observer-first-20261015.json",
+    "bytes": 5498,
+    "sha256": "1890a01fd461903fdf761cf2a4c8da07a9949f4211104589e30f330728e6c1c6"
+  },
+  "rawEffects": {
+    "path": "/private/tmp/p0-46-action-shell-observer-first-20261015/action-shell-observations.json",
+    "bytes": 18470,
+    "sha256": "e028e9440911c07f2f6c1a57a9b7e7fa88b1f709f26876c8203160c48a0df0dd"
+  },
+  "actualShellInvocations": 12,
+  "testCases": [
+    {
+      "name": "AMC action local pnpm shell qualification preserves local-only pnpm setup, the declared Node 20 default, explicit inputs and outputs",
+      "status": "passed"
+    },
+    {
+      "name": "AMC action local pnpm shell qualification installs frozen dependencies, builds, then globally installs the action repository from an unrelated caller cwd",
+      "status": "passed"
+    },
+    {
+      "name": "AMC action local pnpm shell qualification propagates 'install' failure and prevents subsequent install commands",
+      "status": "passed"
+    },
+    {
+      "name": "AMC action local pnpm shell qualification propagates 'build' failure and prevents subsequent install commands",
+      "status": "passed"
+    },
+    {
+      "name": "AMC action local pnpm shell qualification propagates 'npm' failure and prevents subsequent install commands",
+      "status": "passed"
+    },
+    {
+      "name": "AMC action local pnpm shell qualification refuses unsupported input \"latest\" before package or release commands",
+      "status": "passed"
+    },
+    {
+      "name": "AMC action local pnpm shell qualification refuses unsupported input \"1.2.1\" before package or release commands",
+      "status": "passed"
+    },
+    {
+      "name": "AMC action local pnpm shell qualification refuses unsupported input \"LOCAL\" before package or release commands",
+      "status": "passed"
+    },
+    {
+      "name": "AMC action local pnpm shell qualification refuses unsupported input \"\" before package or release commands",
+      "status": "passed"
+    },
+    {
+      "name": "AMC action local pnpm shell qualification refuses a missing action path before executing package commands",
+      "status": "passed"
+    },
+    {
+      "name": "AMC action local pnpm shell qualification preserves release 1.2.0 without pnpm and propagates pipeline 'none' status",
+      "status": "passed"
+    },
+    {
+      "name": "AMC action local pnpm shell qualification preserves release 1.2.0 without pnpm and propagates pipeline 'curl' status",
+      "status": "passed"
+    },
+    {
+      "name": "AMC action local pnpm shell qualification preserves release 1.2.0 without pnpm and propagates pipeline 'sh' status",
+      "status": "passed"
+    }
+  ],
+  "phaseJournal": [
+    {
+      "name": "action-shell-observer-first",
+      "cmd": "pnpm exec vitest run tests/amcActionLocalPnpmQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-46-action-shell-observer-first-20261015.json",
+      "exit": 0,
+      "durationMs": 3566,
+      "startedUtc": "2026-10-14T18:44:22.192912+00:00",
+      "log": "/private/tmp/p0-46-action-shell-observer-first-20261015.log",
+      "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+    },
+    {
+      "name": "action-shell-order-historical-red",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-46-historical-shell-order-observer-20261015.mjs historical",
+      "exit": 1,
+      "durationMs": 725,
+      "startedUtc": "2026-10-14T18:46:38.075576+00:00",
+      "log": "/private/tmp/p0-46-action-shell-order-historical-red-20261015.log",
+      "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+    },
+    {
+      "name": "action-shell-order-current-green",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-46-historical-shell-order-observer-20261015.mjs current",
+      "exit": 0,
+      "durationMs": 469,
+      "startedUtc": "2026-10-14T18:46:57.201015+00:00",
+      "log": "/private/tmp/p0-46-action-shell-order-current-green-20261015.log",
+      "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+    }
+  ],
+  "phaseLogs": [
+    {
+      "path": "/private/tmp/p0-46-action-shell-observer-first-20261015.log",
+      "bytes": 84,
+      "sha256": "753402f62b1bc1e251643a8b1e0597c6986b0cef1d4253600bbcd6d77b283f04"
+    },
+    {
+      "path": "/private/tmp/p0-46-action-shell-order-historical-red-20261015.log",
+      "bytes": 2236,
+      "sha256": "a7faab1a93bd3a4b94e51a6e87b0672d31a6dfa9b7543c00866b59688d2d1906"
+    },
+    {
+      "path": "/private/tmp/p0-46-action-shell-order-current-green-20261015.log",
+      "bytes": 110,
+      "sha256": "af12a1048bff6bd14079f8747f8e0d69156bfe992aa1948e5ae58cb988b755d4"
+    }
+  ],
+  "runtime": "Node22.23.3 actual observer; scoped process.execPath/PATH. Node24 not executed here; Node20 metadata default is preserved but unqualified by this observer.",
+  "observedContract": [
+    "Conditional pnpm/action-setup@v4 with version10.33.0 only for local; Node setup forwards explicit input without changing default20.",
+    "All nine declared inputs/defaults and four output references remain exact.",
+    "Actual parsed Bash block starts with set-euo pipefail and resolves repository via GITHUB_ACTION_PATH/.. from unrelated consumer cwd with spaces and hostile CDPATH.",
+    "Local argv is frozenpnpm install\u2192pnpm build\u2192npm global-install of exact source repository. Shim process cwd remains the consumer cwd; --dir separately names the repository.",
+    "Injected install41/build42/npm43 failures propagate unchanged and prevent subsequent commands.",
+    "latest,1.2.1,LOCAL and empty inputs refuse before command execution; missing action path also refuses before package calls.",
+    "Release1.2.0 invokes inert curl and draining sh observers, never pnpm/npm; curl44 and sh45 failures verify actual pipeline status propagation. No installer text is evaluated."
+  ],
+  "historicalCausalWitness": {
+    "customScript": {
+      "path": "/private/tmp/p0-46-historical-shell-order-observer-20261015.mjs",
+      "bytes": 5786,
+      "sha256": "ac7a1e0caf8c2506764d09ff6325e81b6936ee0aa4ec68ff895be7d4114c4152"
+    },
+    "fixtureMetadata": {
+      "path": "/private/tmp/p0-46-historical-shell-order-fixture-20261015.json",
+      "bytes": 447,
+      "sha256": "95fe1f8ab35cb7c2f918a3bdf5ed4f8c0a95dc3984cd1d36a0787ff13efdf38b"
+    },
+    "fixtureRetainedFiles": [
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/current/action.yml",
+        "bytes": 14266,
+        "sha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/current/commands.jsonl",
+        "bytes": 833,
+        "sha256": "8334f1d7293802c9526dd39cbfe6a1b7edf70b147066b8e7f355be4a09312f8f"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/current/install.sh",
+        "bytes": 475,
+        "sha256": "b2bc5ddc3dca6880619d4248096a522a6a787a0bcf9ed5450ab0fdeaced0b4d8"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/current/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/current/stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/current/summary.json",
+        "bytes": 3574,
+        "sha256": "8f8ae6ab17aa90816732a3f1525b850e021d9f9ac4d306a6e8895fe520aed815"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/historical/action.yml",
+        "bytes": 13989,
+        "sha256": "391696c32dbb74dfa909220020e73fd291c6fbdcc01691b3b3346f091457381c"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/historical/commands.jsonl",
+        "bytes": 812,
+        "sha256": "223e57ce8b6425891e4a3f30936e2e86bf24da761c00fa40bac9a7e0fd9c78e5"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/historical/install.sh",
+        "bytes": 456,
+        "sha256": "34deaadc9112f254c1810e56265e4405300f5c91ade4c8325207300551a02df5"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/historical/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/historical/stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/historical/summary.json",
+        "bytes": 3551,
+        "sha256": "02757df08f57c47bac46a4c305896ff388969c4cdaadfaa19a83773baf4bc9b6"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/observer-bin/curl",
+        "bytes": 411,
+        "sha256": "b7cf7e51ffb74505947a4d1dbbc59da0a460e6dce1c012753f8633af4abaeeae"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/observer-bin/npm",
+        "bytes": 411,
+        "sha256": "b7cf7e51ffb74505947a4d1dbbc59da0a460e6dce1c012753f8633af4abaeeae"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/observer-bin/pnpm",
+        "bytes": 411,
+        "sha256": "b7cf7e51ffb74505947a4d1dbbc59da0a460e6dce1c012753f8633af4abaeeae"
+      },
+      {
+        "path": "/private/tmp/p0-46-owned-shell-order-79twkf/observer-bin/sh",
+        "bytes": 411,
+        "sha256": "b7cf7e51ffb74505947a4d1dbbc59da0a460e6dce1c012753f8633af4abaeeae"
+      }
+    ],
+    "historical": {
+      "mode": "historical",
+      "fixture": {
+        "root": "/private/tmp/p0-46-owned-shell-order-79twkf",
+        "repository": "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout",
+        "caller": "/private/tmp/p0-46-owned-shell-order-79twkf/unrelated consumer checkout",
+        "bin": "/private/tmp/p0-46-owned-shell-order-79twkf/observer-bin",
+        "home": "/private/tmp/p0-46-owned-shell-order-79twkf/home",
+        "actionPath": "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout/amc-action"
+      },
+      "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+      "sourceRef": "19da1edf407fa6e2d61a132fc0ce9b9b8a6c56ed",
+      "originalFix": "e0fdc9c5a40187bf73056752bb53cd1bed67f333",
+      "historicalParent": "19da1edf407fa6e2d61a132fc0ce9b9b8a6c56ed",
+      "actionSha256": "391696c32dbb74dfa909220020e73fd291c6fbdcc01691b3b3346f091457381c",
+      "installRunSha256": "e6b6cc5c66eabea2d48c4a593b805297ced4926719668d32e1d3a43319d5cb40",
+      "executedScriptSha256": "34deaadc9112f254c1810e56265e4405300f5c91ade4c8325207300551a02df5",
+      "runtime": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "executableSha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd",
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "durationMs": 611,
+      "calls": [
+        {
+          "tool": "npm",
+          "args": [
+            "ci",
+            "--prefix",
+            "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout"
+          ],
+          "cwd": "/private/tmp/p0-46-owned-shell-order-79twkf/unrelated consumer checkout",
+          "actionPath": "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout/amc-action"
+        },
+        {
+          "tool": "npm",
+          "args": [
+            "run",
+            "--prefix",
+            "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout",
+            "build"
+          ],
+          "cwd": "/private/tmp/p0-46-owned-shell-order-79twkf/unrelated consumer checkout",
+          "actionPath": "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout/amc-action"
+        },
+        {
+          "tool": "npm",
+          "args": [
+            "install",
+            "-g",
+            "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout"
+          ],
+          "cwd": "/private/tmp/p0-46-owned-shell-order-79twkf/unrelated consumer checkout",
+          "actionPath": "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout/amc-action"
+        }
+      ],
+      "expected": [
+        {
+          "tool": "pnpm",
+          "args": [
+            "--dir",
+            "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout",
+            "install",
+            "--frozen-lockfile"
+          ]
+        },
+        {
+          "tool": "pnpm",
+          "args": [
+            "--dir",
+            "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "tool": "npm",
+          "args": [
+            "install",
+            "-g",
+            "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout"
+          ]
+        }
+      ],
+      "shellOrderContractPassed": false,
+      "phase": "/private/tmp/p0-46-owned-shell-order-79twkf/historical",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Actual unmodified YAML install block executed against observation-only commands. No dependency install/build/global install or release installer occurred.",
+      "historicalLimit": "Historical shell exits0 because inert npm observers succeed. Exit1 below is the genuine current pnpm-order assertion failure, not a reproduced npm-ci EUSAGE or real dependency installation."
+    },
+    "current": {
+      "mode": "current",
+      "fixture": {
+        "root": "/private/tmp/p0-46-owned-shell-order-79twkf",
+        "repository": "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout",
+        "caller": "/private/tmp/p0-46-owned-shell-order-79twkf/unrelated consumer checkout",
+        "bin": "/private/tmp/p0-46-owned-shell-order-79twkf/observer-bin",
+        "home": "/private/tmp/p0-46-owned-shell-order-79twkf/home",
+        "actionPath": "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout/amc-action"
+      },
+      "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+      "sourceRef": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+      "originalFix": "e0fdc9c5a40187bf73056752bb53cd1bed67f333",
+      "historicalParent": "19da1edf407fa6e2d61a132fc0ce9b9b8a6c56ed",
+      "actionSha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+      "installRunSha256": "1f9e3c5b0e8ad4b1efbdaba00d7a39396cc96cc158b363ae8ad888702b00bb5a",
+      "executedScriptSha256": "b2bc5ddc3dca6880619d4248096a522a6a787a0bcf9ed5450ab0fdeaced0b4d8",
+      "runtime": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "executableSha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd",
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "durationMs": 353,
+      "calls": [
+        {
+          "tool": "pnpm",
+          "args": [
+            "--dir",
+            "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout",
+            "install",
+            "--frozen-lockfile"
+          ],
+          "cwd": "/private/tmp/p0-46-owned-shell-order-79twkf/unrelated consumer checkout",
+          "actionPath": "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout/amc-action"
+        },
+        {
+          "tool": "pnpm",
+          "args": [
+            "--dir",
+            "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout",
+            "run",
+            "build"
+          ],
+          "cwd": "/private/tmp/p0-46-owned-shell-order-79twkf/unrelated consumer checkout",
+          "actionPath": "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout/amc-action"
+        },
+        {
+          "tool": "npm",
+          "args": [
+            "install",
+            "-g",
+            "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout"
+          ],
+          "cwd": "/private/tmp/p0-46-owned-shell-order-79twkf/unrelated consumer checkout",
+          "actionPath": "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout/amc-action"
+        }
+      ],
+      "expected": [
+        {
+          "tool": "pnpm",
+          "args": [
+            "--dir",
+            "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout",
+            "install",
+            "--frozen-lockfile"
+          ]
+        },
+        {
+          "tool": "pnpm",
+          "args": [
+            "--dir",
+            "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout",
+            "run",
+            "build"
+          ]
+        },
+        {
+          "tool": "npm",
+          "args": [
+            "install",
+            "-g",
+            "/private/tmp/p0-46-owned-shell-order-79twkf/source checkout"
+          ]
+        }
+      ],
+      "shellOrderContractPassed": true,
+      "phase": "/private/tmp/p0-46-owned-shell-order-79twkf/current",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Actual unmodified YAML install block executed against observation-only commands. No dependency install/build/global install or release installer occurred.",
+      "historicalLimit": "Historical shell exits0 because inert npm observers succeed. Exit1 below is the genuine current pnpm-order assertion failure, not a reproduced npm-ci EUSAGE or real dependency installation."
+    },
+    "sameFixtureAndRuntime": true,
+    "historicalOrigin": "Exact original accepted fix e0fdc9c5 parent19da1edf Git action YAML; only local input interpolation occurs. No current action source is rewritten.",
+    "outcomes": "Original unmodified parent block records npm-ci/npm-build/npm-global and fails the requiredpnpm-order assertion(exit1); current accepted action passes that assertion(exit0). Both observed Bash scripts exit0 because inert commands succeed.",
+    "limit": "This is actual shell command-order RED/GREEN, not an actual dependency installation, reproduced npm-ci EUSAGE, product mutation, or historical full-suite pass."
+  },
+  "protectedInputs": [
+    {
+      "path": "amc-action/action.yml",
+      "sha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+      "equalBase": true,
+      "equalAcceptedMain": true
+    },
+    {
+      "path": ".github/workflows/amc-pr-gate.yml",
+      "sha256": "cac2129b01e6c3b4ce3717863de8baa39be15a7a1d825f012ede2c12c2754834",
+      "equalBase": true,
+      "equalAcceptedMain": true
+    },
+    {
+      "path": ".changeset/amc-action-pnpm.md",
+      "sha256": "9458151d5c9bcb9ef6afe881bcbef16f986fda99f1f5772620a41d190418fb51",
+      "equalBase": true,
+      "equalAcceptedMain": true
+    },
+    {
+      "path": "amc-action/README.md",
+      "sha256": "d89e6495329cc649f1b3d616df32bf2247752b60aa5f036b478b50618e7fcd77",
+      "equalBase": true,
+      "equalAcceptedMain": true
+    },
+    {
+      "path": "package.json",
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "equalBase": true,
+      "equalAcceptedMain": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "equalBase": true,
+      "equalAcceptedMain": true
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+      "equalBase": true,
+      "equalAcceptedMain": true
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "equalBase": true,
+      "equalAcceptedMain": true
+    },
+    {
+      "path": "scripts/line-budgets.json",
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "equalBase": true,
+      "equalAcceptedMain": true
+    },
+    {
+      "path": "scripts/quality/coverage-baseline.json",
+      "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+      "equalBase": true,
+      "equalAcceptedMain": true
+    },
+    {
+      "path": "vitest.config.ts",
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "equalBase": true,
+      "equalAcceptedMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "equalBase": true,
+      "acceptedMainComparison": "Inherited P0-47 manifest differs from accepted main, unchanged from current d8e base."
+    }
+  ],
+  "archiveTreeEqualBase": true,
+  "originalFixAncestorOfAcceptedBaseAndCurrent": true,
+  "observerBugs": {
+    "occurred": false,
+    "notes": "First new13-case run passed; no failure was erased or reinterpreted. The intentional historical contract assertion RED is preserved separately."
+  },
+  "sourceBoundary": "First newtest run journal HEAD was d8e with the newly authored uncommitted test pinned by SHA. Both later private historical/current phases observe parent-finalized4c8 with identical test/action bytes. Git HEAD alone does not identify the initial uncommitted test.",
+  "limitations": [
+    "Shims do not qualify real dependency/native lifecycle/build/global install, actual pnpm setup action or release installer. Parent separately captures real cold install/build/private-prefix CLI use.",
+    "This observer qualifies local shell behavior on macOS with an explicit Node22 runtime. Preserved Node20 default, Linux/hosted workflow execution, registry/release install and end-to-end scoring/comment/artifact/drop behavior are not executed.",
+    "No full-suite, global/per-file coverage, Node24, hosted CI, release/publication or Done claim follows. Prior P0-51/22/23/29 unresolved debt remains separate.",
+    "No production/action/workflow/package/lock/archive/freeze/floor/budget edit, external transport or existing-artifact cleanup was performed by this subagent. Only owned per-test temporary roots were removed after raw observations were retained; historical fixture is preserved."
+  ]
+}

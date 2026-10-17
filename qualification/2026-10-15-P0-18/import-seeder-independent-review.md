@@ -1,0 +1,13 @@
+No actionable findings within this bounded receipt review.
+
+All 388 indexed references and 36 direct receipt references match their hashes and sizes. The five original files preserve all 59 cases, assertions, inputs, cleanup and deadlines. Copied test and guard differences are import prefixes only; configuration and the other workspace guards remain exact.
+
+Raw results confirm 59/59 originally. The same corpus measures 59/46/59 for the eval-tier mutation and 59/58/59 for each seeder, M11 and M12 control. Eval failures come from the unchanged provenance write guard; no accepted ATTESTED rows or zero residual session/blob effects are inferred. M12 fails its first assertion, so its later branch is not independently killed.
+
+Operational results remain 16 total, 15 passing and one strict unresolved version failure. Seven actual importers store SELF_REPORTED rows. Valid-first timestamp refusals preserve all 32 tables, 42 existing evidence rows, eight sessions and exact writer inventories. Historical and recent timestamps remain metadata while event times fall within recorded writer intervals. Actual CLI help, exit 2 and no-effects checks pass; the original 1.2.0 wording still fails against current 2.0.0 output.
+
+Seeder checks call actual default module paths. The installed-layout copy contains 4,529 regular compiled files matching live bytes and refuses despite opt-in; absent opt-in also refuses. This is a copied layout check, not npm-installed acceptance. Thirty-nine retained child records have no process overlap. Eleven of 23 read-only intervals create only the retained SQLite WAL/SHM sidecars; no blanket read-lifecycle no-effects claim follows.
+
+All 4,626 private inputs, 4,529 live compiled inputs, 51 protected check entries over 39 paths and the native binding were independently rehashed. Each mutant changes one private compiled target; full restoration matches. The 7,738-path equality belongs to C's capture before root generated counts. Current differences are exactly root's ten authorized count documents, including README's encoded badge; the separately observed new crypto test is not qualified here. The initial schema-reader failure and its sole sourcePins-to-pins correction remain preserved before product imports.
+
+Local canned and synthetic fixtures do not establish issuer truth, authenticated people, provider capability, legal/expert approval, independent review, trusted timestamps, universal network containment or whole acceptance. Strict version debt and all prior holds remain open. No product import, runtime, rerun, build, install, native load, source, fixture or archive edit occurred. Only this review pair was written. All live-input reads are complete.

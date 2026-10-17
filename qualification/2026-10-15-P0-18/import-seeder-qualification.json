@@ -1,0 +1,399 @@
+{
+  "issue": "P0-18",
+  "date": "2026-10-15",
+  "status": "bounded qualification; original 1.2.0 literal acceptance remains RED; no source repair or Done claim",
+  "source": {
+    "commit": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+    "branch": "codex/p0-18-current-qualification",
+    "root": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+    "beforePins": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/source-before.json",
+      "bytes": 19690,
+      "sha256": "1b6093ad457b0666c40309bcb278cddf82fd690c62d8ea81b17698cb6f2b3ac5"
+    },
+    "afterPins": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/source-after.json",
+      "bytes": 19690,
+      "sha256": "1b6093ad457b0666c40309bcb278cddf82fd690c62d8ea81b17698cb6f2b3ac5"
+    },
+    "checkEntries": 51,
+    "uniquePaths": 39,
+    "rootScopePins": 32,
+    "readinessPins": 19,
+    "allExact": true,
+    "trackedComparison": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/initial-tracked-after-comparison.json",
+      "bytes": 355,
+      "sha256": "35cee6e0a8adfd9778c3f2cbecd25d3f41841e0e7450d92df96a23b06dd92569"
+    },
+    "authorizedNewCryptoPathObserved": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/authorized-new-crypto-path-observed.json",
+      "bytes": 394,
+      "sha256": "9b7430edd4d816c7dacbfe8b3d115658860acb83a3174e89834b4ad29f620047"
+    }
+  },
+  "runtime": {
+    "nodeVersion": "v22.23.3",
+    "nodeExecutable": "/opt/homebrew/opt/node@22/bin/node",
+    "nativeBefore": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/native-before.json",
+      "bytes": 305,
+      "sha256": "5af838088961a975431ba4a29a612a3e11d69971d893becc8d8023fa713e1364"
+    },
+    "nativeAfter": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/native-after.json",
+      "bytes": 305,
+      "sha256": "5af838088961a975431ba4a29a612a3e11d69971d893becc8d8023fa713e1364"
+    },
+    "nativeByteAndInodeExact": true,
+    "minimalCredentialFreeEnvironment": true,
+    "transportGuard": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/deny-transport.mjs",
+      "bytes": 440,
+      "sha256": "c3f82be33f5268d14f805bc627adfcf78b4ce24e47dfc807c7aec3ef79075926"
+    },
+    "transportScope": "Node fetch/http/https/net/dns APIs blocked in actual children; no universal network-sandbox claim."
+  },
+  "originalCorpus": {
+    "files": [
+      "tests/evalImportTrust.test.ts",
+      "tests/evalImportersInterop.test.ts",
+      "tests/dogfoodMaturityEvidence.test.ts",
+      "tests/externalEvidenceProfile.test.ts",
+      "tests/externalEvidenceExport.test.ts"
+    ],
+    "registered": 59,
+    "passed": 59,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "raw": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/original-five-baseline/raw-tests.json",
+      "bytes": 20364,
+      "sha256": "e31b7e1beb72bbbe2d9c1e95c0086cf223db2e1b06f2a72f31bd539945b7bd61"
+    },
+    "command": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/original-five-baseline/command.json",
+      "bytes": 1885,
+      "sha256": "dbc497ca8558cb09ed1ffc44bae07bb577eb203e04224bdf322c2de6fa677b1d"
+    },
+    "adaptations": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/adaptations.json",
+      "bytes": 2086,
+      "sha256": "a28bd01396de5ae9c8f891a8b87c8c912102f10581764497ad957f1bf169ca4c"
+    },
+    "adaptationScope": "Actual original test imports src\u2192dist and matching guard import prefixes only; config, inputs, assertions, case deadlines and original cleanup unchanged."
+  },
+  "operational": {
+    "counts": {
+      "total": 16,
+      "passed": 15,
+      "failed": 1
+    },
+    "report": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/operational/result.json",
+      "bytes": 35613,
+      "sha256": "eaf5e6dc700081313ec3cafa3e4fbb9b4cc04c31b0678243937b56a08cc40a69"
+    },
+    "command": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/operational-driver-first/command.json",
+      "bytes": 1402,
+      "sha256": "feec86feb5b33c57d591e0bb0fb5b8a881fe26854a2f772fe4307d7ce507ae17"
+    },
+    "caseNames": [
+      "openai actual import SELF_REPORTED",
+      "langsmith actual import SELF_REPORTED",
+      "deepeval actual import SELF_REPORTED",
+      "promptfoo actual import SELF_REPORTED",
+      "wandb actual import SELF_REPORTED",
+      "langfuse actual import SELF_REPORTED",
+      "langwatch actual import SELF_REPORTED",
+      "future valid-first whole-file refusal before ledger write",
+      "old valid-first whole-file refusal before ledger write",
+      "historical claimed time remains metadata; ledger records observed writer time",
+      "recent claimed time remains metadata; ledger records observed writer time",
+      "current CLI help hides removed trust-tier flag",
+      "current removed CLI flag exits 2 before effects",
+      "strict original P0-18 removed-version literal 1.2.0",
+      "actual seeder refuses absent opt-in before effects",
+      "actual seeder refuses real node_modules module despite opt-in"
+    ],
+    "sevenFormatNewRows": {
+      "openai actual import SELF_REPORTED": 6,
+      "langsmith actual import SELF_REPORTED": 7,
+      "deepeval actual import SELF_REPORTED": 5,
+      "promptfoo actual import SELF_REPORTED": 5,
+      "wandb actual import SELF_REPORTED": 5,
+      "langfuse actual import SELF_REPORTED": 4,
+      "langwatch actual import SELF_REPORTED": 5
+    },
+    "readerEffects": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/reader-effects-summary.json",
+      "bytes": 16929,
+      "sha256": "1783585c6c6e86c3da65612ffa087b33199681757d45ada6c8dd4d86d414161d"
+    },
+    "readerIntervals": 23,
+    "readerChangedIntervals": 11,
+    "strictOriginalVersionFailure": {
+      "rawStderr": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/op-cli-removed-flag/stderr.log",
+        "bytes": 144,
+        "sha256": "89fdcb518bc44fdbead235714b443a1d600fd4d8b7224cf8a555ed56aea65aff"
+      },
+      "comparison": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/op-strict-original-version-1-2/command.json",
+        "bytes": 1698,
+        "sha256": "bfb15ae035b63822ce326c422b277ef7f992074d19ab5ce43aed3c49447b24a3"
+      },
+      "originalExpected": "--trust-tier was removed in 1.2.0",
+      "actualCurrent": "--trust-tier was removed in 2.0.0",
+      "noRepairOrWaiver": true
+    }
+  },
+  "causalMatrices": {
+    "eval-tier": {
+      "target": "dist/eval/evalImporters.js",
+      "phaseReport": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/eval-tier-matrix.json",
+        "bytes": 38905,
+        "sha256": "688a7a7d97d1b8dec83f833fc4e130d82b0691fda52f6cf65c8e713c1c4bafa8"
+      },
+      "baseline": {
+        "total": 59,
+        "passed": 59,
+        "failed": 0
+      },
+      "mutant": {
+        "total": 59,
+        "passed": 46,
+        "failed": 13,
+        "failedNames": [
+          "eval import trust tier openai imports SELF_REPORTED",
+          "eval import trust tier langsmith imports SELF_REPORTED",
+          "eval import trust tier deepeval imports SELF_REPORTED",
+          "eval import trust tier promptfoo imports SELF_REPORTED",
+          "eval import trust tier wandb imports SELF_REPORTED",
+          "eval import trust tier langfuse imports SELF_REPORTED",
+          "eval import trust tier langwatch imports SELF_REPORTED",
+          "eval import time policy with --historical a three-day-old case is stored at recorded time and keeps its claimed time",
+          "eval import time policy a recent case is accepted and still written at recorded time",
+          "imported evidence quality and status dashboard importEvalResults writes signed metric and failure audit evidence as SELF_REPORTED (P0-18)",
+          "imported evidence quality and status dashboard importEvalResults emits DeepEval confidence calibration metric evidence",
+          "imported evidence quality and status dashboard evalImportCoverageStatus reports dimension and framework coverage",
+          "imported evidence quality and status dashboard evalImportCoverageStatus agent filter isolates per-agent imports"
+        ]
+      },
+      "restored": {
+        "total": 59,
+        "passed": 59,
+        "failed": 0
+      },
+      "zeroPendingTodo": true,
+      "sameNamesAndAssertions": true,
+      "full4626FileRestoration": true,
+      "patch": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/eval-tier.patch",
+        "bytes": 553,
+        "sha256": "ecac9b37b6853908a8e30fe4086b4b961f0b7b4b490106a68834f243f8b69698"
+      }
+    },
+    "seeder-optin": {
+      "target": "dist/dogfood/maturityEvidence.js",
+      "phaseReport": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/seeder-optin-matrix.json",
+        "bytes": 20108,
+        "sha256": "1606cb7d63c5fdb8c695fe70b512f430f1d84c4c9afbbe11a5ada0f767add078"
+      },
+      "baseline": {
+        "total": 59,
+        "passed": 59,
+        "failed": 0
+      },
+      "mutant": {
+        "total": 59,
+        "passed": 58,
+        "failed": 1,
+        "failedNames": [
+          "dogfood maturity evidence refuses to seed without AMC_DEV_DOGFOOD=1"
+        ]
+      },
+      "restored": {
+        "total": 59,
+        "passed": 59,
+        "failed": 0
+      },
+      "zeroPendingTodo": true,
+      "sameNamesAndAssertions": true,
+      "full4626FileRestoration": true,
+      "patch": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/seeder-optin.patch",
+        "bytes": 595,
+        "sha256": "2de869b5acaca6b7572f623a7f8ea823abd5d9706d6c162b80b1699b1317a5a1"
+      }
+    },
+    "S7-M11": {
+      "target": "dist/standard/externalEvidenceProfile.js",
+      "phaseReport": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/S7-M11-matrix.json",
+        "bytes": 20254,
+        "sha256": "b3573d537ac8c55f200fdeabb8d768bba4e831149120e3cacbb6d14df2fb0317"
+      },
+      "baseline": {
+        "total": 59,
+        "passed": 59,
+        "failed": 0
+      },
+      "mutant": {
+        "total": 59,
+        "passed": 58,
+        "failed": 1,
+        "failedNames": [
+          "external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import"
+        ]
+      },
+      "restored": {
+        "total": 59,
+        "passed": 59,
+        "failed": 0
+      },
+      "zeroPendingTodo": true,
+      "sameNamesAndAssertions": true,
+      "full4626FileRestoration": true,
+      "patch": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/S7-M11.patch",
+        "bytes": 705,
+        "sha256": "0ac86e85577edba4404ae69041ea422ab885aa3b4042201e2464c336d9bd9fa3"
+      }
+    },
+    "S7-M12": {
+      "target": "dist/standard/externalEvidenceProfile.js",
+      "phaseReport": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/S7-M12-matrix.json",
+        "bytes": 20227,
+        "sha256": "4b62116f86520c92d91294b336f7ad0463fa5f82deb01c158128a6c7739a4bcb"
+      },
+      "baseline": {
+        "total": 59,
+        "passed": 59,
+        "failed": 0
+      },
+      "mutant": {
+        "total": 59,
+        "passed": 58,
+        "failed": 1,
+        "failedNames": [
+          "external evidence profile the verifier never raises a producer's own lower declaration"
+        ]
+      },
+      "restored": {
+        "total": 59,
+        "passed": 59,
+        "failed": 0
+      },
+      "zeroPendingTodo": true,
+      "sameNamesAndAssertions": true,
+      "full4626FileRestoration": true,
+      "patch": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/S7-M12.patch",
+        "bytes": 656,
+        "sha256": "d487a321a84106c08a877d011d1e0b4c918fcdda36d5ce48dc405f628df29cd5"
+      }
+    }
+  },
+  "restoration": {
+    "liveCompiledFiles": 4529,
+    "liveBefore": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/compiled-live-before.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    "liveAfter": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/compiled-live-after.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    "privateProtectedFiles": 4626,
+    "privateBefore": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/private-baseline-manifest.json",
+      "bytes": 495419,
+      "sha256": "7d83fbb43f171b3214b27aa58b3200b9dadb833e9d939dd6938cf7a15581a5d2"
+    },
+    "privateAfter": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/private-final-manifest.json",
+      "bytes": 495419,
+      "sha256": "7d83fbb43f171b3214b27aa58b3200b9dadb833e9d939dd6938cf7a15581a5d2"
+    },
+    "fullSourceAndCompiledExact": true,
+    "realInstalledCompiledManifest": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/operational/installed-compiled-manifest.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    "realInstalledTestedModulesRegular": true
+  },
+  "chronology": {
+    "setupObserverFailure": {
+      "reason": "Our private initial preflight reader expected sourcePins; root actual schema uses pins. Failure occurred before product import or closure copy. Original private driver retained, only owned schema reader corrected.",
+      "original": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/driver-initial-schema-observer.py",
+        "bytes": 9256,
+        "sha256": "4ce5c82331409204e2b7518ffd655d644a1e3bd1d13a02de84487a8bc5ffd032"
+      },
+      "recordedRepeat": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/setup-original-schema-observer/command.json",
+        "bytes": 1445,
+        "sha256": "7342ef9705b86e762fead0e33c7381f265a9028831bee3dbc1616c743fba61ea"
+      },
+      "corrected": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/setup-corrected-preflight-reader/command.json",
+        "bytes": 1427,
+        "sha256": "e21daca15646f3ebb0d53827bbbec0b93a9effc5206aa0315401d543bd8449b8"
+      },
+      "notProductOrMutationKill": true
+    },
+    "frozenJournal": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 96653,
+      "sha256": "9848bf9785d4cc9cf2ebf9b23f6d9653517d38e1f4c4e8e353277b59cf76eb4c"
+    },
+    "recordedCommands": 59,
+    "noProductSourceChanges": true
+  },
+  "privateEvidence": {
+    "readinessJson": {
+      "path": "/private/tmp/p0-18-import-seeder-readiness-20261015.json",
+      "bytes": 22040,
+      "sha256": "9ff1776f45221c4247166d9e2885b35b63bcf8deb9b16747c556e270a324f450"
+    },
+    "readinessMarkdown": {
+      "path": "/private/tmp/p0-18-import-seeder-readiness-20261015.md",
+      "bytes": 4605,
+      "sha256": "cba822dc8dba92f2ff2027b0d17f300f9752eb62f073b4f0b13bfe3bb13d7bda"
+    },
+    "rootScopePreflight": {
+      "path": "/private/tmp/p0-18-root-scope-preflight-20261015.json",
+      "bytes": 10599,
+      "sha256": "0bf29c39bd04663e2fc9eba8e410907f41227c43a5685802b5b54583e35ff6f6"
+    },
+    "index": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/private-artifact-index.json",
+      "bytes": 115196,
+      "sha256": "f74a40d1b996da4f4df10593cac5eb7a78e58bef7e736dd01abfb7cf2bd61e56"
+    },
+    "refs": 388,
+    "regularSourceBodiesReferenceOnly": true,
+    "privateKeysStayInsideOwnedFixture": true,
+    "noPrivateKeyBodiesInThisReceipt": true
+  },
+  "limits": [
+    "All operational imports are locally canned self-reported inputs; signing proves local integrity only, not issuer truth, authenticated people, provider ability, legal/expert approval or independent review.",
+    "Timestamp no-effects proof is for valid-first mixed time preflight on this nonempty workspace; it is not a general cross-store I/O transaction claim.",
+    "The seven formats use actual current importers. Operational ledger reader/writers and initializer run in distinct finished child processes; no pooled parent/cold child overlap.",
+    "Eleven of 23 readonly intervals changed retained WAL/SHM coordination state; no blanket read-lifecycle no-effects claim.",
+    "Eval ATTESTED mutant fails 13 cases at the unchanged provenance write guard. No accepted ATTESTED rows or zero residual sessions/blob effects are inferred. Original corpus cleanup remains unchanged.",
+    "M12 producer-declaration case fails its first assertion; subsequent second branch is not independently proven killed.",
+    "Seeder positive unchanged original corpus stays synthetic SELF_REPORTED and cannot raise maturity levels. Installed-path and absent-optin operational refusals use actual default module paths in regular complete copied dist, not injected module paths.",
+    "No permanent test/source/helper/CLI/package/lock/archive/guard/floor edits, no dependency install or native rebuild, no Node24, full P0-18/full suite/coverage/hosted/release/G0/Done acceptance.",
+    "All prior paused reservations and strict failures, P0-51 issuer failures, expert holds, historical 47 echo deferral, and P0-29/P0-22 user dispositions remain unchanged."
+  ]
+}

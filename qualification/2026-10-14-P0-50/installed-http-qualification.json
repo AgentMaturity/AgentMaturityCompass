@@ -1,0 +1,726 @@
+{
+  "issue": "P0-50",
+  "qualification": "Current privately installed CLI and public SDK native MCP Streamable HTTP/SSE replay",
+  "result": "PASS within this installed Node22 loopback fixture scope",
+  "runnerExitCode": 0,
+  "startedAt": "2026-10-14T15:27:19.841Z",
+  "completedAt": "2026-10-14T15:28:01.103Z",
+  "checkpointCount": 15,
+  "checks": [
+    {
+      "name": "catalog-server-disposed",
+      "ok": true,
+      "activeSessions": 0,
+      "deletes": 1
+    },
+    {
+      "name": "17-cli-held-before-authenticated-approval",
+      "ok": true,
+      "approvalRequestId": "apprreq_3b270d1a93c14a598b36e6d0d7725aa6",
+      "effects": 0
+    },
+    {
+      "name": "cli-server-disposed",
+      "ok": true,
+      "activeSessions": 0,
+      "deletes": 2
+    },
+    {
+      "name": "cli-governed-mcp-executed",
+      "ok": true,
+      "sessionId": "c5a1ea6a-ad61-4368-a75b-026b4d7f7764",
+      "approvalRequestId": "apprreq_3b270d1a93c14a598b36e6d0d7725aa6"
+    },
+    {
+      "name": "drift-server-disposed",
+      "ok": true,
+      "activeSessions": 0,
+      "deletes": 3
+    },
+    {
+      "name": "changed-catalog-and-unsigned-grant-refused-before-dispatch",
+      "ok": true
+    },
+    {
+      "name": "redirect-and-oauth-challenge-refused",
+      "ok": true,
+      "secondOriginRequests": 0
+    },
+    {
+      "name": "20-sdk-held-before-authenticated-approval",
+      "ok": true,
+      "approvalRequestId": "apprreq_49a9b68ed50f46a0a7a49e50e29d7f59",
+      "effects": 1
+    },
+    {
+      "name": "sdk-server-disposed",
+      "ok": true,
+      "activeSessions": 0,
+      "deletes": 4
+    },
+    {
+      "name": "public-sdk-acp-mcp-forwarding",
+      "ok": true,
+      "sessionId": "d2522acf-2c9d-46b0-b317-308a4eef6ba0",
+      "approvalRequestId": "apprreq_49a9b68ed50f46a0a7a49e50e29d7f59"
+    },
+    {
+      "name": "20b-cancel-held-before-authenticated-approval",
+      "ok": true,
+      "approvalRequestId": "apprreq_7415ae4efdc24a69a2b7fa4dbbdf88a2",
+      "effects": 2
+    },
+    {
+      "name": "cancelled-http-session-disposed",
+      "ok": true,
+      "activeSessions": 0,
+      "deletes": 5
+    },
+    {
+      "name": "public-sdk-cancellation-disposes-http-session",
+      "ok": true,
+      "sessionId": "40732009-e50c-48a1-8319-51b67a114969",
+      "approvalRequestId": "apprreq_7415ae4efdc24a69a2b7fa4dbbdf88a2",
+      "effectsBefore": 2,
+      "effectsAfter": 2
+    },
+    {
+      "name": "cold-evidence-and-policy-pins",
+      "ok": true,
+      "sessionIds": [
+        "c5a1ea6a-ad61-4368-a75b-026b4d7f7764",
+        "d2522acf-2c9d-46b0-b317-308a4eef6ba0",
+        "40732009-e50c-48a1-8319-51b67a114969"
+      ],
+      "signedRows": 92
+    },
+    {
+      "name": "headers-redaction-sse-and-remote-session-cleanup",
+      "ok": true,
+      "httpRequests": 33,
+      "deletes": 5,
+      "sseReplies": 15
+    }
+  ],
+  "sourceRevision": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "artifact": {
+    "tarball": "/private/tmp/p0-50-packed-artifact-20261014/agent-maturity-compass-1.2.0.tgz",
+    "sha256": "c3932ba3b2d693c018c874191c608fbb06709e9e83c77c95f7b9a4ff4d8d82aa",
+    "sourceRevision": "07125b76cb17ecf063f19b914085a5bfc968df35",
+    "cliSha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "packageVersion": "1.2.0",
+    "sdkSourceRange": "^1.31.0",
+    "purpose": "Private qualification artifact, npm pack --ignore-scripts avoids recursive prepack; no release/publication inferred",
+    "sourceGitStatus": ""
+  },
+  "artifactMetadataPath": "/private/tmp/p0-50-current-artifact-20261014.json",
+  "artifactMetadataSha256": "26067e7aad6d5b1789f0cae9bbfb8ff6c786e13bf73ada54397239ad9073d06c",
+  "runtime": {
+    "node": "v22.23.3",
+    "platform": "darwin",
+    "arch": "arm64",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "scopedPath": true,
+    "isolatedHomeAndCache": true
+  },
+  "installed": {
+    "packageVersion": "1.2.0",
+    "installedCliSha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+    "matchesPinnedCurrentCli": true,
+    "privateWorkspacePackageAbsent": "@amc/core cannot resolve from installed AMC package",
+    "sdk": {
+      "version": "1.32.1",
+      "resolutionImporter": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/consumer/node_modules/agent-maturity-compass/dist/mcp/nativeMcpHttpTransport.js",
+      "resolvedTransport": "file:///private/tmp/p0-50-installed-http-attempt3-1vb61m0h/consumer/node_modules/@modelcontextprotocol/sdk/dist/esm/client/streamableHttp.js",
+      "transportSha256": "a477d0a95a1e1224a009e808d2ce01b1fca32de4f32ada4c589bec0443d41536",
+      "packageJsonPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/consumer/node_modules/@modelcontextprotocol/sdk/package.json",
+      "packageJsonSha256": "0216319ea53177f7ed419d660b2f52ccc7e3327e57f9ee2ef03225ff543aeae4",
+      "consumerLockPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/consumer/package-lock.json",
+      "consumerLockSha256": "d126240d81b1d49fe4cb98d0c79157bf65db665bf891ab52b9a78e29beb0024e",
+      "insideFreshConsumer": true
+    },
+    "publicSdkImport": "agent-maturity-compass/sdk/native"
+  },
+  "execution": {
+    "commandCount": 37,
+    "signals": 0,
+    "negativeCommands": [
+      {
+        "label": "18-changed-catalog",
+        "exitCode": 1
+      },
+      {
+        "label": "19-missing-grant",
+        "exitCode": 1
+      },
+      {
+        "label": "19a-redirect",
+        "exitCode": 1
+      },
+      {
+        "label": "19b-auth-challenge",
+        "exitCode": 1
+      }
+    ],
+    "scriptedResponsesRequests": 5,
+    "mcpHttpRequests": 33,
+    "mcpToolCalls": 3,
+    "sseReplies": 15,
+    "deletes": 5,
+    "finalActiveRemoteSessions": 0,
+    "secondOriginRequests": 0,
+    "effects": [
+      "CLI_MCP_NOTE",
+      "SDK_MCP_NOTE"
+    ],
+    "signedRows": 92,
+    "allowedToolAudits": 2,
+    "failedCancellationAudits": 1,
+    "allAuditSessionBindingsMatch": true,
+    "allLoggedOriginsAndAuthorizationsMatch": true
+  },
+  "verification": {
+    "sdkCloseAndVerify": [
+      {
+        "label": "sdk-close-verification",
+        "state": "verified",
+        "scope": "externally-anchored",
+        "sessionId": "d2522acf-2c9d-46b0-b317-308a4eef6ba0",
+        "ok": true,
+        "ledgerOk": true,
+        "unsignedRowCount": 0,
+        "ledgerErrors": [],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+          "expectedFingerprint": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        },
+        "path": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/artifacts/sdk-close-verification.json",
+        "sha256": "da64a5a38fbd43699d74df6a65e84da83359d9963b6f2b667d503e4ff17028d1"
+      },
+      {
+        "label": "cancel-close-verification",
+        "state": "verified",
+        "scope": "externally-anchored",
+        "sessionId": "40732009-e50c-48a1-8319-51b67a114969",
+        "ok": true,
+        "ledgerOk": true,
+        "unsignedRowCount": 0,
+        "ledgerErrors": [],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+          "expectedFingerprint": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        },
+        "path": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/artifacts/cancel-close-verification.json",
+        "sha256": "db6449fa5d8a00ff106331e99a488e6426066b399a6182e5d2a620e5faccd72e"
+      }
+    ],
+    "coldCli": [
+      {
+        "label": "21-cold-ledger",
+        "exitCode": 0,
+        "ok": true,
+        "unsignedRowCount": 0,
+        "requestCount": 0,
+        "allRequestsReconstructed": true,
+        "ledgerErrors": [],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+          "expectedFingerprint": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        },
+        "stdoutPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/artifacts/21-cold-ledger.stdout",
+        "stdoutSha256": "055a3a44b00a3e5e365b08b6b31857c71f0aaecd4657970dbce80f5f97724279"
+      },
+      {
+        "label": "22-cold-session-0",
+        "exitCode": 0,
+        "ok": true,
+        "unsignedRowCount": 0,
+        "requestCount": 2,
+        "allRequestsReconstructed": true,
+        "ledgerErrors": [],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+          "expectedFingerprint": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        },
+        "stdoutPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/artifacts/22-cold-session-0.stdout",
+        "stdoutSha256": "8334d7b500fa196912807c1b0c53e1749d9c21cea404b5f13dbff793089582c2"
+      },
+      {
+        "label": "22-cold-session-1",
+        "exitCode": 0,
+        "ok": true,
+        "unsignedRowCount": 0,
+        "requestCount": 2,
+        "allRequestsReconstructed": true,
+        "ledgerErrors": [],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+          "expectedFingerprint": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        },
+        "stdoutPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/artifacts/22-cold-session-1.stdout",
+        "stdoutSha256": "cd1b9d93ded8e0d1b22655490ae2cadb245d5c747183be93edf3ceb053cbe1db"
+      },
+      {
+        "label": "22-cold-session-2",
+        "exitCode": 0,
+        "ok": true,
+        "unsignedRowCount": 0,
+        "requestCount": 1,
+        "allRequestsReconstructed": true,
+        "ledgerErrors": [],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+          "expectedFingerprint": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        },
+        "stdoutPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/artifacts/22-cold-session-2.stdout",
+        "stdoutSha256": "22dfa20b4790e9d3561bf9b66dfddac26a318057bf06532713d4fc31c01ada72"
+      }
+    ],
+    "policyAndConfigPinsUnchanged": true,
+    "policyPins": [
+      {
+        "name": "budgets.yaml",
+        "sha256": "6acff2b49b3fdff327e83d67669d5037cf2a9758ee99f41c1bae1f84d91ed130"
+      },
+      {
+        "name": "budgets.yaml.sig",
+        "sha256": "a6a6352053ad0ce0105424e289a4d4625b93f9dcc844c2283a01393209e84109"
+      },
+      {
+        "name": "tools.yaml",
+        "sha256": "554e1963d6e2f94bbfd3dee418ee4d284e9d2b55366ee4bbcec0f77a513165c1"
+      },
+      {
+        "name": "tools.yaml.sig",
+        "sha256": "73e433fae87e6b43a64a6109aaa577aaf0ab59b73f6c8d3366c6956ac34d3885"
+      },
+      {
+        "name": "action-policy.yaml",
+        "sha256": "9c8c51f1a6162459d67eb349abbbc3ac7e1253eea1ae7975a41bd4b2c87fa104"
+      },
+      {
+        "name": "action-policy.yaml.sig",
+        "sha256": "ba91139c2432f046c70204648a38cf3f2016ec1a03c916ebcb93c8ed031a74ae"
+      },
+      {
+        "name": "approval-policy.yaml",
+        "sha256": "2e9eef722af0171b38bbd84935babeb1a428e03d19c5f5ff220620b2e2d88a19"
+      },
+      {
+        "name": "approval-policy.yaml.sig",
+        "sha256": "ae6963b40fa96491313c1790ef959747e76e81d4b84c1745f250cc3b451cf0e4"
+      }
+    ],
+    "configSha256": "f5654c4aba5c952c19ff91d8d2c0901aa8d019f264a7a4f3ac4302b72bfa9ee3",
+    "monitorFingerprint": "22ec75e041be1bf7b1f09b3b785dd4b27b2b032b915ef9462307c131183d033c",
+    "monitorPinRecordedBeforeProviderAndAnyToolEffect": true,
+    "monitorTrustMeaning": "Explicitly admitted local fixture monitor public key, read directly before execution and independently of session ledger contents. This is not third-party trust-root certification.",
+    "exactFreshFixtureSecretScan": {
+      "files": [
+        "signed-events.json",
+        "sdk-result.json",
+        "cancel-result.json"
+      ],
+      "generatedSecretCount": 4,
+      "passed": true
+    },
+    "outerProcessExitedAfterOwnServerCleanup": true
+  },
+  "observerAdaptations": [
+    {
+      "scope": "Current artifact/source input metadata only",
+      "path": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/release.json"
+    },
+    {
+      "scope": "Existing fixture MCP configuration field",
+      "old": "protocolVersion omitted",
+      "new": "protocolVersion 2025-11-25",
+      "reason": "Current unpinned native HTTP defaults include newer server discovery; the preserved legacy helper supports the pinned existing initialize/tools/list/tools/call protocol. No current default-path qualification is inferred."
+    },
+    {
+      "scope": "Additional installed artifact provenance observations",
+      "changes": [
+        "Assert pinned current CLI hash",
+        "Assert @amc/core cannot resolve",
+        "Resolve actual SDK ESM transport from installed nativeMcpHttpTransport importer; require containment in fresh consumer and record hashes"
+      ],
+      "reason": "No private checkout modules are imported."
+    },
+    {
+      "scope": "One 401 public-message assertion",
+      "old": "/MCP discovery failed|credential references/",
+      "new": "/^MCP HTTP authentication refused\\./",
+      "source": {
+        "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/src/mcp/nativeMcpHttpTransport.ts",
+        "sha256": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b",
+        "lines": [
+          322,
+          361
+        ]
+      },
+      "preserved": [
+        "nonzero refusal exit",
+        "zero second-origin requests",
+        "catalog/grant refusals",
+        "effect/provider/tool counters",
+        "approval and budget guards"
+      ]
+    },
+    {
+      "scope": "Both SDK startup environments",
+      "old": "env",
+      "new": "env:{...env,AMC_EXPECTED_MONITOR_FINGERPRINT:monitor}",
+      "reason": "Supply the exact monitor fingerprint already recorded before execution and already used in cold CLI verification; mandatory closeAndVerify remains enforced.",
+      "sources": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/src/sdk/nativeAgentClient.ts",
+          "sha256": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5",
+          "lines": [
+            754,
+            760,
+            776
+          ]
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/src/session/sessionEventHistory.ts",
+          "sha256": "7e6ebce77034a1b52cd89beb1aa94725222bf16b4b49734082fd4c1d376bb9a2",
+          "lines": [
+            113
+          ]
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/src/persistence/sessionStoreVerification.ts",
+          "sha256": "6474fdfd0971b7036c442829e7f79da49ae212dac321c47c18fa5b3f67e74d1e",
+          "lines": [
+            270,
+            271
+          ]
+        }
+      ],
+      "diagnostics": [
+        {
+          "variant": "unpinned",
+          "exitCode": 1,
+          "path": "/private/tmp/p0-50-installed-http-attempt2-hcxxkj0z/artifacts/sdk-cold-verification-unpinned.stdout",
+          "sha256": "20e7ebc92b83960c1a81eb738cef0f4f2489b42a247e9ea4d44208d1e21656e4",
+          "ok": false,
+          "ledgerOk": true,
+          "ledgerErrors": [],
+          "trustRoot": {
+            "anchored": false,
+            "monitorFingerprint": "b392915660f61e7b4c46133623b7fee826f0c302d7749c6b34dc6c917609c9fa",
+            "expectedFingerprint": null,
+            "monitorAdmission": {
+              "signature": "ledger monitor key",
+              "purpose": "ledger-row",
+              "keyId": "b392915660f61e7b4c46133623b7fee826f0c302d7749c6b34dc6c917609c9fa",
+              "status": "not-pinned",
+              "source": null,
+              "listId": null,
+              "timeBasis": null,
+              "detail": "key b392915660f61e7b4c46133623b7fee826f0c302d7749c6b34dc6c917609c9fa is not pinned for ledger-row by --pubkey or any trust list; pin it with --pubkey or add it to a signed trust list"
+            }
+          }
+        },
+        {
+          "variant": "pinned",
+          "exitCode": 0,
+          "path": "/private/tmp/p0-50-installed-http-attempt2-hcxxkj0z/artifacts/sdk-cold-verification-pinned.stdout",
+          "sha256": "60d1b377ecb83a8ece8e1ea5e2f4bdb279a35b8ef56fc94ef513c25e906eb5fe",
+          "ok": true,
+          "ledgerOk": true,
+          "ledgerErrors": [],
+          "trustRoot": {
+            "anchored": true,
+            "monitorFingerprint": "b392915660f61e7b4c46133623b7fee826f0c302d7749c6b34dc6c917609c9fa",
+            "expectedFingerprint": "b392915660f61e7b4c46133623b7fee826f0c302d7749c6b34dc6c917609c9fa",
+            "monitorAdmission": {
+              "signature": "ledger monitor key",
+              "purpose": "ledger-row",
+              "keyId": "b392915660f61e7b4c46133623b7fee826f0c302d7749c6b34dc6c917609c9fa",
+              "status": "admitted",
+              "source": "explicit-key",
+              "listId": null,
+              "timeBasis": null,
+              "detail": null
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "preservation": {
+    "originalFixtureDirectory": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/attempt3",
+    "originalRunnerSha256": "00b5510f50c2c41ac5e99cb41a53c64baa65c56f8540065333d33ba1a3ae0199",
+    "adaptedRunnerSha256": "345e2fa03ed77ec35dbc68cd208b2e42abecd427f644021284db190e75f67a61",
+    "allOriginalRunnerBytesRestoredAfterRemovingOnlyDeclaredObserverChanges": true,
+    "all15CheckpointGroupsPreserved": true,
+    "originalHelpers": [
+      {
+        "name": "provider.mjs",
+        "originalPath": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/attempt3/helpers/provider.mjs",
+        "actualPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/helpers/provider.mjs",
+        "sha256": "7c45344a5acea1eb7da541f22fa63d057077831a60307a2d6e08da943a8c0e91",
+        "originalUnchanged": true
+      },
+      {
+        "name": "http-server.mjs",
+        "originalPath": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/attempt3/helpers/http-server.mjs",
+        "actualPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/helpers/http-server.mjs",
+        "sha256": "b87ab7662a4666e2885d4050e2cab1d32b8771d39582975a2d3abc80bf97759a",
+        "originalUnchanged": true
+      },
+      {
+        "name": "owner-pty.py",
+        "originalPath": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/attempt3/helpers/owner-pty.py",
+        "actualPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/helpers/owner-pty.py",
+        "sha256": "93d056a8390ac06537a4dc3e1ee24e9978936b4828192fb453a13bf3f64087af",
+        "originalUnchanged": true
+      }
+    ],
+    "addedSdkObserverPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/helpers/inspect-installed-sdk.mjs",
+    "addedSdkObserverSha256": "b3c852cd170bb18eb48d6495a924bb66954b6306c600a138488c436add5433cc",
+    "patchFromOriginalPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/fixture-adaptation-from-original.patch",
+    "patchFromOriginalSha256": "87246a988615164059df768490ac200fa0832690158081497d6d0bbd474b081d",
+    "monitorPinPatchPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/fixture-monitor-pin-adaptation.patch",
+    "monitorPinPatchSha256": "b97bc57cf0223c290acfad34e5e26369eec68cf8dd3a1b19d10b95e20dfb1b04",
+    "sourceFiles": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/src/mcp/nativeMcpHttpTransport.ts",
+        "sha256": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b",
+        "lines": [
+          322,
+          361
+        ]
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/src/sdk/nativeAgentClient.ts",
+        "sha256": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5",
+        "lines": [
+          754,
+          760,
+          776
+        ]
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/src/session/sessionEventHistory.ts",
+        "sha256": "7e6ebce77034a1b52cd89beb1aa94725222bf16b4b49734082fd4c1d376bb9a2",
+        "lines": [
+          113
+        ]
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/src/persistence/sessionStoreVerification.ts",
+        "sha256": "6474fdfd0971b7036c442829e7f79da49ae212dac321c47c18fa5b3f67e74d1e",
+        "lines": [
+          270,
+          271
+        ]
+      }
+    ],
+    "productionSourceEdited": false,
+    "originalArchivesEdited": false,
+    "trackerOrFreezeEdited": false,
+    "rawArtifactsCopiedIntoQualification": false
+  },
+  "priorAttempts": [
+    {
+      "attempt": 1,
+      "fixtureDirectory": "/private/tmp/p0-50-installed-http-attempt1-irfcle_0",
+      "exitCode": 1,
+      "ok": false,
+      "passedCheckpointCount": 6,
+      "passedCheckpoints": [
+        {
+          "name": "catalog-server-disposed",
+          "ok": true,
+          "activeSessions": 0,
+          "deletes": 1
+        },
+        {
+          "name": "17-cli-held-before-authenticated-approval",
+          "ok": true,
+          "approvalRequestId": "apprreq_bf28b2baa78a4094b17db0d551864860",
+          "effects": 0
+        },
+        {
+          "name": "cli-server-disposed",
+          "ok": true,
+          "activeSessions": 0,
+          "deletes": 2
+        },
+        {
+          "name": "cli-governed-mcp-executed",
+          "ok": true,
+          "sessionId": "2092ff9d-a48a-4600-8dca-e4823a2f73a2",
+          "approvalRequestId": "apprreq_bf28b2baa78a4094b17db0d551864860"
+        },
+        {
+          "name": "drift-server-disposed",
+          "ok": true,
+          "activeSessions": 0,
+          "deletes": 3
+        },
+        {
+          "name": "changed-catalog-and-unsigned-grant-refused-before-dispatch",
+          "ok": true
+        }
+      ],
+      "reason": "Actual nonzero 401 refusal passed behavior guards but the historical public-error regex no longer matched the current typed message.",
+      "receiptPath": "/private/tmp/p0-50-installed-http-attempt1-irfcle_0/artifacts/receipt.json",
+      "receiptSha256": "2e5b33509daef08210dfc743fedd10c021b1e91cb6568d7bf1b6cb407f9b8d4f",
+      "runnerSha256": "1456e8aa39e064ee0fd80e2cfa3f5b67af22a0d34ab9bdbf44ea6c81ba957cd2",
+      "error": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /MCP discovery failed|credential references/. Input:\n\n'MCP HTTP authentication refused. Configure explicit headerRefs, or auth.kind \"oauth2\" and run `amc agent-loop mcp-catalog --authorize`; OAuth is never enrolled automatically.\\n'\n\n    at file:///private/tmp/p0-50-installed-http-attempt1-irfcle_0/run.mjs:91:272",
+      "rawRunnerLogPath": "/private/tmp/p0-50-installed-http-attempt1-irfcle_0/runner.log",
+      "rawRunnerLogSha256": "5b4656a7686a60d0555e02fc1669afef2f75d6c096986855097b02bb3b6b602e"
+    },
+    {
+      "attempt": 2,
+      "fixtureDirectory": "/private/tmp/p0-50-installed-http-attempt2-hcxxkj0z",
+      "exitCode": 1,
+      "ok": false,
+      "passedCheckpointCount": 8,
+      "passedCheckpoints": [
+        {
+          "name": "catalog-server-disposed",
+          "ok": true,
+          "activeSessions": 0,
+          "deletes": 1
+        },
+        {
+          "name": "17-cli-held-before-authenticated-approval",
+          "ok": true,
+          "approvalRequestId": "apprreq_9d8e4c95983f4a509cd7a9d675d0ddef",
+          "effects": 0
+        },
+        {
+          "name": "cli-server-disposed",
+          "ok": true,
+          "activeSessions": 0,
+          "deletes": 2
+        },
+        {
+          "name": "cli-governed-mcp-executed",
+          "ok": true,
+          "sessionId": "e40c066f-18ee-44fa-9a70-435e0bf99da6",
+          "approvalRequestId": "apprreq_9d8e4c95983f4a509cd7a9d675d0ddef"
+        },
+        {
+          "name": "drift-server-disposed",
+          "ok": true,
+          "activeSessions": 0,
+          "deletes": 3
+        },
+        {
+          "name": "changed-catalog-and-unsigned-grant-refused-before-dispatch",
+          "ok": true
+        },
+        {
+          "name": "redirect-and-oauth-challenge-refused",
+          "ok": true,
+          "secondOriginRequests": 0
+        },
+        {
+          "name": "20-sdk-held-before-authenticated-approval",
+          "ok": true,
+          "approvalRequestId": "apprreq_6904d44e1f974aaca7bec098030c368b",
+          "effects": 1
+        }
+      ],
+      "reason": "SDK effect completed, then mandatory closeAndVerify refused its unpinned monitor trust root. The observer omitted the same pre-execution pin already used by cold CLI checks.",
+      "receiptPath": "/private/tmp/p0-50-installed-http-attempt2-hcxxkj0z/artifacts/receipt.json",
+      "receiptSha256": "f4281bd9d1c9c3af04833e76d741955c6dc6be1a77a2244972b75102f51e18ef",
+      "runnerSha256": "caaa34af9c14271d8d9e3079830baf206542981cd0963ce455c350ef7768ed54",
+      "error": "AMCNativeRefusedError: Native evidence verification failed\n    at ChildProcess.<anonymous> (file:///private/tmp/p0-50-installed-http-attempt2-hcxxkj0z/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js:854:39)\n    at Object.onceWrapper (node:events:634:26)\n    at ChildProcess.emit (node:events:519:28)\n    at maybeClose (node:internal/child_process:1101:16)\n    at ChildProcess._handle.onexit (node:internal/child_process:304:5)",
+      "rawRunnerLogPath": "/private/tmp/p0-50-installed-http-attempt2-hcxxkj0z/runner.log",
+      "rawRunnerLogSha256": "88653a24aad1a49aeef70f87615604f427504b7d76dc48424215c2332141b0cd"
+    }
+  ],
+  "evidence": {
+    "fixtureDirectory": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h",
+    "receiptPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/artifacts/receipt.json",
+    "receiptSha256": "5ccab8bf864aef7be233c864324ee42cba5010ec16d0229ebcb5175350d5601b",
+    "commandsPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/artifacts/commands.json",
+    "commandsSha256": "4e7206767b30a8636ed1e8d516e916d151e606b73c5b1f4da38c88bdf9ed82b4",
+    "manifestPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/evidence-manifest.json",
+    "manifestSha256": "0df7aabeca981c20cc0a2d3c04cbd88cac4d23c06275c25d650a79fd8bf69562",
+    "rawArtifactCount": 94
+  },
+  "limitations": [
+    "Real loopback HTTP/SSE server and scripted local Responses provider only; no live vendor, live model, external OAuth enrollment or TLS handshake was exercised.",
+    "Explicit historical protocolVersion 2025-11-25 is qualified here; the current unpinned newer discovery/default protocol path remains outside this replay.",
+    "macOS ARM64 Node22.23.3 only; Node24, other OSes and remote HTTP implementations require separate evidence.",
+    "A pinned advertised catalog does not establish an arbitrary remote implementation contract.",
+    "Cancellation establishes local disposal, fixture DELETE and absence of fixture effect; it does not prove reversal of already committed remote side effects.",
+    "This installed transport receipt does not establish full CI/release acceptance. Parent separately reports the current full release gate exit1 despite all 23,125 tests passing: function coverage72.09<75,1,270 duplicate findings and2,787 dead-code findings; these are retained blockers."
+  ],
+  "secretInputFilesExported": false
+}

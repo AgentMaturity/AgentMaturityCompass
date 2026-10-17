@@ -1,0 +1,863 @@
+{
+  "issue": "P0-52",
+  "kind": "Independent read-only destination and compiled CLI evidence review",
+  "recordedUtc": "2026-10-14T19:22:58.429278+00:00",
+  "reviewStatus": "No open actionable findings after the private harness correction; initial destination production failures are genuine and remain retained.",
+  "findings": [],
+  "reviewedInputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass/tests/federationImportDestinationQualification.test.ts",
+      "bytes": 7833,
+      "sha256": "49ca8059fc8c2d1e683c2c6f2bd5b0cb154ca6e99be4dfb06a4e29deb7758fae"
+    },
+    {
+      "path": "/private/tmp/p0-52-functional-cli-initial-20261015.mjs",
+      "bytes": 5017,
+      "sha256": "900fdd48942f30297495ca64d909dcc21d4cd0816589814171a42e4bbe19d535"
+    },
+    {
+      "path": "/private/tmp/p0-52-functional-cli-20261015.mjs",
+      "bytes": 6752,
+      "sha256": "336760bad10d0ae18f5c5cf6d790d8928704948ad62d7933ff04b0affe253f8e"
+    },
+    {
+      "path": "/private/tmp/p0-52-destination-first-20261015.json",
+      "bytes": 14644,
+      "sha256": "0d04be757c3adb8193db4963be444b43553205e7102d5512d6286f8cd2a77070"
+    },
+    {
+      "path": "/private/tmp/amc-p0-52-destination-evidence-mvU1Wl/inputs.json",
+      "bytes": 904,
+      "sha256": "ac91533d6cd25e32f1e909bf2b78e57fa30c1f52cdfba1a75dcff1b25a272c7b"
+    }
+  ],
+  "initialDestinationCounts": {
+    "success": false,
+    "numTotalTests": 4,
+    "numPassedTests": 1,
+    "numFailedTests": 3,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "destinationFindings": [
+    {
+      "boundary": "federation-root",
+      "evidence": {
+        "path": "/private/tmp/amc-p0-52-destination-evidence-mvU1Wl/linked-federation-root-7.json",
+        "bytes": 53096,
+        "sha256": "6fc235eaf884a3b985963b9e75244b4a55197e6ae4f695d14df6a615914c94ac"
+      },
+      "publisherKeyId": "894f9327c5b3530ed1fb72a849387d25a649079a0071ca9f573518d73134fbd5",
+      "manifestId": "174a1162-a405-4468-97da-4ba0d034a7d8",
+      "outsideAddedRows": [
+        {
+          "path": "inbox/known-publisher",
+          "kind": "directory",
+          "mode": 16877,
+          "inode": 536496165,
+          "links": 3
+        },
+        {
+          "path": "inbox/known-publisher/174a1162-a405-4468-97da-4ba0d034a7d8",
+          "kind": "directory",
+          "mode": 16877,
+          "inode": 536496166,
+          "links": 6
+        },
+        {
+          "path": "inbox/known-publisher/174a1162-a405-4468-97da-4ba0d034a7d8/manifest.json",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536496172,
+          "links": 1,
+          "sha256": "d2e037f64c20fabb8e23a2b0c087a6921c7cd4e1e81828d160d943fe5dd1eafd"
+        },
+        {
+          "path": "inbox/known-publisher/174a1162-a405-4468-97da-4ba0d034a7d8/manifest.sig",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536496173,
+          "links": 1,
+          "sha256": "66c49f4cc029565c292e2a7aa330dfd7332f0dda5343f4b38589147a555ee205"
+        },
+        {
+          "path": "inbox/known-publisher/174a1162-a405-4468-97da-4ba0d034a7d8/public-keys",
+          "kind": "directory",
+          "mode": 16877,
+          "inode": 536496167,
+          "links": 3
+        },
+        {
+          "path": "inbox/known-publisher/174a1162-a405-4468-97da-4ba0d034a7d8/public-keys/publisher.pub",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536496174,
+          "links": 1,
+          "sha256": "894f9327c5b3530ed1fb72a849387d25a649079a0071ca9f573518d73134fbd5"
+        },
+        {
+          "path": "inbox/known-publisher/174a1162-a405-4468-97da-4ba0d034a7d8/transparency",
+          "kind": "directory",
+          "mode": 16877,
+          "inode": 536496169,
+          "links": 4
+        },
+        {
+          "path": "inbox/known-publisher/174a1162-a405-4468-97da-4ba0d034a7d8/transparency/current.root.json",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536496170,
+          "links": 1,
+          "sha256": "d32219dc6fa58f191d97b67a5ada724f56c0b8a7fa6c8ff8732021643184b4c3"
+        },
+        {
+          "path": "inbox/known-publisher/174a1162-a405-4468-97da-4ba0d034a7d8/transparency/current.root.sig",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536496171,
+          "links": 1,
+          "sha256": "0aaedfad054f6ca6fcd4b616db9863ce55fd541926969b847909339245612b6a"
+        }
+      ],
+      "outsideChangedExistingRows": [
+        {
+          "before": {
+            "path": "inbox",
+            "kind": "directory",
+            "mode": 16877,
+            "inode": 536496084,
+            "links": 2
+          },
+          "after": {
+            "path": "inbox",
+            "kind": "directory",
+            "mode": 16877,
+            "inode": 536496084,
+            "links": 3
+          }
+        }
+      ],
+      "sentinelExactStateUnchanged": true,
+      "recipientSnapshotChanged": false
+    },
+    {
+      "boundary": "inbox",
+      "evidence": {
+        "path": "/private/tmp/amc-p0-52-destination-evidence-mvU1Wl/linked-inbox-3.json",
+        "bytes": 53256,
+        "sha256": "cf64010a0b83982f64378f6acc4642a469c0ad6fcdb569e9170988ea08fbcf02"
+      },
+      "publisherKeyId": "3f110ba9ddca51a1b7fa08818b4d1f1c962dd9aca03662833adcde5fe7428ef8",
+      "manifestId": "31322ce2-a223-44e6-9c35-b4f3cd91baff",
+      "outsideAddedRows": [
+        {
+          "path": "known-publisher",
+          "kind": "directory",
+          "mode": 16877,
+          "inode": 536495404,
+          "links": 3
+        },
+        {
+          "path": "known-publisher/31322ce2-a223-44e6-9c35-b4f3cd91baff",
+          "kind": "directory",
+          "mode": 16877,
+          "inode": 536495405,
+          "links": 6
+        },
+        {
+          "path": "known-publisher/31322ce2-a223-44e6-9c35-b4f3cd91baff/manifest.json",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536495411,
+          "links": 1,
+          "sha256": "b973a23b09a472d67386b78058f137b27547bdf8efe23c513e1ecdbd3360ee57"
+        },
+        {
+          "path": "known-publisher/31322ce2-a223-44e6-9c35-b4f3cd91baff/manifest.sig",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536495412,
+          "links": 1,
+          "sha256": "9d02ac40dbd6c5b0e0fbb6e4ce54b7e9550b60c10be03e488c376e1d714d0df6"
+        },
+        {
+          "path": "known-publisher/31322ce2-a223-44e6-9c35-b4f3cd91baff/public-keys",
+          "kind": "directory",
+          "mode": 16877,
+          "inode": 536495406,
+          "links": 3
+        },
+        {
+          "path": "known-publisher/31322ce2-a223-44e6-9c35-b4f3cd91baff/public-keys/publisher.pub",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536495413,
+          "links": 1,
+          "sha256": "3f110ba9ddca51a1b7fa08818b4d1f1c962dd9aca03662833adcde5fe7428ef8"
+        },
+        {
+          "path": "known-publisher/31322ce2-a223-44e6-9c35-b4f3cd91baff/transparency",
+          "kind": "directory",
+          "mode": 16877,
+          "inode": 536495408,
+          "links": 4
+        },
+        {
+          "path": "known-publisher/31322ce2-a223-44e6-9c35-b4f3cd91baff/transparency/current.root.json",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536495409,
+          "links": 1,
+          "sha256": "8389931759668ce31ef79fd88e4b2bb5fe985bdd86d079f721d391a3678e5f8c"
+        },
+        {
+          "path": "known-publisher/31322ce2-a223-44e6-9c35-b4f3cd91baff/transparency/current.root.sig",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536495410,
+          "links": 1,
+          "sha256": "499e01f16030ef4333c9425025f6dc4449c883102add0e9b7fd850f1710e4679"
+        }
+      ],
+      "outsideChangedExistingRows": [
+        {
+          "before": {
+            "path": ".",
+            "kind": "directory",
+            "mode": 16877,
+            "inode": 536495373,
+            "links": 3
+          },
+          "after": {
+            "path": ".",
+            "kind": "directory",
+            "mode": 16877,
+            "inode": 536495373,
+            "links": 4
+          }
+        }
+      ],
+      "sentinelExactStateUnchanged": true,
+      "recipientSnapshotChanged": false
+    },
+    {
+      "boundary": "publisher",
+      "evidence": {
+        "path": "/private/tmp/amc-p0-52-destination-evidence-mvU1Wl/linked-publisher-5.json",
+        "bytes": 53313,
+        "sha256": "db167641fe841220b820fe99c6aca6f9467998f455a277559d38eb126fae1184"
+      },
+      "publisherKeyId": "3b33476211e99f1be5b0e36c8c146c368af0c71a3a4a6cdacfdba3da82241e3e",
+      "manifestId": "f586fd33-6ea7-47b0-b088-f4833cb8c88a",
+      "outsideAddedRows": [
+        {
+          "path": "f586fd33-6ea7-47b0-b088-f4833cb8c88a",
+          "kind": "directory",
+          "mode": 16877,
+          "inode": 536495786,
+          "links": 6
+        },
+        {
+          "path": "f586fd33-6ea7-47b0-b088-f4833cb8c88a/manifest.json",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536495792,
+          "links": 1,
+          "sha256": "4549e964cfd4abbbe144beb1658a5ca43a481b9da6dc0da5c792ec6ff7a98100"
+        },
+        {
+          "path": "f586fd33-6ea7-47b0-b088-f4833cb8c88a/manifest.sig",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536495793,
+          "links": 1,
+          "sha256": "5a5470b81db85d54dc74eb5ebe48fa5bf8ef9b798952edbccf8e02dac14ce0f7"
+        },
+        {
+          "path": "f586fd33-6ea7-47b0-b088-f4833cb8c88a/public-keys",
+          "kind": "directory",
+          "mode": 16877,
+          "inode": 536495787,
+          "links": 3
+        },
+        {
+          "path": "f586fd33-6ea7-47b0-b088-f4833cb8c88a/public-keys/publisher.pub",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536495794,
+          "links": 1,
+          "sha256": "3b33476211e99f1be5b0e36c8c146c368af0c71a3a4a6cdacfdba3da82241e3e"
+        },
+        {
+          "path": "f586fd33-6ea7-47b0-b088-f4833cb8c88a/transparency",
+          "kind": "directory",
+          "mode": 16877,
+          "inode": 536495789,
+          "links": 4
+        },
+        {
+          "path": "f586fd33-6ea7-47b0-b088-f4833cb8c88a/transparency/current.root.json",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536495790,
+          "links": 1,
+          "sha256": "ac6816ff1b1025a5b78d3991cfba4c4b193223d8222e3c1c4713645480aa5770"
+        },
+        {
+          "path": "f586fd33-6ea7-47b0-b088-f4833cb8c88a/transparency/current.root.sig",
+          "kind": "file",
+          "mode": 33188,
+          "inode": 536495791,
+          "links": 1,
+          "sha256": "631afa2728db430f9ebb1784b0594e51f025cbbe26330f446e5d01dd45534f80"
+        }
+      ],
+      "outsideChangedExistingRows": [
+        {
+          "before": {
+            "path": ".",
+            "kind": "directory",
+            "mode": 16877,
+            "inode": 536495755,
+            "links": 3
+          },
+          "after": {
+            "path": ".",
+            "kind": "directory",
+            "mode": 16877,
+            "inode": 536495755,
+            "links": 4
+          }
+        }
+      ],
+      "sentinelExactStateUnchanged": true,
+      "recipientSnapshotChanged": false
+    }
+  ],
+  "pinAndProducerReview": "The operator captures the real publisher key at workspace creation before export and writes a signed peer record. Actual export/verify/import functions are used with no router, producer, trust-admission, archive or filesystem mock. Outer packages are integrity-valid, admitted and trusted with no overrides before destination links are introduced.",
+  "destinationProof": "Normal recipient commits the complete signed package. Each static inbox/publisher/federation-root link returns a successful import instead of refusing and writes five copied files beyond the governed recipient boundary. Nine new rows for inbox/federation-root and eight for publisher include exact envelope, publisher-public-key and transparency-root hashes. Existing sentinel names/bytes/inode/link metadata remain equal; there is no claim that the sentinel content was overwritten.",
+  "snapshotInterpretation": "Recipient lstat snapshots do not follow directory links and stay unchanged in all three REDs. The separate outside-target snapshots expose actual redirected writes. This distinction is preserved rather than treating the unchanged recipient alone as no-effects proof.",
+  "cliPhases": [
+    {
+      "mode": "initial",
+      "receipt": {
+        "path": "/private/tmp/p0-52-functional-cli-20261015.json",
+        "bytes": 522462,
+        "sha256": "a293acb80a7a93c56b7523a57cb84aad65874679e5b8fda438bf78182f0228a3"
+      },
+      "harness": {
+        "path": "/private/tmp/p0-52-functional-cli-initial-20261015.mjs",
+        "bytes": 5017,
+        "sha256": "900fdd48942f30297495ca64d909dcc21d4cd0816589814171a42e4bbe19d535"
+      },
+      "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+      "node": "v22.23.3",
+      "commands": [
+        {
+          "name": "publisher-federate-init",
+          "exit": 0,
+          "effectsChanged": true,
+          "effectExpectationExecuted": false,
+          "addedNames": [
+            ".amc/federation",
+            ".amc/federation/federation.yaml",
+            ".amc/federation/federation.yaml.sig",
+            ".amc/federation/inbox",
+            ".amc/federation/outbox",
+            ".amc/federation/peers"
+          ],
+          "removedNames": [],
+          "changedNames": [
+            ".amc",
+            ".amc/keys/auditor_ed25519.pub",
+            ".amc/keys/lease_ed25519.pub",
+            ".amc/keys/monitor_ed25519.pub",
+            ".amc/keys/session_ed25519.pub",
+            ".amc/vault.amcvault",
+            ".amc/vault.amcvault.meta.json"
+          ],
+          "stdoutSha256": "f3fff60de59592646988f37165a182bcb6ec310e37319c622715f599b20d15c0",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "recipient-federate-init",
+          "exit": 0,
+          "effectsChanged": true,
+          "effectExpectationExecuted": false,
+          "addedNames": [
+            ".amc/federation",
+            ".amc/federation/federation.yaml",
+            ".amc/federation/federation.yaml.sig",
+            ".amc/federation/inbox",
+            ".amc/federation/outbox",
+            ".amc/federation/peers"
+          ],
+          "removedNames": [],
+          "changedNames": [
+            ".amc",
+            ".amc/keys/auditor_ed25519.pub",
+            ".amc/keys/lease_ed25519.pub",
+            ".amc/keys/monitor_ed25519.pub",
+            ".amc/keys/session_ed25519.pub",
+            ".amc/vault.amcvault",
+            ".amc/vault.amcvault.meta.json"
+          ],
+          "stdoutSha256": "b44c4fb9e1d1a44f131ba1acfdfc3f04ede7e306b4ccad63c9f1320a25783fda",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "unknown-recipient-federate-init",
+          "exit": 0,
+          "effectsChanged": true,
+          "effectExpectationExecuted": false,
+          "addedNames": [
+            ".amc/federation",
+            ".amc/federation/federation.yaml",
+            ".amc/federation/federation.yaml.sig",
+            ".amc/federation/inbox",
+            ".amc/federation/outbox",
+            ".amc/federation/peers"
+          ],
+          "removedNames": [],
+          "changedNames": [
+            ".amc",
+            ".amc/keys/auditor_ed25519.pub",
+            ".amc/keys/lease_ed25519.pub",
+            ".amc/keys/monitor_ed25519.pub",
+            ".amc/keys/session_ed25519.pub",
+            ".amc/vault.amcvault",
+            ".amc/vault.amcvault.meta.json"
+          ],
+          "stdoutSha256": "12fd7326d0f6d6dbb2219dee53751e554a33e872edfb0519b87e5084b8d17100",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "genuine-export",
+          "exit": 0,
+          "effectsChanged": false,
+          "effectExpectationExecuted": false,
+          "addedNames": [],
+          "removedNames": [],
+          "changedNames": [],
+          "stdoutSha256": "c542400f55d6d260928ea33baada72aa4c52824755e8e3793eb23a40ee623f2b",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "compiled-explicit-pin-verify",
+          "exit": 0,
+          "effectsChanged": false,
+          "effectExpectationExecuted": false,
+          "addedNames": [],
+          "removedNames": [],
+          "changedNames": [],
+          "stdoutSha256": "aad8f77c8397fffb2e434f9b56d656dce9b0e6c31cbbfe9e479017fc70dc98aa",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "unknown-publisher-refusal",
+          "exit": 1,
+          "effectsChanged": false,
+          "effectExpectationExecuted": false,
+          "addedNames": [],
+          "removedNames": [],
+          "changedNames": [],
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "3f43e6e0f32ed08e81657e45e3012077bf0f9a2817ab20b42ac84f1918ee0c97"
+        },
+        {
+          "name": "safe-peer-add",
+          "exit": 0,
+          "effectsChanged": true,
+          "effectExpectationExecuted": false,
+          "addedNames": [
+            ".amc/federation/peers/known-publisher.json",
+            ".amc/federation/peers/known-publisher.json.sig"
+          ],
+          "removedNames": [],
+          "changedNames": [
+            ".amc/federation/peers"
+          ],
+          "stdoutSha256": "bdeb8b6abf7133d9c972bd0f31d9df4e9853c04652b57b7da1b14ecbf03592c0",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "unsafe-peer-refusal",
+          "exit": 1,
+          "effectsChanged": false,
+          "effectExpectationExecuted": false,
+          "addedNames": [],
+          "removedNames": [],
+          "changedNames": [],
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "bc4b6e3357c95a4077e2e119191a8de41df3d5d11331c727685177082bac3277"
+        },
+        {
+          "name": "genuine-import",
+          "exit": 0,
+          "effectsChanged": true,
+          "effectExpectationExecuted": false,
+          "addedNames": [
+            ".amc/federation/inbox/known-publisher",
+            ".amc/federation/inbox/known-publisher/f2f1afc1-1bb0-4805-8b85-58da89cab724",
+            ".amc/federation/inbox/known-publisher/f2f1afc1-1bb0-4805-8b85-58da89cab724/manifest.json",
+            ".amc/federation/inbox/known-publisher/f2f1afc1-1bb0-4805-8b85-58da89cab724/manifest.sig",
+            ".amc/federation/inbox/known-publisher/f2f1afc1-1bb0-4805-8b85-58da89cab724/public-keys",
+            ".amc/federation/inbox/known-publisher/f2f1afc1-1bb0-4805-8b85-58da89cab724/public-keys/publisher.pub",
+            ".amc/federation/inbox/known-publisher/f2f1afc1-1bb0-4805-8b85-58da89cab724/transparency",
+            ".amc/federation/inbox/known-publisher/f2f1afc1-1bb0-4805-8b85-58da89cab724/transparency/current.root.json",
+            ".amc/federation/inbox/known-publisher/f2f1afc1-1bb0-4805-8b85-58da89cab724/transparency/current.root.sig"
+          ],
+          "removedNames": [],
+          "changedNames": [
+            ".amc/federation/inbox"
+          ],
+          "stdoutSha256": "d93cd6f0260dd0636224ae5f939bff7001fe8d1e57b5949787b79aa2c4b76b32",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "same-bucket-replay-refusal",
+          "exit": 1,
+          "effectsChanged": false,
+          "effectExpectationExecuted": false,
+          "addedNames": [],
+          "removedNames": [],
+          "changedNames": [],
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "1250db91a3cde2a18237a8aa8b891d1f0aa05ca6aeef4fd879a6cc9ae7956f43"
+        }
+      ],
+      "exactCopiedAdmittedMembers": [
+        {
+          "path": "manifest.sig",
+          "bytes": 249,
+          "sha256": "3498e5401c5c418af483d76e399a0f83626b1ba2ce351dd4546ad750da10a91e"
+        },
+        {
+          "path": "manifest.json",
+          "bytes": 796,
+          "sha256": "1fe269d18ae4447bea06d7cb7e00f56a439c91e95f7831bf5bb987a0889e6377"
+        },
+        {
+          "path": "public-keys/publisher.pub",
+          "bytes": 113,
+          "sha256": "cd73b8bb6088137fa949ccf7238e3dd29b6ec49b6e9d42ed4221a113ba287531"
+        },
+        {
+          "path": "transparency/current.root.sig",
+          "bytes": 781,
+          "sha256": "3994eed50aada217dd54ee504d5ac1b4827b1093af692538bc015c865d0370b8"
+        },
+        {
+          "path": "transparency/current.root.json",
+          "bytes": 251,
+          "sha256": "14430ab87c20334f8d12c93ac6b90801b58f0dd4e73eb438f8124105e55bddb2"
+        }
+      ],
+      "unlistedTarMetadataOutsideImportContract": [
+        "._.",
+        "./._artifacts",
+        "./._transparency",
+        "./._manifest.sig",
+        "./._manifest.json",
+        "./._public-keys",
+        "./public-keys/._publisher.pub",
+        "./transparency/._proofs",
+        "./transparency/._current.root.sig",
+        "./transparency/._current.root.json",
+        "./artifacts/._bom",
+        "./artifacts/._plugins",
+        "./artifacts/._certs",
+        "./artifacts/._benchmarks"
+      ],
+      "typedVerifiedIntegrityAndTrust": true,
+      "inputPins": [],
+      "inputPinsUnchanged": null,
+      "allExecutableEffectAssertionsPassed": false
+    },
+    {
+      "mode": "final",
+      "receipt": {
+        "path": "/private/tmp/p0-52-functional-cli-final-20261015.json",
+        "bytes": 527687,
+        "sha256": "8c03516bfb1ffa890bd994898d35b41f69751e6253e077ee15cd8d1877d1c7f3"
+      },
+      "harness": {
+        "path": "/private/tmp/p0-52-functional-cli-20261015.mjs",
+        "bytes": 6752,
+        "sha256": "336760bad10d0ae18f5c5cf6d790d8928704948ad62d7933ff04b0affe253f8e"
+      },
+      "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+      "node": "v22.23.3",
+      "commands": [
+        {
+          "name": "publisher-federate-init",
+          "exit": 0,
+          "effectsChanged": true,
+          "effectExpectationExecuted": true,
+          "addedNames": [
+            ".amc/federation",
+            ".amc/federation/federation.yaml",
+            ".amc/federation/federation.yaml.sig",
+            ".amc/federation/inbox",
+            ".amc/federation/outbox",
+            ".amc/federation/peers"
+          ],
+          "removedNames": [],
+          "changedNames": [
+            ".amc",
+            ".amc/keys/auditor_ed25519.pub",
+            ".amc/keys/lease_ed25519.pub",
+            ".amc/keys/monitor_ed25519.pub",
+            ".amc/keys/session_ed25519.pub",
+            ".amc/vault.amcvault",
+            ".amc/vault.amcvault.meta.json"
+          ],
+          "stdoutSha256": "6ee1990951bd1af10c5d17998fdc60730b7c5ebdb72a58d05799983728c311c3",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "recipient-federate-init",
+          "exit": 0,
+          "effectsChanged": true,
+          "effectExpectationExecuted": true,
+          "addedNames": [
+            ".amc/federation",
+            ".amc/federation/federation.yaml",
+            ".amc/federation/federation.yaml.sig",
+            ".amc/federation/inbox",
+            ".amc/federation/outbox",
+            ".amc/federation/peers"
+          ],
+          "removedNames": [],
+          "changedNames": [
+            ".amc",
+            ".amc/keys/auditor_ed25519.pub",
+            ".amc/keys/lease_ed25519.pub",
+            ".amc/keys/monitor_ed25519.pub",
+            ".amc/keys/session_ed25519.pub",
+            ".amc/vault.amcvault",
+            ".amc/vault.amcvault.meta.json"
+          ],
+          "stdoutSha256": "13b12be75b8acd562520875fc87bb46c03bca8bd9b8b185c3b0a908298da0aaa",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "unknown-recipient-federate-init",
+          "exit": 0,
+          "effectsChanged": true,
+          "effectExpectationExecuted": true,
+          "addedNames": [
+            ".amc/federation",
+            ".amc/federation/federation.yaml",
+            ".amc/federation/federation.yaml.sig",
+            ".amc/federation/inbox",
+            ".amc/federation/outbox",
+            ".amc/federation/peers"
+          ],
+          "removedNames": [],
+          "changedNames": [
+            ".amc",
+            ".amc/keys/auditor_ed25519.pub",
+            ".amc/keys/lease_ed25519.pub",
+            ".amc/keys/monitor_ed25519.pub",
+            ".amc/keys/session_ed25519.pub",
+            ".amc/vault.amcvault",
+            ".amc/vault.amcvault.meta.json"
+          ],
+          "stdoutSha256": "91df3390a562050139118c18fd0abe3fccaa00bed2efa3c051a05a2623a3b289",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "genuine-export",
+          "exit": 0,
+          "effectsChanged": false,
+          "effectExpectationExecuted": true,
+          "addedNames": [],
+          "removedNames": [],
+          "changedNames": [],
+          "stdoutSha256": "e4c959c4cd8d9bce83fa77cf79949971fa0f74596c2e5940fb99c34930edef26",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "compiled-explicit-pin-verify",
+          "exit": 0,
+          "effectsChanged": false,
+          "effectExpectationExecuted": true,
+          "addedNames": [],
+          "removedNames": [],
+          "changedNames": [],
+          "stdoutSha256": "89de9b785908dc6975d95287b29346216bb3a9eacf95c3493b6b3416c0a2c102",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "unknown-publisher-refusal",
+          "exit": 1,
+          "effectsChanged": false,
+          "effectExpectationExecuted": true,
+          "addedNames": [],
+          "removedNames": [],
+          "changedNames": [],
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "f6f100e359419e1463dbca74188d78ee68f0b48d52f9f18e6425f1100c51a446"
+        },
+        {
+          "name": "safe-peer-add",
+          "exit": 0,
+          "effectsChanged": true,
+          "effectExpectationExecuted": true,
+          "addedNames": [
+            ".amc/federation/peers/known-publisher.json",
+            ".amc/federation/peers/known-publisher.json.sig"
+          ],
+          "removedNames": [],
+          "changedNames": [
+            ".amc/federation/peers"
+          ],
+          "stdoutSha256": "eea950865605865934479c3ecac15938ca692756de1fef343370b0b0a600d57d",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "unsafe-peer-refusal",
+          "exit": 1,
+          "effectsChanged": false,
+          "effectExpectationExecuted": true,
+          "addedNames": [],
+          "removedNames": [],
+          "changedNames": [],
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "bc4b6e3357c95a4077e2e119191a8de41df3d5d11331c727685177082bac3277"
+        },
+        {
+          "name": "genuine-import",
+          "exit": 0,
+          "effectsChanged": true,
+          "effectExpectationExecuted": true,
+          "addedNames": [
+            ".amc/federation/inbox/known-publisher",
+            ".amc/federation/inbox/known-publisher/5044e32d-1541-4b31-bf7c-9996ff1ee9ac",
+            ".amc/federation/inbox/known-publisher/5044e32d-1541-4b31-bf7c-9996ff1ee9ac/manifest.json",
+            ".amc/federation/inbox/known-publisher/5044e32d-1541-4b31-bf7c-9996ff1ee9ac/manifest.sig",
+            ".amc/federation/inbox/known-publisher/5044e32d-1541-4b31-bf7c-9996ff1ee9ac/public-keys",
+            ".amc/federation/inbox/known-publisher/5044e32d-1541-4b31-bf7c-9996ff1ee9ac/public-keys/publisher.pub",
+            ".amc/federation/inbox/known-publisher/5044e32d-1541-4b31-bf7c-9996ff1ee9ac/transparency",
+            ".amc/federation/inbox/known-publisher/5044e32d-1541-4b31-bf7c-9996ff1ee9ac/transparency/current.root.json",
+            ".amc/federation/inbox/known-publisher/5044e32d-1541-4b31-bf7c-9996ff1ee9ac/transparency/current.root.sig"
+          ],
+          "removedNames": [],
+          "changedNames": [
+            ".amc/federation/inbox"
+          ],
+          "stdoutSha256": "7266199686f3387e0e67e19215f63cc9812c5574c4a8d0c15618377dd79f417d",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "same-bucket-replay-refusal",
+          "exit": 1,
+          "effectsChanged": false,
+          "effectExpectationExecuted": true,
+          "addedNames": [],
+          "removedNames": [],
+          "changedNames": [],
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "999068e86126274baaefabcb4318809054e77c33b8bb66e3559102673025bdad"
+        }
+      ],
+      "exactCopiedAdmittedMembers": [
+        {
+          "path": "manifest.sig",
+          "bytes": 249,
+          "sha256": "274aaa7009448f9f47b65f01065c48e2fc5e523ba648cd5564efbce907a03975"
+        },
+        {
+          "path": "manifest.json",
+          "bytes": 796,
+          "sha256": "64fbd2111ddc33edd57f5279c71c3b1840c6464a9144b3f5fbcec8c6ab03bcf5"
+        },
+        {
+          "path": "public-keys/publisher.pub",
+          "bytes": 113,
+          "sha256": "2f5c0ff7bf0808bba031d3a7f0e0a8aa5408ce857995f73a50b076ca50a4cbdb"
+        },
+        {
+          "path": "transparency/current.root.sig",
+          "bytes": 781,
+          "sha256": "e15d5f55653011ca227fa93020114a095ba29d61d40d5dadf0dca6889ba98b25"
+        },
+        {
+          "path": "transparency/current.root.json",
+          "bytes": 251,
+          "sha256": "139833804483d3ee7e6c39a2bd8be01dbd3f79f18217c4d4d0f947b0911214c0"
+        }
+      ],
+      "unlistedTarMetadataOutsideImportContract": [
+        "._.",
+        "./._artifacts",
+        "./._transparency",
+        "./._manifest.sig",
+        "./._manifest.json",
+        "./._public-keys",
+        "./public-keys/._publisher.pub",
+        "./transparency/._proofs",
+        "./transparency/._current.root.sig",
+        "./transparency/._current.root.json",
+        "./artifacts/._bom",
+        "./artifacts/._plugins",
+        "./artifacts/._certs",
+        "./artifacts/._benchmarks"
+      ],
+      "typedVerifiedIntegrityAndTrust": true,
+      "inputPins": [
+        {
+          "path": "dist/cli.js",
+          "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+        },
+        {
+          "path": "dist/federation/federationSync.js",
+          "sha256": "6ada90a070455c7e0386937885427c833cb9568c0c671658a1375ea5a243e750"
+        },
+        {
+          "path": "dist/federation/federationStore.js",
+          "sha256": "1ce77499a073f5953c1c49d2c56dc6fb2dd9a92741381301c2c9a637754f1e1a"
+        },
+        {
+          "path": "dist/federation/federationIdentity.js",
+          "sha256": "8e8ecd6718d8a22be070e7499df5c0ad7cf934beadccfdddbcd5f40f14827f9d"
+        },
+        {
+          "path": "dist/federation/federationSchema.js",
+          "sha256": "71ebd42bed8528245732fa30fc533ae2d50d5bb4b1d31e074d16e294e4c42a87"
+        },
+        {
+          "path": "src/federation/federationSync.ts",
+          "sha256": "a91c5d067d887ba54e75285ff43e421bec80cafbdcde0b6e107d97ce082cc3ce"
+        },
+        {
+          "path": "src/federation/federationStore.ts",
+          "sha256": "a2eba944db547fd275d08290766ff1c0e152ab3ed0b7bf641d6fce04c994bd87"
+        }
+      ],
+      "inputPinsUnchanged": true,
+      "allExecutableEffectAssertionsPassed": true
+    }
+  ],
+  "streamHashesIndependentlyChecked": 40,
+  "addressedInitialHarnessGap": {
+    "initial": "Original900fdd48942f30297495ca64d909dcc21d4cd0816589814171a42e4bbe19d535 harness machine-gated ten exits and recorded, but did not machine-gate, before/after effects. sourceHead was a baseline literal and only the top-level CLI hash was recorded.",
+    "correction": "Final336760bad10d0ae18f5c5cf6d790d8928704948ad62d7933ff04b0affe253f8e harness gates ten per-case effect expectations as well as exits; checks actual JSON trust/manifest and imported declared-member hashes; derives runtime Git HEAD and pins seven source/compiled inputs unchanged after execution.",
+    "actualFinal": "Fresh final receipt at bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b has ten matching exits and effects with no error/signal; verifiedContentMatches, importedContentMatches and inputsUnchanged are true. Independent review rechecks40initial/final stream hashes, verifies all five admitted package members equal real archive bytes in both retained recipients, and checks the independent publisher key and bundle hashes.",
+    "preservation": "The original harness and raw receipt remain byte-exact separately. No final executable effect claim is retroactively assigned to the original observer."
+  },
+  "privacy": "No raw private PEM in evidence JSON,40CLI streams or admitted copied package members. Owned-state vault/key files remain private and must not be copied into canonical evidence.",
+  "reviewObserverCorrections": [
+    "The first read-only audit compared the original receipt to the newly corrected harness path; the correct separately preserved -initial script matches the original hash.",
+    "A second read-only archive audit initially included unlisted macOS AppleDouble metadata. The corrected byte comparison follows the actual import contract: verified manifest-declared members plus required envelope. No product failure, test expectation or count was changed by either audit correction."
+  ],
+  "limits": [
+    "Static links point only to fresh fixture-owned siblings. This review is not proof of concurrent replacement resistance, OS atomic confinement, permissions under arbitrary users, cross-store I/O transactions or arbitrary malicious archive batches.",
+    "The ten CLI observations exercise empty benchmark/certificate/BOM/plugin packages, explicit-pinned verification, unknown signer refusal, safe/unsafe peer addition, genuine import and same-bucket replay. Real nested benchmark admissions are separately evidenced by the53-case follow-up receipt.",
+    "CLI export output resides outside the command cwd. Its unchanged cwd snapshot does not mean no filesystem output; the real archive hash and imported member bytes provide its positive effect proof.",
+    "Retained owned-state directories include vault/key files privately. Only hashed metadata, public artifacts and nonsecret streams are suitable for canonical copying; no raw private PEM appears in reviewed JSON,40streams or admitted public package members.",
+    "No tests, builds, CLI execution, source/test edit, guard mutation, private harness edit, external call or cleanup was performed by this reviewer. Parent-owned final source/build/bounded runs are separate.",
+    "The parent reported a setup-overlap run with17pending cases and no product verdict; this review does not convert that observer phase into acceptance. Whole-suite, coverage, Node24, hosted CI, release and prior held debt remain outside this review."
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "source": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+  "counts": {
+    "numTotalTests": 516,
+    "numPassedTests": 515,
+    "numFailedTests": 1,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "success": false
+  },
+  "files": 9,
+  "components": {
+    "originalBaselines": 432,
+    "pureGrader": 59,
+    "actualRunner": 11,
+    "signedOperatorComplianceReader": 14
+  },
+  "soleFailure": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+  "rawSha256": "5ac60533406e8cd76ccaa442f599abbd423e1379087623e1c50313bd334084b3",
+  "proposal": "Private unchanged19-case18/19\u219219/19\u219218/19, with all8 originalabort/isolation green. All4529 copiedfiles restore; not a productionfix or wholeacceptance.",
+  "causal": "Pure same59cases loses3 ungradable,10 toolcall,1 globalregex,12 weakestmethod and11 keywordeligibility cases; allrestored59. Compliance same14 fixtures loses4 eligibility cases thenactualcorrectedrestore14. Runner digest/findings mutantssame19 losesone intendedcase inadditiontobaselinevalidityRED, thenrestore18/19.",
+  "limits": "Controlled callbacks, canned loopback replies, authored signed reader controls and private copies are separate. No built-in structured/executed agent scenario, tool execution, live model/provider or independentregulated evidence is established."
+}

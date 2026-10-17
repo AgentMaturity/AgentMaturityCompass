@@ -1,0 +1,252 @@
+{
+  "kind": "read-only next-priority eligibility preparation",
+  "atUtc": "2026-10-14T15:29:56.708971+00:00",
+  "nextEligibleKey": "P0-22",
+  "eligibleAction": "source reconciliation and own-slice qualification; no active implementation in this audit",
+  "authority": [
+    "Direct user serial current-plan order and P0-29skip; preserve all Claude work and freeze checks.",
+    "Accepted-main docs/program/READY_TO_DEPLOY.md truth/workflow/freeze contract.",
+    "Recovered full issue acceptance plus unchanged five supplied plan documents; October9statuses are dated evidence.",
+    "October12Claude notes/receipts and reservations reconcile later source, but do not imply acceptedmain merge or currentqualification."
+  ],
+  "planInputs": [
+    {
+      "path": "/Users/sid/Downloads/Agent contract.md",
+      "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f",
+      "matchesHandoffHash": true
+    },
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541",
+      "matchesHandoffHash": true
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04",
+      "matchesHandoffHash": true
+    },
+    {
+      "path": "/Users/sid/Downloads/A4 \u00b7 Forge.md",
+      "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65",
+      "matchesHandoffHash": true
+    },
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0",
+      "matchesHandoffHash": true
+    }
+  ],
+  "sourceEvidence": [
+    {
+      "path": "/Users/sid/.codex/attachments/c12ec231-6ce3-4c9c-a092-17b53dbd615b/Pasted text.txt",
+      "sha256": "5cb0587587fb64e1597b046a6ead7b1f6b495c93035716b9140e4b5ef118695e"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-10-14-amc-current-plan-handoff/plan-evidence-index.json",
+      "sha256": "148a458e4e5375a41a57e49c917cbf94705387ca2f512c25ce363157dea76c8a"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/pending-checks.md",
+      "sha256": "6339ea6398fddcfbe18ea96a40b839241745ec138378772c77a581ede1b57870"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/docs/program/READY_TO_DEPLOY.md",
+      "sha256": "0ad78603fd26bd26d1a106b4a52d31ed382c21c4ab9cce901704c588532aadd4"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-14.md",
+      "sha256": "ddbde43361411a3f7f7d848a9851788b6dd15852f63c32b323a2610ce0213b89"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-22.md",
+      "sha256": "32592de8c33bbc377ad3d5f6638698fa39345226978d0abefeba76ba19c511f6"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-23.md",
+      "sha256": "468e694e7989aacbf26f3101efa52bf0e734c64a81946daaf216a8683ce9ff1b"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-30.md",
+      "sha256": "f58d1716546c6f4525c5d9353a07f5e19fcaadd2737ef1d894f97d4dcdd4c97a"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-53.md",
+      "sha256": "b4a8a466829205daff263d337f8e730d90570c614e36547063d9fc63b93ef219"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-55.md",
+      "sha256": "d77a082bd93e1dd71c16063854c1be74d574a0d9b73ecffdbc890bf31783398d"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/qualification/2026-10-11-P0-14/README.md",
+      "sha256": "6628d25b728d1d87a0d6444cc3cb91d4bf1a423197de780ed1c713b9de77b778"
+    }
+  ],
+  "main": {
+    "path": "/Users/sid/AgentMaturityCompass",
+    "head": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+    "status": ""
+  },
+  "heldInt": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+    "head": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+    "meaning": "preserved candidate, not accepted base"
+  },
+  "graphEvidence": {
+    "command": "graphify query \"P0-14 deployment Helm claim labels source ownership dependencies\" --budget800",
+    "installedVersion": "0.9.74",
+    "refreshPin": "0.9.56",
+    "navigationSource": "d69d7037c20161ae65c1030efa4e39598c1beb21",
+    "query": "478nodes found;26shown,452truncated; only navigation evidence",
+    "freshness": "root graph Sep8 and navigation source differs accepted5ea; no refresh/watcher/server run; live source verified directly."
+  },
+  "items": [
+    {
+      "key": "P0-29",
+      "status": "explicitly skipped by user; original draft and unresolved evidence preserved",
+      "eligibleNext": false
+    },
+    {
+      "key": "P0-50",
+      "status": "active; HTTP installed fixture requalification pending; parent reports all23125fulltests passed but coverage/source-quality obligations remain",
+      "eligibleNext": false,
+      "falseDoneAvoided": "MCP components and stdio3/3 do not establish whole release gate success."
+    },
+    {
+      "key": "P0-53",
+      "priority": "Urgent",
+      "due": "2026-10-14",
+      "eligibleNext": false,
+      "reason": "Needs-Sid base exception approval/merge not present on accepted main. P1-65 absent main allowedExceptionKeys, present held int; a candidate cannot authorize itself. Plan/decision comments are not a merged Sid PR.",
+      "sources": [
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-53.md",
+        "/Users/sid/AgentMaturityCompass/scripts/freeze-baseline.json"
+      ]
+    },
+    {
+      "key": "P0-14",
+      "priority": "Urgent",
+      "due": "2026-10-20",
+      "eligibleNext": false,
+      "reason": "Retained Claude issue reservation plus pending dated default-Secret exposure/remediation and Actions/tool-download/pin approvals.",
+      "existingCandidate": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-14",
+        "head": "f46489331ae58bfb53020ae2f2916d3ec7421c33",
+        "containedInHeldInt": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4"
+      },
+      "answeredDecisions": [
+        "D-03 optionC recorded2026-10-11: retain four documented topologies; Railway/Vercel unqualified.",
+        "D-13 public origin as-is, AMC_OS stripped from slices.",
+        "Current direct D-03 health skip untilP2-06 is only that skip, not deployment acceptance."
+      ],
+      "pendingHuman": [
+        "dated chart0.1defaultSecret exposure answer",
+        "Sid remediation text",
+        "Actions/tool download approval and actualSHA/checksum pins",
+        "image namespace follow-through"
+      ],
+      "ownershipEvidence": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md:1496-1499;1582-1588",
+      "qualificationEvidence": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/qualification/2026-10-11-P0-14/README.md:105-119",
+      "limits": "Historical Node25local98tests/30mutations/kind verifier results; original-main-image drillfailed; corrected-image repeatpassed; CI/Compose/docker-smoke/security-scan unrun; eight later deploy-path changes. Reconcile existing work, do not replay original12picks."
+    },
+    {
+      "key": "P0-55",
+      "priority": "Urgent",
+      "due": "2026-10-21",
+      "eligibleNext": false,
+      "reason": "P0-22/P0-51 follow-up qualification and current source/reservation separation needed; do not resume later paused A4/P2-02 source.",
+      "dependencies": [
+        "P0-09",
+        "P0-18",
+        "P0-20",
+        "P0-22",
+        "P0-27",
+        "P0-51"
+      ],
+      "ownershipPrecision": "Original wave1P0-55 paths are marked merged/no longer in flight at RESERVATIONS5-10. Original amc-a4-2 now holds dirty P2-02slice2; it is not a free P0-55checkout. This audit does not impose a new blanket reservation on already merged guards.",
+      "scopeWarning": "P0-55 is advisory before publish and is not a GATE-G0 blocker unless Sid promotes it; do not invent that promotion."
+    },
+    {
+      "key": "P0-22",
+      "priority": "Urgent",
+      "due": "2026-10-24",
+      "eligibleNext": true,
+      "route": "Agent-Doable",
+      "mode": "own-slice source reconciliation and qualification of existing accepted-main implementation",
+      "dependencies": [
+        "P0-08",
+        "P0-15",
+        "P0-21"
+      ],
+      "dependencyEvidence": "All three are merged in accepted main; P0-21 PR72 merge42e0e3a7d5846472f0c4c385ea4f65cd645416fc. OldDone labels do not replace fresh behavior proof.",
+      "sourceCandidate": "/Users/sid/AgentMaturityCompass@5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "originalImplementations": [
+        "f8448aa1e9a62e58265e4d993a4743eaead3699d",
+        "9b5ab7888ef2722fcee88b66a6c91ac2fd438e38"
+      ],
+      "preservedOldDrafts": [
+        "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/amc-p0-22"
+      ],
+      "oldDraftLimit": "Inventory records it as non-Git remnants; do not repair/reset or use as active checkout.",
+      "ownership": "No retained P0-22issue reservation found. RESERVATIONS1588 requires Claude coordination before editing src/cli.ts, src/cli/resultCommandRegistry.ts or src/repl/replParser.ts; no clearance inferred from idle. Read-only and owned test qualification can proceed.",
+      "acceptance": "### Acceptance criteria\n\n- The registry covers every inventory command the keyword test matches; each exclusion has a reason.\n- Strict e2e: no registered command exits 70; every successful one prints \"Claim: \" and its JSON carries `claimKind` and `statusDimensions`.\n- Each listed report builder renders a legend and per-result claim kinds (snapshots).\n- Legacy fixtures read \"Legacy (1.x), self-reported\".\n- No \"Certified\" level name in REPL or dashboard; P0-16 `pending` entries for P0-22 removed.\n- `src/cli.ts` and the files with 1 line of headroom stay within budget; mutation checks recorded; full suite and checks pass; docs and changeset added.\n\n",
+      "needsHumanDecision": "No new plan decision required for unreserved qualification; reserved shared-file edits require ownership coordination.",
+      "recommendedNextWorktree": "root-owned codex/p0-22-current-qualification from accepted source; no overlay of heldint"
+    },
+    {
+      "key": "P0-23",
+      "priority": "Urgent",
+      "due": "2026-10-24",
+      "eligibleNext": false,
+      "queuePosition": "afterP0-22; same priority/due, serial key order",
+      "dependencies": [
+        "P0-08",
+        "P0-15",
+        "P0-21"
+      ],
+      "sourceCandidate": "/Users/sid/AgentMaturityCompass@5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "ownership": "API/Studio shared paths require reservation reconciliation; no A4/P202resume."
+    },
+    {
+      "key": "P0-30",
+      "priority": "Urgent",
+      "due": "2026-10-25",
+      "eligibleNext": false,
+      "dependencies": [
+        "P0-01",
+        "P0-07",
+        "P0-13"
+      ],
+      "reason": "Later due plus retained7fccbbfa issue reservation at RESERVATIONS1497; use existing candidate without mutation in primary or foreign tree."
+    },
+    {
+      "key": "P0-51",
+      "priority": "High",
+      "due": "2026-10-07",
+      "eligibleNext": false,
+      "queuePosition": "dependency follow-up to unblockP0-55, below currently eligibleUrgent item; existing verify truth guards need current qualification, not repeatedimplementation."
+    },
+    {
+      "key": "P0-34/P0-35/P0-36/P0-37/P0-38/P0-39/P0-40",
+      "eligibleNext": false,
+      "reason": "Release/deployment dependencies, human-only credential/rotation/publish decisions and/or issue reservations remain; no publication, key rotation or live deployment implied."
+    }
+  ],
+  "falseDoneAvoided": [
+    "No exportStatusDone or Claude commit subject is currentbehavior qualification.",
+    "No P0-50Done from selected34MCPcases or stdio3checks while HTTP/global obligations remain.",
+    "No D22candidate exception mistaken for acceptedmain authorization.",
+    "No P014historicalNode25/drillrepeat treated as freshcurrentCI acceptance.",
+    "No idle/clean checkout or README-path release treated as issue/source ownership transfer.",
+    "No skippedP029 or pausedA4/P202source resumed."
+  ],
+  "execution": "Read-only source/plan/receipt/graph queries only; no tests, source edits, host installs, project/trackers changes, hosted calls or Claude-session resumption."
+}

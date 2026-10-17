@@ -1,0 +1,212 @@
+{
+  "kind": "actual Node24 CI matrix reconciliation contract and accepted-base freeze checks",
+  "sourceRef": "c4be164ea12d358ea30451391a6df29429fc6a7e",
+  "acceptedBase": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "fixture": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass",
+  "node": "v24.21.0",
+  "pnpm": "10.33.0",
+  "gitNoLazyFetch": true,
+  "initialGitStatus": "",
+  "changedPathsAgainstBase": [
+    ".changeset/p0-48-matrix-completion.md",
+    ".github/workflows/ci.yml",
+    "tests/reconciliationDefectsReleaseGate.test.ts"
+  ],
+  "unchangedGitObjects": [
+    {
+      "path": "src",
+      "baseGitObject": "60652c5c414bc877f58f708509159ba17a23de46",
+      "candidateGitObject": "60652c5c414bc877f58f708509159ba17a23de46",
+      "equal": true
+    },
+    {
+      "path": "packages",
+      "baseGitObject": "fdf91113c7113c0583df1aa38332b6a15c637ec0",
+      "candidateGitObject": "fdf91113c7113c0583df1aa38332b6a15c637ec0",
+      "equal": true
+    },
+    {
+      "path": "scripts",
+      "baseGitObject": "6b76ca2a92b9b4cf685717f7e4b0a80791087238",
+      "candidateGitObject": "6b76ca2a92b9b4cf685717f7e4b0a80791087238",
+      "equal": true
+    },
+    {
+      "path": "unused-code",
+      "baseGitObject": "ac2fb8b8a1b344577063583fd632b35634a820f0",
+      "candidateGitObject": "ac2fb8b8a1b344577063583fd632b35634a820f0",
+      "equal": true
+    },
+    {
+      "path": "vendor",
+      "baseGitObject": "1375a4f7c25ceedc09a5b914bd6d27df0e7796f4",
+      "candidateGitObject": "1375a4f7c25ceedc09a5b914bd6d27df0e7796f4",
+      "equal": true
+    },
+    {
+      "path": "package.json",
+      "baseGitObject": "df32c3ae7f5f0ef1d21d590384f59e1aa6167fb8",
+      "candidateGitObject": "df32c3ae7f5f0ef1d21d590384f59e1aa6167fb8",
+      "equal": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "baseGitObject": "97702e7ad5fc07b5d36a6f246a67f2394c25a13a",
+      "candidateGitObject": "97702e7ad5fc07b5d36a6f246a67f2394c25a13a",
+      "equal": true
+    },
+    {
+      "path": "tsconfig.json",
+      "baseGitObject": "049a148beabbfee79e7f9ee07e3c9c269491a710",
+      "candidateGitObject": "049a148beabbfee79e7f9ee07e3c9c269491a710",
+      "equal": true
+    },
+    {
+      "path": "vitest.config.ts",
+      "baseGitObject": "e72e9654a9d602319c28febb5893da12eb5438b8",
+      "candidateGitObject": "e72e9654a9d602319c28febb5893da12eb5438b8",
+      "equal": true
+    },
+    {
+      "path": "tests/foreignSubagentRunner.test.ts",
+      "baseGitObject": "d1188c0e0d0c61bbefc22827910d01f6e16413fd",
+      "candidateGitObject": "d1188c0e0d0c61bbefc22827910d01f6e16413fd",
+      "equal": true
+    }
+  ],
+  "priorForeignQualification": {
+    "path": "/private/tmp/p0-48-node24-foreign-20261014.json",
+    "sha256": "49cae90c479ffe3398d96b02a4e9d5539b15b28d438b887ba1d98772e09bfefa",
+    "relevantBlobsEqual": true,
+    "builtRuntimeHashesRetained": {
+      "dist/agent/foreignSubagentRunner.js": "edc4c983ea864038f2bb9a279df48f0b28f2b649cabcb4030c01be5cce3d6fa1",
+      "dist/ledger/monitor.js": "9c6f7a7feb50c976e22dd20ef04f9fd6ed8d6fd5be8ece45a4bcba122c955fb9",
+      "dist/agent/subagentSpawn.js": "f33cbe5c831f02a354196630bb8e0d1defddda73f44ae33a442b97783b664c1e"
+    },
+    "notRerun": true
+  },
+  "noRebuildReason": "All production/package/lock/script/archive/vendor/config and foreign-test Git objects equal accepted5ea; existing built foreign/monitor/subagent runtime hashes match its completed Node24 receipt.",
+  "work": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-matrix-final-20261014T144208Z",
+  "sourceHashesBefore": {
+    ".changeset/p0-48-matrix-completion.md": "298eb0a9e87febeded85aed24c2e7072e2b153b7ed9044727acebac73df5c10e",
+    ".github/workflows/ci.yml": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6",
+    "tests/reconciliationDefectsReleaseGate.test.ts": "69d67bf9015fb918f577c1870649e296d3f79854f638e9c9aab648809c889397",
+    "tests/foreignSubagentRunner.test.ts": "446bee5c30d4cacecb7064896df3998eff21096c313b98f924fdc18123d2c7ed",
+    "src/agent/foreignSubagentRunner.ts": "5b382e8e5a26391e3c87283cc0aaccf76287bbcf926cfb2d66993b0ab45c8213",
+    "src/ledger/monitor.ts": "2fa631a7fca5c2e7e8279f985a84d456a991e5bc775750f1568f53a35a95c589",
+    "scripts/release-gate.mjs": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+  },
+  "phases": [
+    {
+      "label": "reconciliation-four-cases",
+      "argv": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/reconciliationDefectsReleaseGate.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-matrix-final-20261014T144208Z/reconciliation-four-cases.json"
+      ],
+      "startedAt": "2026-10-14T14:42:09.006576+00:00",
+      "endedAt": "2026-10-14T14:42:09.428613+00:00",
+      "durationSeconds": 0.422,
+      "exitCode": 0,
+      "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-matrix-final-20261014T144208Z/reconciliation-four-cases.log",
+      "logSha256": "933b709f9180ac7d8322584081b3e48d1291ee698fc34fbb69b8b56980e9bcf0"
+    },
+    {
+      "label": "accepted-base-freeze",
+      "argv": [
+        "npm",
+        "run",
+        "check:freeze",
+        "--",
+        "--base-ref",
+        "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      ],
+      "startedAt": "2026-10-14T14:42:09.429207+00:00",
+      "endedAt": "2026-10-14T14:42:10.825989+00:00",
+      "durationSeconds": 1.397,
+      "exitCode": 0,
+      "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-matrix-final-20261014T144208Z/accepted-base-freeze.log",
+      "logSha256": "c5e692905aab71074925870b73120a5def1181bd51b49214fb32ca7b05a2eb6b"
+    }
+  ],
+  "status": "NODE24_CONTRACT_AND_FREEZE_PASSED",
+  "actualTestReport": {
+    "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-matrix-final-20261014T144208Z/reconciliation-four-cases.json",
+    "sha256": "b6514e4763351bd47f72b761a0ffa43b05a2efb5266f54a795d3a7f95257ff05",
+    "success": true,
+    "numTotalTests": 4,
+    "numPassedTests": 4,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "actualCases": [
+    {
+      "fullName": "test typecheck stays a named release and CI step the release gate runs typecheck:tests as its own step before build",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "test typecheck stays a named release and CI step ci.yml runs the test typecheck as a named step",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "test typecheck stays a named release and CI step npm-publish.yml runs the test typecheck as a named step",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "P0-48 CI matrix completion both supported Node jobs retain their results when a sibling fails",
+      "status": "passed",
+      "failureMessages": []
+    }
+  ],
+  "fourCasesPassed": true,
+  "sourceHashesAfter": {
+    ".changeset/p0-48-matrix-completion.md": "298eb0a9e87febeded85aed24c2e7072e2b153b7ed9044727acebac73df5c10e",
+    ".github/workflows/ci.yml": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6",
+    "tests/reconciliationDefectsReleaseGate.test.ts": "69d67bf9015fb918f577c1870649e296d3f79854f638e9c9aab648809c889397",
+    "tests/foreignSubagentRunner.test.ts": "446bee5c30d4cacecb7064896df3998eff21096c313b98f924fdc18123d2c7ed",
+    "src/agent/foreignSubagentRunner.ts": "5b382e8e5a26391e3c87283cc0aaccf76287bbcf926cfb2d66993b0ab45c8213",
+    "src/ledger/monitor.ts": "2fa631a7fca5c2e7e8279f985a84d456a991e5bc775750f1568f53a35a95c589",
+    "scripts/release-gate.mjs": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+  },
+  "sourceUnchanged": true,
+  "finalHead": "c4be164ea12d358ea30451391a6df29429fc6a7e",
+  "finalGitStatus": "",
+  "privateRawCopies": [
+    {
+      "path": "/private/tmp/p0-48-node24-matrix-final-reconciliation-four-cases-20261014.log",
+      "sha256": "933b709f9180ac7d8322584081b3e48d1291ee698fc34fbb69b8b56980e9bcf0",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-matrix-final-20261014T144208Z/reconciliation-four-cases.log"
+    },
+    {
+      "path": "/private/tmp/p0-48-node24-matrix-final-accepted-base-freeze-20261014.log",
+      "sha256": "c5e692905aab71074925870b73120a5def1181bd51b49214fb32ca7b05a2eb6b",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-matrix-final-20261014T144208Z/accepted-base-freeze.log"
+    },
+    {
+      "path": "/private/tmp/p0-48-node24-matrix-final-reconciliation-four-cases-20261014.json",
+      "sha256": "b6514e4763351bd47f72b761a0ffa43b05a2efb5266f54a795d3a7f95257ff05",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-matrix-final-20261014T144208Z/reconciliation-four-cases.json"
+    }
+  ],
+  "limits": [
+    "Four CI/source reconciliation contract tests and normal accepted-base freeze only; no hosted CI run, actual full release gate, whole suite or coverage qualification.",
+    "The releaseGate test uses its existing failed execute stub to inspect step identity/order; its passing assertion is not a successful actual gate.",
+    "No production or test edits, rebuild, foreign12repeat, dependency install, root candidate action or cleanup of prior artifacts."
+  ],
+  "contractRootOverride": null,
+  "contractReadsOwnCheckout": true
+}

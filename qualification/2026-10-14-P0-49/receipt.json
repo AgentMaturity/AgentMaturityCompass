@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-49",
+  "date": "2026-10-14",
+  "commit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "branch": "codex/p0-49-current-qualification",
+  "node": "v24.21.0",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm audit --prod --audit-level=moderate --json",
+      "exit": 0,
+      "durationMs": 839
+    },
+    {
+      "cmd": "pnpm list --prod --depth Infinity --json",
+      "exit": 0,
+      "durationMs": 304
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@24/bin/node node_modules/vitest/vitest.mjs run tests/planEditsManifest.test.ts --reporter=default --reporter=json --outputFile.json=/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/manifest-whole16.json",
+      "exit": 0,
+      "durationMs": 3506
+    }
+  ],
+  "tests": {
+    "total": 15,
+    "passed": 15,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "1cda8a875a378298bd2a49925cf3a0325f3a6b49e9b61b2a97e4595c9b608d29"
+    },
+    {
+      "path": "final-dependency-qualification.json",
+      "sha256": "540d1e2ad26e116809935af868580028f2d4bbffa7d261dec337bc85785797f3"
+    },
+    {
+      "path": "final-dependency-qualification.md",
+      "sha256": "50a9b84c85c89250e3418b191b07d36866e43c6fa60bc74e8adcb437c93d106f"
+    },
+    {
+      "path": "graph-navigation.log",
+      "sha256": "d47835a86f3fa0bba97b88d68820a2c71cf923f362f3af6000d2217dab69552f"
+    },
+    {
+      "path": "installed-production-graph.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "installed-production-graph.stdout",
+      "sha256": "ed4060d1e72ad0e76f10f0a326139ba352dda7b497e01a23c3abea2f64a84f95"
+    },
+    {
+      "path": "manifest-15-cases.json",
+      "sha256": "a30e91a81ae0d69504b13b56115996ff0af46e712e3666002f2242658095e71c"
+    },
+    {
+      "path": "manifest-whole16.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "manifest-whole16.stdout",
+      "sha256": "0ba53f2a690fa4581d5adaf99f3d936115bbcb609274c41377c9a36f3619feeb"
+    },
+    {
+      "path": "production-audit.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "production-audit.stdout",
+      "sha256": "c30e0af322a954d2a84a0b344aa586a7c82f6b8b477eaff81df8ddc26cc2f5f9"
+    },
+    {
+      "path": "readonly-preflight.json",
+      "sha256": "a01a87e97f41afa29393a7a6bd1913e5797581b88d44fb9b23095dd3990875a3"
+    },
+    {
+      "path": "readonly-preflight.md",
+      "sha256": "3d2ee110f25aac0b258f42dc443dd1c0ee767ca43181a0ddde1fd422c9f16f99"
+    }
+  ],
+  "notes": "Dependency component qualified using fresh same-input Node24 execution at c4be. Production audit exit0, no advisories/all severities0; installed SDK/express/proxy chain matches locked patched2.0.8 and override. All15existing manifest cases pass0pending/todo. The mistakenly requested16count was corrected to actual accepted-source registry15; no waiver or test addition. Raw legacy whole16 filenames are retained with actual JSON15. Source/archive hashes and base/origin ancestry pass with no shallow skip. Current compiled-ancestry guard gap remains assigned to existing P047 candidate; no integration assumed. Source unchanged; this branch contains receipt artifacts only. No whole-suite, coverage, exploit behavior, hostedCI, Done, release or publication claim."
+}

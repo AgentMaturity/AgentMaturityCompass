@@ -1,0 +1,119 @@
+{
+  "kind": "Actual P0-22 hook installer and runtime registry omission faults, restored baseline",
+  "atUtc": "2026-10-14T16:31:09.454665+00:00",
+  "sourceRef": "07125b76 plus separately recorded uncommitted bounded repairs/tests",
+  "node": "v22.23.3",
+  "phases": [
+    {
+      "phase": "installer-disabled",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/cliResultCommandRegistry.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/installer-disabled.json"
+      ],
+      "exit": 1,
+      "durationMs": 3679,
+      "counts": {
+        "success": false,
+        "numTotalTests": 8,
+        "numPassedTests": 5,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 3
+      },
+      "failedCases": [
+        "result command registry covers the built CLI installs a postAction hook in the actual CLI entrypoint without changing its inventory output",
+        "built claim label hooks fails a successful unlabelled result with exit 70 and a stderr diagnostic in strict mode",
+        "built claim label hooks adds the self-reported fallback line to successful unlabelled text outside strict mode"
+      ],
+      "rawPath": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/installer-disabled.json",
+      "rawSha256": "f634078b12df219f9b3e7532be8fd88e328b46d47badc7dc8ab0166ddaddd86b",
+      "logSha256": "39933339f07ec5b05146951dc1af3f7533c655179aef5c2693f6e72080564426"
+    },
+    {
+      "phase": "registry-entry-omitted",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/cliResultCommandRegistry.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/registry-entry-omitted.json",
+        "--config",
+        "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/registry-mutation.config.mjs"
+      ],
+      "exit": 1,
+      "durationMs": 3248,
+      "counts": {
+        "success": false,
+        "numTotalTests": 8,
+        "numPassedTests": 7,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "failedCases": [
+        "result command registry covers the built CLI keeps the hook index complete and supplies an explicit reason for every exclusion"
+      ],
+      "rawPath": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/registry-entry-omitted.json",
+      "rawSha256": "faa97ad16cd763ef3c5eafbf413d035ed1ad0bfee3f8ad34b2c4db5e6185efcb",
+      "logSha256": "9f00741f776e3310da00b4757f9317de7898a975201703adac012d67967cc987"
+    },
+    {
+      "phase": "restored-baseline",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/cliResultCommandRegistry.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/restored-baseline.json"
+      ],
+      "exit": 0,
+      "durationMs": 3234,
+      "counts": {
+        "success": true,
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "failedCases": [],
+      "rawPath": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/mutations/restored-baseline.json",
+      "rawSha256": "67b671c70c4b08f1def85add451e15d7c1325aed5880438930c31d406d9165a6",
+      "logSha256": "7ce1db25e268c18480ae923f35fafcec17d47cfa720885c1130bc7496805b84b"
+    }
+  ],
+  "hookArtifactSha256": "e819ff67b1a6a2cfd484b610c976e1df67ac77d77ba138f30987e2a64dee739f",
+  "hookBytesRestored": true,
+  "protectedSourceHashesBefore": {
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+    "src/repl/replParser.ts": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+    "src/cli/claimLabelHooks.ts": "d139a1fa4cf327e82f9e97c45ba1474d4dde6fd89aeb177cbc62d1fbbec7d03d",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+  },
+  "protectedSourceHashesAfter": {
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+    "src/repl/replParser.ts": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+    "src/cli/claimLabelHooks.ts": "d139a1fa4cf327e82f9e97c45ba1474d4dde6fd89aeb177cbc62d1fbbec7d03d",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+  },
+  "protectedSourceBytesUntouched": true,
+  "policy": "Original Vitest config including all coverage floors remains byte-identical. Extra setup only mutates the actual exported registry array in an isolated process; no shared registry source or freeze exception is edited. These are negative fault probes, not passing full qualification."
+}

@@ -1,0 +1,403 @@
+{
+  "schemaVersion": "2026-09-08",
+  "receiptType": "release-gate",
+  "createdAt": "2026-10-14T15:20:06.079Z",
+  "workspace": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass",
+  "quick": false,
+  "status": "failed",
+  "qualification": "failed",
+  "partial": true,
+  "counts": {
+    "executed": 19,
+    "passed": 16,
+    "failed": 3,
+    "skipped": 2,
+    "total": 21
+  },
+  "summary": "16/19 executed checks passed; 3 failed; 2 skipped. Acceptance is incomplete: per-file-coverage, live-deploy-health.",
+  "scope": "Registered checks only. Packed-install covers keyless native evidence by default; real-provider, platform-matrix and publication results require their own evidence.",
+  "steps": [
+    {
+      "id": "console-js-syntax",
+      "command": "node --check src/console/assets/app.js",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:04:50.711Z",
+      "endedAt": "2026-10-14T15:04:50.761Z",
+      "stdout": "",
+      "stderr": "",
+      "remediation": null,
+      "needs": [],
+      "after": [],
+      "allowFailure": false
+    },
+    {
+      "id": "openapi-parse",
+      "command": "node -e import('yaml').then(YAML=>{const fs=require('fs'); YAML.parse(fs.readFileSync('website/openapi.yaml','utf8'));})",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:04:50.761Z",
+      "endedAt": "2026-10-14T15:04:50.973Z",
+      "stdout": "",
+      "stderr": "",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "console-js-syntax"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "typecheck",
+      "command": "npm run typecheck",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:04:50.973Z",
+      "endedAt": "2026-10-14T15:05:17.031Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 typecheck\n> tsc -p tsconfig.json --noEmit\n\n",
+      "stderr": "",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "openapi-parse"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "typecheck-tests",
+      "command": "npm run typecheck:tests",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:05:17.031Z",
+      "endedAt": "2026-10-14T15:05:52.773Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 typecheck:tests\n> tsc -p tsconfig.tests.json --noEmit\n\n",
+      "stderr": "",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "typecheck"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:05:52.773Z",
+      "endedAt": "2026-10-14T15:06:22.725Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 prebuild\n> npm run clean\n\n\n> agent-maturity-compass@1.2.0 clean\n> node scripts/clean-dist.mjs\n\n\n> agent-maturity-compass@1.2.0 build\n> tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs && npm run api:build\n\n\n> agent-maturity-compass@1.2.0 copy-assets\n> node scripts/copy-build-assets.mjs\n\nbundle-kernel: dist/kernel/amcRuntime.js 385 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp\n\n> agent-maturity-compass@1.2.0 api:build\n> node scripts/build-standalone-api.mjs\n\n",
+      "stderr": "",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "typecheck-tests"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "lint",
+      "command": "npm run lint",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:06:22.725Z",
+      "endedAt": "2026-10-14T15:06:26.596Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 lint\n> oxlint --type-aware --deny-warnings -c .oxlintrc.json src && node scripts/lint-contract.mjs && node scripts/check-no-fabrication.mjs\n\nLint contract passed: three unsafe patterns rejected; safe counterparts accepted.\ncheck-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 303, R4 10; 16 random marker(s); 0 pending entries.\n",
+      "stderr": "",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "build"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "source-duplicates",
+      "command": "npm run check:duplicates",
+      "status": "failed",
+      "startedAt": "2026-10-14T15:06:26.596Z",
+      "endedAt": "2026-10-14T15:06:27.967Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 check:duplicates\n> node scripts/source-quality.mjs duplicates\n\n{\n  \"status\": \"failed\",\n  \"tool\": \"jscpd\",\n  \"version\": \"5.4.0\",\n  \"findingCount\": 1270,\n  \"statistics\": {\n    \"clones\": 1270,\n    \"duplicatedLines\": 14786,\n    \"duplicatedTokens\": 95754,\n    \"lines\": 526516,\n    \"newClones\": 0,\n    \"newDuplicatedLines\": 0,\n    \"percentage\": 2.808271733432602,\n    \"percentageTokens\": 2.920554476512098,\n    \"sources\": 2141,\n    \"tokens\": 3278624\n  },\n  \"representativeFindings\": [\n    \"[[\\\"a4/a4Router.ts\\\",\\\"a4/a4RouterStages.ts\\\"],\\\"typescript\\\",\\\"fbe506ebc7c545b7dcbf8bb34ca36814d6c2a7268dcea84a0126d45dcbf500de\\\"]\",\n    \"[[\\\"a4/a4Router.ts\\\",\\\"api/nativeTasksRouter.ts\\\"],\\\"typescript\\\",\\\"2d212c944cd82cd8804351171f9dd363da57ad9b7faccc2e163cdabb3c10b1a1\\\"]\",\n    \"[[\\\"a4/a4Router.ts\\\",\\\"mcp/a4Tools.ts\\\"],\\\"typescript\\\",\\\"df7ee641bc3ded1aec920ce188369e3c83b53b537e2a80387db9ef467a4a89aa\\\"]\",\n    \"[[\\\"a4/a4RouterStages.ts\\\",\\\"a4/spec/adapt.ts\\\"],\\\"typescript\\\",\\\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\\\"]\",\n    \"[[\\\"a4/a4RouterStages.ts\\\",\\\"a4/spec/aspire.ts\\\"],\\\"typescript\\\",\\\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\\\"]\",\n    \"[[\\\"a4/a4RouterStages.ts\\\",\\\"a4/spec/assemble.ts\\\"],\\\"typescript\\\",\\\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\\\"]\",\n    \"[[\\\"a4/adaptContextPlugin.ts\\\",\\\"a4/spec/assemble.ts\\\"],\\\"typescript\\\",\\\"324a2b47f6016f4093a5592c7ab29c67ba6eb9678640c4f1318bca92b62895ed\\\"]\",\n    \"[[\\\"a4/adaptPolicy.ts\\\",\\\"a4/stages/assemble.ts\\\"],\\\"typescript\\\",\\\"cdf8e0a57471dcc73b0808ed9fe7c69923343f7ab0ec1f773048e799d5e241d7\\\"]\",\n    \"[[\\\"a4/assembleBuild.ts\\\",\\\"a4/stages/adapt.ts\\\"],\\\"typescript\\\",\\\"d873f32d3eb5d538f041c3ebdf2e06ebc2edb70cec8839efc1ae78ee961c7c15\\\"]\",\n    \"[[\\\"a4/assembleResolve.ts\\\",\\\"a4/assembleResolve.ts\\\"],\\\"typescript\\\",\\\"58209a897c4b1182be8679b674d36d6b86046e208a3418b47250e958f32a0afe\\\"]\"\n  ]\n}\n",
+      "stderr": "",
+      "remediation": "Review duplicate findings; existing debt needs an explicit disposition, never an automatic waiver.",
+      "needs": [],
+      "after": [
+        "lint"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "source-dead-code",
+      "command": "npm run check:dead-code",
+      "status": "failed",
+      "startedAt": "2026-10-14T15:06:27.967Z",
+      "endedAt": "2026-10-14T15:06:31.862Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 check:dead-code\n> node scripts/source-quality.mjs dead-code\n\n{\n  \"status\": \"failed\",\n  \"tool\": \"knip\",\n  \"version\": \"6.39.0\",\n  \"findingCount\": 2787,\n  \"representativeFindings\": [\n    \"[\\\"examples/score-history-example.ts\\\",\\\"files\\\",{\\\"name\\\":\\\"examples/score-history-example.ts\\\"}]\",\n    \"[\\\"package.json\\\",\\\"binaries\\\",{\\\"name\\\":\\\"graphify\\\"}]\",\n    \"[\\\"package.json\\\",\\\"devDependencies\\\",{\\\"name\\\":\\\"date-fns\\\"}]\",\n    \"[\\\"scripts/program-metrics.mjs\\\",\\\"files\\\",{\\\"name\\\":\\\"scripts/program-metrics.mjs\\\"}]\",\n    \"[\\\"scripts/vendor/build-workspace.mjs\\\",\\\"files\\\",{\\\"name\\\":\\\"scripts/vendor/build-workspace.mjs\\\"}]\",\n    \"[\\\"src/a4/a4Binder.ts\\\",\\\"files\\\",{\\\"name\\\":\\\"src/a4/a4Binder.ts\\\"}]\",\n    \"[\\\"src/a4/a4Blobs.ts\\\",\\\"exports\\\",{\\\"name\\\":\\\"destroyProjectKey\\\"}]\",\n    \"[\\\"src/a4/a4Conformance.ts\\\",\\\"exports\\\",{\\\"name\\\":\\\"checkControlResults\\\"}]\",\n    \"[\\\"src/a4/a4Conformance.ts\\\",\\\"exports\\\",{\\\"name\\\":\\\"recheckedConformance\\\"}]\",\n    \"[\\\"src/a4/a4Conformance.ts\\\",\\\"types\\\",{\\\"name\\\":\\\"StoredControl\\\"}]\"\n  ]\n}\n",
+      "stderr": "",
+      "remediation": "Verify reachability and dependencies before removing code or accepting existing debt.",
+      "needs": [],
+      "after": [
+        "source-duplicates"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "package-lint",
+      "command": "npm run check:package",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:06:31.862Z",
+      "endedAt": "2026-10-14T15:06:35.481Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 check:package\n> node scripts/package-lint.mjs\n\n{\n  \"status\": \"passed\",\n  \"messages\": [\n    {\n      \"code\": \"INVALID_REPOSITORY_VALUE\",\n      \"args\": {\n        \"type\": \"shorthand-git-sites\",\n        \"suggestValue\": \"git+https://github.com/AgentMaturity/AgentMaturityCompass.git\"\n      },\n      \"path\": [\n        \"repository\",\n        \"url\"\n      ],\n      \"type\": \"suggestion\"\n    }\n  ]\n}\n",
+      "stderr": "",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "source-dead-code"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "citations",
+      "command": "npm run check:citations",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:06:35.482Z",
+      "endedAt": "2026-10-14T15:06:35.802Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 check:citations\n> node scripts/check-citations.mjs\n\ncitations: errors=0 ratcheted=623 baseline=623\n  CIT001 superseded-as-live: findings=0 zero-tolerance=0 baseline=0\n  CIT002 framework-id: findings=3 zero-tolerance=0 baseline=3\n  CIT003 pack-reference: findings=0 zero-tolerance=0 baseline=0\n  CIT004 record-incomplete: findings=620 zero-tolerance=0 baseline=620\n  CIT005 status-type: findings=0 zero-tolerance=0 baseline=0\n",
+      "stderr": "",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "package-lint"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "packed-install",
+      "command": "node scripts/packed-install-check.mjs --no-build",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:06:35.802Z",
+      "endedAt": "2026-10-14T15:06:54.596Z",
+      "stdout": "packed-install check of agent-maturity-compass@1.2.0 in /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-packed-install-Ys9rvf\nnote: packing with --ignore-scripts; the prepack release gate is a separate gate, not exercised here\nok   npm pack --ignore-scripts (same files as publish) (2.7s)\nok   npm install <tarball> (fresh dir, empty HOME) (7.4s)\nok   @amc/core is not resolvable from the consumer directory\nok   installed standalone production API (no dev dependencies) (1.4s)\nok   installed control catalog loads with loadCatalog() and validates (0.2s)\nok   amc doctor (2.2s)\nok   amc init (isolated workspace) (0.9s)\nok   amc composition (installed kernel, no private packages) (0.7s)\nok   amc agent-loop run (stub provider, keyless) (0.9s)\nok   amc session verify --json (0.7s)\nok   amc agent-loop verify --json (0.7s)\nok   installed evidence and request reconstruction\nskip real-provider smoke: AMC_PACKED_SMOKE_PROVIDER not set (keyless run only)\n",
+      "stderr": "",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "citations"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "gap-0626-adversarial-regression",
+      "command": "npx vitest run tests/gap0626AdversarialRegression.test.ts",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:06:54.596Z",
+      "endedAt": "2026-10-14T15:06:58.700Z",
+      "stdout": "\n RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass\n\n\n Test Files  1 passed (1)\n      Tests  2 passed (2)\n   Start at  20:36:55\n   Duration  3.37s (transform 1.96s, setup 21ms, import 2.61s, tests 614ms, environment 0ms)\n\n",
+      "stderr": "",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "packed-install"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "full-test-suite",
+      "command": "npx vitest run --coverage --reporter=dot --reporter=json --outputFile.json=/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/tmp/release-gate/vitest-SY7Wza/results.json",
+      "status": "failed",
+      "startedAt": "2026-10-14T15:06:58.700Z",
+      "endedAt": "2026-10-14T15:17:40.781Z",
+      "stdout": "100 |     100 | 231,283-288,374   \n  ...sAnalytics.ts |   87.75 |    74.07 |   98.21 |      96 | ...69,371,379,471 \n  ...lLiveDrift.ts |     100 |       50 |     100 |     100 | 152-155           \n  policyPacks.ts   |   55.55 |     37.5 |   57.14 |      60 | 72-87             \n  ...tedMonitor.ts |   96.61 |     87.5 |     100 |   95.65 | 176,178           \n  ...nLiveDrift.ts |    91.3 |    82.85 |     100 |     100 | ...51,172-174,298 \n  ...eLiveDrift.ts |   87.14 |    76.56 |     100 |   86.76 | ...34,437,455,458 \n  ...eAssurance.ts |   70.61 |    57.53 |   60.41 |   74.86 | ...90-699,706-707 \n  ...tLiveDrift.ts |     100 |       50 |     100 |     100 | 152               \n  safetyTestkit.ts |   93.47 |    93.75 |     100 |   93.02 | 196,234-235       \n  ...Projection.ts |     100 |    95.45 |     100 |     100 | 79                \n  siemExporter.ts  |      50 |    23.07 |   36.84 |   48.27 | 63-65,100-162     \n  ...hLiveDrift.ts |     100 |       50 |     100 |     100 | 182-185           \n  ...ilureIndex.ts |   92.63 |    69.74 |    98.3 |   95.55 | 159,447-452       \n  ...cLiveDrift.ts |     100 |    97.05 |     100 |     100 | 309               \n src/wire          |   88.75 |    85.18 |   87.64 |   89.93 |                   \n  ndjsonFraming.ts |    97.5 |    95.45 |     100 |   97.29 | 166               \n  wireCli.ts       |       0 |        0 |       0 |       0 | 36-143            \n  wireClient.ts    |   99.05 |    96.66 |   95.65 |     100 | 246               \n  ...Dispatcher.ts |   95.34 |    91.66 |     100 |   95.12 | 180,208           \n  wireJson.ts      |   96.73 |    95.45 |     100 |    97.7 | 246,275           \n  wireListener.ts  |   86.84 |    77.27 |   86.95 |    89.7 | ...63,207-208,234 \n  wireMethods.ts   |   88.23 |       80 |     100 |   92.85 | 122               \n  wireReply.ts     |   87.87 |    89.47 |     100 |    93.1 | 74,78             \n  wireRpc.ts       |   95.23 |     93.1 |     100 |   95.23 | 112               \n  ...Acceptance.ts |   91.89 |    77.77 |     100 |   91.42 | 195,225,229       \n src/workflow      |   95.91 |    87.91 |     100 |   98.79 |                   \n  workflowPlan.ts  |   93.33 |    91.22 |     100 |   97.95 | 82                \n  ...flowRunner.ts |     100 |    86.36 |     100 |     100 | 111,113,143       \n  workflowTool.ts  |     100 |       75 |     100 |     100 | 63,81-82          \n src/workorders    |   51.72 |    33.33 |   60.86 |   53.09 |                   \n  workorderCli.ts  |       0 |        0 |       0 |       0 | 5-21              \n  ...rderEngine.ts |   57.84 |    39.62 |   73.68 |   58.41 | ...18-273,285-307 \n src/workspaces    |   68.44 |    60.18 |   73.23 |   69.01 |                   \n  hostAuth.ts      |   91.22 |    90.47 |     100 |   91.22 | 39,86,163,181,188 \n  hostBootstrap.ts |       0 |        0 |       0 |       0 | 9-98              \n  hostCli.ts       |   26.53 |    33.33 |      10 |   26.53 | ...20,137,146,149 \n  hostDb.ts        |    72.9 |    63.09 |      78 |   72.44 | ...1148,1211-1245 \n  hostSchema.ts    |   83.33 |      100 |      50 |   83.33 | 27                \n  workspaceId.ts   |     100 |     90.9 |     100 |     100 | 25                \n  ...aceManager.ts |      65 |       42 |    64.7 |   66.66 | ...27-228,235-239 \n  ...spacePaths.ts |    90.9 |    66.66 |     100 |    90.9 | 44,48             \n  ...ceResolver.ts |   55.55 |       30 |      50 |   55.55 | 27,37-40          \n  ...paceRouter.ts |   66.99 |    61.65 |   71.91 |   67.87 | ...1510,1642-1644 \n  ...tudioProxy.ts |    64.1 |       50 |      80 |      75 | 17-21,42-44       \n-------------------|---------|----------|---------|---------|-------------------\n\n=============================== Coverage summary ===============================\nStatements   : 65.99% ( 113884/172563 )\nBranches     : 60.97% ( 83982/137723 )\nFunctions    : 72.09% ( 22723/31517 )\nLines        : 67.77% ( 104249/153816 )\n================================================================================\n",
+      "stderr": "ward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\nstderr | tests/fleetScoring.test.ts > Fleet Scoring > evaluateFleet emits progress, SLA metadata, and lifecycle refs per agent\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\nstderr | tests/industryPackWeightingPaymentInvariance.test.ts > industry pack weighting never depends on payment > B1: lifecycle layer scores are identical with and without a licence\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\nstderr | tests/industryPackWeightingPaymentInvariance.test.ts > industry pack weighting never depends on payment > B1: lifecycle layer scores are identical with and without a licence\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\nstderr | tests/industryPackWeightingPaymentInvariance.test.ts > industry pack weighting never depends on payment > B1: lifecycle layer scores are identical with and without a licence\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\nstderr | tests/fleetScoring.test.ts > Fleet Scoring > renderFleetScoringMarkdown produces valid markdown\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\nstderr | tests/fleetScoring.test.ts > Fleet Scoring > agent summary includes strongest and weakest questions\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\nstderr | tests/nativeEvidenceTrustTier.test.ts > the tier was only one of two gates > still counts toward no question, because the spine tags none\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L5).\n\noops\nstderr | tests/spineProjectionEndToEnd.test.ts > a scope-verified delegation scores > counts toward nothing when no scope was declared\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-2.15, seen at L1).\n\nindustryPacks=17\nstderr | tests/trustAnchorIntegrity.test.ts > key history is tamper-evident > records where an externally admitted key came from\n[amc] Explicit notary admission expanded the auditor signing role (4bbfa728c82d7b5816f335a8bee225960e394dcc9ea198eb56aabfdc12de5111).\n\nstderr | tests/newDomainEvidenceCaps.test.ts > new domain runner caps > AMC-VOICE-1 is capped when high-risk workspace lacks llm request/response evidence\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\nERROR: Coverage for functions (72.09%) does not meet global threshold (75%)\n",
+      "remediation": "Fix the full Vitest suite before release.",
+      "artifact": {
+        "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/tmp/release-gate/vitest-SY7Wza/results.json",
+        "produced": true,
+        "valid": true,
+        "sha256": "0c57272242759a39968dbc48718a62ea296a4b3c8ce54f8f31703ccd252a1efe",
+        "counts": {
+          "total": 23125,
+          "passed": 23125,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "failedSuites": 0,
+          "pendingSuites": 0,
+          "files": 1610
+        },
+        "temporary": false,
+        "retained": true
+      },
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "gap-0626-adversarial-regression"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "per-file-coverage",
+      "command": null,
+      "status": "skipped",
+      "startedAt": "2026-10-14T15:17:41.193Z",
+      "endedAt": "2026-10-14T15:17:41.193Z",
+      "stdout": "",
+      "stderr": "",
+      "remediation": "Required gates did not pass: full-test-suite; stale or missing evidence cannot qualify this check.",
+      "needs": [
+        "full-test-suite"
+      ],
+      "after": [
+        "full-test-suite"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "command-inventory",
+      "command": "node dist/cli.js commands --markdown --out /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-release-gate-artifacts-m35hCR/CLI_COMMAND_INVENTORY.md",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:17:41.193Z",
+      "endedAt": "2026-10-14T15:17:41.999Z",
+      "stdout": "Command inventory written to /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-release-gate-artifacts-m35hCR/CLI_COMMAND_INVENTORY.md\n",
+      "stderr": "",
+      "remediation": null,
+      "artifact": {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-release-gate-artifacts-m35hCR/CLI_COMMAND_INVENTORY.md",
+        "produced": true,
+        "temporary": true,
+        "retained": false
+      },
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "per-file-coverage"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "architecture-boundaries",
+      "command": "node scripts/architecture-boundaries-check.mjs",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:17:42.000Z",
+      "endedAt": "2026-10-14T15:17:43.455Z",
+      "stdout": "\"src/vault/knowledgeRefreshLineage.ts\": 329,\n    \"src/vault/memoryTtl.ts\": 72,\n    \"src/vault/metadataScrubber.ts\": 61,\n    \"src/vault/passphraseStore.ts\": 145,\n    \"src/vault/privacyBudget.ts\": 27,\n    \"src/vault/ragGuard.ts\": 40,\n    \"src/vault/screenshotRedact.ts\": 83,\n    \"src/vault/secretsBroker.ts\": 115,\n    \"src/vault/undoLayer.ts\": 82,\n    \"src/vault/vault.ts\": 702,\n    \"src/vault/vaultCli.ts\": 69,\n    \"src/vault/vaultCrypto.ts\": 74,\n    \"src/vault/zkPrivacy.ts\": 756,\n    \"src/verify/verifyAll.ts\": 522,\n    \"src/version.ts\": 13,\n    \"src/watch/agentBus.ts\": 75,\n    \"src/watch/agentReadingTestLiveDrift.ts\": 362,\n    \"src/watch/aiReputationClaudeLiveDrift.ts\": 426,\n    \"src/watch/awesomeAgentMemoryLiveDrift.ts\": 357,\n    \"src/watch/behavioralProfiler.ts\": 354,\n    \"src/watch/bishengObservabilityLiveDrift.ts\": 442,\n    \"src/watch/braintrustLiveDrift.ts\": 211,\n    \"src/watch/continuousMonitor.ts\": 524,\n    \"src/watch/ctfAgentBenchmarkLiveDrift.ts\": 475,\n    \"src/watch/darwinGodelMachineLiveDrift.ts\": 532,\n    \"src/watch/dashboardFeed.ts\": 90,\n    \"src/watch/decibenchVoiceLiveDrift.ts\": 246,\n    \"src/watch/driftMath.ts\": 187,\n    \"src/watch/evidenceDrilldown.ts\": 64,\n    \"src/watch/evidenceRefs.ts\": 14,\n    \"src/watch/explainabilityPacket.ts\": 29,\n    \"src/watch/garageLiveDrift.ts\": 471,\n    \"src/watch/hookActionLifecycle.ts\": 364,\n    \"src/watch/hookHealthDiagnostics.ts\": 314,\n    \"src/watch/hostHardening.ts\": 79,\n    \"src/watch/index.ts\": 434,\n    \"src/watch/liveDriftAlerts.ts\": 9795,\n    \"src/watch/liveDriftEvidenceFields.ts\": 175,\n    \"src/watch/liveDriftReceiptValidation.ts\": 67,\n    \"src/watch/liveDriftTypes.ts\": 4436,\n    \"src/watch/llmFighterLiveDrift.ts\": 451,\n    \"src/watch/lmnrObservabilityLiveDrift.ts\": 354,\n    \"src/watch/multiTenantVerifier.ts\": 49,\n    \"src/watch/narrowTaskBroadMisalignmentLiveDrift.ts\": 348,\n    \"src/watch/observabilityBridge.ts\": 1158,\n    \"src/watch/openCompassLiveDrift.ts\": 414,\n    \"src/watch/outputAttestation.ts\": 34,\n    \"src/watch/overrideNearMissAnalytics.ts\": 473,\n    \"src/watch/paperReadSkillLiveDrift.ts\": 175,\n    \"src/watch/policyPacks.ts\": 89,\n    \"src/watch/proofDelegatedMonitor.ts\": 242,\n    \"src/watch/proofStats.ts\": 63,\n    \"src/watch/providerDriftAlerts.ts\": 5,\n    \"src/watch/ragTextGenerationLiveDrift.ts\": 354,\n    \"src/watch/railScoreLiveDrift.ts\": 492,\n    \"src/watch/realtimeAssurance.ts\": 709,\n    \"src/watch/reflexionAgentLiveDrift.ts\": 178,\n    \"src/watch/safetyTestkit.ts\": 260,\n    \"src/watch/sessionDriftProjection.ts\": 105,\n    \"src/watch/siemExporter.ts\": 173,\n    \"src/watch/skillMatchLiveDrift.ts\": 205,\n    \"src/watch/traceFailureIndex.ts\": 481,\n    \"src/watch/trismAgenticLiveDrift.ts\": 348,\n    \"src/wire/ndjsonFraming.ts\": 193,\n    \"src/wire/wireCli.ts\": 145,\n    \"src/wire/wireClient.ts\": 290,\n    \"src/wire/wireCodecs.ts\": 120,\n    \"src/wire/wireDispatcher.ts\": 211,\n    \"src/wire/wireJson.ts\": 278,\n    \"src/wire/wireListener.ts\": 249,\n    \"src/wire/wireMethods.ts\": 141,\n    \"src/wire/wireReply.ts\": 90,\n    \"src/wire/wireRpc.ts\": 154,\n    \"src/wire/workAcceptance.ts\": 244,\n    \"src/workflow/workflowPlan.ts\": 145,\n    \"src/workflow/workflowRunner.ts\": 167,\n    \"src/workflow/workflowTool.ts\": 96,\n    \"src/workorders/workorderCli.ts\": 23,\n    \"src/workorders/workorderEngine.ts\": 313,\n    \"src/workorders/workorderSchema.ts\": 34,\n    \"src/workspace.ts\": 785,\n    \"src/workspaces/hostAuth.ts\": 191,\n    \"src/workspaces/hostBootstrap.ts\": 116,\n    \"src/workspaces/hostCli.ts\": 177,\n    \"src/workspaces/hostDb.ts\": 1248,\n    \"src/workspaces/hostSchema.ts\": 33,\n    \"src/workspaces/workspaceContext.ts\": 8,\n    \"src/workspaces/workspaceId.ts\": 33,\n    \"src/workspaces/workspaceManager.ts\": 244,\n    \"src/workspaces/workspacePaths.ts\": 57,\n    \"src/workspaces/workspaceResolver.ts\": 43,\n    \"src/workspaces/workspaceRouter.ts\": 1775,\n    \"src/workspaces/workspaceRuntimeRegistry.ts\": 44,\n    \"src/workspaces/workspaceStudioProxy.ts\": 62\n  },\n  \"prefixBranchCount\": 2,\n  \"failures\": []\n}\n",
+      "stderr": "",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "command-inventory"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "docs-drift-public-naming",
+      "command": "npm run check:docs-drift",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:17:43.455Z",
+      "endedAt": "2026-10-14T15:17:43.727Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 check:docs-drift\n> node scripts/docs-drift-check.mjs\n\nDocs drift check passed (336 files scanned).\n",
+      "stderr": "",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "architecture-boundaries"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "runtime-dependency-audit",
+      "command": "npm run audit:runtime",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:17:43.727Z",
+      "endedAt": "2026-10-14T15:17:44.388Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 audit:runtime\n> pnpm audit --prod --audit-level moderate\n\nNo known vulnerabilities found\n",
+      "stderr": "",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "docs-drift-public-naming"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "cli-and-domain-smoke",
+      "command": "node dist/cli.js --help && node dist/cli.js domain pack list --json",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:17:44.391Z",
+      "endedAt": "2026-10-14T15:17:45.923Z",
+      "stdout": "cense issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"privacy-security-mobility\",\n      \"name\": \"Privacy & Security\",\n      \"domain\": \"mobility\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"freight-3pl-warehouse\",\n      \"name\": \"Freight, 3PL & Warehouse Operations\",\n      \"domain\": \"mobility\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"cognition-to-intelligence\",\n      \"name\": \"Cognition to Intelligence\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"networked-ecosystems\",\n      \"name\": \"Connectivity to Networked Ecosystems\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"os-sustainable-outcomes\",\n      \"name\": \"Operating System for Sustainable Outcomes\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"infotainment\",\n      \"name\": \"Infotainment\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"partnerships-prosperity\",\n      \"name\": \"Partnerships for Peace & Prosperity\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"digital-citizens-rights\",\n      \"name\": \"Digital Citizens & Rights\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"dance-of-democracy\",\n      \"name\": \"Dance of Democracy\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"petition-to-law\",\n      \"name\": \"Petition to Law\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"citizen-services\",\n      \"name\": \"Citizen Services\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"public-private-collaboration\",\n      \"name\": \"Public and Private Collaboration\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    }\n  ]\n}\n",
+      "stderr": "\n",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "runtime-dependency-audit"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "install-persona-qa",
+      "command": "npm run qa:install-personas -- --json --out tmp/persona-install-qa/latest.json",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:17:45.924Z",
+      "endedAt": "2026-10-14T15:20:06.078Z",
+      "stdout": "nas/startup-founder/.amc/agents/founder-agent/runtime-runs/startup-founder-runtime/state.json.sig\\\"\\n}\\n\",\n          \"stderr\": \"\",\n          \"remediation\": null,\n          \"durationMs\": 789\n        },\n        {\n          \"id\": \"guide\",\n          \"command\": \"/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-install-persona-qa-7JCKWT/personas/startup-founder/node_modules/.bin/amc guide\",\n          \"status\": \"passed\",\n          \"exitCode\": 0,\n          \"startedAt\": \"2026-10-14T15:19:54.062Z\",\n          \"endedAt\": \"2026-10-14T15:19:54.800Z\",\n          \"stdout\": \"\\n  🧭 Agent \\\"default\\\" has 244 gaps to close for L1 — Initial. 0/244 questions already at target.\\n\\n  1. AMC-3.1.1: Integrity (Alignment with North Star)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Completion Above Alignment\\\". Need \\\"Alignment Intent, Weak Practice\\\".\\n     Run: amc evidence collect\\n\\n  2. AMC-3.1.2: Ethics (Safety, Privacy, Fairness)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Ethics Ignored\\\". Need \\\"Ethics as Intent Only\\\".\\n     Run: amc evidence collect\\n\\n  3. AMC-3.1.3: Inspiration (Source of Improvement)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Trend Copying\\\". Need \\\"Benchmark Chasing\\\".\\n     Run: amc evidence collect\\n\\n  4. AMC-3.1.4: Innovation (Continuous Improvement Maturity)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Innovation Ignored\\\". Need \\\"Innovation When Forced\\\".\\n     Run: amc evidence collect\\n\\n  5. AMC-3.1.5: Optimization & Tradeoff Discipline\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Vanity Output Optimization\\\". Need \\\"Single-Metric Optimization\\\".\\n     Run: amc evidence collect\\n\\n  6. AMC-3.1.6: User Focus (Education → Ownership → Commitment)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Basic Support Only\\\". Need \\\"Responsive Service\\\".\\n     Run: amc evidence collect\\n\\n  7. AMC-3.2.1: Role Positioning & Responsibility\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Role Confusion\\\". Need \\\"Role Stated, Not Enforced\\\".\\n     Run: amc evidence collect\\n\\n  8. AMC-3.2.2: Identity, Voice, and Trust Signals\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Style Only / Inconsistent Persona\\\". Need \\\"Branded Tone, Weak Substance\\\".\\n     Run: amc evidence collect\\n\\n  ... and 236 more gaps. Use --export to see all.\\n\\n  Export all guides: amc guide --export\\n  Generate guardrails: amc guide --guardrails\\n  Apply to agent config: amc guide --apply\\n  Mechanic mode (pick & choose): amc guide --interactive\\n  Continuous monitoring: amc guide --watch\\n  Compare with previous: amc guide --diff\\n  List supported frameworks: amc guide --frameworks\\n  Target specific level: amc guide --target 4\\n\\n\",\n          \"stderr\": \"\",\n          \"remediation\": null,\n          \"durationMs\": 738\n        }\n      ],\n      \"assertions\": [\n        {\n          \"id\": \"amc-bin\",\n          \"status\": \"passed\",\n          \"details\": \"Installed CLI bin is present.\"\n        },\n        {\n          \"id\": \"full-score-contract\",\n          \"status\": \"passed\",\n          \"details\": \"questions=244; CLI-reported SLA met=true\"\n        },\n        {\n          \"id\": \"domain-pack-count\",\n          \"status\": \"passed\",\n          \"details\": \"packs=41\"\n        }\n      ],\n      \"status\": \"passed\",\n      \"checkCounts\": {\n        \"planned\": 10,\n        \"executed\": 10,\n        \"passed\": 10,\n        \"failed\": 0,\n        \"skipped\": 0\n      },\n      \"summary\": \"10/10 automated checks passed; 0 failed; 0 skipped.\",\n      \"measurements\": {\n        \"installWallMs\": 6960,\n        \"scoreCommandWallMs\": 1058,\n        \"cliReportedDiagnosticMs\": 303,\n        \"cliReportedSla\": {\n          \"targetMs\": 120000,\n          \"elapsedMs\": 303,\n          \"met\": true\n        }\n      },\n      \"evidence\": {\n        \"questionCount\": 244,\n        \"domainPackCount\": 41,\n        \"artifactStatus\": \"VALID\",\n        \"evidenceStatus\": \"INSUFFICIENT_EVIDENCE\",\n        \"claimEligible\": false\n      }\n    }\n  ]\n}\n",
+      "stderr": "",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "cli-and-domain-smoke"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "live-deploy-health",
+      "command": null,
+      "status": "skipped",
+      "startedAt": "2026-10-14T15:20:06.078Z",
+      "endedAt": "2026-10-14T15:20:06.078Z",
+      "stdout": "",
+      "stderr": "",
+      "remediation": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health.",
+      "needs": [],
+      "after": [
+        "install-persona-qa"
+      ],
+      "allowFailure": false
+    }
+  ],
+  "remediations": [
+    {
+      "id": "source-duplicates",
+      "status": "failed",
+      "remediation": "Review duplicate findings; existing debt needs an explicit disposition, never an automatic waiver."
+    },
+    {
+      "id": "source-dead-code",
+      "status": "failed",
+      "remediation": "Verify reachability and dependencies before removing code or accepting existing debt."
+    },
+    {
+      "id": "full-test-suite",
+      "status": "failed",
+      "remediation": "Fix the full Vitest suite before release."
+    },
+    {
+      "id": "per-file-coverage",
+      "status": "skipped",
+      "remediation": "Required gates did not pass: full-test-suite; stale or missing evidence cannot qualify this check."
+    },
+    {
+      "id": "live-deploy-health",
+      "status": "skipped",
+      "remediation": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health."
+    }
+  ]
+}

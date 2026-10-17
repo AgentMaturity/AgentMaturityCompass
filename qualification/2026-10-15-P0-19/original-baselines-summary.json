@@ -1,0 +1,48 @@
+{
+  "source": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+  "raw": {
+    "path": "/private/tmp/p0-19-original-baselines-node22-20261015.json",
+    "sha256": "ed73dd6f9bb47a4daaf0b495e0af5618730d75c83c307eabe83450584c7450b4"
+  },
+  "counts": {
+    "numTotalTests": 432,
+    "numPassedTests": 432,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "success": true
+  },
+  "files": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/assuranceAgentResponder.test.ts",
+      "tests": 14,
+      "status": "passed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/assuranceLab.test.ts",
+      "tests": 5,
+      "status": "passed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/redteam.test.ts",
+      "tests": 11,
+      "status": "passed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/regulatoryAssurancePacks.test.ts",
+      "tests": 26,
+      "status": "passed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/assurance/industryPackFailClosed.test.ts",
+      "tests": 355,
+      "status": "passed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/compliance/complianceFailClosed.test.ts",
+      "tests": 21,
+      "status": "passed"
+    }
+  ],
+  "boundary": "Existing six original files; no assertions changed. Industry parameterized validators and loopback endpoint replies are controlled fixtures. This is not the deferred echo-response suite, external provider or whole-P0-19 acceptance."
+}

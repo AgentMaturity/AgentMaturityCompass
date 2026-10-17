@@ -1,0 +1,12 @@
+{
+  "sourcePath": "/Users/sid/AgentMaturityCompass/graphify-out/navigation/trust-and-publication/graph.json",
+  "sourceSha256": "a7a024a5245943bf6e5c90225ff296f1022a9615c2cd2af3ea2fa6f32da07f2f",
+  "ownedQueryDirectory": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/p0-51-graph-navigation-ifl34s9t",
+  "queryTokens": [
+    "trust",
+    "verify",
+    "bundle",
+    "notary"
+  ],
+  "nodeCount": 30
+}

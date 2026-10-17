@@ -1,0 +1,397 @@
+{
+  "scope": "Source-only P0-27 fixture/freeze preflight; only this private JSON and Markdown are written. No new tests, runtime, build/install, live dist reads, source/ref/tracker edits, Claude messages or status closure.",
+  "capturedUtc": "2026-10-14T20:27:21.838709+00:00",
+  "preparedWorktree": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+  "branch": "codex/p0-27-current-qualification",
+  "head": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4",
+  "gitStatus": "",
+  "runtimeAuthorized": false,
+  "startGate": "Wait for root to formally close P0-20 bounded receipt and assign owned test paths. Then wait for the P0-27 frozen install/build-ready notice. This paper plan supplies no authorization by absence or idleness.",
+  "graphReused": {
+    "query": "unsigned store seal session assurance grading refusal",
+    "log": "/private/tmp/p0-52-graph-navigation-w8xr443v/p0-20-next-routing-query.log",
+    "sha256": "d15bf7a7100a787d77646f35721db66f291fcdf52c7ea429ce38cef85fa7d5cd",
+    "limit": "Existing graph is stale;219 nodes found/18 shown under600-token budget. Used only for navigation, with direct source pins and ancestry for current proof. No refresh/watch/server."
+  },
+  "priorRoutingReceipt": {
+    "path": "/private/tmp/p0-20-next-routing-preflight-20261015.json",
+    "sha256": "3b594cc9347bbc5470aaaef46fd58e86ae04585579386ae9f8776560d15562ed"
+  },
+  "sourceInputs": [
+    {
+      "path": "src/assurance/assuranceRunner.ts",
+      "sha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "lines": 975,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/assurance/evidenceWriters.ts",
+      "sha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "lines": 288,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/assurance/agentResponder.ts",
+      "sha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "lines": 597,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/assurance/assuranceStore.ts",
+      "sha256": "c4d54b585ff8cd232983357a7dcbaa6a6b2cef850ed6aa436804ea37c8a29fc9",
+      "lines": 75
+    },
+    {
+      "path": "src/ledger/ledger.ts",
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "lines": 1295,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/ledger/ledgerConnection.ts",
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "lines": 71,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/ledger/ledgerSessionTransactions.ts",
+      "sha256": "0bba4d284e53916f52981b5ea0bd534ac4c77938dbe72970d26ab09c0bc6ed72",
+      "lines": 53,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/ledger/ledgerVerification.ts",
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e",
+      "lines": 755
+    },
+    {
+      "path": "src/diagnostic/runner.ts",
+      "sha256": "7e07cb0b29a19e9629838303b601663feaea6854703c5edc49fa77e60abb3ecd",
+      "lines": 1909,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/ledger/monitor.ts",
+      "sha256": "2fa631a7fca5c2e7e8279f985a84d456a991e5bc775750f1568f53a35a95c589",
+      "lines": 483,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/budgets/nativeBudgetUsage.ts",
+      "sha256": "45f561f1116d0f55f98439508a573b0a586ed060b3c6948d86b1240a50d5e980",
+      "lines": 263,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/llm/adapter/llmRuntime.ts",
+      "sha256": "6ffc6892a8ed3e94ac931fe7472a6268ddaad9f665fd365e68972b2e6edebf1c",
+      "lines": 512,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/agent/nativeFailureGuidance.ts",
+      "sha256": "e797ef59196351467b5fd8e41e0ce2fc81936e19ffda50f6afef4a0c05f0b01b",
+      "lines": 126,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "sha256": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+      "lines": 713,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/utils/pathSafety.ts",
+      "sha256": "e5cece43a2dcdf2640f39180aaedf1d29f6e87ac00b4fe326244bb4d8ebdf768",
+      "lines": 34
+    },
+    {
+      "path": "src/evidence/exporter.ts",
+      "sha256": "30837bbe636fcae29331041f6cb4f7aa314687034d7f0416f0dde55bed31041a",
+      "lines": 521,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/trust/trustContext.ts",
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "lines": 129
+    },
+    {
+      "path": "src/crypto/keys.ts",
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+      "lines": 190
+    },
+    {
+      "path": "src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "lines": 24430,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/cli/resultCommandRegistry.ts",
+      "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "lines": 314,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/repl/replParser.ts",
+      "sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "lines": 520,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "lines": 32
+    },
+    {
+      "path": "scripts/line-budgets.json",
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "lines": 66
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "lines": 405,
+      "matchesPreviousRoutingPin": true
+    }
+  ],
+  "verifiedExistingD15Registrations": [
+    {
+      "path": "src/assurance/assuranceStore.ts",
+      "issue": "P0-09",
+      "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
+      "archivePath": "unused-code/plan-edits/P0-09/src/assurance/assuranceStore.ts.landed",
+      "sha256": "8b6aff7d3c7f9936881a7989e08d7d938151c2c30f9b871be80b6e9c924839b0",
+      "archiveAndBaseBytesVerified": true
+    },
+    {
+      "path": "src/diagnostic/runner.ts",
+      "issue": "P0-18",
+      "baseCommit": "1f3a2f6681389011120fdb8251f95eb5d4527d58",
+      "archivePath": "unused-code/plan-edits/P0-18/src/diagnostic/runner.ts.landed",
+      "sha256": "378115c82d4365c7163beb689355dd8eee5c2f75d04354c92f67a2510932b1d5",
+      "archiveAndBaseBytesVerified": true
+    },
+    {
+      "path": "src/evidence/exporter.ts",
+      "issue": "P0-27",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-27/src/evidence/exporter.ts.landed",
+      "sha256": "e5633b1d0a5cae6c4c73a306768b51a5b8e9e65111a3354d9daae5daa0726a57",
+      "archiveAndBaseBytesVerified": true
+    },
+    {
+      "path": "src/ledger/ledger.ts",
+      "issue": "P0-18",
+      "baseCommit": "1f3a2f6681389011120fdb8251f95eb5d4527d58",
+      "archivePath": "unused-code/plan-edits/P0-18/src/ledger/ledger.ts.landed",
+      "sha256": "11d19e1e3c5ea69b889ae36f5a59ad2352eacd93616c31404012be431642bd6d",
+      "archiveAndBaseBytesVerified": true
+    },
+    {
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "issue": "P0-27",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-27/src/lifecycle/signedControlJournal.ts.landed",
+      "sha256": "4eef636358fb607e4ada186a19aee5e187b9c8e9022c5d04b77467c5b46bbe17",
+      "archiveAndBaseBytesVerified": true
+    }
+  ],
+  "lineLimits": [
+    {
+      "path": "src/assurance/assuranceRunner.ts",
+      "lines": 975,
+      "limit": 976,
+      "remaining": 1,
+      "clearance": false
+    },
+    {
+      "path": "src/assurance/evidenceWriters.ts",
+      "lines": 288,
+      "limit": 800,
+      "remaining": 512,
+      "clearance": false
+    },
+    {
+      "path": "src/ledger/ledger.ts",
+      "lines": 1295,
+      "limit": 1296,
+      "remaining": 1,
+      "clearance": false
+    },
+    {
+      "path": "src/diagnostic/runner.ts",
+      "lines": 1909,
+      "limit": 1910,
+      "remaining": 1,
+      "clearance": false
+    },
+    {
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "lines": 713,
+      "limit": 800,
+      "remaining": 87,
+      "clearance": false
+    },
+    {
+      "path": "src/evidence/exporter.ts",
+      "lines": 521,
+      "limit": 800,
+      "remaining": 279,
+      "clearance": false
+    },
+    {
+      "path": "src/llm/adapter/llmRuntime.ts",
+      "lines": 512,
+      "limit": 800,
+      "remaining": 288,
+      "clearance": false
+    },
+    {
+      "path": "src/cli.ts",
+      "lines": 24430,
+      "limit": 24431,
+      "remaining": 1,
+      "clearance": false
+    }
+  ],
+  "freeze": {
+    "active": true,
+    "baselineSha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "P027InAllowedExceptionKeys": false,
+    "rule": "No new command/inventory path, CLI/REPL registration, budget/floor change, baseline write or archive re-registration. New qualification tests are the proposed authored scope; production stays untouched. Existing registrations preserve frozen historical bytes, not a bypass for behavior checks."
+  },
+  "ownershipSplit": {
+    "sessionAgent": "One new assigned assurance abort/isolation qualification test only, with fresh owned producer/workspace/HOME, independent public pins and private records. Initial source edits prohibited.",
+    "checkpointExportAgent": "Separate new assigned checkpoint/export qualification test file(s) only; no overlap with session file, original tests or source.",
+    "root": "Actual budget integrity/failure projection and genuine compiled CLI/native-turn/unsigned-assurance/export transcripts, frozen install/build, static/freeze, mutation orchestration, final receipt and commit.",
+    "protected": [
+      "src/ledger/**",
+      "src/cli.ts",
+      "src/cli/resultCommandRegistry.ts",
+      "src/repl/replParser.ts",
+      "src/studio/**",
+      "src/api/**",
+      "src/a4/**",
+      "held P1-78 native initiator changes",
+      "paused P2-02/tokenization",
+      "guards/budgets/floors/archives/original tests"
+    ]
+  },
+  "commonFixture": {
+    "workspace": "Fresh owned workspace initialized through real initWorkspace({ workspacePath, agentId: \"default\", trustBoundaryMode: \"isolated\" }); use current signed agent/provider configuration, never user workspace.",
+    "operatorHome": "Fresh HOME and AMC_HOME outside workspace; explicit AMC_CONTROL_CHECKPOINT_DIR outside workspace when needed. vi.stubEnv restored or minimal scoped child environment; never change global CWD.",
+    "pins": "Capture workspace monitor/auditor public PEMs immediately after real initialization and before any producer event/export. Persist only public PEMs/fingerprints and hash metadata. Use actual loadTrustContext with expectMonitor/pubkey purpose ledger-row/artifact-seal as appropriate. Never pin keys extracted from the artifact being verified.",
+    "runtime": "After readiness, explicit Node22.23.3 and matching child PATH/process.execPath. All subprocesses/timeouts bounded; no external/model/live-license activity.",
+    "measurement": "Unique phase/report/effects paths and actual raw JSON/exit/stdout/stderr/input/public-artifact hashes. Close SQLite handles before portable byte snapshots; record all DB/WAL/SHM sidecar names/content and semantic rows. SQLite may create coordination sidecars during reads, so distinguish those observed effects instead of asserting blanket zero filesystem writes."
+  },
+  "F1": {
+    "actualParams": {
+      "workspace": "owned-workspace",
+      "agentId": "default",
+      "packId": "injection (healthcarePHI for the original O20 recipe)",
+      "mode": "supervise",
+      "window": "14d",
+      "noSign": false
+    },
+    "unavailableTarget": "Set AMC_AGENT_BASE_URL to a deliberately unavailable loopback endpoint and ensure the actual configured provider.auth.env credential is absent. Explicit endpoint skips gatewayReachable; missing credential throws real AgentResponderUnavailableError before a provider/model request. Do not mock the producer/resolver or treat arbitrary/parser errors as target unavailability.",
+    "mechanism": "runAssurance starts the session via startAssuranceSession transaction, then resolves the real target inside its try. catch invokes sealAbortedAssuranceSession; it appends ASSURANCE_RUN_ABORTED, seals and rethrows the original error. applyAssurancePatchKit has the same abort helper but must use its genuine failing filesystem/patch input if qualified separately.",
+    "healthyAssertions": [
+      "Actual AgentResponderUnavailableError retained with its expected message/cause semantics.",
+      "New assurance session has ASSURANCE_RUN_STARTED and ASSURANCE_RUN_ABORTED with matching run/session/agent and genuine class reason.",
+      "Actual session final hash/signature/ended_ts are populated; verifyLedgerIntegrity(workspace,{expectedMonitorFingerprint:capturedMonitorId,trust:operatorContext}).chain.ok is true and trust root is independently anchored.",
+      "No assurance_runs success row, no completed report/certificate inferred from the abort. Inspect real tables/events, not log text alone."
+    ],
+    "negatives": [
+      "Private owned DB trigger rejects first evidence insert: startAssuranceSession must roll back both session and first audit row. It is outside runAssurance try; preserve real failure/handle-closure limits rather than assuming whole-run cleanup.",
+      "Private owned DB trigger rejects sealing UPDATE: original availability error remains primary, seal failure is attached as cause when permitted; ledger remains invalid/unsealed and must not be counted as green.",
+      "Already-sealed-session helper call must return the original error without duplicate abort rows or resealing."
+    ]
+  },
+  "F2": {
+    "actualParams": "Same real abort run with AMC_NO_SIGN=1 (which forces input.noSign=true) and noSign:true. Real runAssurance chooses openLedger(workspace,{store:\"unsigned\"}); connection refuses that store without the environment flag.",
+    "healthyAssertions": [
+      "Pre-created signed ledger semantic rows and signatures remain unchanged; compare main DB/sidecars and attribution before/after, disclosing any observed non-row coordination change.",
+      "Unsigned session/event/seal live only under .amc/unsigned/evidence.sqlite; literal unsigned signatures remain explicitly unsigned, not independently trusted.",
+      "No unsigned evidence/run/signature enters the signed DB. Main verify under captured monitor remains healthy after environment restoration.",
+      "Without AMC_NO_SIGN, opening {store:\"unsigned\"} refuses before creating its DB.",
+      "Signed history remains signed-only. A successful later native turn is a separate actual runtime assertion owned by root, not inferred from a healthy DB."
+    ],
+    "rootBudget": [
+      "Healthy signed genuine rows/seals pass readBudgetEvents before any corruption fixture.",
+      "An actual unsigned or edited row in the owned main fixture produces BudgetEvidenceIntegrityError naming the first offending row/signature; do not inject a fake exception.",
+      "Actual native/CLI failure projection reports AMC_EVIDENCE_INTEGRITY and budget_evidence_invalid, while real quota remains QUOTA/budget_refused. It must abort before model invocation.",
+      "Source llmRuntime at this pin comes from reviewed5d178444 qualification reconciliation and differs from both primary-main and held source. Use this pinned file; do not import held caller-scope fixes or modify it by absence of a reservation."
+    ]
+  },
+  "F3": {
+    "actualFunction": "controlCheckpointDir(workspace, \"runtime-firewall-policy\") (other current valid kinds: guardrail-control, compiled-control-plan, legal-hold-head).",
+    "matrix": [
+      "HOME sibling to workspace with AMC_CONTROL_CHECKPOINT_DIR unset: accepted path, no live firewall call inferred.",
+      "HOME equal to or under workspace: exact SignedControlJournalError naming physical root/workspace and AMC_CONTROL_CHECKPOINT_DIR.",
+      "Explicit <workspace>/..cache/cp: refused as inside by whole path segments.",
+      "Fresh sibling explicit root: accepted, including missing leaf segments resolved through nearest existing physical ancestor.",
+      "Fixture-owned symlink alias and macOS /var versus /private/var aliases: compare actual physical paths; do not create or modify global aliases."
+    ],
+    "drift": "The spec proposed src/utils/pathWithin.ts; current source imports isWithin from existing src/utils/pathSafety.ts. Missing pathWithin is not a defect or permission to recreate it. Source homedir() uses HOME, not AMC_HOME, for default checkpoint root; set both for other AMC components but assert this actual default.",
+    "limits": "Helper containment is not complete firewall-enable/storage admission or held P0-57 fix qualification. Do not repair old layouts or relocate user checkpoints."
+  },
+  "F4": {
+    "actualParams": {
+      "workspace": "owned-workspace",
+      "agentId": "default",
+      "includeChain": true,
+      "includeRationale": false
+    },
+    "producers": "Real Ledger.startSession/appendEvidence/sealSession in fresh owned state, with valid monitor signatures and independent pin; all session identifiers avoid reserved a4- namespace. Distinguish seeded signed collector witnesses from actual executed native sessions.",
+    "fixtureRows": [
+      "Named session with session/open meta.agentId=default and20+ additional rows lacking row-level agentId.",
+      "Foreign-agent session and rows.",
+      "Legacy row with meta.agentId=default and optional snake_case agent_id compatibility case.",
+      "Untagged system row, which must not become session-owned.",
+      "Explicitly default-tagged system row as a separate strict spec conflict witness; never silently waive it."
+    ],
+    "assertions": [
+      "dataset.schemaVersion===2; records eventId set exactly matches scoped expected IDs; eventCount===records.length.",
+      "agentFilter.mode is row-meta-or-owned-session; sessionsIncluded contains exactly owned non-system session IDs; rowsExcluded matches total minus selected.",
+      "Whole-chain inclusion metadata is evaluated against all rows; omitted foreign rows are not asserted to make the filtered list a consecutive standalone chain.",
+      "Actual exportVerifierEvidence({...params,format:\"json\",outFile:ownedPath}) writes same dataset/hash/counts to a fresh chosen file, preserving source event content. Root later owns compiled CLI events/sessions/excluded stdout."
+    ],
+    "sourceSpecConflict": {
+      "spec": "Recovered P0-27 step6 says never include system rows for a named agent.",
+      "source": "exporter.ts:291-301 excludes system only from owned-session subquery; explicit row-meta agentId/agent_id predicates still select agent-tagged system rows.",
+      "requiredTreatment": "Create the genuine narrow witness against the literal spec expectation. Retain any resulting RED as unresolved; a source comment or existing compatibility does not authorize green reinterpretation or a production repair."
+    }
+  },
+  "privateMutationRoutes": [
+    {
+      "key": "F1",
+      "target": "Private copy of src/assurance/evidenceWriters.ts, only the ledger.sealSession(sessionId) statement within sealAbortedAssuranceSession.",
+      "expected": "Same successful abort audit/error contract but missing seal makes the meaningful signed ledger/session assertion RED."
+    },
+    {
+      "key": "F2",
+      "target": "Private copy of src/assurance/assuranceRunner.ts, only unsigned-store selection at openLedger.",
+      "expected": "Same AMC_NO_SIGN fixture enters main DB; isolation assertion RED with actual unsigned rows, not parser or module-load failure."
+    },
+    {
+      "key": "F3",
+      "target": "Private copy of src/utils/pathSafety.ts, only isWithin segment predicate reverted to legacy rel.startsWith(\"..\") behavior.",
+      "expected": "Owned ..cache checkpoint refusal is lost while sibling controls remain; unchanged actual assertion RED."
+    },
+    {
+      "key": "F4",
+      "target": "Private copy of src/evidence/exporter.ts, only owned-session OR predicate and its corresponding bound parameter removed together (or valid false predicate preserving bind count).",
+      "expected": "Compiler/parser/SQL remain valid;20+ owned rows disappear while legacy row-meta control remains and exact selected-ID/count assertion RED."
+    }
+  ],
+  "mutationProtocol": "Planning only. After explicit root assignment, hash a private copied TS target and its unmodified dependency inputs; prove exactly the intended source diff. Compile/bundle only into a unique private directory using installed dependencies with an owned node_modules symlink or root-coordinated private compiler output. Apply identical baseline/mutant/restored assertions in a private module observer or separately authorized fixture module switch; retain actual exits/raw outputs. Never mutate production source, live dist, original tests, manifest, freeze/budget/floor files or general module loaders. Parser/import/fixture failures are infrastructure failures, not killed behavior mutations. No mutation is executed by this preflight.",
+  "limits": [
+    "No status closure from old merged/in-review rows, missing tests/helpers or available agent capacity.",
+    "Full P0-27 O20 installed/native behavior and mutation evidence remain outstanding until actual qualified; direct helper coverage alone does not close P0-31/G0.",
+    "Other unsigned writers/unsealed sessions remain original out-of-scope follow-ups; no blanket withSealedSession rewrite, signed-ledger migration or repair of historical sessions.",
+    "P0-29/22 skips, P0-51 precedence debt, P0-52 pending narrow decision and held/paused work remain preserved."
+  ],
+  "executionState": "No new test file, app/server/provider/runtime call, build/install, private mutation or live dist read performed. Only current source/config/archive bytes were read and these private plan documents written."
+}

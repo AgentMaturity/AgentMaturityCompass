@@ -1,0 +1,447 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-27",
+  "date": "2026-10-15",
+  "commit": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "branch": "codex/p0-27-node-runtime-compatibility",
+  "node": "v22.23.3/ABI127 and v24.21.0/ABI137; bounded eight-case runtime compatibility only",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm install --frozen-lockfile --store-dir /private/tmp/p0-27-runtime-compatibility-20261015/node22-store --package-import-method copy --side-effects-cache=false",
+      "exit": 0,
+      "durationMs": 4675
+    },
+    {
+      "cmd": "node /private/tmp/p0-27-runtime-native-abi-proof-20261015.mjs /Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass /private/tmp/p0-27-runtime-compatibility-20261015/node22-native-abi-before.json",
+      "exit": 0,
+      "durationMs": 83
+    },
+    {
+      "cmd": "git clone --shared --branch codex/p0-27-node-runtime-compatibility /Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass /private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+      "exit": 0,
+      "durationMs": 1217
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 31462
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@24/bin/node /opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs install --frozen-lockfile --store-dir /private/tmp/p0-27-runtime-compatibility-20261015/node24-store --package-import-method copy --side-effects-cache=false",
+      "exit": 0,
+      "durationMs": 4752
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/assuranceSessionQualification.test.ts --maxWorkers=1 --reporter=json --outputFile=/private/tmp/p0-27-compat-node22-original-eight-baseline-20261015.json",
+      "exit": 0,
+      "durationMs": 7576
+    },
+    {
+      "cmd": "env AMC_HOME=/private/tmp/p0-27-runtime-compatibility-20261015/node24-home /opt/homebrew/opt/node@24/bin/node /private/tmp/p0-27-runtime-native-abi-proof-20261015.mjs /private/tmp/p0-27-runtime-compatibility-20261015/node24-source /private/tmp/p0-27-runtime-compatibility-20261015/node24-native-abi-before.json",
+      "exit": 0,
+      "durationMs": 46
+    },
+    {
+      "cmd": "env AMC_HOME=/private/tmp/p0-27-runtime-compatibility-20261015/node24-home /opt/homebrew/opt/node@24/bin/node /opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs run build",
+      "exit": 0,
+      "durationMs": 27816
+    },
+    {
+      "cmd": "env AMC_HOME=/private/tmp/p0-27-runtime-compatibility-20261015/node24-home /opt/homebrew/opt/node@24/bin/node /opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs exec vitest run tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-27-runtime-compatibility-20261015/node24-unchanged-parent-guard.json",
+      "exit": 1,
+      "durationMs": 1479
+    },
+    {
+      "cmd": "python3 /private/tmp/p0-27-runtime-compatibility-20261015/node24-child-guard-witness.py",
+      "exit": 0,
+      "durationMs": 69
+    },
+    {
+      "cmd": "git diff --cached --check",
+      "exit": 0,
+      "durationMs": 29
+    },
+    {
+      "cmd": "git commit -m 'test: allow qualified Node 24 in assurance session witnesses'",
+      "exit": 0,
+      "durationMs": 56
+    },
+    {
+      "cmd": "git fetch --no-tags /Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass 75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+      "exit": 0,
+      "durationMs": 72
+    },
+    {
+      "cmd": "git checkout --detach 75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+      "exit": 0,
+      "durationMs": 233
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 32989
+    },
+    {
+      "cmd": "env AMC_HOME=/private/tmp/p0-27-runtime-compatibility-20261015/node24-home /opt/homebrew/opt/node@24/bin/node /opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs run build",
+      "exit": 0,
+      "durationMs": 29085
+    },
+    {
+      "cmd": "pnpm run check:api-ref",
+      "exit": 0,
+      "durationMs": 585
+    },
+    {
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 719
+    },
+    {
+      "cmd": "pnpm run check:counts",
+      "exit": 0,
+      "durationMs": 1042
+    },
+    {
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 3021
+    },
+    {
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 3907
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 5928
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/assuranceSessionQualification.test.ts --maxWorkers=1 --reporter=json --outputFile=/private/tmp/p0-27-compat-node22-candidate-eight-20261015.json",
+      "exit": 0,
+      "durationMs": 9446
+    },
+    {
+      "cmd": "pnpm run typecheck",
+      "exit": 0,
+      "durationMs": 31782
+    },
+    {
+      "cmd": "pnpm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 41331
+    },
+    {
+      "cmd": "env AMC_HOME=/private/tmp/p0-27-runtime-compatibility-20261015/node24-home /opt/homebrew/opt/node@24/bin/node /private/tmp/p0-27-runtime-native-abi-proof-20261015.mjs /private/tmp/p0-27-runtime-compatibility-20261015/node24-source /private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-native-before-runtime.json",
+      "exit": 0,
+      "durationMs": 128
+    },
+    {
+      "cmd": "node /private/tmp/p0-27-runtime-native-abi-proof-20261015.mjs /Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass /private/tmp/p0-27-runtime-compatibility-20261015/node22-native-abi-final.json",
+      "exit": 0,
+      "durationMs": 131
+    },
+    {
+      "cmd": "env AMC_HOME=/private/tmp/p0-27-runtime-compatibility-20261015/node24-home /opt/homebrew/opt/node@24/bin/node /opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs exec vitest run tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-eight-cases.json",
+      "exit": 0,
+      "durationMs": 6265
+    },
+    {
+      "cmd": "pnpm run check:clean-source",
+      "exit": 0,
+      "durationMs": 51183
+    },
+    {
+      "cmd": "env AMC_HOME=/private/tmp/p0-27-runtime-compatibility-20261015/node24-home /opt/homebrew/opt/node@24/bin/node /private/tmp/p0-27-runtime-native-abi-proof-20261015.mjs /private/tmp/p0-27-runtime-compatibility-20261015/node24-source /private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-native-after-runtime.json",
+      "exit": 0,
+      "durationMs": 42
+    },
+    {
+      "cmd": "pnpm run check:duplicates",
+      "exit": 1,
+      "durationMs": 1911
+    },
+    {
+      "cmd": "pnpm run check:dead-code",
+      "exit": 1,
+      "durationMs": 4476
+    },
+    {
+      "cmd": "node /private/tmp/p0-27-runtime-full-dead-code-diagnostic-20261015.mjs /Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass /private/tmp/p0-27-runtime-compatibility-candidate-full-dead-code-20261015.json",
+      "exit": 0,
+      "durationMs": 3612
+    }
+  ],
+  "tests": {
+    "total": 16,
+    "passed": 16,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "P0-19-quality-followup-independent-review.json",
+      "sha256": "659f615a2e48ec6020c6332b06d72de829407f6292160a6ad672448287867617"
+    },
+    {
+      "path": "P0-19-quality-followup-independent-review.md",
+      "sha256": "18f06ff803f07dd02d7943fb5cdea69193594c17d3c39aba061662978c1b4460"
+    },
+    {
+      "path": "README.md",
+      "sha256": "9593eb0614d53fc372145a7788f7acce162dcbad66d2d1efeed672f38393fe69"
+    },
+    {
+      "path": "command-phases.json",
+      "sha256": "4639b21bd23880d76cfaef774ba5a61e843e2c4690ed02d1c0b547b7896e7e67"
+    },
+    {
+      "path": "dead-code-context-diagnostic.log",
+      "sha256": "7f955b6d13be1acdcbc84a3c35ecfa00e549b748dacfd53219a13dc55107f77e"
+    },
+    {
+      "path": "final-api-reference.log",
+      "sha256": "648660b896ecba7aa2a462dde0fb14dc6e78b2be4da3e4723f51ac62e638968f"
+    },
+    {
+      "path": "final-architecture.log",
+      "sha256": "f05a238d7735a51e39844dc2c0ede716bd56f39181d6c57f7d8a45d15b709946"
+    },
+    {
+      "path": "final-bounded-summary.json",
+      "sha256": "0d79cf920490d20fac8f5609c4ff831cd4255be338eb7fccc17180bd26987080"
+    },
+    {
+      "path": "final-clean-source.log",
+      "sha256": "82b8c8ccade12feb82564d0ee78a5486530288bf960c1538859dff6d9673ae7b"
+    },
+    {
+      "path": "final-counts.log",
+      "sha256": "3cb8d7d7aa6acdeab148158b2f3d4a3e3edbe20efb334b1c0bd93f6824f363e2"
+    },
+    {
+      "path": "final-docs.log",
+      "sha256": "bef311da0cc30ab4c29599aa5a0bc14b4644dd64a8c160d6749836a5a814efc0"
+    },
+    {
+      "path": "final-freeze.log",
+      "sha256": "a90593805a41e401c258673b69e6ffb2e76e2b9740f50e7139a972f458c02d4e"
+    },
+    {
+      "path": "final-lint.log",
+      "sha256": "8b3f7344013a4d085b4c73f0f1e16f9cb145e32f6d8d2318f8706853b8d3f8d9"
+    },
+    {
+      "path": "final-production-types.log",
+      "sha256": "8009bd5e7c2809ae90289fced5e5de818b6b7e241115ae2a1860fd4050de2460"
+    },
+    {
+      "path": "final-source-dead-code.log",
+      "sha256": "33fa6d57eb54eeeb5b8c27348c4e8b263a81a2d8510450fad887a793748a0c6d"
+    },
+    {
+      "path": "final-source-duplicates.log",
+      "sha256": "d5ca3cb48306bcf053a9304ecef85bcc1ca4a808be5c2b61edcf39ecac1c780b"
+    },
+    {
+      "path": "final-source-manifest.json",
+      "sha256": "d75ac876d962c205d43c2a71a9c08920f652525598c27c0042f347a9fb575127"
+    },
+    {
+      "path": "final-test-types.log",
+      "sha256": "c442cdaf52649b5e466b9edd150a31c32b6b51a22927f2e59278159c8dd72083"
+    },
+    {
+      "path": "full-quality-context-comparison.json",
+      "sha256": "68ce38d03d42d89970079bce56168e0a436a5aef51254789c83f2896b831a33f"
+    },
+    {
+      "path": "independent-review.json",
+      "sha256": "51b4a6f72b6e4352dd0e5667461586082325b77d2b18dfac391b868353819014"
+    },
+    {
+      "path": "independent-review.md",
+      "sha256": "16d52635f1bfa29f9b86c4d12084b4410856ed2ba05c193530d499be612e5f04"
+    },
+    {
+      "path": "native-isolation.json",
+      "sha256": "a19d8d2c7ab3eb06b951c9c3e849b9fc9b3bda65f4f2e51799b76af84724b021"
+    },
+    {
+      "path": "next-P0-24-routing-preflight.json",
+      "sha256": "bef98c15d5bf1887d27616e65bee75b2644fb13977b61b8eff8895b8c2a68756"
+    },
+    {
+      "path": "next-P0-24-routing-preflight.md",
+      "sha256": "ae01f3954c1ef5788e68c94d8679744eb5b14f30f6a4617a7d6b1bd6badb4e94"
+    },
+    {
+      "path": "node22-baseline-artifact-index.json",
+      "sha256": "46b9f2c509f07671f3b90bea324caeeedd577e567d7c4aac4094d6519e1e650e"
+    },
+    {
+      "path": "node22-baseline-build.log",
+      "sha256": "e69a067a82fca04751c23c4b3d2983b12649261742113e7d030cd36ce1f77b58"
+    },
+    {
+      "path": "node22-baseline.json",
+      "sha256": "1dca182d2b85593fff5051a69c2563ccaf90f09daa5de11082583e31f8325930"
+    },
+    {
+      "path": "node22-candidate-artifact-index.json",
+      "sha256": "5c4be66a477511227b762a24b5792050163f60d30daac372dd1f073be7a5b21e"
+    },
+    {
+      "path": "node22-candidate-eight.log",
+      "sha256": "07a701704046969b7d1aa1050d6f252ea33c543aebf51a5d39492a14d85e2014"
+    },
+    {
+      "path": "node22-candidate.json",
+      "sha256": "f22d67ed7bb896afbd65a5e451ba997f53a6b12049b02a7b5293ba8c75fdd945"
+    },
+    {
+      "path": "node22-final-build.log",
+      "sha256": "e69a067a82fca04751c23c4b3d2983b12649261742113e7d030cd36ce1f77b58"
+    },
+    {
+      "path": "node22-frozen-install.log",
+      "sha256": "a57a3085e4aba8fccc59eb777ca243151b8702ee30a7e7bdd6cf4dd7db44bfdb"
+    },
+    {
+      "path": "node22-native-abi-before.log",
+      "sha256": "a2513a2a1ac2618f38252c276af9200e3da633b1ed7b0d5ace2a30ff256052e0"
+    },
+    {
+      "path": "node22-native-abi-final.log",
+      "sha256": "9e58462da0f599e8389b49390f5abb1db31ffa325e6a39bbb99128380e277024"
+    },
+    {
+      "path": "node22-native-before.json",
+      "sha256": "fe49d6f1f4e8a9a7b51ecaca56cc2b3ba64890eed12e54bc715af436f76910ce"
+    },
+    {
+      "path": "node22-native-final.json",
+      "sha256": "6ebe31d881ef901dd88923655641b4f0009d0bcc2dcdf3d481153caaf573d937"
+    },
+    {
+      "path": "node22-original-eight-baseline.log",
+      "sha256": "5c52d8416ccec63b6bd96fe1c927049f930e0f09b9f1ea71706fb12a792d4836"
+    },
+    {
+      "path": "node24-baseline-build.log",
+      "sha256": "8b0682f6338bcc13478e1662860204a4114f8e2867902bed86258290f0963720"
+    },
+    {
+      "path": "node24-candidate-build.log",
+      "sha256": "8b0682f6338bcc13478e1662860204a4114f8e2867902bed86258290f0963720"
+    },
+    {
+      "path": "node24-candidate-checkout.log",
+      "sha256": "27edb9ea43a7776c600493c3bf4738eb2de8e1054c3fb78fc2941ace1b3bf5f3"
+    },
+    {
+      "path": "node24-candidate-eight-cases.log",
+      "sha256": "82099e6ef4bad3a79e0498d899fd8ee67c464bdbbce200f32c150d679a26843c"
+    },
+    {
+      "path": "node24-candidate-local-fetch.log",
+      "sha256": "5e12394cf57edb766fa6f800cee8ffee4ced8155000c313b78b31db51771ec62"
+    },
+    {
+      "path": "node24-candidate-native-after-runtime.log",
+      "sha256": "4fa2f4b6fced0712e3ad1b2d3b7d98336fe8512395b3e4a35065b38e1722f740"
+    },
+    {
+      "path": "node24-candidate-native-before-runtime.log",
+      "sha256": "0048ecd535f00e9bf887c012c0e1e11049723caca7fd78693e38579d25de9d8c"
+    },
+    {
+      "path": "node24-candidate.json",
+      "sha256": "f2813d1537f31868898344239659ce7fb451e3af22edd88b58fe8b8a7f1710ac"
+    },
+    {
+      "path": "node24-child-guard-witness.json",
+      "sha256": "8e4fdda3a5b0157c0e47a677d9bd2c20b125fa96a11802dab82598a3818fac1e"
+    },
+    {
+      "path": "node24-clone.log",
+      "sha256": "0a708d967dbb6e50f0a79112bdc2f1418721dcbfd0f497306f36dd95b000c1c9"
+    },
+    {
+      "path": "node24-frozen-install.log",
+      "sha256": "1a0e902f8e078bcc085ca0265c0002dc9257aae4572f4d69bf9be5f44a3a8cb3"
+    },
+    {
+      "path": "node24-native-before-build.log",
+      "sha256": "3c29718553cd22471f5a15f3ace22c8502c776b6621b9356e450db4843d52219"
+    },
+    {
+      "path": "node24-native-before.json",
+      "sha256": "818b87a30f0fbfd6fed84b02945461c2167a3267d08101d8a91add36e97ec793"
+    },
+    {
+      "path": "node24-original-guard-refusal.json",
+      "sha256": "8fc9dd5f32b2817e636f9d5f016c149944c8a263885b90a13c7f241ca9276cb4"
+    },
+    {
+      "path": "node24-qualification.json",
+      "sha256": "b0eee97222ed2382dffa1d089be1b6633ed368e3f964a7c1b44d360dd7b48a47"
+    },
+    {
+      "path": "node24-qualification.md",
+      "sha256": "4306b0bfaa0e60f2bf366934d1bef0a41e9158672f927ec87ddb7b91c93c9228"
+    },
+    {
+      "path": "node24-unchanged-child-guard.log",
+      "sha256": "daec91ff07eea718b058b03fb282c920e5061c58a4c09ca3841b501dc78a07d3"
+    },
+    {
+      "path": "node24-unchanged-parent-guard.log",
+      "sha256": "81c4a19b8013f634c4e3b385b27736decb0fa7152ba323b23ded1525ab69c1ab"
+    },
+    {
+      "path": "preservation-check.json",
+      "sha256": "f06e08c2df7494556f279af18a9814cc6dc68c26f285f6f42c1a61eae8a1067d"
+    },
+    {
+      "path": "private-evidence-index.json",
+      "sha256": "51515b70b7192589d0acb0a0afd77f649507cb3a16a436e9cbd53d4de558d67a"
+    },
+    {
+      "path": "proposal-metadata.json",
+      "sha256": "3137bfc86699f0d13a203916a0efb22fa23b106b16802e768b0e94bce32dde9f"
+    },
+    {
+      "path": "remaining-acceptance.json",
+      "sha256": "556a3aa5a04842f5c6b2a3ec0a7725c5b621f7b8df9c77886ab8452291015a28"
+    },
+    {
+      "path": "runtime-preflight.json",
+      "sha256": "b087cd66b4ed96a0d149f53932cd4e846fdd2f3d673b81ffb7481b834d8aad49"
+    },
+    {
+      "path": "runtime-preflight.md",
+      "sha256": "c7a5cff0aa05760347079523608ffcbed64790c237aabcdb17c26bd99a637cec"
+    },
+    {
+      "path": "source-checkpoint.log",
+      "sha256": "af0155b8d067b44c83f64ee2dc76f49a6812fad0594698356088c230f2ffc228"
+    },
+    {
+      "path": "source-quality.json",
+      "sha256": "6cc99863e054a7c0fb0e5438ccc3e4c916c0e5aea29f36c23a9b2237036073c4"
+    },
+    {
+      "path": "source-whitespace.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "two-guard-proposal.patch",
+      "sha256": "4622cd6eb87c0c60bdcda1f53a4e37593adfcb2793d613aa78068ebaea62d205"
+    }
+  ],
+  "notes": "Runtime compatibility follow-up only. Two version predicates in our test now accept Node 22/24; 200 lines and all eight behavioral cases are unchanged. Each candidate passes 8/8 with no pending or todo cases. Original Node 24 parent refusal leaves eight pending, and the byte-equal child refuses before product imports; neither is a product mutation kill. Separate frozen copy installs and actual ABI 127/137 SQLite probes preserve the Node 22 binding across nine rechecks. All 7,737 tracked and 4,529 compiled files remain unchanged after Node 24 execution. Builds, types, lint and ordinary freeze, architecture, counts, docs, API reference and clean-source checks pass. Required quality gates remain failed with 1,269 duplicate and 2,774 dead-code findings. The initial 2,779 count belongs to the earlier 8c phase; complete current finding sets match, and no cleanup or cause is inferred. Production, Claude work, shared guards, floors, ratchets, archives and dependencies are unchanged. Earlier strict P0-27 system-row and mixed SQLite issues, the pending P0-19 source proposal and deferred echo scenarios, and other acceptance debt remain open. No tracker closure, paused resumption, external message or publication. Next is bounded P0-24 qualification."
+}

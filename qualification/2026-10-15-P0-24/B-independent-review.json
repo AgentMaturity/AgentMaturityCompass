@@ -1,0 +1,384 @@
+{
+  "schemaVersion": 1,
+  "reviewedAtUtc": "2026-10-14T22:18:51.023792+00:00",
+  "scope": "Independent read-only review of P0-24 B original citation-linter and main-routine contracts in a private compiled closure. No product import, runtime, tests, build, source/canonical edit or evidence mutation; only this private review pair written.",
+  "result": "no actionable findings within the fixture-driven contract scope",
+  "findings": [],
+  "sourceHead": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "qualificationReceipt": {
+    "path": "/private/tmp/p0-24-citation-causal-qualification-20261015.json",
+    "sha256": "a05fb74b1c7e19e93f862187ed09cf2cb4be49a8179522343d0b3aa06999ef54",
+    "bytes": 61638
+  },
+  "qualificationMarkdown": {
+    "path": "/private/tmp/p0-24-citation-causal-qualification-20261015.md",
+    "sha256": "19b2f9ae7f8aa59694ba887881f5247cf988d3ed7647e0a98cefe09919136bfd",
+    "bytes": 4062
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-24-citation-causal-20261015/artifact-index.json",
+    "sha256": "10872e54a487beb237fb3974932cebbc9dfee4e7caee54c717f89cfcf1f6fc0b",
+    "artifactCount": 44
+  },
+  "verifiedUniqueArtifactReferences": 44,
+  "largestIndexedPrivateArtifactBytes": 45692207,
+  "largePrivateGraphAndManifestsAreReferencesOnly": true,
+  "originalCaseScope": {
+    "linterCases": 21,
+    "includesIssueFixtures": 13,
+    "cliMainCases": 9,
+    "exactSameNamesEveryPhase": 30,
+    "assertionsFixturesCallbacksInputsDeadlinesGuardPolicyUnchanged": true,
+    "fixtureDataByteEqual": true
+  },
+  "phases": [
+    {
+      "phase": "resolver-baseline",
+      "exit": 0,
+      "durationMs": 934,
+      "counts": {
+        "numTotalTests": 30,
+        "numPassedTests": 30,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true
+      },
+      "failedCases": [],
+      "changedPrivateInputs": [],
+      "raw": {
+        "path": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-baseline/raw-tests.json",
+        "sha256": "c6e875d18edcfeacb51c08611de64f743923310a7ba61a40bc6a9e3ff2facd3d",
+        "bytes": 9227
+      }
+    },
+    {
+      "phase": "resolver-mutant",
+      "exit": 1,
+      "durationMs": 868,
+      "counts": {
+        "numTotalTests": 30,
+        "numPassedTests": 26,
+        "numFailedTests": 4,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false
+      },
+      "failedCases": [
+        "lintCitations fixtures mapping packId pii_detection_leakage",
+        "lintCitations fixtures related.packs host_hardening",
+        "lintCitations fixtures suggests the registered id for a near-miss pack reference",
+        "lintCitations fixtures accepts a related.packs entry that matches after ignoring case, - and _"
+      ],
+      "changedPrivateInputs": [
+        "dist/compliance/citations/lint.js"
+      ],
+      "raw": {
+        "path": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-mutant/raw-tests.json",
+        "sha256": "929ea75d755f18889e34a6ca72568250efa81e007ae0cf412bf983e3151509b4",
+        "bytes": 14329
+      }
+    },
+    {
+      "phase": "resolver-restored",
+      "exit": 0,
+      "durationMs": 909,
+      "counts": {
+        "numTotalTests": 30,
+        "numPassedTests": 30,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true
+      },
+      "failedCases": [],
+      "changedPrivateInputs": [],
+      "raw": {
+        "path": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-restored/raw-tests.json",
+        "sha256": "aae750795fcbaefaf79b04e2038ba43848a008d4d62a52ee0cf8f37ab2e53987",
+        "bytes": 9224
+      }
+    },
+    {
+      "phase": "ratchet-baseline",
+      "exit": 0,
+      "durationMs": 869,
+      "counts": {
+        "numTotalTests": 30,
+        "numPassedTests": 30,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true
+      },
+      "failedCases": [],
+      "changedPrivateInputs": [],
+      "raw": {
+        "path": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-baseline/raw-tests.json",
+        "sha256": "9f4846840a7b123f2b472e51447a7fc3d933cedf9380a36fe7937a0f60d28491",
+        "bytes": 9223
+      }
+    },
+    {
+      "phase": "ratchet-mutant",
+      "exit": 1,
+      "durationMs": 864,
+      "counts": {
+        "numTotalTests": 30,
+        "numPassedTests": 29,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false
+      },
+      "failedCases": [
+        "check-citations CLI exits 1 when a ratcheted count rises above its baseline"
+      ],
+      "changedPrivateInputs": [
+        "scripts/check-citations.mjs"
+      ],
+      "raw": {
+        "path": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-mutant/raw-tests.json",
+        "sha256": "c0c7022e77fc5ab618e0ee5b8f635dc8b2ddc217ec56278a79003a7b40e47b05",
+        "bytes": 9608
+      }
+    },
+    {
+      "phase": "ratchet-restored",
+      "exit": 0,
+      "durationMs": 879,
+      "counts": {
+        "numTotalTests": 30,
+        "numPassedTests": 30,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true
+      },
+      "failedCases": [],
+      "changedPrivateInputs": [],
+      "raw": {
+        "path": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-restored/raw-tests.json",
+        "sha256": "6b063703ef18cfe1b4ae51aed12aab6ddffc0287c0ed5c7e463141fe677b3341",
+        "bytes": 9222
+      }
+    }
+  ],
+  "causalAssessment": {
+    "resolver": {
+      "mutant": "resolvesPackId return expression only changed to return true in private compiled module",
+      "matrix": [
+        30,
+        26,
+        30
+      ],
+      "actualFailureNames": [
+        "lintCitations fixtures mapping packId pii_detection_leakage",
+        "lintCitations fixtures related.packs host_hardening",
+        "lintCitations fixtures suggests the registered id for a near-miss pack reference",
+        "lintCitations fixtures accepts a related.packs entry that matches after ignoring case, - and _"
+      ],
+      "nearMissMessageFailure": "Original finding.message assertion throws because the real mutated function suppresses the finding. This is a behavioral consequence, not setup/import failure.",
+      "nineMainRoutineCasesRemainPass": true
+    },
+    "ratchet": {
+      "mutant": "Private copied check-citations main keeps all policy but disables the n>b over-baseline branch",
+      "matrix": [
+        30,
+        29,
+        30
+      ],
+      "actualFailureName": [
+        "check-citations CLI exits 1 when a ratcheted count rises above its baseline"
+      ],
+      "actualExpectedExitVersusResult": "Original test expects1; actual main returns0 for two CIT004 fixture findings versus baseline1.",
+      "zeroToleranceArgumentsMetadataAndOtherCasesRetained": true
+    },
+    "allMutantFailuresExpectedAndDistinct": true,
+    "noPendingOrTodoEveryPhase": true,
+    "restoreBaselineSuccessAndZeroFailuresEveryControl": true
+  },
+  "adaptationReview": {
+    "exactReverseImportPrefixComparisonVerified": true,
+    "adaptations": [
+      {
+        "path": "tests/citations/checkCitationsCli.test.ts",
+        "onlySourceToDistImportPrefix": true,
+        "replacements": 1,
+        "originalSha256": "033144efd88c3c8e0693394dd5d77447d05fa4a178078c0cd54829afe38ff927",
+        "privateSha256": "1498c6ad53a8b9e628c46bc521248e44b12d814c0fc54edc35457f961bc3506e",
+        "patch": "/private/tmp/p0-24-citation-causal-20261015/adaptations/checkCitationsCli.test.ts.patch"
+      },
+      {
+        "path": "tests/citations/lintCitations.test.ts",
+        "onlySourceToDistImportPrefix": true,
+        "replacements": 6,
+        "originalSha256": "d8ac693789c976e7cc84fe1ad020c4513f517d51c2188499315e8bc054c426ae",
+        "privateSha256": "28a8d3383aad7abb01158b093f93ed6aae19292f03060204753e5d4bccb71166",
+        "patch": "/private/tmp/p0-24-citation-causal-20261015/adaptations/lintCitations.test.ts.patch"
+      },
+      {
+        "path": "tests/setup/guardWorkspace.ts",
+        "onlySourceToDistImportPrefix": true,
+        "replacements": 4,
+        "originalSha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+        "privateSha256": "2bfa7cf6368e6dffaaaa4a68086bf57421fbc706398659bfadd34f8577747eac",
+        "patch": "/private/tmp/p0-24-citation-causal-20261015/adaptations/guardWorkspace.ts.patch"
+      }
+    ],
+    "remainingGuardsConfigUnchanged": true,
+    "description": "Only ../../src/ to ../../dist/ substitutions in six linter import occurrences, one CLI import and four guard cleanup type/runtime occurrences. All other bytes reverse to originals; no guard policy or assertions removed.",
+    "existingMainDependencySeam": "Original tests call actual main with existing supported findings/baseline dependencies. This is deliberately fixture-driven main-routine behavior, not a cold CLI or whole-package collector observation."
+  },
+  "restorationVerified": {
+    "privateProtectedFilesIndependentlyRehashed": 4627,
+    "privateCompiledFiles": 4529,
+    "privateScripts": 85,
+    "setupAndAfterManifestExactlyEqual": true,
+    "allCurrentPrivateProtectedBytesMatch": true,
+    "protectedParentInputsIndependentlyRehashed": 2471,
+    "currentParentHashesMatchBefore": true,
+    "defaultCitationBaselineUnchanged": {
+      "actualDefaultBaselineTotals": {
+        "CIT001": 0,
+        "CIT002": 3,
+        "CIT003": 0,
+        "CIT004": 620,
+        "CIT005": 0
+      },
+      "defaultBaselineSha256": "31d07b0f9ea2022e1994f0b9692a3a55c87271d4aaf5e645d9b68a3583d69f59",
+      "defaultBaselineNeverUpdatedByThisLane": true,
+      "privateFixtureBaselineUpdateOnly": "The unchanged CLI tests create and update their own fresh TMPDIR fixtures and remove them after each case. No real/default citation baseline update is used."
+    },
+    "configGuardsMainAndBaselineBytesMatchOriginal": true,
+    "nativeStatAndHashIndependentlyMatch": {
+      "realpath": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 537320078,
+      "links": 1,
+      "bytes": 1931552
+    },
+    "ownedViteCacheRegularDirectories": [
+      {
+        "path": "/private/tmp/p0-24-citation-causal-20261015/closure/node_modules/.vite",
+        "isSymlink": false,
+        "resolved": "/private/tmp/p0-24-citation-causal-20261015/closure/node_modules/.vite"
+      },
+      {
+        "path": "/private/tmp/p0-24-citation-causal-20261015/closure/node_modules/.vite-temp",
+        "isSymlink": false,
+        "resolved": "/private/tmp/p0-24-citation-causal-20261015/closure/node_modules/.vite-temp"
+      }
+    ]
+  },
+  "ownershipObserverChronology": {
+    "initialBroadMetadataObserverFailureRetained": {
+      "exit": 1,
+      "error": "AssertionError",
+      "reason": "The first final metadata observer compared every tracked parent file with its initial snapshot while the parent performed authorized factual test-count documentation updates. The private closure inputs already matched exactly. The corrected scope check retains all ten observed differences and proves the 2,471 original source/scripts/citation tests/fixtures/guards/package inputs still match. No test assertion, input, runtime expectation or mutation outcome changed."
+    },
+    "tenDifferences": [
+      {
+        "path": "CONTRIBUTING.md",
+        "beforeSha256": "5af3ba77f82438a449c2f52be802478da74525a0dab79cd8e9e66dbb20f0ba1c",
+        "nowSha256": "ba2d1f54f67fe94c2fc8b5507510f6e5a52bebb2d106ef2e577519600e1ed933"
+      },
+      {
+        "path": "README.md",
+        "beforeSha256": "acb2751e76a57dfaedd18d21542f86cc7b07f2a05d45e999690d384c52b52ea8",
+        "nowSha256": "c53c6ea477e2a5edc9099cdd46d883e9ec519efc6c748ce8f9c18c756274161d"
+      },
+      {
+        "path": "docs/content/reddit-launch-drafts.md",
+        "beforeSha256": "8ad32fc0d1cd9c64e0c9811799725195c722382959ae52d2e54e3bdd71661f8e",
+        "nowSha256": "26374366a8cdf1c1f8936442b6d502375e1bd07fdc8c3045fbc08ad628516c7a"
+      },
+      {
+        "path": "docs/content/show-hn-draft.md",
+        "beforeSha256": "cc7113daf785243064eff280dfc18c9ded8d0bd6ecf66f29877cc74453fbe104",
+        "nowSha256": "13bd3e85bef3fb4c45de988cf9a37268955fc425798faa366d2d47d713fc3d75"
+      },
+      {
+        "path": "docs/internal/competitive-landscape.md",
+        "beforeSha256": "034667a0d8f6a9c97637ed79bdc65ef2f5670e95576a5ad23cc5516d65ea579a",
+        "nowSha256": "588af022cf907d72731e68f907cbf203f1b7a40cd03cf9c7fac6292abfc7213b"
+      },
+      {
+        "path": "docs/internal/mirofish-simulation-council.md",
+        "beforeSha256": "793de82b238630afcdff4041e842879b3e57e35972504bbef3643f50e39af6c4",
+        "nowSha256": "b179c4ecd44c4d461e8891d868569aa9e1fe2d23f84c20628fffe445b5d1c3ed"
+      },
+      {
+        "path": "website/i18n.js",
+        "beforeSha256": "b5e9eb8b1fe6d9b2409c29c44a4e0b8032ca1b4ade9a55f58dd896ed3402ec1f",
+        "nowSha256": "4be226ac51815404d5bf8861802a81e49e0b62cb135071fb6e78a9cce7258fc0"
+      },
+      {
+        "path": "website/index.html",
+        "beforeSha256": "3e68d48455c8b49fd2d4217ae536d3ec4347147466f1dc11ce02dd5984b81e80",
+        "nowSha256": "2ae0119d4c2227eb0ec71d1b489958c593b9286ebb6874c02d200dc518d5ecc8"
+      },
+      {
+        "path": "website/lite.html",
+        "beforeSha256": "b20dd481ec643a5589e8871cd292be77cc64b42a814c4f49c376dad8923238de",
+        "nowSha256": "608ca03ba2118b2181d69f4e549448b726fdb2eb5028d85d45f8a3c71580c381"
+      },
+      {
+        "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "beforeSha256": "5d0595645351dc6e2b0c8691d03dec8d3d1c03dec5076570b9bdc97305fcb799",
+        "nowSha256": "ba9309480f27f7d9003b926e371e711164d274e053dc2c492d1c1701486eba67"
+      }
+    ],
+    "allTenCurrentHashesIndependentlyMatch": true,
+    "countOnlySemantics": "A independent review also verified each old document becomes the current document solely by1636-to1637 inventory replacements. Those root-authorized changes do not prove B touched source.",
+    "protectedScopeCheck": "All2471 original protected source/scripts/citation tests/fixture/guards/packages remain exact. No original test input/assertion was weakened to accommodate document changes."
+  },
+  "guardAndRuntimeReview": {
+    "actualRecordedRuntime": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesAbi": "127",
+      "vitest": "4.1.11",
+      "dependencyMode": "Private node_modules directory contains read-only package symlinks to the qualified parent Node22 install. Vite cache directories are regular owned private directories; Vitest result cache is disabled. No installation or rebuild.",
+      "childEnvironment": "Minimal private HOME/AMC_HOME and per-phase TMPDIR, explicit Node22 PATH, UTC/C, no provider keys; transport-deny preload retained. No process-global cwd changes.",
+      "originalWorkspaceGuardsRetained": true,
+      "configurationCopiedUnchanged": true,
+      "privateVitestResultCacheDisabled": true,
+      "privateViteCachesOwnRegularDirectories": [
+        {
+          "path": "/private/tmp/p0-24-citation-causal-20261015/closure/node_modules/.vite",
+          "isSymlink": false,
+          "resolved": "/private/tmp/p0-24-citation-causal-20261015/closure/node_modules/.vite"
+        },
+        {
+          "path": "/private/tmp/p0-24-citation-causal-20261015/closure/node_modules/.vite-temp",
+          "isSymlink": false,
+          "resolved": "/private/tmp/p0-24-citation-causal-20261015/closure/node_modules/.vite-temp"
+        }
+      ],
+      "noInstallOrRebuild": true,
+      "collectorBoundary": "These are the original fixture-driven pure-linter and script-main contracts. The CLI cases use their existing supported findings/baseline dependencies. No whole-package collector, legal-source fetch, expert review, currency approval, or model run was executed by this lane; root separately owns current collector/currency qualification."
+    },
+    "transportPreload": {
+      "path": "/private/tmp/p0-24-citation-causal-20261015/deny-transport.mjs",
+      "sha256": "200228ba10f747050dca7dca9ff83e75fdf1b1290057e9b8ac41197c9f1c7c52",
+      "bytes": 469
+    },
+    "transportScope": "Observed preload denies common Node HTTP/HTTPS/net/DNS/fetch calls; not an OS/syscall or universal no-network proof.",
+    "readOnlyToolReuseScope": "Installed parent dependencies reused via links; unchanged native identity specifically verified, not a universal manifest of every dependency file."
+  },
+  "reviewerObserverNotes": [
+    "An initial read of nonexistent tests/citations/lint.test.ts returned missing-file; the actual lintCitations.test.ts was subsequently read in full. No product runtime or evidence mutation followed."
+  ],
+  "limits": [
+    "This tests local fixture-driven source/main contracts, not legal truth, current-law content, authoritative citation accuracy, expert approval or currency.",
+    "Whole current collector acceptance, full P0-24/P0-25, full suite/coverage, Node24/Python, live/model/auth/enforcement, hostedCI/release/Done not inferred.",
+    "Private supported fixture-baseline update cases really write fresh owned TMPDIR bodies; default/root citation baseline remains byte-identical.",
+    "Effect/restoration proof covers protected manifests and recorded intervals, not all-lifecycle/race or universal no-effects guarantees.",
+    "Empty ISO references, experimental metadata, A strictISO failure, all expert/source-quality/freeze/inherited holds remain open.",
+    "Stale graph was only navigation; no current-source acceptance or refresh claim from it."
+  ],
+  "liveDistSourceNativeReadsComplete": true,
+  "parentBuildHoldReleased": true
+}
