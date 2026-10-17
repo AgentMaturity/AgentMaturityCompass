@@ -1,4 +1,5 @@
 import { SessionService } from "../session/sessionService.js";
+import { redactingSessionFor } from "../dataflow/redactingSession.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import { deniedToolNamesForScope, intersectDelegationScopes, parseDelegationScope } from "./delegationScope.js";
 import { parseSubagentStopConditions } from "./subagentStopConditions.js";
@@ -228,7 +229,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
     let descendantStops: readonly string[] | undefined;
     try { descendantStops = descendantStopConditions(ctx.stopConditions, grant?.stopConditions); }
     catch (error) { return { ok: false, text: "", reason: `child stop conditions: ${error instanceof Error ? error.message : String(error)}` }; }
-    const session = new SessionService(init.workspace);
+    const session = redactingSessionFor(new SessionService(init.workspace)); // P2-02: opt-in redaction before commit
     let toolset: ReturnType<typeof agentToolset> | undefined;
     let driver: AgentDriver | undefined;
     let opened = false;

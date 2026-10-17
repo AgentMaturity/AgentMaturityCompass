@@ -162,6 +162,24 @@ function parse(bytes: Buffer): ProcessorRegistryV1 {
     { maxAliasCount: 0, uniqueKeys: true })));
 }
 
+const optedInRegistries = new Set<string>();
+/**
+ * The P2-02 opt-in, without reading or verifying anything: the registry file or its `.sig` exists (the snapshot below is
+ * `missing` only when neither does). A path that cannot be checked counts as opted in, so it fails closed. Once seen
+ * opted in, a workspace stays opted in for the life of the process, so a session composed before the operator opted in
+ * starts redacting, and removing the registry never stops it; every surface (sessions, the action journal, stored
+ * evidence) then makes the same choice.
+ */
+export function protectedDataOptedIn(workspace: string): boolean {
+  let path: string;
+  try { path = processorRegistryPath(workspace); } catch { return true; }
+  if (optedInRegistries.has(path)) return true;
+  let optedIn: boolean;
+  try { optedIn = present(path) || present(processorRegistrySigPath(workspace)); } catch { optedIn = true; }
+  if (optedIn) optedInRegistries.add(path);
+  return optedIn;
+}
+
 /** Missing, unsigned, broken, or ambiguous data never supplies protected-request permission. */
 export function loadProcessorRegistrySnapshot(workspace: string): ProcessorRegistrySnapshot {
   let path: string;

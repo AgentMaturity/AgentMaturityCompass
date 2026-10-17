@@ -9,7 +9,7 @@ import { bridgeConfigSchema } from "./bridgeConfigSchema.js";
 import { loadBridgeConfig, verifyBridgeConfigSignature } from "./bridgeConfigStore.js";
 import { verifyBridgeLease } from "./bridgeAuth.js";
 import { resolveBridgeRoute, buildModelIntent } from "./bridgeRoutes.js";
-import { summarizeBridgeBody, bridgeSha256 } from "./bridgeRedaction.js";
+import { summarizeBridgeBody, bridgeSha256, bridgeEvidenceRedactor } from "./bridgeRedaction.js";
 import { appendBridgeAudit, appendBridgeOutputValidated, appendBridgeRequestReceipt, appendBridgeResponseReceipt } from "./bridgeReceipts.js";
 import { appendBridgeTelemetryEvent, bridgeTelemetryEventSchema } from "./bridgeTelemetry.js";
 import { enforceBridgePolicy } from "./bridgePolicyEnforcer.js";
@@ -571,6 +571,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         writeControlError(options.res, 400, "event_type, session_id, and payload are required");
         return true;
       }
+      const redact = bridgeEvidenceRedactor(options.workspace);
       const ledger = openLedger(options.workspace);
       try {
         try {
@@ -587,10 +588,8 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
           sessionId,
           runtime: "any",
           eventType: "agent_process_started",
-          payload: JSON.stringify({
-            event_type: eventType,
-            payload
-          }),
+          // Stored like bridge telemetry: secrets in every key and leaf, and the protected-data detectors where opted in.
+          payload: JSON.stringify({ event_type: redact.text(eventType), payload: redact.json(payload) }),
           payloadExt: "json",
           inline: false,
           meta: {

@@ -465,6 +465,13 @@
       "sha256": "3b2571d70377251e35752b9473ce7bbdc1f806441345e2f1be0f080c271cc33b"
     },
     {
+      "path": "src/toolhub/toolhubReceipts.ts",
+      "issue": "P2-02",
+      "baseCommit": "b657d0da08e29e3b30eef19988048b4426b30858",
+      "archivePath": "unused-code/plan-edits/P2-02/src/toolhub/toolhubReceipts.ts.landed",
+      "sha256": "4d58d0e910605459639e6ff5df9684ad6f2cc41afd4c529e4385649e26c46e3e"
+    },
+    {
       "path": "src/toolhub/toolhubValidators.ts",
       "issue": "P1-05",
       "baseCommit": "cd04963e99c096e7114734304524be6dae3470e8",

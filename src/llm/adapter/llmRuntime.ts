@@ -63,6 +63,7 @@ import { bindProviderToolNames, usesProviderToolNames } from "../request/provide
 import { ProviderToolBinding } from "./providerToolBinding.js";
 import { checkEgress, EgressBlocked } from "../../residency/checkEgress.js";
 import { detectProtectedRequest, type ProtectedDataDetection } from "../../dataflow/detectors.js";
+import { openTokenLookup } from "../../dataflow/tokenVault.js";
 import { admitProtectedModelRequest, DataFlowRefused } from "../../dataflow/purposePolicy.js";
 import { loadProcessorRegistrySnapshot } from "../../dataflow/processorRegistry.js";
 
@@ -228,8 +229,10 @@ export class LlmRuntime {
         // The workspace is read per use and never fabricated: a session without one reads as an invalid registry, not a missing one.
         if (loadProcessorRegistrySnapshot(this.init.session.workspace).state === "missing") return;
         // A detector refusal (over-long leaf, excessive nesting, unsupported shape) is a typed refusal, not an untyped error.
+        // Tokens this workspace issued (committed rows hold them) are skipped; token-shaped text it did not issue is scanned.
         let detection: ProtectedDataDetection;
-        try { detection = detectProtectedRequest(request); } catch { throw new DataFlowRefused("detector_invalid"); }
+        const tokens = openTokenLookup(this.init.session.workspace);
+        try { detection = detectProtectedRequest(request, tokens.issued); } catch { throw new DataFlowRefused("detector_invalid"); } finally { tokens.close(); }
         if (detection.classes.length === 0) return;
         const admission = admitProtectedModelRequest(this.init.session.workspace, route.providerId, route.baseUrl, detection);
         const evidence = {
