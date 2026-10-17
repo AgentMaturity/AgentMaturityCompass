@@ -28,7 +28,7 @@ node quickstart.mjs                                     # a copy of examples/sdk
 prints its readiness. In a non-interactive shell it reads the owner's login from `AMC_BOOTSTRAP_OWNER_USERNAME` and
 `AMC_BOOTSTRAP_OWNER_PASSWORD` (or their `_FILE` variants) and refuses when the passphrase or the login is missing.
 
-[`examples/sdk/quickstart.mjs`](../../examples/sdk/quickstart.mjs) is the whole program:
+`examples/sdk/quickstart.mjs` in the repository is the whole program:
 
 ```ts
 import { AMCNativeClient } from "agent-maturity-compass/sdk/native";
@@ -84,7 +84,7 @@ preview, experimental, whose routes answer 404 unless the server runs with `AMC_
 | Change or remove an experimental name or member | minor, with a changeset note |
 | Fix behaviour without an API change | patch |
 
-[`sdk/api/native.api.md`](../../sdk/api/native.api.md) is the committed snapshot of every exported name and signature,
+`sdk/api/native.api.md` in the repository is the committed snapshot of every exported name and signature,
 generated from `dist/sdk/nativeAgentClient.d.ts`. `npm run check:sdk-api` (in CI) fails when the snapshot differs from
 the built declarations, and when a branch changes the snapshot without a changeset that mentions `sdk-api`. After an
 intended API change, run `node scripts/check-sdk-api.mjs --write`, review the diff and say what changed in the
