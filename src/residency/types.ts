@@ -50,7 +50,7 @@ export interface CheckEgressInput {
   readonly agentId?: string;
 }
 
-export const DELETION_TARGET_KINDS = ["evidence-payloads", "blobs", "spills", "guard-events", "logs", "caches"] as const;
+export const DELETION_TARGET_KINDS = ["evidence-payloads", "blobs", "spills", "guard-events", "logs", "caches", "token-vault"] as const;
 export type DeletionTargetKind = typeof DELETION_TARGET_KINDS[number];
 export interface LegalHoldScopeV1 {
   readonly tenantId: string;
