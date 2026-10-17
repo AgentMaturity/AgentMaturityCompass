@@ -6170,6 +6170,8 @@ Initialize .amc workspace
 | `--force` | - |
 | `--skip-vault` | - |
 | `--minimal` | - |
+| `--coding` | - |
+| `--regulated` | - |
 
 #### `amc insider-alerts`
 
