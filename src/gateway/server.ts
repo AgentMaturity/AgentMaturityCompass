@@ -25,6 +25,7 @@ import {
 import { applyUpstreamAuth, missingUpstreamAuthRefs, upstreamCredentials } from "./upstreamAuth.js";
 import type { CredentialsService } from "../credentials/credentialsService.js";
 import { redactBody, redactHeaders } from "./redaction.js";
+import { protectedDataOptedIn } from "../dataflow/processorRegistry.js";
 import { relayGatewayResponse } from "./streamPassthrough.js";
 import { monitorPublicKeyFingerprint } from "../receipts/receipt.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -1483,7 +1484,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       }
 
       const requestHeaderRedaction = redactHeaders(toHeaderObject(req.headers), config.redaction.headerKeysDenylist);
-      const requestBodyRedaction = redactBody(requestBody, req.headers["content-type"], config.redaction);
+      const requestBodyRedaction = redactBody(requestBody, req.headers["content-type"], config.redaction,
+        { protectedData: protectedDataOptedIn(options.workspace) });
       const workOrderId = firstString(req.headers["x-amc-workorder-id"]);
       const providerId = upstreamConfigured.providerId ?? route.upstream;
       const clientProcess = firstString(req.headers["x-amc-client-process"]);
@@ -1573,7 +1575,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         responseBody = await readAll(upstreamResponse);
       }
 
-      const responseBodyRedaction = redactBody(responseBody, upstreamResponse.headers["content-type"], config.redaction);
+      const responseBodyRedaction = redactBody(responseBody, upstreamResponse.headers["content-type"], config.redaction,
+        { protectedData: protectedDataOptedIn(options.workspace) });
       const responseInfo = bestEffortJsonInfo(responseBody, incomingUrl.pathname, route.openaiCompatible);
 
       const llmResponseMeta: Record<string, unknown> = {
