@@ -74,7 +74,8 @@ const PII_PATTERNS: PiiPattern[] = [
   { type: "api_key_openai", re: /sk-[A-Za-z0-9]{20,}/g, replacement: "[API_KEY_REDACTED]" },
   { type: "api_key_github", re: /gho_[A-Za-z0-9]{20,}/g, replacement: "[API_KEY_REDACTED]" },
   { type: "api_key_aws", re: /AKIA[A-Z0-9]{16}/g, replacement: "[AWS_KEY_REDACTED]" },
-  { type: "password_json", re: /"password"\s*:\s*"[^"]+"/gi, replacement: "\"password\": \"[REDACTED]\"" },
+  // The whole JSON string value, escapes included, so an escaped quote (\") inside a password does not end it early.
+  { type: "password_json", re: /"password"\s*:\s*"(?:[^"\\]|\\[\s\S])+"/gi, replacement: "\"password\": \"[REDACTED]\"" },
 ];
 
 export interface ScanResult {

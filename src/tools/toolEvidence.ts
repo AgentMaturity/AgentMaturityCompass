@@ -1,3 +1,4 @@
+import { digestField } from "../dataflow/tokenizer.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
   LIVE_PROJECTION_VERSION,
@@ -149,11 +150,14 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
   // ledger would put file contents and command results in a second place with
   // a second retention and DSAR story — the same reason the audit row does not
   // copy the arguments. The hash keeps the claim verifiable against the output
-  // the caller already has.
+  // the caller already has. Its form is the one the pipeline chose for this
+  // call's receipt (P2-02): `outputSha256`, or a keyed `outputDigest` in a
+  // workspace that opted in to protected-data redaction.
   const produced = outcome.bytes > 0 || outcome.output.length > 0;
   if (!produced) {
     return [audit, metric, ...authorization];
   }
+  const outputDigest = digestField("output", outcome.outputDigest ?? { kind: "sha256", value: sha256Hex(outcome.output) });
 
   const stdout: ToolEvidenceRecord = {
     eventType: "stdout",
@@ -162,13 +166,13 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
       bytes: outcome.bytes,
       exitCode: outcome.exitCode,
       timedOut: outcome.timedOut,
-      outputSha256: sha256Hex(outcome.output)
+      ...outputDigest
     }),
     meta: {
       ...common,
       streamKind: "tool_output",
       bytes: outcome.bytes,
-      outputSha256: sha256Hex(outcome.output)
+      ...outputDigest
     }
   };
 

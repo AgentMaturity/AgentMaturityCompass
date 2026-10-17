@@ -82,6 +82,7 @@ import type { ApprovalSeamService } from "./services/approvalServices.js";
 import { agentLoopServices, AGENT_LOOP_SEAM } from "./services/agentLoopServices.js";
 import type { AgentLoopSeamService } from "./services/agentLoopServices.js";
 import { assertSecondSessionWriter } from "../persistence/openSessionEventStore.js";
+import { redactingSessionFor } from "../dataflow/redactingSession.js";
 
 /** The section name a pinned system prompt is registered under. */
 export const PINNED_PROMPT_SECTION = "host:pinned-prompt";
@@ -448,6 +449,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     session = new SessionService(options.workspace);
     session.open({ ...(options.sessionId === undefined ? {} : { sessionId: options.sessionId }), ...identity });
   }
+  // P2-02: in an opted-in workspace, messages and tool results are tokenized before any row is committed.
+  session = redactingSessionFor(session);
   const sessionId = session.sessionId;
   const ctx = new Context();
   const fibers: { dispose(): Promise<void> }[] = [];

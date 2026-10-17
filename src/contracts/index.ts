@@ -33,6 +33,7 @@ import { authorizationRecordV1Schema } from "./v1/authorizationRecord.js";
 import { controlResultV1Schema } from "./v1/controlResult.js";
 import { evidenceEventV1Schema } from "./v1/evidenceEvent.js";
 import { receiptV1Schema, receiptV2Schema } from "./v1/receipt.js";
+import { redactionReceiptV1Schema } from "./v1/redactionReceipt.js";
 import { scopedAttestationV1Schema } from "./v1/scopedAttestation.js";
 
 export * from "./v1/a4ConformanceStatement.js";
@@ -55,6 +56,7 @@ export * from "./v1/authorizationRecord.js";
 export * from "./v1/controlResult.js";
 export * from "./v1/evidenceEvent.js";
 export * from "./v1/receipt.js";
+export * from "./v1/redactionReceipt.js";
 export * from "./v1/scopedAttestation.js";
 // Re-exported, never forked: AMC already parses these records with them.
 export { claimEnvelopeSchema as claimEnvelopeV1Schema, signatureEnvelopeSchema as signatureEnvelopeV1Schema };
@@ -67,6 +69,8 @@ export const CONTRACTS = {
   "receipt": { title: "AMC Receipt", schema: receiptV2Schema },
   "legacy-receipt": { title: "AMC Receipt Payload (legacy v1)", schema: receiptV1Schema },
   "authorization-record": { title: "AMC Authorization Record", schema: authorizationRecordV1Schema },
+  // P2-02: one audit row per redaction before a session row is committed.
+  "redaction-receipt": { title: "AMC Redaction Receipt", schema: redactionReceiptV1Schema },
   "control-result": { title: "AMC Control Result", schema: controlResultV1Schema },
   "claim-envelope": { title: "AMC Claim Envelope", schema: claimEnvelopeSchema },
   "scoped-attestation": { title: "AMC Scoped Attestation", schema: scopedAttestationV1Schema },

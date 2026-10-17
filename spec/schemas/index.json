@@ -161,6 +161,11 @@
       "sha256": "858bb4712a4edb484538c82fdf6dcb58b3dae4364c9e519f33524cdd6cec52c6"
     },
     {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/redaction-receipt.schema.json",
+      "name": "redaction-receipt.schema.json",
+      "sha256": "a3816ed3a5cb446095d5e96439860663326485bf1dddd89a1333ca6a2df2a84e"
+    },
+    {
       "$id": "https://agentmaturity.co/spec/schemas/v1/registry.bench.schema.json",
       "name": "registry.bench.schema.json",
       "sha256": "29de696c9b0e7386cccaa3444d3ed8c6a78ead43ce62c891b46b4b6a1df8aaf0"
