@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -34,13 +34,13 @@ function tempHome(npmrc?: string): string {
 }
 afterEach(() => { for (const home of homes.splice(0)) rmSync(home, { recursive: true, force: true }); });
 
-function run(args: string[], env: Record<string, string>, home: string): Promise<{ code: number; out: string }> {
+function run(args: string[], env: Record<string, string>, home: string, entry = script): Promise<{ code: number; out: string }> {
   // Start from the caller's environment minus every credential name, so the
   // developer's real tokens can neither leak into nor satisfy a test.
   const base: NodeJS.ProcessEnv = { ...process.env, HOME: home };
   for (const name of ENV_NAMES) delete base[name];
   return new Promise((done) => {
-    execFile(process.execPath, [script, ...args], { cwd: root, env: { ...base, ...env } }, (error, stdout, stderr) => {
+    execFile(process.execPath, [entry, ...args], { cwd: root, env: { ...base, ...env } }, (error, stdout, stderr) => {
       done({ code: error ? (typeof error.code === "number" ? error.code : 99) : 0, out: `${stdout}${stderr}` });
     });
   });
@@ -107,5 +107,24 @@ describe("credentials-presence-check", () => {
   test("exits 2 on an unknown action or argument", async () => {
     expect((await run(["--for", "nonsense"], {}, tempHome())).code).toBe(2);
     expect((await run(["--verbose"], {}, tempHome())).code).toBe(2);
+  });
+
+  test("runs the presence checker through an owned symlink instead of exiting with no report", async () => {
+    const home = tempHome();
+    const entry = join(home, "credential-check.mjs");
+    symlinkSync(script, entry);
+    const { code, out } = await run(["--for", "publish", "--json"], {
+      NPM_TOKEN: "public-npm-symlink-canary",
+      CHANGESETS_GITHUB_TOKEN: "public-github-symlink-canary"
+    }, home, entry);
+    expect(code).toBe(0);
+    expect(out.trim()).not.toBe("");
+    const report = JSON.parse(out) as Record<string, Entry>;
+    for (const name of ["NPM_TOKEN", "CHANGESETS_GITHUB_TOKEN"]) {
+      expect(Object.keys(report[name]).sort()).toEqual(["configureAt", "present", "requiredFor"]);
+      expect(report[name].present).toBe(true);
+    }
+    expect(out).not.toContain("public-npm-symlink-canary");
+    expect(out).not.toContain("public-github-symlink-canary");
   });
 });

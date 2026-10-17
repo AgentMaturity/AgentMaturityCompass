@@ -40,6 +40,7 @@
     "api:start": "tsx api/index.ts",
     "api:build": "node scripts/build-standalone-api.mjs",
     "api:start:production": "node dist/standalone-api.js",
+    "deploy:verify": "node scripts/deploy-verify.mjs",
     "lint": "oxlint --type-aware --deny-warnings -c .oxlintrc.json src && node scripts/lint-contract.mjs && node scripts/check-no-fabrication.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",
