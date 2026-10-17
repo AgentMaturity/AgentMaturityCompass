@@ -160,7 +160,14 @@ describe("amc init --regulated (P1-40)", () => {
     expect(layer0.length).toBeGreaterThan(0);
     expect(compiled.requirements.map((r: { controlId: string }) => r.controlId).sort()).toEqual(expect.arrayContaining(layer0));
     expect(plan!.unresolved.length).toBeGreaterThan(0);
-    expect(new Set(plan!.unresolved.flatMap((r) => r.missingFacts))).toEqual(new Set(["useCases", "jurisdictions"]));
+    // Layer 0 waits for useCases and jurisdictions; since P1-18 an unknown station may include `wealth`, so the Wealth
+    // overlay's controls also wait for stations.
+    const facts = new Set(plan!.unresolved.flatMap((r) => r.missingFacts));
+    expect(facts).toEqual(new Set(["useCases", "jurisdictions", "stations"]));
+    // The SDK page names exactly the facts this plan waits for.
+    const page = readFileSync(join(import.meta.dirname, "..", "docs", "sdk", "TYPESCRIPT_SDK.md"), "utf8").replace(/\s+/g, " ");
+    const stated = /plan stays blocked until you state (.+?) in the profile/.exec(page)?.[1] ?? "";
+    expect(new Set([...stated.matchAll(/`([A-Za-z]+)`/g)].map((m) => m[1]))).toEqual(facts);
     expect(existsSync(plan!.profilePath)).toBe(true);
     expect(activeControlPlan(ws), "activation needs stated facts and two other approvers").toBeNull();
   });

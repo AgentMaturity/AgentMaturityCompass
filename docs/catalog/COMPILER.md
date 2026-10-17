@@ -232,10 +232,20 @@ The `compiled-policy` guard runs first in the native pipeline and fails closed:
   that exited on its own) and at archive; a resumed runtime revokes the previous runtime's lease only after it holds
   the writer claim, so a refused resume leaves another process's live runtime alone. When the active plan does not
   verify or no lease can be minted (the lease signing key is unavailable), the runtime is not started; when the
-  previous lease cannot be revoked, the resumed runtime is stopped. A native session without a verified lease (a task
-  started before this change or under a plan that did not require one, a CLI agent session, an `amc acp` process
-  nobody handed a lease) is still denied every call under a plan with `L0-IDN-01`. Under a plan that does not require
-  a lease, no lease is minted or bound;
+  previous lease cannot be revoked, the resumed runtime is stopped. Under a plan whose `identity-binding` requires a
+  principal, a CLI agent run (`amc agent-loop run`, which `amc agent-loop chat` drives) and each `amc acp` session (at
+  `session/new`, `session/load` and `session/fork`, where an operator's fork factory receives the child's lease as
+  `leaseToken`; the SDK's `AMCNativeClient` runs `amc acp`) with workspace tools mint their own
+  lease through `issueLeaseForPrincipal` (P1-79, `src/leases/runLease.ts`): `toolhub:execute`, at most one hour, naming
+  the ACTIVE `users.yaml` user whose username is the OS account running the process, read from the verified file and
+  never from a flag, an environment variable or a request body. That is a local binding: whoever runs as that OS
+  account and can unlock the vault's lease key acts as that user. No such user, or a `users.yaml` that does not
+  verify, refuses `PRINCIPAL_UNRESOLVED` before any session row or lease exists: the CLI exits non-zero, and ACP
+  answers -32602 with `data.reason` `PRINCIPAL_UNRESOLVED`. A lease Studio handed an `amc acp` child is kept, and a run
+  without workspace tools mints none. A native session without a verified lease (a task started before P1-67 or under
+  a plan that did not require one, a delegated child, an in-process `openAgentSession` caller that passes none) is
+  still denied every call under a plan with `L0-IDN-01`, and so is every call after a run's one-hour lease expires
+  (a new run, or a new or loaded ACP session, mints another). Under a plan that requires neither, no lease is minted or bound;
 - any other compiled guard id denies, because this pipeline does not implement it;
 - for an action class with a compiled approval rule, the live signed approval policy must be at least as strict
   (approvals, distinct users, roles, TTL), read and verified in one read, or the call is denied;
