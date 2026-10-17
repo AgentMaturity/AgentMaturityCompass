@@ -145,13 +145,15 @@ export async function copySpec(output) {
   mkdirSync(dirname(indexTarget), { recursive: true });
   copyFileSync(indexPath, indexTarget);
   for (const row of index.schemas) {
-    const source = resolve(specRoot, "schemas/v1", row.name);
-    assertInside(resolve(specRoot, "schemas/v1"), source, `Schema ${row.name}`);
+    // A name is a file in v1/, or `v2/<file>` for a v2 record.
+    const path = row.name.startsWith("v2/") ? row.name : `v1/${row.name}`;
+    const source = resolve(specRoot, "schemas", path);
+    assertInside(resolve(specRoot, "schemas"), source, `Schema ${row.name}`);
     const bytes = readFileSync(source);
-    if (sha256(bytes) !== row.sha256) throw new Error(`spec/schemas/v1/${row.name} does not match spec/schemas/index.json: run npm run gen:schemas`);
+    if (sha256(bytes) !== row.sha256) throw new Error(`spec/schemas/${path} does not match spec/schemas/index.json: run npm run gen:schemas`);
     const url = new URL(row.$id);
     if (url.origin !== "https://agentmaturity.co") throw new Error(`Schema $id is not served by this site: ${row.$id}`);
-    for (const target of new Set([resolve(output, "spec/schemas/v1", row.name), resolve(output, url.pathname.slice(1))])) {
+    for (const target of new Set([resolve(output, "spec/schemas", path), resolve(output, url.pathname.slice(1))])) {
       assertInside(output, target, `Schema target ${row.$id}`);
       mkdirSync(dirname(target), { recursive: true });
       writeFileSync(target, bytes);

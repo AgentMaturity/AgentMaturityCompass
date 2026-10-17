@@ -1,0 +1,32 @@
+{
+  "list": {
+    "type": "amc.trust-list",
+    "version": 1,
+    "listId": "p1-27-qualification",
+    "sequence": 1,
+    "issuedAt": "2026-10-01T00:00:00.000Z",
+    "expiresAt": "2027-10-01T00:00:00.000Z",
+    "entries": [
+      {
+        "keyId": "62a2797313d9a7593b6cef66e59ef667e9c1c80ff343b81eb1976ac250257eff",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA/liD7ATifxozFVmgV1UzXrnfUy1/XmMTIcgt0n6BlnM=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "artifact-seal"
+        ],
+        "subject": "TEST ONLY qualification workspace artifact-seal key",
+        "validFrom": "2026-10-01T00:00:00.000Z",
+        "validTo": null,
+        "source": "operator"
+      }
+    ],
+    "distrust": []
+  },
+  "signatures": [
+    {
+      "keyId": "ae3bfde362b60070a3799cc1a66dec8b64af42cfc440127404156008879cedef",
+      "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAhdW8ShRKuSB5En+f3gW2V66pCfxPWnIYwrrcHjMnvXI=\n-----END PUBLIC KEY-----\n",
+      "signature": "eSHiayXBWbiP/zFVOsN3yP8GsztCLgAQSvnqcFPA9FGTgwHtWYZacHg2yM4QNCA7qNqi/PNfIcv/cpt7fkJGAg=="
+    }
+  ]
+}

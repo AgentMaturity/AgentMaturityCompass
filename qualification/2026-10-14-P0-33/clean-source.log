@@ -1,0 +1,20 @@
+
+> agent-maturity-compass@1.2.0 check:clean-source /Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014
+> node scripts/clean-source-check.mjs
+
+clean-source check of e3c17376 in /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Ugeflj
+ok   git clone (committed tree only) (3.1s)
+ok   git checkout pinned commit (0.5s)
+ok   pnpm install --frozen-lockfile (6.8s)
+ok   pnpm run build (31.7s)
+ok   amc doctor (1.8s)
+ok   amc init (isolated workspace) (1.4s)
+ok   keyless native tool turn (1.0s)
+ok   amc session verify --json (0.8s)
+ok   amc agent-loop verify --json (0.8s)
+ok   signed evidence and request reconstruction (1 expected turns)
+ok   process A: leave a completed turn open for resume (0.9s)
+ok   process B: resume and seal the same session (0.9s)
+ok   amc session verify --json (0.8s)
+ok   amc agent-loop verify --json (0.8s)
+ok   signed evidence and request reconstruction (2 expected turns)

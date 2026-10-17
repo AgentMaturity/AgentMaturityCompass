@@ -58,7 +58,7 @@ function buildArtifact(env: Record<string, string> = {}): string {
 
 afterAll(() => {
   for (const directory of temporaryRoots) rmSync(directory, { recursive: true, force: true });
-});
+}, 120_000);
 
 describe("public Docs Pages artifact", () => {
   test("uses only same-origin runtime inputs and a lockfile-pinned renderer", () => {

@@ -1,0 +1,23 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "type": "application",
+      "bom-ref": "amc:agent:agent-payments",
+      "name": "agent-payments"
+    },
+    "properties": [
+      {
+        "name": "amc:aibom.status",
+        "value": "Experimental"
+      },
+      {
+        "name": "amc:unknown",
+        "value": "TEST ONLY fixture AIBOM: every model fact"
+      }
+    ]
+  },
+  "components": []
+}

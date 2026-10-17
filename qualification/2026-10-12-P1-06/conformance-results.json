@@ -1,0 +1,285 @@
+{
+  "suite": "amc-verifier-fixtures",
+  "version": "v1",
+  "implementation": "amc-verify@0.1.0",
+  "ranAt": "2026-10-12T00:18:28.526Z",
+  "passed": 55,
+  "failed": 0,
+  "cases": [
+    {
+      "case": "backdated",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "claimed-result-failed",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "contradictory",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "cross-tenant",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "distrusted-after-claim",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "distrusted-key",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "distrusted-root-in-another-list",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "empty",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "evaluated-after-issuance",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "excluded-failing-control",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "external-evidence-digest-mismatch",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "external-evidence-tier-inflated",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "external-evidence-unsigned",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "external-evidence-wrong-producer",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "foreign-evidence",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "forged-embedded-key",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "forked-trust-list",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "key-compromise-rotation-without-root",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "key-expired",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "key-not-yet-valid",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "legacy-receipt",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "malformed",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "missing-evidence",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "not-yet-valid",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "outcome-unknown",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "replayed",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "review-rejected-pass",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "revoked-key-compromise",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "revoked-superseded-as-of-before-revocation",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "revoked-superseded-earlier-claim",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "rollback-revocation-list",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "root-threshold-downgrade",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "rotated-out-key-earlier-claim",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "rotation-chain-head-not-first",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "scoped-attestation-v1",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "self-reported-result",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "stale-attestation",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "stale-list-beside-newer",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "stale-trust-list",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "tampered",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "trust-list-rollback",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "unanchored",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "unknown-field",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "unpinned-issuer",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "unreviewed-independent-claim",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "unsupported-version",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "untrusted-trust-list-root",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "valid-attestation",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "valid-external-evidence-attested",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "valid-key-rotation",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "valid-receipt",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "valid-revocation-list",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "valid-root-rotation",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "valid-trust-list",
+      "result": "pass",
+      "diff": null
+    },
+    {
+      "case": "wrong-purpose",
+      "result": "pass",
+      "diff": null
+    }
+  ]
+}

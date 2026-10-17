@@ -34,6 +34,10 @@ process.exitCode = result.ok ? 0 : 1;
 
 `ok` means the supplied structure, references, digests and any supplied signature/authority checks agree. An unsigned file with internally consistent hashes can be valid and still self-reported. It does not prove that a task ran, succeeded, complied with a policy, or earned a score. Protect independently received digests and admitted keys separately from the evidence.
 
+## Standalone verification
+
+`amc-verify` (`docs/STANDALONE_VERIFIER.md` in the repository) verifies a profile without AMC, a workspace or a network. Authorities come only from the signed trust lists you supply: the entry whose `keyId` equals `signature.authorityId` must hold the `evidence-authority` purpose and an `authority` that names the profile's producer and capture method (otherwise `ISSUER_WRONG_PURPOSE`); an unsigned profile names no signer (`ISSUER_NOT_PINNED`). Completeness needs at least one event, the original bytes (supplied as evidence and found by `source.originalSha256`) and a result for every tool call (otherwise `EMPTY_EVIDENCE`, `EVIDENCE_MISSING` or `OUTCOME_UNKNOWN`). Satisfaction recomputes the tier: a declared `trustTier` above what the admitted authority and capture method support fails (`CLAIMED_RESULT_FAILED`), and a `SELF_REPORTED` profile is not evaluated. The normative cases are committed in `spec/fixtures/v1/` (`valid-external-evidence-attested`, `external-evidence-tier-inflated`, `external-evidence-digest-mismatch`, `external-evidence-unsigned`, `external-evidence-wrong-producer`); the vectors under `examples/external-evidence` remain format examples.
+
 ## Contract
 
 Every field is required unless described as nullable. Unknown values use JSON `null`; absent data is not zero.

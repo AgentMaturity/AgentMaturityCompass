@@ -1,0 +1,14 @@
+{
+  "case": "valid-revocation-list",
+  "normative": true,
+  "dimensions": {
+    "integrity": "pass",
+    "issuerAdmission": "pass",
+    "scope": "not-evaluated",
+    "freshness": "pass",
+    "completeness": "pass",
+    "satisfaction": "not-evaluated"
+  },
+  "reasonCodes": {},
+  "exitCode": 3
+}

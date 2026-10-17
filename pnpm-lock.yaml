@@ -156,6 +156,8 @@ importers:
         specifier: ^4.0.9
         version: 4.0.9
 
+  packages/verifier: {}
+
   vendor/acp-schema: {}
 
   vendor/cordis:

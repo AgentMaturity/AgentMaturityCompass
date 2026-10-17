@@ -2,6 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
+import { findBannedWords } from "../scripts/check-release-notes.mjs";
 import { applyBlocks, bumpVersion, generateReleaseNotes, plannedVersion, readChangesets, renderBlocks, summaryOf }
   from "../scripts/release-notes.mjs";
 
@@ -66,10 +67,23 @@ describe("release notes generator (P0-34)", () => {
     ]);
   });
 
-  test("refuses notes without markers or a missing notes file", () => {
+  test("refuses notes without markers, and a breaking release without hand-written notes", () => {
     expect(() => applyBlocks("# no markers\n", { breaking: "", changes: "" })).toThrow(/release-notes:breaking/);
-    const root = fixture({ a: ["minor", "Add a."] }, NOTES(""));
-    expect(() => generateReleaseNotes(root, "1.2.0")).toThrow(/docs\/releases\/1\.2\.0\.md is missing/);
+    const root = fixture({ a: ["minor", "Add a."], b: ["major", "Breaking: drop b."] }, NOTES(""));
+    expect(() => generateReleaseNotes(root, "3.0.0")).toThrow(/docs\/releases\/3\.0\.0\.md is missing: a breaking release needs hand-written/);
+  });
+
+  test("P1-41: a weekly minor or patch release without notes gets train notes that pass every claim check", () => {
+    const root = fixture({ a: ["minor", "Add a."], b: ["patch", "Fix b."] }, NOTES(""));
+    const notes = generateReleaseNotes(root, "1.2.0");
+    expect(notes.before).toBe("");
+    expect(notes.problems).toEqual([]);
+    expect(notes.after).toMatch(/^# AMC 1\.2\.0\n/);
+    expect(notes.after).toContain("1.2.0 is a minor release from the weekly release train");
+    expect(notes.after).toContain("### New and changed behaviour\n\n- Add a. (`a`)\n\n### Fixes\n\n- Fix b. (`b`)\n");
+    expect(notes.after).toContain("amc release verify amc-1.2.0.amcrelease --pubkey amc-release-signing.pub");
+    expect(findBannedWords(notes.after)).toEqual([]);
+    expect(applyBlocks(notes.after, renderBlocks(readChangesets(root)))).toBe(notes.after);
   });
 
   test("summaries stop at a sentence boundary and never cut an abbreviation", () => {

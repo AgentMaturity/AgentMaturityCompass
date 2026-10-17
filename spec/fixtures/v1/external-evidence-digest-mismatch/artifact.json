@@ -1,0 +1,66 @@
+{
+  "profile": "amc.external-evidence",
+  "version": 1,
+  "source": {
+    "producer": "pi-callback",
+    "version": "3.0.0",
+    "originalSha256": "b7d04ddac4a7354f1f74df2fd08ad5cda78852de536d6ab6cd4217f5d35caa43",
+    "mediaType": "application/jsonl"
+  },
+  "session": {
+    "id": "session-ext-1",
+    "parentSessionId": null
+  },
+  "provenance": {
+    "trustTier": "ATTESTED",
+    "captureMethod": "producer-callback",
+    "authorityId": "43985d6868178b4fad2cb158bdd559b2eb5ed8533bedaa010f75dd87eaa4cd11"
+  },
+  "normalization": {
+    "normalizer": "amc-normalizer/1",
+    "normalizedSha256": "938e746ee72755c75e02166ace7601fd2bc470abd605e3f3ccee40f09dc4ece8",
+    "ingestedAt": "2026-09-03T00:00:00.000Z",
+    "losses": []
+  },
+  "policyRefs": [],
+  "events": [
+    {
+      "id": "e1",
+      "parentId": null,
+      "toolCallId": null,
+      "kind": "input",
+      "outcome": null,
+      "sourceTime": "2026-09-02T23:00:00.000Z",
+      "durationNs": null,
+      "cost": null,
+      "attributes": {}
+    },
+    {
+      "id": "e2",
+      "parentId": "e1",
+      "toolCallId": "call-1",
+      "kind": "tool-call",
+      "outcome": null,
+      "sourceTime": "2026-09-02T23:00:00.000Z",
+      "durationNs": null,
+      "cost": null,
+      "attributes": {}
+    },
+    {
+      "id": "e3",
+      "parentId": "e2",
+      "toolCallId": "call-1",
+      "kind": "tool-result",
+      "outcome": "success",
+      "sourceTime": "2026-09-02T23:00:00.000Z",
+      "durationNs": null,
+      "cost": null,
+      "attributes": {}
+    }
+  ],
+  "signature": {
+    "algorithm": "ed25519",
+    "authorityId": "43985d6868178b4fad2cb158bdd559b2eb5ed8533bedaa010f75dd87eaa4cd11",
+    "value": "bXpzyIYlT8ujKbQ2E2Nv+FAvQCW97Jt9r6NfeE+CfdKx3MJGddPvcqV19Cevm7rJaW6YbtMHD/t3t0CVBpSXCw=="
+  }
+}

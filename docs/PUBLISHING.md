@@ -35,7 +35,7 @@ The `release` job fails instead of skipping:
 - no `AMC_RELEASE_SIGNING_KEY` in the environment, or no committed release public key at `trust/amc-release-signing.pub` (P0-37): the job fails before anything is published;
 - no npm credential: `npm publish` fails, and so does the job. The only skip left is "this version is already on npm".
 
-`npm-publish.yml` only opens version PRs (when `CHANGESETS_GITHUB_TOKEN` is set), through `release-prepare.mjs --version-only`; it never publishes, tags or creates a release. The changesets CLI itself cannot version this repository: `pnpm-workspace.yaml` lists only `vendor/*` and `packages/*`, so `changeset version` and `changeset status` never see the root package (since the 2026-08-22 vendoring). `pnpm release` no longer publishes from a shell: it exits 1 and points here.
+`npm-publish.yml` only opens version PRs (when `CHANGESETS_GITHUB_TOKEN` is set), through `release-prepare.mjs --version-only`, on every push to `main`, every Tuesday at 09:00 UTC and on manual dispatch (P1-41 weekly train, [RELEASE_CADENCE.md](RELEASE_CADENCE.md)); it never publishes, tags or creates a release. Its default permission is `contents: read`; only the `version-pr` job holds `contents: write` and `pull-requests: write`, and its checkout keeps no credentials, so changesets/action pushes with `CHANGESETS_GITHUB_TOKEN` and CI runs on the version PR. The changesets CLI itself cannot version this repository: `pnpm-workspace.yaml` lists only `vendor/*` and `packages/*`, so `changeset version` and `changeset status` never see the root package (since the 2026-08-22 vendoring). `pnpm release` no longer publishes from a shell: it exits 1 and points here.
 
 ### Needs Sid: the `release` environment (P0-38)
 
@@ -49,6 +49,18 @@ The workflow cannot create this protection itself: GitHub creates an unprotected
 6. A tag ruleset that lets only Sid create, move or delete `v*` tags (P0-38 step 6).
 
 On the first tag, check that the `approve` job logs the number of required reviewers. Not verified: whether the workflow's `GITHUB_TOKEN` (with `actions: read`) may read the environment's protection rules. If that call is refused, the release stops there, by design; grant the read or ask for a change, but do not remove the check.
+
+### Needs Sid: the weekly release train (P1-41)
+
+The workflows are in the repository; these settings are not, and only Sid can make them:
+
+1. **Version PR token.** Repository secret `CHANGESETS_GITHUB_TOKEN`: a fine-grained personal access token for `AgentMaturity/AgentMaturityCompass` only, with Contents and Pull requests read and write and nothing else. Set an expiry and a calendar reminder (P0-38): an expired token stops the version PR silently. Without it, `npm-publish.yml` logs a notice and opens no PR.
+2. **Schedule.** Confirm the release weekday and UTC time. The defaults are `cron: "0 9 * * 2"` (Tuesday 09:00 UTC, the version PR) in `npm-publish.yml` and `cron: "0 6 * * 1"` (Monday 06:00 UTC, the distribution figure) in `post-publish-verify.yml`; Wednesday is release day. For the single-maintainer scope (D-01 option B) keep the schedule and merge monthly.
+3. **Branch protection on `main`.** A ruleset that requires a pull request and the CI checks `build-test (22)`, `build-test (24)` (they include the release-notes claim-word check) and `changeset`, so a version PR merges only when green. Keep "Allow GitHub Actions to create and approve pull requests" off: the version PR is opened with the token above, not the workflow token.
+4. **Release environment.** The `release` environment with required reviewers and the `v*.*.*` tag rule (above) gates every weekly release; the train adds nothing to it.
+5. **GHCR visibility.** Make `amc-studio` public, or `post-publish-verify.yml` reports the image as not pullable anonymously.
+6. **After each release.** Merge the post-publish pins PR that records the version in `website/publication-status.json`; `release:prepare` plans the next version from it.
+7. **PyPI: held per D-12.** No PyPI workflow exists. If D-12 later publishes the Python SDK, first register a pending publisher on pypi.org (project `amc-sdk`, owner `AgentMaturity`, repository `AgentMaturityCompass`, workflow `pypi-publish.yml`, environment `pypi`), then add that workflow with its contract test.
 
 ### npm credentials (P0-38 picks one)
 
@@ -258,19 +270,7 @@ Users run `curl -fsSL https://agentmaturity.co/install.sh | sh` on macOS/Linux o
 
 ## Release Checklist
 
-```
-[ ] npm run release:prepare -- <version> passes; review and commit its result
-[ ] Merge to `main`, then create and push the matching annotated tag
-[ ] Approve the `release` environment run only for that version
-[ ] Release CI passes tests, builds, package verification, and checksums
-[ ] GitHub Release contains all three platform archives, npm-format tarball, manifest, and `SHA256SUMS`
-[ ] Run both checksum-negative and clean-install verification
-[ ] Verify Docker image visibility before publishing its pull command
-[ ] Verify npm independently before marking its channel available
-[ ] Verify Homebrew independently before marking its channel available
-[ ] Website install tabs updated if version shown
-[ ] Tweet / announce in community
-```
+Each release uses the copyable [release checklist](program/release-checklist.md); the [release runbook](RELEASE_RUNBOOK.md) has the commands.
 
 ---
 
@@ -281,5 +281,5 @@ Users run `curl -fsSL https://agentmaturity.co/install.sh | sh` on macOS/Linux o
 | `AMC_RELEASE_SIGNING_KEY` | Signs the .amcrelease bundle (base64 PEM); the release fails without it |
 | `NPM_TOKEN` | Only for token publishing; trusted publishing needs no secret |
 | `HOMEBREW_TAP_TOKEN` | Pushes formula updates once the tap exists and `AMC_HOMEBREW_TAP=enabled`; the job fails without it then |
-| `CHANGESETS_GITHUB_TOKEN` | Repository secret for `npm-publish.yml` version PRs only |
+| `CHANGESETS_GITHUB_TOKEN` | Repository secret for `npm-publish.yml` version PRs only (fine-grained, this repository, Contents and Pull requests write) |
 | `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` | Docker Hub push (optional; not wired) |

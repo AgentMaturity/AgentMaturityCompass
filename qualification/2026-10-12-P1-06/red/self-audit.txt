@@ -1,0 +1,12 @@
+# RED: npx vitest run tests/verifier on 0fcd97035 plus the new self-audit tests and fixtures, before the fix (9ccb71250)
+     × refuses a root threshold above the pinned roots as a usage error 4ms
+     × refuses a root threshold of zero as a usage error 1ms
+     × --root-threshold reaches the trust lists 12ms
+     × distrusted-after-claim 6ms
+     × revoked-superseded-earlier-claim 2ms
+     × root-threshold-downgrade 2ms
+     × rotated-out-key-earlier-claim 2ms
+     × admission never rests on the record's claimed time: only the verifier's as-of time decides it 5ms
+     × passes 100% of the cases and writes conformance-results.json 5103ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  9 failed | 101 passed (110)

@@ -10,7 +10,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "json-summary"],
-      include: ["src/**/*.ts"],
+      include: ["src/**/*.ts", "packages/verifier/src/**/*.ts"],
       exclude: ["tests/**", "src/console/**", "src/dashboard/**"],
       /**
        * Enforced floor, set just below the measured baseline so a real

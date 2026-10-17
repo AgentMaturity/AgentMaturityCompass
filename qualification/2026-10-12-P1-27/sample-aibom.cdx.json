@@ -1,0 +1,761 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:f8ad9a28-60c4-4e64-a9a7-9a2b5824be08",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-10-12T01:02:48.496Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "bom-ref": "amc:generator",
+          "name": "agent-maturity-compass",
+          "version": "1.2.0"
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "bom-ref": "amc:agent:default",
+      "name": "default",
+      "properties": [
+        {
+          "name": "amc:workspace",
+          "value": "default"
+        },
+        {
+          "name": "amc:agent.role",
+          "value": "assistant"
+        },
+        {
+          "name": "amc:agent.domain",
+          "value": "general"
+        },
+        {
+          "name": "amc:agent.riskTier",
+          "value": "med"
+        },
+        {
+          "name": "amc:provider.template",
+          "value": "openai"
+        },
+        {
+          "name": "amc:provider.route",
+          "value": "/openai"
+        },
+        {
+          "name": "amc:provider.upstream",
+          "value": "openai"
+        }
+      ]
+    },
+    "properties": [
+      {
+        "name": "amc:aibom.status",
+        "value": "experimental"
+      },
+      {
+        "name": "amc:unknown",
+        "value": "datasets: none declared"
+      },
+      {
+        "name": "amc:unknown",
+        "value": "agent-maturity-compass: package digest"
+      },
+      {
+        "name": "amc:unknown",
+        "value": "model fixture-model-1: version"
+      },
+      {
+        "name": "amc:unknown",
+        "value": "model fixture-model-1: modelCard"
+      },
+      {
+        "name": "amc:unknown",
+        "value": "model fixture-model-1: licenses"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "machine-learning-model",
+      "bom-ref": "amc:model:fixture-model-1",
+      "name": "fixture-model-1",
+      "supplier": {
+        "name": "openai"
+      },
+      "properties": [
+        {
+          "name": "amc:source",
+          "value": "signed adapters configuration"
+        },
+        {
+          "name": "amc:provider.route",
+          "value": "/openai"
+        },
+        {
+          "name": "amc:preferred",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "type": "data",
+      "bom-ref": "amc:system-prompt:52d9b04cb2b962af",
+      "name": "system-prompt:52d9b04cb2b962af",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "52d9b04cb2b962af0698973e48f0e37b1a49e66905caf0bf99f185682cf25d70"
+        }
+      ],
+      "data": [
+        {
+          "type": "configuration",
+          "name": "system-prompt:52d9b04cb2b962af"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:kind",
+          "value": "system-prompt"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/action-policy.yaml",
+      "name": ".amc/action-policy.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "9c8c51f1a6162459d67eb349abbbc3ac7e1253eea1ae7975a41bd4b2c87fa104"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/adapters.yaml",
+      "name": ".amc/adapters.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "05e1887f9f7221faeeefc7d496065a8c8d1679cdc79ed8f49f4ea8181e9d2416"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/agent.config.yaml",
+      "name": ".amc/agent.config.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "7929df2d87593769c9ef6d0bc2e4e4b049cc6fcfeef7ffc4cbd8f842dcf4643b"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/amc.config.yaml",
+      "name": ".amc/amc.config.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "2d9b480fe7694b76156b1dc7633167c6dfe290b33f02c458e84ca2887d3de935"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/assurance/policy.yaml",
+      "name": ".amc/assurance/policy.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "bbd681c5807233f7590e499f835c5717dc656439e524ae910413e4e8469b8623"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/audit/maps/active.yaml",
+      "name": ".amc/audit/maps/active.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "690eee72aab355c886fcb4bd3e248aaad0386c981f9d932f37792c805c7993ae"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/audit/maps/builtin.yaml",
+      "name": ".amc/audit/maps/builtin.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "690eee72aab355c886fcb4bd3e248aaad0386c981f9d932f37792c805c7993ae"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/audit/policy.yaml",
+      "name": ".amc/audit/policy.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "854ec597fa4f5d4c9a59e08e989cd7b7e41bfca8adbe51f34750e269179fff59"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/bench/policy.yaml",
+      "name": ".amc/bench/policy.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "a3bcb8e7a502bc6e396c9516950fbe58283069953fa8f1c5a749206772111c36"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/bridge.yaml",
+      "name": ".amc/bridge.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "9fac7907041631982f77b57b692cbbf61cd46f94bd3bc4be2026d62ed8fa4350"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/budgets.yaml",
+      "name": ".amc/budgets.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "eadcd79d9ac72fa608dcbeb5b9ffa2f77430dcd687d0ec96d2f45e87d1cbea52"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/canon/canon.yaml",
+      "name": ".amc/canon/canon.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "4156c99d6dff2ae65279c28ffe9c978a04de60d115f5dac47488e29fa5ac18fe"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/cgx/policy.yaml",
+      "name": ".amc/cgx/policy.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "db84a129a529c04c167176020149521ac23d9ab553b538026c6b7b54cb98e8c5"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/diagnostic/bank/bank.yaml",
+      "name": ".amc/diagnostic/bank/bank.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "609ba843a068df9410042bab698531ad55a64dfeac9a882bbd5f36d4edfd1fee"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/fleet.yaml",
+      "name": ".amc/fleet.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "c65de7d214e64993cb38fcc9c854ef31b4218c05bfa04e3ee853ecf404ce2e0a"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/forecast/policy.yaml",
+      "name": ".amc/forecast/policy.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "fe083f2f1602a057827e73cc7ecc90b18cbdef69d97b3771705b8609c7cf704a"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/gateway.yaml",
+      "name": ".amc/gateway.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "fe6ad26df7c2a48b6eb53529092116473f9d3e57d4b206b30205c73908a36c4c"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/mechanic/profiles.yaml",
+      "name": ".amc/mechanic/profiles.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "fdea1cd1d9005fe22e66b16849fa0319813421e803251c2cefb4f27e6d314b50"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/mechanic/targets.yaml",
+      "name": ".amc/mechanic/targets.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "8cd9fc363e307bf38a6386c4ff4e3a118250bfbd57bb120f6d560640bc921bf8"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/mechanic/tuning.yaml",
+      "name": ".amc/mechanic/tuning.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "c1522312524fa64b7b2ea527abfdf9c34fd08f261e4d0751ccddc3766f1ab9d0"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/model-taxonomy.yaml",
+      "name": ".amc/model-taxonomy.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "1b0de0272af89cc648ad6e3a0c53c0672f6bb6e3748e72784e2f3a1762d70c44"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/ops-policy.yaml",
+      "name": ".amc/ops-policy.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "b3554faece681eae3fec9e8bc19bb62a5dfe2e9979fa6f9e05e3fb32ba877a06"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/prompt/policy.yaml",
+      "name": ".amc/prompt/policy.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "2237af4bf3691bc3147a93b16039ced81f4270a905ba4a032a1afcc22fe874f2"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/tools.yaml",
+      "name": ".amc/tools.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "5c905e75193056ed990b41424c28c79ae10920f70682141e58d9dad1b7d83549"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "amc:file:.amc/trust.yaml",
+      "name": ".amc/trust.yaml",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "2ff211a35563f4d1784e59c68424d6a1970ce86f056e36afa1afa5bba7230344"
+        }
+      ],
+      "properties": [
+        {
+          "name": "amc:signature",
+          "value": "verified"
+        }
+      ]
+    },
+    {
+      "type": "application",
+      "bom-ref": "amc:runtime",
+      "name": "agent-maturity-compass",
+      "version": "1.2.0"
+    }
+  ],
+  "services": [
+    {
+      "bom-ref": "amc:tool:fs.read",
+      "name": "fs.read",
+      "properties": [
+        {
+          "name": "amc:tool.actionClass",
+          "value": "READ_ONLY"
+        },
+        {
+          "name": "amc:tool.context",
+          "value": "native"
+        }
+      ]
+    },
+    {
+      "bom-ref": "amc:tool:fs.write",
+      "name": "fs.write",
+      "properties": [
+        {
+          "name": "amc:tool.actionClass",
+          "value": "WRITE_LOW"
+        },
+        {
+          "name": "amc:tool.context",
+          "value": "native"
+        }
+      ]
+    },
+    {
+      "bom-ref": "amc:tool:fs.edit",
+      "name": "fs.edit",
+      "properties": [
+        {
+          "name": "amc:tool.actionClass",
+          "value": "WRITE_LOW"
+        },
+        {
+          "name": "amc:tool.context",
+          "value": "native"
+        }
+      ]
+    },
+    {
+      "bom-ref": "amc:tool:glob",
+      "name": "glob",
+      "properties": [
+        {
+          "name": "amc:tool.actionClass",
+          "value": "READ_ONLY"
+        },
+        {
+          "name": "amc:tool.context",
+          "value": "native"
+        }
+      ]
+    },
+    {
+      "bom-ref": "amc:tool:grep",
+      "name": "grep",
+      "properties": [
+        {
+          "name": "amc:tool.actionClass",
+          "value": "READ_ONLY"
+        },
+        {
+          "name": "amc:tool.context",
+          "value": "native"
+        }
+      ]
+    },
+    {
+      "bom-ref": "amc:tool:bash",
+      "name": "bash",
+      "properties": [
+        {
+          "name": "amc:tool.actionClass",
+          "value": "WRITE_HIGH"
+        },
+        {
+          "name": "amc:tool.context",
+          "value": "native"
+        }
+      ]
+    },
+    {
+      "bom-ref": "amc:tool:git.status",
+      "name": "git.status",
+      "properties": [
+        {
+          "name": "amc:tool.actionClass",
+          "value": "READ_ONLY"
+        },
+        {
+          "name": "amc:tool.context",
+          "value": "native"
+        }
+      ]
+    },
+    {
+      "bom-ref": "amc:tool:git.commit",
+      "name": "git.commit",
+      "properties": [
+        {
+          "name": "amc:tool.actionClass",
+          "value": "WRITE_LOW"
+        },
+        {
+          "name": "amc:tool.context",
+          "value": "native"
+        }
+      ]
+    },
+    {
+      "bom-ref": "amc:tool:git.push",
+      "name": "git.push",
+      "properties": [
+        {
+          "name": "amc:tool.actionClass",
+          "value": "DEPLOY"
+        },
+        {
+          "name": "amc:tool.context",
+          "value": "native"
+        }
+      ]
+    },
+    {
+      "bom-ref": "amc:tool:http.fetch",
+      "name": "http.fetch",
+      "properties": [
+        {
+          "name": "amc:tool.actionClass",
+          "value": "NETWORK_EXTERNAL"
+        },
+        {
+          "name": "amc:tool.context",
+          "value": "native"
+        }
+      ]
+    },
+    {
+      "bom-ref": "amc:tool:process.spawn",
+      "name": "process.spawn",
+      "properties": [
+        {
+          "name": "amc:tool.actionClass",
+          "value": "WRITE_HIGH"
+        },
+        {
+          "name": "amc:tool.context",
+          "value": "native"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "amc:agent:default",
+      "dependsOn": [
+        "amc:model:fixture-model-1",
+        "amc:system-prompt:52d9b04cb2b962af",
+        "amc:file:.amc/action-policy.yaml",
+        "amc:file:.amc/adapters.yaml",
+        "amc:file:.amc/agent.config.yaml",
+        "amc:file:.amc/amc.config.yaml",
+        "amc:file:.amc/assurance/policy.yaml",
+        "amc:file:.amc/audit/maps/active.yaml",
+        "amc:file:.amc/audit/maps/builtin.yaml",
+        "amc:file:.amc/audit/policy.yaml",
+        "amc:file:.amc/bench/policy.yaml",
+        "amc:file:.amc/bridge.yaml",
+        "amc:file:.amc/budgets.yaml",
+        "amc:file:.amc/canon/canon.yaml",
+        "amc:file:.amc/cgx/policy.yaml",
+        "amc:file:.amc/diagnostic/bank/bank.yaml",
+        "amc:file:.amc/fleet.yaml",
+        "amc:file:.amc/forecast/policy.yaml",
+        "amc:file:.amc/gateway.yaml",
+        "amc:file:.amc/mechanic/profiles.yaml",
+        "amc:file:.amc/mechanic/targets.yaml",
+        "amc:file:.amc/mechanic/tuning.yaml",
+        "amc:file:.amc/model-taxonomy.yaml",
+        "amc:file:.amc/ops-policy.yaml",
+        "amc:file:.amc/prompt/policy.yaml",
+        "amc:file:.amc/tools.yaml",
+        "amc:file:.amc/trust.yaml",
+        "amc:runtime",
+        "amc:tool:fs.read",
+        "amc:tool:fs.write",
+        "amc:tool:fs.edit",
+        "amc:tool:glob",
+        "amc:tool:grep",
+        "amc:tool:bash",
+        "amc:tool:git.status",
+        "amc:tool:git.commit",
+        "amc:tool:git.push",
+        "amc:tool:http.fetch",
+        "amc:tool:process.spawn"
+      ]
+    }
+  ]
+}
