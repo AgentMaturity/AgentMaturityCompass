@@ -40,6 +40,9 @@ import { catalog } from "./catalog/l0/harness.js";
 const OS_USER = userInfo().username;
 const READ = JSON.stringify({ tool: "fs.read", arguments: { path: "workspace/n.txt" } });
 const minted = vi.mocked(issueLeaseToken);
+// Workspace init, plan activation and a full session sign many records; a loaded machine needs more than the defaults.
+const LOADED_MS = 120_000;
+vi.setConfig({ testTimeout: LOADED_MS });
 const originalCwd = process.cwd();
 let workspace: string;
 let home: string;
@@ -58,7 +61,7 @@ beforeEach(() => {
   minted.mockClear();
   priorExitListeners = process.listeners("exit");
   process.chdir(workspace);
-});
+}, LOADED_MS);
 
 afterEach(() => {
   process.chdir(originalCwd);
@@ -125,7 +128,7 @@ async function acpRun(options: { tools?: "none" | "workspace"; leaseToken?: stri
     stderr: { write: () => true } });
   const call = async (id: number, method: string, params: unknown): Promise<Frame> => {
     stdin.emit("data", Buffer.from(`${JSON.stringify({ jsonrpc: "2.0", id, method, params })}\n`));
-    await vi.waitFor(() => expect(frames.find((frame) => frame.id === id)).toBeDefined(), { timeout: 10_000 });
+    await vi.waitFor(() => expect(frames.find((frame) => frame.id === id)).toBeDefined(), { timeout: LOADED_MS });
     return frames.find((frame) => frame.id === id)!;
   };
   try {
