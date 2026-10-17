@@ -1,0 +1,111 @@
+{
+ "schemaVersion": 1,
+ "key": "P1-48",
+ "date": "2026-10-12",
+ "commit": "782aec4736839d0c07ff3daa9fbc3468e21a10ae",
+ "branch": "rtd/p1-48-adversarial-effects-suite",
+ "node": "v25.5.0",
+ "pnpm": "10.33.0",
+ "os": "darwin 25.6.0, local, not CI",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 48515
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 42427
+  },
+  {
+   "cmd": "npm run -s typecheck:tests (first run)",
+   "exit": 2,
+   "durationMs": 55229
+  },
+  {
+   "cmd": "npm run -s typecheck:tests (after 04fa93b82)",
+   "exit": 0,
+   "durationMs": 43000
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 6236
+  },
+  {
+   "cmd": "npm run -s check:counts (first run)",
+   "exit": 1,
+   "durationMs": 1197
+  },
+  {
+   "cmd": "npm run -s check:counts (after 782aec473)",
+   "exit": 0,
+   "durationMs": 795
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 731
+  },
+  {
+   "cmd": "npm run -s check:freeze",
+   "exit": 1,
+   "durationMs": 2832
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0,
+   "durationMs": 2580
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 546
+  },
+  {
+   "cmd": "npm run -s check:schemas",
+   "exit": 0,
+   "durationMs": 1362
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 389
+  },
+  {
+   "cmd": "npm run -s check:threat-model",
+   "exit": 0,
+   "durationMs": 396
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 2607
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 6971
+  },
+  {
+   "cmd": "npx vitest run tests/adversarialSuiteGenerator.test.ts tests/adversarialSuiteObserver.test.ts tests/adversarialSuiteOracle.test.ts",
+   "exit": 0,
+   "durationMs": 1300
+  }
+ ],
+ "tests": {
+  "total": 16,
+  "passed": 16,
+  "failed": 0,
+  "skipped": 0
+ },
+ "artifacts": [
+  {
+   "path": "README.md",
+   "sha256": "3c99450d0b6254fc49830a560a7fbcf010eeb4dadde71ccc7d5ad77573298e84"
+  }
+ ],
+ "notes": "Suite infrastructure only. No AMC attack success rate is claimed; the AMC adapter and results are pending. Adapter shake-out (draft amc-native adapter, not shipped): 800 trials, seed smoke, concurrency 3, wall 172.2 s: 725 pass, 50 fail, 25 inconclusive. The 50 failures were adapter bugs, not AMC findings; the 25 inconclusive are symlink escapes that need P1-05 OS containment. Mutation checks: (1) observer diffManifests always reporting unchanged made 2 observer tests fail; (2) the oracle ignoring observer health made the unhealthy-observer test fail; both restored. check:freeze exit 1 is inherited from int: the P1-65 freeze exception in int's .changeset/a4-cli.md is not in origin/main's freeze-baseline allowedExceptionKeys; P1-48 adds no freeze-exception line. check:qualification is run after this receipt is written. examples/adversarial-suite/cases.json sha256 680ce4f921f7d179bc590e582b3964477cd2e0c12cc112caa2f41a382d2f553c."
+}

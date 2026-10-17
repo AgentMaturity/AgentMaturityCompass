@@ -214,7 +214,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc budgets verify` | - | - | - |
 | `amc bundle` | Portable evidence bundle operations | - | - |
 | `amc bundle diff` | Diff two bundles (maturity/integrity/targets) | - | - |
-| `amc bundle export` | Export a portable, signed evidence bundle for a run | `--run <runId>`<br>`--out <file>`<br>`--agent <agentId>` | - |
+| `amc bundle export` | Export a portable, signed evidence bundle for a run | `--run <runId>`<br>`--out <file>`<br>`--agent <agentId>`<br>`--attest` | - |
 | `amc bundle inspect` | Inspect bundle metadata | - | - |
 | `amc bundle verify` | Verify evidence bundle offline | `--pubkey <path>`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc business` | Business impact — KPI correlation, ROI tracking, and maturity-to-outcome mapping | - | - |
@@ -616,7 +616,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc indices` | Compute deterministic failure-risk indices | `--run <runId>`<br>`--agent <agentId>`<br>`--out <path>` | - |
 | `amc indices fleet` | Compute failure-risk indices across fleet | `--window <window>`<br>`--out <path>` | - |
 | `amc ingest` | Ingest external logs/transcripts as SELF_REPORTED evidence | `--type <kind>`<br>`--agent <agentId>` | - |
-| `amc init` | Initialize .amc workspace | `--trust-boundary <mode>`<br>`--profile <name>`<br>`--force`<br>`--skip-vault`<br>`--minimal` | - |
+| `amc init` | Initialize .amc workspace | `--trust-boundary <mode>`<br>`--profile <name>`<br>`--force`<br>`--skip-vault`<br>`--minimal`<br>`--coding`<br>`--regulated` | - |
 | `amc insider-alerts` | Show insider risk alerts | `--actor <id>`<br>`--ack <alertId>` | - |
 | `amc insider-risk-report` | Generate insider risk analytics report | `--window <days>` | - |
 | `amc insider-risk-scores` | Show insider risk scores by actor | - | - |

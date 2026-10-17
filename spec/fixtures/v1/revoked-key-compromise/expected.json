@@ -1,0 +1,18 @@
+{
+  "case": "revoked-key-compromise",
+  "normative": true,
+  "dimensions": {
+    "integrity": "pass",
+    "issuerAdmission": "fail",
+    "scope": "not-evaluated",
+    "freshness": "not-evaluated",
+    "completeness": "not-evaluated",
+    "satisfaction": "not-evaluated"
+  },
+  "reasonCodes": {
+    "issuerAdmission": [
+      "ISSUER_REVOKED"
+    ]
+  },
+  "exitCode": 1
+}

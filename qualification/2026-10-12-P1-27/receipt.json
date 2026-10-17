@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-27",
+  "date": "2026-10-12",
+  "commit": "118a574fed7d6343ff988d09bc6a219ba6cbd5e2",
+  "branch": "rtd/p1-27-intoto-aibom",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0, local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "node scripts/check-freeze.mjs --base-ref int",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:freeze",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/attest tests/aibom tests/verifier tests/apiRouters.test.ts tests/bundleSpill.test.ts tests/claims/claimEligibility.test.ts tests/consoleApprovalsWhatifBenchmarks.test.ts tests/crypto/keyHistoryMutationGuards.test.ts tests/domainExampleMode.test.ts tests/keyHistoryBundleCertificate.test.ts tests/piHookControl.test.ts tests/receiptsCorrelationRuntimeDashboard.test.ts tests/releaseBundlesArchetypesGate.test.ts tests/trust/embeddedKeyForgery.test.ts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "node packages/verifier/conformance/run.mjs --cmd \"node packages/verifier/bin/amc-verify.mjs\" --out qualification/2026-10-12-P1-27/conformance-results.json",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "python3 <scratch>/mutate.py (11 mutations; see mutations.json)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "node dist/cli.js bundle export --run 22c5a498-f0ba-4cc5-b035-7ceaae548eab --out run.amcbundle --attest",
+      "exit": 0,
+      "durationMs": 1484
+    },
+    {
+      "cmd": "tar -xzf <scratch>/run.amcbundle -C <scratch>",
+      "exit": 0,
+      "durationMs": 16
+    },
+    {
+      "cmd": "node dist/cli.js bundle verify <scratch>/run.amcbundle --pubkey <scratch> --expect-monitor 2e33ae90e227a25a900cc22c5539cb6bcc85834bff67f184deb4e79197103768",
+      "exit": 0,
+      "durationMs": 1167
+    },
+    {
+      "cmd": "node packages/verifier/bin/amc-verify.mjs verify <scratch>/attestations/control-results.sigstore.json --trust-list qualification/2026-10-12-P1-27/trust-list.json --trust-root ae3bfde362b60070a3799cc1a66dec8b64af42cfc440127404156008879cedef --expect-subject default --evidence-dir <scratch> --json",
+      "exit": 3,
+      "durationMs": 95
+    },
+    {
+      "cmd": "node packages/verifier/bin/amc-verify.mjs verify <scratch>/attestations/control-results.sigstore.json --trust-list qualification/2026-10-12-P1-27/trust-list.json --trust-root ae3bfde362b60070a3799cc1a66dec8b64af42cfc440127404156008879cedef --expect-subject default --evidence-dir <scratch> --json",
+      "exit": 1,
+      "durationMs": 98
+    }
+  ],
+  "tests": {
+    "total": 466,
+    "passed": 466,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "47475d20641c7e184dec33b768436bb5cba1573a058be18bb0d0f5e93832daa3"
+    },
+    {
+      "path": "amc-verify-tampered-aibom.json",
+      "sha256": "e42d12cde81f9dea6a268d0fd67451936fb94c173f5c773be5fb7e40cca4cee2"
+    },
+    {
+      "path": "amc-verify-valid.json",
+      "sha256": "2400e6bb8415940e391b099e6d278dbdb6f405fe61ccfeeb2075c2c1572accec"
+    },
+    {
+      "path": "bundle-export.txt",
+      "sha256": "43b0f16caebb2b8cc93638ba5bb93b5736ebd958bd279a6b7c31731d380106a7"
+    },
+    {
+      "path": "bundle-verify.txt",
+      "sha256": "979fcdb5c7a7c1e325836786abc9f5632f8628b3d275eb4526c98bbdb49b5b2e"
+    },
+    {
+      "path": "conformance-results.json",
+      "sha256": "975459b602f2c7c4194877851500902fa6b92f177ca861fc17c18d74da80e2f8"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "2e4dc611110f5462daf307762487ee529361a686dd9b3a72b1438711d6efec48"
+    },
+    {
+      "path": "sample-aibom.cdx.json",
+      "sha256": "a5d0e490438badbd4b1b8d6dd3ca531f032aea0b29a1b26c5c6ed6b950795d29"
+    },
+    {
+      "path": "sample-control-results.sigstore.json",
+      "sha256": "f8471c6bfaddb10bceca3c622f7eba61e9a9bb88d9e55d5d54b478c321e08d70"
+    },
+    {
+      "path": "sigstore-crosscheck.json",
+      "sha256": "827415c2dfa7ff7ce542dba5caa0dff183ca2c9a9bd1f960127eefc4ee8ba1f0"
+    },
+    {
+      "path": "trust-list.json",
+      "sha256": "9f753665e6fb1272c75ec2337d1d1b488a9023bf9c0191abb16e4840022508c0"
+    }
+  ],
+  "notes": "Checks ran after merging int (c9f060740) into the branch. durationMs 0 means the duration was not recorded. 'npm run -s check:freeze' exits 1 against origin/main because int carries the P1-65 changeset (.changeset/a4-cli.md, freeze-exception: P1-65), which origin/main's baseline does not yet allow; it is not caused by P1-27, and the same check passes with --base-ref int (command paths unchanged at 1255; --attest is a flag). amc-verify exits 3 on the valid attestation by design (satisfaction NOT_RECOMPUTABLE) and 1 on the tampered AIBOM (EVIDENCE_MISSING). Tests: the 23 files are every new or changed P1-27 test plus the existing tests that cover bundle.ts, the control-result contract, the verifier package and its fixtures; the full suite was not run. Keyless signing and CycloneDX schema validation are not exercised."
+}

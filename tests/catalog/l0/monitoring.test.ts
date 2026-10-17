@@ -29,7 +29,9 @@ import { newWorkspace } from "./workspaces.js";
 type Scores = { overallHundredths: number; integrityPercent: number; correlationPercent: number };
 type Thresholds = { overallDropGteHundredths: number; layerDropGteHundredths: number; integrityDropGtePercent: number; correlationBelowPercent: number };
 type DriftSetup = { thresholds: Thresholds; previous: Scores; current: Scores; thenCall: { tool: string; actionClass: ActionClass } };
-type ClockSetup = { station: Domain; events: Array<{ kind: "NOTIFIED"; clock: string; atHours: number }> };
+/** `clock` names a clock for NOTIFIED and a trigger for TRIGGER; `due` pins a started clock's deadline, in hours after the incident opened. */
+type ClockSetup = { station: Domain; events: Array<{ kind: "NOTIFIED" | "TRIGGER"; clock: string; atHours: number }>;
+  due?: Array<{ clock: string; hoursAfterCreated: number }> };
 
 /** A sealed diagnostic run report with the fixture's scores (the drift detector's input). */
 function writeRun(ws: string, runId: string, ts: number, s: Scores): void {
@@ -122,10 +124,10 @@ function openIncident(ws: string, store: ReturnType<typeof createIncidentStore>,
 
 const refusalCode = (message: string): string =>
   /backdated/.test(message) ? "backdated" : /future-dated/.test(message) ? "future_dated" : /unknown clock/.test(message) ? "unknown_clock"
-    : /already recorded/.test(message) ? "duplicate_notice" : `unmapped: ${message}`;
+    : /already recorded/.test(message) ? "duplicate_notice" : /before its trigger/.test(message) ? "notice_before_trigger" : `unmapped: ${message}`;
 
-describe("L0-MON-02 incidents start regulatory clocks (F4 clock store)", () => {
-  const fixtures = fixturesFor("incident_clocks", "L0-MON-02");
+describe("L0-MON-02, L1-WLT-US-05 and L1-WLT-US-11: incidents start regulatory clocks (F4 clock store)", () => {
+  const fixtures = fixturesFor("incident_clocks");
   it("has fixtures", () => expect(fixtures.length).toBeGreaterThan(1));
   for (const f of fixtures) {
     it(`${f.ref}: ${f.envelope.expected.result} ${f.envelope.expected.reasonCode ?? ""}`, () => {
@@ -158,7 +160,8 @@ describe("L0-MON-02 incidents start regulatory clocks (F4 clock store)", () => {
         const started = loaded.clocks.filter((c) => c.status !== "NOT_STARTED");
         expect(started.length, "awareness starts the station's clocks").toBeGreaterThan(0);
         for (const c of started) expect(c.dueTs, `${c.clockId} has a deadline`).toBeGreaterThan(createdTs);
-        for (const e of s.events) expect(loaded.clocks.find((c) => c.clockId === e.clock)?.status).toBe("SATISFIED");
+        for (const e of s.events.filter((x) => x.kind === "NOTIFIED")) expect(loaded.clocks.find((c) => c.clockId === e.clock)?.status).toBe("SATISFIED");
+        for (const d of s.due ?? []) expect(loaded.clocks.find((c) => c.clockId === d.clock)?.dueTs, d.clock).toBe(createdTs + d.hoursAfterCreated * 3_600_000);
       } finally {
         ledger.close();
       }

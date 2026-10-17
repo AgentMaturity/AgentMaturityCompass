@@ -2770,6 +2770,7 @@ Export a portable, signed evidence bundle for a run
 | `--run <runId>` | - |
 | `--out <file>` | - |
 | `--agent <agentId>` | - |
+| `--attest` | - |
 
 #### `amc bundle verify`
 
@@ -6169,6 +6170,8 @@ Initialize .amc workspace
 | `--force` | - |
 | `--skip-vault` | - |
 | `--minimal` | - |
+| `--coding` | - |
+| `--regulated` | - |
 
 #### `amc insider-alerts`
 

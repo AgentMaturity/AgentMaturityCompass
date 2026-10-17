@@ -1,0 +1,18 @@
+{
+  "case": "unreviewed-independent-claim",
+  "normative": true,
+  "dimensions": {
+    "integrity": "pass",
+    "issuerAdmission": "pass",
+    "scope": "pass",
+    "freshness": "pass",
+    "completeness": "fail",
+    "satisfaction": "not-evaluated"
+  },
+  "reasonCodes": {
+    "completeness": [
+      "CONTRADICTORY_EVIDENCE"
+    ]
+  },
+  "exitCode": 1
+}

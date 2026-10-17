@@ -302,15 +302,16 @@ describe("verifyEvidenceBundle (amc bundle verify)", () => {
     expect(result.output).toContain("distrusted");
   });
 
-  test("an issuer key superseded after it sealed the bundle is admitted on the claimed signing time", () => {
+  // P1-06: a signing time the bundle claims is its own word, so it never reaches back before a revocation.
+  test("an issuer key superseded after it sealed the bundle is refused, whatever signing time the bundle claims", () => {
     const pem = readFileSync(evidence.auditorPub, "utf8");
     const now = Date.now();
     const superseded = listEntry({ publicKeyPem: pem, privateKeyPem: "", keyId: sha(pem) }, { validFrom: new Date(now - 86_400_000).toISOString(),
       validTo: null, revokedAt: new Date(now - 1_000).toISOString(), revocationReason: "superseded" });
     const result = amc(evidence.workspace, ["bundle", "verify", evidence.bundle, ...monitorPin(), ...listFlags([superseded]), "--json"]);
-    expect(result.status, result.output).toBe(0);
+    expect(result.status, result.output).toBe(1);
     const report = (JSON.parse(result.stdout) as { report: { issuerAdmission: { signatures: Array<{ signature: string; status: string; timeBasis: string | null }> } } }).report;
-    expect(report.issuerAdmission.signatures.find(row => row.signature === "manifest.sig")).toMatchObject({ status: "admitted", timeBasis: "claimed" });
+    expect(report.issuerAdmission.signatures.find(row => row.signature === "manifest.sig")).toMatchObject({ status: "revoked", timeBasis: null });
   });
 });
 

@@ -12,7 +12,9 @@
  *     because it quietly found them through the checkout's node_modules would
  *     prove nothing about a user's machine;
  *   - the tool turn must complete and both installed verification commands must
- *     authenticate its evidence and reconstruct every recorded request.
+ *     authenticate its evidence and reconstruct every recorded request;
+ *   - `amc init --coding` and the SDK quickstart (examples/sdk/quickstart.mjs, P1-40)
+ *     must reach a verified synthetic action through the installed package.
  *
  * A configured real provider is exercised only when AMC_PACKED_SMOKE_PROVIDER
  * (and its credential env) is set; otherwise that step is reported as skipped,
@@ -20,7 +22,7 @@
  */
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -166,6 +168,23 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
       const r = run("amc agent-loop run (stub provider, keyless)", amc,
         ["agent-loop", "run", "--provider", "stub", "--json", "say hello"], { cwd: workspace, env: isolated });
       return verifyRun(r);
+    },
+    () => {
+      // P1-40: amc init --coding in a fresh workspace, then the SDK quickstart against the installed package and bin.
+      const started = Date.now();
+      const quickstart = join(work, "quickstart"); mkdirSync(quickstart);
+      const starterEnv = { ...isolated, AMC_BOOTSTRAP_OWNER_USERNAME: "packed-owner", AMC_BOOTSTRAP_OWNER_PASSWORD: "packed-install-owner" };
+      const init = run("amc init --coding (installed bin)", amc, ["init", "--coding"], { cwd: quickstart, env: starterEnv });
+      // The monitor fingerprint init printed, recorded before any agent runs (P0-09); the quickstart pins it.
+      const pin = /export AMC_EXPECTED_MONITOR_FINGERPRINT=([0-9a-f]{64})/.exec(init.stdout)?.[1];
+      if (!init.ok || !pin) return false;
+      const script = join(consumer, "quickstart.mjs");
+      copyFileSync(join(root, "examples", "sdk", "quickstart.mjs"), script);
+      const r = run("SDK quickstart (installed package; stub provider, synthetic)", "node", [script, quickstart],
+        { cwd: consumer, env: { ...starterEnv, AMC_EXPECTED_MONITOR_FINGERPRINT: pin } });
+      const ok = r.ok && r.stdout.includes("hello.txt written: yes") && r.stdout.includes("verification: verified, externally-anchored");
+      console.log(`${ok ? "ok  " : "FAIL"} installed quickstart reached a verified synthetic action in ${((Date.now() - started) / 1000).toFixed(1)}s (amc init --coding included)`);
+      return ok;
     },
     () => {
       const provider = process.env.AMC_PACKED_SMOKE_PROVIDER;

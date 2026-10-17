@@ -1,0 +1,57 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-13",
+  "polarity": "negative",
+  "evidenceClass": "cross_tenant",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2025-01-01T00:00:00.000Z",
+      "end": "2026-09-30T23:59:59.000Z"
+    },
+    "subject": {
+      "tenantId": "tenant-a",
+      "workspaceId": "ws-a",
+      "deploymentId": "dep-a",
+      "agentId": "agent-1",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [
+      {
+        "ref": {
+          "kind": "receipt",
+          "id": "L1-WLT-US-13-explanation-lineage-1"
+        },
+        "producerId": "amc.explanation.lineage",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.explanation.lineage",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "workspaceId": "ws-a",
+          "agentId": "agent-1",
+          "controlId": "L1-WLT-US-13",
+          "tenantId": "tenant-b"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L1-WLT-US-13-explanation-lineage-1-receipt",
+          "observationKey": "L1-WLT-US-13-observation-1",
+          "observation": "conforms"
+        }
+      }
+    ],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "producer_not_admitted"
+  }
+}

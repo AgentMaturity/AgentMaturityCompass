@@ -1,0 +1,55 @@
+{
+  "registerEntries": 33,
+  "registerEntriesVerified": 5,
+  "registerEntriesUnverified": 28,
+  "registerEntriesAwaitingLegalReviewer": 33,
+  "registerRows": {
+    "strategyRows": 11,
+    "addedRows": 1
+  },
+  "overlayControls": 15,
+  "overlayControlsWithExecutedTest": [
+    "L1-WLT-US-01",
+    "L1-WLT-US-02",
+    "L1-WLT-US-05",
+    "L1-WLT-US-06",
+    "L1-WLT-US-07",
+    "L1-WLT-US-11"
+  ],
+  "overlayControlsAwaitingProducer": [
+    "L1-WLT-US-03",
+    "L1-WLT-US-04",
+    "L1-WLT-US-08",
+    "L1-WLT-US-09",
+    "L1-WLT-US-10",
+    "L1-WLT-US-12",
+    "L1-WLT-US-13",
+    "L1-WLT-US-14",
+    "L1-WLT-US-15"
+  ],
+  "overlayFixtures": 127,
+  "negativeFixturesRun": {
+    "total": 104,
+    "throughEvaluateControl": 90,
+    "againstEnforcementPoints": 14,
+    "passed": 0
+  },
+  "s5": {
+    "entriesAdded": 7,
+    "hostsAdded": [
+      "consumerfinance.gov",
+      "dfs.ny.gov",
+      "cms.gov"
+    ],
+    "entriesWithStationsAdded": 4
+  },
+  "jurisdictionProfiles": [
+    "us-federal",
+    "us-co",
+    "us-ca",
+    "us-tx",
+    "us-nyc",
+    "us-il",
+    "us-ny"
+  ]
+}

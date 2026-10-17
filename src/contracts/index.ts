@@ -5,6 +5,7 @@
  */
 import { z } from "zod";
 import { catalogLockSchema } from "../catalog/lockfile.js";
+import { registerEntrySchema } from "../catalog/register.js";
 import { controlRecordSchema, packManifestSchema } from "../catalog/schema.js";
 import { claimEnvelopeSchema } from "../claims/eligibility/schemas.js";
 import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
@@ -35,6 +36,7 @@ import { evidenceEventV1Schema } from "./v1/evidenceEvent.js";
 import { receiptV1Schema, receiptV2Schema } from "./v1/receipt.js";
 import { redactionReceiptV1Schema } from "./v1/redactionReceipt.js";
 import { scopedAttestationV1Schema } from "./v1/scopedAttestation.js";
+import { scopedAttestationV2Schema } from "./v2/scopedAttestation.js";
 
 export * from "./v1/a4ConformanceStatement.js";
 export * from "./v1/a4Decision.js";
@@ -58,11 +60,13 @@ export * from "./v1/evidenceEvent.js";
 export * from "./v1/receipt.js";
 export * from "./v1/redactionReceipt.js";
 export * from "./v1/scopedAttestation.js";
+export * from "./v2/scopedAttestation.js";
 // Re-exported, never forked: AMC already parses these records with them.
 export { claimEnvelopeSchema as claimEnvelopeV1Schema, signatureEnvelopeSchema as signatureEnvelopeV1Schema };
 export { signedTrustListSchema as trustListV1Schema, verifierReportSchema as verifierReportV1Schema };
 
 export const SPEC_SCHEMA_BASE = "https://agentmaturity.co/spec/schemas/v1/";
+const SPEC_SCHEMA_BASE_V2 = "https://agentmaturity.co/spec/schemas/v2/";
 
 export const CONTRACTS = {
   "evidence-event": { title: "AMC Evidence Event", schema: evidenceEventV1Schema },
@@ -81,6 +85,8 @@ export const CONTRACTS = {
   "control-record": { title: "AMC Control Record", schema: controlRecordSchema },
   "pack-manifest": { title: "AMC Catalog Pack Manifest", schema: packManifestSchema },
   "catalog-lock": { title: "AMC Catalog Lockfile", schema: catalogLockSchema },
+  // Law-as-data register entries (P1-18); refinements are in docs/catalog/REGISTER.md.
+  "register-entry": { title: "AMC Register Entry", schema: registerEntrySchema },
   // A4 Forge (P1-56); refinements are in spec/ACCEPTANCE_RULES.md "A4 project record" (P1-63).
   "a4-project": { title: "AMC A4 Project", schema: a4ProjectV1Schema },
   "a4-revision": { title: "AMC A4 Revision", schema: a4RevisionV1Schema },
@@ -101,6 +107,11 @@ export const CONTRACTS = {
 } as const;
 export type ContractName = keyof typeof CONTRACTS;
 
+/** Version 2 of a record whose v1 `$id` must keep its meaning; published under spec/schemas/v2/. */
+export const CONTRACTS_V2 = {
+  "scoped-attestation": { title: "AMC Scoped Attestation v2", schema: scopedAttestationV2Schema }
+} as const;
+
 /** Parses `value` with the named contract; throws `violates <name> v1: <path> <message>` on the first issue. */
 export function assertContract<N extends ContractName>(name: N, value: unknown): z.output<(typeof CONTRACTS)[N]["schema"]> {
   const parsed = CONTRACTS[name].schema.safeParse(value);
@@ -110,7 +121,7 @@ export function assertContract<N extends ContractName>(name: N, value: unknown):
 }
 
 export interface PublishedSchema {
-  /** File name under spec/schemas/v1/ and .amc/standard/schemas/. */
+  /** File name under spec/schemas/v1/ (and .amc/standard/schemas/), or `v2/<file>` for a v2 record under spec/schemas/v2/. */
   name: string;
   $id: string;
   schema: Record<string, unknown>;
@@ -121,8 +132,8 @@ export interface PublishedSchema {
  * `additionalProperties: false`, an object AMC strips unknown keys from publishes no such rule. Refinements do not
  * reach JSON Schema; spec/ACCEPTANCE_RULES.md lists them.
  */
-function fromZod(name: string, title: string, schema: z.ZodType): PublishedSchema {
-  const $id = `${SPEC_SCHEMA_BASE}${name}`;
+function fromZod(name: string, title: string, schema: z.ZodType, base = SPEC_SCHEMA_BASE): PublishedSchema {
+  const $id = `${base}${name.replace(/^v2\//, "")}`;
   return { name, $id, schema: { ...z.toJSONSchema(schema, { target: "draft-2020-12", io: "input" }), $id, title } };
 }
 
@@ -131,6 +142,7 @@ export function publishedSchemas(): PublishedSchema[] {
   const external = externalEvidenceProfileSchema;
   return [
     ...Object.entries(CONTRACTS).map(([name, row]) => fromZod(`${name}.schema.json`, row.title, row.schema)),
+    ...Object.entries(CONTRACTS_V2).map(([name, row]) => fromZod(`v2/${name}.schema.json`, row.title, row.schema, SPEC_SCHEMA_BASE_V2)),
     ...Object.entries(STANDARD_ARTIFACT_SCHEMAS).map(([name, row]) => fromZod(name, row.title, row.schema)),
     { name: "external-evidence.schema.json", $id: String(external.$id), schema: external }
   ].sort((a, b) => a.name.localeCompare(b.name));

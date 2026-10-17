@@ -1,0 +1,32 @@
+{
+  "name": "agent-maturity-compass-verifier",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Standalone, zero-dependency verifier for AMC records against an explicitly pinned issuer. Private until Sid publishes it.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/packages/verifier/src/index.js",
+  "types": "./dist/packages/verifier/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/packages/verifier/src/index.d.ts",
+      "default": "./dist/packages/verifier/src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "amc-verify": "./bin/amc-verify.mjs"
+  },
+  "files": [
+    "bin/amc-verify.mjs",
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "conformance/run.mjs"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,8 @@
+{
+  "asOf": "2026-10-01T00:00:00.000Z",
+  "trustRoots": [
+    "7284d995184959356042352b876f5eb02b11b250dc7bdd99f58a584e70a1390c",
+    "905273a38dfbad18ea1565ffb9bef798a9d861082a641c22548b0b28ee49e0f9"
+  ],
+  "rootThreshold": 2
+}

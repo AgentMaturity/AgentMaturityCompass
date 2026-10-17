@@ -1,0 +1,42 @@
+Full suite: npx vitest run --reporter=json at 35c491d3074d06bed4fabb9fb6e702f34c71a514, 2026-10-11T23:25:50Z to 2026-10-11T23:57:28Z, no edits during the run.
+Totals: 5058 files, 24194 tests, 24148 passed, 46 failed, 0 skipped.
+
+Failed files (failed tests):
+- tests/amc1473SignedControlLifecycle.test.ts (1)
+- tests/apiRouters.test.ts (0; [vitest] No "isExactIsoTime" export is defined on the "../src/utils/time.js" mock. Did you forget to)
+- tests/assuranceRunNoSign.test.ts (1)
+- tests/dogfoodMaturityEvidence.test.ts (1)
+- tests/jsonlWriterResume.test.ts (19)
+- tests/llmResponsesCapabilities.test.ts (1)
+- tests/nativeValidationOutcomeSurfaces.test.ts (1)
+- tests/privateModuleHelperVisibility.test.ts (1)
+- tests/publicDocsArtifact.test.ts (1)
+- tests/publicDocsGraph.test.ts (1)
+- tests/publicTaskTransport.test.ts (2)
+- tests/releaseEngineeringPack.test.ts (1)
+- tests/releaseSecretScanCoverage.test.ts (2)
+- tests/sessionStoreConformance.test.ts (8)
+- tests/assurance/industryPackFailClosed.test.ts (1)
+- tests/compliance/dataResidencyPersistence.test.ts (1)
+- tests/keys/atomicRotation.test.ts (3; Hook timed out in 10000ms.)
+- tests/performance/sessionSpine.performance.test.ts (1)
+
+Triage. The load average was 11 to 44 (other sessions), so timeouts are expected.
+- tests/apiRouters.test.ts: caused by P1-06. It mocks src/utils/time.js, where ddbffd94e had put isExactIsoTime.
+  5652c8249 moved the helper to src/utils/json.ts and restored src/utils/time.ts to int; the file then passes.
+- Passed when rerun alone at 5652c8249: amc1473SignedControlLifecycle, dogfoodMaturityEvidence,
+  nativeValidationOutcomeSurfaces, apiRouters, rotationStatement, rootRotation, revocationListAtomic (7 files, 92 tests).
+  An earlier isolated rerun also passed assuranceRunNoSign and industryPackFailClosed.
+- Pre-existing, none touched by P1-06:
+  - jsonlWriterResume (19), llmResponsesCapabilities (1), privateModuleHelperVisibility (1),
+    dataResidencyPersistence (1): listed in the session's baseline-triage (P2-01 storage admission and spillStore
+    snapshot).
+  - publicDocsGraph (1): in the baseline. P1-06 cites its guide by path, so it adds no edge.
+  - publicDocsArtifact (1): typedoc needs .git to be a directory, so it fails in any git worktree.
+  - publicTaskTransport (2): the same 2 fail with int's versions of P1-06's src files swapped in and rebuilt.
+  - releaseEngineeringPack, releaseSecretScanCoverage, sessionStoreConformance, atomicRotation: these failed in
+    P1-08's full suite on this lineage. Here they time out under load: atomicRotation hit its 480 s limit when run alone, and
+    P1-08 recorded a timeout too (922 s).
+  - sessionSpine.performance (1): a throughput floor under load.
+- After the last int merge (6b0d755cd), the 20 trust-consuming test files pass: 452 tests, every tests/ file that calls
+  admitKey, loadTrustContext or a trust list, plus the P1-08 statement, lease and A4 signing-probe tests.

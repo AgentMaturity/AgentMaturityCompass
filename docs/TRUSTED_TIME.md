@@ -80,5 +80,5 @@ When TSAs are configured, `amc certify` timestamps the SHA-256 of `cert.json`, e
 ## Not yet covered
 
 - Checkpoints at each session seal: sealing is synchronous today, so the Studio scheduler picks the new events up on its next tick.
-- Timestamps on attestations other than `.amccert`, and attested time in issuer admission (which still uses the claimed signing time).
+- Timestamps on attestations other than `.amccert`, and attested time in issuer admission. Admission judges keys at the verification time and never on a claimed signing time (P1-06); passing an attested signing time to the shared rule (`src/trust/admissionRule.ts`) is the seam that would admit a signature proven earlier than a revocation.
 - Surfacing per-event windows in `amc verify` output. Public anchoring of checkpoints in Rekor v2 is described in [PUBLIC_ANCHORING.md](PUBLIC_ANCHORING.md); SCITT is not covered.

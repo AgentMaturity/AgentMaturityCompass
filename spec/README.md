@@ -9,6 +9,8 @@ them the schema does too. Nothing here is hand-edited.
 - `schemas/index.json`: every schema's file name, `$id` and SHA-256.
 - [`ACCEPTANCE_RULES.md`](ACCEPTANCE_RULES.md): the ordered checks a verifier runs per record, the result each
   failure gives, and every rule a JSON Schema cannot express.
+- [`fixtures/v1/`](fixtures/v1/README.md): normative verifier fixtures, each with its expected verdict and reason
+  codes, and the runner any implementation can be checked with (docs/STANDALONE_VERIFIER.md).
 
 Schema validation checks shape only. It does not show who wrote a record, that the record is unchanged, or that it is
 true; the acceptance rules cover those checks.
@@ -25,12 +27,14 @@ true; the acceptance rules cover those checks.
 | `control-result` | One control's five status dimensions, claim kind and evidence | Contract only; P1-11 emits it |
 | `claim-envelope` | What a result may claim (docs/CLAIM_KINDS.md) | Emitted |
 | `scoped-attestation` | A signed statement about one deployment, profile and window | Contract only; the registry (P3-04) issues it |
+| `v2/scoped-attestation` | Version 2 of it: also one tenant, workspace, subject and sequence, with fixed signed bytes | Contract only; `amc-verify` (P1-06) checks it |
 | `trust-list` | A signed list of pinned keys and their purposes (docs/TRUST_LIST.md) | Read by every verifier |
-| `verifier-report` | The separate results of one verification | Emitted by the verify commands with `--json` |
+| `verifier-report` | The separate results of one verification | Emitted by the verify commands and `amc-verify` with `--json` |
 | `signature-envelope` | The Ed25519 envelope AMC artifacts carry | Emitted |
 | `control-record` | One Regulated Control Catalog control (docs/catalog/CONTROL_RECORD.md) | Read by `loadCatalog`; content under `catalog/` |
 | `pack-manifest` | One catalog pack: its controls, layer, stations and declared support | Read by `loadCatalog` |
 | `catalog-lock` | The digests that pin one catalog tree | Built by `buildCatalogLock`; P1-10 embeds it in compiled plans |
+| `register-entry` | One clause of a jurisdiction's register as law-as-data (docs/catalog/REGISTER.md) | Read by `loadCatalog` from `catalog/registers/` |
 | `a4-project`, `a4-revision`, `a4-gate`, `a4-decision`, `a4-transition`, `a4-intent`, `a4-readiness` and the other `a4-*` records | One A4 Forge project's views (docs/A4_FORGE.md) | Emitted behind `AMC_A4_PREVIEW=1` |
 | `a4-record` | One A4 project exported as stored, for a verifier without SQLite | Checked by `verifyA4Bundle`; fixtures in `tests/fixtures/contracts/a4-record/` |
 | `amcbench`, `amcprompt`, `amccert`, `amcaudit`, `amcpass`, `amcproof`, `registry.bench`, `registry.passport` | The `amc standard` artifacts | Emitted; `amc standard generate` writes these same files |

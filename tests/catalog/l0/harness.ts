@@ -1,5 +1,5 @@
 /**
- * Shared reader for the Layer 0 fixtures (P1-14). Tests key off the fixture files: each executed harness runs every
+ * Shared reader for the catalog fixtures: Layer 0 (P1-14) and the station overlays that reuse its harnesses (P1-18). Tests key off the fixture files: each executed harness runs every
  * fixture whose `setup.harness` names it, so content and test cannot drift apart. `evidence` fixtures run through
  * P1-11's evaluateControl (evidenceFixtures.test.ts); every other harness drives a real enforcement point.
  */
@@ -7,7 +7,9 @@ import { loadCatalog } from "../../../src/catalog/loader.js";
 import type { ControlRecord, FixtureEnvelope } from "../../../src/catalog/types.js";
 
 export const catalog = loadCatalog();
-export const layer0 = [...catalog.controls.values()].filter((c) => c.layer === 0).sort((a, b) => (a.id < b.id ? -1 : 1));
+/** Every control in the catalog, by id; the executed harnesses run any control's fixtures that name them. */
+export const controls = [...catalog.controls.values()].sort((a, b) => (a.id < b.id ? -1 : 1));
+export const layer0 = controls.filter((c) => c.layer === 0);
 
 /** Each executed harness and the test file that runs it. A control is "executed" when one of its fixtures names one. */
 export const EXECUTED_HARNESSES: Readonly<Record<string, string>> = {
@@ -35,7 +37,7 @@ export interface L0Fixture {
 }
 
 export function allFixtures(): L0Fixture[] {
-  return layer0.flatMap((control) => control.tests.flatMap((t) => [...t.fixtures.positive, ...t.fixtures.negative].map((ref) => {
+  return controls.flatMap((control) => control.tests.flatMap((t) => [...t.fixtures.positive, ...t.fixtures.negative].map((ref) => {
     const envelope = catalog.fixtures.get(ref)?.envelope;
     if (!envelope) throw new Error(`fixture ${ref} did not load`);
     return { ref, control, envelope };

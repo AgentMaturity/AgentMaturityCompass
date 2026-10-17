@@ -2194,7 +2194,14 @@ program
   .option("--force", "Force re-initialization, overwrite existing .amc directory", false)
   .option("--skip-vault", "Skip vault setup (useful for CI/headless init)", false)
   .option("--minimal", "Startup-friendly setup without vault prompt or immediate full score", false)
-  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean }) => {
+  .option("--coding", "Starter profile: signed coding tools, a contained shell without network, firewall warn (P1-40)")
+  .option("--regulated", "Starter profile: deny-by-default egress, firewall block, approvals on, a signed Layer 0 plan (P1-40)")
+  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean; coding?: boolean; regulated?: boolean }) => {
+    const { starterProfileFlag, runStarterInit } = await import("./setup/starterProfiles.js");
+    try {
+      const starter = starterProfileFlag(opts);
+      if (starter) { await runStarterInit(process.cwd(), starter, opts.force); return; }
+    } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
     // Force mode: delete existing .amc directory before re-init
     if (opts.force) {
       const { rmSync, existsSync } = await import("fs");
@@ -10308,14 +10315,17 @@ bundle
   .requiredOption("--run <runId>", "run ID")
   .requiredOption("--out <file>", "output .amcbundle file")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { run: string; out: string; agent?: string }) => {
+  .option("--attest", "add the agent's CycloneDX AIBOM and a DSSE-signed in-toto statement about the run (artifact-seal key)")
+  .action((opts: { run: string; out: string; agent?: string; attest?: boolean }) => {
     const result = exportEvidenceBundle({
       workspace: process.cwd(),
       runId: opts.run,
       outFile: opts.out,
-      agentId: opts.agent ?? activeAgent(program)
+      agentId: opts.agent ?? activeAgent(program),
+      attest: opts.attest === true
     });
     console.log(chalk.green(`Bundle exported: ${result.outFile}`));
+    if (opts.attest) console.log("Attested: attestations/aibom.cdx.json and attestations/control-results.sigstore.json (DSSE, workspace artifact-seal key: a local audit trail until a trust list pins that key)");
     printClaimResult(runIdClaim(opts.run, opts.agent ?? activeAgent(program)), {});
     console.log(`Files: ${result.fileCount}, Events: ${result.eventCount}, Sessions: ${result.sessionCount}`);
   });
