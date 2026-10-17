@@ -45,7 +45,7 @@ export type Fixture = {
   home: string; workspace: string; anchor: TimestampAuthority; requests: RequestRecord[];
   url: (path: string) => string;
   recordResult: (result: Awaited<ReturnType<typeof requestTimestamp>>) => void;
-  verifyReply: (path: string, expectedDigestHex?: string) => Promise<AttestedTime>;
+  verifyReply: (path: string, expectedDigestHex?: string, occurrence?: number) => Promise<AttestedTime>;
 };
 
 function errorFact(error: unknown): ErrorFact {
@@ -317,12 +317,14 @@ export async function withGrantFixture(caseId: string, signPath: string, body: (
             policyOid: result.grant.attested.policyOid, messageImprint: { ...result.grant.attested.messageImprint },
             revocationChecked: result.grant.attested.revocationChecked } };
       },
-      verifyReply: async (path, expectedDigestHex = DIGEST) => {
+      verifyReply: async (path, expectedDigestHex = DIGEST, occurrence) => {
         await Promise.all(drivers);
         if (errors.length) throw errors[0]!.error;
         const signed = requests.filter(request => request.path === path);
-        expect(signed).toHaveLength(1);
-        const request = signed[0]!;
+        // Existing calls still require exactly one reply. A multi-reply caller selects explicitly.
+        if (occurrence === undefined) expect(signed).toHaveLength(1);
+        else expect(Number.isInteger(occurrence) && occurrence >= 0 && occurrence < signed.length).toBe(true);
+        const request = signed[occurrence ?? 0]!;
         if (request.queryFile === null || request.responseFile === null) throw new Error("owned query/response is absent");
         await runOpenSsl("verify-query-bound-reply", ["ts", "-verify", "-queryfile", request.queryFile,
           "-in", request.responseFile, "-CAfile", pathFor("root.pem")]);

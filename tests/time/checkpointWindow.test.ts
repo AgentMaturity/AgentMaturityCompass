@@ -19,7 +19,7 @@ import { rawSignature, testKey, trustList } from "../trust/trustFixtures.js";
 import { ANCHOR_ID, POLICY, optionalTsaTest, withGrantFixture, type Fixture } from "./tsaTestFixture.js";
 
 const CHECKOUT = realpathSync(fileURLToPath(new URL("../../", import.meta.url)));
-const optionalCheckpointTest = optionalTsaTest(["CHECKPOINT-PENDING-GRANT", "CHECKPOINT-REQUIRED-REFUSAL"]);
+const optionalCheckpointTest = optionalTsaTest(["CHECKPOINT-PENDING-GRANT", "CHECKPOINT-REQUIRED-REFUSAL", "CHECKPOINT-TWO-BOUND-WINDOW"]);
 const sha256 = (bytes: string | Buffer): string => createHash("sha256").update(bytes).digest("hex");
 
 function filePin(path: string) {
@@ -52,6 +52,7 @@ function checkpointSignatureValid(path: string, digest: string, monitorPem: stri
 type LedgerOwner = { handle: ReturnType<typeof openLedger>; readonly: boolean; closeAttempted: boolean; closed: boolean };
 type CheckpointFixture = {
   trust: TrustContext; monitorPem: string; monitorFingerprint: string; seedEventId: string;
+  appendSealedAudit: (label: string) => string;
   events: () => EvidenceEvent[];
   verify: () => ReturnType<typeof verifyLedgerIntegrity>;
   configure: (required: boolean, path: string) => void;
@@ -75,7 +76,9 @@ async function withCheckpointWorkspace(caseId: string, tsa: Fixture, body: (fixt
     schema: "amc-p125-checkpoint-owned-fixture/1", caseId, checkout: CHECKOUT, workspace: tsa.workspace,
     privateHome: tsa.home, noClockRowGateOrPolicyBypass: true,
     trustBoundary: "the signed own trust list and captured monitor pin are controlled fixture authority, not an independent production issuer",
-    windowBoundary: "one checkpoint supplies an upper bound; no lower-window, scheduler, seal or certificate qualification"
+    windowBoundary: caseId === "CHECKPOINT-TWO-BOUND-WINDOW"
+      ? "two genuine checkpoints supply a window; extra claimedTs values test only the reader; no scheduler, seal or certificate qualification"
+      : "one checkpoint supplies an upper bound; no lower-window, scheduler, seal or certificate qualification"
   };
   const safeError = (error: unknown): unknown => {
     if (error instanceof Error) {
@@ -154,6 +157,15 @@ async function withCheckpointWorkspace(caseId: string, tsa: Fixture, body: (fixt
         ledger.sealSession(sessionId);
         return id;
       });
+      const appendSealedAudit = (label: string): string => useLedger(false, ledger => {
+        const appendedSessionId = randomUUID();
+        ledger.startSession({ sessionId: appendedSessionId, runtime: "unknown", binaryPath: "amc-p125-checkpoint-fixture",
+          binarySha256: hashBinaryOrPath("amc-p125-checkpoint-fixture", "1") });
+        const id = ledger.appendEvidence({ sessionId: appendedSessionId, runtime: "unknown", eventType: "audit", inline: true, payloadExt: "json",
+          payload: JSON.stringify({ schema: "amc-p125-checkpoint-fixture-event/1", caseId, label }), meta: { fixtureCase: caseId, fixtureLabel: label } });
+        ledger.sealSession(appendedSessionId);
+        return id;
+      });
       const events = (): EvidenceEvent[] => useLedger(true, ledger => ledger.getAllEvents());
       const verify = () => verifyLedgerIntegrity(tsa.workspace, { trust, expectedMonitorFingerprint: monitorFingerprint });
       const initialVerification = verify();
@@ -169,7 +181,7 @@ async function withCheckpointWorkspace(caseId: string, tsa: Fixture, body: (fixt
         const loaded = loadTimeConfig(tsa.workspace);
         expect(loaded.required === required && loaded.tsa.length === 1 && loaded.tsa[0]!.url === tsa.url(path)).toBe(true);
       };
-      await body({ trust, monitorPem, monitorFingerprint, seedEventId, events, verify, configure, facts });
+      await body({ trust, monitorPem, monitorFingerprint, seedEventId, appendSealedAudit, events, verify, configure, facts });
     });
   } catch (error) { bodyFailed = true; primary = safeError(error); }
   finally {
@@ -315,6 +327,141 @@ describe("P1-25 real signed ledger checkpoint transitions", () => {
         // First required-control witness follows real HTTP500, signed pending bytes, and unchanged verified ledger positives.
         expect(rejected).toBe(true);
         expect(expectedRejection).toBe(true);
+      });
+    });
+  });
+
+  optionalCheckpointTest("derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries", async () => {
+    await withGrantFixture("CHECKPOINT-TWO-BOUND-WINDOW", "/window-good", async tsa => {
+      await withCheckpointWorkspace("CHECKPOINT-TWO-BOUND-WINDOW", tsa, async fixture => {
+        fixture.configure(false, "/window-good");
+        const beforeFirst = fixture.events();
+        const firstResult = await checkpointLedger(tsa.workspace, fixture.trust);
+        const firstChain = readCheckpointChain(tsa.workspace);
+        expect(firstChain).toHaveLength(1);
+        const first = firstChain[0]!;
+        const firstGrant = await tsa.verifyReply("/window-good", first.sha256);
+        const firstPath = join(checkpointsDir(tsa.workspace), "1.json");
+        const firstBytes = readFileSync(firstPath);
+        const firstTokenPath = join(checkpointsDir(tsa.workspace), "1.tsr");
+        const firstToken = readFileSync(firstTokenPath);
+        const middleId = fixture.appendSealedAudit("between-checkpoints");
+        const beforeSecond = fixture.events();
+        const secondResult = await checkpointLedger(tsa.workspace, fixture.trust);
+        const chain = readCheckpointChain(tsa.workspace);
+        expect(chain).toHaveLength(2);
+        const second = chain[1]!;
+        // The explicit occurrence selects this query; the original default still requires one response.
+        expect(tsa.requests.map(request => request.path)).toEqual(["/window-good", "/window-good"]);
+        const secondGrant = await tsa.verifyReply("/window-good", second.sha256, 1);
+        const secondPath = join(checkpointsDir(tsa.workspace), "2.json");
+        const secondTokenPath = join(checkpointsDir(tsa.workspace), "2.tsr");
+        const secondToken = readFileSync(secondTokenPath);
+        const events = fixture.events();
+        const verification = fixture.verify();
+        const checkpointRows = events.filter(event => event.event_type === "time/checkpoint");
+        const middleIndex = events.findIndex(event => event.id === middleId);
+        const middle = events[middleIndex];
+        const seedIndex = events.findIndex(event => event.id === fixture.seedEventId);
+        const seed = events[seedIndex];
+        const lastCheckpointIndex = events.findIndex(event => event.id === checkpointRows[1]?.id);
+        const lastCheckpoint = events[lastCheckpointIndex];
+        const timeline = ledgerTimeline(tsa.workspace, events, { anchors: [tsa.anchor] });
+        const zeroTimeline = ledgerTimeline(tsa.workspace, events, { anchors: [tsa.anchor], toleranceMinutes: 0 });
+        const lowerMs = Date.parse(firstGrant.genTime);
+        const upperMs = Date.parse(secondGrant.genTime);
+        const lowerAccuracyMs = firstGrant.accuracyMs ?? 0;
+        const upperAccuracyMs = secondGrant.accuracyMs ?? 0;
+        // Five minutes is the independent default contract. Date claims have integer-millisecond resolution.
+        const defaultLowerEdge = Math.ceil(lowerMs - lowerAccuracyMs - 5 * 60_000);
+        const defaultUpperEdge = Math.floor(upperMs + upperAccuracyMs + 5 * 60_000);
+        const zeroLowerEdge = Math.ceil(lowerMs - lowerAccuracyMs);
+        const zeroUpperEdge = Math.floor(upperMs + upperAccuracyMs);
+        const defaultClaims: Array<{ id: string; claimedTs: number; expected: string[] }> = [
+          { id: "default-lower-inclusive", claimedTs: defaultLowerEdge, expected: [] },
+          { id: "default-lower-one-ms-beyond", claimedTs: defaultLowerEdge - 1, expected: ["BACKDATED_CLAIM"] },
+          { id: "default-upper-inclusive", claimedTs: defaultUpperEdge, expected: [] },
+          { id: "default-upper-one-ms-beyond", claimedTs: defaultUpperEdge + 1, expected: ["POSTDATED_CLAIM"] }
+        ];
+        const zeroClaims: Array<{ id: string; claimedTs: number; expected: string[] }> = [
+          { id: "zero-lower-inclusive", claimedTs: zeroLowerEdge, expected: [] },
+          { id: "zero-lower-one-ms-beyond", claimedTs: zeroLowerEdge - 1, expected: ["BACKDATED_CLAIM"] },
+          { id: "zero-upper-inclusive", claimedTs: zeroUpperEdge, expected: [] },
+          { id: "zero-upper-one-ms-beyond", claimedTs: zeroUpperEdge + 1, expected: ["POSTDATED_CLAIM"] },
+          { id: "zero-refuses-default-lower-edge", claimedTs: defaultLowerEdge, expected: ["BACKDATED_CLAIM"] },
+          { id: "zero-refuses-default-upper-edge", claimedTs: defaultUpperEdge, expected: ["POSTDATED_CLAIM"] }
+        ];
+        const defaultObservations = defaultClaims.map(row => ({ ...row, result: timeline.eventTime(middleIndex, row.claimedTs) }));
+        const zeroObservations = zeroClaims.map(row => ({ ...row, result: zeroTimeline.eventTime(middleIndex, row.claimedTs) }));
+        const actualMiddle = middle === undefined ? null : timeline.eventTime(middleIndex, middle.ts);
+        const seedTime = seed === undefined ? null : timeline.eventTime(seedIndex, seed.ts);
+        const lastCheckpointTime = lastCheckpoint === undefined ? null : timeline.eventTime(lastCheckpointIndex, lastCheckpoint.ts);
+        const afterReads = fixture.events();
+        const finalVerification = fixture.verify();
+        const signaturesValid = checkpointSignatureValid(firstPath, first.sha256, fixture.monitorPem)
+          && checkpointSignatureValid(secondPath, second.sha256, fixture.monitorPem);
+        fixture.facts.twoBoundWindow = {
+          results: [firstResult, secondResult], checkpoints: chain.map(row => ({ ...row, tokenSha256: row.checkpoint.sequence === 1 ? sha256(firstToken) : sha256(secondToken) })),
+          checkpointPins: [filePin(firstPath), filePin(secondPath)], tokenPins: [filePin(firstTokenPath), filePin(secondTokenPath)],
+          signaturesValid, firstCheckpointBytesUnchanged: readFileSync(firstPath).equals(firstBytes),
+          independentGrants: [firstGrant, secondGrant].map(attested => ({ genTime: attested.genTime, accuracyMs: attested.accuracyMs,
+            digest: attested.messageImprint.digest, anchorId: attested.tsa.anchorId, signerCertSha256: attested.tsa.certSha256,
+            tokenSha256: sha256(Buffer.from(attested.tokenDerB64, "base64")), revocationChecked: attested.revocationChecked })),
+          checkpointRows: checkpointRows.map(event => ({ id: event.id, eventHash: event.event_hash, meta: JSON.parse(event.meta_json) as unknown })),
+          middle: middle === undefined ? null : { id: middle.id, ts: middle.ts, eventHash: middle.event_hash, index: middleIndex, time: actualMiddle },
+          seedTime, lastCheckpointTime, defaultObservations, zeroObservations,
+          readerClaimsOnly: true, persistedRowTimestampsOrClockEdited: false,
+          eventsUnchangedByReader: JSON.stringify(afterReads) === JSON.stringify(events),
+          ledger: { beforeReader: verification.ok, afterReader: finalVerification.ok, chain: finalVerification.chain.ok,
+            governance: finalVerification.governance.ok, anchored: finalVerification.trustRoot.anchored, errors: finalVerification.errors.length }
+        };
+        // Real crypto, chain, event and ledger positives precede the first lower-window witness.
+        expect(firstResult).toEqual({ sequence: 1, status: "timestamped", failures: [] });
+        expect(secondResult).toEqual({ sequence: 2, status: "timestamped", failures: [] });
+        expect(signaturesValid).toBe(true);
+        expect(readFileSync(firstPath).equals(firstBytes)).toBe(true);
+        expect(chain[0]).toEqual(first);
+        expect(second.checkpoint.previousCheckpointSha256).toBe(first.sha256);
+        expect(first.checkpoint.ledger).toEqual({ eventCount: beforeFirst.length, headEventHash: beforeFirst[beforeFirst.length - 1]!.event_hash });
+        expect(second.checkpoint.ledger).toEqual({ eventCount: beforeSecond.length, headEventHash: beforeSecond[beforeSecond.length - 1]!.event_hash });
+        expect(firstToken.equals(Buffer.from(firstGrant.tokenDerB64, "base64"))).toBe(true);
+        expect(secondToken.equals(Buffer.from(secondGrant.tokenDerB64, "base64"))).toBe(true);
+        expect(checkpointRows).toHaveLength(2);
+        expect(checkpointRows.map(event => JSON.parse(event.meta_json))).toEqual([
+          { checkpointSequence: 1, checkpointSha256: first.sha256, tokenSha256: sha256(firstToken) },
+          { checkpointSequence: 2, checkpointSha256: second.sha256, tokenSha256: sha256(secondToken) }
+        ]);
+        expect(verification.ok && verification.chain.ok && verification.governance.ok && verification.trustRoot.anchored).toBe(true);
+        expect(finalVerification.ok && finalVerification.chain.ok && finalVerification.governance.ok && finalVerification.trustRoot.anchored).toBe(true);
+        expect(middle !== undefined && middleIndex > events.findIndex(event => event.id === checkpointRows[0]!.id)
+          && middleIndex < lastCheckpointIndex && seed !== undefined && lastCheckpoint !== undefined).toBe(true);
+        expect(lowerMs <= upperMs).toBe(true); // Equal-second TSA genTimes are valid; no wait or clock edit.
+        expect(timeline.checkpoints).toEqual([
+          { sequence: 1, status: "timestamped", genTime: firstGrant.genTime, detail: null },
+          { sequence: 2, status: "timestamped", genTime: secondGrant.genTime, detail: null }
+        ]);
+        expect(actualMiddle).not.toBeNull();
+        if (actualMiddle === null || middle === undefined || seedTime === null || lastCheckpointTime === null) throw new Error("real window fixture event is absent");
+        expect(actualMiddle.time.basis).toBe("attested-window");
+        expect(actualMiddle.time.window).toEqual({ notBefore: firstGrant.genTime, notAfter: secondGrant.genTime });
+        expect(actualMiddle.time.attested).toEqual(secondGrant);
+        expect(actualMiddle.time.claimedAt).toBe(new Date(middle.ts).toISOString());
+        expect(seedTime.time.basis).toBe("attested-upper-bound");
+        expect(lastCheckpointTime.time.basis).toBe("claimed");
+        for (const row of defaultObservations) {
+          expect(row.result.findings, row.id).toEqual(row.expected);
+          expect(row.result.time.claimedAt, row.id).toBe(new Date(row.claimedTs).toISOString());
+          expect(row.result.time.basis, row.id).toBe("attested-window");
+          expect(row.result.time.window, row.id).toEqual({ notBefore: firstGrant.genTime, notAfter: secondGrant.genTime });
+        }
+        for (const row of zeroObservations) {
+          expect(row.result.findings, row.id).toEqual(row.expected);
+          expect(row.result.time.claimedAt, row.id).toBe(new Date(row.claimedTs).toISOString());
+          expect(row.result.time.basis, row.id).toBe("attested-window");
+          expect(row.result.time.window, row.id).toEqual({ notBefore: firstGrant.genTime, notAfter: secondGrant.genTime });
+        }
+        expect(actualMiddle.findings).toEqual([]);
+        expect(afterReads).toEqual(events);
       });
     });
   });
