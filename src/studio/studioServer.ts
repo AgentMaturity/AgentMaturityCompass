@@ -16,7 +16,7 @@ import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { onboardingRunForApi, onboardingStatusForApi } from "./onboardingApi.js";
 import { runDiagnostic, generateReport, loadRunReport } from "../diagnostic/runner.js";
 import { agentRunFiles } from "../diagnostic/runReportResolution.js";
-import { evaluateDiagnosticEvidenceReadiness, summarizeDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
+import { summarizeDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
 import {
@@ -111,7 +111,7 @@ import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { serveConsolePath } from "../console/consoleServer.js";
 import { handleStudioApiDelegation } from "./apiDelegation.js";
-import { bindStudioResultRoute, ENTITLEMENT_NOTE, withClaimBody } from "./studioClaimOutput.js";
+import { bindStudioResultRoute, ENTITLEMENT_NOTE, studioStoredRunReport, withClaimBody } from "./studioClaimOutput.js";
 import { authenticateStudioAgent } from "./agentCredentialAuth.js";
 import { allowStudioCors as allowCors } from "./studioCors.js";
 import { createNativeTaskService } from "./nativeTaskService.js";
@@ -7186,12 +7186,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const reportJsonMatch = pathname.match(/^\/runs\/([^/]+)\/report$/);
       if (reportJsonMatch && req.method === "GET") {
         const runId = decodeURIComponent(reportJsonMatch[1] ?? "");
-        const report = loadRunReport(options.workspace, runId);
-        if (!auth.isAdmin && auth.agentId && report.agentId !== auth.agentId) {
-          json(res, 403, { error: "scope does not include this agent" });
-          return;
-        }
-        json(res, 200, { ...report, evidenceReadiness: evaluateDiagnosticEvidenceReadiness(report) });
+        const report = studioStoredRunReport(res, options.workspace, runId, auth);
+        json(res, report.status, report.body);
         return;
       }
 
