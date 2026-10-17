@@ -16,7 +16,7 @@ import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { withDeletionGate } from "../residency/deletionGate.js";
 import { ensureDir } from "../utils/fs.js";
 import type { ProtectedDataClass } from "../vault/dataClassification.js";
-import { getVaultSecret, setVaultSecret } from "../vault/vault.js";
+import { getVaultSecret, setVaultSecret, unlockVault, vaultExists, vaultStatus } from "../vault/vault.js";
 import { RedactionRefused } from "./tokenizer.js";
 
 export interface TokenKeys { readonly hmac: Buffer; readonly aes: Buffer }
@@ -34,9 +34,14 @@ function decodeKeys(encoded: string | null): TokenKeys {
   return Object.freeze({ hmac: bytes.subarray(0, KEY_BYTES), aes: bytes.subarray(KEY_BYTES) });
 }
 
-/** The workspace token keys from the unlocked vault; the first caller creates them under a lock. */
+/**
+ * The workspace token keys from the unlocked vault; the first caller creates them under a lock. Like signing, a vault
+ * session evicted after its TTL is reopened from AMC_VAULT_PASSPHRASE; with no passphrase a locked vault refuses.
+ */
 export function loadTokenKeys(workspace: string): TokenKeys {
   try {
+    const passphrase = process.env.AMC_VAULT_PASSPHRASE;
+    if (!vaultStatus(workspace).unlocked && passphrase && vaultExists(workspace)) unlockVault(workspace, passphrase);
     const existing = getVaultSecret(workspace, KEY_SECRET);
     if (existing !== null) return decodeKeys(existing);
     // ponytail: the lock orders AMC's own key creation only; the vault's whole-envelope rewrite can still lose a secret to
