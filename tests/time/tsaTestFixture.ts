@@ -86,7 +86,7 @@ export function optionalTsaTest(caseIds: readonly string[]) {
 }
 
 /** Every run is retained; private keys and full child streams are never console evidence. */
-export async function withGrantFixture(caseId: string, signPath: string, body: (fixture: Fixture) => Promise<void>): Promise<void> {
+export async function withGrantFixture(caseId: string, signPath: string, body: (fixture: Fixture) => Promise<void>, options?: { accuracy?: "secs:1,millisecs:234" }): Promise<void> {
   const requests: RequestRecord[] = [];
   const sockets = new Map<Socket, SocketRecord>();
   const terminals: Promise<void>[] = [];
@@ -101,6 +101,7 @@ export async function withGrantFixture(caseId: string, signPath: string, body: (
   let selectedTool: SelectedTool | undefined;
   let resultObservation: Record<string, unknown> | null = null;
   let replyObservation: Record<string, unknown> | null = null;
+  let issuerProfile: Record<string, unknown> | undefined;
   let origin = "";
   let listenerStarted = false;
   let listenerClosed = false;
@@ -270,7 +271,12 @@ export async function withGrantFixture(caseId: string, signPath: string, body: (
     writeOwned("root.cnf", "[req]\nprompt=no\ndistinguished_name=dn\n[dn]\nCN=AMC TSA GRANT ROOT TEST ONLY\n[root_ca]\nbasicConstraints=critical,CA:true,pathlen:0\nkeyUsage=critical,keyCertSign,cRLSign\nsubjectKeyIdentifier=hash\n");
     writeOwned("req.cnf", "[req]\nprompt=no\ndistinguished_name=dn\n[dn]\nCN=AMC TSA GRANT SIGNER TEST ONLY\n");
     writeOwned("extensions.cnf", "[tsa_leaf]\nbasicConstraints=critical,CA:false\nkeyUsage=critical,digitalSignature\nextendedKeyUsage=critical,timeStamping\nsubjectKeyIdentifier=hash\nauthorityKeyIdentifier=keyid:always,issuer\n");
-    const tsaConfig = writeOwned("tsa.cnf", "[tsa]\ndefault_tsa=tsa_local\n[tsa_local]\nserial=tsa-serial.txt\nsigner_cert=tsa.pem\nsigner_key=tsa.key\ncerts=root.pem\nsigner_digest=sha256\ndefault_policy=1.2.3.4.1\ndigests=sha256\ness_cert_id_alg=sha256\ness_cert_id_chain=no\nordering=no\nclock_precision_digits=0\ntsa_name=no\n");
+    const tsaConfig = writeOwned("tsa.cnf", "[tsa]\ndefault_tsa=tsa_local\n[tsa_local]\nserial=tsa-serial.txt\nsigner_cert=tsa.pem\nsigner_key=tsa.key\ncerts=root.pem\nsigner_digest=sha256\ndefault_policy=1.2.3.4.1\ndigests=sha256\ness_cert_id_alg=sha256\ness_cert_id_chain=no\nordering=no\nclock_precision_digits=0\ntsa_name=no\n"
+      + (options?.accuracy === "secs:1,millisecs:234" ? "accuracy=secs:1,millisecs:234\n" : ""));
+    if (options?.accuracy === "secs:1,millisecs:234") {
+      const configBytes = readFileSync(tsaConfig);
+      issuerProfile = { accuracy: options.accuracy, configBytes: configBytes.length, configSha256: sha256(configBytes) };
+    }
     writeOwned("tsa-serial.txt", "01\n");
     for (const name of ["root.key", "root.pem", "tsa.key", "tsa.csr", "tsa.pem"]) writeOwned(name, Buffer.alloc(0));
     childEnv = { HOME: home, OPENSSL_CONF: tsaConfig,
@@ -333,7 +339,8 @@ export async function withGrantFixture(caseId: string, signPath: string, body: (
         const verified = verifyTimestampToken({ token: readFileSync(request.responseFile), expectedDigestHex,
           nonceHex: nonce, anchors: [anchor] });
         replyObservation = { path, querySha256: sha256(request.body), responseSha256: sha256(readFileSync(request.responseFile)),
-          queryBoundOpenSslVerified: true, amcVerified: verified.ok, refusalCode: verified.ok ? null : verified.code };
+          queryBoundOpenSslVerified: true, amcVerified: verified.ok, refusalCode: verified.ok ? null : verified.code,
+          ...(options?.accuracy === "secs:1,millisecs:234" ? { accuracyMs: verified.ok ? verified.attested.accuracyMs : null } : {}) };
         expect(verified.ok).toBe(true);
         if (!verified.ok) throw new Error(`real owned reply refused: ${verified.code}`);
         expect(verified.attested.tsa.certSha256).toBe(sha256(leaf.raw));
@@ -341,6 +348,7 @@ export async function withGrantFixture(caseId: string, signPath: string, body: (
         expect(verified.attested.policyOid).toBe(POLICY);
         expect(verified.attested.messageImprint).toEqual({ hashAlgorithm: "sha256", digest: expectedDigestHex });
         expect(verified.attested.revocationChecked).toBe(false);
+        expect(verified.attested.accuracyMs).toBe(options?.accuracy === "secs:1,millisecs:234" ? 1234 : null);
         return verified.attested;
       } });
   } catch (error) { failed = true; primary = error; }
@@ -370,6 +378,7 @@ export async function withGrantFixture(caseId: string, signPath: string, body: (
       const publicRecord = { caseId, checkout: CHECKOUT, workspace, retainedPrivateRoot: privateRoot,
         tool: selectedTool ?? null, reviewedDocumentation: { version: REVIEWED_OPENSSL_VERSION, path: REVIEWED_OPENSSL_DOC },
         resultObservation, replyObservation,
+        ...(issuerProfile === undefined ? {} : { issuerProfile }),
         listenerStarted, listenerClosed, socketCount: sockets.size, socketsClosed: [...sockets.values()].every(socket => socket.closed),
         requests: requests.map(({ body: query, headers, ...request }) => ({ ...request, queryBytes: query.length,
           querySha256: sha256(query), contentType: headers["content-type"], accept: headers.accept })),

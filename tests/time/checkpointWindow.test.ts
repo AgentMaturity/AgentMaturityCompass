@@ -21,7 +21,7 @@ import { rawSignature, testKey, trustList } from "../trust/trustFixtures.js";
 import { ANCHOR_ID, POLICY, optionalTsaTest, withGrantFixture, type Fixture } from "./tsaTestFixture.js";
 
 const CHECKOUT = realpathSync(fileURLToPath(new URL("../../", import.meta.url)));
-const optionalCheckpointTest = optionalTsaTest(["CHECKPOINT-PENDING-GRANT", "CHECKPOINT-REQUIRED-REFUSAL", "CHECKPOINT-TWO-BOUND-WINDOW", "CHECKPOINT-EVENT-CADENCE", "CHECKPOINT-PERSISTED-PRODUCER-CLAIMS"]);
+const optionalCheckpointTest = optionalTsaTest(["CHECKPOINT-PENDING-GRANT", "CHECKPOINT-REQUIRED-REFUSAL", "CHECKPOINT-TWO-BOUND-WINDOW", "CHECKPOINT-EVENT-CADENCE", "CHECKPOINT-PERSISTED-PRODUCER-CLAIMS", "CHECKPOINT-SIGNED-ACCURACY"]);
 const sha256 = (bytes: string | Buffer): string => createHash("sha256").update(bytes).digest("hex");
 
 function filePin(path: string) {
@@ -793,5 +793,177 @@ describe("P1-25 real signed ledger checkpoint transitions", () => {
         expect(finalVerification.ok && finalVerification.chain.ok && finalVerification.governance.ok && finalVerification.trustRoot.anchored).toBe(true);
       });
     });
+  });
+
+  optionalCheckpointTest("widens genuine signed checkpoint windows by nonzero accuracy at inclusive default and zero-tolerance edges", async () => {
+    await withGrantFixture("CHECKPOINT-SIGNED-ACCURACY", "/accuracy-good", async tsa => {
+      await withCheckpointWorkspace("CHECKPOINT-SIGNED-ACCURACY", tsa, async fixture => {
+        fixture.facts.windowBoundary = "two genuine query-bound grants with signed Accuracy 1234 ms widen both reader bounds; inclusive default and zero-tolerance edges only; no clock, row or scheduler change";
+        const stages: Array<Record<string, unknown>> = [];
+        const independentGrants: Array<Record<string, unknown>> = [];
+        const accuracy: Record<string, unknown> = { requestedProfile: "secs:1,millisecs:234", expectedAccuracyMs: 1234,
+          readerClaimsOnly: true, persistedRowTimestampsOrClockEdited: false, stages, independentGrants };
+        fixture.facts.signedAccuracy = accuracy;
+        const recordGrant = (attested: Awaited<ReturnType<Fixture["verifyReply"]>>): void => {
+          independentGrants.push({ genTime: attested.genTime, accuracyMs: attested.accuracyMs, digest: attested.messageImprint.digest,
+            anchorId: attested.tsa.anchorId, signerCertSha256: attested.tsa.certSha256,
+            tokenSha256: sha256(Buffer.from(attested.tokenDerB64, "base64")), revocationChecked: attested.revocationChecked });
+        };
+        fixture.configure(false, "/accuracy-good");
+        const beforeFirst = fixture.events();
+        const firstResult = await checkpointLedger(tsa.workspace, fixture.trust);
+        const firstChain = readCheckpointChain(tsa.workspace);
+        stages.push({ id: "first-checkpoint", result: firstResult, chain: firstChain, requestPaths: tsa.requests.map(request => request.path) });
+        expect(firstChain).toHaveLength(1);
+        const first = firstChain[0]!;
+        const firstGrant = await tsa.verifyReply("/accuracy-good", first.sha256);
+        recordGrant(firstGrant);
+        const firstPath = join(checkpointsDir(tsa.workspace), "1.json");
+        const firstTokenPath = join(checkpointsDir(tsa.workspace), "1.tsr");
+        const firstBytes = readFileSync(firstPath);
+        const firstToken = readFileSync(firstTokenPath);
+        const firstSignatureValid = checkpointSignatureValid(firstPath, first.sha256, fixture.monitorPem);
+        const firstEvents = fixture.events();
+        const firstRows = firstEvents.filter(event => event.event_type === "time/checkpoint");
+        const firstVerification = fixture.verify();
+        accuracy.first = { result: firstResult, checkpoint: first, checkpointPin: filePin(firstPath), tokenPin: filePin(firstTokenPath),
+          signatureValid: firstSignatureValid, tokenMatchesIndependentGrant: firstToken.equals(Buffer.from(firstGrant.tokenDerB64, "base64")),
+          checkpointRows: firstRows.map(event => ({ id: event.id, eventHash: event.event_hash, meta: JSON.parse(event.meta_json) as unknown })),
+          ledger: { ok: firstVerification.ok, chain: firstVerification.chain.ok, governance: firstVerification.governance.ok,
+            anchored: firstVerification.trustRoot.anchored, errors: firstVerification.errors.length } };
+        expect(firstResult).toEqual({ sequence: 1, status: "timestamped", failures: [] });
+        expect(firstSignatureValid).toBe(true);
+        expect(firstToken.equals(Buffer.from(firstGrant.tokenDerB64, "base64"))).toBe(true);
+        expect(first.checkpoint.ledger).toEqual({ eventCount: beforeFirst.length, headEventHash: beforeFirst[beforeFirst.length - 1]!.event_hash });
+        expect(firstRows).toHaveLength(1);
+        expect(JSON.parse(firstRows[0]!.meta_json)).toEqual({ checkpointSequence: 1, checkpointSha256: first.sha256, tokenSha256: sha256(firstToken) });
+        expect(firstVerification.ok && firstVerification.chain.ok && firstVerification.governance.ok && firstVerification.trustRoot.anchored).toBe(true);
+        expect(firstVerification.errors).toHaveLength(0);
+
+        const middleId = fixture.appendSealedAudit("accuracy-between-checkpoints");
+        const beforeSecond = fixture.events();
+        const storedMiddle = beforeSecond.find(event => event.id === middleId);
+        stages.push({ id: "middle-appended", row: storedMiddle === undefined ? null : {
+          id: storedMiddle.id, ts: storedMiddle.ts, eventHash: storedMiddle.event_hash, index: beforeSecond.indexOf(storedMiddle) } });
+        expect(storedMiddle).toBeDefined();
+        if (storedMiddle === undefined) throw new Error("signed-accuracy middle event is absent");
+        const secondResult = await checkpointLedger(tsa.workspace, fixture.trust);
+        const chain = readCheckpointChain(tsa.workspace);
+        stages.push({ id: "second-checkpoint", result: secondResult, chain, requestPaths: tsa.requests.map(request => request.path) });
+        expect(chain).toHaveLength(2);
+        const second = chain[1]!;
+        expect(tsa.requests.map(request => request.path)).toEqual(["/accuracy-good", "/accuracy-good"]);
+        const secondGrant = await tsa.verifyReply("/accuracy-good", second.sha256, 1);
+        recordGrant(secondGrant);
+        const secondPath = join(checkpointsDir(tsa.workspace), "2.json");
+        const secondTokenPath = join(checkpointsDir(tsa.workspace), "2.tsr");
+        const secondBytes = readFileSync(secondPath);
+        const secondToken = readFileSync(secondTokenPath);
+        const events = fixture.events();
+        const verification = fixture.verify();
+        const checkpointRows = events.filter(event => event.event_type === "time/checkpoint");
+        const middleIndex = events.findIndex(event => event.id === middleId);
+        const middle = events[middleIndex];
+        const lowerIndex = events.findIndex(event => event.id === firstRows[0]!.id);
+        const upperIndex = events.findIndex(event => event.id === checkpointRows[1]?.id);
+        const signaturesValid = checkpointSignatureValid(firstPath, first.sha256, fixture.monitorPem)
+          && checkpointSignatureValid(secondPath, second.sha256, fixture.monitorPem);
+        accuracy.covered = { results: [firstResult, secondResult], checkpoints: chain,
+          checkpointPins: [filePin(firstPath), filePin(secondPath)], tokenPins: [filePin(firstTokenPath), filePin(secondTokenPath)],
+          signaturesValid, firstCheckpointBytesUnchanged: readFileSync(firstPath).equals(firstBytes),
+          checkpointRows: checkpointRows.map(event => ({ id: event.id, eventHash: event.event_hash, meta: JSON.parse(event.meta_json) as unknown })),
+          lowerIndex, middleIndex, upperIndex, ledger: { ok: verification.ok, chain: verification.chain.ok,
+            governance: verification.governance.ok, anchored: verification.trustRoot.anchored, errors: verification.errors.length } };
+        expect(secondResult).toEqual({ sequence: 2, status: "timestamped", failures: [] });
+        expect(signaturesValid).toBe(true);
+        expect(chain[0]).toEqual(first);
+        expect(second.checkpoint.previousCheckpointSha256).toBe(first.sha256);
+        expect(second.checkpoint.ledger).toEqual({ eventCount: beforeSecond.length, headEventHash: beforeSecond[beforeSecond.length - 1]!.event_hash });
+        expect(secondToken.equals(Buffer.from(secondGrant.tokenDerB64, "base64"))).toBe(true);
+        expect(checkpointRows).toHaveLength(2);
+        expect(checkpointRows.map(event => JSON.parse(event.meta_json))).toEqual([
+          { checkpointSequence: 1, checkpointSha256: first.sha256, tokenSha256: sha256(firstToken) },
+          { checkpointSequence: 2, checkpointSha256: second.sha256, tokenSha256: sha256(secondToken) }
+        ]);
+        expect(verification.ok && verification.chain.ok && verification.governance.ok && verification.trustRoot.anchored).toBe(true);
+        expect(verification.errors).toHaveLength(0);
+        expect(events.slice(0, beforeSecond.length)).toEqual(beforeSecond);
+        expect(middle).toEqual(storedMiddle);
+        expect(lowerIndex >= 0 && lowerIndex < middleIndex && middleIndex < upperIndex).toBe(true);
+        if (middle === undefined) throw new Error("covered signed-accuracy middle event is absent");
+        expect(firstGrant.accuracyMs).toBe(1234);
+        expect(secondGrant.accuracyMs).toBe(1234);
+        const lowerMs = Date.parse(firstGrant.genTime);
+        const upperMs = Date.parse(secondGrant.genTime);
+        const lowerAccuracyMs = firstGrant.accuracyMs;
+        const upperAccuracyMs = secondGrant.accuracyMs;
+        expect(lowerAccuracyMs !== null && upperAccuracyMs !== null).toBe(true);
+        if (lowerAccuracyMs === null || upperAccuracyMs === null) throw new Error("genuine signed Accuracy is absent");
+        expect(Number.isInteger(lowerAccuracyMs) && lowerAccuracyMs > 0 && Number.isInteger(upperAccuracyMs) && upperAccuracyMs > 0).toBe(true);
+        expect(Number.isFinite(lowerMs) && Number.isFinite(upperMs) && lowerMs <= upperMs).toBe(true);
+
+        const timeline = ledgerTimeline(tsa.workspace, events, { anchors: [tsa.anchor] });
+        const zeroTimeline = ledgerTimeline(tsa.workspace, events, { anchors: [tsa.anchor], toleranceMinutes: 0 });
+        const defaultLowerEdge = lowerMs - lowerAccuracyMs - 300_000;
+        const defaultUpperEdge = upperMs + upperAccuracyMs + 300_000;
+        const zeroLowerEdge = lowerMs - lowerAccuracyMs;
+        const zeroUpperEdge = upperMs + upperAccuracyMs;
+        const defaultClaims: Array<{ id: string; claimedTs: number; expected: string[] }> = [
+          { id: "default-lower-inclusive", claimedTs: defaultLowerEdge, expected: [] },
+          { id: "default-lower-one-ms-beyond", claimedTs: defaultLowerEdge - 1, expected: ["BACKDATED_CLAIM"] },
+          { id: "default-upper-inclusive", claimedTs: defaultUpperEdge, expected: [] },
+          { id: "default-upper-one-ms-beyond", claimedTs: defaultUpperEdge + 1, expected: ["POSTDATED_CLAIM"] }
+        ];
+        const zeroClaims: Array<{ id: string; claimedTs: number; expected: string[] }> = [
+          { id: "zero-lower-inclusive", claimedTs: zeroLowerEdge, expected: [] },
+          { id: "zero-lower-one-ms-beyond", claimedTs: zeroLowerEdge - 1, expected: ["BACKDATED_CLAIM"] },
+          { id: "zero-upper-inclusive", claimedTs: zeroUpperEdge, expected: [] },
+          { id: "zero-upper-one-ms-beyond", claimedTs: zeroUpperEdge + 1, expected: ["POSTDATED_CLAIM"] },
+          { id: "zero-refuses-default-lower-edge", claimedTs: defaultLowerEdge, expected: ["BACKDATED_CLAIM"] },
+          { id: "zero-refuses-default-upper-edge", claimedTs: defaultUpperEdge, expected: ["POSTDATED_CLAIM"] }
+        ];
+        const defaultObservations = defaultClaims.map(row => ({ ...row, result: timeline.eventTime(middleIndex, row.claimedTs) }));
+        const zeroObservations = zeroClaims.map(row => ({ ...row, result: zeroTimeline.eventTime(middleIndex, row.claimedTs) }));
+        const actualMiddle = timeline.eventTime(middleIndex, middle.ts);
+        const zeroActualMiddle = zeroTimeline.eventTime(middleIndex, middle.ts);
+        const afterReads = fixture.events();
+        const finalVerification = fixture.verify();
+        const oldFilesUnchanged = readFileSync(firstPath).equals(firstBytes) && readFileSync(firstTokenPath).equals(firstToken)
+          && readFileSync(secondPath).equals(secondBytes) && readFileSync(secondTokenPath).equals(secondToken);
+        accuracy.observations = { bounds: { lowerMs, upperMs, lowerAccuracyMs, upperAccuracyMs, defaultToleranceMs: 300_000,
+          defaultLowerEdge, defaultUpperEdge, zeroLowerEdge, zeroUpperEdge }, checkpoints: timeline.checkpoints,
+          zeroCheckpoints: zeroTimeline.checkpoints, defaultObservations, zeroObservations,
+          middle: { id: middle.id, ts: middle.ts, eventHash: middle.event_hash, index: middleIndex, actualMiddle, zeroActualMiddle } };
+        accuracy.final = { eventsUnchangedByReader: JSON.stringify(afterReads) === JSON.stringify(events), oldFilesUnchanged,
+          ledger: { ok: finalVerification.ok, chain: finalVerification.chain.ok, governance: finalVerification.governance.ok,
+            anchored: finalVerification.trustRoot.anchored, errors: finalVerification.errors.length } };
+        expect([defaultLowerEdge, defaultUpperEdge, zeroLowerEdge, zeroUpperEdge].every(Number.isInteger)).toBe(true);
+        expect(defaultLowerEdge <= defaultUpperEdge && zeroLowerEdge <= zeroUpperEdge).toBe(true);
+        const expectedCheckpoints = [
+          { sequence: 1, status: "timestamped", genTime: firstGrant.genTime, detail: null },
+          { sequence: 2, status: "timestamped", genTime: secondGrant.genTime, detail: null }
+        ];
+        expect(timeline.checkpoints).toEqual(expectedCheckpoints);
+        expect(zeroTimeline.checkpoints).toEqual(expectedCheckpoints);
+        for (const row of [...defaultObservations, ...zeroObservations]) {
+          expect(row.result.time.claimedAt).toBe(new Date(row.claimedTs).toISOString());
+          expect(row.result.time.basis).toBe("attested-window");
+          expect(row.result.time.window).toEqual({ notBefore: firstGrant.genTime, notAfter: secondGrant.genTime });
+          expect(row.result.time.attested).toEqual(secondGrant);
+          expect(row.result.findings).toEqual(row.expected);
+        }
+        for (const result of [actualMiddle, zeroActualMiddle]) {
+          expect(result.time.claimedAt).toBe(new Date(middle.ts).toISOString());
+          expect(result.time.basis).toBe("attested-window");
+          expect(result.time.window).toEqual({ notBefore: firstGrant.genTime, notAfter: secondGrant.genTime });
+          expect(result.time.attested).toEqual(secondGrant);
+          expect(result.findings).toEqual([]);
+        }
+        expect(afterReads).toEqual(events);
+        expect(oldFilesUnchanged).toBe(true);
+        expect(finalVerification.ok && finalVerification.chain.ok && finalVerification.governance.ok && finalVerification.trustRoot.anchored).toBe(true);
+        expect(finalVerification.errors).toHaveLength(0);
+      });
+    }, { accuracy: "secs:1,millisecs:234" });
   });
 });
