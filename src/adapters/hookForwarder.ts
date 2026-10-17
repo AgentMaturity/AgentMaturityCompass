@@ -468,8 +468,12 @@ const NEVER_BLOCKED = new Set(["Stop", "SubagentStop", "TeammateIdle", "TaskComp
  * How a failed Claude Code control-mode hook answers, by event: deny a tool, block a prompt, never block a start or a
  * stop. A hook event AMC does not install is answered the same way (never with an allow): a blockable one blocks.
  */
-function claudeFailure(event: string | null, forwarding: boolean, error: unknown): HookForwardOutcome {
+function claudeFailure(handler: string | null, payloadEvents: ReadonlySet<string>, forwarding: boolean, error: unknown): HookForwardOutcome {
   const why = error instanceof HookDeadlineError ? "timed out" : redactBridgeText(error instanceof Error ? error.message : String(error));
+  // Claude Code runs a hook for the event its payload names: a PreToolUse or UserPromptSubmit payload is denied or
+  // blocked whichever event the handler was installed for, so exit 0 never lets such a call through here.
+  const event = handler === "PreToolUse" || payloadEvents.has("PreToolUse") ? "PreToolUse"
+    : handler === "UserPromptSubmit" || payloadEvents.has("UserPromptSubmit") ? "UserPromptSubmit" : handler;
   if (event !== null && NEVER_BLOCKED.has(event) && event !== "Stop") {
     return { stdout: `${JSON.stringify({ systemMessage: `AMC does not handle the ${event} hook (${why}).` })}\n`, stderr: "", exitCode: 0 };
   }
@@ -483,6 +487,25 @@ function claudeFailure(event: string | null, forwarding: boolean, error: unknown
   }
   if (error instanceof HookDeadlineError) return claudeDeny("AMC hook control timed out; action denied.");
   return claudeDeny(forwarding ? "AMC hook control unavailable; action denied." : "AMC hook control input invalid; action denied.");
+}
+
+/** Every hook event name a payload could be read as naming (repeated, escaped or malformed forms included). */
+function payloadEventNames(bytes: Buffer): Set<string> {
+  const text = bytes.toString("utf8").replace(/^\uFEFF/, "");
+  const names = new Set([...text.matchAll(/"hook_event_name"\s*:\s*"((?:[^"\\]|\\.){0,128})"/g)].map((match) => {
+    try {
+      return JSON.parse(`"${match[1]}"`) as string;
+    } catch {
+      return match[1]!;
+    }
+  }));
+  try {
+    const name = (JSON.parse(text) as { hook_event_name?: unknown }).hook_event_name;
+    if (typeof name === "string") names.add(name);
+  } catch {
+    // Unparseable: the names matched above stand.
+  }
+  return names;
 }
 
 /** Claude Code's payload bytes read the one way they can be read, then the installation's bound release's payload schema. */
@@ -506,10 +529,12 @@ async function answerClaudeHook(opts: HookForwardOptions, readInput: () => Promi
   deadlineMs: number): Promise<HookForwardOutcome> {
   const handler = opts.event ?? null;
   let forwarding = false;
+  let payloadEvents: ReadonlySet<string> = new Set();
   try {
     return await withHookDeadline(deadlineMs, async (signal) => {
       const received = await readInput();
       const bytes = typeof received === "string" ? Buffer.from(received, "utf8") : received;
+      payloadEvents = payloadEventNames(bytes);
       switch (handler) {
         case "PreToolUse": {
           const { payload, text } = claudePayload(bytes, opts, workspace);
@@ -540,7 +565,7 @@ async function answerClaudeHook(opts: HookForwardOptions, readInput: () => Promi
       throw new HookIntegrationError("HOOK_INPUT_UNSUPPORTED", `AMC's Claude Code hook handler names no event AMC handles (${handler ?? "none"}); reinstall the hook`);
     });
   } catch (error) {
-    return claudeFailure(handler, forwarding, error);
+    return claudeFailure(handler, payloadEvents, forwarding, error);
   }
 }
 

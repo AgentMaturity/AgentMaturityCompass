@@ -230,6 +230,8 @@ under `/usr/local/lib/node_modules/agent-maturity-compass`). Each handler runs i
    bytes' digest, the targets it resolved and the authorization record.
 3. The forwarder lets a call through only through `claudeAllow`, after verifying that row and its receipt, and then
    answers exit 0 with `{}`: no permission decision, so Claude Code's own permission settings and prompts still decide.
+   No other path answers exit 0 to a PreToolUse: a PreToolUse payload that reaches any other AMC handler is denied, and a
+   UserPromptSubmit payload is blocked.
    A permission mode (`bypassPermissions`, `dontAsk`, …) never weakens a deny, and a Claude Code `ask` is never AMC
    approval: AMC has no approval path for hook calls, so a call that needs approval is denied.
 

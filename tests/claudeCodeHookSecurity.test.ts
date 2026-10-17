@@ -332,9 +332,10 @@ describe("authorization bypass (round two)", () => {
       expect(stopAtPre.exitCode).toBe(2);
       expect(stopAtPre.stdout).toContain('"permissionDecision":"deny"');
       const allowedRead = pre(workspace, "Read", { file_path: join(cwdOf(workspace), "workspace", "public.txt") });
+      // Claude Code runs a hook for the event its payload names: a PreToolUse payload at any AMC handler is denied (exit 2).
       const preAtStop = await runHookForward({ ...opts, event: "Stop" }, async () => JSON.stringify(allowedRead), workspace, 5_000);
-      expect(preAtStop.exitCode).toBe(0);
-      expect(preAtStop.stdout).not.toContain("allow");
+      expect(preAtStop.exitCode).toBe(2);
+      expect(preAtStop.stdout).toContain('"permissionDecision":"deny"');
     } finally {
       await bridge.close();
     }

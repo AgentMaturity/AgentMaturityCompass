@@ -5,6 +5,7 @@
  * fuzzed payloads: whenever an answer would let a tool run, claudeAllow must have returned an allow for those exact bytes.
  */
 import { createHash } from "node:crypto";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import { runHookForward, type HookForwardOptions } from "../src/adapters/hookForwarder.js";
@@ -62,7 +63,10 @@ async function run(handler: string | undefined, bytes: Buffer): Promise<boolean>
   const opts: HookForwardOptions = { provider: "claude-code", mode: "control", agent: agentId, tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: bridgeBase,
     ...(handler ? { event: handler } : {}) };
   const out = await runHookForward(opts, async () => bytes, workspace, 5_000);
-  const allowLike = (handler === "PreToolUse" && out.exitCode === 0) || /"permissionDecision"\s*:\s*"allow"|"decision"\s*:\s*"approve"|"continue"\s*:\s*true/.test(out.stdout);
+  // Claude Code runs a hook for the event its payload names; for PreToolUse any exit 0 (the silent {} allow included) lets
+  // the tool run, whichever event the handler was installed for.
+  const preToolUse = handler === "PreToolUse" || /"hook_event_name"\s*:\s*"PreToolUse"/.test(bytes.toString("utf8"));
+  const allowLike = (preToolUse && out.exitCode === 0) || /"permissionDecision"\s*:\s*"allow"|"decision"\s*:\s*"approve"|"continue"\s*:\s*true/.test(out.stdout);
   const vouched = allows.slice(before).some((digest) => digest === sha256(bytes));
   expect(allowLike, `${handler}: ${out.stdout}`).toBe(vouched);
   if (handler === undefined) expect(out.exitCode).toBe(2);
@@ -104,6 +108,20 @@ function mutate(random: () => number): Buffer {
 }
 
 describe("an allow only ever comes out of claudeAllow", () => {
+  test("a session the foreign-hook rule leaves not governed is denied with exit 2", async () => {
+    mkdirSync(join(workspace, ".claude", "skills", "s"), { recursive: true });
+    writeFileSync(join(workspace, ".claude", "skills", "s", "SKILL.md"), "---\nname: s\nhooks:\n  PreToolUse: []\n---\n");
+    try {
+      const opts: HookForwardOptions = { provider: "claude-code", mode: "control", agent: agentId, tokenFile: ".amc/hooks/claude-code.lease",
+        bridgeUrl: bridgeBase, event: "PreToolUse" };
+      const out = await runHookForward(opts, async () => Buffer.from(JSON.stringify(allowedRead())), workspace, 5_000);
+      expect(out.exitCode).toBe(2);
+      expect(out.stderr).toMatch(/not governed/);
+    } finally {
+      rmSync(join(workspace, ".claude", "skills"), { recursive: true, force: true });
+    }
+  });
+
   test("every pinned hook event, sent to every handler and to one naming no event", async () => {
     for (const handler of HANDLERS) {
       for (const event of EVENTS) await run(handler, Buffer.from(JSON.stringify({ ...allowedRead(), hook_event_name: event })));
