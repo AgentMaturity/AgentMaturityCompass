@@ -246,8 +246,11 @@ command can still reach these files through a path it does not name (`'/usr/bin/
 outside Claude Code (`.claude/settings.local.json` stays user-editable).
 
 What AMC re-reads: every decision re-reads the settings files Claude Code merges (managed, user, project, local),
-plugins enabled there included, and stops governing a session whose hooks changed. Skill and agent frontmatter and the
-process's arguments are read at registration only. Foreign hooks on events that cannot change a call's input (for
+plugins enabled there included, and checks that the session's skill and agent files are the ones it registered with;
+any change, or a source AMC cannot read or parse, means the session is not governed. The process's arguments are read
+at registration only (they cannot change while it runs). Paths are compared one way everywhere: resolved through
+symlinks from the working directory, with `~` expanded, and each segment folded (NFKC, case, trailing dots), so
+`.AMC`, `./x/../.amc`, a link to `.amc`, a full-width `．ａｍｃ` and `.amc.` all count as `.amc`. Foreign hooks on events that cannot change a call's input (for
 example PostToolUse, Stop or Notification) are not refused: they run workspace code outside AMC's decisions.
 
 **Residual window.** AMC resolves each path through symlinks when it decides and binds the decision to the resolved

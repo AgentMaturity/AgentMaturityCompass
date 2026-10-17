@@ -6,7 +6,7 @@
  */
 import { execFileSync } from "node:child_process";
 import { homedir } from "node:os";
-import { existsSync, readdirSync, readFileSync, readlinkSync, realpathSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, readlinkSync, realpathSync, statSync } from "node:fs";
 import { basename, delimiter, dirname, isAbsolute, join, normalize, relative, resolve, sep } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
@@ -57,16 +57,25 @@ export function claudeSessionSha256(sessionId: string): string {
 }
 
 /**
- * Where Claude Code opens an absolute `path` (its file tools expand `~` and relative paths before hooks run), followed
- * through symlinks with the case the file system stores and named inside the workspace when it lies there. Null for
- * a form with more than one spelling or one AMC cannot resolve as the OS does: not absolute, `.` or `..` segments, a
- * repeated or trailing separator, not NFC, a control character, a dangling link, any path on Windows.
+ * The one resolver every Claude Code path check uses: `~` and a path relative to `cwd` expanded, then followed through
+ * symlinks with the case the file system stores and named inside the workspace when it lies there. Null for a value
+ * that is not NFC, holds a control character, or cannot be resolved as the OS would (a dangling link, any path on Windows).
+ */
+function claudeResolvePath(value: string, workspace: string, cwd: string): string | null {
+  if (process.platform === "win32" || value.length === 0 || value.normalize("NFC") !== value || /[\u0000-\u001f\u007f]/.test(value)) return null;
+  const expanded = value === "~" ? homedir() : value.startsWith("~/") ? join(homedir(), value.slice(2)) : value;
+  const real = realLocation(normalize(isAbsolute(expanded) ? expanded : join(cwd, expanded)));
+  return real === null ? null : inWorkspace(real, workspace);
+}
+
+/**
+ * Where Claude Code opens an absolute `path` (its file tools expand `~` and relative paths before hooks run), through
+ * claudeResolvePath, for a value in its one canonical spelling: absolute, no `.` or `..` segment, no repeated or
+ * trailing separator. Null otherwise (the call is then unmapped and denied).
  */
 function claudeFileLocation(value: unknown, workspace: string): string | null {
-  if (process.platform === "win32" || typeof value !== "string" || !isAbsolute(value) || normalize(value) !== value
-    || (value.length > 1 && value.endsWith(sep)) || value.normalize("NFC") !== value || /[\u0000-\u001f\u007f]/.test(value)) return null;
-  const real = realLocation(value);
-  return real === null ? null : inWorkspace(real, workspace);
+  if (typeof value !== "string" || !isAbsolute(value) || normalize(value) !== value || (value.length > 1 && value.endsWith(sep))) return null;
+  return claudeResolvePath(value, workspace, "/");
 }
 
 /** A glob that stays under the directory it searches: not absolute, no `~`, no `..` anywhere (a brace alternative included), no escape. */
@@ -130,21 +139,27 @@ export function claudeToolRequest(toolName: string, input: Record<string, unknow
   return null;
 }
 
+/**
+ * A path segment in the form AMC compares: NFKC (full-width and other compatibility lookalikes), case-folded (macOS and
+ * Windows volumes are case-insensitive by default), trailing dots and spaces dropped (Windows drops them).
+ */
+const fold = (segment: string) => segment.normalize("NFKC").toLowerCase().replace(/[. ]+$/, (dots) => (segment === "." || segment === ".." ? dots : ""));
+const foldPath = (path: string) => path.split(sep).map(fold).join(sep);
 const within = (root: string, location: string) => {
-  const rel = relative(root, location);
+  const rel = relative(foldPath(root), foldPath(location));
   return rel === "" || !(rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel));
 };
 
-/** Whether `location` is in the workspace's `.amc` or is a Claude Code settings file (`.claude/settings*.json`). */
+/** Whether a resolved `location` is in the workspace's `.amc` or is a Claude Code settings file (`.claude/settings*.json`). */
 function amcFile(location: string, workspace: string): boolean {
   return within(join(resolve(workspace), ".amc"), location)
-    || (basename(dirname(location)).toLowerCase() === ".claude" && /^settings(\..*)?\.json$/i.test(basename(location)));
+    || (fold(basename(dirname(location))) === ".claude" && /^settings(\..*)?\.json$/.test(fold(basename(location))));
 }
 
 /**
- * Whether a Grep or Glob search root reaches AMC's files: it is in, or holds, the workspace's `.amc`, its `.claude`, or
- * the user's `~/.claude`. Claude Code 2.1.296 searches hidden directories (ripgrep `--hidden`; Glob also `--no-ignore`),
- * so a search of the workspace root would read AMC's hook lease.
+ * Whether a resolved Grep or Glob search root reaches AMC's files: it is in, or holds, the workspace's `.amc` or `.claude`
+ * or the user's `~/.claude`. Claude Code 2.1.296 searches hidden directories (ripgrep `--hidden`; Glob also
+ * `--no-ignore`), so a search of the workspace root would read AMC's hook lease.
  */
 function searchReachesAmc(root: string, workspace: string): boolean {
   const ws = resolve(workspace);
@@ -154,14 +169,15 @@ function searchReachesAmc(root: string, workspace: string): boolean {
 }
 
 /**
- * Whether a pure-form Bash word names AMC's files: a path segment `.amc`, a `.claude/settings*.json`, or a path (the word,
- * or the value after `=`) that resolves, through symlinks and from `cwd`, into `.amc` or onto a settings file.
+ * Whether a pure-form Bash word names AMC's files: the word, or the value after its `=`, resolved by claudeResolvePath
+ * from `cwd`, is in `.amc` or is a settings file; or one of its segments folds to `.amc` (a word that is not a path, such
+ * as `host:.amc/x`).
  */
 function bashWordNamesAmc(word: string, workspace: string, cwd: string): boolean {
-  if (word.split(/[\/=:,]/).some((part) => part.toLowerCase() === ".amc") || /(^|[\/=:,])\.claude[\/]settings[^\/]*\.json$/i.test(word)) return true;
+  if (word.split(/[\\/=:,]/).some((part) => fold(part) === ".amc")) return true;
   return [word, ...(word.includes("=") ? [word.slice(word.indexOf("=") + 1)] : [])].some((value) => {
-    const real = value.length > 0 ? realLocation(isAbsolute(value) ? value : join(cwd, value)) : null;
-    return real !== null && amcFile(inWorkspace(real, workspace), workspace);
+    const location = claudeResolvePath(value, workspace, cwd);
+    return location !== null && amcFile(location, workspace);
   });
 }
 
@@ -192,7 +208,8 @@ export function claudeCodeRefusal(cwd: string, workspace: string, toolName: stri
     return "AMC accepts a WebFetch URL only in its canonical form (as the URL parser writes it), so AMC denied the call.";
   }
   // AMC's own state (its hook lease, ledger and keys) is neither read nor written from a governed session.
-  const location = toolName === "Glob" || toolName === "Grep" ? claudeFileLocation(input.path ?? cwd, workspace) : claudeFileLocation(input.file_path, workspace);
+  const raw = toolName === "Glob" || toolName === "Grep" ? input.path ?? cwd : input.file_path;
+  const location = typeof raw === "string" ? claudeResolvePath(raw, workspace, realCwd!) : null;
   if (location === null) return null;
   if (toolName === "Read" && within(join(resolve(workspace), ".amc"), location)) return "AMC protects its hook configuration.";
   if ((toolName === "Glob" || toolName === "Grep") && searchReachesAmc(location, workspace)) return "AMC protects its hook configuration.";
@@ -242,14 +259,15 @@ export function processExecutable(pid: number): string | null {
   }
 }
 
-/** Markdown files under `root`, at most `depth` directories deep and MAX_HOOK_SOURCES in all. */
+/** Markdown files under `root`, at most `depth` directories deep and MAX_HOOK_SOURCES in all. A directory AMC cannot list throws. */
 const MAX_HOOK_SOURCES = 1_000;
 function markdownFiles(root: string, depth: number, found: string[] = []): string[] {
   let entries: import("node:fs").Dirent[];
   try {
     entries = readdirSync(root, { withFileTypes: true });
-  } catch {
-    return found;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return found;
+    throw error;
   }
   for (const entry of entries) {
     if (found.length >= MAX_HOOK_SOURCES) break;
@@ -273,25 +291,58 @@ function frontmatterHooks(path: string): boolean {
   }
 }
 
+/** The skill and agent files Claude Code reads for a session: under the project's `.claude` and the user's configuration directory. */
+function hookSourceFiles(workspace: string, configDir: string): string[] {
+  return [join(resolve(workspace), ".claude"), configDir].flatMap((dir) => [...markdownFiles(join(dir, "skills"), 2), ...markdownFiles(join(dir, "agents"), 2)]);
+}
+
+/** A digest of those files' identities (path, device, inode, size, times): any added, removed or changed file changes it. */
+function hookSourcesDigest(files: readonly string[]): string {
+  return sha256Hex(canonicalize(files.map((file) => {
+    try {
+      const stat = statSync(file);
+      return [file, stat.dev, stat.ino, stat.size, stat.mtimeMs, stat.ctimeMs];
+    } catch {
+      return [file, "unreadable"];
+    }
+  })));
+}
+
 /**
- * Why a Claude Code session may run hooks AMC did not install, beyond its settings files, or null: a skill or agent whose
- * frontmatter declares hooks (in the project's `.claude` or the user's configuration directory), or a Claude Code process
- * started with `--settings` or `--plugin-dir`. AMC cannot read its arguments: refused too. Not needed when Claude Code
- * runs only managed hooks.
+ * Why a Claude Code session may run hooks AMC did not install, beyond its settings files, and the digest of its skill and
+ * agent files: a skill or agent whose frontmatter declares hooks (in the project's `.claude` or the user's configuration
+ * directory), a directory AMC cannot list, or (with `pid`) a process started with `--settings` or `--plugin-dir` or
+ * whose arguments AMC cannot read. Not needed when Claude Code runs only managed hooks.
  */
-export function claudeSessionHookSources(input: { workspace: string; configDir: string; pid: number }): string | null {
-  for (const dir of [join(resolve(input.workspace), ".claude"), input.configDir]) {
-    const declared = [...markdownFiles(join(dir, "skills"), 2), ...markdownFiles(join(dir, "agents"), 2)].find(frontmatterHooks);
-    if (declared) return `the skill or agent ${declared} declares hooks AMC did not install`;
+export function claudeSessionHookSources(input: { workspace: string; configDir: string; pid?: number }): { problem: string | null; digest: string } {
+  let files: string[];
+  try {
+    files = hookSourceFiles(input.workspace, input.configDir);
+  } catch (error) {
+    return { problem: `AMC cannot list this session's skills or agents (${error instanceof Error ? error.message : String(error)})`, digest: "" };
   }
+  const digest = hookSourcesDigest(files);
+  const result = (problem: string | null) => ({ problem, digest });
+  const declared = files.find(frontmatterHooks);
+  if (declared) return result(`the skill or agent ${declared} declares hooks AMC did not install`);
+  if (input.pid === undefined) return result(null);
   let args: string;
   try {
     args = process.platform === "linux" ? readFileSync(`/proc/${input.pid}/cmdline`, "utf8").split("\0").join(" ")
       : execFileSync("ps", ["-o", "args=", "-p", String(input.pid)], { encoding: "utf8", timeout: 5_000 });
   } catch {
-    return "AMC cannot read this Claude Code process's arguments";
+    return result("AMC cannot read this Claude Code process's arguments");
   }
-  return /(^|\s)--(settings|plugin-dir)(=|\s|$)/.test(args) ? "this Claude Code process was started with --settings or --plugin-dir, which can add hooks AMC did not install" : null;
+  return result(/(^|\s)--(settings|plugin-dir)(=|\s|$)/.test(args) ? "this Claude Code process was started with --settings or --plugin-dir, which can add hooks AMC did not install" : null);
+}
+
+/** The digest of a session's skill and agent files now, or null when AMC cannot list them: compared with the registered one at every decision. */
+export function claudeHookSourcesDigest(workspace: string, configDir: string): string | null {
+  try {
+    return hookSourcesDigest(hookSourceFiles(workspace, configDir));
+  } catch {
+    return null;
+  }
 }
 
 export interface ClaudeHookBinding { readonly eventName: string; readonly handlerSha256: string }
@@ -371,6 +422,9 @@ export function scanClaudeHookSettings(input: { workspace: string; userSettingsP
   const othersRun = !managed.some((file) => file.value!.allowManagedHooksOnly === true)
     && !read.some((file) => file.scope !== "managed" && file.value!.disableAllHooks === true);
   foreignHooksBlocked = !othersRun;
+  const malformed = read.find((file) => file.value!.enabledPlugins !== undefined
+    && !(isObject(file.value!.enabledPlugins) && Object.values(file.value!.enabledPlugins).every((enabled) => typeof enabled === "boolean")));
+  if (malformed) return result(`enabledPlugins in ${malformed.path} is not an object of booleans`);
   // A plugin's hooks run beside AMC's (with managed hooks only, so do those of plugins managed settings force-enable).
   const plugin = (othersRun ? read : managed).find((file) => isObject(file.value!.enabledPlugins)
     && Object.values(file.value!.enabledPlugins).some((enabled) => enabled === true));

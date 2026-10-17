@@ -12,10 +12,10 @@
  */
 import { randomUUID } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { isAbsolute, join, resolve } from "node:path";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 import { z } from "zod";
 import {
-  CLAUDE_MANAGED_SETTINGS_DIRS, claudeCodeBindingSchema, claudeSessionHookSources, claudeSessionSha256, processExecutable, QUALIFIED_CLAUDE_CODE_VERSIONS,
+  CLAUDE_MANAGED_SETTINGS_DIRS, claudeCodeBindingSchema, claudeHookSourcesDigest, claudeSessionHookSources, claudeSessionSha256, processExecutable, QUALIFIED_CLAUDE_CODE_VERSIONS,
   scanClaudeHookSettings, type ClaudeCodeBinding, type ClaudeHookBinding,
 } from "../adapters/hookProviders/claudeCode.js";
 import { cachedFileSha256, clearPiDigestCache } from "../adapters/pi/piInstall.js";
@@ -52,6 +52,8 @@ const recordSchema = z.strictObject({
   manifestSha256: sha256Schema,
   /** The user settings file of this session's Claude Code configuration directory, scanned at every decision. */
   userSettingsPath: z.string().min(1),
+  /** The digest of the session's skill and agent files when it registered; null when Claude Code runs only managed hooks. */
+  hookSourcesSha256: sha256Schema.nullable(),
   qualified: z.boolean(),
 });
 type ClaudeCodeRegistrationRecord = z.infer<typeof recordSchema>;
@@ -166,7 +168,13 @@ export function claudeCodeSessionRegistration(ledger: LedgerHandle, agentId: str
     return { status: "invalid", reason: `${drift ?? "AMC's hook forwarder changed"} after this session registered` };
   }
   const scan = scanClaudeHookSettings({ workspace: ledger.workspace, userSettingsPath: found.record.userSettingsPath, managedDir, bindings: bindings(manifest) });
-  return scan.problem ? { status: "invalid", reason: `${scan.problem}, after this session registered` } : found;
+  if (scan.problem) return { status: "invalid", reason: `${scan.problem}, after this session registered` };
+  // Skills and agents can add hooks too: while foreign hooks run, their files must be the ones the session registered with.
+  if (!scan.foreignHooksBlocked && (found.record.hookSourcesSha256 === null
+    || claudeHookSourcesDigest(ledger.workspace, dirname(found.record.userSettingsPath)) !== found.record.hookSourcesSha256)) {
+    return { status: "invalid", reason: "this session's skills or agents changed after it registered" };
+  }
+  return found;
 }
 
 /**
@@ -198,11 +206,12 @@ export function registerClaudeCodeSession(input: { workspace: string; authentica
   const scan = scanClaudeHookSettings({ workspace: input.workspace, userSettingsPath, managedDir: input.managedDir === undefined ? defaultManagedDir() : input.managedDir,
     bindings: bindings(manifest) });
   if (scan.problem) throw invalid(scan.problem);
-  const extra = scan.foreignHooksBlocked ? null : claudeSessionHookSources({ workspace: input.workspace, configDir: parsed.amc.configDir, pid: parsed.amc.claudePid });
-  if (extra) throw invalid(extra);
+  const sources = scan.foreignHooksBlocked ? null : claudeSessionHookSources({ workspace: input.workspace, configDir: parsed.amc.configDir, pid: parsed.amc.claudePid });
+  if (sources?.problem) throw invalid(sources.problem);
   const record: ClaudeCodeRegistrationRecord = {
     kind: RECORD_KIND, agentId: input.authenticatedAgentId, sessionSha256: claudeSessionSha256(parsed.session_id), claudeCodeVersion: install.version,
     claudeCodeSha256: install.sha256, forwarderSha256: manifest.claudeCode.forwarder.sha256, manifestSha256: manifest.manifestSha256, userSettingsPath,
+    hookSourcesSha256: sources?.digest ?? null,
     qualified: QUALIFIED_CLAUDE_CODE_VERSIONS.includes(install.version),
   };
   const prefix = prefixFor(input.authenticatedAgentId, parsed.session_id, manifest.manifestSha256);
