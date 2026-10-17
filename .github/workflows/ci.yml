@@ -145,6 +145,11 @@ jobs:
       - name: Diagnostic gate reachability
         run: npm run check:gates
 
+      - name: Set up Helm for full test suite
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5
+        with:
+          version: "v4.3.0"
+
       # Both gates existed as npm scripts that no workflow ran, so docs drift
       # and incident-readiness regressions could merge and ship unchecked.
       # Coverage thresholds were pinned at 0, so the gate could never fail and
