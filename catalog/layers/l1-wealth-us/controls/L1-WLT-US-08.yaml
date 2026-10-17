@@ -45,7 +45,7 @@ binding:
   kind: enforcement_point
   points: [tool_pipeline, egress]
   mechanism: Protected-data admission flags nonpublic information in model requests (P2-02); a monitor that throttles
-    bulk-extraction attempts and alerts is not built yet (P1-79, proposed).
+    bulk-extraction attempts and alerts is not built yet (P1-80, proposed, not yet in the plan).
   parameters: []
   manualDuty: null
 tests:
