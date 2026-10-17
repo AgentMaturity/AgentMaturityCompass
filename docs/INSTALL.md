@@ -126,23 +126,26 @@ docker compose -f docker-compose.tls.yml up -d --build
 
 ## Option E: Kubernetes (Helm)
 
-```bash
-helm install amc deploy/helm/amc \
-  --set replicaCount=2 \
-  --set workspace.persistence.size=10Gi \
-  --set ingress.enabled=true
-```
+First create `amc-bootstrap` in the release namespace using the [private-file or external-secret flow](KUBERNETES_HELM_DEPLOYMENT.md#create-bootstrap-secret). Supply all five keys (`vaultPassphrase`, `ownerUsername`, `ownerPassword`, `notaryPassphrase`, `notaryAuthSecret`), even with the notary disabled. The chart renders no Secret by default.
 
-Validate the chart first:
+Validate the chart before installing:
 
 ```bash
 helm lint deploy/helm/amc
 helm template amc deploy/helm/amc
 ```
 
-See `deploy/helm/amc/values.yaml` for all configurable values.
+Use one replica for the workspace:
 
-For production rollout, secret creation, health checks, rollback, Kustomize, and the Terraform Helm-release example, see `docs/KUBERNETES_HELM_DEPLOYMENT.md`.
+```bash
+helm install amc deploy/helm/amc \
+  --namespace amc-system \
+  --set replicaCount=1 \
+  --set workspace.persistence.size=10Gi \
+  --set ingress.enabled=true
+```
+
+See `deploy/helm/amc/values.yaml` for all configurable values. Explicit chart-managed Secret creation requires `bootstrap.createSecret=true` and all five supplied values; see the operator guide for its release-record exposure and existing-release precautions. These instructions do not establish a qualified deployment.
 
 ## Platform-Specific Notes
 
@@ -201,8 +204,8 @@ cd AgentMaturityCompass && git pull && pnpm install --frozen-lockfile && pnpm ru
 # Docker
 cd deploy/compose && docker compose pull && docker compose up -d --build
 
-# Helm
-helm upgrade amc deploy/helm/amc
+# Helm: review existing Secret ownership and the upgrade notes in docs/KUBERNETES_HELM_DEPLOYMENT.md first.
+helm upgrade amc deploy/helm/amc --namespace amc-system --set replicaCount=1
 ```
 
 ## Uninstalling

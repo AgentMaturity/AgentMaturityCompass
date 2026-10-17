@@ -31,23 +31,43 @@ The chart renders:
 - `Service` for Studio, Gateway, and proxy ports.
 - `Ingress` when enabled.
 - `PersistentVolumeClaim` for the AMC workspace.
-- `NetworkPolicy`, `PodDisruptionBudget`, `ServiceAccount`, `ConfigMap`, and bootstrap `Secret`.
+- `NetworkPolicy`, `PodDisruptionBudget`, `ServiceAccount` and `ConfigMap`.
+- No `Secret` by default. The chart references the separately provisioned `amc-bootstrap` Secret. Explicit `bootstrap.createSecret=true` renders it only after all five values are supplied and the template rejects any leading `change-me` prefix, case-insensitively.
 - Liveness `/healthz` and readiness `/readyz` probes.
 
 ## Create Bootstrap Secret
 
-For production, create the bootstrap secret outside Git and keep real values out of Helm values and Terraform state.
+Provision `amc-bootstrap` outside Git, preferably through your existing secret manager. For the file-based example, write your own values to five private files before running the command; the files must stay outside Git. All five keys below are mounted by the current Deployment even with the notary disabled. Use the same namespace for the Secret and release.
 
 ```bash
 kubectl create namespace amc-system
 
 kubectl -n amc-system create secret generic amc-bootstrap \
-  --from-literal=vaultPassphrase='replace-with-long-random-passphrase' \
-  --from-literal=ownerUsername='admin' \
-  --from-literal=ownerPassword='replace-with-long-random-password' \
-  --from-literal=notaryPassphrase='replace-with-long-random-passphrase' \
-  --from-literal=notaryAuthSecret='replace-with-long-random-secret'
+  --from-file=vaultPassphrase=./vault-passphrase.txt \
+  --from-file=ownerUsername=./owner-username.txt \
+  --from-file=ownerPassword=./owner-password.txt \
+  --from-file=notaryPassphrase=./notary-passphrase.txt \
+  --from-file=notaryAuthSecret=./notary-auth-secret.txt
 ```
+
+The namespace creation line is for a new namespace. Keep actual values out of shell command literals, Helm values and Terraform state.
+
+For a new release, chart-managed Secret creation is an explicit alternative:
+
+```bash
+helm install amc deploy/helm/amc --namespace amc-system \
+  --set replicaCount=1 \
+  --set bootstrap.createSecret=true \
+  --set-file bootstrap.values.vaultPassphrase=./vault-passphrase.txt \
+  --set-file bootstrap.values.ownerUsername=./owner-username.txt \
+  --set-file bootstrap.values.ownerPassword=./owner-password.txt \
+  --set-file bootstrap.values.notaryPassphrase=./notary-passphrase.txt \
+  --set-file bootstrap.values.notaryAuthSecret=./notary-auth-secret.txt
+```
+
+All five values are required, and any leading `change-me` prefix is refused case-insensitively. Values supplied to Helm, including file inputs, become part of the release record, so prefer out-of-band provisioning. The rendered Secret includes `helm.sh/resource-policy: keep`; that annotation alone does not establish retention behavior for an existing release. Review the upgrade notes before changing an existing installation.
+
+Use one replica for the workspace. This partial bootstrap change adds no values schema or strict input-type guarantee and does not qualify a cluster, upgrade or rollback.
 
 ## Install With Helm
 
@@ -88,9 +108,9 @@ helm upgrade --install amc deploy/helm/amc \
 ## Verify Runtime
 
 ```bash
-kubectl -n amc-system rollout status deploy/amc
+kubectl -n amc-system rollout status deploy/amc-amc
 kubectl -n amc-system get pods,svc,ingress,pvc
-kubectl -n amc-system port-forward svc/amc 3212:3212
+kubectl -n amc-system port-forward svc/amc-amc 3212:3212
 ```
 
 Then open `http://127.0.0.1:3212/console`.
@@ -142,6 +162,10 @@ kubectl apply -k deploy/k8s
 Use the raw manifests for review, platform policy mapping, or environments where Helm is not permitted.
 
 ## Upgrade and Rollback
+
+This source change turns default Secret creation off without establishing an upgrade or rollback procedure. If an existing Helm release manages `amc-bootstrap`, do not assume that a release which stops rendering it will preserve it. Inspect the deployed Secret and release manifests and protect the workspace data before selecting a migration. A new keep annotation is not evidence that an existing Secret is protected. Whether any environment used the old published defaults, and its exposure, remediation and rotation decisions, remain operator matters tracked by P0-37; no confirmation or passphrase-migration procedure is recorded here.
+
+The commands below are procedure examples, not evidence of an executed or safe migration.
 
 ```bash
 helm upgrade amc deploy/helm/amc --namespace amc-system --atomic --wait

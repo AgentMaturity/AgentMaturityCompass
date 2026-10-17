@@ -1,11 +1,13 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
+import * as YAML from "yaml";
 import { loadStudioRuntimeConfig } from "../src/config/loadConfig.js";
 
-const workspace = process.cwd();
+const workspace = fileURLToPath(new URL("../", import.meta.url));
 
 function read(path: string): string {
   return readFileSync(resolve(workspace, path), "utf8");
@@ -196,5 +198,102 @@ describe("deployment pack assets", () => {
     });
     expect(rendered.status).toBe(0);
     expect(`${rendered.stdout}${rendered.stderr}`).toContain("kind: Deployment");
+  });
+});
+
+const ROOT = fileURLToPath(new URL("../", import.meta.url));
+const CHART = fileURLToPath(new URL("../deploy/helm/amc/", import.meta.url));
+const KEYS = ["vaultPassphrase", "ownerUsername", "ownerPassword", "notaryPassphrase", "notaryAuthSecret"] as const;
+type BootstrapValues = Record<(typeof KEYS)[number], string>;
+const VALID_VALUES: BootstrapValues = {
+  vaultPassphrase: "p014-public-fixture-vault",
+  ownerUsername: "p014-public-fixture-owner",
+  ownerPassword: "p014-public-fixture-password",
+  notaryPassphrase: "p014-public-fixture-notary",
+  notaryAuthSecret: "p014-public-fixture-notary-auth"
+};
+const PLACEHOLDERS = [
+  ["change-me-public-fixture", "vaultPassphrase"],
+  ["CHANGE-ME-public-fixture", "vaultPassphrase"],
+  ["change-me-public-fixture", "ownerUsername"],
+  ["CHANGE-ME-public-fixture", "ownerUsername"],
+  ["change-me-public-fixture", "ownerPassword"],
+  ["CHANGE-ME-public-fixture", "ownerPassword"],
+  ["change-me-public-fixture", "notaryPassphrase"],
+  ["CHANGE-ME-public-fixture", "notaryPassphrase"],
+  ["change-me-public-fixture", "notaryAuthSecret"],
+  ["CHANGE-ME-public-fixture", "notaryAuthSecret"]
+] as const;
+
+interface Manifest {
+  kind?: string;
+  metadata?: { name?: string; annotations?: Record<string, string> };
+  type?: string;
+  stringData?: Record<string, string>;
+}
+
+function render(values?: Partial<BootstrapValues>) {
+  const temp = mkdtempSync(join(tmpdir(), "amc-helm-secrets-"));
+  try {
+    const args = ["template", "amc", CHART];
+    if (values !== undefined) {
+      const valuesPath = join(temp, "values.json");
+      writeFileSync(valuesPath, JSON.stringify({ bootstrap: { createSecret: true, values } }), { encoding: "utf8", mode: 0o600 });
+      args.push("--values", valuesPath);
+    }
+    // Helm must be installed; spawn errors, signals and timeouts are failures, never refusals.
+    const result = spawnSync("helm", args, { cwd: ROOT, encoding: "utf8", timeout: 60_000 });
+    const details = JSON.stringify({ status: result.status, signal: result.signal, error: result.error?.message, stdout: result.stdout, stderr: result.stderr });
+    expect(result.error, details).toBeUndefined();
+    expect(result.signal, details).toBeNull();
+    expect(typeof result.status, details).toBe("number");
+    return { ...result, details };
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+}
+
+function successfulManifests(result: ReturnType<typeof render>): Manifest[] {
+  expect(result.status, result.details).toBe(0);
+  const documents = YAML.parseAllDocuments(result.stdout, { uniqueKeys: true });
+  expect(documents.flatMap((document) => document.errors.map((error) => error.message)), result.details).toEqual([]);
+  return documents.map((document) => document.toJS() as Manifest | null | undefined)
+    .filter((document): document is Manifest => document !== null && document !== undefined);
+}
+
+function expectRefusal(values: Partial<BootstrapValues>, diagnostic: string) {
+  const result = render(values);
+  expect(result.status, result.details).toBe(1);
+  expect(result.stderr, result.details).toContain(diagnostic);
+}
+
+describe("Helm bootstrap Secret defaults and explicit values", () => {
+  it("default chart renders no bootstrap Secret", () => {
+    const documents = successfulManifests(render());
+    expect(documents.filter((document) => document.kind === "Deployment").length).toBeGreaterThan(0);
+    expect(documents.filter((document) => document.kind === "Secret")).toEqual([]);
+  });
+
+  it("explicit five-key bootstrap opt-in renders exactly the supplied Secret", () => {
+    const documents = successfulManifests(render(VALID_VALUES));
+    expect(documents.filter((document) => document.kind === "Deployment").length).toBeGreaterThan(0);
+    const secrets = documents.filter((document) => document.kind === "Secret");
+    expect(secrets).toHaveLength(1);
+    const secret = secrets[0]!;
+    expect(secret.metadata?.name).toBe("amc-bootstrap");
+    expect(secret.type).toBe("Opaque");
+    expect(secret.metadata?.annotations).toEqual({ "helm.sh/resource-policy": "keep" });
+    expect(secret.stringData).toEqual(VALID_VALUES);
+  });
+
+  it.each(KEYS)("refuses missing bootstrap.values.%s", (key) => {
+    const values: Partial<BootstrapValues> = { ...VALID_VALUES };
+    delete values[key];
+    expectRefusal(values, `bootstrap.values.${key} is required when bootstrap.createSecret=true`);
+  });
+
+  it.each(PLACEHOLDERS)("refuses %s for bootstrap.values.%s", (placeholder, key) => {
+    expectRefusal({ ...VALID_VALUES, [key]: placeholder },
+      `bootstrap.values.${key} starts with the published placeholder prefix; supply a real value`);
   });
 });

@@ -43,13 +43,15 @@ Open:
 
 ## Kubernetes (Helm)
 
+Provision `amc-bootstrap` in the release namespace before installing. The default chart renders no Secret; the referenced Secret needs `vaultPassphrase`, `ownerUsername`, `ownerPassword`, `notaryPassphrase` and `notaryAuthSecret`, including when the notary is disabled. Use one replica for the workspace.
+
 ```bash
 helm lint deploy/helm/amc
 helm template amc deploy/helm/amc
-helm install amc deploy/helm/amc
+helm install amc deploy/helm/amc --namespace amc-system --set replicaCount=1
 ```
 
-Full operator guide: `docs/KUBERNETES_HELM_DEPLOYMENT.md`.
+Follow the [operator guide](KUBERNETES_HELM_DEPLOYMENT.md#create-bootstrap-secret) for private-file or external-secret setup, explicit chart-managed opt-in and existing-release precautions.
 
 Example values profiles:
 
