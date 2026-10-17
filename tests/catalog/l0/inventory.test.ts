@@ -21,8 +21,8 @@ function scaffold(ws: string, agentId: string): { configPath: string; sigPath: s
   return { configPath: made.configPath, sigPath: made.configSigPath };
 }
 
-describe("L0-INV-01 agent registry entry (signed agent.config.yaml)", () => {
-  const fixtures = fixturesFor("agent_config", "L0-INV-01");
+describe("L0-INV-01 and L1-WLT-US-07: agent registry entry (signed agent.config.yaml)", () => {
+  const fixtures = fixturesFor("agent_config");
   it("has fixtures", () => expect(fixtures.length).toBeGreaterThan(1));
   for (const f of fixtures) {
     it(`${f.ref}: ${f.envelope.expected.result} ${f.envelope.expected.reasonCode ?? ""}`, () => {

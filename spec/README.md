@@ -33,6 +33,7 @@ true; the acceptance rules cover those checks.
 | `control-record` | One Regulated Control Catalog control (docs/catalog/CONTROL_RECORD.md) | Read by `loadCatalog`; content under `catalog/` |
 | `pack-manifest` | One catalog pack: its controls, layer, stations and declared support | Read by `loadCatalog` |
 | `catalog-lock` | The digests that pin one catalog tree | Built by `buildCatalogLock`; P1-10 embeds it in compiled plans |
+| `register-entry` | One clause of a jurisdiction's register as law-as-data (docs/catalog/REGISTER.md) | Read by `loadCatalog` from `catalog/registers/` |
 | `a4-project`, `a4-revision`, `a4-gate`, `a4-decision`, `a4-transition`, `a4-intent`, `a4-readiness` and the other `a4-*` records | One A4 Forge project's views (docs/A4_FORGE.md) | Emitted behind `AMC_A4_PREVIEW=1` |
 | `a4-record` | One A4 project exported as stored, for a verifier without SQLite | Checked by `verifyA4Bundle`; fixtures in `tests/fixtures/contracts/a4-record/` |
 | `amcbench`, `amcprompt`, `amccert`, `amcaudit`, `amcpass`, `amcproof`, `registry.bench`, `registry.passport` | The `amc standard` artifacts | Emitted; `amc standard generate` writes these same files |

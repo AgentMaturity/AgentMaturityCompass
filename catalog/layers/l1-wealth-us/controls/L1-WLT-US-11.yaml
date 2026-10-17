@@ -1,0 +1,126 @@
+# Draft (P1-18): wealth.us.incident-notices. Experimental, agent-drafted and not independently reviewed; expert sign-off waits for D-08.
+# Extends L0-MON-02 (Layer 0, P1-14) with the US finance parameter and citation.
+# A result under this control is evidence of conformity, never proof of compliance.
+
+id: L1-WLT-US-11
+version: "0.1.0"
+support: experimental
+layer: 1
+family: incident-response
+stations: [wealth]
+title: NYDFS 72-hour and GLBA 30-day notice drills
+statement: Incident drills start the NYDFS 72-hour and GLBA 30-day FTC notice clocks from their triggers and record each
+  notice against its deadline.
+riskRationale: A missed regulator notice is a violation in itself; P1-17's clocks make each deadline computable from
+  recorded triggers.
+mandatory: true
+applicability:
+  predicate: {always: true}
+  reasons:
+    - "The Wealth overlay applies to every US deployment in the Wealth station (pack scope: station wealth, jurisdiction
+      US)."
+  exclusions: []
+citations:
+  - key: us-nydfs-500-17-a
+    registerId: us-nydfs-part-500
+    instrument: 23 NYCRR Part 500 (NYDFS Cybersecurity Regulation)
+    clause: "23 NYCRR 500.17(a)(1): notify the superintendent within 72 hours after determining that a cybersecurity
+      incident occurred"
+    edition: Second Amendment as adopted (effective 2023-11-01), NYDFS
+    jurisdiction: US-NY
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: Already in force; the text read is the Second Amendment, effective 2023-11-01 (P1-17). The date the 72-hour
+      notice first applied is not recorded; the legal reviewer records it.
+    url: https://www.dfs.ny.gov/system/files/documents/2023/10/rf_fs_2amend23NYCRR500_text_20231101.pdf
+    retrieval:
+      state: verified
+      retrievedAt: "2026-10-07"
+      contentSha256: 075846139bd36e25659a110325dd5d4b04ef1e052bbf796c512bde59a8b66b33
+    appliesWhen: {fact: jurisdictions, includesAny: [US-NY]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+  - key: us-glba-314-4-j
+    registerId: us-glba-safeguards
+    instrument: GLBA Safeguards Rule (FTC), 16 CFR Part 314
+    clause: "16 CFR 314.4(j): notify the FTC within 30 days when 500 or more consumers are affected"
+    edition: CFR annual edition 2026, Title 16 Vol. 1 (revised 2026-01-01), GPO govinfo
+    jurisdiction: US
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: In force; no source in scope gives the date paragraph (j) took effect (the eCFR version history P1-17 read
+      lists 2024-05-13 as the section's latest amendment, which is not recorded here as (j)'s effective date). The legal
+      reviewer records it.
+    url: https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec314-4.xml
+    retrieval:
+      state: verified
+      retrievedAt: "2026-10-07"
+      contentSha256: 78db42ccdd11efa9aacd304e6deb2f9b1008e4af9f3c6d23b1f829fb455cc632
+    appliesWhen:
+      all:
+        - {fact: jurisdictions, includesAny: [US]}
+        - {fact: entityTypes, includesAny: [non_bank_financial_institution]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+binding:
+  kind: manual
+  points: []
+  mechanism: Recording an incident's triggers starts the nydfs-500-17-notice and glba-314-4j-ftc-notice clocks (P1-17);
+    signed clock events record each notice; notice drafts wait for P2-26.
+  parameters: []
+  manualDuty:
+    duty: "Run notice drills: record the determination and awareness triggers and each notice, and prepare each notice
+      before its deadline."
+    ownerRole: ciso
+    cadence: per incident and in each drill
+    evidenceOfPerformance: The signed clock events and the notice drafts.
+tests:
+  - id: L1-WLT-US-11-T1
+    type: drill
+    oracle:
+      kind: ledger_state
+      observes: The monitor-signed clock events, the deadlines computed from them and the store's refusals.
+    fixtures:
+      positive:
+        - L1-WLT-US-11/positive/evidence-valid.json
+        - L1-WLT-US-11/positive/glba-clock-starts.json
+        - L1-WLT-US-11/positive/nydfs-notice-within-72h.json
+      negative:
+        - L1-WLT-US-11/negative/future-dated-ftc-notice.json
+        - L1-WLT-US-11/negative/notice-for-another-station.json
+        - L1-WLT-US-11/negative/evidence-contradictory.json
+        - L1-WLT-US-11/negative/evidence-cross-tenant.json
+        - L1-WLT-US-11/negative/evidence-empty.json
+        - L1-WLT-US-11/negative/evidence-replayed.json
+        - L1-WLT-US-11/negative/evidence-stale.json
+        - L1-WLT-US-11/negative/evidence-violation.json
+    passCriteria: A determination starts the NYDFS 72-hour clock and a notice inside it satisfies it; awareness starts the
+      GLBA 30-day FTC clock; a notice for a clock the station does not list and a future-dated notice are refused
+      (T-NY-4, T-US-GLBA-2). Notice drafting (P2-26) is not driven by this test.
+    attempts: 1
+evidence:
+  - id: L1-WLT-US-11-E1
+    producer: amc.incidents.clocks
+    bindingFields: [workspaceId, controlId]
+    freshness: {maxAgeDays: 30}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+  - id: L1-WLT-US-11-E2
+    producer: amc.incidents.notices
+    bindingFields: [workspaceId, controlId]
+    freshness: {maxAgeDays: 30}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+invalidatedBy: [deployment_version, policy_version]
+owner: {role: ciso}
+clock: null
+levels: [L2, L3]
+crosswalk: []
+review: {status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null}
+provenance: {draftedBy: ai, draftedAt: "2026-10-12", approvedBy: null}

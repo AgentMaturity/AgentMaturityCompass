@@ -1,5 +1,4 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import YAML from "yaml";
 import { describe, expect, it, vi } from "vitest";
 import { openActionJournal, type ActionJournal } from "../../../src/actions/actionJournal.js";
 import { DEPLOYMENT_NOT_BOUND } from "../../../src/actions/authorize.js";
@@ -7,13 +6,12 @@ import { listApprovalRequests, loadApprovalRequestRecord, recordApprovalDecision
 import { createApprovalForIntent, decideApprovalForIntent, verifyApprovalForExecution } from "../../../src/approvals/approvalEngine.js";
 import { initApprovalPolicy } from "../../../src/approvals/approvalPolicyEngine.js";
 import type { UserRole } from "../../../src/auth/roles.js";
-import { loadToolsConfig, signToolsConfig, toolsConfigPath } from "../../../src/toolhub/toolhubValidators.js";
 import { toolEvidenceFor } from "../../../src/tools/toolEvidence.js";
 import { ToolPipeline } from "../../../src/tools/toolPipeline.js";
 import { defineTool, ToolRegistry } from "../../../src/tools/toolRegistry.js";
 import type { ActionClass } from "../../../src/types.js";
 import { fixturesFor, type L0Fixture } from "./harness.js";
-import { newWorkspace } from "./workspaces.js";
+import { newWorkspace, signPayTool } from "./workspaces.js";
 
 /**
  * L0-OVS-01, L0-OVS-02 and L0-OVS-03 against the real approval engine and tool pipeline (P1-14). A FINANCIAL tool's
@@ -26,22 +24,14 @@ type BoundSetup = { tool: string; actionClass: ActionClass; approved: Record<str
   approvers: Approver[]; scenario: "approved" | "no_approval" | "expired" | "second_use" };
 type QuorumSetup = { actionClass: ActionClass; decisions: Approver[]; initiator?: string; writePath?: "store" };
 
-function signPayTool(ws: string, name: string, actionClass: ActionClass): void {
-  const config = loadToolsConfig(ws);
-  config.tools.allowedTools.push({ name, actionClass,
-    bindingFields: { amount: "amount", currency: "currency", recipient: "recipient" } } as (typeof config.tools.allowedTools)[number]);
-  writeFileSync(toolsConfigPath(ws), YAML.stringify(config));
-  signToolsConfig(ws);
-}
-
 function decide(ws: string, approvalId: string, a: Approver) {
   return decideApprovalForIntent({ workspace: ws, agentId: "default", approvalId, decision: a.decision ?? "APPROVED", mode: "EXECUTE",
     reason: "layer0 fixture decision", userId: a.userId, username: a.userId, userRoles: a.roles });
 }
 
-describe("L0-OVS-01 and L0-OVS-02: a signed human approval bound to the exact action", () => {
-  const fixtures = [...fixturesFor("bound_approval", "L0-OVS-01"), ...fixturesFor("bound_approval", "L0-OVS-02")];
-  it("has fixtures for both controls", () => expect(new Set(fixtures.map((f) => f.control.id)).size).toBe(2));
+describe("L0-OVS-01, L0-OVS-02 and L1-WLT-US-02: a signed human approval bound to the exact action", () => {
+  const fixtures = fixturesFor("bound_approval");
+  it("has fixtures for each control", () => expect(new Set(fixtures.map((f) => f.control.id))).toEqual(new Set(["L0-OVS-01", "L0-OVS-02", "L1-WLT-US-02"])));
   for (const f of fixtures) {
     it(`${f.ref}: ${f.envelope.expected.result} ${f.envelope.expected.reasonCode ?? ""}`, async () => {
       const s = f.envelope.setup as unknown as BoundSetup;

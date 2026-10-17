@@ -20,6 +20,8 @@ catalog/
   producers.yaml                 admitted evidence producers (ProducerRecord[] under `producers:`)
   publisher-hosts.yaml           standards-body hosts for voluntary-standard citations (`hosts:`)
   profiles/cross-station.json    descriptive station-composition templates (P2-28)
+  registers/<id>.json            law-as-data register: one entry per clause (P1-18, REGISTER.md)
+  jurisdictions/<folder>/profiles.json   jurisdiction profiles over register entries (P1-18)
   layers/<pack>/pack.yaml        pack manifest
   layers/<pack>/controls/<id>.yaml   one control record; the file name is the control id
   fixtures/<id>/positive/*.json  fixture envelopes a test must allow or pass
@@ -46,7 +48,9 @@ catalog/
 | A second control or pack with an id already loaded | `CAT_DUPLICATE_ID` |
 
 Each fixture is read once: its SHA-256 and its parsed envelope come from the same bytes. `loadCatalog` returns
-`{ root, manifest, vocabulary, producers, publisherHosts, packs, controls, controlFiles, fixtures, issues }`.
+`{ root, manifest, vocabulary, producers, publisherHosts, packs, controls, controlFiles, fixtures, issues }`, plus
+`crossStationProfiles`, `registers` and `jurisdictionProfiles` when those files exist. A register's format and rules are
+in [REGISTER.md](REGISTER.md); a control citation whose `key` is a register entry id must restate that entry.
 
 `validateCatalog(cat, { asOf })` adds the cross-file rules below and returns `{ ok, errors, warnings }`. `ok` is true
 only with no errors. Each issue is `{ code, severity, file, controlId, path, message }`.

@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-18",
+  "date": "2026-10-12",
+  "commit": "93720e3f07f8587c33b1cba89b99a266d1b8bf39",
+  "branch": "rtd/p1-18-wealth-overlay",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2), local, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 120328
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 113964
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 187038
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 7496
+    },
+    {
+      "cmd": "npx vitest run tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/catalog/l0/",
+      "exit": 0,
+      "durationMs": 183509
+    },
+    {
+      "cmd": "node scripts/check-regulatory-currency.mjs",
+      "exit": 0,
+      "durationMs": 114
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 821
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 1424
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 831
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 3279
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 3348
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 529
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 954
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 232
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 283
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 908
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 3801
+    }
+  ],
+  "tests": {
+    "total": 24489,
+    "passed": 24469,
+    "failed": 20,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "counts.json",
+      "sha256": "dc2fb063f7abfcace1e3a9a3cd0ba46aa34ab78fb06dcfd9fc0d04fafe6e1da0"
+    },
+    {
+      "path": "mutations.txt",
+      "sha256": "914e0219e286cfb9120ce3ad9fef9d9b47f76f2670b2715b4372cbd1b7de8aee"
+    },
+    {
+      "path": "currency-check.txt",
+      "sha256": "a395bbc0e0f209e4604c3c2f39cec45efdd715c3b6eb202a485985bb1396b250"
+    },
+    {
+      "path": "checks.json",
+      "sha256": "762a6f8b037b2c8b122a79d316301b1c80d0acebb0a1d89b408faed73aa4c299"
+    }
+  ],
+  "notes": "Local macOS arm64 run with Node 22, not CI, on a shared machine whose load average stayed between 12 and 23 during the runs. No network access: no source was fetched or hashed in P1-18 (the five hashed register entries reuse P1-17's recorded fetches). The commands ran on the commit named here; tests are the full vitest suite on its parent 3fce1de97f1f636ee925f6185c63a969db984d0d (the merge of int at 7fcb1af5f), which differs only by a source-quality baseline shrink: 24,489 tests, 24,469 passed, 20 failed in 10 files, none in a catalog, register or overlay file. Rerun serially with long timeouts, sessionStoreConformance, releaseEngineeringPack, releaseSecretScanCoverage, assuranceRunNoSign and dogfoodMaturityEvidence pass; assuranceLabV2 and nativeClientStartupAbort pass on a plain rerun. Still failing under this load: sessionSpine.performance (a throughput floor of 150 events/s measured at 40 to 127), keys/atomicRotation (its crash-matrix test exceeds even a 480 s timeout) and publicDocsArtifact, which fails in any git worktree (followups.md). All passed in earlier int full-suite runs; none imports a module P1-18 changed. The 34 related files (910 tests) and the two new files (25 tests) pass. counts.json: 33 register entries (5 verified by content hash, 28 unverified with a reason, all 33 awaiting a legal reviewer) and 15 overlay controls (6 with an executed test against an enforcement point, 9 waiting for a producer); 104 negative fixtures ran (90 through evaluateControl, 14 against enforcement points) and none passed. mutations.txt records the host-rule, litigation-rule and review-gate mutation checks. Every control and entry is experimental, agent-drafted and not independently reviewed (D-08); nothing here is a compliance claim."
+}
