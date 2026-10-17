@@ -125,12 +125,17 @@ merge, so across projects a lock change renders as `scope_changed` ("catalog loc
 and re-approve.
 
 An activated compiled plan whose identity binding requires a lease used to deny every native tool call from Studio
-tasks, which carry none. P1-67 has Studio mint a lease per native task runtime; Adapt (P1-61) models the remaining
-cases as the readiness item `adapt.plan.nativeSessionsAllowed` (`PLAN_DENIES_NATIVE_SESSION`) rather than hiding them:
-tasks started before activation, CLI agent sessions and delegated children carry no lease and are denied every call.
+tasks, which carry none. P1-67 has Studio mint a lease per native task runtime, and P1-79 has CLI agent runs
+(`amc agent-loop run`), SDK native client sessions and `amc acp` sessions with workspace tools mint their own
+(`src/leases/runLease.ts`) while the plan requires a principal. Adapt (P1-61) models the remaining cases as the readiness
+item `adapt.plan.nativeSessionsAllowed` (`PLAN_DENIES_NATIVE_SESSION`, `NATIVE_TASK_LEASE:P1-67`, `RUN_LEASE:P1-79`)
+rather than hiding them: tasks started before activation, delegated children and an in-process `openAgentSession`
+caller that passes no lease carry no lease and are denied every call.
 `L0-IDN-01` also requires a principal, and since P1-78 the lease names the task's signed-in principal, so Studio refuses
 at start (409 `PRINCIPAL_UNRESOLVED`) a task whose principal is not an active local `users.yaml` user, a workspace-router
-session or the admin token included; the item lists `PRINCIPAL_REQUIRED` and `NON_LOCAL_USER_SESSIONS_DENIED` and says so.
+session or the admin token included. A run's lease names the active `users.yaml` user whose username is the OS account,
+so a run whose OS account is not one is refused `PRINCIPAL_UNRESOLVED` before its session opens (the CLI exits non-zero,
+ACP answers -32602). The item lists `PRINCIPAL_REQUIRED` and `NON_LOCAL_USER_SESSIONS_DENIED` and says so.
 Every revision now binds `plan.journalEntrySha256` (the active compiled-plan journal's head; any activation, in A4 or
 from the CLI, makes an open gate `RESOURCE_DRIFTED`) and `plan.lockDigest` (the shipped catalog's lock, digested without
 `generatedBy`, the AMC version that built it, which `verifyCatalogLock` ignores too: an AMC upgrade with an unchanged
@@ -142,8 +147,8 @@ revision. The same holds for the context slots (`context.contextPluginSha256`, `
 activation record of the agent). Those files sit outside `.amc/`: an entry that is not a regular file (a link, a FIFO)
 or a profile directory that is a link reads `RESOURCE_UNREADABLE`. A prompt pack rebuilt by the prompt
 scheduler moves `context.promptPackSha256`, so an open gate reads `RESOURCE_DRIFTED` until it is requested again.
-Under an active plan, Studio mints a native task's lease with the workspace lease key, which the vault holds: while the
-vault is locked, `adapt.plan.nativeSessionsAllowed` reads WAITING (`LEASE_NOT_ISSUED`, `VAULT_LOCKED`). The item decides
+Under an active plan, Studio mints a native task's lease, and a CLI, SDK or ACP run with workspace tools its own, with
+the workspace lease key, which the vault holds: while the vault is locked, `adapt.plan.nativeSessionsAllowed` reads WAITING (`LEASE_NOT_ISSUED`, `VAULT_LOCKED`). The item decides
 from the journal head the head revision bound only while that head is current: a head moved since (an activation from
 the CLI, another project or this one) or a journal that no longer verifies reads NOT_EVALUATED
 (`PLAN_HEAD_MOVED_OR_UNREADABLE`), never `NO_ACTIVE_PLAN`.
@@ -383,7 +388,9 @@ the agent's prompt pack.
   does at once, and every project's next revision in the workspace records the active plan's head. That stays the
   remaining limit: a project whose revisions recorded another project's active plan keeps the regulated quorum and
   identity floors (two distinct keys, live-checked identities) although its own plan is not activated. Under an active plan, Studio native tasks with workspace tools started after activation run under a lease
-  (P1-67); tasks started before it, CLI agent sessions and delegated children are denied every call.
+  (P1-67), and CLI agent runs, SDK native client sessions and ACP sessions with workspace tools mint their own for the
+  OS account's active `users.yaml` user (P1-79); tasks started before it, delegated children and in-process sessions
+  opened without a lease are denied every call.
 - **Lifecycle bridge.** Adapt's rows (`testing → staging`) are the only source of `controlsSatisfied` for that advance:
   `integration_tests_passing` from executed checks that all passed on a non-stub provider, `security_review_signed`
   only from a `review_record` entry met by an admitted external record (an AUDITOR role vote alone leaves it

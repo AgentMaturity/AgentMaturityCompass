@@ -46,7 +46,7 @@ import {
   understandAdapt
 } from "../adaptPolicy.js";
 import {
-  ACTIVATE_PLAN_EFFECT_ID, ADAPT_CLAIM_BOUNDARY, ADAPT_SPEC_SCHEMA, CARRIED, CATALOG_EXPERIMENTAL_NOTICE, NATIVE_LEASE_KEY, QUESTIONS, adaptItems, adaptSpecOf,
+  ACTIVATE_PLAN_EFFECT_ID, ADAPT_CLAIM_BOUNDARY, ADAPT_SPEC_SCHEMA, CARRIED, CATALOG_EXPERIMENTAL_NOTICE, NATIVE_LEASE_KEY, QUESTIONS, RUN_LEASE_KEY, adaptItems, adaptSpecOf,
   answerGaps, buildOf, carriedValues, currentPlan, factAnswer, factList, profileIdOf, proposedFor, proposedPlan, understandingOf, type AdaptBuild
 } from "../spec/adapt.js";
 import { answersDigestOf, answerValues, askGapCodes, listValue, mergeCarried, textValue, understandingCurrent } from "../spec/aspire.js";
@@ -171,7 +171,7 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
       novice: reviews.length === 0 ? "No extra review is required at completion." : `Completion also needs: ${reviews.map((entry) => entry.label).join("; ")}. A role's approval is an acknowledgement, not an expert review.`,
       practitioner: reviews.map((entry) => `${entry.kind}${entry.role === undefined ? "" : ` (${entry.role})`}: ${entry.label}`).join("; ") || "none",
       expert: `gatePolicyOf(chain).gates["adapt.completion"].requiredReviews = ${canonicalize(reviews)}` },
-    { id: "activation", sources: ["activateControlPlan", "compiledPolicyGuard", NATIVE_LEASE_KEY], dataStatus: null,
+    { id: "activation", sources: ["activateControlPlan", "compiledPolicyGuard", NATIVE_LEASE_KEY, RUN_LEASE_KEY], dataStatus: null,
       novice: activation === "regulated" ? "Because this project is regulated, completing Adapt switches the plan on for the whole workspace, after a second, separate approval."
         : activation === "active_elsewhere" ? "Another plan is already switched on for this workspace, a workspace has one plan for every agent, and this plan would weaken it, "
           + "so it cannot be switched on: it stays signed but not switched on, and a project owner records that, with a reason, after Review and before completing."
@@ -181,9 +181,13 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
           + "is refused: plan_activated waits (PLAN_ACTIVATION_DEFERRED) until an owner acknowledges it with a reason after Review, recorded on the conformance statement, and "
           + "completion then leaves this plan signed, not activated. "
           : `Not regulated: completion leaves the plan signed, not activated; an owner may open ${ACTIVATE_PLAN_EFFECT_ID} before completing. `}`
-        + "Under an active plan with L0-IDN-01 every native tool call needs a verified lease: Studio native tasks with workspace tools started after activation get one (P1-67); tasks started before it, CLI agent sessions and delegated children do not and are denied. "
-        + "L0-IDN-01 also requires a principal, and the lease names the task's signed-in principal, so a task whose principal is not an active local users.yaml user (a workspace-router session or the admin token included) is refused at start, 409 PRINCIPAL_UNRESOLVED (P1-78).",
-      expert: "signPlan({ reviewAgentId, quorumFloor }) files the SECURITY review when the effect gate opens; activateControlPlan verifies it and consumes it as activate-<digest32>; compiledPolicyGuard denies any session whose pinned head differs from the journal's." },
+        + "Under an active plan with L0-IDN-01 every native tool call needs a verified lease: Studio native tasks with workspace tools started after activation get one (P1-67), "
+        + "and CLI agent runs (amc agent-loop run), SDK native client sessions and amc acp sessions with workspace tools mint their own (P1-79); "
+        + "tasks started before it, delegated children and an in-process openAgentSession caller that passes no lease do not and are denied. "
+        + "L0-IDN-01 also requires a principal, and the lease names the task's signed-in principal, so a task whose principal is not an active local users.yaml user (a workspace-router session or the admin token included) is refused at start, 409 PRINCIPAL_UNRESOLVED (P1-78). "
+        + "A run's lease names the active users.yaml user whose username is the OS account, so a run whose OS account is not one is refused PRINCIPAL_UNRESOLVED before its session opens: the CLI exits non-zero and ACP answers -32602.",
+      expert: "signPlan({ reviewAgentId, quorumFloor }) files the SECURITY review when the effect gate opens; activateControlPlan verifies it and consumes it as activate-<digest32>; compiledPolicyGuard denies any session whose pinned head differs from the journal's; "
+        + "runLease (src/leases/runLease.ts) mints a run's lease through issueLeaseForPrincipal when planRequiresPrincipal holds." },
     { id: "memory", sources: ["src/a4/adaptMemoryPolicy.ts", "ReasoningMemoryItem (src/learning/reasoningMemory.ts)"], dataStatus: null,
       novice: `The agent may remember items classed ${memory.privacyClass} for up to ${memory.expiresAfterDays} days, reviewed after ${memory.reviewAfterDays}, `
         + `read by ${memory.allowedConsumers.join(", ")}. AMC records this policy but does not enforce it yet.`,
