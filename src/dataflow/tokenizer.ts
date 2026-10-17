@@ -18,7 +18,7 @@ export const TOKEN_PATTERN_SOURCE = String.raw`\[\[amc:(?:phi|pii|card_number|ba
 
 const refusalReasons = ["vault_unavailable", "vault_integrity", "token_collision", "detector_invalid", "content_not_text",
   "attachment_not_redactable", "declared_fields_unparseable", "declared_fields_unverifiable", "receipt_failed",
-  "redaction_failed"] as const;
+  "redaction_failed", "runtime_unsupported"] as const;
 export type RedactionRefusal = typeof refusalReasons[number];
 
 /** Static diagnostics only: no value, span, path, filename or key material enters this exception. */

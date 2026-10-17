@@ -53,7 +53,7 @@ export const MAX_PROTECTED_TEXT_CHARS = 1_048_576;
 export const MAX_REQUEST_SCAN_CHARS = 16_777_216;
 const JSON_ESCAPES: Readonly<Record<string, string>> = Object.freeze({ n: "\n", t: "\t", r: "\r", b: "\b", f: "\f" });
 // JSON string escapes (\n, \uXXXX, \" ...) decoded in one linear pass, so escaped text in malformed arguments still matches.
-const decodeJsonEscapes = (text: string) => text.replace(/\\(?:u([0-9a-fA-F]{4})|([\s\S]))/g,
+export const decodeJsonEscapes = (text: string) => text.replace(/\\(?:u([0-9a-fA-F]{4})|([\s\S]))/g,
   (_match, hex: string | undefined, char: string) => hex !== undefined ? String.fromCharCode(Number.parseInt(hex, 16))
     : Object.hasOwn(JSON_ESCAPES, char) ? JSON_ESCAPES[char]! : char);
 /** Binds the patterns, mappings, filters, token format and limits below; receipts and admission rows carry it. */
@@ -62,7 +62,7 @@ export const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   classMapping: CLASS_BY_TYPE,
   noiseFilters: Object.fromEntries(Object.entries(NOISE_FILTERS).map(([type, re]) => [type, re.source])),
   tokenFormat: TOKEN_PATTERN_SOURCE,
-  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-ms-timestamps-not-cards-spans-inside-issued-token-hex-skipped-token-crossing-spans-rechecked-without-issued-tokens-password-json-value-span-v10",
+  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-ms-timestamps-not-cards-spans-inside-issued-token-hex-skipped-token-crossing-spans-rechecked-without-issued-tokens-password-json-escaped-value-span-tool-results-also-escape-decoded-v11",
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS }
 }));
 function refused(): never { throw new Error("Protected request detection refused unsupported or excessive traversal"); }
@@ -94,9 +94,11 @@ function shieldedByToken(text: string, tokens: readonly (readonly [number, numbe
 }
 
 // A JSON password span covers the key, the colon and the quoted value; only the value is the credential. Narrowed to it,
-// a replacement keeps `"password": "<token>"`, so redacted JSON stays JSON. The value holds no quote ([^"]+).
+// a replacement keeps `"password": "<token>"`, so redacted JSON stays JSON. The value can hold escaped quotes, so its
+// start is found from the head of the span, not by searching back for a quote.
+const PASSWORD_HEAD = /^"password"\s*:\s*"/i;
 const valueOnly = (text: string, span: PiiSpan): PiiSpan => span.type !== "password_json" ? span
-  : { ...span, start: text.lastIndexOf("\"", span.end - 2) + 1, end: span.end - 1 };
+  : { ...span, start: span.start + PASSWORD_HEAD.exec(text.slice(span.start, span.end))![0].length, end: span.end - 1 };
 
 /** Offsets refer to the original text. No matched values are returned or logged. */
 export function detectProtectedText(text: string, issued: IssuedToken = NONE_ISSUED): readonly ProtectedDataSpan[] {
@@ -130,9 +132,14 @@ export function redactProtectedText(text: string, replace: (region: ProtectedDat
   return Object.freeze({ text: spans.length === 0 ? text : out + text.slice(cursor), spans });
 }
 
+/** A number a parse kept as its source literal (`JSON.rawJSON`, Node 21 and later). */
+export const isRawJson = (value: unknown): value is { readonly rawJSON: string } =>
+  (JSON as unknown as { isRawJSON?: (value: unknown) => boolean }).isRawJSON?.(value) === true;
+
 /**
- * Applies `redact` to every key and string leaf of a parsed JSON value, and to each number leaf as text (a number with a
- * detection becomes the redacted string), so the result still serializes as JSON. Stored gateway and bridge evidence use it.
+ * Applies `redact` to every key and string leaf of a parsed JSON value, and to each number leaf as text, its source literal
+ * where the parse kept one (a number with a detection becomes the redacted string), so the result still serializes as
+ * JSON. Stored gateway and bridge evidence and the session redactor use it.
  * An integer beyond 2^53 with at most 20 digits lost digits when it was parsed (a 17-19 digit card number sent as a JSON
  * number keeps only its leading ones), so its text cannot be checked: with `opaque` it becomes `opaque()` instead.
  */
@@ -144,6 +151,7 @@ export function redactJsonLeaves(value: unknown, redact: (text: string) => strin
     const redacted = redact(text);
     return redacted === text ? value : redacted;
   }
+  if (isRawJson(value)) { const redacted = redact(value.rawJSON); return redacted === value.rawJSON ? value : redacted; }
   if (Array.isArray(value)) return value.map(item => redactJsonLeaves(item, redact, opaque));
   if (value === null || typeof value !== "object") return value;
   return Object.fromEntries(Object.entries(value).map(([key, item]) => [redact(key), redactJsonLeaves(item, redact, opaque)]));
@@ -198,6 +206,11 @@ export function detectProtectedRequest(request: EncodableRequest, issued: Issued
     // refused. A number that overflows to Infinity (1e999) carries no text and becomes null, since visit() refuses it.
     // Valid arguments are also scanned as raw decoded text, because the provider receives these bytes whatever a parser
     // keeps: a duplicate key hides its earlier value from the parsed leaves. That pass only adds classes not yet counted.
+    const decoded = (text: string) => {
+      const raw = decodeJsonEscapes(text);
+      charge(raw.length);
+      for (const span of detectProtectedText(raw, issued)) if (!(counts[span.dataClass] ?? 0)) add(span.dataClass);
+    };
     const json = (text: string) => {
       if (typeof text !== "string") refused();
       let parsed: unknown;
@@ -210,9 +223,7 @@ export function detectProtectedRequest(request: EncodableRequest, issued: Issued
         return;
       }
       visit(parsed, 0);
-      const raw = decodeJsonEscapes(text);
-      charge(raw.length);
-      for (const span of detectProtectedText(raw, issued)) if (!(counts[span.dataClass] ?? 0)) add(span.dataClass);
+      decoded(text);
     };
 
     scan(request.model);
@@ -224,7 +235,10 @@ export function detectProtectedRequest(request: EncodableRequest, issued: Issued
       if (!Array.isArray(message.parts)) refused();
       for (const part of message.parts) {
         switch (part.kind) {
-          case "text": case "thinking": case "tool_result": scan(part.text); break;
+          case "text": case "thinking": scan(part.text); break;
+          // Escaped, a value right after \n or \t in a JSON result (every MCP result) has no word boundary, so the result is
+          // also scanned decoded. It is not parsed, so its nesting depth never refuses the request.
+          case "tool_result": scan(part.text); decoded(part.text); break;
           case "tool_use": scan(part.toolName); json(part.argumentsJson); break;
           case "image": case "audio": break;
           default: refused();

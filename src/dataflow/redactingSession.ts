@@ -3,11 +3,11 @@
  * registry file or its `.sig` exists, checked on every record and latched once seen), user messages, queued inbox text,
  * text attachments and tool results are tokenized before the session writes a row, a spill or a model-visible part.
  * Values a signed tool definition declares in `protectedFields` are tokenized first; the experimental text detectors are
- * the backstop for everything else, and they scan exactly the text that is committed.
+ * the backstop for everything else. They scan JSON as the strings a JSON reader sees, then exactly the text that is committed.
  *
  * Every failure refuses the commit: a locked vault, a vault or receipt write that fails, a token collision, text over the
- * per-leaf limit, undecodable bytes or a declaring tool's unparseable OK result throws a static `RedactionRefused`, and the
- * raw value is never committed. A refused tool result (or native-validation output) is still answered, with a static
+ * per-leaf limit, undecodable bytes, a declaring tool's unparseable OK result or a runtime without number source text
+ * (Node 20) throws a static `RedactionRefused`, and the raw value is never committed. A refused tool result (or native-validation output) is still answered, with a static
  * withheld notice and a `PROTECTED_DATA_REDACTION_REFUSED` audit row, so the transcript stays well formed. Binary
  * attachments and media inbox input are refused (`attachment_not_redactable`), media before anything is spilled.
  * Each redaction writes one `RedactionReceiptV1` audit row before the commit it describes.
@@ -25,7 +25,8 @@ import { RUN_CODE_TOOL } from "../tools/toolPipeline.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { ProtectedDataClass } from "../vault/dataClassification.js";
-import { DETECTOR_SET_DIGEST, MAX_PROTECTED_TEXT_CHARS, redactProtectedText } from "./detectors.js";
+import { decodeJsonEscapes, detectProtectedText, DETECTOR_SET_DIGEST, isRawJson, MAX_PROTECTED_TEXT_CHARS, redactJsonLeaves,
+  redactProtectedText, type ProtectedDataSpan } from "./detectors.js";
 import { protectedDataOptedIn } from "./processorRegistry.js";
 import { digestField, keyedOutputDigest, RedactionRefused, TOKEN_PATTERN_SOURCE, tokenFor } from "./tokenizer.js";
 import { loadTokenKeys, openTokenLookup, storeTokens, type TokenEntry, type TokenKeys } from "./tokenVault.js";
@@ -43,56 +44,45 @@ export interface Redaction {
 export interface Redactor { redact(text: string, declared?: DeclaredFields, unparseable?: "refuse" | "detectors"): Redaction }
 
 const MAX_JSON_DEPTH = 64;
+// ponytail: JSON inside a string leaf (an MCP result's text holding JSON) is decoded one level deep; JSON nested deeper is
+// scanned as its escaped text. Each level scans its text about three times, so raise this only with a scan budget.
+const MAX_NESTED_JSON = 1;
 const WHOLE_TOKEN = new RegExp(`^${TOKEN_PATTERN_SOURCE}$`);
-interface RawJson { readonly rawJSON: string }
-const jsonRaw = JSON as unknown as { rawJSON?: (text: string) => RawJson; isRawJSON?: (value: unknown) => value is RawJson };
-const isRawJson = (value: unknown): value is RawJson => jsonRaw.isRawJSON?.(value) === true;
-const JSON_STRING_OR_NUMBER = /"(?:[^"\\]|\\.)*"|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g;
+const rawJSON = (JSON as unknown as { rawJSON?: (text: string) => unknown }).rawJSON;
+const NOT_JSON = Symbol("not JSON");
 
 /**
- * Parses a declaring tool's result so that re-serializing it reproduces every number's source text: where the engine
- * exposes it (Node 21+), each number keeps its literal; elsewhere a literal a double would change (1.0, 1e5, 2^53 + 1)
- * refuses. A duplicate key keeps its last value, as the parse does, and the committed text is that re-serialization.
+ * Parses JSON text so that re-serializing it reproduces every number's source text (`JSON.rawJSON`, Node 21 and later;
+ * redaction refuses without it); `NOT_JSON` when the text is not JSON. A duplicate key keeps its last value, as the parse
+ * does. Anything else that stops the parse (nesting too deep) refuses.
  */
 function parseExact(text: string): unknown {
-  const rawJSON = jsonRaw.rawJSON;
-  const refused = () => new RedactionRefused("declared_fields_unparseable");
-  let root: unknown;
   try {
-    root = rawJSON === undefined ? JSON.parse(text) : JSON.parse(text, (_key, value: unknown, context?: { readonly source?: unknown }) => {
+    return JSON.parse(text, (_key, value: unknown, context?: { readonly source?: unknown }) => {
       if (typeof value !== "number") return value;
-      if (typeof context?.source !== "string") throw refused();
+      if (rawJSON === undefined || typeof context?.source !== "string") throw new RedactionRefused("runtime_unsupported");
       return rawJSON(context.source);
     });
-  } catch { throw refused(); }
-  if (rawJSON === undefined) {
-    for (const [literal] of text.matchAll(JSON_STRING_OR_NUMBER)) if (!literal.startsWith("\"") && String(Number(literal)) !== literal) throw refused();
+  } catch (error) {
+    if (error instanceof SyntaxError) return NOT_JSON;
+    throw error instanceof RedactionRefused ? error : new RedactionRefused("detector_invalid");
   }
-  return root;
 }
 
 /** The re-serialized parse, indented when the source had line breaks. */
 const reserialize = (root: unknown, source: string): string => JSON.stringify(root, null, source.includes("\n") ? 2 : undefined);
 
-/**
- * The text the detectors scan and the session commits. JSON whose strings hold \u escapes is committed as its
- * re-serialization, which writes each escaped character out (all but control characters and lone surrogates), so the
- * detectors see what any JSON reader sees ("\u0034111 1111 1111 1111" is a card number). Other text is kept as it is.
- * ponytail: escapes in text that is not JSON (code, a partial document) stay escaped and unseen by the detectors.
- */
-function unescapedJson(text: string): string {
-  if (!/\\u[0-9a-fA-F]{4}/.test(text)) return text;
-  try { return reserialize(parseExact(text), text); } catch { return text; }
-}
+/** A parse whose strings the leaf scan reads: an object, an array or a string. A number or literal is scanned as its text. */
+const isDocument = (root: unknown): boolean => typeof root === "string" || (typeof root === "object" && root !== null && !isRawJson(root));
 
 /**
- * Tokenizes declared paths in a parsed JSON document; `tokenize` counts each value. Returns the re-serialized document.
+ * Tokenizes declared paths in a parsed JSON document; `tokenize` counts each value. Returns the tokenized document.
  * Under a declared path every string, number and boolean is a value, and so is every object key (`byName: phi` over
  * {"Jane Roe": {...}}). A value or key that is a token this workspace issued stays as it is, so redacting twice changes
  * nothing.
  */
-function tokenizeDeclared(parsed: unknown, source: string, declared: DeclaredFields,
-  tokenize: (dataClass: ProtectedDataClass, value: string) => string, matched: Set<string>, issued: (token: string) => boolean): string {
+function tokenizeDeclared(parsed: unknown, declared: DeclaredFields,
+  tokenize: (dataClass: ProtectedDataClass, value: string) => string, matched: Set<string>, issued: (token: string) => boolean): unknown {
   let root = parsed;
   let tokens = 0;
   const deeper = (depth: number) => { if (depth > MAX_JSON_DEPTH) throw new RedactionRefused("declared_fields_unparseable"); return depth + 1; };
@@ -123,8 +113,7 @@ function tokenizeDeclared(parsed: unknown, source: string, declared: DeclaredFie
     root = apply(root, path.split("."), dataClass, 0);
     if (tokens > before) matched.add(path);
   }
-  // Always the re-serialized parse, never the original bytes: a shadowed duplicate key's value was never inspected.
-  return reserialize(root, source);
+  return root;
 }
 
 /** Declared fields first, then the text detectors over the result; every token's value is stored before this returns. */
@@ -134,6 +123,8 @@ export function createWorkspaceRedactor(workspace: string): Redactor {
       const lookup = openTokenLookup(workspace);
       try {
         if (typeof text !== "string" || text.length > MAX_PROTECTED_TEXT_CHARS) throw new RedactionRefused("detector_invalid");
+        // A re-serialized number must keep its literal; without number source text nothing is redacted, or committed.
+        if (rawJSON === undefined) throw new RedactionRefused("runtime_unsupported");
         let keys: TokenKeys | undefined;
         const entries = new Map<string, TokenEntry>();
         // Issued: stored by an earlier redaction, or made by this one (stored only when it returns).
@@ -150,17 +141,41 @@ export function createWorkspaceRedactor(workspace: string): Redactor {
           counts.set(`${dataClass}\0${detector}`, { ...finding, count: finding.count + 1 });
           return token;
         };
+        const detected = (region: ProtectedDataSpan, value: string) => tokenize(region.dataClass, region.detector, value);
+        const scanText = (value: string) => redactProtectedText(value, detected, issued).text;
+        /**
+         * JSON is scanned as a JSON reader sees it: each string leaf and key decoded, each number as its literal, and JSON
+         * inside a string leaf the same way. Escaped, a value right after \n or \t has no word boundary, so the patterns
+         * would miss it. The parse is committed re-serialized only when `force`, when a leaf changed, or when the decoded
+         * text holds a detection the parse does not (a duplicate key's earlier value); otherwise its bytes are kept. The
+         * detectors then scan exactly the committed text (the JSON password heuristic needs the key beside its value).
+         */
+        const redactJson = (root: unknown, source: string, nested: number, force: boolean): string => {
+          let changed = false;
+          const leaves = redactJsonLeaves(root, value => {
+            const redactedLeaf = redactLeaf(value, nested + 1);
+            changed ||= redactedLeaf !== value;
+            return redactedLeaf;
+          });
+          const rewrite = force || changed || detectProtectedText(decodeJsonEscapes(source), issued).length > 0;
+          return scanText(rewrite ? reserialize(leaves, source) : source);
+        };
+        const redactLeaf = (value: string, nested: number): string => {
+          if (nested > MAX_NESTED_JSON || !/^\s*[[{]/.test(value)) return scanText(value);
+          const root = parseExact(value);
+          return root === NOT_JSON ? scanText(value) : redactJson(root, value, nested, false);
+        };
         const matched = new Set<string>();
-        let parsed: { readonly root: unknown } | null = null;
-        if (declared !== undefined && Object.keys(declared).length > 0) {
-          try { parsed = { root: parseExact(text) }; } catch (error) { if (unparseable === "refuse") throw error; }
-        }
-        // Declared fields bind exactly the committed bytes: a parsed result is committed as its re-serialization.
-        const declaredText = parsed === null ? unescapedJson(text)
-          : tokenizeDeclared(parsed.root, text, declared!, (dataClass, value) => tokenize(dataClass, "declared_field", value), matched, issued);
+        const root = parseExact(text);
+        const declaring = declared !== undefined && Object.keys(declared).length > 0;
+        if (declaring && root === NOT_JSON && unparseable === "refuse") throw new RedactionRefused("declared_fields_unparseable");
         let redacted: string;
         try {
-          redacted = redactProtectedText(declaredText, (region, value) => tokenize(region.dataClass, region.detector, value), issued).text;
+          // A declaring tool's parsed result is always committed re-serialized, never as its original bytes: a shadowed
+          // duplicate key's value was never inspected, and declared fields bind exactly the committed bytes.
+          redacted = declaring && root !== NOT_JSON
+            ? redactJson(tokenizeDeclared(root, declared!, (dataClass, value) => tokenize(dataClass, "declared_field", value), matched, issued), text, 0, true)
+            : isDocument(root) ? redactJson(root, text, 0, false) : scanText(text);
         } catch (error) {
           throw error instanceof RedactionRefused ? error : new RedactionRefused("detector_invalid");
         }
