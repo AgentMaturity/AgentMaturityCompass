@@ -1,11 +1,12 @@
 /**
  * Redaction before commit (P2-02). Every composed native session is wrapped; while its workspace has opted in (a processor
  * registry file or its `.sig` exists, checked on every record and latched once seen), user messages, queued inbox text,
- * text attachments and tool results are tokenized before the session writes a row, a spill or a model-visible part. Values a signed tool definition declares in
- * `protectedFields` are tokenized first; the experimental text detectors are the backstop for everything else.
+ * text attachments and tool results are tokenized before the session writes a row, a spill or a model-visible part.
+ * Values a signed tool definition declares in `protectedFields` are tokenized first; the experimental text detectors are
+ * the backstop for everything else, and they scan exactly the text that is committed.
  *
  * Every failure refuses the commit: a locked vault, a vault or receipt write that fails, a token collision, text over the
- * per-leaf limit, undecodable bytes or a declaring tool's unparseable result throws a static `RedactionRefused`, and the
+ * per-leaf limit, undecodable bytes or a declaring tool's unparseable OK result throws a static `RedactionRefused`, and the
  * raw value is never committed. A refused tool result (or native-validation output) is still answered, with a static
  * withheld notice and a `PROTECTED_DATA_REDACTION_REFUSED` audit row, so the transcript stays well formed. Binary
  * attachments and media inbox input are refused (`attachment_not_redactable`), media before anything is spilled.
@@ -35,7 +36,11 @@ export interface Redaction {
   readonly findings: Readonly<RedactionReceiptV1["findings"]>;
   readonly declaredFields: readonly string[];
 }
-export interface Redactor { redact(text: string, declared?: DeclaredFields): Redaction }
+/**
+ * `unparseable` says what a declaring tool's result that is not JSON gets: `refuse` (declared_fields_unparseable), or
+ * `detectors` (the text detectors only; for error, denial and cancellation text, which is often plain text).
+ */
+export interface Redactor { redact(text: string, declared?: DeclaredFields, unparseable?: "refuse" | "detectors"): Redaction }
 
 const MAX_JSON_DEPTH = 64;
 const WHOLE_TOKEN = new RegExp(`^${TOKEN_PATTERN_SOURCE}$`);
@@ -66,24 +71,45 @@ function parseExact(text: string): unknown {
   return root;
 }
 
+/** The re-serialized parse, indented when the source had line breaks. */
+const reserialize = (root: unknown, source: string): string => JSON.stringify(root, null, source.includes("\n") ? 2 : undefined);
+
 /**
- * Tokenizes declared paths in a JSON document; `tokenize` counts each value. Returns the re-serialized document. A value
- * that is a token this workspace issued stays as it is, so redacting twice changes nothing.
+ * The text the detectors scan and the session commits. JSON whose strings hold \u escapes is committed as its
+ * re-serialization, which writes each escaped character out (all but control characters and lone surrogates), so the
+ * detectors see what any JSON reader sees ("\u0034111 1111 1111 1111" is a card number). Other text is kept as it is.
+ * ponytail: escapes in text that is not JSON (code, a partial document) stay escaped and unseen by the detectors.
  */
-function tokenizeDeclared(text: string, declared: DeclaredFields, tokenize: (dataClass: ProtectedDataClass, value: string) => string,
-  matched: Set<string>, issued: (token: string) => boolean): string {
-  let root = parseExact(text);
+function unescapedJson(text: string): string {
+  if (!/\\u[0-9a-fA-F]{4}/.test(text)) return text;
+  try { return reserialize(parseExact(text), text); } catch { return text; }
+}
+
+/**
+ * Tokenizes declared paths in a parsed JSON document; `tokenize` counts each value. Returns the re-serialized document.
+ * Under a declared path every string, number and boolean is a value, and so is every object key (`byName: phi` over
+ * {"Jane Roe": {...}}). A value or key that is a token this workspace issued stays as it is, so redacting twice changes
+ * nothing.
+ */
+function tokenizeDeclared(parsed: unknown, source: string, declared: DeclaredFields,
+  tokenize: (dataClass: ProtectedDataClass, value: string) => string, matched: Set<string>, issued: (token: string) => boolean): string {
+  let root = parsed;
   let tokens = 0;
   const deeper = (depth: number) => { if (depth > MAX_JSON_DEPTH) throw new RedactionRefused("declared_fields_unparseable"); return depth + 1; };
   const mapOwn = (value: object, map: (item: unknown, key: string) => unknown) =>
     Object.fromEntries(Object.entries(value).map(([key, item]) => [key, map(item, key)]));
-  const cover = (value: unknown, dataClass: ProtectedDataClass, depth: number): unknown => {
+  const tokenOf = (dataClass: ProtectedDataClass, text: string): string => {
+    if (WHOLE_TOKEN.test(text) && issued(text)) return text;
+    tokens += 1;
+    return tokenize(dataClass, text);
+  };
+  const cover = (item: unknown, dataClass: ProtectedDataClass, depth: number): unknown => {
     const next = deeper(depth);
-    if (typeof value === "string" && WHOLE_TOKEN.test(value) && issued(value)) return value;
-    if (typeof value === "string" || typeof value === "number") { tokens += 1; return tokenize(dataClass, String(value)); }
-    if (isRawJson(value)) { tokens += 1; return tokenize(dataClass, value.rawJSON); }
-    if (Array.isArray(value)) return value.map(item => cover(item, dataClass, next));
-    return value !== null && typeof value === "object" ? mapOwn(value, item => cover(item, dataClass, next)) : value;
+    if (typeof item === "string" || typeof item === "number" || typeof item === "boolean") return tokenOf(dataClass, String(item));
+    if (isRawJson(item)) return tokenOf(dataClass, item.rawJSON);
+    if (Array.isArray(item)) return item.map(element => cover(element, dataClass, next));
+    if (item === null || typeof item !== "object") return item;
+    return Object.fromEntries(Object.entries(item).map(([key, child]) => [tokenOf(dataClass, key), cover(child, dataClass, next)]));
   };
   const apply = (value: unknown, parts: readonly string[], dataClass: ProtectedDataClass, depth: number): unknown => {
     const next = deeper(depth);
@@ -98,13 +124,13 @@ function tokenizeDeclared(text: string, declared: DeclaredFields, tokenize: (dat
     if (tokens > before) matched.add(path);
   }
   // Always the re-serialized parse, never the original bytes: a shadowed duplicate key's value was never inspected.
-  return JSON.stringify(root, null, text.includes("\n") ? 2 : undefined);
+  return reserialize(root, source);
 }
 
 /** Declared fields first, then the text detectors over the result; every token's value is stored before this returns. */
 export function createWorkspaceRedactor(workspace: string): Redactor {
   return Object.freeze({
-    redact(text: string, declared?: DeclaredFields): Redaction {
+    redact(text: string, declared?: DeclaredFields, unparseable: "refuse" | "detectors" = "refuse"): Redaction {
       const lookup = openTokenLookup(workspace);
       try {
         if (typeof text !== "string" || text.length > MAX_PROTECTED_TEXT_CHARS) throw new RedactionRefused("detector_invalid");
@@ -125,8 +151,13 @@ export function createWorkspaceRedactor(workspace: string): Redactor {
           return token;
         };
         const matched = new Set<string>();
-        const declaredText = declared === undefined || Object.keys(declared).length === 0 ? text
-          : tokenizeDeclared(text, declared, (dataClass, value) => tokenize(dataClass, "declared_field", value), matched, issued);
+        let parsed: { readonly root: unknown } | null = null;
+        if (declared !== undefined && Object.keys(declared).length > 0) {
+          try { parsed = { root: parseExact(text) }; } catch (error) { if (unparseable === "refuse") throw error; }
+        }
+        // Declared fields bind exactly the committed bytes: a parsed result is committed as its re-serialization.
+        const declaredText = parsed === null ? unescapedJson(text)
+          : tokenizeDeclared(parsed.root, text, declared!, (dataClass, value) => tokenize(dataClass, "declared_field", value), matched, issued);
         let redacted: string;
         try {
           redacted = redactProtectedText(declaredText, (region, value) => tokenize(region.dataClass, region.detector, value), issued).text;
@@ -154,8 +185,8 @@ function declaredFieldsFor(workspace: string, toolName: string | undefined): Dec
     return undefined;
   }
   if (toolName !== undefined && toolName !== RUN_CODE_TOOL) return findToolDefinition(snapshot.config, toolName)?.protectedFields;
-  // A result whose call this session never recorded cannot be matched to its tool's declarations, and a Code Mode result
-  // relays what declaring tools returned to the program, raw.
+  // A result whose call this session never recorded (or whose ID two calls share) cannot be matched to its tool's
+  // declarations, and a Code Mode result relays what declaring tools returned to the program, raw.
   // ponytail: so every run_code result is refused (withheld) while some tool declares fields; tokenizing each sub-call's
   // declared fields at the ToolPipeline boundary, before the program sees them, lifts that.
   if (snapshot.config.tools.allowedTools.some(tool => tool.protectedFields !== undefined)) throw new RedactionRefused("declared_fields_unverifiable");
@@ -169,8 +200,8 @@ function decodeText(content: string | Buffer, refusal: "content_not_text" | "att
 
 /** Redacts `text` and, when anything was found, writes its receipt row on `session` first; any failure refuses. */
 function redactWithReceipt(session: SessionService, redactor: Redactor, text: string, source: RedactionReceiptV1["source"],
-  callId: string | null, declared?: DeclaredFields): string {
-  const result = redactor.redact(text, declared);
+  callId: string | null, declared?: DeclaredFields, unparseable?: "refuse" | "detectors"): string {
+  const result = redactor.redact(text, declared, unparseable);
   if (result.findings.length === 0) return result.text;
   try {
     const receipt = redactionReceiptV1Schema.parse({ schema: "amc.redaction-receipt/v1", sessionId: session.sessionId, source, callId,
@@ -193,10 +224,9 @@ const MEDIA_INPUT_PREFIXES = [NATIVE_IMAGE_INPUT_FORMAT, NATIVE_ORDERED_INPUT_FO
  * Every other member is the session's own.
  */
 export function createRedactingSession(session: SessionService, redactor: Redactor, active: () => boolean = () => true): SessionService {
-  const toolNames = new Map<string, string>();
   const spilledDescriptors = new Set<string>();
-  const redact = (text: string, source: RedactionReceiptV1["source"], callId: string | null, declared?: DeclaredFields): string =>
-    redactWithReceipt(session, redactor, text, source, callId, declared);
+  const redact = (text: string, source: RedactionReceiptV1["source"], callId: string | null, declared?: DeclaredFields,
+    unparseable?: "refuse" | "detectors"): string => redactWithReceipt(session, redactor, text, source, callId, declared, unparseable);
   /**
    * Tool output that must still be answered. A refusal commits a static notice in place of the output, after a
    * `PROTECTED_DATA_REDACTION_REFUSED` row naming the reason, so the call is never left unanswered; the output is not
@@ -212,17 +242,26 @@ export function createRedactingSession(session: SessionService, redactor: Redact
       return `[amc] tool output withheld: protected-data redaction refused (${error.reason})`;
     }
   };
-  const toolNameOf = (callId: string): string | undefined => {
-    const known = toolNames.get(callId);
-    if (known !== undefined) return known;
-    // A call recorded before this wrapper existed (a resumed session): its signed tool/call row names the tool.
-    for (const event of [...session.readEvents()].reverse()) {
-      if (event.event_type !== "tool/call") continue;
-      let meta: { toolCallId?: unknown; toolName?: unknown };
-      try { meta = JSON.parse(event.meta_json) as typeof meta; } catch { throw new RedactionRefused("declared_fields_unverifiable"); }
-      if (meta.toolCallId === callId && typeof meta.toolName === "string") return meta.toolName;
+  /**
+   * The tool each call ID names, from the session's signed tool/call rows (a resumed session's earlier calls included),
+   * read once and then kept current by recordToolCall. Null when two calls share an ID (adapters do not reject that), so
+   * a result is never matched to another tool's declarations.
+   */
+  let toolNames: Map<string, string | null> | undefined;
+  const noteCall = (names: Map<string, string | null>, callId: string, toolName: string | null) =>
+    names.set(callId, names.has(callId) ? null : toolName);
+  const toolNameOf = (callId: string): string | null | undefined => {
+    if (toolNames === undefined) {
+      const names = new Map<string, string | null>();
+      for (const event of session.readEvents()) {
+        if (event.event_type !== "tool/call") continue;
+        let meta: { toolCallId?: unknown; toolName?: unknown };
+        try { meta = JSON.parse(event.meta_json) as typeof meta; } catch { throw new RedactionRefused("declared_fields_unverifiable"); }
+        if (typeof meta.toolCallId === "string") noteCall(names, meta.toolCallId, typeof meta.toolName === "string" ? meta.toolName : null);
+      }
+      toolNames = names;
     }
-    return undefined;
+    return toolNames.get(callId);
   };
   const overrides = {
     recordUserMessage(text: string, provenance?: Parameters<SessionService["recordUserMessage"]>[1]): SessionEventRef {
@@ -238,17 +277,18 @@ export function createRedactingSession(session: SessionService, redactor: Redact
     },
     recordToolCall(call: Parameters<SessionService["recordToolCall"]>[0]): SessionEventRef {
       const ref = session.recordToolCall(call);
-      toolNames.set(call.toolCallId, call.toolName);
+      if (toolNames !== undefined) noteCall(toolNames, call.toolCallId, call.toolName);
       return ref;
     },
     recordToolResult(result: Parameters<SessionService["recordToolResult"]>[0]): SessionEventRef {
       if (!active()) return session.recordToolResult(result);
       const content = redactOrWithhold(result.toolCallId, () => {
-        // Declared fields bind a successful result's JSON; error, denial and cancellation text gets the detectors only,
-        // except a Code Mode result, whose text in any outcome can carry what a declaring tool returned.
-        const toolName = toolNameOf(result.toolCallId);
-        const declared = result.outcome === "OK" || toolName === RUN_CODE_TOOL ? declaredFieldsFor(session.workspace, toolName) : undefined;
-        return redact(decodeText(result.content, "content_not_text"), "tool/result", result.toolCallId, declared);
+        // Declared fields bind a declaring tool's result in every outcome: a failing EHR or HTTP tool can still return the
+        // record. An OK result must be JSON; error, denial and cancellation text that is not JSON gets the detectors only.
+        // An unknown or shared call ID has no single tool, so it counts as unrecorded.
+        const declared = declaredFieldsFor(session.workspace, toolNameOf(result.toolCallId) ?? undefined);
+        return redact(decodeText(result.content, "content_not_text"), "tool/result", result.toolCallId, declared,
+          result.outcome === "OK" ? "refuse" : "detectors");
       });
       return session.recordToolResult({ ...result, content });
     },
