@@ -216,6 +216,10 @@ jobs:
       - name: API reference drift
         run: npm run check:api-ref
 
+      # P1-40: the public API snapshot of agent-maturity-compass/sdk/native (docs/sdk/TYPESCRIPT_SDK.md).
+      - name: SDK API snapshot
+        run: npm run check:sdk-api
+
       - name: Changelog page drift
         run: npm run check:changelog-page
 
