@@ -217,7 +217,7 @@ describe("P03 governed native MCP recovery", () => {
   test("an ambiguous tool POST failure explains uncertainty and never automatically dispatches again", async () => {
     const f = await fixture(); await f.mount(); f.state.toolMode = "drop";
     const result = await f.call();
-    expect(result.outcome).toBe("ERROR"); expect(String(result.content)).toContain("remote tool may have executed");
+    expect(result.outcome).toBe("TOOL_OUTCOME_UNKNOWN"); expect(String(result.content)).toContain("remote tool may have executed");
     expect(String(result.content)).toContain("not replayed"); expect(String(result.content)).not.toContain(SECRET);
     expect((await f.call()).outcome).toBe("DENIED"); expect(f.posts("tools/call")).toHaveLength(1);
     expect(f.calls.filter(call => call.cursor?.startsWith("tool:"))).toHaveLength(0);
@@ -244,7 +244,7 @@ describe("P03 governed native MCP recovery", () => {
 
   test.each([401, 403, 404] as const)("HTTP %s during recovery requires explicit repair/remount and preserves the no-replay warning", async status => {
     const f = await fixture(); await f.mount(); f.state.toolMode = "resume"; f.state.resumeStatus = status;
-    const result = await f.call(); expect(result.outcome).toBe("ERROR");
+    const result = await f.call(); expect(result.outcome).toBe("TOOL_OUTCOME_UNKNOWN");
     expect(String(result.content)).toContain(status === 404 ? "session expired" : "headerRefs");
     expect(String(result.content)).toContain("not replayed"); expect(String(result.content)).not.toContain(SECRET);
     expect((await f.call()).outcome).toBe("DENIED"); expect(f.posts("tools/call")).toHaveLength(1); expect(f.posts("initialize")).toHaveLength(2);

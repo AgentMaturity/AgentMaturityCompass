@@ -11,6 +11,7 @@ import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidato
 import { discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName, type MountedNativeMcpServer } from "../src/mcp/nativeMcpClient.js";
 import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants, resolveNativeMcpServer } from "../src/setup/nativeMcpConfig.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { openActionJournal } from "../src/actions/actionJournal.js";
 
 // A genuine separate stdio process speaking JSON-RPC. No shared dist, SDK
 // server implementation, network connection or provider credentials are used.
@@ -51,7 +52,7 @@ const tool = (name = "lookup"): RemoteTool => ({ name, description: "Synthetic l
 const cleanups: (() => Promise<void>)[] = [];
 afterEach(async () => { for (const cleanup of cleanups.splice(0).reverse()) await cleanup(); vi.unstubAllEnvs(); });
 
-function setup(state: FixtureState, permitted = state.tools.map(remote => remote.name)) {
+function setup(state: FixtureState, permitted = state.tools.map(remote => remote.name), actionClass: "READ_ONLY" | "WRITE_HIGH" = "READ_ONLY") {
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "mcp-fixture-vault-passphrase");
   const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-native-mcp-")));
   cleanups.push(async () => { rmSync(workspace, { recursive: true, force: true }); });
@@ -61,7 +62,7 @@ function setup(state: FixtureState, permitted = state.tools.map(remote => remote
   initBudgets(workspace, "default"); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const config = loadToolsConfig(workspace);
   initToolsConfig(workspace, { ...config, tools: { ...config.tools, allowedTools: [...config.tools.allowedTools,
-    ...permitted.map(name => ({ name: nativeMcpToolName("fixture", name), actionClass: "READ_ONLY" as const }))] } });
+    ...permitted.map(name => ({ name: nativeMcpToolName("fixture", name), actionClass }))] } });
   const session = new SessionService(workspace);
   session.open({ sessionId: "native-mcp-fixture", agentId: "default", harnessVersion: "fixture", compositionDigest: "fixture", policyDigest: "fixture" });
   session.startTurn({ trigger: "user" }); session.startStep();
@@ -84,7 +85,7 @@ function setup(state: FixtureState, permitted = state.tools.map(remote => remote
     mount: async (overrides: Partial<Parameters<typeof mountNativeMcpServer>[0]> = {}) => {
       const reviewed = await discoverNativeMcpCatalog(server, workspace);
       const mounted = await mountNativeMcpServer({ server, workspace, agentId: "default", toolset: tools,
-        expectedCatalogDigest: reviewed.digest, grants: state.tools.map(remote => ({ name: remote.name, actionClass: "READ_ONLY" })), ...overrides });
+        expectedCatalogDigest: reviewed.digest, grants: state.tools.map(remote => ({ name: remote.name, actionClass })), ...overrides });
       mounts.push(mounted); return mounted;
     },
     call: (name: string, args: Record<string, unknown>, signal = new AbortController().signal) => tools.seam.execute({
@@ -127,7 +128,8 @@ describe("native MCP pinned stdio integration", () => {
     const fixture = setup({ tools: [{ ...tool("first"), outputSchema: { type: "object", properties: { count: { type: "integer" } }, required: ["count"] } }, tool("last")],
       pageSize: 1, result: { content: [{ type: "text", text: "invalid output" }], structuredContent: { count: "not-an-integer" } } });
     await fixture.mount(); const outcome = await fixture.call("first", { query: "fixture" });
-    expect(outcome.outcome).toBe("ERROR"); expect(fixture.calls()).toHaveLength(1);
+    // The result arrived and was discarded: the remote tool ran, so its outcome is typed unknown, not an error.
+    expect(outcome.outcome).toBe("TOOL_OUTCOME_UNKNOWN"); expect(fixture.calls()).toHaveLength(1);
   });
   test("input schemas sharing an id cannot reuse another tool's validator", async () => {
     const shared = "https://fixture.invalid/input";
@@ -145,7 +147,7 @@ describe("native MCP pinned stdio integration", () => {
       { ...tool("second"), outputSchema: { type: "object", $id: shared, properties: { count: { type: "integer" } }, required: ["count"] } }
     ], result: { content: [{ type: "text", text: "valid integer result" }], structuredContent: { count: 4 } } });
     await fixture.mount(); expect((await fixture.call("second", { query: "fixture" })).outcome).toBe("OK");
-    expect((await fixture.call("first", { query: "fixture" })).outcome).toBe("ERROR");
+    expect((await fixture.call("first", { query: "fixture" })).outcome).toBe("TOOL_OUTCOME_UNKNOWN");
   });
   test("remote errors retain structured details and timeouts retain their separate failure fact", async () => {
     const fixture = setup({ tools: [tool()], result: { isError: true,
@@ -155,7 +157,7 @@ describe("native MCP pinned stdio integration", () => {
     expect(JSON.parse(String(failed.content))).toMatchObject({ isError: true, structuredContent: { code: "SYNTHETIC_REFUSAL" } });
     fixture.change({ tools: [tool()], waitOnCall: true });
     const timedOut = await fixture.call("lookup", { query: "wait" });
-    expect(timedOut).toMatchObject({ outcome: "ERROR", exitCode: 1, timedOut: true });
+    expect(timedOut).toMatchObject({ outcome: "TOOL_OUTCOME_UNKNOWN", exitCode: 1, timedOut: true });
     expect(fixture.tools.registry.visible("default").has(nativeMcpToolName("fixture", "lookup"))).toBe(false);
   });
   test("required task execution is explicitly refused instead of dispatching a synchronous call", async () => {
@@ -184,6 +186,28 @@ describe("native MCP pinned stdio integration", () => {
     await vi.waitFor(() => expect(fixture.calls()).toHaveLength(1)); controller.abort();
     expect((await running).outcome).toBe("CANCELLED");
     expect((await fixture.call("lookup", { query: "after abort" })).outcome).toBe("DENIED"); expect(fixture.calls()).toHaveLength(1);
+  });
+  test.each([
+    ["a tools/call that never answers", { waitOnCall: true }],
+    ["a result the output schema discards", { result: { content: [{ type: "text", text: "invalid output" }], structuredContent: { count: "not-an-integer" } } }]
+  ] as const)("a journaled WRITE_HIGH call after %s is outcome_unknown and blocks an identical re-dispatch", async (_case, behaviour) => {
+    const fixture = setup({ tools: [{ ...tool(), outputSchema: { type: "object", properties: { count: { type: "integer" } }, required: ["count"] } }],
+      ...behaviour }, undefined, "WRITE_HIGH");
+    await fixture.mount();
+    const first = await fixture.call("lookup", { query: "fixture" });
+    expect(first.outcome).toBe("TOOL_OUTCOME_UNKNOWN"); expect(fixture.calls()).toHaveLength(1);
+    const journal = openActionJournal(fixture.workspace);
+    let blocking: string[] = [];
+    try {
+      blocking = journal.blockingExecutions({ workspaceId: journal.workspaceId, agentId: "default" });
+      expect(blocking.map(id => journal.get(id)?.state)).toEqual(["outcome_unknown"]);
+    } finally { journal.close(); }
+    // The failure disposed the grant; a fresh reviewed mount must still not dispatch the same call again. The unknown
+    // execution blocks this agent's journaled calls first (blocked_by_unreconciled), ahead of the duplicate check.
+    await fixture.mount();
+    const second = await fixture.call("lookup", { query: "fixture" });
+    expect(second.outcome).toBe("DENIED"); expect(String(second.content)).toContain(`blocked_by_unreconciled:${blocking[0]}`);
+    expect(fixture.calls()).toHaveLength(1);
   });
   test("output schema validation precedes secret redaction", async () => {
     const secret = "synthetic-mcp-schema-secret-4f82b1";
