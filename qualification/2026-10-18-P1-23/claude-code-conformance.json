@@ -1,0 +1,64 @@
+{
+  "version": "2.1.296",
+  "binary": "<scratch prefix>/node_modules/@anthropic-ai/claude-code-darwin-arm64/claude",
+  "platform": "darwin-arm64",
+  "cases": {
+    "allowedRead": {
+      "exit": 0,
+      "ranTool": true,
+      "decision": "allow",
+      "claudeCodeVersion": "2.1.296",
+      "claim": "enforced_at_claude_code_pretooluse",
+      "registeredSessions": 1,
+      "lifecycle": "completed",
+      "authorizationMismatch": false
+    },
+    "denied": {
+      "exit": 0,
+      "bashEffect": false,
+      "writeCreated": false,
+      "mcpRan": false,
+      "settingsCreated": false,
+      "reasons": [
+        "\"PreToolUse:Bash hook error: AMC allows a Claude Code Bash command only in its pure form ('/absolute/binary' 'arg' \u2026, single-quoted words, no shell syntax); AMC",
+        "\"PreToolUse:Write hook error: Signed Approval Policy requires 1 human approval before WRITE_LOW. A Claude Code ask is not AMC approval, and AMC has no approval ",
+        "\"PreToolUse:mcp__amcprobe__echo hook error: Provider tool mcp__amcprobe__echo is not mapped to an allowed ToolHub tool.\\n\\n<system-reminder>\\n<total_tokens>1499",
+        "\"PreToolUse:Write hook error: AMC protects its hook configuration.\\n\\n<system-reminder>\\n<total_tokens>14999998 tokens left</total_tokens>\\n</system-reminder>\""
+      ]
+    },
+    "foreignPreToolUseHook": {
+      "exit": 0,
+      "ranTool": false,
+      "reason": "\"PreToolUse:Read hook error: This Claude Code session has no AMC registration, so it is not governed; AMC denied the call.\\n\\n<system-reminder>\\n<total_tokens>14999998 tokens left</total_tokens>\\n</sy"
+    },
+    "admissionFreeze": {
+      "exit": 0,
+      "modelRequests": 0
+    },
+    "latencyMs": {
+      "n": 200,
+      "allowed": 200,
+      "p50": 727.9,
+      "p95": 1159.9,
+      "measured": "spawn of the installed PreToolUse handler (node + AMC forwarder entry) to its exit: observation, control decision, ledger receipt check; loopback Bridge"
+    },
+    "receiptsVerified": {
+      "rows": 217,
+      "failures": 0
+    },
+    "bridgeStopped": {
+      "exit": 0,
+      "ranTool": false,
+      "modelRequests": 0,
+      "reason": ""
+    }
+  },
+  "claudeCode": {
+    "package": "@anthropic-ai/claude-code@2.1.296",
+    "integrity": "sha512-OX/k/rpcthMqnFKOWcpNcbiLsMKtAjLOpQNJHlYiDCFUznWCIwdRTyl/p9SdHVrsrzZuPMCNqZjnpakIni6upw==",
+    "nativePackage": "@anthropic-ai/claude-code-darwin-arm64@2.1.296",
+    "nativeIntegrity": "sha512-vqtx3kS3r1hNLMk+N8JMG5J4kcLHIbI3t/NSIdcFQZrRVCFA6NtcxJyn/B+Sf3GxJaFJOCEfoBQXsFo10+Oj9A==",
+    "binarySha256": "c9b5341637becbd423ddffc5b254afb645682a3868cb708bbc6cc0e7bb419937"
+  },
+  "environment": "local macOS arm64 (Darwin 25.6.0, macOS 26.6.2), Node v22.23.3, not CI; model replies from a scripted loopback endpoint; outbound network denied by sandbox-exec"
+}

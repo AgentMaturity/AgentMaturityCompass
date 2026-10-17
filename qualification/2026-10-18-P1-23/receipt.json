@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-23",
+  "date": "2026-10-18",
+  "commit": "c8a9907b4a8d3faea5c2953cbcbb3444cd07c0a4",
+  "branch": "rtd/p1-23-claude-code-hooks",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "AMC_CLAUDE_CODE_CONFORMANCE=1 AMC_CLAUDE_CODE_PREFIX=<prefix> AMC_CLAUDE_CODE_CONFORMANCE_OUT=<file> AMC_CLAUDE_CODE_LATENCY_N=200 npx vitest run tests/conformance/claudeCodeHooks.conformance.test.ts",
+      "exit": 0,
+      "durationMs": 205230
+    },
+    {
+      "cmd": "npx vitest run tests/amc1464ProviderControlDocs.test.ts tests/amc1465AdapterCapabilityDocs.test.ts tests/amc1466HookActionLifecycleDocs.test.ts tests/amc1469ControlProjection.test.ts tests/amc1470ControlSimulation.test.ts tests/amc1471ApprovalDelivery.test.ts tests/amc1472OutcomeOnboarding.test.ts tests/amc1473SignedControlLifecycle.test.ts tests/amc1474ReusableScopeTemplates.test.ts tests/amc1475NestedConditionAuthoring.test.ts tests/amc1476ProviderSteerOutcome.test.ts tests/amc1477ObserveOnlyRollout.test.ts tests/amc1480HookHealthDiagnostics.test.ts tests/amc1482McpToolContext.test.ts tests/amc1483CompoundCommandBlastRadius.test.ts tests/amcPiExtension.test.ts tests/apiContractVerification.test.ts tests/apiRouters.test.ts tests/claudeCodeAllowFunnel.test.ts tests/claudeCodeHookSecurity.test.ts tests/claudeCodeIntake.test.ts tests/claudeCodeRecordedHooks.test.ts tests/claudeHookFailClosed.test.ts tests/claudeHookInstalledConfig.test.ts tests/cloudReferenceArchitectures.test.ts tests/connectHookIntegration.test.ts tests/controlHttpResponsesParity.test.ts tests/domainProofApiFilesystemBoundary.test.ts tests/gap0010GalileoStudioDrilldownBoundary.test.ts tests/gap0017PromptLayerStudioDrilldownBoundary.test.ts tests/gap0721PaperTrailStudioDrilldownBoundary.test.ts tests/gap0737ApoStudioDrilldownBoundary.test.ts tests/gap0748MultiAgentBargainingStudioDrilldownUnavailableBoundary.test.ts tests/gap0783AwesomeAgentEvolutionStudioDrilldownBoundary.test.ts tests/gap0822AgenticClearStudioDrilldownBoundary.test.ts tests/gap0835MachineEconomicAgencyStudioDrilldownBoundary.test.ts tests/gap0860GoOpenllmetryStudioDrilldownBoundary.test.ts tests/gap0911AresDashboardStudioDrilldownBoundary.test.ts tests/gap0918TraceMindStudioDrilldownBoundary.test.ts tests/gap0943BraintrustStudioDrilldownBoundary.test.ts tests/gap0958LaminarStudioDrilldownBoundary.test.ts tests/gap0962CometOpikStudioDrilldownBoundary.test.ts tests/gap0967RagaAiCatalystStudioDrilldownBoundary.test.ts tests/gap0979HeliconeStudioDrilldownBoundary.test.ts tests/gap3747CometOpikStudioDrilldownBoundary.test.ts tests/gap3748LangtraceTraceFailureTaxonomyBoundary.test.ts tests/hookActionLifecycle.test.ts tests/hookActionLifecycleSurfaces.test.ts tests/hookAdmission.test.ts tests/hookAuditLatch.test.ts tests/hookControl.test.ts tests/hookIntake.test.ts tests/integrationScaffold.test.ts tests/leaseRevocationFailClosed.test.ts tests/nativeScheduleLifecycle.test.ts tests/newProductModulesBatch2.test.ts tests/observeApiRoutes.test.ts tests/openapiContracts.test.ts tests/openapiWebhookSchemas.test.ts tests/piHookControl.test.ts tests/piSessionImportBoundaries.test.ts tests/piSessionRegistration.test.ts tests/providerNeutralHookIngress.test.ts tests/pythonSdk.test.ts tests/sdkConsolidationDocs.test.ts tests/studioApiAuthorization.test.ts tests/studioVaultModeLoop.test.ts tests/subagentHookInheritance.test.ts tests/utilsCoreFoundation.test.ts tests/workAcceptance.test.ts",
+      "exit": 0,
+      "durationMs": 229220
+    }
+  ],
+  "tests": {
+    "total": 841,
+    "passed": 841,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "claude-code-conformance.json",
+      "sha256": "ce37d5b428511e68a39ceee31e10efeaeed747ee7d17ac996be3b9a2a72b7c94"
+    },
+    {
+      "path": "fixtures.json",
+      "sha256": "8e4cfca86543bd7982793c8cc948b94143b75b08c322fdb3a8c424411d1e9a3f"
+    },
+    {
+      "path": "latency.json",
+      "sha256": "7e7c3c97ab1d80eeffb001e55f5255e02ab3b0c1b60d60a4cb17d5a929b06ed9"
+    }
+  ],
+  "notes": "Local macOS arm64, not CI, heavily loaded host. Tests: conformance 7/7 plus focused suites 834/834. Latency is above the 50 ms target on every platform measured; the Linux figures come from an offline arm64 container on the same host. Windows not verified; Linux packages pinned, not run against Claude Code."
+}
