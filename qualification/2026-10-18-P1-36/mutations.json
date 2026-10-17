@@ -1,0 +1,90 @@
+[
+ {
+  "id": "M1",
+  "mutation": "write after each edit instead of once (spec mutation 1)",
+  "file": "src/tools/builtin/fsTools.ts",
+  "failingTests": [
+   "$$ is not collapsed to $",
+   "$& does not re-insert the match",
+   "$1 stays literal (guard)",
+   "$` and $' do not insert the surrounding text",
+   "a template literal stays literal (guard)",
+   "allows the edit once the file has been read",
+   "applies edits in order",
+   "edits the target of a symlink and keeps the link",
+   "keeps a byte-order mark",
+   "lets a create be edited without an intervening read",
+   "lets a slice read satisfy read-before-edit for the whole file",
+   "lets a truncated read still authorise an edit",
+   "lets an edit be followed by another edit",
+   "names the count and the fix for an ambiguous edit in a list",
+   "redacts secrets from the diff before it reaches the tool result or the evidence",
+   "refuses the whole list when one edit fails, and names it",
+   "refuses when the file changes between this call's read and its write",
+   "replaces every occurrence with replaceAll",
+   "returns a diff from fs.edit and records the hashes of the bytes on disk, with no content",
+   "treats ./a.txt and a.txt as the same file",
+   "treats a symlink and its target as one file, once read through either",
+   "writes replacement text literally under replaceAll"
+  ],
+  "summary": "Tests  22 failed | 53 passed (75)"
+ },
+ {
+  "id": "M2",
+  "mutation": "drop the exactly-once rule when replaceAll is false (spec mutation 2)",
+  "file": "src/tools/builtin/fsEditPlan.ts",
+  "failingTests": [
+   "counts overlapping matches, so a unique edit is really unique",
+   "names the count and the fix for an ambiguous edit in a list",
+   "refuses a find text that appears twice and leaves the file unchanged",
+   "refuses an ambiguous match rather than picking one"
+  ],
+  "summary": "Tests  4 failed | 71 passed (75)"
+ },
+ {
+  "id": "M3",
+  "mutation": "skip the read-to-write digest comparison",
+  "file": "src/tools/builtin/fsTools.ts",
+  "failingTests": [
+   "refuses when the file changes between this call's read and its write"
+  ],
+  "summary": "Tests  1 failed | 74 passed (75)"
+ },
+ {
+  "id": "M4",
+  "mutation": "show the diff without secret redaction",
+  "file": "src/tools/builtin/fsTools.ts",
+  "failingTests": [
+   "redacts secrets from the diff before it reaches the tool result or the evidence"
+  ],
+  "summary": "Tests  1 failed | 74 passed (75)"
+ },
+ {
+  "id": "M5",
+  "mutation": "decode without keeping a byte-order mark",
+  "file": "src/tools/builtin/fsTools.ts",
+  "failingTests": [
+   "keeps a byte-order mark"
+  ],
+  "summary": "Tests  1 failed | 74 passed (75)"
+ },
+ {
+  "id": "M6",
+  "mutation": "count non-overlapping matches only",
+  "file": "src/tools/builtin/fsEditPlan.ts",
+  "failingTests": [
+   "counts overlapping matches, so a unique edit is really unique"
+  ],
+  "summary": "Tests  1 failed | 74 passed (75)"
+ },
+ {
+  "id": "M7",
+  "mutation": "refuse binary only when it is invalid UTF-8 (no NUL check)",
+  "file": "src/tools/builtin/fsTools.ts",
+  "failingTests": [
+   "refuses binary and non-UTF-8 files deterministically, and leaves the raw read as it was",
+   "shows a binary notice instead of a diff for binary content"
+  ],
+  "summary": "Tests  2 failed | 73 passed (75)"
+ }
+]
