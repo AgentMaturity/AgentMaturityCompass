@@ -15,7 +15,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { isAbsolute, join, resolve } from "node:path";
 import { z } from "zod";
 import {
-  CLAUDE_MANAGED_SETTINGS_DIRS, claudeCodeBindingSchema, claudeSessionSha256, processExecutable, QUALIFIED_CLAUDE_CODE_VERSIONS,
+  CLAUDE_MANAGED_SETTINGS_DIRS, claudeCodeBindingSchema, claudeSessionHookSources, claudeSessionSha256, processExecutable, QUALIFIED_CLAUDE_CODE_VERSIONS,
   scanClaudeHookSettings, type ClaudeCodeBinding, type ClaudeHookBinding,
 } from "../adapters/hookProviders/claudeCode.js";
 import { cachedFileSha256, clearPiDigestCache } from "../adapters/pi/piInstall.js";
@@ -169,7 +169,10 @@ export function claudeCodeSessionRegistration(ledger: LedgerHandle, agentId: str
   return scan.problem ? { status: "invalid", reason: `${scan.problem}, after this session registered` } : found;
 }
 
-/** Record (or replay) the registration of one Claude Code session. A different registration of a recorded session supersedes it. */
+/**
+ * Record (or replay) the registration of one Claude Code session. Its first registration binds its configuration
+ * directory: another is refused. A newer registration under the same installation supersedes the earlier one.
+ */
 export function registerClaudeCodeSession(input: { workspace: string; authenticatedAgentId: string; rawInput: string; now?: number;
   managedDir?: string | null; lease?: { leaseId: string } }): ClaudeCodeRegistrationResult {
   if (Buffer.byteLength(input.rawInput, "utf8") > MAX_BODY_BYTES) throw invalid("Claude Code session registration is too large");
@@ -195,6 +198,8 @@ export function registerClaudeCodeSession(input: { workspace: string; authentica
   const scan = scanClaudeHookSettings({ workspace: input.workspace, userSettingsPath, managedDir: input.managedDir === undefined ? defaultManagedDir() : input.managedDir,
     bindings: bindings(manifest) });
   if (scan.problem) throw invalid(scan.problem);
+  const extra = scan.foreignHooksBlocked ? null : claudeSessionHookSources({ workspace: input.workspace, configDir: parsed.amc.configDir, pid: parsed.amc.claudePid });
+  if (extra) throw invalid(extra);
   const record: ClaudeCodeRegistrationRecord = {
     kind: RECORD_KIND, agentId: input.authenticatedAgentId, sessionSha256: claudeSessionSha256(parsed.session_id), claudeCodeVersion: install.version,
     claudeCodeSha256: install.sha256, forwarderSha256: manifest.claudeCode.forwarder.sha256, manifestSha256: manifest.manifestSha256, userSettingsPath,
@@ -206,6 +211,10 @@ export function registerClaudeCodeSession(input: { workspace: string; authentica
   try {
     const existing = latestRegistration(ledger, prefix, input.authenticatedAgentId);
     if (existing.status === "invalid") throw new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, existing.reason);
+    // The configuration directory is the one input the client names: the session's first registration binds it.
+    if (existing.status === "registered" && existing.record.userSettingsPath !== record.userSettingsPath) {
+      throw new HookControlError("HOOK_CONTROL_REPLAY_CONFLICT", 409, "this Claude Code session registered another configuration directory; AMC keeps the first");
+    }
     if (existing.status === "registered" && existing.eventId && canonicalize(existing.record) === canonicalize(record)) {
       const meta = JSON.parse((ledger.db.prepare("SELECT meta_json FROM evidence_events WHERE id = ?").get(existing.eventId) as { meta_json: string }).meta_json) as
         { receipt_id: string };

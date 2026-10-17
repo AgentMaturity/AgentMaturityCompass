@@ -72,4 +72,19 @@ describe("caps that churn cannot defeat", () => {
     expect(counters.size).toBeLessThanOrEqual(12);
     expect(counters.admit(scope("lease", "one-more"), 1_002, write)).not.toBeNull();
   });
+
+  test("a refusal episode writes its first refusal, then rows of up to summaryIds; a new episode starts a new row", () => {
+    const counters = new IntakeCounters({ session: 2, lease: 360, workspace: 1_200, windowMs: 60_000, maxEntries: 4_096, summaryIds: 50 });
+    const { written, write } = rows();
+    const scope1 = scope("lease", "s");
+    for (let i = 0; i < 100; i += 1) counters.admit(scope1, 1_000 + i, write, { toolUseId: `t${i}`, actionId: `a${i}` });
+    expect(written.length).toBe(2);
+    expect(written.map((row) => row.shed.toolUseIds.length)).toEqual([1, 50]);
+    counters.backpressure(scope1, 1_200, write);
+    expect(written.reduce((total, row) => total + row.shed.count, 0)).toBe(98);
+    // The window passes: the session admits again, then a new flood is a new episode with its own first row.
+    for (let i = 0; i < 3; i += 1) counters.admit(scope1, 70_000 + i, write, { toolUseId: `n${i}`, actionId: `b${i}` });
+    expect(written.at(-1)!.shed.toolUseIds).toEqual(["n2"]);
+  });
 });
+

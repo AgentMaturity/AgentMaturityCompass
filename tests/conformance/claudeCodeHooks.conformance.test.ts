@@ -262,7 +262,8 @@ describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { tim
       child.stdin.end(payload);
       const code = await new Promise<number | null>((done) => child.on("close", done));
       samples.push(performance.now() - started);
-      if (code === 0 && stdout.includes('"permissionDecision":"allow"')) allowed += 1;
+      // AMC only restricts: a verified allow is exit 0 with the empty answer.
+      if (code === 0 && stdout.trim() === "{}") allowed += 1;
     }
     cases.latencyMs = { n, allowed, p50: Number(percentile(samples, 50).toFixed(1)), p95: Number(percentile(samples, 95).toFixed(1)),
       measured: "spawn of the installed PreToolUse handler (node + AMC forwarder entry) to its exit: observation, control decision, ledger receipt check; loopback Bridge" };

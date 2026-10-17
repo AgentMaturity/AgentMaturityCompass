@@ -8,7 +8,8 @@
  * - an allow of the action AMC derives from this payload's session_id and tool_use_id, bound to the SHA-256 of these
  *   exact payload bytes, under a qualified registration (the row names the registered Claude Code version) with an
  *   authorization record;
- * - answered with the native allow response whose digest the receipt signs, and nothing else in it (no input rewrite);
+ * - answered with the empty native response whose digest the receipt signs (no permission decision, so Claude Code's own
+ *   permission settings and prompts still apply; no input rewrite);
  * - for a workspace whose hook audit latch this process does not see set.
  *
  * The Bridge decided allow only for a current registration, an unlatched writer and no intake backpressure; a signed
@@ -29,8 +30,8 @@ export interface ClaudeAnswer {
 }
 
 const sha256 = (bytes: Buffer | string) => createHash("sha256").update(bytes).digest("hex");
-const allowResponseSchema = z.strictObject({ hookSpecificOutput: z.strictObject({ hookEventName: z.literal("PreToolUse"),
-  permissionDecision: z.literal("allow"), permissionDecisionReason: z.string().max(4_096).optional() }) });
+// AMC only restricts: its allow is the empty answer, so Claude Code's own permission settings and prompts still apply.
+const allowResponseSchema = z.strictObject({});
 const allowRowSchema = z.object({ decision: z.literal("allow"), effectiveOutcome: z.literal("allow"), providerMapping: z.literal("native"),
   agentId: z.string(), actionId: z.string(), claudePayloadSha256: z.string(), claudeCodeVersion: z.string().min(1),
   authorizationRecordDigest: z.string().regex(/^[a-f0-9]{64}$/), providerResponseSha256: z.string().regex(/^[a-f0-9]{64}$/) });

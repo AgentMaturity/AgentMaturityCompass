@@ -12,7 +12,6 @@ import { readStdinAll } from "../src/adapters/hookForwarder.js";
 import { claudeActionId } from "../src/adapters/hookProviders/claudeCode.js";
 import { clearPiDigestCache } from "../src/adapters/pi/piInstall.js";
 import { handleHookControlRequest } from "../src/bridge/hookControlRoute.js";
-import { claudeCodeGovernance, claudeCodeSessionRegistration } from "../src/bridge/claudeCodeSessionRegistry.js";
 import { openLedger, verifyEvidenceEventIntegrity } from "../src/ledger/ledger.js";
 import { inspectHookActionLifecycle } from "../src/watch/hookActionLifecycle.js";
 import { agentId, claudeWorkspace, controlRequest, decide, lease, recorded, register } from "./helpers/claudeCodeHookFixtures.js";
@@ -121,22 +120,6 @@ describe("registrations and payloads cannot defeat the caps", () => {
     // claudeWorkspace() registered one session already: 30 per lease per minute in all.
     expect(refused).toBe(35 - 29);
     expect(register(workspace, session)).toMatchObject({ registered: true, idempotentReplay: true });
-  });
-
-  test("a new registration of a session supersedes the old one", () => {
-    const workspace = claudeWorkspace();
-    const session = String(recorded("SessionStart-startup", workspace).session_id);
-    const moved = join(workspace, ".fixture-home", "other-config");
-    expect(register(workspace, session, moved)).toMatchObject({ registered: true, idempotentReplay: false });
-    const ledger = openLedger(workspace);
-    try {
-      const found = claudeCodeSessionRegistration(ledger, agentId, session);
-      expect(found.status === "registered" && found.record.userSettingsPath).toBe(join(moved, "settings.json"));
-    } finally {
-      ledger.close();
-    }
-    expect(claudeCodeGovernance(workspace, agentId).registeredSessions).toBe(1);
-    expect(decide(workspace, readCall(workspace, session).raw).decision).toBe("allow");
   });
 
   test("an oversized body is refused before it is parsed, at the route and in the forwarder", async () => {

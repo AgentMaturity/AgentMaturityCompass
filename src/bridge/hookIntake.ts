@@ -105,7 +105,9 @@ export class IntakeCounters {
     for (const row of rows) {
       if (row.counter && (row === holder || row.level === full.level)) this.counters.set(row.key, { ...row.counter, backpressure: true, shed: row === holder ? shed : row.counter.shed });
     }
-    if (!holder || previous === null || shed.toolUseIds.length >= this.limits.summaryIds) {
+    // An episode starts when the holder is not yet under backpressure: its first refusal is written at once, the rest in
+    // rows of up to summaryIds, and whatever is left when the holder next decides or recovers.
+    if (!holder || !holder.counter!.backpressure || shed.toolUseIds.length >= this.limits.summaryIds) {
       write(shed, full.level);
       if (holder) this.counters.set(holder.key, { ...this.counters.get(holder.key)!, shed: null });
     }

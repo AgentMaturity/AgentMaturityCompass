@@ -5,8 +5,10 @@
  * install a control installation binds, and the scan of the settings files whose hooks Claude Code runs.
  */
 import { execFileSync } from "node:child_process";
+import { homedir } from "node:os";
 import { existsSync, readdirSync, readFileSync, readlinkSync, realpathSync } from "node:fs";
 import { basename, delimiter, dirname, isAbsolute, join, normalize, relative, resolve, sep } from "node:path";
+import YAML from "yaml";
 import { z } from "zod";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
@@ -128,10 +130,46 @@ export function claudeToolRequest(toolName: string, input: Record<string, unknow
   return null;
 }
 
+const within = (root: string, location: string) => {
+  const rel = relative(root, location);
+  return rel === "" || !(rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel));
+};
+
+/** Whether `location` is in the workspace's `.amc` or is a Claude Code settings file (`.claude/settings*.json`). */
+function amcFile(location: string, workspace: string): boolean {
+  return within(join(resolve(workspace), ".amc"), location)
+    || (basename(dirname(location)).toLowerCase() === ".claude" && /^settings(\..*)?\.json$/i.test(basename(location)));
+}
+
 /**
- * Why AMC refuses a Claude Code call before mapping it: a working directory outside the workspace, or a Write or Edit
- * of AMC's hook configuration (`.claude/settings*.json` anywhere, the workspace's `.amc/`). Claude Code's own users can
- * still edit these files outside Claude Code, and a Bash command can write them unless its plan is denied.
+ * Whether a Grep or Glob search root reaches AMC's files: it is in, or holds, the workspace's `.amc`, its `.claude`, or
+ * the user's `~/.claude`. Claude Code 2.1.296 searches hidden directories (ripgrep `--hidden`; Glob also `--no-ignore`),
+ * so a search of the workspace root would read AMC's hook lease.
+ */
+function searchReachesAmc(root: string, workspace: string): boolean {
+  const ws = resolve(workspace);
+  // Each directory in the workspace's form and in its real form: a root outside the workspace comes back as a real path.
+  return [join(ws, ".amc"), join(ws, ".claude"), join(homedir(), ".claude")].flatMap((dir) => [dir, realLocation(dir) ?? dir])
+    .some((dir) => within(dir, root) || within(root, dir));
+}
+
+/**
+ * Whether a pure-form Bash word names AMC's files: a path segment `.amc`, a `.claude/settings*.json`, or a path (the word,
+ * or the value after `=`) that resolves, through symlinks and from `cwd`, into `.amc` or onto a settings file.
+ */
+function bashWordNamesAmc(word: string, workspace: string, cwd: string): boolean {
+  if (word.split(/[\/=:,]/).some((part) => part.toLowerCase() === ".amc") || /(^|[\/=:,])\.claude[\/]settings[^\/]*\.json$/i.test(word)) return true;
+  return [word, ...(word.includes("=") ? [word.slice(word.indexOf("=") + 1)] : [])].some((value) => {
+    const real = value.length > 0 ? realLocation(isAbsolute(value) ? value : join(cwd, value)) : null;
+    return real !== null && amcFile(inWorkspace(real, workspace), workspace);
+  });
+}
+
+/**
+ * Why AMC refuses a Claude Code call before mapping it: a working directory outside the workspace, a form AMC cannot
+ * prove, or a call that names or searches AMC's files (`.amc`, the hook lease, `.claude/settings*.json`): Read of
+ * `.amc`, a Grep or Glob root that reaches them, a Bash word that names them, a Write or Edit of either. A Bash command
+ * can still reach them through a path it does not name (`'/usr/bin/find' '.'`); this is not OS containment.
  */
 export function claudeCodeRefusal(cwd: string, workspace: string, toolName: string, input: Record<string, unknown>): string | null {
   const realCwd = isAbsolute(cwd) && normalize(cwd) === cwd && cwd.normalize("NFC") === cwd ? realLocation(cwd) : null;
@@ -140,8 +178,12 @@ export function claudeCodeRefusal(cwd: string, workspace: string, toolName: stri
   if (rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel)) {
     return "Claude Code's working directory is outside this AMC workspace, so AMC cannot resolve its paths; control denies the call.";
   }
-  if (toolName === "Bash" && !claudePureBash(input.command, workspace)) {
-    return "AMC allows a Claude Code Bash command only in its pure form ('/absolute/binary' 'arg' …, single-quoted words, no shell syntax); AMC cannot prove what this one runs, so AMC denied it.";
+  if (toolName === "Bash") {
+    const pure = claudePureBash(input.command, workspace);
+    if (!pure) {
+      return "AMC allows a Claude Code Bash command only in its pure form ('/absolute/binary' 'arg' …, single-quoted words, no shell syntax); AMC cannot prove what this one runs, so AMC denied it.";
+    }
+    if ([pure.binary, ...pure.argv].some((word) => bashWordNamesAmc(word, workspace, realCwd!))) return "AMC protects its hook configuration.";
   }
   if ((toolName === "Glob" && !containedGlob(input.pattern)) || (toolName === "Grep" && !containedGlob(input.glob))) {
     return "AMC denies a glob that could leave the directory it searches (absolute, `~`, `..` or an escape), so AMC denied the call.";
@@ -150,19 +192,11 @@ export function claudeCodeRefusal(cwd: string, workspace: string, toolName: stri
     return "AMC accepts a WebFetch URL only in its canonical form (as the URL parser writes it), so AMC denied the call.";
   }
   // AMC's own state (its hook lease, ledger and keys) is neither read nor written from a governed session.
-  const insideAmc = (location: string | null) => {
-    const rel = location === null ? ".." : relative(join(resolve(workspace), ".amc"), location);
-    return !(rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel));
-  };
-  const namesAmc = (glob: unknown) => typeof glob === "string" && glob.split("/").some((part) => part.toLowerCase() === ".amc");
-  if (toolName === "Read" && insideAmc(claudeFileLocation(input.file_path, workspace))) return "AMC protects its hook configuration.";
-  if ((toolName === "Glob" || toolName === "Grep") && (insideAmc(claudeFileLocation(input.path ?? cwd, workspace))
-    || namesAmc(toolName === "Glob" ? input.pattern : input.glob))) return "AMC protects its hook configuration.";
-  if (toolName !== "Write" && toolName !== "Edit") return null;
-  const location = claudeFileLocation(input.file_path, workspace);
+  const location = toolName === "Glob" || toolName === "Grep" ? claudeFileLocation(input.path ?? cwd, workspace) : claudeFileLocation(input.file_path, workspace);
   if (location === null) return null;
-  const settings = basename(dirname(location)).toLowerCase() === ".claude" && /^settings(\..*)?\.json$/i.test(basename(location));
-  return settings || insideAmc(location) ? "AMC protects its hook configuration." : null;
+  if (toolName === "Read" && within(join(resolve(workspace), ".amc"), location)) return "AMC protects its hook configuration.";
+  if ((toolName === "Glob" || toolName === "Grep") && searchReachesAmc(location, workspace)) return "AMC protects its hook configuration.";
+  return (toolName === "Write" || toolName === "Edit") && amcFile(location, workspace) ? "AMC protects its hook configuration." : null;
 }
 
 const claudeCodeInstallSchema = z.strictObject({ binaryPath: z.string().min(1), version: z.string().min(1), sha256: z.string().regex(/^[a-f0-9]{64}$/) });
@@ -208,6 +242,58 @@ export function processExecutable(pid: number): string | null {
   }
 }
 
+/** Markdown files under `root`, at most `depth` directories deep and MAX_HOOK_SOURCES in all. */
+const MAX_HOOK_SOURCES = 1_000;
+function markdownFiles(root: string, depth: number, found: string[] = []): string[] {
+  let entries: import("node:fs").Dirent[];
+  try {
+    entries = readdirSync(root, { withFileTypes: true });
+  } catch {
+    return found;
+  }
+  for (const entry of entries) {
+    if (found.length >= MAX_HOOK_SOURCES) break;
+    const path = join(root, entry.name);
+    if (entry.isDirectory() && depth > 0) markdownFiles(path, depth - 1, found);
+    else if (entry.name.toLowerCase().endsWith(".md")) found.push(path);
+  }
+  return found;
+}
+
+/** Whether a skill or agent file's frontmatter declares hooks; one AMC cannot read or parse counts as declaring them. */
+function frontmatterHooks(path: string): boolean {
+  try {
+    const text = readFileSync(path, "utf8");
+    if (!text.startsWith("---")) return false;
+    const end = text.indexOf("\n---", 3);
+    const value = YAML.parse(text.slice(3, end < 0 ? undefined : end)) as unknown;
+    return isObject(value) && value.hooks !== undefined && value.hooks !== null;
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Why a Claude Code session may run hooks AMC did not install, beyond its settings files, or null: a skill or agent whose
+ * frontmatter declares hooks (in the project's `.claude` or the user's configuration directory), or a Claude Code process
+ * started with `--settings` or `--plugin-dir`. AMC cannot read its arguments: refused too. Not needed when Claude Code
+ * runs only managed hooks.
+ */
+export function claudeSessionHookSources(input: { workspace: string; configDir: string; pid: number }): string | null {
+  for (const dir of [join(resolve(input.workspace), ".claude"), input.configDir]) {
+    const declared = [...markdownFiles(join(dir, "skills"), 2), ...markdownFiles(join(dir, "agents"), 2)].find(frontmatterHooks);
+    if (declared) return `the skill or agent ${declared} declares hooks AMC did not install`;
+  }
+  let args: string;
+  try {
+    args = process.platform === "linux" ? readFileSync(`/proc/${input.pid}/cmdline`, "utf8").split("\0").join(" ")
+      : execFileSync("ps", ["-o", "args=", "-p", String(input.pid)], { encoding: "utf8", timeout: 5_000 });
+  } catch {
+    return "AMC cannot read this Claude Code process's arguments";
+  }
+  return /(^|\s)--(settings|plugin-dir)(=|\s|$)/.test(args) ? "this Claude Code process was started with --settings or --plugin-dir, which can add hooks AMC did not install" : null;
+}
+
 export interface ClaudeHookBinding { readonly eventName: string; readonly handlerSha256: string }
 export interface ClaudeHookScan {
   /** Why Claude Code would not run exactly AMC's installed hooks and nothing that can rewrite a tool's input, or null. */
@@ -216,6 +302,8 @@ export interface ClaudeHookScan {
   readonly managedDelivery: boolean;
   /** SHA-256 over every scanned path and its bytes' digest (null when absent). */
   readonly digest: string;
+  /** Claude Code runs only managed hooks (managed `allowManagedHooksOnly`, or `disableAllHooks` outside managed settings). */
+  readonly foreignHooksBlocked: boolean;
 }
 
 type Scope = "managed" | "user" | "project" | "local";
@@ -258,8 +346,9 @@ function handlers(settings: Record<string, unknown>): Array<[string, unknown, un
  * reads them) and checks that the hooks Claude Code runs include exactly the AMC handlers `bindings` names, no other
  * AMC-marked handler, and no PreToolUse or PermissionRequest handler of anyone else, which could replace the tool input
  * after AMC allowed it. `allowManagedHooksOnly`, or `disableAllHooks` outside managed settings, leaves only managed
- * hooks running. Not read: MDM profiles, registry policy, server-managed settings, plugins, skill and agent
- * frontmatter, `--settings` and SDK hooks.
+ * hooks running. Any enabled plugin (`enabledPlugins`) is refused: its hooks run beside AMC's. Not read here: MDM
+ * profiles, registry policy, server-managed settings and SDK hooks; skill and agent frontmatter and the process's
+ * `--settings` and `--plugin-dir` are checked at registration (claudeSessionHookSources).
  */
 export function scanClaudeHookSettings(input: { workspace: string; userSettingsPath: string; managedDir: string | null;
   bindings: readonly ClaudeHookBinding[] }): ClaudeHookScan {
@@ -273,13 +362,19 @@ export function scanClaudeHookSettings(input: { workspace: string; userSettingsP
     }
   });
   const digest = sha256Hex(canonicalize(read.map(({ path: p, sha256 }) => [p, sha256])));
-  const result = (problem: string | null, managedDelivery = false): ClaudeHookScan => ({ problem, managedDelivery, digest });
+  let foreignHooksBlocked = false;
+  const result = (problem: string | null, managedDelivery = false): ClaudeHookScan => ({ problem, managedDelivery, digest, foreignHooksBlocked });
   const unreadable = read.find((file) => file.value === null);
   if (unreadable) return result(`Claude Code settings ${unreadable.path} cannot be read as a JSON object`);
   const managed = read.filter((file) => file.scope === "managed");
   if (managed.some((file) => file.value!.disableAllHooks === true)) return result("managed settings disable every hook");
   const othersRun = !managed.some((file) => file.value!.allowManagedHooksOnly === true)
     && !read.some((file) => file.scope !== "managed" && file.value!.disableAllHooks === true);
+  foreignHooksBlocked = !othersRun;
+  // A plugin's hooks run beside AMC's (with managed hooks only, so do those of plugins managed settings force-enable).
+  const plugin = (othersRun ? read : managed).find((file) => isObject(file.value!.enabledPlugins)
+    && Object.values(file.value!.enabledPlugins).some((enabled) => enabled === true));
+  if (plugin) return result(`an enabled plugin in ${plugin.path} can run hooks AMC did not install`);
   const wanted = new Set(input.bindings.map((binding) => `${binding.eventName}\0${binding.handlerSha256}`));
   const seen = { all: new Set<string>(), managed: new Set<string>() };
   for (const file of othersRun ? read : managed) {

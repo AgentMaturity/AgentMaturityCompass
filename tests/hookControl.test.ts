@@ -135,13 +135,8 @@ afterEach(() => {
 
 describe("provider-native signed hook control", () => {
   test("renders exact pinned Claude and Gemini native response shapes", () => {
-    expect(renderProviderControlResponse("claude-code", "allow", "signed allow")).toEqual({
-      hookSpecificOutput: {
-        hookEventName: "PreToolUse",
-        permissionDecision: "allow",
-        permissionDecisionReason: "signed allow",
-      },
-    });
+    // P1-23: AMC only restricts Claude Code; its allow is the empty answer, so Claude Code's own permissions still apply.
+    expect(renderProviderControlResponse("claude-code", "allow", "signed allow")).toEqual({});
     expect(renderProviderControlResponse("claude-code", "deny", "signed deny")).toEqual({
       hookSpecificOutput: {
         hookEventName: "PreToolUse",
@@ -199,9 +194,7 @@ describe("provider-native signed hook control", () => {
     });
 
     expect(result.decision).toBe("allow");
-    expect(result.providerResponse).toEqual(expect.objectContaining({
-      hookSpecificOutput: expect.objectContaining({ permissionDecision: "allow" }),
-    }));
+    expect(result.providerResponse).toEqual({});
     expect(result.providerResponseSha256).toMatch(/^[a-f0-9]{64}$/);
     expect(result.receiptId).toBeTruthy();
     // P1-23: a Claude Code decision is a v2 action_state receipt (receipt purpose key) bound to AMC's action id.
@@ -595,9 +588,7 @@ describe("provider-native signed hook control", () => {
       });
 
       expect(result.control.decision).toBe("allow");
-      expect(result.control.providerResponse).toEqual(expect.objectContaining({
-        hookSpecificOutput: expect.objectContaining({ permissionDecision: "allow" }),
-      }));
+      expect(result.control.providerResponse).toEqual({});
       expect(result.observation.receiptId).toBeTruthy();
       expect(verifyReceipt(result.control.receipt, getPurposeKeyHistory(workspace, "receipt")).ok).toBe(true);
       const terminal = await forwardProviderHookEvent({

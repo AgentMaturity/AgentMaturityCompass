@@ -11,9 +11,9 @@ where the claim stops. The Claude Code contract it relies on is pinned in
 
 | Hook | What AMC claims | Can it stop the call? | When AMC cannot answer |
 | --- | --- | --- | --- |
-| `PreToolUse` | **Enforced.** A call runs only when AMC answers allow, and only one function in AMC's forwarder can answer allow: it needs AMC's signed, sealed decision for these exact payload bytes and a fresh nonce, for the action derived from this `session_id` and `tool_use_id`, under a qualified session registration. Everything else is denied with exit 2. | Yes | Deny, exit 2 (`onFailure: "block"` also covers a hook that cannot start or times out) |
+| `PreToolUse` | **Enforced, as a restriction.** AMC only restricts: a call runs only when AMC does not deny it and Claude Code's own permissions allow it. Only one function in AMC's forwarder lets a call through (exit 0 with an empty answer, no permission decision): it needs AMC's signed, sealed decision for these exact payload bytes and a fresh nonce, for the action derived from this `session_id` and `tool_use_id`, under a qualified session registration. Everything else is denied with exit 2. | Yes | Deny, exit 2 (`onFailure: "block"` also covers a hook that cannot start or times out) |
 | `UserPromptSubmit` | **Admission.** The prompt proceeds only on AMC's signed admission row for its digest and session (lease valid, signed policies intact, no active freeze). Only the prompt's length and SHA-256 reach AMC; the text is never stored. | Yes | The prompt is blocked |
-| `SessionStart` | **Registration (lease-holder attestation).** AMC measures its forwarder, the bound Claude Code binary, the executable of the session's process and the settings Claude Code merges, and records a signed registration. | No | The session is not governed: its tool calls are denied |
+| `SessionStart` | **Registration (lease-holder attestation).** AMC measures its forwarder, the bound Claude Code binary, the executable of the session's process, the settings Claude Code merges, skill and agent frontmatter and the process's arguments, and records a signed registration. A foreign PreToolUse hook, an enabled plugin, a skill or agent that declares hooks, or `--settings`/`--plugin-dir` refuse it, unless managed settings deliver AMC's hooks with `allowManagedHooksOnly` (then only a plugin managed settings force-enable refuses it). | No | The session is not governed: its tool calls are denied |
 | `PostToolUse`, `PostToolUseFailure` | **Observed.** AMC compares the input that ran with the input it authorized (`authorizationMismatch`). A mismatch is observed, not prevented: the tool already ran. | No | A message to Claude; the outcome is not recorded |
 | `Stop` | **Observed.** The end of the turn. AMC never asks Claude Code to keep working. | No (AMC never blocks it) | A message only |
 | Every other hook | Not installed, so nothing is claimed. | | |
@@ -228,18 +228,27 @@ under `/usr/local/lib/node_modules/agent-maturity-compass`). Each handler runs i
    `session_id` and `tool_use_id`, checks the session's registration, the audit latch and intake backpressure, and
    evaluates AMC's signed policies on the mapped tool. It records the decision as a signed, sealed ledger row bound to the
    bytes' digest, the targets it resolved and the authorization record.
-3. The forwarder answers allow only through `claudeAllow`, after verifying that row and its receipt. A permission mode
-   (`bypassPermissions`, `dontAsk`, …) never weakens a deny, and a Claude Code `ask` is never AMC approval: AMC has no
-   approval path for hook calls, so a call that needs approval is denied.
+3. The forwarder lets a call through only through `claudeAllow`, after verifying that row and its receipt, and then
+   answers exit 0 with `{}`: no permission decision, so Claude Code's own permission settings and prompts still decide.
+   A permission mode (`bypassPermissions`, `dontAsk`, …) never weakens a deny, and a Claude Code `ask` is never AMC
+   approval: AMC has no approval path for hook calls, so a call that needs approval is denied.
 
 What is mapped: `Read`, `Glob`, `Grep` (`fs.read`), `Write`, `Edit` (`fs.write`), `WebFetch` (`http.fetch`, canonical
 URLs only) and `Bash` in its pure form only: single-quoted words, the first the absolute path of the binary, no shell
 syntax (`'/bin/echo' 'hello'`). MCP tools and every other tool are denied as unmapped (mapping MCP tools is a follow-up).
 
-AMC protects its own configuration from a governed session: `Write` or `Edit` to any `.claude/settings*.json` or to
-`.amc/**`, and `Read`, `Glob` or `Grep` of `.amc/**` (its hook lease included), are denied. Users can still edit these
-files outside Claude Code, and `.claude/settings.local.json` stays user-editable; AMC's registration and every decision
-re-read the merged settings and stop governing a session whose hooks changed.
+AMC refuses the calls that name or search its own files ("AMC protects its hook configuration."): `Write` or `Edit` of
+any `.claude/settings*.json` or of `.amc/**`; `Read` of `.amc/**`; a `Grep` or `Glob` whose search root is in, or holds,
+the workspace's `.amc` or `.claude` or the user's `~/.claude` (Claude Code 2.1.296 searches hidden directories, so a
+search of the workspace root, its default, is denied: name a subdirectory); and a `Bash` command any of whose words
+names `.amc`, a `.claude/settings*.json` file, or a path that resolves into them. This is not containment: a Bash
+command can still reach these files through a path it does not name (`'/usr/bin/find' '.'`), and users can edit them
+outside Claude Code (`.claude/settings.local.json` stays user-editable).
+
+What AMC re-reads: every decision re-reads the settings files Claude Code merges (managed, user, project, local),
+plugins enabled there included, and stops governing a session whose hooks changed. Skill and agent frontmatter and the
+process's arguments are read at registration only. Foreign hooks on events that cannot change a call's input (for
+example PostToolUse, Stop or Notification) are not refused: they run workspace code outside AMC's decisions.
 
 **Residual window.** AMC resolves each path through symlinks when it decides and binds the decision to the resolved
 targets. Claude Code opens the file afterwards; a symlink swapped between AMC's decision and Claude Code's open is outside
@@ -255,7 +264,7 @@ what AMC can see.
   unauthenticated requests are refused and never latch.
 - **Intake caps.** Post-tool and Stop observations are capped per session (120 a minute), per lease (360) and per
   workspace (1,200); session registrations per lease (30) and per workspace (60). An observation over a cap is listed in
-  a signed summary row (count, up to 50 ids and their digest), the calls it belongs to read `observationNotRecorded:
+  a signed summary row (an episode's first refusal at once, then rows of up to 50 ids with their digest), the calls it belongs to read `observationNotRecorded:
   "rate-limited"` in `hooks lifecycle`, and the capped scope's tool calls are denied until its minute passes. Decision rows
   and admission are never capped.
 
@@ -289,11 +298,10 @@ recording the observation and the decision; the forwarder entry already skips th
 ## Limits
 
 - Registration is a lease-holder attestation: a process holding the installation's hook lease can register a session
-  without Claude Code running, and AMC cannot prove Claude Code ran a hook. A newer registration of a session supersedes
-  the earlier one.
+  without Claude Code running, and AMC cannot prove Claude Code ran a hook. A session's first registration binds its
+  Claude Code configuration directory; a later registration naming another is refused.
 - Observations are authenticated by the lease, not by the session: a lease holder can push another session of the same
   lease into backpressure for a minute.
-- Glob and Grep from the workspace root rely on Claude Code skipping hidden directories such as `.amc`.
 - The hook lease allows 120 requests a minute per Bridge route by default (`--rpm` at install); past it, calls are denied.
 - A call whose payload is larger than about 190 KiB is denied: the control request carries it base64-encoded within 256 KiB.
 - Windows is not verified; only macOS arm64 ran against Claude Code 2.1.296.

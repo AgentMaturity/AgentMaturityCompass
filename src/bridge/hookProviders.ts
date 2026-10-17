@@ -214,7 +214,9 @@ function lossyOutcomeNote(outcome: "ask" | "steer", provider: HookProvider): str
     : "Gemini CLI BeforeTool does not support a verified corrective retry outcome, so AMC denied the action.";
 }
 
-const claudeControlResponseSchema = z.object({
+// AMC only restricts Claude Code: an allow is the empty answer (no permission decision), so Claude Code's own permission
+// settings and prompts still apply; a deny blocks the call.
+const claudeControlResponseSchema = z.union([z.object({}).strict(), z.object({
   hookSpecificOutput: z.object({
     hookEventName: z.literal("PreToolUse"),
     permissionDecision: controlDecisionSchema,
@@ -230,7 +232,10 @@ const claudeControlResponseSchema = z.object({
       message: "corrective context requires a blocking deny decision",
     });
   }
-});
+  if (value.hookSpecificOutput.permissionDecision === "allow") {
+    ctx.addIssue({ code: "custom", path: ["hookSpecificOutput", "permissionDecision"], message: "a Claude Code allow carries no permission decision" });
+  }
+})]);
 
 const geminiControlResponseSchema = z.union([
   z.object({ decision: z.literal("allow") }).strict(),
@@ -283,6 +288,7 @@ export function renderProviderControlResponse(
   const provider = parseProvider(providerInput);
   const reason = cleanReason(reasonInput);
   if (provider === "claude-code") {
+    if (decision === "allow") return {};
     const additionalContext = decision === "deny" && extra.additionalContext
       ? cleanReason(extra.additionalContext)
       : null;

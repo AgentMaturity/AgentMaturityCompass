@@ -293,9 +293,8 @@ describe("Claude Code control hook fails closed with exit code 2", () => {
       stdin: claudeRead(join(real, "workspace", "public.txt"), "toolu_policy_allow_01", real),
     });
     expect(allowed.status).toBe(0);
-    expect(JSON.parse(allowed.stdout)).toEqual({
-      hookSpecificOutput: expect.objectContaining({ hookEventName: "PreToolUse", permissionDecision: "allow" }),
-    });
+    // AMC only restricts: an allow carries no permission decision, so Claude Code's own permissions still apply.
+    expect(JSON.parse(allowed.stdout)).toEqual({});
 
     const asked = await forward({
       workspace, provider: "claude-code", agentId, bridgeBase,
