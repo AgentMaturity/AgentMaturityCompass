@@ -3,7 +3,8 @@
  * registry file or its `.sig` exists, checked on every record and latched once seen), user messages, queued inbox text,
  * text attachments and tool results are tokenized before the session writes a row, a spill or a model-visible part.
  * Values a signed tool definition declares in `protectedFields` are tokenized first; the experimental text detectors are
- * the backstop for everything else. They scan JSON as the strings a JSON reader sees, and other text as it is.
+ * the backstop for everything else. They scan JSON as the strings a JSON reader sees, and other text as it is and then
+ * with its JSON escapes decoded.
  *
  * Every failure refuses the commit: a locked vault, a vault or receipt write that fails, a token collision, text over the
  * per-leaf limit, undecodable bytes, a declaring tool's unparseable OK result or a runtime without number source text
@@ -25,8 +26,8 @@ import { RUN_CODE_TOOL } from "../tools/toolPipeline.js";
 import { sha256Hex } from "../utils/hash.js";
 import { assertNoDuplicateJsonKeys, canonicalize } from "../utils/json.js";
 import type { ProtectedDataClass } from "../vault/dataClassification.js";
-import { detectProtectedText, DETECTOR_SET_DIGEST, isRawJson, MAX_PROTECTED_TEXT_CHARS, redactJsonLeaves, redactProtectedText,
-  type ProtectedDataSpan } from "./detectors.js";
+import { decodedFinds, detectProtectedText, DETECTOR_SET_DIGEST, isPasswordMember, isRawJson, MAX_PROTECTED_TEXT_CHARS,
+  redactJsonLeaves, redactProtectedText, type ProtectedDataSpan } from "./detectors.js";
 import { protectedDataOptedIn } from "./processorRegistry.js";
 import { digestField, keyedOutputDigest, RedactionRefused, TOKEN_PATTERN_SOURCE, tokenFor } from "./tokenizer.js";
 import { loadTokenKeys, openTokenLookup, storeTokens, type TokenEntry, type TokenKeys } from "./tokenVault.js";
@@ -44,8 +45,9 @@ export interface Redaction {
 export interface Redactor { redact(text: string, declared?: DeclaredFields, unparseable?: "refuse" | "detectors"): Redaction }
 
 const MAX_JSON_DEPTH = 64;
-// ponytail: JSON inside a string leaf (an MCP result's text holding JSON) is decoded one level deep; JSON nested deeper is
-// scanned as its escaped text. Each level scans its text about three times, so raise this only with a scan budget.
+// ponytail: JSON inside a string leaf (an MCP result's text holding JSON) is parsed one level deep; JSON nested deeper is
+// scanned as text and then searched with its escapes decoded (`scanFallback`). Each level scans its text about three times,
+// so raise this only with a scan budget.
 const MAX_NESTED_JSON = 1;
 const WHOLE_TOKEN = new RegExp(`^${TOKEN_PATTERN_SOURCE}$`);
 const rawJSON = (JSON as unknown as { rawJSON?: (text: string) => unknown }).rawJSON;
@@ -69,9 +71,6 @@ function parseExact(text: string): unknown {
   }
 }
 
-/** The re-serialized parse, indented when the source was (a trailing line feed on compact JSON is not indentation). */
-const reserialize = (root: unknown, source: string): string => JSON.stringify(root, null, /\n[ \t]/.test(source) ? 2 : undefined);
-
 /** Whether JSON text the parse accepted repeats a key: the parse kept the last value, and the earlier one was never read. */
 function hasDuplicateKey(source: string): boolean {
   try { assertNoDuplicateJsonKeys(source); return false; } catch { return true; }
@@ -86,8 +85,9 @@ const isDocument = (root: unknown): boolean => typeof root === "string" || (type
  * {"Jane Roe": {...}}). A value or key that is a token this workspace issued stays as it is, so redacting twice changes
  * nothing. JSON held in a string leaf, one level deep (an MCP result's text block, an HTTP-style `body`), is part of the
  * document: a path that reaches such a string continues inside it, and every path also applies from its top, so a bare
- * `patient.name` covers the text block. Each string value tokenized goes into `values`, for the detector pass to tokenize
- * wherever else the result repeats it (a `structuredContent.patient.name` copy in the text block).
+ * `patient.name` covers the text block. Each string, number literal and key tokenized goes into `values`, for the detector
+ * pass to tokenize wherever else the result repeats it (a `structuredContent.patient.name` copy in the text block). A
+ * boolean is tokenized only where its path reaches it; recorded, every `true` or `false` in the result would be.
  */
 function tokenizeDeclared(parsed: unknown, declared: DeclaredFields, tokenize: (dataClass: ProtectedDataClass, value: string) => string,
   matched: Set<string>, issued: (token: string) => boolean, values: Map<string, ProtectedDataClass>): unknown {
@@ -107,20 +107,24 @@ function tokenizeDeclared(parsed: unknown, declared: DeclaredFields, tokenize: (
     if (doc === null || typeof doc !== "object" || isRawJson(doc)) return text;
     const before = tokens;
     const result = update(doc);
-    return tokens > before ? reserialize(result, text) : text;
+    return tokens > before ? JSON.stringify(result) : text;
+  };
+  // ponytail: a short declared value (7, "x") also tokenizes every equal leaf or key elsewhere in the result; add a minimum
+  // length here if that over-redaction matters.
+  const record = (dataClass: ProtectedDataClass, text: string): string => {
+    const token = tokenOf(dataClass, text);
+    if (token !== text) values.set(text, dataClass);
+    return token;
   };
   const cover = (item: unknown, dataClass: ProtectedDataClass, depth: number): unknown => {
     const next = deeper(depth);
-    if (typeof item === "string") {
-      const token = tokenOf(dataClass, item);
-      if (token !== item) values.set(item, dataClass);
-      return token;
-    }
-    if (typeof item === "number" || typeof item === "boolean") return tokenOf(dataClass, String(item));
-    if (isRawJson(item)) return tokenOf(dataClass, item.rawJSON);
+    if (typeof item === "string") return record(dataClass, item);
+    if (typeof item === "number") return record(dataClass, String(item));
+    if (typeof item === "boolean") return tokenOf(dataClass, String(item));
+    if (isRawJson(item)) return record(dataClass, item.rawJSON);
     if (Array.isArray(item)) return item.map(element => cover(element, dataClass, next));
     if (item === null || typeof item !== "object") return item;
-    return Object.fromEntries(Object.entries(item).map(([key, child]) => [tokenOf(dataClass, key), cover(child, dataClass, next)]));
+    return Object.fromEntries(Object.entries(item).map(([key, child]) => [record(dataClass, key), cover(child, dataClass, next)]));
   };
   const apply = (value: unknown, parts: readonly string[], dataClass: ProtectedDataClass, depth: number, nested: number): unknown => {
     const next = deeper(depth);
@@ -175,9 +179,9 @@ export function createWorkspaceRedactor(workspace: string): Redactor {
          * JSON is scanned as a JSON reader sees it: each string leaf and key decoded, each number as its literal, and JSON
          * inside a string leaf the same way. Escaped, a value right after \n or \t has no word boundary, so the patterns
          * would miss it. A `password` member's value is also scanned with its key beside it (`redactMember`). The parse is
-         * committed re-serialized when `force`, when a leaf changed, or when it repeats a key (the earlier value was never
-         * read); otherwise its bytes are kept. Neither is scanned again as a whole, so tokens longer than the values they
-         * replace never push committed JSON over the per-leaf limit.
+         * committed re-serialized, compact, when `force`, when a leaf changed, or when it repeats a key (the earlier value
+         * was never read); otherwise its bytes are kept. Neither is scanned again as a whole, so tokens longer than the
+         * values they replace never push committed JSON over the per-leaf limit.
          */
         const redactJson = (root: unknown, source: string, nested: number, force: boolean): string => {
           let changed = false;
@@ -186,7 +190,7 @@ export function createWorkspaceRedactor(workspace: string): Redactor {
             changed ||= redactedLeaf !== value;
             return redactedLeaf;
           });
-          return force || changed || hasDuplicateKey(source) ? reserialize(leaves, source) : source;
+          return force || changed || hasDuplicateKey(source) ? JSON.stringify(leaves) : source;
         };
         /**
          * One key or leaf (`key`: the member a string leaf sits under). A value a declared path tokenized is tokenized
@@ -197,14 +201,25 @@ export function createWorkspaceRedactor(workspace: string): Redactor {
           const declaredClass = declaredValues.get(value);
           if (declaredClass !== undefined) return tokenize(declaredClass, "declared_field", value);
           const redactedLeaf = redactLeaf(value, nested);
-          if (key === undefined || !/^password$/i.test(key)) return redactedLeaf;
-          const password = detectProtectedText(JSON.stringify({ [key]: redactedLeaf }), issued).some(span => span.detector === "password_json");
-          return password ? tokenize("credential", "password_json", value) : redactedLeaf;
+          return isPasswordMember(key, redactedLeaf, issued) ? tokenize("credential", "password_json", value) : redactedLeaf;
         };
         const redactLeaf = (value: string, nested: number): string => {
-          if (nested > MAX_NESTED_JSON || !/^\s*[[{]/.test(value)) return scanText(value);
+          if (nested > MAX_NESTED_JSON || !/^\s*[[{]/.test(value)) return scanFallback(value);
           const root = parseExact(value);
-          return root === NOT_JSON ? scanText(value) : redactJson(root, value, nested, false);
+          return root === NOT_JSON ? scanFallback(value) : redactJson(root, value, nested, false);
+        };
+        /**
+         * Text that is not one JSON document (JSONL, a log-prefixed line) or JSON nested deeper than MAX_NESTED_JSON:
+         * scanned as it is, then searched with its escapes decoded (`decodedFinds`). Anything only decoding shows
+         * tokenizes the whole text; text whose decoding does not settle refuses.
+         */
+        const scanFallback = (value: string): string => {
+          const scanned = scanText(value);
+          const hit: { span?: ProtectedDataSpan } = {};
+          const found = decodedFinds(scanned, decoded => { hit.span = detectProtectedText(decoded, issued)[0]; return hit.span !== undefined; });
+          if (!found) return scanned;
+          if (hit.span === undefined) throw new RedactionRefused("detector_invalid");
+          return tokenize(hit.span.dataClass, hit.span.detector, value);
         };
         const matched = new Set<string>();
         const root = parseExact(text);
@@ -217,7 +232,7 @@ export function createWorkspaceRedactor(workspace: string): Redactor {
           redacted = declaring && root !== NOT_JSON
             ? redactJson(tokenizeDeclared(root, declared!, (dataClass, value) => tokenize(dataClass, "declared_field", value), matched, issued,
               declaredValues), text, 0, true)
-            : isDocument(root) ? redactJson(root, text, 0, false) : scanText(text);
+            : isDocument(root) ? redactJson(root, text, 0, false) : scanFallback(text);
         } catch (error) {
           throw error instanceof RedactionRefused ? error : new RedactionRefused("detector_invalid");
         }

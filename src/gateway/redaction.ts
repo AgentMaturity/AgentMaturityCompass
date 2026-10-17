@@ -1,5 +1,5 @@
-import { decodeJsonEscapes, MAX_PROTECTED_TEXT_CHARS, MAX_REQUEST_SCAN_CHARS, nestedJsonRedactor, redactJsonLeaves,
-  redactProtectedText } from "../dataflow/detectors.js";
+import { decodedFinds, isPasswordMember, MAX_PROTECTED_TEXT_CHARS, MAX_REQUEST_SCAN_CHARS, nestedJsonRedactor,
+  redactJsonLeaves, redactProtectedText } from "../dataflow/detectors.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { GatewayConfig } from "./config.js";
 
@@ -109,17 +109,19 @@ class ScanBudgetExceeded extends Error {}
  * opted in (a processor registry or its `.sig` exists). A detected value becomes `[REDACTED]` (no key or token here, so
  * nothing is restorable). A text over the detectors' per-leaf limit is replaced whole, and once one body's scanned keys and
  * leaves pass the request-wide scan budget the whole body is: never stored unscanned. So is a JSON integer that parsing
- * rounded (a 17-19 digit card number sent as a number), whose digits can no longer be checked.
+ * rounded (a 17-19 digit card number sent as a number), whose digits can no longer be checked. A `password` member's value
+ * (`key`) is checked with its key beside it, as the JSON password heuristic needs, and replaced whole when it matches.
  * ponytail: the budget is the native path's (16 MiB), so hostile text (IBAN-shaped words) can still hold the event loop
  * for about 10 s per body before the whole body is replaced; a smaller gateway budget trades that for whole-body
  * replacement of large ordinary bodies.
  */
-function protectedRedactor(reasons: Set<string>): (text: string) => string {
+function protectedRedactor(reasons: Set<string>): (text: string, key?: string) => string {
   let scanned = 0;
-  return (text) => {
+  const charge = (length: number) => { scanned += length; if (scanned > MAX_REQUEST_SCAN_CHARS) throw new ScanBudgetExceeded(); };
+  return (text, key) => {
     if (text.length > MAX_PROTECTED_TEXT_CHARS) { reasons.add("protectedData:unscanned"); return "[REDACTED]"; }
-    scanned += text.length;
-    if (scanned > MAX_REQUEST_SCAN_CHARS) throw new ScanBudgetExceeded();
+    charge(text.length);
+    if (isPasswordMember(key, text, undefined, charge)) { reasons.add("protectedData:credential"); return "[REDACTED]"; }
     return redactProtectedText(text, (region) => { reasons.add(`protectedData:${region.dataClass}`); return "[REDACTED]"; }).text;
   };
 }
@@ -192,10 +194,9 @@ export function redactBody(
   if (options.protectedData) {
     const redact = protectedRedactor(protectedReasons);
     stored = redact(bodyText);
-    // Text can carry JSON escapes too (an event stream of JSON chunks): anything the detectors still find in the stored
-    // text with its escapes decoded replaces the whole body.
-    const decoded = decodeJsonEscapes(stored);
-    if (redact(decoded) !== decoded) return unscannedJsonBody();
+    // Text can carry JSON escapes too (an event stream of JSON chunks, JSON inside them): anything the detectors still find
+    // in the stored text with its escapes decoded, level by level, replaces the whole body.
+    if (decodedFinds(stored, decoded => redact(decoded) !== decoded)) return unscannedJsonBody();
   }
   const textResult = applyTextRegexRedaction(stored, redaction.textRegexDenylist);
   const wasRedacted = textResult.changed || protectedReasons.size > 0;

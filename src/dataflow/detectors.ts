@@ -56,13 +56,31 @@ const JSON_ESCAPES: Readonly<Record<string, string>> = Object.freeze({ n: "\n", 
 export const decodeJsonEscapes = (text: string) => text.replace(/\\(?:u([0-9a-fA-F]{4})|([\s\S]))/g,
   (_match, hex: string | undefined, char: string) => hex !== undefined ? String.fromCharCode(Number.parseInt(hex, 16))
     : Object.hasOwn(JSON_ESCAPES, char) ? JSON_ESCAPES[char]! : char);
+// ponytail: JSON inside a JSON string escapes again at each level, so text is decoded level by level, up to this many
+// times; text still changing after them counts as a finding (replaced or tokenized whole). Raise it if deeper JSON is real.
+const MAX_DECODE_PASSES = 8;
+/**
+ * Whether `found` holds for `text` with its JSON escapes decoded once, then again, while that changes it. Escaped, a value
+ * right after \n or \t has no word boundary, in JSON at any depth, after a log prefix, or in JSON that does not parse.
+ * Callers scan the text as it is first: decoded, an escaped quote ends a password value early and a backslash no longer
+ * separates words, so decoded text is only searched, never stored.
+ */
+export function decodedFinds(text: string, found: (decoded: string) => boolean): boolean {
+  for (let pass = 1, current = text; current.includes("\\"); pass += 1) {
+    const decoded = decodeJsonEscapes(current);
+    if (decoded === current) return false;
+    if (pass > MAX_DECODE_PASSES || found(decoded)) return true;
+    current = decoded;
+  }
+  return false;
+}
 /** Binds the patterns, mappings, filters, token format and limits below; receipts and admission rows carry it. */
 export const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   schema: "amc.protected-detectors/v1", support: "experimental", patterns: getPIIDetectorMetadata(), spanScanRevision: PII_SPAN_SCAN_REVISION,
   classMapping: CLASS_BY_TYPE,
   noiseFilters: Object.fromEntries(Object.entries(NOISE_FILTERS).map(([type, re]) => [type, re.source])),
   tokenFormat: TOKEN_PATTERN_SOURCE,
-  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-ms-timestamps-not-cards-spans-inside-issued-token-hex-skipped-token-crossing-spans-rechecked-without-issued-tokens-password-json-escaped-value-span-tool-results-also-escape-decoded-evidence-leaves-hold-json-one-level-v12",
+  traversalRevision: "request-json-leaves-plus-raw-decoded-args-password-context-malformed-args-as-escape-decoded-text-non-finite-args-as-null-parse-overflow-refused-per-leaf-and-request-limits-noise-rejected-in-scan-plus-and-double-colon-kept-ms-timestamps-not-cards-spans-inside-issued-token-hex-skipped-token-crossing-spans-rechecked-without-issued-tokens-password-json-escaped-value-span-tool-results-also-escape-decoded-evidence-leaves-hold-json-one-level-escapes-decoded-level-by-level-up-to-8-what-only-decoding-shows-replaces-the-text-password-member-key-in-evidence-v13",
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS }
 }));
 function refused(): never { throw new Error("Protected request detection refused unsupported or excessive traversal"); }
@@ -159,30 +177,42 @@ export function redactJsonLeaves(value: unknown, redact: (text: string, key?: st
   return Object.fromEntries(Object.entries(value).map(([name, item]) => [redact(name), redactJsonLeaves(item, redact, opaque, name)]));
 }
 
+/**
+ * Whether `value`, under member `key`, is a password by the JSON password heuristic, which needs the key beside the value:
+ * a leaf scanned alone never matches it. `charge` gets the length scanned. A context over the per-leaf limit counts as a
+ * password, so the caller replaces the value whole.
+ */
+export function isPasswordMember(key: string | undefined, value: string, issued: IssuedToken = NONE_ISSUED,
+  charge: (length: number) => void = () => undefined): boolean {
+  if (key === undefined || !/^password$/i.test(key)) return false;
+  const context = JSON.stringify({ [key]: value });
+  if (context.length > MAX_PROTECTED_TEXT_CHARS) return true;
+  charge(context.length);
+  return detectProtectedText(context, issued).some(span => span.detector === "password_json");
+}
+
 const JSON_TEXT = /^\s*[[{]/;
 /**
- * `redact` for `redactJsonLeaves` over stored evidence (gateway, ToolHub, bridge). Escaped, a value right after \n or \t
- * has no word boundary, so the patterns would miss it in JSON held as text (an MCP result's text). Text that holds a JSON
- * object or array is walked like the outer value, one level deep, with the same `redact` and `opaque`; when an inner key
- * or leaf changed it is re-stringified and scanned whole. Otherwise it is scanned with its escapes decoded (a duplicate
- * key's earlier value, JSON that does not parse) and stored decoded and redacted when that finds anything. Other text is
- * `redact`ed as it is.
+ * `redact` for `redactJsonLeaves` over stored evidence (gateway, ToolHub, bridge); `key` is the member a string leaf sits
+ * under, for the JSON password heuristic. Text that holds a JSON object or array (an MCP result's text) is walked like the
+ * outer value, one level deep, and re-stringified when an inner key or leaf changed. Each text is `redact`ed as it is, so
+ * an escaped quote stays inside a password value and a backslash still separates words, and then searched with its
+ * escapes decoded (`decodedFinds`): anything only decoding shows replaces the text whole (`opaque()`).
  */
-export function nestedJsonRedactor(redact: (text: string) => string, opaque?: () => string): (text: string) => string {
-  return (text) => {
-    if (text.length > MAX_PROTECTED_TEXT_CHARS || !JSON_TEXT.test(text)) return redact(text);
-    let parsed: unknown, isJson = true;
-    try { parsed = JSON.parse(text); } catch (error) { if (!(error instanceof SyntaxError)) throw error; isJson = false; }
-    if (isJson) {
-      let changed = false;
-      const inner = redactJsonLeaves(parsed, leaf => { const out = redact(leaf); changed ||= out !== leaf; return out; },
-        opaque === undefined ? undefined : () => { changed = true; return opaque(); });
-      if (changed) return redact(JSON.stringify(inner));
-    }
-    const decoded = decodeJsonEscapes(text);
-    const scanned = redact(decoded);
-    if (scanned !== decoded) return scanned;
-    return isJson || decoded === text ? text : redact(text);
+export function nestedJsonRedactor(redact: (text: string, key?: string) => string, opaque: () => string):
+  (text: string, key?: string) => string {
+  const scan = (text: string, key?: string) => {
+    const scanned = redact(text, key);
+    return decodedFinds(scanned, decoded => redact(decoded) !== decoded) ? opaque() : scanned;
+  };
+  return (text, key) => {
+    if (text.length > MAX_PROTECTED_TEXT_CHARS || !JSON_TEXT.test(text)) return scan(text, key);
+    let parsed: unknown;
+    try { parsed = JSON.parse(text); } catch (error) { if (!(error instanceof SyntaxError)) throw error; return scan(text, key); }
+    let changed = false;
+    const inner = redactJsonLeaves(parsed, (leaf, name) => { const out = scan(leaf, name); changed ||= out !== leaf; return out; },
+      () => { changed = true; return opaque(); });
+    return scan(changed ? JSON.stringify(inner) : text, key);
   };
 }
 
