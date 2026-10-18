@@ -45,6 +45,7 @@ const EXPECTED = {
   resumedSameSession: true,
   verified: phases("succeeded", "succeeded"),
   receiptStates: [],
+  recheckFailures: [],
   tamperedParentFork: "TAMPERED"
 };
 type Leg = Record<string, unknown> & { ids: { parent: string; child: string } };
@@ -94,7 +95,8 @@ function cli(f: Fixture, args: readonly string[]): { child: ChildProcess; done: 
   child.stderr!.on("data", (chunk: Buffer) => { stderr += chunk.toString("utf8"); });
   return { child, done: new Promise((done) => child.once("close", (code) => done({ code, stdout, stderr }))) };
 }
-const cliJson = (output: { stdout: string }) => JSON.parse(output.stdout) as { sessionId: string; toolCalls: number; execution: { phases: unknown; receiptStates: string[] } };
+const cliJson = (output: { stdout: string }) => JSON.parse(output.stdout) as { sessionId: string; toolCalls: number;
+  execution: { phases: unknown; receiptStates: string[]; recheckFailures: string[] } };
 
 async function cliLeg(f: Fixture): Promise<Leg> {
   const verbs = new Set<string>(), record: Record<string, unknown> = {};
@@ -117,6 +119,7 @@ async function cliLeg(f: Fixture): Promise<Leg> {
   record.streamed = approved.stderr.includes("Live reply"); verbs.add("stream");
   record.toolCalled = summary.toolCalls > 0;
   record.approvedTurn = summary.execution.phases; record.receiptStates = summary.execution.receiptStates;
+  record.recheckFailures = summary.execution.recheckFailures;
   verbs.add("dispose"); // --keep-open released the writer; the process then exited.
   const resumed = await cli(f, ["agent-loop", "run", "hello", "--session", parent, ...flags]).done;
   expect(resumed.code, resumed.stderr).toBe(0);
@@ -159,6 +162,7 @@ async function typescriptLeg(f: Fixture): Promise<Leg> {
   record.streamed = seen.length > 0; verbs.add("stream");
   record.toolCalled = approved.updates.some((u) => u.update.sessionUpdate === "tool_call");
   record.approvedTurn = approved.execution!.phases; record.receiptStates = approved.execution!.receiptStates;
+  record.recheckFailures = approved.execution!.recheckFailures;
   await first.dispose(); verbs.add("dispose");
   const second = await AMCNativeClient.start(options);
   const resumed = await second.resumeSession(parent);
@@ -237,6 +241,7 @@ async function studioLeg(f: Fixture): Promise<Leg> {
     record.streamed = events.length > 0; verbs.add("stream");
     record.toolCalled = events.some((event) => event.kind === "tool");
     record.approvedTurn = view.execution!.phases; record.receiptStates = view.execution!.receiptStates;
+    record.recheckFailures = view.execution!.recheckFailures;
     const parent = view.sessionId!;
     view = await control(parentTask, "release", view.revision); verbs.add("dispose");
     view = await control(parentTask, "resume", view.revision);

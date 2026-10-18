@@ -31,7 +31,7 @@ import { NativeTaskDescriptors, nativeTaskId, taskBodyHash, type NativeTaskDescr
 import { readNativeTaskProjection, type NativeTaskProjection } from "./nativeTaskProjection.js";
 import { inspectJsonlSessionRecovery } from "../session/jsonlContinuation.js";
 import { deriveExecutionStatus } from "../execution/executionContract.js";
-import { sessionReceiptStates } from "../execution/executionStatus.js";
+import { sessionReceipts } from "../execution/executionStatus.js";
 import { NativeTaskServiceError, type NativeTaskActor, type NativeTaskConfiguration, type NativeTaskLimits,
   type NativeTaskService, type NativeTaskState, type NativeTaskView } from "./nativeTaskTypes.js";
 
@@ -69,7 +69,7 @@ interface Entry {
   /** Process closure is distinct from a successful signed session handover. */
   processCleanupConfirmed?: boolean;
   /** P2-13: verified receipt states read with the projection, and whether a start or fork was refused before any session. */
-  receiptStates?: readonly string[]; admissionRefused?: boolean;
+  receipts?: ReturnType<typeof sessionReceipts>; admissionRefused?: boolean;
 }
 export interface NativeTaskServiceOptions {
   readonly workspace: string;
@@ -235,7 +235,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     if (!entry.descriptor.sessionId || Date.now() - entry.projectionAt < 250) return entry.projection !== undefined;
     try {
       entry.projection = readNativeTaskProjection(workspace, entry.descriptor.sessionId, entry.descriptor.agentId);
-      entry.receiptStates = sessionReceiptStates(workspace, entry.descriptor.sessionId);
+      entry.receipts = sessionReceipts(workspace, entry.descriptor.sessionId);
       entry.projectionError = undefined; entry.changedSince = undefined;
       // A later read never softens a failed verdict; it only withdraws a positive one whose head moved.
       if (entry.verification !== "failed" && entry.verificationStoreHead !== entry.projection.storeHeadEventHash) entry.verification = "not-verified";
@@ -250,7 +250,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         if (!entry.projection) entry.projectionError = MOVING;
         return false;
       }
-      entry.projection = undefined; entry.receiptStates = undefined;
+      entry.projection = undefined; entry.receipts = undefined;
       entry.projectionError = moving ? UNSETTLED : "Committed native evidence could not be authenticated or exceeded the display bound. No transcript or approval is shown. Restore the original evidence and refresh; no alternate history was substituted.";
       return false;
     }
@@ -299,7 +299,8 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     const running = ["running", "cancel-requested"].includes(entry.state) || (entry.state === "starting" && d.pendingTurn);
     // P2-13: each phase from its own source; Studio's verdict feeds only evidence-verification.
     const execution = d.sessionId ? deriveExecutionStatus({ sessionId: d.sessionId, admission: "admitted",
-      turn: running ? "running" : p ? p.ending : "unreadable", receiptStates: p ? entry.receiptStates ?? null : null,
+      turn: running ? "running" : p ? p.ending : "unreadable", receiptStates: p ? entry.receipts?.states ?? null : null,
+      recheckFailures: entry.receipts?.recheckFailures ?? [],
       verified: entry.verification === "not-verified" ? null : entry.verification !== "failed" })
       : entry.admissionRefused ? deriveExecutionStatus({ sessionId: "", admission: "refused", turn: null, receiptStates: [], verified: null }) : null;
     const result: NativeTaskView = { taskId: d.taskId, sessionId: d.sessionId, agentId: d.agentId, provider: d.provider, model: d.model, tools: d.tools, toolsDigest: d.toolsDigest,

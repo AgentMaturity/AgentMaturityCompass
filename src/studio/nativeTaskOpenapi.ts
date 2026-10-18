@@ -106,7 +106,7 @@ export function nativeTaskSchemas(): Record<string, unknown> {
     NativeTaskControl: object({ expectedRevision: { type: "integer", minimum: 1, maximum: 32 } }),
     NativeTaskFork: { ...object({ clientRequestId: uuid, expectedRevision: { type: "integer", minimum: 1, maximum: 32 } }),
       description: "A new owner-scoped request ID for the child task, and the parent's current revision. The child keeps the parent's pinned provider, model, tools digest, checks and limits, with its own lease; it starts with no inherited model context. A parent that does not verify is refused with code NATIVE_FORK_<reason>." },
-    ExecutionStatus: { ...object({ sessionId: string, receiptStates: strings,
+    ExecutionStatus: { ...object({ sessionId: string, receiptStates: strings, recheckFailures: strings,
       phases: object(Object.fromEntries(["admission", "model-completion", "side-effect-completion", "evidence-verification"].map(phase =>
         [phase, { type: "string", enum: ["pending", "succeeded", "failed", "refused", "unknown"] }]))) }),
       description: "The four execution phases (P2-13, docs/sdk/EXECUTION_API.md). Each has one source and none implies another: a finished turn whose evidence nobody verified reads model-completion succeeded, evidence-verification pending." },

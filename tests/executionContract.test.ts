@@ -12,7 +12,7 @@ import { credentialRef } from "../src/credentials/credentialRef.js";
 import {
   deriveExecutionStatus, EXECUTION_PHASES, EXECUTION_SURFACES, EXECUTION_VERBS, parseExecutionStatus, type ExecutionFacts
 } from "../src/execution/executionContract.js";
-import { executionStatusFor, sessionReceiptStates } from "../src/execution/executionStatus.js";
+import { executionStatusFor, sessionReceipts } from "../src/execution/executionStatus.js";
 import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
 import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
 import { closeSqlitePool } from "../src/storage/sqlitePool.js";
@@ -54,9 +54,18 @@ describe("phase derivation (P2-13)", () => {
     expect(phases({ receiptStates: ["requested"] })["side-effect-completion"]).toBe("unknown");
   });
 
-  it("settled actions succeed, denied and cancelled included; a broken chain fails above everything else", () => {
-    expect(phases({ receiptStates: ["cancelled", "completed", "denied"] })["side-effect-completion"]).toBe("succeeded");
+  it("only all-completed effects succeed: a denial is refused, a pre-dispatch cancellation failed, a broken chain fails above all", () => {
+    expect(phases({ receiptStates: ["completed", "completed"] })["side-effect-completion"]).toBe("succeeded");
+    expect(phases({ receiptStates: ["cancelled", "completed", "denied"] })["side-effect-completion"]).toBe("refused");
+    expect(phases({ receiptStates: ["cancelled", "completed"] })["side-effect-completion"]).toBe("failed");
     expect(phases({ receiptStates: ["integrity_failed", "outcome_unknown"] })["side-effect-completion"]).toBe("failed");
+  });
+
+  it("carries the typed recheck failures, sorted and once each, beside the phases", () => {
+    const status = deriveExecutionStatus(facts({ receiptStates: ["denied", "denied"], recheckFailures: ["purpose_violation", "binding_changed:amount", "purpose_violation"] }));
+    expect(status.recheckFailures).toEqual(["binding_changed:amount", "purpose_violation"]);
+    expect(status.phases["side-effect-completion"]).toBe("refused");
+    expect(deriveExecutionStatus(facts({})).recheckFailures).toEqual([]);
   });
 
   it("only a complete turn is a finished model turn; a blocked one is refused", () => {
@@ -73,7 +82,8 @@ describe("the wire shape and the surface table (P2-13)", () => {
     expect(parseExecutionStatus(JSON.parse(JSON.stringify(status)))).toEqual(status);
     const wire = JSON.parse(JSON.stringify(status)) as Record<string, unknown>;
     for (const bad of [{ ...wire, extra: 1 }, { ...wire, phases: { ...status.phases, admission: "maybe" } },
-      { ...wire, phases: { admission: "succeeded" } }, { ...wire, receiptStates: [1] }, { ...wire, sessionId: 7 }, null, []]) {
+      { ...wire, phases: { admission: "succeeded" } }, { ...wire, receiptStates: [1] }, { ...wire, sessionId: 7 },
+      { ...wire, recheckFailures: ["Purpose Violation"] }, { sessionId: "s-1", phases: wire.phases, receiptStates: [] }, null, []]) {
       expect(parseExecutionStatus(bad)).toBeNull();
     }
   });
@@ -104,7 +114,7 @@ describe("receipt states from verified journal chains (P2-13 over P1-03)", () =>
     prepareFaultWorkspace(root);
     return root;
   }
-  function journaled(root: string, journal: ActionJournal, sessionId: string, end: "completed" | "outcome_unknown"): string {
+  function journaled(root: string, journal: ActionJournal, sessionId: string, end: "completed" | "outcome_unknown" | "recheck_failed"): string {
     const callId = `call-${randomUUID()}`;
     const execution: ToolExecution = { token: randomUUID(), callId, rootCallId: callId, parentToken: null, workspace: root, name: PAYMENT_TOOL,
       agentId: "default", actionClass: "FINANCIAL", requestedMode: "EXECUTE", effectiveMode: "EXECUTE", arguments: { ...FAULT_ARGUMENTS[PAYMENT_TOOL] } };
@@ -114,6 +124,8 @@ describe("receipt states from verified journal chains (P2-13 over P1-03)", () =>
     journal.request({ executionId: id, agentId: "default", toolName: PAYMENT_TOOL, actionClass: "FINANCIAL", sessionId, callId,
       parentExecutionId: null, idempotencyKey: bound.record.idempotencyKey });
     journal.authorize(id, bound.digest);
+    // As ToolPipeline records a failed pre-dispatch recheck (src/tools/toolPipeline.ts).
+    if (end === "recheck_failed") { journal.deny(id, "recheck_failed:purpose_violation,binding_changed:amount"); return id; }
     journal.start(id, bound.record);
     if (end === "completed") journal.complete(id, { effect: "applied", outcomeDigest: sha256Hex("p213"), externalRef: null, reasonCode: "p213_completed" });
     else journal.markUnknown(id, "p213_ambiguous");
@@ -122,24 +134,26 @@ describe("receipt states from verified journal chains (P2-13 over P1-03)", () =>
 
   it("reports each verified head, outcome_unknown makes side effects unknown, and a broken or hidden chain is an integrity failure", () => {
     const root = workspace(), sessionId = `session-${randomUUID()}`;
-    expect(sessionReceiptStates(root, sessionId)).toEqual([]);
+    expect(sessionReceipts(root, sessionId)).toEqual({ states: [], recheckFailures: [] });
     const journal = openActionJournal(root);
     let unknownId: string;
     try {
       journaled(root, journal, `other-${randomUUID()}`, "completed");
       journaled(root, journal, sessionId, "completed");
+      journaled(root, journal, sessionId, "recheck_failed");
       // Last: an outcome_unknown execution blocks this agent's later journaled starts (P1-03).
       unknownId = journaled(root, journal, sessionId, "outcome_unknown");
     } finally { journal.close(); }
     const status = executionStatusFor(root, { sessionId, admission: "admitted", turn: "complete", verified: null });
-    expect(status.receiptStates).toEqual(["completed", "outcome_unknown"]);
+    expect(status.receiptStates).toEqual(["completed", "denied", "outcome_unknown"]);
+    expect(status.recheckFailures).toEqual(["binding_changed:amount", "purpose_violation"]);
     expect(status.phases).toMatchObject({ "model-completion": "succeeded", "side-effect-completion": "unknown", "evidence-verification": "pending" });
 
     closeSqlitePool(`ledger:${resolve(root)}:${join(root, ".amc", "evidence.sqlite")}`);
     const db = new Database(join(root, ".amc", "evidence.sqlite"));
     try { db.pragma("foreign_keys = OFF"); db.prepare("DELETE FROM action_executions WHERE execution_id = ?").run(unknownId); } finally { db.close(); }
     // The signed ACTION_STATE rows still name it; its chain no longer matches an index row, so it fails, never vanishes.
-    expect(sessionReceiptStates(root, sessionId)).toEqual(["completed", "integrity_failed"]);
+    expect(sessionReceipts(root, sessionId).states).toEqual(["completed", "denied", "integrity_failed"]);
     expect(executionStatusFor(root, { sessionId, admission: "admitted", turn: "complete", verified: null }).phases["side-effect-completion"]).toBe("failed");
   });
 });

@@ -19,6 +19,7 @@ EXECUTION_VERBS = ("start", "stream", "approve", "cancel", "resume", "fork", "di
 EXECUTION_PHASES = ("admission", "model-completion", "side-effect-completion", "evidence-verification")
 PHASE_STATES = ("pending", "succeeded", "failed", "refused", "unknown")
 _RECEIPT_STATE = re.compile(r"[a-z_]{1,64}")
+_RECHECK_FAILURE = re.compile(r"[a-z_]{1,64}(?::[a-z_]{1,64})?")
 _APPROVAL_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,127}")
 _ROLE = re.compile(r"[A-Z_]{1,32}")
 
@@ -29,6 +30,8 @@ class ExecutionStatus:
     session_id: str
     phases: dict[str, str]
     receipt_states: tuple[str, ...]
+    #: Typed pre-dispatch recheck failures (e.g. ``purpose_violation``) of the actions the recheck denied.
+    recheck_failures: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -50,15 +53,17 @@ class VerificationReceipt:
 
 def parse_execution_status(value: Any) -> Optional[ExecutionStatus]:
     """Exactly the wire shape, or None. Never repaired or defaulted."""
-    if not isinstance(value, dict) or set(value) != {"sessionId", "phases", "receiptStates"}:
+    if not isinstance(value, dict) or set(value) != {"sessionId", "phases", "receiptStates", "recheckFailures"}:
         return None
-    session_id, phases, states = value["sessionId"], value["phases"], value["receiptStates"]
+    session_id, phases, states, rechecks = value["sessionId"], value["phases"], value["receiptStates"], value["recheckFailures"]
     if (not isinstance(session_id, str) or len(session_id) > 200 or not isinstance(phases, dict)
             or set(phases) != set(EXECUTION_PHASES) or any(phases[phase] not in PHASE_STATES for phase in EXECUTION_PHASES)
             or not isinstance(states, list) or len(states) > 4096
-            or any(not isinstance(state, str) or _RECEIPT_STATE.fullmatch(state) is None for state in states)):
+            or any(not isinstance(state, str) or _RECEIPT_STATE.fullmatch(state) is None for state in states)
+            or not isinstance(rechecks, list) or len(rechecks) > 64
+            or any(not isinstance(code, str) or _RECHECK_FAILURE.fullmatch(code) is None for code in rechecks)):
         return None
-    return ExecutionStatus(session_id, {phase: phases[phase] for phase in EXECUTION_PHASES}, tuple(states))
+    return ExecutionStatus(session_id, {phase: phases[phase] for phase in EXECUTION_PHASES}, tuple(states), tuple(rechecks))
 
 
 def run_cli(command: list[str], args: list[str], *, cwd: str, env: dict[str, str], timeout: float) -> subprocess.CompletedProcess[str]:

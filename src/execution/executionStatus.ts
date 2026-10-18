@@ -10,19 +10,23 @@ import { openLedger } from "../ledger/ledger.js";
 import { hasTable } from "../ledger/ledgerSchema.js";
 import { deriveExecutionStatus, EVIDENCE_INCOMPLETE, INTEGRITY_FAILED, type ExecutionFacts, type ExecutionStatus } from "./executionContract.js";
 
+const RECHECK_FAILED = "recheck_failed:";
+
 /**
- * The verified head state of every execution journaled for `sessionId`, sorted. Executions are found from the index AND
+ * The verified head state of every execution journaled for `sessionId`, sorted, and the typed recheck failures of the
+ * ones the pre-dispatch recheck denied (their `denied` receipt's `recheck_failed:<code>[,<code>]` reason). Executions are found from the index AND
  * from the signed ACTION_STATE rows, so deleting an index row does not hide one; each chain is then verified (hash,
  * link, signature) and a chain that fails is `integrity_failed`, never skipped. A workspace with no ledger or no journal
  * table has journaled nothing. Signatures are checked against the workspace's own keys: a local audit trail.
  */
-export function sessionReceiptStates(workspace: string, sessionId: string): readonly string[] {
-  if (!existsSync(join(workspace, ".amc", "evidence.sqlite"))) return [];
+export function sessionReceipts(workspace: string, sessionId: string): { readonly states: readonly string[]; readonly recheckFailures: readonly string[] } {
+  const none = { states: [], recheckFailures: [] };
+  if (!existsSync(join(workspace, ".amc", "evidence.sqlite"))) return none;
   let ledger: ReturnType<typeof openLedger>;
-  try { ledger = openLedger(workspace, { readonly: true }); } catch { return [INTEGRITY_FAILED]; }
+  try { ledger = openLedger(workspace, { readonly: true }); } catch { return { states: [INTEGRITY_FAILED], recheckFailures: [] }; }
   try {
     ledger.db.exec("BEGIN"); // One snapshot: the executions found are the ones verified.
-    if (!hasTable(ledger.db, "action_executions")) return [];
+    if (!hasTable(ledger.db, "action_executions")) return none;
     const ids = new Set((ledger.db.prepare("SELECT execution_id FROM action_executions WHERE session_id = ?")
       .all(sessionId) as Array<{ execution_id: string }>).map((row) => row.execution_id));
     for (const row of ledger.db.prepare("SELECT meta_json FROM evidence_events WHERE event_type = 'audit' AND meta_json LIKE ?")
@@ -30,14 +34,17 @@ export function sessionReceiptStates(workspace: string, sessionId: string): read
       const meta = JSON.parse(row.meta_json) as Record<string, unknown>;
       if (meta.auditType === "ACTION_STATE" && meta.agentSessionId === sessionId && typeof meta.executionId === "string") ids.add(meta.executionId);
     }
-    return [...ids].map((id) => {
+    const states: string[] = [], recheckFailures: string[] = [];
+    for (const id of ids) {
       const chain = verifyChainIn(ledger, id);
       const head = chain.receipts.at(-1);
-      if (!chain.ok || !head) return INTEGRITY_FAILED;
-      return head.state === "completed" && !head.evidenceComplete ? EVIDENCE_INCOMPLETE : head.state;
-    }).sort();
+      if (!chain.ok || !head) { states.push(INTEGRITY_FAILED); continue; }
+      states.push(head.state === "completed" && !head.evidenceComplete ? EVIDENCE_INCOMPLETE : head.state);
+      if (head.state === "denied" && head.reasonCode.startsWith(RECHECK_FAILED)) recheckFailures.push(...head.reasonCode.slice(RECHECK_FAILED.length).split(","));
+    }
+    return { states: states.sort(), recheckFailures };
   } catch {
-    return [INTEGRITY_FAILED]; // An unreadable journal is an integrity failure, never "nothing journaled".
+    return { states: [INTEGRITY_FAILED], recheckFailures: [] }; // An unreadable journal is an integrity failure, never "nothing journaled".
   } finally {
     if (ledger.db.inTransaction) ledger.db.exec("COMMIT");
     ledger.close();
@@ -45,8 +52,9 @@ export function sessionReceiptStates(workspace: string, sessionId: string): read
 }
 
 /** The status a surface reports: its own observations plus the session's verified receipt states. */
-export function executionStatusFor(workspace: string, facts: Omit<ExecutionFacts, "receiptStates">): ExecutionStatus {
-  return deriveExecutionStatus({ ...facts, receiptStates: sessionReceiptStates(workspace, facts.sessionId) });
+export function executionStatusFor(workspace: string, facts: Omit<ExecutionFacts, "receiptStates" | "recheckFailures">): ExecutionStatus {
+  const receipts = sessionReceipts(workspace, facts.sessionId);
+  return deriveExecutionStatus({ ...facts, receiptStates: receipts.states, recheckFailures: receipts.recheckFailures });
 }
 
 /**

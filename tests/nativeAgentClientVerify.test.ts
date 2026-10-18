@@ -29,7 +29,7 @@ if (process.argv.includes('agent-loop') && verify > 0) {
 type TrustRoot = { anchored: boolean; monitorFingerprint: string | null; expectedFingerprint: string | null };
 const verifiedPhases = { admission: "succeeded", "model-completion": "succeeded", "side-effect-completion": "succeeded", "evidence-verification": "succeeded" };
 const receipt = (trustRoot: TrustRoot, phases: Record<string, string> = verifiedPhases) => ({ ok: true, ledgerOk: true, ledgerErrors: [], sessionChainErrors: [],
-  unsignedRowIds: [], requests: [{ headerEventId: "header-1", status: "reconstructed" }], trustRoot, execution: { sessionId: "", phases, receiptStates: [] } });
+  unsignedRowIds: [], requests: [{ headerEventId: "header-1", status: "reconstructed" }], trustRoot, execution: { sessionId: "", phases, receiptStates: [], recheckFailures: [] } });
 const roots: string[] = [], clients: AMCNativeClient[] = [];
 afterEach(async () => {
   for (const client of clients.splice(0)) await client.close();

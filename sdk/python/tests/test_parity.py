@@ -48,6 +48,7 @@ EXPECTED = {
     "resumedSameSession": True,
     "verified": _phases("succeeded", "succeeded"),
     "receiptStates": [],
+    "recheckFailures": [],
     "tamperedParentFork": "TAMPERED",
 }
 
@@ -99,6 +100,7 @@ def run_scenario(workspace: str, amc_bin: list[str], env: dict[str, str]) -> dic
     verbs.add("stream")
     record["approvedTurn"] = approved.execution.phases
     record["receiptStates"] = list(approved.execution.receipt_states)
+    record["recheckFailures"] = list(approved.execution.recheck_failures)
 
     agent.dispose()
     verbs.add("dispose")

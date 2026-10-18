@@ -456,7 +456,7 @@ test("fork (P2-13): an owned child task whose session names the verified parent,
   const s = service();
   let parent = await s.start(actor, input("Synthetic parent turn."));
   parent = await idle(s, parent.taskId);
-  expect(parent.execution).toEqual({ sessionId: parent.sessionId, receiptStates: [],
+  expect(parent.execution).toEqual({ sessionId: parent.sessionId, receiptStates: [], recheckFailures: [],
     phases: { admission: "succeeded", "model-completion": "succeeded", "side-effect-completion": "succeeded", "evidence-verification": "pending" } });
   const request = { clientRequestId: randomUUID(), expectedRevision: parent.revision };
   const [child, again] = [await s.fork(actor, parent.taskId, request), await s.fork(actor, parent.taskId, request)];

@@ -425,7 +425,7 @@ describe("P0-06 SDK native-shell warning delivery", () => {
 });
 
 describe("P2-13 execution verbs on the TypeScript SDK", () => {
-  const execution = (sessionId: string) => ({ sessionId, receiptStates: [],
+  const execution = (sessionId: string) => ({ sessionId, receiptStates: [], recheckFailures: [],
     phases: { admission: "succeeded", "model-completion": "succeeded", "side-effect-completion": "succeeded", "evidence-verification": "pending" } });
 
   test.each([

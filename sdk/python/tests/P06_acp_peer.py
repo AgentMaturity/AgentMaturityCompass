@@ -126,7 +126,7 @@ def main() -> None:
                 update(session_id, {"sessionUpdate": "agent_message_chunk", "content": {"type": "text", "text": "block"}})
                 extension = {"validation": {"status": "not-requested", "turn": 1, "configSha256": None, "checks": []}}
                 if mode in ("execution", "bad-execution"):
-                    extension["execution"] = {"sessionId": session_id, "receiptStates": [], "phases": {
+                    extension["execution"] = {"sessionId": session_id, "receiptStates": [], "recheckFailures": [], "phases": {
                         "admission": "succeeded", "model-completion": "succeeded", "side-effect-completion": "succeeded",
                         "evidence-verification": "maybe" if mode == "bad-execution" else "pending"}}
                 reply(request_id, {"stopReason": "end_turn", "_meta": {EXT: extension}})

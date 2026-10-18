@@ -78,7 +78,7 @@ describe("the native ACP runtime under the execution contract (P2-13)", () => {
       expect(answered.result?.stopReason).toBe("end_turn");
       expect((answered.result!._meta as Record<string, Record<string, unknown>>)[AMC]!.execution).toEqual({ sessionId: parent,
         phases: { admission: "succeeded", "model-completion": "succeeded", "side-effect-completion": "succeeded", "evidence-verification": "pending" },
-        receiptStates: [] });
+        receiptStates: [], recheckFailures: [] });
 
       const forked = await client.call("_amc/session/fork", { sessionId: parent, ...scope() });
       expect(forked.error).toBeUndefined();
@@ -144,7 +144,7 @@ describe("the CLI's --json reports carry the same phases (P2-13)", () => {
     const run = await cli(["agent-loop", "run", "hello", "--provider", "stub", "--tools", "none", "--credentials-home", home, "--json"]);
     expect(run.failed).toBe(false);
     const sessionId = run.json.sessionId as string;
-    expect(run.json.execution).toEqual({ sessionId, receiptStates: [],
+    expect(run.json.execution).toEqual({ sessionId, receiptStates: [], recheckFailures: [],
       phases: { admission: "succeeded", "model-completion": "succeeded", "side-effect-completion": "succeeded", "evidence-verification": "pending" } });
     const verified = await cli(["agent-loop", "verify", sessionId, "--json", "--expect-monitor", sha256Hex(getPublicKeyPem(workspace, "monitor"))]);
     expect(verified.json.ok).toBe(true);

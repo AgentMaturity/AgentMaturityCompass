@@ -30,6 +30,11 @@ export interface ExecutionStatus {
   readonly phases: Readonly<Record<ExecutionPhase, PhaseState>>;
   /** The verified head state of each journaled action (P1-03 states), plus `evidence_incomplete` and `integrity_failed`. */
   readonly receiptStates: readonly string[];
+  /**
+   * The typed recheck failures (`RecheckFailure`, e.g. `binding_changed:amount`, `purpose_violation`) of every journaled
+   * action the pre-dispatch recheck denied, read from the same verified receipts, sorted and deduplicated.
+   */
+  readonly recheckFailures: readonly string[];
 }
 
 /** A `completed` head whose evidence is marked incomplete, and a receipt chain that failed verification. */
@@ -70,8 +75,10 @@ export interface ExecutionFacts {
    * Any other value (`unreadable` when the rows could not be read, a reason this version does not know) reads unknown.
    */
   readonly turn: TurnEndReason | "running" | (string & Record<never, never>) | null;
-  /** From `sessionReceiptStates`; null when the journal could not be read at all. */
+  /** From `sessionReceipts`; null when the journal could not be read at all. */
   readonly receiptStates: readonly string[] | null;
+  /** From `sessionReceipts`; absent means none. */
+  readonly recheckFailures?: readonly string[];
   /** `verifyAgentRun(...).ok`; null until verification ran. */
   readonly verified: boolean | null;
 }
@@ -80,17 +87,21 @@ const ADMISSION = { admitted: "succeeded", refused: "refused", failed: "failed" 
 /** Only `complete` is a finished turn. A cut-off turn (limits, cancellation, error) did not finish; `blocked` is a guard's refusal. */
 const MODEL: Readonly<Record<string, PhaseState>> = { complete: "succeeded", blocked: "refused", cancelled: "failed",
   max_tokens: "failed", max_steps: "failed", error: "failed", interrupted: "failed" };
-const SETTLED = new Set(["completed", "denied", "cancelled"]);
+const KNOWN = new Set(["completed", "denied", "cancelled", "outcome_unknown", EVIDENCE_INCOMPLETE, "requested", "authorized", "started"]);
 const OPEN = new Set(["requested", "authorized", "started"]);
 
-/** Settlement, not success: denied and cancelled actions are settled; a dispatch whose outcome nobody recorded is not. */
+/**
+ * Did every side effect the session attempted complete? A broken chain fails; an effect nobody can settle (outcome
+ * unknown, incomplete evidence, still open after its turn, a state this version does not know) is unknown; a denial
+ * (a guard or the pre-dispatch recheck) is refused; a cancellation before dispatch failed; only all-completed succeeds.
+ */
 function sideEffects(states: readonly string[] | null, turnSettled: boolean): PhaseState {
   if (states === null) return "unknown";
   if (states.includes(INTEGRITY_FAILED)) return "failed";
-  if (states.some((state) => state === "outcome_unknown" || state === EVIDENCE_INCOMPLETE)) return "unknown";
+  if (states.some((state) => state === "outcome_unknown" || state === EVIDENCE_INCOMPLETE || !KNOWN.has(state))) return "unknown";
   if (states.some((state) => OPEN.has(state))) return turnSettled ? "unknown" : "pending";
   if (!turnSettled) return "pending";
-  return states.every((state) => SETTLED.has(state)) ? "succeeded" : "unknown";
+  return states.includes("denied") ? "refused" : states.includes("cancelled") ? "failed" : "succeeded";
 }
 
 export function deriveExecutionStatus(facts: ExecutionFacts): ExecutionStatus {
@@ -103,7 +114,8 @@ export function deriveExecutionStatus(facts: ExecutionFacts): ExecutionStatus {
       "side-effect-completion": sideEffects(facts.receiptStates, turnSettled),
       "evidence-verification": facts.verified === null ? "pending" : facts.verified ? "succeeded" : "failed"
     }),
-    receiptStates: Object.freeze([...(facts.receiptStates ?? [])])
+    receiptStates: Object.freeze([...(facts.receiptStates ?? [])]),
+    recheckFailures: Object.freeze([...new Set(facts.recheckFailures ?? [])].sort())
   });
 }
 
@@ -113,12 +125,14 @@ const sameKeys = (value: Record<string, unknown>, keys: readonly string[]): bool
 
 /** A status read off the wire, exactly in this shape, or null. Never repaired or defaulted. */
 export function parseExecutionStatus(value: unknown): ExecutionStatus | null {
-  if (!isRecord(value) || !sameKeys(value, ["sessionId", "phases", "receiptStates"]) || typeof value.sessionId !== "string"
+  if (!isRecord(value) || !sameKeys(value, ["sessionId", "phases", "receiptStates", "recheckFailures"]) || typeof value.sessionId !== "string"
     || value.sessionId.length > 200 || !isRecord(value.phases) || !sameKeys(value.phases, EXECUTION_PHASES)
-    || !Array.isArray(value.receiptStates) || value.receiptStates.length > 4096) return null;
+    || !Array.isArray(value.receiptStates) || value.receiptStates.length > 4096
+    || !Array.isArray(value.recheckFailures) || value.recheckFailures.length > 64) return null;
   const phases = value.phases;
   if (!EXECUTION_PHASES.every((phase) => (PHASE_STATES as readonly unknown[]).includes(phases[phase]))) return null;
   if (!value.receiptStates.every((state) => typeof state === "string" && /^[a-z_]{1,64}$/.test(state))) return null;
+  if (!value.recheckFailures.every((code) => typeof code === "string" && /^[a-z_]{1,64}(?::[a-z_]{1,64})?$/.test(code))) return null;
   return Object.freeze({ sessionId: value.sessionId, phases: Object.freeze({ ...phases }) as ExecutionStatus["phases"],
-    receiptStates: Object.freeze([...value.receiptStates as string[]]) });
+    receiptStates: Object.freeze([...value.receiptStates as string[]]), recheckFailures: Object.freeze([...value.recheckFailures as string[]]) });
 }
