@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "2026-09-08",
+  "id": "cod-docs-consistency",
+  "domain": "coding",
+  "description": "Make documented defaults match the code without changing the code.",
+  "prompt": "Task files are under ./workspace/ relative to your working directory; every path below is relative to ./workspace/. repo/README.md documents defaults that no longer match repo/config.mjs. Update README.md so that every documented default, in the table and in the prose, matches DEFAULTS in repo/config.mjs. Keep the table's format. Do not change repo/config.mjs or any other file.",
+  "files": {
+    "repo/config.mjs": "export const DEFAULTS = Object.freeze({ port: 8080, retries: 3, timeoutMs: 15000, logLevel: \"info\" });\n\nexport function resolveConfig(overrides = {}) {\n  return { ...DEFAULTS, ...overrides };\n}\n",
+    "repo/README.md": "# pilot-client\n\nSettings and their defaults:\n\n| Setting | Default |\n|---|---|\n| `port` | `3000` |\n| `retries` | `5` |\n| `timeoutMs` | `15000` |\n| `logLevel` | `debug` |\n\nBy default the client retries 5 times before giving up and waits 15000 ms for each attempt.\n"
+  }
+}

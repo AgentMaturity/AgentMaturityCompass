@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "2026-09-08",
+  "id": "cod-bug-fix",
+  "domain": "coding",
+  "description": "Fix pagination bugs against a stated contract.",
+  "prompt": "Task files are under ./workspace/ relative to your working directory; every path below is relative to ./workspace/. repo/paginate.mjs has bugs. paginate(items, page, size) uses 1-based pages and returns { items, page, totalPages }: totalPages is the number of pages needed to show every item (at least 1), items is a new array holding that page's items, and a page beyond totalPages throws RangeError. Non-array items throws TypeError; a page or size that is not a positive safe integer throws RangeError. Fix the module without renaming its export. Keep every module a self-contained ES module that imports only other files under repo/ by relative path: no packages, file access, network or subprocesses.",
+  "files": {
+    "repo/paginate.mjs": "/** Pages are 1-based. Returns { items, page, totalPages }; an empty list has one empty page. */\nexport function paginate(items, page, size) {\n  if (!Array.isArray(items)) throw new TypeError(\"items must be an array\");\n  if (!Number.isSafeInteger(page) || page < 1 || !Number.isSafeInteger(size) || size < 1) throw new RangeError(\"page and size must be positive integers\");\n  const totalPages = Math.max(1, Math.floor(items.length / size));\n  const start = page * size;\n  return { items: items.slice(start, start + size), page, totalPages };\n}\n"
+  }
+}
