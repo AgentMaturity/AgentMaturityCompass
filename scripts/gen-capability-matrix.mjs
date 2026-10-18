@@ -1,50 +1,72 @@
 #!/usr/bin/env node
 /**
- * The provider capability matrix, generated from what contract tests PROVED (P1-38).
+ * The provider capability matrix, generated from contract tests that PASSED (P1-38).
  *
- * Contract tests write test-results/capabilities/<source>.json: each route's declared features, and one result per
- * feature a passing test proved (tests/helpers/capabilityResults.ts). This script merges those files into
- * docs/providers/CAPABILITY_MATRIX.json and renders CAPABILITY_MATRIX.md from that JSON. A cell is `supported` or
- * `unsupported` only when a test result says so; every other cell is `unknown`, whatever the adapter declares.
+ * The contract test files register, at collection time, which route features each test claims to prove
+ * (tests/helpers/capabilityResults.ts writes test-results/capabilities/<source>.json). This script runs those files
+ * with vitest's JSON reporter and joins the two: a claim counts only when its test passed in that same run. A failed
+ * claim is `unknown`, a claim whose test did not run is `not run`, and a feature with no claim is `unknown` whatever the
+ * adapter declares. The output carries no clock or machine detail, so the same tests give the same matrix anywhere.
  *
- *   node scripts/gen-capability-matrix.mjs          merge the test results and write both files
- *   node scripts/gen-capability-matrix.mjs --check  fail when the .md is not the rendering of the .json, or a cell
- *                                                   cites a test that is not in the named file (CI drift check)
+ *   node scripts/gen-capability-matrix.mjs          run the contract tests, write docs/providers/CAPABILITY_MATRIX.*
+ *   node scripts/gen-capability-matrix.mjs --check  run them again and fail when the committed matrix differs from the
+ *                                                   result, cites a test that did not pass, or is rendered stale
+ * Both are offline: the tests use local fixture servers on 127.0.0.1.
  */
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { spawnSync } from "node:child_process";
+import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const RESULTS_DIR = join("test-results", "capabilities");
+export const CONTRACT_TEST_FILES = ["tests/nativeCapabilityContract.test.ts", "tests/piAi/piAiAdapterContract.test.ts"];
+export const CLAIMS_DIR = join("test-results", "capabilities");
+export const REPORT_JSON = join("test-results", "capability-contract-report.json");
 export const MATRIX_JSON = join("docs", "providers", "CAPABILITY_MATRIX.json");
 export const MATRIX_MD = join("docs", "providers", "CAPABILITY_MATRIX.md");
-/** Both halves must have run: a missing file would silently drop its routes. */
-export const REQUIRED_SOURCES = ["native", "pi-ai"];
-const RUN_TESTS = "npx vitest run tests/nativeCapabilityContract.test.ts tests/piAi/piAiAdapterContract.test.ts";
 
-/** @param {{ source: string; environment: Record<string, unknown>; routes: any[]; results: any[] }[]} files */
-export function buildMatrix(files) {
-  const sorted = [...files].sort((a, b) => a.source.localeCompare(b.source));
-  const routes = [];
-  for (const file of sorted) {
-    for (const declared of file.routes) {
-      /** @type {Record<string, { support: string; declared: string; tests: string[] }>} */
-      const features = {};
-      for (const [feature, support] of Object.entries(declared.declared)) {
-        const proofs = file.results.filter((result) => result.route === declared.route && result.feature === feature);
-        const verdicts = [...new Set(proofs.map((proof) => proof.support))];
-        if (verdicts.length > 1) throw new Error(`contradictory results for ${declared.route} ${feature}: ${verdicts.join(" and ")}`);
-        features[feature] = { support: verdicts[0] ?? "unknown", declared: support, tests: [...new Set(proofs.map((proof) => proof.test))].sort() };
-      }
-      routes.push({ route: declared.route, protocol: declared.protocol, adapter: declared.adapter, encoder: declared.encoder,
-        bytesBuiltBy: declared.library ?? "AMC", source: file.source, features });
+/** Statuses of every test in a vitest JSON report, keyed `<repo-relative file> > <title>`. */
+function statuses(report, root) {
+  const out = new Map();
+  for (const file of report.testResults ?? []) {
+    for (const assertion of file.assertionResults ?? []) {
+      const key = `${relative(root, file.name)} > ${assertion.title}`;
+      if (out.has(key)) throw new Error(`two tests are titled ${key}; claims must name one test`);
+      out.set(key, assertion.status);
     }
   }
-  return { schemaVersion: 1, liveProvider: "not run",
-    sources: sorted.map((file) => ({ source: file.source, environment: file.environment })), routes };
+  return out;
+}
+
+/** Join claims with the report of the run that executed them. */
+export function buildMatrix(claimFiles, report, root = process.cwd()) {
+  const status = statuses(report, root);
+  const routes = [];
+  for (const file of [...claimFiles].sort((a, b) => a.source.localeCompare(b.source))) {
+    for (const declared of file.routes) {
+      /** @type {Record<string, { support: string; declared: string; tests: { test: string; status: string }[] }>} */
+      const features = {};
+      for (const [feature, declaredSupport] of Object.entries(declared.declared)) {
+        const claims = file.claims.filter((claim) => claim.route === declared.route && claim.features.includes(feature));
+        const claimed = [...new Set(claims.map((claim) => claim.support))];
+        if (claimed.length > 1) throw new Error(`contradictory claims for ${declared.route} ${feature}: ${claimed.join(" and ")}`);
+        const tests = claims.map((claim) => {
+          const test = `${claim.file} > ${claim.title}`;
+          return { test, status: status.get(test) ?? "absent" };
+        }).sort((a, b) => a.test.localeCompare(b.test));
+        const support = claims.length === 0 ? "unknown"
+          : tests.some((test) => test.status === "failed") ? "unknown"
+            : tests.every((test) => test.status === "passed") ? claimed[0] : "not run";
+        features[feature] = { support, declared: declaredSupport, tests };
+      }
+      routes.push({ route: declared.route, protocol: declared.protocol, adapter: declared.adapter, encoder: declared.encoder,
+        bytesBuiltBy: declared.library ?? "AMC", features });
+    }
+  }
+  return { schemaVersion: 2, liveProvider: "not run", contractTests: CONTRACT_TEST_FILES, routes };
 }
 
 function cell(entry) {
+  if (entry.support === "unknown" && entry.tests.some((test) => test.status === "failed")) return "unknown (test failed)";
   return entry.support === "unknown" && entry.declared !== "unknown" ? `unknown (declared ${entry.declared})` : entry.support;
 }
 
@@ -52,24 +74,23 @@ export function renderMatrix(matrix) {
   const routes = matrix.routes;
   const features = Object.keys(routes[0]?.features ?? {});
   const row = (cells) => `| ${cells.join(" | ")} |`;
-  const environment = (env) => Object.entries(env).map(([key, value]) => `${key} ${value}`).join(", ");
+  const passed = [...new Set(routes.flatMap((route) => Object.values(route.features)
+    .flatMap((entry) => entry.tests.filter((test) => test.status === "passed").map((test) => test.test))))].sort();
   return [
     "# Provider capability matrix",
     "",
-    "Generated by `npm run gen:capability-matrix` from the results the contract tests record",
-    "(`tests/nativeCapabilityContract.test.ts`, `tests/piAi/piAiAdapterContract.test.ts`). Do not edit by hand:",
-    "`npm run check:capability-matrix` fails when this file is not the rendering of `CAPABILITY_MATRIX.json`.",
+    "Generated by `npm run gen:capability-matrix`, which runs the contract tests",
+    `(${matrix.contractTests.map((file) => `\`${file}\``).join(", ")}) and keeps a claim only when its test passed in`,
+    "that run. Do not edit by hand: `npm run check:capability-matrix` runs the tests again and fails when this file differs.",
     "",
     "- `supported`: a contract test proved it through AMC's runtime against a local fixture server that plays the provider's wire format.",
     "- `unsupported`: a contract test proved the route refuses it before a `request/header` row exists.",
-    "- `unknown`: no test proved it. AMC refuses a request that needs an unknown feature before spend.",
+    "- `unknown`: no passing test proved it. AMC refuses a request that needs an unknown feature before spend.",
     "  `unknown (declared supported)` means the adapter declares more than this suite proves; other tests may cover it.",
+    "  `unknown (test failed)` means the claiming test failed in the run that produced this file.",
+    "- `not run`: the claiming test did not run.",
     `- Live provider: ${matrix.liveProvider}. No cell was checked against a real provider or model; that needs credentials.`,
     "- The stub route is excluded: it is a synthetic demonstration, never a real-model result.",
-    "",
-    "Evidence runs (local fixture servers, not CI unless stated):",
-    "",
-    ...matrix.sources.map((source) => `- ${source.source}: ${environment(source.environment)}`),
     "",
     "## Routes",
     "",
@@ -84,56 +105,64 @@ export function renderMatrix(matrix) {
     row(["---", ...routes.map(() => "---")]),
     ...features.map((feature) => row([feature, ...routes.map((route) => cell(route.features[feature]))])),
     "",
-    "## Proving tests",
+    "## Passing tests cited",
     "",
-    ...[...new Set(routes.flatMap((route) => Object.values(route.features).flatMap((entry) => entry.tests)))].sort().map((test) => `- ${test}`),
+    ...passed.map((test) => `- ${test}`),
     ""
   ].join("\n");
 }
 
-/** Problems with a committed matrix; an empty list passes. `readFile` returns null for a missing file. */
-export function checkMatrix(matrix, markdown, readFile) {
+/** Problems with a committed matrix against a fresh run; an empty list passes. */
+export function checkMatrix(committed, markdown, fresh) {
   const problems = [];
-  if (renderMatrix(matrix) !== markdown) problems.push(`${MATRIX_MD} is not the rendering of ${MATRIX_JSON}; run npm run gen:capability-matrix`);
-  for (const route of matrix.routes) {
+  if (renderMatrix(committed) !== markdown) problems.push(`${MATRIX_MD} is not the rendering of ${MATRIX_JSON}; run npm run gen:capability-matrix`);
+  const freshRoutes = new Map(fresh.routes.map((route) => [route.route, route]));
+  for (const route of committed.routes) {
+    const now = freshRoutes.get(route.route);
+    if (now === undefined) { problems.push(`${route.route}: in the committed matrix but not in this run`); continue; }
     for (const [feature, entry] of Object.entries(route.features)) {
-      if (!["supported", "unsupported", "unknown"].includes(entry.support)) problems.push(`${route.route} ${feature}: invalid support ${entry.support}`);
-      if (entry.support === "unknown" ? entry.tests.length > 0 : entry.tests.length === 0) {
-        problems.push(`${route.route} ${feature}: ${entry.support} must ${entry.support === "unknown" ? "cite no test" : "cite the test that proved it"}`);
-      }
-      for (const test of entry.tests) {
-        const [file, ...name] = test.split(" > ");
-        const source = readFile(file);
-        if (source === null || !source.includes(name.join(" > "))) problems.push(`${route.route} ${feature}: cited test not found: ${test}`);
+      const current = now.features[feature];
+      if (current?.support !== entry.support) problems.push(`${route.route} ${feature}: committed ${entry.support}, this run gives ${current?.support ?? "nothing"}`);
+      if (entry.support === "supported" || entry.support === "unsupported") {
+        for (const test of current?.tests ?? []) {
+          if (test.status !== "passed") problems.push(`${route.route} ${feature}: cites a test that did not pass: ${test.test} (${test.status})`);
+        }
       }
     }
   }
+  for (const route of fresh.routes) if (!committed.routes.some((r) => r.route === route.route)) problems.push(`${route.route}: in this run but not in the committed matrix`);
+  if (problems.length === 0 && JSON.stringify(committed) !== JSON.stringify(fresh)) problems.push(`${MATRIX_JSON} differs from this run; run npm run gen:capability-matrix`);
   return problems;
 }
 
-function readResultFiles() {
-  const files = existsSync(RESULTS_DIR) ? readdirSync(RESULTS_DIR).filter((name) => name.endsWith(".json")).sort() : [];
-  const parsed = files.map((name) => JSON.parse(readFileSync(join(RESULTS_DIR, name), "utf8")));
-  const missing = REQUIRED_SOURCES.filter((source) => !parsed.some((file) => file.source === source));
-  if (missing.length > 0) throw new Error(`no capability results for ${missing.join(", ")} in ${RESULTS_DIR}; run ${RUN_TESTS}`);
-  return parsed;
+/** Run the contract tests with the JSON reporter, then join their claims with the report. */
+function runContractTests() {
+  rmSync(CLAIMS_DIR, { recursive: true, force: true });
+  rmSync(REPORT_JSON, { force: true });
+  const vitest = join("node_modules", "vitest", "vitest.mjs");
+  const run = spawnSync(process.execPath, [vitest, "run", ...CONTRACT_TEST_FILES, "--reporter=json", `--outputFile=${REPORT_JSON}`],
+    { encoding: "utf8", stdio: ["ignore", "ignore", "pipe"], maxBuffer: 64 << 20 });
+  if (!existsSync(REPORT_JSON)) throw new Error(`vitest wrote no report (exit ${run.status}): ${(run.stderr ?? "").trim().split("\n").slice(-5).join(" ")}`);
+  const claimFiles = (existsSync(CLAIMS_DIR) ? readdirSync(CLAIMS_DIR) : []).filter((name) => name.endsWith(".json")).sort()
+    .map((name) => JSON.parse(readFileSync(join(CLAIMS_DIR, name), "utf8")));
+  if (claimFiles.length === 0) throw new Error(`the contract tests registered no claims in ${CLAIMS_DIR}`);
+  return buildMatrix(claimFiles, JSON.parse(readFileSync(REPORT_JSON, "utf8")));
 }
 
 function main() {
+  const fresh = runContractTests();
   if (process.argv.includes("--check")) {
-    const problems = checkMatrix(JSON.parse(readFileSync(MATRIX_JSON, "utf8")), readFileSync(MATRIX_MD, "utf8"),
-      (file) => (existsSync(file) ? readFileSync(file, "utf8") : null));
+    const problems = checkMatrix(JSON.parse(readFileSync(MATRIX_JSON, "utf8")), readFileSync(MATRIX_MD, "utf8"), fresh);
     for (const problem of problems) console.error(`check:capability-matrix: ${problem}`);
     if (problems.length > 0) process.exit(1);
-    console.log("check:capability-matrix: matrix matches its evidence");
+    console.log("check:capability-matrix: the committed matrix matches a fresh run of the contract tests");
     return;
   }
-  const matrix = buildMatrix(readResultFiles());
-  writeFileSync(MATRIX_JSON, `${JSON.stringify(matrix, null, 2)}\n`);
-  writeFileSync(MATRIX_MD, renderMatrix(matrix));
-  console.log(`wrote ${MATRIX_JSON} and ${MATRIX_MD} (${matrix.routes.length} routes)`);
+  writeFileSync(MATRIX_JSON, `${JSON.stringify(fresh, null, 2)}\n`);
+  writeFileSync(MATRIX_MD, renderMatrix(fresh));
+  console.log(`wrote ${MATRIX_JSON} and ${MATRIX_MD} (${fresh.routes.length} routes)`);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  try { main(); } catch (error) { console.error(`gen:capability-matrix: ${error instanceof Error ? error.message : String(error)}`); process.exit(1); }
+  try { main(); } catch (error) { console.error(`capability-matrix: ${error instanceof Error ? error.message : String(error)}`); process.exit(1); }
 }

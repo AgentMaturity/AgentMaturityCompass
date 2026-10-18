@@ -5,25 +5,23 @@
  * test-results/capabilities/pi-ai.json; scripts/gen-capability-matrix.mjs renders the matrix from that file.
  */
 import { createHash } from "node:crypto";
-import { afterAll, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import type { SessionService } from "../../src/session/sessionService.js";
 import { ingestAttachment } from "../../src/attachments/attachmentIngest.js";
 import { LlmCapabilityError } from "../../src/llm/adapter/providerCapabilities.js";
 import { providerToolWireName } from "../../src/llm/request/providerToolNames.js";
 import type { EncodableRequest, ToolSchema } from "../../src/llm/request/requestSpec.js";
-import { loadPiAi, PI_AI_PROVIDERS, PI_AI_VERSION, type PiAiLibrary, type PiAiProviderId } from "../../src/llm/providers/piAi/piAiLoader.js";
-import { createPiAiEncoder } from "../../src/llm/providers/piAi/piAiEncoder.js";
-import { piAiRouteFor, PI_AI_CAPABILITIES } from "../../src/llm/providers/piAi/piAiAdapter.js";
+import { loadPiAi, PI_AI_PACKAGE, PI_AI_PROVIDERS, PI_AI_VERSION, type PiAiLibrary, type PiAiProviderId } from "../../src/llm/providers/piAi/piAiLoader.js";
+import { createPiAiEncoder, piAiEncoderId, PI_AI_ENCODER_VERSION } from "../../src/llm/providers/piAi/piAiEncoder.js";
+import { piAiRouteFor, PI_AI_ADAPTER_ID, PI_AI_CAPABILITIES } from "../../src/llm/providers/piAi/piAiAdapter.js";
 import { CapabilityRecorder, capabilityRoute } from "../helpers/capabilityResults.js";
-import { chatSse, drain, FIXTURE_KEY, piHarness as fixtureHarness, PI_FIXTURE_MODELS } from "../helpers/fixtureProviderHarness.js";
+import { chatSse, drain, FIXTURE_KEY, piHarness, PI_FIXTURE_MODELS } from "../helpers/fixtureProviderHarness.js";
 import { IMAGE_PNG_BASE64 } from "../fixtures/nativeAcpImageRuntime.js";
 
 const recorder = new CapabilityRecorder("pi-ai", "tests/piAi/piAiAdapterContract.test.ts");
-afterAll(() => { recorder.write({ piAi: PI_AI_VERSION }); });
-async function piHarness(provider: PiAiProviderId, responses: string[]) {
-  const h = await fixtureHarness(provider, responses);
-  recorder.route(capabilityRoute(h.route.providerId, h.route.adapter, `@earendil-works/pi-ai@${PI_AI_VERSION}`));
-  return h;
+for (const provider of PI_AI_PROVIDERS) {
+  recorder.route(capabilityRoute(`pi-ai:${provider}`, { id: PI_AI_ADAPTER_ID, version: 1, capabilities: PI_AI_CAPABILITIES,
+    encoderId: piAiEncoderId(provider), encoderVersion: PI_AI_ENCODER_VERSION }, `${PI_AI_PACKAGE}@${PI_AI_VERSION}`));
 }
 const headers = (session: SessionService) => session.readEvents().filter((event) => event.event_type === "request/header");
 const sha256 = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
@@ -37,71 +35,74 @@ describe("pi-ai routes behind the adapter seam (P1-38, local fixture server)", (
       ["tool-result-error-flag", "unsupported"], ["tool-result-error-text", "unsupported"], ["usage", "supported"]]);
   });
 
-  test.each(PI_AI_PROVIDERS)("%s: the fixture receives exactly the bytes the signed header commits to, and text and usage decode", async (provider) => {
-    const h = await piHarness(provider, [chatSse({ text: "Hello from the fixture." })]);
-    const call = h.runtime.prepare(h.spec());
-    const chunks = await drain(call.stream());
-    expect(h.received).toHaveLength(1);
-    const wire = h.received[0]!;
-    expect(wire.url).toBe("/v1/chat/completions");
-    expect(wire.headers.authorization).toBe(`Bearer ${FIXTURE_KEY}`);
-    expect(sha256(wire.body)).toBe(call.requestDigest);
-    const header = JSON.parse(headers(h.session)[0]!.meta_json) as Record<string, unknown>;
-    expect(header).toMatchObject({ providerId: `pi-ai:${provider}`, encoderId: `pi-ai:${provider}`, encoderVersion: 1, requestDigest: sha256(wire.body) });
-    const body = JSON.parse(wire.body.toString("utf8")) as Record<string, unknown>;
-    expect(body).toMatchObject({ model: PI_FIXTURE_MODELS[provider], stream: true, stream_options: { include_usage: true },
-      messages: [{ role: "system", content: "Answer from the fixture; this is not a model claim." }, { role: "user", content: [{ type: "text", text: "Say hello." }] }] });
-    expect(chunks).toContainEqual({ type: "block-end", index: 0, block: { kind: "text", text: "Hello from the fixture." } });
-    expect(chunks).toContainEqual({ type: "usage", usage: { inputTokens: 10, outputTokens: 3 } });
-    expect(call.settled?.failure).toBeNull();
-    recorder.prove(`pi-ai:${provider}`, ["text-input", "text-output", "usage"], "supported",
-      "%s: the fixture receives exactly the bytes the signed header commits to, and text and usage decode");
-  });
+  for (const provider of PI_AI_PROVIDERS) {
+    recorder.test(`pi-ai:${provider}`, ["text-input", "text-output", "usage"], "supported",
+      `${provider}: the fixture receives exactly the bytes the signed header commits to, and text and usage decode`, async () => {
+      const h = await piHarness(provider, [chatSse({ text: "Hello from the fixture." })]);
+      const call = h.runtime.prepare(h.spec());
+      const chunks = await drain(call.stream());
+      expect(h.received).toHaveLength(1);
+      const wire = h.received[0]!;
+      expect(wire.url).toBe("/v1/chat/completions");
+      expect(wire.headers.authorization).toBe(`Bearer ${FIXTURE_KEY}`);
+      expect(sha256(wire.body)).toBe(call.requestDigest);
+      const header = JSON.parse(headers(h.session)[0]!.meta_json) as Record<string, unknown>;
+      expect(header).toMatchObject({ providerId: `pi-ai:${provider}`, encoderId: `pi-ai:${provider}`, encoderVersion: 1, requestDigest: sha256(wire.body) });
+      const body = JSON.parse(wire.body.toString("utf8")) as Record<string, unknown>;
+      expect(body).toMatchObject({ model: PI_FIXTURE_MODELS[provider], stream: true, stream_options: { include_usage: true },
+        messages: [{ role: "system", content: "Answer from the fixture; this is not a model claim." }, { role: "user", content: [{ type: "text", text: "Say hello." }] }] });
+      expect(chunks).toContainEqual({ type: "block-end", index: 0, block: { kind: "text", text: "Hello from the fixture." } });
+      expect(chunks).toContainEqual({ type: "usage", usage: { inputTokens: 10, outputTokens: 3 } });
+      expect(call.settled?.failure).toBeNull();
+    });
+  }
 
-  test.each(PI_AI_PROVIDERS)("%s: a streamed tool call decodes under the offered name and replays as history", async (provider) => {
-    const wireName = providerToolWireName("fs.read");
-    const h = await piHarness(provider, [chatSse({ tool: { id: "call_fixture_1", name: wireName, args: '{"path":"a.txt"}' } }),
-      chatSse({ text: "Read it." })]);
-    const first = h.runtime.prepare(h.spec([readTool]));
-    const chunks = await drain(first.stream());
-    expect(chunks).toContainEqual({ type: "block-end", index: 1, block: { kind: "tool_use", id: "call_fixture_1", name: "fs.read",
-      providerWireName: wireName, arguments: '{"path":"a.txt"}' } });
-    h.session.recordToolResult({ toolCallId: "call_fixture_1", outcome: "OK", exitCode: 0, timedOut: false, denied: false, content: "file text" });
-    h.finishStep(first); h.session.startStep();
-    const second = h.runtime.prepare(h.spec([readTool]));
-    await drain(second.stream());
-    expect(h.received).toHaveLength(2);
-    expect(sha256(h.received[1]!.body)).toBe(second.requestDigest);
-    const replay = JSON.parse(h.received[1]!.body.toString("utf8")) as { messages: Record<string, unknown>[]; tools: unknown[] };
-    expect(replay.messages.slice(2)).toEqual([
-      { role: "assistant", content: null, tool_calls: [{ id: "call_fixture_1", type: "function", function: { name: wireName, arguments: '{"path":"a.txt"}' } }] },
-      { role: "tool", content: "file text", tool_call_id: "call_fixture_1" }]);
-    expect(replay.tools).toHaveLength(1);
-    recorder.prove(`pi-ai:${provider}`, ["tool-calls", "tool-replay"], "supported",
-      "%s: a streamed tool call decodes under the offered name and replays as history");
-  });
+  for (const provider of PI_AI_PROVIDERS) {
+    recorder.test(`pi-ai:${provider}`, ["tool-calls", "tool-replay"], "supported",
+      `${provider}: a streamed tool call decodes under the offered name and replays as history`, async () => {
+      const wireName = providerToolWireName("fs.read");
+      const h = await piHarness(provider, [chatSse({ tool: { id: "call_fixture_1", name: wireName, args: '{"path":"a.txt"}' } }),
+        chatSse({ text: "Read it." })]);
+      const first = h.runtime.prepare(h.spec([readTool]));
+      const chunks = await drain(first.stream());
+      expect(chunks).toContainEqual({ type: "block-end", index: 1, block: { kind: "tool_use", id: "call_fixture_1", name: "fs.read",
+        providerWireName: wireName, arguments: '{"path":"a.txt"}' } });
+      h.session.recordToolResult({ toolCallId: "call_fixture_1", outcome: "OK", exitCode: 0, timedOut: false, denied: false, content: "file text" });
+      h.finishStep(first); h.session.startStep();
+      const second = h.runtime.prepare(h.spec([readTool]));
+      await drain(second.stream());
+      expect(h.received).toHaveLength(2);
+      expect(sha256(h.received[1]!.body)).toBe(second.requestDigest);
+      const replay = JSON.parse(h.received[1]!.body.toString("utf8")) as { messages: Record<string, unknown>[]; tools: unknown[] };
+      expect(replay.messages.slice(2)).toEqual([
+        { role: "assistant", content: null, tool_calls: [{ id: "call_fixture_1", type: "function", function: { name: wireName, arguments: '{"path":"a.txt"}' } }] },
+        { role: "tool", content: "file text", tool_call_id: "call_fixture_1" }]);
+      expect(replay.tools).toHaveLength(1);
+    });
+  }
 
-  test.each(PI_AI_PROVIDERS)("%s: a failed tool result is refused before a header, because the pinned encoding cannot carry it", async (provider) => {
-    const wireName = providerToolWireName("fs.read");
-    const h = await piHarness(provider, [chatSse({ tool: { id: "call_fixture_2", name: wireName, args: '{"path":"a.txt"}' } })]);
-    const first = h.runtime.prepare(h.spec([readTool]));
-    await drain(first.stream());
-    h.session.recordToolResult({ toolCallId: "call_fixture_2", outcome: "ERROR", exitCode: 1, timedOut: false, denied: false, content: "no such file" });
-    h.finishStep(first); h.session.startStep();
-    expect(() => h.runtime.prepare(h.spec([readTool]))).toThrow(LlmCapabilityError);
-    expect(headers(h.session)).toHaveLength(1);
-    expect(h.received).toHaveLength(1);
-    // Why it is unsupported, not unknown: pi-ai@1.3.0 sends a failed and a successful result as identical bytes.
-    const library = await loadPiAi();
-    const payload = (isError: boolean) => capturePayload(library, provider, [
-      { role: "user", content: [{ type: "text", text: "go" }], timestamp: 0 },
-      { role: "assistant", content: [{ type: "toolCall", id: "c1", name: "fs_read", arguments: { path: "a" } }], api: "openai-completions",
-        provider, model: PI_FIXTURE_MODELS[provider], usage: zeroUsage, stopReason: "toolUse", timestamp: 0 },
-      { role: "toolResult", toolCallId: "c1", toolName: "fs_read", content: [{ type: "text", text: "out" }], isError, timestamp: 0 }]);
-    expect(payload(true)).toBe(payload(false));
-    recorder.prove(`pi-ai:${provider}`, ["tool-result-error-flag", "tool-result-error-text"], "unsupported",
-      "%s: a failed tool result is refused before a header, because the pinned encoding cannot carry it");
-  });
+  for (const provider of PI_AI_PROVIDERS) {
+    recorder.test(`pi-ai:${provider}`, ["tool-result-error-flag", "tool-result-error-text"], "unsupported",
+      `${provider}: a failed tool result is refused before a header, because the pinned encoding cannot carry it`, async () => {
+      const wireName = providerToolWireName("fs.read");
+      const h = await piHarness(provider, [chatSse({ tool: { id: "call_fixture_2", name: wireName, args: '{"path":"a.txt"}' } })]);
+      const first = h.runtime.prepare(h.spec([readTool]));
+      await drain(first.stream());
+      h.session.recordToolResult({ toolCallId: "call_fixture_2", outcome: "ERROR", exitCode: 1, timedOut: false, denied: false, content: "no such file" });
+      h.finishStep(first); h.session.startStep();
+      expect(() => h.runtime.prepare(h.spec([readTool]))).toThrow(LlmCapabilityError);
+      expect(headers(h.session)).toHaveLength(1);
+      expect(h.received).toHaveLength(1);
+      // Why it is unsupported, not unknown: pi-ai@1.3.0 sends a failed and a successful result as identical bytes.
+      const library = await loadPiAi();
+      const payload = (isError: boolean) => capturePayload(library, provider, [
+        { role: "user", content: [{ type: "text", text: "go" }], timestamp: 0 },
+        { role: "assistant", content: [{ type: "toolCall", id: "c1", name: "fs_read", arguments: { path: "a" } }], api: "openai-completions",
+          provider, model: PI_FIXTURE_MODELS[provider], usage: zeroUsage, stopReason: "toolUse", timestamp: 0 },
+        { role: "toolResult", toolCallId: "c1", toolName: "fs_read", content: [{ type: "text", text: "out" }], isError, timestamp: 0 }]);
+      expect(payload(true)).toBe(payload(false));
+    });
+  }
 
   test.each(PI_AI_PROVIDERS)("%s: image input is refused before any request/header row exists", async (provider) => {
     const h = await piHarness(provider, []);
