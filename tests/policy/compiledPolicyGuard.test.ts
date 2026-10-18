@@ -114,7 +114,7 @@ describe("compiled policy guard on already-derived unit inputs", () => {
   it("requires the already-derived authorization to carry its lease identity", () => {
     const input = policy({ guards: [identity({ requireAgentLease: true })] });
     neutral(input, execution({ authorization: authorization() }));
-    const expected = `compiled policy denied this call (control ${CONTROL}@1.0.0): IDENTITY_UNRESOLVED: the call carries no verified agent lease`;
+    const expected = `compiled policy denied this call (control ${CONTROL}@1.0.0): IDENTITY_UNRESOLVED: the call carries no verified agent lease, or its lease names a principal that does not resolve`;
     expect(compiledPolicyDenial(input, WORKSPACE, execution())).toBe(expected);
     expect(compiledPolicyDenial(input, WORKSPACE, execution({ authorization: authorization("lease", null) }))).toBe(expected);
   });
@@ -132,7 +132,7 @@ describe("compiled policy guard on already-derived unit inputs", () => {
     const input = policy({ guards: [identity({ requireAgentLease: true, requirePrincipal: true })] });
     neutral(input, execution({ authorization: authorization() }));
     expect(compiledPolicyDenial(input, WORKSPACE, execution()))
-      .toBe(`compiled policy denied this call (control ${CONTROL}@1.0.0): IDENTITY_UNRESOLVED: the call carries no verified agent lease`);
+      .toBe(`compiled policy denied this call (control ${CONTROL}@1.0.0): IDENTITY_UNRESOLVED: the call carries no verified agent lease, or its lease names a principal that does not resolve`);
     expect(compiledPolicyDenial(input, WORKSPACE, execution({ authorization: authorization("cli-os-user") })))
       .toBe(`compiled policy denied this call (control ${CONTROL}@1.0.0): PRINCIPAL_UNRESOLVED: no authenticated principal is bound to the call (an OS user name is self-reported)`);
   });
