@@ -642,7 +642,10 @@
         "envelope": {
           "properties": {
             "alg": {
-              "const": "ed25519",
+              "enum": [
+                "ed25519",
+                "ecdsa-p256-sha256"
+              ],
               "type": "string"
             },
             "fingerprint": {
