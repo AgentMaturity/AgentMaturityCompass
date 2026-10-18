@@ -15,15 +15,16 @@
 import type { TurnEndReason } from "../session/sessionTypes.js";
 
 /** The wire version of this contract. Each client refuses a runtime that does not advertise exactly this version. */
-export const EXECUTION_API_VERSION = 1;
+/** @public */ export const EXECUTION_API_VERSION = 1;
 
-export const EXECUTION_VERBS = ["start", "stream", "approve", "cancel", "resume", "fork", "dispose", "verify"] as const;
-export type ExecutionVerb = (typeof EXECUTION_VERBS)[number];
-export const EXECUTION_PHASES = ["admission", "model-completion", "side-effect-completion", "evidence-verification"] as const;
-export type ExecutionPhase = (typeof EXECUTION_PHASES)[number];
-export const PHASE_STATES = ["pending", "succeeded", "failed", "refused", "unknown"] as const;
-export type PhaseState = (typeof PHASE_STATES)[number];
+/** @public */ export const EXECUTION_VERBS = ["start", "stream", "approve", "cancel", "resume", "fork", "dispose", "verify"] as const;
+/** @public */ export type ExecutionVerb = (typeof EXECUTION_VERBS)[number];
+/** @public */ export const EXECUTION_PHASES = ["admission", "model-completion", "side-effect-completion", "evidence-verification"] as const;
+/** @public */ export type ExecutionPhase = (typeof EXECUTION_PHASES)[number];
+/** @public */ export const PHASE_STATES = ["pending", "succeeded", "failed", "refused", "unknown"] as const;
+/** @public */ export type PhaseState = (typeof PHASE_STATES)[number];
 
+/** @public */
 export interface ExecutionStatus {
   readonly sessionId: string;
   readonly phases: Readonly<Record<ExecutionPhase, PhaseState>>;
@@ -65,8 +66,11 @@ export interface ExecutionFacts {
   readonly sessionId: string;
   /** `admitted` once the runtime opened the session; null before it answered. */
   readonly admission: "admitted" | "refused" | "failed" | null;
-  /** The latest signed turn ending; `running` while a turn is in flight; null before the first turn. */
-  readonly turn: TurnEndReason | "running" | null;
+  /**
+   * The latest recorded turn ending (a `TurnEndReason`); `running` while a turn is in flight; null before the first turn.
+   * Any other value (`unreadable` when the rows could not be read, a reason this version does not know) reads unknown.
+   */
+  readonly turn: TurnEndReason | "running" | (string & Record<never, never>) | null;
   /** From `sessionReceiptStates`; null when the journal could not be read at all. */
   readonly receiptStates: readonly string[] | null;
   /** `verifyAgentRun(...).ok`; null until verification ran. */

@@ -5,6 +5,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { verifyChainIn } from "../actions/actionJournal.js";
+import { readAgentRunSummary } from "../agent/runReport.js";
 import { openLedger } from "../ledger/ledger.js";
 import { hasTable } from "../ledger/ledgerSchema.js";
 import { deriveExecutionStatus, EVIDENCE_INCOMPLETE, INTEGRITY_FAILED, type ExecutionFacts, type ExecutionStatus } from "./executionContract.js";
@@ -46,4 +47,15 @@ export function sessionReceiptStates(workspace: string, sessionId: string): read
 /** The status a surface reports: its own observations plus the session's verified receipt states. */
 export function executionStatusFor(workspace: string, facts: Omit<ExecutionFacts, "receiptStates">): ExecutionStatus {
   return deriveExecutionStatus({ ...facts, receiptStates: sessionReceiptStates(workspace, facts.sessionId) });
+}
+
+/**
+ * The status of a recorded session read back cold (`amc agent-loop verify --json`): admission from the session's own
+ * rows, the model phase from its latest RECORDED turn ending (rows, not a verdict), and `verified` from the verifier.
+ */
+export function recordedExecutionStatus(workspace: string, sessionId: string, verified: boolean | null): ExecutionStatus {
+  let recorded: ReturnType<typeof readAgentRunSummary> | null = null;
+  try { recorded = readAgentRunSummary(workspace, sessionId, "idle"); } catch { /* unreadable rows: the model phase reads unknown */ }
+  return executionStatusFor(workspace, { sessionId, admission: recorded === null ? null : recorded.events > 0 ? "admitted" : null,
+    turn: recorded === null ? "unreadable" : recorded.endings.at(-1)?.reason ?? null, verified });
 }

@@ -22,7 +22,9 @@ import { runLease } from "../leases/runLease.js";
 import { resolveNativeValidationSelection } from "../setup/nativeValidationConfig.js";
 import { amcVersion } from "../version.js";
 import { createAcpAgent, type AcpAgent } from "./acpAgentServer.js";
-import type { AcpForkSessionFactory } from "./acpRuntimeContracts.js";
+import type { AcpForkSessionFactory, AcpForkSessionParams } from "./acpRuntimeContracts.js";
+import { forkSession } from "../session/sessionResume.js";
+import { redactingSessionFor } from "../dataflow/redactingSession.js";
 import { ACP_MAX_TURN_UPDATE_BYTES } from "./acpCommittedUpdates.js";
 import type { AcpSink } from "./acpConnection.js";
 
@@ -216,7 +218,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
     try { return runLease({ workspace: init.workspace, agentId: init.agentId, model: route.models?.[0] ?? route.providerId, tools, ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }) }); }
     catch (error) { throw error instanceof LeasePrincipalRefused ? new AcpFailure(ACP_ERROR.invalidParams, error.message, { reason: error.code }) : error; }
   };
-  const sessionOptions = (params: { sessionId: string; workspace: string; agentId: string }): AgentSessionInit & { sessionId: string } =>
+  const sessionOptions = (params: { sessionId: string; workspace: string; agentId: string }, lease = sessionLease()): AgentSessionInit & { sessionId: string } =>
     ({
       workspace: params.workspace,
       sessionId: params.sessionId,
@@ -242,10 +244,30 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
         ...(validation === undefined ? {} : { validation }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
       tools, maxSteps, ...shellOptIn, ...(compaction === undefined ? {} : { compaction }), ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
-      ...(validation === undefined ? {} : { validation }), ...sessionLease()
+      ...(validation === undefined ? {} : { validation }), ...lease
     });
 
   const claimant = { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Date.now() };
+  const nativeSession = (session: AgentSessionInit & { sessionId: string }, signal: AbortSignal, resumed: boolean) => prepareAcpNativeSession({
+    session, signal, ...(resumed ? { claimant } : {}),
+    ...(approval ? { approval } : {}), ...(mcp ? { mcp } : {}),
+    ...(init.credentialsHome === undefined ? {} : { credentialsHome: init.credentialsHome }),
+    ...(init.credentialsFile === undefined ? {} : { credentialsFile: init.credentialsFile }),
+    initiator: init.initiator ?? cliInitiator(),
+    onApprovalRaised: event => { stderr.write(`amc acp: signed approval pending: ${event.approvalRequestId}\n`); } });
+  /**
+   * `_amc/session/fork` (P2-13), the CLI's --fork-from: the lease first (P1-79, refused before any row), then the child's
+   * signed open row naming the verified parent's final row, written through the redaction wrapper (P2-02) and handed over
+   * at once, then this runtime takes the child through the same verified resume gates as session/load.
+   */
+  const lineageFork = (params: AcpForkSessionParams): ReturnType<typeof nativeSession> => {
+    const lease = sessionLease();
+    const identity = sessionOptions({ ...params, sessionId: params.parentSessionId }, lease);
+    const { service } = forkSession({ workspace: params.workspace, parentSessionId: params.parentSessionId, claimant, agentId: params.agentId,
+      harnessVersion: identity.harnessVersion, compositionDigest: identity.compositionDigest, policyDigest: identity.policyDigest });
+    redactingSessionFor(service).releaseWithoutClosing();
+    return nativeSession(sessionOptions({ ...params, sessionId: service.sessionId }, lease), params.signal, true);
+  };
 
   const agent = createAcpAgent({
     workspace: init.workspace,
@@ -255,19 +277,10 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
     orderedImageInput: true,
     audioInput: true,
     ...(init.forkSessionFactory === undefined ? {} : { forkSessionFactory: params => init.forkSessionFactory!({ ...params, ...sessionLease() }) }),
+    lineageForkFactory: lineageFork,
     write: createAcpStdioSink(stdout),
-    sessionFactory: params => prepareAcpNativeSession({ session: sessionOptions(params), signal: params.signal,
-      ...(approval ? { approval } : {}), ...(mcp ? { mcp } : {}),
-      ...(init.credentialsHome === undefined ? {} : { credentialsHome: init.credentialsHome }),
-      ...(init.credentialsFile === undefined ? {} : { credentialsFile: init.credentialsFile }),
-      initiator: init.initiator ?? cliInitiator(),
-      onApprovalRaised: event => { stderr.write(`amc acp: signed approval pending: ${event.approvalRequestId}\n`); } }),
-    resumeSessionFactory: params => prepareAcpNativeSession({ session: sessionOptions(params), claimant, signal: params.signal,
-      ...(approval ? { approval } : {}), ...(mcp ? { mcp } : {}),
-      ...(init.credentialsHome === undefined ? {} : { credentialsHome: init.credentialsHome }),
-      ...(init.credentialsFile === undefined ? {} : { credentialsFile: init.credentialsFile }),
-      initiator: init.initiator ?? cliInitiator(),
-      onApprovalRaised: event => { stderr.write(`amc acp: signed approval pending: ${event.approvalRequestId}\n`); } }),
+    sessionFactory: params => nativeSession(sessionOptions(params), params.signal, false),
+    resumeSessionFactory: params => nativeSession(sessionOptions(params), params.signal, true),
     onUnusable: () => { void close().catch(reportShutdownFailure); },
     // stderr, never stdout. See the module note.
     log: (message) => { stderr.write(`amc acp: ${message}\n`); }
