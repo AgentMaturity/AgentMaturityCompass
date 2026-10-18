@@ -20,6 +20,7 @@ import { renderPlanDiffMarkdown } from "./compiler/diff.js";
 import { signPlan } from "./compiler/sign.js";
 import type { CompiledPlan, SignedPlan } from "./compiler/types.js";
 import { loadCatalog } from "./loader.js";
+import { compileInputs } from "./compileInputs.js";
 import { verifyCatalogLock } from "./lockfile.js";
 
 interface CompileFlags { profile: string; previous?: string; lock?: string; out?: string; json?: boolean; requestReview?: boolean; allowWeakening?: boolean; activate?: string }
@@ -50,7 +51,11 @@ export function compileCatalogPlan(workspace: string, opts: CompileFlags) {
   }
   const previous = opts.previous ? readSignedPlan(resolve(workspace, opts.previous)) : null;
   const now = new Date();
-  const plan = compilePlan({ profile, catalog, asOf: now.toISOString(),
+  // P1-10F: the same workspace inputs A4 Adapt compiles with: the verified .amc/tools.yaml, or with none the built-in
+  // default list; one that does not verify refuses.
+  const inputs = compileInputs(workspace);
+  const visibleToolsSource = inputs.signedTools ? { source: "signed-tools-yaml" as const, sha256: inputs.signedTools.sha256 } : { source: "defaults" as const };
+  const plan = compilePlan({ profile, catalog, asOf: now.toISOString(), ...inputs,
     ...(profile.mergeExceptions?.length ? { mergeExceptionTrust: loadTrustContext({ now }) } : {}) });
   const outDir = resolve(workspace, opts.out ?? join("amc-control-plans", plan.profile.profileId, plan.digest.slice("sha256:".length, "sha256:".length + 12)));
   try {
@@ -71,15 +76,15 @@ export function compileCatalogPlan(workspace: string, opts: CompileFlags) {
   for (const [name, text] of Object.entries(files)) writeFileAtomic(join(outDir, name), text, 0o644);
   const activated = opts.activate ? activateControlPlan({ workspace, signed, approvalRequestId: opts.activate,
     reviewAgentId: profile.deployment.agentIds[0] ?? "", allowWeakening: opts.allowWeakening }) : null;
-  return { plan, signed, weakenings, outDir, files: Object.keys(files), activated };
+  return { plan, signed, weakenings, outDir, files: Object.keys(files), activated, visibleToolsSource };
 }
 
 export function runCatalogCompile(workspace: string, opts: CompileFlags): number {
-  const { plan, signed, weakenings, outDir, files, activated } = compileCatalogPlan(workspace, opts);
+  const { plan, signed, weakenings, outDir, files, activated, visibleToolsSource } = compileCatalogPlan(workspace, opts);
   const count = (a: string) => plan.requirements.filter((r) => r.applicability === a).length;
   if (opts.json) {
     console.log(JSON.stringify({ status: plan.status, digest: plan.digest, policyDigest: plan.runtimePolicy.policyDigest, outDir,
-      files, review: signed.review, weakenings, activation: activated, claim: "experimental plan; no compliance claim" }, null, 2));
+      files, review: signed.review, weakenings, activation: activated, visibleToolsSource, claim: "experimental plan; no compliance claim" }, null, 2));
   } else {
     console.log((plan.status === "ready" ? chalk.green : chalk.yellow)(`Control plan ${plan.status}: ${outDir}`));
     console.log(`  ${plan.digest}; ${count("applicable")} applicable, ${count("unresolved")} unresolved, ${count("not_applicable")} not applicable`);
@@ -88,6 +93,9 @@ export function runCatalogCompile(workspace: string, opts: CompileFlags): number
     for (const c of plan.conflicts.filter((x) => x.mergeKey && x.resolution !== "unresolved")) console.log(chalk.gray(`  station merge ${c.mergeKey}: ${c.resolution}, chosen ${c.chosenControlId}`));
     for (const e of plan.mergeExceptionRejected ?? []) console.log(chalk.yellow(`  rejected station exception ${e.id} (${e.mergeKey}): ${e.reason}`));
     for (const u of plan.unsupported) console.log(chalk.gray(`  unsupported ${u.controlId} (${u.reason}): ${u.detail}`));
+    console.log(visibleToolsSource.source === "defaults"
+      ? chalk.yellow("  visible tools: the built-in default list (no .amc/tools.yaml)")
+      : `  visible tools: the signed .amc/tools.yaml (sha256 ${visibleToolsSource.sha256.slice(0, 12)}); once active, a different tools.yaml refuses every call until you recompile and reactivate`);
     for (const w of weakenings) console.log(chalk.yellow(`  weakens (allowed) ${w}`));
     console.log(`  review: pending${signed.review.approvalRequestId ? ` (approval request ${signed.review.approvalRequestId})` : "; no approval requested (--request-review)"}`);
     if (activated) {

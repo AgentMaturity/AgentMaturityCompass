@@ -127,10 +127,12 @@ function verifyToolsConfigBytes(workspace: string, explicitPath?: string): Verif
       bytes: valid ? bytes : null
     };
   } catch (error) {
+    // The reason reaches model-visible denials and API responses: a file error is named by its class, never its path.
+    const code = (error as NodeJS.ErrnoException).code;
     return {
       valid: false,
       signatureExists: true,
-      reason: `invalid signature payload: ${String(error)}`,
+      reason: typeof code === "string" ? `tools config unreadable (${code})` : `invalid signature payload: ${String(error)}`,
       digestSha256: null,
       bytes: null
     };

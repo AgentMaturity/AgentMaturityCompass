@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-10",
+  "date": "2026-10-18",
+  "commit": "9c83b6bed209d7a586a147cc5aa7f5e63e5b02b2",
+  "branch": "rtd/p1-10f-delegate-visible-tools",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2), local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 94593
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 68044
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 63194
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 3912
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 984
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 578
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 2420
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2146
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 406
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 721
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 262
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 304
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 898
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 3787
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 262
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 393
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=4 <76 paths, focused-tests.json>",
+      "exit": 0,
+      "durationMs": 1056101
+    },
+    {
+      "cmd": "npx tsx probe.mts <int dc416268d tree> and <this branch> (no-tools plan digests, plan-digests-int.json)",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": {
+    "total": 1347,
+    "passed": 1347,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "1a34561ac405513954129f0bdf032b19b5c73935a1da0bd780adb8bb637e1ba2"
+    },
+    {
+      "path": "focused-tests.json",
+      "sha256": "558c9e5c646a6073130a0a5eb5ceb5194662e673121c55f80b4a85a2c8aae768"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "0783563f5ad5e59c37c3df9e50d9b501607587f546cabbdcc02cff190b624ad2"
+    },
+    {
+      "path": "plan-digests.json",
+      "sha256": "888a5f70a021639b59b18ab8ee5aca94a91aedd69f345e10f4b8f94cfd3b01b2"
+    },
+    {
+      "path": "plan-digests-int.json",
+      "sha256": "5543748f9b7fde34edb87e9c86c73b181ebe4e5f4a02402a07008d52eb7fc501"
+    }
+  ],
+  "notes": "P1-10 follow-up P1-10F after both independent reviews and the P1-34 merge. Focused tests only; the full suite was not run. The probe row's duration was not measured (0). See README.md."
+}
