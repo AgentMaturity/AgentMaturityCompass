@@ -19,7 +19,8 @@ import { compilePlan, parseDeploymentProfile } from "./compiler/compile.js";
 import { renderPlanDiffMarkdown } from "./compiler/diff.js";
 import { signPlan } from "./compiler/sign.js";
 import type { CompiledPlan, SignedPlan } from "./compiler/types.js";
-import { loadCatalog } from "./loader.js";
+import { loadAdmittedCatalog } from "./admission/gate.js";
+import { renderCatalogCheck, runCatalogCheck } from "./admission/index.js";
 import { compileInputs } from "./compileInputs.js";
 import { verifyCatalogLock } from "./lockfile.js";
 
@@ -42,7 +43,8 @@ export function compileCatalogPlan(workspace: string, opts: CompileFlags) {
   if (ref && sha256Hex(readFileSync(resolve(workspace, ref.path))) !== ref.sha256) {
     throw new Error(`operating profile ${ref.path} does not match the sha256 the deployment profile records`);
   }
-  const catalog = loadCatalog();
+  // P1-33: a pack's declared reviewed support stands only where its recomputed admission admits it.
+  const catalog = loadAdmittedCatalog();
   if (opts.lock) {
     const check = verifyCatalogLock(readJson(resolve(workspace, opts.lock)), catalog);
     if (!check.ok) {
@@ -107,8 +109,33 @@ export function runCatalogCompile(workspace: string, opts: CompileFlags): number
   return plan.status === "ready" ? 0 : 2;
 }
 
+interface CheckFlags { pack?: string; catalog?: string; json?: boolean; write?: boolean }
+
+/** `amc catalog check` (P1-33; named freeze exception): exit 0 when every declared support is admissible, 1 otherwise. */
+async function runCatalogCheckCommand(opts: CheckFlags): Promise<number> {
+  const result = await runCatalogCheck({ catalogRoot: opts.catalog, packId: opts.pack, write: opts.write });
+  if (opts.json) console.log(JSON.stringify({ ...result, claim: "admission reports: evidence of conformity planning; a met record criterion shows signed records exist, not that the content is right" }, null, 2));
+  else for (const line of renderCatalogCheck(result)) console.log(line.startsWith("REFUSED") ? chalk.red(line) : line);
+  return result.exitCode;
+}
+
 export function registerCatalogCommands(program: Command): void {
-  const catalog = program.command("catalog").description("Regulated Control Catalog (experimental): compile deployment profiles into control plans");
+  const catalog = program.command("catalog").description("Regulated Control Catalog (experimental): check pack admission and compile deployment profiles into control plans");
+  catalog
+    .command("check")
+    .description("Check each pack's declared support against the ten admission criteria (exit 0 when every declared support is admissible, 1 otherwise)")
+    .option("--pack <id>", "Check one pack")
+    .option("--catalog <dir>", "Catalog root (default: the shipped catalog)")
+    .option("--json", "Output as JSON")
+    .option("--write", "Write each report to <catalog>/admission/<pack-id>-<version>.json (never edits a pack)", false)
+    .action(async (opts: CheckFlags) => {
+      try {
+        process.exitCode = await runCatalogCheckCommand(opts);
+      } catch (error) {
+        console.error(chalk.red(error instanceof Error ? error.message : String(error)));
+        process.exitCode = 1;
+      }
+    });
   catalog
     .command("compile")
     .description("Compile a deployment profile against the catalog into a signed, experimental control plan (exit 0 ready, 2 blocked, 1 error)")

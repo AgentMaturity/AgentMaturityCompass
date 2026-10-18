@@ -239,7 +239,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc casebook init` | Create a signed casebook | `--agent <agentId>`<br>`--casebook <id>` | - |
 | `amc casebook list` | List casebooks | `--agent <agentId>` | - |
 | `amc casebook verify` | Verify signed casebook and case files | `--casebook <id>`<br>`--agent <agentId>` | - |
-| `amc catalog` | Regulated Control Catalog (experimental): compile deployment profiles into control plans | - | - |
+| `amc catalog` | Regulated Control Catalog (experimental): check pack admission and compile deployment profiles into control plans | - | - |
+| `amc catalog check` | Check each pack's declared support against the ten admission criteria (exit 0 when every declared support is admissible, 1 otherwise) | `--pack <id>`<br>`--catalog <dir>`<br>`--json`<br>`--write` | - |
 | `amc catalog compile` | Compile a deployment profile against the catalog into a signed, experimental control plan (exit 0 ready, 2 blocked, 1 error) | `--profile <file>`<br>`--previous <plan.json>`<br>`--lock <catalog.lock.json>`<br>`--out <dir>`<br>`--request-review`<br>`--allow-weakening`<br>`--activate <approvalRequestId>`<br>`--json` | - |
 | `amc cert` | Certificate operations | - | - |
 | `amc cert generate` | Generate execution-proof trust certificate (signed PDF or JSON) | `--agent <id>`<br>`--output <path>`<br>`--valid-days <n>`<br>`--no-sign`<br>`--preview`<br>`--badge`<br>`--url`<br>`--base-url <url>` | - |
