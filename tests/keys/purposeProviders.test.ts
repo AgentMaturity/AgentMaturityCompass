@@ -7,13 +7,21 @@ import { verifyHexDigestAny } from "../../src/crypto/keys.js";
 import { signingKeyId, verifyCanonical } from "../../src/keys/algorithmPolicy.js";
 import { AntiRollbackError } from "../../src/keys/highWater.js";
 import { keysetPaths } from "../../src/keys/keyset.js";
-import { KeyProviderError } from "../../src/keys/provider.js";
+import { KeyProviderError, type KeyProvider } from "../../src/keys/provider.js";
 import { awsKmsProvider } from "../../src/keys/providers/awsKms.js";
 import { bindPurposeProviderKey, exportPurposePublicKey, signWithPurposeKey } from "../../src/keys/purposeProviders.js";
 import { getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem, listKeys, revokeKey, rotatePurposeKeys, verifyProofOfPossession } from "../../src/keys/purposeKeys.js";
-import { lockVault, vaultPaths } from "../../src/vault/vault.js";
-import { initWorkspace, loadAMCConfig, saveAMCConfig } from "../../src/workspace.js";
-import { AWS_ARN, awsFake, fakeKey } from "./providerFakes.js";
+import { lockVault, vaultPaths, vaultStatus } from "../../src/vault/vault.js";
+import { initWorkspace, loadAMCConfig, saveAMCConfig, signAmcConfig } from "../../src/workspace.js";
+import { logSequence } from "../../src/keys/anchorLog.js";
+import { encodeDelegation, issueDelegation } from "../../src/keys/delegation.js";
+import { KeyRevokedError, keyRevocationLocation } from "../../src/keys/keyRevocations.js";
+import { nextRevocationList, publishRevocationList, readAnchoredRevocationList, revocationListSha256 } from "../../src/keys/revocationList.js";
+import { gcpKmsProvider } from "../../src/keys/providers/gcpKms.js";
+import { fileKeyProvider } from "../../src/keys/providers/file.js";
+import { setMode } from "../../src/mode/mode.js";
+import { generateKeyPairSync, sign } from "node:crypto";
+import { AWS_ARN, awsFake, fakeKey, GCP_KEY, gcpFake } from "./providerFakes.js";
 
 const PASS = process.env.AMC_VAULT_PASSPHRASE!;
 const roots: string[] = [];
@@ -26,13 +34,26 @@ function workspace(): string {
   return root;
 }
 
-/** Writes the `keys` section of .amc/amc.config.yaml (null removes it). */
-function configureKeys(root: string, keys: unknown): void {
+/**
+ * Writes the `keys` section of .amc/amc.config.yaml (null removes it) and signs the file, as an owner does with
+ * `amc verify --sign-config`; `signed: false` leaves the edit unsigned.
+ */
+function configureKeys(root: string, keys: unknown, opts: { signed?: boolean } = {}): void {
   const path = join(root, ".amc", "amc.config.yaml");
   const config = (YAML.parse(readFileSync(path, "utf8")) ?? {}) as Record<string, unknown>;
   if (keys === null) delete config.keys;
   else config.keys = keys;
   writeFileSync(path, YAML.stringify(config));
+  if (opts.signed !== false) signAmcConfig(root);
+}
+
+/** Records a revocation of `keyId` straight into the workspace key revocation list (as another tool or a restore would). */
+function recordRevocation(root: string, keyId: string): void {
+  const location = keyRevocationLocation(root);
+  const current = readAnchoredRevocationList(location)!;
+  const list = nextRevocationList(location.listId, { sequence: current.list.sequence, sha256: revocationListSha256(current.list) },
+    [...current.list.revoked, { id: keyId, kind: "key", revokedAt: new Date().toISOString(), reason: "key-compromise: ledger-row" }], 0);
+  publishRevocationList(location, list, getSigningKey(root, "revocation-list"), logSequence);
 }
 
 const sealKey = fakeKey("p256");
@@ -87,7 +108,7 @@ describe("purpose keys held by key providers (P2-08)", () => {
     const pem = sealKey.publicKey.export({ format: "pem", type: "spki" }).toString();
     expect(bound).toMatchObject({ purpose: "ledger-row", generation: before + 1, provider: "aws-kms", keyId: signingKeyId(pem), algorithm: "ecdsa-p256-sha256", protection: "hsm", protectionBasis: "provider-metadata" });
     const keyset = JSON.parse(readFileSync(keysetPaths(root).keyset, "utf8"));
-    expect(keyset.providers["ledger-row"]).toEqual({ provider: "aws-kms", keyId: signingKeyId(pem), algorithm: "ecdsa-p256-sha256", protection: "hsm", protectionBasis: "provider-metadata" });
+    expect(keyset.providers["ledger-row"]).toEqual({ provider: "aws-kms", id: AWS_ARN("seal"), keyId: signingKeyId(pem), algorithm: "ecdsa-p256-sha256", protection: "hsm", protectionBasis: "provider-metadata" });
     expect(keyset.files["keys/ledger-row-provider.pub"]).toMatch(/^[0-9a-f]{64}$/);
     expect(listKeys(root).purposes.find(row => row.purpose === "ledger-row")).toMatchObject({ provider: "aws-kms", algorithm: "ecdsa-p256-sha256", protection: "hsm", protectionBasis: "provider-metadata", providerKeyId: signingKeyId(pem) });
 
@@ -109,19 +130,22 @@ describe("purpose keys held by key providers (P2-08)", () => {
     await bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider: kms().provider });
     const delegate = getSigningKey(root, "ledger-row");
 
-    const down = await signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider: kms("TimeoutError").provider }).catch((e: unknown) => e as KeyProviderError);
+    const down = (await signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider: kms("TimeoutError").provider }).catch((e: unknown) => e)) as KeyProviderError;
     expect(down).toMatchObject({ code: "KEY_PROVIDER_UNAVAILABLE", status: 503 });
     expect(down.message).not.toMatch(/vault locked|internal\.example|111122223333/i);
     await expect(bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider: kms("AccessDeniedException").provider })).rejects.toSatisfy(isCode("KEY_PROVIDER_AUTH_FAILED"));
 
+    // The key set, not the config, decides which key signs: a config naming another key, or none, changes nothing until
+    // the owner binds again, and only the delegate the provider certified keeps signing rows.
+    const boundId = listKeys(root).purposes.find(row => row.purpose === "ledger-row")!.providerKeyId;
     configureKeys(root, { refs: { "ledger-row": { provider: "aws-kms", id: AWS_ARN("other") } } });
-    await expect(signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider: kms().provider })).rejects.toThrow(/not the key the key set binds/);
-
-    // The key set, not the config, decides: without keys.refs the provider path refuses, and only the delegate the
-    // provider certified keeps signing rows.
+    await expect(signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider: kms().provider })).resolves.toMatchObject({ keyId: boundId });
     configureKeys(root, null);
-    await expect(signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider: kms().provider })).rejects.toSatisfy(isCode("KEY_PROVIDER_KEY_REFUSED"));
+    await expect(signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider: kms().provider })).resolves.toMatchObject({ keyId: boundId });
     expect(getSigningKey(root, "ledger-row")).toBe(delegate);
+    // A provider that describes another key than the bound one is refused.
+    const swapped = awsFake({ [AWS_ARN("seal")]: otherKey });
+    await expect(signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider: awsKmsProvider(swapped.call) })).rejects.toThrow(/not the key the key set binds/);
 
     // Putting back the key set from before the binding is a rollback this machine refuses.
     writeFileSync(keysetPaths(root).keyset, unbound);
@@ -161,9 +185,84 @@ describe("purpose keys held by key providers (P2-08)", () => {
     expect(verifyProofOfPossession({ ...exported, purpose: "artifact-seal" })).toBe(false);
   });
 
+  it("review: a provider-held purpose is refused before the vault is touched", () => {
+    const root = workspace();
+    configureKeys(root, { refs: { "artifact-seal": { provider: "aws-kms", id: AWS_ARN("seal") } } }, { signed: false });
+    lockVault(root);
+    // AMC_VAULT_PASSPHRASE is set, so touching the vault would unlock it.
+    expect(() => getSigningKey(root, "artifact-seal")).toThrow(expect.objectContaining({ code: "KEY_PROVIDER_HELD" }));
+    expect(vaultStatus(root).unlocked).toBe(false);
+  });
+
+  it("review: picking a provider key needs a signed amc.config.yaml, and the bytes verified are the bytes used", async () => {
+    const root = workspace();
+    configureKeys(root, { refs: { "ledger-row": { provider: "aws-kms", id: AWS_ARN("seal") } } }, { signed: false });
+    const { fake, provider } = kms();
+    await expect(bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider })).rejects.toThrow(/amc\.config\.yaml/);
+    expect(fake.requests).toEqual([]);
+    // Unsigned, the section still refuses the vault (it can only refuse, never pick a key).
+    expect(() => getSigningKey(root, "ledger-row")).toThrow(expect.objectContaining({ code: "KEY_PROVIDER_HELD" }));
+    signAmcConfig(root);
+    await bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider });
+    // An unsigned edit naming another key binds nothing; renewing the bound key needs no signature; signing ignores the config.
+    const requests = fake.requests.length;
+    configureKeys(root, { refs: { "ledger-row": { provider: "aws-kms", id: AWS_ARN("other") } } }, { signed: false });
+    await expect(bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider })).rejects.toThrow(/amc\.config\.yaml/);
+    expect(fake.requests.length).toBe(requests);
+    await expect(signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider })).resolves.toMatchObject({ keyId: signingKeyId(sealKey.publicKey.export({ format: "pem", type: "spki" }).toString()) });
+    configureKeys(root, { refs: { "ledger-row": { provider: "aws-kms", id: AWS_ARN("seal") } }, requireNonExportable: true }, { signed: false });
+    await expect(bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider })).resolves.toMatchObject({ delegation: expect.any(Object) });
+  });
+
+  it("review: the ledger-row delegate is refused once the bound provider key is revoked", async () => {
+    const root = workspace();
+    configureKeys(root, { refs: { "ledger-row": { provider: "aws-kms", id: AWS_ARN("seal") } } });
+    const { provider } = kms();
+    const bound = await bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider });
+    expect(getSigningKey(root, "ledger-row")).toContain("PRIVATE KEY");
+    recordRevocation(root, bound.keyId);
+    expect(() => getSigningKey(root, "ledger-row")).toThrow(KeyRevokedError);
+    await expect(signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider })).rejects.toBeInstanceOf(KeyRevokedError);
+  });
+
+  it("review: a delegation for any key but the one the vault serves is refused", async () => {
+    const root = workspace();
+    configureKeys(root, { refs: { "ledger-row": { provider: "aws-kms", id: AWS_ARN("seal") } } });
+    const { provider } = kms();
+    await bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider });
+    const issuer = await provider.describe({ provider: "aws-kms", id: AWS_ARN("seal") });
+    const stranger = generateKeyPairSync("ed25519").publicKey.export({ format: "pem", type: "spki" }).toString();
+    const forged = await issueDelegation(provider, issuer, { delegatePublicKeyPem: stranger, notBefore: new Date(), hours: 24, maxEvents: 10 });
+    writeFileSync(join(vaultPaths(root).keysDir, "delegations", "ledger-row.json"), encodeDelegation(forged));
+    expect(() => getSigningKey(root, "ledger-row")).toThrow(expect.objectContaining({ code: "KEY_DELEGATION_INVALID" }));
+  });
+
+  it("review: never another provider, and key changes stay owner-only", async () => {
+    const root = workspace();
+    configureKeys(root, { refs: { "ledger-row": { provider: "aws-kms", id: AWS_ARN("seal") } } });
+    await bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider: kms().provider });
+    // The config now names a Google key: the binding is AWS, so nothing is asked of Google and nothing signs.
+    configureKeys(root, { refs: { "ledger-row": { provider: "gcp-kms", id: GCP_KEY, version: "1" } } });
+    const google = gcpFake(fakeKey("p256"), "HSM");
+    await expect(signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider: gcpKmsProvider(google.call) })).rejects.toSatisfy(isCode("KEY_PROVIDER_KEY_REFUSED"));
+    expect(google.requests).toEqual([]);
+    // Even a provider of another kind that presents the bound key (and can sign with it) is not asked.
+    const bound = await kms().provider.describe({ provider: "aws-kms", id: AWS_ARN("seal") });
+    let asked = 0;
+    const confused: KeyProvider = { id: "gcp-kms", describe: async ref => { asked++; return { ...bound, ref }; },
+      sign: async (_ref, message) => { asked++; return sign("sha256", message, { key: sealKey.privateKey, dsaEncoding: "ieee-p1363" }); } };
+    await expect(signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider: confused })).rejects.toSatisfy(isCode("KEY_PROVIDER_KEY_REFUSED"));
+    expect(asked).toBe(0);
+    // Agent mode: binding and creating a file-provider wrap key are refused inside the functions.
+    setMode(root, "agent");
+    await expect(bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider: kms().provider })).rejects.toThrow(/owner mode|agent mode/i);
+    await expect(fileKeyProvider(root).wrapKey!({ provider: "file", id: "ledger-dek" }, Buffer.alloc(32))).rejects.toThrow(/owner mode|agent mode/i);
+  });
+
   it("keys.requireNonExportable refuses the vault (file provider) for unbound purposes", async () => {
     const root = workspace();
-    configureKeys(root, { requireNonExportable: true });
+    // Unsigned: the setting only refuses, so it counts as written (and the vault could not sign the config under it).
+    configureKeys(root, { requireNonExportable: true }, { signed: false });
     expect(() => getSigningKey(root, "receipt")).toThrow(expect.objectContaining({ code: "KEY_PROVIDER_KEY_REFUSED" }));
     await expect(signWithPurposeKey(root, "receipt", Buffer.alloc(32))).rejects.toSatisfy(isCode("KEY_PROVIDER_KEY_REFUSED"));
   });

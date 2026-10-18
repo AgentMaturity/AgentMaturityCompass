@@ -6,7 +6,7 @@ import { join, resolve } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
 import { signingKeyId } from "../src/keys/algorithmPolicy.js";
 import { callProviderSync, type BridgeRequest } from "../src/keys/providerBridge.js";
-import { KeyProviderError, type KeyDescription, type KeyRef } from "../src/keys/provider.js";
+import { KeyProviderError, type KeyDescription } from "../src/keys/provider.js";
 import { signNotaryAttestation } from "../src/notary/notaryAttestation.js";
 import { appendNotaryLogEntry, initNotaryLog, verifyNotaryLog } from "../src/notary/notaryLog.js";
 import { loadNotarySigner } from "../src/notary/notarySigner.js";
@@ -16,7 +16,7 @@ import { sha256Hex } from "../src/utils/hash.js";
 const dirs: string[] = [];
 afterAll(() => { for (const dir of dirs) rmSync(dir, { recursive: true, force: true }); });
 const notaryDir = () => { const dir = mkdtempSync(join(tmpdir(), "amc-notary-kp-")); dirs.push(dir); return dir; };
-const REF: KeyRef = { provider: "aws-kms", id: "arn:aws:kms:eu-west-1:111122223333:key/notary" };
+const REF = { provider: "aws-kms" as const, id: "arn:aws:kms:eu-west-1:111122223333:key/notary" };
 
 /** A synchronous stand-in for the provider bridge child: one local key, described as `protection`. */
 function bridgeFor(kind: "ed25519" | "p256", protection: KeyDescription["protection"], opts: { badSignature?: boolean; claims?: unknown } = {}) {

@@ -42,6 +42,9 @@ const hex = z.string().regex(/^[0-9a-f]{64}$/);
 /** P2-08: a provider-held key bound to a purpose; its public key is `keys/<purpose>-provider.pub`, pinned in `files`. */
 const providerBindingSchema = z.strictObject({
   provider: z.enum(KEY_PROVIDER_IDS).exclude(["file"]),
+  /** How to reach the key (the ref it was bound from): signing routes by this, never by the editable config. */
+  id: z.string().min(1).max(2048),
+  version: z.string().min(1).max(256).optional(),
   keyId: hex,
   algorithm: z.enum(SIGNING_ALGORITHMS),
   protection: z.enum(["software", "hsm", "external", "unknown"]),
@@ -368,7 +371,8 @@ export function assertBoundPublicKey(workspace: string, purpose: LocalPurpose, p
  */
 export function boundProviderKey(workspace: string, purpose: LocalPurpose): { binding: ProviderBinding; publicKeyPem: string } | null {
   // Presence from the mark-bound key set; the digest checks only once a binding exists, so vault-only readers see no change.
-  const binding = boundKeyset(workspace)?.providers?.[purpose];
+  // Purpose files without a key set (a 1.x workspace mid-migration) bind no provider key; the vault's own reads refuse them.
+  const binding = boundKeyset(workspace, { allowUnboundFiles: true })?.providers?.[purpose];
   if (binding === undefined) return null;
   const keyset = assertKeysetComplete(workspace)!;
   const publicKeyPem = readContainedOrNull(workspace, keysetFileRel(`keys/${purpose}-provider.pub`), 64 * 1024)?.toString("utf8") ?? null;

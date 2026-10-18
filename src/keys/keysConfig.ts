@@ -34,23 +34,31 @@ const keysConfigSchema = z.strictObject({
 });
 export type KeysConfig = z.infer<typeof keysConfigSchema>;
 
-const CONFIG_REL = ".amc/amc.config.yaml";
+export const CONFIG_REL = ".amc/amc.config.yaml";
 const memo = new Map<string, { stamp: string; config: KeysConfig }>();
 
-/** The parsed `keys` section (defaults when absent), re-read only after the file changed. An invalid section throws. */
-export function loadKeysConfig(workspace: string): KeysConfig {
-  const stamp = statStamp([join(workspace, CONFIG_REL)]);
-  const cached = memo.get(workspace);
-  if (cached?.stamp === stamp) return cached.config;
-  const bytes = readContainedOrNull(workspace, CONFIG_REL, 1024 * 1024);
+/** The `keys` section of these amc.config.yaml bytes (defaults when absent or null). An invalid section throws. */
+export function parseKeysSection(bytes: Buffer | null): KeysConfig {
   const raw = bytes === null ? undefined : (YAML.parse(bytes.toString("utf8")) as { keys?: unknown } | null)?.keys;
   const parsed = keysConfigSchema.safeParse(raw ?? {});
   if (!parsed.success) {
     const issue = parsed.error.issues[0];
     throw new Error(`amc.config.yaml keys: ${issue ? `${issue.path.join(".") || "(root)"} ${issue.message}` : "invalid"}`);
   }
-  memo.set(workspace, { stamp, config: parsed.data });
   return parsed.data;
+}
+
+/**
+ * The `keys` section as the file stands, signed or not, re-read only after it changed. Use it only to refuse: a key is
+ * picked from a signed config (src/keys/purposeProviders.ts) or from the committed key set, never from this.
+ */
+export function loadKeysConfig(workspace: string): KeysConfig {
+  const stamp = statStamp([join(workspace, CONFIG_REL)]);
+  const cached = memo.get(workspace);
+  if (cached?.stamp === stamp) return cached.config;
+  const config = parseKeysSection(readContainedOrNull(workspace, CONFIG_REL, 1024 * 1024));
+  memo.set(workspace, { stamp, config });
+  return config;
 }
 
 export function keyPolicy(config: KeysConfig): KeyPolicy {

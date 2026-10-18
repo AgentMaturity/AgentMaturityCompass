@@ -3,7 +3,7 @@
  * admits. Kept apart from src/keys/purposeKeys.ts (rotation, revocation, export), which writes the transparency log, so
  * that src/crypto/keys.ts and the trust context load no log writer.
  */
-import { verifyKeyHistoryEnvelope, type KeyHistoryEnvelope, type KeyHistorySubject } from "../crypto/keyHistoryEnvelope.js";
+import { publicKeyFromPrivate, verifyKeyHistoryEnvelope, type KeyHistoryEnvelope, type KeyHistorySubject } from "../crypto/keyHistoryEnvelope.js";
 import type { KeyPurpose } from "../trust/keyPurposes.js";
 import { join } from "node:path";
 import { readContainedOrNull, statStamp } from "../utils/containedFs.js";
@@ -14,7 +14,9 @@ import { isLocalPurpose, roleOfPurpose, type LocalPurpose } from "../vault/vault
 import { historyLogId, loggedAnchor } from "./anchors.js";
 import { checkHighWater, compareHighWater, keyHistoryMarkKey } from "./highWater.js";
 import { assertBoundPublicKey, assertNoPendingKeyset, boundProviderKey, keysetDeclared, keysetFileRel } from "./keyset.js";
+import { signingKeyId } from "./algorithmPolicy.js";
 import { verifyDelegation } from "./delegation.js";
+import { assertKeyNotRevoked } from "./keyRevocations.js";
 import { configuredRef, loadKeysConfig } from "./keysConfig.js";
 import { KeyProviderError, type KeyProviderId } from "./provider.js";
 
@@ -26,52 +28,62 @@ export function assertLocal(purpose: KeyPurpose): LocalPurpose {
 /**
  * The private key for one signing purpose. Refused while the key set is incomplete or the vault is locked, and (P2-08)
  * whenever the purpose's key is held by a provider: the vault never stands in for it. The one exception is the
- * ledger-row delegate, a vault key served only while a provider-signed delegation for it is current.
+ * ledger-row delegate, a vault key served only while a provider-signed delegation for that very key is current.
  */
 export function getSigningKey(workspace: string, purpose: KeyPurpose): string {
   const local = assertLocal(purpose);
-  // The vault first, so a locked vault or a revoked vault key is reported exactly as before.
+  // Authorization before the vault is touched: a provider-held purpose never unlocks or reads it.
+  const delegateKeyId = assertVaultMaySign(workspace, local);
   const privateKeyPem = getVaultPurposeKeyPem(workspace, local);
-  assertVaultMaySign(workspace, local);
+  // The delegation must name the key served here, not only the published ledger-row.pub.
+  if (delegateKeyId !== null && signingKeyId(publicKeyFromPrivate(privateKeyPem)) !== delegateKeyId) {
+    throw new KeyProviderError("KEY_DELEGATION_INVALID", boundProviderKey(workspace, local)?.binding.provider ?? "file", "the delegation names another key than the vault's ledger-row key");
+  }
   return privateKeyPem;
 }
 
-/** Refuses a purpose that keys config or the committed key set gives to a provider, and the vault under requireNonExportable. */
-export function assertVaultMaySign(workspace: string, purpose: LocalPurpose): void {
+/**
+ * Refuses a purpose that keys config or the committed key set gives to a provider, and the vault under
+ * requireNonExportable. The config is read unsigned here because it can only refuse; it never picks a key. For a bound
+ * ledger-row it returns the key id the current delegation names, after checking the issuer is not revoked.
+ */
+export function assertVaultMaySign(workspace: string, purpose: LocalPurpose): string | null {
   const config = loadKeysConfig(workspace);
   const bound = boundProviderKey(workspace, purpose);
   const ref = configuredRef(config, purpose);
   if (bound === null && ref === null) {
     if (config.requireNonExportable) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", `keys.requireNonExportable refuses the vault's ${purpose} key`);
-    return;
+    return null;
   }
-  if (purpose === "ledger-row" && bound !== null) return assertCurrentDelegation(workspace, bound.publicKeyPem, bound.binding.provider);
+  if (purpose === "ledger-row" && bound !== null) {
+    assertKeyNotRevoked(workspace, true, bound.binding.keyId, purpose);
+    return currentDelegateKeyId(workspace, bound.publicKeyPem, bound.binding.provider);
+  }
   throw new KeyProviderError("KEY_PROVIDER_HELD", bound?.binding.provider ?? ref!.provider, bound === null
     ? `the ${purpose} key is configured to a provider key that the key set does not bind yet; run amc keys rotate --purpose ${purpose}`
     : `the ${purpose} key never leaves the provider; this signer needs a vault key and cannot use it`);
 }
 
 export const DELEGATION_REL = ".amc/keys/delegations/ledger-row.json";
-const delegationMemo = new Map<string, { stamp: string; notBefore: number; notAfter: number }>();
+const delegationMemo = new Map<string, { stamp: string; notBefore: number; notAfter: number; delegateKeyId: string }>();
 
-/** The vault's ledger-row key is the delegate: a delegation from the bound provider key must name it and cover now. */
-function assertCurrentDelegation(workspace: string, issuerPublicKeyPem: string, provider: KeyProviderId): void {
+/** The key id a delegation from the bound provider key names, when that delegation verifies and covers now. */
+function currentDelegateKeyId(workspace: string, issuerPublicKeyPem: string, provider: KeyProviderId): string {
   const now = new Date();
-  const stamp = statStamp([join(workspace, DELEGATION_REL), join(workspace, keysetFileRel("keys/ledger-row.pub")), join(workspace, keysetFileRel("keys/ledger-row-provider.pub"))]);
+  const stamp = statStamp([join(workspace, DELEGATION_REL), join(workspace, keysetFileRel("keys/ledger-row-provider.pub"))]);
   let window = delegationMemo.get(workspace);
   if (window?.stamp !== stamp) {
     const bytes = readContainedOrNull(workspace, DELEGATION_REL, 64 * 1024);
     if (bytes === null) throw new KeyProviderError("KEY_DELEGATION_INVALID", provider, "the ledger-row delegate has no delegation; renew it with amc keys rotate --purpose ledger-row");
     const verdict = verifyDelegation(bytes, { issuerPublicKeyPems: [issuerPublicKeyPem], at: now });
-    const delegate = getSigningPublicKeyPem(workspace, "ledger-row");
-    if (verdict.valid && verdict.delegation.delegatePublicKeyPem !== delegate) throw new KeyProviderError("KEY_DELEGATION_INVALID", provider, "the delegation names another ledger-row key");
     if (!verdict.valid) throw new KeyProviderError("KEY_DELEGATION_INVALID", provider, `${verdict.reason}; renew it with amc keys rotate --purpose ledger-row`);
-    window = { stamp, notBefore: Date.parse(verdict.delegation.notBefore), notAfter: Date.parse(verdict.delegation.notAfter) };
+    window = { stamp, notBefore: Date.parse(verdict.delegation.notBefore), notAfter: Date.parse(verdict.delegation.notAfter), delegateKeyId: verdict.delegation.delegateKeyId };
     delegationMemo.set(workspace, window);
   }
   if (now.getTime() < window.notBefore || now.getTime() > window.notAfter) {
     throw new KeyProviderError("KEY_DELEGATION_INVALID", provider, "the ledger-row delegation is outside its window; renew it with amc keys rotate --purpose ledger-row");
   }
+  return window.delegateKeyId;
 }
 
 const KEY_FILE_BYTES = 1024 * 1024;

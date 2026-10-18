@@ -1,7 +1,9 @@
 /**
  * Purpose keys held by key providers (P2-08). `keys.refs.<purpose>` in amc.config.yaml names a provider key;
- * `amc keys rotate --purpose <p>` binds it: the provider proves possession, then one key-set generation records the
- * binding and pins `keys/<purpose>-provider.pub`, under the same anti-rollback marks as every P1-08 key set.
+ * `amc keys rotate --purpose <p>` binds it (owner mode, vault passphrase, and a config whose signature verifies): the
+ * provider proves possession, then one key-set generation records the binding (provider, ref, key id) and pins
+ * `keys/<purpose>-provider.pub`, under the same anti-rollback marks as every P1-08 key set. Signing then reaches the key
+ * by the ref the key set records; the editable config never picks a key, it can only make a signer refuse.
  *
  * From then on the purpose signs only through the provider (signWithPurposeKey). getSigningKey refuses it with
  * KEY_PROVIDER_HELD: the vault never stands in, whether the provider is down, the config changed or the binding was
@@ -10,23 +12,25 @@
  */
 import { join } from "node:path";
 import { assertOwnerMode } from "../mode/mode.js";
-import { writeContained } from "../utils/containedFs.js";
+import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
+import { readContainedOrNull, writeContained } from "../utils/containedFs.js";
+import { sha256Hex } from "../utils/hash.js";
 import { unlockedPayloadForKeyChange, vaultPaths } from "../vault/vault.js";
 import type { LocalPurpose } from "../vault/vaultPayload.js";
 import type { KeyPurpose } from "../trust/keyPurposes.js";
-import type { SigningAlgorithm } from "./algorithmPolicy.js";
+import { verifyWithKey, type SigningAlgorithm } from "./algorithmPolicy.js";
 import { encodeDelegation, issueDelegation, MAX_DELEGATION_HOURS } from "./delegation.js";
 import { assertKeyNotRevoked } from "./keyRevocations.js";
 import { assertKeysetComplete, boundProviderKey, commitKeyset, type ProviderBinding } from "./keyset.js";
-import { configuredRef, keyPolicy, loadKeysConfig } from "./keysConfig.js";
-import { attempt, checkedDescription, KeyProviderError, signChecked, type KeyDescription, type KeyProvider, type KeyProviderId } from "./provider.js";
+import { CONFIG_REL, configuredRef, keyPolicy, loadKeysConfig, parseKeysSection, type KeysConfig } from "./keysConfig.js";
+import { attempt, checkedDescription, KeyProviderError, signChecked, type KeyDescription, type KeyProvider, type KeyProviderId, type KeyRef } from "./provider.js";
 import { awsKmsProvider } from "./providers/awsKms.js";
 import { azureKeyVaultProvider } from "./providers/azureKeyVault.js";
 import { fileKeyProvider } from "./providers/file.js";
 import { gcpKmsProvider } from "./providers/gcpKms.js";
 import { pkcs11Provider } from "./providers/pkcs11.js";
 import { popBytes } from "./purposeKeys.js";
-import { assertLocal, DELEGATION_REL, getSigningPublicKeyPem } from "./signingKeys.js";
+import { assertLocal, DELEGATION_REL, getPurposeKeyHistory } from "./signingKeys.js";
 
 /**
  * Purposes a provider key can be bound to in this release. ponytail: ledger-row only, whose hot path keeps a vault
@@ -52,23 +56,56 @@ export function loadKeyProvider(workspace: string, id: KeyProviderId): KeyProvid
   return provider;
 }
 
-/** The key that signs `purpose`: the vault, or the bound provider key behind the configured ref. `override` replaces the provider (tests). */
+const SIG_REL = `${CONFIG_REL}.sig`;
+
+/**
+ * The keys section of an amc.config.yaml whose signature (`amc verify --sign-config`) verifies under the config-signature
+ * key history, from one read: the bytes verified are the bytes parsed. Picking a provider key needs this; an unsigned or
+ * changed config only refuses.
+ */
+function signedKeysConfig(workspace: string, provider: KeyProviderId): KeysConfig {
+  const bytes = readContainedOrNull(workspace, CONFIG_REL, 1024 * 1024);
+  const sig = readContainedOrNull(workspace, SIG_REL, 64 * 1024);
+  let verified = false;
+  if (bytes !== null && sig !== null) {
+    try {
+      const record = JSON.parse(sig.toString("utf8")) as { configSha256?: unknown; signature?: unknown };
+      const digest = sha256Hex(bytes);
+      verified = record.configSha256 === digest && typeof record.signature === "string"
+        && getPurposeKeyHistory(workspace, "config-signature").some(pem => verifyWithKey(Buffer.from(digest, "hex"), pem, Buffer.from(record.signature as string, "base64")));
+    } catch { /* an unreadable signature verifies nothing */ }
+  }
+  if (!verified) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", provider, "a provider key is picked only from an amc.config.yaml whose signature verifies; sign it with amc verify --sign-config");
+  return parseKeysSection(bytes);
+}
+
+/** How to reach a bound key: the ref recorded in the key set when it was bound. */
+function boundRef(binding: ProviderBinding): KeyRef {
+  return { provider: binding.provider, id: binding.id, ...(binding.version === undefined ? {} : { version: binding.version }) };
+}
+const sameRef = (a: KeyRef, b: KeyRef) => a.provider === b.provider && a.id === b.id && a.version === b.version;
+
+/**
+ * The key that signs `purpose`: the vault, or the bound provider key, reached by the ref the key set records (never by
+ * the editable config). `override` replaces the provider instance (tests) and must be the bound provider.
+ */
 async function purposeSigner(workspace: string, purpose: LocalPurpose, override?: KeyProvider): Promise<{ provider: KeyProvider; description: KeyDescription }> {
-  const config = loadKeysConfig(workspace);
   const bound = boundProviderKey(workspace, purpose);
-  const ref = configuredRef(config, purpose);
+  const config = loadKeysConfig(workspace);
   if (bound === null) {
-    if (ref !== null) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, `the key set binds no ${ref.provider} key to ${purpose} yet; run amc keys rotate --purpose ${purpose}`);
+    const configured = configuredRef(config, purpose);
+    if (configured !== null) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", configured.provider, `the key set binds no ${configured.provider} key to ${purpose} yet; run amc keys rotate --purpose ${purpose}`);
     const vault = loadKeyProvider(workspace, "file");
     return { provider: vault, description: checkedDescription(await attempt("file", "describe", () => vault.describe({ provider: "file", id: purpose })), keyPolicy(config)) };
   }
-  if (ref === null || ref.provider !== bound.binding.provider) {
-    throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", bound.binding.provider, `keys.refs.${purpose} must name the ${bound.binding.provider} key the key set binds`);
-  }
+  const ref = boundRef(bound.binding);
+  if (override !== undefined && override.id !== ref.provider) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, `the key set binds a ${ref.provider} key to ${purpose}; no other provider signs for it`);
   assertKeyNotRevoked(workspace, true, bound.binding.keyId, purpose);
   const provider = override ?? loadKeyProvider(workspace, ref.provider);
   const description = checkedDescription(await attempt(ref.provider, "describe", () => provider.describe(ref)), keyPolicy(config));
-  if (description.keyId !== bound.binding.keyId) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, `the provider's ${purpose} key is not the key the key set binds`);
+  if (description.keyId !== bound.binding.keyId || description.algorithm !== bound.binding.algorithm) {
+    throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, `the provider's ${purpose} key is not the key the key set binds`);
+  }
   return { provider, description };
 }
 
@@ -113,28 +150,38 @@ export async function bindPurposeProviderKey(workspace: string, purpose: KeyPurp
   }
   const passphrase = opts.passphrase ?? process.env.AMC_VAULT_PASSPHRASE;
   if (!passphrase) throw new Error("Binding a provider key requires the vault passphrase (AMC_VAULT_PASSPHRASE or interactive input).");
-  unlockedPayloadForKeyChange(workspace, passphrase);
-  const config = loadKeysConfig(workspace);
-  const ref = configuredRef(config, local);
+  const payload = unlockedPayloadForKeyChange(workspace, passphrase);
+  const keyset = assertKeysetComplete(workspace);
+  if (keyset === null) throw new Error("this workspace has no key set to bind a provider key into");
+  const current = keyset.providers?.[local];
+  const unsigned = loadKeysConfig(workspace);
+  const named = configuredRef(unsigned, local);
+  if (named === null || named.provider === "file") throw new Error(`keys.refs.${local} names no provider key; nothing to bind`);
+  // Renewing the bound key needs nothing from the config. Picking a key (the first, or another) needs it signed.
+  const renewing = current !== undefined && sameRef(boundRef(current), named);
+  const ref = renewing ? boundRef(current) : configuredRef(signedKeysConfig(workspace, named.provider), local);
   if (ref === null || ref.provider === "file") throw new Error(`keys.refs.${local} names no provider key; nothing to bind`);
+  if (opts.provider !== undefined && opts.provider.id !== ref.provider) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, `keys.refs.${local} names a ${ref.provider} key`);
   const provider = opts.provider ?? loadKeyProvider(workspace, ref.provider);
-  const description = checkedDescription(await attempt(ref.provider, "describe", () => provider.describe(ref)), keyPolicy(config));
+  const description = checkedDescription(await attempt(ref.provider, "describe", () => provider.describe(ref)), keyPolicy(unsigned));
   if (description.exportable) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, "an exportable key is never bound");
+  if (renewing && description.keyId !== current.keyId) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, "the provider no longer holds the bound key");
   assertKeyNotRevoked(workspace, true, description.keyId, local);
   const now = opts.now ?? new Date();
   // Possession before the key set names the key: the provider signs this purpose's proof under the described key.
   await signChecked(provider, description, popBytes({ keyId: description.keyId, purpose: local, issuedAt: now.toISOString() }));
-  const keyset = assertKeysetComplete(workspace);
-  if (keyset === null) throw new Error("this workspace has no key set to bind a provider key into");
-  const binding: ProviderBinding = { provider: ref.provider, keyId: description.keyId, algorithm: description.algorithm, protection: description.protection, protectionBasis: description.protectionBasis };
-  const generation = keyset.providers?.[local]?.keyId === description.keyId ? keyset.generation : commitKeyset(workspace, {
+  const binding: ProviderBinding = { provider: ref.provider, id: ref.id, ...(ref.version === undefined ? {} : { version: ref.version }), keyId: description.keyId,
+    algorithm: description.algorithm, protection: description.protection, protectionBasis: description.protectionBasis };
+  const generation = renewing ? keyset.generation : commitKeyset(workspace, {
     keys: keyset.keys,
     writes: [{ path: join(vaultPaths(workspace).keysDir, `${local}-provider.pub`), bytes: description.publicKeyPem, mode: 0o644 }],
     providers: { ...keyset.providers, [local]: binding }
   }).generation;
   let delegation: BindResult["delegation"] = null;
   if (local === "ledger-row") {
-    const signed = await issueDelegation(provider, description, { delegatePublicKeyPem: getSigningPublicKeyPem(workspace, "ledger-row"), notBefore: now, hours: MAX_DELEGATION_HOURS, maxEvents: LEDGER_DELEGATION_MAX_EVENTS });
+    // The delegate is the key the vault serves for ledger-row, read from the unlocked vault itself.
+    const delegatePublicKeyPem = publicKeyFromPrivate(payload.keys["ledger-row"]!.privateKeyPem);
+    const signed = await issueDelegation(provider, description, { delegatePublicKeyPem, notBefore: now, hours: MAX_DELEGATION_HOURS, maxEvents: LEDGER_DELEGATION_MAX_EVENTS });
     writeContained(workspace, DELEGATION_REL, encodeDelegation(signed), 0o644);
     delegation = { notBefore: signed.delegation.notBefore, notAfter: signed.delegation.notAfter, maxEvents: signed.delegation.maxEvents };
   }

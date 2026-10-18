@@ -5,6 +5,7 @@
  */
 import { createCipheriv, createDecipheriv, randomBytes, sign } from "node:crypto";
 import { getSigningKey, getSigningPublicKeyPem } from "../signingKeys.js";
+import { assertOwnerMode } from "../../mode/mode.js";
 import { getVaultSecret, setVaultSecret } from "../../vault/vault.js";
 import { isLocalPurpose, type LocalPurpose } from "../../vault/vaultPayload.js";
 import { signingKeyId } from "../algorithmPolicy.js";
@@ -22,6 +23,8 @@ function wrapSecret(workspace: string, ref: KeyRef, create: boolean): Buffer {
   let value = getVaultSecret(workspace, name);
   if (value === null) {
     if (!create) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the vault holds no wrap key of that name");
+    // Creating a key is a key change: owner mode, checked here as well as by any caller.
+    assertOwnerMode(workspace, "keys rotate");
     value = randomBytes(32).toString("base64");
     setVaultSecret(workspace, name, value);
   }

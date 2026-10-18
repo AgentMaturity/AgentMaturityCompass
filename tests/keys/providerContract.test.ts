@@ -172,8 +172,8 @@ describe("key provider requests and failures (P2-08)", () => {
   });
 
   it("PKCS#11: a wrong PIN is KEY_PROVIDER_AUTH_FAILED without the PIN or library path; the PIN comes only from the environment", async () => {
-    const wrong = await pkcs11Provider({ module: pkcs11Fake({ token: "amc", pin: PIN, keys: [] }).module, env: { AMC_PKCS11_PIN: "0000" } })
-      .describe({ provider: "pkcs11", id: "pkcs11:token=amc;object=k" }).catch((e: unknown) => e as Error);
+    const wrong = (await pkcs11Provider({ module: pkcs11Fake({ token: "amc", pin: PIN, keys: [] }).module, env: { AMC_PKCS11_PIN: "0000" } })
+      .describe({ provider: "pkcs11", id: "pkcs11:token=amc;object=k" }).catch((e: unknown) => e)) as Error;
     expect(wrong).toMatchObject({ code: "KEY_PROVIDER_AUTH_FAILED" });
     expect(wrong.message).not.toMatch(/0000|1234|softhsm/);
     await expect(pkcs11Provider({ module: pkcs11Fake({ token: "amc", pin: PIN, keys: [] }).module, env: {} }).describe({ provider: "pkcs11", id: "pkcs11:token=amc;object=k" }))
