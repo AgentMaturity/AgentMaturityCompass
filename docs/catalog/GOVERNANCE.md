@@ -24,24 +24,25 @@ evidence of conformity, never proof of compliance.
 | Risk owner | Named human | Accepts the residual risk the control leaves. |
 | Second reviewer | Named human | The second independent pair of eyes. |
 
-AI agents may draft and refute. They never approve: a review record's reviewer is a human, and a decision signed by a
-user holding the `AGENT` role is refused.
+AI agents may draft and refute. They never approve: a review record's reviewer is a named human whose own key the
+operator pinned for `catalog-review`, and a record declaring any other identity kind is refused.
 
 ## The two-person rule
 
-`reviewed` support needs verified approvals from at least two distinct humans, one of them credentialed for one of the
-subject's domains (stations). A citation also needs an approval from a credentialed legal reviewer. Content an AI
+`reviewed` support needs verified approvals from at least two distinct pinned reviewers, one of them credentialed for
+one of the subject's domains (stations). A citation also needs an approval from a credentialed legal reviewer. Content an AI
 drafted needs a human approval that names the draft in its `aiInputs` (kind `draft`, confirmed). Any verified objection
 (`reject` or `request_changes`) blocks the quorum until it is resolved by new records. `meetsReviewQuorum(subject,
 records, ctx)` encodes this; P1-33 calls it for admission criteria 2 and 9.
 
-"Credentialed" means listed in the D-08 expert roster for that domain (or for `legal`). The roster is an input to the
-quorum check, not a field a record can declare. Until D-08 supplies it, no quorum can be met.
+"Credentialed" means listed in the D-08 expert roster for that domain (or for `legal`), keyed by the reviewer's
+trust-list subject. The roster is an input to the quorum check, not a field a record can declare. Until D-08 supplies
+the experts, their pinned keys and the roster, no quorum can be met, so no control can compile as reviewed.
 
 ### Independence and conflicts of interest
 
-A reviewer may not review a subject they authored or a change they made: the verifier refuses a record whose reviewer's
-user id or name matches the subject's authors (its git authors, names or emails, supplied by the caller). Every record
+A reviewer may not review a subject they authored or a change they made: the verifier refuses a record whose signing
+reviewer (trust-list subject) or declared name matches the subject's authors (its git authors, names or emails). Every record
 states `reviewer.credential` and `reviewer.conflictsDeclared`; both must be non-blank, and "none" is a declaration, not
 a blank.
 
@@ -61,35 +62,40 @@ data, not catalog content: they never change a digest. The format (`reviewRecord
 | `scope` | What was checked: `statement`, `applicability`, `citations`, `tests`, `evidence`, `crosswalk`. |
 | `aiInputs` | `[{ kind: draft \| refutation \| f5_verdict, ref, confirmed }]`: the AI material the reviewer relied on. |
 | `notes` | Free text. |
-| `decidedAt`, `nextReviewDue` | `YYYY-MM-DD`. |
-| `approvalRequestId` | The approval-engine request the reviewer decided. |
+| `decidedAt`, `nextReviewDue` | `YYYY-MM-DD`. `decidedAt` is the signing time the record claims. |
+| `signature` | `{ publicKeyPem, value }`: Ed25519 over sha256 of `amc.catalog-review/v1`, a zero byte and the canonical record without `signature`. |
 
-A record is a declaration until `verifyReviewRecord(record, ctx)` checks it. It is valid only when:
+A record is a declaration until `verifyReviewRecord(record, ctx)` checks it against the operator's trust
+(`loadTrustContext`, read with the server's clock). It is valid only when:
 
 1. it parses (human identity, non-blank credential and conflicts);
-2. the reviewer authored neither the subject nor the change;
-3. every `f5_verdict` input marked confirmed has a row in `catalog/governance/f5-confirmations.yaml` naming this record;
-4. the approval request verifies (signature and chain), and its intent hash covers this record's subject, digest included
-   (`catalogReviewIntent(subject)`, tool `catalog.review.decide`);
-5. the reviewer's own decision on that request is signed, bound to the request (`requestDigestSha256`), made by a user
-   without the `AGENT` role, and agrees with the record (`approve` with an approval, `reject` or `request_changes` with
-   a denial).
+2. its signature verifies under the key it names, and a signed trust list pins that key for `catalog-review` at the
+   verification time (the operator's m-of-n root policy applies to the list). A `--pubkey` pin, workspace keys,
+   `--allow-unpinned`, another purpose, a revoked or distrusted key, or a `decidedAt` after the verification time or
+   before the key's validity admits nothing;
+3. `reviewer.identity.userId` equals that trust-list entry's `subject`: the reviewer comes from the signature, never
+   from a field;
+4. the reviewer authored neither the subject nor the change;
+5. every `f5_verdict` input marked confirmed has a row in `catalog/governance/f5-confirmations.yaml` naming this record.
 
-A record whose subject digest has moved since the decision is `expired`: any edit to the subject needs a new review.
-The decisions are signed with the workspace's keys, so a verified record is a local audit trail, not portable trust.
+Anything else is `unverified` (`GOV_REVIEW_SIGNATURE_INVALID`, `GOV_REVIEW_SIGNER_UNPINNED`,
+`GOV_REVIEW_REVIEWER_UNKNOWN`, `GOV_REVIEW_SELF_REVIEW`, `GOV_REVIEW_F5_UNCONFIRMED`, `GOV_REVIEW_RECORD_INVALID`) and
+moves nothing. A valid record whose subject digest has moved since is `expired`: any edit to the subject needs a new
+review.
 
 ### How to record a decision
 
-1. Compute the subject's digest from the catalog lock (`amc catalog compile` writes `catalog.lock.json`; a control's
+1. Sid adds each reviewer's public key to the operator's signed trust list for `catalog-review`, with the reviewer as
+   its `subject`, and the reviewer to the D-08 roster with their domains. AMC never holds a reviewer's private key
+   (`getSigningKey` refuses `catalog-review`).
+2. Compute the subject's digest from the catalog lock (`amc catalog compile` writes `catalog.lock.json`; a control's
    digest is its `controls[]` row).
-2. File an approval request for `catalogReviewIntent(subject)` in the governance workspace, one per reviewer or one
-   shared by both.
-3. Each reviewer decides it as themselves, through an authenticated path that binds the decision to the request digest,
-   never on someone else's behalf.
-4. Write the record file, then the changelog entry that names it.
-5. Update the control's `review` block and `support` in the same change. CI checks the rest.
+3. Each reviewer writes their record and signs it with their own key (`signReviewRecord`), never on someone else's
+   behalf, and adds it under `catalog/reviews/`.
+4. Append the changelog entry that names the records, and update the control's `review` block and `support` in the same
+   change. CI checks the rest.
 
-There is no review UI yet (P2-22).
+There is no review UI or signing command yet (P2-22).
 
 ## Currency reviews
 
@@ -113,12 +119,15 @@ Monthly review of every US state citation is real expert load; budget expert hou
 |---|---|---|
 | `GOV_REVIEW_DUE_SOON` | warning | The next review is within 14 days (the due day included). |
 | `GOV_REVIEW_OVERDUE` | error for reviewed and qualified, warning otherwise | The next review has passed. |
-| `GOV_REVIEW_UNRESOLVED` | error for reviewed and qualified | The next review cannot be scheduled (no approved, dated review; an unknown register entry; a malformed date). |
+| `GOV_REVIEW_STALE` | error for reviewed and qualified, warning for any other recorded review | The review date is missing, unparsable or in the future, or the next review cannot be scheduled (an unknown register entry). Stale is never current. |
+| `GOV_REVIEW_UNVERIFIED` | error | Reviewed or qualified content without a valid quorum of review records signed by pinned reviewers. |
 | `GOV_REVERIFY_OPEN` | error | Reviewed or qualified content cites an instrument an open re-verify item affects. |
 | `GOV_REGISTER_STATUS_REVIEW` | warning | A register entry's stated status should have changed by now (P1-18). |
 
-Expiry routes content to review and never rewrites anything. A compilation (`compilePlan`) treats overdue or
-unschedulable reviewed content as `experimental` in that plan's requirement row, with the reason. The YAML is not
+Currency only ever makes support stricter, and its clock is the server's date, never a record field. Expiry routes
+content to review and never rewrites anything. A compilation (`compilePlan`) treats reviewed or qualified content as
+`experimental` in that plan's requirement row, with the reason, when its review is overdue or stale or when it has no
+verified quorum (no caller passes review authority yet, so today every row is experimental). The YAML is not
 edited, and the control's digest, the lock and every stored `ControlResult` (which pin `controlVersion` and
 `controlDigest`) stay byte-identical.
 
