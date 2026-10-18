@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { Command } from "commander";
 import { MCP_TOOL_METADATA } from "../src/mcp/amcMcpServer.js";
+import { a4ToolMetadata } from "../src/mcp/a4Tools.js";
 import { registerMcpCommands } from "../src/mcp/mcpCli.js";
 import { registerTransparencyReportCommands } from "../src/transparency/transparencyReportCli.js";
 import { generateTransparencyReport } from "../src/transparency/transparencyReport.js";
@@ -34,9 +35,10 @@ function tracked(ws: string): string {
 // ---------------------------------------------------------------------------
 
 describe("MCP_TOOL_METADATA", () => {
-  it("exports 15 tools (20 with AMC_A4_PREVIEW=1)", () => {
+  it("exports the 15 core tools plus the A4 preview tools", () => {
     // P1-17 added amc_incident_clocks and P1-44 the four industry pack tools; both count changes are intended.
-    expect(MCP_TOOL_METADATA).toHaveLength(process.env.AMC_A4_PREVIEW === "1" ? 20 : 15);
+    // AMC_A4_PREVIEW=1 adds a4ToolMetadata()'s five tools (20 in all); without it there are none.
+    expect(MCP_TOOL_METADATA).toHaveLength(15 + a4ToolMetadata().length);
     const names = MCP_TOOL_METADATA.map((t) => t.name);
     expect(names).toContain("amc_list_agents");
     expect(names).toContain("amc_quickscore");
