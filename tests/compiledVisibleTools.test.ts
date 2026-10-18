@@ -1,7 +1,22 @@
+import { generateKeyPairSync } from "node:crypto";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import YAML from "yaml";
 import { describe, expect, it, vi } from "vitest";
+
+/** Counts reads of one file made inside a tool-guard pass (ToolRegistry.guardReason); every other read passes through. */
+const guardReads = vi.hoisted(() => ({ path: null as string | null, count: 0 }));
+vi.mock("node:fs", async (importOriginal) => {
+  const real = await importOriginal<typeof import("node:fs")>();
+  const readFileSync = ((...args: Parameters<typeof real.readFileSync>) => {
+    if (guardReads.path !== null && args[0] === guardReads.path && (new Error().stack ?? "").includes("guardReason")) guardReads.count += 1;
+    return real.readFileSync(...args);
+  }) as typeof real.readFileSync;
+  return { ...real, readFileSync, default: { ...real, readFileSync } };
+});
+
+import { driftedSlots, RESOURCE_SLOTS } from "../src/a4/a4Gates.js";
+import { understandAdapt } from "../src/a4/adaptPolicy.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import { createDriverRunner } from "../src/agent/subagentRunner.js";
@@ -11,11 +26,11 @@ import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { initUsersConfig } from "../src/auth/authApi.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { compileCatalogPlan } from "../src/catalog/catalogCli.js";
-import { activateControlPlan } from "../src/catalog/compiler/activate.js";
 import { compilePlan, parseDeploymentProfile } from "../src/catalog/compiler/compile.js";
 import type { MergedParameter } from "../src/catalog/compiler/merge.js";
 import { buildRuntimePolicy } from "../src/catalog/compiler/runtimePolicy.js";
 import { planWeakenings } from "../src/catalog/compiler/sign.js";
+import { signHexDigest } from "../src/crypto/keys.js";
 import { issueLeaseToken } from "../src/leases/leaseSigner.js";
 import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
 import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
@@ -33,7 +48,8 @@ import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTra
 
 /**
  * P1-10F: the compiled `toolPipeline.visibleTools` are the tools the workspace's VERIFIED signed tools.yaml allows,
- * intersected with what the plan's controls permit; without a verified tools.yaml they stay the built-in default list.
+ * intersected with what the plan's controls permit; with no tools.yaml they stay the built-in default list, and one that
+ * does not verify refuses the compile (TOOLS_CONFIG_UNVERIFIED) for `amc catalog compile` and A4 Adapt alike.
  * The plan records the tools.yaml digest it used, and the compiled-policy guard refuses every call once that file
  * changes, until the plan is recompiled and reactivated. Plans are compiled and activated through `amc catalog
  * compile`'s own composition (compileCatalogPlan), the caller that reads and verifies tools.yaml.
@@ -63,7 +79,15 @@ function governedWorkspace(): string {
   initBudgets(ws, "default");
   writeRuntimeFirewallPolicy({ workspace: ws, mode: "observe" });
   writeFileSync(join(ws, "deployment-profile.json"), JSON.stringify(PROFILE));
+  mkdirSync(join(ws, "workspace"), { recursive: true });
+  writeFileSync(join(ws, "workspace", "n.txt"), "fixture");
   return ws;
+}
+
+/** What a compile throws (or undefined), with its code. */
+function refusal(run: () => unknown): { code?: unknown; message: string } | undefined {
+  try { run(); } catch (error) { return error as { code?: unknown; message: string }; }
+  return undefined;
 }
 
 const compile = (ws: string, flags: { requestReview?: boolean; activate?: string; allowWeakening?: boolean } = {}) =>
@@ -106,8 +130,6 @@ function driverRunner(ws: string, leaseToken: string): SubagentRunner {
       { destinationId: "fixture-provider", match: { hosts: ["fixture.invalid"] }, channels: ["provider"], region: us, transferBasis: null }],
     rules: [{ ruleId: "fixture-us", controlId: "L0-DAT-04", appliesTo: { dataClasses: ["customer_financial"], jurisdictions: ["US"] },
       allowedJurisdictions: ["US"], acceptsTransferBasis: false }] });
-  mkdirSync(join(ws, "workspace"), { recursive: true });
-  writeFileSync(join(ws, "workspace", "n.txt"), "fixture");
   const registry = new AdapterRegistry();
   registry.register({ providerId: LOOP_PROVIDER, baseUrl: "https://fixture.invalid", credentialRef: null, models: [LOOP_MODEL],
     adapter: { ...scriptedAdapter([toolStep("child_read", "fs.read", JSON.stringify({ path: "workspace/n.txt" })), textStep("child done")]),
@@ -187,15 +209,18 @@ describe("visibleTools derive from the verified signed tools.yaml (buildRuntimeP
     expect(buildRuntimePolicy(new Map(), ["default"], { config: narrow, sha256: "ef".repeat(32) }).toolPipeline.visibleTools).toEqual(["delegate", "fs.read"]);
   });
 
-  it("the digest alone is not a weakening; a tool tools.yaml adds is", () => {
+  it("binding tools.yaml or narrowing it is not a weakening; widening it or dropping the binding is", () => {
     const profile = parseDeploymentProfile(PROFILE);
     const asOf = new Date().toISOString();
     const plain = compilePlan({ profile, catalog, asOf });
     const pinned = compilePlan({ profile, catalog, asOf, signedTools: { config: defaultToolsConfig(), sha256: "01".repeat(32) } });
-    expect(pinned.digest, "the digest binds into the plan").not.toBe(plain.digest);
-    expect(planWeakenings(plain, pinned)).toEqual([]);
     const wider = compilePlan({ profile, catalog, asOf, signedTools: { config: toolsWith(["delegate"]), sha256: "02".repeat(32) } });
+    expect(pinned.digest, "the digest binds into the plan").not.toBe(plain.digest);
+    expect(planWeakenings(plain, pinned), "binding a tools.yaml").toEqual([]);
+    expect(planWeakenings(wider, pinned), "a new digest that only narrows").toEqual([]);
     expect(planWeakenings(pinned, wider).join("\n")).toMatch(/toolPipeline\.visibleTools/);
+    // A plan compiled without tools.yaml (the default list) replacing one that binds it: the binding would vanish silently.
+    expect(planWeakenings(pinned, plain).join("\n")).toMatch(/toolPipeline\.toolsConfigSha256 "(01){32}" -> absent/);
   });
 });
 
@@ -216,20 +241,69 @@ describe("amc catalog compile reads tools.yaml only when it verifies (compileCat
     expect(plan.runtimePolicy.toolPipeline.toolsConfigSha256).toBe(sha256Hex(readFileSync(toolsConfigPath(ws))));
   });
 
-  for (const state of ["unsigned", "tampered"] as const) {
-    it(`tools.yaml ${state}, with delegate: the built-in default list, byte-identical to a compile without tools.yaml`, () => {
+  it("no tools.yaml: the built-in default list, byte-identical to a compile without signedTools", () => {
+    const ws = governedWorkspace();
+    rmSync(toolsConfigPath(ws));
+    rmSync(toolsConfigSigPath(ws), { force: true });
+    const { plan, visibleToolsSource } = compile(ws);
+    expect(visibleToolsSource).toEqual({ source: "defaults" });
+    expect(plan.runtimePolicy.toolPipeline.visibleTools).toEqual(DEFAULT_NAMES);
+    expect(plan.runtimePolicy.toolPipeline).not.toHaveProperty("toolsConfigSha256");
+    expect(plan.digest).toBe(compilePlan({ profile: parseDeploymentProfile(PROFILE), catalog, asOf: new Date().toISOString() }).digest);
+  });
+
+  /** Puts a signed tools.yaml listing delegate into a state that does not verify; returns the reason verification gives. */
+  const unverified: Record<string, (ws: string) => string> = {
+    "its signature removed": (ws) => { rmSync(toolsConfigSigPath(ws)); return "tools config signature missing"; },
+    "edited after signing": (ws) => { writeFileSync(toolsConfigPath(ws), YAML.stringify(toolsWith(["delegate", "workflow"]))); return "digest mismatch"; },
+    "signed by a key this workspace does not hold": (ws) => {
+      const bytes = readFileSync(toolsConfigPath(ws));
+      const foreign = generateKeyPairSync("ed25519").privateKey.export({ type: "pkcs8", format: "pem" }).toString();
+      writeFileSync(toolsConfigSigPath(ws), JSON.stringify({ digestSha256: sha256Hex(bytes), signature: signHexDigest(sha256Hex(bytes), foreign), signedTs: 0, signer: "auditor" }));
+      return "signature verification failed";
+    }
+  };
+  for (const [state, breakIt] of Object.entries(unverified)) {
+    it(`a tools.yaml ${state}: the compile refuses TOOLS_CONFIG_UNVERIFIED, naming the file, the reason and the fix`, () => {
       const ws = governedWorkspace();
       signTools(ws, ["delegate"]);
-      if (state === "unsigned") rmSync(toolsConfigSigPath(ws));
-      else writeFileSync(toolsConfigPath(ws), YAML.stringify(toolsWith(["delegate", "workflow"])));
-      const { plan, visibleToolsSource } = compile(ws);
-      expect(plan.runtimePolicy.toolPipeline.visibleTools).toEqual(DEFAULT_NAMES);
-      expect(plan.runtimePolicy.toolPipeline).not.toHaveProperty("toolsConfigSha256");
-      expect(visibleToolsSource).toMatchObject({ source: "defaults" });
-      const plain = compilePlan({ profile: parseDeploymentProfile(PROFILE), catalog, asOf: new Date().toISOString() });
-      expect(plan.digest).toBe(plain.digest);
+      const reason = breakIt(ws);
+      const error = refusal(() => compile(ws));
+      expect(error?.code).toBe("TOOLS_CONFIG_UNVERIFIED");
+      expect(error?.message).toContain(".amc/tools.yaml");
+      expect(error?.message).toContain(reason);
+      expect(error?.message).toMatch(/amc tools sign.*remove it/);
+      expect(error?.message, "no host path").not.toContain(ws);
     });
   }
+});
+
+describe("A4 Adapt compiles from the same verified tools.yaml (P1-10F)", () => {
+  const adapt = (ws: string) => understandAdapt({ workspace: ws, projectId: "a4p_p110f", workspaceId: "ws-p110f", agentId: "default", answers: [],
+    now: Date.parse("2026-10-18T00:00:00Z") });
+
+  it("a tools.yaml that does not verify: Understand reports TOOLS_CONFIG_UNVERIFIED, not COMPILE_FAILED", () => {
+    const ws = governedWorkspace();
+    signTools(ws, ["delegate"]);
+    writeFileSync(toolsConfigPath(ws), YAML.stringify(toolsWith(["delegate", "workflow"])));
+    const facts = adapt(ws);
+    expect(facts.plan).toBeNull();
+    expect(facts.compileError?.code).toBe("TOOLS_CONFIG_UNVERIFIED");
+  });
+
+  it("tools.yaml changed after Propose: Understand compiles another plan digest, and the revision's tools slot reads drifted", () => {
+    const ws = governedWorkspace();
+    signTools(ws, ["delegate"]);
+    const proposed = adapt(ws).plan!;
+    expect(proposed.runtimePolicy.toolPipeline.toolsConfigSha256).toBe(sha256Hex(readFileSync(toolsConfigPath(ws))));
+    expect(proposed.runtimePolicy.toolPipeline.visibleTools).toContain("delegate");
+    // What a revision binds at Propose; Build, decide, complete and the effect preamble refuse RESOURCE_DRIFTED on it.
+    const bound = { "signedConfigs.tools": RESOURCE_SLOTS["signedConfigs.tools"]!(ws, "default") };
+    expect(driftedSlots(ws, bound, "default")).toEqual([]);
+    signTools(ws, ["delegate", "workflow"]);
+    expect(adapt(ws).plan!.digest).not.toBe(proposed.digest);
+    expect(driftedSlots(ws, bound, "default")).toEqual(["signedConfigs.tools"]);
+  });
 });
 
 describe("delegate under an activated plan (P1-10F)", () => {
@@ -268,26 +342,18 @@ describe("delegate under an activated plan (P1-10F)", () => {
     } finally { run.toolset.close(); }
   });
 
-  it("an unsigned tools.yaml at compile: the activated plan keeps the default list, and delegate stays refused once it is signed", async () => {
+  it("one verified read of tools.yaml per guard pass decides the plan's pin, the allowlist and the native tool identity", async () => {
     const ws = governedWorkspace();
     signTools(ws, ["delegate"]);
-    rmSync(toolsConfigSigPath(ws));
-    const { signed, visibleToolsSource } = compile(ws, { requestReview: true });
-    expect(visibleToolsSource).toEqual({ source: "defaults", reason: "tools config signature missing" });
-    // The approval engine refuses decisions while tools.yaml does not verify, so it is signed before the review.
-    signToolsConfig(ws);
-    const approvalId = signed.review.approvalRequestId!;
-    for (const userId of ["owner-1", "owner-2"]) {
-      decideApprovalForIntent({ workspace: ws, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE",
-        reason: "P1-10F fixture plan review", userId, username: userId, userRoles: ["OWNER"] });
-    }
-    activateControlPlan({ workspace: ws, signed, approvalRequestId: approvalId, reviewAgentId: "default" });
+    activate(ws);
     const run = compose(ws, ownerLease(ws).token);
     try {
-      expect(run.offered()).not.toContain("delegate");
-      expect(await run.call("delegate", DELEGATE)).toContain(HIDDEN);
-      expect(run.children).toEqual([]);
-    } finally { run.toolset.close(); }
+      guardReads.path = toolsConfigPath(ws);
+      guardReads.count = 0;
+      const text = await run.call("fs.read", { path: "workspace/n.txt" });
+      expect(text).toContain('"outcome":"OK"');
+      expect(guardReads.count, "tools.yaml reads inside the guard pass").toBe(1);
+    } finally { guardReads.path = null; run.toolset.close(); }
   });
 
   it("tools.yaml changed after activation: every call refused until the plan is recompiled and reactivated", async () => {

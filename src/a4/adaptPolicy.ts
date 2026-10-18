@@ -16,6 +16,7 @@ import type { CompiledPlan, DeploymentProfile, PlanDiff, SignedPlan } from "../c
 import { digestOf } from "../catalog/digest.js";
 import { loadCatalog, type LoadedCatalog } from "../catalog/loader.js";
 import { buildCatalogLock } from "../catalog/lockfile.js";
+import { verifiedSignedTools } from "../catalog/signedTools.js";
 import { loadApprovalConsumed } from "../approvals/approvalChainStore.js";
 import type { ApprovalRequestInput } from "../approvals/approvalEngine.js";
 import { loadVerifiedApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
@@ -139,7 +140,7 @@ export function understandAdapt(input: { workspace: string; projectId: string; w
   try {
     profile = parseDeploymentProfile(raw);
     catalog = loadCatalog();
-    plan = compilePlan({ profile, catalog, asOf: new Date(input.now).toISOString() });
+    plan = compilePlan({ profile, catalog, asOf: new Date(input.now).toISOString(), ...verifiedSignedTools(input.workspace) });
   } catch (error) {
     compileError = { code: errorCodeOf(error, "COMPILE_FAILED"), message: (error instanceof Error ? error.message : String(error)).slice(0, 500) };
   }

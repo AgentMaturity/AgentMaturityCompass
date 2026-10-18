@@ -11,7 +11,6 @@ import { dirname, join, resolve } from "node:path";
 import chalk from "chalk";
 import type { Command } from "commander";
 import { assertOutsideSignedConfigTree } from "../domains/operatingProfiles/operatingProfileEmit.js";
-import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { loadTrustContext } from "../trust/trustContext.js";
@@ -21,6 +20,7 @@ import { renderPlanDiffMarkdown } from "./compiler/diff.js";
 import { signPlan } from "./compiler/sign.js";
 import type { CompiledPlan, SignedPlan } from "./compiler/types.js";
 import { loadCatalog } from "./loader.js";
+import { verifiedSignedTools } from "./signedTools.js";
 import { verifyCatalogLock } from "./lockfile.js";
 
 interface CompileFlags { profile: string; previous?: string; lock?: string; out?: string; json?: boolean; requestReview?: boolean; allowWeakening?: boolean; activate?: string }
@@ -51,13 +51,10 @@ export function compileCatalogPlan(workspace: string, opts: CompileFlags) {
   }
   const previous = opts.previous ? readSignedPlan(resolve(workspace, opts.previous)) : null;
   const now = new Date();
-  // P1-10F: visible tools come from .amc/tools.yaml only when it verifies (bytes, signature and schema from one read);
-  // otherwise from the built-in default list, which fails closed.
-  const tools = loadVerifiedToolsConfigSnapshot(workspace);
-  const signedTools = tools.signatureValid && tools.config && tools.digestSha256 ? { config: tools.config, sha256: tools.digestSha256 } : null;
-  const visibleToolsSource = signedTools ? { source: "signed-tools-yaml" as const, sha256: signedTools.sha256 }
-    : { source: "defaults" as const, reason: tools.reason ?? "tools config did not verify" };
-  const plan = compilePlan({ profile, catalog, asOf: now.toISOString(), ...(signedTools ? { signedTools } : {}),
+  // P1-10F: visible tools come from the verified .amc/tools.yaml; with none, the built-in default list; one that does not verify refuses.
+  const tools = verifiedSignedTools(workspace);
+  const visibleToolsSource = tools.signedTools ? { source: "signed-tools-yaml" as const, sha256: tools.signedTools.sha256 } : { source: "defaults" as const };
+  const plan = compilePlan({ profile, catalog, asOf: now.toISOString(), ...tools,
     ...(profile.mergeExceptions?.length ? { mergeExceptionTrust: loadTrustContext({ now }) } : {}) });
   const outDir = resolve(workspace, opts.out ?? join("amc-control-plans", plan.profile.profileId, plan.digest.slice("sha256:".length, "sha256:".length + 12)));
   try {
@@ -96,7 +93,7 @@ export function runCatalogCompile(workspace: string, opts: CompileFlags): number
     for (const e of plan.mergeExceptionRejected ?? []) console.log(chalk.yellow(`  rejected station exception ${e.id} (${e.mergeKey}): ${e.reason}`));
     for (const u of plan.unsupported) console.log(chalk.gray(`  unsupported ${u.controlId} (${u.reason}): ${u.detail}`));
     console.log(visibleToolsSource.source === "defaults"
-      ? chalk.yellow(`  visible tools: the built-in default list (.amc/tools.yaml: ${visibleToolsSource.reason})`)
+      ? chalk.yellow("  visible tools: the built-in default list (no .amc/tools.yaml)")
       : `  visible tools: the signed .amc/tools.yaml (sha256 ${visibleToolsSource.sha256.slice(0, 12)}); once active, a different tools.yaml refuses every call until you recompile and reactivate`);
     for (const w of weakenings) console.log(chalk.yellow(`  weakens (allowed) ${w}`));
     console.log(`  review: pending${signed.review.approvalRequestId ? ` (approval request ${signed.review.approvalRequestId})` : "; no approval requested (--request-review)"}`);
