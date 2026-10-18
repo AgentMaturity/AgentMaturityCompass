@@ -17,6 +17,7 @@ import { startGateway } from "../src/gateway/server.js";
 import { initGatewayConfig, verifyGatewayConfigSignature } from "../src/gateway/config.js";
 import { issueLeaseForCli, verifyLeaseForCli } from "../src/leases/leaseCli.js";
 import { leasePayloadSchema } from "../src/leases/leaseSchema.js";
+import { initUsersConfig } from "../src/auth/authApi.js";
 import { workspaceIdFromDirectory } from "../src/workspaces/workspaceId.js";
 import { evidenceProducer, effectiveTrustTier, eventMeta, readerTrustFor } from "../src/claims/evidenceProvenance.js";
 import { runDiagnostic } from "../src/diagnostic/runner.js";
@@ -311,6 +312,19 @@ describe("other synthetic producers carry the label", () => {
       claimKind: "synthetic_example", agentId: customAgentId, workspaceId: workspaceIdFromDirectory(dir)
     });
     expect(verifyGatewayConfigSignature(dir).valid).toBe(true);
+  });
+
+  test("a synthetic_example lease minted for an authenticated principal keeps both signed fields (P0-15 with P1-78)", () => {
+    const dir = tempDir("amc-p015-principal-");
+    initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
+    const { owner } = initUsersConfig({ workspace: dir, username: "p015-owner", password: "p015-fixture-password" });
+    const lease = issueLeaseForCli({ workspace: dir, workspaceId: workspaceIdFromDirectory(dir), agentId: DEMO_AGENT_ID,
+      claimKind: "synthetic_example", principalKey: `LOCAL_USER:${owner.userId}`, ttl: "15m", scopes: "gateway:llm",
+      routes: "/local", models: "gpt-4o-demo", rpm: 60, tpm: 200000, maxCostUsdPerDay: null });
+    const verification = verifyLeaseForCli({ workspace: dir, token: lease.token });
+    expect(verification.ok).toBe(true);
+    expect(leasePayloadSchema.parse(verification.payload)).toMatchObject({
+      claimKind: "synthetic_example", principal: { userId: owner.userId }, agentId: DEMO_AGENT_ID });
   });
 
   test("lab-simulate placeholder results carry a synthetic_example envelope", async () => {

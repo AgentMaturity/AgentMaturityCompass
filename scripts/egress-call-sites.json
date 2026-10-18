@@ -164,9 +164,9 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/demo/demoRun.ts:375:1",
+      "siteId": "src/demo/demoRun.ts:378:1",
       "path": "src/demo/demoRun.ts",
-      "line": 375,
+      "line": 378,
       "call": "fetch(",
       "status": "gated",
       "reason": "Released no-vault internal runDemo caller installs prepared workspace scope; private helper captures it, prepares same-endpoint manual-redirect gateway POST, and gates bridge immediately before fetch with null facts/caller-declared demo actor. Typed denial propagates without a complete run result. Source-only: frozen CLI caller cli-late-stage-commands.ts:348 remains deferred for explicit workspace wiring, and external library callers own their scope. Earlier temp setup/lease/servers/requests can have effects; synthetic output, cleanup and transport/region limits remain unqualified."
@@ -180,9 +180,9 @@
       "reason": "Doctor rules capture one bridge probe URL and check known workspace before diagnostic lease issuance; both sequential carrier POSTs pass that scope to helper. Copied headers/prepared native options and body precede a final same-URL bridge gate; null resource facts, caller-declared agent header (system if absent), no independent actor/lease proof. Typed refusal rejects before connection mapping and becomes residency FAIL, not invalid config. Source-only; a late denial can follow lease/first POST and earlier local effects; ordinary deadline/draining and DNS/HTTP/proof limitations remain."
     },
     {
-      "siteId": "src/domains/industryPackEntitlement.ts:489:1",
+      "siteId": "src/domains/industryPackEntitlement.ts:492:1",
       "path": "src/domains/industryPackEntitlement.ts",
-      "line": 489,
+      "line": 492,
       "call": "fetcher(",
       "status": "gated",
       "reason": "Online activation POST uses captured explicit-or-ALS scope, kept separate from the persistence cwd fallback, and checks network-tool residency immediately before same-endpoint injected fetch with manual redirects. Key and expiry are captured; license classes/purpose remain unknown. Local-valid shortcut and verifier are unchanged. Source-only; trusted injected fetch, DNS, response parsing/caps, environment drift and post-dispatch persistence limits remain."
@@ -268,17 +268,17 @@
       "reason": "Both final gateway HTTP paths check the trusted workspace registry before every attempt, outside breaker accounting. CONNECT tunnels are listed separately."
     },
     {
-      "siteId": "src/gateway/server.ts:1014:1",
+      "siteId": "src/gateway/server.ts:1016:1",
       "path": "src/gateway/server.ts",
-      "line": 1014,
+      "line": 1016,
       "call": "netConnect(",
       "status": "gated",
       "reason": "Strict CONNECT authority parsing supplies the actual socket host and port and an HTTPS root registry locator. After DNS and allowlist admission, a final synchronous checkEgress precedes netConnect using the trusted gateway workspace, lease-verified agent, network-tool channel and explicit unknown data classes. Typed residency refusal returns before socket creation. This seam does not prove TLS, an encrypted request path or payload classification, or physical region."
     },
     {
-      "siteId": "src/gateway/server.ts:1760:1",
+      "siteId": "src/gateway/server.ts:1766:1",
       "path": "src/gateway/server.ts",
-      "line": 1760,
+      "line": 1766,
       "call": "httpRequest(",
       "status": "exempt",
       "reason": "gatewayStatus probes the gateway health endpoint with a GET and no protected agent body or credentials; final provider requests are separate gated rows."
