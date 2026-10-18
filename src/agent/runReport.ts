@@ -283,7 +283,9 @@ export async function verifyAgentRun(workspace: string, sessionId: string, trust
       ledger.close();
     }
   }
-  const requests = deriveSessionRequests({ workspace, sessionId }).map((derivation) => ({
+  // P1-38: a pi-ai request re-derives only through the pinned library, loaded only when this session used it.
+  const piEncoders = await (await import("../llm/providers/piAi/piAiAdapter.js")).piAiDerivationEncoders(workspace, sessionId);
+  const requests = deriveSessionRequests({ workspace, sessionId, ...(piEncoders === null ? {} : { encoders: piEncoders }) }).map((derivation) => ({
     headerEventId: derivation.headerEventId,
     status: derivation.status,
     detail: derivation.detail

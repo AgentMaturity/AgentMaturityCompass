@@ -1,0 +1,134 @@
+[
+  {
+    "cmd": "pnpm install --frozen-lockfile",
+    "exit": 0,
+    "durationMs": 2503,
+    "tail": "│   to run scripts.                                                            │\n│                                                                              │\n╰──────────────────────────────────────────────────────────────────────────────╯\nDone in 2.3s using pnpm v10.33.0"
+  },
+  {
+    "cmd": "npm run -s build",
+    "exit": 0,
+    "durationMs": 150810,
+    "tail": "bundle-kernel: dist/kernel/amcRuntime.js 385 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp"
+  },
+  {
+    "cmd": "npm run -s typecheck",
+    "exit": 0,
+    "durationMs": 38966,
+    "tail": ""
+  },
+  {
+    "cmd": "npm run -s typecheck:tests",
+    "exit": 0,
+    "durationMs": 73433,
+    "tail": ""
+  },
+  {
+    "cmd": "npm run -s lint",
+    "exit": 0,
+    "durationMs": 6033,
+    "tail": "Lint contract passed: three unsafe patterns rejected; safe counterparts accepted.\ncheck-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 10; 16 random marker(s); 0 pending entries."
+  },
+  {
+    "cmd": "npm run -s check:counts",
+    "exit": 0,
+    "durationMs": 1612,
+    "tail": "Published source counts match the repository; this check does not execute tests."
+  },
+  {
+    "cmd": "npm run -s check:docs-drift",
+    "exit": 0,
+    "durationMs": 749,
+    "tail": "Docs drift check passed (336 files scanned; truth claims and commands checked in 249 public files; 4 logged exceptions)."
+  },
+  {
+    "cmd": "npm run -s check:freeze -- --base-ref int",
+    "exit": 0,
+    "durationMs": 3456,
+    "tail": "Freeze guard passed: {\"cliCommandPaths\":1255,\"cliInventoryPaths\":1255,\"stationPacks\":41,\"stationPackQuestions\":632}"
+  },
+  {
+    "cmd": "npm run -s check:architecture-boundaries",
+    "exit": 0,
+    "durationMs": 2921,
+    "tail": "  },\n  \"prefixBranchCount\": 2,\n  \"failures\": []\n}"
+  },
+  {
+    "cmd": "npm run -s check:gates",
+    "exit": 0,
+    "durationMs": 445,
+    "tail": "| L5 | 0 | 0 | 264 |\n\n11 registered emitters, 4 evidence maps, 281 literal audit emissions classified, 9 evaluated gate requirements checked.\ncheck:gates: every evaluated gate requirement has a registered, non-synthetic emitter."
+  },
+  {
+    "cmd": "npm run -s check:schemas",
+    "exit": 0,
+    "durationMs": 892,
+    "tail": "gen-spec-schemas: 41 schemas current; 80 contract fixtures agree"
+  },
+  {
+    "cmd": "npm run -s check:api-ref",
+    "exit": 0,
+    "durationMs": 276,
+    "tail": "docs/API_REFERENCE.md matches the source."
+  },
+  {
+    "cmd": "npm run -s check:threat-model",
+    "exit": 0,
+    "durationMs": 336,
+    "tail": "check-threat-model: ok (/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-38/docs/security/channel-map.json)"
+  },
+  {
+    "cmd": "npm run -s check:duplicates",
+    "exit": 0,
+    "durationMs": 1270,
+    "tail": "{\"scan\":\"duplicates\",\"baseline\":1223,\"current\":1240,\"new\":0,\"stale\":0,\"accepted\":17}\nNo source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
+  },
+  {
+    "cmd": "npm run -s check:dead-code",
+    "exit": 1,
+    "durationMs": 5346,
+    "tail": "{\"scan\":\"dead-code\",\"baseline\":2704,\"current\":2719,\"new\":1,\"stale\":0,\"accepted\":14}\nnew dead-code finding a3d1c7aa0e27f5cb5d123244ab650dff1530805d3c8ee37a091e16dd050a717f: package.json devDependencies {\"name\":\"@earendil-works/pi-ai\"}\nFix each new finding, or accept one: npm run quality:baseline -- dead-code --accept <id> --reason \"<why, 20+ characters>\"\nNo source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
+  },
+  {
+    "cmd": "npm run -s check:third-party-notices",
+    "exit": 0,
+    "durationMs": 276,
+    "tail": "THIRD_PARTY_NOTICES is current (10 vendored packages)."
+  },
+  {
+    "cmd": "npm run -s check:capability-matrix",
+    "exit": 0,
+    "durationMs": 60437,
+    "tail": "check:capability-matrix: the committed matrix matches a fresh run of the contract tests"
+  },
+  {
+    "cmd": "npm run -s audit:runtime",
+    "exit": 0,
+    "durationMs": 1225,
+    "tail": "No known vulnerabilities found"
+  },
+  {
+    "cmd": "npm run -s check:packed-install",
+    "exit": 0,
+    "durationMs": 142712,
+    "tail": "ok   amc init --coding (installed bin) (1.9s)\nok   SDK quickstart (installed package; stub provider, synthetic) (3.2s)\nok   installed quickstart reached a verified synthetic action in 5.1s (amc init --coding included)\nskip real-provider smoke: AMC_PACKED_SMOKE_PROVIDER not set (keyless run only)"
+  },
+  {
+    "cmd": "npm run -s check:dead-code",
+    "exit": 0,
+    "durationMs": 8047,
+    "tail": "{\"scan\":\"dead-code\",\"baseline\":2704,\"current\":2719,\"new\":0,\"stale\":0,\"accepted\":15}\nNo source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
+  },
+  {
+    "cmd": "npx vitest run <56 existing test files importing the changed modules> tests/piAi tests/nativeCapabilityContract.test.ts tests/capabilityMatrix.test.ts",
+    "exit": 1,
+    "durationMs": 389000,
+    "tail": "Test Files 3 failed | 59 passed (62); Tests 4 failed | 992 passed (996); failures: hook/test timeouts under load"
+  },
+  {
+    "cmd": "npx vitest run tests/cliDelegateFlag.test.ts tests/nativeShellComposition.test.ts tests/nativeValidationOutcomeSurfaces.test.ts",
+    "exit": 0,
+    "durationMs": 78000,
+    "tail": "Test Files 3 passed (3); Tests 65 passed (65)"
+  }
+]
