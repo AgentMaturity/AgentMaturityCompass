@@ -1,270 +1,254 @@
 # AMC Compliance Report (ISO_42001)
 
-> **Pre-2.0.0 sample output; do not cite.** An AMC version before 2.0.0 generated this report. That version passed "no denied audit events" on an empty ledger, counted any event of a listed type for any control, and downgraded untrusted maps to `PARTIAL`, so the `PARTIAL` statuses and the coverage score below overstate the evidence. From 2.0.0, a category without control-bound evidence is `NOT_EVALUATED` and the coverage score is not evaluated (`null`) when no category was evaluated. Regenerate the report with `amc compliance report`. A compliance report is evidence of conformity, not a certification.
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
+- Mappings: experimental: drafted and refuted by AI agents, not signed off by a named expert (D-08 pending). A result for another framework never sets a result here.
+- Flag: ISO/IEC 42005 descoped 2026-10-04 (iso.org unreachable): an alias with zero mapped controls, status "unverified: source unreachable". Its three categories are listed, never evaluated or counted. The ISO 42006 category is an AMC signal, not a clause mapping.
 - Agent: default
-- Window: 2026-02-13T08:51:05.826Z -> 2026-03-15T08:51:05.826Z
-- Config trusted: NO (compliance maps signature missing)
-- Trust coverage: OBSERVED 100.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
-- Coverage score: 45.5% (S:0 P:10 M:1 U:0)
+- Window: 2026-09-18T08:36:39.355Z -> 2026-10-18T08:36:39.355Z
+- Config trusted: YES
+- Trust coverage: OBSERVED 0.0% | ATTESTED 0.0% | SELF_REPORTED 0.0%
+- Coverage: not evaluated (0 of 8 categories passed or failed) (S:0 P:0 M:0 N:8 U:0)
+- Descoped: 3 categories are listed but not evaluated or counted (licensed text unavailable).
+- Full hashes remain available in JSON reports: `amc compliance report --json`.
+
+## Status and Evidence Drilldown
+
+- Each category carries five status dimensions (result, evidence, enforcement, review, applicability) and a claim kind, decided from the evidence this report admitted; the claim line under each heading prints them.
+- SATISFIED (result pass): every requirement passed on admitted, control-bound AMC runtime evidence, the compliance maps are trusted, and a compiled plan records that the control applies.
+- MISSING (result fail): an admitted record shows a requirement failed (a denied audit event or a failing sealed assurance run).
+- NOT_EVALUATED: evidence is absent, untrusted, stale, contradictory or outside the window, the maps are untrusted, or no applicability decision is recorded; this is not a pass.
+- PARTIAL and UNKNOWN appear only in reports written by earlier versions; neither earns coverage credit.
+- Hash drill-down: match the `eventId` below in the JSON report to inspect the full `eventHash` and evidence metadata.
 
 ## Categories
 
-### Clause 4 Context (PARTIAL)
+### Clause 4 Context (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 AIMS context, stakeholder expectations, and boundary definition are documented.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
-- Compliance maps signature invalid; green status is downgraded to PARTIAL.
+- no control-bound evidence for iso42001_clause_4_context in window
+- iso42001_clause_4_context-E1: fewer than 1 admitted records in the window
+- not evaluated: no compiled plan decides this control's applicability yet
 Evidence references:
-- 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- 37eef13c-1e36-40bd-a4b5-75a5f0b77db0 (audit) hash=5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f
-- e0f6b4f8-3609-403e-84a9-8f4567c4ffe0 (audit) hash=f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100
-- 6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c (audit) hash=a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034
-- cb07bf50-d272-4425-9c7a-213a1af6a927 (audit) hash=8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0
-- b6df717a-9223-47eb-a72b-1b920b694a2f (audit) hash=32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- 008a35a2-7e22-4bcf-b78a-27fd01a3c32a (audit) hash=c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f
-- d37123d6-88ed-45b4-9d33-12cfda21932d (audit) hash=d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059
-- a4fc32d4-e5d2-419a-9520-9c02b5fc5d35 (audit) hash=e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38
-- c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3 (audit) hash=5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c
+- none
 What would make this SATISFIED?
-- No additional evidence required for this requirement
+- Capture review, artifact, audit events bound to 'iso42001_clause_4_context' (meta.controlIds) from AMC runtime with OBSERVED trust tier
+- A compiled plan must record that this control applies before it can pass
 
-### Clause 5 Leadership (PARTIAL)
+### Clause 5 Leadership (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 Leadership commitment, accountability assignment, and governance controls are evidenced.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
-- Assurance pack 'governance_bypass' score 100 meets threshold
-- Compliance maps signature invalid; green status is downgraded to PARTIAL.
+- no control-bound evidence for iso42001_clause_5_leadership in window
+- iso42001_clause_5_leadership-E1: fewer than 1 admitted records in the window
+- not evaluated: no compiled plan decides this control's applicability yet
+- No sealed assurance run for 'governance_bypass' in window
+- iso42001_clause_5_leadership-E2: fewer than 1 admitted records in the window
 Evidence references:
-- 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- 37eef13c-1e36-40bd-a4b5-75a5f0b77db0 (audit) hash=5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f
-- e0f6b4f8-3609-403e-84a9-8f4567c4ffe0 (audit) hash=f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100
-- 6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c (audit) hash=a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034
-- cb07bf50-d272-4425-9c7a-213a1af6a927 (audit) hash=8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0
-- b6df717a-9223-47eb-a72b-1b920b694a2f (audit) hash=32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- 008a35a2-7e22-4bcf-b78a-27fd01a3c32a (audit) hash=c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f
-- d37123d6-88ed-45b4-9d33-12cfda21932d (audit) hash=d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059
-- a4fc32d4-e5d2-419a-9520-9c02b5fc5d35 (audit) hash=e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38
-- c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3 (audit) hash=5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c
+- none
 What would make this SATISFIED?
-- No additional evidence required for this requirement
-- Improve 'governance_bypass' score to >= 80 and keep *_SUCCEEDED <= 0
+- Capture audit, tool_action events bound to 'iso42001_clause_5_leadership' (meta.controlIds) from AMC runtime with OBSERVED trust tier
+- Run assurance pack 'governance_bypass' with score >= 80 and *_SUCCEEDED <= 0
+- A compiled plan must record that this control applies before it can pass
 
-### Clause 6 Planning (PARTIAL)
+### Clause 6 Planning (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 Risk/opportunity planning and AI objectives are tracked with measurable controls.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
-- Compliance maps signature invalid; green status is downgraded to PARTIAL.
+- no control-bound evidence for iso42001_clause_6_planning in window
+- iso42001_clause_6_planning-E1: fewer than 1 admitted records in the window
+- not evaluated: no compiled plan decides this control's applicability yet
 Evidence references:
-- 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- 37eef13c-1e36-40bd-a4b5-75a5f0b77db0 (audit) hash=5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f
-- e0f6b4f8-3609-403e-84a9-8f4567c4ffe0 (audit) hash=f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100
-- 6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c (audit) hash=a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034
-- cb07bf50-d272-4425-9c7a-213a1af6a927 (audit) hash=8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0
-- b6df717a-9223-47eb-a72b-1b920b694a2f (audit) hash=32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- 008a35a2-7e22-4bcf-b78a-27fd01a3c32a (audit) hash=c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f
-- d37123d6-88ed-45b4-9d33-12cfda21932d (audit) hash=d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059
-- a4fc32d4-e5d2-419a-9520-9c02b5fc5d35 (audit) hash=e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38
-- c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3 (audit) hash=5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c
+- none
 What would make this SATISFIED?
-- No additional evidence required for this requirement
+- Capture audit, metric events bound to 'iso42001_clause_6_planning' (meta.controlIds) from AMC runtime with OBSERVED trust tier
+- A compiled plan must record that this control applies before it can pass
 
-### Clause 7 Support (MISSING)
+### Clause 7 Support (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 Competence, documented information, and support resources are maintained as evidence artifacts.
 
 Deterministic reasons:
-- No evidence events found for types: artifact, review
+- no control-bound evidence for iso42001_clause_7_support in window
+- iso42001_clause_7_support-E1: fewer than 1 admitted records in the window
+- not evaluated: no compiled plan decides this control's applicability yet
 Evidence references:
 - none
 What would make this SATISFIED?
-- Capture artifact, review events with OBSERVED trust tier
+- Capture artifact, review events bound to 'iso42001_clause_7_support' (meta.controlIds) from AMC runtime with OBSERVED trust tier
+- A compiled plan must record that this control applies before it can pass
 
-### Clause 8 Operation (PARTIAL)
+### Clause 8 Operation (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 Operational lifecycle controls and risk treatment are evidence-linked during runtime execution.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
-- No denied audit events found
-- Compliance maps signature invalid; green status is downgraded to PARTIAL.
+- no control-bound evidence for iso42001_clause_8_operation in window
+- iso42001_clause_8_operation-E1: fewer than 1 admitted records in the window
+- not evaluated: no compiled plan decides this control's applicability yet
+- no agent activity in window; absence of violations proves nothing
+- iso42001_clause_8_operation-E2: fewer than 1 admitted records in the window
 Evidence references:
-- 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- 37eef13c-1e36-40bd-a4b5-75a5f0b77db0 (audit) hash=5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f
-- e0f6b4f8-3609-403e-84a9-8f4567c4ffe0 (audit) hash=f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100
-- 6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c (audit) hash=a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034
-- cb07bf50-d272-4425-9c7a-213a1af6a927 (audit) hash=8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0
-- b6df717a-9223-47eb-a72b-1b920b694a2f (audit) hash=32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- 008a35a2-7e22-4bcf-b78a-27fd01a3c32a (audit) hash=c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f
-- d37123d6-88ed-45b4-9d33-12cfda21932d (audit) hash=d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059
-- a4fc32d4-e5d2-419a-9520-9c02b5fc5d35 (audit) hash=e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38
-- c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3 (audit) hash=5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c
+- none
 What would make this SATISFIED?
-- No additional evidence required for this requirement
+- Capture tool_action, tool_result, audit events bound to 'iso42001_clause_8_operation' (meta.controlIds) from AMC runtime with OBSERVED trust tier
+- Capture AMC runtime evidence for this agent in the window
+- A compiled plan must record that this control applies before it can pass
 
-### Clause 9 Performance Evaluation (PARTIAL)
+### Clause 9 Performance Evaluation (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 Monitoring, measurement, and internal evaluation evidence are continuously produced.
 
 Deterministic reasons:
-- Found 12516 matching events with observed ratio 1.000
-- Assurance pack 'hallucination' score 100 meets threshold
-- Compliance maps signature invalid; green status is downgraded to PARTIAL.
+- no control-bound evidence for iso42001_clause_9_performance_evaluation in window
+- iso42001_clause_9_performance_evaluation-E1: fewer than 1 admitted records in the window
+- not evaluated: no compiled plan decides this control's applicability yet
+- No sealed assurance run for 'hallucination' in window
+- iso42001_clause_9_performance_evaluation-E2: fewer than 1 admitted records in the window
 Evidence references:
-- 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- 37eef13c-1e36-40bd-a4b5-75a5f0b77db0 (audit) hash=5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f
-- e0f6b4f8-3609-403e-84a9-8f4567c4ffe0 (audit) hash=f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100
-- 6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c (audit) hash=a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034
-- cb07bf50-d272-4425-9c7a-213a1af6a927 (audit) hash=8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0
-- b6df717a-9223-47eb-a72b-1b920b694a2f (audit) hash=32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- 008a35a2-7e22-4bcf-b78a-27fd01a3c32a (audit) hash=c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f
-- d37123d6-88ed-45b4-9d33-12cfda21932d (audit) hash=d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059
-- a4fc32d4-e5d2-419a-9520-9c02b5fc5d35 (audit) hash=e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38
-- c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3 (audit) hash=5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c
+- none
 What would make this SATISFIED?
-- No additional evidence required for this requirement
-- Improve 'hallucination' score to >= 75 and keep *_SUCCEEDED <= 0
+- Capture metric, test, audit events bound to 'iso42001_clause_9_performance_evaluation' (meta.controlIds) from AMC runtime with OBSERVED trust tier
+- Run assurance pack 'hallucination' with score >= 75 and *_SUCCEEDED <= 0
+- A compiled plan must record that this control applies before it can pass
 
-### Clause 10 Improvement (PARTIAL)
+### Clause 10 Improvement (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 Nonconformity remediation and continual-improvement loops are closed with deterministic evidence.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
-- No denied audit events found
-- Compliance maps signature invalid; green status is downgraded to PARTIAL.
+- no control-bound evidence for iso42001_clause_10_improvement in window
+- iso42001_clause_10_improvement-E1: fewer than 1 admitted records in the window
+- not evaluated: no compiled plan decides this control's applicability yet
+- no agent activity in window; absence of violations proves nothing
+- iso42001_clause_10_improvement-E2: fewer than 1 admitted records in the window
 Evidence references:
-- 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- 37eef13c-1e36-40bd-a4b5-75a5f0b77db0 (audit) hash=5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f
-- e0f6b4f8-3609-403e-84a9-8f4567c4ffe0 (audit) hash=f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100
-- 6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c (audit) hash=a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034
-- cb07bf50-d272-4425-9c7a-213a1af6a927 (audit) hash=8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0
-- b6df717a-9223-47eb-a72b-1b920b694a2f (audit) hash=32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- 008a35a2-7e22-4bcf-b78a-27fd01a3c32a (audit) hash=c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f
-- d37123d6-88ed-45b4-9d33-12cfda21932d (audit) hash=d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059
-- a4fc32d4-e5d2-419a-9520-9c02b5fc5d35 (audit) hash=e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38
-- c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3 (audit) hash=5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c
+- none
 What would make this SATISFIED?
-- No additional evidence required for this requirement
+- Capture audit, tool_action events bound to 'iso42001_clause_10_improvement' (meta.controlIds) from AMC runtime with OBSERVED trust tier
+- Capture AMC runtime evidence for this agent in the window
+- A compiled plan must record that this control applies before it can pass
 
-### ISO 42005 Impact Assessment (PARTIAL)
+### ISO 42005 Impact Assessment (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 Impact assessment scope, stakeholder boundary, and foreseeable misuse are captured.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
-- Compliance maps signature invalid; green status is downgraded to PARTIAL.
+- not evaluated: descoped (licensed text unavailable)
 Evidence references:
-- 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- 37eef13c-1e36-40bd-a4b5-75a5f0b77db0 (audit) hash=5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f
-- e0f6b4f8-3609-403e-84a9-8f4567c4ffe0 (audit) hash=f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100
-- 6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c (audit) hash=a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034
-- cb07bf50-d272-4425-9c7a-213a1af6a927 (audit) hash=8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0
-- b6df717a-9223-47eb-a72b-1b920b694a2f (audit) hash=32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- 008a35a2-7e22-4bcf-b78a-27fd01a3c32a (audit) hash=c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f
-- d37123d6-88ed-45b4-9d33-12cfda21932d (audit) hash=d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059
-- a4fc32d4-e5d2-419a-9520-9c02b5fc5d35 (audit) hash=e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38
-- c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3 (audit) hash=5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c
+- none
 What would make this SATISFIED?
-- No additional evidence required for this requirement
+- A licensed copy of the standard and a named expert's review (D-08)
 
-### ISO 42005 Impact Assessment (PARTIAL)
+### ISO 42005 Impact Assessment (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 Impact severity, likelihood, and uncertainty are quantified and regularly re-evaluated.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
-- Compliance maps signature invalid; green status is downgraded to PARTIAL.
+- not evaluated: descoped (licensed text unavailable)
 Evidence references:
-- 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- 37eef13c-1e36-40bd-a4b5-75a5f0b77db0 (audit) hash=5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f
-- e0f6b4f8-3609-403e-84a9-8f4567c4ffe0 (audit) hash=f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100
-- 6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c (audit) hash=a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034
-- cb07bf50-d272-4425-9c7a-213a1af6a927 (audit) hash=8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0
-- b6df717a-9223-47eb-a72b-1b920b694a2f (audit) hash=32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- 008a35a2-7e22-4bcf-b78a-27fd01a3c32a (audit) hash=c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f
-- d37123d6-88ed-45b4-9d33-12cfda21932d (audit) hash=d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059
-- a4fc32d4-e5d2-419a-9520-9c02b5fc5d35 (audit) hash=e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38
-- c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3 (audit) hash=5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c
+- none
 What would make this SATISFIED?
-- No additional evidence required for this requirement
+- A licensed copy of the standard and a named expert's review (D-08)
 
-### ISO 42005 Impact Assessment (PARTIAL)
+### ISO 42005 Impact Assessment (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 Traceability from identified impacts to mitigations and closure evidence is maintained.
 
 Deterministic reasons:
-- Found 7135 matching events with observed ratio 1.000
-- Compliance maps signature invalid; green status is downgraded to PARTIAL.
+- not evaluated: descoped (licensed text unavailable)
 Evidence references:
-- 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- 37eef13c-1e36-40bd-a4b5-75a5f0b77db0 (audit) hash=5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f
-- e0f6b4f8-3609-403e-84a9-8f4567c4ffe0 (audit) hash=f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100
-- 6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c (audit) hash=a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034
-- cb07bf50-d272-4425-9c7a-213a1af6a927 (audit) hash=8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0
-- b6df717a-9223-47eb-a72b-1b920b694a2f (audit) hash=32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- 008a35a2-7e22-4bcf-b78a-27fd01a3c32a (audit) hash=c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f
-- d37123d6-88ed-45b4-9d33-12cfda21932d (audit) hash=d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059
-- a4fc32d4-e5d2-419a-9520-9c02b5fc5d35 (audit) hash=e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38
-- c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3 (audit) hash=5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c
+- none
 What would make this SATISFIED?
-- No additional evidence required for this requirement
+- A licensed copy of the standard and a named expert's review (D-08)
 
-### ISO 42006 Conformity Evidence (PARTIAL)
+### ISO 42006 Conformity Evidence (NOT_EVALUATED)
+
+**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
 Certification-ready, machine-readable audit evidence packages are generated and verifiable.
 
 Deterministic reasons:
-- Found 12516 matching events with observed ratio 1.000
-- Found denied audit events: TRACE_RECEIPT_INVALID, TRACE_EVENT_HASH_NOT_FOUND, CONFIG_SIGNATURE_INVALID
+- no control-bound evidence for iso42006_conformity_evidence_package in window
+- iso42006_conformity_evidence_package-E1: fewer than 1 admitted records in the window
+- not evaluated: no compiled plan decides this control's applicability yet
+- no agent activity in window; absence of violations proves nothing
+- iso42006_conformity_evidence_package-E2: fewer than 1 admitted records in the window
 Evidence references:
-- 2fdbcf3f-5754-4a70-9109-b49544d71db3 (audit) hash=23941bf91946bdd7f7f6fcc818024fd798441c23507ccf68d6ed389c1adad7de
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- 37eef13c-1e36-40bd-a4b5-75a5f0b77db0 (audit) hash=5178af41b822b3bb55c550a74c00f36351b3055d805199774e67a81745b2e06f
-- e0f6b4f8-3609-403e-84a9-8f4567c4ffe0 (audit) hash=f6a0a586e713309ded55331ab53a8a12af0276de3ca5a5b0100de741a6c5f100
-- 6408b1bf-1cdf-418b-9cc0-78d4ab2dea4c (audit) hash=a2a328212391b01c3d5ded9f96a25a22399f50dd1d2bf9fdef580f5f1bc36034
-- cb07bf50-d272-4425-9c7a-213a1af6a927 (audit) hash=8566d974694f4fb8118e6c89e2faf9fb51d442d1daf2c6a5b54709269ea342e0
-- b6df717a-9223-47eb-a72b-1b920b694a2f (audit) hash=32360b69c2521f79ba5beeda8e0e8050cb2a031be4c7e55d9c6ef038f8f8ebe4
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- 008a35a2-7e22-4bcf-b78a-27fd01a3c32a (audit) hash=c0db4a0af6b61a19cb7cb32b10dc3ea386a5501875960981b994092968b0d23f
-- d37123d6-88ed-45b4-9d33-12cfda21932d (audit) hash=d7920398c4e18652e97831100da7fc64e66694dc89bc518f3ae5c529666a3059
-- a4fc32d4-e5d2-419a-9520-9c02b5fc5d35 (audit) hash=e63f6dbe00166645a5484ebda7c8d3bd5af86daf96b6f18a808f47c613dc7a38
-- c2764cc7-5b52-48a2-bf03-c5dd58a8c3f3 (audit) hash=5d1cd0e8a68260391de041f690008bf3c3a87630fcf9324a8e3aa9f8afaf6a2c
-- cc5c7f16-f649-4b42-935b-bd0bb3c565f0 (audit) hash=944ed050ef43f39562402b1aafd6c76f3ff8a742db0dae278353f297a7507e11
-- ba22a9f8-2355-46c6-b907-af14fb536f7c (audit) hash=5046e70dc6d562fffa8f3803e2e675ab69092ff23676773f47d6784e42e5db6c
-- c1f0aec0-78de-48e0-b6c7-656ac7fc3db5 (audit) hash=c0771cb18cfd7a22649fc912d231072923703a6f6d36cad8003588dfb8960fa3
-- df618483-8615-4f17-bb69-617c5fcb6a31 (audit) hash=7c470b47b98b4b71e55ddaf5e1e7a04cc80dc7af6e959902775d2fbfcabdab82
-- ac9970f2-48bb-4156-bd56-a61bf37d5218 (audit) hash=4d7a72207893d83c3746918b60e6e1d97b9b0e39c117e5e3475dd220577d6884
-- fde667c3-eedc-4c62-af57-e55ef6ad403a (audit) hash=7a2387d2b0c031951a03d8f54e5da04efc5c70a1274c7be97ed571be4718e756
+- none
 What would make this SATISFIED?
-- No additional evidence required for this requirement
-- Resolve and eliminate audit events: TRACE_RECEIPT_INVALID, TRACE_EVENT_HASH_NOT_FOUND, CONFIG_SIGNATURE_INVALID
+- Capture artifact, audit, test events bound to 'iso42006_conformity_evidence_package' (meta.controlIds) from AMC runtime with OBSERVED trust tier
+- Capture AMC runtime evidence for this agent in the window
+- A compiled plan must record that this control applies before it can pass
+
+## Legal Review Appendix
+
+This appendix is not legal advice. It is an export-ready checklist for qualified legal, compliance, or audit reviewers.
+
+Export packet:
+- Markdown report: this file, generated for framework `ISO_42001`.
+- JSON evidence report: `amc compliance report --framework ISO_42001 --json --out compliance-iso_42001.json`.
+- Evidence drill-down: use the event IDs above to recover full hashes and metadata from the JSON report.
+- Reviewer focus: resolve every MISSING and NOT_EVALUATED item before using this report as customer, board, regulator, or audit evidence.
+
+Framework-specific legal-review notes:
+- ISO/IEC 42001 legal review: confirm AI management-system scope, role accountability, risk-treatment acceptance, supplier obligations, and audit-evidence retention requirements.
+- Confirm unresolved controls have owners, target dates, and acceptance criteria before certification or customer use.
+
+Reviewer sign-off prompts:
+- Is this framework applicable to the agent, deployment context, geography, and customer commitment?
+- Are all non-claims preserved in customer-facing or regulator-facing materials?
+- Are remediation owners and dates assigned for unresolved categories?
+- Are signed artifacts required before this report is used externally?
 
 ## Non-Claims
 - This report provides evidence-backed signals only; it is not legal advice.
-- Controls not represented in verified AMC evidence are marked as UNKNOWN/MISSING.
+- Controls without control-bound AMC runtime evidence in the window are NOT_EVALUATED; absence of evidence is never a pass.
+- A category passes only when a compiled plan records that it applies; until then sufficient evidence is still not evaluated.
+- Ledger evidence is verified against this workspace's own monitor key: a local audit trail, not a portable verdict.
 - Owner attestations must be explicitly signed and are not inferred automatically.
+
+## How to read claim kinds
+
+### Claim kinds
+
+- **Synthetic example (not evidence)**: example values from a labelled example mode; never evidence, never a level
+- **Self-reported**: stated by the agent or its operator, or not backed by observed evidence, including results stored by AMC 1.x; numeric self-answers reach at most level 1 and never pass a regulated control
+- **Observed**: AMC observed the behaviour at runtime or in an executed test
+- **Independently reviewed**: approved by an independent reviewer whose key is pinned
+
+### Status dimensions
+
+- **Result**: pass, fail or not evaluated
+- **Evidence**: sufficient, incomplete, stale, contradictory or untrusted
+- **Enforcement**: none, advisory, observed or enforced at a named boundary
+- **Review**: pending, approved, rejected or expired
+- **Applicability**: applicable, not applicable with a rationale, or unresolved
+
+### Results
+
+- **Not evaluated**: AMC could not decide from trustworthy evidence; it is never a pass, a partial result or a default score
