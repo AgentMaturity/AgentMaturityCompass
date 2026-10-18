@@ -163,6 +163,7 @@ export const RESULT_COMMANDS: readonly ResultCommand[] = [
   self("compliance roadmap", "compliance:euAiActRoadmap"),
   self("comms-check", "comms-check"),
   self("audit binder create", "audit:binder"),
+  // An .amcaudit binder carries "audit:binder"; a signed industry-pack audit (.json) verifies as "audit:industry-pack".
   self("audit binder verify", "audit:binder"),
   self("audit verify", "audit:workspace"),
   self("residency-report", "residency"),

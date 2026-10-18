@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { verify } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -151,6 +152,18 @@ describe("P0-20 genuine signed audit and independent issuer admission", () => {
     expect(signature?.digestSha256).toBe(sha256Hex(canonicalize(unsigned)));
     expect(verify(null, Buffer.from(signature!.digestSha256, "hex"), auditorPem,
       Buffer.from(signature!.signature, "base64"))).toBe(true);
+  });
+
+  test("amc audit binder verify labels a trusted signed audit with its own claim in strict mode", () => {
+    const file = join(fixture, "cli-signed-audit.json"), pin = join(fixture, "cli-auditor.pub");
+    writeFileSync(file, JSON.stringify(signed)); writeFileSync(pin, auditorPem);
+    const home = join(fixture, "cli-home"); mkdirSync(home, { recursive: true });
+    const run = spawnSync(process.execPath, [join(root, "dist", "cli.js"), "audit", "binder", "verify", file, "--pubkey", pin, "--json"], {
+      cwd: workspace, encoding: "utf8", timeout: 60_000, env: { PATH: process.env.PATH, HOME: home, AMC_HOME: home, NO_COLOR: "1",
+        AMC_CLAIM_LABELS_STRICT: "1", AMC_VAULT_PASSPHRASE: "p0-20-owned-audit-signing-fixture", AMC_CONTROL_CHECKPOINT_DIR: join(fixture, "cli-checkpoints") } });
+    expect(run.status, run.stderr).toBe(0);
+    const body = JSON.parse(run.stdout) as { claimKind?: string; claimLabel?: string };
+    expect(body.claimKind).toBe("self_reported"); expect(body.claimLabel).toMatch(/^Claim: Self-reported/);
   });
 
   test.each([false, true])("an embedded key or explicit PEM is only a locator, explicit PEM=%s", explicit => {
