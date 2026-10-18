@@ -9,7 +9,8 @@ export interface Nis2Input {
   packet: Partial<{ incidentId: string; createdAt: string; summary: string; contact: string;
     maliciousActSuspected: boolean; crossBorderImpact: boolean }> | null;
 }
-const utcTimestamp = z.iso.datetime();
+// Date.parse compares milliseconds; reject finer precision instead of truncating it.
+const utcTimestamp = z.iso.datetime().refine((value) => !/\.\d{4,}Z$/.test(value));
 /** These fields define a local draft warning protocol, not a legal interpretation or a sent notification. */
 const TEXT_FIELDS = ["incidentId", "createdAt", "summary", "contact"] as const;
 

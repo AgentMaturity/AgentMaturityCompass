@@ -121,6 +121,27 @@ describe("Technology draft fixtures through the actual compiled platform-agent p
     const spec = oracleCases.map((fixture) => fixture.envelope.setup.technologyOracle as TechnologyOracleSpec)
       .find((candidate) => candidate.kind === "nis2" && candidate.expected.result === "pass");
     if (!spec || spec.kind !== "nis2" || !spec.input.awareness || !spec.input.packet) throw new Error("no positive NIS2 fixture");
+    const at = (awareAt: string, createdAt: string) => runTechnologyOracle({ ...spec, input: { ...spec.input,
+      awareness: { ...spec.input.awareness!, awareAt }, packet: { ...spec.input.packet, createdAt } } });
+    for (const fraction of ["", ".1", ".12", ".123"]) {
+      expect(at(`2026-10-18T00:00:00${fraction}Z`, `2026-10-19T00:00:00${fraction}Z`).reasonCode, fraction)
+        .toBe("warning_on_time");
+    }
+    expect(at("2026-10-18T00:00:00.000Z", "2026-10-19T00:00:00.001Z").reasonCode).toBe("warning_late");
+    // Date.parse truncates sub-millisecond digits, which could admit a late or earlier warning.
+    const precisionCases = [
+      ["2026-10-18T00:00:00.000Z", "2026-10-19T00:00:00.0001Z"],
+      ["2026-10-18T00:00:00.0009Z", "2026-10-18T00:00:00.0001Z"],
+      ["2026-10-18T00:00:00.0001Z", "2026-10-18T00:00:00.001Z"]
+    ] as const;
+    expect(precisionCases.map(([awareAt, createdAt]) => {
+      const result = at(awareAt, createdAt);
+      return { result: result.result, reasonCode: result.reasonCode };
+    })).toEqual([
+      { result: "fail", reasonCode: "warning_incomplete" },
+      { result: "not_evaluated", reasonCode: "awareness_missing" },
+      { result: "not_evaluated", reasonCode: "awareness_missing" }
+    ]);
     expect(runTechnologyOracle({ ...spec, input: { ...spec.input, clockId: "eu-cra-early-warning-24h" } }).reasonCode)
       .toBe("nis2_clock_missing");
     for (const awareAt of ["0", "2026-02-30T00:00:00Z", "2026-10-18T00:00:00"]) {
