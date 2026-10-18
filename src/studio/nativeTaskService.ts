@@ -1,6 +1,6 @@
 import { assertNativeTaskValidationPin, inspectNativeTaskValidation, nativeTaskValidationView } from "./nativeTaskValidation.js";
 import { assertNativeTaskData, assertNativeTaskInputCapability, dispatchNativeTaskInput, nativeTaskInputCapabilities,
-  nativeTaskStartSchema, nativeTaskTurnSchema, prepareNativeTaskInput, type PreparedNativeTaskInput, NATIVE_TASK_MAX_PARTS_BYTES } from "./nativeTaskInput.js";
+  nativeTaskForkSchema, nativeTaskStartSchema, nativeTaskTurnSchema, prepareNativeTaskInput, type PreparedNativeTaskInput, NATIVE_TASK_MAX_PARTS_BYTES } from "./nativeTaskInput.js";
 import { encodeNativeOrderedInput } from "../attachments/nativeOrderedInput.js";
 import { encodeNativeAudioInput } from "../attachments/nativeAudioInput.js";
 import { sessionSpillCap } from "../session/sessionPayloadCap.js";
@@ -30,6 +30,8 @@ import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_LEASE_ENV } from "../acp/acpRunt
 import { NativeTaskDescriptors, nativeTaskId, taskBodyHash, type NativeTaskDescriptor } from "./nativeTaskDescriptors.js";
 import { readNativeTaskProjection, type NativeTaskProjection } from "./nativeTaskProjection.js";
 import { inspectJsonlSessionRecovery } from "../session/jsonlContinuation.js";
+import { deriveExecutionStatus } from "../execution/executionContract.js";
+import { sessionReceiptStates } from "../execution/executionStatus.js";
 import { NativeTaskServiceError, type NativeTaskActor, type NativeTaskConfiguration, type NativeTaskLimits,
   type NativeTaskService, type NativeTaskState, type NativeTaskView } from "./nativeTaskTypes.js";
 
@@ -66,6 +68,8 @@ interface Entry {
   verification: NativeTaskView["verification"]; verificationScope?: NativeTaskView["verificationScope"]; finishing?: Promise<void>;
   /** Process closure is distinct from a successful signed session handover. */
   processCleanupConfirmed?: boolean;
+  /** P2-13: verified receipt states read with the projection, and whether a start or fork was refused before any session. */
+  receiptStates?: readonly string[]; admissionRefused?: boolean;
 }
 export interface NativeTaskServiceOptions {
   readonly workspace: string;
@@ -231,6 +235,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     if (!entry.descriptor.sessionId || Date.now() - entry.projectionAt < 250) return entry.projection !== undefined;
     try {
       entry.projection = readNativeTaskProjection(workspace, entry.descriptor.sessionId, entry.descriptor.agentId);
+      entry.receiptStates = sessionReceiptStates(workspace, entry.descriptor.sessionId);
       entry.projectionError = undefined; entry.changedSince = undefined;
       // A later read never softens a failed verdict; it only withdraws a positive one whose head moved.
       if (entry.verification !== "failed" && entry.verificationStoreHead !== entry.projection.storeHeadEventHash) entry.verification = "not-verified";
@@ -245,7 +250,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         if (!entry.projection) entry.projectionError = MOVING;
         return false;
       }
-      entry.projection = undefined;
+      entry.projection = undefined; entry.receiptStates = undefined;
       entry.projectionError = moving ? UNSETTLED : "Committed native evidence could not be authenticated or exceeded the display bound. No transcript or approval is shown. Restore the original evidence and refresh; no alternate history was substituted.";
       return false;
     }
@@ -291,6 +296,12 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     const validation = nativeTaskValidationView(d.validation, p?.validation,
         !!d.validation && d.pendingTurn && (entry.state === "starting" || (["running", "cancel-requested"].includes(entry.state) && (p?.validation.turn ?? null) === entry.validationPriorTurn)),
         d.pendingTurn && (!entry.client || (p?.validation.turn ?? null) === entry.validationPriorTurn));
+    const running = ["running", "cancel-requested"].includes(entry.state) || (entry.state === "starting" && d.pendingTurn);
+    // P2-13: each phase from its own source; Studio's verdict feeds only evidence-verification.
+    const execution = d.sessionId ? deriveExecutionStatus({ sessionId: d.sessionId, admission: "admitted",
+      turn: running ? "running" : p ? p.ending : "unreadable", receiptStates: p ? entry.receiptStates ?? null : null,
+      verified: entry.verification === "not-verified" ? null : entry.verification !== "failed" })
+      : entry.admissionRefused ? deriveExecutionStatus({ sessionId: "", admission: "refused", turn: null, receiptStates: [], verified: null }) : null;
     const result: NativeTaskView = { taskId: d.taskId, sessionId: d.sessionId, agentId: d.agentId, provider: d.provider, model: d.model, tools: d.tools, toolsDigest: d.toolsDigest,
       maxSteps: d.maxSteps, maxTokens: d.maxTokens, revision: d.revision, clientRequestId: d.submissions[0]!.clientRequestId,
       lastClientRequestId: d.submissions[d.submissions.length - 1]!.clientRequestId, state: !entry.client && p?.closed ? "closed" : entry.state,
@@ -300,7 +311,8 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       verification: entry.verification, verificationScope: entry.verification === "externally-anchored" || entry.verification === "anchored-prefix" ? entry.verificationScope ?? null : null, approvals: p?.approvals ?? [], approvalError: p?.approvalError ?? null,
       nextCursor: p?.nextCursor ?? 0, firstCursor: p?.firstCursor ?? 1, droppedEvents: p?.droppedEvents ?? 0,
       history, resumeBlockedReason, recovery: recovery ? { eligible: recovery.eligible, state: recovery.state, message: recovery.message } : null,
-      canResume: !!d.sessionId && !!p && (p.history.backend === "sqlite" || recovery?.eligible === true) && !d.closed && !p.closed && !entry.client && entry.state !== "starting" && entry.state !== "verifying" };
+      canResume: !!d.sessionId && !!p && (p.history.backend === "sqlite" || recovery?.eligible === true) && !d.closed && !p.closed && !entry.client && entry.state !== "starting" && entry.state !== "verifying",
+      execution };
     // Released task history is reconstructed on demand, not retained for every descriptor in memory.
     if (!entry.client && !retainProjection) { entry.projection = undefined; entry.projectionAt = 0; }
     return result;
@@ -357,7 +369,8 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         validation: inspectNativeTaskValidation(validationConfig, actor.demo),
         boundary: "Provider access is not pre-tested. Stub records a canned local demonstration, not a model answer. Limits apply per native turn; existing signed budgets govern aggregate spending. No custom origins, commands, MCP mounts or grants can be supplied by the browser." };
   }
-  async function prepare(actor: NativeTaskActor, entry: Entry, resume: boolean, input?: PreparedNativeTaskInput): Promise<void> {
+  async function prepare(actor: NativeTaskActor, entry: Entry, mode: "new" | "resume" | { readonly forkFrom: string }, input?: PreparedNativeTaskInput): Promise<void> {
+    const resume = mode === "resume";
     const d = entry.descriptor;
     assertToolPin(d);
     const config = await configuration(actor);
@@ -384,7 +397,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     if (input) assertNativeTaskInputCapability(entry.client.capabilities, input);
     const abortSetup = () => { void entry.client?.close(); };
     entry.startupAbort.signal.addEventListener("abort", abortSetup, { once: true });
-    try { entry.session = resume ? await entry.client.resumeSession(d.sessionId!) : await entry.client.newSession(); }
+    try { entry.session = resume ? await entry.client.resumeSession(d.sessionId!) : typeof mode === "object" ? await entry.client.forkSession(mode.forkFrom) : await entry.client.newSession(); }
     finally { entry.startupAbort.signal.removeEventListener("abort", abortSetup); }
     if (!resume || lease) persist(entry, { ...(resume ? {} : { sessionId: entry.session.sessionId }), ...(lease ? { leaseId: lease.payload.leaseId } : {}) });
     // P1-67: this runtime now holds the writer claim, so the previous one is gone; its lease must not stay live.
@@ -513,9 +526,10 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       const entry = remember(d);
       if (!admitted) return view(entry);
       entry.state = "starting";
-      try { entry.preparation = prepare(actor, entry, false, preparedInput!); await entry.preparation;
+      try { entry.preparation = prepare(actor, entry, "new", preparedInput!); await entry.preparation;
         if (shuttingDown || entry.finishing || entry.startupCancelled) throw new Error("Studio is stopping"); await dispatch(entry, preparedInput!); }
-      catch (error) { entry.error = error instanceof NativeTaskServiceError ? error.message : "Native startup did not finish. No model request was automatically retried; inspect setup and task status."; await stop(entry); entry.state = "failed"; }
+      catch (error) { entry.error = error instanceof NativeTaskServiceError ? error.message : "Native startup did not finish. No model request was automatically retried; inspect setup and task status.";
+        entry.admissionRefused = error instanceof NativeTaskServiceError && !entry.descriptor.sessionId; await stop(entry); entry.state = "failed"; }
       finally { entry.preparation = undefined; }
       return view(entry);
     },
@@ -580,7 +594,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         if (!recovery.eligible) throw new NativeTaskServiceError("RECOVERY_REFUSED", 409, recovery.message);
       }
       capacity(); entry.state = "starting"; entry.startupCancelled = false; entry.startupAbort = new AbortController();
-      try { entry.preparation = prepare(actor, entry, true); await entry.preparation;
+      try { entry.preparation = prepare(actor, entry, "resume"); await entry.preparation;
         if (shuttingDown || entry.finishing || entry.startupCancelled) throw new Error("Studio is stopping"); persist(entry, { pendingTurn: false }); }
       catch (error) {
         // A named refusal keeps its reason; stop() then appends any lease it could not revoke.
@@ -589,6 +603,50 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         await stop(entry); entry.state = "failed";
       }
       finally { entry.preparation = undefined; }
+      return view(entry);
+    },
+    /**
+     * fork (P2-13): a new owned task whose session's signed open row names this task's verified session. It keeps the
+     * parent's pinned provider, model, tools digest, checks and limits (equal grants, re-checked at start), with its own
+     * runtime lease and limits; no model context is inherited. A parent that does not verify is refused NATIVE_FORK_<reason>.
+     */
+    async fork(actor, taskId, input) {
+      assertNativeTaskData(input);
+      const parsed = nativeTaskForkSchema.safeParse(input);
+      if (!parsed.success) throw new NativeTaskServiceError("INPUT_INVALID", 400, "Invalid native task fork.");
+      const parent = control(actor, taskId, parsed.data.expectedRevision).descriptor;
+      const parentSession = parent.sessionId;
+      if (!parentSession) throw new NativeTaskServiceError("NO_SESSION", 409, "No native session was recorded to fork.");
+      const { clientRequestId } = parsed.data, childId = nativeTaskId(actor.principalId, clientRequestId), bodyHash = taskBodyHash({ fork: taskId, ...parsed.data });
+      let admitted = false;
+      const d = descriptors.lock(() => {
+        assertUniqueSubmission(actor, childId, clientRequestId);
+        const existing = descriptors.read(childId);
+        if (existing) { assertOwner(actor, existing); if (existing.submissions[0]!.bodyHash !== bodyHash) throw new NativeTaskServiceError("REQUEST_CONFLICT", 409, "That request ID already names a different task."); return existing; }
+        capacity();
+        if (descriptors.list().length >= 256) throw new NativeTaskServiceError("TASK_HISTORY_LIMIT", 409, "This workspace has 256 current tasks. Close and explicitly archive a reviewed task before creating more tasks.");
+        const now = Date.now();
+        const descriptor: NativeTaskDescriptor = { kind: parent.kind, taskId: childId, principalId: parent.principalId, agentId: parent.agentId, demo: parent.demo,
+          sessionId: null, provider: parent.provider, model: parent.model, tools: parent.tools, toolsDigest: parent.toolsDigest,
+          ...(parent.validation ? { validation: parent.validation } : {}), maxSteps: parent.maxSteps, maxTokens: parent.maxTokens,
+          createdAt: now, updatedAt: now, revision: 1, pendingTurn: false, closed: false, forkedFrom: { taskId, sessionId: parentSession },
+          submissions: [{ clientRequestId, bodyHash, revision: 1 }] };
+        descriptors.write(descriptor); admitted = true; return descriptor;
+      });
+      const entry = remember(d);
+      if (!admitted) return view(entry);
+      entry.state = "starting";
+      let refusal: string | undefined;
+      try { entry.preparation = prepare(actor, entry, { forkFrom: parentSession }); await entry.preparation; }
+      catch (error) {
+        const reason = error instanceof AMCNativeRefusedError ? (error.data as { reason?: unknown } | undefined)?.reason : undefined;
+        refusal = typeof reason === "string" && /^[A-Z_]{1,64}$/.test(reason) ? reason : undefined;
+        entry.error = error instanceof NativeTaskServiceError ? error.message : refusal ? `The parent session was refused for forking (${refusal}); nothing was forked.`
+          : "Native fork did not finish. No model request was sent; inspect setup and task status.";
+        entry.admissionRefused = error instanceof NativeTaskServiceError || refusal !== undefined;
+        await stop(entry); entry.state = "failed";
+      } finally { entry.preparation = undefined; }
+      if (refusal) throw new NativeTaskServiceError(`FORK_${refusal}`, 409, entry.error!);
       return view(entry);
     },
     archive(actor, taskId, expectedRevision) {

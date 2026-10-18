@@ -53,6 +53,7 @@ export const nativeTaskStartSchema = z.object({ clientRequestId: z.string().uuid
     context.addIssue({ code: "custom", message: "Workspace tools require the displayed scope digest; no-tools tasks must omit it." });
   if (value.validation && value.tools !== "workspace") context.addIssue({ code: "custom", message: "Public checks require signed workspace tools." });
 }).transform(value => value as NativeTaskStartRequest);
+export const nativeTaskForkSchema = z.object({ clientRequestId: z.string().uuid(), expectedRevision: z.number().int().min(1).max(32) }).strict();
 export const nativeTaskTurnSchema = z.object({ clientRequestId: z.string().uuid(),
   expectedRevision: z.number().int().min(1).max(32), ...payload
 }).strict().superRefine(exactlyOne).transform(value => value as NativeTaskTurn);
