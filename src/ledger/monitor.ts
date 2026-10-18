@@ -5,6 +5,7 @@ import { openLedger, hashBinaryOrPath } from "./ledger.js";
 import { runProcess } from "../exec/runProcess.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { dummyProviderKeyEnv, stripProviderKeys } from "../utils/providerKeys.js";
+import { processOutputRedactor, recordedArgv } from "../bridge/bridgeRedaction.js";
 
 /** How long any single `--version` attempt may take before it is abandoned. */
 const VERSION_PROBE_TIMEOUT_MS = 3_000;
@@ -110,22 +111,26 @@ async function spawnMonitoredProcess(params: {
       binarySha256: binaryHash
     });
 
+    const argv = recordedArgv(params.workspace, params.command, params.args, params.scrubValues);
     ledger.appendEvidence({
       sessionId,
       runtime: params.runtime,
       eventType: "gateway",
-      payload: JSON.stringify({ stage: "process_start", command: params.command, args: params.args, meta: params.meta ?? {} }),
+      payload: JSON.stringify({ stage: "process_start", command: argv.command, args: argv.args, meta: params.meta ?? {} }),
       payloadExt: "json",
       meta: {
         stage: "process_start",
-        command: params.command,
-        args: params.args,
+        command: argv.command,
+        args: argv.args,
         ...(params.meta ?? {})
       }
     });
 
     const recorded = { stdout: 0, stderr: 0 };
     const truncationAnnounced = { stdout: false, stderr: false };
+    // What the process wrote and was sent: where the workspace opted in to protected-data redaction (P2-02), stored as
+    // `amc wrap`'s bridge telemetry is; elsewhere as it was (`processOutputRedactor`). The terminal sees the scrubbed text.
+    const evidence = processOutputRedactor(params.workspace);
     const record = (stream: "stdout" | "stderr", text: string): void => {
       const bytes = Buffer.byteLength(text, "utf8");
       if (recorded[stream] >= MAX_RECORDED_OUTPUT_BYTES) {
@@ -153,7 +158,7 @@ async function spawnMonitoredProcess(params: {
         sessionId,
         runtime: params.runtime,
         eventType: stream,
-        payload: text,
+        payload: evidence(text),
         payloadExt: "txt",
         inline: true,
         meta: {
@@ -173,8 +178,8 @@ async function spawnMonitoredProcess(params: {
         AMC_EVALUATED_AGENT: "1"
       },
       stdin: "pipe",
-      // Tee AND record: the operator and the log see the same scrubbed text,
-      // so there is no arrangement in which they disagree.
+      // Tee AND record: the operator and the log both see the scrubbed text; in an
+      // opted-in workspace the log stores it after the redaction above, which only removes more.
       stdout: "tee",
       stderr: "tee",
       maxCaptureBytes: MAX_RECORDED_OUTPUT_BYTES,
@@ -195,7 +200,7 @@ async function spawnMonitoredProcess(params: {
           sessionId,
           runtime: params.runtime,
           eventType: "stdin",
-          payload: chunk,
+          payload: evidence(chunk),
           payloadExt: "txt",
           inline: true,
           meta: {
@@ -304,7 +309,15 @@ export async function wrapRuntime(
 export async function wrapAny(
   command: string,
   args: string[],
-  opts: { workspace: string; agentId?: string; signal?: AbortSignal }
+  opts: {
+    workspace: string;
+    agentId?: string;
+    signal?: AbortSignal;
+    /** Environment the process gets beside AMC's (a sandbox's `docker run -e NAME` values). */
+    envExtras?: Record<string, string>;
+    /** Values to scrub from the recorded argv and output: a lease handed to the process, above all. */
+    scrubValues?: readonly string[];
+  }
 ): Promise<string> {
   const agentId = resolveAgentId(opts.workspace, opts.agentId);
   return (await spawnMonitoredProcess({
@@ -312,6 +325,8 @@ export async function wrapAny(
     runtime: "any",
     command,
     args,
+    ...(opts.envExtras ? { envExtras: opts.envExtras } : {}),
+    ...(opts.scrubValues ? { scrubValues: opts.scrubValues } : {}),
     ...(opts.signal ? { signal: opts.signal } : {}),
     meta: {
       mode: "wrap-any",
@@ -459,13 +474,15 @@ export async function startMonitor(opts: {
     });
 
     if (opts.stdin) {
+      // Where the workspace opted in (P2-02), stored as `amc wrap`'s stdout telemetry is; elsewhere as it was.
+      const evidence = processOutputRedactor(opts.workspace);
       await new Promise<void>((resolve) => {
         process.stdin.on("data", (chunk: Buffer) => {
           ledger.appendEvidence({
             sessionId,
             runtime: opts.runtime,
             eventType: "stdout",
-            payload: chunk,
+            payload: evidence(chunk),
             payloadExt: "txt",
             inline: true,
             meta: { source: "stdin_pipe", trustTier: "OBSERVED", agentId }

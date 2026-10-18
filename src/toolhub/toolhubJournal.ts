@@ -11,8 +11,8 @@ import type { ActionClass, ExecutionMode } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
-import { hashToolBlastRadiusConsent, type ToolBlastRadiusConsent } from "./blastRadiusConsent.js";
-import { appendToolEvidenceWithReceipt } from "./toolhubReceipts.js";
+import type { ToolBlastRadiusConsent } from "./blastRadiusConsent.js";
+import { appendToolEvidenceWithReceipt, redactedEvidenceValue } from "./toolhubReceipts.js";
 import type { ToolDefinition } from "./toolsSchema.js";
 
 export const isJournaledToolhubExecution = (mode: ExecutionMode, actionClass: ActionClass): boolean =>
@@ -214,17 +214,19 @@ export function openToolhubExecutionEvidence(input: EvidenceInput, actionMetadat
   let resultReceipt: string | undefined;
   let closed = false;
   let sealed = false;
-  const blastRadiusConsentHash = hashToolBlastRadiusConsent(input.blastRadiusConsent);
+  // The consent quotes argument paths; in an opted-in workspace its meta copy and digest are over the redacted copy.
+  const blastRadiusConsent = redactedEvidenceValue(input.workspace, input.blastRadiusConsent);
+  const blastRadiusConsentHash = sha256Hex(canonicalize(blastRadiusConsent));
   const common = { executionId: input.executionId, intentId: input.intentId, requestedMode: input.requestedMode,
     effectiveMode: input.effectiveMode, actionClass: input.actionClass, approvalId: input.approvalId, blastRadiusConsentHash };
   try {
     ledger.startSession({ sessionId, runtime: "unknown", binaryPath: "amc-toolhub", binarySha256: "toolhub" });
     const action = appendToolEvidenceWithReceipt({ ledger, workspace: input.workspace, sessionId, agentId: input.agentId,
       toolName: input.toolName, eventType: "tool_action", extraMeta: { ...common, execTicketValid: input.execTicketValid,
-        approvalDecisionReceiptId: input.approvalDecisionReceiptId, blastRadiusConsent: input.blastRadiusConsent, ...actionMetadata },
+        approvalDecisionReceiptId: input.approvalDecisionReceiptId, blastRadiusConsent, ...actionMetadata },
       payload: { ...common, args: input.args, workOrderId: input.workOrderId, execTicketProvided: input.execTicketProvided,
         execTicketValid: input.execTicketValid, approvalDecisionReceiptId: input.approvalDecisionReceiptId,
-        blastRadiusConsent: input.blastRadiusConsent, ...actionMetadata } });
+        blastRadiusConsent, ...actionMetadata } });
     eventIds.push(action.eventId);
     return {
       ledger, sessionId, eventIds, actionReceipt: action.receipt,
