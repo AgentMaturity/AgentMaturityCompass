@@ -2,7 +2,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import YAML from "yaml";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { verifyHexDigestAny } from "../../src/crypto/keys.js";
 import { signingKeyId, verifyCanonical } from "../../src/keys/algorithmPolicy.js";
 import { AntiRollbackError } from "../../src/keys/highWater.js";
@@ -23,9 +23,13 @@ import { setMode } from "../../src/mode/mode.js";
 import { generateKeyPairSync, sign } from "node:crypto";
 import { AWS_ARN, awsFake, fakeKey, GCP_KEY, gcpFake } from "./providerFakes.js";
 
+// The built-in distrust list ships empty; tests put a key on it through this hoisted state.
+const distrust = vi.hoisted(() => ({ entries: [] as Array<{ keyId: string; distrustedFrom: string | null; reason: "key-compromise"; note: string; source: string }> }));
+vi.mock("../../src/trust/builtInDistrust.js", () => ({ builtInDistrust: () => distrust.entries }));
+
 const PASS = process.env.AMC_VAULT_PASSPHRASE!;
 const roots: string[] = [];
-afterEach(() => { for (const root of roots.splice(0)) { lockVault(root); rmSync(root, { recursive: true, force: true }); } });
+afterEach(() => { distrust.entries = []; for (const root of roots.splice(0)) { lockVault(root); rmSync(root, { recursive: true, force: true }); } });
 
 function workspace(): string {
   const root = mkdtempSync(join(tmpdir(), "amc-purpose-providers-"));
@@ -257,6 +261,52 @@ describe("purpose keys held by key providers (P2-08)", () => {
     setMode(root, "agent");
     await expect(bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider: kms().provider })).rejects.toThrow(/owner mode|agent mode/i);
     await expect(fileKeyProvider(root).wrapKey!({ provider: "file", id: "ledger-dek" }, Buffer.alloc(32))).rejects.toThrow(/owner mode|agent mode/i);
+  });
+
+  it("review 5: AMC, not the provider, decides revocation: a revoked bound key refuses with KeyRevokedError before the provider is asked", async () => {
+    const root = workspace();
+    configureKeys(root, { refs: { "ledger-row": { provider: "aws-kms", id: AWS_ARN("seal") } } });
+    const { fake, provider } = kms();
+    const bound = await bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider });
+    recordRevocation(root, bound.keyId);
+    const asked = fake.requests.length;
+    const refused = await signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider }).catch((e: unknown) => e);
+    expect(refused).toBeInstanceOf(KeyRevokedError);
+    expect(refused).toMatchObject({ code: "KEY_REVOKED" });
+    await expect(exportPurposePublicKey(root, "ledger-row", { provider })).rejects.toBeInstanceOf(KeyRevokedError);
+    expect(fake.requests.length).toBe(asked);
+  });
+
+  it("review 5: AMC, not the provider, decides the binding: a provider presenting another key than the key set names is refused with KEY_PROVIDER_KEY_REFUSED", async () => {
+    const root = workspace();
+    configureKeys(root, { refs: { "ledger-row": { provider: "aws-kms", id: AWS_ARN("seal") } } });
+    await bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider: kms().provider });
+    // The provider answers for the bound ref with another key, and even reports the bound key id for it.
+    const boundId = listKeys(root).purposes.find(row => row.purpose === "ledger-row")!.providerKeyId!;
+    const swapped = awsKmsProvider(awsFake({ [AWS_ARN("seal")]: otherKey }).call);
+    const liar: KeyProvider = { ...swapped, describe: async ref => ({ ...(await swapped.describe(ref)), keyId: boundId }) };
+    for (const provider of [swapped, liar]) {
+      await expect(signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider })).rejects.toSatisfy(isCode("KEY_PROVIDER_KEY_REFUSED"));
+    }
+  });
+
+  it("review 5: a key on the distrust list refuses at the server clock, on the provider and the vault path alike", async () => {
+    const root = workspace();
+    configureKeys(root, { refs: { "ledger-row": { provider: "aws-kms", id: AWS_ARN("seal") } } });
+    const { fake, provider } = kms();
+    const bound = await bindPurposeProviderKey(root, "ledger-row", { passphrase: PASS, provider });
+    distrust.entries = [{ keyId: bound.keyId, distrustedFrom: new Date(Date.now() + 3_600_000).toISOString(), reason: "key-compromise", note: "test", source: "test" }];
+    await expect(signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider })).resolves.toMatchObject({ keyId: bound.keyId });
+    distrust.entries = [{ ...distrust.entries[0]!, distrustedFrom: null }];
+    const asked = fake.requests.length;
+    await expect(signWithPurposeKey(root, "ledger-row", Buffer.alloc(32), { provider })).rejects.toThrow(/distrusted/);
+    expect(fake.requests.length).toBe(asked);
+    // The delegate path checks its issuer the same way.
+    expect(() => getSigningKey(root, "ledger-row")).toThrow(/distrusted/);
+    // And the vault path, through the same function.
+    const vaultKeyId = listKeys(root).purposes.find(row => row.purpose === "receipt")!.keyId!;
+    distrust.entries = [{ keyId: vaultKeyId, distrustedFrom: null, reason: "key-compromise", note: "test", source: "test" }];
+    expect(() => getSigningKey(root, "receipt")).toThrow(/distrusted/);
   });
 
   it("keys.requireNonExportable refuses the vault (file provider) for unbound purposes", async () => {

@@ -18,9 +18,8 @@ import { sha256Hex } from "../utils/hash.js";
 import { unlockedPayloadForKeyChange, vaultPaths } from "../vault/vault.js";
 import type { LocalPurpose } from "../vault/vaultPayload.js";
 import type { KeyPurpose } from "../trust/keyPurposes.js";
-import { verifyWithKey, type SigningAlgorithm } from "./algorithmPolicy.js";
+import { signingKeyId, verifyWithKey, type SigningAlgorithm } from "./algorithmPolicy.js";
 import { encodeDelegation, issueDelegation, MAX_DELEGATION_HOURS } from "./delegation.js";
-import { assertKeyNotRevoked } from "./keyRevocations.js";
 import { assertKeysetComplete, boundProviderKey, commitKeyset, type ProviderBinding } from "./keyset.js";
 import { CONFIG_REL, configuredRef, keyPolicy, loadKeysConfig, parseKeysSection, type KeysConfig } from "./keysConfig.js";
 import { attempt, checkedDescription, KeyProviderError, signChecked, type KeyDescription, type KeyProvider, type KeyProviderId, type KeyRef } from "./provider.js";
@@ -30,7 +29,7 @@ import { fileKeyProvider } from "./providers/file.js";
 import { gcpKmsProvider } from "./providers/gcpKms.js";
 import { pkcs11Provider } from "./providers/pkcs11.js";
 import { popBytes } from "./purposeKeys.js";
-import { assertLocal, DELEGATION_REL, getPurposeKeyHistory } from "./signingKeys.js";
+import { assertKeyUsableNow, assertLocal, assertSigningKeyUsable, DELEGATION_REL, getPurposeKeyHistory } from "./signingKeys.js";
 
 /**
  * Purposes a provider key can be bound to in this release. ponytail: ledger-row only, whose hot path keeps a vault
@@ -96,14 +95,18 @@ async function purposeSigner(workspace: string, purpose: LocalPurpose, override?
     const configured = configuredRef(config, purpose);
     if (configured !== null) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", configured.provider, `the key set binds no ${configured.provider} key to ${purpose} yet; run amc keys rotate --purpose ${purpose}`);
     const vault = loadKeyProvider(workspace, "file");
-    return { provider: vault, description: checkedDescription(await attempt("file", "describe", () => vault.describe({ provider: "file", id: purpose })), keyPolicy(config)) };
+    const description = checkedDescription(await attempt("file", "describe", () => vault.describe({ provider: "file", id: purpose })), keyPolicy(config));
+    assertSigningKeyUsable(workspace, purpose, description.publicKeyPem, "file");
+    return { provider: vault, description };
   }
   const ref = boundRef(bound.binding);
   if (override !== undefined && override.id !== ref.provider) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, `the key set binds a ${ref.provider} key to ${purpose}; no other provider signs for it`);
-  assertKeyNotRevoked(workspace, true, bound.binding.keyId, purpose);
+  // The vault's gate, from AMC's own state, before the provider is asked anything: binding, revocation, distrust.
+  assertSigningKeyUsable(workspace, purpose, bound.publicKeyPem, ref.provider);
   const provider = override ?? loadKeyProvider(workspace, ref.provider);
   const description = checkedDescription(await attempt(ref.provider, "describe", () => provider.describe(ref)), keyPolicy(config));
-  if (description.keyId !== bound.binding.keyId || description.algorithm !== bound.binding.algorithm) {
+  // The key the provider presents, identified by its own bytes (never its reported id), must be the bound key.
+  if (signingKeyId(description.publicKeyPem) !== bound.binding.keyId) {
     throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, `the provider's ${purpose} key is not the key the key set binds`);
   }
   return { provider, description };
@@ -165,8 +168,14 @@ export async function bindPurposeProviderKey(workspace: string, purpose: KeyPurp
   const provider = opts.provider ?? loadKeyProvider(workspace, ref.provider);
   const description = checkedDescription(await attempt(ref.provider, "describe", () => provider.describe(ref)), keyPolicy(unsigned));
   if (description.exportable) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, "an exportable key is never bound");
-  if (renewing && description.keyId !== current.keyId) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, "the provider no longer holds the bound key");
-  assertKeyNotRevoked(workspace, true, description.keyId, local);
+  const keyId = signingKeyId(description.publicKeyPem)!;
+  // Renewing: the full gate on the bound key. Binding a new key: revocation and distrust (no key set names it yet).
+  if (renewing) {
+    if (keyId !== current.keyId) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, "the provider no longer holds the bound key");
+    assertSigningKeyUsable(workspace, local, description.publicKeyPem, ref.provider);
+  } else {
+    assertKeyUsableNow(workspace, local, keyId, ref.provider);
+  }
   const now = opts.now ?? new Date();
   // Possession before the key set names the key: the provider signs this purpose's proof under the described key.
   await signChecked(provider, description, popBytes({ keyId: description.keyId, purpose: local, issuedAt: now.toISOString() }));

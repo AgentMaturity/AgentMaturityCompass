@@ -9,11 +9,13 @@ import { join } from "node:path";
 import { readContainedOrNull, statStamp } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { getVaultPurposeKeyPem, purposeKeyPaths, vaultPaths } from "../vault/vault.js";
+import { getVaultPurposeKeyPem, purposeKeyPaths, vaultPaths, vaultStatus } from "../vault/vault.js";
+import { distrustAt } from "../trust/admissionRule.js";
+import { builtInDistrust } from "../trust/builtInDistrust.js";
 import { isLocalPurpose, roleOfPurpose, type LocalPurpose } from "../vault/vaultPayload.js";
 import { historyLogId, loggedAnchor } from "./anchors.js";
 import { checkHighWater, compareHighWater, keyHistoryMarkKey } from "./highWater.js";
-import { assertBoundPublicKey, assertNoPendingKeyset, boundProviderKey, keysetDeclared, keysetFileRel } from "./keyset.js";
+import { assertBoundPublicKey, assertKeysetComplete, assertNoPendingKeyset, boundProviderKey, keysetDeclared, keysetFileRel } from "./keyset.js";
 import { signingKeyId } from "./algorithmPolicy.js";
 import { verifyDelegation } from "./delegation.js";
 import { assertKeyNotRevoked } from "./keyRevocations.js";
@@ -35,11 +37,43 @@ export function getSigningKey(workspace: string, purpose: KeyPurpose): string {
   // Authorization before the vault is touched: a provider-held purpose never unlocks or reads it.
   const delegateKeyId = assertVaultMaySign(workspace, local);
   const privateKeyPem = getVaultPurposeKeyPem(workspace, local);
+  // No-sign mode's ephemeral key (vault locked, AMC_NO_SIGN=1) is in no key set and signs nothing verifiable.
+  if (process.env.AMC_NO_SIGN === "1" && !vaultStatus(workspace).unlocked) return privateKeyPem;
+  // The same pre-sign gate as every provider key, on the key actually served.
+  const keyId = assertSigningKeyUsable(workspace, local, publicKeyFromPrivate(privateKeyPem), "file");
   // The delegation must name the key served here, not only the published ledger-row.pub.
-  if (delegateKeyId !== null && signingKeyId(publicKeyFromPrivate(privateKeyPem)) !== delegateKeyId) {
+  if (delegateKeyId !== null && keyId !== delegateKeyId) {
     throw new KeyProviderError("KEY_DELEGATION_INVALID", boundProviderKey(workspace, local)?.binding.provider ?? "file", "the delegation names another key than the vault's ledger-row key");
   }
   return privateKeyPem;
+}
+
+/**
+ * The pre-sign gate every signing key passes, the vault's and a provider's alike, decided from AMC's own signed state
+ * and never from what a provider says about its key. The key is identified by its own bytes and must be the one the
+ * committed, mark-bound key set names for the purpose and holder (`file` is the vault; any other id is the bound
+ * provider). Then assertKeyUsableNow. Returns the key id.
+ */
+export function assertSigningKeyUsable(workspace: string, purpose: LocalPurpose, publicKeyPem: string, holder: KeyProviderId): string {
+  const keyId = signingKeyId(publicKeyPem);
+  const keyset = assertKeysetComplete(workspace);
+  const named = holder === "file" ? keyset?.keys[purpose] : keyset?.providers?.[purpose]?.provider === holder ? keyset.providers[purpose]!.keyId : undefined;
+  if (keyId === null || named === undefined || named !== keyId) {
+    throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, `the ${purpose} key is not the ${holder === "file" ? "vault" : holder} key the committed key set names`);
+  }
+  assertKeyUsableNow(workspace, purpose, keyId, holder);
+  return keyId;
+}
+
+/**
+ * A key about to sign or be bound, at the server clock: the workspace key revocation list must load and verify (a
+ * missing or unverifiable list refuses every key) and must not revoke it (KeyRevokedError), and the built-in distrust
+ * list must not distrust it.
+ */
+export function assertKeyUsableNow(workspace: string, purpose: LocalPurpose, keyId: string, holder: KeyProviderId): void {
+  assertKeyNotRevoked(workspace, true, keyId, purpose);
+  const distrusted = distrustAt(builtInDistrust(), keyId, Date.now());
+  if (distrusted) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, `the ${purpose} key ${keyId} is distrusted (${distrusted.reason}, ${distrusted.source})`);
 }
 
 /**
@@ -56,7 +90,8 @@ export function assertVaultMaySign(workspace: string, purpose: LocalPurpose): st
     return null;
   }
   if (purpose === "ledger-row" && bound !== null) {
-    assertKeyNotRevoked(workspace, true, bound.binding.keyId, purpose);
+    // The issuer passes the same gate as any key it could sign with directly.
+    assertSigningKeyUsable(workspace, purpose, bound.publicKeyPem, bound.binding.provider);
     return currentDelegateKeyId(workspace, bound.publicKeyPem, bound.binding.provider);
   }
   throw new KeyProviderError("KEY_PROVIDER_HELD", bound?.binding.provider ?? ref!.provider, bound === null
