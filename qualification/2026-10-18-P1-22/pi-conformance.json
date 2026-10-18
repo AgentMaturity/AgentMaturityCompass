@@ -2,12 +2,12 @@
   "schema": "amc.pi-conformance/v1",
   "key": "P1-22",
   "followUp": "evidence-write latch, repeat and intake rules (P1-23's) for Pi",
-  "amcCommit": "0edf4a93666c4b628c3d09b6a949a41288343095",
-  "recordedAt": "2026-10-18T01:09:51.514Z",
+  "amcCommit": "86da8c341c9c750578c74b6a50d0eef4b30528b0",
+  "recordedAt": "2026-10-18T01:21:20.265Z",
   "recordedAtSource": "this machine's clock when the record was written, after the runs",
   "environment": {
     "label": "local macOS arm64 (not CI)",
-    "load": "Other worktrees' AMC test runs were active; load averages 21.53 20.08 19.55 then 18.66 20.43 19.85. Latency was not measured on an idle host."
+    "load": "Other worktrees' AMC test runs were active; load averages 19.19 18.98 19.23 then 25.11 20.96 19.96. Latency was not measured on an idle host."
   },
   "pi": [
     {
@@ -107,8 +107,8 @@
         },
         "latencyMs": {
           "n": 100,
-          "p50": 58.2,
-          "p95": 107.8,
+          "p50": 57.5,
+          "p95": 77.1,
           "measured": "extension tool_call handler to its result: requested observation, control decision, receipt check; loopback Bridge"
         },
         "receiptsVerified": {
@@ -219,8 +219,8 @@
         },
         "latencyMs": {
           "n": 100,
-          "p50": 62.3,
-          "p95": 91.1,
+          "p50": 59.1,
+          "p95": 101.2,
           "measured": "extension tool_call handler to its result: requested observation, control decision, receipt check; loopback Bridge"
         },
         "receiptsVerified": {
