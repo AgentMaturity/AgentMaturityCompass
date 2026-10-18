@@ -4,10 +4,12 @@
  * every parameter must map to an enforcement point, and every exception must name a real control. Unknown facts stay
  * unknown; a mandatory control left unresolved, or an unresolved conflict, blocks the plan.
  */
+import { REGULATORY_REGISTER } from "../../compliance/regulatory/index.js";
 import { canonicalize } from "../../utils/json.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { amcVersion } from "../../version.js";
 import { digestOf } from "../digest.js";
+import { evaluateReviewCurrency } from "../governance/currency.js";
 import { buildCatalogLock } from "../lockfile.js";
 import { FACT_NAMES } from "../schema.js";
 import type { FactName } from "../types.js";
@@ -63,6 +65,16 @@ export function compilePlan(input: CompileInput): CompiledPlan {
   checkParameters(cat);
   checkExceptions(profile, cat);
   const { requirements, retired } = decideApplicability(profile, cat, asOfMs);
+  // P1-34: overdue or unschedulable reviewed content compiles as experimental. Only this plan's copy changes; the record,
+  // its digest (so the lock and past results) and the YAML stay as they are.
+  for (const r of requirements) {
+    const control = cat.controls.get(r.controlId);
+    if (!control || (control.support !== "reviewed" && control.support !== "qualified")) continue;
+    const currency = evaluateReviewCurrency(control, REGULATORY_REGISTER, new Date(asOfMs).toISOString().slice(0, 10));
+    if (currency.support === r.support) continue;
+    r.support = currency.support;
+    r.reasons.push(`${currency.reasons.join(", ")}: review ${currency.nextReviewDue ? `was due ${currency.nextReviewDue}` : "cannot be scheduled"}; compiled as ${currency.support} until re-reviewed`);
+  }
   const candidates = requirements.filter((r) => r.applicability !== "not_applicable").flatMap((r) => cat.controls.get(r.controlId) ?? []);
   const scope = profile.primaryStation.value !== null && profile.stations.value !== null
     ? { primary: profile.primaryStation.value, stations: profile.stations.value } : null;
