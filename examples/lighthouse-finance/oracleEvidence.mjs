@@ -45,7 +45,15 @@ export function snapshot(workspace) {
   const paths = [join(amc, 'evidence.sqlite'), join(amc, 'evidence.sqlite-wal')];
   const keyDir = join(amc, 'keys');
   insist(realpathSync(keyDir) === keyDir && lstatSync(keyDir).isDirectory(), 'unsafe public key directory');
-  for (const name of readdirSync(keyDir).sort()) paths.push(join(keyDir, name));
+  // Key rotation (P1-08) keeps its journal in real subdirectories such as keys/rotations/gen-1; pin every file in them too.
+  const walk = dir => {
+    for (const name of readdirSync(dir).sort()) {
+      const path = join(dir, name), stat = lstatSync(path);
+      if (stat.isDirectory() && !stat.isSymbolicLink()) walk(path);
+      else paths.push(path);
+    }
+  };
+  walk(keyDir);
   return paths.map(path => {
     try { return regular(path, 128 * 1024 * 1024).pin; }
     catch (error) { if (error.code === 'ENOENT') return { path, absent: true }; throw error; }
@@ -282,7 +290,7 @@ function authorization(view, pins, tracked) {
     && record.scope.workspaceId === view.head.workspaceId && [null, pins.tenantId].includes(record.scope.tenantId)
     && record.subject.governedAs === pins.agentId && record.subject.runAs === pins.agentId
     && record.session.sessionId === intent.sessionId && record.session.callId === intent.callId
-    && record.session.parentToken === null && record.scope.deploymentId === 'unregistered' && record.scope.tenantId === null
+    && record.session.parentToken === null && record.scope.deploymentId === 'not_bound' && record.scope.tenantId === null
     && record.delegation.leaseId === null && record.policy.compiledPolicyDigest === null && record.policy.policyRevision === null
     && record.delegation?.depth === 0 && record.delegation.parentExecutionId === null
     && record.action.toolName === pins.toolName && record.action.actionClass === 'FINANCIAL' && record.action.mode === 'EXECUTE'
