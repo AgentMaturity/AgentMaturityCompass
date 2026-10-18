@@ -1,0 +1,356 @@
+{
+  "schemaVersion": 1,
+  "source": "native",
+  "environment": {
+    "node": "22.23.3",
+    "platform": "darwin-arm64",
+    "ci": false
+  },
+  "routes": [
+    {
+      "route": "anthropic",
+      "protocol": "anthropic-messages",
+      "adapter": "anthropic-messages@4",
+      "encoder": "anthropic-messages@4",
+      "declared": {
+        "text-input": "supported",
+        "text-output": "supported",
+        "image-input": "supported",
+        "image-output": "unsupported",
+        "audio-input": "unsupported",
+        "audio-output": "unsupported",
+        "video-input": "unsupported",
+        "thinking-output": "supported",
+        "thinking-replay": "unsupported",
+        "tool-calls": "supported",
+        "tool-replay": "supported",
+        "tool-result-error-flag": "supported",
+        "tool-result-error-text": "unsupported",
+        "usage": "supported",
+        "cache-read-usage": "supported",
+        "cache-write-usage": "supported",
+        "prompt-cache-control": "supported"
+      }
+    },
+    {
+      "route": "openai",
+      "protocol": "openai-chat-completions",
+      "adapter": "openai-chat@4",
+      "encoder": "openai-chat@4",
+      "declared": {
+        "text-input": "supported",
+        "text-output": "supported",
+        "image-input": "supported",
+        "image-output": "unsupported",
+        "audio-input": "unsupported",
+        "audio-output": "unsupported",
+        "video-input": "unsupported",
+        "thinking-output": "unsupported",
+        "thinking-replay": "unsupported",
+        "tool-calls": "supported",
+        "tool-replay": "supported",
+        "tool-result-error-flag": "unsupported",
+        "tool-result-error-text": "supported",
+        "usage": "supported",
+        "cache-read-usage": "supported",
+        "cache-write-usage": "unsupported",
+        "prompt-cache-control": "unsupported"
+      }
+    },
+    {
+      "route": "openai-responses",
+      "protocol": "openai-responses",
+      "adapter": "openai-responses@3",
+      "encoder": "openai-responses@3",
+      "declared": {
+        "text-input": "supported",
+        "text-output": "supported",
+        "image-input": "supported",
+        "image-output": "unsupported",
+        "audio-input": "unsupported",
+        "audio-output": "unsupported",
+        "video-input": "unsupported",
+        "thinking-output": "unsupported",
+        "thinking-replay": "unsupported",
+        "tool-calls": "supported",
+        "tool-replay": "supported",
+        "tool-result-error-flag": "unsupported",
+        "tool-result-error-text": "supported",
+        "usage": "supported",
+        "cache-read-usage": "supported",
+        "cache-write-usage": "supported",
+        "prompt-cache-control": "unsupported"
+      }
+    },
+    {
+      "route": "deepseek",
+      "protocol": "deepseek-chat-completions",
+      "adapter": "deepseek-chat@1",
+      "encoder": "deepseek-chat@1",
+      "declared": {
+        "text-input": "supported",
+        "text-output": "supported",
+        "image-input": "unsupported",
+        "image-output": "unsupported",
+        "audio-input": "unsupported",
+        "audio-output": "unsupported",
+        "video-input": "unsupported",
+        "thinking-output": "supported",
+        "thinking-replay": "supported",
+        "tool-calls": "supported",
+        "tool-replay": "supported",
+        "tool-result-error-flag": "unsupported",
+        "tool-result-error-text": "supported",
+        "usage": "supported",
+        "cache-read-usage": "supported",
+        "cache-write-usage": "unsupported",
+        "prompt-cache-control": "unsupported"
+      }
+    },
+    {
+      "route": "gemini",
+      "protocol": "gemini-generate-content",
+      "adapter": "gemini-generate-content@1",
+      "encoder": "gemini-generate-content@1",
+      "declared": {
+        "text-input": "supported",
+        "text-output": "supported",
+        "image-input": "supported",
+        "image-output": "unsupported",
+        "audio-input": "unsupported",
+        "audio-output": "unsupported",
+        "video-input": "unsupported",
+        "thinking-output": "supported",
+        "thinking-replay": "supported",
+        "tool-calls": "supported",
+        "tool-replay": "supported",
+        "tool-result-error-flag": "unsupported",
+        "tool-result-error-text": "supported",
+        "usage": "supported",
+        "cache-read-usage": "supported",
+        "cache-write-usage": "unsupported",
+        "prompt-cache-control": "unsupported"
+      }
+    },
+    {
+      "route": "gemini-audio",
+      "protocol": "gemini-generate-content",
+      "adapter": "gemini-generate-content@2",
+      "encoder": "gemini-generate-content@2",
+      "declared": {
+        "text-input": "supported",
+        "text-output": "supported",
+        "image-input": "supported",
+        "image-output": "unsupported",
+        "audio-input": "supported",
+        "audio-output": "unsupported",
+        "video-input": "unsupported",
+        "thinking-output": "supported",
+        "thinking-replay": "supported",
+        "tool-calls": "supported",
+        "tool-replay": "supported",
+        "tool-result-error-flag": "unsupported",
+        "tool-result-error-text": "supported",
+        "usage": "supported",
+        "cache-read-usage": "supported",
+        "cache-write-usage": "unsupported",
+        "prompt-cache-control": "unsupported"
+      }
+    },
+    {
+      "route": "ollama",
+      "protocol": "ollama-chat",
+      "adapter": "ollama-chat@1",
+      "encoder": "ollama-chat@1",
+      "declared": {
+        "text-input": "supported",
+        "text-output": "supported",
+        "image-input": "supported",
+        "image-output": "unsupported",
+        "audio-input": "unsupported",
+        "audio-output": "unsupported",
+        "video-input": "unsupported",
+        "thinking-output": "supported",
+        "thinking-replay": "supported",
+        "tool-calls": "supported",
+        "tool-replay": "supported",
+        "tool-result-error-flag": "unsupported",
+        "tool-result-error-text": "supported",
+        "usage": "supported",
+        "cache-read-usage": "supported",
+        "cache-write-usage": "unsupported",
+        "prompt-cache-control": "unsupported"
+      }
+    }
+  ],
+  "results": [
+    {
+      "route": "anthropic",
+      "feature": "text-input",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "anthropic",
+      "feature": "text-output",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "anthropic",
+      "feature": "usage",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "openai",
+      "feature": "text-input",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "openai",
+      "feature": "text-output",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "openai",
+      "feature": "usage",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "openai-responses",
+      "feature": "text-input",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "openai-responses",
+      "feature": "text-output",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "openai-responses",
+      "feature": "usage",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "deepseek",
+      "feature": "text-input",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "deepseek",
+      "feature": "text-output",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "deepseek",
+      "feature": "usage",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "gemini",
+      "feature": "text-input",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "gemini",
+      "feature": "text-output",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "gemini",
+      "feature": "usage",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "gemini-audio",
+      "feature": "text-input",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "gemini-audio",
+      "feature": "text-output",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "gemini-audio",
+      "feature": "usage",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "ollama",
+      "feature": "text-input",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "ollama",
+      "feature": "text-output",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "ollama",
+      "feature": "usage",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a text reply decodes with reported usage, and the fixture received exactly the signed bytes"
+    },
+    {
+      "route": "anthropic",
+      "feature": "tool-calls",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a tool call decodes under the offered name"
+    },
+    {
+      "route": "openai",
+      "feature": "tool-calls",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a tool call decodes under the offered name"
+    },
+    {
+      "route": "openai-responses",
+      "feature": "tool-calls",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a tool call decodes under the offered name"
+    },
+    {
+      "route": "deepseek",
+      "feature": "tool-calls",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a tool call decodes under the offered name"
+    },
+    {
+      "route": "gemini",
+      "feature": "tool-calls",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a tool call decodes under the offered name"
+    },
+    {
+      "route": "gemini-audio",
+      "feature": "tool-calls",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a tool call decodes under the offered name"
+    },
+    {
+      "route": "ollama",
+      "feature": "tool-calls",
+      "support": "supported",
+      "test": "tests/nativeCapabilityContract.test.ts > %s: a tool call decodes under the offered name"
+    }
+  ]
+}
