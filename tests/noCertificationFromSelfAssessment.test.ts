@@ -17,6 +17,7 @@ const mcpTools = vi.hoisted(() => new Map<string, ToolHandler>());
 vi.mock("@modelcontextprotocol/sdk/server/mcp.js", () => ({
   McpServer: class {
     tool(name: string, _description: string, _schema: unknown, handler: ToolHandler) { mcpTools.set(name, handler); }
+    registerTool(name: string, _config: unknown, handler: ToolHandler) { mcpTools.set(name, handler); }
     resource() {}
     async connect() {}
     async close() {}
