@@ -1,0 +1,21 @@
+{
+  "source": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "base": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "selectedCommits": [
+    "0fef1989aa1f928d1e111e71ab52d34d0721418c",
+    "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+    "71ed73e5886bc957130f9712985281d1b1149fca",
+    "c4be164ea12d358ea30451391a6df29429fc6a7e"
+  ],
+  "checks": {
+    "scripts/release-gate.mjs": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+    "scripts/per-file-coverage.mjs": "ce5b1fcaa4d81cfb7c14cd6fe3d9f26d0563f9ce7f19f9a746cdcf8b817cffb3",
+    "scripts/quality/coverage-baseline.json": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+  },
+  "productionAndToolsEqualQualifiedP047": true,
+  "worktreeStatus": ""
+}

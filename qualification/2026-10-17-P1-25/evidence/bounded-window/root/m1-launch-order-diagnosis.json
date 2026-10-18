@@ -1,0 +1,47 @@
+{
+  "at": "2026-10-17T00:16:10.361024+00:00",
+  "applyAction": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/control-action-apply1.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-action-apply1.json",
+    "bytes": 3845,
+    "sha256": "fe64b55095aa7a0142dccb2eec937b5c62d3a74cfc4f1c078af0659432f4cbe6",
+    "dev": 16777231,
+    "inode": 543812619,
+    "nlink": 1
+  },
+  "originalObservedCommand": {
+    "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-m1/command.json",
+    "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-m1/command.json",
+    "bytes": 2806,
+    "sha256": "f6a4d1eee6fd92bfb9767384871cf77320de2b556e08c0340a280675b3077923",
+    "dev": 16777231,
+    "inode": 543813848,
+    "nlink": 1
+  },
+  "helperClosedAfterTestLaunchMs": 47.099000000000004,
+  "originalRunRetainedDiagnosticOnly": true,
+  "sourceAndFreshOriginalsAndAll151PhysicalElevenNativesPreserved": true,
+  "exactExpectedLiveMutantAndOnlyOneQDirtyPathVerified": true,
+  "noReapplyAutomaticRestoreRetrySignalOrGuardChange": true,
+  "repeatJustification": "Dependent test launch preceded actual helper closure. Repeat same already-applied verified mutant in a new uniquely named sequential phase after actual apply exit0.",
+  "oldRootBindingsRetained": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/control-root-bindings.before-sequential-correction.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/control-root-bindings.before-sequential-correction.json",
+    "bytes": 5670,
+    "sha256": "85a6ba5bad5918d06a6539248349076d7b7b735ca5bb83dfae916d14f449c8dc",
+    "dev": 16777231,
+    "inode": 543813897,
+    "nlink": 1
+  },
+  "correctedRootBindings": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/control-root-bindings.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/control-root-bindings.json",
+    "bytes": 5681,
+    "sha256": "17f3feea4252208ec67fbd6845a56fbac5aeb8a994fdc40cd693fe0687198a8f",
+    "dev": 16777231,
+    "inode": 543812594,
+    "nlink": 1
+  },
+  "onlyProspectivePhaseNameChanged": "p125w-m1 -> p125w-m1-sequential",
+  "noFutureOutcomeHashAdopted": true
+}

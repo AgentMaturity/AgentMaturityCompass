@@ -1,0 +1,2818 @@
+{
+  "registryPaths": [
+    "quickscore",
+    "lite-score",
+    "run",
+    "report",
+    "why-capped",
+    "unknowns",
+    "meta-confidence",
+    "confidence-drift",
+    "agent diagnose",
+    "eval run",
+    "eval status",
+    "executive brief",
+    "memory assess",
+    "ci check",
+    "improve",
+    "fix",
+    "quickstart",
+    "loop run",
+    "score",
+    "score formal-spec",
+    "score adversarial",
+    "score collect-evidence",
+    "score production-ready",
+    "score operational-independence",
+    "score behavioral-contract",
+    "score fail-secure",
+    "score output-integrity",
+    "score state-portability",
+    "score eu-ai-act",
+    "score owasp-llm",
+    "score regulatory-readiness",
+    "score self-knowledge",
+    "score kernel-sandbox",
+    "score runtime-identity",
+    "score calibration-gap",
+    "score evidence-conflict",
+    "score density-map",
+    "score evidence-ingest",
+    "score level-transition",
+    "score gaming-resistance",
+    "score sleeper-detection",
+    "score audit-depth",
+    "score policy-consistency",
+    "score autonomy-duration",
+    "score pause-quality",
+    "score task-horizon",
+    "score factuality",
+    "score alignment-index",
+    "score interpretability",
+    "score faithfulness",
+    "score a2a-protocol",
+    "score distributed-agents",
+    "score memory-integrity",
+    "score memory-depth",
+    "score output-attestation",
+    "score mutual-verification",
+    "score transparency-log",
+    "score tier",
+    "score industry-adjust",
+    "score industry-benchmark",
+    "score simulation-lane",
+    "score safety-research",
+    "product autonomy",
+    "strategy compare",
+    "fleet score",
+    "fleet report",
+    "fleet overview",
+    "fleet status",
+    "fleet health",
+    "fleet trust-report",
+    "fleet slo status",
+    "org score",
+    "org community score",
+    "dag score",
+    "leaderboard show",
+    "leaderboard export",
+    "leaderboard public-export",
+    "insider-risk-scores",
+    "observe timeline",
+    "badge",
+    "export badge",
+    "passport badge",
+    "domain assess",
+    "domain gaps",
+    "domain report",
+    "domain roadmap",
+    "domain assurance",
+    "domain apply",
+    "domain pack run",
+    "domain conformance",
+    "assurance run",
+    "assurance runs",
+    "assurance show",
+    "assurance verify",
+    "assurance cert-issue",
+    "assurance cert-verify",
+    "assurance scheduler run-now",
+    "assurance toctou",
+    "assurance compound-threats",
+    "assurance shutdown-compliance",
+    "assurance advanced-threats",
+    "ci redteam",
+    "shield posture",
+    "shield trust-pipeline",
+    "shield analyze-mcp",
+    "shield analyze-runtime",
+    "shield reputation",
+    "benchmark run",
+    "benchmark report",
+    "benchmark compare",
+    "benchmark stats",
+    "benchmark verify",
+    "benchmark provider-drift",
+    "benchmark replay-corpus",
+    "compliance report",
+    "compliance matrix",
+    "compliance fleet",
+    "compliance diff",
+    "compliance risk-classify",
+    "compliance roadmap",
+    "comms-check",
+    "audit binder create",
+    "audit binder verify",
+    "audit verify",
+    "residency-report",
+    "export grc",
+    "business grc-export",
+    "business report",
+    "business risk",
+    "business kpi",
+    "certify",
+    "cert generate",
+    "cert inspect",
+    "cert verify",
+    "enforce verify-certificate",
+    "enforce formal-verify",
+    "passport create",
+    "passport show",
+    "passport verify",
+    "passport verify-token",
+    "passport compare",
+    "passport translate-score",
+    "passport export-latest",
+    "passport share",
+    "passport search",
+    "bundle export",
+    "bundle verify",
+    "bundle inspect",
+    "bundle diff",
+    "gate",
+    "attest",
+    "attestation-export",
+    "notary attest",
+    "notary verify-attest",
+    "outcomes attest",
+    "transform attest",
+    "transform attest-verify",
+    "watch attest",
+    "transparency report",
+    "transparency verify",
+    "transparency verify-bundle",
+    "verify all",
+    "session verify",
+    "eval import",
+    "import",
+    "ingest",
+    "demo run",
+    "demo prospect",
+    "demo share",
+    "mirofish run",
+    "mirofish compare",
+    "mirofish stress",
+    "lab-simulate"
+  ],
+  "fixture": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1",
+  "concurrency": 1,
+  "strict": true,
+  "credentialsInherited": false,
+  "transport": "denied",
+  "acceptance": "literal; empty successful arrays remain failures",
+  "source": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+  "registeredAttemptCount": 173,
+  "successes": 126,
+  "refusals": 47,
+  "exit70": 0,
+  "signals": 0,
+  "literalUnlabelledEmptyResults": [
+    "passport search",
+    "leaderboard show"
+  ],
+  "commands": [
+    {
+      "name": "seed-init",
+      "args": [
+        "init",
+        "--trust-boundary",
+        "isolated",
+        "--profile",
+        "ci"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1910,
+      "stdoutSha256": "2a8cd720a4f4695b1624909961f32c3bf0ced5a78ecc71aefc20c71dfea5cfd6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "seed-sign-config",
+      "args": [
+        "verify",
+        "--sign-config"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1838,
+      "stdoutSha256": "3f75f84dbe08b9f26f3a63e4b570b47f662cfece9768216665188f4bc7922025",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "seed-signed-diagnostic",
+      "args": [
+        "run",
+        "--score-only",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1643,
+      "stdoutSha256": "4e95471f6661e513033823a822e3a5582373a49a98006dae27533cfec05e341b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "seed-lab",
+      "args": [
+        "lab-create",
+        "--kind",
+        "typed_attention",
+        "--name",
+        "p0-22-fixture",
+        "--model",
+        "offline-fixture"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1353,
+      "stdoutSha256": "9b16f5e5aa33aff062409c0ae7cf85525d3deb2d794f7cb819f280fee6d5d703",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fix",
+      "args": [
+        "fix",
+        "--dry-run",
+        "--yes",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 918,
+      "stdoutSha256": "f30a214862752ccc7206a8d224b91ac87b18edc81a1d024c6da5e3e88e184ec7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "improve",
+      "args": [
+        "improve",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 896,
+      "stdoutSha256": "cab506241796d9b952f799fe650b90476a5c36a1e16914c6522a3b0280fc55bd",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "quickscore",
+      "args": [
+        "quickscore",
+        "--auto",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1033,
+      "stdoutSha256": "0cd29930a42c25123766c208ee7f811f050958002e2fb79eef717f01425883d8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "run",
+      "args": [
+        "run",
+        "--score-only",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1092,
+      "stdoutSha256": "dce26e191dca4b6e8fea86232b5f87fccc688db4c127791fa11e8f2682e221ef",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "report",
+      "args": [
+        "report",
+        "d7302b58-9647-4982-9304-c00b1d93e580"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 834,
+      "stdoutSha256": "aac9ec4e4975a67be30ab0dda0d38006eae8b9e5acc1b93cadca9d99d1c58411",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "verify all",
+      "args": [
+        "verify",
+        "all",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 856,
+      "stdoutSha256": "3f1f90783fa0d79ae9ed1781b9ddf173a094c2aabe474591a0f558c81d2f6f16",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "eval import",
+      "args": [
+        "eval",
+        "import",
+        "--format",
+        "openai",
+        "--file",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 794,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "5c4a7d62342f1d58cbdfada0a347525a3db43286dbe015faf882f0436e789a02"
+    },
+    {
+      "name": "eval status",
+      "args": [
+        "eval",
+        "status",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 827,
+      "stdoutSha256": "8114da478879074d2169318c5efcaf82a9f5f42fd9f0b642756558365f06d832",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "eval run",
+      "args": [
+        "eval",
+        "run",
+        "--format",
+        "json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1012,
+      "stdoutSha256": "8a51db672526097eacc4a2e19603f3644aaa6c614de61616a07b3b0791f3751e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "bundle export",
+      "args": [
+        "bundle",
+        "export",
+        "--run",
+        "d7302b58-9647-4982-9304-c00b1d93e580",
+        "--out",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/bundle-export.json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 897,
+      "stdoutSha256": "320115ef89fcf2cf57ce551341572558d1ee4f81c5a985f3a0e17d5113851b48",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "bundle verify",
+      "args": [
+        "bundle",
+        "verify",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 785,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "aaa79398fd83284602b54094d32e4f0efd2038c8cb6a6019a6f7bd3d8476149b"
+    },
+    {
+      "name": "bundle inspect",
+      "args": [
+        "bundle",
+        "inspect",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 795,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "aaa79398fd83284602b54094d32e4f0efd2038c8cb6a6019a6f7bd3d8476149b"
+    },
+    {
+      "name": "bundle diff",
+      "args": [
+        "bundle",
+        "diff",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 792,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "aaa79398fd83284602b54094d32e4f0efd2038c8cb6a6019a6f7bd3d8476149b"
+    },
+    {
+      "name": "ci check",
+      "args": [
+        "ci",
+        "check",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 1008,
+      "stdoutSha256": "24e06da1e87498312e1355a14b94d501424536b6850a20102279988919cc7286",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "ci redteam",
+      "args": [
+        "ci",
+        "redteam",
+        "default",
+        "--plugins",
+        "injection",
+        "--strategies",
+        "direct",
+        "--no-sign",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 841,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "f3dc1ffb90c0b352405fb376fd74d4c1f2689836f7b1ac30af0097615d4168fd"
+    },
+    {
+      "name": "export grc",
+      "args": [
+        "export",
+        "grc",
+        "--framework",
+        "EU_AI_ACT",
+        "--out",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/export-grc.json",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 861,
+      "stdoutSha256": "c5ab8975d9dd512df34969d13c3eb46768fac5e3f076e71e0bcd11d21de0eda3",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "export badge",
+      "args": [
+        "export",
+        "badge",
+        "--run",
+        "d7302b58-9647-4982-9304-c00b1d93e580",
+        "--out",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/export-badge.json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 821,
+      "stdoutSha256": "345c2ae0fb2e172c9836e78a310eb1eb4a4dfddac4233335f0db9b62c39e5cc7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "assurance toctou",
+      "args": [
+        "assurance",
+        "toctou",
+        "--agent",
+        "default",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 766,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "f3dc1ffb90c0b352405fb376fd74d4c1f2689836f7b1ac30af0097615d4168fd"
+    },
+    {
+      "name": "assurance compound-threats",
+      "args": [
+        "assurance",
+        "compound-threats",
+        "--agent",
+        "default",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 765,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "f3dc1ffb90c0b352405fb376fd74d4c1f2689836f7b1ac30af0097615d4168fd"
+    },
+    {
+      "name": "assurance shutdown-compliance",
+      "args": [
+        "assurance",
+        "shutdown-compliance",
+        "--agent",
+        "default",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 762,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "f3dc1ffb90c0b352405fb376fd74d4c1f2689836f7b1ac30af0097615d4168fd"
+    },
+    {
+      "name": "assurance advanced-threats",
+      "args": [
+        "assurance",
+        "advanced-threats",
+        "--agent",
+        "default",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 763,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "f3dc1ffb90c0b352405fb376fd74d4c1f2689836f7b1ac30af0097615d4168fd"
+    },
+    {
+      "name": "assurance run",
+      "args": [
+        "assurance",
+        "run",
+        "--agent",
+        "default",
+        "--pack",
+        "injection",
+        "--no-sign",
+        "--format",
+        "text"
+      ],
+      "status": 2,
+      "signal": null,
+      "durationMs": 814,
+      "stdoutSha256": "363cae8a1e5014b9b7ce553025ecf5ca976ddcc08d510453c97dc9e96ee73cae",
+      "stderrSha256": "efc290ea1e25544b9123cf9a493f16ab8eb64fde7b850546c440a192e1793386"
+    },
+    {
+      "name": "assurance runs",
+      "args": [
+        "assurance",
+        "runs"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 843,
+      "stdoutSha256": "545a46fb5daa4a91e14d875ff09977b7735dd3372f98b0b3abaf8536e5f368fa",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "assurance show",
+      "args": [
+        "assurance",
+        "show",
+        "--run",
+        "fixture-missing-run"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 809,
+      "stdoutSha256": "d9646f0193610cae1dc4e99f9c0711cb54795f7fc3841805e9214073038d3f1f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "assurance cert-issue",
+      "args": [
+        "assurance",
+        "cert-issue",
+        "--run",
+        "fixture-missing-run"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 804,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "7a3a76a557810c267fe08a871c32115c9f598788a9189730c03e08613b20db2a"
+    },
+    {
+      "name": "assurance cert-verify",
+      "args": [
+        "assurance",
+        "cert-verify",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 766,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "6f01eb6bf398d56736abc889f64f3b9ef0c52ca626bc578b78e00347fdc7ceef"
+    },
+    {
+      "name": "assurance scheduler run-now",
+      "args": [
+        "assurance",
+        "scheduler",
+        "run-now"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 838,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "f3dc1ffb90c0b352405fb376fd74d4c1f2689836f7b1ac30af0097615d4168fd"
+    },
+    {
+      "name": "assurance verify",
+      "args": [
+        "assurance",
+        "verify",
+        "--assuranceRun",
+        "fixture-missing-run"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 789,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "cc594db8921da2ab50803f636da0dc6ef1466e755f714b964c1d1cc52ffb82f5"
+    },
+    {
+      "name": "cert generate",
+      "args": [
+        "cert",
+        "generate",
+        "--agent",
+        "default",
+        "--output",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/cert-generate.json",
+        "--preview"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 822,
+      "stdoutSha256": "e23932c535e588487614ac32302855028a9fc647a1e73deb27f65d812789d110",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "cert verify",
+      "args": [
+        "cert",
+        "verify",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 1021,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "aaa79398fd83284602b54094d32e4f0efd2038c8cb6a6019a6f7bd3d8476149b"
+    },
+    {
+      "name": "cert inspect",
+      "args": [
+        "cert",
+        "inspect",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 851,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "aaa79398fd83284602b54094d32e4f0efd2038c8cb6a6019a6f7bd3d8476149b"
+    },
+    {
+      "name": "notary attest",
+      "args": [
+        "notary",
+        "attest",
+        "--out",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/notary-attest.json",
+        "--notary-dir",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/uninitialized-notary",
+        "--workspace",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/workspace"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 822,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "bd0b44ba5d77ec088627c04bdf82a4e393a7cb59f47f2c239beb33138521bb3d"
+    },
+    {
+      "name": "notary verify-attest",
+      "args": [
+        "notary",
+        "verify-attest",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 805,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "aaa79398fd83284602b54094d32e4f0efd2038c8cb6a6019a6f7bd3d8476149b"
+    },
+    {
+      "name": "loop run",
+      "args": [
+        "loop",
+        "run",
+        "--days",
+        "1"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 1093,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "a87cec34583700d1ebcbe5a79373803a3d1910e975862053f657c229e444a48c"
+    },
+    {
+      "name": "transparency verify",
+      "args": [
+        "transparency",
+        "verify"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 789,
+      "stdoutSha256": "9916326b48da5d4f9663b2d61e40eb702ef1b14328df572751bf23c85d931863",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "transparency verify-bundle",
+      "args": [
+        "transparency",
+        "verify-bundle",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 776,
+      "stdoutSha256": "0cfc6cd2282343413e28c84a986da5445949ca2f988f81865c7b033a8d106da6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "transparency report",
+      "args": [
+        "transparency",
+        "report",
+        "default",
+        "--format",
+        "json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 828,
+      "stdoutSha256": "b6dc3fbc9eff83f3f41ed5e9dcbc59c69633e8c936fc17e90d9bd9eefb2ac459",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "compliance report",
+      "args": [
+        "compliance",
+        "report",
+        "--framework",
+        "EU_AI_ACT",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 810,
+      "stdoutSha256": "9976cce9782f04164af23275bd2ea749d755b486984997c12954d4c0ce528c29",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "compliance fleet",
+      "args": [
+        "compliance",
+        "fleet",
+        "--framework",
+        "EU_AI_ACT",
+        "--window",
+        "30d",
+        "--out",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/compliance-fleet.json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 806,
+      "stdoutSha256": "4f3fb3bb122302d9a246f8aff687afa4b3cede1c0dc6175d8d39d9a542d01094",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "compliance diff",
+      "args": [
+        "compliance",
+        "diff",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 763,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "6f01eb6bf398d56736abc889f64f3b9ef0c52ca626bc578b78e00347fdc7ceef"
+    },
+    {
+      "name": "compliance matrix",
+      "args": [
+        "compliance",
+        "matrix",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 824,
+      "stdoutSha256": "d850a41e5e5f5f499e01f5ee8e9f7177fc6fb9fd77bae2c8c6a0229503afdd98",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "compliance risk-classify",
+      "args": [
+        "compliance",
+        "risk-classify",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 767,
+      "stdoutSha256": "b46f85677b264a8dacffd33b7ef7fbc4e73640ab6d30767ee46f02e59f3c01a4",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "compliance roadmap",
+      "args": [
+        "compliance",
+        "roadmap",
+        "--framework",
+        "EU_AI_ACT",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 763,
+      "stdoutSha256": "ac9f063f23cbef087ed9b481d4a2a564dc85c7b413bfc19553222ab7f14ec711",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "outcomes attest",
+      "args": [
+        "outcomes",
+        "attest",
+        "--metric",
+        "fixture-missing-metric",
+        "--value",
+        "0",
+        "--reason",
+        "P0-22 fixture attestation"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 753,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "203f52813efd1f188bea0ca19260d2ca6c111b909865525a11b16561ade02ab0"
+    },
+    {
+      "name": "audit binder create",
+      "args": [
+        "audit",
+        "binder",
+        "create",
+        "--scope",
+        "agent",
+        "--id",
+        "default",
+        "--out",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/audit-binder-create.json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 864,
+      "stdoutSha256": "9bc2d2ee967c211524c82de47e6bf97b867388f2c5f86128739ae9e618db5e00",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "audit binder verify",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 756,
+      "stdoutSha256": "4e8a014abd23c9bcf24ec94e5b9f95c2727f7ecaf5cdcd41d0e1800d3b54b9b1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "audit verify",
+      "args": [
+        "audit",
+        "verify"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 748,
+      "stdoutSha256": "4e718c165a46422326b76690768b302ac23b1344c064a326e2180504e02445b2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "passport create",
+      "args": [
+        "passport",
+        "create",
+        "--scope",
+        "agent",
+        "--id",
+        "default",
+        "--out",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/passport-create.json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 764,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "219029c04ecb421274343fa82771f1e1c87926702d0a7f5200592a646020cf62"
+    },
+    {
+      "name": "passport verify",
+      "args": [
+        "passport",
+        "verify",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 769,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "6f01eb6bf398d56736abc889f64f3b9ef0c52ca626bc578b78e00347fdc7ceef"
+    },
+    {
+      "name": "passport show",
+      "args": [
+        "passport",
+        "show",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 765,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "aaa79398fd83284602b54094d32e4f0efd2038c8cb6a6019a6f7bd3d8476149b"
+    },
+    {
+      "name": "passport badge",
+      "args": [
+        "passport",
+        "badge",
+        "--scope",
+        "agent",
+        "--id",
+        "default"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 866,
+      "stdoutSha256": "256aedfa68942c17c995b6d139646e458d37946aac5f45359813899c8dc39bb7",
+      "stderrSha256": "9c1444d781f21af3c8a588e9097865c59c0d52e716bab9ccf657d3bad93381f8"
+    },
+    {
+      "name": "passport export-latest",
+      "args": [
+        "passport",
+        "export-latest",
+        "--scope",
+        "agent",
+        "--id",
+        "default",
+        "--out",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/passport-export-latest.json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 848,
+      "stdoutSha256": "ad0e34c258eb2e01ee22306275f08373a143b1416884870654dbc105ed220764",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "passport share",
+      "args": [
+        "passport",
+        "share",
+        "--agent",
+        "default",
+        "--format",
+        "json",
+        "--out",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/passport-share.json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 762,
+      "stdoutSha256": "313dae074aa39405710da6b6bc17d75471f405d53cb01104f5945cdb6e3b51d1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "passport compare",
+      "args": [
+        "passport",
+        "compare",
+        "default",
+        "fixture-missing-agent"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 935,
+      "stdoutSha256": "a6e2ab9fed5b25c563eb0f3efa93617257877b910ade8fa3aaa9ed25dfec7a06",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "passport search",
+      "args": [
+        "passport",
+        "search",
+        "--capability",
+        "p0-22-empty-capability"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 768,
+      "stdoutSha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "passport verify-token",
+      "args": [
+        "passport",
+        "verify-token",
+        "{\"tokenId\":\"fixture\",\"expiresAt\":0,\"claims\":[],\"signature\":\"invalid\"}",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 777,
+      "stdoutSha256": "073b172bba28745850effbe070a15c8f287656520e7c18bae7a616690c6cfb3e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "passport translate-score",
+      "args": [
+        "passport",
+        "translate-score",
+        "--from",
+        "amc",
+        "--to",
+        "nist_ai_rmf",
+        "--score",
+        "0",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 777,
+      "stdoutSha256": "32c1794090ec4c05c08592cd50852f52ee8d8272394a69a9aec23c337f1b5084",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "gate",
+      "args": [
+        "gate",
+        "--bundle",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--policy",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 759,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "aaa79398fd83284602b54094d32e4f0efd2038c8cb6a6019a6f7bd3d8476149b"
+    },
+    {
+      "name": "certify",
+      "args": [
+        "certify",
+        "--run",
+        "d7302b58-9647-4982-9304-c00b1d93e580",
+        "--policy",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--out",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/certify.json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 795,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "fb82f9f8bf3b86a67143911761986da23562db8887002bd4fd4465b545c84864"
+    },
+    {
+      "name": "fleet report",
+      "args": [
+        "fleet",
+        "report",
+        "--format",
+        "md",
+        "--output",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/fleet-report.json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1152,
+      "stdoutSha256": "75cd9703b65ba0cf2c466bbb004e37dc82537680f5c27b1cc5f0f5a76d9bffa5",
+      "stderrSha256": "43dfab21559f59536432230d12bd075bf1c5a8dab5a3d632653288863dde135e"
+    },
+    {
+      "name": "fleet score",
+      "args": [
+        "fleet",
+        "score",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1222,
+      "stdoutSha256": "5951e40803bd593f67f0aa668257d38a16c2a251b54c59a51e35627511ebcfec",
+      "stderrSha256": "43dfab21559f59536432230d12bd075bf1c5a8dab5a3d632653288863dde135e"
+    },
+    {
+      "name": "fleet health",
+      "args": [
+        "fleet",
+        "health",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 832,
+      "stdoutSha256": "f588ae6f165e6d1cedb50df603486a445ec5cad1f89e74f0b1377333bc70d2f9",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fleet status",
+      "args": [
+        "fleet",
+        "status",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 795,
+      "stdoutSha256": "ba30415e8f986bd5167e1c23c06c0465c012975c973582db8cf13db127f848e5",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fleet overview",
+      "args": [
+        "fleet",
+        "overview",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 790,
+      "stdoutSha256": "23cf65cb133213be8d722cd1f3d09990de22e9a349fa2451624aa0b44bfac9a1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fleet slo status",
+      "args": [
+        "fleet",
+        "slo",
+        "status"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 803,
+      "stdoutSha256": "90fbfa2475e162f2fe11eea3d997ab13e17741c99a1a3de340bedbdf82289d52",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fleet trust-report",
+      "args": [
+        "fleet",
+        "trust-report"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1257,
+      "stdoutSha256": "25382a9856e983953a58063d90d047e341985ba0b1a5fe74bcefe44be7fe4948",
+      "stderrSha256": "43dfab21559f59536432230d12bd075bf1c5a8dab5a3d632653288863dde135e"
+    },
+    {
+      "name": "agent diagnose",
+      "args": [
+        "agent",
+        "diagnose",
+        "--token-file",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--studio",
+        "http://127.0.0.1:1"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 775,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "6f01eb6bf398d56736abc889f64f3b9ef0c52ca626bc578b78e00347fdc7ceef"
+    },
+    {
+      "name": "ingest",
+      "args": [
+        "ingest",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--type",
+        "generic_text"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 781,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "aaa79398fd83284602b54094d32e4f0efd2038c8cb6a6019a6f7bd3d8476149b"
+    },
+    {
+      "name": "attest",
+      "args": [
+        "attest",
+        "--ingest-session",
+        "fixture-missing-session",
+        "--attested-by",
+        "fixture-operator",
+        "--statement",
+        "P0-22 fixture only"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 765,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "43d59865e7c94f54957e022da1bbb687861aea00866cbe7835660dfeabe35c3b"
+    },
+    {
+      "name": "transform attest",
+      "args": [
+        "transform",
+        "attest",
+        "--agent",
+        "default",
+        "--task",
+        "fixture-missing-task",
+        "--statement",
+        "P0-22 fixture only"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 815,
+      "stdoutSha256": "597865cbd4c63a5550f894def16ff8a2ae24c4d7c773b7bcaa3ddec7d5f3f63a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "transform attest-verify",
+      "args": [
+        "transform",
+        "attest-verify",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 766,
+      "stdoutSha256": "d719511de9416d2582ce1584a71f1b49b1e3c42ab967cdf477051c9a65937842",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "org score",
+      "args": [
+        "org",
+        "score"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 825,
+      "stdoutSha256": "ebc4ac7e16d6062725eaecd5f3f7ab155aea62190fd6d863b9162db82cb3eb2f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "org community score",
+      "args": [
+        "org",
+        "community",
+        "score",
+        "--platform",
+        "fixture-community"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 819,
+      "stdoutSha256": "f43b37ac399dee0362c173a65c5aad21f604b8c7c57dd9df103e978d5def5386",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "benchmark verify",
+      "args": [
+        "benchmark",
+        "verify",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 849,
+      "stdoutSha256": "ca589ae0ad1152ae2714ddc0dc4973a9ca01bfa75002997e5131e8bb37232cff",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "benchmark report",
+      "args": [
+        "benchmark",
+        "report",
+        "--out",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/benchmark-report.json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 787,
+      "stdoutSha256": "ea6c111e95b8808c61866fa49ef5678f45ba49ad96bf10f7ef00e913dd95f432",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "benchmark stats",
+      "args": [
+        "benchmark",
+        "stats"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 766,
+      "stdoutSha256": "adc0eed29afc95307a98242d6e6eabc802a73fb43f8698a5d15c0c78c9997dbb",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "benchmark run",
+      "args": [
+        "benchmark",
+        "run",
+        "--agent",
+        "default",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 782,
+      "stdoutSha256": "8f5ed91553bfa0678f3153061a82c74bc394637ea4020ff429a3bd276418c843",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "benchmark compare",
+      "args": [
+        "benchmark",
+        "compare",
+        "default",
+        "fixture-missing-agent",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 761,
+      "stdoutSha256": "8a7cc676b1f16437e95468f17a11e7d1e5ff644879932c676cadcaf93903dcdd",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "benchmark provider-drift",
+      "args": [
+        "benchmark",
+        "provider-drift",
+        "--file",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 773,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "6f01eb6bf398d56736abc889f64f3b9ef0c52ca626bc578b78e00347fdc7ceef"
+    },
+    {
+      "name": "benchmark replay-corpus",
+      "args": [
+        "benchmark",
+        "replay-corpus",
+        "--file",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 783,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "6f01eb6bf398d56736abc889f64f3b9ef0c52ca626bc578b78e00347fdc7ceef"
+    },
+    {
+      "name": "lab-simulate",
+      "args": [
+        "lab-simulate",
+        "--experiment",
+        "lab_87aa3b3e-f11"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 885,
+      "stdoutSha256": "aac74ec579f8e992513169466ede9bc25c827d4943200d469c98951c28890702",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "insider-risk-scores",
+      "args": [
+        "insider-risk-scores"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 791,
+      "stdoutSha256": "13edbd9d304c99f65e45f2d71675d67e4896444445a0ac6c8deb97245ed36c54",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "attestation-export",
+      "args": [
+        "attestation-export",
+        "--tenant",
+        "fixture-tenant"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 854,
+      "stdoutSha256": "4a680369ef384908bbfed563ab1d218b0df59e70027d2850721665548707962c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "residency-report",
+      "args": [
+        "residency-report",
+        "--tenant",
+        "fixture-tenant"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 765,
+      "stdoutSha256": "e37fd632ac644783d3d452d5c46ec42b9d59b2130974cc5cc66164cced69eb38",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "why-capped",
+      "args": [
+        "why-capped"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 882,
+      "stdoutSha256": "873a760a3c24a909f0bab01b564b6f5fc4e0002acd3096b5de3d58c050735572",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "confidence-drift",
+      "args": [
+        "confidence-drift"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 833,
+      "stdoutSha256": "b74c8a801429a152b4226ae2c4be02b4026cb4dbcb09818f0fa3f38d79613eb8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "unknowns",
+      "args": [
+        "unknowns"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 876,
+      "stdoutSha256": "f28d6cfc5c7ac6a06e73a98119914caf7d6b2abd1598018b20d63e498c3aedcb",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "meta-confidence",
+      "args": [
+        "meta-confidence"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 881,
+      "stdoutSha256": "e6842d0230dcccc6af5241b296f239cd63385899ca74256956dd6cd560e73d38",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "shield analyze-runtime",
+      "args": [
+        "shield",
+        "analyze-runtime",
+        "--agent",
+        "default",
+        "--action",
+        "read",
+        "--tool",
+        "fixture-read",
+        "--parameters",
+        "{}",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 851,
+      "stdoutSha256": "a843630cf053baf9532b47611a09a58cc4ca60af1aa2f78553ef1043a14a30a6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "shield reputation",
+      "args": [
+        "shield",
+        "reputation",
+        "fixture-missing-tool",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1152,
+      "stdoutSha256": "0300f9de510615a5becd5f52011a2c6a86ded4368d0b2ad0b39bae98da03710f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "shield trust-pipeline",
+      "args": [
+        "shield",
+        "trust-pipeline",
+        "--agent",
+        "default",
+        "--action",
+        "read",
+        "--tool",
+        "fixture-read",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1867,
+      "stdoutSha256": "abbfef03d0bcbbce4276963878707ebe8afc0d67f939aa3c478ed9f29b69a11b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "shield posture",
+      "args": [
+        "shield",
+        "posture",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 814,
+      "stdoutSha256": "093b901438cc4eb2de83c56de45d6e4c38a7ac2af2a164f866aa05b781981fe3",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "shield analyze-mcp",
+      "args": [
+        "shield",
+        "analyze-mcp",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 790,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "1e05673781b149ce2417d6b64ec6f8f71a1226b7d3e36584616814e7e139f827"
+    },
+    {
+      "name": "enforce formal-verify",
+      "args": [
+        "enforce",
+        "formal-verify"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 763,
+      "stdoutSha256": "48903d2d38313ff10ad2200ec4a6fd8b24155b22c0c85e28de3e8127f2bbcf7e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "enforce verify-certificate",
+      "args": [
+        "enforce",
+        "verify-certificate",
+        "{\"certificateHash\":\"invalid\",\"proofTree\":{\"id\":\"fixture\",\"rule\":\"axiom\",\"conclusion\":{\"text\":\"fixture\",\"predicate\":\"fixture\",\"freeVars\":[]},\"premises\":[],\"verified\":true,\"hash\":\"invalid\"}}",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 714,
+      "stdoutSha256": "e293b6986da724aca7babefaf71766f7f0f20c8091b8a09e91793877bb3af99d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "watch attest",
+      "args": [
+        "watch",
+        "attest",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 748,
+      "stdoutSha256": "0cda2fd8f3498fb1362183628a9e96a10fd950667b1a4487e415417f95cab68d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "product autonomy",
+      "args": [
+        "product",
+        "autonomy",
+        "default",
+        "supervised",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 779,
+      "stdoutSha256": "642b62ccb311a2e717272c679351a5df9ee2b50086a2e889193c2d7f99d9bbec",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "domain apply",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--dry-run",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 774,
+      "stdoutSha256": "70ed13cf4508139c36c9bb933445db333134ea1b6449b53f609bc8b7262d4c76",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "domain pack run",
+      "args": [
+        "domain",
+        "pack",
+        "run",
+        "--pack",
+        "clinical-trials",
+        "--baseline",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 771,
+      "stdoutSha256": "92edc56e160ef15c147c91a9c89329c5f3fc2b65ed4a88b3e916912d25965a1d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "domain assess",
+      "args": [
+        "domain",
+        "assess",
+        "--agent",
+        "default",
+        "--domain",
+        "health",
+        "--example",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 776,
+      "stdoutSha256": "9461afd775ba026395169c8fa23dce4b6148345959aacb5c818193e0aa3fcc41",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "domain gaps",
+      "args": [
+        "domain",
+        "gaps",
+        "--agent",
+        "default",
+        "--domain",
+        "health",
+        "--example",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 776,
+      "stdoutSha256": "0ab95a7739da163e396d303231b9633d88f19bac048045c0c0393c3cd61934f8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "domain report",
+      "args": [
+        "domain",
+        "report",
+        "--agent",
+        "default",
+        "--domain",
+        "health",
+        "--output",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/domain-report.json",
+        "--example",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 794,
+      "stdoutSha256": "58dbe08c60818eebb0d7589eba7636c7d4141e90460ac4c8ce3a514a92a84140",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "domain assurance",
+      "args": [
+        "domain",
+        "assurance",
+        "--agent",
+        "default",
+        "--domain",
+        "health",
+        "--example",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 789,
+      "stdoutSha256": "203dd541b5e2f912be520836c618814063024578df73025427071bd13a0a4cbf",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "domain roadmap",
+      "args": [
+        "domain",
+        "roadmap",
+        "--agent",
+        "default",
+        "--domain",
+        "health",
+        "--example",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 778,
+      "stdoutSha256": "6dce9f2dd86dcfbd9a2453d5dd8623ee0a9d64e628ddb3051aaa047378e472a6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "domain conformance",
+      "args": [
+        "domain",
+        "conformance",
+        "--station",
+        "health",
+        "--agent",
+        "default",
+        "--max-evidence-age",
+        "24h",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 851,
+      "stdoutSha256": "7fe1cf5223d6171fae5d3094424db8cca8bff18204f12d3f1c681959dfc13a5a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score",
+      "args": [
+        "score"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 753,
+      "stdoutSha256": "8d31bd3ec6615ea2689ac56c2be8ea4a6c989ea1ecb0b2454fb143a64cec0fc7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score formal-spec",
+      "args": [
+        "score",
+        "formal-spec",
+        "default",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 801,
+      "stdoutSha256": "ac051117aa0ea0310d37c09df747e0fa2a44bf019ba9859571ac06bf93fd27da",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score adversarial",
+      "args": [
+        "score",
+        "adversarial",
+        "default",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 775,
+      "stdoutSha256": "dfc320bb11aa1bdf6d9a95f769234af51cc71add59191c66fefa5a38ddddf4a7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score collect-evidence",
+      "args": [
+        "score",
+        "collect-evidence",
+        "default",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 743,
+      "stdoutSha256": "7a7aea71b13749cab5721e168f0bb633c1fb1b0422dfec00c39c014b4845af38",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score production-ready",
+      "args": [
+        "score",
+        "production-ready",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 752,
+      "stdoutSha256": "a130db9f544aeded08b94cb8ecf06c87f9cf6ca3ff9c125b1ddd179d857f50a6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score operational-independence",
+      "args": [
+        "score",
+        "operational-independence",
+        "default",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 746,
+      "stdoutSha256": "dfd2ed4eb6c15e4815b2dc9d1c06bf246cb5d126808995cd5de63479e5e0e458",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score behavioral-contract",
+      "args": [
+        "score",
+        "behavioral-contract",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 734,
+      "stdoutSha256": "7369889a058cf6d9f8afe8f223c4cbe73689f73b3f5ede86ffcb575c9956724e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score fail-secure",
+      "args": [
+        "score",
+        "fail-secure",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 751,
+      "stdoutSha256": "41321bca2c7ef9a360adcbdaaca6137268d5c506a765ac3d4b43a8825285d218",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score output-integrity",
+      "args": [
+        "score",
+        "output-integrity",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 745,
+      "stdoutSha256": "e7a74aef47679d40624b48d7f694bb31bfb0c8b275c0fea798fac869e7428a1a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score state-portability",
+      "args": [
+        "score",
+        "state-portability",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 770,
+      "stdoutSha256": "5362de922edc5b15b25e16cefed8e13cbd6b0602fa5e14c38b9002e273ba9754",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score eu-ai-act",
+      "args": [
+        "score",
+        "eu-ai-act",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 744,
+      "stdoutSha256": "2fa90d8d250a179a0c23922652e97f4aebd0ab30672b3908e7b85cc275a2f22a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score owasp-llm",
+      "args": [
+        "score",
+        "owasp-llm",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 737,
+      "stdoutSha256": "0b06535cb051b6cd0e9232b6c01e62912ea6f26afd7beeca23a252d3886b5b32",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score regulatory-readiness",
+      "args": [
+        "score",
+        "regulatory-readiness",
+        "--agent",
+        "default",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 905,
+      "stdoutSha256": "c76d21e1a6ae09c4ae15b8eef41bdfea48fd13c51626e65e89fdf0036d3f3c47",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score self-knowledge",
+      "args": [
+        "score",
+        "self-knowledge",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 732,
+      "stdoutSha256": "2deb57a2f2c89afe798b6988cfef15fd91f987312b8aff342be6ce65e737a76d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score kernel-sandbox",
+      "args": [
+        "score",
+        "kernel-sandbox",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 733,
+      "stdoutSha256": "fe974d5a2f8f36eb7c90a963bd4e5297fd5c991398001356de454d3ad2cda40c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score runtime-identity",
+      "args": [
+        "score",
+        "runtime-identity",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 731,
+      "stdoutSha256": "a28101f8307da2f823bce5b4bfe23a4957a462a1a7e44fafccddd18f922fe1eb",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score calibration-gap",
+      "args": [
+        "score",
+        "calibration-gap",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 739,
+      "stdoutSha256": "268f3d71e6082615499dbe62de1b57a16c294f8a01811599efacbd7b5543d89a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score evidence-conflict",
+      "args": [
+        "score",
+        "evidence-conflict",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 738,
+      "stdoutSha256": "6f802e4264d99694a0d5620960b4e7dd8abe98f4777c6d36f57725916b9cc211",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score density-map",
+      "args": [
+        "score",
+        "density-map",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 769,
+      "stdoutSha256": "94eecd81d2e1e80cee6ccae8b21a6d69a903b3b5eafd64aec2427f8ceff364f5",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score evidence-ingest",
+      "args": [
+        "score",
+        "evidence-ingest",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 796,
+      "stdoutSha256": "b18e1ca8f77f87e875adb77318d243822d78cf9f060cc718d4dd1701b17c71cd",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score level-transition",
+      "args": [
+        "score",
+        "level-transition",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 748,
+      "stdoutSha256": "323725675066fb97cfa29c12c309eb58ad07fd1648360ceca2522d23e85088fe",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score gaming-resistance",
+      "args": [
+        "score",
+        "gaming-resistance",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 766,
+      "stdoutSha256": "8179956d1b8d3a067b4a7c0d8ba2849d31011a702bcc9a9f8dc3e4a97bb6871b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score sleeper-detection",
+      "args": [
+        "score",
+        "sleeper-detection",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 805,
+      "stdoutSha256": "641b75229d4aaa2e36d0adce7787e9231590ceedc62c684d2d43cd3f908c695f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score audit-depth",
+      "args": [
+        "score",
+        "audit-depth",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 765,
+      "stdoutSha256": "641b75229d4aaa2e36d0adce7787e9231590ceedc62c684d2d43cd3f908c695f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score policy-consistency",
+      "args": [
+        "score",
+        "policy-consistency",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 779,
+      "stdoutSha256": "d214ab5a214e42fbd3cc6a114cc15b777facab64c43732c2628cfc41c4b6a402",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score autonomy-duration",
+      "args": [
+        "score",
+        "autonomy-duration",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 777,
+      "stdoutSha256": "77a9522d3191cce45dde36c64aa3c305ce275a767ed1dc5ddb812f3e0aa8bbdb",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score pause-quality",
+      "args": [
+        "score",
+        "pause-quality",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 757,
+      "stdoutSha256": "5f0d446170c7be170d95c509318bc22df577ec4a778fe5ae59d9afaeb992371c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score task-horizon",
+      "args": [
+        "score",
+        "task-horizon",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 758,
+      "stdoutSha256": "3b5196f23f7f23c31f4f6631d48c56ea68ebbe6d84d72e7fda29cd7e67a2f248",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score factuality",
+      "args": [
+        "score",
+        "factuality",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 804,
+      "stdoutSha256": "5beac6f4c6e223a044e75e5004c5da7f6b9b883ce718ee3696baa75cc9277821",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score alignment-index",
+      "args": [
+        "score",
+        "alignment-index",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 760,
+      "stdoutSha256": "61e04562b6c5ff47b9eb7519abdc7049c18d9dc2a0345fac432177e8f370dab5",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score interpretability",
+      "args": [
+        "score",
+        "interpretability",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 765,
+      "stdoutSha256": "66a46181a64f858c4be6a8e7315c9dcbed6225d3466277df0c30ab183e4601c5",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score faithfulness",
+      "args": [
+        "score",
+        "faithfulness",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 757,
+      "stdoutSha256": "aeda3b0637c17a562207fb4c300ebf62ab7d2cb28a3faf4bb533ee9840c43853",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score a2a-protocol",
+      "args": [
+        "score",
+        "a2a-protocol",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 760,
+      "stdoutSha256": "1391a430d65c7b1c9f773f51dd90bbb677a65b5a685798e5e827a320fa14403f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score distributed-agents",
+      "args": [
+        "score",
+        "distributed-agents",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 756,
+      "stdoutSha256": "1405c871fe5a790dc49e77735b3360f97f3ae12254d6cf39ef7ee6444cdda5e8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score memory-integrity",
+      "args": [
+        "score",
+        "memory-integrity",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 751,
+      "stdoutSha256": "95eb55d375e34d10cd446b34fabb7a5b526521d38ab64197bff56a39abace00c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score memory-depth",
+      "args": [
+        "score",
+        "memory-depth",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 752,
+      "stdoutSha256": "6191fbcce79979e48115d33f3bdbd1486db7d5aca8a05b36be6a41a398b3333a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score output-attestation",
+      "args": [
+        "score",
+        "output-attestation",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 762,
+      "stdoutSha256": "3fe45778d42f25305f91dcccaf77ed62181b717ac6395c50b1ad91ebbcc3fce3",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score mutual-verification",
+      "args": [
+        "score",
+        "mutual-verification",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 743,
+      "stdoutSha256": "1c9793cd104f5ef5adea3dc01bbaa5366523b6fdc2d867c7bb52eced6448c2c7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score transparency-log",
+      "args": [
+        "score",
+        "transparency-log",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 831,
+      "stdoutSha256": "51352888de95381b88df368a98c37f2f76de5690d637789ca8ed4972041fe10e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score tier",
+      "args": [
+        "score",
+        "tier",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 762,
+      "stdoutSha256": "74d2dba61bccd6d974109b0f9bdb2c29afb9bce51ba98b4a8249d0777e8776fb",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score industry-adjust",
+      "args": [
+        "score",
+        "industry-adjust",
+        "--industry",
+        "healthcare",
+        "--score",
+        "0",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 834,
+      "stdoutSha256": "8c1d7a4f28d040c98e59e8cc1bb15c1648f83cde0b0683e53b5aa95a0fcf4797",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score industry-benchmark",
+      "args": [
+        "score",
+        "industry-benchmark",
+        "--industry",
+        "healthcare",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 749,
+      "stdoutSha256": "a35ded937e32e180c0a3e537a2761525958226b1ff9dc3da212e5da2187a5fd8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score simulation-lane",
+      "args": [
+        "score",
+        "simulation-lane",
+        "--system-type",
+        "simulation-engine",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 881,
+      "stdoutSha256": "5270ddbf3fa643ccc6c0a4aec7fb921698c4adb7136122fd0ef8598e5aeec6ed",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "score safety-research",
+      "args": [
+        "score",
+        "safety-research",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 761,
+      "stdoutSha256": "95efdfee1fc4f0d024894270e63a0aa59ab773213eea9480d2487c439308f506",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "memory assess",
+      "args": [
+        "memory",
+        "assess",
+        "default",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 794,
+      "stdoutSha256": "10cd14650288eb28d58b4276ac1b403d1e48d5808a19c5132cc11a4ed8aa38fc",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "dag score",
+      "args": [
+        "dag",
+        "score",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 764,
+      "stdoutSha256": "9ede20490975f0d930608a886f682a2c27738b6da1637c82f6a26d546f3fa130",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "quickstart",
+      "args": [
+        "quickstart"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 746,
+      "stdoutSha256": "398bd76a5462a401f12395fdb5783feedccbdda8e41786d2c445559e277041fc",
+      "stderrSha256": "9ded5d25b220e8b0bcd064dc2b55cfae61ce5891e0b904c60df6ac3aaaf075f9"
+    },
+    {
+      "name": "demo run",
+      "args": [
+        "demo",
+        "run",
+        "--gateway",
+        "http://127.0.0.1:1",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 754,
+      "stdoutSha256": "fa90eefce8f0eba5e7fd5b7aafcc3588ef0a22315445b29aa9d6a52fe8b0daac",
+      "stderrSha256": "34ad2cee135ab8d1efc570f4a5617258d6935cc8322703a4010ee1951e0488fe"
+    },
+    {
+      "name": "demo prospect",
+      "args": [
+        "demo",
+        "prospect",
+        "--json",
+        "--out",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/demo-prospect.json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 751,
+      "stdoutSha256": "0eb1ab15fbe243f9df23b6f74511608e4a2a8bef1d21d1b117fef7a70e7a4b72",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "demo share",
+      "args": [
+        "demo",
+        "share",
+        "--json",
+        "--out",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/demo-share.json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 740,
+      "stdoutSha256": "f89d31984c2ed58cb62c43154491c2c0fd9d3f796b834c85f7953787e016fb87",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "observe timeline",
+      "args": [
+        "observe",
+        "timeline",
+        "--agent",
+        "default",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 977,
+      "stdoutSha256": "97192655809439d333f6da8034ee5a23912f6ac5e3075e712941d96bd54cfec2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "import",
+      "args": [
+        "import",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 715,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "f7a4419cba606a78484a7a4845e71cecdfc8ce89b26c6c98106e1dd5b3880181"
+    },
+    {
+      "name": "strategy compare",
+      "args": [
+        "strategy",
+        "compare",
+        "--file",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 732,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "6f01eb6bf398d56736abc889f64f3b9ef0c52ca626bc578b78e00347fdc7ceef"
+    },
+    {
+      "name": "lite-score",
+      "args": [
+        "lite-score",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1099,
+      "stdoutSha256": "db855f37a58e00ea194245fd3d7476d07557ca0cdb424224f6d4611904950940",
+      "stderrSha256": "43dfab21559f59536432230d12bd075bf1c5a8dab5a3d632653288863dde135e"
+    },
+    {
+      "name": "business kpi",
+      "args": [
+        "business",
+        "kpi",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1113,
+      "stdoutSha256": "09d8fedb5b8f4a864622d5ee0d16e48306f338257c5c68a07e840d2bbbdd2e91",
+      "stderrSha256": "43dfab21559f59536432230d12bd075bf1c5a8dab5a3d632653288863dde135e"
+    },
+    {
+      "name": "business risk",
+      "args": [
+        "business",
+        "risk",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1140,
+      "stdoutSha256": "791367f13ce5467eb6a0edc3214a2dabc691f28ebbf754e1fb144c7bcb128b14",
+      "stderrSha256": "43dfab21559f59536432230d12bd075bf1c5a8dab5a3d632653288863dde135e"
+    },
+    {
+      "name": "business grc-export",
+      "args": [
+        "business",
+        "grc-export",
+        "--portfolio",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/deliberately-absent-fixture.json",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 723,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "6f01eb6bf398d56736abc889f64f3b9ef0c52ca626bc578b78e00347fdc7ceef"
+    },
+    {
+      "name": "business report",
+      "args": [
+        "business",
+        "report",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 722,
+      "stdoutSha256": "eb3ded745bd98eddc1d6a9d8b1e3130dfa8f0e15ddc18f1da845e0afc7998714",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "executive brief",
+      "args": [
+        "executive",
+        "brief",
+        "--run",
+        "d7302b58-9647-4982-9304-c00b1d93e580",
+        "--format",
+        "markdown"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 816,
+      "stdoutSha256": "b30d30ede175097c474172bb35496b2551c7a091da2edd0c2d590943d9f09b3d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "leaderboard show",
+      "args": [
+        "leaderboard",
+        "show",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 763,
+      "stdoutSha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "leaderboard export",
+      "args": [
+        "leaderboard",
+        "export",
+        "--format",
+        "json",
+        "--output",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/leaderboard-export.json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 719,
+      "stdoutSha256": "f06799203e8af8f6260b1889a16f4324063bddc761e317972764e45fd97d98a5",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "leaderboard public-export",
+      "args": [
+        "leaderboard",
+        "public-export",
+        "--output",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/outputs/leaderboard-public-export.json",
+        "--dataset-id",
+        "p0-22-fixture",
+        "--name",
+        "P0-22 fixture",
+        "--license",
+        "CC0-1.0",
+        "--salt",
+        "p0-22-owned-salt",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 721,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "726b33f6481c1f2d36a9f6934dd0ee15d4e4d2d067fc1c0b1c75b8ebbc43017b"
+    },
+    {
+      "name": "comms-check",
+      "args": [
+        "comms-check",
+        "--text",
+        "Fixture system supports human review.",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 724,
+      "stdoutSha256": "df5bbbc54260b47c42c4bdba1ac05025b5a5328800e73077d265c14446638039",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "badge",
+      "args": [
+        "badge",
+        "--agent",
+        "default",
+        "--level",
+        "0",
+        "--score",
+        "0",
+        "--format",
+        "url"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 743,
+      "stdoutSha256": "571cd77bac1ca31c75476ebfcaa92cfeca166e0028ccd01692d3c0596ac27be9",
+      "stderrSha256": "9c1444d781f21af3c8a588e9097865c59c0d52e716bab9ccf657d3bad93381f8"
+    },
+    {
+      "name": "mirofish run",
+      "args": [
+        "mirofish",
+        "run",
+        "--scenario",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/scenario.yaml",
+        "--iterations",
+        "2",
+        "--seed",
+        "7",
+        "--output",
+        "json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 724,
+      "stdoutSha256": "506e48369b7fb399bcfe3574434dcdcf4dc2ffa2406225004bbcf3f51b208395",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "mirofish compare",
+      "args": [
+        "mirofish",
+        "compare",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/scenario.yaml",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/scenario.yaml",
+        "--iterations",
+        "2",
+        "--seed",
+        "7"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 725,
+      "stdoutSha256": "5387ccc4a18922b2984e2d4a62a66cd78e5cd37dde8fda2b05073ae3b33f7589",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "mirofish stress",
+      "args": [
+        "mirofish",
+        "stress",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p022-cli-labels-156TQ1/scenario.yaml",
+        "--seed",
+        "7"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 986,
+      "stdoutSha256": "c265816d39171a8dff9af35fe1fc38686e83fc4113850084781788cddf575649",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "session verify",
+      "args": [
+        "session",
+        "verify",
+        "--json"
+      ],
+      "status": 1,
+      "signal": null,
+      "durationMs": 753,
+      "stdoutSha256": "a9541a0d001f4504538075139a415ccf03ab18d266d9d70be2bb3ab413f63439",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "exact-domain-example",
+      "args": [
+        "domain",
+        "assess",
+        "--agent",
+        "default",
+        "--domain",
+        "health",
+        "--example",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 726,
+      "stdoutSha256": "9461afd775ba026395169c8fa23dce4b6148345959aacb5c818193e0aa3fcc41",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "exact-domain-baseline",
+      "args": [
+        "domain",
+        "pack",
+        "run",
+        "--pack",
+        "clinical-trials",
+        "--baseline",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 726,
+      "stdoutSha256": "92edc56e160ef15c147c91a9c89329c5f3fc2b65ed4a88b3e916912d25965a1d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "exact-quickscore-auto",
+      "args": [
+        "quickscore",
+        "--auto",
+        "--json"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 1194,
+      "stdoutSha256": "c903954fecd3e69a0bf0c379e19bdb559eab118ac85fb403886edbea0f920e92",
+      "stderrSha256": "43dfab21559f59536432230d12bd075bf1c5a8dab5a3d632653288863dde135e"
+    },
+    {
+      "name": "exact-legacy-run",
+      "args": [
+        "report",
+        "p0-22-legacy-1-1-1"
+      ],
+      "status": 0,
+      "signal": null,
+      "durationMs": 776,
+      "stdoutSha256": "f0821da936c4d030c9862bcc5faeb29e735363f6d1da82a60223ad7d1253c731",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791996676616-50841/commands.json",
+      "sha256": "e498fa0e511caf687dcc9b19e52e814e52310e2c19017af039421119d69eb6e9",
+      "bytes": 12051396
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-claim-labels-1791996676616-50841/qualification-summary.json",
+      "sha256": "ef78c2608d9dc0fb803981e2d9540abf6bf209f7d20b88f3558cfb652cb28f0d",
+      "bytes": 12061821
+    }
+  ]
+}

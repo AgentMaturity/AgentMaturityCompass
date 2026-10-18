@@ -1,0 +1,31 @@
+{
+  "source": "2024f25c79973987b44a4a1298488d55ee0d6227",
+  "purpose": "Read-only response to the P0-45 spec adjacent doctor-fix risk; not repair-path runtime evidence.",
+  "sourcePin": {
+    "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/src/doctor/doctorFix.ts",
+    "bytes": 10366,
+    "sha256": "5599a8acd65ea9d0038d34de8754c47cc6c052515210bb12f84ab48c6c56a7c3"
+  },
+  "observedSource": {
+    "brokenTopLevelSymlinksLines": [
+      103,
+      141
+    ],
+    "branch": "Iterates every top-level .amc entry, and unlinks entries identified as symlinks when the target is missing or link inspection throws. This branch has two unlink calls and no visible deletion gate or evidence-name exclusion.",
+    "staleCacheLines": [
+      145,
+      176
+    ],
+    "cacheBranch": "Unlinks entries beneath .amc/cache through the existing withDeletionGate with kind:caches."
+  },
+  "inference": "The broken-link branch is not confined away from evidence-like top-level names. An evidence.sqlite-named dangling symlink is not excluded by this source. Removing such a link removes its pathname, not a currently existing target body. No execution, deletion or byte loss was observed.",
+  "unapprovedFollowupProposal": {
+    "scope": "Review doctor broken-symlink cleanup for evidence-path exclusions and applicable hold admission; preserve links when their role or hold state is uncertain.",
+    "planLead": "P2-01 is a related global-deletion-executor lead, not approved scope coverage for this observation.",
+    "approved": false,
+    "assignedOwner": null,
+    "externalIssueCreated": false
+  },
+  "scopeBoundary": "doctor-fix is a separate adjacent command. No doctor, hold-policy, fixture or product source was changed; held ownership and normal freeze boundaries remain. This static source gap is retained without turning it into an observed repair failure.",
+  "formalAcceptanceClosed": false
+}

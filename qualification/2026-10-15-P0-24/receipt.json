@@ -1,0 +1,442 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-24",
+  "date": "2026-10-15",
+  "commit": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+  "branch": "codex/p0-24-current-qualification",
+  "node": "v22.23.3; bounded Node24 unqualified",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm install --frozen-lockfile --store-dir /private/tmp/p0-24-qualification-20261015/store --package-import-method copy --side-effects-cache=false",
+      "exit": 0,
+      "durationMs": 17500
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 31210
+    },
+    {
+      "cmd": "node scripts/check-citations.mjs --json",
+      "exit": 0,
+      "durationMs": 374
+    },
+    {
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1609
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/citations/lintCitations.test.ts tests/citations/checkCitationsCli.test.ts tests/compliance/mappingPackRefs.test.ts tests/euAiActTimeline.test.ts tests/industryPackSchema.test.ts tests/industryPackRegulatoryRefresh.test.ts tests/industryPackAudit.test.ts tests/industryPacks-infotainment.test.ts --maxWorkers=1 --reporter=json --outputFile=/private/tmp/p0-24-unchanged-eight-file-baseline-20261015.json",
+      "exit": 0,
+      "durationMs": 4928
+    },
+    {
+      "cmd": "node scripts/check-regulatory-currency.mjs --as-of 2026-10-15 --json",
+      "exit": 0,
+      "durationMs": 68
+    },
+    {
+      "cmd": "python3 /private/tmp/p0-24-cold-cli-qualification-20261015.py",
+      "exit": 1,
+      "durationMs": 2738
+    },
+    {
+      "cmd": "python3 /private/tmp/p0-24-cold-cli-corrected-observer-20261015.py",
+      "exit": 0,
+      "durationMs": 2966
+    },
+    {
+      "cmd": "pnpm run gen-counts",
+      "exit": 0,
+      "durationMs": 1178
+    },
+    {
+      "cmd": "pnpm run typecheck",
+      "exit": 0,
+      "durationMs": 31368
+    },
+    {
+      "cmd": "pnpm run typecheck:tests",
+      "exit": 2,
+      "durationMs": 41821
+    },
+    {
+      "cmd": "pnpm run check:duplicates",
+      "exit": 1,
+      "durationMs": 1953
+    },
+    {
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2319
+    },
+    {
+      "cmd": "pnpm run check:dead-code",
+      "exit": 1,
+      "durationMs": 5237
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 6041
+    },
+    {
+      "cmd": "pnpm run check:api-ref",
+      "exit": 0,
+      "durationMs": 935
+    },
+    {
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 1131
+    },
+    {
+      "cmd": "pnpm run check:counts",
+      "exit": 0,
+      "durationMs": 2134
+    },
+    {
+      "cmd": "pnpm run check:duplicates",
+      "exit": 1,
+      "durationMs": 2335
+    },
+    {
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 3504
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 4913
+    },
+    {
+      "cmd": "pnpm run check:dead-code",
+      "exit": 1,
+      "durationMs": 5149
+    },
+    {
+      "cmd": "pnpm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 39337
+    },
+    {
+      "cmd": "node /private/tmp/p0-24-full-dead-code-diagnostic-20261015.mjs /Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass /private/tmp/p0-24-current-full-dead-code-20261015.json",
+      "exit": 0,
+      "durationMs": 3026
+    },
+    {
+      "cmd": "git diff --cached --check",
+      "exit": 0,
+      "durationMs": 17
+    },
+    {
+      "cmd": "git commit -m 'test: qualify experimental P0-24 citation behavior'",
+      "exit": 0,
+      "durationMs": 44
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/citationCorrections.test.ts tests/citations/lintCitations.test.ts tests/citations/checkCitationsCli.test.ts tests/compliance/mappingPackRefs.test.ts tests/euAiActTimeline.test.ts tests/industryPackSchema.test.ts tests/industryPackRegulatoryRefresh.test.ts tests/industryPackAudit.test.ts tests/industryPacks-infotainment.test.ts --maxWorkers=1 --reporter=json --outputFile=/private/tmp/p0-24-final-bounded-node22-20261015.json",
+      "exit": 1,
+      "durationMs": 7401
+    },
+    {
+      "cmd": "pnpm run check:clean-source",
+      "exit": 0,
+      "durationMs": 50709
+    }
+  ],
+  "tests": {
+    "total": 91,
+    "passed": 90,
+    "failed": 1,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "A-citations-qualification.json",
+      "sha256": "44c070e64894c54560de42727c233aaaebf695f280bcc06b6de035b18f2c492f"
+    },
+    {
+      "path": "A-citations-qualification.md",
+      "sha256": "2afc041cde4e3c9969e729f91cfcc8c51181269333a457e142010e8f325b37df"
+    },
+    {
+      "path": "A-independent-review.json",
+      "sha256": "0046d11ad1462703b55ec5f7201b2016c1801bbec693d8fd52dfa98f926a5881"
+    },
+    {
+      "path": "A-independent-review.md",
+      "sha256": "9deba7234b821190a3198048d7342cbc4b9b416d8b909c0ec31fb8b22f6aef29"
+    },
+    {
+      "path": "B-causal-qualification.json",
+      "sha256": "a05fb74b1c7e19e93f862187ed09cf2cb4be49a8179522343d0b3aa06999ef54"
+    },
+    {
+      "path": "B-causal-qualification.md",
+      "sha256": "19b2f9ae7f8aa59694ba887881f5247cf988d3ed7647e0a98cefe09919136bfd"
+    },
+    {
+      "path": "B-independent-review.json",
+      "sha256": "a6eeff4e3bdca973a3c7901d46c264c06395e7455a50527c731a94baa491e23b"
+    },
+    {
+      "path": "B-independent-review.md",
+      "sha256": "6ef2826b9b32d9286e1583eb2a67f4f916a9e8cb6b944da24694d4b583656287"
+    },
+    {
+      "path": "CLI-corrected-observer.json",
+      "sha256": "798c945835afc169fcfb43b02502325920bcc67e3ba5be6162e1e94f9aa590d5"
+    },
+    {
+      "path": "CLI-independent-review.json",
+      "sha256": "7de02dc2c49875de7179766a539952995ffc9a50d6b008565377d8fb4c3f7a4a"
+    },
+    {
+      "path": "CLI-independent-review.md",
+      "sha256": "ae749c235de1532dcdccf3d134a9777a5af6111da4ca377af0f5400ef607f292"
+    },
+    {
+      "path": "CLI-observer-correction.json",
+      "sha256": "d8a0b3447a50e84298d6648d4e2cd03e1dfbbf0e2355fbacecae341f0da3f4ff"
+    },
+    {
+      "path": "CLI-original-observer.json",
+      "sha256": "17654fa58f9a8cdab357e310dccc2d189cbe31a383bafc98bd8a68aa50e41495"
+    },
+    {
+      "path": "README.md",
+      "sha256": "4f675cee80614ee393825ac34d88709153b5fce66826ecc91f5c95f9c7e7da52"
+    },
+    {
+      "path": "actual-citation-collector.log",
+      "sha256": "dde3bd869c7d2ad044fd5c435e5035713e0d07e987b6b699977d925bedfc5110"
+    },
+    {
+      "path": "actual-cold-cli-controls.log",
+      "sha256": "126de6cf1cfd2e001a27c2ef6644e6d95fbef8ed8809c2b0d6edb1d6f93b2eeb"
+    },
+    {
+      "path": "actual-cold-cli-corrected-controls.log",
+      "sha256": "547b22aa55941a6d2df3ccb0db011160c9cba9832ded9c255e9e5d441c2943b3"
+    },
+    {
+      "path": "actual-regulatory-currency.log",
+      "sha256": "9b7282378b6fc4fa874249f83042fe83cd9629367217a744158bced1824b41e1"
+    },
+    {
+      "path": "architecture.log",
+      "sha256": "281d280f45ae6d8f869768087493249953301a8cb4931fce38d2e7b3ab039ee0"
+    },
+    {
+      "path": "baseline-build.log",
+      "sha256": "004088ebe4a7b69f7d1d29cf0c6d1f254a52e4484271bbe1a95cea7f90e5bd56"
+    },
+    {
+      "path": "baseline-freeze.log",
+      "sha256": "f05f8689113a0bbbcf2deb490b9c7ef0f0d5b93f1f85106bf25337672f30a2fc"
+    },
+    {
+      "path": "command-journal-before-canonical.jsonl",
+      "sha256": "c6285f248f8228f9ce947944564846d6dfa6fe28075bbfff78f1b6a915a34258"
+    },
+    {
+      "path": "command-phases.json",
+      "sha256": "e2040b84bc98d8653845c3382613d1c9c39372f1cd4919ffe366eb2093ab5993"
+    },
+    {
+      "path": "corrected-test-types.log",
+      "sha256": "3156c02cacd50a0d374395755ca219574c69693aa74c7b7ff2ee580562f0fc15"
+    },
+    {
+      "path": "current-full-dead-code.json",
+      "sha256": "e635ca7fc11270f45f5510dc4444a7473d79b5c2f53c3c3708e4e83bd149a52e"
+    },
+    {
+      "path": "factual-test-source-counts.log",
+      "sha256": "e1aa5e2e96d20e5dd47fac64b12d1b04501ac783fe9b1d8c2e044dcabf539035"
+    },
+    {
+      "path": "final-api-reference.log",
+      "sha256": "46b7258cf09830675450ae96e850710baea71ee2302df7df906dcc124b21bc89"
+    },
+    {
+      "path": "final-bounded-node22.json",
+      "sha256": "4ee5d9c38b1f3d0df45877828aa2718238520ca789359fa1165c51104170d8ae"
+    },
+    {
+      "path": "final-bounded-summary.json",
+      "sha256": "4282867d2c93ae46c739dbe5ddcda0506c74da60f8a5c98777f68de14ceeeb19"
+    },
+    {
+      "path": "final-clean-source.log",
+      "sha256": "a2e020e67ba70c39bd19771820c91bae0f450bc7926e0f846cca66cc74d8fefb"
+    },
+    {
+      "path": "final-counts.log",
+      "sha256": "7fb46ea85425bd67a1d06ba9daa2632e5626f29161ee0e94603d323e7bffa0bf"
+    },
+    {
+      "path": "final-docs.log",
+      "sha256": "1c14400be6daf21f9708ecfd9a5b48c87f1bfce412da4940f59a1e8f6bfe2f46"
+    },
+    {
+      "path": "final-freeze.log",
+      "sha256": "f05f8689113a0bbbcf2deb490b9c7ef0f0d5b93f1f85106bf25337672f30a2fc"
+    },
+    {
+      "path": "final-lint.log",
+      "sha256": "b0bb97ac590ad8e560ab77570b5960aaf306c083bee1289e4bd6c9d5e28d3808"
+    },
+    {
+      "path": "final-nine-file-bounded-suite.log",
+      "sha256": "d054fd09687d8722020a64f84a023eac179e29ed93743a907de1c429bffc58e1"
+    },
+    {
+      "path": "final-source-dead-code.log",
+      "sha256": "8f5120fd4bfef22b8a11f7d1fc57858fc80e74d8e48f2cf5675e45b27760d560"
+    },
+    {
+      "path": "final-source-duplicates.log",
+      "sha256": "02406a6fa7a6a1bf907f4cde90d0290e3d4f9ed354c53b2107ce044a62bc12fa"
+    },
+    {
+      "path": "final-source-manifest.json",
+      "sha256": "8871995f273a5270e5417153196004f3a1b71ceb20ba5137d2cb829ee78a9c68"
+    },
+    {
+      "path": "frozen-install.log",
+      "sha256": "a4a195af810f9797086255dedfaf21e8ff16b7a2f4dc7fcf5550d28105dcde11"
+    },
+    {
+      "path": "full-dead-code-diagnostic.log",
+      "sha256": "9122f4d39783078b4e48edd193e5618688b01c32e69eda7fe5feed2e23093989"
+    },
+    {
+      "path": "full-quality-context-comparison.json",
+      "sha256": "56d9b7cce0a9bb1b291929fa500af2bb70fd97c45c8a468db2486f1cd6ae19fa"
+    },
+    {
+      "path": "lint.log",
+      "sha256": "b0bb97ac590ad8e560ab77570b5960aaf306c083bee1289e4bd6c9d5e28d3808"
+    },
+    {
+      "path": "new-test-design.json",
+      "sha256": "74c41183b31de93d4ef49c0d1dad78a51a22581cb55a5134d366ed608f99988c"
+    },
+    {
+      "path": "new-test-design.md",
+      "sha256": "39ee5c3b70fbfc9f551ce1ff71f9708d48b020f99fc8af69d6212de32edb2cf1"
+    },
+    {
+      "path": "next-key-routing-preflight.json",
+      "sha256": "c081db3fc51120aeb70b427e52170a2d72b3fb684df39b114fdda7fa11573771"
+    },
+    {
+      "path": "next-key-routing-preflight.md",
+      "sha256": "4b5eadc5b11fdc3448e026fff8b3129bfeee239d3652f5f720dbf731785cab5b"
+    },
+    {
+      "path": "preservation-check.json",
+      "sha256": "8b1caf9c8af338ab7726bf33aca2739711b534a12dd909b0a83b9724576e37ee"
+    },
+    {
+      "path": "prior-P0-24-routing-preflight.json",
+      "sha256": "bef98c15d5bf1887d27616e65bee75b2644fb13977b61b8eff8895b8c2a68756"
+    },
+    {
+      "path": "prior-P0-24-routing-preflight.md",
+      "sha256": "ae01f3954c1ef5788e68c94d8679744eb5b14f30f6a4617a7d6b1bd6badb4e94"
+    },
+    {
+      "path": "prior-full-dead-code.json",
+      "sha256": "0a33d09f2f323f643e7d99c517a5d397ea72f1053d1c20395408328ca3449b0a"
+    },
+    {
+      "path": "private-evidence-index.json",
+      "sha256": "d03ca93e253e7e8c5fe9f1c3eba15a582b01d14445ccc1bdee2b2d437d74eba6"
+    },
+    {
+      "path": "production-types.log",
+      "sha256": "9ec9c76a0904901db3b6cf366e3720125ebdad7179b93f72e4fe078ca9edbc15"
+    },
+    {
+      "path": "python-command-journal-frozen.jsonl",
+      "sha256": "71705937cafab02e2140705e172a94fb06d4dc8588d70e9084febc4011a07ae9"
+    },
+    {
+      "path": "python-independent-review.json",
+      "sha256": "e807538ba0626b715c64e505bf03d0e2c6d2478f5619c127655d307b257a79ba"
+    },
+    {
+      "path": "python-independent-review.md",
+      "sha256": "27c08a7cfd807a2c98fc889ffea47f391054e768baf5320c8f59bbead428b410"
+    },
+    {
+      "path": "python-qualification.json",
+      "sha256": "5f35ba179af37cdd7fed09541886422cd9db052350bd0d70737e9b60787febc4"
+    },
+    {
+      "path": "python-qualification.md",
+      "sha256": "7dc0718b6556a6b5a50573dc4af75b445368c9f54f48f1d29b1973e2815debc1"
+    },
+    {
+      "path": "python-readiness.json",
+      "sha256": "231a14bc387c8192a854fdad46a42568388c8d13a66e5b232b0359eebea7389c"
+    },
+    {
+      "path": "python-readiness.md",
+      "sha256": "3869f6f2960d419be946fe1a1b82e435c55cefc5240df6b1407aa4f297a36364"
+    },
+    {
+      "path": "remaining-acceptance.json",
+      "sha256": "36b161268a49aecbd4e54a7b28a9c5f33d2338b606f819f0d6ef8c7015e2016f"
+    },
+    {
+      "path": "root-scope-preflight.json",
+      "sha256": "2ed3c9572890f8301a7635f0ddd31b283f2ccb29bc2c718f37e35bb7aefbdf51"
+    },
+    {
+      "path": "source-checkpoint.log",
+      "sha256": "916aa6a366411aed3e444f766a9cb8f4d6578548b052b2de0df820d46115d841"
+    },
+    {
+      "path": "source-dead-code.log",
+      "sha256": "8f5120fd4bfef22b8a11f7d1fc57858fc80e74d8e48f2cf5675e45b27760d560"
+    },
+    {
+      "path": "source-duplicates.log",
+      "sha256": "02406a6fa7a6a1bf907f4cde90d0290e3d4f9ed354c53b2107ce044a62bc12fa"
+    },
+    {
+      "path": "source-pre-checkpoint-manifest.json",
+      "sha256": "21c2b6cbc5f5d77e8433e7864bd96ddd6326d15764f655343173cd3919182c27"
+    },
+    {
+      "path": "source-quality.json",
+      "sha256": "ee680c8bb4fe5b8b009d2aaf08a2883b60b7f4b1fe8b769e4d05484d16ccc4cf"
+    },
+    {
+      "path": "source-whitespace.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "test-types.log",
+      "sha256": "88172a2f3f75329c38ca3473fe450eae89afc438bc5010f01769971ae9435340"
+    },
+    {
+      "path": "unchanged-eight-file-baseline.json",
+      "sha256": "bfb9ec7e597527611547424dc2b57e62b05f6aa67cdc795e612ef75fe093703d"
+    },
+    {
+      "path": "unchanged-eight-file-baseline.log",
+      "sha256": "ef1da81d77eb117a75c94c5eb41cf30fc98f50ba25cc27c57333de49d5b0ab78"
+    }
+  ],
+  "notes": "Bounded P0-24 qualification only. Final Node22 nine-file corpus 91/90/1 with zero pending/todo; one strict ISO A.5 policy failure remains. New23/22/1 and original-body A matrix preserved; type-only annotation followed original TS7006 and corrected types pass, no typed-body causal claim. B same30 fixture cases, resolver30/26/30 and ratchet30/29/30, exact import-only adaptations/restoration. Python17/17 and private5/4/5 and coldCLI corrected3/3 are separate controls, not added to91. Initial CLI0/3 observer errors with process exits0 remain visible; actual pending/unresolved/none label contract replaces invented experimental literal. Ordinary static/build/clean checks pass; required quality1269/2751 still fails. Full2774-to2751 sets differ by23 removed/no additions, no production-cleanup or cause claim. All31 expert columns, held ISO/other rows, law/context and inherited failures/skips/proposals remain unresolved. Source only one new test/ten count documents; primary/Claude/held/reservation pins preserved independently. No full suite, coverage, Node24, hostedCI, G0, release, Done approval, paused resumption or external publication/message. Next bounded routing is P0-18."
+}

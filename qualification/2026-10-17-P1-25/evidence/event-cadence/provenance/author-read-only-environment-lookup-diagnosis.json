@@ -1,0 +1,14 @@
+{
+  "schema": "p125ec-private-author-readonly-environment-lookup-diagnosis/1",
+  "actualToolResult": {
+    "chunkId": "3e5691",
+    "exitCode": 1,
+    "sessionId": null
+  },
+  "attemptedPath": "/private/tmp/p1-25-cadence-qualification-20261017/actual-environment.json",
+  "actualError": "FileNotFoundError: [Errno 2] No such file or directory",
+  "threePrecedingEstablishedMetadataReadsSucceeded": true,
+  "commandBranchReadInThatCellNotReached": true,
+  "noProductOrWrapperCommandRunOrQualificationCredit": true,
+  "correction": "Root authorized using the exact closed p125ec-actual-environment log; no missing file was created."
+}

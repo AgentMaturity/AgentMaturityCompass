@@ -1,0 +1,106 @@
+{
+  "schema": "p126-current54-fixed-corpus/1",
+  "sourceOutcome": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/p126-source-combined-outcome.json",
+    "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/p126-source-combined-outcome.json",
+    "bytes": 11051,
+    "sha256": "b81c1584f4bf9364ce154ce36e45e37dbe8c866a093abd82366c03f075a9c35b",
+    "dev": 16777231,
+    "inode": 543338558,
+    "nlink": 1,
+    "readScope": "full source summary/inventory"
+  },
+  "files": [
+    "tests/transparency/rfc9162.test.ts",
+    "tests/transparency/legacyAmbiguity.test.ts",
+    "tests/transparencyMerkleIncremental.test.ts",
+    "tests/transparencyMerkleFailLoud.test.ts",
+    "tests/sessionAnchorOfflineProof.test.ts"
+  ],
+  "orderedNamesWithinEachFile": {
+    "tests/sessionAnchorOfflineProof.test.ts": [
+      "session root anchoring anchors a closed session as a session-root transparency artifact",
+      "session root anchoring re-anchoring an unchanged session reuses the existing entry",
+      "session root anchoring the exporter refuses to issue a proof against an unsigned root",
+      "session anchor proof \u2014 offline verification verifies from a directory with no .amc, after the workspace is deleted",
+      "session anchor proof \u2014 offline verification a truncated seal list breaks the session root it claims",
+      "session anchor proof \u2014 offline verification an edited descriptor no longer matches the digest the log anchored",
+      "session anchor proof \u2014 offline verification an edited transparency entry fails its own hash recomputation",
+      "session anchor proof \u2014 offline verification a tampered proof path no longer resolves to the anchored root",
+      "session anchor proof \u2014 offline verification a root that was never signed is rejected even when the path is consistent",
+      "session anchor proof \u2014 offline verification a leaf index outside the signed tree is rejected",
+      "session anchor proof \u2014 offline verification verification fails against a fingerprint the holder did not expect",
+      "session anchor proof \u2014 offline verification an empty pin is refused rather than treated as no pin",
+      "session anchor proof \u2014 offline verification a bundle re-signed with an attacker's auditor key fails the pin",
+      "session anchor proof \u2014 offline verification a descriptor carrying an unrecognised field is rejected, not silently ignored",
+      "session anchor proof \u2014 offline verification a fingerprint that disagrees with the bundle's own key is reported",
+      "session anchor proof \u2014 offline verification anchoring and offline verification work on the JSONL backend",
+      "session anchor proof \u2014 offline verification refuses a proof when the LEDGER does not verify, not just the log",
+      "session anchor proof \u2014 offline verification auditorKeyFingerprint is the sha256 of the exported PEM",
+      "the cryptographic checks fire in the failing direction a forged root signature is rejected \u2014 the one check that makes this cryptography",
+      "the cryptographic checks fire in the failing direction a truncated seal list is rejected by the sealCount cross-check",
+      "the cryptographic checks fire in the failing direction a descriptor whose sealCount disagrees with its seal list is rejected",
+      "the cryptographic checks fire in the failing direction a descriptor whose turnCount is inflated is rejected"
+    ],
+    "tests/transparencyMerkleFailLoud.test.ts": [
+      "a failed merkle update is surfaced, not swallowed appendTransparencyEntry throws when the root cannot be advanced",
+      "a failed merkle update is surfaced, not swallowed the entry is still in the log, and the log itself still verifies",
+      "a failed merkle update is surfaced, not swallowed the lag outlives the process that hit it and names the entry",
+      "a failed merkle update is surfaced, not swallowed the explicit repair path clears the lag",
+      "a failed merkle update is surfaced, not swallowed a recorded lag fails verification on its own, and a healthy append clears it",
+      "a failed merkle update is surfaced, not swallowed a corrupt pending marker still reports a lag rather than being ignored",
+      "merkle verification reports instead of throwing an unparseable log line is a verification error, not an exception"
+    ],
+    "tests/transparencyMerkleIncremental.test.ts": [
+      "transparency merkle frontier equivalence frontier root equals the full rebuild at every leaf count (amc-legacy-v1)",
+      "transparency merkle frontier equivalence frontier root equals the full rebuild at every leaf count (rfc9162-sha256)",
+      "transparency merkle frontier equivalence a wrong odd-node rule diverges from the rebuild \u2014 the equivalence oracle discriminates",
+      "transparency merkle frontier equivalence frontier shape check rejects a leaf count the nodes cannot have produced",
+      "incremental transparency merkle updates appends produce the root and the leaves file a full rebuild would produce",
+      "incremental transparency merkle updates history is appended, not rewritten",
+      "incremental transparency merkle updates the resume state tracks the log and points at the published root",
+      "incremental resume is used, and untrusted resume state falls back a resumable append takes the incremental path",
+      "incremental resume is used, and untrusted resume state falls back a workspace written before the frontier existed migrates itself on the next append",
+      "incremental resume is used, and untrusted resume state falls back a tampered frontier is rebuilt from the log instead of steering the root",
+      "incremental resume is used, and untrusted resume state falls back a frontier that does not cover this append's parent is not resumed",
+      "incremental resume is used, and untrusted resume state falls back a truncated leaves file is detected and repaired rather than appended to"
+    ],
+    "tests/transparency/legacyAmbiguity.test.ts": [
+      "algorithm-aware legacy ambiguity legacy three/four roots collide while RFC roots differ and both proof APIs remain usable",
+      "algorithm-aware legacy ambiguity RFC entry verification needs index and size and derives sides rather than trusting flags"
+    ],
+    "tests/transparency/rfc9162.test.ts": [
+      "RFC 9162 offline tree empty, leaf and node hashes preserve byte domains and child order",
+      "RFC 9162 offline tree ports eight leaf inputs and all nine known roots from constants.go",
+      "RFC 9162 offline tree ports the five exact happy-path inclusion JSON vectors",
+      "RFC 9162 offline tree ports the five exact happy-path consistency JSON vectors",
+      "RFC 9162 offline tree matches an independent recursive root at every size from 1 through 64",
+      "RFC 9162 offline tree verifies every inclusion index against independent roots for sizes 1 through 64",
+      "RFC 9162 offline tree verifies every consistency pair through size 64 against independent roots",
+      "RFC 9162 offline tree incremental and rebuilt frontiers match independent RFC roots through size 64",
+      "RFC 9162 offline tree refuses the exact size-2 inclusion witness when only declared size changes to 3",
+      "RFC 9162 offline tree rejects malformed, changed, extra, missing and wrong-index inclusion inputs",
+      "RFC 9162 offline tree rejects malformed consistency proofs, changed roots, invalid sizes and boundary mismatches"
+    ]
+  },
+  "perFileCounts": {
+    "tests/sessionAnchorOfflineProof.test.ts": 22,
+    "tests/transparencyMerkleFailLoud.test.ts": 7,
+    "tests/transparencyMerkleIncremental.test.ts": 12,
+    "tests/transparency/legacyAmbiguity.test.ts": 2,
+    "tests/transparency/rfc9162.test.ts": 11
+  },
+  "totalUniqueCaseIdentities": 54,
+  "sourceActualTests": {
+    "total": 54,
+    "passed": 54,
+    "failed": 0,
+    "skipped": 0
+  },
+  "sourceActualHookTaskEntries": 46,
+  "sourceActualIndividualHookValues": 46,
+  "futureCountsAreNotPredicted": true,
+  "withinRunJoin": "Join exact relative file+fullName+occurrence and state between retained raw JSON and run-end observer; include all file/suite/test errors and hooks.",
+  "crossRunJoin": "Same five-file membership and exact ordered names within each file. File completion order can vary. Never sum the five runs as a larger canonical corpus.",
+  "rowCountsVsTests": "2080 inclusion positions/2144 consistency pairs are finite data rows within fixed test bodies, not additional test identities."
+}

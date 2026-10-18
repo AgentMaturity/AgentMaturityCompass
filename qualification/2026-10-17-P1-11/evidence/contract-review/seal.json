@@ -1,0 +1,32 @@
+{
+  "schema": "p111-contract-review-seal/1",
+  "at": "2026-10-16T19:24:27.775603+00:00",
+  "allReadsFinished": true,
+  "blockersForBoundedLane": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/review.json",
+      "bytes": 11004,
+      "sha256": "c9ac4e114c8a7d62e02c3b0fbf5d133ad3e2b08db057677395d5d0cb17321c74"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/README.md",
+      "bytes": 1861,
+      "sha256": "3afa67ea6d28ef035ea2081131ed85608a1bcc3020781378a40a220e0a8a6fea"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/controls.json",
+      "bytes": 5322,
+      "sha256": "059651d3ccf2e21f9142d968a164c48bd9736259f006acb23e4613972a499ca0"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/input-pins.json",
+      "bytes": 7272,
+      "sha256": "055bb71136b5600c31a160899c21db09837413dd97dee68975005b22c5696336"
+    }
+  ],
+  "inputCount": 29,
+  "candidateNotYetReviewed": true,
+  "mutantFilesWritten": false,
+  "sourceExecutedOrWritten": false
+}

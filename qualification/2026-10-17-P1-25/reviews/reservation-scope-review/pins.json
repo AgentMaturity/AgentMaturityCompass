@@ -1,0 +1,98 @@
+{
+  "schema": "static-review-input-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/ownership-admission/review.json",
+      "bytes": 7879,
+      "sha256": "e199e8f69e3e03e54986d91fb804871a0a21380109bb8309544ef774b746e4ec"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/ownership-admission/README.md",
+      "bytes": 3334,
+      "sha256": "d59088a6f0cd2bbe4b785f2bb8e17aa5a2a085ef0bf2f93a8d6216eba37b5bce"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/ownership-admission/ownership-observations.json",
+      "bytes": 524481,
+      "sha256": "160111ce1ecad75dc39f17ba6a73ce312eeb5a45521323967096005f51cc4740"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/ownership-admission/ownership-facts.json",
+      "bytes": 48933,
+      "sha256": "6dbcccc187de116ddb441247e5525620926b4f7754666f5922b571e9299c21ba"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/ownership-admission/preservation-refresh.json",
+      "bytes": 27179,
+      "sha256": "0ca1089dea555a9786a13cd0dee9eb387aa82a38690401c5be1ccb8626f48404"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/ownership-admission/input-pins.json",
+      "bytes": 20427,
+      "sha256": "3953f2e7961829b98f3d2208dd19de74a177195a975e53489bd92ddcd5459f2e"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/ownership-admission/preparation-stop.json",
+      "bytes": 605,
+      "sha256": "f19ac201cacb0ac9871de4efe804881be959cc15d0dd96bd8103a2f26c962c9e"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/ownership-admission/reservation-metadata-recovery.json",
+      "bytes": 3118,
+      "sha256": "ba4eec1218344092ce7ea9c370f7e394871ed7bb38b149e6013d7f36ba7ac5e5"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/ownership-admission/src-time-checkpoint.ts.claude-preserved.diff",
+      "bytes": 2018,
+      "sha256": "2283fead9ab642f9892cf5ef662948e50ff0ae813bac745e7b3d044d9d73824e"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/ownership-admission/docs-TRUSTED_TIME.md.claude-preserved.diff",
+      "bytes": 1014,
+      "sha256": "980e2e52c0f727ceaf3742fc898e9d124a254aacdf27ae5b1e3839b4e533ec4a"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/ownership-admission/seal.json",
+      "bytes": 2512,
+      "sha256": "c26681f2702c6a0152e7c3318a434c660c2abd04dd332f4741c96b6a87fc1230"
+    },
+    {
+      "path": "/private/tmp/p2-07-pending-state-qualification-20261016/ownership-audit/reservation-excerpts.json",
+      "bytes": 23845,
+      "sha256": "4d02a4c9b76dc55ff382bd49324709a38381e3f7951adc401bee7087d7d3fbe3"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/review.json",
+      "bytes": 9683,
+      "sha256": "434d61a16dc3b8a157f17995f759f2d29c0abe44a4115bed905eb53fbb532f64"
+    },
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-25.md",
+      "bytes": 12911,
+      "sha256": "db346645bc6ac0b783f22bbba50cb07b36e74832507218e4a2488a6d8b68f279"
+    },
+    {
+      "path": "/Users/sid/.claude/projects/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1.jsonl",
+      "bytes": 66844173,
+      "sha256": "b78616f7457d6dc038962161f6c9971bbe3d6f61969d1e95f512e3d77be99d22"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/reservation-scope-review/review.json",
+      "bytes": 11598,
+      "sha256": "4e72d3e9d8604707469c038e61f261b6d6dad48191d9e61f6d0ac57b1a8dddb2"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/reservation-scope-review/README.md",
+      "bytes": 2110,
+      "sha256": "da9641b0bc9fc74f65a0aa29195e994301c7c5beadce7326c92b4bf2d4eaacf6"
+    }
+  ],
+  "historicalRecordHashEncoding": "raw JSONL line bytes excluding final newline; each line number is one-based"
+}

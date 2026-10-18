@@ -1,0 +1,801 @@
+{
+  "issue": "P0-51",
+  "kind": "Bounded actual portable licence signed-list key discovery qualification",
+  "createdAt": "2026-10-14T18:15:53.771683+00:00",
+  "repo": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass",
+  "base": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+  "sourceState": "Uncommitted candidate rooted at measured 3b08; parent owns final source pin and all broader acceptance.",
+  "test": {
+    "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/industryPackPortableVerification.test.ts",
+    "bytes": 11469,
+    "sha256": "ab9ad072e64c1e0f89c0a41ea836b004bf220eea272a7c248513b338fa8eeb42"
+  },
+  "source": {
+    "path": "src/domains/industryPackEntitlement.ts",
+    "bytes": 22012,
+    "sha256": "07cb4a8cfe1c84a25a60f2465830ac172bc36ba60634142e277e9de19fd14401",
+    "baseSha256": "095572a719fe570a2c3207aa51c32470140b861655ba803846c4b61564e9f5f0",
+    "equalsBase": false
+  },
+  "protectedInputs": [
+    {
+      "path": "src/cli.ts",
+      "bytes": 1064339,
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "baseSha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "equalsBase": true
+    },
+    {
+      "path": "src/cli-domain-product-commands.ts",
+      "bytes": 39523,
+      "sha256": "a52646b18c640000b621f83868d1a2be0b04b8c3e7edfe3e3e96a633e7c768e6",
+      "baseSha256": "a52646b18c640000b621f83868d1a2be0b04b8c3e7edfe3e3e96a633e7c768e6",
+      "equalsBase": true
+    },
+    {
+      "path": "src/cli-trust-flags.ts",
+      "bytes": 6277,
+      "sha256": "fe92104ef1561ca0d45c0b9db46c346a0fc9f77e1e11d428c22205300739a081",
+      "baseSha256": "fe92104ef1561ca0d45c0b9db46c346a0fc9f77e1e11d428c22205300739a081",
+      "equalsBase": true
+    },
+    {
+      "path": "src/trust/admission.ts",
+      "bytes": 9401,
+      "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+      "baseSha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+      "equalsBase": true
+    },
+    {
+      "path": "src/trust/trustContext.ts",
+      "bytes": 7037,
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "baseSha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "equalsBase": true
+    },
+    {
+      "path": "src/trust/trustList.ts",
+      "bytes": 10386,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+      "baseSha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+      "equalsBase": true
+    },
+    {
+      "path": "src/trust/verifierReport.ts",
+      "bytes": 6887,
+      "sha256": "e1d0cf40a349af2f2490b652f516f04b43a97f38c7043eb640ffbe12c39f2af2",
+      "baseSha256": "e1d0cf40a349af2f2490b652f516f04b43a97f38c7043eb640ffbe12c39f2af2",
+      "equalsBase": true
+    },
+    {
+      "path": "package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "baseSha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "equalsBase": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "baseSha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "equalsBase": true
+    }
+  ],
+  "rootCause": "Original portable licence verifier only tried explicit or environment PEM candidates. A signature-verified operator list was admitted by the trust APIs but never supplied a PEM candidate to the licence integrity verifier.",
+  "repair": "Parent adds public PEM candidates from already signature-verified context.lists; no purpose filter, auto-pin, trust override, activation, admission or schema change.",
+  "phases": {
+    "portable-license-pure-red": {
+      "name": "portable-license-pure-red",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/industryPackPortableVerification.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-51-portable-license-pure-red-20261014.json",
+      "exit": 1,
+      "durationMs": 1498,
+      "startedUtc": "2026-10-14T17:52:29.147992+00:00",
+      "log": "/private/tmp/p0-51-portable-license-pure-red-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+      "tests": {
+        "success": false,
+        "numTotalTests": 21,
+        "numPassedTests": 17,
+        "numFailedTests": 4,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "cases": [
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) an operator-signed purpose-bound list alone locates and trusts the genuine licence signer",
+          "status": "failed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) a supplied PEM locates the same signer while the operator list supplies admission",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'distrusted' remains refused with explicit PEM false and both allow flags",
+          "status": "failed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'distrusted' remains refused with explicit PEM true and both allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'revoked' remains refused with explicit PEM false and both allow flags",
+          "status": "failed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'revoked' remains refused with explicit PEM true and both allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'wrong-purpose' remains refused with explicit PEM false and both allow flags",
+          "status": "failed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'wrong-purpose' remains refused with explicit PEM true and both allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) an unknown actual signer stays untrusted with 'neither' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) an unknown actual signer stays untrusted with 'unpinned' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) an unknown actual signer stays untrusted with 'unanchored' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) an unknown actual signer stays untrusted with 'both' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) tampering a real payload defeats signature integrity even under an admitted signer and both allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'legacy' activation compatibility never becomes portable trust under 'neither' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'legacy' activation compatibility never becomes portable trust under 'unpinned' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'legacy' activation compatibility never becomes portable trust under 'unanchored' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'legacy' activation compatibility never becomes portable trust under 'both' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'hmac' activation compatibility never becomes portable trust under 'neither' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'hmac' activation compatibility never becomes portable trust under 'unpinned' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'hmac' activation compatibility never becomes portable trust under 'unanchored' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'hmac' activation compatibility never becomes portable trust under 'both' allow flags",
+          "status": "passed"
+        }
+      ]
+    },
+    "portable-license-cli-red": {
+      "name": "portable-license-cli-red",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-51-portable-license-cli-witness-20261014.mjs red",
+      "exit": 1,
+      "durationMs": 1872,
+      "startedUtc": "2026-10-14T17:59:58.879928+00:00",
+      "log": "/private/tmp/p0-51-portable-license-cli-red-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    "portable-license-pure-green": {
+      "name": "portable-license-pure-green",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/industryPackPortableVerification.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-51-portable-license-pure-green-20261014.json",
+      "exit": 0,
+      "durationMs": 1906,
+      "startedUtc": "2026-10-14T18:00:43.288523+00:00",
+      "log": "/private/tmp/p0-51-portable-license-pure-green-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+      "tests": {
+        "success": true,
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "cases": [
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) an operator-signed purpose-bound list alone locates and trusts the genuine licence signer",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) a supplied PEM locates the same signer while the operator list supplies admission",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'distrusted' remains refused with explicit PEM false and both allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'distrusted' remains refused with explicit PEM true and both allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'revoked' remains refused with explicit PEM false and both allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'revoked' remains refused with explicit PEM true and both allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'wrong-purpose' remains refused with explicit PEM false and both allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'wrong-purpose' remains refused with explicit PEM true and both allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) an unknown actual signer stays untrusted with 'neither' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) an unknown actual signer stays untrusted with 'unpinned' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) an unknown actual signer stays untrusted with 'unanchored' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) an unknown actual signer stays untrusted with 'both' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) tampering a real payload defeats signature integrity even under an admitted signer and both allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'legacy' activation compatibility never becomes portable trust under 'neither' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'legacy' activation compatibility never becomes portable trust under 'unpinned' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'legacy' activation compatibility never becomes portable trust under 'unanchored' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'legacy' activation compatibility never becomes portable trust under 'both' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'hmac' activation compatibility never becomes portable trust under 'neither' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'hmac' activation compatibility never becomes portable trust under 'unpinned' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'hmac' activation compatibility never becomes portable trust under 'unanchored' allow flags",
+          "status": "passed"
+        },
+        {
+          "name": "Industry Pack portable Ed25519 verification (P0-51) 'hmac' activation compatibility never becomes portable trust under 'both' allow flags",
+          "status": "passed"
+        }
+      ]
+    },
+    "portable-license-cli-green": {
+      "name": "portable-license-cli-green",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-51-portable-license-cli-witness-20261014.mjs green /private/tmp/p0-51-owned-license-cli-6FtU6j/fixture.json",
+      "exit": 0,
+      "durationMs": 1866,
+      "startedUtc": "2026-10-14T18:11:31.972060+00:00",
+      "log": "/private/tmp/p0-51-portable-license-cli-green-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    }
+  },
+  "rawReports": [
+    {
+      "path": "/private/tmp/p0-51-portable-license-pure-red-20261014.json",
+      "bytes": 14445,
+      "sha256": "3c2fdc94abe28edb6d493bf64857ddf91f756c065346e042a7cb31f6d90d9845"
+    },
+    {
+      "path": "/private/tmp/p0-51-portable-license-pure-red-20261014.log",
+      "bytes": 4720,
+      "sha256": "a9a851343ea25a665dc2f186da8e1fba81cac9afc90b036dff6d14988f30d87f"
+    },
+    {
+      "path": "/private/tmp/p0-51-portable-license-cli-red-20261014/summary.json",
+      "bytes": 7204,
+      "sha256": "9a6db44586361ec1c729c5031ab2b0618730a5be6bca82f0cba589e052642b9f"
+    },
+    {
+      "path": "/private/tmp/p0-51-portable-license-cli-red-20261014.log",
+      "bytes": 746,
+      "sha256": "ba37089e515895152bfc53ae5162f4f4f7c3c500c86e768a806fcd272241b9fb"
+    },
+    {
+      "path": "/private/tmp/p0-51-portable-license-pure-green-20261014.json",
+      "bytes": 9150,
+      "sha256": "e5d21dfc3390032b8ee8b74880d9dd4991aa21e53df59462cb509d778ff4bd69"
+    },
+    {
+      "path": "/private/tmp/p0-51-portable-license-pure-green-20261014.log",
+      "bytes": 407,
+      "sha256": "c65ac41ee505733c4993d57aac715233e9d80cede69c582d5bb0596fe374cee2"
+    },
+    {
+      "path": "/private/tmp/p0-51-portable-license-cli-green-20261014/summary.json",
+      "bytes": 7115,
+      "sha256": "9479609d400b7e7d89e43aec1b9c0ac23d44584413ee6885d119733cb0c5155d"
+    },
+    {
+      "path": "/private/tmp/p0-51-portable-license-cli-green-20261014.log",
+      "bytes": 329,
+      "sha256": "fa4a88d7835d18d1cd9e65b22f5974d90899bd07242c58ec844b43702914bc1c"
+    }
+  ],
+  "originalPureRedReceipt": {
+    "path": "/private/tmp/p0-51-portable-license-pure-red-receipt-20261014.json",
+    "bytes": 54360,
+    "sha256": "c3b93d651a4e3b64b6dac7114e65337c2a72a8960351c731de2647c304e253cb"
+  },
+  "cli": {
+    "red": {
+      "phase": "red",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "nodeSha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "sourceVsCompiledBoundary": "HEAD3b08 baseline dist unchanged; root TS candidate already contains only list-key discovery repair",
+      "sourceTree": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass",
+      "inputs": [
+        {
+          "path": "dist/cli.js",
+          "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+          "bytes": 1054087
+        },
+        {
+          "path": "dist/cli-domain-product-commands.js",
+          "sha256": "0ae9dcb8e2a0da1ef9fbc4331205412ee346204e6baff70e68ff5933881fdeba",
+          "bytes": 40535
+        },
+        {
+          "path": "dist/domains/industryPackEntitlement.js",
+          "sha256": "eaac1f3d3e383dd8ac32b10613f7510dee38d9d15cd69aeb925cd7fa4dfbc03b",
+          "bytes": 19658
+        },
+        {
+          "path": "dist/trust/trustContext.js",
+          "sha256": "846b794fdcde123feda47f36b371891bcbdb5f8a5086fb2aaaaf8df73c618390",
+          "bytes": 5605
+        },
+        {
+          "path": "dist/trust/trustList.js",
+          "sha256": "4500847b46e4575d84d347fc8afacd1d35896019024590e80515bbd922783819",
+          "bytes": 10052
+        },
+        {
+          "path": "dist/trust/admission.js",
+          "sha256": "b81927daf71b18dfba3978d64ae02d752f3d4a8f61204bd36e4134e971d38078",
+          "bytes": 8256
+        },
+        {
+          "path": "dist/trust/verifierReport.js",
+          "sha256": "ab5306a3b3bde8cbf4776dc72638d8a213ace2c717d7c2194bcbb24ee73b37ae",
+          "bytes": 6231
+        },
+        {
+          "path": "src/domains/industryPackEntitlement.ts",
+          "sha256": "07cb4a8cfe1c84a25a60f2465830ac172bc36ba60634142e277e9de19fd14401",
+          "bytes": 22012
+        }
+      ],
+      "fixture": {
+        "root": "/private/tmp/p0-51-owned-license-cli-6FtU6j",
+        "home": "/private/tmp/p0-51-owned-license-cli-6FtU6j/home",
+        "amcHome": "/private/tmp/p0-51-owned-license-cli-6FtU6j/operator",
+        "workspace": "/private/tmp/p0-51-owned-license-cli-6FtU6j/workspace",
+        "licensePath": "/private/tmp/p0-51-owned-license-cli-6FtU6j/license.txt",
+        "publicKeyPath": "/private/tmp/p0-51-owned-license-cli-6FtU6j/issuer.pub",
+        "listPath": "/private/tmp/p0-51-owned-license-cli-6FtU6j/operator/trust/amc-trust-list.json",
+        "rootKeyId": "cbfe46dc18be9f257c544dafe5a3ddc00cb445c801b112184db21d8b842af8e1",
+        "issuerKeyId": "2a053ac8337063dcff1de871562e1f7f8f7ac6af2944d82eb59f728150ee542e",
+        "guard": "/private/tmp/p0-51-owned-license-cli-6FtU6j/deny-transport.mjs",
+        "licenceSha256": "fc8034897eb584047f567142ac9e613906081fdebb36a2b7e52112ab89339789",
+        "publicKeySha256": "2a053ac8337063dcff1de871562e1f7f8f7ac6af2944d82eb59f728150ee542e",
+        "listSha256": "a585ddf440f0373b260fa9028422eceba4395b4fd278381981bfabbf40872495",
+        "guardSha256": "2247990392f8593ac85d1bce5898994b3ebbfbcb92f3074ff35046e7c4dce7dd",
+        "metadataPath": "/private/tmp/p0-51-owned-license-cli-6FtU6j/fixture.json"
+      },
+      "environmentKeys": [
+        "AMC_CLAIM_LABELS_STRICT",
+        "AMC_HOME",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TERM"
+      ],
+      "licencePublicKeyEnvironmentAbsent": true,
+      "strict": true,
+      "externalTransport": "denied",
+      "commands": [
+        {
+          "name": "explicit-pem-control",
+          "argv": [
+            "domain",
+            "pack",
+            "verify",
+            "--key",
+            "<owned licence SHA256=fc8034897eb584047f567142ac9e613906081fdebb36a2b7e52112ab89339789>",
+            "--json",
+            "--trust-list",
+            "/private/tmp/p0-51-owned-license-cli-6FtU6j/operator/trust/amc-trust-list.json",
+            "--trust-root",
+            "cbfe46dc18be9f257c544dafe5a3ddc00cb445c801b112184db21d8b842af8e1",
+            "--pubkey",
+            "/private/tmp/p0-51-owned-license-cli-6FtU6j/issuer.pub"
+          ],
+          "actualArgvSha256": "b212e0696e8052ed3fcc394973811c8492bead447873c322782736197dba2279",
+          "status": 0,
+          "signal": null,
+          "error": null,
+          "durationMs": 780,
+          "stdoutPath": "/private/tmp/p0-51-portable-license-cli-red-20261014/explicit-pem-control.stdout",
+          "stderrPath": "/private/tmp/p0-51-portable-license-cli-red-20261014/explicit-pem-control.stderr",
+          "stdoutSha256": "e18e994a11bb194544ff581397bd30809253c71dca41570e49dcccfbaad43039",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutBytes": 1617,
+          "stderrBytes": 0,
+          "actual": {
+            "valid": true,
+            "integrity": {
+              "status": "pass",
+              "errors": []
+            },
+            "admission": {
+              "status": "pass",
+              "signatures": [
+                {
+                  "signature": "license signature",
+                  "purpose": "artifact-seal",
+                  "keyId": "2a053ac8337063dcff1de871562e1f7f8f7ac6af2944d82eb59f728150ee542e",
+                  "status": "admitted",
+                  "source": "explicit-key",
+                  "listId": null,
+                  "timeBasis": null,
+                  "detail": null
+                }
+              ]
+            },
+            "trusted": true,
+            "overrides": []
+          }
+        },
+        {
+          "name": "signed-list-only",
+          "argv": [
+            "domain",
+            "pack",
+            "verify",
+            "--key",
+            "<owned licence SHA256=fc8034897eb584047f567142ac9e613906081fdebb36a2b7e52112ab89339789>",
+            "--json",
+            "--trust-list",
+            "/private/tmp/p0-51-owned-license-cli-6FtU6j/operator/trust/amc-trust-list.json",
+            "--trust-root",
+            "cbfe46dc18be9f257c544dafe5a3ddc00cb445c801b112184db21d8b842af8e1"
+          ],
+          "actualArgvSha256": "07b5a8d1544c27c3c489183ade2185461b7fc4fe51ee6efce3f38f22240731fd",
+          "status": 1,
+          "signal": null,
+          "error": null,
+          "durationMs": 786,
+          "stdoutPath": "/private/tmp/p0-51-portable-license-cli-red-20261014/signed-list-only.stdout",
+          "stderrPath": "/private/tmp/p0-51-portable-license-cli-red-20261014/signed-list-only.stderr",
+          "stdoutSha256": "a4aebc05c0064774ebabddf278edf4dbd96e5569ffb4f868c8803274802b8ddf",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutBytes": 1602,
+          "stderrBytes": 0,
+          "actual": {
+            "valid": false,
+            "integrity": {
+              "status": "fail",
+              "errors": [
+                "no Ed25519 license public key: pass --pubkey or set AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY"
+              ]
+            },
+            "admission": {
+              "status": "fail",
+              "signatures": [
+                {
+                  "signature": "license signature",
+                  "purpose": "artifact-seal",
+                  "keyId": null,
+                  "status": "not-pinned",
+                  "source": null,
+                  "listId": null,
+                  "timeBasis": null,
+                  "detail": "the artifact names no public key for this signature"
+                }
+              ]
+            },
+            "trusted": false,
+            "overrides": []
+          }
+        }
+      ],
+      "expectedSignedListOnly": {
+        "status": 0,
+        "valid": true,
+        "trusted": true,
+        "integrity": "pass",
+        "admission": "admitted",
+        "source": "trust-list"
+      },
+      "signedListAcceptancePassed": false
+    },
+    "green": {
+      "phase": "green",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "nodeSha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "sourceVsCompiledBoundary": "Parent-rebuilt candidate dist; same retained licence/list/root files and CLI argv",
+      "sourceTree": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass",
+      "inputs": [
+        {
+          "path": "dist/cli.js",
+          "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+          "bytes": 1054087
+        },
+        {
+          "path": "dist/cli-domain-product-commands.js",
+          "sha256": "0ae9dcb8e2a0da1ef9fbc4331205412ee346204e6baff70e68ff5933881fdeba",
+          "bytes": 40535
+        },
+        {
+          "path": "dist/domains/industryPackEntitlement.js",
+          "sha256": "4e3fe2bf23940c8ca7a3847f8bfaf83612806679e13f663e23ff100ebff7261c",
+          "bytes": 19863
+        },
+        {
+          "path": "dist/trust/trustContext.js",
+          "sha256": "846b794fdcde123feda47f36b371891bcbdb5f8a5086fb2aaaaf8df73c618390",
+          "bytes": 5605
+        },
+        {
+          "path": "dist/trust/trustList.js",
+          "sha256": "4500847b46e4575d84d347fc8afacd1d35896019024590e80515bbd922783819",
+          "bytes": 10052
+        },
+        {
+          "path": "dist/trust/admission.js",
+          "sha256": "b81927daf71b18dfba3978d64ae02d752f3d4a8f61204bd36e4134e971d38078",
+          "bytes": 8256
+        },
+        {
+          "path": "dist/trust/verifierReport.js",
+          "sha256": "ab5306a3b3bde8cbf4776dc72638d8a213ace2c717d7c2194bcbb24ee73b37ae",
+          "bytes": 6231
+        },
+        {
+          "path": "src/domains/industryPackEntitlement.ts",
+          "sha256": "07cb4a8cfe1c84a25a60f2465830ac172bc36ba60634142e277e9de19fd14401",
+          "bytes": 22012
+        }
+      ],
+      "fixture": {
+        "root": "/private/tmp/p0-51-owned-license-cli-6FtU6j",
+        "home": "/private/tmp/p0-51-owned-license-cli-6FtU6j/home",
+        "amcHome": "/private/tmp/p0-51-owned-license-cli-6FtU6j/operator",
+        "workspace": "/private/tmp/p0-51-owned-license-cli-6FtU6j/workspace",
+        "licensePath": "/private/tmp/p0-51-owned-license-cli-6FtU6j/license.txt",
+        "publicKeyPath": "/private/tmp/p0-51-owned-license-cli-6FtU6j/issuer.pub",
+        "listPath": "/private/tmp/p0-51-owned-license-cli-6FtU6j/operator/trust/amc-trust-list.json",
+        "rootKeyId": "cbfe46dc18be9f257c544dafe5a3ddc00cb445c801b112184db21d8b842af8e1",
+        "issuerKeyId": "2a053ac8337063dcff1de871562e1f7f8f7ac6af2944d82eb59f728150ee542e",
+        "guard": "/private/tmp/p0-51-owned-license-cli-6FtU6j/deny-transport.mjs",
+        "licenceSha256": "fc8034897eb584047f567142ac9e613906081fdebb36a2b7e52112ab89339789",
+        "publicKeySha256": "2a053ac8337063dcff1de871562e1f7f8f7ac6af2944d82eb59f728150ee542e",
+        "listSha256": "a585ddf440f0373b260fa9028422eceba4395b4fd278381981bfabbf40872495",
+        "guardSha256": "2247990392f8593ac85d1bce5898994b3ebbfbcb92f3074ff35046e7c4dce7dd",
+        "metadataPath": "/private/tmp/p0-51-owned-license-cli-6FtU6j/fixture.json"
+      },
+      "environmentKeys": [
+        "AMC_CLAIM_LABELS_STRICT",
+        "AMC_HOME",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TERM"
+      ],
+      "licencePublicKeyEnvironmentAbsent": true,
+      "strict": true,
+      "externalTransport": "denied",
+      "commands": [
+        {
+          "name": "explicit-pem-control",
+          "argv": [
+            "domain",
+            "pack",
+            "verify",
+            "--key",
+            "<owned licence SHA256=fc8034897eb584047f567142ac9e613906081fdebb36a2b7e52112ab89339789>",
+            "--json",
+            "--trust-list",
+            "/private/tmp/p0-51-owned-license-cli-6FtU6j/operator/trust/amc-trust-list.json",
+            "--trust-root",
+            "cbfe46dc18be9f257c544dafe5a3ddc00cb445c801b112184db21d8b842af8e1",
+            "--pubkey",
+            "/private/tmp/p0-51-owned-license-cli-6FtU6j/issuer.pub"
+          ],
+          "actualArgvSha256": "b212e0696e8052ed3fcc394973811c8492bead447873c322782736197dba2279",
+          "status": 0,
+          "signal": null,
+          "error": null,
+          "durationMs": 769,
+          "stdoutPath": "/private/tmp/p0-51-portable-license-cli-green-20261014/explicit-pem-control.stdout",
+          "stderrPath": "/private/tmp/p0-51-portable-license-cli-green-20261014/explicit-pem-control.stderr",
+          "stdoutSha256": "9bb4dc6778707cc382fdb2e62f3715e241518d9f1b26a72dae020ecd05c5c2d3",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutBytes": 1617,
+          "stderrBytes": 0,
+          "actual": {
+            "valid": true,
+            "integrity": {
+              "status": "pass",
+              "errors": []
+            },
+            "admission": {
+              "status": "pass",
+              "signatures": [
+                {
+                  "signature": "license signature",
+                  "purpose": "artifact-seal",
+                  "keyId": "2a053ac8337063dcff1de871562e1f7f8f7ac6af2944d82eb59f728150ee542e",
+                  "status": "admitted",
+                  "source": "explicit-key",
+                  "listId": null,
+                  "timeBasis": null,
+                  "detail": null
+                }
+              ]
+            },
+            "trusted": true,
+            "overrides": []
+          }
+        },
+        {
+          "name": "signed-list-only",
+          "argv": [
+            "domain",
+            "pack",
+            "verify",
+            "--key",
+            "<owned licence SHA256=fc8034897eb584047f567142ac9e613906081fdebb36a2b7e52112ab89339789>",
+            "--json",
+            "--trust-list",
+            "/private/tmp/p0-51-owned-license-cli-6FtU6j/operator/trust/amc-trust-list.json",
+            "--trust-root",
+            "cbfe46dc18be9f257c544dafe5a3ddc00cb445c801b112184db21d8b842af8e1"
+          ],
+          "actualArgvSha256": "07b5a8d1544c27c3c489183ade2185461b7fc4fe51ee6efce3f38f22240731fd",
+          "status": 0,
+          "signal": null,
+          "error": null,
+          "durationMs": 775,
+          "stdoutPath": "/private/tmp/p0-51-portable-license-cli-green-20261014/signed-list-only.stdout",
+          "stderrPath": "/private/tmp/p0-51-portable-license-cli-green-20261014/signed-list-only.stderr",
+          "stdoutSha256": "9c5ed3744b42021add7e8ddd9b2a519fdf5c3c2036c8e451da2498d61cd71ea5",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutBytes": 1633,
+          "stderrBytes": 0,
+          "actual": {
+            "valid": true,
+            "integrity": {
+              "status": "pass",
+              "errors": []
+            },
+            "admission": {
+              "status": "pass",
+              "signatures": [
+                {
+                  "signature": "license signature",
+                  "purpose": "artifact-seal",
+                  "keyId": "2a053ac8337063dcff1de871562e1f7f8f7ac6af2944d82eb59f728150ee542e",
+                  "status": "admitted",
+                  "source": "trust-list",
+                  "listId": "p0-51-built-cli",
+                  "timeBasis": "claimed",
+                  "detail": null
+                }
+              ]
+            },
+            "trusted": true,
+            "overrides": []
+          }
+        }
+      ],
+      "expectedSignedListOnly": {
+        "status": 0,
+        "valid": true,
+        "trusted": true,
+        "integrity": "pass",
+        "admission": "admitted",
+        "source": "trust-list"
+      },
+      "signedListAcceptancePassed": true
+    },
+    "sameFixtureHashes": true,
+    "sameActualArgvSha256": true,
+    "sameRuntime": true,
+    "allStoredStreamHashesRechecked": true,
+    "explicitPemControlNote": "CLI --pubkey is also an explicit admission pin; the pure function control only supplies the PEM locator.",
+    "boundaryNote": "Pure RED was captured before the TS repair. Actual CLI RED used unchanged baseline dist while TS already held the candidate repair. Actual CLI GREEN used parent-rebuilt dirty candidate dist. Top-level CLI and trust dist hashes stayed equal; licence module eaac1f3d3e383dd8ac32b10613f7510dee38d9d15cd69aeb925cd7fa4dfbc03b changed to 4e3fe2bf23940c8ca7a3847f8bfaf83612806679e13f663e23ff100ebff7261c."
+  },
+  "retainedFixture": {
+    "inventory": [
+      {
+        "path": "/private/tmp/p0-51-owned-license-cli-6FtU6j/deny-transport.mjs",
+        "bytes": 689,
+        "sha256": "2247990392f8593ac85d1bce5898994b3ebbfbcb92f3074ff35046e7c4dce7dd"
+      },
+      {
+        "path": "/private/tmp/p0-51-owned-license-cli-6FtU6j/fixture.json",
+        "bytes": 1180,
+        "sha256": "c1e7c10d93b7a0d2cfbd97d6cd722af8dc9e5e0db7165a86ba16a718c0799a61"
+      },
+      {
+        "path": "/private/tmp/p0-51-owned-license-cli-6FtU6j/issuer.pub",
+        "bytes": 113,
+        "sha256": "2a053ac8337063dcff1de871562e1f7f8f7ac6af2944d82eb59f728150ee542e"
+      },
+      {
+        "path": "/private/tmp/p0-51-owned-license-cli-6FtU6j/license.txt",
+        "bytes": 337,
+        "sha256": "fc8034897eb584047f567142ac9e613906081fdebb36a2b7e52112ab89339789"
+      },
+      {
+        "path": "/private/tmp/p0-51-owned-license-cli-6FtU6j/operator/trust/amc-trust-list.json",
+        "bytes": 915,
+        "sha256": "a585ddf440f0373b260fa9028422eceba4395b4fd278381981bfabbf40872495"
+      },
+      {
+        "path": "/private/tmp/p0-51-owned-license-cli-6FtU6j/operator/trust/trust-roots.json",
+        "bytes": 115,
+        "sha256": "d203e90139bd42eda0e752f80b74f4b31a366a834ad182bb057d9670d63f92d7"
+      }
+    ],
+    "noPrivatePemPersisted": true,
+    "cleanup": "None; retained exact licence/list/root fixture supports both phases."
+  },
+  "limitations": [
+    "Twenty-one pure cases and two exact same-input CLI commands are component evidence only. No full suite, coverage, Node24, hosted, browser, release or live licensing claim follows.",
+    "The separate ten-family corpus retains three current explicit-pin compromise-revocation failures; this discovery repair is not proof they are resolved.",
+    "P0-22 two empty-array failures and P0-23 held seven failures remain unresolved; no paused or held source was edited."
+  ]
+}

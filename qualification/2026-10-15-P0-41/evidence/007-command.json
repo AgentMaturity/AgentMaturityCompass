@@ -1,0 +1,54 @@
+{
+  "startedUtc": "2026-10-15T07:25:31.250859+00:00",
+  "pid": 28685,
+  "ownedPgid": 28685,
+  "observedPgidAfterLaunch": 28685,
+  "cwd": "/private/tmp/p0-41-causal-qualification-20261015/source",
+  "argv": [
+    "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+    "run",
+    "tests/p041ProgramMetricsQualification.test.ts",
+    "--cache=false",
+    "--maxWorkers=1",
+    "--no-file-parallelism",
+    "--reporter=default",
+    "--reporter=json",
+    "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+    "--outputFile.json=/private/tmp/p0-41-causal-qualification-20261015/phases/P041-M1-missing-source-zero--baseline/raw-producer.json"
+  ],
+  "environmentKeys": [
+    "AMC_P021_RUNTIME_OBSERVER_PATH",
+    "AMC_P041_QUALIFICATION_ARTIFACT_ROOT",
+    "GIT_NO_LAZY_FETCH",
+    "HOME",
+    "LANG",
+    "LC_ALL",
+    "PATH",
+    "TMPDIR"
+  ],
+  "home": "/private/tmp/p0-41-causal-qualification-20261015/home/P041-M1-missing-source-zero--baseline",
+  "tmpdir": "/private/tmp/p0-41-causal-qualification-20261015/tmp/P041-M1-missing-source-zero--baseline",
+  "cliArtifactRoot": "/private/tmp/p0-41-causal-qualification-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline",
+  "node": {
+    "bytes": 67024,
+    "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+  },
+  "environmentLimit": "Explicit8 keys, no OS or universal network/cache isolation.",
+  "exit": 1,
+  "endedUtc": "2026-10-15T07:25:37.332283+00:00",
+  "durationMs": 6084,
+  "ownedGroupProbes": [
+    {
+      "capturedUtc": "2026-10-15T07:25:37.332250+00:00",
+      "pgid": 28685,
+      "signal": 0,
+      "absentByESRCH": true,
+      "errno": 3
+    }
+  ],
+  "groupAbsentByESRCH": true,
+  "signalsOtherThanZeroSent": false,
+  "maxGroupPollingSeconds": 5
+}

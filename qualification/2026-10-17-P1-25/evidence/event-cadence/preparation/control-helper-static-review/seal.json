@@ -1,0 +1,29 @@
+{
+  "schema": "p125ec-independent-control-helper-review-seal/1",
+  "at": "2026-10-17T01:07:01.134000+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-helper-static-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-helper-static-review/review.json",
+      "bytes": 6496,
+      "sha256": "45db44e5f721d0218d2bab2e9c1c9d322fb22100528deacb8875a4bd8d344a16",
+      "dev": 16777231,
+      "inode": 543900183,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-helper-static-review/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-helper-static-review/input-pins.json",
+      "bytes": 9131,
+      "sha256": "22c144e604116d6d0f9bc42e68eadd8b5f567877f6222bef947f0a64a6ed543c",
+      "dev": 16777231,
+      "inode": 543900184,
+      "nlink": 1
+    }
+  ],
+  "inputPinCount": 22,
+  "allOutputsCompleteAndClosed": true,
+  "blockers": [],
+  "noHelperOrProductExecution": true,
+  "noPriorArtifactOrSourceWrites": true
+}

@@ -1,0 +1,89 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 2705,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "failed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts"
+  ],
+  "testCount": 1,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "1134472039",
+      "name": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+      "state": "fail",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1134472039_0",
+      "name": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts binds real allowed and denied native reads from two sealed sessions to the shipped AMC-5.29 gates",
+      "fullName": "binds real allowed and denied native reads from two sealed sessions to the shipped AMC-5.29 gates",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected [ { …(7) }, { …(7) }, { …(7) }, …(5) ] to deeply equal [ { …(7) }, { …(7) }, { …(7) }, …(5) ]",
+          "actual": "[\n  {\n    \"bytes\": 40,\n    \"dev\": 16777231,\n    \"inode\": 542975679,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/allowed.txt\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/allowed.txt\",\n    \"sha256\": \"490f37e4cb23e0a481ee9bcd7f2c6d47033b776666efca3b3c3bbdb7bbd74cab\",\n  },\n  {\n    \"bytes\": 38,\n    \"dev\": 16777231,\n    \"inode\": 542975680,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/denied.txt\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/denied.txt\",\n    \"sha256\": \"512661706f674e96b22c55630f761fc268e0f1930da00587c85b583ba5668b84\",\n  },\n  {\n    \"bytes\": 348,\n    \"dev\": 16777231,\n    \"inode\": 542975681,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml\",\n    \"sha256\": \"f1c2bc923947fd515f763172e0015adce317ca4a570c3ffdf83111dc4e6b9475\",\n  },\n  {\n    \"bytes\": 247,\n    \"dev\": 16777231,\n    \"inode\": 542975682,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml.sig\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml.sig\",\n    \"sha256\": \"087e5ea99c916382156a9c0be2dd93168f54402666f467aef147ccdaca9be22a\",\n  },\n  {\n    \"bytes\": 476,\n    \"dev\": 16777231,\n    \"inode\": 542975697,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json\",\n    \"sha256\": \"d67722c0a6306f95b59000cc9386d9cdc1acc9b86e7e915eb9849530bfbb4330\",\n  },\n  {\n    \"bytes\": 862,\n    \"dev\": 16777231,\n    \"inode\": 542975698,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json.sig\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json.sig\",\n    \"sha256\": \"474df779c4bf417cbfbede70118bc2dbdaa16dc7843f69d7cc9e1b679d971b67\",\n  },\n  {\n    \"bytes\": 113,\n    \"dev\": 16777231,\n    \"inode\": 542975703,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/monitor_ed25519.pub\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/monitor_ed25519.pub\",\n    \"sha256\": \"1f65860e5ec91826f7a8eaca7e437f2584988e10456de336ce2c7f806f122e17\",\n  },\n  {\n    \"bytes\": 113,\n    \"dev\": 16777231,\n    \"inode\": 542975704,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/auditor_ed25519.pub\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/auditor_ed25519.pub\",\n    \"sha256\": \"80dddeea1bddd4fbeb6b890d67601eedbf13591d73d681d51f2be61dc7c4e40a\",\n  },\n]",
+          "expected": "[\n  {\n    \"bytes\": 40,\n    \"dev\": 16777231,\n    \"inode\": 542975679,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/allowed.txt\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/allowed.txt\",\n    \"sha256\": \"490f37e4cb23e0a481ee9bcd7f2c6d47033b776666efca3b3c3bbdb7bbd74cab\",\n  },\n  {\n    \"bytes\": 38,\n    \"dev\": 16777231,\n    \"inode\": 542975680,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/denied.txt\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/denied.txt\",\n    \"sha256\": \"512661706f674e96b22c55630f761fc268e0f1930da00587c85b583ba5668b84\",\n  },\n  {\n    \"bytes\": 348,\n    \"dev\": 16777231,\n    \"inode\": 542975681,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml\",\n    \"sha256\": \"f1c2bc923947fd515f763172e0015adce317ca4a570c3ffdf83111dc4e6b9475\",\n  },\n  {\n    \"bytes\": 247,\n    \"dev\": 16777231,\n    \"inode\": 542975682,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml.sig\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml.sig\",\n    \"sha256\": \"087e5ea99c916382156a9c0be2dd93168f54402666f467aef147ccdaca9be22a\",\n  },\n  {\n    \"bytes\": 476,\n    \"dev\": 16777231,\n    \"inode\": 542975697,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json\",\n    \"sha256\": \"d67722c0a6306f95b59000cc9386d9cdc1acc9b86e7e915eb9849530bfbb4330\",\n  },\n  {\n    \"bytes\": 862,\n    \"dev\": 16777231,\n    \"inode\": 542975698,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json.sig\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json.sig\",\n    \"sha256\": \"474df779c4bf417cbfbede70118bc2dbdaa16dc7843f69d7cc9e1b679d971b67\",\n  },\n  {\n    \"bytes\": 113,\n    \"dev\": 16777231,\n    \"inode\": 542975566,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/monitor_ed25519.pub\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/monitor_ed25519.pub\",\n    \"sha256\": \"1f65860e5ec91826f7a8eaca7e437f2584988e10456de336ce2c7f806f122e17\",\n  },\n  {\n    \"bytes\": 113,\n    \"dev\": 16777231,\n    \"inode\": 542975568,\n    \"nlink\": 1,\n    \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/auditor_ed25519.pub\",\n    \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/auditor_ed25519.pub\",\n    \"sha256\": \"80dddeea1bddd4fbeb6b890d67601eedbf13591d73d681d51f2be61dc7c4e40a\",\n  },\n]",
+          "showDiff": true,
+          "operator": "deepStrictEqual",
+          "diff": "- Expected\n+ Received\n\n@@ -54,20 +54,20 @@\n      \"sha256\": \"474df779c4bf417cbfbede70118bc2dbdaa16dc7843f69d7cc9e1b679d971b67\",\n    },\n    {\n      \"bytes\": 113,\n      \"dev\": 16777231,\n-     \"inode\": 542975566,\n+     \"inode\": 542975703,\n      \"nlink\": 1,\n      \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/monitor_ed25519.pub\",\n      \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/monitor_ed25519.pub\",\n      \"sha256\": \"1f65860e5ec91826f7a8eaca7e437f2584988e10456de336ce2c7f806f122e17\",\n    },\n    {\n      \"bytes\": 113,\n      \"dev\": 16777231,\n-     \"inode\": 542975568,\n+     \"inode\": 542975704,\n      \"nlink\": 1,\n      \"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/auditor_ed25519.pub\",\n      \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/auditor_ed25519.pub\",\n      \"sha256\": \"80dddeea1bddd4fbeb6b890d67601eedbf13591d73d681d51f2be61dc7c4e40a\",\n    },",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected [ { …(7) }, { …(7) }, { …(7) }, …(5) ] to deeply equal [ { …(7) }, { …(7) }, { …(7) }, …(5) ]\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:365:31\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:181:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+              "line": 365,
+              "column": 31
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+              "line": 181,
+              "column": 5
+            }
+          ]
+        },
+        {
+          "stack": "Error: captured owned file/policy/public-key pin changed\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:392:58\n    at cleanup (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:123:11)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:383:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "message": "captured input preservation: captured owned file/policy/public-key pin changed",
+          "name": "Error",
+          "constructor": "Function<Error>",
+          "toString": "Function<toString>",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+              "line": 392,
+              "column": 58
+            },
+            {
+              "method": "cleanup",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+              "line": 123,
+              "column": 11
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+              "line": 383,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

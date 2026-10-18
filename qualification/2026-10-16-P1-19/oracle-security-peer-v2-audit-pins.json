@@ -1,0 +1,121 @@
+{
+  "schema": "p119-oracle-security-v2-review-pins/1",
+  "closedOutputs": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-v2-audit/README.md",
+      "bytes": 2272,
+      "sha256": "f6a2199b2cd75678f97a35705d4973f10f910283b01788f0e3f5872b86daf575",
+      "device": 16777231,
+      "inode": 541767573,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-v2-audit/review.json",
+      "bytes": 9651,
+      "sha256": "6911176ec93dccdbe1919f0a076128d07a6c745b992da73ec2d3a1df1d196ecb",
+      "device": 16777231,
+      "inode": 541767574,
+      "nlink": 1
+    }
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19409,
+      "sha256": "f238a3dddc0f9aa5079ef1c8c859a5620948272fafefca5ca3081462a1d0eded",
+      "device": 16777231,
+      "inode": 541766512,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 27458,
+      "sha256": "3a988d22647c9be6499b8df5c08fc3dde1d0281f1b1da4bda71c3f41e21b04f7",
+      "device": 16777231,
+      "inode": 541766421,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19441,
+      "sha256": "90a24dd18f8695efb2bdcee5ece5605c507690d3fe940edb3e7a4911e3eb43a8",
+      "device": 16777231,
+      "inode": 541767456,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 28475,
+      "sha256": "4df67b11e019797c5b485bc91ed428d7f8c3f38b9da3f3cad08ba7c8a9e6526b",
+      "device": 16777231,
+      "inode": 541767457,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/v1-to-v2.patch",
+      "bytes": 8706,
+      "sha256": "4d9fe2a40b633607d0f577e8b2e40408bc4d03b157bc3743029da1df458a6f7e",
+      "device": 16777231,
+      "inode": 541767458,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/interface-addendum.json",
+      "bytes": 2005,
+      "sha256": "937865aa4653c63da62a43f875cc7692efab111e411dad5c7bbe2aa79d6281c3",
+      "device": 16777231,
+      "inode": 541767459,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-audit/review.json",
+      "bytes": 15398,
+      "sha256": "4c335c07288ad7df93573e9cff7cb5c7252cc14e5b68b4ad5b53afba15b532e2",
+      "device": 16777231,
+      "inode": 541767276,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-audit/pins.json",
+      "bytes": 6346,
+      "sha256": "6ca189df8c837600e938a92a0081aca4b69564d91c663c92d5e33900b91d39fa",
+      "device": 16777231,
+      "inode": 541767278,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+      "bytes": 12366,
+      "sha256": "19b046e71142f66a5ba514bb1ea8bb1d26bbc39ddd15cfb882bab253d3c517c5",
+      "device": 16777231,
+      "inode": 539133630,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalChainStore.ts",
+      "bytes": 26341,
+      "sha256": "72f14a9fe4a01375ab20a4129f05a7ef8c2ccd6959cdc2777a87f429d7f443ae",
+      "device": 16777231,
+      "inode": 539133624,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalEngine.ts",
+      "bytes": 21065,
+      "sha256": "a2257cea092960d8815e6608e4d2cd416cba5d429eabb6e3a1147d7902e91b06",
+      "device": 16777231,
+      "inode": 539133628,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalPolicySchema.ts",
+      "bytes": 2472,
+      "sha256": "fb7f5bbe8f1711d994e20a982a73c817a6f0651873b9ad091cc9b3d19f2d1456",
+      "device": 16777231,
+      "inode": 539133631,
+      "nlink": 1
+    }
+  ],
+  "inputsRecheckedAtClosure": true,
+  "allReadsAndWritesFinished": true
+}

@@ -1,0 +1,18 @@
+{
+  "operator": "principal-binding",
+  "sourceBefore": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710",
+  "mutant": "795d017b45195c9579a9e32769d1673d33c3e8ab010d5042bdacba3663df4463",
+  "patchSha256": "d80e5b2a542aa03d28b35cb90a1c5ddbcf898a6c3b43b5a9a4c1be5585e2ee0d",
+  "patchCapturedFromLiveMutant": true,
+  "at": "2026-10-16T20:10:29.444480+00:00",
+  "target": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/tools/guards/compiledPolicyGuard.ts",
+  "sourceCommit": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+  "mode": "apply",
+  "compiledMutation": false,
+  "nativeMutation": false,
+  "automaticRestoreOrRetry": false,
+  "targetPhysicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/tools/guards/compiledPolicyGuard.ts",
+  "targetInode": 543265642,
+  "targetNlink": 1,
+  "regularSingleLinkCheckedBeforeWrite": true
+}

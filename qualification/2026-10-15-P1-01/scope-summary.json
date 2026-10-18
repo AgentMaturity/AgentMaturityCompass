@@ -1,0 +1,87 @@
+{
+  "key": "P1-01",
+  "source": "559fafc4fb52e586606f5fdf471ce65f44c5cf58",
+  "productionSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "primaryTests": {
+    "total": 16,
+    "passed": 16,
+    "failed": 0,
+    "skipped": 0
+  },
+  "separateCounts": {
+    "schemas": 38,
+    "parityFixtures": 75,
+    "outsideParityJson": 9,
+    "rootProbeModes": 3,
+    "rootCommandRecords": 21,
+    "stripControlChildRecords": 7,
+    "failedPassthroughChildRecords": 3
+  },
+  "formalAcceptanceClosed": false,
+  "originalCaseIdentities": [
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile an internally valid unsigned import remains self-reported with unknown timing and unverified parent"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile semantic identity survives a different receipt time but signatures bind the receipt time"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile rejects corrupt id without accepting a trust claim"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile rejects corrupt parent without accepting a trust claim"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile rejects corrupt tool without accepting a trust claim"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile rejects corrupt duration without accepting a trust claim"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile rejects corrupt calendar without accepting a trust claim"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile rejects corrupt digest without accepting a trust claim"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile rejects corrupt unicode without accepting a trust claim"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile a signing key cannot promote imports or self-admit"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile independent authority is scoped to producer and capture method"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile governed observation requires the admitted signature and original/digest mismatches refuse"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile the verifier never raises a producer's own lower declaration"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "external evidence profile future fields/versions and duplicate tool settlements refuse"
+    ],
+    [
+      "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/standardSchemaCaveat.test.ts",
+      "published standard schemas are the generated spec schemas, with no permissiveness caveat"
+    ]
+  ]
+}

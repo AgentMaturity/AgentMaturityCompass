@@ -1,0 +1,34 @@
+{
+  "schema": "p125-checkpoint-receipt-scope-preparation-seal/1",
+  "at": "2026-10-16T23:31:38.220896+00:00",
+  "blockers": [],
+  "allReadsFinished": true,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-scope-preparation/review.json",
+      "bytes": 5536,
+      "sha256": "862243c0fa50a99f1d59284d3856c62da1bb503c3c2f7b1de0470d689be8214a"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-scope-preparation/README.md",
+      "bytes": 2028,
+      "sha256": "570ff6096be3ad91e448005d98b0ad92173e9411f741c17e8d9de98ebe8d4920"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-scope-preparation/pins.json",
+      "bytes": 7280,
+      "sha256": "87e18beb75a1d07ea083fc67cad12fa9c1199a21c09b123cbac2cf7b30fead2d"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-scope-preparation/closed-read-observations.json",
+      "bytes": 1456322,
+      "sha256": "c272e61da7834918d7001e0f168b7f8db3983e2d356287d002267e04cffb0767"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-scope-preparation/read-tool-results.json",
+      "bytes": 10159,
+      "sha256": "fe224e60534be0f8121b01ba94283aaac00820ed15d7aa4d7247f1fd651f4a80"
+    }
+  ],
+  "sourceOrMetadataAllocationProductExecutionOrSourceIndexQaWrites": false
+}

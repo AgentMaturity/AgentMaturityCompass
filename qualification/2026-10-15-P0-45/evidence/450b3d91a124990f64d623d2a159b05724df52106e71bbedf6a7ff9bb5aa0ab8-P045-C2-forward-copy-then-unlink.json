@@ -1,0 +1,60 @@
+{
+  "setupSha256": "e5c206bac71f342068f035291aa5f5e99ed5411cbf73e1a1e3816b08426765dd",
+  "controllerSha256": "9479a7a7186ce97e740dad14fda9c0244f3f3173d8d41a30b659de8e5e40e192",
+  "proposalSha256": "5161f783b18396d03d1c4d4e18dc6b196f282aa33b394a0b8f6c6952cf76612f",
+  "sourceManifestSha256": "1d2ae6b2a90b8e4c9e10de35b8bc870d87e0e784fabbdba6914d9fc5423a963b",
+  "compiledManifestSha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48",
+  "preservationSha256": "cfaadfe1062c5cd94cf0b692f32d0baf6d8a3236807508ec202aaff3345c391e",
+  "observerSha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447",
+  "setupIndexSha256": "d72f77548b61e77c1650a96387f10424d96df3722360566f59ea73e2fc05746e",
+  "authorization": "START_P045_CAUSAL_P045-C2-forward-copy-then-unlink",
+  "control": "P045-C2-forward-copy-then-unlink",
+  "releasedUtc": "2026-10-15T06:14:09.480194+00:00",
+  "setupPath": "/private/tmp/p0-45-causal-qualification-20261015/setup.json",
+  "setupIndexPath": "/private/tmp/p0-45-causal-qualification-20261015/setup-index.json",
+  "controllerPath": "/private/tmp/p0-45-causal-qualification-20261015/driver/controller.py",
+  "closureRoot": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+  "parentRoot": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+  "rootAuthor": "Root; user-authorized bounded P0-45 qualification only",
+  "noHumanApprovalClaim": true,
+  "releaseAuthor": {
+    "path": "/private/tmp/p0-45-author-causal-release-20261015.py",
+    "bytes": 4879,
+    "sha256": "9c03f4999bfbb65bbc3a3f5a60ff29e7c5408a48bfef377baa682e10b6aebab7"
+  },
+  "preCausalNormalFreeze": {
+    "path": "/private/tmp/p0-45-qualification-20261015/command-pre-causal-normal-freeze/command.json",
+    "bytes": 1164,
+    "sha256": "66428ed62dd0d914a7ceb2b9fec5bfe34db956e97cfa90b6b91105b2defe6ed2"
+  },
+  "priorControlsCompleted": [
+    "P045-C1-fail-closed-hold-admission"
+  ],
+  "scope": "Only this unchanged original core12 source-mode baseline/mutant/restored control. No source ownership transfer, product guard waiver, dist edit or test/config/deadline change.",
+  "boundaries": "Borrowed dependencies and seven-key child environment. No independent install, OS/network or universal descendant proof. Failures and masks need actual review; C2 rename-spy sensitivity is not byte-loss proof.",
+  "sealedSetupReview": {
+    "path": "/private/tmp/p0-45-controller-sealed-setup-review-20261015.json",
+    "bytes": 20040,
+    "sha256": "91b1cc2d9a7856d4e8177e5fde967ac1a76f71d8932ac011f9de2d306a58ed19"
+  },
+  "staticCodeReview": {
+    "path": "/private/tmp/p0-45-controller-code-static-review-20261015.json",
+    "bytes": 9129,
+    "sha256": "725d5b9b832baf828de85f884eaf5ed0c92ff8692751e13f01ab7cf4bf1bd013"
+  },
+  "rootInputVerification": {
+    "path": "/private/tmp/p0-45-causal-root-sealed-input-verification-20261015.json",
+    "bytes": 2614,
+    "sha256": "e4620bce97e5ca42ebfec49e780f7920ce0e03f0c258e78f4567517c30931db8"
+  },
+  "recipeReview": {
+    "path": "/private/tmp/p0-45-recipes-static-review-20261015.json",
+    "bytes": 15708,
+    "sha256": "6ae309898f6b772144c7b24120800c3c94db85d034788cb570739bcb33697a46"
+  },
+  "originalCorporaReview": {
+    "path": "/private/tmp/p0-45-original-corpora-independent-review-20261015.json",
+    "bytes": 44245,
+    "sha256": "699e0c65ac32bfc9705ad4c978d12494e0f49ce699e24da188ef29504914c939"
+  }
+}

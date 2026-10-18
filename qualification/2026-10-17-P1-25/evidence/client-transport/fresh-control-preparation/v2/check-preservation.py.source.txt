@@ -1,0 +1,27 @@
+"""Explicit read-only snapshot; no mutation, recovery or continuous-isolation claim."""
+from pathlib import Path
+import datetime
+import importlib.util
+import json
+import sys
+
+P = Path('/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation')
+spec = importlib.util.spec_from_file_location('p125c_control_support', P / 'v2/source-control.py')
+support = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(support)
+label, = sys.argv[1:]
+assert label in ('before-controls', 'after-m1', 'final')
+binding, protected, q = support.context()
+assert support.git(q, 'status', '--porcelain=v1') == b''
+facts = support.preservation(binding, protected, q)
+target, unused = support.pin(q / support.TARGET)
+source, unused = support.pin(support.S / support.TARGET)
+assert (target['dev'], target['inode']) != (source['dev'], source['inode'])
+out = {'schema': 'p125c-current-preservation-snapshot/1',
+       'at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'label': label,
+       'sourceCommit': binding['sourceCommit'], 'sourceRoot': str(support.S), 'freshRoot': str(q),
+       **facts, 'target': target, 'sourceTarget': source,
+       'bothTreesClean': True, 'bothIndexesEmpty': True,
+       'boundary': 'Actual read-only boundary snapshot only. No continuous isolation, unrecorded earlier check, runtime or future restoration credit.'}
+support.write_json(support.B / ('preservation-' + label + '.json'), out)
+print(json.dumps(out))

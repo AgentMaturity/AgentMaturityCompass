@@ -1,0 +1,137 @@
+{
+  "schema": "p112-inert-metadata-repair-review-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/actual-receipt-inputs-v2.json",
+      "bytes": 40407,
+      "sha256": "6531c6447eac9e7e4dc69e85e88f0e3f31bff675e3f8a5a27a100bf660992f10"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/actual-receipt-inputs-v3.json",
+      "bytes": 41458,
+      "sha256": "c349098b3a2a9742368fe56920ed6504d3097c2be375ebd71f2feab731d66e0b"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/before-full.json",
+      "bytes": 248942,
+      "sha256": "6a80bacf2deaefbaeb28ef400cb0caf30ae472dcb8a5f1bc60d5952622088a0b"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/discovery-correction.json",
+      "bytes": 2962,
+      "sha256": "0b0d0e09f6136c72877e9b8108808fa793ffcd0c0c816d53b07d65fc33c0502f"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/expectation-stop.json",
+      "bytes": 439,
+      "sha256": "e07f4e09e8d9c7eed3fb710ed67f1b36225d4cbf06e8c6b3f7759516327d27b3"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-current-full.json",
+      "bytes": 248137,
+      "sha256": "6b82381cb434c3f7d787815280a9fc4e7279ae64f5e5b48cf61603ca9495b7a3"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/protected-inputs.json",
+      "bytes": 30018,
+      "sha256": "17ae38c0dc5f93017d6162253db1ec5e6f95f462c98b3730a922aa13bd9767a0"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery-review/seal.json",
+      "bytes": 906,
+      "sha256": "02352517643926ccbb05213c724f33c9e4462f170248d93f459f9674c2b38064"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery-review/review.json",
+      "bytes": 6169,
+      "sha256": "1baf10de6a1a4915f69cf6d534d1b935e7a10884a9f73342ec724a4590c80abd"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/compiledPolicyGuard.test.ts",
+      "bytes": 11155,
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/assemble-receipt.py",
+      "bytes": 4119,
+      "sha256": "55a5d8ef05e6ae776e0f6e9b69e49e2dc6c948275b3da606122487e3f3217868"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/private-receipt-root-v2/2026-10-17-P1-12/receipt.json",
+      "bytes": 54938,
+      "sha256": "adf6d71c19c853eea55a92d1c896fa97ab92211d6bb357e004d73691416e5e57"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/private-receipt-root-v2/2026-10-17-P1-12/README.md",
+      "bytes": 4745,
+      "sha256": "b1dd46c21354c840d85893bd7f1cf73c403bcc33f7059f6ac1d40edd5c4c8685"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/private-receipt-root-v2/2026-10-17-P1-12/evidence/assembly-inputs.json",
+      "bytes": 40407,
+      "sha256": "6531c6447eac9e7e4dc69e85e88f0e3f31bff675e3f8a5a27a100bf660992f10"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/private-receipt-root-v2/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts",
+      "bytes": 11155,
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/private-receipt-root-v3/2026-10-17-P1-12/receipt.json",
+      "bytes": 55097,
+      "sha256": "2b9726cf2604d24f1764066e5285841d0d31b140fdc54cce36a92d99699b92b7"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/private-receipt-root-v3/2026-10-17-P1-12/README.md",
+      "bytes": 5426,
+      "sha256": "ba1b43ae1c82df34746ed6132a8907f954874646eb7d3c762e4f6173ff80a546"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/private-receipt-root-v3/2026-10-17-P1-12/evidence/assembly-inputs.json",
+      "bytes": 41458,
+      "sha256": "c349098b3a2a9742368fe56920ed6504d3097c2be375ebd71f2feab731d66e0b"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/private-receipt-root-v3/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts.source.txt",
+      "bytes": 11155,
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/private-receipt-root-v3/2026-10-17-P1-12/evidence/discovery-correction.json",
+      "bytes": 2962,
+      "sha256": "0b0d0e09f6136c72877e9b8108808fa793ffcd0c0c816d53b07d65fc33c0502f"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-repair-review/checks.json",
+      "bytes": 591261,
+      "sha256": "4ca21a71953448f329889a99a1d1430090fea334d608849a6a1df65db6141176"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-repair-review/content-boundaries.json",
+      "bytes": 1316,
+      "sha256": "8b9f6f6f5d0b27fbe675b82c76c128d6bdd59cf4db90d3724ea571c30e4c3ff6"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-repair-review/review.json",
+      "bytes": 4968,
+      "sha256": "5d75fcfa69d94a5790ff3d7a950c0373c7df9d8ee86af6a3e0c8506fdc77c9b0"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-repair-review/README.md",
+      "bytes": 3199,
+      "sha256": "37c11b579e9386d381ab379b0b2b9323b11e191a6c61689431d107b89a31ab40"
+    }
+  ]
+}

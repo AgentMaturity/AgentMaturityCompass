@@ -1,0 +1,488 @@
+{
+  "schemaVersion": 1,
+  "kind": "read-only serial routing preflight",
+  "afterActiveIssue": "P0-54",
+  "createdUtc": "2026-10-14T19:42:21.808493+00:00",
+  "source": {
+    "worktree": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass",
+    "head": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+    "statusAtCapture": "",
+    "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+    "primaryHeld": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+    "durableClaude": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+    "P052ReceiptCommit": "06217dd2bcdc1817eb2b189b7571bd3ed27c0950",
+    "headAtTaskDispatch": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+    "captureNote": "Root advanced the active P0-54 source to the current534460ab during this read-only audit; selected existing production path comparisons remain directly measured. No full P0-54 completion inferred."
+  },
+  "recommendation": {
+    "key": "P0-20",
+    "slice": "Qualify existing signed industry-pack audit producer, pinned verification, compiled CLI messages/verdicts, and contained binder reader.",
+    "when": "After active P0-54 qualification finishes; no next runtime or implementation started.",
+    "reason": "P0-20 directly advances Urgent P0-55 due21October and is smaller than its other unqualified runtime dependencies. P0-19 and P0-20 share22October High priority. Workstreams E02 lists P0-19 first; this recommendation deliberately favors the urgent dependency, not an invented document order. P0-27 is High/due25October.",
+    "proposedWriteScope": "ONLY NEW tests/industryPackAuditSigningQualification.test.ts, separately root-owned private CLI fixtures/receipts. Existing production, helpers and tests stay read-only. This preflight grants no ownership or implementation clearance.",
+    "notDone": true
+  },
+  "comparison": [
+    {
+      "key": "P0-55",
+      "priority": "Urgent",
+      "due": "2026-10-21",
+      "exportStatus": "Not started",
+      "later": "Merged5d4740de plus dc14bf63;12October notes In review. Full acceptance remains unresolved: activeP0-22/P0-51 failures and unsigned/session follow-up debt. Source existence is not qualification."
+    },
+    {
+      "key": "P0-20",
+      "priority": "High",
+      "due": "2026-10-22",
+      "exportStatus": "In review",
+      "later": "Accepted sign/verify path and protected reader; targeted signing regression file absent. Recommended dependency seam."
+    },
+    {
+      "key": "P0-19",
+      "priority": "High",
+      "due": "2026-10-22",
+      "exportStatus": "In review",
+      "later": "Accepted scenarioGrading plus v1 inconclusive followup. Planned scenario/runner/echo test files absent. Historical47 echo cases assigned P2-27, not current runtime results. Re-evaluate after P0-20."
+    },
+    {
+      "key": "P0-27",
+      "priority": "High",
+      "due": "2026-10-25",
+      "exportStatus": "In review",
+      "later": "Accepted aborted seals, unsigned store gate, integrity error, segment-aware checkpoint and schema2 owned-session export. Planned four named regression files absent; runtime qualification open."
+    }
+  ],
+  "P055Dependencies": {
+    "P0-09": "HistoricalDone/old dated verifier receipt and existing pinned admission; remaining surfaces have active P0-51 successor debt.",
+    "P0-18": "HistoricalDone/accepted provenance followups; subject/replay/time checks not refreshed here.",
+    "P0-20": "Source accepted; signing/reader qualification proposed.",
+    "P0-22": "Current bounded512/510/2/0; passport search and leaderboard show empty-array failures active.",
+    "P0-27": "Source accepted; closing note retains other unsigned writers and missing-seal sites.",
+    "P0-51": "Current bounded822/789/33/0;3 pin-precedence conflicts and30 formal trust-field refusals active."
+  },
+  "earlierDates": [
+    {
+      "key": "P0-53",
+      "due": "14October",
+      "limit": "Separate Needs-Sid/freeze-exception integration seam. Preserve primary1236 vs held1255/P1-65 baselines; no self-authorization."
+    },
+    {
+      "key": "P0-03",
+      "due": "16October",
+      "limit": "Needs-Sid worktree cleanup; no deletion/resumption."
+    },
+    {
+      "key": "P0-41",
+      "due": "16October",
+      "limit": "Medium metrics; no invented measurement."
+    },
+    {
+      "key": "P1-56",
+      "due": "17October",
+      "limit": "Accepted but unqualified/reserved A4 spine; distinct routed/auth scope."
+    },
+    {
+      "keys": [
+        "P0-13",
+        "P0-42",
+        "P0-15",
+        "P0-17",
+        "P0-18",
+        "P0-43",
+        "P0-44"
+      ],
+      "dueRange": "16\u201320October",
+      "limit": "HistoricalDone/source acceptance does not imply current whole qualification; preserve evidence, no tracker closure."
+    },
+    {
+      "keys": [
+        "P0-14",
+        "P0-37"
+      ],
+      "due": "20October",
+      "limit": "Distinct deployment/topology/key-rotation/publication decisions and reserved work; no live operation or clearance."
+    }
+  ],
+  "currentSemantics": [
+    "Empty industry audit is synthetic_example and cannot be signed. Answered audit remains self_reported/not_evaluated even with a genuine signature.",
+    "Sign through signIndustryPackAuditJson/signSerializedPayloadWithAuditor. TrustContext admits artifact-seal; embedded key and PEM merely locate the signer.",
+    "Tamper plus recomputed receiptHash retains signature refusal. Foreign/attacker/malformed/unsigned controls must remain false; no crypto or claim downgrade.",
+    "Actual domain apply requires --agent and paid entitlement before audit. Reuse existing authentic Ed25519 createIndustryPackLicenseKey fixture at tests/cliClaimLabels.e2e.test.ts293\u2013303. Child gets public issuer key+valid fixture token only, not private issuer key; no online checkout/activation or gate bypass.",
+    "auditBinderVerifyForApi has no publicKeyPath, uses real exports root and one rechecked descriptor, refuses links/hardlinks/FIFO/devices. Direct helper coverage is not routed HTTP/auth qualification.",
+    "Current accepted binder route removed pathExists pre-check via dc14bf63. Missing named file reaches generic UNREADABLE; an absent lookup with no file remains404. Old closing-note/changeset404 wording is historical."
+  ],
+  "proposedControls": [
+    "genuine signed audit",
+    "tamper and rehash",
+    "foreign auditor",
+    "attacker envelope/signature",
+    "unsigned/checksum-only",
+    "synthetic signing refusal",
+    "self-reported claim cap",
+    "locked-vault/no signed file",
+    "actual signer/fingerprint/verify/checksum CLI lines",
+    "regular and nested exports positives; leaf/parent/root links, hardlink, FIFO, missing and outside refusal with unchanged byte/link snapshots",
+    "operator-pinned CLI external file positive versus server-helper outside refusal"
+  ],
+  "heldAndOwnership": {
+    "reservationSha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+    "clearanceGranted": false,
+    "meaning": "Missing key, idle state, ancestry or same bytes is not clearance. Preserve current human authority and all latest reserved/shared boundaries. Qualification proposal only.",
+    "selectedHeldDifference": "auditApi/auditCli differ only in P1-78 export-request initiator. Preserve separately; do not overlay. Industry audit, domain apply, binder signer and org signer match accepted main/held/Claude.",
+    "P052Sync": "Pending narrow source decision remains separate;3 destination+4 alias-history failures active, receipt committed06217dd2b with measuredbc0666. No source repair or waived witness.",
+    "activeReceipts": [
+      {
+        "key": "P0-22",
+        "receipt": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/qualification/2026-10-14-P0-22/receipt.json",
+        "sha256": "8438da42b78fa73070b56ee3083f6cdc524e7702be04791cc9ebe9f81a664fbf",
+        "measuredSource": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+        "counts": {
+          "total": 512,
+          "passed": 510,
+          "failed": 2,
+          "skipped": 0
+        }
+      },
+      {
+        "key": "P0-23",
+        "receipt": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/qualification/2026-10-14-P0-23/receipt.json",
+        "sha256": "c694f72e5d1f352c07ebdc07ecd88cf08348cf5fd17826803bfb0dcac7c625a1",
+        "measuredSource": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+        "counts": {
+          "total": 229,
+          "passed": 222,
+          "failed": 7,
+          "skipped": 0
+        }
+      },
+      {
+        "key": "P0-51",
+        "receipt": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/qualification/2026-10-14-P0-51/receipt.json",
+        "sha256": "d422ab20f449fa3c7b11d6b29a71b6e6aabc921e99aaf4914f2ec23a21977db8",
+        "measuredSource": "d8e5168556aeea8e8c12cbc67848839824edbb48",
+        "counts": {
+          "total": 822,
+          "passed": 789,
+          "failed": 33,
+          "skipped": 0
+        }
+      },
+      {
+        "key": "P0-52",
+        "receipt": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-52/receipt.json",
+        "sha256": "119fef441f07d2fc30b7d751162445e7559e2879816ea40aa0f272275f239f7e",
+        "measuredSource": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+        "counts": {
+          "total": 418,
+          "passed": 411,
+          "failed": 7,
+          "skipped": 0
+        }
+      }
+    ],
+    "protected": "Existing source/tests/helpers, CLI/registry/REPL/API/Studio/A4/privacy, frozen archives/manifest, package/lock, freeze/floors/budgets remain unchanged. Later repair needs separate scope/snapshot audit."
+  },
+  "planHashes": [
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541",
+      "bytes": 38227
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04",
+      "bytes": 78486
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-55.md",
+      "sha256": "d77a082bd93e1dd71c16063854c1be74d574a0d9b73ecffdbc890bf31783398d",
+      "bytes": 9347
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-20.md",
+      "sha256": "37ec0c324825688883f173007800cdcf3e9e1fdc3f1dc811971cf0244805ffc9",
+      "bytes": 11001
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-19.md",
+      "sha256": "6cdeabe21d7f1512dbf5919e554daedeb8182e9457b894db473582d8131d404b",
+      "bytes": 14449
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-27.md",
+      "sha256": "dcfab371fdb076e688ab79d1ea9e471c16e68088f46ea1cde4c240283067a889",
+      "bytes": 13317
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+      "bytes": 275376
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/pending-checks.md",
+      "sha256": "6339ea6398fddcfbe18ea96a40b839241745ec138378772c77a581ede1b57870",
+      "bytes": 196468
+    }
+  ],
+  "sourceHashes": [
+    {
+      "path": "src/domains/industryPackAudit.ts",
+      "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d",
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same"
+    },
+    {
+      "path": "src/domains/domainApplyCli.ts",
+      "sha256": "e381955cf4f1ac136c86d39be33eac29e47c6a8cb83f9781c4abdd78c9d8d84b",
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same"
+    },
+    {
+      "path": "src/domains/industryPackEntitlement.ts",
+      "sha256": "07cb4a8cfe1c84a25a60f2465830ac172bc36ba60634142e277e9de19fd14401",
+      "acceptedMain": "different",
+      "primaryHeld": "different",
+      "durableClaude": "different"
+    },
+    {
+      "path": "src/audit/binderSigner.ts",
+      "sha256": "b08f4f95cb172def287cbb089539939394ba26d7433d610df7a2bef4608a610d",
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same"
+    },
+    {
+      "path": "src/audit/auditApi.ts",
+      "sha256": "371901e70b53f446f5dfd1f0abc1d8c0e9dceee231eb656a46f0f20a770b803a",
+      "acceptedMain": "same",
+      "primaryHeld": "different",
+      "durableClaude": "different"
+    },
+    {
+      "path": "src/audit/auditCli.ts",
+      "sha256": "dae8d57ffdecd6726d27fa5751337727ce52d4da465cf5a76d066c67d5cc27ee",
+      "acceptedMain": "same",
+      "primaryHeld": "different",
+      "durableClaude": "different"
+    },
+    {
+      "path": "src/org/orgSigner.ts",
+      "sha256": "bdaa0eca7235251e66e653a1d1dd4d7d16e383581c01a6bc14d049d95c7f75cf",
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same"
+    },
+    {
+      "path": "src/trust/admission.ts",
+      "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "different"
+    },
+    {
+      "path": "src/assurance/scenarioGrading.ts",
+      "sha256": "552aa7235f50a5f835d4d33259c500a997e3a8e05664dca633b77ee1917c4af0",
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same"
+    },
+    {
+      "path": "src/assurance/evidenceWriters.ts",
+      "sha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same"
+    },
+    {
+      "path": "src/assurance/assuranceRunner.ts",
+      "sha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same"
+    },
+    {
+      "path": "src/budgets/nativeBudgetUsage.ts",
+      "sha256": "45f561f1116d0f55f98439508a573b0a586ed060b3c6948d86b1240a50d5e980",
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same"
+    },
+    {
+      "path": "src/evidence/exporter.ts",
+      "sha256": "30837bbe636fcae29331041f6cb4f7aa314687034d7f0416f0dde55bed31041a",
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same"
+    },
+    {
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "sha256": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same"
+    },
+    {
+      "path": "src/ledger/ledgerConnection.ts",
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same"
+    },
+    {
+      "path": "src/agent/nativeFailureGuidance.ts",
+      "sha256": "e797ef59196351467b5fd8e41e0ce2fc81936e19ffda50f6afef4a0c05f0b01b",
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same"
+    },
+    {
+      "path": "src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "acceptedMain": "same",
+      "primaryHeld": "different",
+      "durableClaude": "different"
+    },
+    {
+      "path": "src/studio/studioServer.ts",
+      "sha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+      "acceptedMain": "same",
+      "primaryHeld": "different",
+      "durableClaude": "different"
+    },
+    {
+      "path": "tests/industryPackAudit.test.ts",
+      "sha256": "beeb9caa35b55ae2543764cb77bc02506608767be77b607a67b4736c3a8784f6",
+      "acceptedMain": "different",
+      "primaryHeld": "different",
+      "durableClaude": "different"
+    },
+    {
+      "path": "tests/cliClaimLabels.e2e.test.ts",
+      "sha256": "b97c8895ddc35398d174a42433d7dee40f75beff2ca4bfcc5fe600d43681b11e",
+      "acceptedMain": "absent",
+      "primaryHeld": "absent",
+      "durableClaude": "absent"
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "acceptedMain": "same",
+      "primaryHeld": "different",
+      "durableClaude": "different"
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "acceptedMain": "different",
+      "primaryHeld": "different",
+      "durableClaude": "different"
+    }
+  ],
+  "acceptedReferences": [
+    {
+      "key": "P0-20-sign",
+      "commit": "1e3c874805bbd971ccd8a317e8ac3df1509b37b2",
+      "ancestorOfCurrent": true,
+      "ancestorOfAcceptedMain": true
+    },
+    {
+      "key": "P0-20-verify",
+      "commit": "9f3fc03e9d466d7ee6e4e0a53ede3c0e56e6ea1e",
+      "ancestorOfCurrent": true,
+      "ancestorOfAcceptedMain": true
+    },
+    {
+      "key": "P0-20-merge",
+      "commit": "19da1edf407fa6e2d61a132fc0ce9b9b8a6c56ed",
+      "ancestorOfCurrent": true,
+      "ancestorOfAcceptedMain": true
+    },
+    {
+      "key": "P0-19-merge",
+      "commit": "3aa75a1196417570f9199980c290dad36a55dea3",
+      "ancestorOfCurrent": true,
+      "ancestorOfAcceptedMain": true
+    },
+    {
+      "key": "P0-19-v1-followup",
+      "commit": "da093617408162ac38a3a01a52bf9e4209fca292",
+      "ancestorOfCurrent": true,
+      "ancestorOfAcceptedMain": true
+    },
+    {
+      "key": "P0-27-merge",
+      "commit": "f4f377584885dc865e1e57797c18ac159d75824d",
+      "ancestorOfCurrent": true,
+      "ancestorOfAcceptedMain": true
+    },
+    {
+      "key": "P0-55-merge",
+      "commit": "5d4740de268e513bfa63e6fecb3cd3fa1cb2a48b",
+      "ancestorOfCurrent": true,
+      "ancestorOfAcceptedMain": true
+    },
+    {
+      "key": "P0-55-binder-followup",
+      "commit": "dc14bf63dbd2f17d92f4bb7f56616d7769969e52",
+      "ancestorOfCurrent": true,
+      "ancestorOfAcceptedMain": true
+    }
+  ],
+  "graphNavigation": {
+    "path": "/private/tmp/p0-52-graph-navigation-w8xr443v/graphify-out/graph.json",
+    "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395",
+    "originalGraphSha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395",
+    "builtAtCommitRecordedInP052Preflight": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+    "stale": true,
+    "installedVersionRecorded": "0.9.74",
+    "refreshPin": "0.9.56",
+    "actualArgv": [
+      "graphify",
+      "query",
+      "industry audit binder assurance grading ledger session seal",
+      "--budget",
+      "1000"
+    ],
+    "exit": 0,
+    "nodes": 36459,
+    "found": 1134,
+    "shown": 35,
+    "truncated": true,
+    "meaning": "Read-only private existing graph queried from observed vocabulary first; current source directly verified. No refresh, watcher/server, model or save-result."
+  },
+  "futureCommands": {
+    "setupInPinnedRootOwnedFixture": [
+      "git rev-parse HEAD",
+      "git status --short",
+      "PATH=/opt/homebrew/opt/node@22/bin:$PATH pnpm install --frozen-lockfile",
+      "PATH=/opt/homebrew/opt/node@22/bin:$PATH pnpm run build"
+    ],
+    "existingBaseline": [
+      "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/industryPackAudit.test.ts --reporter=json --outputFile=/private/tmp/p0-20-original-audit-node22-20261015.json"
+    ],
+    "afterRootAuthorsProposedNewTest": [
+      "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/industryPackAuditSigningQualification.test.ts tests/industryPackAudit.test.ts --reporter=json --outputFile=/private/tmp/p0-20-signed-audit-bounded-node22-20261015.json"
+    ],
+    "actualCLIFromPrivateWorkspaceAfterGenuineFixtureSetup": [
+      "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/dist/cli.js domain apply --agent default --pack clinical-trials --audit --responses answers.json --audit-bundle signed.json",
+      "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/dist/cli.js audit binder verify signed.json --pubkey recorded-auditor.pub --json",
+      "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/dist/cli.js domain apply --agent default --pack clinical-trials --audit --responses answers.json --audit-bundle unsigned.json --no-sign",
+      "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/dist/cli.js audit binder verify unsigned.json --pubkey recorded-auditor.pub --json",
+      "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/dist/cli.js audit binder verify tampered-rehashed.json --pubkey recorded-auditor.pub --json"
+    ],
+    "ordinaryChecks": [
+      "PATH=/opt/homebrew/opt/node@22/bin:$PATH pnpm run typecheck",
+      "PATH=/opt/homebrew/opt/node@22/bin:$PATH pnpm run typecheck:tests",
+      "PATH=/opt/homebrew/opt/node@22/bin:$PATH pnpm run lint",
+      "PATH=/opt/homebrew/opt/node@22/bin:$PATH pnpm run check:counts",
+      "PATH=/opt/homebrew/opt/node@22/bin:$PATH pnpm run check:docs-drift",
+      "PATH=/opt/homebrew/opt/node@22/bin:$PATH pnpm run check:architecture-boundaries",
+      "PATH=/opt/homebrew/opt/node@22/bin:$PATH pnpm run check:freeze"
+    ]
+  },
+  "commandConditions": "Future proposals only; none executed. Use Node22.23.3/pnpm10.33.0, isolated HOME/AMC_HOME/checkpoints, no real provider credentials or external transport. CLI argv binds the current owned-tree absolute compiled path and private-workspace cwd; if root selects a new P0-20 tree, replace it with that measured absolute path. Pin executable/source/artifacts; intentional refusal exit1 is asserted, not hidden.",
+  "acceptanceLimits": "Full eight signing/CLI cases, two causal private mutation witnesses, docs/API-reference review, whole suite/coverage/Node24/hosted acceptance remain open. Static links do not prove OS atomic confinement or cross-store I/O safety; direct helper is not auth. Keep original criteria and record stricter P0-09/P0-21 current semantics; no full P0-55 closure.",
+  "notPerformed": "No product imports/runtime/CLI, tests/build/install, source/test/archive/control/ref/tracker mutation, app/external messages, live activation/publish, cleanup or paused work resumption. Only these mode0600 private JSON/Markdown receipts written."
+}

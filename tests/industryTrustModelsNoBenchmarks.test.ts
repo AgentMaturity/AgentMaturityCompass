@@ -1,7 +1,8 @@
 import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, test } from "vitest";
 import { CONSTRUCT_VALIDITY_DATA } from "../src/compliance/globalRegulatory.js";
 import { openLedger } from "../src/ledger/ledger.js";
@@ -40,7 +41,7 @@ function runWorkspace(sealed: boolean): string {
 
 function runCli(args: string[], cwd = mkdtempSync(join(tmpdir(), "amc-p015-industry-"))) {
   roots.push(cwd);
-  return spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), ...args], {
+  return spawnSync(process.execPath, [fileURLToPath(new URL("../dist/cli.js", import.meta.url)), ...args], {
     cwd, env: { ...process.env, NO_COLOR: "1" }, encoding: "utf8", timeout: 60_000
   });
 }

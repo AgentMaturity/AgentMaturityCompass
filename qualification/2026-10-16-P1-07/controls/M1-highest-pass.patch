@@ -1,0 +1,14 @@
+--- a/src/diagnostic/levelSemantics.ts
++++ b/src/diagnostic/levelSemantics.ts
+@@ -185,9 +185,8 @@
+     return { ...evaluation, level: gate.level, status };
+   });
+   let level: Level = 0;
+-  for (const next of [1, 2, 3, 4, 5] as const) {
+-    if (perLevel.find((row) => row.level === next)?.status !== "pass") break;
+-    level = next;
++  for (const row of perLevel) {
++    if (row.status === "pass") level = row.level;
+   }
+   return { level, perLevel };
+ }

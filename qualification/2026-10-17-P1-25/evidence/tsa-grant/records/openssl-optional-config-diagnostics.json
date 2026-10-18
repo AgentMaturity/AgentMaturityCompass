@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-16T22:49:42.664256+00:00",
+  "sourcePhase": "p125g-source-combined",
+  "actualSigningChildExit": 0,
+  "actualQueryBoundOraclesExit": 0,
+  "actualAmcGrants": 2,
+  "diagnostics": [
+    "NCONF_get_string:no value:group=tsa_local name=other_policies",
+    "NCONF_get_string:no value:group=tsa_local name=accuracy"
+  ],
+  "classification": "OpenSSL emits absent optional configuration-field diagnostics after response generation. Both exact-query/root oracles and actual AMC verification accept the generated responses; no child error event/nonzero exit, hook or cleanup failure occurred. These stderr diagnostics remain private retained originals and are not relabelled as absent.",
+  "documentation": {
+    "path": "/opt/homebrew/Cellar/openssl@4/4.0.3/share/man/man1/openssl-ts.1ssl.gz",
+    "bytes": 9162,
+    "sha256": "6f6de32de7aca71f4e6e3f83066498bafd853e217c3658678d13ef7d40490265"
+  },
+  "sourceOrConfigChanged": false,
+  "priorReadOnlyLookupFailure": "An uncompressed4.0.3 manpage filename was absent. The actual pinned installed gz path was then read; no source/helper/product/QA mutation came from the lookup."
+}

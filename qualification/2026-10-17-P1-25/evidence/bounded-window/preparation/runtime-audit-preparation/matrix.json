@@ -1,0 +1,41 @@
+{
+  "schema": "p125w-inert-runtime-audit-preparation-matrix/1",
+  "observed": {
+    "prospectiveCohortOrder": [
+      "tests/time/checkpointWindow.test.ts",
+      "tests/time/tsaGrant.test.ts",
+      "tests/time/verifyTimestamp.test.ts"
+    ],
+    "unchangedVerifierSelectionSupported": true,
+    "sourceFileInventoryIntends22NotRuntimeCredit": true,
+    "noPassHookOrResourceCountsPredicted": true,
+    "existingPinnedObservedHelperAndFrozenHarnessUnchanged": true
+  },
+  "public": {
+    "oldPendingRequiredBranchesRetained": true,
+    "newGreenBranchCaseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+    "sourceGateLocations": {
+      "window": 445,
+      "defaultFindings": 452,
+      "zeroLoopHeader": 457,
+      "zeroFindings": 458
+    },
+    "literalDefaultToleranceMs": 300000,
+    "readerOracleRows": {
+      "default": 4,
+      "zero": 6
+    },
+    "accuracyNullMeansZero": true,
+    "equalSecondGenTimesAllowed": true,
+    "firstReplyProof": "Exact actual verify-query-bound-reply child argv for its captured query/reply/root plus its own per-grant facts. The shared replyObservation is last-reply-only.",
+    "firstHeadLimit": "No separate seed hash exists in the sealed public facts. First eventCount/hash shape/digest-linked grant and real timeline admission are checked; source assertion and actual GREEN cohort remain the literal head comparison evidence.",
+    "derivedResources": "Children and owners from actual arrays, sockets from actual reported count; no expected resource totals."
+  },
+  "privacy": {
+    "noDirectoryTraversalOrKeyPrivateRunRead": true,
+    "runtimeReadsOnlyExplicitPublicJsonQueryReplyAndNamedStreamHashes": true,
+    "rawStreamBodiesNeverPublished": true
+  },
+  "runtimeResults": null,
+  "sourceAllocation": null
+}

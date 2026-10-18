@@ -1,0 +1,563 @@
+import { describe, expect, test } from "vitest";
+import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { closeSync, existsSync, lstatSync, mkdirSync, mkdtempSync, openSync, readFileSync, realpathSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
+import { CANONICAL_METRIC_IDS, computeMetrics } from "../scripts/program-metrics.mjs";
+
+// NEW, synthetic-input qualification. Not current program measurements or closure approval.
+// No timeout override: the original Vitest configuration and product Git 5000 ms remain.
+// Optional retained-artifact mode is enabled only by this explicitly named private root.
+const ARTIFACT_ENV = "AMC_P041_QUALIFICATION_ARTIFACT_ROOT";
+const REPO = realpathSync(resolve(dirname(fileURLToPath(import.meta.url)), ".."));
+const INPUT_PATHS = ["scripts/program-metrics.mjs", "docs/program/gaps.json",
+  "docs/program/metrics.json", "docs/program/metrics-manual.json"];
+const TARGET_KEYS = ["oct2026", "g0", "g1", "g2", "g3", "singleMaintainer"];
+const SURFACE_KEYS = ["cli", "reports", "mcp", "api", "studio"];
+const CHECK_MESSAGE = "Program metric registrations are structurally valid; measurement and qualification remain separate.\n";
+const CLOSED_ERROR = "G1: closing evidence not committed at HEAD or mergedSha not an ancestor of HEAD (shallow history cannot verify)";
+
+type Source = { type: string; path?: string; pointer?: string; workflow?: string; job?: string; surfaces?: Record<string, string[]> };
+type Registration = { id: string; label: string; kind: "repo" | "manual"; source: Source | null; owner: string; targets: Record<string, string> };
+type Metrics = { schemaVersion: number; targetColumn: "funded" | "singleMaintainer"; nextGate?: string; metrics: Registration[] };
+type Gap = { id: string; severity: string; status: string; closedBy: string | null; closedAt: string | null;
+  closingEvidence: { path: string; mergedSha: string } | null; title: string; evidence: string; fix: string; ownerKeys: string[] };
+type Gaps = { schemaVersion: number; source: string; gaps: Gap[] };
+type ManualEntry = { metric: string; value: number | string; source: string; asOf: string; recordedBy: string };
+type Manual = { entries: ManualEntry[] };
+type FileResult = { name: string; status: string; assertionResults?: { status: string }[] };
+type SuppliedReport = { startTime?: number; testResults: FileResult[] };
+type Inputs = { gaps: Gaps; metrics: Metrics; manual: Manual; vitestReport?: SuppliedReport;
+  workflowYaml?: string | Record<string, string>; jsonSources?: Record<string, unknown> };
+type Row = { id: string; label: string; owner: string; value: number | string | null; current: string;
+  status: string; source: string | null; asOf: string | null; targets: Record<string, string>; surfaceStatuses?: Record<string, string> };
+type Computed = { valid: boolean; errors: string[]; targetColumn: string; nextGate: string; rows: Row[] };
+type Fixture = { root: string; home: string; temporary: string; evidence?: string; env: NodeJS.ProcessEnv;
+  sequence: number; extraPaths: Set<string>; commits: string[] };
+type Command = { argv: string[]; cwd: string; pid: number | null; status: number | null; signal: NodeJS.Signals | null;
+  stdout: string; stderr: string; error: { name: string; message: string; code?: string } | null };
+
+// Independently transcribed from Plan lines 990–1004, not derived from metrics.json.
+const EXPECTED_PLAN = [
+  ["critical_gaps_open", "Critical gaps open", "G0 items close gaps G1–G4 and G7; P1-07 closes gap G5; P1-01 and P1-30 close gap G6", "7", "2", "0", "0", "0", "0"],
+  ["release_cadence", "Release cadence", "P0-39, P1-41", "1 version ever", "1.2.0 published", "Weekly", "Weekly", "Weekly", "Monthly"],
+  ["claim_kind_surfaces", "Surfaces labelling claim kinds", "P0-22, P0-23", "0 of 5", "5 of 5", "5 of 5", "5 of 5", "5 of 5", "5 of 5"],
+  ["contained_shell_oses", "OSes with a contained shell (others refused)", "P0-06, P1-05, P2-14", "1", "1", "2", "2–3", "3", "2"],
+  ["executed_catalog_controls", "Catalog controls with executed tests", "P1-09, P2-10, P2-27", "0", "0", "60", "150", "300", "60"],
+  ["false_mandatory_passes", "False mandatory passes on normative fixtures", "P1-06, P1-19", "Not measured", "Not measured", "0", "0", "0", "0"],
+  ["expert_signed_controls", "Controls with expert sign-off", "D-08, D-14", "0", "0", "Finance lighthouse", "Both lighthouses", "Both lighthouses and partnered stations", "Finance lighthouse"],
+  ["benchmark_tasks_run", "Benchmark tasks run", "P1-47, P2-20", "0", "0", "20 (pilot)", "At least 100, run by an outside party", "At least 100", "20"],
+  ["developer_verified_action_15m", "Developers reaching a verified action in 15 minutes", "P1-49", "Not measured", "Not measured", "8 of 10", "8 of 10", "8 of 10", "8 of 10"],
+  ["reviewer_reconstruction_time", "Reviewer reconstruction time against baseline", "P1-29, P2-03, P2-05", "No baseline", "No baseline", "Baselines recorded", "−50%", "−50%", "Not yet measured"],
+  ["design_partners", "Design partners", "P1-29, P1-21, P2-03, P2-05, P3-01", "0", "0", "3 signed", "1 supervised pilot, 1 reviewer-only", "1 in production, 5 signed", "1 in shadow"],
+  ["independent_verifiers", "Independently built verifiers passing the fixtures", "P1-06, P3-03", "0", "0", "1 (AMC's)", "1", "2", "1"],
+  ["independent_assessors", "Independent assessors qualified", "P2-21, P3-04", "0", "0", "0", "0 (criteria published)", "10", "0"],
+  ["regulator_references", "Regulator, sandbox or insurer references", "P3-05, P3-06", "0", "0", "0", "0", "At least 1", "0"],
+  ["a4_bound_approval_projects", "A4 projects taken Aspire → Activate with bound approvals from two distinct users", "P1-62, P2-39", "Not measured", "Not measured", "1 (reported)", "1 pilot recorded through A4 if D-23", "—", "—"]
+];
+
+function sha(bytes: string | Buffer): string { return createHash("sha256").update(bytes).digest("hex"); }
+function json<T>(path: string): T { return JSON.parse(readFileSync(join(REPO, path), "utf8")) as T; }
+function fresh(): Inputs {
+  return { gaps: json<Gaps>("docs/program/gaps.json"), metrics: json<Metrics>("docs/program/metrics.json"),
+    manual: json<Manual>("docs/program/metrics-manual.json") };
+}
+function row(result: Computed, id: string): Row {
+  const found = result.rows.find(candidate => candidate.id === id);
+  if (!found) throw new Error("Missing result row: " + id);
+  return found;
+}
+function registration(inputs: Inputs, id: string): Registration {
+  const found = inputs.metrics.metrics.find(candidate => candidate.id === id);
+  if (!found) throw new Error("Missing input registration: " + id);
+  return found;
+}
+function inside(parent: string, child: string): boolean {
+  const suffix = relative(parent, child);
+  return suffix === "" || !isAbsolute(suffix) && suffix !== ".." && !suffix.startsWith(".." + sep);
+}
+function retainedRoot(): string | undefined {
+  const selected = process.env[ARTIFACT_ENV];
+  if (selected === undefined) return undefined;
+  if (!isAbsolute(selected) || lstatSync(selected).isSymbolicLink() || !lstatSync(selected).isDirectory()) {
+    throw new Error(ARTIFACT_ENV + " must name an existing absolute, non-symlink private directory");
+  }
+  const root = realpathSync(selected);
+  if (inside(REPO, root) || inside(root, REPO)) throw new Error("Artifact directory must be separate from source");
+  return root;
+}
+function wxJson(path: string, value: unknown): void {
+  const encoded = JSON.stringify(value, (_key, item: unknown) => {
+    if (item === undefined) return { p041NonJsonValue: "undefined" };
+    if (typeof item === "number" && !Number.isFinite(item)) return { p041NonJsonValue: String(item) };
+    return item;
+  }, 2);
+  writeFileSync(path, encoded + "\n", { flag: "wx", mode: 0o600 });
+}
+function calculate(id: string, inputs: Inputs): Computed {
+  const result = computeMetrics(inputs) as Computed;
+  const destination = retainedRoot();
+  if (destination) {
+    const directory = mkdtempSync(join(destination, id + "-pure-"));
+    wxJson(join(directory, "supplied-input-and-result.json"), { id, scope: "supplied synthetic/register input only", inputs, result });
+  }
+  return result;
+}
+function surfaces(inputs: Inputs): void {
+  registration(inputs, "claim_kind_surfaces").source = { type: "vitest",
+    surfaces: Object.fromEntries(SURFACE_KEYS.map(key => [key, ["synthetic/" + key + ".test.ts"]])) };
+}
+function assertionFile(name: string, status = "passed", assertionStatuses = ["passed"]): FileResult {
+  return { name, status, assertionResults: assertionStatuses.map(value => ({ status: value })) };
+}
+function closeDeclaration(inputs: Inputs, path: string, mergedSha: string): void {
+  const gap = inputs.gaps.gaps.find(candidate => candidate.id === "G1");
+  if (!gap) throw new Error("Missing G1 fixture");
+  gap.status = "closed"; gap.closedBy = "synthetic fixture declarer"; gap.closedAt = "2026-10-15";
+  gap.closingEvidence = { path, mergedSha };
+}
+function put(fixture: Fixture, path: string, bytes: string | Buffer): void {
+  const target = join(fixture.root, path);
+  mkdirSync(dirname(target), { recursive: true });
+  writeFileSync(target, bytes);
+  fixture.extraPaths.add(path);
+}
+function putJson(fixture: Fixture, path: string, value: unknown): void { put(fixture, path, JSON.stringify(value, null, 2) + "\n"); }
+function snapshot(fixture: Fixture, directory: string): unknown[] {
+  return [...new Set([...INPUT_PATHS, ...fixture.extraPaths])].sort().map(path => {
+    const target = join(fixture.root, path);
+    if (!existsSync(target)) return { path, exists: false };
+    const bytes = readFileSync(target);
+    const copy = join(directory, "inputs", path);
+    mkdirSync(dirname(copy), { recursive: true });
+    writeFileSync(copy, bytes, { flag: "wx", mode: 0o600 });
+    return { path, exists: true, bytes: bytes.length, sha256: sha(bytes) };
+  });
+}
+function command(fixture: Fixture, executable: string, args: string[]): Command {
+  fixture.sequence += 1;
+  const directory = fixture.evidence ? join(fixture.evidence, String(fixture.sequence).padStart(3, "0")) : undefined;
+  if (directory) {
+    mkdirSync(directory);
+    const inputs = snapshot(fixture, directory);
+    wxJson(join(directory, "intent.json"), { argv: [executable, ...args], cwd: fixture.root,
+      envKeys: Object.keys(fixture.env).sort(), commits: fixture.commits, inputs,
+      note: "No environment values retained; no command timeout/retry/termination added." });
+  }
+  // File-backed streams avoid spawnSync's pipe-buffer termination path.
+  // Synchronous normal completion only; no new timeout, signal or retry.
+  const streams = directory ?? join(fixture.temporary, String(fixture.sequence).padStart(3, "0"));
+  if (!directory) mkdirSync(streams);
+  const stdoutPath = join(streams, "stdout.log"), stderrPath = join(streams, "stderr.log");
+  const child = (() => {
+    const stdout = openSync(stdoutPath, "wx", 0o600);
+    try {
+      const stderr = openSync(stderrPath, "wx", 0o600);
+      try { return spawnSync(executable, args, { cwd: fixture.root, env: fixture.env, stdio: ["ignore", stdout, stderr] }); }
+      finally { closeSync(stderr); }
+    } finally { closeSync(stdout); }
+  })();
+  const result: Command = { argv: [executable, ...args], cwd: fixture.root, pid: child.pid ?? null,
+    status: child.status, signal: child.signal, stdout: readFileSync(stdoutPath, "utf8"), stderr: readFileSync(stderrPath, "utf8"),
+    error: child.error ? { name: child.error.name, message: child.error.message,
+      code: "code" in child.error ? String(child.error.code) : undefined } : null };
+  if (directory) wxJson(join(directory, "result.json"), result);
+  return result;
+}
+function git(fixture: Fixture, args: string[]): string {
+  const result = command(fixture, "git", args);
+  if (result.error || result.signal || result.status !== 0) {
+    throw new Error("Owned fixture Git command failed; inspect retained command record: " + args.join(" "));
+  }
+  return result.stdout.trim();
+}
+function commit(fixture: Fixture, paths: string[], message: string): string {
+  git(fixture, ["add", "--", ...paths]);
+  git(fixture, ["commit", "-m", message]);
+  const id = git(fixture, ["rev-parse", "--verify", "HEAD"]);
+  if (!/^[a-f0-9]{40}$/.test(id)) throw new Error("Fixture did not yield a genuine full commit ID");
+  fixture.commits.push(id);
+  if (fixture.evidence) wxJson(join(fixture.evidence, "commit-" + fixture.commits.length + ".json"), {
+    commit: id, parents: git(fixture, ["show", "-s", "--format=%P", id]), scope: "genuine local synthetic commit; no merge approval or signature assertion"
+  });
+  return id;
+}
+function cli(fixture: Fixture, args: string[]): Command {
+  return command(fixture, process.execPath, [join(fixture.root, "scripts/program-metrics.mjs"), ...args]);
+}
+function success(result: Command): void {
+  expect(result.error).toBeNull(); expect(result.signal).toBeNull(); expect(result.status).toBe(0); expect(result.stderr).toBe("");
+}
+function refusal(result: Command, diagnostic: string): void {
+  expect(result.error).toBeNull(); expect(result.signal).toBeNull(); expect(result.status).toBe(1);
+  expect(result.stdout).toBe(""); expect(result.stderr).toContain("program-metrics: " + diagnostic);
+}
+function fixture(id: string): Fixture {
+  const selected = retainedRoot();
+  const owned = mkdtempSync(join(selected ?? tmpdir(), id + "-p041-"));
+  const root = join(owned, "fixture"), home = join(owned, "home"), temporary = join(owned, "tmp");
+  mkdirSync(root); mkdirSync(home); mkdirSync(temporary);
+  const evidence = selected ? join(owned, "evidence") : undefined;
+  if (evidence) mkdirSync(evidence);
+  const globalConfig = join(home, "gitconfig");
+  writeFileSync(globalConfig, "", { flag: "wx", mode: 0o600 });
+  const env: NodeJS.ProcessEnv = { PATH: process.env.PATH, HOME: home, TMPDIR: temporary, LANG: "C", LC_ALL: "C",
+    GIT_CONFIG_GLOBAL: globalConfig, GIT_CONFIG_NOSYSTEM: "1", GIT_TERMINAL_PROMPT: "0" };
+  const selectedFixture: Fixture = { root, home, temporary, evidence, env, sequence: 0, extraPaths: new Set(), commits: [] };
+  for (const path of INPUT_PATHS) put(selectedFixture, path, readFileSync(join(REPO, path)));
+  // Borrow installed YAML resolution only. Never stage the link or run dependency commands.
+  symlinkSync(join(REPO, "node_modules"), join(root, "node_modules"), "dir");
+  if (evidence) wxJson(join(evidence, "fixture.json"), { id, root, home, temporary,
+    envKeys: Object.keys(env).sort(), scriptBytes: readFileSync(join(root, INPUT_PATHS[0]!)).length,
+    scriptSha256: sha(readFileSync(join(root, INPUT_PATHS[0]!))), borrowedModules: realpathSync(join(REPO, "node_modules")),
+    preserved: true, artifactMode: "required by later qualification runner; optional for ordinary test invocation" });
+  git(selectedFixture, ["init"]);
+  git(selectedFixture, ["config", "--local", "user.name", "P041 Synthetic Fixture"]);
+  git(selectedFixture, ["config", "--local", "user.email", "p041-fixture@example.invalid"]);
+  commit(selectedFixture, INPUT_PATHS, "Initial synthetic P041 fixture");
+  return selectedFixture;
+}
+
+describe("P041 supplied-input and genuine local Git qualification", () => {
+  test("Q1 preserves 15 Plan rows, 90 target cells, owners and all 26 historical registrations", () => {
+    const inputs = fresh();
+    expect([...CANONICAL_METRIC_IDS]).toEqual(EXPECTED_PLAN.map(values => values[0]));
+    expect(inputs.metrics.metrics.map(metric => [metric.id, metric.label, metric.owner,
+      ...TARGET_KEYS.map(key => metric.targets[key])])).toEqual(EXPECTED_PLAN);
+    expect(inputs.metrics.targetColumn).toBe("funded");
+    expect(inputs.manual.entries).toEqual([]);
+    expect(inputs.metrics.metrics.filter(metric => metric.source === null)).toHaveLength(14);
+    expect(inputs.gaps.gaps.map(gap => gap.id).sort((a, b) => Number(a.slice(1)) - Number(b.slice(1))))
+      .toEqual(Array.from({ length: 26 }, (_, index) => "G" + (index + 1)));
+    expect(inputs.gaps.gaps.filter(gap => gap.severity === "Critical")).toHaveLength(7);
+    expect(inputs.gaps.gaps.filter(gap => gap.severity === "High")).toHaveLength(15);
+    expect(inputs.gaps.gaps.filter(gap => gap.severity === "Medium")).toHaveLength(4);
+    for (const gap of inputs.gaps.gaps) {
+      expect(gap.status).toBe("open"); expect(gap.closedBy).toBeNull();
+      expect(gap.closingEvidence).toBeNull(); expect(gap.closedAt).toBeNull(); expect(gap.ownerKeys.length).toBeGreaterThan(0);
+    }
+    const result = calculate("Q1", inputs);
+    expect(result.errors).toEqual([]); expect(result.rows).toHaveLength(15);
+  });
+
+  test("Q2 missing evidence stays null before any status or current-value assertions", () => {
+    const result = calculate("Q2", fresh());
+    const missing = row(result, "release_cadence");
+    expect(missing.value).toBeNull(); // First assertion: planned missing-source control.
+    expect(result.valid).toBe(true); expect(result.errors).toEqual([]);
+    const critical = row(result, "critical_gaps_open");
+    expect(critical.value).toBe(7); expect(critical.current).toBe("7 open (G1, G2, G3, G4, G5, G6, G7)");
+    expect(critical.source).toContain("merge/signatures not verified");
+    for (const metric of result.rows.filter(candidate => candidate.id !== "critical_gaps_open")) {
+      expect(metric.value).toBeNull(); expect(metric.status).toBe("not_measured");
+      expect(metric.current).toContain("not measured"); expect(metric.source).toBeNull(); expect(metric.asOf).toBeNull();
+    }
+  });
+
+  test("Q3 pure closure computation counts only a shaped declaration and does not authenticate it", () => {
+    const invalid = fresh(); invalid.gaps.gaps[0]!.status = "closed";
+    const missing = calculate("Q3-missing", invalid);
+    expect(row(missing, "critical_gaps_open").value).toBe(7);
+    expect(missing.errors).toContain("gaps: G1 is closed without qualification path, full merged SHA, closer, and date");
+    const shaped = fresh(); closeDeclaration(shaped, "qualification/synthetic/receipt.json", "a".repeat(40));
+    const declared = calculate("Q3-shaped", shaped);
+    expect(declared.errors).toEqual([]); expect(row(declared, "critical_gaps_open").value).toBe(6);
+    expect(row(declared, "critical_gaps_open").source).toContain("merge/signatures not verified");
+  });
+
+  test("Q4 absent registered report, workflow and JSON inputs remain pending", () => {
+    const inputs = fresh(); surfaces(inputs);
+    registration(inputs, "contained_shell_oses").source = { type: "ci-matrix", workflow: ".github/workflows/synthetic.yml", job: "contained-shell" };
+    registration(inputs, "executed_catalog_controls").source = { type: "json", path: "synthetic/catalog.json", pointer: "/count" };
+    const result = calculate("Q4", inputs);
+    expect(result.errors).toEqual([]);
+    for (const id of ["claim_kind_surfaces", "contained_shell_oses", "executed_catalog_controls"]) {
+      expect(row(result, id).value).toBeNull(); expect(row(result, id).status).toBe("not_measured");
+    }
+  });
+
+  test("Q5 supplied partial surface report distinguishes two passes, one failure and two missing", () => {
+    const inputs = fresh(); surfaces(inputs);
+    inputs.vitestReport = { startTime: 1_792_022_400_000, testResults: [
+      assertionFile("/synthetic-root/synthetic/cli.test.ts"),
+      assertionFile("synthetic/mcp.test.ts"),
+      assertionFile("synthetic/api.test.ts", "failed", ["failed"])
+    ] };
+    const result = calculate("Q5", inputs), metric = row(result, "claim_kind_surfaces");
+    expect(result.errors).toEqual([]); expect(metric.value).toBe(2); expect(metric.status).toBe("partially_measured");
+    expect(metric.current).toBe("2 of 5; 2 surfaces not measured");
+    expect(metric.surfaceStatuses).toEqual({ cli: "passed", reports: "not_measured", mcp: "passed", api: "failed", studio: "not_measured" });
+    expect(metric.asOf).toBe(new Date(inputs.vitestReport.startTime!).toISOString());
+    expect(metric.source).toContain("supplied Vitest JSON; 3 evaluated surfaces, 2 not measured");
+  });
+
+  test("Q6a an empty assertion list stays null before later nonvacuity checks", () => {
+    const inputs = fresh(); surfaces(inputs);
+    inputs.vitestReport = { testResults: [assertionFile("synthetic/cli.test.ts", "passed", [])] };
+    const empty = row(calculate("Q6-empty", inputs), "claim_kind_surfaces");
+    expect(empty.value).toBeNull(); // First assertion: planned vacuous-file-pass control.
+    expect(empty.status).toBe("not_measured"); expect(empty.surfaceStatuses?.cli).toBe("not_measured");
+    for (const assertions of [undefined, [{ status: "skipped" }], [{ status: "todo" }], [{ status: "pending" }]]) {
+      const file: FileResult = { name: "synthetic/cli.test.ts", status: "passed" };
+      if (assertions !== undefined) file.assertionResults = assertions;
+      inputs.vitestReport.testResults = [file];
+      const result = calculate("Q6-nonpassing", inputs);
+      expect(result.errors).toEqual([]); expect(row(result, "claim_kind_surfaces").value).toBeNull();
+    }
+  });
+
+  test("Q6b a failed registered file outranks its absent sibling", () => {
+    const inputs = fresh(); surfaces(inputs);
+    registration(inputs, "claim_kind_surfaces").source!.surfaces!.cli.push("synthetic/cli-sibling.test.ts");
+    inputs.vitestReport = { testResults: [assertionFile("synthetic/cli.test.ts", "failed", ["failed"])] };
+    const result = calculate("Q6-failed", inputs), metric = row(result, "claim_kind_surfaces");
+    expect(result.errors).toEqual([]); expect(metric.value).toBe(0); expect(metric.status).toBe("partially_measured");
+    expect(metric.surfaceStatuses?.cli).toBe("failed"); expect(metric.current).toBe("0 of 5; 4 surfaces not measured");
+  });
+
+  test("Q6c duplicate matching report paths refuse rather than double count", () => {
+    const inputs = fresh(); surfaces(inputs);
+    inputs.vitestReport = { testResults: [assertionFile("synthetic/cli.test.ts"), assertionFile("/elsewhere/synthetic/cli.test.ts")] };
+    const result = calculate("Q6-duplicate", inputs);
+    expect(result.valid).toBe(false); expect(result.errors).toContain("claim_kind_surfaces: duplicate results for synthetic/cli.test.ts");
+    expect(row(result, "claim_kind_surfaces").value).toBeNull();
+  });
+
+  test("Q7a YAML matrices count distinct configured OS families, not versions or containment", () => {
+    const inputs = fresh();
+    registration(inputs, "contained_shell_oses").source = { type: "ci-matrix", workflow: ".github/workflows/synthetic.yml", job: "contained-shell" };
+    const expression = "$" + "{{ matrix.os }}";
+    for (const [labels, count] of [[["ubuntu-22.04", "macos-14"], 2], [["ubuntu-22.04", "ubuntu-24.04"], 1]] as const) {
+      inputs.workflowYaml = "jobs:\n  contained-shell:\n    runs-on: '" + expression + "'\n    strategy:\n      matrix:\n        os: [" + labels.join(", ") + "]\n";
+      const metric = row(calculate("Q7-matrix", inputs), "contained_shell_oses");
+      expect(metric.value).toBe(count); expect(metric.source).toContain("configured OS families only, not containment qualification");
+    }
+    inputs.workflowYaml = "jobs:\n  contained-shell:\n    runs-on: [self-hosted, linux, x64]\n";
+    expect(row(calculate("Q7-labels", inputs), "contained_shell_oses").value).toBe(1);
+  });
+
+  test("Q7b absent, unknown, conflicting and unsupported YAML jobs remain pending", () => {
+    const inputs = fresh();
+    registration(inputs, "contained_shell_oses").source = { type: "ci-matrix", workflow: ".github/workflows/synthetic.yml", job: "contained-shell" };
+    const yaml = [
+      "jobs:\n  other:\n    runs-on: ubuntu-latest\n",
+      "jobs:\n  contained-shell:\n    runs-on: [self-hosted, unknown]\n",
+      "jobs:\n  contained-shell:\n    runs-on: [linux, windows]\n",
+      "jobs:\n  contained-shell:\n    runs-on: ubuntu-latest\n    strategy:\n      matrix:\n        os: [ubuntu-latest]\n        include: []\n",
+      "jobs:\n  contained-shell:\n    runs-on: ubuntu-latest\n    strategy:\n      matrix:\n        os: [ubuntu-latest]\n        exclude: []\n",
+      "jobs:\n  contained-shell:\n    runs-on: '" + "$" + "{{ inputs.runner }}'\n"
+    ];
+    for (const workflowYaml of yaml) {
+      inputs.workflowYaml = workflowYaml;
+      const result = calculate("Q7-pending", inputs);
+      expect(result.errors).toEqual([]); expect(row(result, "contained_shell_oses").value).toBeNull();
+    }
+  });
+
+  test("Q8a a dated sourced manual zero is measured while malformed provenance refuses", () => {
+    const inputs = fresh();
+    const entry: ManualEntry = { metric: "release_cadence", value: 0, source: "synthetic ledger row 1", asOf: "2026-10-15", recordedBy: "fixture recorder" };
+    inputs.manual.entries = [entry];
+    const valid = calculate("Q8-manual-zero", inputs), metric = row(valid, "release_cadence");
+    expect(valid.errors).toEqual([]); expect(metric.value).toBe(0); expect(metric.status).toBe("measured");
+    expect(metric.asOf).toBe("2026-10-15"); expect(metric.source).toContain("synthetic ledger row 1; recorded by fixture recorder");
+    for (const change of [{ source: "" }, { recordedBy: "" }, { asOf: "" }, { asOf: "2026-02-30" }]) {
+      inputs.manual.entries = [{ ...entry, ...change }];
+      const invalid = calculate("Q8-bad-manual", inputs);
+      expect(invalid.errors).toContain("manual: invalid value or provenance for release_cadence");
+      expect(row(invalid, "release_cadence").value).toBeNull();
+    }
+    for (const key of ["source", "recordedBy", "asOf"] as const) {
+      const absent: Partial<ManualEntry> = { ...entry };
+      delete absent[key];
+      inputs.manual.entries = [absent as ManualEntry]; // Intentionally malformed supplied JSON shape.
+      expect(calculate("Q8-absent-manual", inputs).errors).toContain("manual: invalid value or provenance for release_cadence");
+    }
+    inputs.manual.entries = [entry, { ...entry }];
+    expect(calculate("Q8-manual-duplicate", inputs).errors).toContain("manual: duplicate metric release_cadence");
+  });
+
+  test("Q8b registered JSON zero, escaped pointers, absence and malformed values stay distinct", () => {
+    const inputs = fresh();
+    const source = { type: "json", path: "synthetic/counts.json", pointer: "/a~1b/~0count" };
+    registration(inputs, "executed_catalog_controls").source = source;
+    inputs.jsonSources = { [source.path]: { "a/b": { "~count": 0 } } };
+    const valid = calculate("Q8-json-zero", inputs), metric = row(valid, "executed_catalog_controls");
+    expect(valid.errors).toEqual([]); expect(metric.value).toBe(0); expect(metric.status).toBe("measured");
+    expect(metric.source).toBe("synthetic/counts.json#/a~1b/~0count; registered supplied JSON; date: not supplied");
+    for (const value of [undefined, null]) {
+      inputs.jsonSources = { [source.path]: { "a/b": { "~count": value } } };
+      expect(row(calculate("Q8-json-missing", inputs), "executed_catalog_controls").value).toBeNull();
+    }
+    for (const value of ["0", Number.POSITIVE_INFINITY, true]) {
+      inputs.jsonSources = { [source.path]: { "a/b": { "~count": value } } };
+      expect(calculate("Q8-json-invalid", inputs).errors).toContain("executed_catalog_controls: JSON pointer must resolve to a finite number");
+    }
+    registration(inputs, "executed_catalog_controls").source = { ...source, pointer: "/bad~2escape" };
+    inputs.jsonSources = {};
+    expect(calculate("Q8-json-pointer", inputs).errors).toContain("executed_catalog_controls: invalid JSON pointer");
+  });
+
+  test("Q9a genuine CLI check reports structural validity only", () => {
+    const owned = fixture("Q9-check"), result = cli(owned, ["--check"]);
+    success(result); expect(result.stdout).toBe(CHECK_MESSAGE);
+  });
+
+  test("Q9b genuine CLI JSON returns 15 rows, declared seven and fourteen pending values", () => {
+    const owned = fixture("Q9-json"), result = cli(owned, ["--json"]);
+    success(result);
+    const output = JSON.parse(result.stdout) as Computed;
+    expect(output.valid).toBe(true); expect(output.errors).toEqual([]); expect(output.rows).toHaveLength(15);
+    expect(row(output, "critical_gaps_open").value).toBe(7);
+    expect(row(output, "critical_gaps_open").source).toContain("HEAD:docs/program/gaps.json;");
+    expect(output.rows.filter(metric => metric.value === null)).toHaveLength(14);
+  });
+
+  test("Q9c explicit and default markdown agree with 15 rows and funded columns", () => {
+    const owned = fixture("Q9-markdown"), explicit = cli(owned, ["--markdown"]), implicit = cli(owned, []);
+    success(explicit); success(implicit); expect(implicit.stdout).toBe(explicit.stdout);
+    expect(explicit.stdout.trimEnd().split("\n")).toHaveLength(17);
+    expect(explicit.stdout.split("\n")[0]).toBe("| Metric | Current | Source | Next gate target (g0) |");
+    expect(explicit.stdout).not.toContain("Single maintainer target");
+  });
+
+  test("Q10a a dirty gap closure cannot override committed open registrations", () => {
+    const owned = fixture("Q10-dirty-gaps"), inputs = fresh();
+    closeDeclaration(inputs, "qualification/dirty-only.json", owned.commits[0]!);
+    putJson(owned, "docs/program/gaps.json", inputs.gaps);
+    const result = cli(owned, ["--json"]); success(result);
+    expect(row(JSON.parse(result.stdout) as Computed, "critical_gaps_open").value).toBe(7);
+    expect(git(owned, ["diff", "--name-only"])).toBe("docs/program/gaps.json");
+  });
+
+  test("Q10b committed registered JSON zero survives changed and deleted working copies", () => {
+    const owned = fixture("Q10-head-json"), inputs = fresh();
+    registration(inputs, "executed_catalog_controls").source = { type: "json", path: "synthetic/counts.json", pointer: "/count" };
+    putJson(owned, "docs/program/metrics.json", inputs.metrics); putJson(owned, "synthetic/counts.json", { count: 0 });
+    commit(owned, ["docs/program/metrics.json", "synthetic/counts.json"], "Register synthetic committed zero");
+    putJson(owned, "synthetic/counts.json", { count: 999 });
+    const dirty = cli(owned, ["--json"]); success(dirty);
+    const first = row(JSON.parse(dirty.stdout) as Computed, "executed_catalog_controls");
+    expect(first.value).toBe(0); expect(first.source).toContain("committed HEAD JSON");
+    unlinkSync(join(owned.root, "synthetic/counts.json"));
+    const missing = cli(owned, ["--json"]); success(missing);
+    expect(row(JSON.parse(missing.stdout) as Computed, "executed_catalog_controls").value).toBe(0);
+  });
+
+  test("Q11a a committed closed gap without a closing declaration refuses", () => {
+    const owned = fixture("Q11-incomplete-closure"), inputs = fresh(); inputs.gaps.gaps[0]!.status = "closed";
+    putJson(owned, "docs/program/gaps.json", inputs.gaps);
+    commit(owned, ["docs/program/gaps.json"], "Commit incomplete synthetic closure");
+    refusal(cli(owned, ["--check"]), "gaps: G1 is closed without qualification path, full merged SHA, closer, and date");
+  });
+
+  test("Q11b invalid manual provenance refuses all output modes", () => {
+    const owned = fixture("Q11-manual");
+    putJson(owned, "docs/program/metrics-manual.json", { entries: [{ metric: "release_cadence", value: 0, source: "", asOf: "2026-10-15", recordedBy: "fixture" }] });
+    for (const mode of ["--check", "--json", "--markdown"]) {
+      refusal(cli(owned, [mode]), "manual: invalid value or provenance for release_cadence");
+    }
+  });
+
+  test("Q11c conflicting modes, unknown flags and invalid report paths refuse", () => {
+    const owned = fixture("Q11-options");
+    refusal(cli(owned, ["--json", "--check"]), "select one output mode");
+    refusal(cli(owned, ["--unknown-fixture-option"]), "unknown argument: --unknown-fixture-option");
+    for (const args of [["--vitest-json"], ["--vitest-json", "../outside.json"], ["--vitest-json", "/outside.json"],
+      ["--vitest-json", "a.json", "--vitest-json", "b.json"]]) {
+      refusal(cli(owned, args), "--vitest-json requires one repository-relative file");
+    }
+  });
+
+  test("Q12a a missing qualification path at HEAD refuses a shaped closure", () => {
+    const owned = fixture("Q12-missing"), inputs = fresh();
+    const path = "qualification/synthetic/absent.json";
+    owned.extraPaths.add(path);
+    closeDeclaration(inputs, path, owned.commits[0]!);
+    putJson(owned, "docs/program/gaps.json", inputs.gaps);
+    commit(owned, ["docs/program/gaps.json"], "Commit synthetic missing-evidence declaration");
+    refusal(cli(owned, ["--json"]), CLOSED_ERROR);
+  });
+
+  test("Q12b untracked-only evidence cannot satisfy the HEAD path check", () => {
+    const owned = fixture("Q12-untracked"), inputs = fresh();
+    const path = "qualification/synthetic/untracked.json";
+    putJson(owned, path, { synthetic: true });
+    closeDeclaration(inputs, path, owned.commits[0]!); putJson(owned, "docs/program/gaps.json", inputs.gaps);
+    commit(owned, ["docs/program/gaps.json"], "Commit declaration while leaving evidence untracked");
+    expect(git(owned, ["ls-files", "--", path])).toBe("");
+    refusal(cli(owned, ["--json"]), CLOSED_ERROR);
+  });
+
+  test("Q12c a zero merged SHA refuses even with a committed evidence path", () => {
+    const owned = fixture("Q12-zero"), inputs = fresh(), path = "qualification/synthetic/zero.json";
+    putJson(owned, path, { synthetic: true }); closeDeclaration(inputs, path, "0".repeat(40));
+    putJson(owned, "docs/program/gaps.json", inputs.gaps);
+    commit(owned, [path, "docs/program/gaps.json"], "Commit zero-SHA synthetic declaration");
+    refusal(cli(owned, ["--json"]), CLOSED_ERROR);
+  });
+
+  test("Q12d a nonexistent full merged SHA refuses with a committed evidence path", () => {
+    const owned = fixture("Q12-nonexistent"), inputs = fresh(), path = "qualification/synthetic/nonexistent.json";
+    putJson(owned, path, { synthetic: true }); closeDeclaration(inputs, path, "f".repeat(40));
+    putJson(owned, "docs/program/gaps.json", inputs.gaps);
+    commit(owned, [path, "docs/program/gaps.json"], "Commit nonexistent-SHA synthetic declaration");
+    const absent = command(owned, "git", ["cat-file", "-e", "f".repeat(40)]);
+    expect(absent.error).toBeNull(); expect(absent.signal).toBeNull(); expect(absent.status).toBeTypeOf("number"); expect(absent.status).not.toBe(0);
+    refusal(cli(owned, ["--json"]), CLOSED_ERROR);
+  });
+
+  test("Q12e a genuine sibling commit is not an ancestor of the closure commit", () => {
+    const owned = fixture("Q12-nonancestor"), base = owned.commits[0]!;
+    git(owned, ["checkout", "-b", "synthetic-sibling"]);
+    putJson(owned, "synthetic/sibling.json", { synthetic: "sibling" });
+    const sibling = commit(owned, ["synthetic/sibling.json"], "Genuine synthetic sibling commit");
+    git(owned, ["checkout", "-b", "synthetic-mainline", base]);
+    const inputs = fresh(), path = "qualification/synthetic/nonancestor.json";
+    putJson(owned, path, { synthetic: true }); closeDeclaration(inputs, path, sibling);
+    putJson(owned, "docs/program/gaps.json", inputs.gaps);
+    commit(owned, [path, "docs/program/gaps.json"], "Commit declaration naming sibling history");
+    const ancestry = command(owned, "git", ["merge-base", "--is-ancestor", sibling, "HEAD"]);
+    expect(ancestry.error).toBeNull(); expect(ancestry.signal).toBeNull(); expect(ancestry.status).toBe(1);
+    refusal(cli(owned, ["--json"]), CLOSED_ERROR);
+  });
+
+  test("Q12f a committed synthetic path and real ancestor pass structural checks only", () => {
+    const owned = fixture("Q12-ancestor"), ancestor = owned.commits[0]!, inputs = fresh();
+    const path = "qualification/synthetic/declaration-only.json";
+    putJson(owned, path, { synthetic: true, warning: "No signature or approval; this is an invented local declaration." });
+    closeDeclaration(inputs, path, ancestor); putJson(owned, "docs/program/gaps.json", inputs.gaps);
+    commit(owned, [path, "docs/program/gaps.json"], "Commit synthetic declaration with genuine ancestor");
+    expect(git(owned, ["merge-base", "--is-ancestor", ancestor, "HEAD"])).toBe("");
+    const result = cli(owned, ["--json"]); success(result);
+    const output = JSON.parse(result.stdout) as Computed;
+    expect(output.errors).toEqual([]); expect(row(output, "critical_gaps_open").value).toBe(6);
+    expect(row(output, "critical_gaps_open").source).toContain("merge/signatures not verified");
+  });
+
+  test("Q13 only a synthetic singleMaintainer selection adds its column and cells are escaped", () => {
+    const owned = fixture("Q13-render"), inputs = fresh();
+    const metric = registration(inputs, "release_cadence");
+    metric.label = "Synthetic <metric> & pipe|line\nnext";
+    metric.targets.g0 = "gate|<target>&\nnext";
+    metric.targets.singleMaintainer = "solo|<target>&\nnext";
+    inputs.manual.entries = [{ metric: "release_cadence", value: "value|<cell>&\nnext",
+      source: "source|<cell>&\nnext", asOf: "2026-10-15", recordedBy: "synthetic" }];
+    putJson(owned, "docs/program/metrics.json", inputs.metrics);
+    putJson(owned, "docs/program/metrics-manual.json", inputs.manual);
+    const funded = cli(owned, ["--markdown"]); success(funded);
+    expect(funded.stdout.split("\n")[0]).toBe("| Metric | Current | Source | Next gate target (g0) |");
+    expect(funded.stdout).not.toContain("Single maintainer target");
+    expect(funded.stdout).toContain("Synthetic &lt;metric&gt; &amp; pipe\\|line<br>next");
+    expect(funded.stdout).toContain("value\\|&lt;cell&gt;&amp;<br>next");
+    expect(funded.stdout).toContain("gate\\|&lt;target&gt;&amp;<br>next");
+    inputs.metrics.targetColumn = "singleMaintainer";
+    putJson(owned, "docs/program/metrics.json", inputs.metrics);
+    const single = cli(owned, ["--markdown"]); success(single);
+    expect(single.stdout.split("\n")[0]).toBe("| Metric | Current | Source | Next gate target (g0) | Single maintainer target |");
+    expect(single.stdout).toContain("solo\\|&lt;target&gt;&amp;<br>next");
+    expect(single.stdout.trimEnd().split("\n")).toHaveLength(17);
+  });
+});

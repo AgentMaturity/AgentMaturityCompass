@@ -1,0 +1,31 @@
+{
+  "schema": "p125w-private-extension-skeleton-author-review/1",
+  "at": "2026-10-17T00:26:33.406155+00:00",
+  "blockers": [],
+  "preferredInertHelper": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/assemble-extension.py.source.txt",
+  "baseMetadataCountsRead": {
+    "files": 1484,
+    "artifacts": 1483,
+    "nonIndexPayloads": 1481,
+    "commands": 173,
+    "orderedAssemblyPins": 2188
+  },
+  "baseMetadataCheckpoint": "ac7759702ecbfda304b57e78eb1bd946340adc0f",
+  "baseSemanticSource": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+  "currentActualSourceCheckpoint": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+  "sourceOutcomePinOnlyNotNewRuntimeAudit": true,
+  "acceptedChainAndPublicationManifestUnready": true,
+  "actualRuntime151TwoSuccessorSchemaUsed": true,
+  "allSelectedNewCommandsAndPresentRawRolesBound": true,
+  "actualActionClosureGatesAcceptedProductStarts": true,
+  "originalM1OverlapRetainedDiagnosticOnly": true,
+  "historicalApplyBindingMappedToExactPreservedBytesOnly": true,
+  "oldB37LauncherAndEofFactsPreservedNotInventedForB38": true,
+  "actualPreservationFieldNamesUsed": true,
+  "twoControlTargetsAndEveryFailureMessageBound": true,
+  "privacyInertLosslessAndCompiledHelperExclusionsRetained": true,
+  "prefixOwnershipAndMetadataAdmissionStillPending": true,
+  "helperImportedParsedCompiledExecuted": false,
+  "sourceIndexQaWrites": false,
+  "rootFullReadIndependentReviewAndActualManifestRequired": true
+}

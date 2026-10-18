@@ -1,0 +1,20 @@
+{
+  "preparedPlan": {
+    "path": "/private/tmp/p0-41-causal-plan-v2-prepared-20261015.json",
+    "bytes": 4818,
+    "sha256": "40c69dbdf6df2937236595b352e539eb0e88c7d842970421cb62123f4b30ad8a"
+  },
+  "preparedController": {
+    "path": "/private/tmp/p0-41-causal-controller-v2-prepared-20261015.py",
+    "bytes": 25175,
+    "sha256": "d8a77e46b5b95f537c21f5eac47f3b16f5a9791584c53ba67fd43b63d48515ca"
+  },
+  "copyHelper": {
+    "path": "/private/tmp/p0-41-prepare-source-copy-v2-prepared-20261015.py",
+    "bytes": 2502,
+    "sha256": "6ab1627fd9ea5778e0820a744a6508e1de536b4e78e7f5bd81b59869a376f9ea"
+  },
+  "codeDerivation": "Exactly three namespace/template/hash literal substitutions; unchanged controller behavior, controls, guards, timeouts, lifecycle, errors and release keys. Copy helper exactly one root namespace substitution.",
+  "fixtureDerivation": "Single reviewed expectation fix only, freshnamespace; oldrun staysHALTED.",
+  "runtimeOccurred": false
+}

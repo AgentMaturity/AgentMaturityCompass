@@ -13,6 +13,8 @@ import { startGateway, type GatewayHandle } from "../gateway/server.js";
 import { initWorkspace } from "../workspace.js";
 import { openLedger } from "../ledger/ledger.js";
 import { ensureLeaseRevocationStore, issueLeaseForCli } from "../leases/leaseCli.js";
+import { verifyLeaseToken } from "../leases/leaseVerifier.js";
+import { revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { getWorkspaceScope, withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { checkScopedEgress } from "../residency/checkEgress.js";
@@ -113,9 +115,9 @@ export function noVaultDemoGatewayConfig(upstreamBaseUrl: string): GatewayConfig
   return {
     listen: { host: "127.0.0.1", port: 0 },
     redaction: {
-      headerKeysDenylist: ["authorization", "x-api-key", "api-key", "x-openai-key"],
+      headerKeysDenylist: ["authorization", "x-api-key", "api-key", "x-openai-key", "x-amc-lease", "x-goog-api-key", "x-anthropic-api-key", "cookie", "set-cookie"],
       jsonPathsDenylist: ["$.api_key", "$.key"],
-      textRegexDenylist: ["(?i)sk-[A-Za-z0-9]{10,}", "(?i)bearer\\s+[A-Za-z0-9._-]{10,}"]
+      textRegexDenylist: ["(?i)sk-[A-Za-z0-9_-]{10,}", "(?i)bearer\\s+[A-Za-z0-9._-]{10,}"]
     },
     upstreams: {
       demo_local: {
@@ -182,6 +184,7 @@ export function prepareNoVaultDemoWorkspace(params: {
       workspace,
       workspaceId: workspaceIdFromDirectory(workspace),
       agentId,
+      claimKind: "synthetic_example",
       ttl: "15m",
       scopes: "gateway:llm,receipt:verify",
       routes: "/local",
@@ -380,6 +383,27 @@ async function sendRequest(
 }
 
 export async function runDemo(gatewayUrl: string, leaseToken?: string, agentId = DEMO_AGENT_ID): Promise<DemoResult> {
+  // The existing gateway verifier remains authoritative; verify locally too before sending scripted content.
+  const workspace = getWorkspaceScope() ?? process.cwd();
+  const refusal = "demo traffic requires a valid synthetic_example lease for the selected agent and workspace";
+  let verification: ReturnType<typeof verifyLeaseToken>;
+  try {
+    verification = verifyLeaseToken({
+      workspace,
+      token: leaseToken ?? "",
+      expectedWorkspaceId: workspaceIdFromDirectory(workspace),
+      expectedAgentId: agentId,
+      requiredScope: "gateway:llm",
+      routePath: "/local/v1/chat/completions",
+      model: "gpt-4o-demo",
+      revokedLeaseIds: revokedLeaseIdSet(workspace)
+    });
+  } catch {
+    throw new Error(refusal);
+  }
+  if (!verification.ok || verification.payload?.claimKind !== "synthetic_example" || verification.payload.agentId !== agentId) {
+    throw new Error(refusal);
+  }
   const start = Date.now();
   let sent = 0;
 
@@ -425,8 +449,9 @@ export async function runDemo(gatewayUrl: string, leaseToken?: string, agentId =
     gatewayUrl,
     durationMs: Date.now() - start,
     mode: "gateway",
+    demoOnly: true,
     agentId,
-    trustLabel: leaseToken ? "SIGNED" : "DEMO_ONLY",
+    trustLabel: "DEMO_ONLY",
   };
 }
 

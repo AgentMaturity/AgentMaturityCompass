@@ -1,0 +1,32 @@
+{
+  "phase": "p112-m3",
+  "rootAllFailuresRead": true,
+  "sourceCommit": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+  "operator": "principal-binding",
+  "outcomeSha256": "2051574b880c704e67c2af082dd3796b8c33f8d2ee6a84d4c7ecb3ace7d716ea",
+  "noHookOrEnvironmentFailure": true,
+  "classification": "Two semantic assertion failures after removal of principal refusal: absent record and combined-rule supplied cli-os-user both return undefined instead of exact principal denial. Three supplied authenticated principal methods passed their earlier neutral checks; earlier combined-rule missing-lease denial still passed.",
+  "failures": [
+    {
+      "file": "tests/policy/compiledPolicyGuard.test.ts",
+      "line": 127,
+      "test": "rejects absent and OS-user principals while consuming the authenticated principal methods",
+      "expected": "PRINCIPAL_UNRESOLVED exact control/version denial",
+      "received": "undefined"
+    },
+    {
+      "file": "tests/policy/compiledPolicyGuard.test.ts",
+      "line": 137,
+      "test": "preserves lease-before-principal refusal when both identity requirements apply",
+      "expected": "PRINCIPAL_UNRESOLVED exact control/version denial",
+      "received": "undefined"
+    }
+  ],
+  "maskedAssertions": [
+    {
+      "line": 128,
+      "reason": "Separate OS-user assertion follows failing absent-record assertion in same body; no separate mutant witness credit."
+    }
+  ],
+  "scope": "Pure helper typed-input consumption only; no authentication or lease verification claim."
+}

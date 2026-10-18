@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/checkpoint-window/commands/p125k-counts-before/stdout-stderr.log",
+    "bytes": 81,
+    "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
+  },
+  "dataBase64": "UHVibGlzaGVkIHNvdXJjZSBjb3VudHMgbWF0Y2ggdGhlIHJlcG9zaXRvcnk7IHRoaXMgY2hlY2sgZG9lcyBub3QgZXhlY3V0ZSB0ZXN0cy4K",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

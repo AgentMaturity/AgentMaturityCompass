@@ -1,0 +1,1100 @@
+{
+  "schema": "p125f-source-current-preservation-review/1",
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "currentSourceSelectedPins": [
+    {
+      "relativePath": "CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "f251e3bd5071672598a90cc71064e41c3143fef495b6ed0c2f74e4860c7a269a",
+      "dev": 16777231,
+      "inode": 542454930,
+      "nlink": 1
+    },
+    {
+      "relativePath": "README.md",
+      "bytes": 59828,
+      "sha256": "4d39403454d0af139a177a6ec531c33e2aa2023278d874119e00e4f9c2aec60d",
+      "dev": 16777231,
+      "inode": 542454935,
+      "nlink": 1
+    },
+    {
+      "relativePath": "dist/enforce/egressAllowlist.js",
+      "bytes": 7433,
+      "sha256": "651ae93ead241db5080bb223666c05c86bae5634393d98d0375f32216c5b0fa3",
+      "dev": 16777231,
+      "inode": 543511926,
+      "nlink": 1
+    },
+    {
+      "relativePath": "dist/residency/checkEgress.js",
+      "bytes": 9405,
+      "sha256": "77befb2fd7332d20afd098cb28c5ca60e654066ed4f3143da50d06f3eb48804f",
+      "dev": 16777231,
+      "inode": 543512137,
+      "nlink": 1
+    },
+    {
+      "relativePath": "dist/residency/destinationRegistry.js",
+      "bytes": 9345,
+      "sha256": "729b18a842f3864ff033d66e9fb6d64459567cef7574757e70b6768620c4732c",
+      "dev": 16777231,
+      "inode": 543512135,
+      "nlink": 1
+    },
+    {
+      "relativePath": "dist/time/der.js",
+      "bytes": 5518,
+      "sha256": "1ed3e62994bc5d7aad45e721ca73234c5c1e4069a81fa271adb3e7f894c2a89e",
+      "dev": 16777231,
+      "inode": 543512075,
+      "nlink": 1
+    },
+    {
+      "relativePath": "dist/time/timeEvidence.js",
+      "bytes": 2973,
+      "sha256": "4157ecf0aa60813bea6335f4a26fb13f7cb5b4ed4c3b86c6515b90b8295c1829",
+      "dev": 16777231,
+      "inode": 543511812,
+      "nlink": 1
+    },
+    {
+      "relativePath": "dist/time/tsaClient.js",
+      "bytes": 10436,
+      "sha256": "8b6faba60532929264ec200c1692f1c3df7257298058f2e1e799b601087fc670",
+      "dev": 16777231,
+      "inode": 543512079,
+      "nlink": 1
+    },
+    {
+      "relativePath": "dist/time/verifyTimestamp.js",
+      "bytes": 14777,
+      "sha256": "914d44693865680b1e3123255dfe4f393930ccbf2f418b3b8302b9c3cc942afa",
+      "dev": 16777231,
+      "inode": 543512077,
+      "nlink": 1
+    },
+    {
+      "relativePath": "dist/trust/trustContext.js",
+      "bytes": 5605,
+      "sha256": "846b794fdcde123feda47f36b371891bcbdb5f8a5086fb2aaaaf8df73c618390",
+      "dev": 16777231,
+      "inode": 543511630,
+      "nlink": 1
+    },
+    {
+      "relativePath": "docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "edb78bf0e80c8c052b41c16102c0c087590f2b81f73d235699870995b6360556",
+      "dev": 16777231,
+      "inode": 542455439,
+      "nlink": 1
+    },
+    {
+      "relativePath": "docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "e1a87d7a073be86e3657d3bdd2b992d5b677a8b9f865e7288f3ac34d0f640884",
+      "dev": 16777231,
+      "inode": 542455440,
+      "nlink": 1
+    },
+    {
+      "relativePath": "docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "76cd549bcf137cf62614d52574c9cb0744afd99498e2f4c1be878a92362d5852",
+      "dev": 16777231,
+      "inode": 542455590,
+      "nlink": 1
+    },
+    {
+      "relativePath": "docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "80fd75e6bddd9c58f8af50c564d3f0d0eb7315f851284b1490b9c58f1a1eb2e2",
+      "dev": 16777231,
+      "inode": 542455594,
+      "nlink": 1
+    },
+    {
+      "relativePath": "knip.json",
+      "bytes": 1928,
+      "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1",
+      "dev": 16777231,
+      "inode": 542456398,
+      "nlink": 1
+    },
+    {
+      "relativePath": "package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "dev": 16777231,
+      "inode": 542456404,
+      "nlink": 1
+    },
+    {
+      "relativePath": "pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "dev": 16777231,
+      "inode": 542456844,
+      "nlink": 1
+    },
+    {
+      "relativePath": "qualification/receipt.schema.json",
+      "bytes": 2315,
+      "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6",
+      "dev": 16777231,
+      "inode": 542458522,
+      "nlink": 1
+    },
+    {
+      "relativePath": "scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "dev": 16777231,
+      "inode": 542458537,
+      "nlink": 1
+    },
+    {
+      "relativePath": "scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48",
+      "dev": 16777231,
+      "inode": 542458540,
+      "nlink": 1
+    },
+    {
+      "relativePath": "scripts/clean-source-check.mjs",
+      "bytes": 7910,
+      "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b",
+      "dev": 16777231,
+      "inode": 542458545,
+      "nlink": 1
+    },
+    {
+      "relativePath": "scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "dev": 16777231,
+      "inode": 542458558,
+      "nlink": 1
+    },
+    {
+      "relativePath": "scripts/gen-counts.mjs",
+      "bytes": 9141,
+      "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f",
+      "dev": 16777231,
+      "inode": 542458561,
+      "nlink": 1
+    },
+    {
+      "relativePath": "scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+      "dev": 16777231,
+      "inode": 542458605,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/catalog/compiler/activate.ts",
+      "bytes": 9250,
+      "sha256": "09bcf8d146e417a70b73b7333da60761d730805afc0bd481916e75ccf2731fc0",
+      "dev": 16777231,
+      "inode": 542459294,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/catalog/compiler/compile.ts",
+      "bytes": 6400,
+      "sha256": "53a9813fc1a6c5fd4b0fa851ae3d556a5c3496a9b43674aff6f1ba3a73bac82b",
+      "dev": 16777231,
+      "inode": 542459296,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+      "dev": 16777231,
+      "inode": 542459674,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/crypto/signing/signatureEnvelope.ts",
+      "bytes": 2237,
+      "sha256": "586626d236555f99ce51a53a8e438814f376ad5af2ac5b82bb6b1fb3fa16b6e7",
+      "dev": 16777231,
+      "inode": 542459676,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/crypto/signing/signer.ts",
+      "bytes": 7862,
+      "sha256": "88579bba0833ce86dd3fcfac8ea6ccf068772b4a5273ef7bc7b87b1c77a2ef09",
+      "dev": 16777231,
+      "inode": 542459677,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/enforce/egressAllowlist.ts",
+      "bytes": 8093,
+      "sha256": "db66259630b75151ba90d87577a3f5afd56e4ea2d957b4fb7fd3a2434c4c7c99",
+      "dev": 16777231,
+      "inode": 542459859,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/enforce/evidenceEmitter.ts",
+      "bytes": 24443,
+      "sha256": "fc6885586da01b60ce062dedce3d6fde872fd87ae2919ae08e92d280d4190b41",
+      "dev": 16777231,
+      "inode": 542459862,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "dev": 16777231,
+      "inode": 542460160,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/ledger/ledgerConnection.ts",
+      "bytes": 3137,
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "dev": 16777231,
+      "inode": 542460161,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/residency/checkEgress.ts",
+      "bytes": 10311,
+      "sha256": "5ac226f5479a8b441738221c247b094ceb51a975af1252b82c9ded782b00d9af",
+      "dev": 16777231,
+      "inode": 542460656,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/residency/destinationRegistry.ts",
+      "bytes": 9134,
+      "sha256": "9cc37a4acb4eea64a0e93280d0a6727fba3d5574ccbc1414e223bd71a71ff21d",
+      "dev": 16777231,
+      "inode": 542460658,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/residency/types.ts",
+      "bytes": 4406,
+      "sha256": "50ac0fbcd78b521afa81177834463f26648cf047429cf743d4c4cd5bb7d3babe",
+      "dev": 16777231,
+      "inode": 542460660,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/time/der.ts",
+      "bytes": 5959,
+      "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6",
+      "dev": 16777231,
+      "inode": 542461051,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+      "dev": 16777231,
+      "inode": 542461052,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/time/tsaClient.ts",
+      "bytes": 10927,
+      "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "dev": 16777231,
+      "inode": 542461053,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/time/verifyTimestamp.ts",
+      "bytes": 16478,
+      "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89",
+      "dev": 16777231,
+      "inode": 542461054,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/trust/keyPurposes.ts",
+      "bytes": 604,
+      "sha256": "525e2f0d8b01b34891a1693f6f770b70c14819cb15c60f6f25589c35027253bd",
+      "dev": 16777231,
+      "inode": 542461144,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/trust/trustContext.ts",
+      "bytes": 7037,
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "dev": 16777231,
+      "inode": 542461149,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/trust/trustList.ts",
+      "bytes": 10386,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+      "dev": 16777231,
+      "inode": 542461150,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/utils/fs.ts",
+      "bytes": 1006,
+      "sha256": "e83f9f76ed73987babd3ef62aaf5281dd0d3a9ac5f55075f283c3fb123fa02e4",
+      "dev": 16777231,
+      "inode": 542461171,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/utils/hash.ts",
+      "bytes": 259,
+      "sha256": "1507e34cf2dcc614e9b7bf05a790806a18ab878e8d282c16cb673718f92a6601",
+      "dev": 16777231,
+      "inode": 542461172,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b",
+      "dev": 16777231,
+      "inode": 542461173,
+      "nlink": 1
+    },
+    {
+      "relativePath": "src/workspace.ts",
+      "bytes": 27587,
+      "sha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "dev": 16777231,
+      "inode": 542461302,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/README.md",
+      "bytes": 784,
+      "sha256": "1ac37a60cabc739bfa0a0f8489f20346e3d4ba23789e918d54d85b667783eef8",
+      "dev": 16777231,
+      "inode": 543070146,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/expired.token.der",
+      "bytes": 2356,
+      "sha256": "1baf6dd1c9d9601c98bf47506563b0226bfb132a884f674dad9eb641e3420d3a",
+      "dev": 16777231,
+      "inode": 543070141,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/missing-eku.token.der",
+      "bytes": 2332,
+      "sha256": "264ca611164421a268c868d0631660cbfc3423873cd9231514e7b9fd64280ec8",
+      "dev": 16777231,
+      "inode": 543070139,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/noncritical-eku.token.der",
+      "bytes": 2353,
+      "sha256": "84e186ce834f2a9f30a87a1b8ba722c95517c9e110a922ce72c72c67677d6896",
+      "dev": 16777231,
+      "inode": 543070140,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/provenance.json",
+      "bytes": 80160,
+      "sha256": "3c38fe129eecdd32d9f8cd2d89028dbe73e17ad5634ffd7b0667e0eef0c32366",
+      "dev": 16777231,
+      "inode": 543070145,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/public-certificates.json",
+      "bytes": 10021,
+      "sha256": "430746b4e4e721616a57bbec9d8b8a950cdd3b2631d51dc4925d263cb1642b52",
+      "dev": 16777231,
+      "inode": 543070136,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/query.der",
+      "bytes": 76,
+      "sha256": "6c039cf80c0e99b576a1802d7916835d5c11f85998c60ea866dc02a1403051c7",
+      "dev": 16777231,
+      "inode": 543070143,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/tampered-attribute.token.der",
+      "bytes": 2356,
+      "sha256": "fc6ac617be35765b6038bd928ec00d09de02cffbee88c6e99341d697517cfd1d",
+      "dev": 16777231,
+      "inode": 543070142,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/tstinfo.der",
+      "bytes": 93,
+      "sha256": "98e46babfb8aa4a7ba99eb4fd4976feca3f23a3e8cb6992ae93c435d6542ba35",
+      "dev": 16777231,
+      "inode": 543070144,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/valid.response.der",
+      "bytes": 2365,
+      "sha256": "cf14b113569a5be83fd3491938f5cb650724fffef7c0a946edb09fb62c1fdc31",
+      "dev": 16777231,
+      "inode": 543070138,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/fixtures/rfc3161/valid.token.der",
+      "bytes": 2356,
+      "sha256": "d45216b462f9286af58ab5a3694c82b3b1675959a45011ec9c35eef1e4973912",
+      "dev": 16777231,
+      "inode": 543070137,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+      "dev": 16777231,
+      "inode": 542463190,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+      "dev": 16777231,
+      "inode": 542463193,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+      "dev": 16777231,
+      "inode": 542463194,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/time/tsaClient.test.ts",
+      "bytes": 15569,
+      "sha256": "2e70ff1d331f9ec7263dc437119ce9ab505fc1e39c5fbbb27592569cad6c1cb8",
+      "dev": 16777231,
+      "inode": 543440275,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/time/tsaFallback.test.ts",
+      "bytes": 16974,
+      "sha256": "3f3eb0f312d18eef34d9625fe725b385ad29ff9d2042c533a1a41acdb2c1c5a0",
+      "dev": 16777231,
+      "inode": 543511005,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/time/verifyTimestamp.test.ts",
+      "bytes": 11425,
+      "sha256": "47f9aa1984cf61ae0d1192d2c04d4f3138c0fa42d32145124552bd648eddeb31",
+      "dev": 16777231,
+      "inode": 543070134,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tests/trust/trustFixtures.ts",
+      "bytes": 2312,
+      "sha256": "da8626dc36baf6756414f921450228cf780327e6dd24793a2e35c1de16fdb61d",
+      "dev": 16777231,
+      "inode": 542463301,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+      "dev": 16777231,
+      "inode": 542463391,
+      "nlink": 1
+    },
+    {
+      "relativePath": "tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+      "dev": 16777231,
+      "inode": 542463392,
+      "nlink": 1
+    },
+    {
+      "relativePath": "vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "dev": 16777231,
+      "inode": 542464352,
+      "nlink": 1
+    },
+    {
+      "relativePath": "website/i18n.js",
+      "bytes": 44169,
+      "sha256": "82a6b652ec3942844a2aada509b7256e973093f1617e37da6bd04fadeb847060",
+      "dev": 16777231,
+      "inode": 542464407,
+      "nlink": 1
+    },
+    {
+      "relativePath": "website/index.html",
+      "bytes": 43520,
+      "sha256": "4468804cbaceb41ff376a7e155e434c597996f42026642afb09897d8dbb6e75d",
+      "dev": 16777231,
+      "inode": 542464408,
+      "nlink": 1
+    },
+    {
+      "relativePath": "website/lite.html",
+      "bytes": 11197,
+      "sha256": "f69082f63720bb53bd9aa313903050321707bc90efc80d3bd3f6166e61dd0ee0",
+      "dev": 16777231,
+      "inode": 542464412,
+      "nlink": 1
+    },
+    {
+      "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "48aaf1ca1121c9e88a9849d3dcefcdb5de865b3ab85f9245d7d1cd81cc25b5a6",
+      "dev": 16777231,
+      "inode": 542464444,
+      "nlink": 1
+    }
+  ],
+  "priorNativePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 542501039,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 539175547,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543125595,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543200130,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543305423,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543396326,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543499352,
+      "nlink": 1
+    }
+  ],
+  "protected128Exact": true,
+  "heldR18HeadIndexExact": true,
+  "gitReadOnlyObservations": [
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "d8b5c3250138a10078c21886642595f669c4a73c\n",
+      "stdoutBytes": 41,
+      "stdoutSha256": "131cf9c40c82767f2fee06bbb1780262f10341fb27113c701c6848ae2f6f994d",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "rev-parse",
+        "d8b5c3250138a10078c21886642595f669c4a73c^"
+      ],
+      "exit": 0,
+      "stdout": "a0cfbc280f2b11207205541ba89112c125c29895\n",
+      "stdoutBytes": 41,
+      "stdoutSha256": "93247e76a4e8bc895a06f9c356ecec76cdda1a5ba9d57bd3147930c7f20b10a2",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "status",
+        "--porcelain=v1"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stdoutBytes": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stdoutBytes": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "diff-tree",
+        "--no-commit-id",
+        "--name-only",
+        "-r",
+        "d8b5c3250138a10078c21886642595f669c4a73c"
+      ],
+      "exit": 0,
+      "stdout": "CONTRIBUTING.md\nREADME.md\ndocs/content/reddit-launch-drafts.md\ndocs/content/show-hn-draft.md\ndocs/internal/competitive-landscape.md\ndocs/internal/mirofish-simulation-council.md\ntests/time/tsaFallback.test.ts\nwebsite/i18n.js\nwebsite/index.html\nwebsite/lite.html\nwhitepaper/AMC_WHITEPAPER_v1.md\n",
+      "stdoutBytes": 293,
+      "stdoutSha256": "0057bcf415a152b3a5dbc1f7b8abe3d1cf68b3ca13c801c492061888c24caad2",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "diff",
+        "--check",
+        "a0cfbc280f2b11207205541ba89112c125c29895",
+        "d8b5c3250138a10078c21886642595f669c4a73c"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stdoutBytes": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "d8b5c3250138a10078c21886642595f669c4a73c:README.md"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 59828,
+      "stdoutSha256": "4d39403454d0af139a177a6ec531c33e2aa2023278d874119e00e4f9c2aec60d",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "d8b5c3250138a10078c21886642595f669c4a73c:CONTRIBUTING.md"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 16220,
+      "stdoutSha256": "f251e3bd5071672598a90cc71064e41c3143fef495b6ed0c2f74e4860c7a269a",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "d8b5c3250138a10078c21886642595f669c4a73c:website/index.html"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 43520,
+      "stdoutSha256": "4468804cbaceb41ff376a7e155e434c597996f42026642afb09897d8dbb6e75d",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "d8b5c3250138a10078c21886642595f669c4a73c:website/lite.html"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 11197,
+      "stdoutSha256": "f69082f63720bb53bd9aa313903050321707bc90efc80d3bd3f6166e61dd0ee0",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "d8b5c3250138a10078c21886642595f669c4a73c:website/i18n.js"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 44169,
+      "stdoutSha256": "82a6b652ec3942844a2aada509b7256e973093f1617e37da6bd04fadeb847060",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "d8b5c3250138a10078c21886642595f669c4a73c:docs/content/show-hn-draft.md"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 1951,
+      "stdoutSha256": "e1a87d7a073be86e3657d3bdd2b992d5b677a8b9f865e7288f3ac34d0f640884",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "d8b5c3250138a10078c21886642595f669c4a73c:docs/content/reddit-launch-drafts.md"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 3075,
+      "stdoutSha256": "edb78bf0e80c8c052b41c16102c0c087590f2b81f73d235699870995b6360556",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "d8b5c3250138a10078c21886642595f669c4a73c:docs/internal/competitive-landscape.md"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 3880,
+      "stdoutSha256": "76cd549bcf137cf62614d52574c9cb0744afd99498e2f4c1be878a92362d5852",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "d8b5c3250138a10078c21886642595f669c4a73c:docs/internal/mirofish-simulation-council.md"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 2489,
+      "stdoutSha256": "80fd75e6bddd9c58f8af50c564d3f0d0eb7315f851284b1490b9c58f1a1eb2e2",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "d8b5c3250138a10078c21886642595f669c4a73c:whitepaper/AMC_WHITEPAPER_v1.md"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 107509,
+      "stdoutSha256": "48aaf1ca1121c9e88a9849d3dcefcdb5de865b3ab85f9245d7d1cd81cc25b5a6",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "d8b5c3250138a10078c21886642595f669c4a73c:tests/time/tsaFallback.test.ts"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 16974,
+      "stdoutSha256": "3f3eb0f312d18eef34d9625fe725b385ad29ff9d2042c533a1a41acdb2c1c5a0",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "a0cfbc280f2b11207205541ba89112c125c29895:README.md"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 59828,
+      "stdoutSha256": "1cf5097efb8c894746065edb1ef625fc21f616c76060fc4bd2c0011eadbc5826",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "a0cfbc280f2b11207205541ba89112c125c29895:CONTRIBUTING.md"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 16220,
+      "stdoutSha256": "49837eb4b3cea2bbf03c46244d370dc80c72c0dec6e78cad7dbc426ef3896c9e",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "a0cfbc280f2b11207205541ba89112c125c29895:website/index.html"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 43520,
+      "stdoutSha256": "0bf924630aac6ffc3666ed5b899c493c7abbbf16cdbba4ebc1d793893d06ea53",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "a0cfbc280f2b11207205541ba89112c125c29895:website/lite.html"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 11197,
+      "stdoutSha256": "85a23bdc6aa1890627afb0c57562aca3aa2479f0764c0f771d92e03576704db3",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "a0cfbc280f2b11207205541ba89112c125c29895:website/i18n.js"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 44169,
+      "stdoutSha256": "d8385bdeacd02b68add2930d54bc3578fa5d256d0020b5b245462be6eff900c1",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "a0cfbc280f2b11207205541ba89112c125c29895:docs/content/show-hn-draft.md"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 1951,
+      "stdoutSha256": "950a26cb53c37c58e98d298878f9219a448cccdc74511e23ba0ebda2e0ab70b5",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "a0cfbc280f2b11207205541ba89112c125c29895:docs/content/reddit-launch-drafts.md"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 3075,
+      "stdoutSha256": "45b32dc7ffb39cb808b59f72da39cded0a59c4feeca5bddf0f4c8e5e2e9eea02",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "a0cfbc280f2b11207205541ba89112c125c29895:docs/internal/competitive-landscape.md"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 3880,
+      "stdoutSha256": "ce8d53e766334530a3d89f0b30a4ed12db3696eec72e900bb956c521321783dd",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "a0cfbc280f2b11207205541ba89112c125c29895:docs/internal/mirofish-simulation-council.md"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 2489,
+      "stdoutSha256": "06ae59f494f5fe76df76c5be54a94d11ea7fbbce4cd60cec4d8be4c8330d7551",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "cat-file",
+        "blob",
+        "a0cfbc280f2b11207205541ba89112c125c29895:whitepaper/AMC_WHITEPAPER_v1.md"
+      ],
+      "exit": 0,
+      "stdout": null,
+      "stdoutBytes": 107509,
+      "stdoutSha256": "f980b8c42da97ea010b88408b2114d60330040c75be2753be856083c945f9e01",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d\n",
+      "stdoutBytes": 41,
+      "stdoutSha256": "d649601809e11b7c52326c72b6e5fdd42023be7f5c387ee8c45be2641ba1adad",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "status",
+        "--porcelain=v1"
+      ],
+      "exit": 0,
+      "stdout": " M CONTRIBUTING.md\n M README.md\n M docs/SSO_OIDC.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M src/identity/identityConfig.ts\n M src/identity/oidc/jwtVerify.ts\n M src/identity/oidc/oidcRoutes.ts\n M tests/identity/jwtVerify.test.ts\n M unused-code/plan-edits/manifest.json\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? .changeset/p2-07-oidc-validation-policy.md\n?? tests/identity/oidcValidationConfig.test.ts\n",
+      "stdoutBytes": 584,
+      "stdoutSha256": "7b2f1c4b4919c3620f71a68064faccf7c97807f6b869a826a6acfdd2df2ebbdc",
+      "stderr": ""
+    },
+    {
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stdoutBytes": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    }
+  ],
+  "futureFreshEvidenceIncluded": false
+}

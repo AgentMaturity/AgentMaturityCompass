@@ -1,0 +1,82 @@
+{
+  "capturedUtc": "2026-10-15T22:45:49.534538+00:00",
+  "root": "/private/tmp/lhfo-u44EX3",
+  "actualCurrentSnapshot": [
+    {
+      "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/evidence.sqlite",
+      "dev": 16777231,
+      "ino": 541767675,
+      "bytes": 577536,
+      "sha256": "340caaade51d538e3106d5fe35977d95a4237e3e6742e7068da6e2942e369d22"
+    },
+    {
+      "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/evidence.sqlite-wal",
+      "dev": 16777231,
+      "ino": 541767831,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/auditor_ed25519.pub",
+      "dev": 16777231,
+      "ino": 541767656,
+      "bytes": 113,
+      "sha256": "28b6fa416128fa13b7122f7e0c9f9bcb119b06cb2897e20b5c2a5281bf1bdd24"
+    },
+    {
+      "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/auditor_history.json",
+      "dev": 16777231,
+      "ino": 541767657,
+      "bytes": 717,
+      "sha256": "e321f0d4664ed4d23ea5ea36c67d064e4aa80bf071011d9393c079e94e4d994f"
+    },
+    {
+      "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/lease_ed25519.pub",
+      "dev": 16777231,
+      "ino": 541767658,
+      "bytes": 113,
+      "sha256": "d16b83edb0060501a6e17a04e2910b6417c8df5e21f61052011c1123310f624e"
+    },
+    {
+      "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/lease_history.json",
+      "dev": 16777231,
+      "ino": 541767659,
+      "bytes": 715,
+      "sha256": "7a0fb914121009c6d5a397da2cf133c1c058d222563a657e45ef2b51864824d2"
+    },
+    {
+      "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/monitor_ed25519.pub",
+      "dev": 16777231,
+      "ino": 541767654,
+      "bytes": 113,
+      "sha256": "7016936dafb765cf6e21299054c95132348b9acbb7871ffca3a38b17fdb2d469"
+    },
+    {
+      "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/monitor_history.json",
+      "dev": 16777231,
+      "ino": 541767655,
+      "bytes": 717,
+      "sha256": "fd218df371d42d62a27e90d6fe12c3ada72e72df2c0b722580aa2f0fd2f3ce5b"
+    },
+    {
+      "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/session_ed25519.pub",
+      "dev": 16777231,
+      "ino": 541767660,
+      "bytes": 113,
+      "sha256": "09ed3b20eace57675b4d5cf9cf00e52c95209b7a46aa48ec071c154e41a97f33"
+    },
+    {
+      "path": "/private/tmp/lhfo-u44EX3/workspaces/p119-oracle-552495d1-91a1-43ab-aa68-6edc5a2aaa64/.amc/keys/session_history.json",
+      "dev": 16777231,
+      "ino": 541767661,
+      "bytes": 717,
+      "sha256": "cf8d4ca5f366f9408357658ddc46d437208504918a2723904503d8fa9293728d"
+    }
+  ],
+  "currentEqualsRecordedAfter": true,
+  "onlyReplaceWalWithAbsentEqualsRecordedBefore": true,
+  "beforeSha256": "6b9cd4cb93f3984ad74cd90260220c8d0c7ec45e042668ae0ee51a4b9123db95",
+  "afterSha256": "3d25bf2e8551b1040885cb08a9dd4ea881574c86e7acdbe9fa58b412ceab6d19",
+  "diagnosis": "The sole pinned snapshot difference is WAL absent before vs a distinct actual 0-byte regular WAL after. DB and all key/history identity/bytes match both hashes. Read-only extraction opened SQLite after the before snapshot; no SQL or product runtime was run for this reconstruction.",
+  "fixConstraint": "Establish and retain actual read-only connection/read transaction before baseline. Preserve strict DB/WAL/key identity/bytes/presence throughout cold verifier plus independent action read. Do not ignore or restore WAL."
+}

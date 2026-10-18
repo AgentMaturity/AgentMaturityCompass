@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-16T11:03:09.244484+00:00",
+  "sourceCommit": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+  "R": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout",
+  "sourceClean": true,
+  "freshClean": true,
+  "exactSelectedSourcePinsPreserved": 57,
+  "exactSelectedCompiledPinsPreserved": 5,
+  "nativeIdentityPreserved": true,
+  "independentNativeStillDistinct": true,
+  "bothExactRestorationsPassed51": true,
+  "sourceMutantsOnly": true,
+  "compiledOutputsNotRebuiltForMutants": true,
+  "oldCompilerHaltMarkersUnchanged": true,
+  "formalDone": false,
+  "noTerminatingSignalsOrAutomaticUnreviewedRetryOrRestoration": true,
+  "originalPrivateRecord": {
+    "path": "/private/tmp/p1-37-qualification-20261016/final-restoration.json",
+    "bytes": 724,
+    "sha256": "3185357f3030d05d0f0d9a370c6c7bed97fc237e56d652fb5bdf235b32d27d04"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-16T19:48:17.557362+00:00",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "priorHead": "85dd9d9bda246a78407bb06c9123e78c1745ea15",
+  "priorBranch": "codex/p1-11-evidence-qualification",
+  "newBranch": "codex/p1-12-compiled-guard-qualification",
+  "argv": [
+    "git",
+    "switch",
+    "-c",
+    "codex/p1-12-compiled-guard-qualification"
+  ],
+  "exit": 0,
+  "stdout": "",
+  "stderr": "Switched to a new branch 'codex/p1-12-compiled-guard-qualification'\n",
+  "sourceAllocationMade": false
+}

@@ -1,0 +1,76 @@
+{
+  "schema": "p126-bounded-whole-issue-gaps/1",
+  "sourceCommit": "32435b41d59e651ad2b259a59703cd137e5c925a",
+  "wholeIssueDone": false,
+  "controlsFullyConsumed": true,
+  "allPlaceholdersMustBeResolvedBeforeFinalAssembly": false,
+  "gaps": [
+    {
+      "id": "P126-G01",
+      "scope": "Formal P1-25 dependency",
+      "status": "open",
+      "needed": "Full timestamp/checkpoint and relevant TSA integration acceptance remains separate from the bounded P1-25 verifier checkpoint."
+    },
+    {
+      "id": "P126-G02",
+      "scope": "Signed migration and algorithm/default compatibility",
+      "status": "open",
+      "needed": "Exercise a genuine 1,000-entry migration and signed record binding, algorithm omission/legacy rules, defaults and all existing passport/certificate/session consumers. Existing code is preserved; this tree-only slice supplies no new full-flow proof."
+    },
+    {
+      "id": "P126-G03",
+      "scope": "C2SP checkpoints",
+      "status": "open",
+      "needed": "Qualify signed-note/checkpoint parsing, key names/signatures, tampered lines and pinned published vectors or explicitly recorded provenance."
+    },
+    {
+      "id": "P126-G04",
+      "scope": "Rekor and external trust/time",
+      "status": "open",
+      "needed": "Recorded genuine receipts, pinned service checkpoint signatures, inclusion, checkpoint binding, RFC3161 token and reported failure/status behavior across real offline entry points."
+    },
+    {
+      "id": "P126-G05",
+      "scope": "SCITT service and backend",
+      "status": "open",
+      "needed": "The current selected config/backend lane is Rekor v2. SCITT service, draft/version/API and receipt verification remain outside this cohort."
+    },
+    {
+      "id": "P126-G06",
+      "scope": "Permanent public entries",
+      "status": "open",
+      "needed": "Sid\u2019s written approval required by the specification before any permanent test submission; no approval or submission is inferred."
+    },
+    {
+      "id": "P126-G07",
+      "scope": "Library and dependency choice",
+      "status": "open",
+      "needed": "Keep the pending library decision separate. Porting Apache data, retaining its notices and running the notices check do not adopt a runtime dependency."
+    },
+    {
+      "id": "P126-G08",
+      "scope": "Both actual controls and restoration",
+      "status": "bounded controls closed",
+      "needed": "Actual M1 and M2 failures, every first assertion and mask were read and classified. Both explicit byte-exact restorations passed the same54-case cohort. This closes only the two selected semantic controls, not all P1-26 integration acceptance."
+    },
+    {
+      "id": "P126-G09",
+      "scope": "Resource and environment limits",
+      "status": "recorded limitation",
+      "needed": "Do not upgrade unchanged workspace fixtures\u2019 passing hooks/process closure into universal worker environment, pool/native/vault or filesystem/descendant cleanup proof."
+    },
+    {
+      "id": "P126-G10",
+      "scope": "Full suite, coverage and quality",
+      "status": "open",
+      "needed": "Duplicates1268 and deadcode2723 remain RED and unwaived. No full-suite/coverage result is supplied; numeric generation and diagnostic comparisons do not close these gates."
+    },
+    {
+      "id": "P126-G11",
+      "scope": "Documentation/publication and whole acceptance",
+      "status": "open",
+      "needed": "Semantic docs, dependency review, changeset, full specification/integration checks, fixture capture dates and merged PR acceptance remain distinct from ten numeric count surfaces and this source checkpoint."
+    }
+  ],
+  "heldDecisionsPreserved": true
+}

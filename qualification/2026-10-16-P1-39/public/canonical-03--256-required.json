@@ -1,0 +1,106 @@
+{
+  "schema": "amc-p139-oauth-first/1",
+  "label": "S256-required",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-QKL9FA",
+  "observations": {
+    "positiveIssuerMatches": true,
+    "rows": [
+      {
+        "label": "absent",
+        "refused": true,
+        "fixed": true
+      },
+      {
+        "label": "empty",
+        "refused": true,
+        "fixed": true
+      },
+      {
+        "label": "plain-only",
+        "refused": true,
+        "fixed": true
+      }
+    ]
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-authorization-server/issuer/path",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-authorization-server/issuer/path",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-authorization-server/issuer/path",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-authorization-server/issuer/path",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    }
+  ],
+  "clients": [],
+  "sockets": [
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    }
+  ],
+  "lifecycle": {
+    "started": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0
+  },
+  "errors": [],
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "environmentMutated": false,
+  "productionCallbackServerCloseObserved": false,
+  "childProcessCreated": false,
+  "signalsSent": false
+}

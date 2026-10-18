@@ -1,0 +1,91 @@
+{
+  "schema": "p125-root-final-bounded-review/1",
+  "at": "2026-10-16T19:06:56.072772+00:00",
+  "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "blockers": [],
+  "scope": "Bounded offline verifier and configured-anchor artifactTime seam only. Root reviewed actual commands, original source/test/fixture flow and all peer results.",
+  "formalDone": false,
+  "goalComplete": false,
+  "sourceFiles22": {
+    "newTest": 1,
+    "publicFixtures": 11,
+    "generatedNumericCountFiles": 10,
+    "generatedSpans": 15,
+    "productionSourceChanges": 0,
+    "existingTestChanges": 0,
+    "packageLockGuardChanges": 0
+  },
+  "cryptography": {
+    "actualOpenSSLChildren": 41,
+    "zero": 40,
+    "expectedTamperedRefusal": 4,
+    "primaryTsQueryPathVerify": "OK",
+    "fourCmsContentsExact": true,
+    "negativeCertCmsChecksImplyPkIAcceptance": false,
+    "tamperOffset1937IndependentlyLocated": true,
+    "dateClockOrSignaturePatching": false,
+    "privateKeyOrGeneratorSourceExport": false,
+    "externalNetworkOrHistoricalTimeProof": false
+  },
+  "canonical": {
+    "newCases": 17,
+    "unchangedCases": 30,
+    "actualTests": 47,
+    "files": 3,
+    "sourcePassed": 47,
+    "freshPassed": 47,
+    "cohortsSummed": false
+  },
+  "controlFailures": [
+    1,
+    2
+  ],
+  "restoredTotals": [
+    47,
+    47
+  ],
+  "allFive47OrderedInventoriesExact": true,
+  "hooksPerPhase": 29,
+  "unhandledAndLateErrors": 0,
+  "allFailuresClassified": true,
+  "secondaryMaskedLines": [
+    200,
+    201,
+    202
+  ],
+  "compiledSensitivityClaim": false,
+  "sourceAndFreshNativeAndProtectedStatePreserved": true,
+  "freshFinalCountsGatesFreezePassed": true,
+  "sourceTypechecksLintBuildThreatArchitectureDocsCountsGatesFreezePassed": true,
+  "quality": "RED1268duplicates/2724deadcode",
+  "qualityWaiverOrBaselineAdoption": false,
+  "metadataAdmission": {
+    "currentRoots": 178,
+    "metadataAbsences": 178,
+    "historiesEmpty": 11,
+    "D15": "none",
+    "sourceClean": true
+  },
+  "heldArchive": "Exact13501bytes/0ffce36a...,ignoredcommonexclude:19,untracked/indexempty; userholdremains.",
+  "reservation": "Livefilemissing; lastknown275376bytes/9ac6...binding; sharedappendpending; no ownershiprelease or generalClaudecoordination inferred.",
+  "optionalMetadataScan": "No naturalclosure/sessionID; excludedfromcommand/snapshot/absencecredit; exactmarkerlookupnomatchnotdescendantproof.",
+  "actualStaging": "Ordinaryaddexit1warnedignoredtrackedcountpaths;all22stagedblobsreviewedexact,whitespace0,ordinarycommit0; noforce/noverify.",
+  "peerInputsActuallyVerified": {
+    "testAndFixture": 250,
+    "assembler": 110,
+    "freshChain": 152
+  },
+  "remaining": [
+    "P1-01",
+    "heldpackageapproval",
+    "sourcegenerator",
+    "TSAclient/in-processTSA",
+    "checkpointwindows/pending/sealing",
+    "issuance/report/CLI",
+    "algorithmcoverage/CIinterop",
+    "fullsuite/globalquality/CI/release"
+  ],
+  "allOtherHeldDecisionsPreserved": true,
+  "nextPlanItem": "P1-11",
+  "PRPushMergeReleaseTrackerDone": false
+}

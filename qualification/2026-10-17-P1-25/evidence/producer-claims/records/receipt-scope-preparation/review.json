@@ -1,0 +1,533 @@
+{
+  "schema": "p125pc-producer-receipt-scope-readonly-review/1",
+  "at": "2026-10-17T02:13:41.973861+00:00",
+  "blockers": [],
+  "scope": {
+    "paths": [
+      "qualification/2026-10-17-P1-25/README.md",
+      "qualification/2026-10-17-P1-25/receipt.json",
+      "qualification/2026-10-17-P1-25/assembly-inputs.json",
+      "qualification/2026-10-17-P1-25/evidence/producer-claims"
+    ],
+    "onlyThreeExistingOwnMetadataSuccessors": [
+      "qualification/2026-10-17-P1-25/README.md",
+      "qualification/2026-10-17-P1-25/receipt.json",
+      "qualification/2026-10-17-P1-25/assembly-inputs.json"
+    ],
+    "newEvidencePrefix": "qualification/2026-10-17-P1-25/evidence/producer-claims/",
+    "sourceHeadAtSnapshot": "5d4e9e8d74bef32e68090369223947691c5fea21",
+    "sourceBranchAtSnapshot": "codex/p1-25-producer-qualification",
+    "noReadyOrSourceCopyApproval": true
+  },
+  "inventory": {
+    "registryAuthoritiesRefreshed": 3,
+    "registeredLogicalRoots": 170,
+    "knownLogicalAliases": 189,
+    "physicalRoots": 188,
+    "allPrior187PhysicalRootsRetained": true,
+    "onlyAdditionalOwnedFreshRoot": [
+      "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout"
+    ],
+    "exactPresenceChecks": 752,
+    "all188FullHeadBranchStatusIndexAndFourPathStatusesRetained": true,
+    "allScopedStatusesEmpty": true,
+    "newPrefixAbsentAcrossEveryRoot": true,
+    "historyAuthorities": 21,
+    "allPrior20AuthoritiesRetained": true,
+    "onlyAdditionalAuthority": [
+      "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout/.git"
+    ],
+    "allRefNameStatusHistoryHasNoNewPrefix": true,
+    "noNewRootOrAuthorityAllocation": true
+  },
+  "metadata": {
+    "presentInElevenRootsSevenVersionsPerFile": true,
+    "allPriorSixVersionsRetained": true,
+    "onlyPriorRootChangesAreCompletedB39ThreeOwnMetadataSuccessors": [
+      {
+        "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "relativePath": "qualification/2026-10-17-P1-25/README.md",
+        "oldPin": {
+          "relativePath": "qualification/2026-10-17-P1-25/README.md",
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+          "symlink": false,
+          "regular": true,
+          "directory": false,
+          "dev": 16777231,
+          "inode": 543134232,
+          "nlink": 1,
+          "bytes": 33444,
+          "sha256": "b31bfc9936fa3cd8b3cf11acf80668367d368aa1583f4e2f4f936bb5edc4146e"
+        },
+        "newPin": {
+          "relativePath": "qualification/2026-10-17-P1-25/README.md",
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+          "symlink": false,
+          "regular": true,
+          "directory": false,
+          "dev": 16777231,
+          "inode": 543134232,
+          "nlink": 1,
+          "bytes": 39139,
+          "sha256": "aba7856d4dd7af0f69ef520cc3c0acb801c4d49c93ab4fe680573fe97483a80b"
+        }
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "relativePath": "qualification/2026-10-17-P1-25/receipt.json",
+        "oldPin": {
+          "relativePath": "qualification/2026-10-17-P1-25/receipt.json",
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+          "symlink": false,
+          "regular": true,
+          "directory": false,
+          "dev": 16777231,
+          "inode": 543134235,
+          "nlink": 1,
+          "bytes": 419697,
+          "sha256": "9a2ea03ff3d8a4c17ca7a495446578c7a057bf483538d725db6b226ebcdc7479"
+        },
+        "newPin": {
+          "relativePath": "qualification/2026-10-17-P1-25/receipt.json",
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+          "symlink": false,
+          "regular": true,
+          "directory": false,
+          "dev": 16777231,
+          "inode": 543134235,
+          "nlink": 1,
+          "bytes": 525598,
+          "sha256": "63877e73c81c7888b702d47acf3777279e3002ba26db2a38dfbf0d68e50e51df"
+        }
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "relativePath": "qualification/2026-10-17-P1-25/assembly-inputs.json",
+        "oldPin": {
+          "relativePath": "qualification/2026-10-17-P1-25/assembly-inputs.json",
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+          "symlink": false,
+          "regular": true,
+          "directory": false,
+          "dev": 16777231,
+          "inode": 543134234,
+          "nlink": 1,
+          "bytes": 658148,
+          "sha256": "31c00e6d3989609474209b6a03e0a402a1e266ae9f26848c696ad3364c1a6d96"
+        },
+        "newPin": {
+          "relativePath": "qualification/2026-10-17-P1-25/assembly-inputs.json",
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+          "symlink": false,
+          "regular": true,
+          "directory": false,
+          "dev": 16777231,
+          "inode": 543134234,
+          "nlink": 1,
+          "bytes": 877972,
+          "sha256": "b6ccb30242fd6f54ae7490d5d382cd093c0862575c5c88a43deb0996eb069cb0"
+        }
+      }
+    ],
+    "allOtherPriorRootMetadataBytesAndPhysicalPinsExact": true,
+    "currentThreeFilesEqualMetadata888AndSource5dGitBlobs": true,
+    "currentOwnMetadata": [
+      {
+        "relativePath": "qualification/2026-10-17-P1-25/README.md",
+        "current": {
+          "relativePath": "qualification/2026-10-17-P1-25/README.md",
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+          "symlink": false,
+          "regular": true,
+          "directory": false,
+          "dev": 16777231,
+          "inode": 543134232,
+          "nlink": 1,
+          "bytes": 39139,
+          "sha256": "aba7856d4dd7af0f69ef520cc3c0acb801c4d49c93ab4fe680573fe97483a80b"
+        }
+      },
+      {
+        "relativePath": "qualification/2026-10-17-P1-25/receipt.json",
+        "current": {
+          "relativePath": "qualification/2026-10-17-P1-25/receipt.json",
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+          "symlink": false,
+          "regular": true,
+          "directory": false,
+          "dev": 16777231,
+          "inode": 543134235,
+          "nlink": 1,
+          "bytes": 525598,
+          "sha256": "63877e73c81c7888b702d47acf3777279e3002ba26db2a38dfbf0d68e50e51df"
+        }
+      },
+      {
+        "relativePath": "qualification/2026-10-17-P1-25/assembly-inputs.json",
+        "current": {
+          "relativePath": "qualification/2026-10-17-P1-25/assembly-inputs.json",
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+          "exists": true,
+          "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+          "symlink": false,
+          "regular": true,
+          "directory": false,
+          "dev": 16777231,
+          "inode": 543134234,
+          "nlink": 1,
+          "bytes": 877972,
+          "sha256": "b6ccb30242fd6f54ae7490d5d382cd093c0862575c5c88a43deb0996eb069cb0"
+        }
+      }
+    ],
+    "variants": {
+      "qualification/2026-10-17-P1-25/README.md": [
+        {
+          "bytes": 9421,
+          "sha256": "d3b5255d6679c1d00494ade4b4818dbe2c5c97a786879de3ae4f1ca6545e7127",
+          "rootCount": 4,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout"
+          ]
+        },
+        {
+          "bytes": 15980,
+          "sha256": "14ff4c7747694485db980c0041a210ccf1335271641d22f3ec1df40215438a7e",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout"
+          ]
+        },
+        {
+          "bytes": 20240,
+          "sha256": "0e06dd9663a62f3f861ead994abede47c20083ea35c48e30ee08bed85f559072",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout"
+          ]
+        },
+        {
+          "bytes": 24235,
+          "sha256": "e55024763f964239a65fa8b9fb80ff236c26f9ffb21518908b892d195d6ded68",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout"
+          ]
+        },
+        {
+          "bytes": 28642,
+          "sha256": "d0ba38b25c4737ff34977213db42847da1bccbdd6f6f1183bce1f33d98b305d9",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout"
+          ]
+        },
+        {
+          "bytes": 33444,
+          "sha256": "b31bfc9936fa3cd8b3cf11acf80668367d368aa1583f4e2f4f936bb5edc4146e",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout"
+          ]
+        },
+        {
+          "bytes": 39139,
+          "sha256": "aba7856d4dd7af0f69ef520cc3c0acb801c4d49c93ab4fe680573fe97483a80b",
+          "rootCount": 2,
+          "roots": [
+            "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout"
+          ]
+        }
+      ],
+      "qualification/2026-10-17-P1-25/receipt.json": [
+        {
+          "bytes": 66214,
+          "sha256": "c2064956af3bcde63fa631bfb20aa63250e2fd68e94aa055da70ceffc9b10496",
+          "rootCount": 4,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout"
+          ]
+        },
+        {
+          "bytes": 126991,
+          "sha256": "1fcef2ee2271e19e5f39aff0d97052c432bb7f923955d18d41d36749c774d7e9",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout"
+          ]
+        },
+        {
+          "bytes": 189462,
+          "sha256": "8b65debfaf983bc607529aa87239b845bdcc692e6a33145c97b0db5d46c50cdc",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout"
+          ]
+        },
+        {
+          "bytes": 238970,
+          "sha256": "730c521699fc442a29a761dadaff43bd1a9ae78def93447aa85cd4ca8440622b",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout"
+          ]
+        },
+        {
+          "bytes": 320549,
+          "sha256": "74a39b8bc4f6edf5883808fe881b9bfbdd6992718a0e40fa6ac0b79787676f5a",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout"
+          ]
+        },
+        {
+          "bytes": 419697,
+          "sha256": "9a2ea03ff3d8a4c17ca7a495446578c7a057bf483538d725db6b226ebcdc7479",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout"
+          ]
+        },
+        {
+          "bytes": 525598,
+          "sha256": "63877e73c81c7888b702d47acf3777279e3002ba26db2a38dfbf0d68e50e51df",
+          "rootCount": 2,
+          "roots": [
+            "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout"
+          ]
+        }
+      ],
+      "qualification/2026-10-17-P1-25/assembly-inputs.json": [
+        {
+          "bytes": 80751,
+          "sha256": "e726c06516d9310170f22dd34ed53b7db02827d80c725875f541ed9ba8dc3df9",
+          "rootCount": 4,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout"
+          ]
+        },
+        {
+          "bytes": 150409,
+          "sha256": "6261cf6f1fd22ab71cbb5f9ec611809f6d96b00ae20013cb673b099247ec3b72",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout"
+          ]
+        },
+        {
+          "bytes": 253487,
+          "sha256": "7ba7697de9c12d7990bd635a70656ddde71f44aa4b2e8b8e682075de3acb5b1c",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout"
+          ]
+        },
+        {
+          "bytes": 350152,
+          "sha256": "308eea402785300a4e2f1cfe7e683ac1af60b9c790181a0584a3600301cbb5e7",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout"
+          ]
+        },
+        {
+          "bytes": 492151,
+          "sha256": "ea081b90920f200518c787035f7789a187e80060bc7065b4ea493b617455e88d",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout"
+          ]
+        },
+        {
+          "bytes": 658148,
+          "sha256": "31c00e6d3989609474209b6a03e0a402a1e266ae9f26848c696ad3364c1a6d96",
+          "rootCount": 1,
+          "roots": [
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout"
+          ]
+        },
+        {
+          "bytes": 877972,
+          "sha256": "b6ccb30242fd6f54ae7490d5d382cd093c0862575c5c88a43deb0996eb069cb0",
+          "rootCount": 2,
+          "roots": [
+            "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout"
+          ]
+        }
+      ]
+    },
+    "otherVersionsMustNotBeCopiedNormalizedOrReplaced": true
+  },
+  "preservation": {
+    "all175ActiveProtectedBytesPhysicalPinsExact": true,
+    "allTwelvePriorAndDistinctThirteenthNativeBytesPhysicalPinsExact": true,
+    "allThirteenNativeIdentitiesDistinctSingleLink": true,
+    "currentSourceAndFreshHeadsSameSourceCheckpoint": true,
+    "bothSourceAndFreshFullTreesIndexesCleanAtRead": true,
+    "heldRHead18DirtyRowsAndEmptyIndexExact": true,
+    "heldRHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "heldRDirtyRows": [
+      " M CONTRIBUTING.md",
+      " M README.md",
+      " M docs/SSO_OIDC.md",
+      " M docs/content/reddit-launch-drafts.md",
+      " M docs/content/show-hn-draft.md",
+      " M docs/internal/competitive-landscape.md",
+      " M docs/internal/mirofish-simulation-council.md",
+      " M src/identity/identityConfig.ts",
+      " M src/identity/oidc/jwtVerify.ts",
+      " M src/identity/oidc/oidcRoutes.ts",
+      " M tests/identity/jwtVerify.test.ts",
+      " M unused-code/plan-edits/manifest.json",
+      " M website/i18n.js",
+      " M website/index.html",
+      " M website/lite.html",
+      " M whitepaper/AMC_WHITEPAPER_v1.md",
+      "?? .changeset/p2-07-oidc-validation-policy.md",
+      "?? tests/identity/oidcValidationConfig.test.ts"
+    ],
+    "thirtyOneHeldRSourceDocConfigArchivePinsExact": true,
+    "heldRPinnedPaths": [
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/der.ts",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/tsaClient.ts",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/checkpoint.ts",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/TRUSTED_TIME.md",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/security/dependency-reviews/rfc3161.md",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/p2-07-oidc-validation-policy.md",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/SSO_OIDC.md",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/identityConfig.ts",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/jwtVerify.ts",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/oidcRoutes.ts",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/oidcValidationConfig.test.ts",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/P2-07/src/identity/identityConfig.ts.landed"
+    ],
+    "primaryRootAtRead": {
+      "root": "/Users/sid/AgentMaturityCompass",
+      "head": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "branch": "main",
+      "status": "",
+      "staged": "",
+      "cleanIsNotAnOwnershipRelease": true
+    },
+    "knownClaudeAndProviderArchiveWorkPreservedByExactHeldPinsAndStatuses": true,
+    "current102SourceFreshPairsAnd23CompiledPairsNotReauditedHere": true,
+    "rootActualFinalPreservationMetadata": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-after-controls.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-after-controls.json",
+      "bytes": 1794,
+      "sha256": "f731abdeab10d226cfdef73a4dbe25a47684d98e126502678310f112f6f47a41",
+      "dev": 16777231,
+      "inode": 543998885,
+      "nlink": 1
+    },
+    "futureOnlyThreeExactMetadataSuccessorsNeedSeparateRootAdmission": "Three current rows are protected; the other172 rows and all natives remain exact after any separately admitted successor."
+  },
+  "reservationBoundary": {
+    "lastKnownBinding": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "currentFullRuleTextAndDeltasUnknown": true,
+    "noMissingPathProbeSearchRecreationSharedAppendOrClaudeContact": true,
+    "absenceDoesNotReleaseOwnershipOrCreateNewHumanApprovalHold": true,
+    "boundedContinuationOnlyWithinCurrentOwnReceiptScope": true
+  },
+  "closure": {
+    "gitChildren": 1158,
+    "all1158CurrentReadOnlyGitChildrenNaturalExit0": true,
+    "outerToolChunk": "555934",
+    "outerToolExit": 0,
+    "outerSessionId": null,
+    "allPidArgvStartEndStdoutStderrExitFactsRetained": true,
+    "noKillsTimeoutsRetriesOrBackgroundProcesses": "No child kill, timeout or command retry was used. A distinct second scan follows the disclosed failed report-construction attempt.",
+    "GIT_NO_LAZY_FETCH1AndOptionalLocksOff": true,
+    "fsmonitorDisabledOnlyForEachReadOnlyGitCommand": true,
+    "noOutputExistenceSubstitutionForNaturalClosure": true,
+    "attempt1NaturalExit1UnpersistedFactsZeroCredit": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/attempt1-read-error.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/attempt1-read-error.json",
+      "bytes": 806,
+      "sha256": "8f377ff55fcf64199122646e8bdc298c8cabe162101561e1f60af3f2540e864e",
+      "dev": 16777231,
+      "inode": 544002239,
+      "nlink": 1
+    },
+    "largeRawObservationsPrivateOnly": true,
+    "rawReads": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/raw-read-observations.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/raw-read-observations.json",
+      "bytes": 8316970,
+      "sha256": "ac57f5bf31084cab045f9ee51bcb3f326368c276e3fa565933ffb76d0044a964",
+      "dev": 16777231,
+      "inode": 544002331,
+      "nlink": 1
+    },
+    "observations": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/observations.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/observations.json",
+      "bytes": 8341015,
+      "sha256": "ce6e891b333b11433e429a0fe814aee8d0a6afd88e888d76403d01a42f645d99",
+      "dev": 16777231,
+      "inode": 544002332,
+      "nlink": 1
+    }
+  },
+  "requiredRootActions": [
+    "Finish and independently review exact private packet and explicit command/artifact selection.",
+    "Refresh hosted WIP excluding Dependabot only from WIP, all changed paths, freeze and D15.",
+    "Retain the complete active old packet and admit only exact old/new three metadata successor pins plus producer prefix.",
+    "Root alone may copy, validate, check unchanged quality/freeze, verify complete index paths/blobs/default fullrange whitespace, ordinary commit and committed-only export."
+  ],
+  "noProductHelperNativeSqlNetworkSourceIndexQaImplementationOrSourceAllocation": true,
+  "noWholeIssuePlanReleaseOrOwnershipReleaseCredit": true,
+  "allHeldDecisionsFreezeQualityAndF37SkipRemainIntact": true,
+  "verdict": "No concrete overlap was observed for the proposed producer prefix within the finite known inventory, current full/scoped statuses and all-ref receipt histories. The three existing own metadata indices remain protected until separate exact root admission; no copy or READY approval is granted."
+}

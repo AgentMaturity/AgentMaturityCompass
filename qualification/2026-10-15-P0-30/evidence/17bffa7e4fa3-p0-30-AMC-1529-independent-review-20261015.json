@@ -1,0 +1,1009 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1529",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "capturedUtc": "2026-10-15T03:22:32.392734+00:00",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "scope": "Independent read-only actual audit of the frozen original notary corpus and two private source controls. Only this report pair is written; no AMC imports, tests, native loading, product parser, compiler, build, listener, network, Git or source/input edits.",
+  "findings": [],
+  "rawAndObserverAudit": {
+    "inputReceipts": [
+      {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015.json",
+        "bytes": 18352,
+        "sha256": "b163c11f374ac9c9fff4e307f2ee6b0b4889b8b0ce47f4dee7780a162d6858ff"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015.md",
+        "bytes": 2109,
+        "sha256": "2410c9e41c4c2610c47a3f5f01f9feccdc4b3429399c017310033fd7ec0ad73f"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/artifact-index.json",
+        "bytes": 1054164,
+        "sha256": "167a58b054e636b0c1c219e10b175686121f65130fc259073cfb07cd0a2ba465"
+      }
+    ],
+    "indexReferences": 4211,
+    "allIndexedBytesExact": true,
+    "frozenJournal": {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 18202,
+      "sha256": "084ffd9ab36bfabb1f1ba8e833c364ee16d597812fe178c5857978943794c5ad"
+    },
+    "commands": 8,
+    "corpusProcesses": 7,
+    "originalDistinctRegisteredCases": 16,
+    "repeatedExecutions": 82,
+    "allActualCommandExitsNormalZeroOrOneNoSignals": true,
+    "allEightGroupsEmptyWithoutSignals": true,
+    "phases": [
+      {
+        "phase": "initial-original-notary-baseline",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/initial-original-notary-baseline/raw-tests.json",
+          "bytes": 7027,
+          "sha256": "193df04e71b021f12698eb44ff347a7b2c054c1e82800ee9122813fb0108b1cd"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/initial-original-notary-baseline/runtime-observer.json",
+          "bytes": 8029,
+          "sha256": "23ded7e6a36e2da3426b8f179e2c9d195dca41c2dda7b5fda0118a25ee23ffe1"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/initial-original-notary-baseline/command.json",
+          "bytes": 2531,
+          "sha256": "7b475725a986e7443cb90ba52d64aec08849e837be099c005dcdb5f7b434ff33"
+        },
+        "counts": {
+          "numTotalTests": 16,
+          "numPassedTests": 16,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "numPendingTestSuites": 0
+        },
+        "exit": 0,
+        "allRecordedTaskHooksUnhandledAndNamedLateDiagnosticsClean": true,
+        "failedAncestorTaskStates": 0,
+        "directFailures": [],
+        "sameOriginalCaseNames": true,
+        "groupsEmptyWithoutSignals": true
+      },
+      {
+        "phase": "P30-1529-replay-bytes-binding-baseline",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-baseline/raw-tests.json",
+          "bytes": 7023,
+          "sha256": "e293c24373279da56e4eaab4ac06e48ec6ae799e1182328856871949ff939614"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-baseline/runtime-observer.json",
+          "bytes": 8029,
+          "sha256": "d9d8894594b1377b0dd712078a19c7e1bc651d2e86eeee7fbf1a3497d0635b44"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-baseline/command.json",
+          "bytes": 2579,
+          "sha256": "b55b540699e5de7b3a9f279936e0cff268fbf58cb5a1ed96e59f8135a38732e8"
+        },
+        "counts": {
+          "numTotalTests": 16,
+          "numPassedTests": 16,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "numPendingTestSuites": 0
+        },
+        "exit": 0,
+        "allRecordedTaskHooksUnhandledAndNamedLateDiagnosticsClean": true,
+        "failedAncestorTaskStates": 0,
+        "directFailures": [],
+        "sameOriginalCaseNames": true,
+        "groupsEmptyWithoutSignals": true
+      },
+      {
+        "phase": "P30-1529-replay-bytes-binding-mutant",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-mutant/raw-tests.json",
+          "bytes": 10100,
+          "sha256": "092603efe222f64355fe636ff638f4a78834ef5adbbd4b6ee2872738686d8d8b"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-mutant/runtime-observer.json",
+          "bytes": 13819,
+          "sha256": "ee69038f7dec4c6c7a9cfa5a14ada983856f2ad1d4d7e443ec03e79a1264d479"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-mutant/command.json",
+          "bytes": 2565,
+          "sha256": "21175a0b7c245c48add755e3fd108232459ea6273b3724c248b32a8004a7b7a1"
+        },
+        "counts": {
+          "numTotalTests": 16,
+          "numPassedTests": 13,
+          "numFailedTests": 3,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "numPendingTestSuites": 0
+        },
+        "exit": 1,
+        "allRecordedTaskHooksUnhandledAndNamedLateDiagnosticsClean": true,
+        "failedAncestorTaskStates": 4,
+        "directFailures": [
+          {
+            "name": "authenticated notary replay admission consumes one admission across accepted signature and timestamp spellings for POST /sign",
+            "type": "AssertionError",
+            "locations": [
+              "tests/notaryAuthReplay.test.ts:47:38"
+            ],
+            "fullFailureMessageSha256": "c80ccb07d74b05ae434cb8fa0cc897370feaf045829c8dd9eaf536a9692b851e",
+            "firstLine": "AssertionError: expected 'POST:/sign:1800000000000:71962EC1F84C\u2026' to be 'POST:/sign:1800000000000:71962ec1f84c\u2026' // Object.is equality"
+          },
+          {
+            "name": "authenticated notary replay admission consumes one admission across accepted signature and timestamp spellings for GET /log/tail",
+            "type": "AssertionError",
+            "locations": [
+              "tests/notaryAuthReplay.test.ts:47:38"
+            ],
+            "fullFailureMessageSha256": "30315116cb8d775799d5b6f3bfe931bd88d849422de9abe42405a056ae216363",
+            "firstLine": "AssertionError: expected 'GET:/log/tail:1800000000000:4D0469C39\u2026' to be 'GET:/log/tail:1800000000000:4d0469c39\u2026' // Object.is equality"
+          },
+          {
+            "name": "optional Compose notary listener and policy signing signs the original digest through the actual CLI service and policy producer, retaining auth and payload checks",
+            "type": "AssertionError",
+            "locations": [
+              "tests/notaryComposeIntegration.test.ts:191:39"
+            ],
+            "fullFailureMessageSha256": "d1e4d1a34b8237eb007c51ecfa53cc003f37e7fbe17c1f13d80425c9daaf67d7",
+            "firstLine": "AssertionError: expected 200 to be 401 // Object.is equality"
+          }
+        ],
+        "sameOriginalCaseNames": true,
+        "groupsEmptyWithoutSignals": true
+      },
+      {
+        "phase": "P30-1529-replay-bytes-binding-restored",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-restored/raw-tests.json",
+          "bytes": 7020,
+          "sha256": "861527f93f46818dd7018fbc3f52eec62066d09771477b6aa9ff58dab71505b9"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-restored/runtime-observer.json",
+          "bytes": 8029,
+          "sha256": "e20e22959d052aa2497c22ff77f8704a77899691c3fa3f6e87f7434a9dcb758d"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-restored/command.json",
+          "bytes": 2579,
+          "sha256": "03749df60c8c6e991a8dc1e5e00e5a4243ee334cc417b30aac6143ff36b43280"
+        },
+        "counts": {
+          "numTotalTests": 16,
+          "numPassedTests": 16,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "numPendingTestSuites": 0
+        },
+        "exit": 0,
+        "allRecordedTaskHooksUnhandledAndNamedLateDiagnosticsClean": true,
+        "failedAncestorTaskStates": 0,
+        "directFailures": [],
+        "sameOriginalCaseNames": true,
+        "groupsEmptyWithoutSignals": true
+      },
+      {
+        "phase": "P30-1529-replay-lifetime-baseline",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-baseline/raw-tests.json",
+          "bytes": 2884,
+          "sha256": "0680c0b0ef3cb409905f7beecebd546527f518acaebb53a33d0345c06b6ba187"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-baseline/runtime-observer.json",
+          "bytes": 3344,
+          "sha256": "7750a1066e8180887e47193ca4c79a41a6b76405299c0252d7c174556911c627"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-baseline/command.json",
+          "bytes": 2490,
+          "sha256": "2a5e3ac41f48950208194dc41be13a6919902946f590b187b811ecf3fa81138a"
+        },
+        "counts": {
+          "numTotalTests": 6,
+          "numPassedTests": 6,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "numPendingTestSuites": 0
+        },
+        "exit": 0,
+        "allRecordedTaskHooksUnhandledAndNamedLateDiagnosticsClean": true,
+        "failedAncestorTaskStates": 0,
+        "directFailures": [],
+        "sameOriginalCaseNames": true,
+        "groupsEmptyWithoutSignals": true
+      },
+      {
+        "phase": "P30-1529-replay-lifetime-mutant",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-mutant/raw-tests.json",
+          "bytes": 4177,
+          "sha256": "7df6cd55d809ba737bdb8e8cd928b8678065e4e20d82391274e026c40b85808e"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-mutant/runtime-observer.json",
+          "bytes": 5420,
+          "sha256": "f3651a63e3ae9d9802b9769d2785d05a0ed98e2615a1592db095e926821281dc"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-mutant/command.json",
+          "bytes": 2476,
+          "sha256": "ec68bcaaafb96b6670a418806fb732d847d179fafe3521d91ec0e4a0d82f9972"
+        },
+        "counts": {
+          "numTotalTests": 6,
+          "numPassedTests": 5,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "numPendingTestSuites": 0
+        },
+        "exit": 1,
+        "allRecordedTaskHooksUnhandledAndNamedLateDiagnosticsClean": true,
+        "failedAncestorTaskStates": 2,
+        "directFailures": [
+          {
+            "name": "authenticated notary replay admission retains a future-dated authentication through its inclusive validity boundary",
+            "type": "AssertionError",
+            "locations": [
+              "tests/notaryAuthReplay.test.ts:70:29"
+            ],
+            "fullFailureMessageSha256": "90ec73444449210f03e3f1809258710a2eb64825be8d7f49343170a5f1d425f8",
+            "firstLine": "AssertionError: expected { ok: true } to deeply equal { ok: false, \u2026(1) }"
+          }
+        ],
+        "sameOriginalCaseNames": true,
+        "groupsEmptyWithoutSignals": true
+      },
+      {
+        "phase": "P30-1529-replay-lifetime-restored",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-restored/raw-tests.json",
+          "bytes": 2894,
+          "sha256": "e1b05557cf243d06bce03d8535c6115740b9a3d2586efcd860323d6670407669"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-restored/runtime-observer.json",
+          "bytes": 3344,
+          "sha256": "876c7e33749e8c1af927afc568b0755efd6315c7a5baf7c61260f899e4339a53"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-restored/command.json",
+          "bytes": 2490,
+          "sha256": "f55f68266b67a825ec0b19d9ac8a6ceceea57bc8ae1aa553b681fa34cb2f43ff"
+        },
+        "counts": {
+          "numTotalTests": 6,
+          "numPassedTests": 6,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "numPendingTestSuites": 0
+        },
+        "exit": 0,
+        "allRecordedTaskHooksUnhandledAndNamedLateDiagnosticsClean": true,
+        "failedAncestorTaskStates": 0,
+        "directFailures": [],
+        "sameOriginalCaseNames": true,
+        "groupsEmptyWithoutSignals": true
+      }
+    ],
+    "mutations": [
+      {
+        "id": "P30-1529-replay-bytes-binding",
+        "target": "src/notary/notaryAuth.ts",
+        "sourceOriginalSha256": "cfbfee8ce9e6dcd4b623a1f666d63f61e9aebebcba7f5dafa0306fb7b7abe959",
+        "sourceMutantSha256": "68b00b91242b20cb12ef12e1dc0d86751afa2b2a3d75e2ab5e1eacb5ed344a31",
+        "sourceAndCompiledAnchorFindOnce": true,
+        "patch": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/P30-1529-replay-bytes-binding.patch",
+          "bytes": 504,
+          "sha256": "af7266402153058ebb77f52c5021774160b5b5daf4edc45502a67605a9aafa36"
+        },
+        "onlyTargetManifestDelta": true,
+        "restoredCompleteManifestExact": true,
+        "compiledBytesNeverChanged": true,
+        "counts": [
+          16,
+          13,
+          16
+        ]
+      },
+      {
+        "id": "P30-1529-replay-lifetime",
+        "target": "src/notary/notaryAuth.ts",
+        "sourceOriginalSha256": "cfbfee8ce9e6dcd4b623a1f666d63f61e9aebebcba7f5dafa0306fb7b7abe959",
+        "sourceMutantSha256": "498cc6862e61ebd72477792390cceabfab100af213d8d9a62b73c88b76c28234",
+        "sourceAndCompiledAnchorFindOnce": true,
+        "patch": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/P30-1529-replay-lifetime.patch",
+          "bytes": 559,
+          "sha256": "d7cd6da1ede547a7ee83640fcba54f58333a13ba187ed74173ce2d77e718ee26"
+        },
+        "onlyTargetManifestDelta": true,
+        "restoredCompleteManifestExact": true,
+        "compiledBytesNeverChanged": true,
+        "counts": [
+          6,
+          5,
+          6
+        ]
+      }
+    ],
+    "launcherFingerprint": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "releaseAllPinsExact": true,
+    "releaseBeforeRuntime": true,
+    "observerBoundary": "Run-end task/hooks/unhandled plus post-exit named diagnostics. Failed ancestor state is allowed; non-test error objects are absent. No universal absence of unlogged errors or child-native fingerprint is claimed."
+  },
+  "preservationAudit": {
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "privateRegularClosureFiles": 12268,
+    "newTestOrProductFiles": 0,
+    "allCurrentRootExpectedSourceCompiledBytesExact": true,
+    "rootCompiledPathSetExact": true,
+    "privatePreparedFinalCompletePathSetAndBytesExact": true,
+    "allCopiedFileInodesDistinctFromRoot": true,
+    "pinGroups": [
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/protected-pins-before.json",
+          "bytes": 44989,
+          "sha256": "ff3298842ee7ef69776bc71ebe5a817af35e06707333edfd5b2750be6a33d297"
+        },
+        "references": 205,
+        "allCurrentBytesDirectlyVerifiedExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/prior-reference-pins-before.json",
+          "bytes": 679698,
+          "sha256": "14825523b7b05d4b8b89441c296d1c305bcdd78871e3d55ab4e2d7aebafbcfcb"
+        },
+        "references": 2964,
+        "allCurrentBytesDirectlyVerifiedExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/readiness-pins-before.json",
+          "bytes": 737,
+          "sha256": "cbb576319feb3eedd4af0c86984271c696e197e4a6c199df5f6b46927f119a82"
+        },
+        "references": 4,
+        "allCurrentBytesDirectlyVerifiedExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/late-predecessor-pins.json",
+          "bytes": 3,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "references": 0,
+        "allCurrentBytesDirectlyVerifiedExact": true
+      }
+    ],
+    "priorActualClosureCount": 14,
+    "priorClosures": [
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/full-closure-final.json",
+          "bytes": 1399899,
+          "sha256": "dda63cf4e8b307c8297550cb97a0ff4fd6510321c4cd160e0a35317bc723d4d9"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/full-closure-final.json",
+          "bytes": 1400381,
+          "sha256": "8198cac2ab5fadefcb20247de3363e1df670a7b1692646853139725ca1fde6fd"
+        },
+        "files": 12273,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/full-closure-final.json",
+          "bytes": 1399887,
+          "sha256": "299b0969cccf57ccf3b1b7f1c3a7763366d190e889786f42b8b0881f55de0228"
+        },
+        "files": 12269,
+        "allExact": true
+      }
+    ],
+    "allPriorActualPathSetsAndBytesDirectlyVerifiedExact": true,
+    "releaseAndAdditionalLatePins": [
+      {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/controller-v2.py",
+        "bytes": 20763,
+        "sha256": "41ba3b5e8a90baf353f2fe8dc295ad4294ed8ab61829b8a2b80f0eaf3e1bf5e6"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/observer-reporter.mjs",
+        "bytes": 2013,
+        "sha256": "0a640743a8f81de76380335283f7fb1062f8d159d18828b2461ccd870c3672ea"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/setup-v2.json",
+        "bytes": 13288,
+        "sha256": "fcfcaa5637761e2f81b264a6dd7c22f33e33b8dc446be6fb2f9a0a9719dd96c1"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/setup-v2-artifact-index.json",
+        "bytes": 716991,
+        "sha256": "9952a7cbf5337ad6254c43c28ba4b088546d7c665cb7c720c8f419312072f2df"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1529-v2-setup-independent-review-20261015.json",
+        "bytes": 36410,
+        "sha256": "cfc8ffe5322fdd80328081563dea335b877c69bc5e97ae7714fd235b4dfdfce4"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1529-setup-root-review-20261015.json",
+        "bytes": 2165,
+        "sha256": "19fbb614cf4c5f251eeb751b28189951bdd15894a4eb368646fe0dd112573546"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1534-root-bounded-outcome-20261015.json",
+        "bytes": 5122,
+        "sha256": "2ec1d662a36bf59efc610fab049eb7341b4539e61f1472545cec808fc809aad6"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1534-race-independent-review-20261015.json",
+        "bytes": 71494,
+        "sha256": "e108c318dfb6ef91a5d2fb2dfc923ab68dc6cf37a7501240176e4cb23b3226ac"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1534-race-public-crypto-review-20261015.json",
+        "bytes": 111829,
+        "sha256": "54500c03c7a0aaf6d4467ff774519369efa262c85a6e0a370eaf2b7b61751dff"
+      }
+    ],
+    "dependencyLinks": 307,
+    "allDependencyTargetsCurrentExact": true,
+    "privateViteDirectoriesNotShared": true,
+    "nativePhysicalIdentityCurrentExact": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "retainedRootHead": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "retainedRootStatus": "clean",
+    "reviewRanGit": false,
+    "namedFixtureRootsCurrentlyAbsent": true,
+    "namedFixturePrefixesChecked": [
+      "amc-notary-compose-",
+      "amc-repo-snapshot-",
+      "amc-vitest-guard-"
+    ],
+    "universalNoEffectsClaim": false,
+    "rootFinalPreservation": {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/root-final-readonly-preservation.json",
+      "bytes": 631,
+      "sha256": "2292bb9e34ced6c98860c7ac882bc69c95b78b4e326e91e80322fa99916f5da7"
+    }
+  },
+  "counting": {
+    "originalAuth": {
+      "singles": 4,
+      "parameterRows": 2,
+      "registered": 6
+    },
+    "originalIntegration": {
+      "singles": 5,
+      "invalidBindRows": 5,
+      "registered": 10
+    },
+    "originalDistinctUnion": 16,
+    "initialPassed": 16,
+    "bytesBindingPassed": [
+      16,
+      13,
+      16
+    ],
+    "lifetimePassed": [
+      6,
+      5,
+      6
+    ],
+    "actualOuterCommands": 8,
+    "corpusProcesses": 7,
+    "repeatedExecutions": 82,
+    "freshFixtures": "Same original generators, criteria, imports, guards, configuration, deadlines and cleanup; newly produced local keys, workspaces, ports and timestamps, not identical physical inputs."
+  },
+  "meaningAndMasking": [
+    {
+      "control": "replay-bytes-binding",
+      "source": "notaryAuth.ts:98 uses verified expected HMAC; the private delta substitutes raw sigHeader after normalized authentication at 91.",
+      "pureFailures": "POST and GET both fail exact replay-key equality at notaryAuthReplay.test.ts:47:38, after original map admission 42 and uppercase authentication 45 pass.",
+      "pureMasking": "guard(equivalent)48 and the later whitespace iteration 43 are not reached. These failures observe unequal identities, not uppercase/whitespace map admission.",
+      "actualHTTP": "The actual source foreground CLI service returns 200 instead of 401 at notaryComposeIntegration.test.ts:191:39 for uppercase spelling of consumed valid POST authentication.",
+      "earlierHTTPChecks": "Original-digest policy signing and independent Node crypto 161\u2013167, wrong-secret 401 at 169\u2013171, checksum 400/error 180\u2013182, valid 200/response verification 184\u2013186 and exact replay 401/reason 187\u2013189 pass first.",
+      "HTTPMasking": "The uppercase response reason 192 and all GET-tail checks 194\u2013203 are masked. No unobserved response signature/body, duplicate-log consequence or GET-tail bypass is inferred."
+    },
+    {
+      "control": "replay-lifetime",
+      "failure": "notaryAuthReplay.test.ts:70:29 observes {ok:true} instead of {ok:false,reason:authentication expired} for the retained authenticated object.",
+      "source": "Removing notaryAuth.ts:49 lets expired-map cleanup 46\u201348 precede replay lookup and re-admission.",
+      "earlierChecks": "Initial admission 60, inclusive replay boundaries 61\u201366 and fresh helper timestamp-skew refusal 69 pass.",
+      "scope": "Lifetime B/M/R runs only the six pure cases under mocked Date.now. Line 69 constructs IncomingMessage-shaped headers; it is not an HTTP request. POST 207\u2013227 and GET 290\u2013310 reauthenticate before replay admission in source, but no HTTP expiry/skew request is executed by this matrix."
+    }
+  ],
+  "wordingClarification": {
+    "pin": {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/lifetime-http-wording-clarification.json",
+      "bytes": 862,
+      "sha256": "359e5fcc61d858efb9105302bccfc1e792fca882fc6596f06ea91941b306b65d"
+    },
+    "additionalInputOutsideOriginal4211Index": true,
+    "scope": "Metadata-only root addendum. Original frozen packet, raw observations and index remain unchanged. Fresh HTTP-style timestamp-skew refusal refers only to pure helper 69."
+  },
+  "observationAndLifecycle": {
+    "v1": "Original v 1 preparation never ran; its static observation blocker remains preserved. The actual release selects reviewed v 2 and all eight frozen command records are inspected.",
+    "originalCriteria": "A private additional reporter outside the product closure observes original default/JSON output without changing tests, config, global/per-file guards, setup or deadlines.",
+    "errors": "All recorded non-test error arrays, hooks, unhandled/file errors, pending/todo/pending suites and nine known late close/guard/unhandled patterns are clean. Bytes and lifetime mutants have four and two failed ancestor states respectively; empty ancestor error arrays distinguish expected propagation from infrastructure error.",
+    "outerExitGate": "The v 2 predicate itself omits explicit normal-exit/no-signal checks. Root freezing and this independent audit directly verified every actual outer exit 0/1, null signal, no timeout and no forced group action. There is no current false-positive completion. Future 1537 preparation strengthens that predicate separately.",
+    "outerGroups": "All eight owned command groups are initially/finally empty without forced outer signals.",
+    "internalChildLimit": "Original stopChild 52\u201357 requests SIGTERM and has a five-second SIGKILL fallback. Exact internal child code/signal is not retained; no normal-exit or no-signal claim is extended to every child.",
+    "childStreams": "The actual source registrar runs through --import tsx. Original child stdout is ignored and stderr drained 69\u201371; full child streams and per-service loaded-native/ABI are not measured.",
+    "fingerprint": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "fingerprintLimit": "Separate current-launcher fingerprint only. Physical native-file preservation is not a per-child measurement.",
+    "network": "The deliberate 0.0.0.0 listener is reached through 127.0.0.1. availablePort releases its probe socket before service bind. No blanket network isolation or confinement claim.",
+    "cleanup": "Named original fixture/snapshot/guard roots are absent within owned phase TMPDIRs; other HOME/tmp/cache effects are not claimed absent. Parent pooled handles may persist until outer process exit. No independent cold-reader interval or P0-27 corruption-cause repair.",
+    "deadlines": "Original default and HTTP 30-second deadlines, ten-second readiness, five-second internal stop fallback and outer 180-second bound are unchanged.",
+    "lateBoundary": "Run-end observer precedes global teardown; actual post-exit outer streams separately gate named diagnostics. No universal absence of unlogged errors is asserted."
+  },
+  "authorityLimits": [
+    "Actual local HMAC and FILE_SEALED Ed 25519 signing use locally generated fixture authority and pinned public key. Required SOFTWARE and hardware:false remain explicit; this is not hardware/provider/external-person accreditation.",
+    "Compose/Caddy coverage parses YAML and text only. No container, Caddy process, TLS endpoint or Docker network is started.",
+    "No installed package, full old batch, whole P0-30/AMC 1529 Done, full suite, coverage, Node 24, hosted/G 0/release or dependency closure follows. Required duplicate 1269/dead-code 2751 failures remain unwaived.",
+    "Generic reservations or absence of source holds are not transfer clearance. Claude, archives, prior evidence and freeze inputs remain unchanged."
+  ],
+  "copiedRecipeProvenance": "Retained readiness-origin wording says runtime was not executed in this namespace. Actual raw matrices/journal/root receipt establish the current completed run; that copied origin note is not current runtime status.",
+  "semanticPeer": {
+    "reviewer": "/root/p0_22_report_audit/p024_packet_meaning/amc1537_source_static",
+    "scope": "Read-only frozen source/raw meaning subreview; no writes, execution or reruns.",
+    "findings": [],
+    "allReadsFinished": true
+  },
+  "sourcePins": [
+    {
+      "relativePath": "tests/notaryAuthReplay.test.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/tests/notaryAuthReplay.test.ts",
+        "bytes": 5441,
+        "sha256": "65c0a32f30d749de35db511627de90ed7b86cae91c03dbe029add14bf41a35ab"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/notaryAuthReplay.test.ts",
+        "bytes": 5441,
+        "sha256": "65c0a32f30d749de35db511627de90ed7b86cae91c03dbe029add14bf41a35ab"
+      }
+    },
+    {
+      "relativePath": "tests/notaryComposeIntegration.test.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/tests/notaryComposeIntegration.test.ts",
+        "bytes": 12882,
+        "sha256": "8d21aa14b5ecc6247e415f7d679c4f1c05065d5d82f8def20f9b68883ba3410c"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/notaryComposeIntegration.test.ts",
+        "bytes": 12882,
+        "sha256": "8d21aa14b5ecc6247e415f7d679c4f1c05065d5d82f8def20f9b68883ba3410c"
+      }
+    },
+    {
+      "relativePath": "src/notary/notaryAuth.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/src/notary/notaryAuth.ts",
+        "bytes": 3821,
+        "sha256": "cfbfee8ce9e6dcd4b623a1f666d63f61e9aebebcba7f5dafa0306fb7b7abe959"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/notary/notaryAuth.ts",
+        "bytes": 3821,
+        "sha256": "cfbfee8ce9e6dcd4b623a1f666d63f61e9aebebcba7f5dafa0306fb7b7abe959"
+      }
+    },
+    {
+      "relativePath": "src/notary/notaryServer.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/src/notary/notaryServer.ts",
+        "bytes": 13001,
+        "sha256": "f97c992ca0043e0b8fcf8c7e2a3f2048b5284b8729efc91f0e0aa96e7308f120"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/notary/notaryServer.ts",
+        "bytes": 13001,
+        "sha256": "f97c992ca0043e0b8fcf8c7e2a3f2048b5284b8729efc91f0e0aa96e7308f120"
+      }
+    },
+    {
+      "relativePath": "src/notary/notarySigner.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/src/notary/notarySigner.ts",
+        "bytes": 8061,
+        "sha256": "f5f5997d9c03e0bfb8549a2a4d7f7ba920b61ce71f742a3a02088e4534adef6c"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/notary/notarySigner.ts",
+        "bytes": 8061,
+        "sha256": "f5f5997d9c03e0bfb8549a2a4d7f7ba920b61ce71f742a3a02088e4534adef6c"
+      }
+    },
+    {
+      "relativePath": "src/notary/notaryCli.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/src/notary/notaryCli.ts",
+        "bytes": 8187,
+        "sha256": "62200fe85329faf2477334788d25e37f83863aefecd3a64f482330a86c0a2f51"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/notary/notaryCli.ts",
+        "bytes": 8187,
+        "sha256": "62200fe85329faf2477334788d25e37f83863aefecd3a64f482330a86c0a2f51"
+      }
+    },
+    {
+      "relativePath": "src/notary/notaryVerify.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/src/notary/notaryVerify.ts",
+        "bytes": 2012,
+        "sha256": "9d21b74c8ea4d0dd2fcfad51d250a10ff6b0a3792691a2c9a4f5c5054a68ca07"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/notary/notaryVerify.ts",
+        "bytes": 2012,
+        "sha256": "9d21b74c8ea4d0dd2fcfad51d250a10ff6b0a3792691a2c9a4f5c5054a68ca07"
+      }
+    },
+    {
+      "relativePath": "src/cli-notary-commands.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/src/cli-notary-commands.ts",
+        "bytes": 1446,
+        "sha256": "112b56d4eccdc093643559cff2f0db8f84721a03bce23a14e8a09334e7400902"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/cli-notary-commands.ts",
+        "bytes": 1446,
+        "sha256": "112b56d4eccdc093643559cff2f0db8f84721a03bce23a14e8a09334e7400902"
+      }
+    },
+    {
+      "relativePath": "src/crypto/signing/signer.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/src/crypto/signing/signer.ts",
+        "bytes": 7862,
+        "sha256": "88579bba0833ce86dd3fcfac8ea6ccf068772b4a5273ef7bc7b87b1c77a2ef09"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/crypto/signing/signer.ts",
+        "bytes": 7862,
+        "sha256": "88579bba0833ce86dd3fcfac8ea6ccf068772b4a5273ef7bc7b87b1c77a2ef09"
+      }
+    },
+    {
+      "relativePath": "src/trust/trustConfig.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/src/trust/trustConfig.ts",
+        "bytes": 14297,
+        "sha256": "db12a1f2f64c7feb2e23d0a2a2cdc6793ba4f93287df5d41dce41ca89ab730f6"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/trust/trustConfig.ts",
+        "bytes": 14297,
+        "sha256": "db12a1f2f64c7feb2e23d0a2a2cdc6793ba4f93287df5d41dce41ca89ab730f6"
+      }
+    },
+    {
+      "relativePath": "vitest.config.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      }
+    },
+    {
+      "relativePath": "tests/setup/guardWorkspace.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+      }
+    },
+    {
+      "relativePath": "tests/setup/repoWorkspaceGuard.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+      }
+    },
+    {
+      "relativePath": "tests/setup/repoWorkspaceGuard.global.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+      }
+    },
+    {
+      "relativePath": "scripts/check-freeze.mjs",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/scripts/check-freeze.mjs",
+        "bytes": 9946,
+        "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+        "bytes": 9946,
+        "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+      }
+    },
+    {
+      "relativePath": "scripts/freeze-baseline.json",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/closure/scripts/freeze-baseline.json",
+        "bytes": 554,
+        "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+        "bytes": 554,
+        "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+      }
+    }
+  ],
+  "metadataPins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/controller.py",
+      "bytes": 17742,
+      "sha256": "c97a43c156c3d717b1d1629ab81290361ef62c4f093525d93eb4bb07e745cfd0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/controller-v2.py",
+      "bytes": 20763,
+      "sha256": "41ba3b5e8a90baf353f2fe8dc295ad4294ed8ab61829b8a2b80f0eaf3e1bf5e6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/controller-v2-from-v1.patch",
+      "bytes": 8111,
+      "sha256": "5e906aef5efc6ccd55c8f90ac53f8d0c2fb4c383f810c14ca17d93c4524bbe3a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/observer-reporter.mjs",
+      "bytes": 2013,
+      "sha256": "0a640743a8f81de76380335283f7fb1062f8d159d18828b2461ccd870c3672ea"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/recipes.json",
+      "bytes": 2939,
+      "sha256": "73f1af50cc6a249661e71b67ddb52efd9999c39d5aca9ebcc1efeff9747d13bc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/setup.json",
+      "bytes": 10475,
+      "sha256": "ede93f7e058a4957ec22f7977db579099f6c02f716518f17c0d81bb1436af391"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/setup-v2.json",
+      "bytes": 13288,
+      "sha256": "fcfcaa5637761e2f81b264a6dd7c22f33e33b8dc446be6fb2f9a0a9719dd96c1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/setup-artifact-index.json",
+      "bytes": 714411,
+      "sha256": "6d79abc1a5dc5deb80ea5ee8ad466e99080c7441edc63b232d7132877c0fd47b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/setup-v2-artifact-index.json",
+      "bytes": 716991,
+      "sha256": "9952a7cbf5337ad6254c43c28ba4b088546d7c665cb7c720c8f419312072f2df"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/root-runtime-release.json",
+      "bytes": 2321,
+      "sha256": "1afd1428ef2a70fa1490a2fa2f0eddb22f757f351bc2371f4ec58165f85d345c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/final-preservation.json",
+      "bytes": 713,
+      "sha256": "1556b0ec6435ce4c8055fd72cbdf62c741ec27ecca3aee705596248188721733"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/root-final-readonly-preservation.json",
+      "bytes": 631,
+      "sha256": "2292bb9e34ced6c98860c7ac882bc69c95b78b4e326e91e80322fa99916f5da7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/full-closure-prepared.json",
+      "bytes": 1399777,
+      "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/full-closure-final.json",
+      "bytes": 1399777,
+      "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/readiness-pins-before.json",
+      "bytes": 737,
+      "sha256": "cbb576319feb3eedd4af0c86984271c696e197e4a6c199df5f6b46927f119a82"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/review-delegation-note.json",
+      "bytes": 409,
+      "sha256": "d288505a53c96d2506209e67088cfbcbe5f83eb4ec40c6ad6e606de6fa6b3b07"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/preparation-navigation-note.json",
+      "bytes": 362,
+      "sha256": "cc659ff440924b51df78160f2f4b8e110429cb6b98e9e4fae0e9794e53c169ac"
+    }
+  ],
+  "additionalFreezeScript": {
+    "path": "/private/tmp/p0-30-freeze-1529-20261015.py",
+    "bytes": 10393,
+    "sha256": "c6bff7aa569869b4e6355c0550a8091d4c77b6ad35832bc3847a5711187b7d73"
+  },
+  "observerCorrections": "A local audit command first had a Python spacing syntax error and did not execute; its corrected filesystem/JSON audit passed. A report-assembly source pin then guessed absent notaryClient.ts and stopped before writes; the absent path was removed. No product runtime or evidence changed.",
+  "allReadsFinished": true,
+  "productImports": 0,
+  "testReruns": 0,
+  "nativeLoading": 0,
+  "productParserCompilerBuildRuns": 0,
+  "networkOrListenerRuns": 0,
+  "GitRuns": 0,
+  "sourceProducerPriorPacketWrites": 0,
+  "allRetainedPinTriplesRecheckedAfterProseAssembly": 107
+}

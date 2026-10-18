@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-16T22:49:50.403653+00:00",
+  "role": "before-source-reference",
+  "baseline": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/after-metadata-full.json",
+    "bytes": 247823,
+    "sha256": "36b9e659ca601d24982ccc8f4d7bf2d54779bbddb2f84ada1a35b174a0356182"
+  },
+  "sourceParent": "da61205c0817267133451bac11e57bd0318fe44f",
+  "actualPriorPhase": "p125f-metadata-quality-diagnostic",
+  "priorWholeTrackedSourceBytesSameBeforeNewTest": true,
+  "priorFindingCount": 2719,
+  "newScanClaim": false,
+  "copiedOrRelabelledBaseline": false,
+  "qualityGatePassed": false,
+  "boundary": "Exact actual prior metadata diagnostic snapshot adopted as the before-new-test baseline. Branch-only continuation did not change tracked source; only the separately admitted new grant test was added. Global RED stays unwaived."
+}

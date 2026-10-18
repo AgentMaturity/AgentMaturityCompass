@@ -1,0 +1,6 @@
+{
+  "path": "dist/kernel/amcRuntime.js",
+  "compilerSha256": "7960e3a179f94a8ed511eb24176d49da67e8e162919e71878b4cc14c514e14d1",
+  "probeSha256": "501cb8767e687f8b029ae872ab9583c115de89f4224a848bb0ca49d2a7a4d726",
+  "reason": "Unchanged kernel source; compiler-only emission replaced a bundled output. All contract probes use the exact accepted parent bundle."
+}

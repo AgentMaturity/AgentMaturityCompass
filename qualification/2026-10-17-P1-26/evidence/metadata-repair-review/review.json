@@ -1,0 +1,84 @@
+{
+  "schema": "p112-owned-inert-metadata-repair-independent-review/1",
+  "at": "2026-10-16T20:34:27.350439+00:00",
+  "blockers": [],
+  "scope": "Complete private V2/V3 packet comparison and the already materialized root-owned metadata only. No P1-26 source admission or runtime result is established.",
+  "sourceHeadObserved": "fc2e64eb6ea0cf092c7a6ea86229f9628083eb35",
+  "completePackets": {
+    "v2Files": 278,
+    "v3Files": 279,
+    "v2Bytes": 2044706,
+    "v3Bytes": 2049559,
+    "commonFilesByteExact": 274,
+    "changedCommonFiles": [
+      "README.md",
+      "evidence/assembly-inputs.json",
+      "receipt.json"
+    ],
+    "renamedSourceEvidence": {
+      "from": "evidence/test-design/compiledPolicyGuard.test.ts",
+      "to": "evidence/test-design/compiledPolicyGuard.test.ts.source.txt",
+      "bytes": 11155,
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0",
+      "exactToV2PrivateOriginalAndActualSourceTest": true
+    },
+    "onlyOtherAddedPayload": "evidence/discovery-correction.json",
+    "allFilesRegularNoSymlinks": true,
+    "largestIndividualFileBytes": 248255,
+    "allPerFileUnder1MiB": true
+  },
+  "indexesAndOriginals": {
+    "v2Index": 277,
+    "v3Index": 278,
+    "bothUniqueAndCoverEveryFileExceptReceipt": true,
+    "allArtifactHashesMatch": true,
+    "all217V2V3PrivateProducerRowsMatch": true,
+    "all40LosslessRoundtripsMatchMetadataAndActualProducer": true,
+    "all40EnvelopeFilesByteExactToV2": true,
+    "wholeOriginalV2PacketMatchesGitAtFc2": true,
+    "originalV2GitBlobRows": 278,
+    "oldActiveReceiptAndReadmeRetainedPrivatelyAndInGit": true,
+    "noHistoricalCommandOutcomeOrAuthorSealEdit": true
+  },
+  "manifestAndClaimBoundary": {
+    "receiptChangedOnlyArtifactIndex": true,
+    "receiptTestsCommandsNotesEnvironmentSourceCommitExact": true,
+    "activeV3AssemblyIsVersionedNewRecord": "Its schema, timestamp, artifact target/addition, README and revision boundary change. The original V2 assembly bytes remain exact in private V2 and the complete fc2 Git packet. Nested historical producer/author seals remain among the274unchanged files. This is a new active revision, not a claim that the old candidate had an inert filename.",
+    "commonProducerRecordRowsChanged": 0,
+    "readme": "Appends the factual five-import discovery explanation and explicitly leaves post-materialization results separate. Existing bounded source/fresh/control/quality statements remain unchanged.",
+    "sourceMaterialization": {
+      "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-12",
+      "sourceFiles": 279,
+      "v3Files": 279,
+      "exactPathSet": true,
+      "allBytesExact": true,
+      "mismatches": []
+    }
+  },
+  "protection": {
+    "initialInputPins": 113,
+    "unchangedOtherPins": 111,
+    "all111Exact": true,
+    "twoExplicitlyAdmittedRootMetadataSuccessors": [
+      "qualification/2026-10-17-P1-12/receipt.json",
+      "qualification/2026-10-17-P1-12/README.md"
+    ],
+    "bothCurrentFilesMatchV3": true,
+    "initialSnapshotNotRewritten": true,
+    "allFiveNativePhysicalAndHashPinsExact": true,
+    "rootObservedScope": "The retained Git status contains only the metadata README, assembly-inputs, candidate rename, receipt and new discovery record. The rename is already staged by root; no empty-index claim is made. This reviewer made no index or source writes."
+  },
+  "qualityAndDiscovery": {
+    "actualBefore": 2728,
+    "priorSourceReference": 2723,
+    "addedFindings": 5,
+    "removedFindings": 0,
+    "allFiveAreExactUnresolvedImportsFromOldQualificationCandidate": true,
+    "sameScannerAndVersion": true,
+    "qualification": "The complete retained finding sets establish this five-entry delta. They do not independently establish all scanner/environment inputs equivalent or predict its removal after the rename. Global quality remains RED and unwaived.",
+    "vitest": "Current unchanged include tests/**/*.test.ts excludes this qualification copy; no actual Vitest collection failure is claimed. The earlier expectation-stop and actual Knip RED remain retained.",
+    "after": "Pending for this review. Root owns actual unchanged validators, D15/freeze, quality and any later status. No success, finding count, waiver or baseline adoption is predicted."
+  },
+  "preservedHolds": "P1-26 source work remains paused by root for this own metadata repair. Library-adoption decision, full P1-25/P1-26 integration and public-entry approval boundary, provider archive/R overlays, Claude variants, missing reservation limitation, F37 skip and all other holds remain unchanged. No new human approval hold is invented.",
+  "executionBoundary": "Local files, complete bytes/JSON/base64 hashes, read-only Git tree/status and native-file stat/hash metadata only. No product/helper/test/compiler/scanner/native/SQL/network/probe execution, product/source/index mutation, source admission or check bypass."
+}

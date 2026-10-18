@@ -1,0 +1,33 @@
+{
+  "phase": "p125w-m1-sequential",
+  "sourceCommit": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+  "operator": "OMIT-LOWER-BOUND-SELECTION",
+  "outcomeSha256": "513c698db17a7e5a954bb5ab88484a27c5ae012a0a7702d2449a6c1554caa40b",
+  "at": "2026-10-17T00:17:08.110689+00:00",
+  "rootAllFailuresRead": true,
+  "allFailuresClassified": true,
+  "firstSensitiveAssertionRead": true,
+  "noHookOrEnvironmentFailure": true,
+  "actualCohortAndHooksMatchCanonical": true,
+  "actualOwnedChildrenAndCleanupRead": true,
+  "allFailures": [
+    {
+      "test": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+      "messages": [
+        "expected 'attested-upper-bound' to be 'attested-window' // Object.is equality"
+      ],
+      "classification": "The only failure is the intended loss of the lower checkpoint bound: the real middle ledger event becomes attested-upper-bound instead of attested-window. Genuine query-bound grants, signed checkpoint chain/head links, stored token equality, checkpoint event metadata and before/after ledger positives completed before assertion445. No hook, HTTP, crypto, native or cleanup failure occurred.",
+      "firstSensitiveFrame": "tests/time/checkpointWindow.test.ts:445:41"
+    }
+  ],
+  "firstSensitiveAssertion": "expect(actualMiddle.time.basis).toBe(\"attested-window\") at checkpointWindow.test.ts:445:41",
+  "masking": "Assertion445 stops the body. Exact-window/upper-attestation/claimedAt assertions446-450 and all later default452/zero458 finding and row assertions are masked. All ten reader observations were computed earlier and retained, but they are not promoted to asserted passes.",
+  "actualResourceCounts": {
+    "children": 30,
+    "explicitChildStreamHashCount": 60,
+    "closedSockets": 8,
+    "closedLedgerOwners": 16
+  },
+  "originalP125wM1DiagnosticOnly": true,
+  "acceptedControlPhaseNaturallySequentialAfterActualApplyClosure": true
+}

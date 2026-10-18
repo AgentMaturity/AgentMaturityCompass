@@ -1,0 +1,66 @@
+--- p1-01-build-canonical-packet-prepared-20261015.py
++++ p1-01-build-canonical-packet-v2-prepared-20261015.py
+@@ -1,6 +1,6 @@
+ """UNEXECUTED metadata builder. Root must bind final frozen inputs in a NEW version.
+ 
+-Writes only Q. Selection/checks precede Q mkdir; publication is not transactional.
++Writes only Q. All planned bytes/cap/secret checks precede Q mkdir; writes are not transactional.
+ No product imports/tests/builds, regeneration, deletion, source edits or retries.
+ """
+ from pathlib import Path
+@@ -190,6 +190,8 @@
+ 
+ The closed root journal retains {len(rows)} command records, including these nonzero rows: {json.dumps(nonzero)}. Quality findings remain unwaived. The separate typed stripping control retains seven child records: {json.dumps(child_codes)}. They repeat receipt/schema checks in a private physical copy, including compilation and two expected negative checks, without regeneration. Their actual restoration and failure attribution remain in the result, audit and outcome. Nested child records and their parent wrapper row are not separate top-level runs.
+ 
++The v4 control required real TypeScript compilation to exit 0. It retained the exact known thin compiler kernel output (SHA-256 prefix 7960e3a), then restored the accepted kernel bytes (SHA-256 prefix 501cb876) before the probes. The receipt/schema checks exercise direct compiled contract modules with that kernel held constant. This is not a fresh full mutant build or proof of a mutated bundled-kernel route.
++
+ The earlier literal passthrough attempt remains halted and preserved. Its actual children exited 0, 0 and 2: real TypeScript compilation reported TS2339 before either mutant negative check or restoration. It is a failed control attempt, not a product failure or successful sensitivity proof. The later stripping control does not close the exact literal-passthrough specification criterion.
+ 
+ Required permanent tests/contracts files remain absent. Shape parity does not verify lifecycle semantics, provenance authority, trust admission or truth. Publication byte/HTML marker checks do not establish full HTML equivalence or deployed HTTP availability. Evidence exports omit a portable hash preimage. Full suite, coverage, Node24, hosted CI, release/pack, external identity, formal dependency acceptance and tracker Done remain unqualified. Shared A4/index ownership, paused work and pending transfers remain. Source, compiled, Pages, physical and failed-attempt indices stay private, unsplit hash references. Formal acceptance is false.
+@@ -199,28 +201,33 @@
+         'separateCounts': {'schemas': 38, 'parityFixtures': 75, 'outsideParityJson': 9, 'rootProbeModes': 3,
+             'rootCommandRecords': len(rows), 'stripControlChildRecords': len(children), 'failedPassthroughChildRecords': len(failed_children)},
+         'formalAcceptanceClosed': False, 'originalCaseIdentities': identities}
+-    # All planned prerequisite reads/validation finish before this first canonical write.
+-    Q.mkdir(); (Q / 'evidence').mkdir(); copied = []
+-    def write(name, data):
+-        with (Q / name).open('xb') as stream: stream.write(safe_body(data))
+-        assert (Q / name).read_bytes() == data
++    # Freeze and validate EVERY planned output body before creating Q.
++    # Later I/O errors can still leave partial output; no cleanup/retry is attempted.
++    planned = {}; copied = []
++    def plan(name, data):
++        assert name not in planned
++        planned[name] = safe_body(data)
+     for number, (source, (entry, data)) in enumerate(sorted(selected.items())):
+         label = re.sub(r'[^A-Za-z0-9._-]', '_', Path(source).name)
+         name = 'evidence/' + str(number).zfill(3) + '-' + label
+-        write(name, data); copied.append({'source': entry, 'copiedPath': name, 'sha256': entry['sha256']})
+-    write('private-references.json', encoded({'copiedSources': copied, 'privateOnlyUnsplit': list(private_refs.values()),
++        plan(name, data); copied.append({'source': entry, 'copiedPath': name, 'sha256': entry['sha256']})
++    plan('private-references.json', encoded({'copiedSources': copied, 'privateOnlyUnsplit': list(private_refs.values()),
+         'finalBindings': bound, 'runtime': runtime, 'formalAcceptanceClosed': False}))
+-    write('scope-summary.json', encoded(summary))
+-    write('README.md', safe_body(readme.encode()))
++    plan('scope-summary.json', encoded(summary))
++    plan('README.md', safe_body(readme.encode()))
+     receipt = {'schemaVersion': 1, 'key': 'P1-01', 'date': '2026-10-15', 'commit': SOURCE, 'branch': BRANCH,
+         **{key: runtime[key] for key in ('node', 'pnpm', 'os', 'arch')}, 'commands': commands,
+         'tests': summary['primaryTests'], 'artifacts': [], 'notes': readme}
+-    receipt['artifacts'] = [{'path': str(path.relative_to(Q)), 'sha256': pin(path)['sha256']}
+-        for path in sorted(Q.rglob('*')) if path.is_file()]
+-    write('receipt.json', encoded(receipt))
++    receipt['artifacts'] = [{'path': name, 'sha256': hashlib.sha256(data).hexdigest()}
++        for name, data in sorted(planned.items())]
++    plan('receipt.json', encoded(receipt))
++    Q.mkdir(); (Q / 'evidence').mkdir()
++    for name, data in sorted(planned.items()):
++        with (Q / name).open('xb') as stream: stream.write(data)
++        assert (Q / name).read_bytes() == data
+     assert git('rev-parse', 'HEAD') == SOURCE
+     assert all(line.startswith('?? qualification/2026-10-15-P1-01/') for line in git('status', '--porcelain', '--untracked-files=all').splitlines())
+-    print(json.dumps({'qualification': str(Q), 'files': len(receipt['artifacts']) + 1,
++    print(json.dumps({'qualification': str(Q), 'files': len(planned),
+         'receipt': pin(Q / 'receipt.json'), 'formalAcceptanceClosed': False}))
+ 
+ 

@@ -1,0 +1,34 @@
+{
+  "schema": "p107-runtime-source-run-peer-seal/1",
+  "state": "ACTUAL_SCOPED_SOURCE_RUNTIME_AUDIT_CLOSED",
+  "blockers": [],
+  "inputCount": 28,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-source-run-review/review.json",
+      "bytes": 22080,
+      "sha256": "54fef116033adea0adc65d39e204a6d8015a55b1cef99c26bd9c6aa8dcb91219",
+      "readScope": "Exact private read-only actual audit output."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-source-run-review/identity-joins.json",
+      "bytes": 3234,
+      "sha256": "a9fa5b3083623a506765e6c9fe44c9e0ed83ac81badbc61afc0a6c80dee09781",
+      "readScope": "Exact private read-only actual audit output."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-source-run-review/README.md",
+      "bytes": 1629,
+      "sha256": "b9dba357112f8de769b0742721421e54446082f8f1499db6aff11866f5537648",
+      "readScope": "Exact private read-only actual audit output."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-source-run-review/pins.json",
+      "bytes": 9945,
+      "sha256": "061e8552b2209ae7dcc031e2a0a061aace962939689478fe1f59330be4e9fea5",
+      "readScope": "Exact private read-only actual audit output."
+    }
+  ],
+  "noExecution": true,
+  "checkoutIndexQaWrites": false
+}

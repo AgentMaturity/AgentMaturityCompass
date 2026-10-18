@@ -14,6 +14,7 @@ import type { IncomingHttpHeaders } from "node:http";
 import { isIP, type LookupFunction } from "node:net";
 import { canonicalAddress, canonicalHost, isNonPublicAddress, resolveAddresses, resolveAndCheck, type EgressCheck } from "../enforce/egressAllowlist.js";
 import type { GatewayConfig } from "./config.js";
+import { plainUtf8 } from "./redaction.js";
 
 export type FieldRefusalReason = "refused-field" | "content-encoding" | "charset" | "byte-order-mark" | "invalid-utf8" | "not-json" | "not-object";
 export interface FieldRefusal { reason: FieldRefusalReason; fields: string[] }
@@ -31,7 +32,6 @@ export interface FieldGuard {
   targetRefused(host: string, addresses: readonly string[]): Promise<{ reason: string; unresolved: boolean } | null>;
 }
 
-const BOMS = [Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from([0xfe, 0xff]), Buffer.from([0xff, 0xfe])];
 // Some upstream JSON decoders match keys case-insensitively with Unicode folding; compare folded names (refuses more, never less).
 const fold = (key: string): string => key.normalize("NFKC").toLowerCase();
 
@@ -131,13 +131,10 @@ export function requestFieldRefusal(body: Buffer, headers: IncomingHttpHeaders, 
   if (fields.length === 0 || body.byteLength === 0) return null;
   const encoding = headers["content-encoding"];
   if (encoding !== undefined && encoding.split(",").some((token) => token.trim().toLowerCase() !== "identity")) return { reason: "content-encoding", fields: [] };
-  const charset = /;\s*charset\s*=\s*"?([^";\s]+)/i.exec(headers["content-type"] ?? "")?.[1]?.toLowerCase();
-  if (charset !== undefined && charset !== "utf-8" && charset !== "utf8") return { reason: "charset", fields: [] };
-  if (BOMS.some((bom) => body.subarray(0, bom.length).equals(bom))) return { reason: "byte-order-mark", fields: [] };
-  let text: string;
-  try { text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(body); } catch { return { reason: "invalid-utf8", fields: [] }; }
+  const plain = plainUtf8(body, headers["content-type"]);
+  if (!("text" in plain)) return { reason: plain.refusal, fields: [] };
   let parsed: unknown;
-  try { parsed = JSON.parse(text); } catch { return { reason: "not-json", fields: [] }; }
+  try { parsed = JSON.parse(plain.text); } catch { return { reason: "not-json", fields: [] }; }
   if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) return { reason: "not-object", fields: [] };
   const keys = new Set(Object.keys(parsed).map(fold));
   const present = fields.filter((field) => keys.has(fold(field)));

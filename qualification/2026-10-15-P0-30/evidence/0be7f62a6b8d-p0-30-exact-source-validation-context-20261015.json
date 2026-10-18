@@ -1,0 +1,159 @@
+{
+  "capturedUtc": "2026-10-14T23:31:20.312396+00:00",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "srcTree": "312506e6b4130ce1c46a8ec5316a087d6bbd9c71",
+  "mode": "Exact-source validation context reuse, not a new execution claim",
+  "priorCanonicalReceipt": {
+    "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-18/receipt.json",
+    "bytes": 15979,
+    "sha256": "6c9940a729b54c033cd9c8fcc5d849d475455a07bda1594cf554b8689e3f665b"
+  },
+  "sourceManifest": {
+    "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-18/final-source-manifest.json",
+    "bytes": 2883,
+    "sha256": "124d904c45c9b7ad53bbacb743c4287ab17b7f1e7c01beb65118a3947f718a53"
+  },
+  "commandPhases": {
+    "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-18/command-phases.json",
+    "bytes": 15080,
+    "sha256": "ad855dd7a7fd2c9f54e22496fe2e55ce04aff355849fad97987a71615521925a"
+  },
+  "sourceQuality": {
+    "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-18/source-quality.json",
+    "bytes": 5504,
+    "sha256": "9c76e98914f855802d9701e326f69dcd7c95fed588ce761b148a09ae688079ac"
+  },
+  "reusedSourcePhases": [
+    {
+      "phase": "architecture",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2321,
+      "startedUtc": "2026-10-14T22:51:15.324882+00:00",
+      "log": "/private/tmp/p0-18-architecture-20261015.log",
+      "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+    },
+    {
+      "phase": "lint",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 4502,
+      "startedUtc": "2026-10-14T22:51:15.324865+00:00",
+      "log": "/private/tmp/p0-18-lint-20261015.log",
+      "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+    },
+    {
+      "phase": "production-types",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run typecheck",
+      "exit": 0,
+      "durationMs": 28837,
+      "startedUtc": "2026-10-14T22:51:15.324996+00:00",
+      "log": "/private/tmp/p0-18-production-types-20261015.log",
+      "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+    },
+    {
+      "phase": "final-api-reference",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:api-ref",
+      "exit": 0,
+      "durationMs": 419,
+      "startedUtc": "2026-10-14T22:56:30.629113+00:00",
+      "log": "/private/tmp/p0-18-final-api-reference-20261015.log",
+      "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+    },
+    {
+      "phase": "final-docs",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 501,
+      "startedUtc": "2026-10-14T22:56:30.631470+00:00",
+      "log": "/private/tmp/p0-18-final-docs-20261015.log",
+      "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+    },
+    {
+      "phase": "final-counts",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:counts",
+      "exit": 0,
+      "durationMs": 616,
+      "startedUtc": "2026-10-14T22:56:30.625672+00:00",
+      "log": "/private/tmp/p0-18-final-counts-20261015.log",
+      "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+    },
+    {
+      "phase": "final-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1705,
+      "startedUtc": "2026-10-14T22:56:30.625522+00:00",
+      "log": "/private/tmp/p0-18-final-freeze-20261015.log",
+      "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+    },
+    {
+      "phase": "source-duplicates",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:duplicates",
+      "exit": 1,
+      "durationMs": 1760,
+      "startedUtc": "2026-10-14T22:56:30.633730+00:00",
+      "log": "/private/tmp/p0-18-source-duplicates-20261015.log",
+      "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+    },
+    {
+      "phase": "source-dead-code",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:dead-code",
+      "exit": 1,
+      "durationMs": 4630,
+      "startedUtc": "2026-10-14T22:56:30.621134+00:00",
+      "log": "/private/tmp/p0-18-source-dead-code-20261015.log",
+      "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+    },
+    {
+      "phase": "final-test-types",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 36988,
+      "startedUtc": "2026-10-14T22:56:19.039789+00:00",
+      "log": "/private/tmp/p0-18-final-test-types-20261015.log",
+      "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31"
+    },
+    {
+      "phase": "final-clean-source",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:clean-source",
+      "exit": 0,
+      "durationMs": 51562,
+      "startedUtc": "2026-10-14T23:04:26.194446+00:00",
+      "log": "/private/tmp/p0-18-final-clean-source-20261015.log",
+      "head": "58e91dcef111bf02f773dcbfd1921d428cf75e34"
+    }
+  ],
+  "currentFreshPhases": {
+    "journal": "/private/tmp/p0-30-commands-20261015.jsonl",
+    "meaning": "Fresh frozen install, build, actual62-case baseline and normal freeze were executed in this new lane. Live appendable journal is not immutable evidence."
+  },
+  "limits": [
+    "No source, original test, guard, package or lock changes occurred in P0-30; all7739tracked bytes were recorded exact before/after private portable probes.",
+    "Prior source-level passes are evidence for the same source58 content and unchanged dependency lock, not rerun P0-30 commands.",
+    "Both required source-quality gates remain failed:1269duplicates and2751dead-code findings; no bypass or cleanup is implied.",
+    "No Node24, full-suite, coverage, hosted CI, complete76-entry batch, release, G0 or Done claim."
+  ]
+}

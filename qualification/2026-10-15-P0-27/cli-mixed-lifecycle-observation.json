@@ -1,0 +1,8 @@
+{
+  "mixedLifecycleHarness": "/private/tmp/p0-27-compiled-cli-mixed-lifecycle-observer-20261015.mjs",
+  "sha256": "968432d02441fcedfc5f5358c10ddd445919b01c534fc9ef7deb4d946cf270f8",
+  "partialEvidence": "/private/tmp/p0-27-compiled-cli-QrIp7x",
+  "log": "/private/tmp/p0-27-compiled-cli-current-contract-20261015.log",
+  "observation": "After two actual24-event native turns and pinned verification output, the parent snapshot reader threw SQLITE_CORRUPT while its initializer pooled connection remained open. A fresh independent reader after parentexit finds quick_check ok and54 events. No data repair or source change occurred. This is an unqualified mixed parent/child lifecycle observation, not a full CLI verdict or a proven product cause.",
+  "nextFixture": "Initialize inside a completed cold child, preserve every per-command outcome immediately, then exercise the same actual CLI controls. Source/guards/dependencies are unchanged."
+}

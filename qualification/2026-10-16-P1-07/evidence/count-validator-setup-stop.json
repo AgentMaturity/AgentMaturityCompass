@@ -1,0 +1,7 @@
+{
+  "privateValidatorFirstAttempt": "stopped at README.md before recording a result or launching dependent checks",
+  "reason": "Expected raw and decimal counts but omitted the existing URL-encoded badge 1%2C683 to 1%2C686",
+  "actualGeneratorExit": 0,
+  "sourceFailureOrAssertionWaiver": false,
+  "correction": "Verify all three exact serializations of the same source-file inventory transformation"
+}

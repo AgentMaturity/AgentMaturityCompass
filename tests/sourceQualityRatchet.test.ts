@@ -1,8 +1,9 @@
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import YAML from "yaml";
 import {
   baseCheck, baselineEntries, compareToBaseline, configSha256, duplicateFindings, knipFindings, parseBaseline,
   ratchet, serializeBaseline, trendRow
@@ -338,5 +339,40 @@ describe("source-quality ratchet", () => {
     const unknown = spawnSync(process.execPath, ["scripts/source-quality.mjs", "dead-code", "--waive"], { encoding: "utf8" });
     expect(unknown.status).toBe(1);
     expect(unknown.stderr).toMatch(/waive/);
+  });
+});
+
+describe("required source-quality CI gate", () => {
+  type Step = { name?: string; run?: string; "continue-on-error"?: boolean | string };
+  const workflow = YAML.parse(readFileSync(".github/workflows/ci.yml", "utf8")) as {
+    jobs: Record<string, { steps: Step[]; "continue-on-error"?: boolean | string }>;
+  };
+  const job = workflow.jobs["build-test"]!;
+  const step = job.steps.find(item => item.name === "Source duplication and reachability")!;
+
+  it("does not allow a failed ratchet to pass the build job", () => {
+    expect(job["continue-on-error"] ?? false).toBe(false);
+    expect(step["continue-on-error"] ?? false).toBe(false);
+  });
+
+  // The workflow runs on Ubuntu; Windows does not provide this Bash contract.
+  it.skipIf(process.platform === "win32").each(["duplicates", "dead-code"])("propagates a failed %s command from the real workflow", failure => {
+    const root = mkdtempSync(join(tmpdir(), "amc-quality-ci-"));
+    roots.push(root);
+    const log = join(root, "commands.log");
+    const npm = join(root, "npm");
+    writeFileSync(npm, '#!/bin/sh\nprintf "%s\\n" "$*" >> "$QUALITY_TEST_LOG"\ncase "$*" in\n  *"check:$QUALITY_TEST_FAIL"*) exit 7 ;;\nesac\n');
+    chmodSync(npm, 0o755);
+    const result = spawnSync("bash", ["--noprofile", "--norc", "-e", "-o", "pipefail", "-c", step.run!], {
+      env: { ...process.env, PATH: `${root}:${process.env.PATH}`, QUALITY_BASE: "HEAD",
+        QUALITY_TEST_LOG: log, QUALITY_TEST_FAIL: failure },
+      encoding: "utf8"
+    });
+    expect(result.error).toBeUndefined();
+    expect(result.status).toBe(7);
+    const calls = readFileSync(log, "utf8").trim().split("\n");
+    expect(calls).toEqual(failure === "duplicates"
+      ? ["run check:duplicates -- --base HEAD"]
+      : ["run check:duplicates -- --base HEAD", "run check:dead-code -- --base HEAD"]);
   });
 });

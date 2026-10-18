@@ -1,0 +1,171 @@
+{
+  "schema": "p125pc-control-root-bindings/1",
+  "readyForControls": true,
+  "sourceParent": "8889784782c8f7413e1cccab579ae4b8b6f21cc1",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceCommit": "5d4e9e8d74bef32e68090369223947691c5fea21",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout",
+  "baseProtectedInputsPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+    "bytes": 88277,
+    "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac",
+    "dev": 16777231,
+    "inode": 543919520,
+    "nlink": 1
+  },
+  "runtimeProtectedInputsPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+    "bytes": 90612,
+    "sha256": "42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59",
+    "dev": 16777231,
+    "inode": 543919887,
+    "nlink": 1
+  },
+  "sourceSelectionPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/source-selection.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/source-selection.json",
+    "bytes": 7899,
+    "sha256": "40618cf6cd152f4a56319124eb44aa967ae939b1dbdb454f2277634c30cf7431",
+    "dev": 16777231,
+    "inode": 543919580,
+    "nlink": 1
+  },
+  "freshSourceBindingPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-source-binding.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/fresh-source-binding.json",
+    "bytes": 127548,
+    "sha256": "9aa8dc730a6daaffbaef8f24bf12c9595a4d07c721841fb27a6d874b2cc12980",
+    "dev": 16777231,
+    "inode": 543990375,
+    "nlink": 1
+  },
+  "observedAuditPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/audit-observed.py",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/audit-observed.py",
+    "bytes": 2198,
+    "sha256": "468aee0d4ded5290f60e231fa6a94e3617f7a243de96f46f1ac1a77fd73dc439",
+    "dev": 16777231,
+    "inode": 543926541,
+    "nlink": 1
+  },
+  "sourceOutcomePin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-outcome.json",
+    "bytes": 7969,
+    "sha256": "6cc159f39b6256b255d459f323615b20fed9ce366df06b7c1c58f8dc7b09e045",
+    "dev": 16777231,
+    "inode": 543926549,
+    "nlink": 1
+  },
+  "freshOutcomePin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-outcome.json",
+    "bytes": 8001,
+    "sha256": "37a6fef970bca7282fecf5593f083bd672c1831f2f0f58b7aa8dec556d91ecac",
+    "dev": 16777231,
+    "inode": 543992114,
+    "nlink": 1
+  },
+  "sourceSuccessors": [
+    {
+      "old": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "bytes": 48568,
+        "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7",
+        "dev": 16777231,
+        "inode": 543658576,
+        "nlink": 1
+      },
+      "new": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "bytes": 61752,
+        "sha256": "36ba6394d4c8b824e2fbe9e2d2b5c1729431bf0206c9d5d08c357ca70a33082a",
+        "dev": 16777231,
+        "inode": 543658576,
+        "nlink": 1
+      },
+      "originalPreservedPin": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/original-owned-source/checkpointWindow.test.ts.source.txt",
+        "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/original-owned-source/checkpointWindow.test.ts.source.txt",
+        "bytes": 48568,
+        "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7",
+        "dev": 16777231,
+        "inode": 543919885,
+        "nlink": 1
+      },
+      "originalGitCommits": [
+        "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+        "8889784782c8f7413e1cccab579ae4b8b6f21cc1"
+      ]
+    }
+  ],
+  "phases": {
+    "source": "p125pc-source-combined",
+    "fresh": "p125pc-fresh-canonical",
+    "mutants": [
+      "p125pc-m1",
+      "p125pc-m2"
+    ],
+    "restorations": [
+      "p125pc-restore1",
+      "p125pc-restore2"
+    ]
+  },
+  "rootReviewedActualSourceAndFreshOutcomes": true,
+  "rootReviewedActualSourceAndFreshPublicEvidence": true,
+  "rootReviewedActualPreservationAndNativePins": true,
+  "rootReviewedExactHelperAndControlRecipes": true,
+  "noFutureOutcomeHashesAdopted": true,
+  "directActionNaturalClosureBeforeDependentTestsRequired": true,
+  "actualActionRecordsNotFuturePins": {
+    "pattern": "/private/tmp/p1-25-producer-qualification-20261017/control-action-<apply-or-restore><1-or-2>.json",
+    "createdByRootOnlyAfterActualNaturalReturn": true,
+    "fields": [
+      "argv",
+      "startedUtc",
+      "endedUtc",
+      "exit",
+      "stdout",
+      "stderr"
+    ],
+    "futureActionHashes": null
+  },
+  "knownStaticCandidatePin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+    "bytes": 61752,
+    "sha256": "36ba6394d4c8b824e2fbe9e2d2b5c1729431bf0206c9d5d08c357ca70a33082a",
+    "dev": 16777231,
+    "inode": 543909995,
+    "nlink": 1
+  },
+  "knownStaticPeerReviewPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/independent-static-review/review.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/independent-static-review/review.json",
+    "bytes": 8070,
+    "sha256": "c96bac8905edda6dd996318619df6aab484e2b3f2438c65339266da3f6c947a7",
+    "dev": 16777231,
+    "inode": 543910559,
+    "nlink": 1
+  },
+  "preferredBaseline": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+    "activeRows": 175,
+    "retainedNativeMetadataPins": 12,
+    "prebuildCompiledObservationHashesAreNotActive": true
+  },
+  "boundary": "Root admits the exact two source-only controls after actual source/fresh24 GREEN, public producer and cleanup evidence,175 protected inputs/204 selected physical files/13 distinct natives, exact helper and recipe review. No future RED/restoration outcome or action hash is adopted; original template remains unready.",
+  "rootActualReviewPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/root-source-fresh-review.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/root-source-fresh-review.json",
+    "bytes": 3797,
+    "sha256": "f57de8531b02f9c1f742d3ef776228a10b80eca6cf7e876022b18c459ebca368",
+    "dev": 16777231,
+    "inode": 543992212,
+    "nlink": 1
+  }
+}

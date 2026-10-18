@@ -1,0 +1,86 @@
+{
+  "schema": "p125-fallback-receipt-extension-preparation/1",
+  "at": "2026-10-16T22:24:31.847152+00:00",
+  "status": "Private unexecuted plan and skeleton only",
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "parentMetadataCommit": "a0cfbc280f2b11207205541ba89112c125c29895",
+  "historicalClientSource": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "activeExistingPathsAllowedToChange": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json"
+  ],
+  "onlyNewPacketPrefix": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/evidence/tsa-fallback",
+  "oldPacket": {
+    "files": 613,
+    "artifacts": 612,
+    "nonIndexPayloadsPreservedByteExact": 610,
+    "commandsPreservedInOrder": 76,
+    "assemblyPinsPreservedInOrder": 676,
+    "originalManifest": {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/actual-receipt-inputs.json",
+      "bytes": 21102,
+      "sha256": "07c702081c3730c96399c4722a5ea914429d8c373b81cb9d9b307031f205f0d0"
+    },
+    "oldReadmeBytes": 15980,
+    "oldReadmeRequiredAsVerbatimSuffix": true,
+    "oldNotesRequiredAsVerbatimPrefix": true
+  },
+  "runtimeProtection": {
+    "protectedInputs": 128,
+    "oldActiveMetadataIncluded": 3,
+    "all128ExactThroughRuntimeAndPrivateAssembly": true,
+    "laterThreeSuccessors": "Separate exact root admission binds the original private 613-file packet and old three/new three pins emitted in publication-expectations. No circular new receipt hash is put into its own input manifest. The other 125 pins remain exact.",
+    "priorNativePins": 7,
+    "futureDistinctFreshNativeRequired": true,
+    "finalNativePins": 8
+  },
+  "canonical": {
+    "fixedCases": 21,
+    "newFallbackBodies": 4,
+    "unchangedVerifierBodies": 17,
+    "noPrior28Or47Sum": true,
+    "futureFailuresAndHooks": null,
+    "actualSevenPhaseChainRequired": [
+      "p125f-fresh-canonical",
+      "p125f-m1",
+      "p125f-restore1",
+      "p125f-m2",
+      "p125f-restore2",
+      "p125f-m3",
+      "p125f-restore3"
+    ],
+    "actualRules": "Source/fresh unique ordered identities and actual hooks match. Each RED has its positive actual failure count; each explicit restoration is actual GREEN 21. The independent review and manual protocol bind every actual failure, first assertion and mask with source/operator/outcome classifications. No failure total is predicted."
+  },
+  "actualFreshBindingRequired": {
+    "selectedPathsEachRoot": 72,
+    "compiledPairs": 8,
+    "protectedInputs": 128,
+    "oldNativePins": 7,
+    "nativePinsAfterFresh": 8,
+    "cleanSourceHelperVitestCredit": false
+  },
+  "privateArtifactRules": {
+    "onlyExplicitWhitelistedPins": true,
+    "code": "Every selected source/script target is inert .source.txt. The assembler, builder and patches containing the literal secret guard remain hash-only; no alternate encoding or rename publishes forbidden-marker bytes.",
+    "logsAndPatches": "Use the established lossless base64 JSON envelope with original bytes/hash roundtrip. Nonzero command results remain unchanged.",
+    "excluded": "All before-originals/private-originals, observations.json/ownership-observations.json, large ownership data, private keys/vault/native modules and recursive private-directory adoption. Raw originals remain private.",
+    "perFileLimit": 1048576,
+    "secretsGuard": "Retain existing byte-marker and extension exclusions; root reads actual selections."
+  },
+  "rootProtocol": [
+    "Preserve all 613 old files privately byte-exact and bind the old three indexes before private assembly. No old file is renamed/reencoded to bypass ignores.",
+    "Fill and read the exact actual manifest, all command rows and selected artifacts, actual source/fresh/control/manual/independent review/final preservation/gaps, and final README/notes. No guessed future result.",
+    "Root alone assembles into a new exclusive private output. Verify all 610 old payloads, 676 ordered old pins and original manifest, 76 old commands, complete artifact index and every lossless roundtrip.",
+    "Run the unchanged private validator. Separately admit only the three root metadata successors plus the new prefix; verify the other 125 protected pins and old three/new three exact publication expectations.",
+    "Root alone materializes. Run unchanged source validator and actual required quality/freeze/D15 checks. Global RED stays unwaived; no config/baseline/ignore/force workaround.",
+    "Ordinary dependent staging checks exact paths and every actual index blob, default staged whitespace and default full-range whitespace against source d8b5c3250138a10078c21886642595f669c4a73c. Any nonzero stops before ordinary commit.",
+    "After actual held-input/index/HEAD reinspection, use an ordinary commit. Inspect all actual HEAD-only files/blobs, export committed files only, and run unchanged validator on that export. A workspace pass is not publication completeness.",
+    "Record actual commit/export/QA closure later without inventing future commands in the assembled receipt."
+  ],
+  "noExecutionByAuthor": true,
+  "noSourceIndexQaWrites": true,
+  "allHoldsAndF37SkipRetained": true,
+  "noWholeIssuePlanReleaseCredit": true,
+  "preservedPrivateAuthoringStop": "private-authoring-stop.json"
+}

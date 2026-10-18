@@ -1,0 +1,151 @@
+{
+  "schema": "p112-independent-actual-fresh-binding-review/1",
+  "at": "2026-10-16T20:09:48.427583+00:00",
+  "allReadsFinished": true,
+  "blockers": [],
+  "sourceCommit": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout",
+  "actualBindingPin": {
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-source-binding.json",
+    "bytes": 72394,
+    "sha256": "3f33395304145cb7b705b7253ae564b713a6043f24468c7ceb727f6e9e8ba118"
+  },
+  "helper": {
+    "phase": "p112-fresh-clean-source",
+    "exit": 0,
+    "durationMs": 46076,
+    "ownedPgid": 25433,
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "commandMatchesActualBinding": true,
+    "logPin": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-fresh-clean-source/stdout-stderr.log",
+      "bytes": 852,
+      "sha256": "e3be4455b71c6fb04a1f7e367067bfa204e493e58e00f6ac9236ae36757c0105"
+    },
+    "actualChecksRead": [
+      "pnpm install --frozen-lockfile",
+      "pnpm run build",
+      "amc doctor",
+      "amc init (isolated workspace)",
+      "keyless native tool turn",
+      "signed evidence and request reconstruction (1 expected turns)",
+      "process A: leave a completed turn open for resume",
+      "process B: resume and seal the same session",
+      "signed evidence and request reconstruction (2 expected turns)"
+    ],
+    "vitestCredit": false,
+    "boundary": "Actual frozen helper install/build/doctor/keyless signed one-turn and cross-process two-turn checks only. Natural owned-group closure is not universal descendant, filesystem or inherited-environment isolation."
+  },
+  "selectedPreservation": {
+    "actualMatchedRelativePaths": 59,
+    "sourceFreshRegularDistinctFileIdentities": 118,
+    "actualCompiledPairs": [
+      {
+        "sourceRelativePath": "src/tools/guards/compiledPolicyGuard.ts",
+        "compiledRelativePath": "dist/tools/guards/compiledPolicyGuard.js"
+      },
+      {
+        "sourceRelativePath": "src/tools/guards/policyGuards.ts",
+        "compiledRelativePath": "dist/tools/guards/policyGuards.js"
+      },
+      {
+        "sourceRelativePath": "src/tools/toolPipeline.ts",
+        "compiledRelativePath": "dist/tools/toolPipeline.js"
+      },
+      {
+        "sourceRelativePath": "src/tools/toolRegistry.ts",
+        "compiledRelativePath": "dist/tools/toolRegistry.js"
+      },
+      {
+        "sourceRelativePath": "src/actions/authorize.ts",
+        "compiledRelativePath": "dist/actions/authorize.js"
+      },
+      {
+        "sourceRelativePath": "src/catalog/compiler/activate.ts",
+        "compiledRelativePath": "dist/catalog/compiler/activate.js"
+      },
+      {
+        "sourceRelativePath": "src/policy/effectivePolicyReceipt.ts",
+        "compiledRelativePath": "dist/policy/effectivePolicyReceipt.js"
+      },
+      {
+        "sourceRelativePath": "src/enforce/guardrailRuntimeBindings.ts",
+        "compiledRelativePath": "dist/enforce/guardrailRuntimeBindings.js"
+      }
+    ],
+    "compiledPairCount": 8,
+    "meaning": "Actual S/Q byte parity and finite preservation, not compiled-mutant sensitivity.",
+    "prospectiveCountHashesUsed": false,
+    "protectedInputHashesRechecked": 88,
+    "heldInputBoundary": "Protected byte pins independently match. S/Q cleanliness and held R HEAD/status/index are actual root-recorded binding facts, not Git probes by reviewer.",
+    "nativePins": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 542501039,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 539175547,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543125595,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543200130,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543305423,
+        "nlink": 1
+      }
+    ],
+    "all5NativeIdentitiesDistinctSingleLinkAndHashExact": true,
+    "freshNativeInode": 543305423,
+    "borrowedRunnerPinRechecked": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "bytes": 43,
+      "sha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+      "dev": 16777231,
+      "inode": 539152709,
+      "nlink": 1
+    },
+    "sourceOriginalTargetRegularSingleLink": true,
+    "sourceAndFreshCleanFromRoot": true,
+    "heldRHeadStatusIndexExactFromRoot": true
+  },
+  "qualificationBoundary": "No Vitest canonical/control phase is credited by this helper/binding review. It does not prove real compiled payment thresholds, destination effects, activation/lease/approval integration, receipt/evidence binding or full P1-12 acceptance.",
+  "qualityBoundary": "Retain actual global RED1268 duplicates and dead-code2724\u21922723 from the separately sealed legitimate test-import diagnostic; no quality waiver.",
+  "holds": "P1-07 strict-binding closure, held P1-02 combinations, all other held decisions/F37 skip and Claude work remain preserved.",
+  "executionByReviewer": false,
+  "checkoutIndexQaWrites": false,
+  "continuousIsolationClaim": false
+}

@@ -1,0 +1,299 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 1380,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/evidenceEmitterRegistry.test.ts",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/levelCumulative.test.ts"
+  ],
+  "testCount": 21,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "178489895",
+      "name": "tests/diagnostic/evidenceEmitterRegistry.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/evidenceEmitterRegistry.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "178489895_0",
+      "name": "tests/diagnostic/evidenceEmitterRegistry.test.ts P1-07 emitter registry finite correspondence",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "178489895_0_0",
+      "name": "tests/diagnostic/evidenceEmitterRegistry.test.ts P1-07 emitter registry finite correspondence registered IDs are unique and keep both canonical tool-decision anchors",
+      "fullName": "P1-07 emitter registry finite correspondence registered IDs are unique and keep both canonical tool-decision anchors",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "178489895_0_1",
+      "name": "tests/diagnostic/evidenceEmitterRegistry.test.ts P1-07 emitter registry finite correspondence the registry excludes seeder modules and synthetic claims and caps importers at L1",
+      "fullName": "P1-07 emitter registry finite correspondence the registry excludes seeder modules and synthetic claims and caps importers at L1",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "178489895_0_2",
+      "name": "tests/diagnostic/evidenceEmitterRegistry.test.ts P1-07 emitter registry finite correspondence every current module contains its exact quoted literal in this physical checkout",
+      "fullName": "P1-07 emitter registry finite correspondence every current module contains its exact quoted literal in this physical checkout",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "178489895_1",
+      "name": "tests/diagnostic/evidenceEmitterRegistry.test.ts P1-07 synthetic already-effective-tier admission matrices",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "178489895_1_0",
+      "name": "tests/diagnostic/evidenceEmitterRegistry.test.ts P1-07 synthetic already-effective-tier admission matrices observed admission needs the exact shape, runtime producer and effective tier",
+      "fullName": "P1-07 synthetic already-effective-tier admission matrices observed admission needs the exact shape, runtime producer and effective tier",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "178489895_1_1",
+      "name": "tests/diagnostic/evidenceEmitterRegistry.test.ts P1-07 synthetic already-effective-tier admission matrices import admission requires import provenance, matching metric key and SELF_REPORTED",
+      "fullName": "P1-07 synthetic already-effective-tier admission matrices import admission requires import provenance, matching metric key and SELF_REPORTED",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "178489895_1_2",
+      "name": "tests/diagnostic/evidenceEmitterRegistry.test.ts P1-07 synthetic already-effective-tier admission matrices requiresMeta means own-property presence without claiming delegation-scope validation",
+      "fullName": "P1-07 synthetic already-effective-tier admission matrices requiresMeta means own-property presence without claiming delegation-scope validation",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "178489895_1_3",
+      "name": "tests/diagnostic/evidenceEmitterRegistry.test.ts P1-07 synthetic already-effective-tier admission matrices unknown audit shapes refuse while broad stdout admission does not authenticate a unique writer",
+      "fullName": "P1-07 synthetic already-effective-tier admission matrices unknown audit shapes refuse while broad stdout admission does not authenticate a unique writer",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "178489895_2",
+      "name": "tests/diagnostic/evidenceEmitterRegistry.test.ts P1-07 public parser provenance on unverified input",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "178489895_2_0",
+      "name": "tests/diagnostic/evidenceEmitterRegistry.test.ts P1-07 public parser provenance on unverified input known manual/import/dogfood and unbound ATTESTED markers cannot impersonate observed tool receipts",
+      "fullName": "P1-07 public parser provenance on unverified input known manual/import/dogfood and unbound ATTESTED markers cannot impersonate observed tool receipts",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "178489895_2_1",
+      "name": "tests/diagnostic/evidenceEmitterRegistry.test.ts P1-07 public parser provenance on unverified input missing or unknown source defaults to runtime, and parsed import tests remain self-reported",
+      "fullName": "P1-07 public parser provenance on unverified input missing or unknown source defaults to runtime, and parsed import tests remain self-reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-371472822",
+      "name": "tests/diagnostic/levelCumulative.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/levelCumulative.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-371472822_0",
+      "name": "tests/diagnostic/levelCumulative.test.ts P1-07 cumulative gate graphs (synthetic inputs)",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-371472822_0_0",
+      "name": "tests/diagnostic/levelCumulative.test.ts P1-07 cumulative gate graphs (synthetic inputs) a later passing L3 cannot skip failed L2; the contiguous graph still has a positive",
+      "fullName": "P1-07 cumulative gate graphs (synthetic inputs) a later passing L3 cannot skip failed L2; the contiguous graph still has a positive",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-371472822_0_1",
+      "name": "tests/diagnostic/levelCumulative.test.ts P1-07 cumulative gate graphs (synthetic inputs) gate levels rather than array positions determine the contiguous result",
+      "fullName": "P1-07 cumulative gate graphs (synthetic inputs) gate levels rather than array positions determine the contiguous result",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-371472822_0_2",
+      "name": "tests/diagnostic/levelCumulative.test.ts P1-07 cumulative gate graphs (synthetic inputs) a missing lower gate stops advancement although later gates were evaluated",
+      "fullName": "P1-07 cumulative gate graphs (synthetic inputs) a missing lower gate stops advancement although later gates were evaluated",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-371472822_0_3",
+      "name": "tests/diagnostic/levelCumulative.test.ts P1-07 cumulative gate graphs (synthetic inputs) duplicate level declarations are refused",
+      "fullName": "P1-07 cumulative gate graphs (synthetic inputs) duplicate level declarations are refused",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-371472822_0_4",
+      "name": "tests/diagnostic/levelCumulative.test.ts P1-07 cumulative gate graphs (synthetic inputs) not_evaluated below a passing later gate stops the contiguous level",
+      "fullName": "P1-07 cumulative gate graphs (synthetic inputs) not_evaluated below a passing later gate stops the contiguous level",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-371472822_1",
+      "name": "tests/diagnostic/levelCumulative.test.ts P1-07 canonical map with synthetic unverified parser-built rows",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-371472822_1_0",
+      "name": "tests/diagnostic/levelCumulative.test.ts P1-07 canonical map with synthetic unverified parser-built rows independent allowed and denied literals across two synthetic days and sessions reach only L2",
+      "fullName": "P1-07 canonical map with synthetic unverified parser-built rows independent allowed and denied literals across two synthetic days and sessions reach only L2",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-371472822_1_1",
+      "name": "tests/diagnostic/levelCumulative.test.ts P1-07 canonical map with synthetic unverified parser-built rows missing denied evidence and independent session or day minima remain failures",
+      "fullName": "P1-07 canonical map with synthetic unverified parser-built rows missing denied evidence and independent session or day minima remain failures",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-371472822_1_2",
+      "name": "tests/diagnostic/levelCumulative.test.ts P1-07 canonical map with synthetic unverified parser-built rows map binding ignores writer-selected tags above L1 and preserves a valid taggedRows index",
+      "fullName": "P1-07 canonical map with synthetic unverified parser-built rows map binding ignores writer-selected tags above L1 and preserves a valid taggedRows index",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-371472822_1_3",
+      "name": "tests/diagnostic/levelCumulative.test.ts P1-07 canonical map with synthetic unverified parser-built rows trimmed duplicate question tags bind one supplied event once",
+      "fullName": "P1-07 canonical map with synthetic unverified parser-built rows trimmed duplicate question tags bind one supplied event once",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-371472822_1_4",
+      "name": "tests/diagnostic/levelCumulative.test.ts P1-07 canonical map with synthetic unverified parser-built rows canonical higher levels stay not_evaluated without inventing runtime emitters",
+      "fullName": "P1-07 canonical map with synthetic unverified parser-built rows canonical higher levels stay not_evaluated without inventing runtime emitters",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-371472822_1_5",
+      "name": "tests/diagnostic/levelCumulative.test.ts P1-07 canonical map with synthetic unverified parser-built rows self-reported import and keyword input can earn L1 but cannot create higher map evidence",
+      "fullName": "P1-07 canonical map with synthetic unverified parser-built rows self-reported import and keyword input can earn L1 but cannot create higher map evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-371472822_1_6",
+      "name": "tests/diagnostic/levelCumulative.test.ts P1-07 canonical map with synthetic unverified parser-built rows manual and dogfood audit lookalikes never become registered runtime support",
+      "fullName": "P1-07 canonical map with synthetic unverified parser-built rows manual and dogfood audit lookalikes never become registered runtime support",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

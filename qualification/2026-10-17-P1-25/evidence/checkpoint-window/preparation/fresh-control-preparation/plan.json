@@ -1,0 +1,101 @@
+{
+  "schema": "p125k-future-fresh-binding-and-control-plan/1",
+  "at": "2026-10-16T23:30:37.705184+00:00",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceBranch": "codex/p1-25-checkpoint-qualification",
+  "preChangeSourceHead": "3468e29027c32209a5f794b7ffea3f1565de490e",
+  "sourceCommit": null,
+  "freshRoot": null,
+  "bindingRequiredAt": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-source-binding.json",
+  "bindingSchema": "p125k-actual-fresh-source-binding/1",
+  "bindingRequiredFields": [
+    "sourceRoot",
+    "freshRoot",
+    "sourceCommit",
+    "boundPaths",
+    "compiledPairs",
+    "existingNativePins",
+    "freshNative",
+    "helper",
+    "runtimeProtectedInputsPin",
+    "vitestCreditFromHelper",
+    "prospectiveCountOrCompiledHashesAdopted"
+  ],
+  "bindingStructure": "Reuse B36 actual binding rows: relativePath, bytes,sha256 and source/fresh actual physical pins. RuntimeProtectedInputsPin must bind the exact actual B37 runtime pinset; future sourceCommit/Q/compiled/native identities come only from actual root helper/build/binder observations.",
+  "selectedNames": 94,
+  "compiledPairs": 19,
+  "activeProtectedInputs": 142,
+  "priorNativePins": 9,
+  "totalAfterDistinctFreshNative": 10,
+  "prechange142OldSourceBytesNotRequiredAfterExplicitSuccessor": true,
+  "actualRuntimeProtectedPin": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/runtime-protected-inputs.json",
+    "bytes": 70694,
+    "sha256": "bd1bae1f206edaed9aaac06650c98d0e8dd8e60eef85d986ca44439c4d02afc5"
+  },
+  "prechangeProtectedPin": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/protected-inputs.json",
+    "bytes": 68779,
+    "sha256": "de322b4c2df60ad80c736987f24a0b6aa7f46413cacbd7cc7a0573fa1854b8ca"
+  },
+  "onlyGrantOldToNew": {
+    "oldSha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc",
+    "newSha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca",
+    "other141Exact": true,
+    "originalPrivateAndGitHistoryRequired": true
+  },
+  "corpus": [
+    "tests/time/checkpointWindow.test.ts",
+    "tests/time/tsaGrant.test.ts",
+    "tests/time/verifyTimestamp.test.ts"
+  ],
+  "declaredLiteralBodies": 21,
+  "runtimePassed": null,
+  "hooks": null,
+  "controlFailedCounts": null,
+  "phases": [
+    "p125k-source-combined",
+    "p125k-fresh-canonical",
+    "p125k-m1",
+    "p125k-restore1",
+    "p125k-m2",
+    "p125k-restore2"
+  ],
+  "operators": [
+    "OMIT-CHECKPOINT-EVENT",
+    "OMIT-REQUIRED-PENDING-REFUSAL"
+  ],
+  "auditAdapter": {
+    "inertSource": {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/runtime-audit-preparation/audit-observed.py.source.txt",
+      "bytes": 2165,
+      "sha256": "3fa420420119af3654c1fe6e6c4ccccdae7c5a4e7f0e2d51a0bc1229cd2f3c3e"
+    },
+    "rootExactCopyTo": "/private/tmp/p1-25-checkpoint-qualification-20261017/audit-observed.py"
+  },
+  "requiredManualClassificationFields": [
+    "phase",
+    "sourceCommit",
+    "operator",
+    "outcomeSha256",
+    "rootAllFailuresRead:true",
+    "allFailuresClassified:true",
+    "firstSensitiveAssertionRead:true",
+    "noHookOrEnvironmentFailure:true",
+    "actualCohortAndHooksMatchCanonical:true",
+    "actualOwnedChildrenAndCleanupRead:true",
+    "allFailures:list matching actual failed count",
+    "firstSensitiveAssertion:nonempty",
+    "masking:nonempty"
+  ],
+  "protocol": [
+    "Root full-read and separately admit the exact helpers/recipes and fresh source-only control scope. No command is run by this author.",
+    "Require actual clean source checkpoint and owned fresh Q, exact helper closure/build binding and same ordered zero-skip source/fresh identities. No helper Vitest credit.",
+    "Require all four ACTIVE/HALTED spellings absent, clean S/Q and empty indexes, exact heldR18/head/index,94selected physical file pairs,19compiled preservation pairs,142active bytes and ten distinct natives.",
+    "Require prechange142 metadata exact, original9f9 private+Git188/3468 bytes preserved, only source-grantc8c successor admitted and141otherrows unchanged. Never reopen old Sgrant9f9 as a live requirement.",
+    "Apply one exact once-match source-only operator in pristine owned Q only; original/exclusive prepared record/live patch and no-follow descriptor/single-link/source-distinct guards remain.",
+    "Wait for actual naturally closed RED, read all first assertions and masks, supply exact outcome/source/operator-bound manual classification, then explicitly restore original bytes. No automatic restore/retry/signals.",
+    "Second operator requires actual same-cohort GREEN restore1 first. Root separately runs restore2 GREEN and final preservation. All snapshots are bounded observations, not continuous isolation."
+  ],
+  "boundary": "Only names/recipes/guarded private helper text. No new source commit/Q/future hash/runtime/hooks/failure totals or qualification credit is supplied. Source-only controls do not qualify compiled code, public TSA, CMS universality, F37, sealing/issuance or full P1-25."
+}

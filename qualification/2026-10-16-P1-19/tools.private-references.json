@@ -1,0 +1,1491 @@
+{
+  "schema": "p119-tools-private-references/1",
+  "files": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/HARNESS_COMPARISON.md",
+      "bytes": 20955,
+      "sha256": "1ba0b836ecaeac644804af3bfb79c858a228d69dbbb801ba0c871460042fec4e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+      "bytes": 14667,
+      "sha256": "98827b75314ab42b753bccf984f3e249b09522e46c824908be59e4fedf151f86"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/harness-comparison/nativeOracle.mjs",
+      "bytes": 18098,
+      "sha256": "e91a3bded2fd7a04e9660d350830cc04b74dc82587a68f3107ab55b07a226cf6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/faults.mjs",
+      "bytes": 2864,
+      "sha256": "7aad83275985054c5c1fd6173f02a7dd5a86b8a1d5a470adde73dd7390d5290b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/server.mjs",
+      "bytes": 27740,
+      "sha256": "f3e493bcfb1507bb5c324e773776795c90318183856123080e7f828aec0c8be0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/txlog.mjs",
+      "bytes": 6696,
+      "sha256": "45b8bf0624ebfb3fb1a7cfb8291cc3835205763ffd865a7d32fb6e469d360140"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/receipt.schema.json",
+      "bytes": 2315,
+      "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/cases.json",
+      "bytes": 52804,
+      "sha256": "f955827ca996c2adaad3b4c31faf895375a13644b4c616d7cdeb302d6ef55999"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/seed.json",
+      "bytes": 4718,
+      "sha256": "1b52e98459eeb6cfa4dcc0501c6409cc4fa6c38a070df2558b6b9c43a443d50e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/schemas/v1/authorization-record.schema.json",
+      "bytes": 14589,
+      "sha256": "93c50b8e80c49a8d831f990c6899be765be1f66066df3673797a01f730f5e36f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/schemas/v1/receipt.schema.json",
+      "bytes": 11129,
+      "sha256": "858bb4712a4edb484538c82fdf6dcb58b3dae4364c9e519f33524cdd6cec52c6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionCliCommands.ts",
+      "bytes": 3337,
+      "sha256": "5e15ae02eb3168ea11a46df76fdaac3ebc966185240a77bd7815bfd0c97d609d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionJournal.ts",
+      "bytes": 33320,
+      "sha256": "b42e3b88bc1a849d4c5409259a4328ea4f1a29a660bf9e0e4f55e1d96916e1b4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/authorizationRecord.ts",
+      "bytes": 4176,
+      "sha256": "03707d72dfecef59af3e003dcbca4a675b06dffd5f568bada178d171f446150d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/authorize.ts",
+      "bytes": 20450,
+      "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/normalizeArguments.ts",
+      "bytes": 6300,
+      "sha256": "4efdbc0db4e4926c87509754e94867b1eafd45b13a2d14dca9a79749dbe81908"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/receiptStates.ts",
+      "bytes": 7612,
+      "sha256": "7df3a6cf1e7f4a54e384ede867577dcf184c669e607ce164a578f72a93d25446"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalChainStore.ts",
+      "bytes": 26341,
+      "sha256": "72f14a9fe4a01375ab20a4129f05a7ef8c2ccd6959cdc2777a87f429d7f443ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalEngine.ts",
+      "bytes": 21065,
+      "sha256": "a2257cea092960d8815e6608e4d2cd416cba5d429eabb6e3a1147d7902e91b06"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+      "bytes": 12366,
+      "sha256": "19b046e71142f66a5ba514bb1ea8bb1d26bbc39ddd15cfb882bab253d3c517c5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalQuorum.ts",
+      "bytes": 4388,
+      "sha256": "0f2c806ee6bb748f209f649b1c19092ec93bfe75b349c8a0aa381a90549e62a8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/budgets/budgets.ts",
+      "bytes": 10695,
+      "sha256": "bae506f230b0511759f795cb0099f9b8d3fdb77aa42789e70658e4f84d15243c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/bundles/bundle.ts",
+      "bytes": 42233,
+      "sha256": "a28de38c02c4c748de0c81c925b655b274ce287b72db9e834823b41375d78894"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-evidence-store-commands.ts",
+      "bytes": 7392,
+      "sha256": "43549b82cec61a77333fb3889238ad8d896c3e09290dcb5b6589114c9d152559"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-session-commands.ts",
+      "bytes": 17552,
+      "sha256": "c640189b30cecb2539e59cb2f088d3a4a8277f3431cc2a145c88706694e015ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-trust-flags.ts",
+      "bytes": 6277,
+      "sha256": "fe92104ef1561ca0d45c0b9db46c346a0fc9f77e1e11d428c22205300739a081"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/contracts/v1/authorizationRecord.ts",
+      "bytes": 3279,
+      "sha256": "2e67a443157adabbcd05ab47f52619a26a93c4edf5bcb2a2da4c1e9deccab953"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/contracts/v1/receipt.ts",
+      "bytes": 2606,
+      "sha256": "16c5ecce46d99e465923c7cde3eea81defc3375ccd417877b34ba4073e722e20"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/evidence/auditPacket.ts",
+      "bytes": 8432,
+      "sha256": "7880cbd53abbb153cf541e0387ccbf8341bd31903122907b032f33b0edd8565c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/evidence/exporter.ts",
+      "bytes": 17632,
+      "sha256": "3f99c5f37339a2640ef27654d9249a3bec546f0b9172bd405fa47b6a8cea9021"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/governor/actionPolicyEngine.ts",
+      "bytes": 34205,
+      "sha256": "95448aec3b9d3b9abbe675a1a6f9922b069818a44b4e1876d3a4751724eeef2d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/eventHash.ts",
+      "bytes": 1726,
+      "sha256": "da31a26164e9fee0752619a67e7f78790082d5a1c14cf95e72f716192b6ca06a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/ledgerSchema.ts",
+      "bytes": 22470,
+      "sha256": "8375975c42861af68a69ba33e367f8f03a9b691155a9e974152916da90c0df25"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+      "bytes": 35501,
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/sessionVerification.ts",
+      "bytes": 3048,
+      "sha256": "b231357057916a626c440d5f11462bbe8004994602024b93f47f75744abf2f7f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentAdapter.ts",
+      "bytes": 7838,
+      "sha256": "f6bf640a995cfcfb7f2aa3edb5cb16460ba129621caa3e4a4d44f4a26be4ee4e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentArgs.ts",
+      "bytes": 1865,
+      "sha256": "73f37d1a65ff5100aa66e7e9c729b84bc6f977fc59fff18490b9e0ee63dc15fa"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentServiceClient.ts",
+      "bytes": 11998,
+      "sha256": "6c95c1d07fc6a6965733180c53a964c7a11c4e1d840e0670c1bc31d9a8b1ccd7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/receipts/receipt.ts",
+      "bytes": 5409,
+      "sha256": "fa24ce3e706cdbfce461dcf553a35d54389a1cc831135eebe9d109f352508d67"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/toolhub/toolhubValidators.ts",
+      "bytes": 14760,
+      "sha256": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolEvidence.ts",
+      "bytes": 6941,
+      "sha256": "c0453fde0f6b1f29cc9847120735ff241eacf876228c291f7291e377682e1162"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "bytes": 32498,
+      "sha256": "185437847aef58288e7d56601d8fef7d47de3fbbbb9ec0e6adf51d23a92d429b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolTypes.ts",
+      "bytes": 7901,
+      "sha256": "e8b2c56d487a091506369fcf6d11db91fe1030957494bfc7d5bb04058f75077a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceId.ts",
+      "bytes": 1151,
+      "sha256": "507c07573b42279d672230063af0af48e356603c336598b4d3d462f8279ea016"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-19.md",
+      "bytes": 28238,
+      "sha256": "25846731b701a4d0b44c1a22d9be0957005b463b15203db629cfb7e5fc00d0b9"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-architecture/command.json",
+      "bytes": 1288,
+      "sha256": "7ce5d382dce148d2fa160765bec0ee1e9332d2a57028c7122e9b75eaf55d118b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-architecture/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "4e374ba42fcda087381b298cc127abf73c5b2d93a251d048a18412b80b72d778"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-architecture/owned-process.json",
+      "bytes": 457,
+      "sha256": "06e1fc3051d3a6cd4cf23b17423b3eb56a930627b1110113eba12961375e93b6"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-architecture/stdout-stderr.log",
+      "bytes": 95677,
+      "sha256": "789916e57e4e08b7f22e5c0c287cbfdff07ecf79231fbce1b97389a590c7e500"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-clean-source/command.json",
+      "bytes": 1284,
+      "sha256": "10a2333d5bec16b46c336465715cafb2459cc167ad801cbcb738ea4a9bc0e5bd"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-clean-source/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "5b18df76bbcfca530a4fac0c68a5d8697668294611e76080210b10022051041f"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-clean-source/owned-process.json",
+      "bytes": 456,
+      "sha256": "886de5d35c4b7c43c22b63ad8fb9ff719b25547a3965bf1d0dd8f9c7d3be63ab"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-clean-source/stdout-stderr.log",
+      "bytes": 852,
+      "sha256": "4c7fb4087ba2a7f8cc96bbd5d84a7ac1bbb1fe92b5c5450f801b79dc56e559b6"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-before/command.json",
+      "bytes": 1267,
+      "sha256": "709f254490f5c24e5fead6d85c9af565e4f08a3175500feddd8cf44ed9473cb2"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-before/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "45380e77a9209f8e6e060d1d1f372a2e0461a383061054a7e7e61fc13d6aaacb"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-before/owned-process.json",
+      "bytes": 446,
+      "sha256": "1487bff81c1eba490c044a148bbeace44c05da6a1b58f7fe6120735c2b5f8907"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-before/stdout-stderr.log",
+      "bytes": 1228,
+      "sha256": "c95155a73d6781a7fe8fd611ef8b67893bc2a2d7a271c8d5c65561c60e0e16ed"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-final/command.json",
+      "bytes": 1268,
+      "sha256": "4886a3cd58a62bc701262407d80b320ff174149debf972758f0a78ce8135f9b9"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-final/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "6f53c4ef05e8d331cc50fe98f8b3751b2009d585a8de46d721cb04588d4ce506"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-final/owned-process.json",
+      "bytes": 449,
+      "sha256": "cbaa1d69cfd698dd17f65244566cdab98aecbc1c81f2f2b698321e6eb73f9a39"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-final/stdout-stderr.log",
+      "bytes": 81,
+      "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-generate/command.json",
+      "bytes": 1271,
+      "sha256": "9b8c43e7cdbd90c556d5502fd8e7201fc2897759fb33cdb78b5ca2f643997fea"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-generate/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "21a0140810ec32fc40e524d6a0597010b07f71eaf1f2a2acb18541e04422c4e7"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-generate/owned-process.json",
+      "bytes": 446,
+      "sha256": "2acc2db29fe5f7588a75a18498243fb43577fe0b2df1173a36eae5e0052559de"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-generate/stdout-stderr.log",
+      "bytes": 20,
+      "sha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-deadcode-delta/command.json",
+      "bytes": 3504,
+      "sha256": "44f57261e80b1aa5e6d076884423e48ab9980be810cdfbd342dab0e85d61bee6"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-deadcode-delta/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "63f8324c724e64bfec65d75c6ffe99878e2a9ac69a45291cd0f6c9c889346b36"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-deadcode-delta/owned-process.json",
+      "bytes": 1565,
+      "sha256": "6c1bb547bddf9b4e0c84641d9f68bfedd633b8a6acbc229fe889486e34971b96"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-deadcode-delta/stdout-stderr.log",
+      "bytes": 498412,
+      "sha256": "f59a5736ee353fa05a243a26d30af81f3750274e375522391559ed0f0f053563"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-deadcode/command.json",
+      "bytes": 1273,
+      "sha256": "259a94d1280fcbcc146727335ff026fbfbc7ad4ad0de35d8e75ec9bceb8b6bde"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-deadcode/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "d814f008358768bc07e58e4991757b45fdb0435b44cce8a2b061666317cf9bca"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-deadcode/owned-process.json",
+      "bytes": 455,
+      "sha256": "62eccec08fe28e4ea3be107c12d3e8b0dedd6312b71e5001dee1ec9bdd025ddf"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-deadcode/stdout-stderr.log",
+      "bytes": 962,
+      "sha256": "49d979befbc5bf5a4c51558bb565b65a2f21d34032e634ac7cfb1b973c3dbc79"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-docs/command.json",
+      "bytes": 1245,
+      "sha256": "3dda5eeb8bf97bbaca1401c3e0560a90362b994883fb8a3a28f76e5125ef14d7"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-docs/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "42d191865cb925806df23ff97a38b4e415d1f22fc99c37bbe5f9f889b20449a8"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-docs/owned-process.json",
+      "bytes": 444,
+      "sha256": "647d6fc85f551c85959f59e33e0639b89d162b96bd81cd6ed8df49c96329a8bb"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-docs/stdout-stderr.log",
+      "bytes": 45,
+      "sha256": "5407ecd8d6d4e86e27cada4e5cfb641626af7a5f0c2e7c6ac879cd34ecbd8d92"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-duplicates/command.json",
+      "bytes": 1278,
+      "sha256": "2151a7f12fdbb968d7c5fc4c0c73d2eed1f489d44ff8e51016daee050068f240"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-duplicates/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "c963354ef4304c3ae6294fc0746781394f2ef7ee5cb22114377aa93b3d1b921f"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-duplicates/owned-process.json",
+      "bytes": 456,
+      "sha256": "7ea382b29e41bc994a996fc2b02a48912e757b303b2d26ea1f47cfaec42509d9"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-duplicates/stdout-stderr.log",
+      "bytes": 1845,
+      "sha256": "1b1ba849c8834dbaae46182c501fe720fb6fb86d5f953ab27cd83fd01b4ba50d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-final-lint/command.json",
+      "bytes": 1161,
+      "sha256": "2753d036136682fa40b478577006f329a109cf2fd5c65aed3737f42dc4d4aabf"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-final-lint/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "8bcb7c5ac885d00ccb842cd2a8d3faf801228552e5825c654e9192d6650522a3"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-final-lint/owned-process.json",
+      "bytes": 397,
+      "sha256": "ad9515d1d51d38aeef462a5266916c4d095097a8b6fb814a49764e5e4cb41035"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-final-lint/stdout-stderr.log",
+      "bytes": 443,
+      "sha256": "d08987d08f71a61edb2971955d0b863717bb9862df09fb5e1d629ddec3d48dec"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-final-tests-typecheck/command.json",
+      "bytes": 1360,
+      "sha256": "38dcaf4f75a7ef98194873a9e28e09ba6cd616c1fbe24945d2f3b3c6a81b5110"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-final-tests-typecheck/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "a5a6f55648b2d091ad4467fc1d29fb78a555d59a3682f105e0fa539e980e1456"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-final-tests-typecheck/owned-process.json",
+      "bytes": 488,
+      "sha256": "91fb4118054064ede70e447dd2967eebe6c7fd3b05f65649449ad5939dfdfa2b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-final-tests-typecheck/stdout-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-freeze/command.json",
+      "bytes": 1242,
+      "sha256": "0cadf18953ca5e79f2b73cdc7d9369b1a6da8cc5a2d4664e677bfe781e126b9f"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-freeze/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "ce19b5a5d8e8fb1dc5ab189c293c9afa351c9873d372fe108e0c7608e1921de6"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-freeze/owned-process.json",
+      "bytes": 440,
+      "sha256": "f53b14cd35a454a9cc9e57ddbaaf0fbcce7d87c1d07adfb7697a28817129c4d3"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-freeze/stdout-stderr.log",
+      "bytes": 116,
+      "sha256": "bf2c6aa2a9a9bc0f0d1679f94040946347d7e819a28bc7e33bc7235806bb6253"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-fresh/command.json",
+      "bytes": 3279,
+      "sha256": "9ce83efd8f89085634f6dfe5002dabda8acad1ac5d211077d5ea25569c543339"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-fresh/observer.json",
+      "bytes": 17874,
+      "sha256": "f72021905af5ab1c453758626417e2cc14ebb2c9abdb8e27e7786151fa389f75"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-fresh/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "838ee46183fb79acb37c9480392c6a7225bfb32ea53b20b2c0a76d26c6a44373"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-fresh/owned-process.json",
+      "bytes": 1093,
+      "sha256": "f0340e1bee171c57dfba3972ae0a717de6abd3b140e17dcea2b66f100e50a978"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-fresh/raw.json",
+      "bytes": 13624,
+      "sha256": "f07a38f8d56e8bf0ddeaa7d6553ba74d253fe92afd99a9d12bed554b95024852"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-fresh/stdout-stderr.log",
+      "bytes": 1639384,
+      "sha256": "77f426fa9547d2e63971f68fbde2312169a98c5da257e80de2e93b121dc64d94"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-missing-positive/command.json",
+      "bytes": 3011,
+      "sha256": "321367ce289f1fb6345ee4273c8a473c252134c5c478dc2074c2f4ba1993a337"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-missing-positive/observer.json",
+      "bytes": 13536,
+      "sha256": "f2beda620b942b28b39afb1e98a86b0f63413f9f766cc26022c5299ef2928362"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-missing-positive/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "c023857f6e73f36ad63e94c129abdf0a5fd4457434ab60ace78314a7812b8d97"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-missing-positive/owned-process.json",
+      "bytes": 926,
+      "sha256": "917eb803a31994eb9ceb61e89ec5c1e6e27d1bb52c924e2015bd39d662059f99"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-missing-positive/raw.json",
+      "bytes": 8265,
+      "sha256": "cd9354b418b486b649bd34f39ced9f82cc9fe7a04f33d6759a808ebcffefd399"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-missing-positive/stdout-stderr.log",
+      "bytes": 16563,
+      "sha256": "cc5a4199f62ce61c3d4e67135325f3705f0c861357760a28b361122f8c3ee276"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-build/command.json",
+      "bytes": 1186,
+      "sha256": "ec8638cafefa7a572536a8c5658e33aaa52edf2c57fe7a1b847d718826e52193"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-build/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "9c4030af2f037077e5621382d17de583f113212c64c1115d2b23d4f66eec7451"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-build/owned-process.json",
+      "bytes": 398,
+      "sha256": "86b72498adda6f48d7c4bb1fd56bdaa264cbed2cab708e375001ee31e8abb087"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-build/stdout-stderr.log",
+      "bytes": 947,
+      "sha256": "7e23aaa928609c33a5d82827259cb85d157909edca8609eeb8132c1e9120a936"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-green/command.json",
+      "bytes": 2932,
+      "sha256": "69885be2ab81b78280165aa2cf356766810b00d7bdc4e7383440cc467817b19c"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-green/observer.json",
+      "bytes": 9933,
+      "sha256": "7f261a9c358c0dcbc7fce8693c7edd468c1158798cf9a75c8216bc409a8457f7"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-green/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "746833b0d68adcf33d2e1654cb9e2653a4c9b14ff137983d45f7682379ea93e1"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-green/owned-process.json",
+      "bytes": 876,
+      "sha256": "20dc259c46a0bc539b6e52fb23d6c2ab43c6e220e77f30b0f1ed6b3251829efb"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-green/raw.json",
+      "bytes": 7158,
+      "sha256": "476ae1a4f5379a0fb9c055e72e80dd1c5e32bc1b5a71ddb8ccf61a5ce6f707c5"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-green/stdout-stderr.log",
+      "bytes": 27075,
+      "sha256": "94766713fb159e09afc30379f6d78b5695ef02aa896223be3987a0f159d6b9f5"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-red/command.json",
+      "bytes": 2919,
+      "sha256": "ea72c7650be3b77193e1243250a10de77dcfa4cec88a43f210f6a4eb3372f3c3"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-red/observer.json",
+      "bytes": 13854,
+      "sha256": "834bde37c4d125a16ca78b178ddff5c31283ad14f25d8fa02ce1b1c9b2f4d516"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-red/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "b349e8cadea7ec99387922a372e8c627f306e04ed462fbfda9f5c1b96a27661d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-red/owned-process.json",
+      "bytes": 874,
+      "sha256": "e52ddb64043359ce5492db6fb36681ed89b8088195b693b0bec1e1920777a7f8"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-red/raw.json",
+      "bytes": 8160,
+      "sha256": "1dea43c9074fcf68e50573801a309f453fffccad64e8c3d2f224e9853f1559d5"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-red/stdout-stderr.log",
+      "bytes": 28269,
+      "sha256": "9e957516b400595ea6054bf2cb9c6f0a542b86770e96222d95990b4d606501eb"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-source-lint/command.json",
+      "bytes": 1160,
+      "sha256": "70832ac458d757b5b17f221bb856384092edeec3b2daf2524919df178d189698"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-source-lint/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "9b9c9a2df6a906cd1a9becca1922b2286659bd87b974026196b8c09118af14fa"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-source-lint/owned-process.json",
+      "bytes": 394,
+      "sha256": "b658183a77fa5a1ab6d083e717cd191819da7d2500c3aed6ce83edd11df75bf6"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-source-lint/stdout-stderr.log",
+      "bytes": 443,
+      "sha256": "d08987d08f71a61edb2971955d0b863717bb9862df09fb5e1d629ddec3d48dec"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-all/command.json",
+      "bytes": 2845,
+      "sha256": "cae9d8698ac19751b43a7e5a158cd127dffb8418a0c5901a82777dcc8c6a7eb9"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-all/observer.json",
+      "bytes": 20191,
+      "sha256": "c03517dcc09f6e49b4da3657d12537b2fc5069a8829962d59f2a64fb4ecdebc8"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-all/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "33798ec4b91739c0ce9fe1bda57928fbf7f3c767a1ecee4122ed8aaa8c489f2d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-all/owned-process.json",
+      "bytes": 866,
+      "sha256": "d20d150fc35656a9cab338d64c8bf667ed6fa151ed0654363adc41d0be5aa349"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-all/raw.json",
+      "bytes": 14243,
+      "sha256": "383e84379cf9c7fe9e8f59bfe4abde6a5222a17bfd99e0265f7b60600548e3d9"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-all/stdout-stderr.log",
+      "bytes": 1556104,
+      "sha256": "814ddcf8b09fc60d8593e96c29cc738206c5b24e122c92d7d9d4ac36a680d4f9"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-build/command.json",
+      "bytes": 1157,
+      "sha256": "6f43af164162405d460e27039df20c4c5108a3f4b46c2e3d60280de9a07fee51"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-build/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "45d627dd62b2b2ea5340e46ce058aad6dff7826ff1438ae041d7d7ae2aac3285"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-build/owned-process.json",
+      "bytes": 395,
+      "sha256": "411c0479355748ccc8f67f7ce56ca94f46a2644dd113474169baef2e4b4f7996"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-build/stdout-stderr.log",
+      "bytes": 947,
+      "sha256": "7e23aaa928609c33a5d82827259cb85d157909edca8609eeb8132c1e9120a936"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-positive/command.json",
+      "bytes": 2975,
+      "sha256": "725017ff2cde7dd034959b0ad2848192bcb212bee35b2243909d687ffcc9cabf"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-positive/observer.json",
+      "bytes": 9493,
+      "sha256": "fd62fbf48b79943653305cef73fc1061bdcc96a0b9207df20703a3de070d226d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-positive/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "a7780b09a062d3b1cd2d7f270ae785355cb3f59c8c2991f00083b7fa24c37ac2"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-positive/owned-process.json",
+      "bytes": 921,
+      "sha256": "72b14744f5079d6acc38d19cd58ddffe02dff2f9e5cb5afb0f84ff6196867348"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-positive/raw.json",
+      "bytes": 6847,
+      "sha256": "f272f3c729e8a7de2e073c3985b019865b3749b96384a4223a984dff48f7e1b2"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-positive/stdout-stderr.log",
+      "bytes": 60840,
+      "sha256": "34481120deddc38abb6ee23e33c811b2e481654947e288ca2b9fd1c29a9301b9"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-typecheck/command.json",
+      "bytes": 1287,
+      "sha256": "f6cc0b53610e1c1bedb43ad02771e8ff5375dee3a3ed6c6effec33ec884f1a67"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-typecheck/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "248f67dc415c9f9cb73bd4ba426de9bd39075240dd3a922b5c48fde567d07fb9"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-typecheck/owned-process.json",
+      "bytes": 456,
+      "sha256": "7c03489b0d52a21be47dd35e613967d4dc8fb2b7e1990a2b15d5eb1a5fba1469"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-typecheck/stdout-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v2-repaired-controls/command.json",
+      "bytes": 3098,
+      "sha256": "22694896bcac0c288c544e28226fdc5c22f0aa9714f1f37f58508de9627170dc"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v2-repaired-controls/observer.json",
+      "bytes": 17733,
+      "sha256": "824de654697026cb8ac067ef1b3521dd8531205e4766ea2426ee1107a5edfa2d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v2-repaired-controls/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "a217c5b7f82149abff58512d736a3c17551192da8074cfbfc945d66c3f3e24c6"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v2-repaired-controls/owned-process.json",
+      "bytes": 960,
+      "sha256": "12265c620bad265007978494ecf77f0408d7c485bda6a79a5c9589f70bcd9519"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v2-repaired-controls/raw.json",
+      "bytes": 12755,
+      "sha256": "429ac81dfdb6028026a0012fa82063b0a0e2b2ff0043e182a3f8f08925827661"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v2-repaired-controls/stdout-stderr.log",
+      "bytes": 148743,
+      "sha256": "f15cae436702a9163d8647578a5cf6792d63bde72eb7668191b53b5253737f7d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v2-tests-typecheck/command.json",
+      "bytes": 1351,
+      "sha256": "76e3d5f0bf5badca507701f69d17b173e8404607447404d12aabe79d4cc388af"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v2-tests-typecheck/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "36009ca9168f40898bbe0a9b3b62514c320cac19c83d204dbef8db15d9224e34"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v2-tests-typecheck/owned-process.json",
+      "bytes": 485,
+      "sha256": "5dc94d7611e68bd6661814a05fb4e16cc2637909fb51aff4cc9d3f642ae08b4d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v2-tests-typecheck/stdout-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-fresh.producer.json",
+      "bytes": 13624,
+      "sha256": "f07a38f8d56e8bf0ddeaa7d6553ba74d253fe92afd99a9d12bed554b95024852"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-missing-positive.producer.json",
+      "bytes": 8265,
+      "sha256": "cd9354b418b486b649bd34f39ced9f82cc9fe7a04f33d6759a808ebcffefd399"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-report-contract-green.producer.json",
+      "bytes": 7158,
+      "sha256": "476ae1a4f5379a0fb9c055e72e80dd1c5e32bc1b5a71ddb8ccf61a5ce6f707c5"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-report-contract-red.producer.json",
+      "bytes": 8160,
+      "sha256": "1dea43c9074fcf68e50573801a309f453fffccad64e8c3d2f224e9853f1559d5"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v1-all.producer.json",
+      "bytes": 14243,
+      "sha256": "383e84379cf9c7fe9e8f59bfe4abde6a5222a17bfd99e0265f7b60600548e3d9"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v1-positive.producer.json",
+      "bytes": 6847,
+      "sha256": "f272f3c729e8a7de2e073c3985b019865b3749b96384a4223a984dff48f7e1b2"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v2-repaired-controls.producer.json",
+      "bytes": 12755,
+      "sha256": "429ac81dfdb6028026a0012fa82063b0a0e2b2ff0043e182a3f8f08925827661"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/followup-service-audit/audit.json",
+      "bytes": 6868,
+      "sha256": "74b64e674945860bb5df30e7a5f265853f199a88c83283cd6b33ece91947717a"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/original-service-audit/audit.json",
+      "bytes": 6965,
+      "sha256": "8bbef814aba6bc0957f7e692a979ec948a39583b77e6f678d443790544618652"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/actual-missing-tools-red.json",
+      "bytes": 7347,
+      "sha256": "d03c0f343e6b32e15d2f84c2939993d21c411d726e9ebf75427fde0b183b1f77"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/counts-before/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "eb1178ec67cc7c3a2952a7285404aed69ff8abc612edaed0cbec627a602a33cb"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/counts-before/README.md",
+      "bytes": 59828,
+      "sha256": "dde61133a882de2c1a5bfd3fe936529fdc6731076a393cb053516cec63068c1a"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/counts-before/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "4cdf3ea7cc53d86f2b3d5c09132fd1235165a7f935a7f5cfcd1723d659399875"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/counts-before/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "b2b659d6f50009b56cd7a10905b22ee542ccb1ac4a0b9a8cfae3a52ea6466492"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/counts-before/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "6f4a0af209490501133fcf8cd8e31aa88be2a3fc7232a17f65b8cf727ce452ed"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/counts-before/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "a4e29065c022b69e8a722c715e7f256e1b72bdc24666bb91a78a774d1e1150ba"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/counts-before/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "c9d92217734286a75df14c64eb1921150ab7eda31854545ec88419e7cd9ec77a"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/counts-before/website/index.html",
+      "bytes": 43520,
+      "sha256": "3dd2cb17bbba6cc69572fdcdd72d17ab6fe5184c0f29bee4c8dcd931c6b076a4"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/counts-before/website/lite.html",
+      "bytes": 11197,
+      "sha256": "2aaaabcf08756ed1c7840feec211bef1c220d680b34f9f4ed877314a69f2e1f9"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/counts-before/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "44987e4dca9d6872ac9c76ba2fb82646d6b042f3b3cbc7d7a9177b0f978a1cac"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/counts-generation-review.json",
+      "bytes": 2794,
+      "sha256": "6301327b44f33bdf2e01ce4dc74bad4d053ef729a9519f85ff9b4d1d0fe262b6"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/counts-input-pins.json",
+      "bytes": 3292,
+      "sha256": "bcde90bccdf1636112eb64cc58f8ff382d66e3b646c4d1d450e63fca28f7d5fc"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/deadcode-delta-plan.json",
+      "bytes": 1611,
+      "sha256": "2341fb1e283848e77527be417b3f51d3fd8d50ccbb4ac1b986dfa2d1d921414c"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/deadcode-delta-root-review.json",
+      "bytes": 1155,
+      "sha256": "6d39700e78fa89393446a6bcd5e1bfcd986bade908208f5b20d173675e73e85d"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/documentation-paths-D15.json",
+      "bytes": 473,
+      "sha256": "1763312dec3a2feec96603b2b54f1b05a835417df9dc14f10d45b976687da113"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/exact-source-staging.json",
+      "bytes": 451,
+      "sha256": "dc7a9842c5266e37e94cdc7ac5a48a0d8548764e7568b9bce2a183293820725d"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/finance-fixture-tools-append.txt",
+      "bytes": 3186,
+      "sha256": "2dfeb397a228cd2daff45901fd2ad5f4e39d940f764e437358b2d92abb75e4bf"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/finance-readme-tools-append.txt",
+      "bytes": 520,
+      "sha256": "034f011331c453ee7cc788e713b3908bf9ac8d6e6f1365ff5e6784fa45a9d501"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/finance-tools-changeset.txt",
+      "bytes": 261,
+      "sha256": "a5244ea333243820421d381207fcaf350095ce2c72471276dbfc98a0ed601a98"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/finance-tools-documentation-application.json",
+      "bytes": 1044,
+      "sha256": "9b3c445c4e0ce745b4d5e5cb88694e35806c4c5945f5fa3e39be5670b58194bd"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/fresh-clone-before-tools.json",
+      "bytes": 18487,
+      "sha256": "ddcf03da54e0cd0de8f34ad297de06e5186bcd007c8b03b3e3b49f29cbdee2c4"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/fresh-tools-audit/README.md",
+      "bytes": 2802,
+      "sha256": "3223f204ec08dd498dc1cc33c5d926f03496bb4b12d1d3150e4883b6f51de625"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/fresh-tools-audit/pins.json",
+      "bytes": 26071,
+      "sha256": "a8fafac2637bbc62a7c73cbe0a4176293771cde4ed5cb66804bdce8f55597b77"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/fresh-tools-audit/review.json",
+      "bytes": 218147,
+      "sha256": "6cdc0d4fc94d3bbf0e4184785ce2d9c12e7375e02c8c020bb52c6c813789a9db"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/fresh-tools-root-review.json",
+      "bytes": 5002,
+      "sha256": "cbf18be15f475b426ecb05640883ecbcbd69200452c047cc805754b6b5f7fcc2"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/interface-admission.json",
+      "bytes": 2234,
+      "sha256": "821f885a0e7029206272de7e859e5b6e39d36765c251008fbf6e699f952692fa"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/live-wip-before-tools-checkpoint.json",
+      "bytes": 5858,
+      "sha256": "99501a2107d551bca67680b47d4b95c6654114eb182c41c0ff371b8c04b5d101"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/missing-source-red-audit/README.md",
+      "bytes": 2050,
+      "sha256": "82e6569cfa34ae1f82bef7e7e72d64e063663431defcad790d27435bff8732f8"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/missing-source-red-audit/pins.json",
+      "bytes": 613,
+      "sha256": "e8c313c3a7f171c701a6f85b11e3e6a8c3eb3f16e534eb2f3ea1ac2aa457a600"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/missing-source-red-audit/review.json",
+      "bytes": 21895,
+      "sha256": "1ab503fa4e7e853d2ca2736ef976a804fd5da19ea01efafd1bd03de652dac929"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/persistence-fault-test-proposal/README.md",
+      "bytes": 3410,
+      "sha256": "b701e04de432b38dfce3ea77c69d8fdbd122b83e073843e2d5f06df5737dc5e2"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/persistence-fault-test-proposal/pins.json",
+      "bytes": 3014,
+      "sha256": "cab3e90128775eb2c1ab58c9c1987569b9be9fa00f84e21c689edf956f34d21a"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/persistence-fault-test-proposal/proposal.patch",
+      "bytes": 6535,
+      "sha256": "c2bff7ae684d3c383143a5232030666e6d3c075f4b9d04619be8efab928ce69b"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/persistence-fault-test-proposal/tests/helpers/financeToolsQualification.ts",
+      "bytes": 31480,
+      "sha256": "76d538aac8eaa372d41a212b930582ebddc5a6b9f6f8625fc51df99d8bc143c7"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/persistence-fault-test-proposal/tests/lighthouse/financeOpsTools.test.ts",
+      "bytes": 15104,
+      "sha256": "2efebd8cb0a029557ae7b7214f058abaefbe75ede1a30c0ba74856a4bcd07dad"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/positive-runtime-audit/README.md",
+      "bytes": 2087,
+      "sha256": "e30818611304469db4530783fc0447c7db68f66d4d3428e1ad0185916c50abfa"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/positive-runtime-audit/pins.json",
+      "bytes": 11427,
+      "sha256": "1ae380806b3e1b3389f4706b69e5aaefbc490e02377703fdb6d72abe40cd3fc1"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/positive-runtime-audit/review.json",
+      "bytes": 29066,
+      "sha256": "5ae823c6bc8a76cae3d9551536b1a558a870f3c1d002bac7536dce974696d9ca"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/pre-admission-first-refusal.json",
+      "bytes": 483,
+      "sha256": "670bb4adfd51d90de38ffbf766ba2a61dfc25cc4de7753511f810244559efff4"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/prospective-admission.json",
+      "bytes": 8627,
+      "sha256": "768c532819a698620be88ece60da4cf3accfeb260b2dfad1efb8b8d57fb94944"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/qualification-layout-design/README.md",
+      "bytes": 6490,
+      "sha256": "ac249a1c0db0b49337ce61991b95c910f21d1471ae4013109258ca83e688ac0b"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/qualification-layout-design/design.json",
+      "bytes": 8055,
+      "sha256": "66ff4483db3a15c68e845d168ac2e3fde0321b937037fd9aa0159f240b4df9a2"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/qualification-layout-design/fresh-result-addendum-pins.json",
+      "bytes": 597,
+      "sha256": "479a71d1613bf262155810f3afa0bbcc1df60462510601c6373270400a1657e5"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/qualification-layout-design/fresh-result-addendum.json",
+      "bytes": 4449,
+      "sha256": "27a6293888708c2efaf55ca59dcca3d1a926d9822a0d77c2ac81f1d0af4388c1"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/qualification-layout-design/fresh-result-addendum.md",
+      "bytes": 1727,
+      "sha256": "d2803644a92675f41825e4bf74803479a38d63762a43ba7d27d0799abfbe192a"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/qualification-layout-design/pins.json",
+      "bytes": 919,
+      "sha256": "a2109762dad2e33f16a4d4df990cfca95aeff87cc48e7af96299078037c45a1a"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/qualification-layout-design/preserved-existing-files.json",
+      "bytes": 34933,
+      "sha256": "7024ad6e6ea2f2f7895a91aa7dc98fce90c427cdabf7691d02013f0296bff6c9"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/qualification-supplement-proposal/build-tools-supplement.py",
+      "bytes": 10153,
+      "sha256": "a5df0907712cc83f3702e7f3a1b9fa9a6878296a581d4c426a9b75836eaf77f7"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/qualification-supplement-proposal/tools.README.template.md",
+      "bytes": 4954,
+      "sha256": "0b8744dd261044b7b83723f2d915cdd30a9e1d6299406f7262675e003d8d815b"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/quality-sequence-plan.json",
+      "bytes": 2474,
+      "sha256": "5eef63bb453131b9e3b60bec46efba4adbd427c219e1b3ca8a47abca3a698e02"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/quality-sequence-results.json",
+      "bytes": 12136,
+      "sha256": "484e56060cea3a31f68bae3297dc62f07b00e69f87a6090bce4ea008bc2e251e"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/reference-query-assertion-repair/README.md",
+      "bytes": 3475,
+      "sha256": "8aac03031e316d6a0a92b5e84015d9613f845cc32bdca0e46a1680752b6b5498"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/reference-query-assertion-repair/financePaymentContext.test.ts",
+      "bytes": 8212,
+      "sha256": "6442cc44d473a13182139163ce86cebebdfbebed88c625a68cbc7abf1615a3b9"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/reference-query-assertion-repair/line-number-correction.json",
+      "bytes": 1192,
+      "sha256": "2797b9d916ff52cc4475044508c8f038d6acc12bd7d43a604460e1cbe2ce5b6e"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/reference-query-assertion-repair/pins.json",
+      "bytes": 1187,
+      "sha256": "696104f731bf57db30823ed78429fb74a12b69108691d107c64276720c5147d0"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/reference-query-assertion-repair/proposal.patch",
+      "bytes": 1749,
+      "sha256": "2f251c87bd411f7a6d986a36e79901bbea9adb2828f91f33fd45d71b7e114f3a"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/reference-query-assertion-repair/review.json",
+      "bytes": 33801,
+      "sha256": "8d3eebbdf1df532ec9147898756905bfd63a505c1aa12c5b5c07fd55a1a6d8e0"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/remaining-p119-readonly/README.md",
+      "bytes": 6844,
+      "sha256": "4216d74ae22a010c1f33df2e522065f7723cc60bb9dc19088fe2ed9342c011de"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/remaining-p119-readonly/input-pins.json",
+      "bytes": 14587,
+      "sha256": "7aa74f54046983a28871feb122f79318e9e0d0492a84db590191843db006c60f"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/remaining-p119-readonly/report.json",
+      "bytes": 19747,
+      "sha256": "a4958de69d0d2c2104861020fe83f527faa6a964eb1db0cb77d950ea6358693a"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-alignment-proposal/README.md",
+      "bytes": 1434,
+      "sha256": "74be6b94147bc5a095edbb9d43dfdc6585adae980397e427c61442185f6284b3"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-alignment-proposal/pins.json",
+      "bytes": 2232,
+      "sha256": "b1f6a7fb969f33f0d866b0a41bfe9c03aa021ad88403e27aa04bd99c3f5dab0d"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-alignment-proposal/proposal.patch",
+      "bytes": 2971,
+      "sha256": "4ef4e7c917764b2f9bfdfda74f397960d3eee82a1af7d19566d6648cd6f28415"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-alignment-proposal/src/lighthouse/finance/financeOpsTools.ts",
+      "bytes": 16638,
+      "sha256": "872fea352b8c2709c1b5d2fef98cf03a35487add3a81d587229b576fc36eb95b"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-alignment-proposal/tests/lighthouse/financeOpsTools.test.ts",
+      "bytes": 15074,
+      "sha256": "c3acd026892b638cbfd438ee6c1f5c1f45c35af494b1ae1e5ebc36c4c072b815"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-green-root-review.json",
+      "bytes": 5555,
+      "sha256": "df9cb0e4debbb1e47e92b5dc50343e895a19779b8feea8a1caed4dd5aa5a43a8"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-runtime-audit/README.md",
+      "bytes": 3523,
+      "sha256": "ca71ad8579b7aebcd89133d87522edb979bfcc63deb4bb491b9132e2e206f5bd"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-runtime-audit/pins.json",
+      "bytes": 614,
+      "sha256": "1a6dd4897041c923751e25d601468336319d6681ecc053a0d2b1dd2a7ac2335b"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-runtime-audit/review.json",
+      "bytes": 50965,
+      "sha256": "97addf88fb5f786554a0c3240101edc53a4fdaa229e08a2c3e307150cc7c128a"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-source-application.json",
+      "bytes": 5644,
+      "sha256": "00a078c986299b3fd9c99c725b08cc990125b659afd93e4d0938d6c77989a487"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-static-peer-review/README.md",
+      "bytes": 1040,
+      "sha256": "8b5b223fa0f7a0ef67e6c7156a605b27027ab81905447329d199ec7a41598914"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-static-peer-review/pins.json",
+      "bytes": 2531,
+      "sha256": "f6a9ec84ea3d73f43ba9715a37c98492015b6264d177a0050295f25b034e9f05"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-static-peer-review/review.json",
+      "bytes": 1844,
+      "sha256": "b8172484dc56e61690e4d0eada44de380ec011e78475c000a4c8f2fe77de9a42"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-test-first-application.json",
+      "bytes": 945,
+      "sha256": "8e68d544f8fd0c69e6332c6e5d069b5ac300fd007cf6237b855678e41b9729d2"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/security-design-peer-review/README.md",
+      "bytes": 2402,
+      "sha256": "7f84134e9387f6dbfeb803519644faef13ec3ddb988aa6f74da63139ab197341"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/security-design-peer-review/pins.json",
+      "bytes": 10681,
+      "sha256": "38d08f59df350f999437508c878ac0469dcd90c2891f5c3ee94540c8094db806"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/security-design-peer-review/review.json",
+      "bytes": 19543,
+      "sha256": "dd2caafeac5af2508c2279e77d29af55194ce59958d0500095f65f57bb6c0a81"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/source-candidate-manifest.json",
+      "bytes": 17125,
+      "sha256": "2a2000349a4d2d3c1496ef3cfffba47d68566e28d88b25d383ff71e0a7fb021d"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/source-commit-result.json",
+      "bytes": 864,
+      "sha256": "a2e8ded3e7f17f0725bfb0ce128902a7f304a5563c9fbfafaf34a85078507474"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/source-interface-root-review.json",
+      "bytes": 1175,
+      "sha256": "d3c037e7091f601231e37cf698d08d9ee901270a36f22d2db9fd5444dbafd1a0"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/source-paths-pre-application-D15.json",
+      "bytes": 398,
+      "sha256": "756320363376c6f0ba66ea5075330cc9f9fc39cd27e129b12f11da9de556f82f"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/source-proposal/README.md",
+      "bytes": 5977,
+      "sha256": "a93b57f5e9f26925c66c972b8312dad978d1dd9202c85ba726229f7427b9e92b"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/source-proposal/interface.json",
+      "bytes": 6881,
+      "sha256": "5308cf19589a149c47386625074c399ebd871fab91b8c95fa3ff5e04268666f7"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/source-proposal/pins.json",
+      "bytes": 11359,
+      "sha256": "7995cb12552674ed8960d6315a545131449a124b04cfe839d0646df08ff720ee"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/source-proposal/src/lighthouse/finance/financeOpsTools.ts",
+      "bytes": 16662,
+      "sha256": "8def4fa532949f90df5a996f76fea24a2a01f76905e5af655597d6085934eae7"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/source-proposal/src/lighthouse/finance/financePaymentContext.ts",
+      "bytes": 10761,
+      "sha256": "93d7ee42184c96a6a9281690c8d0e7436c951289cebf7dd0c63ba1048c94630e"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/source-static-peer-review/README.md",
+      "bytes": 1634,
+      "sha256": "fe027c018ee72d651dbfcfd967e6c510cb27faf85bb0e2e16175fb63ab2fbc8b"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/source-static-peer-review/pins.json",
+      "bytes": 4970,
+      "sha256": "27030e81bbc7bf9ce3c54d746bbb889d443c97ac61cc82bbf30156a99cfa8178"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/source-static-peer-review/review.json",
+      "bytes": 4758,
+      "sha256": "6c162296d47a7d0193737e01432aacef7d1ebac609bc0025b03b06878a9985ac"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/source-v1-root-application.json",
+      "bytes": 808,
+      "sha256": "72f3c6e7de1f3bfd7fc95324a5d600d92b89dc07174040e913789bbf7098ca2d"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/test-repairs-static-peer-review/README.md",
+      "bytes": 1845,
+      "sha256": "020d34b9992433a48b1f3686edbad491d56c664273621e9847a89679d40ef74c"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/test-repairs-static-peer-review/pins.json",
+      "bytes": 7350,
+      "sha256": "5979ba1f34bbdec53cb36c45ba52f5b2ac4cf388fc00cd3d4310042832a903a5"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/test-repairs-static-peer-review/review.json",
+      "bytes": 3486,
+      "sha256": "e6ce89bf6a07656cd85a6e87dc7724a9da65629f0efef9345742c4c1c0f6815f"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-paths-pre-application-D15.json",
+      "bytes": 446,
+      "sha256": "b953091565712a2d07fa34cead0160424e41632e2131cc5aa095b3de853f75f6"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-peer-review/README.md",
+      "bytes": 5433,
+      "sha256": "213da8188cb641679094f6302528632caf991cc16f61a2adee8ab7e830dfd5cb"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-peer-review/pins.json",
+      "bytes": 600,
+      "sha256": "f25b656cdfc445708b92f88cff887a510a9c303aba7b9241aa02257ac700caf7"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-peer-review/review.json",
+      "bytes": 10323,
+      "sha256": "fd972a6fb9117f6ca0c535fd2d00fce585d3a5b64dd1d6af37823fb3a0845c00"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-proposal/README.md",
+      "bytes": 9385,
+      "sha256": "2311668593fa7f0fccf05f77686b559ba4dc32f19cf922a8aaa39f9329fed787"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-proposal/interface-clarification.json",
+      "bytes": 1698,
+      "sha256": "e5e9a6b9c774f901776d9df0cfb466b0ac164b6b3068305f3efb23e8d8875241"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-proposal/interface.json",
+      "bytes": 14100,
+      "sha256": "a845178f7633a951ec659c006110d8d26ed1b6985499058caf3a8bcbceb9f537"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-proposal/pins.json",
+      "bytes": 5307,
+      "sha256": "30dd44a2afdcb285e566b05c7bad646896bdf0d4ba4ac93272a8e42eb8f9b58e"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-proposal/root-read-output-clarification.json",
+      "bytes": 1190,
+      "sha256": "c289906e41b36a942cfcb281fd566edb4066667dd72196b3d5fa4d6f3e314a50"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-proposal/tests/helpers/financeToolsQualification.ts",
+      "bytes": 29668,
+      "sha256": "0b88d2750da15cf0fea5265a65b5e8579d672c1eb3836f601cd0a7b9bfb1361a"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-proposal/tests/lighthouse/financeOpsTools.test.ts",
+      "bytes": 12452,
+      "sha256": "bd020874e60ab79cc01de1d63048a1fd07ffd700e747f81300c25c540380d388"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-proposal/tests/lighthouse/financePaymentContext.test.ts",
+      "bytes": 7223,
+      "sha256": "6138bb9f5905e24c0239116b9687ae856e5cbf82e19624eb9bc93a401d9f43e2"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-proposal/vault-scope-clarification.json",
+      "bytes": 913,
+      "sha256": "361c8e2e1adb4c2edb82a2c2ff67d536110a3c86254d7aefea2ac8cbd0956a88"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-static-peer-review/README.md",
+      "bytes": 1164,
+      "sha256": "d97921a935bdb477d77c45aab71e5c74574c5725e07bbabf371a6471341f83cb"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-static-peer-review/pins.json",
+      "bytes": 3782,
+      "sha256": "e066eb79826617509d199af9e30090ddd5ed8215a6dd68ba26b9292a29fd95ec"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-static-peer-review/review.json",
+      "bytes": 2547,
+      "sha256": "4313b7a9ae5464bb9471c3873305f4ea6461f2664f9e15307a0aa4ff7a182eb2"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-v1-root-application.json",
+      "bytes": 1236,
+      "sha256": "70834684271910cc8c77161d876a85220e1ea3357a6057a5f4aa24bb07f90372"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-v2-paths-D15.json",
+      "bytes": 491,
+      "sha256": "8f5906ebaa9bbec2330c40e70884c60c4af719e79fcadddd19fb40515741a3da"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/tests-v2-root-application.json",
+      "bytes": 1231,
+      "sha256": "f28b926514649107822a508a11a3caf822bef5cb2270731d8f0c81fbbdac2cf1"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/v1-full-failure-root-review.json",
+      "bytes": 7948,
+      "sha256": "b8a0c8dc570233755596c5b40ffe226675531af5ea522991961453071b02d6fe"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/v1-full-runtime-audit/README.md",
+      "bytes": 4227,
+      "sha256": "0c0a319ab9c14fdca4c1816b78809b83337a812adf6ccd61a91272990049ce53"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/v1-full-runtime-audit/audit.json",
+      "bytes": 68564,
+      "sha256": "1e5ad617f2e755fd303ea15b610f1d4f714869aeb8cef30b6601f88eec71e6bf"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/v1-full-runtime-audit/input-pins.json",
+      "bytes": 10166,
+      "sha256": "a77dcfcd787df8ba763bbe2db17940f5b42fbcf799ad84fc1aa153c96f199994"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/v1-positive-root-review.json",
+      "bytes": 5287,
+      "sha256": "2971d80b4d0a4822784df4f9afe407bb4cb4216fc413d0110797286749d0ad3a"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/v2-repaired-controls-audit/README.md",
+      "bytes": 2279,
+      "sha256": "e2014e5373b0eeacf207e2b2f2d0ad1e81f7eb66985e07e2e3c753a85dfbf830"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/v2-repaired-controls-audit/pins.json",
+      "bytes": 11326,
+      "sha256": "5d0a55ed8a0155610232383a89d40179165b26c0289526b592fac248e0ae9d83"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/v2-repaired-controls-audit/review.json",
+      "bytes": 38979,
+      "sha256": "fd0a5b181b2c49c37bf5ce957aceb51be776dfc32e855a2f65fbe6025a33725a"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4oBTOJ/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    }
+  ],
+  "excludedBodies": [
+    "raw streams",
+    "tokens",
+    "private keys",
+    "vaults",
+    "raw configurations",
+    "native binaries",
+    "fixture and source closure trees",
+    "oversize unsplit manifests or indices"
+  ],
+  "transitivePrivatePointersAreNotPublicCopies": true
+}

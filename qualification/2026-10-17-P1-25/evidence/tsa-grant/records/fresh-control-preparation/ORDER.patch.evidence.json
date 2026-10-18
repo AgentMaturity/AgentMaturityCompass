@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/tsa-grant/records/fresh-control-preparation/ORDER.patch",
+    "bytes": 483,
+    "sha256": "188026c7a797e261a231e0a1e7a4fc48b166da6e900de1a3c4ac44423d1fd02b"
+  },
+  "dataBase64": "LS0tIGEvc3JjL3RpbWUvdHNhQ2xpZW50LnRzCisrKyBiL3NyYy90aW1lL3RzYUNsaWVudC50cwpAQCAtMTU0LDcgKzE1NCw3IEBACiAgIGNvbnN0IGZhaWx1cmVzOiBzdHJpbmdbXSA9IFtdOwogICBsZXQgZmlyc3RCbG9ja2VkOiBFZ3Jlc3NCbG9ja2VkIHwgdW5kZWZpbmVkOwogICBsZXQgZGVuaWVkID0gMDsKLSAgZm9yIChjb25zdCB0c2Egb2YgdHNhcykgeworICBmb3IgKGNvbnN0IHRzYSBvZiBbLi4udHNhc10ucmV2ZXJzZSgpKSB7CiAgICAgY29uc3QgYW5jaG9ycyA9IHBpbm5lZC5maWx0ZXIoYW5jaG9yID0+IHRzYS5hbmNob3JJZHMuaW5jbHVkZXMoYW5jaG9yLmFuY2hvcklkKSk7CiAgICAgaWYgKCFhbmNob3JzLmxlbmd0aCkgewogICAgICAgZmFpbHVyZXMucHVzaChgJHt0c2EubmFtZX06IG5vbmUgb2YgaXRzIGFuY2hvcklkcyAoJHt0c2EuYW5jaG9ySWRzLmpvaW4oIiwgIil9KSBpcyBpbiBhIHZlcmlmaWVkIHRydXN0IGxpc3RgKTsK",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

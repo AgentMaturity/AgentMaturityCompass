@@ -1,0 +1,1 @@
+check-threat-model: channel network-egress: /channels/0/owners/0 must match pattern "^(P[0-3]-\d{2}|D-\d{2}|GATE-G[0-3])$" (got "P9-99")

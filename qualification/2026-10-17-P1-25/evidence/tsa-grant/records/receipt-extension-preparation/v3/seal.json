@@ -1,0 +1,51 @@
+{
+  "schema": "p125g-private-receipt-extension-v3-author-seal/1",
+  "at": "2026-10-16T23:06:57.836751+00:00",
+  "preferredHelper": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/assemble-extension.py.source.txt",
+  "preferredPatch": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/v2-to-v3.patch.txt",
+  "readmeProposal": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/README.actual-proposal.md",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/assemble-extension.py.source.txt",
+      "bytes": 25753,
+      "sha256": "f95873d2163af4f9d54333673c4c0f1ab420e3c0776218bdb1a32ee3efdecff7"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/v2-to-v3.patch.txt",
+      "bytes": 12589,
+      "sha256": "0504f2b883624ec291574a12eeb678ae8fe8dbfcfdafa4c284183cf0387a5a48"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/input-template.json",
+      "bytes": 23443,
+      "sha256": "4a5600c9655647f0c6fecaf4b55dc3a36a4cd47b06f77c5a32f83be5f235dba3"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/README.md",
+      "bytes": 2881,
+      "sha256": "80f5556467aa13a8f782ff1a462334bcb7787abbf5966c33cf8dbdfd54023ad1"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/README.actual-proposal.md",
+      "bytes": 24235,
+      "sha256": "e55024763f964239a65fa8b9fb80ff236c26f9ffb21518908b892d195d6ded68"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/input-pins.json",
+      "bytes": 7328,
+      "sha256": "5869f70fbb3c7f1c2ce1122bb96c0bd0b06693ee051aa5261a21d649021c5f1b"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v3/author-static-review.json",
+      "bytes": 1249,
+      "sha256": "4e190c17ebb8f3eda1c9cdbf4f09ff5beab4ea00bc4b59abd01d94813559ba03"
+    }
+  ],
+  "preservedV2Seal": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/receipt-extension-preparation/v2/seal.json",
+    "bytes": 2219,
+    "sha256": "7a4be56197543efd039ef4568a16db29ba28fb7813bd76c4cd906b60735b8189"
+  },
+  "executionOrSourceWrites": false,
+  "rootFullReadAndIndependentStaticReviewStillRequired": true
+}

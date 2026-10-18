@@ -1,0 +1,133 @@
+{
+  "schema": "p126-count-surface-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/count-surface-review/proposed-admission.json",
+      "bytes": 24378,
+      "sha256": "d92be217b2f2904ac6e0810d56d4e8e4d6aa5722ee59d8f85c04f59394f4702d"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/count-surface-review/ownership-observations.json",
+      "bytes": 919387,
+      "sha256": "6856805c51f771ab0c5dc4d22ab5d0624b4355868e26b40b176fe5032784c142"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/count-surface-review/seal.json",
+      "bytes": 1323,
+      "sha256": "5da3dc2a806792c98435c7217b02e1e94a4277956b76aa7f006e9b250a6b421d"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/count-surface-actual.json",
+      "bytes": 582,
+      "sha256": "35b86ccff9ebd558ce759a6b1d42af47942f2b87897e1c772d51eb6c17718187"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/scope-review/observations.json",
+      "bytes": 1418515,
+      "sha256": "15f4241395764f37cf624e6ada468eb3581aebc8e865015580f626c6999822a7"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/scope-review/review.json",
+      "bytes": 6265,
+      "sha256": "b4906bfb3ad054f35abe48cfa21bdedc34be5b3b3eac420d3fa0f72465600214"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/scope-review/seal.json",
+      "bytes": 1227,
+      "sha256": "2d9e21c2280ffb39a3c44627b47353392da7ecaafe4d45c4589ebf47178c2d13"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/license-scope-review/review.json",
+      "bytes": 4365,
+      "sha256": "c05d04a188efb0a329c01df6a446a9eba45dd00eb7d51de4ad7d49f06f779a04"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+      "bytes": 9141,
+      "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/knip.json",
+      "bytes": 1928,
+      "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1"
+    }
+  ],
+  "completePerRootFilePins": "ownership-observations.json",
+  "preservedOriginals": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/README.md",
+      "bytes": 59828,
+      "sha256": "3b39cfb5d8279b295afe74fd89db694e2d2f210b430be3644935619368d5f44a"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "94da70f37fc7181a806b93b80c027042f7c215d8b5d65727eaff2d608ecc6ba6"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/website/index.html",
+      "bytes": 43520,
+      "sha256": "3eb4d3313271913abb81ac391084aec461628132be9687ab4c927e232de8d4a4"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/website/lite.html",
+      "bytes": 11197,
+      "sha256": "d71d1fbd6d0a13fa42cd7be83b4d25c6a5eeec21dd1343d7a723582221196370"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "413ed4eaba823bd0c0a1ad77422662f4ee8d5a221b9a95d19a2f95e113726433"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "def5e0e91b20400671f5c40d2069cdabd090afb5b2cac40d4663bf74e8104a8f"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "af0c5f47077494b8cc2106d63c5849223f210f470263de8b09a59d5479f92065"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "97ca78747fcbab5faa9630ba4bff8cb1e8b3aec265976c38ce247c75df053db9"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "5c0a952587cf63ed23e58262bff6d9dba08286715defd2fee2dd56d25423dad5"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/before-originals/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "e300a8c31c72767655c974f4642a9a8ebc45588416043b6ee7ed90c0548e87f2"
+    }
+  ]
+}

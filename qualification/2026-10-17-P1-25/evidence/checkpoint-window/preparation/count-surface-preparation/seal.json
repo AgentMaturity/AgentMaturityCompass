@@ -1,0 +1,45 @@
+{
+  "schema": "p125-checkpoint-count-surface-preparation-seal/1",
+  "at": "2026-10-16T23:28:45.135771+00:00",
+  "blockers": [],
+  "allReadsFinished": true,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/count-surface-preparation/proposed-admission.json",
+      "bytes": 30326,
+      "sha256": "55859dae75a802a467a5d6c73c4af7447508dda71c7269fb384abbc9f37257ff"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/count-surface-preparation/review.json",
+      "bytes": 1221,
+      "sha256": "24972d472a26e386d55ab26cc8eafaf9887c73cd85667bb9391c746dd6429a06"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/count-surface-preparation/README.md",
+      "bytes": 2161,
+      "sha256": "ac2612c9eaf20185bbde7a08200e05c7cd80eab2ca5c8805140e540430e89545"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/count-surface-preparation/pins.json",
+      "bytes": 14743,
+      "sha256": "d009b3498f51113b63d7a54f3b70064026cbe2679b434e54ce5db3a93287b210"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/count-surface-preparation/read-tool-results.json",
+      "bytes": 30443,
+      "sha256": "f4011a51d82c9248fc12c23dacca147932b81f212f138f5a3ff56635e5d03004"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/count-surface-preparation/closed-read-observations.json",
+      "bytes": 7718679,
+      "sha256": "af8fe29de44f24cb8cb7385b6cbf11a209d2f42b0784dc8df83fecaf7ea1c416"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/count-surface-preparation/lookup-limitation.json",
+      "bytes": 458,
+      "sha256": "79cff381b0d18ef0e96477189084d8cacf4c0e4d82eee3056506c8bcfd95e3e9"
+    }
+  ],
+  "noSourceGeneratorRuntimeOrAllocationCredit": true,
+  "sourceIndexQaWrites": false
+}

@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-33",
+  "date": "2026-10-18",
+  "commit": "c93ba2c3b409e6ac4129b9a31111f6163c98364d",
+  "branch": "rtd/p1-33-catalog-reverify",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2), local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 80000
+    },
+    {
+      "cmd": "python3 P1-33-work/mutate.py (38 mutations)",
+      "exit": 0,
+      "durationMs": 330000
+    },
+    {
+      "cmd": "npx vitest run --config P1-33-work/repro/vitest.config.ts (the review repros, gated loads pointed at loadAdmittedCatalog)",
+      "exit": 0,
+      "durationMs": 5000
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 44394
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 58851
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 3740
+    },
+    {
+      "cmd": "npm run -s check:counts (after node scripts/gen-counts.mjs --write)",
+      "exit": 0,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 583
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 2464
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2238
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 392
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 770
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 258
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 309
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 274
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1040
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 4319
+    },
+    {
+      "cmd": "npm run -s check:catalog-admission",
+      "exit": 0,
+      "durationMs": 1061
+    },
+    {
+      "cmd": "npm run -s check:catalog-currency",
+      "exit": 0,
+      "durationMs": 439
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+      "exit": 0,
+      "durationMs": 2830
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref origin/main",
+      "exit": 0,
+      "durationMs": 812
+    },
+    {
+      "cmd": "npm run -s check:package",
+      "exit": 0,
+      "durationMs": 5906
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 197871
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 495
+    },
+    {
+      "cmd": "npx vitest run tests/catalog/ tests/compiledVisibleTools.test.ts tests/compilerStationDefaults.test.ts tests/runPrincipalLease.test.ts tests/starterProfiles.test.ts tests/studioVaultModeLoop.test.ts tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/freezeGuard.test.ts tests/keys/a4ActivateSigningProbe.test.ts tests/keys/a4SigningProbe.test.ts tests/approvalRecordCompatibility.test.ts tests/compliance/evidenceBinding.test.ts tests/claims/d03Gates.test.ts tests/architectureBoundaries.test.ts --reporter=json",
+      "exit": 1,
+      "durationMs": 146443
+    }
+  ],
+  "tests": {
+    "total": 828,
+    "passed": 827,
+    "failed": 1,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "d69dc3cab954ecc7eab1c28a020888ba5024421750306a98796dfa3406b0afce"
+    },
+    {
+      "path": "amc.l0.baseline-0.1.0.json",
+      "sha256": "1b077beb4de5f9919f39ff2cc125d1fa8e4b9b092c7fe53f2e38d1828e668928"
+    },
+    {
+      "path": "focused-tests.json",
+      "sha256": "e4ab4c738fa6c1d4766fff613392eee07f01704705df1b60dc32ec996fc35892"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "059eb1113945382f44348f27a257f65491503f9e891e5e71ea4c54163a50a2e2"
+    },
+    {
+      "path": "review-repros.txt",
+      "sha256": "6378d6557fe3942e0dbe681ca211fe1d187f91ebebdb1d0a12d9903ca6f29229"
+    }
+  ],
+  "notes": "Focused tests only; the full suite was not run here. The focused vitest run exits 1 on one test that also fails on int: tests/compliance/evidenceBinding.test.ts 'every source literal in src is classified' (the signed-tools-yaml and defaults literals P1-10F added to src/catalog/catalogCli.ts; int has the same literals and test). check:counts first failed on the new test file and passed after gen-counts --write, committed as c93ba2c3b; the other checks ran at 6737a3a2a, which differs from HEAD only in generated count files. All 38 mutations killed. Durations of the build, mutation and repro rows are approximate. No pack is promoted: every pack is experimental and no D-08 reviewer exists."
+}

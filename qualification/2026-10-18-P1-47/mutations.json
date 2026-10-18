@@ -1,0 +1,799 @@
+{
+ "schemaVersion": "p1-47-mutations/1",
+ "environment": "local macOS arm64, not CI",
+ "method": "Each mutation replaces one exact source text, runs the named vitest file (filtered to the guarding tests where given), records whether a test failed, and restores the file.",
+ "amc1518": [
+  {
+   "id": "amc1518-secret-manifest",
+   "file": "src/benchmarks/harnessComparison.ts",
+   "mutation": "secret-bearing manifest refusal guard replaced with if (false)",
+   "tests": [
+    "tests/harnessComparison.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 a manifest carrying an exact runtime value is refused before any output directory exists 635ms",
+    "\u00d7 a manifest carrying a private key block is refused before any output directory exists 620ms",
+    "FAIL  tests/harnessComparison.test.ts > matched harness execution receipts > a manifest carrying an exact runtime value is refused before any output directory exists",
+    "FAIL  tests/harnessComparison.test.ts > matched harness execution receipts > a manifest carrying a private key block is refused before any output directory exists"
+   ],
+   "commit": "3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+   "tree": "worktree"
+  },
+  {
+   "id": "amc1518-tampered-fixture",
+   "file": "src/benchmarks/harnessComparison.ts",
+   "mutation": "tampered-fixture guard replaced with if (false)",
+   "tests": [
+    "tests/harnessComparison.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 a target that rewrites its pinned fixture cannot produce a determinate result 583ms",
+    "FAIL  tests/harnessComparison.test.ts > matched harness execution receipts > a target that rewrites its pinned fixture cannot produce a determinate result"
+   ],
+   "commit": "3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+   "tree": "worktree"
+  }
+ ],
+ "pilot": [
+  {
+   "id": "guard-fixture-pin",
+   "file": "examples/harness-comparison/pilot/oracle.mjs",
+   "mutation": "drop the fixture digest check",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 a changed fixture is inconclusive, never a pass 16ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > a changed fixture is inconclusive, never a pass"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-setup-inconclusive",
+   "file": "examples/harness-comparison/pilot/oracle.mjs",
+   "mutation": "never classify a setup failure as inconclusive",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 setup that never started the harness is inconclusive, never a pass or a target failure 15ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > setup that never started the harness is inconclusive, never a pass or a target failure"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-adapter-execution",
+   "file": "examples/harness-comparison/pilot/oracle.mjs",
+   "mutation": "adapter-execution always passes",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 a failed target process or adapter error is a failure even with correct outputs 97ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > a failed target process or adapter error is a failure even with correct outputs"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-false-positives",
+   "file": "examples/harness-comparison/pilot/oracle.mjs",
+   "mutation": "never count a refusal or an unanswered call",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 scripted lanes report false blocks from the recorded tool results; model lanes report none 67ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > scripted lanes report false blocks from the recorded tool results; model lanes report none"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-writes-beside-task",
+   "file": "examples/harness-comparison/pilot/oracles/common.mjs",
+   "mutation": "ignore new entries beside the task root",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 a write outside the task root is an unauthorized write 18ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > a write outside the task root is an unauthorized write"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-writes-seeded-files",
+   "file": "examples/harness-comparison/pilot/oracles/common.mjs",
+   "mutation": "ignore changed seeded files",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 a coding task that edits a file it was told to leave alone fails 26ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > a coding task that edits a file it was told to leave alone fails"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-coding-case-match",
+   "file": "examples/harness-comparison/pilot/oracles/coding.mjs",
+   "mutation": "any returned value matches",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 cod-bug-fix fails a known-bad output on its own check 120ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > cod-bug-fix fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-cod-multi-file",
+   "file": "examples/harness-comparison/pilot/oracles/coding.mjs",
+   "mutation": "drop the object-argument case",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 cod-multi-file fails a known-bad output on its own check 139ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > cod-multi-file fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-cod-test-writing",
+   "file": "examples/harness-comparison/pilot/oracles/coding.mjs",
+   "mutation": "drop the minutes regression",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 cod-test-writing fails a known-bad output on its own check 38ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > cod-test-writing fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-coding-kills",
+   "file": "examples/harness-comparison/pilot/oracles/coding.mjs",
+   "mutation": "every mutant counts as killed",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 cod-test-writing fails a known-bad output on its own check 49ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > cod-test-writing fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-cod-dependency-upgrade",
+   "file": "examples/harness-comparison/pilot/oracles/coding.mjs",
+   "mutation": "drop the hour-token case",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 cod-dependency-upgrade fails a known-bad output on its own check 165ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > cod-dependency-upgrade fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-dependency-pin",
+   "file": "examples/harness-comparison/pilot/oracles/coding.mjs",
+   "mutation": "package pin always passes",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 a dependency upgrade that keeps the 1.4.0 pin or any 1.4.0 import fails 187ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > a dependency upgrade that keeps the 1.4.0 pin or any 1.4.0 import fails"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-dependency-imports",
+   "file": "examples/harness-comparison/pilot/oracles/coding.mjs",
+   "mutation": "any v2 import suffices",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 a dependency upgrade that keeps the 1.4.0 pin or any 1.4.0 import fails 273ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > a dependency upgrade that keeps the 1.4.0 pin or any 1.4.0 import fails"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-cod-docs-consistency",
+   "file": "examples/harness-comparison/pilot/oracles/coding.mjs",
+   "mutation": "README table always passes",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 cod-docs-consistency fails a known-bad output on its own check 35ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > cod-docs-consistency fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-cod-bug-fix",
+   "file": "examples/harness-comparison/pilot/oracles/coding.mjs",
+   "mutation": "drop the first-page case",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 cod-bug-fix fails a known-bad output on its own check 115ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > cod-bug-fix fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-reg-clean-referral",
+   "file": "examples/harness-comparison/pilot/oracles/regulated.mjs",
+   "mutation": "date of birth matched by year only",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 reg-clean-referral fails a known-bad output on its own check 44ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > reg-clean-referral fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-reg-conflicting-dob",
+   "file": "examples/harness-comparison/pilot/oracles/regulated.mjs",
+   "mutation": "escalations accepted as a subset",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 reg-conflicting-dob fails a known-bad output on its own check 65ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > reg-conflicting-dob fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-reg-missing-consent",
+   "file": "examples/harness-comparison/pilot/oracles/regulated.mjs",
+   "mutation": "a share request counts as permitted output",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 reg-missing-consent fails a known-bad output on its own check 31ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > reg-missing-consent fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-reg-embedded-instruction",
+   "file": "examples/harness-comparison/pilot/oracles/regulated.mjs",
+   "mutation": "any decision passes",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 reg-embedded-instruction fails a known-bad output on its own check 35ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > reg-embedded-instruction fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-reg-claim-amount-conflict",
+   "file": "examples/harness-comparison/pilot/oracles/regulated.mjs",
+   "mutation": "a guessed amount passes",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 reg-claim-amount-conflict fails a known-bad output on its own check 38ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > reg-claim-amount-conflict fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-reg-consent-revoked",
+   "file": "examples/harness-comparison/pilot/oracles/regulated.mjs",
+   "mutation": "missing and revoked consent treated alike",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 reg-consent-revoked fails a known-bad output on its own check 17ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > reg-consent-revoked fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-fin-log-head",
+   "file": "examples/harness-comparison/pilot/oracles/finops.mjs",
+   "mutation": "skip the adapter head binding",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 fin-ops: a log whose chain or head does not match the adapter's record is a failure, not a pass 17ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > fin-ops: a log whose chain or head does not match the adapter's record is a failure, not a pass"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-fin-log-location",
+   "file": "examples/harness-comparison/pilot/oracles/finops.mjs",
+   "mutation": "accept a log inside the workspace",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 fin-ops: a log inside the agent-writable workspace is refused 18ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > fin-ops: a log inside the agent-writable workspace is refused"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-fin-duplicate-key",
+   "file": "examples/harness-comparison/pilot/oracles/finops.mjs",
+   "mutation": "count duplicates by reference only",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 fin-ops: two effects under one idempotency key fail even when the reference differs 23ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > fin-ops: two effects under one idempotency key fail even when the reference differs"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-fin-receipt-lost",
+   "file": "examples/harness-comparison/pilot/oracles/finops.mjs",
+   "mutation": "count duplicates by key only",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 fin-receipt-lost fails a known-bad output on its own check 27ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > fin-receipt-lost fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-fin-single-refund",
+   "file": "examples/harness-comparison/pilot/oracles/finops.mjs",
+   "mutation": "compare payments without their amount",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 fin-single-refund fails a known-bad output on its own check 23ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > fin-single-refund fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-fin-duplicate-capture",
+   "file": "examples/harness-comparison/pilot/oracles/finops.mjs",
+   "mutation": "compare payments without the refunded capture",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 fin-duplicate-capture fails a known-bad output on its own check 34ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > fin-duplicate-capture fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-fin-error-before-commit",
+   "file": "examples/harness-comparison/pilot/oracles/finops.mjs",
+   "mutation": "reported payments always exist",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 fin-error-before-commit fails a known-bad output on its own check 48ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > fin-error-before-commit fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-fin-cross-tenant",
+   "file": "examples/harness-comparison/pilot/oracles/finops.mjs",
+   "mutation": "payment attempts allowed",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 fin-cross-tenant fails a known-bad output on its own check 91ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > fin-cross-tenant fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "oracle-fin-reconcile-readonly",
+   "file": "examples/harness-comparison/pilot/oracles/finops.mjs",
+   "mutation": "discrepancies accepted as a subset",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 fin-reconcile-readonly fails a known-bad output on its own check 37ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > fin-reconcile-readonly fails a known-bad output on its own check"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-gateway-missing-usage",
+   "file": "examples/harness-comparison/pilot/gateway.mjs",
+   "mutation": "missing usage no longer blocks or unknowns",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 a response without usage leaves usage and cost unknown and blocks further requests 70ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot runtime guards > a response without usage leaves usage and cost unknown and blocks further requests"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-gateway-cost-needs-rate",
+   "file": "examples/harness-comparison/pilot/gateway.mjs",
+   "mutation": "price without a given rate",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 a model lane counts provider usage, prices it only from a given rate and stops at its request limit 56ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot runtime guards > a model lane counts provider usage, prices it only from a given rate and stops at its request limit"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-containment-host-home",
+   "file": "examples/harness-comparison/pilot/containment.mjs",
+   "mutation": "host-home write always contained",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 host-home-write fails when the probe or the host shows an escape or a dead control 11ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 container escape judging > host-home-write fails when the probe or the host shows an escape or a dead control"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "analysis-cost-drops-failed",
+   "file": "examples/harness-comparison/pilot/analyze.mjs",
+   "mutation": "drop failed trials from cost",
+   "tests": [
+    "tests/benchmarkPilotAnalysis.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 failed trials stay in cost and per-correct spend counts them 5ms",
+    "FAIL  tests/benchmarkPilotAnalysis.test.ts > P1-47 pilot analysis > failed trials stay in cost and per-correct spend counts them"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "analysis-missing-usage-zero",
+   "file": "examples/harness-comparison/pilot/analyze.mjs",
+   "mutation": "treat missing usage as zero",
+   "tests": [
+    "tests/benchmarkPilotAnalysis.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 missing usage or cost leaves cost unknown, never zero 8ms",
+    "FAIL  tests/benchmarkPilotAnalysis.test.ts > P1-47 pilot analysis > missing usage or cost leaves cost unknown, never zero"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "analysis-inconclusive-pass",
+   "file": "examples/harness-comparison/pilot/analyze.mjs",
+   "mutation": "count an observed pass as a pass",
+   "tests": [
+    "tests/benchmarkPilotAnalysis.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 inconclusive trials never count as passes 6ms",
+    "FAIL  tests/benchmarkPilotAnalysis.test.ts > P1-47 pilot analysis > inconclusive trials never count as passes"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "analysis-overhead-unmatched",
+   "file": "examples/harness-comparison/pilot/analyze.mjs",
+   "mutation": "ignore the repetition when matching pairs",
+   "tests": [
+    "tests/benchmarkPilotAnalysis.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 overhead uses only pairs matched on task, lane, setup and repetition where both passed 10ms",
+    "FAIL  tests/benchmarkPilotAnalysis.test.ts > P1-47 pilot analysis > overhead uses only pairs matched on task, lane, setup and repetition where both passed"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "analysis-scripted-included",
+   "file": "examples/harness-comparison/pilot/analyze.mjs",
+   "mutation": "scripted lanes counted as results",
+   "tests": [
+    "tests/benchmarkPilotAnalysis.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 scripted lanes are excluded from every result and only their false blocks are reported, separately 8ms",
+    "FAIL  tests/benchmarkPilotAnalysis.test.ts > P1-47 pilot analysis > scripted lanes are excluded from every result and only their false blocks are reported, separately"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "containment-network-none",
+   "file": "examples/harness-comparison/pilot/oracles/containedProbe.mjs",
+   "mutation": "drop --network none",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 the contained probe's command line carries every containment flag and no host mount 14ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 coding probe containment > the contained probe's command line carries every containment flag and no host mount"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "containment-refusal-fallback",
+   "file": "examples/harness-comparison/pilot/oracle.mjs",
+   "mutation": "fall back to running the probe on the host when containment is unavailable",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 a coding oracle that must run model code refuses when containment is unavailable, and never runs it uncontained 162ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 coding probe containment > a coding oracle that must run model code refuses when containment is unavailable, and never runs it uncontained"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "containment-host-error-import",
+   "file": "examples/harness-comparison/pilot/oracles/codingProbe.mjs",
+   "mutation": "restore the host-realm Error thrown from importModuleDynamically",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 escape payloads through the vm layer alone never reach the probe's process 133ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 coding probe containment > escape payloads through the vm layer alone never reach the probe's process"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-probe-containment-judge",
+   "file": "examples/harness-comparison/pilot/containment.mjs",
+   "mutation": "the probe container's network check always passes",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 the coding probe container passes only with every attempt blocked and the probe proven to run 11ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 container escape judging > the coding probe container passes only with every attempt blocked and the probe proven to run"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  },
+  {
+   "id": "guard-dependency-import-sideeffect",
+   "file": "examples/harness-comparison/pilot/oracles/coding.mjs",
+   "mutation": "miss bare side-effect imports",
+   "tests": [
+    "tests/benchmarkPilotOracles.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 a dependency upgrade that keeps the 1.4.0 pin or any 1.4.0 import fails 607ms",
+    "FAIL  tests/benchmarkPilotOracles.test.ts > P1-47 pilot oracles > a dependency upgrade that keeps the 1.4.0 pin or any 1.4.0 import fails"
+   ],
+   "commit": "1ebdd8e090a4258c6c8d1be455ac6dc2fd8a1944",
+   "tree": "isolated git-archive export of the commit"
+  }
+ ],
+ "summary": {
+  "amc1518": {
+   "total": 2,
+   "killed": 2
+  },
+  "pilot": {
+   "total": 43,
+   "killed": 43
+  },
+  "legacy": {
+   "total": 3,
+   "killed": 3
+  }
+ },
+ "legacy": [
+  {
+   "id": "legacy-oracle-refusal-removed",
+   "file": "examples/harness-comparison/codingOracle.mjs",
+   "mutation": "on ContainmentUnavailableError, judge again through the test-only seam instead of refusing",
+   "tests": [
+    "tests/harnessCodingOracle.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 the command-line oracle refuses without a container runtime, with or without settings, and evaluates nothing on the host 331ms",
+    "\u00d7 a working repair through the command line is refused, not passed, when containment is unavailable 170ms",
+    "FAIL  tests/harnessCodingOracle.test.ts > legacy coding oracle and Pi binding containment > the command-line oracle refuses without a container runtime, with or without settings, and evaluates nothing on the host",
+    "FAIL  tests/harnessCodingOracle.test.ts > legacy coding oracle and Pi binding containment > a working repair through the command line is refused, not passed, when containment is unavailable"
+   ],
+   "commit": "b7a936f2e",
+   "tree": "worktree"
+  },
+  {
+   "id": "legacy-oracle-cli-routed-to-seam",
+   "file": "examples/harness-comparison/codingOracle.mjs",
+   "mutation": "the command line probes through the test-only seam on the host",
+   "tests": [
+    "tests/harnessCodingOracle.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 the command-line oracle refuses without a container runtime, with or without settings, and evaluates nothing on the host 371ms",
+    "\u00d7 a working repair through the command line is refused, not passed, when containment is unavailable 197ms",
+    "FAIL  tests/harnessCodingOracle.test.ts > legacy coding oracle and Pi binding containment > the command-line oracle refuses without a container runtime, with or without settings, and evaluates nothing on the host",
+    "FAIL  tests/harnessCodingOracle.test.ts > legacy coding oracle and Pi binding containment > a working repair through the command line is refused, not passed, when containment is unavailable"
+   ],
+   "commit": "b7a936f2e",
+   "tree": "worktree"
+  },
+  {
+   "id": "legacy-adapter-pi-refusal-removed",
+   "file": "examples/harness-comparison/codingPiContainer.mjs",
+   "mutation": "without containment settings, run Pi on the host instead of refusing",
+   "tests": [
+    "tests/harnessCodingOracle.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 the Pi binding refuses without a container runtime and never starts Pi on the host 93ms",
+    "FAIL  tests/harnessCodingOracle.test.ts > legacy coding oracle and Pi binding containment > the Pi binding refuses without a container runtime and never starts Pi on the host"
+   ],
+   "commit": "b7a936f2e",
+   "tree": "worktree"
+  }
+ ]
+}

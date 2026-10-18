@@ -1,0 +1,85 @@
+{
+  "schema": "p119-tools-repair-history/1",
+  "missingSourceRed": {
+    "registered": 18,
+    "failed": 1,
+    "filtered": 17,
+    "meaning": "Genuine initialization succeeded before exact selected-build ERR_MODULE_NOT_FOUND; no finance assertions reached."
+  },
+  "historicalV1": {
+    "registered": 31,
+    "passed": 30,
+    "failed": 1,
+    "reason": "Invalid query-bearing-path expectation; provider omits queries from normalized path logs.",
+    "masked": "Second path comparison and later POST/commit assertions in that failed body were not reached."
+  },
+  "selectedV2": {
+    "registered": 32,
+    "passed": 2,
+    "failed": 0,
+    "filtered": 30,
+    "meaning": "Corrected normalized-route control plus genuine directory-obstruction persistence control; not another full32 run."
+  },
+  "reportContract": {
+    "red": {
+      "registered": 19,
+      "passed": 0,
+      "failed": 1,
+      "filtered": 18
+    },
+    "green": {
+      "registered": 19,
+      "passed": 1,
+      "failed": 0,
+      "filtered": 18
+    },
+    "exactDelta": "Three source/report expectation keys transactionId to txnId, plus exact deep equality test.",
+    "maskedRed": "First exact report equality failed; subsequent count/zero-effect assertions were masked. Public provider evidence independently had zero effects.",
+    "formalF37": "Not the normative dated-window setup/runner."
+  },
+  "fresh": {
+    "registered": 32,
+    "passed": 32,
+    "failed": 0,
+    "filtered": 0,
+    "sourceCommit": "12ec56c514e1a8d165f9cfee7e57f8a673122edf"
+  },
+  "fullPrivateReviews": [
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/missing-source-red-audit/review.json",
+      "bytes": 21895,
+      "sha256": "1ab503fa4e7e853d2ca2736ef976a804fd5da19ea01efafd1bd03de652dac929"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/v1-full-runtime-audit/audit.json",
+      "bytes": 68564,
+      "sha256": "1e5ad617f2e755fd303ea15b610f1d4f714869aeb8cef30b6601f88eec71e6bf"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/reference-query-assertion-repair/review.json",
+      "bytes": 33801,
+      "sha256": "8d3eebbdf1df532ec9147898756905bfd63a505c1aa12c5b5c07fd55a1a6d8e0"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/reference-query-assertion-repair/line-number-correction.json",
+      "bytes": 1192,
+      "sha256": "2797b9d916ff52cc4475044508c8f038d6acc12bd7d43a604460e1cbe2ce5b6e"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/v2-repaired-controls-audit/review.json",
+      "bytes": 38979,
+      "sha256": "fd0a5b181b2c49c37bf5ce957aceb51be776dfc32e855a2f65fbe6025a33725a"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/report-contract-runtime-audit/review.json",
+      "bytes": 50965,
+      "sha256": "97addf88fb5f786554a0c3240101edc53a4fdaa229e08a2c3e307150cc7c128a"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/fresh-tools-audit/review.json",
+      "bytes": 218147,
+      "sha256": "6cdc0d4fc94d3bbf0e4184785ce2d9c12e7375e02c8c020bb52c6c813789a9db"
+    }
+  ],
+  "formalAcceptanceClosed": false
+}

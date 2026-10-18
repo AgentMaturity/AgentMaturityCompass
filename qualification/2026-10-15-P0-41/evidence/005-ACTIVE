@@ -1,0 +1,6 @@
+{
+  "phase": "P041-M1-missing-source-zero--baseline",
+  "startedUtc": "2026-10-15T07:25:31.247867+00:00",
+  "state": "launching",
+  "rule": "Persistent on uncertainty; no automatic signal, cleanup or restoration."
+}

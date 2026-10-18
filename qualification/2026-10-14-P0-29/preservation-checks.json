@@ -1,0 +1,51 @@
+{
+  "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "qualifiedCode": "af209a0ee6e714448ff95c7201fe1a6a2b7493cf",
+  "protectedFiles": [
+    {
+      "path": "scripts/check-freeze.mjs",
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "vitest.config.ts",
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "scripts/quality/coverage-baseline.json",
+      "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "scripts/quality/source-quality-baseline.json",
+      "existsOnAcceptedMain": false,
+      "existsOnCandidate": false,
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "plans/amc-gap-register.md",
+      "sha256": "a0391942a44f1b376aabb18774fd82117986691f29f4c98984fdf3f7eadf258d",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "plans/amc-gap-execution-log.md",
+      "sha256": "6d7b4844b69481495abeb0e22ce8f9ca5ea91b1e5a45d62a9f396ca8ea577340",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "plans/amc-state-ledger.md",
+      "sha256": "d3e449fa2912e49538c09b0abc859ba6e961635822a6392debded7bc86ac487a",
+      "sameAsAcceptedMain": true
+    }
+  ],
+  "productionScriptsWorkflowsPreserved": true,
+  "originalJsonSha256": "7e25d40365fb187f23f4b646b4dc2c6b0b497ca771e7b52ffb578b6266e1e153",
+  "originalMarkdownSha256": "dcd3d044e34d9b8f5e6fbb97d56f91aab29f66490e304f6d862165c7aaebc980",
+  "trackerCloseoutApplied": false
+}

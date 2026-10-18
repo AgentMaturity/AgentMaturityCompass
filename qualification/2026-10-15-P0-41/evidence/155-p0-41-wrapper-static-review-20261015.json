@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-41",
+  "reviewer": "/root/failure_diagnosis",
+  "capturedUtc": "2026-10-15T07:06:47.319506+00:00",
+  "reviewType": "Read-only static full-source and exact derivation review of an unexecuted private wrapper",
+  "decision": "NO_BLOCKING_STATIC_FINDINGS",
+  "findings": [],
+  "blockingFindings": [],
+  "reviewedWrapper": {
+    "path": "/private/tmp/p0-41-run-command-prepared-20261015.py",
+    "bytes": 10488,
+    "sha256": "e1dc7f607d992d38b94ab8b12218de579bc1d58f2adee77a0d788190c345bbbe"
+  },
+  "derivedFromWrapper": {
+    "path": "/private/tmp/p0-11-run-command-prepared-20261015.py",
+    "bytes": 10488,
+    "sha256": "b28dec64355192e41615628c8219fe831b83a62f8ee709834844a962301e079a"
+  },
+  "priorReview": {
+    "path": "/private/tmp/p0-11-wrapper-static-review-20261015.json",
+    "bytes": 3720,
+    "sha256": "43390cccbc1f122267cd822f5f72b107759dc51fd66363636471605459006fcf"
+  },
+  "reporter": {
+    "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+    "bytes": 2110,
+    "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+  },
+  "exactDerivation": {
+    "verified": true,
+    "functionalChanges": [],
+    "changedOnly": [
+      "P0-41 docstring label",
+      "private BASE namespace",
+      "managed ROOT namespace",
+      "private JOURNAL namespace",
+      "terminal P041 diagnostic label"
+    ],
+    "method": "Full text equality after only P0-11/p0-11/P011 namespace substitutions"
+  },
+  "checks": [
+    "Original command argv and deadlines are preserved; observed invocation checks direct pinned Node 22 and assigned Vitest entry point.",
+    "Both frozen observer and JSON reporters remain required; one fresh absolute producer path is constrained below BASE and outside reserved metadata, home and store paths.",
+    "Popen retains start_new_session=True, exclusive files and owned process metadata; normal wait is unbounded.",
+    "Owned-group polling uses signal 0 only, with a five-second bound and 50-millisecond interval; completion requires positive ESRCH.",
+    "No terminating signals, retries or automatic restoration are added; uncertain failures retain ACTIVE and write HALTED.",
+    "Observed producer is snapshotted byte-exact with exclusive creation after normal exit and group absence; observer PID and cwd are checked.",
+    "Before/after Git HEAD binding is preserved; the frozen reporter hash and legacy observer key are unchanged.",
+    "Journal remains intentionally appendable; command, snapshot and process evidence paths remain exclusive."
+  ],
+  "limits": [
+    "No runtime, parser, import, syntax check, test, build, install or native ABI observation was performed.",
+    "The wrapper inherits os.environ; its scoped overrides are not the later causal seven-key environment or credential/transport/cache isolation.",
+    "No P0-41 fixture artifact-environment policy was inferred or approved.",
+    "Process exit 0 or 1, a raw snapshot and group absence do not prove test acceptance or a semantic mutation kill.",
+    "Case counts, body errors, hook/setup errors, known late-close diagnostics and teardown attribution remain for actual post-exit review.",
+    "Reporter run-end is before global teardown; signal-0 ESRCH covers the owned group and is not universal detached-descendant absence.",
+    "Git HEAD equality is not full source/data-byte preservation.",
+    "Unbounded normal waiting can remain incomplete; no timeout recovery or terminating cleanup is provided."
+  ],
+  "performed": {
+    "fullSourceRead": true,
+    "exactDiffRead": true,
+    "hashAndBindingCheck": true,
+    "wrapperImported": false,
+    "codeParsed": false,
+    "syntaxChecked": false,
+    "wrapperExecuted": false,
+    "productRuntimePerformed": false,
+    "repositoryModified": false,
+    "runtimeBaseCreated": false
+  },
+  "runtimeAuthorizationProvided": false,
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true,
+  "markdown": {
+    "path": "/private/tmp/p0-41-wrapper-static-review-20261015.md",
+    "bytes": 2600,
+    "sha256": "94e65540130e1259624d932aadadfafd3a2beb42092f398eb7f5320325204a27"
+  }
+}

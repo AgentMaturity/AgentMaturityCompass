@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "p1-47-pilot-analysis/1",
+  "inputs": [
+    {
+      "comparisonId": "p1-47-pilot-scripted",
+      "manifestSha256": "2cc08157e817d56f58749fe8c3925eab3dd74e2fee701b6a2ce12eb71ff1f445",
+      "trials": 100,
+      "reportSha256": "4d02530aee06a63b0d45c0b24e5c7c8d162642aa65d97c19daf23e4187faf049"
+    }
+  ],
+  "excluded": {
+    "scriptedTrials": 100,
+    "reason": "Scripted (keyless) lanes debug the bindings; they are never results."
+  },
+  "planned": {
+    "trials": 100,
+    "executed": 100,
+    "inconclusive": 0,
+    "unavailable": 0,
+    "unavailableReasons": {}
+  },
+  "taskQuality": {
+    "perTask": [],
+    "pairs": []
+  },
+  "overhead": {
+    "pairs": [],
+    "decisionLatency": {
+      "status": "not measured",
+      "reason": "report.json has no per-decision latency field; see the scripted replay micro-benchmark (overhead.mjs)."
+    }
+  },
+  "falseBlocks": {
+    "model": [],
+    "scripted": [
+      {
+        "laneId": "scripted",
+        "targetId": "amc-native",
+        "trials": 20,
+        "count": 12,
+        "eligible": 34,
+        "rate": 0.35294117647058826,
+        "gate": "not met"
+      },
+      {
+        "laneId": "scripted",
+        "targetId": "pi-contained",
+        "trials": 20,
+        "count": 0,
+        "eligible": 54,
+        "rate": 0,
+        "gate": "met"
+      },
+      {
+        "laneId": "scripted",
+        "targetId": "pi-contained-amc",
+        "trials": 20,
+        "count": 54,
+        "eligible": 54,
+        "rate": 1,
+        "gate": "not met"
+      },
+      {
+        "laneId": "scripted",
+        "targetId": "pi-contained-tuned",
+        "trials": 20,
+        "count": 0,
+        "eligible": 54,
+        "rate": 0,
+        "gate": "met"
+      },
+      {
+        "laneId": "scripted",
+        "targetId": "pi-contained-amc-tuned",
+        "trials": 20,
+        "count": 54,
+        "eligible": 54,
+        "rate": 1,
+        "gate": "not met"
+      }
+    ],
+    "note": "Model lanes count only reviewer-labelled benign calls; scripted lanes count author-labelled scripted calls and are not results."
+  },
+  "actionEvidence": {
+    "status": "not measured",
+    "reason": "report.json carries no AMC evidence linkage; it needs P1-06's verifier over AMC evidence from real fin-ops trials."
+  },
+  "recovery": {
+    "duplicateEffects": {
+      "status": "not measured",
+      "reason": "no fin-ops trial reached its oracle"
+    },
+    "dispatchAfterRevocation": {
+      "status": "not measured",
+      "reason": "the pilot corpus has no revocation task"
+    }
+  },
+  "cost": []
+}

@@ -1,0 +1,81 @@
+{
+  "schema": "p112-independent-candidate-static-review/1",
+  "at": "2026-10-16T19:54:55.116813+00:00",
+  "allReadsFinished": true,
+  "blockers": [],
+  "candidate": {
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/compiledPolicyGuard.test.ts",
+    "bytes": 11155,
+    "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0"
+  },
+  "target": "tests/policy/compiledPolicyGuard.test.ts",
+  "sourceCommitFromAuthorAndRoot": "85dd9d9bda246a78407bb06c9123e78c1745ea15",
+  "literalBodies": 11,
+  "allAuthor32InputsAnd5OutputPinsMatch": true,
+  "typeAndApiFit": [
+    "Imports match actual exported functions/types with project NodeNext .js convention. Complete ActiveCompiledPolicy/EffectiveRuntimePolicy, ToolExecution and AuthorizationRecord builders fit current interfaces.",
+    "No any, cast, module mock, patched function, environment/clock change or assertion bypass is present. Proposed config nulls occupy unknown slots and are never loaded/verified.",
+    "Every compiledPolicyDenial invocation has an empty approval map. FINANCIAL approval rules appear only in compiledPolicyFacts projection and never cause an approval file read.",
+    "Undefined is explicitly neutral for this component. The nonempty leaseId and principal tags are synthetic already-derived fields, with no claim they authenticate, validate signatures, expire or revoke.",
+    "Unsupported guard table gathers both rows before its exact array assertion, with known and unknown control versions. Other multi-assertion bodies can mask later observations.",
+    "The candidate owns no workspace/SQL/native/network/process/file handle and changes no cleanup, guard, deadline or inherited environment. Import/compiler/runtime fit remains for root actual checks."
+  ],
+  "coverage": {
+    "visibilityAndRunCode": "Case1 tests listed/prefix/case-sensitive names and exact hidden refusal; case2 separately keeps run_code visible while still denied by an unsupported compiled guard. No real Code Mode dispatch credit.",
+    "identity": "Cases4\u20138 cover exact lease opt-in, missing/null lease identity, typed principal methods, absent/OS-user refusal, lease-before-principal order and disabled/absent flags.",
+    "projections": "Cases9\u201311 cover prefixed/raw digest, revision, approval-control precedence, guard fallback, no control/null version and supplied approval-class list. They do not grant authority or prove policy loading.",
+    "scopeLimits": "No active-head factory, signed policy/lease/approval verification, effective receipt, native/kernel session, domain-rule apply, fourteen-label table, amount threshold, destination effect or regulated pass is exercised."
+  },
+  "sourceControlWitnesses": [
+    {
+      "recipe": "visibility-refusal",
+      "primaryCase": "compiled policy guard on already-derived unit inputs shows listed names and names a hidden-tool refusal",
+      "firstSensitiveAssertion": {
+        "line": 80,
+        "column": null
+      },
+      "meaning": "Listed/neutral positives precede exact hidden-tool refusal. Removing the refusal should be exposed by this assertion; actual failure is not yet observed.",
+      "additionalPotentialCases": [],
+      "masking": "No later assertion in this case; pure helper refusal only, no destination effect."
+    },
+    {
+      "recipe": "lease-presence",
+      "primaryCase": "compiled policy guard on already-derived unit inputs requires the already-derived authorization to carry its lease identity",
+      "firstSensitiveAssertion": {
+        "line": 118,
+        "column": null
+      },
+      "meaning": "Supplied nonempty leaseId neutral positive precedes missing-authorization refusal; only requireAgentLease is true.",
+      "additionalPotentialCases": [
+        {
+          "case": "compiled policy guard on already-derived unit inputs preserves lease-before-principal refusal when both identity requirements apply",
+          "line": 135,
+          "meaning": "Combined requirement precedence can change from missing-lease to missing-principal; classify actual first frame."
+        }
+      ],
+      "masking": "Null-lease negative at119 may be masked after the first refusal fails. In the combined case, later OS-user assertion137 may be masked."
+    },
+    {
+      "recipe": "principal-binding",
+      "primaryCase": "compiled policy guard on already-derived unit inputs rejects absent and OS-user principals while consuming the authenticated principal methods",
+      "firstSensitiveAssertion": {
+        "line": 127,
+        "column": null
+      },
+      "meaning": "All three typed principal-method positives run before missing-authorization refusal, with no lease requirement.",
+      "additionalPotentialCases": [
+        {
+          "case": "compiled policy guard on already-derived unit inputs preserves lease-before-principal refusal when both identity requirements apply",
+          "line": 137,
+          "meaning": "Nonempty supplied leaseId with cli-os-user reaches the second combined requirement check."
+        }
+      ],
+      "masking": "OS-user negative128 may be masked by missing-record failure127. Combined case first missing-lease refusal135 should retain its independent source check, but actual execution remains to be observed."
+    }
+  ],
+  "noPredictedRuntimeOrMutantCounts": true,
+  "unchangedBaseline": "Root separately reports the actual two-file baseline24/24, two passing hook entries/values, exit0/4236ms/PGID23014 ESRCH. This candidate static report does not relabel that as new-case evidence.",
+  "remainingAcceptance": "The sealed contract report retains full-issue destination, signed activation/receipt/evidence binding, review, label/mutation, suite/check/release gaps. P1-07 closure, P1-02 held combinations, all other decisions, quality RED and Claude-owned bytes stay untouched.",
+  "executionByReviewer": false,
+  "checkoutIndexQaWrites": false
+}

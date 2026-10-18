@@ -1,0 +1,10 @@
+{
+  "schema": "lighthouse-finance-oracle-interface-clarification/1",
+  "preservedInterfaceSha256": "009727dbbcd6f2196b96a0122a3c7fc89094da6401adbc3965ffcca5e99520ce",
+  "rootApproved": "The parent approved private source authoring and the four-path wire; this is not runtime or repository admission.",
+  "lifecycle": "Nested children inherit the frozen outer guard's process group. Await natural close and stream completion, then prove only that child's PID is absent. The outer frozen wrapper separately proves its own PGID. Never detach merely to manufacture a group claim, kill, retry, or resolve early on lifecycle uncertainty.",
+  "snapshot": "Bind the cold verifier result to exact unchanged DB and WAL bytes plus the key/history inputs it used. Independently authenticate and recheck policy, approval and preimage files. SHM coordination bytes are observed separately, not claimed immutable.",
+  "paths": "The operator trust manifest is outside both the workspace and provider run directory. Approvals and preimage paths are strictly beneath the anchored real workspace. Public anchors never originate in driver stdout.",
+  "sourceCheckpoint": "335a3a9ae977f898391fdf2db186138e82d000ae is a metadata-only checkpoint above component source b9ba9a092f491d821c154679473b6f38c75b935d; earlier core input pins remain separate.",
+  "formalAcceptanceClosed": false
+}

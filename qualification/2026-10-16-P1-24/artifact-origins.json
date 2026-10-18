@@ -1,0 +1,263 @@
+{
+  "schema": "p124-packet-artifact-origins/1",
+  "sourceCommit": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+  "byteExactCopies": [
+    {
+      "destination": "fresh.raw.json",
+      "source": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-fresh-canonical/raw.json",
+        "bytes": 42327,
+        "sha256": "9b31d62cbbd3692625788e59ca649fdc6b202ec0ad26d699a1ba3ead00216c6a"
+      },
+      "copy": "Exact bytes; no redaction, trimming or reserialization."
+    },
+    {
+      "destination": "fresh.observer.json",
+      "source": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-fresh-canonical/observer.json",
+        "bytes": 56211,
+        "sha256": "9e1657efd67a2f171e5a39f99f8e37414ea333b4f2fa6b9419d9535a72aa5022"
+      },
+      "copy": "Exact bytes; no redaction, trimming or reserialization."
+    },
+    {
+      "destination": "mutant-format-message.raw.json",
+      "source": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-mutant-format-message/raw.json",
+        "bytes": 71423,
+        "sha256": "244dd583248d85b0fe17f26f88fca42c6e5a243ca643a5f178577ec5e0e6f53c"
+      },
+      "copy": "Exact bytes; no redaction, trimming or reserialization."
+    },
+    {
+      "destination": "mutant-format-message.observer.json",
+      "source": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-mutant-format-message/observer.json",
+        "bytes": 121679,
+        "sha256": "ec450a45027fb681dfcba55da421aa0ca532a45b5a98a26ea0c4591ab0fd97f0"
+      },
+      "copy": "Exact bytes; no redaction, trimming or reserialization."
+    },
+    {
+      "destination": "restored-format-message.raw.json",
+      "source": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-restored-format-message/raw.json",
+        "bytes": 42316,
+        "sha256": "32a798e2acea70b8dc54e7f320a052aed4176ed43cc4aa97003e7b90ca81833f"
+      },
+      "copy": "Exact bytes; no redaction, trimming or reserialization."
+    },
+    {
+      "destination": "restored-format-message.observer.json",
+      "source": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-restored-format-message/observer.json",
+        "bytes": 56211,
+        "sha256": "718b41b67b5b61bffe400fd04fc07802f8ebdd7a063e483b4d5beb183fdad149"
+      },
+      "copy": "Exact bytes; no redaction, trimming or reserialization."
+    },
+    {
+      "destination": "mutant-original-sha.raw.json",
+      "source": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-mutant-original-sha/raw.json",
+        "bytes": 43658,
+        "sha256": "8d228fec123f79ce46572fcd83e7fca04a42f61f9aa64e4ee3d4ed527f8fc84b"
+      },
+      "copy": "Exact bytes; no redaction, trimming or reserialization."
+    },
+    {
+      "destination": "mutant-original-sha.observer.json",
+      "source": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-mutant-original-sha/observer.json",
+        "bytes": 58774,
+        "sha256": "a4fc3f96813b3a3dabc9aea49adc25efa4058b76ea0efe27a69460c161ddab9b"
+      },
+      "copy": "Exact bytes; no redaction, trimming or reserialization."
+    },
+    {
+      "destination": "restored-original-sha.raw.json",
+      "source": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-restored-original-sha/raw.json",
+        "bytes": 42308,
+        "sha256": "4cc73f1cbdcd4941cd6741a468b6b58a4db219989b5b826797a2c2f739388a89"
+      },
+      "copy": "Exact bytes; no redaction, trimming or reserialization."
+    },
+    {
+      "destination": "restored-original-sha.observer.json",
+      "source": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-restored-original-sha/observer.json",
+        "bytes": 56211,
+        "sha256": "cb9397176a3f35c9306da0022ff214b8563ae53cad1c19767f1fc86920267d75"
+      },
+      "copy": "Exact bytes; no redaction, trimming or reserialization."
+    },
+    {
+      "destination": "fresh-source-binding.json",
+      "source": {
+        "path": "/private/tmp/p1-24-qualification-20261016/fresh-source-binding.json",
+        "bytes": 16233,
+        "sha256": "55c4855511c5f64907090ca2bf2994c2d17f2ada66e6d3d7615306c1acf3c729"
+      },
+      "copy": "Exact closed bytes."
+    },
+    {
+      "destination": "final-restoration.json",
+      "source": {
+        "path": "/private/tmp/p1-24-qualification-20261016/final-restoration.json",
+        "bytes": 434,
+        "sha256": "2cd48916df306e20fdb619cef884891c51873ac320b7afb467569ede48a05723"
+      },
+      "copy": "Exact closed bytes."
+    },
+    {
+      "destination": "count-overlay-proof.json",
+      "source": {
+        "path": "/private/tmp/p1-24-qualification-20261016/count-overlay-proof.json",
+        "bytes": 3134,
+        "sha256": "b563a688a51015755d6adfb5fd26d8c074c8eebe4a82e6a8e268a18503e630d3"
+      },
+      "copy": "Exact closed bytes."
+    },
+    {
+      "destination": "official-upstream-observations.json",
+      "source": {
+        "path": "/private/tmp/p1-24-qualification-20261016/upstream-read/observations.json",
+        "bytes": 6320,
+        "sha256": "23b415935545782f3f0c105a1eef6a3ebd86f2734c150e00a1fbe97aa010687b"
+      },
+      "copy": "Exact closed bytes."
+    },
+    {
+      "destination": "official-upstream-input-pins.json",
+      "source": {
+        "path": "/private/tmp/p1-24-qualification-20261016/upstream-read/input-pins.json",
+        "bytes": 5412,
+        "sha256": "1ac87d97d498180c87efa27d8cbd3d98c0d423d1ca4c2839ba0cab61adc147e2"
+      },
+      "copy": "Exact closed bytes."
+    },
+    {
+      "destination": "receipt-ownership-preflight.json",
+      "source": {
+        "path": "/private/tmp/p1-24-qualification-20261016/receipt-ownership-preflight.json",
+        "bytes": 33329,
+        "sha256": "3d541123689bcc6db519f16e83b8144d770c3eb50b62053d3f084163cf26966b"
+      },
+      "copy": "Exact closed bytes."
+    },
+    {
+      "destination": "hosted-touch-scope.json",
+      "source": {
+        "path": "/private/tmp/p1-24-qualification-20261016/hosted-touch-scope.json",
+        "bytes": 4693,
+        "sha256": "c93a49f7b14d30c40778adadee3a3f723aeb4e5b5bd52913bb67c1a69351466b"
+      },
+      "copy": "Exact closed bytes."
+    },
+    {
+      "destination": "docs-materialization.json",
+      "source": {
+        "path": "/private/tmp/p1-24-qualification-20261016/docs-materialization.json",
+        "bytes": 469,
+        "sha256": "75b981c67925b116633e4db006d2c688d66dbc923dd98aa2aa810940b7ae5b8d"
+      },
+      "copy": "Exact closed bytes."
+    },
+    {
+      "destination": "reviews/fresh-runtime-audit/review.json",
+      "source": {
+        "path": "/private/tmp/p1-24-qualification-20261016/fresh-runtime-audit/review.json",
+        "bytes": 6587,
+        "sha256": "a10aa88fe3b3cae9410e7452ef54cd84bc6e54b92bc9390f6a92b46226faa6bd"
+      },
+      "copy": "Exact closed bytes."
+    },
+    {
+      "destination": "reviews/fresh-runtime-audit/README.md",
+      "source": {
+        "path": "/private/tmp/p1-24-qualification-20261016/fresh-runtime-audit/README.md",
+        "bytes": 1833,
+        "sha256": "7a0479b6ac568c4d65d9bc1535f000efd22dfbb03d9fe6195add2b52139c2280"
+      },
+      "copy": "Exact closed bytes."
+    },
+    {
+      "destination": "reviews/fresh-runtime-audit/pins.json",
+      "source": {
+        "path": "/private/tmp/p1-24-qualification-20261016/fresh-runtime-audit/pins.json",
+        "bytes": 965,
+        "sha256": "4f3ee9847c2a95cf47da22c45c505fdfbd4aeeee7750f499a8fec6d87b17c231"
+      },
+      "copy": "Exact closed bytes."
+    },
+    {
+      "destination": "fresh-public-proof.json",
+      "source": {
+        "path": "/private/tmp/p1-24-qualification-20261016/fresh-runtime-audit/public-proof.json",
+        "bytes": 15556,
+        "sha256": "edf9cb731a5a56b58119c0d9ab5d7017b825bf31175bfa85c28c086c049a1683"
+      },
+      "copy": "Exact closed bytes."
+    }
+  ],
+  "derivedMetadata": [
+    "README.md",
+    "commands.json",
+    "source-inputs.json",
+    "sensitivity.json",
+    "evidence.json",
+    "artifact-origins.json",
+    "receipt.json"
+  ],
+  "noSecretTrees": "No private keys, vault, credentials, original/importer fixture trees or entire workspace copied. Public proof only.",
+  "closedPeerIncluded": "Fresh audit only; independent controls pending and uncredited at cutoff.",
+  "rootFinalization": {
+    "sourceProposalClosure": {
+      "path": "/private/tmp/p1-24-qualification-20261016/qualification-proposal-parent/proposal-closure.json",
+      "bytes": 8327,
+      "sha256": "218ece726909b1c891bdc91643194504b4228a853f7c9fcc2a9907db6c6e5037"
+    },
+    "newClosedCopies": [
+      {
+        "destination": "reviews/control-audit/README.md",
+        "source": {
+          "path": "/private/tmp/p1-24-qualification-20261016/control-audit/README.md",
+          "bytes": 3009,
+          "sha256": "71e7f65e630def5e89cb35a94b84e81ee9bde3fc88ad534dbc2813e784fb6287"
+        }
+      },
+      {
+        "destination": "reviews/control-audit/field-public-proofs.json",
+        "source": {
+          "path": "/private/tmp/p1-24-qualification-20261016/control-audit/field-public-proofs.json",
+          "bytes": 59895,
+          "sha256": "4044f82bbcff61098e5aa9e4d1c0eadde30fcd9f6f8478a2223743fda898b5b2"
+        }
+      },
+      {
+        "destination": "reviews/control-audit/pins.json",
+        "source": {
+          "path": "/private/tmp/p1-24-qualification-20261016/control-audit/pins.json",
+          "bytes": 737,
+          "sha256": "b54aa3da3944bd117b582cb643e8037ad680af5bfada96669ecdcb5b05af6693"
+        }
+      },
+      {
+        "destination": "reviews/control-audit/review.json",
+        "source": {
+          "path": "/private/tmp/p1-24-qualification-20261016/control-audit/review.json",
+          "bytes": 41947,
+          "sha256": "00023cc06b8ec2ca9b0552d557b76a40757679ebdea294e39a47ec44227c562b"
+        }
+      }
+    ],
+    "revisedRootOwnedSummaries": [
+      "README.md",
+      "evidence.json",
+      "sensitivity.json",
+      "receipt.json"
+    ],
+    "originalPrivateProposalPreserved": true
+  }
+}

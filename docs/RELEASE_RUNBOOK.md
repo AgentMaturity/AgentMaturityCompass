@@ -145,6 +145,12 @@ pnpm run release:gate -- --json --out tmp/release-gate/candidate.json
 pnpm run release:prepack-check
 ```
 
+The full gate follows CI's test profiles: the correctness suite runs with coverage and a 45-minute process limit, then performance floors run serially without coverage. Both profiles retain separate JSON reports and fail qualification on test failures, missing or invalid reports, or skipped/todo cases. The per-file coverage ratchet includes `src/` and `packages/verifier/src/`; its existing floors still apply. Quick mode records these checks as omitted and cannot establish complete qualification.
+
+CI's `release-gate` job runs the full gate on macOS with Node 24 for pushes and manual dispatches, with a 120-minute job limit and retained receipts. This host executes the actual Darwin confinement tests; the existing Ubuntu Node 22/24 matrix remains separate platform evidence. Its `e2e-playwright` job installs Chromium and runs the full website suite, retaining an HTML report on failure. Coverage reports are retained even when a correctness test fails; a failed process or report still blocks the dependent per-file coverage check.
+
+Live deployment health requires the D-03-approved AMC health URL in the repository variable `AMC_RELEASE_GATE_LIVE_URL`, or an explicit written D-03 skip until P2-06. On 14 October 2026, Sid approved the written skip until P2-06: "live-deploy-health skipped: no supported deployment until D-03 names one". The receipt retains that omission; it does not qualify a deployment. This decision covers only the health check.
+
 What this validates:
 - the npm artifact can be produced from the built source
 - SBOM + license inventory generation works

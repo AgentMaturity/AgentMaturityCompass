@@ -1,0 +1,193 @@
+{
+  "schema": "p125w-private-extension-input/1",
+  "readyForPrivateAssembly": false,
+  "sourceCommit": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+  "branch": "codex/p1-25-window-qualification",
+  "environment": null,
+  "basePacket": "/private/tmp/p1-25-window-qualification-20261017/original-p125-packet",
+  "baseReceipt": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/original-p125-packet/receipt.json",
+    "bytes": 320549,
+    "sha256": "74a39b8bc4f6edf5883808fe881b9bfbdd6992718a0e40fa6ac0b79787676f5a"
+  },
+  "baseReadme": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/original-p125-packet/README.md",
+    "bytes": 28642,
+    "sha256": "d0ba38b25c4737ff34977213db42847da1bccbdd6f6f1183bce1f33d98b305d9"
+  },
+  "baseAssembly": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/original-p125-packet/assembly-inputs.json",
+    "bytes": 492151,
+    "sha256": "ea081b90920f200518c787035f7789a187e80060bc7065b4ea493b617455e88d"
+  },
+  "basePreservationPin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/original-p125-packet-pinset.json",
+    "bytes": 308162,
+    "sha256": "b8f809e0887bee5b94df74b0127fadc86568552b15f06caa280711797f54323e"
+  },
+  "requiredPins": {
+    "sourceCheckpoint": {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-checkpoint.json",
+      "bytes": 530,
+      "sha256": "fc272296ef0059e6f9c3f766a1d4c1dd6ddc9c5a8def9678672bb0317fcc38d5"
+    },
+    "sourceOutcome": {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-source-combined-outcome.json",
+      "bytes": 6567,
+      "sha256": "3ab58da9f6baa979905fc4772b41199218d4c2572d97d57c85709018986d7580"
+    },
+    "freshBinding": null,
+    "canonicalOutcome": null,
+    "m1Outcome": null,
+    "restore1Outcome": null,
+    "m2Outcome": null,
+    "restore2Outcome": null,
+    "independentChainReview": null,
+    "finalPreservation": null,
+    "wholeIssueGaps": null,
+    "protectedInputs": {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 78069,
+      "sha256": "f84cd7442210621575ebb659e8fb783fc5764dea3222b7aa5bdccefc0473b725"
+    },
+    "controlRootBindings": null,
+    "launchOrderDiagnosis": {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/m1-launch-order-diagnosis.json",
+      "bytes": 2314,
+      "sha256": "abb0b91b712e69491077266d607bd0e02c03526327a00c0fcd48884d4d3d8814"
+    }
+  },
+  "independentChainReviewSchema": null,
+  "controlOperationPins": [
+    {
+      "operator": "OMIT-LOWER-BOUND-SELECTION",
+      "number": 1,
+      "originalPin": null,
+      "applyPreparedPin": null,
+      "applyPin": null,
+      "manualClassificationPin": null,
+      "restorePreparedPin": null,
+      "restorePin": null,
+      "livePatchPin": null,
+      "applyActionPin": null,
+      "restoreActionPin": null
+    },
+    {
+      "operator": "OMIT-TOLERANCE-CONTRIBUTION",
+      "number": 2,
+      "originalPin": null,
+      "applyPreparedPin": null,
+      "applyPin": null,
+      "manualClassificationPin": null,
+      "restorePreparedPin": null,
+      "restorePin": null,
+      "livePatchPin": null,
+      "applyActionPin": null,
+      "restoreActionPin": null
+    }
+  ],
+  "diagnosticEvidencePins": {
+    "outcome": {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-m1-outcome.json",
+      "bytes": 9989,
+      "sha256": "3bfa539cc6424568a1bf24b73845ad1d871ee1561fd4e0d0cd920bd474f50735"
+    },
+    "command": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-m1/command.json",
+      "bytes": 2806,
+      "sha256": "f6a4d1eee6fd92bfb9767384871cf77320de2b556e08c0340a280675b3077923"
+    },
+    "log": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-m1/stdout-stderr.log",
+      "bytes": 51716,
+      "sha256": "a178ec00626dce256e6af5222a22e0827f674f2317b9cfb6ade4867b3a4407c8"
+    },
+    "rawProducer": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p125w-m1.raw.json",
+      "bytes": 9035,
+      "sha256": "7c4d9eb5431d8e075ee402a8893cd7641ea363bdd1b06c2b265fbee6ff2e5aea"
+    },
+    "rawSnapshot": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-m1/raw.json",
+      "bytes": 9035,
+      "sha256": "7c4d9eb5431d8e075ee402a8893cd7641ea363bdd1b06c2b265fbee6ff2e5aea"
+    },
+    "observer": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-m1/observer.json",
+      "bytes": 14348,
+      "sha256": "7c19df77d867952b0e6ea0e9e3b22268d559413c15f62932d4f0aca66ad87a2d"
+    },
+    "oldRootBindings": {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/control-root-bindings.before-sequential-correction.json",
+      "bytes": 5670,
+      "sha256": "85a6ba5bad5918d06a6539248349076d7b7b735ca5bb83dfae916d14f449c8dc"
+    }
+  },
+  "diagnosticRunExcludedFromAcceptance": false,
+  "publicOutputAllowlistPin": null,
+  "newCommandPins": [],
+  "newArtifacts": [],
+  "hashOnlyPins": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/assemble-extension.py.source.txt",
+      "bytes": 36920,
+      "sha256": "8ab30e2239b1a91b8338f09ed75be92ae478475a1ae9e293fce155f56198aa88"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/b37-v4-to-b38.patch.txt",
+      "bytes": 36270,
+      "sha256": "2caa8b6548f40cd315733eab0de62e886e931ed9db9d3166260e1b5828a35146"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v4/assemble-extension.py.source.txt",
+      "bytes": 32762,
+      "sha256": "e3a7f161979310df0e0908023d54f4ad9b4529961b1bb03eea64bb2d52e8b197"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v4/v3-to-v4.patch.txt",
+      "bytes": 1738,
+      "sha256": "5fdb2d0382451d1eb3a34e38819c22b8df44ee38144120ee742d17417fdd519b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "bytes": 34549,
+      "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+      "dev": 16777231,
+      "inode": 543658576,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/original-own-source/checkpointWindow.test.ts.source.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/original-own-source/checkpointWindow.test.ts.source.txt",
+      "bytes": 22649,
+      "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7",
+      "dev": 16777231,
+      "inode": 543741686,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+      "bytes": 34549,
+      "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+      "dev": 16777231,
+      "inode": 543727816,
+      "nlink": 1
+    }
+  ],
+  "commandSelectionCutoffUtc": null,
+  "rootReviewedExactCommandAndArtifactInventory": false,
+  "readmePin": null,
+  "notes": null,
+  "rootReviewedActualControlsAndMasks": false,
+  "rootReadFullReadmeAndWholeIssueGaps": false,
+  "noAggregateCohortTotal": false,
+  "controlRecipesPin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/controls.json",
+    "bytes": 5499,
+    "sha256": "20328ea86febed06507f121d56d4dc28b4389acbb494298367d73e828f53ff78"
+  },
+  "sourceControlHelperPin": null,
+  "boundary": "Unready private skeleton. Actual source checkpoint/source22 and original launch-order diagnostic pins are recorded; the accepted fresh/control/restoration, root-binding, peer, preservation and whole-issue pins remain unfilled here even though root may already hold actual completed records. Root must fill/review a separate actual manifest. The original p125w-m1 is excluded diagnostic evidence, with no sensitivity credit or remapping; only the actual corrected phase in root bindings may enter acceptance. B37 launcher/EOF facts remain historical within the preserved old packet; no analogous B38 facts are invented. No assembly, metadata admission, publication or runtime credit is supplied."
+}

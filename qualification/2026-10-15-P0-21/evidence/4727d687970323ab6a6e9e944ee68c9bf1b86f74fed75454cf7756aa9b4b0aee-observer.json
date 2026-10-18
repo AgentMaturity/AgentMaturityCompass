@@ -1,0 +1,566 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 13259,
+  "cwd": "/private/tmp/p0-21-causal-qualification-20261015/closure",
+  "reason": "passed",
+  "files": [
+    "/private/tmp/p0-21-causal-qualification-20261015/closure/tests/domainAssessmentUnits.test.ts",
+    "/private/tmp/p0-21-causal-qualification-20261015/closure/tests/logisticsIndustryPack.test.ts",
+    "/private/tmp/p0-21-causal-qualification-20261015/closure/tests/noCertificationFromSelfAssessment.test.ts",
+    "/private/tmp/p0-21-causal-qualification-20261015/closure/tests/scoreUnits.test.ts",
+    "/private/tmp/p0-21-causal-qualification-20261015/closure/tests/selfReportedLevelCap.test.ts",
+    "/private/tmp/p0-21-causal-qualification-20261015/closure/tests/transparencyReport.test.ts"
+  ],
+  "testCount": 37,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "591620456",
+      "name": "tests/domainAssessmentUnits.test.ts",
+      "fullName": null,
+      "filepath": "/private/tmp/p0-21-causal-qualification-20261015/closure/tests/domainAssessmentUnits.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "591620456_0",
+      "name": "tests/domainAssessmentUnits.test.ts domain engine takes typed units (P0-21)",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "591620456_0_0",
+      "name": "tests/domainAssessmentUnits.test.ts domain engine takes typed units (P0-21) a raw 6 in domainQuestionScores throws instead of scoring 6%",
+      "fullName": "domain engine takes typed units (P0-21) a raw 6 in domainQuestionScores throws instead of scoring 6%",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "591620456_0_1",
+      "name": "tests/domainAssessmentUnits.test.ts domain engine takes typed units (P0-21) a percentage passed as a Likert answer throws",
+      "fullName": "domain engine takes typed units (P0-21) a percentage passed as a Likert answer throws",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "591620456_0_2",
+      "name": "tests/domainAssessmentUnits.test.ts domain engine takes typed units (P0-21) a base level of 7 throws",
+      "fullName": "domain engine takes typed units (P0-21) a base level of 7 throws",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "591620456_0_3",
+      "name": "tests/domainAssessmentUnits.test.ts domain engine takes typed units (P0-21) valid units convert explicitly: base levels via levelToPercent, answers via likertToPercent",
+      "fullName": "domain engine takes typed units (P0-21) valid units convert explicitly: base levels via levelToPercent, answers via likertToPercent",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-611860791",
+      "name": "tests/logisticsIndustryPack.test.ts",
+      "fullName": null,
+      "filepath": "/private/tmp/p0-21-causal-qualification-20261015/closure/tests/logisticsIndustryPack.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-611860791_0",
+      "name": "tests/logisticsIndustryPack.test.ts freight, 3PL, and warehouse industry pack",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-611860791_0_0",
+      "name": "tests/logisticsIndustryPack.test.ts freight, 3PL, and warehouse industry pack registers the dedicated logistics pack under mobility discovery",
+      "fullName": "freight, 3PL, and warehouse industry pack registers the dedicated logistics pack under mobility discovery",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-611860791_0_1",
+      "name": "tests/logisticsIndustryPack.test.ts freight, 3PL, and warehouse industry pack scores concrete logistics controls and surfaces low-level compliance gaps",
+      "fullName": "freight, 3PL, and warehouse industry pack scores concrete logistics controls and surfaces low-level compliance gaps",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1210071088",
+      "name": "tests/noCertificationFromSelfAssessment.test.ts",
+      "fullName": null,
+      "filepath": "/private/tmp/p0-21-causal-qualification-20261015/closure/tests/noCertificationFromSelfAssessment.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1210071088_0",
+      "name": "tests/noCertificationFromSelfAssessment.test.ts no certification from self-assessment (P0-21)",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1210071088_0_0",
+      "name": "tests/noCertificationFromSelfAssessment.test.ts no certification from self-assessment (P0-21) all-5 answers on every registered pack are a complete self-assessment, not a certification",
+      "fullName": "no certification from self-assessment (P0-21) all-5 answers on every registered pack are a complete self-assessment, not a certification",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1210071088_0_1",
+      "name": "tests/noCertificationFromSelfAssessment.test.ts no certification from self-assessment (P0-21) a partial self-assessment is reported as incomplete",
+      "fullName": "no certification from self-assessment (P0-21) a partial self-assessment is reported as incomplete",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1210071088_0_2",
+      "name": "tests/noCertificationFromSelfAssessment.test.ts no certification from self-assessment (P0-21) an answer outside 1-5 is refused, not clamped",
+      "fullName": "no certification from self-assessment (P0-21) an answer outside 1-5 is refused, not clamped",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1210071088_0_3",
+      "name": "tests/noCertificationFromSelfAssessment.test.ts no certification from self-assessment (P0-21) the pack audit reports a self-reported overall with no certified field",
+      "fullName": "no certification from self-assessment (P0-21) the pack audit reports a self-reported overall with no certified field",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1210071088_0_4",
+      "name": "tests/noCertificationFromSelfAssessment.test.ts no certification from self-assessment (P0-21) the domain report carries no certification field or wording",
+      "fullName": "no certification from self-assessment (P0-21) the domain report carries no certification field or wording",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1210071088_0_5",
+      "name": "tests/noCertificationFromSelfAssessment.test.ts no certification from self-assessment (P0-21) the transparency report shows evidence standing, never certification",
+      "fullName": "no certification from self-assessment (P0-21) the transparency report shows evidence standing, never certification",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1210071088_0_6",
+      "name": "tests/noCertificationFromSelfAssessment.test.ts no certification from self-assessment (P0-21) MCP sector-pack and trust-score text say self-assessment and evidence standing",
+      "fullName": "no certification from self-assessment (P0-21) MCP sector-pack and trust-score text say self-assessment and evidence standing",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "178721560",
+      "name": "tests/scoreUnits.test.ts",
+      "fullName": null,
+      "filepath": "/private/tmp/p0-21-causal-qualification-20261015/closure/tests/scoreUnits.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "178721560_0",
+      "name": "tests/scoreUnits.test.ts typed score units (P0-21)",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "178721560_0_0",
+      "name": "tests/scoreUnits.test.ts typed score units (P0-21) a Likert answer is an integer 1-5 and nothing else",
+      "fullName": "typed score units (P0-21) a Likert answer is an integer 1-5 and nothing else",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "178721560_0_1",
+      "name": "tests/scoreUnits.test.ts typed score units (P0-21) percent, level and fraction reject values outside their range",
+      "fullName": "typed score units (P0-21) percent, level and fraction reject values outside their range",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "178721560_0_2",
+      "name": "tests/scoreUnits.test.ts typed score units (P0-21) conversions are explicit",
+      "fullName": "typed score units (P0-21) conversions are explicit",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "178721560_0_3",
+      "name": "tests/scoreUnits.test.ts typed score units (P0-21) percentToLevel is the one level table: L2 starts at 30",
+      "fullName": "typed score units (P0-21) percentToLevel is the one level table: L2 starts at 30",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "1909578920",
+      "name": "tests/selfReportedLevelCap.test.ts",
+      "fullName": null,
+      "filepath": "/private/tmp/p0-21-causal-qualification-20261015/closure/tests/selfReportedLevelCap.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1909578920_0",
+      "name": "tests/selfReportedLevelCap.test.ts self-reported evidence caps at L1 (P0-21)",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1909578920_0_0",
+      "name": "tests/selfReportedLevelCap.test.ts self-reported evidence caps at L1 (P0-21) L2 counts met only by SELF_REPORTED events support at most level 1",
+      "fullName": "self-reported evidence caps at L1 (P0-21) L2 counts met only by SELF_REPORTED events support at most level 1",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1909578920_0_1",
+      "name": "tests/selfReportedLevelCap.test.ts self-reported evidence caps at L1 (P0-21) imported rows tagged to the question support exactly level 1",
+      "fullName": "self-reported evidence caps at L1 (P0-21) imported rows tagged to the question support exactly level 1",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1909578920_0_2",
+      "name": "tests/selfReportedLevelCap.test.ts self-reported evidence caps at L1 (P0-21) the same counts with OBSERVED events support level 2, the highest its evidence map evaluates (P1-07)",
+      "fullName": "self-reported evidence caps at L1 (P0-21) the same counts with OBSERVED events support level 2, the highest its evidence map evaluates (P1-07)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1909578920_0_3",
+      "name": "tests/selfReportedLevelCap.test.ts self-reported evidence caps at L1 (P0-21) no base gate at L2 or above accepts SELF_REPORTED",
+      "fullName": "self-reported evidence caps at L1 (P0-21) no base gate at L2 or above accepts SELF_REPORTED",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1909578920_0_4",
+      "name": "tests/selfReportedLevelCap.test.ts self-reported evidence caps at L1 (P0-21) a gate that lists no tiers defaults to OBSERVED and ATTESTED",
+      "fullName": "self-reported evidence caps at L1 (P0-21) a gate that lists no tiers defaults to OBSERVED and ATTESTED",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1543594809",
+      "name": "tests/transparencyReport.test.ts",
+      "fullName": null,
+      "filepath": "/private/tmp/p0-21-causal-qualification-20261015/closure/tests/transparencyReport.test.ts",
+      "state": "pass",
+      "hooks": {
+        "beforeAll": "pass",
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1543594809_0",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_0",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport generates report for valid agent",
+      "fullName": "generateTransparencyReport generates report for valid agent",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_1",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport report has correct identity fields",
+      "fullName": "generateTransparencyReport report has correct identity fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_2",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport report has correct dimensions from run",
+      "fullName": "generateTransparencyReport report has correct dimensions from run",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_3",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport renders markdown with expected sections",
+      "fullName": "generateTransparencyReport renders markdown with expected sections",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_4",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport preserves legacy version 1.1.1 in rendered transparency output",
+      "fullName": "generateTransparencyReport preserves legacy version 1.1.1 in rendered transparency output",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_5",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport preserves legacy version undefined in rendered transparency output",
+      "fullName": "generateTransparencyReport preserves legacy version undefined in rendered transparency output",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_6",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport does not promote an unsealed current transparency run to observed",
+      "fullName": "generateTransparencyReport does not promote an unsealed current transparency run to observed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_7",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport renders valid JSON",
+      "fullName": "generateTransparencyReport renders valid JSON",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_8",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport throws for non-existent agent",
+      "fullName": "generateTransparencyReport throws for non-existent agent",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_9",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport handles agent with no runs gracefully",
+      "fullName": "generateTransparencyReport handles agent with no runs gracefully",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_10",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport handles agent with no BOM gracefully",
+      "fullName": "generateTransparencyReport handles agent with no BOM gracefully",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_11",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport report version is 1.0",
+      "fullName": "generateTransparencyReport report version is 1.0",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_12",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport evidence standing — evidence_supported when integrity >= 0.9 and level >= 4",
+      "fullName": "generateTransparencyReport evidence standing — evidence_supported when integrity >= 0.9 and level >= 4",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_13",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport evidence standing — partial_evidence when integrity >= 0.6 or level >= 2",
+      "fullName": "generateTransparencyReport evidence standing — partial_evidence when integrity >= 0.6 or level >= 2",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1543594809_0_14",
+      "name": "tests/transparencyReport.test.ts generateTransparencyReport evidence standing — insufficient_evidence when integrity < 0.6 and level < 2",
+      "fullName": "generateTransparencyReport evidence standing — insufficient_evidence when integrity < 0.6 and level < 2",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

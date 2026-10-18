@@ -1,0 +1,315 @@
+{
+  "versions": [
+    {
+      "path": "/private/tmp/p2-07-oidc-qualification-20261016/test-proposal/jwtVerify.test.ts",
+      "bytes": 35921,
+      "sha256": "2f499b91fbd214f91772c6427c976a054eac2039917d4448836f276bc700a207"
+    },
+    {
+      "path": "/private/tmp/p2-07-oidc-qualification-20261016/test-proposal-v2/jwtVerify.test.ts",
+      "bytes": 40375,
+      "sha256": "274b379af37d90ecfd12b1d9644261f525d52a4d88bbf1a2806ba4f87f748309"
+    },
+    {
+      "path": "/private/tmp/p2-07-oidc-qualification-20261016/test-proposal-v3/jwtVerify.test.ts",
+      "bytes": 40561,
+      "sha256": "293a99eb5e5f8b52e5fb7a1658eeb60b1b9826d6abf15d9524e35096bdca2db3"
+    }
+  ],
+  "v1BlockerReview": {
+    "path": "/private/tmp/p2-07-oidc-qualification-20261016/test-proposal-review/review.json",
+    "bytes": 10265,
+    "sha256": "cada171950a55cf9870027be8af4435c8d0d15315b09b8ab9cf2abdeaf229b9d"
+  },
+  "v2StaticReview": {
+    "path": "/private/tmp/p2-07-oidc-qualification-20261016/v2-static-review/review.json",
+    "bytes": 7485,
+    "sha256": "1d479b3782743ca4743d12c585ac3d880c7616cd61f6af3f377044b935f53cca"
+  },
+  "v3StaticReview": {
+    "path": "/private/tmp/p2-07-oidc-qualification-20261016/v3-static-review/review.json",
+    "bytes": 4626,
+    "sha256": "308232494ac995a5e26c7125cb3fc420a1f6b2c181d566006a91423f3c57dc0d"
+  },
+  "v2ActualFailedOutcome": {
+    "schema": "p207-closed-runtime/1",
+    "at": "2026-10-16T11:32:01.669933+00:00",
+    "phase": "p207-v2-four-files",
+    "command": {
+      "phase": "p207-v2-four-files",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-v2-four-files.raw.json",
+      "exit": 1,
+      "durationMs": 10945,
+      "startedUtc": "2026-10-16T11:31:40.354273+00:00",
+      "endedUtc": "2026-10-16T11:31:51.315996+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v2-four-files/stdout-stderr.log",
+      "head": "67c4fc34fc8602fe607e44de8d0eb61b9d89959b",
+      "headAfter": "67c4fc34fc8602fe607e44de8d0eb61b9d89959b",
+      "ownedProcess": {
+        "pid": 44165,
+        "ownedPgid": 44165,
+        "observedPgidAfterLaunch": 44165,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/identity/jwtVerify.test.ts",
+          "tests/enterpriseSsoScim.test.ts",
+          "tests/security/api-security.test.ts",
+          "tests/security/identityAccountBinding.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-v2-four-files.raw.json"
+        ],
+        "startedUtc": "2026-10-16T11:31:40.354273+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/p207-v2-four-files.raw.json",
+          "bytes": 56187,
+          "sha256": "313873d10a2d5adbe972be76c7bdb8550a739373a626d428d91ac8219c009f80"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v2-four-files/raw.json",
+          "bytes": 56187,
+          "sha256": "313873d10a2d5adbe972be76c7bdb8550a739373a626d428d91ac8219c009f80"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v2-four-files/observer.json",
+          "bytes": 73371,
+          "sha256": "149a1b6bb9acdb19a1067fd58dda344fee8bfaabfa949e8be7b2590bc026ba8f"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    "physicalRoot": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "tests": {
+      "total": 150,
+      "passed": 149,
+      "failed": 1,
+      "skipped": 0
+    },
+    "failures": [
+      {
+        "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts",
+        "title": "bounded real OIDC JSON transport and discovery enforces the real ten-second request timeout and naturally closes its owned endpoint",
+        "messages": [
+          "Error: owned HTTP server closure uncertain\n    at withFixture (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts:202:83)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts:548:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      }
+    ],
+    "identitiesAndStatusesMatch": true,
+    "original22IdentitiesPreserved": true,
+    "hooksPassed": true,
+    "hookCount": 26,
+    "unhandledErrors": [],
+    "lateDiagnosticPatterns": [
+      "Unhandled Errors?",
+      "Unhandled Rejection",
+      "uncaught exception",
+      "Error during teardown",
+      "Tests modified the repository workspace",
+      "Hook timed out",
+      "Error:.*global.?teardown",
+      "ELIFECYCLE",
+      "error during close",
+      "close timed out",
+      "error during global teardown",
+      "Tests closed successfully but something prevents",
+      "test timed out",
+      "failed to load",
+      "worker exited"
+    ],
+    "lateHits": [],
+    "pins": [
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v2-four-files/raw.json",
+        "bytes": 56187,
+        "sha256": "313873d10a2d5adbe972be76c7bdb8550a739373a626d428d91ac8219c009f80"
+      },
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v2-four-files/observer.json",
+        "bytes": 73371,
+        "sha256": "149a1b6bb9acdb19a1067fd58dda344fee8bfaabfa949e8be7b2590bc026ba8f"
+      },
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v2-four-files/stdout-stderr.log",
+        "bytes": 13766,
+        "sha256": "1ce768624d03f52b70e13d473e5cf68d5e3eed225b8c595af86453898102d243"
+      },
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v2-four-files/command.json",
+        "bytes": 2778,
+        "sha256": "ff49bf296e3b33ad9f5f697f707845f7a2184f25a6e12d9b2ab4cb4b07dff9c7"
+      },
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v2-four-files/owned-process.json",
+        "bytes": 857,
+        "sha256": "695d3ef5a7bfabe92aa37eeb329369205bebb4558aaf74f897c3c37bff5c1d4f"
+      },
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v2-four-files/owned-group-after-exit.json",
+        "bytes": 262,
+        "sha256": "2c5b53ab2641f1b74a5dbd1b40be049ad5c0f4887601f6984b3639c040787126"
+      }
+    ],
+    "boundary": "Actual unfiltered four-file identity corpus only. Root must classify every RED body error and hidden later assertions. No full-suite, canonical independent verifier or release claim.",
+    "formalDone": false
+  },
+  "v3CorrectedROutcome": {
+    "schema": "p207-closed-runtime/1",
+    "at": "2026-10-16T11:36:27.996718+00:00",
+    "phase": "p207-v3-four-files",
+    "command": {
+      "phase": "p207-v3-four-files",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/identity/jwtVerify.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-v3-four-files.raw.json",
+      "exit": 0,
+      "durationMs": 11048,
+      "startedUtc": "2026-10-16T11:36:12.638526+00:00",
+      "endedUtc": "2026-10-16T11:36:23.701420+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v3-four-files/stdout-stderr.log",
+      "head": "67c4fc34fc8602fe607e44de8d0eb61b9d89959b",
+      "headAfter": "67c4fc34fc8602fe607e44de8d0eb61b9d89959b",
+      "ownedProcess": {
+        "pid": 44821,
+        "ownedPgid": 44821,
+        "observedPgidAfterLaunch": 44821,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/identity/jwtVerify.test.ts",
+          "tests/enterpriseSsoScim.test.ts",
+          "tests/security/api-security.test.ts",
+          "tests/security/identityAccountBinding.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-v3-four-files.raw.json"
+        ],
+        "startedUtc": "2026-10-16T11:36:12.638526+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/p207-v3-four-files.raw.json",
+          "bytes": 55674,
+          "sha256": "b4524350ac0918908c0cb3a745fe695aefe1acb419a5b4954408c5dc675b47ab"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v3-four-files/raw.json",
+          "bytes": 55674,
+          "sha256": "b4524350ac0918908c0cb3a745fe695aefe1acb419a5b4954408c5dc675b47ab"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v3-four-files/observer.json",
+          "bytes": 72114,
+          "sha256": "cb3f3383acbd774346f13135adbc4967fedcdd0c02e77ba89175546cdf9e4f86"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    "physicalRoot": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "tests": {
+      "total": 150,
+      "passed": 150,
+      "failed": 0,
+      "skipped": 0
+    },
+    "failures": [],
+    "identitiesAndStatusesMatch": true,
+    "original22IdentitiesPreserved": true,
+    "hooksPassed": true,
+    "hookCount": 26,
+    "unhandledErrors": [],
+    "lateDiagnosticPatterns": [
+      "Unhandled Errors?",
+      "Unhandled Rejection",
+      "uncaught exception",
+      "Error during teardown",
+      "Tests modified the repository workspace",
+      "Hook timed out",
+      "Error:.*global.?teardown",
+      "ELIFECYCLE",
+      "error during close",
+      "close timed out",
+      "error during global teardown",
+      "Tests closed successfully but something prevents",
+      "test timed out",
+      "failed to load",
+      "worker exited"
+    ],
+    "lateHits": [],
+    "pins": [
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v3-four-files/raw.json",
+        "bytes": 55674,
+        "sha256": "b4524350ac0918908c0cb3a745fe695aefe1acb419a5b4954408c5dc675b47ab"
+      },
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v3-four-files/observer.json",
+        "bytes": 72114,
+        "sha256": "cb3f3383acbd774346f13135adbc4967fedcdd0c02e77ba89175546cdf9e4f86"
+      },
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v3-four-files/stdout-stderr.log",
+        "bytes": 3434,
+        "sha256": "4f670a68c6fed1e5f603e20195adf7aaac9bf36b113793f79fa48e0ffbd6160f"
+      },
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v3-four-files/command.json",
+        "bytes": 2778,
+        "sha256": "ab125ac19295200b3db9646d22883c42f97f0b45dc0eaf50b2e9b6e0fb1c1532"
+      },
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v3-four-files/owned-process.json",
+        "bytes": 857,
+        "sha256": "d7bd576b65d6fc89ddb21e362843820b638aacff048c0b5b42ac401398ed2798"
+      },
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-v3-four-files/owned-group-after-exit.json",
+        "bytes": 262,
+        "sha256": "a142e06f63611d2bba2fdbd2191e8331d88f9bf3f2f6f2fc5ff6e166df339532"
+      }
+    ],
+    "boundary": "Actual unfiltered four-file identity corpus only. Root must classify every RED body error and hidden later assertions. No full-suite, canonical independent verifier or release claim.",
+    "formalDone": false
+  },
+  "productionChanged": false
+}

@@ -1,0 +1,23 @@
+{
+  "capturedUtc": "2026-10-15T06:44:44.730590+00:00",
+  "parentTrackedChecked": 8362,
+  "parentCompiledChecked": 4529,
+  "privateFilesChecked": 12891,
+  "parentDelta": [],
+  "privateUnexpectedDelta": [],
+  "immutableExternalDelta": [],
+  "native": {
+    "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "device": 16777231,
+    "inode": 538824643,
+    "nlink": 1,
+    "mode": 493
+  },
+  "expectedSourceDeviations": [
+    "scripts/check-threat-model.mjs"
+  ],
+  "privateHashMapSha256": "5ede950b16a17edb1bacdcaff67d1149c544e6b241187135a749919f8dc1c012",
+  "processBoundary": "File bytes only; dependency/cache universe and detached descendants are not proven absent."
+}

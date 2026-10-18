@@ -1,0 +1,1 @@
+{"phase":"baseline","counts":{"total":2,"passed":0,"failed":2},"report":"/private/tmp/p0-20-proposal-proof-9b9tzktr/baseline-two-trusted.json","failures":[{"name":"trusted-text-verify","exit":70,"gates":["trusted exit0","actual canonical text claim line"]},{"name":"trusted-json-verify","exit":70,"gates":["trusted exit0","canonical self-reported JSON fields"]}]}

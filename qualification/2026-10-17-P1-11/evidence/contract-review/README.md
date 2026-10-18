@@ -1,0 +1,9 @@
+The bounded lane can directly qualify15 decisive admission/dimension rules using typed, already-derived evidence and a typed applicability plan. Those fixtures are unit inputs. They prove no real signature, receipt/event_hash, imported provenance, external authority, compiled plan or public-report positive.
+
+The current public report intentionally uses plan:null. It withholds passes even with sufficient evidence. Preserve its existing empty-ledger score null and record the spec's score0 mismatch as an unqualified whole-issue gap. Also retain the NOT_EVALUATED versus spec UNKNOWN compatibility spelling difference. These are technical scope limits, not new human holds.
+
+The smallest unchanged regression set is complianceFailClosed, evidenceBinding and coverageScorer; root reported63/63. The evidenceBinding source-literal census reads held-R/src under wrapper cwd. Additional claim/table/matrix/report/catalog tests are listed as related options, not invented gates.
+
+Four source-only freshQ control recipes are pinned: tenant, freshness, ignored attributes tier and replay. Each has a distinct first semantic rejection/tier witness with valid earlier prerequisites; no mutant was written or result predicted. The tier control qualifies consumption of derived provenance only and does not substitute for the spec's actual meta.trustTier loader mutation. Root applies/restores one operator at a time after real canonical evidence.
+
+Trusted admitted violations remain failures despite incomplete/contradictory evidence; system positive rows remain rejected for agent scope while system violations retain the deliberate violation-only path. The report preserves loader, sampling/oracle, plan, public-surface, historical-main comparison, full-suite/global-quality and full-issue gaps. All source ownership, holds, freeze checks and F37 skip remain intact.

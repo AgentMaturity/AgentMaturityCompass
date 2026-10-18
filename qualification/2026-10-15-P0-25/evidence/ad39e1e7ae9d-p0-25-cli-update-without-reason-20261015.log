@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:citations
+> node scripts/check-citations.mjs --update-baseline
+
+citations: --update-baseline requires --reason "<text>"; usage: node scripts/check-citations.mjs [--json] [--update-baseline --reason "<text>"]

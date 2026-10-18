@@ -1,0 +1,89 @@
+{
+  "schema": "p125f-control-helper-independent-static-review/1",
+  "at": "2026-10-16T22:14:39.441317+00:00",
+  "blockers": [],
+  "status": "Finite static review only; helpers remain unexecuted by this reviewer.",
+  "reviewedHelpers": [
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/source-control.py",
+      "bytes": 15955,
+      "sha256": "d8788251c7481baccea9bd7dba4da5e43fc2649e22393b5542c64d779b6c0ef7"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/check-preservation.py",
+      "bytes": 1472,
+      "sha256": "894a259f41e243002fcf44f73ee07ed607b39a89bb3e92f3d45cc44bd9bcc7ac"
+    }
+  ],
+  "sealedPreparationOutputsRehashed": 14,
+  "authorInputPinsRehashed": 154,
+  "sourceRecipes": [
+    {
+      "operator": "F1-order",
+      "oneExactSourceMatch": true,
+      "beforeLine": 157,
+      "inMemoryWholeFile": {
+        "bytes": 10942,
+        "sha256": "ff81c88306ad744cdb6efa0011aef214c686733a6ef98e77993fabf0b17d7fc9"
+      },
+      "patchExact": true,
+      "sourceMutantWritten": false
+    },
+    {
+      "operator": "F2-no-continue",
+      "oneExactSourceMatch": true,
+      "beforeLine": 172,
+      "inMemoryWholeFile": {
+        "bytes": 10940,
+        "sha256": "c8b94cc2b7ba905d380e64989bce9e4f3734e6dfc4aeb4a588f4612a86e1dc31"
+      },
+      "patchExact": true,
+      "sourceMutantWritten": false
+    },
+    {
+      "operator": "F3-unpinned-dispatch",
+      "oneExactSourceMatch": true,
+      "beforeLine": 160,
+      "inMemoryWholeFile": {
+        "bytes": 10911,
+        "sha256": "ecae1ba1428281a8ba8fe7e1e065d4cffa0e62504a113dfd70d43c745de16938"
+      },
+      "patchExact": true,
+      "sourceMutantWritten": false
+    }
+  ],
+  "exactB34V2AdaptationPatchesVerified": true,
+  "finiteContract": {
+    "selectedNames": 72,
+    "compiledPairs": 8,
+    "protectedInputs": 128,
+    "priorNativePins": 7,
+    "futureDistinctNativeRequired": true,
+    "futureCorpus": 21,
+    "futureHooksAndFailureCountsUnknown": true,
+    "compiledFilesIncludedIn72Names": true
+  },
+  "guardReview": [
+    "Actual future source/fresh binding, matching HEADs, clean S, empty S/Q indexes, exact dirty held R state and actual closed clean-source argv/PGID facts are required. All four current ACTIVE/HALTED marker spellings are rejected.",
+    "Every selected source/fresh file is checked for regular canonical single-link physical identity, global distinct dev/inode and exact bytes. All128 protected inputs and seven old plus one future distinct native pins are rechecked.",
+    "Each explicit operation preserves exclusive originals/prepared records; target uses O_NOFOLLOW descriptor identity and known exact bytes before the sole in-place write. No automatic restore, retry, signal or test execution occurs.",
+    "Actual source and fresh21 identities/hooks must match. Every RED requires natural exit1, actual failed tests, same ordered21, no non-test/unhandled/late failures, full manual source/operator/outcome-bound failure and masking classification before explicit exact restoration.",
+    "F2 requires actual F1 byte restoration and same21 green restore1; F3 requires actual F2 byte restoration and same21 green restore2, including actual canonical hook-entry/value equality."
+  ],
+  "witnessReview": {
+    "F1": "ORDER261 follows single-TSA254; later264-268 are masked. Additional NO-ANCHOR239 and TIMEOUT-CONTINUE287 remain actual-outcome-dependent.",
+    "F2": "Caught HTTP500 and default-abort branches reach the inserted break; actual route witnesses261/287 precede later result assertions.",
+    "F3": "NO-ANCHOR237 zero-wire witness follows matching-anchor231;238-241 are masked if237 fails."
+  },
+  "limits": [
+    "No helper import, syntax parsing, compilation or execution; no product/native/SQL/network/test/probe execution. In-memory byte reconstruction was not stored as source.",
+    "The future source commit, fresh root, binding/native/compiled pins, canonical result, control sensitivity and restored greens remain root-run evidence, not static review credit.",
+    "Checks establish finite snapshots and a root-reviewed sequential protocol; no continuous isolation or full issue/quality/F37/plan completion claim."
+  ],
+  "privateAuthoringStopRetained": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/private-authoring-stop.json",
+    "bytes": 489,
+    "sha256": "f4f8c761d9928ec9c55b585e4367f40e0c0a21b9ec74f297c4a5a33a8bae6a4c"
+  },
+  "sourceCheckoutIndexQaWrites": false
+}

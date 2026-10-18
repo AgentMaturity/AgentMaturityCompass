@@ -2147,7 +2147,7 @@ export function generateFullOpenApiSpec(): OpenApiSpec {
         "Includes endpoints for diagnostics, assurance, CGX, leases, approvals, " +
         "plugins, forecasting, and provider proxying.",
     },
-    paths: withClaimResponses(withClaimResponses(allPaths, API_RESULT_ROUTES, true), STUDIO_RESULT_ROUTES, false),
+    paths: withClaimResponses(withClaimResponses(allPaths, API_RESULT_ROUTES, true, true), STUDIO_RESULT_ROUTES, false),
     components: {
       schemas: allSchemas,
       securitySchemes: {

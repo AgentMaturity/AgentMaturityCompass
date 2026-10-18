@@ -1,0 +1,39 @@
+{
+  "classification": "body-assertion-failures-observed",
+  "total": 37,
+  "passed": 36,
+  "failed": 1,
+  "pending": 0,
+  "todo": 0,
+  "failures": [
+    {
+      "file": "tests/scoreUnits.test.ts",
+      "fullName": "typed score units (P0-21) percentToLevel is the one level table: L2 starts at 30",
+      "rawFailureMessages": [
+        "AssertionError: percent 30: expected 1 to be 2 // Object.is equality\n    at /private/tmp/p0-21-causal-qualification-20261015/closure/tests/scoreUnits.test.ts:47:58\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ],
+      "observerErrors": [
+        {
+          "message": "percent 30: expected 1 to be 2 // Object.is equality",
+          "actual": "1",
+          "expected": "2",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "- Expected\n+ Received\n\n- 2\n+ 1",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: percent 30: expected 1 to be 2 // Object.is equality\n    at /private/tmp/p0-21-causal-qualification-20261015/closure/tests/scoreUnits.test.ts:47:58\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/tmp/p0-21-causal-qualification-20261015/closure/tests/scoreUnits.test.ts",
+              "line": 47,
+              "column": 58
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+}

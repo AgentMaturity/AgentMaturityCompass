@@ -1,0 +1,371 @@
+{
+  "kind": "independent read-only applied fixture repair diff review",
+  "baseline": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+  "candidateHead": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+  "reviewScope": "eleven applied bounded fixture repair files; temporary landedSource freeze mutation recorded separately",
+  "result": "no actionable acceptance weakening findings in eleven fixture repairs",
+  "actionableFindings": [],
+  "appliedFiles": [
+    {
+      "path": "tests/apiRouters.test.ts",
+      "baselineSha256": "64fe33c9b184db17c8abc522cd7435a3c53af4e4672b82c3550dda551a27b748",
+      "reviewedSha256": "5724a984520a581a14c21d8f8ab835b54a88400c15fd31580dacb240d2efd6a9",
+      "removedAssertionLines": [
+        "    await assertJsonRoute(handleEnforceRoute as any, { pathname: \"/api/v1/enforce/formal/certificate\", method: \"POST\", body: { certificate: { proof: true } } });"
+      ],
+      "addedAssertionLines": [
+        "    const certificate = await assertJsonRoute(handleEnforceRoute as any, { pathname: \"/api/v1/enforce/formal/certificate\", method: \"POST\", body: { certificate: { proof: true } } });",
+        "    expect(certificate).toMatchObject({ valid: false, integrityValid: true, status: \"UNTRUSTED\" });"
+      ],
+      "diff": "--- a/tests/apiRouters.test.ts\n+++ b/tests/apiRouters.test.ts\n@@ -285,7 +285,7 @@\n \n   boundedModelCheck: vi.fn(() => ({ verified: true })),\n   generateTLASpec: vi.fn(() => \"---- MODULE Spec ----\"),\n-  verifyFormalCertificate: vi.fn(() => ({ valid: true })),\n+  verifyFormalCertificate: vi.fn(() => ({ valid: true, issues: [] as string[] })),\n \n   collectVerifierEvidence: vi.fn(async () => ({ rows: [1] })),\n   renderVerifierEvidenceJson: vi.fn(() => ({ exported: true })),\n@@ -1670,7 +1670,9 @@\n     await assertJsonRoute(handleEnforceRoute as any, { pathname: \"/api/v1/enforce/evaluate\", method: \"POST\", body: { action: \"deploy\", tool: \"kubectl\", agentId: \"agent-1\", context: { env: \"prod\" } } });\n     await assertJsonRoute(handleEnforceRoute as any, { pathname: \"/api/v1/enforce/formal/verify\", method: \"POST\", body: { property: { id: \"p1\", name: \"Safe\", description: \"desc\", formula: \"G safe\", kind: \"safety\", severity: \"high\" }, agentState: { ok: true } } });\n     await assertJsonRoute(handleEnforceRoute as any, { pathname: \"/api/v1/enforce/formal/tla-spec\", method: \"POST\" });\n-    await assertJsonRoute(handleEnforceRoute as any, { pathname: \"/api/v1/enforce/formal/certificate\", method: \"POST\", body: { certificate: { proof: true } } });\n+    const certificate = await assertJsonRoute(handleEnforceRoute as any, { pathname: \"/api/v1/enforce/formal/certificate\", method: \"POST\", body: { certificate: { proof: true } } });\n+    // P0-51: an unkeyed proof certificate is never an authentic artifact, even when its hash checks out.\n+    expect(certificate).toMatchObject({ valid: false, integrityValid: true, status: \"UNTRUSTED\" });\n   });\n \n   test(\"evidence router covers status, list, gaps, ingest, collect, export, attest, and bundle routes\", async () => {\n"
+    },
+    {
+      "path": "tests/compliance/dataResidencyPersistence.test.ts",
+      "baselineSha256": "a433f31221368e3a8eeef6c05053c6e0769034325d52d49f00ca3e79394dfabe",
+      "reviewedSha256": "d3c440d4097a256466072af5c82d15d3aad214388cedc8cf61d9d6fc66714e09",
+      "removedAssertionLines": [
+        "    expect(existsSync(path)).toBe(true);",
+        "    expect(stored.record_hash).toMatch(/^[0-9a-f]{64}$/);",
+        "    expect(stored.prev_record_hash).toBeTruthy();"
+      ],
+      "addedAssertionLines": [
+        "import { assertDeletionAllowed, DeletionDenied } from \"../../src/residency/deletionGate.js\";",
+        "    expect(() => assertDeletionAllowed(logsDeletion(workspace))).toThrow(DeletionDenied);",
+        "    expect(assertDeletionAllowed(logsDeletion(workspace)).verdict).toBe(\"clear\");",
+        "      expect(existsSync(file), file).toBe(true);",
+        "    expect(JSON.parse(readFileSync(path, \"utf8\"))).toMatchObject({",
+        "    expect(snapshot.holdsChecked).toBe(1);",
+        "    expect(snapshot.registryDigest).toMatch(/^[0-9a-f]{64}$/);",
+        "    expect(snapshot.journalRevision).toBeGreaterThan(0);",
+        "      expect(() => readLegalHoldRegistry(workspace)).toThrow(LegalHoldRegistryError);",
+        "      expect(() => getActiveLegalHolds(\"acme\", workspace)).toThrow(LegalHoldRegistryError);",
+        "      expect(holdVerdict({ workspace })).toEqual({ verdict: \"unknown\", reason });"
+      ],
+      "diff": "--- a/tests/compliance/dataResidencyPersistence.test.ts\n+++ b/tests/compliance/dataResidencyPersistence.test.ts\n@@ -1,5 +1,5 @@\n import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n-import { mkdtempSync, rmSync, readFileSync, existsSync } from \"node:fs\";\n+import { mkdtempSync, rmSync, readFileSync, existsSync, writeFileSync } from \"node:fs\";\n import { tmpdir } from \"node:os\";\n import { join } from \"node:path\";\n import {\n@@ -16,6 +16,15 @@\n   generateResidencyReport,\n   resetDataResidencyState\n } from \"../../src/compliance/dataResidency.js\";\n+import {\n+  holdVerdict,\n+  legalHoldRegistryRoot,\n+  LegalHoldRegistryError,\n+  readLegalHoldRegistry\n+} from \"../../src/residency/legalHoldRegistry.js\";\n+import { assertDeletionAllowed, DeletionDenied } from \"../../src/residency/deletionGate.js\";\n+\n+const logsDeletion = (workspace: string) => ({ workspace, executor: \"residency-test\", target: { kind: \"logs\" as const } });\n \n /**\n  * Residency policies, tenants and legal holds lived only in module-level\n@@ -69,6 +78,8 @@\n     const active = getActiveLegalHolds(\"acme\", workspace);\n     expect(active.map((h) => h.holdId)).toContain(hold.holdId);\n     expect(isTenantUnderLegalHold(\"acme\", workspace)).toBe(true);\n+    // Deletion admission reads the same registry, so a later process is refused.\n+    expect(() => assertDeletionAllowed(logsDeletion(workspace))).toThrow(DeletionDenied);\n   });\n \n   it(\"records a release so a later process sees it\", () => {\n@@ -81,6 +92,7 @@\n     resetDataResidencyState();\n     expect(getActiveLegalHolds(\"acme\", workspace)).toHaveLength(0);\n     expect(isTenantUnderLegalHold(\"acme\", workspace)).toBe(false);\n+    expect(assertDeletionAllowed(logsDeletion(workspace)).verdict).toBe(\"clear\");\n   });\n \n   it(\"sees every registered tenant when checking isolation\", () => {\n@@ -98,17 +110,52 @@\n     expect(getPolicyForRegion(\"eu-west-1\", workspace)?.policyId).toBe(policy.policyId);\n   });\n \n-  it(\"chains and signs stored records so tampering is detectable\", () => {\n+  it(\"signs each stored hold and anchors the set in HEAD and the journal (P2-01)\", () => {\n     const hold = issueLegalHold(\n       { tenantId: \"acme\", reason: \"litigation\", issuedBy: \"legal\" },\n       workspace\n     );\n-    const path = join(workspace, \".amc\", \"compliance\", \"residency\", \"legal-holds\", `${hold.holdId}.json`);\n-    expect(existsSync(path)).toBe(true);\n-    const stored = JSON.parse(readFileSync(path, \"utf8\"));\n-    expect(stored.record_hash).toMatch(/^[0-9a-f]{64}$/);\n-    expect(stored.prev_record_hash).toBeTruthy();\n+    const root = legalHoldRegistryRoot(workspace);\n+    const path = join(root, `${hold.holdId}.json`);\n+    for (const file of [path, `${path}.sig`, join(root, \"HEAD.json\"), join(root, \"HEAD.json.sig\"), join(root, \"journal\")]) {\n+      expect(existsSync(file), file).toBe(true);\n+    }\n+    expect(JSON.parse(readFileSync(path, \"utf8\"))).toMatchObject({\n+      schemaVersion: \"amc.legal-hold/v1\", holdId: hold.holdId, active: true, scope: { tenantId: \"acme\" }\n+    });\n+    const snapshot = readLegalHoldRegistry(workspace);\n+    expect(snapshot.holdsChecked).toBe(1);\n+    expect(snapshot.registryDigest).toMatch(/^[0-9a-f]{64}$/);\n+    expect(snapshot.journalRevision).toBeGreaterThan(0);\n   });\n+\n+  // Each tamper must surface as an integrity failure, never as \"no active holds\".\n+  const tampers: Array<[string, (path: string) => void, string]> = [\n+    [\"a forged release in the record\", (path) => {\n+      const record = JSON.parse(readFileSync(path, \"utf8\"));\n+      writeFileSync(path, JSON.stringify({ ...record, active: false, releasedTs: record.issuedTs }) + \"\\n\");\n+    }, \"signature_invalid\"],\n+    [\"a broken record signature\", (path) => {\n+      const sig = JSON.parse(readFileSync(`${path}.sig`, \"utf8\"));\n+      writeFileSync(`${path}.sig`, JSON.stringify({ ...sig, signature: Buffer.alloc(64).toString(\"base64\") }));\n+    }, \"signature_invalid\"],\n+    [\"a deleted record and signature\", (path) => {\n+      rmSync(path); rmSync(`${path}.sig`);\n+    }, \"record_corrupt\"]\n+  ];\n+  for (const [name, tamper, reason] of tampers) {\n+    it(`refuses ${name} instead of reporting the tenant unheld`, () => {\n+      const hold = issueLegalHold(\n+        { tenantId: \"acme\", reason: \"litigation\", issuedBy: \"legal\" },\n+        workspace\n+      );\n+      tamper(join(legalHoldRegistryRoot(workspace), `${hold.holdId}.json`));\n+      resetDataResidencyState();\n+      expect(() => readLegalHoldRegistry(workspace)).toThrow(LegalHoldRegistryError);\n+      expect(() => getActiveLegalHolds(\"acme\", workspace)).toThrow(LegalHoldRegistryError);\n+      expect(holdVerdict({ workspace })).toEqual({ verdict: \"unknown\", reason });\n+    });\n+  }\n \n   it(\"still works without a workspace, for library callers\", () => {\n     const hold = issueLegalHold({ tenantId: \"acme\", reason: \"x\", issuedBy: \"y\" });\n"
+    },
+    {
+      "path": "tests/enterpriseSsoScim.test.ts",
+      "baselineSha256": "361742db0c03b657f46bfdce126fdc2d06043aa6e447c2524de017725cac20b5",
+      "reviewedSha256": "8458813ecb3596f66931306d3a7aabd76807d466274d1cdcfc2f1980336a4d1e",
+      "removedAssertionLines": [
+        "      expect(callback.status).toBe(401);"
+      ],
+      "addedAssertionLines": [
+        "      expect(refused.status).toBe(400);",
+        "      expect(refused.headers.location).toBeUndefined();",
+        "      expect(callback.status).toBe(403);",
+        "      expect(callback.body).toContain(\"email not verified\");"
+      ],
+      "diff": "--- a/tests/enterpriseSsoScim.test.ts\n+++ b/tests/enterpriseSsoScim.test.ts\n@@ -3,7 +3,7 @@\n import { mkdtempSync, readFileSync, rmSync, writeFileSync } from \"node:fs\";\n import { join } from \"node:path\";\n import { tmpdir } from \"node:os\";\n-import { afterEach, describe, expect, test } from \"vitest\";\n+import { afterEach, describe, expect, test, vi } from \"vitest\";\n import { initWorkspace } from \"../src/workspace.js\";\n import { canonicalize } from \"../src/utils/json.js\";\n import { createHostUser, createWorkspaceRecord, findHostUserById, initHostDb, rolesForUserIdInWorkspace } from \"../src/workspaces/hostDb.js\";\n@@ -29,6 +29,7 @@\n }\n \n afterEach(() => {\n+  vi.unstubAllEnvs();\n   while (roots.length > 0) {\n     const dir = roots.pop();\n     if (dir) {\n@@ -121,20 +122,20 @@\n   return { hostDir, workspaceDir };\n }\n \n-function jwtSignEdDsa(params: {\n+function jwtSignRs256(params: {\n   privateKeyPem: string;\n   kid: string;\n   payload: Record<string, unknown>;\n }): string {\n   const header = {\n-    alg: \"EdDSA\",\n+    alg: \"RS256\",\n     typ: \"JWT\",\n     kid: params.kid\n   };\n   const encodedHeader = b64url(JSON.stringify(header));\n   const encodedPayload = b64url(JSON.stringify(params.payload));\n   const input = `${encodedHeader}.${encodedPayload}`;\n-  const signature = sign(null, Buffer.from(input, \"utf8\"), params.privateKeyPem);\n+  const signature = sign(\"sha256\", Buffer.from(input, \"utf8\"), params.privateKeyPem);\n   return `${input}.${b64url(signature)}`;\n }\n \n@@ -149,7 +150,8 @@\n   close: () => Promise<void>;\n } {\n   const kid = params.kid ?? \"oidc-test-kid\";\n-  const keyPair = generateKeyPairSync(\"ed25519\");\n+  // P2-07 admits RS256, PS256 and ES256 only; EdDSA is refused.\n+  const keyPair = generateKeyPairSync(\"rsa\", { modulusLength: 2048 });\n   const privateKeyPem = keyPair.privateKey.export({ format: \"pem\", type: \"pkcs8\" }).toString();\n   const publicJwk = keyPair.publicKey.export({ format: \"jwk\" }) as Record<string, unknown>;\n   const codeNonce = new Map<string, string>();\n@@ -178,7 +180,7 @@\n             {\n               ...publicJwk,\n               kid,\n-              alg: \"EdDSA\",\n+              alg: \"RS256\",\n               use: \"sig\"\n             }\n           ]\n@@ -234,7 +236,7 @@\n       if (code !== \"noemail\") {\n         payload.email = \"sso-user@example.com\";\n       }\n-      const idToken = jwtSignEdDsa({\n+      const idToken = jwtSignRs256({\n         privateKeyPem,\n         kid,\n         payload\n@@ -361,6 +363,16 @@\n     });\n \n     try {\n+      // P2-07: an HTTP identity provider is refused unless the loopback development opt-in is set.\n+      const refused = await httpCall({\n+        url: `http://127.0.0.1:${routerPort}/host/api/auth/oidc/testoidc/login`,\n+        method: \"GET\"\n+      });\n+      expect(refused.status).toBe(400);\n+      expect(refused.headers.location).toBeUndefined();\n+\n+      // This fake IdP is the test's subject and listens on literal 127.0.0.1 over HTTP.\n+      vi.stubEnv(\"AMC_IDENTITY_ALLOW_INSECURE_LOOPBACK\", \"1\");\n       const login = await httpCall({\n         url: `http://127.0.0.1:${routerPort}/host/api/auth/oidc/testoidc/login`,\n         method: \"GET\"\n@@ -447,6 +459,8 @@\n     });\n \n     try {\n+      // This fake IdP is the test's subject and listens on literal 127.0.0.1 over HTTP.\n+      vi.stubEnv(\"AMC_IDENTITY_ALLOW_INSECURE_LOOPBACK\", \"1\");\n       const login = await httpCall({\n         url: `http://127.0.0.1:${routerPort}/host/api/auth/oidc/oidcemailproof/login`,\n         method: \"GET\"\n@@ -461,7 +475,9 @@\n         url: String(authorize.headers.location ?? \"\"),\n         method: \"GET\"\n       });\n-      expect(callback.status).toBe(401);\n+      // P2-07 reports \"OIDC email not verified\", which the router answers 403 like a missing email.\n+      expect(callback.status).toBe(403);\n+      expect(callback.body).toContain(\"email not verified\");\n       expect(parseSetCookie(callback.headers)).not.toContain(\"amc_session=\");\n     } finally {\n       await host.close();\n@@ -502,6 +518,8 @@\n     });\n \n     try {\n+      // This fake IdP is the test's subject and listens on literal 127.0.0.1 over HTTP.\n+      vi.stubEnv(\"AMC_IDENTITY_ALLOW_INSECURE_LOOPBACK\", \"1\");\n       const login = await httpCall({\n         url: `http://127.0.0.1:${routerPort}/host/api/auth/oidc/oidcsec/login`,\n         method: \"GET\"\n"
+    },
+    {
+      "path": "tests/helpers/nativeValidationOperator.ts",
+      "baselineSha256": "5d164a8cc5ba305bc39ac36fdcb31f626de32cd4fc96269691d44ec6e60e895e",
+      "reviewedSha256": "c66ef0a6bc6b125597a744a5bf6ab5eb3fcc0c3bb321a95bf5b3afb735b3eab0",
+      "removedAssertionLines": [],
+      "addedAssertionLines": [],
+      "diff": "--- a/tests/helpers/nativeValidationOperator.ts\n+++ b/tests/helpers/nativeValidationOperator.ts\n@@ -12,22 +12,27 @@\n import { loadNativeValidationConfiguration } from \"../../src/setup/nativeValidationConfig.js\";\n \n export type OutcomeCase = \"success\" | \"nonzero\" | \"denied\" | \"budget\";\n+/** The one directory the signed shell policy lets the fixture command write. */\n+const EFFECT_DIR = \"validation-out\";\n /** Disposable signed operator policy. No production credential or external model. */\n export function validationOperatorFixture(workspace: string, mode: OutcomeCase) {\n   mkdirSync(workspace, { recursive: true });\n   initWorkspace({ workspacePath: workspace, agentId: \"default\", trustBoundaryMode: \"isolated\" });\n-  // The checks run through the native shell. On macOS it is offered only by an\n-  // explicit operator opt-in (P0-06), which no workspace file can grant: each\n-  // caller passes --unsafe-unconfined-shell, allowUnconfinedShell, or starts\n-  // Studio with AMC_UNSAFE_UNCONFINED_SHELL=1. Linux still requires Bubblewrap.\n+  // The checks run through the native shell. Since P1-05 it is confined with\n+  // Seatbelt on macOS whenever Seatbelt is available (Bubblewrap on Linux); the\n+  // operator opt-in (P0-06) callers pass applies only without it. The confined\n+  // shell writes only to signed writableDirectories, so the effect goes there.\n   const budget = defaultBudgets(\"default\");\n   if (mode === \"budget\") budget.budgets.perAgent.default!.daily.maxToolExecutes.WRITE_HIGH = 0;\n   writeFileSync(budgetsPath(workspace), YAML.stringify(budget)); signBudgetsConfig(workspace);\n   initApprovalPolicy(workspace);\n   writeRuntimeFirewallPolicy({ workspace, mode: \"block\" });\n-  const command = `printf validation-outcome > validation-effect; printf validation-outcome; exit ${mode === \"nonzero\" ? 7 : 0}`;\n+  mkdirSync(join(workspace, EFFECT_DIR));\n+  // The second write probes confinement: outside the grant it must not land, opt-in or not (P1-05).\n+  const command = `printf validation-outcome > ${EFFECT_DIR}/validation-effect; (printf escaped > validation-escape) 2>/dev/null; printf validation-outcome; exit ${mode === \"nonzero\" ? 7 : 0}`;\n   const tools = defaultToolsConfig();\n   tools.tools.allowedTools = tools.tools.allowedTools.filter(tool => tool.name === \"bash\");\n+  tools.tools.allowedTools[0]!.nativeSandbox = { kind: \"os-native\", writableDirectories: [EFFECT_DIR] };\n   // Narrow the shipped shell declaration to this exact fixture command. Keep\n   // all shipped denials; do not disable policy, budget, approvals or signatures.\n   tools.tools.allowedTools[0]!.deny!.argvRegexDenylist!.push(`^(?!${command.replace(/[.*+?^${}()|[\\]\\\\]/g, \"\\\\$&\")}$)[\\\\s\\\\S]*$`);\n@@ -36,7 +41,8 @@\n   writeFileSync(checks, JSON.stringify({ schemaVersion: 1, checks: [{ id: \"public\", title: \"Exact operator fixture\", command, timeoutMs: 15000 }] }));\n   const loaded = loadNativeValidationConfiguration(checks);\n   return { checks, sha256: loaded.sha256, toolsDigest: loadVerifiedToolsConfigSnapshot(workspace).digestSha256!,\n-    effect: () => existsSync(join(workspace, \"validation-effect\")) ? readFileSync(join(workspace, \"validation-effect\"), \"utf8\") : null };\n+    effect: () => existsSync(join(workspace, EFFECT_DIR, \"validation-effect\")) ? readFileSync(join(workspace, EFFECT_DIR, \"validation-effect\"), \"utf8\") : null,\n+    escaped: () => existsSync(join(workspace, \"validation-escape\")) };\n }\n \n /** Automated fixture approvers, not human evidence. Existing signed quorum is unchanged. */\n"
+    },
+    {
+      "path": "tests/jsonlWriterResume.test.ts",
+      "baselineSha256": "515f697c54eba34ab93783b7cc3a54745b31e95ebb343a4773849a145136966e",
+      "reviewedSha256": "c317e6b3b3f65ae96a07b7906e5dc90ed61404e29a33f4b05f030bed8777205a",
+      "removedAssertionLines": [],
+      "addedAssertionLines": [],
+      "diff": "--- a/tests/jsonlWriterResume.test.ts\n+++ b/tests/jsonlWriterResume.test.ts\n@@ -65,7 +65,8 @@\n   workspace = mkdtempSync(join(root, \"amc-jsonl-resume-\"));\n   const environment: Record<string, string | undefined> = { AMC_SESSION_STORE: undefined, AMC_NO_SIGN: undefined,\n     AMC_EXPECTED_MONITOR_FINGERPRINT: undefined, AMC_HOME: join(workspace, \"operator-home\"),\n-    AMC_CONTROL_CHECKPOINT_DIR: join(workspace, \"control-checkpoints\"), AMC_VAULT_REMEMBER: \"0\" };\n+    // Outside the workspace: a checkpoint root inside it is refused by name (P0-57, CONTROL_CHECKPOINT_ROOT_IN_WORKSPACE).\n+    AMC_CONTROL_CHECKPOINT_DIR: `${workspace}-control-checkpoints`, AMC_VAULT_REMEMBER: \"0\" };\n   originalEnvironment = Object.fromEntries(Object.keys(environment).map(key => [key, process.env[key]]));\n   for (const [key, value] of Object.entries(environment)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; }\n   initWorkspace({ workspacePath: workspace, agentId: \"default\", trustBoundaryMode: \"isolated\" });\n"
+    },
+    {
+      "path": "tests/nativeManagedRecovery.test.ts",
+      "baselineSha256": "7c25a87715ef92e03cf106443d649ddd16c6321ba116be28969fc0c8c5aaeb69",
+      "reviewedSha256": "33c868fe6e7e0fc61b8d5dddf47539649f3e9f4669d89efb0d66d92752a7fc1b",
+      "removedAssertionLines": [
+        "  expect(f.operator.effect()).toBe(\"validation-outcome\");"
+      ],
+      "addedAssertionLines": [
+        "  expect(f.operator.effect()).toBe(\"validation-outcome\"); expect(f.operator.escaped()).toBe(false);"
+      ],
+      "diff": "--- a/tests/nativeManagedRecovery.test.ts\n+++ b/tests/nativeManagedRecovery.test.ts\n@@ -115,7 +115,7 @@\n   expect(second.validationSelection).toEqual(first.validationSelection);\n   const newDecisions = f.observations.filter(row => String(row.path).includes(\"/approve\") && !firstApprovals.has(row.path));\n   expect(newDecisions.length).toBeGreaterThanOrEqual(2); expect(new Set(newDecisions.map(row => row.identity))).toEqual(new Set([\"ada\", \"grace\"]));\n-  expect(f.operator.effect()).toBe(\"validation-outcome\");\n+  expect(f.operator.effect()).toBe(\"validation-outcome\"); expect(f.operator.escaped()).toBe(false);\n   await f.control(first.taskId, \"verify\", 2);\n   writeFileSync(join(f.root, \"native-controller-recovery.json\"), JSON.stringify({ backend, sessionId: id, sameStudio: true,\n     originalApprovalRemovalRefused: true, changedValidationPinRefused: true, newApproverIdentities: [...new Set(newDecisions.map(row => row.identity))],\n"
+    },
+    {
+      "path": "tests/nativeSandboxPolicyBinding.test.ts",
+      "baselineSha256": "77f9287750a6b0db4a199d2fd9999f9e4d5fc9296f9ea3b058f57db26212e694",
+      "reviewedSha256": "5626272eeafc4f9a1fe2ed13f5dd719e7e5a15f47da57470007dfd04ef0cd725",
+      "removedAssertionLines": [
+        "    expect(result.output).toMatch(mode === \"signed\" ? /changed after shell admission/ : /verifiable signed tools policy/);"
+      ],
+      "addedAssertionLines": [
+        "    expect(result.denied).toMatchObject({ stage: \"authorization\", reason: expect.stringContaining(\"policy_revision_changed\") });",
+        "    expect(unrecorded.ok).toBe(false);",
+        "    expect(unrecorded.output).toMatch(mode === \"signed\" ? /changed after shell admission/ : /verifiable signed tools policy/);"
+      ],
+      "diff": "--- a/tests/nativeSandboxPolicyBinding.test.ts\n+++ b/tests/nativeSandboxPolicyBinding.test.ts\n@@ -156,15 +156,21 @@\n   });\n \n   it.each([\"signed\", \"unsigned\"] as const)(\"refuses a %s policy change between admission and dispatch\", async mode => {\n-    const root = setup(); sign(root); const { registry, pipeline } = compose(root);\n+    const root = setup(); sign(root); const { registry } = compose(root);\n     registry.guard(\"operator-policy-change\", () => {\n       if (mode === \"signed\") sign(root, { nativeSandbox: { kind: \"linux-bwrap\", writableDirectories: [] } });\n       else writeFileSync(join(root, \".amc\", \"tools.yaml\"), \"tools: broken\\n\");\n       return undefined;\n     });\n-    const result = await pipeline.execute(call());\n+    // P1-02: the authorization record's recheck, the last stage before the body, refuses the changed policy first.\n+    const result = await new ToolPipeline({ registry, workspace: root }).execute(call());\n     expect(result.ok).toBe(false);\n-    expect(result.output).toMatch(mode === \"signed\" ? /changed after shell admission/ : /verifiable signed tools policy/);\n+    expect(result.denied).toMatchObject({ stage: \"authorization\", reason: expect.stringContaining(\"policy_revision_changed\") });\n+    // A composition that binds no authorization record still reaches the shell body's own admission check.\n+    sign(root);\n+    const unrecorded = await new ToolPipeline({ registry, workspace: root, authorizeClasses: new Set() }).execute(call());\n+    expect(unrecorded.ok).toBe(false);\n+    expect(unrecorded.output).toMatch(mode === \"signed\" ? /changed after shell admission/ : /verifiable signed tools policy/);\n     expect(backend.run).not.toHaveBeenCalled();\n   });\n \n"
+    },
+    {
+      "path": "tests/nativeValidationOutcomeSurfaces.test.ts",
+      "baselineSha256": "786a09a6bc84d78593cacd25443e6ae77efe77b3a320b7e318bce9c45adb340c",
+      "reviewedSha256": "739fe9f2c92961ca242490df36c2d3610f329bfd3b3cba71cb4429cb34b63551",
+      "removedAssertionLines": [],
+      "addedAssertionLines": [
+        "  expect(f.escaped()).toBe(false);"
+      ],
+      "diff": "--- a/tests/nativeValidationOutcomeSurfaces.test.ts\n+++ b/tests/nativeValidationOutcomeSurfaces.test.ts\n@@ -92,6 +92,7 @@\n     exitCode: mode === \"success\" ? 0 : mode === \"nonzero\" ? 7 : null, reason: mode === \"success\" ? null : mode === \"nonzero\" ? \"nonzero-exit\" : \"execution-denied\" }] });\n   expect(summary.toolCalls).toBe(1);\n   expect(f.effect()).toBe(mode === \"success\" || mode === \"nonzero\" ? \"validation-outcome\" : null);\n+  expect(f.escaped()).toBe(false);\n   const history = loadSessionEventHistory({ workspace, sessionId: summary.sessionId, agentId: \"default\", requireSealed: true });\n   const outputId = summary.validation.checks[0]!.outputEventId;\n   const checkCallId = summary.validation.checks[0]!.callId;\n"
+    },
+    {
+      "path": "tests/questionScoreExplainability.test.ts",
+      "baselineSha256": "4787cfbbfc9c95ab8566cb0afbf8242e0e474a1ed51a2d49c6b6ea031c493e0a",
+      "reviewedSha256": "ab951b6e17a1fe25bec5f24edc373214744e6032055fec2bc49539250ac968a7",
+      "removedAssertionLines": [
+        "    expect(guide.sections[0]?.evidenceNeeded.join(\"\\n\")).toContain(\"DOI/OpenAlex/Zenodo metadata\");",
+        "    expect(guide.sections[0]?.evidenceNeeded.join(\"\\n\")).toContain(\"cognitive-retrieval preprint\");",
+        "    expect(guide.sections[0]?.evidenceNeeded.join(\"\\n\")).toContain(\"UpTrain repository metadata\");"
+      ],
+      "addedAssertionLines": [
+        "    expect(guide.sections[0]?.notEvaluated).toContain(\"Not evaluated: L4 needs continuity\");",
+        "    expect(guide.sections[0]?.evidenceNeeded).toEqual([]);",
+        "    expect(guide.sections[0]?.notEvaluated).toContain(\"Not evaluated: L4 needs continuity\");",
+        "    expect(guide.sections[0]?.evidenceNeeded).toEqual([]);"
+      ],
+      "diff": "--- a/tests/questionScoreExplainability.test.ts\n+++ b/tests/questionScoreExplainability.test.ts\n@@ -6928,7 +6928,8 @@\n           reason: expect.stringContaining(\"DOI/OpenAlex/Zenodo metadata confirms source relevance only\"),\n         }),\n       ],\n-      repairHint: expect.stringContaining(\"release gates\"),\n+      // P1-07: AMC-1.3's L5 is not evaluated, so the hint names it and its reason instead of release-gate advice.\n+      repairHint: expect.stringContaining(\"Target L5: Not evaluated: L5 needs a scoped attestation\"),\n       status: \"ready\",\n       reproducibleEvalPacks: [\n         expect.objectContaining({\n@@ -6956,8 +6957,9 @@\n     expect(guideMarkdown).toContain(\"Accepted evidence IDs: ev-gap-0634-eval-pack, ev-gap-0634-signed-ledgers, ev-gap-0634-ci\");\n     expect(guideMarkdown).toContain(\"ev-gap-0634-paper-metadata-only\");\n     expect(guideMarkdown).toContain(\"Repair hint:\");\n-    expect(guide.sections[0]?.evidenceNeeded.join(\"\\n\")).toContain(\"DOI/OpenAlex/Zenodo metadata\");\n-    expect(guide.sections[0]?.evidenceNeeded.join(\"\\n\")).toContain(\"cognitive-retrieval preprint\");\n+    // P1-07: AMC-1.3's L4 is not evaluated, so the section gives that reason and lists no evidence to collect for it.\n+    expect(guide.sections[0]?.notEvaluated).toContain(\"Not evaluated: L4 needs continuity\");\n+    expect(guide.sections[0]?.evidenceNeeded).toEqual([]);\n \n     const passport = passportJsonSchema.parse({\n       v: 1,\n@@ -7020,7 +7022,7 @@\n       questionId: \"AMC-1.3\",\n       acceptedEvidenceIds: [\"ev-gap-0634-eval-pack\", \"ev-gap-0634-signed-ledgers\", \"ev-gap-0634-ci\"],\n       rejectedEvidenceReasons: [expect.objectContaining({ evidenceId: \"ev-gap-0634-paper-metadata-only\" })],\n-      repairHint: expect.stringContaining(\"release gates\"),\n+      repairHint: expect.stringContaining(\"Target L5: Not evaluated\"),\n     });\n   });\n \n@@ -7145,7 +7147,8 @@\n           reason: expect.stringContaining(\"repository metadata is source context only\"),\n         }),\n       ],\n-      repairHint: expect.stringContaining(\"release gates\"),\n+      // P1-07: AMC-1.3's L5 is not evaluated, so the hint names it and its reason instead of release-gate advice.\n+      repairHint: expect.stringContaining(\"Target L5: Not evaluated: L5 needs a scoped attestation\"),\n       status: \"ready\",\n       reproducibleEvalPacks: [\n         expect.objectContaining({\n@@ -7171,7 +7174,9 @@\n     expect(guideMarkdown).toContain(\"Accepted evidence IDs: ev-uptrain-eval-pack, ev-uptrain-signed-ledgers\");\n     expect(guideMarkdown).toContain(\"ev-uptrain-repo-metadata-only\");\n     expect(guideMarkdown).toContain(\"Repair hint:\");\n-    expect(guide.sections[0]?.evidenceNeeded.join(\"\\n\")).toContain(\"UpTrain repository metadata\");\n+    // P1-07: AMC-1.3's L4 is not evaluated, so the section gives that reason and lists no evidence to collect for it.\n+    expect(guide.sections[0]?.notEvaluated).toContain(\"Not evaluated: L4 needs continuity\");\n+    expect(guide.sections[0]?.evidenceNeeded).toEqual([]);\n \n     const passport = passportJsonSchema.parse({\n       v: 1,\n@@ -7232,7 +7237,7 @@\n       questionId: \"AMC-1.3\",\n       acceptedEvidenceIds: [\"ev-uptrain-eval-pack\", \"ev-uptrain-signed-ledgers\"],\n       rejectedEvidenceReasons: [expect.objectContaining({ evidenceId: \"ev-uptrain-repo-metadata-only\" })],\n-      repairHint: expect.stringContaining(\"release gates\"),\n+      repairHint: expect.stringContaining(\"Target L5: Not evaluated\"),\n     });\n   });\n \n"
+    },
+    {
+      "path": "tests/security/api-security.test.ts",
+      "baselineSha256": "a571872a971327c9c8a12beba875f2a0536a81165da539501627a72d4571be54",
+      "reviewedSha256": "4e57d8cfa5e122ddad248e60438c94354b230ade8bc551972b80e91282421c1d",
+      "removedAssertionLines": [],
+      "addedAssertionLines": [
+        "      expect(await verifyAt(encodeJwt(validClaims))).toEqual({ ok: false, error: \"id_token verification failed\" });",
+        "      expect(() => validateOidcUrl(\"http://idp.example.com\")).toThrow(\"OIDC HTTPS required\");",
+        "      expect(() => validateOidcUrl(\"https://10.0.0.1\")).toThrow(\"OIDC private destination refused\");",
+        "      expect(() => validateOidcUrl(\"https://10.0.0.1\")).toThrow(\"OIDC private destination refused\");",
+        "      expect(() => validateOidcUrl(\"http://localhost:8080\")).toThrow(\"OIDC HTTPS required\");",
+        "      expect((await verifyAt(encodeJwt(validClaims))).ok).toBe(true);",
+        "      expect(await verifyAt(encodeJwt(validClaims, true))).toEqual({ ok: false, error: \"unsupported jwt alg\" });"
+      ],
+      "diff": "--- a/tests/security/api-security.test.ts\n+++ b/tests/security/api-security.test.ts\n@@ -3,7 +3,7 @@\n import { mkdtempSync, rmSync } from \"node:fs\";\n import { tmpdir } from \"node:os\";\n import { join } from \"node:path\";\n-import { afterEach, describe, expect, test } from \"vitest\";\n+import { afterEach, describe, expect, test, vi } from \"vitest\";\n import { initWorkspace } from \"../../src/workspace.js\";\n import { loadAssurancePolicy, saveAssurancePolicy } from \"../../src/assurance/assurancePolicyStore.js\";\n import { startStudioApiServer } from \"../../src/studio/studioServer.js\";\n@@ -14,7 +14,7 @@\n import { initHostDb, createHostUser, createWorkspaceRecord, grantMembership } from \"../../src/workspaces/hostDb.js\";\n import { hostWorkspaceDir } from \"../../src/workspaces/workspacePaths.js\";\n import { startWorkspaceRouter } from \"../../src/workspaces/workspaceRouter.js\";\n-import { verifyJwtIdToken } from \"../../src/identity/oidc/jwtVerify.js\";\n+import { validateOidcUrl, verifyJwtIdToken } from \"../../src/identity/oidc/jwtVerify.js\";\n \n const roots: string[] = [];\n \n@@ -504,18 +504,21 @@\n     }\n   }, 30_000);\n \n-  test(\"OIDC JWT verifier rejects expired and nonce-mismatched tokens\", async () => {\n-    const keyPair = generateKeyPairSync(\"ed25519\");\n+  test(\"OIDC JWT verifier rejects expired, nonce-mismatched, EdDSA and non-loopback-opt-in HTTP tokens\", async () => {\n+    // P2-07 admits RS256, PS256 and ES256 only.\n+    const keyPair = generateKeyPairSync(\"rsa\", { modulusLength: 2048 });\n+    const edKeyPair = generateKeyPairSync(\"ed25519\");\n     const kid = \"security-test-kid\";\n     const issuerPort = await pickFreePort();\n     const issuer = `http://127.0.0.1:${issuerPort}`;\n     const audience = \"amc-security-audience\";\n     const jwk = keyPair.publicKey.export({ format: \"jwk\" }) as Record<string, unknown>;\n+    const edJwk = edKeyPair.publicKey.export({ format: \"jwk\" }) as Record<string, unknown>;\n     const server = createServer((req, res) => {\n       if ((req.url ?? \"\").startsWith(\"/jwks\")) {\n         res.statusCode = 200;\n         res.setHeader(\"content-type\", \"application/json\");\n-        res.end(JSON.stringify({ keys: [{ ...jwk, kid, alg: \"EdDSA\", use: \"sig\" }] }));\n+        res.end(JSON.stringify({ keys: [{ ...jwk, kid, alg: \"RS256\", use: \"sig\" }, { ...edJwk, kid: \"ed-kid\", alg: \"EdDSA\", use: \"sig\" }] }));\n         return;\n       }\n       res.statusCode = 404;\n@@ -524,13 +527,29 @@\n     await new Promise<void>((resolvePromise) => server.listen(issuerPort, \"127.0.0.1\", () => resolvePromise()));\n     try {\n       const nowSec = Math.floor(Date.now() / 1000);\n-      const encodeJwt = (claims: Record<string, unknown>): string => {\n-        const header = toBase64Url(Buffer.from(JSON.stringify({ alg: \"EdDSA\", typ: \"JWT\", kid }), \"utf8\"));\n+      const encodeJwt = (claims: Record<string, unknown>, eddsa = false): string => {\n+        const header = toBase64Url(Buffer.from(JSON.stringify({ alg: eddsa ? \"EdDSA\" : \"RS256\", typ: \"JWT\", kid: eddsa ? \"ed-kid\" : kid }), \"utf8\"));\n         const payload = toBase64Url(Buffer.from(JSON.stringify(claims), \"utf8\"));\n         const signingInput = Buffer.from(`${header}.${payload}`, \"utf8\");\n-        const signature = signDetached(null, signingInput, keyPair.privateKey);\n+        const signature = eddsa ? signDetached(null, signingInput, edKeyPair.privateKey) : signDetached(\"sha256\", signingInput, keyPair.privateKey);\n         return `${header}.${payload}.${toBase64Url(signature)}`;\n       };\n+      const verifyAt = (token: string) => verifyJwtIdToken({\n+        token, issuer, audience, jwksUri: `${issuer}/jwks`, nonce: \"expected-nonce\", clockSkewSeconds: 0\n+      });\n+      const validClaims = { iss: issuer, aud: audience, sub: \"oidc-user-1\", nonce: \"expected-nonce\", exp: nowSec + 600, iat: nowSec };\n+\n+      // P2-07: an HTTP issuer is refused unless the loopback development opt-in is set.\n+      expect(await verifyAt(encodeJwt(validClaims))).toEqual({ ok: false, error: \"id_token verification failed\" });\n+      expect(() => validateOidcUrl(\"http://idp.example.com\")).toThrow(\"OIDC HTTPS required\");\n+      expect(() => validateOidcUrl(\"https://10.0.0.1\")).toThrow(\"OIDC private destination refused\");\n+      // The fake issuer is this test's subject and listens on literal 127.0.0.1 over HTTP.\n+      vi.stubEnv(\"AMC_IDENTITY_ALLOW_INSECURE_LOOPBACK\", \"1\");\n+      // The opt-in covers literal loopback only, never another private address or plain HTTP elsewhere.\n+      expect(() => validateOidcUrl(\"https://10.0.0.1\")).toThrow(\"OIDC private destination refused\");\n+      expect(() => validateOidcUrl(\"http://localhost:8080\")).toThrow(\"OIDC HTTPS required\");\n+      expect((await verifyAt(encodeJwt(validClaims))).ok).toBe(true);\n+      expect(await verifyAt(encodeJwt(validClaims, true))).toEqual({ ok: false, error: \"unsupported jwt alg\" });\n \n       const expiredToken = encodeJwt({\n         iss: issuer,\n@@ -574,6 +593,7 @@\n         expect(nonceMismatch.error).toContain(\"nonce mismatch\");\n       }\n     } finally {\n+      vi.unstubAllEnvs();\n       await new Promise<void>((resolvePromise) => server.close(() => resolvePromise()));\n     }\n   });\n"
+    },
+    {
+      "path": "tests/studioNativeTaskService.test.ts",
+      "baselineSha256": "745b411a2a57fd4f1663e2b6e6517dbf46dd363f73cdf0e2d664bc73564d62af",
+      "reviewedSha256": "3302107b6e2c8f4aa9101b612fc236e5aca8cab718058281b3b22d31e504c6c5",
+      "removedAssertionLines": [],
+      "addedAssertionLines": [],
+      "diff": "--- a/tests/studioNativeTaskService.test.ts\n+++ b/tests/studioNativeTaskService.test.ts\n@@ -34,12 +34,12 @@\n beforeEach(() => {\n   prior = process.env.AMC_VAULT_PASSPHRASE; process.env.AMC_VAULT_PASSPHRASE = pass;\n   root = mkdtempSync(join(tmpdir(), \"amc-studio-service-\"));\n-  credentialHome = join(root, \"operator-home\"); mkdirSync(credentialHome, { mode: 0o700 });\n+  credentialHome = mkdtempSync(join(tmpdir(), \"amc-studio-operator-home-\"));\n   initWorkspace({ workspacePath: root, trustBoundaryMode: \"isolated\" });\n });\n afterEach(async () => {\n   const outcomes = await Promise.allSettled(services.splice(0).map(service => service.close()));\n-  lockVault(root); rmSync(root, { recursive: true, force: true });\n+  lockVault(root); rmSync(root, { recursive: true, force: true }); rmSync(credentialHome, { recursive: true, force: true });\n   if (prior === undefined) delete process.env.AMC_VAULT_PASSPHRASE; else process.env.AMC_VAULT_PASSPHRASE = prior;\n   expect(outcomes.filter(outcome => outcome.status === \"rejected\")).toEqual([]);\n });\n"
+    }
+  ],
+  "checks": [
+    {
+      "paths": [
+        "tests/apiRouters.test.ts"
+      ],
+      "assessment": "strengthened",
+      "source": "src/api/enforceRouter.ts:464-469 and src/trust/verifierReport.ts unsignedArtifactReport",
+      "details": "Mock gains the required issues[] field; existing successful route status assertion remains and certificate output now explicitly requires valid false, integrityValid true, status UNTRUSTED. No authentic-certificate claim added."
+    },
+    {
+      "paths": [
+        "tests/questionScoreExplainability.test.ts"
+      ],
+      "assessment": "source-backed obsolete output replacements",
+      "source": "src/diagnostic/levelSemantics.ts:48-50,74-75,115-124; questionScoreExplainability.ts:2582-2584; guideGenerator.ts:449-473",
+      "details": "Only obsolete release-gate advice and guide evidence-needed strings are replaced by present P1-07 L4/L5 not-evaluated notices and evidenceNeeded[]. Accepted/rejected IDs, provenance, source qualification, scoring, readiness fields and passport facts remain unchanged."
+    },
+    {
+      "paths": [
+        "tests/enterpriseSsoScim.test.ts",
+        "tests/security/api-security.test.ts"
+      ],
+      "assessment": "preserved and strengthened security",
+      "source": "src/identity/oidc/jwtVerify.ts:25-29,130-176; oidcRoutes.ts:89-93; src/workspaces/workspaceRouter.ts:1038-1049",
+      "details": "Positive fake IdP changes unsupported EdDSA to accepted RSA2048/RS256, while explicit EdDSA rejection is added. Original expiry and nonce negatives, unverified-email/no-session-cookie behavior, roles and SCIM assertions remain. HTTP is refused before literal-loopback development opt-in; ordinary HTTP/private destinations still refused after opt-in. Callback401 replacement403 matches current route and adds reason-body check. Environment opt-ins are test-scoped and restored by finally/afterEach."
+    },
+    {
+      "paths": [
+        "tests/studioNativeTaskService.test.ts"
+      ],
+      "assessment": "fixture location only; all original assertions unchanged",
+      "source": "src/lifecycle/signedControlJournal.ts:114-127; tests/studioNativeTaskService.test.ts:31-49",
+      "details": "New owned operator home is a unique mkdtemp sibling outside governed workspace, with default0700 permissions and paired cleanup after all service.close promises settle. Current internal consistency UNTRUSTED failed verdict, stale-revision refusal, sealing, retained evidence, restart/resume, archive and dedup assertions remain byte-identical. Prior controlled Node24 diagnostic gave whole file10pass; this read-only review performs no execution."
+    },
+    {
+      "paths": [
+        "tests/jsonlWriterResume.test.ts"
+      ],
+      "assessment": "durable owned checkpoint layout correction; all assertions unchanged",
+      "source": "src/lifecycle/signedControlJournal.ts:114-127,311-323,562-578; src/catalog/compiler/activate.ts:72-76,94-96; src/residency/checkEgress.ts:42,122-130",
+      "details": "The checkpoint root is the unique owned-workspace derived sibling `${workspace}-control-checkpoints`. It is outside the governed path and inherited identically by forked real writer/resumer children. Current signed journal uses real durable checkpoint files; no signing, fsync, key, store or recovery implementation changed. afterEach still disposes services/kills owned children/restores environment and intentionally retains workspaces and checkpoint artifacts. Every prefix, effects, budget, tamper, live/foreign lock, cancelled/complete turn, uncertain dispatch and resume assertion remains unchanged."
+    },
+    {
+      "paths": [
+        "tests/helpers/nativeValidationOperator.ts",
+        "tests/nativeManagedRecovery.test.ts",
+        "tests/nativeValidationOutcomeSurfaces.test.ts"
+      ],
+      "assessment": "real signed confinement fixture and stronger effect assertions",
+      "source": "src/sandbox/nativeSandboxBinding.ts:98-103; nativeSandboxPolicy.ts:35-59; seatbeltNativeShell.ts:78-82; built dist equivalents inspected",
+      "details": "Exact fixture command still prints validation-outcome and retains explicit success/nonzero exit values. It now writes the expected effect under the one signed nativeSandbox writableDirectories grant validation-out; existing signed argv exact-match denylist admits only that exact command. A second real shell redirection attempts validation-escape at workspace root outside the grant; escaped() false is asserted in both consumers. No sandbox/backend/filesystem mock added: these consumers load current built CLI/SDK/Studio and backend chooses actual Seatbelt on Darwin. Success/nonzero modes require the granted effect plus absence of the outside-grant effect; denied/budget modes retain no-effect/denial assertions. Every existing approval quorum, accounting, output reference, sealed history, cold projection and current UNTRUSTED verifier expectation remains."
+    },
+    {
+      "paths": [
+        "tests/nativeSandboxPolicyBinding.test.ts"
+      ],
+      "assessment": "both refusal layers retained",
+      "source": "src/tools/toolPipeline.ts:367-394,410-425; src/actions/authorize.ts:96-110,294-303; src/sandbox/nativeSandboxBinding.ts",
+      "details": "Default pipeline result must fail at authorization with policy_revision_changed, which current guard/policy recheck ordering returns before body. A second test-only composition without authorization binding then exercises and retains both original signed/unsigned shell-body error regexes. backend.run remains not-called after both attempts. Existing synthetic backend seam is unchanged and is explicitly labelled no OS-confinement evidence."
+    },
+    {
+      "paths": [
+        "tests/compliance/dataResidencyPersistence.test.ts"
+      ],
+      "assessment": "source-backed persisted-format replacement plus real tamper negatives",
+      "source": "src/compliance/dataResidency.ts:432-439; src/residency/legalHoldRegistry.ts:71,109-123,184-214,269-283,375-399",
+      "details": "Old .amc/compliance/residency/legal-holds path and record_hash/prev_record_hash no longer describe production. Replacement requires modern record/detached signature/signedHEAD/journal artifacts, schema/tenant/active record, verified registry digest and positive journal revision. New forged-release, signature corruption and missingrecord+signature mutations must throw typed registry errors and preserve unknown verdict reasons instead of treating tenant unheld. All existing cross-process tenant/policy/hold/release and workspace-free library assertions remain. Deletion assertions are additive."
+    }
+  ],
+  "productionDiffPaths": [
+    "src/claims/evidenceProvenance.ts",
+    "src/llm/adapter/llmRuntime.ts"
+  ],
+  "sourceHashes": [
+    {
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "sha256": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/catalog/compiler/activate.ts",
+      "sha256": "09bcf8d146e417a70b73b7333da60761d730805afc0bd481916e75ccf2731fc0",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/residency/checkEgress.ts",
+      "sha256": "5ac226f5479a8b441738221c247b094ceb51a975af1252b82c9ded782b00d9af",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/sandbox/nativeSandboxBinding.ts",
+      "sha256": "316f08828ae1c68d540ab11935f01629db99236d03fa030bb01530da6caf466d",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/sandbox/nativeSandboxPolicy.ts",
+      "sha256": "57ee432a15576f8d62c795acfd06776e49b7f3b019fed7f8bf35cca69573559e",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/sandbox/seatbeltNativeShell.ts",
+      "sha256": "087961b03749d3d8c2c5af9428573f670e6d17f2f24f0a23ced159bb6220844f",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/tools/toolPipeline.ts",
+      "sha256": "de0791037badc8d0abc62642527d87e7a6030d1d364e322c30995d187ccaf794",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/actions/authorize.ts",
+      "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/compliance/dataResidency.ts",
+      "sha256": "d07f1cb766034fe4f82765148988fbfc0a516c075a7480c2364112b7226c3c17",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/residency/legalHoldRegistry.ts",
+      "sha256": "51bd8e494515a6a3f7825d9e72a621702acd3fd12b1a212e55bd2c6e437cd315",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/residency/deletionGate.ts",
+      "sha256": "e6158c7b2e2aa699d54e5b6147cb2cadbf8471003b46112be4a0fbd59716c9e5",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/studio/nativeTaskService.ts",
+      "sha256": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/identity/oidc/jwtVerify.ts",
+      "sha256": "2d5dd9bc1533ff6a5bd1783d25cc1603c61bf5f2fb6990ea1a4937dde2051792",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/identity/oidc/oidcRoutes.ts",
+      "sha256": "0016abef4cff9012c141656dff6b28b2b74c9a36c6e4efe9a5df43d40d18b9d6",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/workspaces/workspaceRouter.ts",
+      "sha256": "c06242bc22da1063a69649d6cdaf7e11d06e6c853df7845bb376a1ca8167560e",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/diagnostic/levelSemantics.ts",
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "sha256": "a08af5a16b73589f47ba3ebf8a74bb17b6e715fb1bf53bab369fef8436486e17",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/guide/guideGenerator.ts",
+      "sha256": "bb856e03a9ef141ce98bbac79ff0b5669a6d7393300bee6a78d1d9700a6b8b03",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/api/enforceRouter.ts",
+      "sha256": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+      "byteEqualBaseline": true
+    },
+    {
+      "path": "src/trust/verifierReport.ts",
+      "sha256": "e1d0cf40a349af2f2490b652f516f04b43a97f38c7043eb640ffbe12c39f2af2",
+      "byteEqualBaseline": true
+    }
+  ],
+  "builtRuntimeHashes": [
+    {
+      "path": "dist/cli.js",
+      "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+    },
+    {
+      "path": "dist/sdk/nativeAgentClient.js",
+      "sha256": "6dead15ddabfc163b56c687d311cda2ffbdc4af6870d78e14b9e85a760ed93d1"
+    },
+    {
+      "path": "dist/studio/nativeTaskService.js",
+      "sha256": "47176a7025286f803bb5d8c2b0444085d032321b35ad7a0b5381785962599097"
+    },
+    {
+      "path": "dist/sandbox/nativeSandboxBinding.js",
+      "sha256": "59c449c65c916677e76a4e374aa4d5fef9edac482611af46704d213f3106390b"
+    },
+    {
+      "path": "dist/sandbox/nativeSandboxPolicy.js",
+      "sha256": "4a20768b1f49aa33b080f2d75dec96b1a5dbe3d7633949f4cc572476d7ddc657"
+    },
+    {
+      "path": "dist/sandbox/seatbeltNativeShell.js",
+      "sha256": "baf73248fbcd8b7a153af9969339f3dbe88a3594d5dffce40bbc14ef6fa5f8b5"
+    }
+  ],
+  "temporaryFreezeMutation": {
+    "path": "tests/helpers/landedSource.ts",
+    "baselineSha256": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111",
+    "observedSha256": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111",
+    "isRestoredNow": true,
+    "excludedFromPositiveReview": true,
+    "ownerConfirmation": "Parent confirmed intentionally active live-read mutation via /private/tmp/p0-47-run-integration-mutation.py with finally restoration; runs26linkedparity files. No changes by reviewer.",
+    "qualificationRequirement": "Must restore baseline bytes and rerun appropriate positive checks before claiming clean candidate or positive qualification."
+  },
+  "limits": [
+    "No tests/builds/process mutations or candidate edits performed by this review. Root-provided first5files110/110 is separate execution evidence and was not reproduced here.",
+    "Real native consumer confinement coverage is Darwin-specific. No Linux Bubblewrap/installed-package/provider/human qualification inferred.",
+    "Added active-hold deletion check proves refusal, possibly unknown/tenant_unmapped; it does not prove mapped held-verdict behavior.",
+    "Only eleven fixture repairs reviewed as positive applied changes. Temporary live-read mutation is intentionally excluded, not approved for retention."
+  ]
+}

@@ -1,0 +1,1623 @@
+{
+  "createdUtc": "2026-10-14T23:39:55.525760+00:00",
+  "scope": "Immutable private evidence references. Full copied source, compiled and encrypted fixture bodies remain private; their complete manifests are referenced instead of copying executable or secret material into a future canonical packet.",
+  "artifacts": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-bundle-raw-history-compiled-mutant.json",
+      "bytes": 462540,
+      "sha256": "31f771c4766605d2fa62a5e7fb8eac57b97cac6a64fa4250dfb2fbb42aa68f95"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-bundle-raw-history-compiled-restored.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-bundle-raw-history-matrix.json",
+      "bytes": 27079,
+      "sha256": "ae7a861fb076e94c1a6ad3e423faf9140338001d626a6c0b28c8db8914799463"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-bundle-raw-history-source-mutant.json",
+      "bytes": 1246,
+      "sha256": "dd544485ae1b45db38d8ba8c9fc65ea2e4c366ef7cc308fab168762750cafdef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-bundle-raw-history.patch",
+      "bytes": 635,
+      "sha256": "73f4123ff1c5d34f8c69604f75826032f4479dafba31c0fb4105964fece0de82"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-certificate-raw-history-compiled-mutant.json",
+      "bytes": 462540,
+      "sha256": "9bbd170a31f0e6e1f726285d0be5a2f691d851b6cd6d6be690bb0eea6caa2a87"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-certificate-raw-history-compiled-restored.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-certificate-raw-history-matrix.json",
+      "bytes": 27069,
+      "sha256": "f786d29e56869c5c9d4b01472defb6fde64289db10c8f173054c0c48f533bc7a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-certificate-raw-history-source-mutant.json",
+      "bytes": 1261,
+      "sha256": "153dfbe2ab7634d9ae5569e9451680789c190f44129f09a2493a12f194715ceb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-certificate-raw-history.patch",
+      "bytes": 647,
+      "sha256": "08ce732886dbe0261caae1b18474b67e7a09c953fb9b59c2605a378c8fecb57f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-cold-vault-initializes-compiled-mutant.json",
+      "bytes": 462540,
+      "sha256": "30fba24d2fbd10032d25cfaa38df988b0a40b39dc71a70ef0108985f7c25138e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-cold-vault-initializes-compiled-restored.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-cold-vault-initializes-matrix.json",
+      "bytes": 27095,
+      "sha256": "6a90195514f488f54291c8c26b9c8019e16c5ed2cf26940a2be15d916c51432e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-cold-vault-initializes-source-mutant.json",
+      "bytes": 1068,
+      "sha256": "c78881dab421819fb1c558f75e6ba28b211adc9bdc2a841193f84f6d7e208a50"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-cold-vault-initializes.patch",
+      "bytes": 514,
+      "sha256": "d815670b9327c7e18e179856245544e1ea0a90cd32d0c71aeaa7945b5c9d2fdd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-envelope-signature-compiled-mutant.json",
+      "bytes": 462540,
+      "sha256": "f5dac67b17c7ab9362b8ff0c84d80e4ec2eeebe85fa15ab3463dafb3996289de"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-envelope-signature-source-mutant.json",
+      "bytes": 1334,
+      "sha256": "6cde7846f90a708878bb8f4c6afb54c3c942dce61c8305bf784973f209c2a9d0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-envelope-signature.patch",
+      "bytes": 676,
+      "sha256": "87d4aec92b20a13650de97370dc36721ea8134c06c1a799ea33cfedda9326c3d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-unsigned-migration-compiled-mutant.json",
+      "bytes": 462540,
+      "sha256": "aeef20a45abec826d60cf40ba50504bec509ca67e4de0db809836d4b1be9ca22"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-unsigned-migration-compiled-restored.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-unsigned-migration-matrix.json",
+      "bytes": 27702,
+      "sha256": "43ea9c264921eab93cc91724f8cbaa82c438262c6851b82945dc996b1d6c8e92"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-unsigned-migration-source-mutant.json",
+      "bytes": 1888,
+      "sha256": "93de9d682b70350326abfd7ad48c670ad36697d22a937e7a1b498c98be2638ea"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-unsigned-migration.patch",
+      "bytes": 1254,
+      "sha256": "f22f6689706a97ae80d41733300243912c67b91d322b70836de64723a1ce71c7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/adaptations.json",
+      "bytes": 2981,
+      "sha256": "0e22e3e769d6a0dbb11ff6bc62414e9274a72ffe6b8757fdac33af0c8de9ae3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-effects.json",
+      "bytes": 6306,
+      "sha256": "48205bbee4c0cb07d641bf44e791899b501c04fad05a3817c75569644539f7ae"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-legacy-after-inspect.json",
+      "bytes": 4883,
+      "sha256": "5c77eaeb672a4326b6eeb85382d8cdc65990328ef89d6db3b458adc9623e3b93"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-legacy-after-inspector-snapshot.json",
+      "bytes": 17727,
+      "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-legacy-after-verifier-snapshot.json",
+      "bytes": 17727,
+      "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-legacy-before-inspect.json",
+      "bytes": 4883,
+      "sha256": "c53d6915357953cd3fcb5c0298806fcbb49681294e14ae2e975291b70568924f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-legacy-before-inspector-snapshot.json",
+      "bytes": 17727,
+      "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-legacy-before-verifier-snapshot.json",
+      "bytes": 17727,
+      "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-legacy-verify.json",
+      "bytes": 935,
+      "sha256": "4202838069fd047434a64336c89deb8f57c70d65b34d8ad72c22be3d410e3d97"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-missing-vault-after-inspect.json",
+      "bytes": 4883,
+      "sha256": "beefe990a64f2affacdf067ba3d31adac865a3d6b260305783d655f0bec0d8a5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-missing-vault-after-inspector-snapshot.json",
+      "bytes": 17557,
+      "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-missing-vault-after-verifier-snapshot.json",
+      "bytes": 17557,
+      "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-missing-vault-before-inspect.json",
+      "bytes": 4883,
+      "sha256": "223873c4564b5588756ca9fba122d35b8282686c614311c6a6a0a4fcbc47841d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-missing-vault-before-inspector-snapshot.json",
+      "bytes": 17557,
+      "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-missing-vault-before-verifier-snapshot.json",
+      "bytes": 17557,
+      "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-missing-vault-verify.json",
+      "bytes": 1113,
+      "sha256": "afae852992d9bccfdd449369f061fb20f0e2d20287a097dd646ddd50c9e0d735"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-effects.json",
+      "bytes": 9233,
+      "sha256": "3e10f2bd7150c902c7bf5477e19042cc4885c143d056a8725446151cda1ff0a6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-legacy-after-inspect.json",
+      "bytes": 4883,
+      "sha256": "ac5b9b34424e3b5a8e804e5046eda6c2b8f3535548fea9d4848081eb1488d55d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-legacy-after-inspector-snapshot.json",
+      "bytes": 17727,
+      "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-legacy-after-verifier-snapshot.json",
+      "bytes": 17377,
+      "sha256": "42e0e007d83e1edb2d3188c50f945f4cb62760516a0a6ef2f8533f882769070d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-legacy-before-inspect.json",
+      "bytes": 4883,
+      "sha256": "ee5942c7eb78f45dc0e2f2ebb06f14fe945f3d100ac8d141dfa408e7ffdcf62a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-legacy-before-inspector-snapshot.json",
+      "bytes": 17727,
+      "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-legacy-before-verifier-snapshot.json",
+      "bytes": 17727,
+      "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-legacy-verify.json",
+      "bytes": 935,
+      "sha256": "de7068468fb30b016689ab2427e9fcaade59cd769671722f0770dc648097da78"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-missing-vault-after-inspect.json",
+      "bytes": 4883,
+      "sha256": "af52d4b22c7d927944d7f97129e8c3379550ac8410445b6e52f114ef84ee2950"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-missing-vault-after-inspector-snapshot.json",
+      "bytes": 18746,
+      "sha256": "1231563c287875533bf7bbc2e780a1de3be97c3e496cf2f34d96be4b1fb12d08"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-missing-vault-after-verifier-snapshot.json",
+      "bytes": 18396,
+      "sha256": "aae0825835619480d7a3ab8452d5e77bc519acd7f032f7b3268421c4a56fe47e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-missing-vault-before-inspect.json",
+      "bytes": 4883,
+      "sha256": "1e8f8ac5f56ab5d1d692a3d49fd0ae3ee223d06fedfdcd8e77416084cef4a652"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-missing-vault-before-inspector-snapshot.json",
+      "bytes": 17557,
+      "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-missing-vault-before-verifier-snapshot.json",
+      "bytes": 17557,
+      "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-missing-vault-verify.json",
+      "bytes": 2112,
+      "sha256": "c549667ab7fb63ec1bddc87e261ef473d4073f782c461133ff386126596f718e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-effects.json",
+      "bytes": 6306,
+      "sha256": "f000187d9d916b23c4b3c5bd28991d2196f9346256772582207bc48683111cf6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-legacy-after-inspect.json",
+      "bytes": 4883,
+      "sha256": "88c3270a857ad872ac37102efc3efdca888f47ece5df7cd6b8fae6fd55003019"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-legacy-after-inspector-snapshot.json",
+      "bytes": 17727,
+      "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-legacy-after-verifier-snapshot.json",
+      "bytes": 17727,
+      "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-legacy-before-inspect.json",
+      "bytes": 4883,
+      "sha256": "7eda359ba6ec213c2c6d1a206cf5f0b29319549421dc8c9f99c8be54b2aa1640"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-legacy-before-inspector-snapshot.json",
+      "bytes": 17727,
+      "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-legacy-before-verifier-snapshot.json",
+      "bytes": 17727,
+      "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-legacy-verify.json",
+      "bytes": 935,
+      "sha256": "a6aa966827b51f3e454fe67cc718cc92cd65c8c7aa42b6baff9da08bb829e1c4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-missing-vault-after-inspect.json",
+      "bytes": 4883,
+      "sha256": "fb5565f6bded28929ed0a540a9acd28710066c8cf893c24ac0330fce8b4b410b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-missing-vault-after-inspector-snapshot.json",
+      "bytes": 17557,
+      "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-missing-vault-after-verifier-snapshot.json",
+      "bytes": 17557,
+      "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-missing-vault-before-inspect.json",
+      "bytes": 4883,
+      "sha256": "61611b99d389879ec1a0c7449b2fe3695d247e495d7761e0f8c506ea2f3a1df7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-missing-vault-before-inspector-snapshot.json",
+      "bytes": 17557,
+      "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-missing-vault-before-verifier-snapshot.json",
+      "bytes": 17557,
+      "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-missing-vault-verify.json",
+      "bytes": 1113,
+      "sha256": "5e47d55926c83852f4a1f25b4dd90b9b237adb2f4138013af8480ee93135aaa9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/frozen-inputs.json",
+      "bytes": 57064,
+      "sha256": "be6f5742e6135ca91c53cae8b6b30038b86c295246b9b502873583543054a924"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/initial-cold-inspect.json",
+      "bytes": 4883,
+      "sha256": "b60583c490d22827b3f59e56c694decfefa3120668bba48866d172035831a700"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/initial-nonempty-tables.json",
+      "bytes": 3223,
+      "sha256": "67ee7d7e3eee7ac4ccec315fada54d8fa862f7ca5f4a9188d2f5e8a4b5d62653"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/initializer.json",
+      "bytes": 2423,
+      "sha256": "f5cc7f8b9a35036e4cbe876197e37de23316fe098821b4fc0c1121373560b119"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/legacy-preparation.json",
+      "bytes": 414,
+      "sha256": "51d9c45660417502867e2cbd60e745a81dee4d2466007f946f23a1387378d3a5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/public-pins-before-evidence.json",
+      "bytes": 1028,
+      "sha256": "a8bad16b2e904e39ccae65062032d45b738997be62e9ac78d4c5d5f6d8b2f927"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects.mjs",
+      "bytes": 3642,
+      "sha256": "bbdd9292e1237596e24152b133999018c68f57d200a7f441e2d1e68861c3ddc9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold_effects.py",
+      "bytes": 3704,
+      "sha256": "b3aaed1ce14bf61e8655bb0db0eaf75b88704585418132dda98181958161820b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 97071,
+      "sha256": "03bf66c0e20c29a1e216e46edeebbf0eec4e678e5776f7818ff51cf6e99db060"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/compiled-live-after.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/compiled-original.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/compiled-private-after.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/compiler-isolation-observer.json",
+      "bytes": 1271,
+      "sha256": "5793407878a9be4e04d5f569afc2305b7a78aef9a3865e3eea9efa6febdd38a4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/deny-transport.mjs",
+      "bytes": 727,
+      "sha256": "89aa82116df526c2347cf7189d2353d5be9caaf118290e1d12a0c49326b9333f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/driver-original-controller.py",
+      "bytes": 11918,
+      "sha256": "41029bbcb6b6a276cf139139f582e80ee6d2dcde26a908f6db57b209126b3953"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/driver-pre-isolation-observer.py",
+      "bytes": 11918,
+      "sha256": "41029bbcb6b6a276cf139139f582e80ee6d2dcde26a908f6db57b209126b3953"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/driver.py",
+      "bytes": 13756,
+      "sha256": "c556a16b413a2195c0c2ffa504fcceac4652e466540d6ca3edfaf3700957bf7c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/finalize.py",
+      "bytes": 15518,
+      "sha256": "f5cd7c29b956a4f24ab9a5071f762c17f6c6c8553334e0b06684f461596834a8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/full-closure-final.json",
+      "bytes": 1399777,
+      "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/full-closure-restoration.json",
+      "bytes": 102,
+      "sha256": "bd7f546fb71b74003e0f70f1b3b3e38196720e1a65862985eee5daf6d2dc8d3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/held-test-absence.json",
+      "bytes": 119,
+      "sha256": "c31957142c942b5e87323eb72bcbc1cb24078d6f9bf6d2557c00f2c24767753b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/isolated-P30-1525-envelope-signature-compiled-mutant.json",
+      "bytes": 462540,
+      "sha256": "d540463ee30cc6451641a6c5fb83874e707e74564622844efdb431b86cf384dc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/isolated-P30-1525-envelope-signature-compiled-restored.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/isolated-P30-1525-envelope-signature-matrix.json",
+      "bytes": 33600,
+      "sha256": "f57552a2779b53a20451815e2d38a0a582382e7756ddddf0fd0c899dfde7df62"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/isolated-P30-1525-envelope-signature-source-mutant.json",
+      "bytes": 1334,
+      "sha256": "6cde7846f90a708878bb8f4c6afb54c3c942dce61c8305bf784973f209c2a9d0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/isolated-P30-1525-envelope-signature.patch",
+      "bytes": 676,
+      "sha256": "87d4aec92b20a13650de97370dc36721ea8134c06c1a799ea33cfedda9326c3d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/native-after.json",
+      "bytes": 305,
+      "sha256": "817378b2664f3d92a8ae6740d6874c0820d982d243f625e4ee4c55e8af60d881"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/native-before.json",
+      "bytes": 305,
+      "sha256": "817378b2664f3d92a8ae6740d6874c0820d982d243f625e4ee4c55e8af60d881"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/original-test-inputs/tests/crypto/keyHistoryAdmission.test.ts",
+      "bytes": 13739,
+      "sha256": "7131f574d427bfe60b40962eb354d73e2911da79ed4fcd0734e6444981572a5b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/original-test-inputs/tests/crypto/keyHistoryForgery.test.ts",
+      "bytes": 4118,
+      "sha256": "00e1e3accf649aee74250670326b9ea2dbde7b8d89253291ac0ca5f56f6282f4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/original-test-inputs/tests/helpers/trustContext.ts",
+      "bytes": 4280,
+      "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/original-test-inputs/tests/keyHistoryBundleCertificate.test.ts",
+      "bytes": 13129,
+      "sha256": "e9ee19e2a185caad0b857fd6168de1dc41c07203d64bb2b4e2d74c9076f46b68"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/original-test-inputs/tests/ledgerVerificationReadOnly.test.ts",
+      "bytes": 9057,
+      "sha256": "4190737d0e35f10c8bd909294017071933156d90d9ebcb79189973ea52521d96"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/original-test-inputs/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/original-test-inputs/tests/vaultUnlockCaching.test.ts",
+      "bytes": 9632,
+      "sha256": "06ce4b80128ae2b946ae9597f79d0a6d548d3193ef657218e028076625f50356"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-baseline/command.json",
+      "bytes": 2020,
+      "sha256": "a7e8ecdd4f98c624f306d7d74d5f7f755bf0977ba759080004b9447af5f74c18"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-baseline/raw-tests.json",
+      "bytes": 22466,
+      "sha256": "f1ab88293dcada07c75e54c6393366b3e832ac7e6deeda6ffff8a824356e006f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-baseline/stdout.log",
+      "bytes": 133,
+      "sha256": "3fa79c46b28ae358ad9e1b77a0318df03bb34399516a0ec994ebc0f8517ab465"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-baseline/summary.json",
+      "bytes": 7451,
+      "sha256": "3acfe901282b3f1d710b528fa7d51c5ee57056b34a23b51d0c13874ec29e32e5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-compile-mutant/command.json",
+      "bytes": 1619,
+      "sha256": "9ecef2fcd15dc86e8baf6a8f15b721d1611ba916c2eada3c2c3019aa8d91a1b7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-compile-mutant/emit-isolation.json",
+      "bytes": 443,
+      "sha256": "c9d2c4076951acd5578c8fa90fbec69766efef4439f7c18ebf9dc0db4b0ce689"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-compile-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-compile-mutant/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-compile-restored/command.json",
+      "bytes": 1631,
+      "sha256": "c9cff06116db3b07732cc589b3170fbb8c5978933ec422fdb628e617eb54b34b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-compile-restored/emit-isolation.json",
+      "bytes": 391,
+      "sha256": "ed2ae181928af23b8cf12569972db7914634aa83d350fffa4652e8e6ed68e78a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-compile-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-compile-restored/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-mutant/command.json",
+      "bytes": 2006,
+      "sha256": "9a55b069fc184d50eab45520d9e7bc825f801af3f581f04885712086ab049313"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-mutant/raw-tests.json",
+      "bytes": 25052,
+      "sha256": "aabfafac692814f1f6e6f2b5092cd323871c0b3b743fe3a8fb1b10b2f3f103e3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-mutant/stdout.log",
+      "bytes": 131,
+      "sha256": "5e69bfcaa4695c563de1f089d0539f9b37fcf54339bc2787c90801f0645b22ce"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-mutant/summary.json",
+      "bytes": 10605,
+      "sha256": "bee23b1e58b737117ce750ec8bc7d63980baab65070857ec10d1c9c5a79c77e7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-restored/command.json",
+      "bytes": 2020,
+      "sha256": "90c30226670f1d34ba09afca965485503960c27a7eb1dc7368bd88b5e319ccae"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-restored/raw-tests.json",
+      "bytes": 22465,
+      "sha256": "584dec579cbe73dd64659a66f0f61b356a16b9564319c5087f3c61145e053b3d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-restored/stdout.log",
+      "bytes": 133,
+      "sha256": "0e1b15422ff6027d41bab9a80e4b8656f0c8c58062f1315473f1f41994801cf2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-restored/summary.json",
+      "bytes": 7451,
+      "sha256": "997a2781aa86ab65b9ab880756839fe9af12ed4c418b63c0ecab19f0b1c03a1a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-baseline/command.json",
+      "bytes": 2055,
+      "sha256": "f88db0750a6aabad1fc1db05a27d1b07e7fb38363052adf455658d99b8e7e3fc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-baseline/raw-tests.json",
+      "bytes": 22482,
+      "sha256": "3d68e3a189f56d2c0e3bdc2a3a83b7cb983bc518f7d25478265f29b37e6ddc43"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-baseline/stdout.log",
+      "bytes": 138,
+      "sha256": "5a127a32022ca9eb5c7cb6569e93599b89779b00ace9007fffe334a48eb9af53"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-baseline/summary.json",
+      "bytes": 7461,
+      "sha256": "13417928eab961adeb4b2b86a8b6c26a1ca0350115f5d2086548d03bfbf6cf32"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-compile-mutant/command.json",
+      "bytes": 1649,
+      "sha256": "178a410f5b5c90202f04b515047c5e989b30870752b1bf9610575fab059635d6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-compile-mutant/emit-isolation.json",
+      "bytes": 471,
+      "sha256": "670c93349bb251ecab7bd5e470fffd9e7f54773f1967333886a5647225359d0f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-compile-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-compile-mutant/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-compile-restored/command.json",
+      "bytes": 1661,
+      "sha256": "5b14daed3dff8e8cd5342836379f269dff09dc6ae6faf254acf9ee533c3d8e6e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-compile-restored/emit-isolation.json",
+      "bytes": 405,
+      "sha256": "aad4a52de6d379f0a186e9dfd57dc402cf5214a9159c94d04f5854c6b47b13fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-compile-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-compile-restored/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-mutant/command.json",
+      "bytes": 2041,
+      "sha256": "d2eb37b728b79b6dc3fbdc0182e93f952bb447cf69141cfaaf58b60206043f6f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-mutant/raw-tests.json",
+      "bytes": 25044,
+      "sha256": "28d5697a8c157acfce95f3de0445d7d40e6215cac39719cf2ce602de575103d7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-mutant/stdout.log",
+      "bytes": 136,
+      "sha256": "f36cb130649a150812d20f90db73a314199b4790a89cd55ba1dc8fac114808ff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-mutant/summary.json",
+      "bytes": 10567,
+      "sha256": "204d02520a9d91420415d6b0eb64bf0b946ce7def64acaaf771f933b9aa87ab8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-restored/command.json",
+      "bytes": 2055,
+      "sha256": "1c5cdb7a294af227604fa6859dd5c10e589771b74c10ce0719bf934c5ead4693"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-restored/raw-tests.json",
+      "bytes": 22465,
+      "sha256": "8a05a93768ffc333daad0b1f8443846b158725c7d737726987060d8fea9f599c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-restored/stdout.log",
+      "bytes": 138,
+      "sha256": "d6caf36edbfaf7283ca5cf104e33cd48ba49384ec4b155c9a7bea1d2b30c1ba2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-restored/summary.json",
+      "bytes": 7461,
+      "sha256": "6288529550cc7c56e236c2fdc4bfbec9dd927e503256ddb4036f864a3ebb08d1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-baseline/command.json",
+      "bytes": 2048,
+      "sha256": "0c5f5f6645f94da2bd4ce49db97cc0ed763a42800dd1abb98a7070c762aa3bc0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-baseline/raw-tests.json",
+      "bytes": 22499,
+      "sha256": "7a334aa309a460875a6734ab338641fce6fc5ac56a2760cc8017968bed344ded"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-baseline/stdout.log",
+      "bytes": 137,
+      "sha256": "c7cc70380886bbecc3e1e10cd5584a8e2b4a7f583258ff3fa0ec14e178c30e12"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-baseline/summary.json",
+      "bytes": 7459,
+      "sha256": "87c7e89779ff7f0299dd23caa6520a1c2696151348ca021db7bca99ea71b9466"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-compile-mutant/command.json",
+      "bytes": 1643,
+      "sha256": "688c9add085211ddb789b5ad1aa8bc633a2158e9d081d32864c1678def618348"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-compile-mutant/emit-isolation.json",
+      "bytes": 487,
+      "sha256": "8a0eea20d65c26308a73e0883a6f42e6b37cffea8ec2a36d3c0a63a34a4fdd66"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-compile-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-compile-mutant/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-compile-restored/command.json",
+      "bytes": 1655,
+      "sha256": "4c00f5a6a72186a6f522c9882dde174ee9b757feab8dd7576b35512c6c0e5d7d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-compile-restored/emit-isolation.json",
+      "bytes": 413,
+      "sha256": "88b9098a990dddcf793714bdef26b76e84a5a1331e7187d02f14eebffaf2ef4f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-compile-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-compile-restored/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-mutant/command.json",
+      "bytes": 2034,
+      "sha256": "8d8eedf190d7242cea88a320af930e6536de821e481a8dc7eb6fb71c42f08976"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-mutant/raw-tests.json",
+      "bytes": 25279,
+      "sha256": "050143b8176e713400a68a77d962de0d3f73a649f587cf8aa0d81bd8a4fb2b51"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-mutant/stdout.log",
+      "bytes": 135,
+      "sha256": "8cf337f43b615d27f571334abd232982d18253ef4cb415cd5d285af61f201207"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-mutant/summary.json",
+      "bytes": 10809,
+      "sha256": "66aace46d42064497fcbababdce91ae3b33e6077bed4ce3d9c47b11c55f75496"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-restored/command.json",
+      "bytes": 2048,
+      "sha256": "4e250053e1db1f22e9e1a4d15de6974c6aaf60cbb230b945527189f97cad316f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-restored/raw-tests.json",
+      "bytes": 22460,
+      "sha256": "950cd909e799b29826ac9ebda0d15ec42791d4c00f6982c63d0a6caa26629016"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-restored/stdout.log",
+      "bytes": 137,
+      "sha256": "613828cc6e4d38027254ac6980b2af663fc781912bc8c16affc860ce7f700499"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-restored/summary.json",
+      "bytes": 7459,
+      "sha256": "b4856d21e30ebd544c9f6b3601a8ff7af66ac5b27fe90d918193ca25576da70f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-baseline/command.json",
+      "bytes": 2020,
+      "sha256": "9878f97feb311c0d24c0d399a461dad6f208a75d7224f7df7f98de02558fbae9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-baseline/raw-tests.json",
+      "bytes": 22487,
+      "sha256": "b69c70d3446b4d28e858d1582340211d03871b5688d72e5c74b083ef08fa55d3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-baseline/stdout.log",
+      "bytes": 133,
+      "sha256": "90178261271846a411ebbc93af51f0625d60ebff4e78e08035a428660ce0eefc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-baseline/summary.json",
+      "bytes": 7451,
+      "sha256": "34db24ad1fbd77e060563b36ba57ad74819c3da2687bc183ce392b1cae7cbd12"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-compile-mutant/command.json",
+      "bytes": 1619,
+      "sha256": "32d0620c99098d66ff93c97d8105348a6854f20b1e7d09e2b16281bc3ff03abf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-compile-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-compile-mutant/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-compile-restored/command.json",
+      "bytes": 1631,
+      "sha256": "65349f02ca285aee67cf66f6207bced5142c1ce5b340e40870fa871408860c46"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-compile-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-compile-restored/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-mutant/command.json",
+      "bytes": 2006,
+      "sha256": "36a7b22504f5db44ba1827f749a3faac6840e4a6a4a00a7387d1085fa3020183"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-mutant/raw-tests.json",
+      "bytes": 30764,
+      "sha256": "6d293703dadb7d361a688da9b805bffdf339a8b3b9c47628cfce21239da7b514"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-mutant/stdout.log",
+      "bytes": 131,
+      "sha256": "476d3524cf2e01f32b83355ed2d87ecd87e8fe8b74dfa3d285b96b4d0e21c433"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-envelope-signature-mutant/summary.json",
+      "bytes": 16946,
+      "sha256": "c003c2f3f2b05cb71bbcedb85aa9bd2f0e3854edb3fb63e867aa82707a348a15"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-baseline/command.json",
+      "bytes": 2020,
+      "sha256": "bcbcd9e4e12fa3c45347a2544bc43f7b07182e0de4eb3e991004fbdddfadd8ae"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-baseline/raw-tests.json",
+      "bytes": 22480,
+      "sha256": "6924a8e8de0d5c6bf3b2ea42fb016119b2b633af5c55494bed22324baa6a055e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-baseline/stdout.log",
+      "bytes": 133,
+      "sha256": "1a905f0487fa76af744ed61d89d17f9d7db577d023efe853e1b58d37470283c1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-baseline/summary.json",
+      "bytes": 7451,
+      "sha256": "03d5d91cba78a4be2a53d627ab7297d1bda81960cf2dbd64a580eecabf4abbe5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-compile-mutant/command.json",
+      "bytes": 1619,
+      "sha256": "2844afac934500a6c07bbc7772e0eae80a3fe60fba75cb023926c71c46e174f4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-compile-mutant/emit-isolation.json",
+      "bytes": 431,
+      "sha256": "23d97977e6238ff734121030bfa128f5f22c7acb448e29e2553c0aa32ce97f5b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-compile-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-compile-mutant/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-compile-restored/command.json",
+      "bytes": 1631,
+      "sha256": "9823c08f6e3a1f0c7b9fd6848c1c5ef8f3a7b38f541371f54a98fbe195287915"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-compile-restored/emit-isolation.json",
+      "bytes": 385,
+      "sha256": "4f125d66a5629492e6ede91f544da5e395aac33e3ec750ffb6f1147b638b9e47"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-compile-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-compile-restored/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-mutant/command.json",
+      "bytes": 2006,
+      "sha256": "809475f0226170ff68dc51a1d357cb484ba9caf07f3efbb54724e7c7ebb7dd47"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-mutant/raw-tests.json",
+      "bytes": 25268,
+      "sha256": "f13da4e294f9a509801d50bbe85745e63428d89ac1721160126845e3d6b4a5c8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-mutant/stdout.log",
+      "bytes": 131,
+      "sha256": "804c4ad2bfd6aeb771cda1e04f8fffba72dbeb7a18ecef622ce5feffe29929ea"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-mutant/summary.json",
+      "bytes": 10595,
+      "sha256": "b1950ad55c4dd673cf34b68b9ed835dd02b2a6637477794ab2c42757d6b3bb69"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-restored/command.json",
+      "bytes": 2020,
+      "sha256": "e9769cf6a2977fed8e2536d71163f5352babbba5da5685e736cbbe86f9ef4473"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-restored/raw-tests.json",
+      "bytes": 22435,
+      "sha256": "6f526c55b5e30738b1c744842b5ebccc06c8d2fe367d6ef53962c2a2ec8b12c3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-restored/stdout.log",
+      "bytes": 133,
+      "sha256": "c0fce6a3ab27d984585edc30cad0e3888010695d2085ca0bbbd0c5142f96aecf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-restored/summary.json",
+      "bytes": 7451,
+      "sha256": "8154ee4a2eee80de92e0658489786c08c46566a310be652612b0a2fb14ac1555"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-legacy-after-inspect/command.json",
+      "bytes": 2125,
+      "sha256": "0ed22bf3134f8cfe270bd9676f298205a38b45bd64c408d74a2d13dbec28f61f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-legacy-after-inspect/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-legacy-after-inspect/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-legacy-before-inspect/command.json",
+      "bytes": 2132,
+      "sha256": "cedaa2e54f9e8242568cc1ebb373bb0e44368d8e1cba565a2d4559edb7931d1f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-legacy-before-inspect/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-legacy-before-inspect/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-legacy-verify/command.json",
+      "bytes": 2075,
+      "sha256": "3e1f6e60e87f94d827f6b2ce0c57f73d290d29d0c477035b2bdb7dc5e24eed42"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-legacy-verify/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-legacy-verify/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-missing-vault-after-inspect/command.json",
+      "bytes": 2174,
+      "sha256": "eb5e0f57bb124134a252176e02429e7dc097c033295414a7fec9a25a21919d63"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-missing-vault-after-inspect/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-missing-vault-after-inspect/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-missing-vault-before-inspect/command.json",
+      "bytes": 2181,
+      "sha256": "fcc55a436f384c09b7a8e8c7722a7b1f9a10108fc7e86f452de169dab448defe"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-missing-vault-before-inspect/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-missing-vault-before-inspect/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-missing-vault-verify/command.json",
+      "bytes": 2124,
+      "sha256": "fa00d2877b5d38efce3916a434ae9e5074cce4c2a1d48952a50154c0b443b54d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-missing-vault-verify/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-baseline-missing-vault-verify/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-legacy-after-inspect/command.json",
+      "bytes": 2111,
+      "sha256": "b08cfaa32e5bc1788c911315b7835bfb485cebbdb213f426e3462266d19a67f5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-legacy-after-inspect/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-legacy-after-inspect/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-legacy-before-inspect/command.json",
+      "bytes": 2118,
+      "sha256": "55e22a00e6c80f9a13c54412ffe60a61f9690098fb6c98866de4d6cb11b6069b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-legacy-before-inspect/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-legacy-before-inspect/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-legacy-verify/command.json",
+      "bytes": 2061,
+      "sha256": "807463f284e799dc9ddef9802ea3514a636409e1205ce1ac05035082bfff1490"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-legacy-verify/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-legacy-verify/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-missing-vault-after-inspect/command.json",
+      "bytes": 2160,
+      "sha256": "621ef9aeea07d7e6576ba314b0339421758e67725cbc55f329aa950143d339b1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-missing-vault-after-inspect/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-missing-vault-after-inspect/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-missing-vault-before-inspect/command.json",
+      "bytes": 2167,
+      "sha256": "76a26dbddb0912848f71dde0f5f4448e17c07b34ff2425fa272bdba6e8c97e52"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-missing-vault-before-inspect/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-missing-vault-before-inspect/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-missing-vault-verify/command.json",
+      "bytes": 2110,
+      "sha256": "5199936167af200f4e0dadc73b59458dd3191ee2b2e9d1ebf8257904243f44cc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-missing-vault-verify/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-mutant-missing-vault-verify/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-legacy-after-inspect/command.json",
+      "bytes": 2125,
+      "sha256": "0767716c24a83d512fb5e66964d914fd48fea84ce1da4f36f58a2e2fb7ebfdb1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-legacy-after-inspect/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-legacy-after-inspect/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-legacy-before-inspect/command.json",
+      "bytes": 2132,
+      "sha256": "6c4ea093722225285310dc9eab2ba1268845a783e30ec384142af0dc23ce4ae1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-legacy-before-inspect/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-legacy-before-inspect/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-legacy-verify/command.json",
+      "bytes": 2075,
+      "sha256": "ce68c3e10799ae945e90477176ff112e3b473181849d19ab5408a113ab19915e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-legacy-verify/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-legacy-verify/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-missing-vault-after-inspect/command.json",
+      "bytes": 2174,
+      "sha256": "62dc3712274baebdfc9690e0ee2a25b33bb9c363e79e185c28119e781aef059d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-missing-vault-after-inspect/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-missing-vault-after-inspect/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-missing-vault-before-inspect/command.json",
+      "bytes": 2181,
+      "sha256": "5740fafed2503b46f1af86a7c199eb51f4d45288c482a8fb7907fcd19d669240"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-missing-vault-before-inspect/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-missing-vault-before-inspect/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-missing-vault-verify/command.json",
+      "bytes": 2124,
+      "sha256": "c78ac274ca4a50a74d320816c29e3c24ba6efb361174f3c2d5d950be2e3b4f61"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-missing-vault-verify/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-P30-1525-cold-vault-initializes-restored-missing-vault-verify/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-initial-cold-inspect/command.json",
+      "bytes": 1838,
+      "sha256": "5a96e8ea1d0d94fd49499141b6a5979e9b460913ab6d04faed620cb62f852131"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-initial-cold-inspect/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-initial-cold-inspect/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-initializer/command.json",
+      "bytes": 1778,
+      "sha256": "ec674a7fd3b7d0355ee4699f7cd0900979b753dc7b79af20629e3e64106c1bca"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-initializer/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-initializer/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-legacy-preparation/command.json",
+      "bytes": 1828,
+      "sha256": "d315097f5e8e1b3469a7b307a3ace766bc15a85642025c52ce203582fbadd640"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-legacy-preparation/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/effect-legacy-preparation/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/final-live-source-status/command.json",
+      "bytes": 1422,
+      "sha256": "5a005cdded7f5d77a6c72348eae1b97a08741e2ff693f5f74e9f33610d89d150"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/final-live-source-status/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/final-live-source-status/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/final-preservation-pins/command.json",
+      "bytes": 1451,
+      "sha256": "619552eba0fe99a1243073b5ab4a2de9ac5eb01488cd2f119d0e603b4f000672"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/final-preservation-pins/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/final-preservation-pins/stdout.log",
+      "bytes": 133,
+      "sha256": "1364e7545250b834d50ead9079b13a2463c438cf70390d72f30df889de8ceb0f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-baseline/command.json",
+      "bytes": 2083,
+      "sha256": "abc6f6cf60ec1b1c4062c55443d1eb4582be405eb7e9c83c048dff8ecbe60fd0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-baseline/raw-tests.json",
+      "bytes": 22472,
+      "sha256": "0c9c02407f1f19f19015c436d9b2b09803ea36a1d1e45865907557c84d1f039d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-baseline/stdout.log",
+      "bytes": 142,
+      "sha256": "a0a957a02899646c366f10450f3a8a85dc24c8a4f0a0d20997b8edb12b107469"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-baseline/summary.json",
+      "bytes": 7469,
+      "sha256": "8b5df340536424e7a52c545f5a4e43d14076e955dd26253497f9bd64b904b2b3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-compile-mutant/command.json",
+      "bytes": 1673,
+      "sha256": "b645347f6008982d13bf418d32fceebc742ba564cf793e3a2b193703f45420d6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-compile-mutant/emit-isolation.json",
+      "bytes": 487,
+      "sha256": "8983bb54e73ac7a45eae89d71cdc90e61f55097b6bda9028a8cdf2e3ffc4ca0c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-compile-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-compile-mutant/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-compile-restored/command.json",
+      "bytes": 1685,
+      "sha256": "f9b507d3610a93a9f133eb70f0b29450904cb838dea2b35a677576d32e64e87b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-compile-restored/emit-isolation.json",
+      "bytes": 413,
+      "sha256": "1357cdd96b39f0e7093173cca4ddc5d4a441232812b45ec37009600e3f69cbaa"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-compile-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-compile-restored/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-mutant/command.json",
+      "bytes": 2069,
+      "sha256": "c10f24238c0ba9ef9da6a757b6da650ce2668373657e18101da8f2ba94e38b9c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-mutant/raw-tests.json",
+      "bytes": 30704,
+      "sha256": "a14c09140f6312edece64d55499da4831ddcce9d674684eca00a07cf160b766d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-mutant/stdout.log",
+      "bytes": 140,
+      "sha256": "d5b47f5e1d1e8aa5f9a9b85c8d4b5e9d7ecba5ff133ab628fd6aac8b2694f5ea"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-mutant/summary.json",
+      "bytes": 16964,
+      "sha256": "dce399f0746181a5f9ba8f6b20a22296931aa5ce05cab13ff5b1919911b41de3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-restored/command.json",
+      "bytes": 2083,
+      "sha256": "663a895022b605b978fea199421ec1eded4f7984a3d06550c2720719e73aafdb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-restored/raw-tests.json",
+      "bytes": 22478,
+      "sha256": "57648f6fa67e0eaad368fa708e37280f209aa25586154eb489aaecd963844914"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-restored/stdout.log",
+      "bytes": 142,
+      "sha256": "36f76e3a07c7f0cb275d08dc0399aecbf2184edb41a67d537d2770cbd11d08c8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-restored/summary.json",
+      "bytes": 7469,
+      "sha256": "3fe9870210904cf0e71a982b30121da8e4ee7904774743495152fc4cb67b4d24"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/private-copy-setup/command.json",
+      "bytes": 1397,
+      "sha256": "dc477931a5acdfdadabcdc17f1e4180c248cf8f0d177af46154d8f589180bd5e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/private-copy-setup/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/private-copy-setup/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/private-first-baseline/command.json",
+      "bytes": 1922,
+      "sha256": "2826cce982eaab1f28f9ac4331e9d33370935e536efd6c0b839f6478bfe4e03c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/private-first-baseline/raw-tests.json",
+      "bytes": 22467,
+      "sha256": "e72190595a2214cae85c5cff51be62390dd290ea90d13b71c24c28060d9f9f6e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/private-first-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/private-first-baseline/stdout.log",
+      "bytes": 119,
+      "sha256": "ce3c41c3553e34c64a095fbc5536b8c2c17a6345831ddb0e30c6a84e70ef4f57"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/private-first-baseline/summary.json",
+      "bytes": 7423,
+      "sha256": "2cf066a53227a904b50aa969fd0851788fd4f3c07c0c9435c031455b5e535733"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/private-final-tracked.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/private-original-tracked.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/private-working-manifest.json",
+      "bytes": 1399777,
+      "sha256": "f86cea6462982db0ce6a41ca7fc4e02541dfaf313770f4afefdfe2abf65e30d7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/private-working-tracked.json",
+      "bytes": 914595,
+      "sha256": "66249927d3b4db6c7e61ea5d5c5c5e667c37e9e3289170cdf2893b97f58ab462"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/root-tracked-after.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/root-tracked-before.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/runtime-observation.json",
+      "bytes": 762,
+      "sha256": "6647801ba4849f5b9f49f6ec8ce8084e0290b42be0a79d5f267745ae9c7ab3e3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/setup.json",
+      "bytes": 691,
+      "sha256": "6124fbf5bb3c469ca82b460e669d1ae740bd2e4ed6381537fe61cd11d76eefeb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/source-after.json",
+      "bytes": 12730,
+      "sha256": "d343a6dffe4cd6aeb778d88fdd9a0bb2bb3672ca994945e1545a47a537fefdbb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/source-before.json",
+      "bytes": 12730,
+      "sha256": "d343a6dffe4cd6aeb778d88fdd9a0bb2bb3672ca994945e1545a47a537fefdbb"
+    }
+  ],
+  "artifactCount": 322,
+  "frozenJournal": {
+    "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 97071,
+    "sha256": "03bf66c0e20c29a1e216e46edeebbf0eec4e678e5776f7818ff51cf6e99db060"
+  },
+  "excludedAppendableJournal": "/private/tmp/p0-30-AMC-1525-qualification-20261015/commands.jsonl"
+}

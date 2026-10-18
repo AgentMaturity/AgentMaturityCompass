@@ -1,0 +1,824 @@
+{
+  "schemaVersion": 1,
+  "audit": "P0-47 accepted-main parity baseline diagnosis",
+  "timestampUtc": "2026-10-14T13:23:16.611447+00:00",
+  "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "candidateP033": "7d5d8335bf973900fb9a9d9d331471b1b366ef8b",
+  "claudePreserved": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+  "report": {
+    "path": "/private/tmp/p0-47-current-parity-20261014.json",
+    "sha256": "edf01d678127d5d80a12b9b27d7496c6b3bfbbd896a2e8c10d4191c1415593fd",
+    "counts": {
+      "numTotalTests": 7113,
+      "numPassedTests": 7051,
+      "numFailedTests": 62,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": false
+    }
+  },
+  "conclusion": "All62 failed assertions belong to4 inherited integration roots:2 missing D-15 source snapshots and2 intentional production behavior changes absent from the old parity harness. No timeout failure or new P0-47 source-helper defect accounts for them. Relevant production bytes already match both preserved candidates.",
+  "suiteFailures": [
+    {
+      "suite": "archiveFilesParity.test.ts",
+      "assertions": 50,
+      "failed": 1,
+      "owner": "P1-16 D-15 follow-up",
+      "failures": [
+        {
+          "name": "archive file utility parity: src/audit/binderArtifact.ts preserves extraction bounds, all verifiers, domain errors and public APIs",
+          "durationMs": 27.093541000000187,
+          "error": "AssertionError: expected 'import { mkdtempSync, readFileSync, r…' to be 'import { mkdtempSync, readFileSync, r…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        }
+      ]
+    },
+    {
+      "suite": "explainabilityContractParity.test.ts",
+      "assertions": 40,
+      "failed": 28,
+      "owner": "P1-07 repair-hint parity follow-up",
+      "failures": [
+        {
+          "name": "explainability shared contracts retain complete original exported flows uses existing literal report inputs and exercises every changed domain with a ready original receipt",
+          "durationMs": 21.65254200000004,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-13T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-13T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows ragFlowDiagnostics: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 3.698750000000018,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-13T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-13T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows incidentTriageLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 7.609958000000006,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-14T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-14T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows benchmarkSubmissionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 2.545708000000104,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-14T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-14T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows testSuiteEvaluationLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 2.2067500000000564,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows evalAiLibraryQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 7.06879200000003,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows openModelRagQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 2.525917000000163,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows opikEvaluationQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 2.5030409999999392,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows deepEvalQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 2.639666000000034,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows statisticalAgentTrialLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 3.637959000000137,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-19T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-19T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows codeQuestQualityLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 8.281959000000143,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-19T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-19T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows multiUserBenchmarkLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 9.431790999999976,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-16T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-16T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows professionalTaskLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 3.575207999999975,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-16T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-16T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows iotFirmwareQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 3.6525410000001557,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows retailSalesQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 2.379666000000043,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows continualLearningBenchmarkLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 2.186374999999998,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows hermesTurboPerformanceLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 2.278291000000081,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-19T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-19T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows obsStudioDrilldownLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 1.8976669999999558,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-13T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-13T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows scorableStudioDrilldownLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+          "durationMs": 4.277875000000222,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows incidentTriageProofHashes: each omitted or malformed proof retains original refusal",
+          "durationMs": 2.243249999999989,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-14T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-14T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows benchmarkSubmissionProofHashes: each omitted or malformed proof retains original refusal",
+          "durationMs": 1.7966670000000704,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-14T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-14T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows multiUserBenchmarkProofHashes: each omitted or malformed proof retains original refusal",
+          "durationMs": 3.9054170000001704,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-16T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-16T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows continualLearningBenchmarkProofHashes: each omitted or malformed proof retains original refusal",
+          "durationMs": 4.9919159999999465,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows hermesTurboPerformanceProofHashes: each omitted or malformed proof retains original refusal",
+          "durationMs": 2.140875000000051,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-19T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-19T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows iotFirmwareQuestionProofHashes: each omitted or malformed proof retains original refusal",
+          "durationMs": 2.7198329999998805,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows retailSalesQuestionProofHashes: each omitted or malformed proof retains original refusal",
+          "durationMs": 1.7928330000002006,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows scorableStudioDrilldownProofHashes: each omitted or malformed proof retains original refusal",
+          "durationMs": 1.825083000000177,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "explainability shared contracts retain complete original exported flows obsStudioDrilldownProofHashes: each omitted or malformed proof retains original refusal",
+          "durationMs": 1.760332999999946,
+          "error": "AssertionError: expected '{\"generatedAt\":\"2026-06-13T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-13T00:00:00.0…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        }
+      ]
+    },
+    {
+      "suite": "privateModuleHelperVisibility.test.ts",
+      "assertions": 229,
+      "failed": 1,
+      "owner": "P2-01 D-15 follow-up",
+      "failures": [
+        {
+          "name": "individually reviewed module-private helper visibility retains the exact finite declaration manifest and supported package entries",
+          "durationMs": 6.402791999999977,
+          "error": "AssertionError: expected '1351dd56270ba66159a5b5fd3747e5969b2d2…' to be 'de1469cf447c9ccf8a22fef1ebcce716b3af7…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        }
+      ]
+    },
+    {
+      "suite": "signedArtifactVerificationParity.test.ts",
+      "assertions": 59,
+      "failed": 32,
+      "owner": "P1-26 compatibility parity follow-up; preserve P0-09 strict trust admission",
+      "failures": [
+        {
+          "name": "entire archived signed artifact workflows against real local signatures binder real signatures verify through embedded, explicit and workspace trust paths",
+          "durationMs": 158.48995800000012,
+          "error": "AssertionError: expected '{\"ok\":true,\"binder\":{\"v\":1,\"binderId\"…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures binder public argument getters keep the original access order",
+          "durationMs": 104.22212499999841,
+          "error": "AssertionError: expected { ok: true, …(3) } to deeply equal Object{ ok: false, …(3) }",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures binder preserves renamed child root discovery",
+          "durationMs": 145.20208300000013,
+          "error": "AssertionError: expected '{\"ok\":true,\"binder\":{\"v\":1,\"binderId\"…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures binder preserves flat root root discovery",
+          "durationMs": 208.4997089999997,
+          "error": "AssertionError: expected '{\"ok\":true,\"binder\":{\"v\":1,\"binderId\"…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures binder tampered digest refuses",
+          "durationMs": 143.88600000000042,
+          "error": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures binder tampered signature refuses",
+          "durationMs": 139.66291699999965,
+          "error": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures binder tampered envelope mismatch refuses",
+          "durationMs": 174.94404199999917,
+          "error": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures binder privacy missing scan retains the domain policy",
+          "durationMs": 171.63845800000126,
+          "error": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures binder privacy failed scan retains the domain policy",
+          "durationMs": 193.10620799999924,
+          "error": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures binder privacy checksum mismatch retains the domain policy",
+          "durationMs": 139.52508299999863,
+          "error": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures binder privacy missing checksum retains the domain policy",
+          "durationMs": 149.8003750000007,
+          "error": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures binder absent inclusion directory and ignored suffixes preserve existing proof admission",
+          "durationMs": 187.10554200000115,
+          "error": "AssertionError: expected '{\"ok\":true,\"binder\":{\"v\":1,\"binderId\"…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures binder multiple privacy failures retain error order and checksum whitespace behavior",
+          "durationMs": 140.6950420000012,
+          "error": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures binder root and calculation-manifest hash tampering refuses",
+          "durationMs": 128.17833299999984,
+          "error": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport real signatures verify through embedded, explicit and workspace trust paths",
+          "durationMs": 117.46820900000057,
+          "error": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport public argument getters keep the original access order",
+          "durationMs": 81.25995900000089,
+          "error": "AssertionError: expected { ok: true, …(3) } to deeply equal Object{ ok: false, …(3) }",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport preserves renamed child root discovery",
+          "durationMs": 193.25045900000077,
+          "error": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport preserves flat root root discovery",
+          "durationMs": 153.46987499999886,
+          "error": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport tampered digest refuses",
+          "durationMs": 132.9489999999987,
+          "error": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport tampered signature refuses",
+          "durationMs": 185.66383399999904,
+          "error": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport tampered envelope mismatch refuses",
+          "durationMs": 111.03149999999914,
+          "error": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport privacy missing scan retains the domain policy",
+          "durationMs": 111.99216700000034,
+          "error": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport privacy failed scan retains the domain policy",
+          "durationMs": 108.79750000000058,
+          "error": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport privacy checksum mismatch retains the domain policy",
+          "durationMs": 122.39987499999916,
+          "error": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport privacy missing checksum retains the domain policy",
+          "durationMs": 117.50433300000077,
+          "error": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport absent inclusion directory and ignored suffixes preserve existing proof admission",
+          "durationMs": 112.62895800000115,
+          "error": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport multiple privacy failures retain error order and checksum whitespace behavior",
+          "durationMs": 107.18370800000048,
+          "error": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport root and calculation-manifest hash tampering refuses",
+          "durationMs": 97.66120800000135,
+          "error": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures multiple unbound expected proof ids refuse even when their input order differs",
+          "durationMs": 112.4220000000023,
+          "error": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures workspace verification reports every refusal from a tampered registered binder",
+          "durationMs": 141.75616699999955,
+          "error": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport revocation remains enforced with workspace trust",
+          "durationMs": 86.36208400000032,
+          "error": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        },
+        {
+          "name": "entire archived signed artifact workflows against real local signatures passport expiry is enforced without changing the signed document",
+          "durationMs": 50.321875000001455,
+          "error": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+          "category": "assertion mismatch, not timeout"
+        }
+      ]
+    }
+  ],
+  "rootCauses": [
+    {
+      "suite": "archiveFilesParity.test.ts",
+      "failed": 1,
+      "rootCause": "P1-16 changed binderArtifact under an existing whole-source freeze without registering its D-15 snapshot on main. The preserved follow-up archives exact pre-P1-16 base bytes; no assertion/body change is needed.",
+      "owner": "P1-16",
+      "sourceChange": "24edc1451 (later conformance projection refinements51940696a and digest/tree single-read6e2302332 remain live)",
+      "existingRepairCommit": "19334cb415cb547f2cda6f556b9bd1a7248d4a30",
+      "remedy": "Import only the already-authored historical archive plus its single manifest row; preserve current binder production behavior and original parity assertion."
+    },
+    {
+      "suite": "privateModuleHelperVisibility.test.ts",
+      "failed": 1,
+      "rootCause": "Its heldContractSources pins spillStore to de1469cf, while accepted-main live source is1351dd56 after P2-01 legal-hold changes. Main lacks the preserved D-15 entry.",
+      "owner": "P2-01",
+      "sourceChange": "6ced4871b, subsequent9d702f24b",
+      "existingRepairCommit": "a75e1a0c09868d728db102a5ba9086ddfdb485bd",
+      "remedy": "Import only the exact e89f48428 historical .landed file and row; keep the expected held-contract hash and live deletion/legal-hold source unchanged."
+    },
+    {
+      "suite": "explainabilityContractParity.test.ts",
+      "failed": 28,
+      "rootCause": "Main repairHintFor now returns a Not evaluated target/reason when the next level is unmeasurable (P1-07). The historical harness compiles the old advice unchanged and compares full JSON; repairHint-derived rowHash/manifestHash/packHash then legitimately diverge.",
+      "owner": "P1-07",
+      "sourceChange": "8f666572749a13b5d656dc59edce723336445468",
+      "existingRepairCommits": [
+        "a52db763f",
+        "9e9d1b036"
+      ],
+      "remedy": "Reuse the two literal recorded forward edits and full strengthened harness; keep full JSON parity, exact original hashes, once-only text guards, delta restriction to repairHint/rowHash/manifestHash and tests retaining archived advice at evaluable levels."
+    },
+    {
+      "suite": "signedArtifactVerificationParity.test.ts",
+      "failed": 32,
+      "rootCause": "P1-26 makes proof algorithm and size come from carried signed-root state. Archived verifiers pass merkleRoot:null into the actual live proof checker; without a root the checker uses amc-legacy-v1 and refuses new rfc9162-sha256 proof fixtures. Main current verifiers pass signed roots through P0-09 admission, producing true-vs-false and error-array parity differences.",
+      "owner": "P1-26 (compatibility); P0-09 (strict live trust contract)",
+      "sourceChange": "def0955fac234ea0ce96c849c849cffd49a99ea4 changes benchProofs/tree contract; P0-09 wired current verifier root signature/admission",
+      "existingRepairCommits": [
+        "ab5f12b30",
+        "b815c8297",
+        "9e9d1b036"
+      ],
+      "remedy": "Reuse archived-verifier forward compatibility adapters and strengthened harness as one unit with its map. Preserve full original result-field equality, actual live current verifier and proof checker, P0-09 signature/root/pin validation, original .original files, unedited-archive refusal test, and wrong-algorithm negative proof."
+    }
+  ],
+  "productionComparison": [
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "mainSha256": "a08af5a16b73589f47ba3ebf8a74bb17b6e715fb1bf53bab369fef8436486e17",
+      "P033Sha256": "a08af5a16b73589f47ba3ebf8a74bb17b6e715fb1bf53bab369fef8436486e17",
+      "claudeSha256": "a08af5a16b73589f47ba3ebf8a74bb17b6e715fb1bf53bab369fef8436486e17",
+      "allIdentical": true
+    },
+    {
+      "path": "src/diagnostic/levelSemantics.ts",
+      "mainSha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+      "P033Sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+      "claudeSha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+      "allIdentical": true
+    },
+    {
+      "path": "src/audit/binderVerifier.ts",
+      "mainSha256": "b7efcef92effb50588606e9a95d1bcc28b2e0de34a1a59b556194cca7fee7e7a",
+      "P033Sha256": "b7efcef92effb50588606e9a95d1bcc28b2e0de34a1a59b556194cca7fee7e7a",
+      "claudeSha256": "b7efcef92effb50588606e9a95d1bcc28b2e0de34a1a59b556194cca7fee7e7a",
+      "allIdentical": true
+    },
+    {
+      "path": "src/passport/passportVerifier.ts",
+      "mainSha256": "4c703c6d49ee7f17a2ca0ba8e0a2ce31b24412cbac066f6afdb8f5b6cce682a5",
+      "P033Sha256": "4c703c6d49ee7f17a2ca0ba8e0a2ce31b24412cbac066f6afdb8f5b6cce682a5",
+      "claudeSha256": "4c703c6d49ee7f17a2ca0ba8e0a2ce31b24412cbac066f6afdb8f5b6cce682a5",
+      "allIdentical": true
+    },
+    {
+      "path": "src/bench/benchProofs.ts",
+      "mainSha256": "1df60fe2be9ae8583b2661a8646954405939b64f7049d8f6f4c40f6c307d3b16",
+      "P033Sha256": "1df60fe2be9ae8583b2661a8646954405939b64f7049d8f6f4c40f6c307d3b16",
+      "claudeSha256": "1df60fe2be9ae8583b2661a8646954405939b64f7049d8f6f4c40f6c307d3b16",
+      "allIdentical": true
+    },
+    {
+      "path": "src/utils/signedArtifactVerification.ts",
+      "mainSha256": "9759ba4d33ac496f98674e8f7a78267bab8b898e5b863e3b4a6180762b4e982d",
+      "P033Sha256": "9759ba4d33ac496f98674e8f7a78267bab8b898e5b863e3b4a6180762b4e982d",
+      "claudeSha256": "9759ba4d33ac496f98674e8f7a78267bab8b898e5b863e3b4a6180762b4e982d",
+      "allIdentical": true
+    },
+    {
+      "path": "src/audit/binderArtifact.ts",
+      "mainSha256": "92afbfd1a576c6491e789c55d4b15ff347b8b3ffae58d9eb38aaadcaaabea67a",
+      "P033Sha256": "92afbfd1a576c6491e789c55d4b15ff347b8b3ffae58d9eb38aaadcaaabea67a",
+      "claudeSha256": "92afbfd1a576c6491e789c55d4b15ff347b8b3ffae58d9eb38aaadcaaabea67a",
+      "allIdentical": true
+    },
+    {
+      "path": "src/session/spill/spillStore.ts",
+      "mainSha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af",
+      "P033Sha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af",
+      "claudeSha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af",
+      "allIdentical": true
+    }
+  ],
+  "boundedReusablePaths": [
+    {
+      "path": "tests/explainabilityContractParity.test.ts",
+      "candidateSha256": "c53222bdc8afa8d90496ec7f7a1696640fa4487067e342eb3175adee5408e189",
+      "claudeSha256": "c53222bdc8afa8d90496ec7f7a1696640fa4487067e342eb3175adee5408e189",
+      "candidateEqualsClaude": true,
+      "presentOnMain": true,
+      "mainSha256": "770ef3525f1dbbf4d4a387ce6057660f19972b946fe12418bbbbc6bd554642b6"
+    },
+    {
+      "path": "tests/signedArtifactVerificationParity.test.ts",
+      "candidateSha256": "b4440597565e3bd2beb4046714ab08d04ca31f1b503b785825cef7c4e73cbeb4",
+      "claudeSha256": "b4440597565e3bd2beb4046714ab08d04ca31f1b503b785825cef7c4e73cbeb4",
+      "candidateEqualsClaude": true,
+      "presentOnMain": true,
+      "mainSha256": "9641e98d4ad30fde10108a2c1283a693ccb23f79b066590af0085b233733835d"
+    },
+    {
+      "path": "unused-code/2026-10-02-native/explainability-contracts/restoration.json",
+      "candidateSha256": "cf80e00a32f0596328eedf83774be6717b7626f7c7e86a7650f5da48ee9aaaa3",
+      "claudeSha256": "cf80e00a32f0596328eedf83774be6717b7626f7c7e86a7650f5da48ee9aaaa3",
+      "candidateEqualsClaude": true,
+      "presentOnMain": true,
+      "mainSha256": "1c47c543f4029ac9c111e4438e661adf645f24aec90dbbd10db700e394c53325"
+    },
+    {
+      "path": "unused-code/2026-10-02-native/signed-artifacts/restoration-map.json",
+      "candidateSha256": "f2a93564e978d25d3d018f2cfb04aeab4467c5a334682d11d9096f02e46629cf",
+      "claudeSha256": "f2a93564e978d25d3d018f2cfb04aeab4467c5a334682d11d9096f02e46629cf",
+      "candidateEqualsClaude": true,
+      "presentOnMain": true,
+      "mainSha256": "4fec142f74c993bae21f5708fde1bbd09e9a7f7521d54be98c7bd364d70dcda6"
+    },
+    {
+      "path": "unused-code/plan-edits/P1-16/src/audit/binderArtifact.ts.landed",
+      "candidateSha256": "9b40bd627e04b45b395fba58e4318808b71c34ab40048d344088a22d635c7e46",
+      "claudeSha256": "9b40bd627e04b45b395fba58e4318808b71c34ab40048d344088a22d635c7e46",
+      "candidateEqualsClaude": true,
+      "presentOnMain": false,
+      "mainSha256": null
+    },
+    {
+      "path": "unused-code/plan-edits/P2-01/src/session/spill/spillStore.ts.landed",
+      "candidateSha256": "de1469cf447c9ccf8a22fef1ebcce716b3af7455b7127eb00ddc7cb5a7bc59e7",
+      "claudeSha256": "de1469cf447c9ccf8a22fef1ebcce716b3af7455b7127eb00ddc7cb5a7bc59e7",
+      "candidateEqualsClaude": true,
+      "presentOnMain": false,
+      "mainSha256": null
+    }
+  ],
+  "manifestHandling": "Merge only the2 verified snapshot rows into current sorted manifest; do not overlay the candidate manifest or other work. The6 full reusable file paths plus the2-row manifest edit make7 touched paths.",
+  "snapshots": [
+    {
+      "entry": {
+        "path": "src/audit/binderArtifact.ts",
+        "issue": "P1-16",
+        "baseCommit": "1c1ff4b1ff3d94960aee7e130e5dba6988126d4c",
+        "archivePath": "unused-code/plan-edits/P1-16/src/audit/binderArtifact.ts.landed",
+        "sha256": "9b40bd627e04b45b395fba58e4318808b71c34ab40048d344088a22d635c7e46"
+      },
+      "archiveEqualsMainAncestorBaseBlob": true,
+      "archiveHashMatches": true,
+      "baseAncestorOfMain": true,
+      "currentLiveFileEqualsHistoricalArchive": false
+    },
+    {
+      "entry": {
+        "path": "src/session/spill/spillStore.ts",
+        "issue": "P2-01",
+        "baseCommit": "e89f4842892c1eae4e4acf6996c7d0d31a4b229e",
+        "archivePath": "unused-code/plan-edits/P2-01/src/session/spill/spillStore.ts.landed",
+        "sha256": "de1469cf447c9ccf8a22fef1ebcce716b3af7455b7127eb00ddc7cb5a7bc59e7"
+      },
+      "archiveEqualsMainAncestorBaseBlob": true,
+      "archiveHashMatches": true,
+      "baseAncestorOfMain": true,
+      "currentLiveFileEqualsHistoricalArchive": false
+    }
+  ],
+  "forwardEdits": [
+    {
+      "issue": "P1-07",
+      "commit": "8f666572749a13b5d656dc59edce723336445468",
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "reason": "repairHintFor names a not-evaluated next level and its reason instead of advising toward it",
+      "before": "import { sha256Hex } from \"../utils/hash.js\";\n",
+      "after": "import { notEvaluatedLevel } from \"./levelSemantics.js\";\nimport { sha256Hex } from \"../utils/hash.js\";\n",
+      "mapPath": "unused-code/2026-10-02-native/explainability-contracts/restoration.json",
+      "beforeOccurrencesInArchive": 1,
+      "afterOccurrencesInCurrentMain": 1,
+      "meaning": "literal recorded P1-07 production edit",
+      "mapDiff": "diff --git a/unused-code/2026-10-02-native/explainability-contracts/restoration.json b/unused-code/2026-10-02-native/explainability-contracts/restoration.json\nindex 56c74f1a9..04d53eeb3 100644\n--- a/unused-code/2026-10-02-native/explainability-contracts/restoration.json\n+++ b/unused-code/2026-10-02-native/explainability-contracts/restoration.json\n@@ -192,6 +192,24 @@\n       \"after\": \"import {\\n  incidentTriageProofHashes,\\n  benchmarkSubmissionProofHashes,\\n  multiUserBenchmarkProofHashes,\\n  continualLearningBenchmarkProofHashes,\\n  hermesTurboPerformanceProofHashes,\\n  iotFirmwareQuestionProofHashes,\\n  retailSalesQuestionProofHashes,\\n  scorableStudioDrilldownProofHashes,\\n  obsStudioDrilldownProofHashes,\\n} from \\\"./explainabilityContracts.js\\\";\\n\\nexport type ScoreEvidenceDrilldownState\"\n     }\n   ],\n+  \"forwardEdits\": [\n+    {\n+      \"issue\": \"P1-07\",\n+      \"commit\": \"8f666572749a13b5d656dc59edce723336445468\",\n+      \"path\": \"src/diagnostic/questionScoreExplainability.ts\",\n+      \"reason\": \"repairHintFor names a not-evaluated next level and its reason instead of advising toward it\",\n+      \"before\": \"import { sha256Hex } from \\\"../utils/hash.js\\\";\\n\",\n+      \"after\": \"import { notEvaluatedLevel } from \\\"./levelSemantics.js\\\";\\nimport { sha256Hex } from \\\"../utils/hash.js\\\";\\n\"\n+    },\n+    {\n+      \"issue\": \"P1-07\",\n+      \"commit\": \"8f666572749a13b5d656dc59edce723336445468\",\n+      \"path\": \"src/diagnostic/questionScoreExplainability.ts\",\n+      \"reason\": \"repairHintFor names a not-evaluated next level and its reason instead of advising toward it\",\n+      \"before\": \"function repairHintFor(question: DiagnosticQuestion, score: QuestionScore): string {\\n  const nextLevel = Math.min(score.finalLevel + 1, 5);\\n\",\n+      \"after\": \"function repairHintFor(question: DiagnosticQuestion, score: QuestionScore): string {\\n  const nextLevel = Math.min(score.finalLevel + 1, 5);\\n  // P1-07: a next level AMC cannot evaluate gets its reason, not advice that would promise it.\\n  const notEvaluated = notEvaluatedLevel(question, score.finalLevel, nextLevel);\\n  if (notEvaluated) {\\n    return `Target L${nextLevel}: ${notEvaluated.notice}`;\\n  }\\n\"\n+    }\n+  ],\n   \"statusSites\": [\n     \"hasReplayableRagFlowDiagnostic\",\n     \"hasReplayableIncidentTriageLens\",\n"
+    },
+    {
+      "issue": "P1-07",
+      "commit": "8f666572749a13b5d656dc59edce723336445468",
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "reason": "repairHintFor names a not-evaluated next level and its reason instead of advising toward it",
+      "before": "function repairHintFor(question: DiagnosticQuestion, score: QuestionScore): string {\n  const nextLevel = Math.min(score.finalLevel + 1, 5);\n",
+      "after": "function repairHintFor(question: DiagnosticQuestion, score: QuestionScore): string {\n  const nextLevel = Math.min(score.finalLevel + 1, 5);\n  // P1-07: a next level AMC cannot evaluate gets its reason, not advice that would promise it.\n  const notEvaluated = notEvaluatedLevel(question, score.finalLevel, nextLevel);\n  if (notEvaluated) {\n    return `Target L${nextLevel}: ${notEvaluated.notice}`;\n  }\n",
+      "mapPath": "unused-code/2026-10-02-native/explainability-contracts/restoration.json",
+      "beforeOccurrencesInArchive": 1,
+      "afterOccurrencesInCurrentMain": 1,
+      "meaning": "literal recorded P1-07 production edit",
+      "mapDiff": "diff --git a/unused-code/2026-10-02-native/explainability-contracts/restoration.json b/unused-code/2026-10-02-native/explainability-contracts/restoration.json\nindex 56c74f1a9..04d53eeb3 100644\n--- a/unused-code/2026-10-02-native/explainability-contracts/restoration.json\n+++ b/unused-code/2026-10-02-native/explainability-contracts/restoration.json\n@@ -192,6 +192,24 @@\n       \"after\": \"import {\\n  incidentTriageProofHashes,\\n  benchmarkSubmissionProofHashes,\\n  multiUserBenchmarkProofHashes,\\n  continualLearningBenchmarkProofHashes,\\n  hermesTurboPerformanceProofHashes,\\n  iotFirmwareQuestionProofHashes,\\n  retailSalesQuestionProofHashes,\\n  scorableStudioDrilldownProofHashes,\\n  obsStudioDrilldownProofHashes,\\n} from \\\"./explainabilityContracts.js\\\";\\n\\nexport type ScoreEvidenceDrilldownState\"\n     }\n   ],\n+  \"forwardEdits\": [\n+    {\n+      \"issue\": \"P1-07\",\n+      \"commit\": \"8f666572749a13b5d656dc59edce723336445468\",\n+      \"path\": \"src/diagnostic/questionScoreExplainability.ts\",\n+      \"reason\": \"repairHintFor names a not-evaluated next level and its reason instead of advising toward it\",\n+      \"before\": \"import { sha256Hex } from \\\"../utils/hash.js\\\";\\n\",\n+      \"after\": \"import { notEvaluatedLevel } from \\\"./levelSemantics.js\\\";\\nimport { sha256Hex } from \\\"../utils/hash.js\\\";\\n\"\n+    },\n+    {\n+      \"issue\": \"P1-07\",\n+      \"commit\": \"8f666572749a13b5d656dc59edce723336445468\",\n+      \"path\": \"src/diagnostic/questionScoreExplainability.ts\",\n+      \"reason\": \"repairHintFor names a not-evaluated next level and its reason instead of advising toward it\",\n+      \"before\": \"function repairHintFor(question: DiagnosticQuestion, score: QuestionScore): string {\\n  const nextLevel = Math.min(score.finalLevel + 1, 5);\\n\",\n+      \"after\": \"function repairHintFor(question: DiagnosticQuestion, score: QuestionScore): string {\\n  const nextLevel = Math.min(score.finalLevel + 1, 5);\\n  // P1-07: a next level AMC cannot evaluate gets its reason, not advice that would promise it.\\n  const notEvaluated = notEvaluatedLevel(question, score.finalLevel, nextLevel);\\n  if (notEvaluated) {\\n    return `Target L${nextLevel}: ${notEvaluated.notice}`;\\n  }\\n\"\n+    }\n+  ],\n   \"statusSites\": [\n     \"hasReplayableRagFlowDiagnostic\",\n     \"hasReplayableIncidentTriageLens\",\n"
+    },
+    {
+      "issue": "P1-26",
+      "commit": "def0955fac234ea0ce96c849c849cffd49a99ea4",
+      "path": "src/audit/binderVerifier.ts",
+      "reason": "a proof's tree and tree size come from the merkle root the artifact carries; a bundle without one is checked as amc-legacy-v1 only",
+      "before": "      transparencyRoot: null,\n      merkleRoot: null,\n      proofs: inclusion\n",
+      "after": "      transparencyRoot: null,\n      merkleRoot: pathExists(join(root, \"proofs\", \"merkle.root.json\"))\n        ? { root: JSON.parse(readUtf8(join(root, \"proofs\", \"merkle.root.json\"))), signature: null, sha256: \"\" } : null,\n      proofs: inclusion\n",
+      "mapPath": "unused-code/2026-10-02-native/signed-artifacts/restoration-map.json",
+      "beforeOccurrencesInArchive": 1,
+      "afterOccurrencesInCurrentMain": 0,
+      "meaning": "bounded archived-verifier compatibility adapter for P1-26 proof contract; not a literal verifier edit at def0955fa",
+      "mapDiff": "diff --git a/unused-code/2026-10-02-native/signed-artifacts/restoration-map.json b/unused-code/2026-10-02-native/signed-artifacts/restoration-map.json\nindex c1043d21d..466ccdecf 100644\n--- a/unused-code/2026-10-02-native/signed-artifacts/restoration-map.json\n+++ b/unused-code/2026-10-02-native/signed-artifacts/restoration-map.json\n@@ -17,6 +17,24 @@\n       \"bytes\": 9969\n     }\n   ],\n+  \"forwardEdits\": [\n+    {\n+      \"issue\": \"P1-26\",\n+      \"commit\": \"def0955fac234ea0ce96c849c849cffd49a99ea4\",\n+      \"path\": \"src/audit/binderVerifier.ts\",\n+      \"reason\": \"a proof's tree and tree size come from the merkle root the artifact carries; a bundle without one is checked as amc-legacy-v1 only\",\n+      \"before\": \"      transparencyRoot: null,\\n      merkleRoot: null,\\n      proofs: inclusion\\n\",\n+      \"after\": \"      transparencyRoot: null,\\n      merkleRoot: pathExists(join(root, \\\"proofs\\\", \\\"merkle.root.json\\\"))\\n        ? { root: JSON.parse(readUtf8(join(root, \\\"proofs\\\", \\\"merkle.root.json\\\"))), signature: null, sha256: \\\"\\\" } : null,\\n      proofs: inclusion\\n\"\n+    },\n+    {\n+      \"issue\": \"P1-26\",\n+      \"commit\": \"def0955fac234ea0ce96c849c849cffd49a99ea4\",\n+      \"path\": \"src/passport/passportVerifier.ts\",\n+      \"reason\": \"a proof's tree and tree size come from the merkle root the artifact carries; a bundle without one is checked as amc-legacy-v1 only\",\n+      \"before\": \"      transparencyRoot: null,\\n      merkleRoot: null,\\n      proofs: inclusion\\n\",\n+      \"after\": \"      transparencyRoot: null,\\n      merkleRoot: pathExists(join(root, \\\"proofs\\\", \\\"merkle.root.json\\\"))\\n        ? { root: JSON.parse(readUtf8(join(root, \\\"proofs\\\", \\\"merkle.root.json\\\"))), signature: null, sha256: \\\"\\\" } : null,\\n      proofs: inclusion\\n\"\n+    }\n+  ],\n   \"newFilesToRemoveOnRestore\": [\n     \"src/utils/signedArtifactVerification.ts\",\n     \"tests/signedArtifactVerificationParity.test.ts\"\n"
+    },
+    {
+      "issue": "P1-26",
+      "commit": "def0955fac234ea0ce96c849c849cffd49a99ea4",
+      "path": "src/passport/passportVerifier.ts",
+      "reason": "a proof's tree and tree size come from the merkle root the artifact carries; a bundle without one is checked as amc-legacy-v1 only",
+      "before": "      transparencyRoot: null,\n      merkleRoot: null,\n      proofs: inclusion\n",
+      "after": "      transparencyRoot: null,\n      merkleRoot: pathExists(join(root, \"proofs\", \"merkle.root.json\"))\n        ? { root: JSON.parse(readUtf8(join(root, \"proofs\", \"merkle.root.json\"))), signature: null, sha256: \"\" } : null,\n      proofs: inclusion\n",
+      "mapPath": "unused-code/2026-10-02-native/signed-artifacts/restoration-map.json",
+      "beforeOccurrencesInArchive": 1,
+      "afterOccurrencesInCurrentMain": 0,
+      "meaning": "bounded archived-verifier compatibility adapter for P1-26 proof contract; not a literal verifier edit at def0955fa",
+      "mapDiff": "diff --git a/unused-code/2026-10-02-native/signed-artifacts/restoration-map.json b/unused-code/2026-10-02-native/signed-artifacts/restoration-map.json\nindex c1043d21d..466ccdecf 100644\n--- a/unused-code/2026-10-02-native/signed-artifacts/restoration-map.json\n+++ b/unused-code/2026-10-02-native/signed-artifacts/restoration-map.json\n@@ -17,6 +17,24 @@\n       \"bytes\": 9969\n     }\n   ],\n+  \"forwardEdits\": [\n+    {\n+      \"issue\": \"P1-26\",\n+      \"commit\": \"def0955fac234ea0ce96c849c849cffd49a99ea4\",\n+      \"path\": \"src/audit/binderVerifier.ts\",\n+      \"reason\": \"a proof's tree and tree size come from the merkle root the artifact carries; a bundle without one is checked as amc-legacy-v1 only\",\n+      \"before\": \"      transparencyRoot: null,\\n      merkleRoot: null,\\n      proofs: inclusion\\n\",\n+      \"after\": \"      transparencyRoot: null,\\n      merkleRoot: pathExists(join(root, \\\"proofs\\\", \\\"merkle.root.json\\\"))\\n        ? { root: JSON.parse(readUtf8(join(root, \\\"proofs\\\", \\\"merkle.root.json\\\"))), signature: null, sha256: \\\"\\\" } : null,\\n      proofs: inclusion\\n\"\n+    },\n+    {\n+      \"issue\": \"P1-26\",\n+      \"commit\": \"def0955fac234ea0ce96c849c849cffd49a99ea4\",\n+      \"path\": \"src/passport/passportVerifier.ts\",\n+      \"reason\": \"a proof's tree and tree size come from the merkle root the artifact carries; a bundle without one is checked as amc-legacy-v1 only\",\n+      \"before\": \"      transparencyRoot: null,\\n      merkleRoot: null,\\n      proofs: inclusion\\n\",\n+      \"after\": \"      transparencyRoot: null,\\n      merkleRoot: pathExists(join(root, \\\"proofs\\\", \\\"merkle.root.json\\\"))\\n        ? { root: JSON.parse(readUtf8(join(root, \\\"proofs\\\", \\\"merkle.root.json\\\"))), signature: null, sha256: \\\"\\\" } : null,\\n      proofs: inclusion\\n\"\n+    }\n+  ],\n   \"newFilesToRemoveOnRestore\": [\n     \"src/utils/signedArtifactVerification.ts\",\n     \"tests/signedArtifactVerificationParity.test.ts\"\n"
+    }
+  ],
+  "originalArchiveBytes": [
+    {
+      "path": "unused-code/2026-10-02-native/explainability-contracts/originals/src/diagnostic/questionScoreExplainability.ts",
+      "mainSha256": "89dc1dfde57a623b15a8daee75150d467f7db376a41a3880fcea21e48557554f",
+      "candidateSha256": "89dc1dfde57a623b15a8daee75150d467f7db376a41a3880fcea21e48557554f",
+      "claudeSha256": "89dc1dfde57a623b15a8daee75150d467f7db376a41a3880fcea21e48557554f",
+      "allOriginalBytesIdentical": true
+    },
+    {
+      "path": "unused-code/2026-10-02-native/explainability-contracts/originals/src/diagnostic/questionScoreExplainability.ts",
+      "mainSha256": "89dc1dfde57a623b15a8daee75150d467f7db376a41a3880fcea21e48557554f",
+      "candidateSha256": "89dc1dfde57a623b15a8daee75150d467f7db376a41a3880fcea21e48557554f",
+      "claudeSha256": "89dc1dfde57a623b15a8daee75150d467f7db376a41a3880fcea21e48557554f",
+      "allOriginalBytesIdentical": true
+    },
+    {
+      "path": "unused-code/2026-10-02-native/signed-artifacts/originals/src/audit/binderVerifier.ts",
+      "mainSha256": "c0497062161defcd8edbf877e463bbd14140b8095a32394f3383cb7991df52c8",
+      "candidateSha256": "c0497062161defcd8edbf877e463bbd14140b8095a32394f3383cb7991df52c8",
+      "claudeSha256": "c0497062161defcd8edbf877e463bbd14140b8095a32394f3383cb7991df52c8",
+      "allOriginalBytesIdentical": true
+    },
+    {
+      "path": "unused-code/2026-10-02-native/signed-artifacts/originals/src/passport/passportVerifier.ts",
+      "mainSha256": "c22f33a747c722f72cbac7ce0ddeb6969004904b80edd9a29cd5a2acf2dbf566",
+      "candidateSha256": "c22f33a747c722f72cbac7ce0ddeb6969004904b80edd9a29cd5a2acf2dbf566",
+      "claudeSha256": "c22f33a747c722f72cbac7ce0ddeb6969004904b80edd9a29cd5a2acf2dbf566",
+      "allOriginalBytesIdentical": true
+    }
+  ],
+  "historicalExecutionEvidence": {
+    "historicalReport": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/p0-33-continuation/full-tests.json",
+    "sha256": "465b58cd0f701583b8e12b8be9d83a4e79c31f0a5d69ccf20565519068d7e2f9",
+    "affectedSuites": [
+      {
+        "suite": "archiveFilesParity.test.ts",
+        "status": "passed",
+        "assertions": 50,
+        "passed": 50,
+        "failed": 0,
+        "pending": 0
+      },
+      {
+        "suite": "explainabilityContractParity.test.ts",
+        "status": "passed",
+        "assertions": 42,
+        "passed": 42,
+        "failed": 0,
+        "pending": 0
+      },
+      {
+        "suite": "privateModuleHelperVisibility.test.ts",
+        "status": "passed",
+        "assertions": 229,
+        "passed": 229,
+        "failed": 0,
+        "pending": 0
+      },
+      {
+        "suite": "signedArtifactVerificationParity.test.ts",
+        "status": "passed",
+        "assertions": 61,
+        "passed": 61,
+        "failed": 0,
+        "pending": 0
+      }
+    ],
+    "overall": {
+      "numTotalTests": 24335,
+      "numPassedTests": 24324,
+      "numFailedTests": 11,
+      "numPendingTests": 0,
+      "success": false
+    },
+    "currentP033Receipt": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/qualification/2026-10-14-P0-33/receipt.json",
+      "commit": "8fb531d52dcdb9a1ca090540e02b77ca7c2f0f42",
+      "notes": "Blocked, not Done. Counts are assertions, not suite success: one cleanup hook failed; measured functions72.89%<75%, independent per-file diagnostic880violations/289files. Actual full gate exit1 at8fb; per-file step dependency-skipped. Atdfe063a6dab076804cae00a362c57655d2e3dcfb, cleanup/report/approved health omission followup has50focused checks each onNode22/24, no full rerun. Freeze exit1 remains actualmain P1-65base refusal; do not self-authorize. D-03written health skip untilP2-06 directly approved14Oct. Three green main pushes/fresh merged-source proof absent. Mutations intentionallyexit1 with filtered cases; preceding failures remain in companions. Earlier receipt/code observations are historical snapshots. AMC-483 remains open under these acceptance blockers."
+    },
+    "meaning": "These exact affected suites were observed passing on the preserved candidate corpus; the overall run failed and P0-33 receipt remains Blocked. Do not call this a passed release gate or qualification of accepted main. Current-main rerun is required after any bounded transplant."
+  },
+  "currentTrustSourceEvidence": [
+    {
+      "path": "src/bench/benchProofs.ts",
+      "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "gitBlob": "98ec140dc863325b9c34036507953656c8e0dd67",
+      "sha256": "1df60fe2be9ae8583b2661a8646954405939b64f7049d8f6f4c40f6c307d3b16",
+      "firstLine": 128,
+      "lastLine": 154,
+      "excerpt": "export function verifyBenchProofBundle(bundle: BenchProofBundle): {\n  ok: boolean;\n  errors: string[];\n} {\n  const errors: string[] = [];\n  const signedRow = bundle.merkleRoot ? bundle.merkleRoot.root as { root?: unknown; leafCount?: unknown; algorithm?: unknown } | null : null;\n  const signedRoot = signedRow?.root;\n  const algorithm: MerkleAlgorithm = signedRow?.algorithm === \"rfc9162-sha256\" ? \"rfc9162-sha256\" : \"amc-legacy-v1\";\n  for (const proof of bundle.proofs) {\n    if ((proof.algorithm ?? \"amc-legacy-v1\") !== algorithm || (signedRow && signedRow.algorithm !== undefined && signedRow.algorithm !== algorithm)) {\n      errors.push(`inclusion proof ${proof.proofId} names ${proof.algorithm ?? \"amc-legacy-v1\"}, but the signed merkle root is ${String(signedRow?.algorithm ?? \"amc-legacy-v1\")}`);\n    }\n    const valid = verifyEntryInclusion({\n      algorithm,\n      entryHash: proof.eventHash,\n      leafIndex: proof.leafIndex,\n      treeSize: typeof signedRow?.leafCount === \"number\" ? signedRow.leafCount : undefined,\n      proofPath: proof.merklePath,\n      root: proof.rootHash\n    });\n    if (!valid) {\n      errors.push(`invalid inclusion proof: ${proof.proofId}`);\n    }\n    if (bundle.merkleRoot && proof.rootHash !== signedRoot) {\n      errors.push(`inclusion proof ${proof.proofId} does not resolve to the signed merkle root`);\n    }\n  }"
+    },
+    {
+      "path": "src/bench/benchProofs.ts",
+      "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "gitBlob": "98ec140dc863325b9c34036507953656c8e0dd67",
+      "sha256": "1df60fe2be9ae8583b2661a8646954405939b64f7049d8f6f4c40f6c307d3b16",
+      "firstLine": 161,
+      "lastLine": 190,
+      "excerpt": "/**\n * P0-09: inclusion proofs count only against the signed proofs/merkle.root.json an artifact carries. The root's\n * signature needs a key the trust context admits for artifact-seal, and every proof must resolve to that signed root,\n * never to a root the proof file names for itself. Proofs without a signed root leave the artifact unanchored.\n */\nexport function verifyProofsAgainstSignedRoot(params: {\n  root: string;\n  proofs: readonly BenchInclusionProof[];\n  trust: TrustContext;\n  candidates: ReadonlyArray<string | null | undefined>;\n  /** The artifact's claimed signing time, which the root signature shares. */\n  claimedSignedAt?: number | null;\n}): { errors: string[]; admission: IssuerAdmission | null; anchoring: VerifierReportV1[\"anchoring\"] } {\n  const rootPath = join(params.root, \"proofs\", \"merkle.root.json\");\n  const sigPath = join(params.root, \"proofs\", \"merkle.root.sig\");\n  if (params.proofs.length === 0 || !pathExists(rootPath) || !pathExists(sigPath)) {\n    const { errors } = verifyBenchProofBundle({ transparencyRoot: null, merkleRoot: null, proofs: [...params.proofs] });\n    return { errors, admission: null, anchoring: params.proofs.length === 0\n      ? { status: \"not-applicable\", detail: \"no inclusion proofs\" }\n      : { status: \"unanchored\", detail: \"inclusion proofs without a signed proofs/merkle.root.json\" } };\n  }\n  const digest = sha256Hex(readFileSync(rootPath));\n  const sig = JSON.parse(readUtf8(sigPath)) as { digestSha256?: unknown; signature?: unknown; envelope?: unknown };\n  const signedRoot = JSON.parse(readUtf8(rootPath)) as { root?: unknown };\n  const bound = verifyBenchProofBundle({ transparencyRoot: null, merkleRoot: { root: signedRoot, signature: sig, sha256: digest }, proofs: [...params.proofs] });\n  const errors = [...bound.errors];\n  if (sig.digestSha256 !== digest) errors.push(\"signed merkle root digest mismatch\");\n  const check = checkDigestSignature({ signature: \"proofs/merkle.root.sig\", purpose: \"artifact-seal\", digestHex: digest,\n    signatureB64: String(sig.signature ?? \"\"), candidates: [...params.candidates, envelopePublicKey(sig.envelope)], context: params.trust,\n    claimedSignedAt: params.claimedSignedAt ?? null });"
+    },
+    {
+      "path": "src/audit/binderVerifier.ts",
+      "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "gitBlob": "c9740c606710d056fe43522c2d790df65ae84a23",
+      "sha256": "b7efcef92effb50588606e9a95d1bcc28b2e0de34a1a59b556194cca7fee7e7a",
+      "firstLine": 120,
+      "lastLine": 135,
+      "excerpt": "    if (!check.verified || (signature.envelope !== undefined && signature.signature !== signature.envelope.sigB64)) {\n      errors.push({ code: \"SIGNATURE_INVALID\", message: \"binder signature verification failed\" });\n    }\n\n    verifySignedArtifactPiiScan({\n      root,\n      artifact: \"binder\",\n      readScan: (path) => binderPiiScanSchema.parse(JSON.parse(readUtf8(path)) as unknown),\n      requireChecksum: true,\n      errors\n    });\n\n    const inclusion = readSignedArtifactInclusionProofs(root);\n    const proofs = verifyProofsAgainstSignedRoot({ root, proofs: inclusion, trust: params.trust, candidates, claimedSignedAt: signature.signedTs });\n    errors.push(...proofs.errors.map((message) => ({ code: \"PROOF_INVALID\", message })));\n    if (proofs.admission) signatures.push(proofs.admission);"
+    },
+    {
+      "path": "src/passport/passportVerifier.ts",
+      "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "gitBlob": "327d511dc2bb22e61dbd9cf740995692f357b3b3",
+      "sha256": "4c703c6d49ee7f17a2ca0ba8e0a2ce31b24412cbac066f6afdb8f5b6cce682a5",
+      "firstLine": 130,
+      "lastLine": 145,
+      "excerpt": "    if (!check.verified || (signature.envelope !== undefined && signature.signature !== signature.envelope.sigB64)) {\n      errors.push({ code: \"SIGNATURE_INVALID\", message: \"passport signature verification failed\" });\n    }\n\n    verifySignedArtifactPiiScan({\n      root,\n      artifact: \"passport\",\n      readScan: (path) => passportPiiScanSchema.parse(JSON.parse(readUtf8(path)) as unknown),\n      requireChecksum: false,\n      errors\n    });\n\n    const inclusion = readSignedArtifactInclusionProofs(root);\n    const proofs = verifyProofsAgainstSignedRoot({ root, proofs: inclusion, trust: params.trust, candidates, claimedSignedAt: signature.signedTs });\n    errors.push(...proofs.errors.map((message) => ({ code: \"PROOF_INVALID\", message })));\n    if (proofs.admission) signatures.push(proofs.admission);"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "gitBlob": "4cb2c123210b019d7b397569129f24a03bd635d2",
+      "sha256": "a08af5a16b73589f47ba3ebf8a74bb17b6e715fb1bf53bab369fef8436486e17",
+      "firstLine": 2579,
+      "lastLine": 2597,
+      "excerpt": "function repairHintFor(question: DiagnosticQuestion, score: QuestionScore): string {\n  const nextLevel = Math.min(score.finalLevel + 1, 5);\n  // P1-07: a next level AMC cannot evaluate gets its reason, not advice that would promise it.\n  const notEvaluated = notEvaluatedLevel(question, score.finalLevel, nextLevel);\n  if (notEvaluated) {\n    return `Target L${nextLevel}: ${notEvaluated.notice}`;\n  }\n  const upgrade = firstSentence(question.upgradeHints);\n  const gateHint = firstSentence(question.evidenceGateHints);\n  if (upgrade && gateHint) {\n    return `${upgrade} Target L${nextLevel}: ${gateHint}`;\n  }\n  if (upgrade) {\n    return `${upgrade} Target L${nextLevel}: collect signed evidence that satisfies the next maturity gate.`;\n  }\n  if (gateHint) {\n    return `Target L${nextLevel}: ${gateHint}`;\n  }\n  return `Target L${nextLevel}: collect signed, question-tagged evidence and rerun the diagnostic.`;"
+    }
+  ],
+  "limits": [
+    "No tests or builds were executed by this diagnostic reviewer. All observations are current report/source/history reads.",
+    "Source-derived classifications are corroborated by identical relevant production files and passing affected suites in the preserved candidate report; the failed baseline JSON does not include expanded actual/expected values.",
+    "P1-26 forward adapters are not literal production verifier patch provenance; their source-contract owner and limits must remain explicit.",
+    "D-15 missing snapshots were retrospectively repaired by preserved authored follow-ups from real ancestor base blobs, not fabricated current source.",
+    "P0-47 remains unqualified on accepted main until the relevant parity corpus passes there or on a truthfully pinned candidate. Distancestry guard is independently handled by root and excluded from these62 failures.",
+    "Preserved Claude/P0-33 source, tests, archives, refs and worktrees were not edited."
+  ],
+  "trackedDiffAtFinish": [],
+  "boundedPatchReview": {
+    "reviewedTouchedPaths": [
+      "tests/explainabilityContractParity.test.ts",
+      "tests/signedArtifactVerificationParity.test.ts",
+      "unused-code/2026-10-02-native/explainability-contracts/restoration.json",
+      "unused-code/2026-10-02-native/signed-artifacts/restoration-map.json",
+      "unused-code/plan-edits/P1-16/src/audit/binderArtifact.ts.landed",
+      "unused-code/plan-edits/P2-01/src/session/spill/spillStore.ts.landed",
+      "unused-code/plan-edits/manifest.json"
+    ],
+    "fileCount": 7,
+    "bodyPolicy": "Reuse only the6 exact reviewed file bodies (candidate and Claude hashes identical). Merge only the2 exact snapshot rows into current sorted manifest. All relevant production source remains unchanged.",
+    "P126AdapterClassification": "Archived binder/passport verifier compatibility adapters. Their after strings are absent from literal current verifiers; def0955fa changes the live proof contract, and current P0-09 verifiers perform signed-root validation. Do not describe them as literal current verifier source edits.",
+    "guardReview": [
+      "Original .original source hashes and bytes remain identical on main, Claude and P0-33.",
+      "P1-07 each before applies once; each after appears once in live main; all other output fields and full JSON parity remain checked. Added delta case restricts changed leaves torepairHint/rowHash/manifestHash and requires actual Not evaluated hints; evaluable next levels retain archived advice.",
+      "P1-26 each archived adapter before applies once and one adapter per verifier is asserted; entire original verifier executes with real imported dependencies.",
+      "P1-26 added negative case runs the unedited archive and requires refusal of RFC9162 proofs without a carried root, then requires wrong-algorithm proof refusal under current verifier.",
+      "Current verifier imports and signed-root digest/signature/purpose/pin/root-binding logic remain live and unchanged. Original tampered digest/signature/envelope, privacy scan/checksum, absent-proof-directory, proof-id order, root/hash, revocation and expiry cases remain retained.",
+      "Existing full normalized result-field equality is retained for old fields; P0-09 report exclusion is inherited from accepted main and is not newly introduced by these repairs."
+    ],
+    "qualificationStatus": "The4 affected suites passed in the prior observed candidate report only. Overall P0-33 remains Blocked; current-main/application rerun is necessary.",
+    "reservations": "These bodies are preserved Claude-authored committed work at clean990cb586, also present byte-identically in the preserved P0-33 candidate. No exact active file-reservation authority was available in the inspected current handoff or Claude filesystem. Clean Git state and committed ownership do not establish reservation clearance. Do not modify, resume or clean another session; reuse only into root’s own isolated worktree and record original author/commit provenance."
+  }
+}

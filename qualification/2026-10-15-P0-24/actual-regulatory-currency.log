@@ -1,0 +1,3053 @@
+{
+  "ok": true,
+  "errors": [],
+  "entries": [
+    {
+      "id": "eu-ai-act",
+      "status": "partially-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R1689",
+          "retrievedAt": "2026-10-04T05:06:55Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32026R1744",
+          "retrievedAt": "2026-10-04T05:06:57Z"
+        },
+        {
+          "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-111",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-50",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/timeline/timeline-implementation-eu-ai-act",
+          "retrievedAt": "2026-10-03T16:22:05Z"
+        },
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng",
+          "retrievedAt": "2026-10-03T16:24:43Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-gdpr",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://commission.europa.eu/law/law-topic/data-protection/legal-framework-eu-data-protection_en",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32016R0679",
+          "retrievedAt": "2026-10-04T05:07:04Z"
+        },
+        {
+          "url": "https://www.edpb.europa.eu/our-work-tools/our-documents/opinion-board-art-64/opinion-282024-certain-data-protection-aspects_en",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/62022CJ0203",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025%2F0360%28COD%29",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://commission.europa.eu/law/law-topic/data-protection/data-protection-explained_en",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-dora",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32022R2554",
+          "retrievedAt": "2026-10-04T05:06:55Z"
+        },
+        {
+          "url": "https://www.eiopa.europa.eu/digital-operational-resilience-act-dora_en",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-nis2",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32022L2555",
+          "retrievedAt": "2026-10-04T05:06:55Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R2690",
+          "retrievedAt": "2026-10-04T05:06:55Z"
+        },
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/policies/nis2-directive",
+          "retrievedAt": "2026-10-03T16:59:04Z"
+        },
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/news/commission-refers-ireland-spain-france-and-netherlands-court-justice-failing-transpose-rules",
+          "retrievedAt": "2026-10-03T17:00:29Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-cra",
+      "status": "partially-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R2847",
+          "retrievedAt": "2026-10-04T05:06:58Z"
+        },
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-mdr-ivdr",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32017R0746",
+          "retrievedAt": "2026-10-04T05:07:04Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32023R0607",
+          "retrievedAt": "2026-10-04T05:07:00Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R1860",
+          "retrievedAt": "2026-10-04T05:07:03Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32017R0745",
+          "retrievedAt": "2026-10-04T05:07:04Z"
+        },
+        {
+          "url": "https://health.ec.europa.eu/medical-devices-sector/new-regulations_en",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-1",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-nist-ai-rmf",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-nist-ai-600-1",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-iec-42001",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/42001",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-iec-42005",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/42005",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "us-co-sb24-205",
+      "status": "superseded",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://leg.colorado.gov/bills/sb24-205",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://leg.colorado.gov/bills/sb25b-004",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://leg.colorado.gov/bills/sb26-189",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-co-sb26-189",
+      "status": "enacted-not-yet-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://leg.colorado.gov/bills/sb26-189",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "cn-pipl",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.cac.gov.cn/2021-08/20/c_1631050028355286.htm",
+          "retrievedAt": "2026-10-03T16:24:47Z"
+        }
+      ]
+    },
+    {
+      "id": "cn-genai-interim-measures",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm",
+          "retrievedAt": "2026-10-03T17:05:10Z"
+        }
+      ]
+    },
+    {
+      "id": "br-lgpd",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm",
+          "retrievedAt": "2026-10-03T16:25:04Z"
+        }
+      ]
+    },
+    {
+      "id": "in-dpdp",
+      "status": "partially-applicable",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2190014&reg=3&lang=2",
+          "retrievedAt": "2026-10-03T16:24:43Z"
+        },
+        {
+          "url": "https://www.indiacode.nic.in/handle/123456789/22037?view_type=browse",
+          "retrievedAt": "2026-10-03T16:24:42Z"
+        }
+      ]
+    },
+    {
+      "id": "jp-appi",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.ppc.go.jp/en/legal/",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.japaneselawtranslation.go.jp/en/laws/view/4241/en",
+          "retrievedAt": "2026-10-03T16:24:44Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-ai-omnibus",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32026R1744",
+          "retrievedAt": "2026-10-04T05:06:55Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-ai-act-guidelines-prohibited-definition",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-prohibited-artificial-intelligence-ai-practices-defined-ai-act",
+          "retrievedAt": "2026-10-03T16:59:04Z"
+        },
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-ai-system-definition-facilitate-first-ai-acts-rules-application",
+          "retrievedAt": "2026-10-03T16:59:04Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-gpai-code-of-practice",
+      "status": "published",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai",
+          "retrievedAt": "2026-10-03T16:59:04Z"
+        },
+        {
+          "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113",
+          "retrievedAt": "2026-10-03T16:59:27Z"
+        },
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai",
+          "retrievedAt": "2026-10-03T16:59:04Z"
+        },
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/policies/guidelines-gpai-providers",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R1689",
+          "retrievedAt": "2026-10-04T05:06:57Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-ai-act-art50-guidance",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai",
+          "retrievedAt": "2026-10-03T16:59:04Z"
+        },
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/library/guidelines-transparency-obligations-providers-and-deployers-ai-systems",
+          "retrievedAt": "2026-10-03T16:59:27Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32026R1744",
+          "retrievedAt": "2026-10-04T05:06:57Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R1689",
+          "retrievedAt": "2026-10-04T05:06:57Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-mdcg-2025-6-aib-2025-1",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://health.ec.europa.eu/latest-updates/mdcg-2025-6-faq-interplay-between-medical-devices-regulation-vitro-diagnostic-medical-devices-2025-06-19_en",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-data-act",
+      "status": "partially-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32023R2854",
+          "retrievedAt": "2026-10-04T05:06:58Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-ehds",
+      "status": "enacted-not-yet-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32025R0327",
+          "retrievedAt": "2026-10-04T05:06:59Z"
+        },
+        {
+          "url": "https://health.ec.europa.eu/ehealth-digital-health-and-care/european-health-data-space-regulation-ehds_en",
+          "retrievedAt": "2026-10-03T16:59:04Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-eudralex-gmp-annex11-22",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://health.ec.europa.eu/consultations/stakeholders-consultation-eudralex-volume-4-good-manufacturing-practice-guidelines-chapter-4-annex_en",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-cdsm",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32019L0790",
+          "retrievedAt": "2026-10-04T05:07:03Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-eqf-ila-recommendations",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32017H0615(01)",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022H0627(03)",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-eudr",
+      "status": "enacted-not-yet-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32023R1115",
+          "retrievedAt": "2026-10-04T05:07:06Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32025R2650",
+          "retrievedAt": "2026-10-04T05:07:06Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-csrd",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32025L0794",
+          "retrievedAt": "2026-10-04T05:07:07Z"
+        },
+        {
+          "url": "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025/0045(COD)",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32026L0470",
+          "retrievedAt": "2026-10-04T05:07:07Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32022L2464",
+          "retrievedAt": "2026-10-04T05:07:08Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-csddd",
+      "status": "enacted-not-yet-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024L1760",
+          "retrievedAt": "2026-10-04T05:07:08Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32026L0470",
+          "retrievedAt": "2026-10-04T05:07:08Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-espr",
+      "status": "partially-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R1781",
+          "retrievedAt": "2026-10-04T05:07:08Z"
+        },
+        {
+          "url": "https://environment.ec.europa.eu/news/new-eu-rules-stop-destruction-unsold-clothes-and-shoes-2026-02-09_en",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-waste-framework",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32025L1892",
+          "retrievedAt": "2026-10-04T05:07:09Z"
+        },
+        {
+          "url": "https://environment.ec.europa.eu/news/revised-waste-framework-directive-enters-force-2025-10-16_en",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-ecgt-green-claims",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024L0825",
+          "retrievedAt": "2026-10-04T05:07:09Z"
+        },
+        {
+          "url": "https://www.europarl.europa.eu/legislative-train/theme-a-european-green-deal/file-substantiating-green-claims",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-ppwr",
+      "status": "partially-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32025R0040",
+          "retrievedAt": "2026-10-04T05:07:10Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-machinery",
+      "status": "enacted-not-yet-applicable",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32023R1230",
+          "retrievedAt": "2026-10-04T05:07:11Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32026R1744",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-uwwtd-2024",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024L3019",
+          "retrievedAt": "2026-10-04T05:07:12Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-cer",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32022L2557",
+          "retrievedAt": "2026-10-04T05:07:12Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-nccs-electricity",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R1366",
+          "retrievedAt": "2026-10-04T05:07:12Z"
+        },
+        {
+          "url": "https://eur-lex.europa.eu/eli/reg_del/2024/1366/oj/eng",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-iuu",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32023R2842",
+          "retrievedAt": "2026-10-04T05:07:13Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-eed",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32023L1791",
+          "retrievedAt": "2026-10-04T05:07:15Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-methane",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R1787",
+          "retrievedAt": "2026-10-04T05:07:15Z"
+        },
+        {
+          "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ%3AL_202401787",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-taxonomy",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32020R0852",
+          "retrievedAt": "2026-10-04T05:07:15Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32026R0073",
+          "retrievedAt": "2026-10-04T05:07:17Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-gsr",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32019R2144",
+          "retrievedAt": "2026-10-04T05:07:20Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32022R1426",
+          "retrievedAt": "2026-10-04T05:07:18Z"
+        },
+        {
+          "url": "https://commission.europa.eu/news-and-media/news/safer-cars-safer-roads-new-rules-take-effect-2026-07-08_en",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-mrv-fueleu",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32023R0957",
+          "retrievedAt": "2026-10-04T05:07:19Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32023R1805",
+          "retrievedAt": "2026-10-04T05:07:20Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-efti",
+      "status": "partially-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32020R1056",
+          "retrievedAt": "2026-10-04T05:07:23Z"
+        },
+        {
+          "url": "https://transport.ec.europa.eu/transport-themes/logistics-and-multimodal-transport/efti-regulation_en",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-pld",
+      "status": "enacted-not-yet-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024L2853",
+          "retrievedAt": "2026-10-04T05:07:21Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-epbd",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024L1275",
+          "retrievedAt": "2026-10-04T05:07:22Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-cpr",
+      "status": "partially-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R3110",
+          "retrievedAt": "2026-10-04T05:07:22Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-eidas2",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R1183",
+          "retrievedAt": "2026-10-04T05:07:23Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R2979",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32026R1731",
+          "retrievedAt": "2026-10-04T05:07:42Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-dsa",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32022R2065",
+          "retrievedAt": "2026-10-04T05:07:27Z"
+        },
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/library/code-conduct-disinformation",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/news/commission-fines-x-eu120-million-under-digital-services-act",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-dma",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32022R1925",
+          "retrievedAt": "2026-10-04T05:07:28Z"
+        },
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/news/commission-finds-apple-and-meta-breach-digital-markets-act",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://digital-markets-act.ec.europa.eu/commission-fines-google-eur890-million-breaches-digital-markets-act-2026-07-23_en",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-emfa",
+      "status": "partially-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R1083",
+          "retrievedAt": "2026-10-04T05:07:28Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-political-ads",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R0900",
+          "retrievedAt": "2026-10-04T05:07:23Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-interoperable-europe",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R0903",
+          "retrievedAt": "2026-10-04T05:07:24Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-open-data",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32019L1024",
+          "retrievedAt": "2026-10-04T05:07:26Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32023R0138",
+          "retrievedAt": "2026-10-04T05:07:25Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-sdg-regulation",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32018R1724",
+          "retrievedAt": "2026-10-04T05:07:25Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-ai-liability-directive",
+      "status": "superseded",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/52022PC0496",
+          "retrievedAt": "2026-10-04T05:07:26Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-european-democracy-shield",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://commission.europa.eu/news-and-media/news/stronger-measures-protect-our-democracy-and-civil-society-2025-11-12_en",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-eaa",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32019L0882",
+          "retrievedAt": "2026-10-04T05:07:31Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-trade-secrets",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32016L0943",
+          "retrievedAt": "2026-10-04T05:07:29Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-platform-work",
+      "status": "enacted-not-yet-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024L2831",
+          "retrievedAt": "2026-10-04T05:07:31Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-pay-transparency",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32023L0970",
+          "retrievedAt": "2026-10-04T05:07:31Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-psd2",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32015L2366",
+          "retrievedAt": "2026-10-04T05:07:34Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32018R0389",
+          "retrievedAt": "2026-10-04T05:07:33Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-psr-psd3",
+      "status": "proposed",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.europarl.europa.eu/legislative-train/theme-economic-and-monetary-affairs-econ/file-revision-of-eu-rules-on-payment-services?sid=10001",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2023/0209(COD)",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-sepa-instant",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R0886",
+          "retrievedAt": "2026-10-04T05:07:34Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-tfr",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32023R1113",
+          "retrievedAt": "2026-10-04T05:07:36Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-mica",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32023R1114",
+          "retrievedAt": "2026-10-04T05:07:36Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-aml-package",
+      "status": "enacted-not-yet-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R1624",
+          "retrievedAt": "2026-10-04T05:07:35Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-esma-ai-statement",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.esma.europa.eu/press-news/esma-news/esma-provides-guidance-firms-using-artificial-intelligence-investment-services",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "eu-mifid2-mar",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32016L1034",
+          "retrievedAt": "2026-10-04T05:22:00Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32017R0589",
+          "retrievedAt": "2026-10-04T05:07:39Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32014R0596",
+          "retrievedAt": "2026-10-04T05:07:39Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32014L0065",
+          "retrievedAt": "2026-10-04T05:07:39Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-ccd2",
+      "status": "enacted-not-yet-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32023L2225",
+          "retrievedAt": "2026-10-04T05:07:39Z"
+        }
+      ]
+    },
+    {
+      "id": "eu-etsi-en-303-645",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/03.01.03_60/en_303645v030103p.pdf",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "coe-ai-convention",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32026D1080",
+          "retrievedAt": "2026-10-04T05:07:41Z"
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/22026A01081",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.coe.int/en/web/conventions/full-list?module=signatures-by-treaty&treatynum=225",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "coe-rec-2017-5",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.coe.int/en/web/cm",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "oecd-ai-principles",
+      "status": "published",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://oecd.ai/en/ai-principles",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "oecd-ppp-recommendation",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://legalinstruments.oecd.org/api/print?ids=275&lang=en",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "uk-duaa-2025",
+      "status": "partially-applicable",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.gov.uk/guidance/data-use-and-access-act-2025-plans-for-commencement",
+          "retrievedAt": "2026-10-03T17:05:10Z"
+        },
+        {
+          "url": "https://ico.org.uk/about-the-ico/media-centre/news-and-blogs/2026/02/statement-on-the-commencement-of-the-data-use-and-access-act-duaa/",
+          "retrievedAt": "2026-10-04"
+        },
+        {
+          "url": "https://www.gov.uk/guidance/data-use-and-access-act-2025-data-protection-and-privacy-changes",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "jp-ai-promotion-act",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www8.cao.go.jp/cstp/ai/ai_act/ai_act.html",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "kr-ai-basic-act",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.law.go.kr/lsInfoP.do?lsiSeq=268543",
+          "retrievedAt": "2026-10-04"
+        },
+        {
+          "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsId=014820&efYd=20260122&chrClsCd=010202&urlMode=lsInfoP&ancYnChk=0",
+          "retrievedAt": "2026-10-03T17:06:18Z"
+        },
+        {
+          "url": "https://www.korea.kr/news/policyNewsView.do?newsId=148958380",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "sg-mgf-genai-agentic",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.mddi.gov.sg/newsroom/singapore-launches-new-model-ai-governance-framework-for-agentic-ai--/",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "cn-ai-content-labeling-measures",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm",
+          "retrievedAt": "2026-10-03T17:05:10Z"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-iec-42006",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/42006",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-iec-23894",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/77304.html",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-27799",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/84647.html",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-iec-40500",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/91029.html",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-29990",
+      "status": "superseded",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/21001",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-14001",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/news/2026/04/iso-14001-2026-published",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-9001",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/news/2026/04/iso-14001-2026-published",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.iso.org/news/2026/09/ISO9001-2026",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-28000",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/88413.html",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-37120",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/37120",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-26262",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/90022.html",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-21448",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/21448",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-pas-8800",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/83303.html",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-ts-5083",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/81920.html",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-3691-4",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/83545.html",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-iec-27701",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/27701",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-iec-29115",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/29115",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-26000",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/26000",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-iec-25012",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/35736.html",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-22301",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/75106.html",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "intl-iso-iec-5962",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.iso.org/standard/81870.html",
+          "retrievedAt": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "us-eo-14110",
+      "status": "superseded",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents/2025-01901.json",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/full_text/text/2025/01/28/2025-01901.txt",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        }
+      ]
+    },
+    {
+      "id": "us-eo-14179",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/full_text/text/2025/01/31/2025-02172.txt",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents.json?conditions[presidential_document_type]=executive_order",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents/2025-02172.json",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        }
+      ]
+    },
+    {
+      "id": "us-eo-14319",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/full_text/text/2025/07/28/2025-14217.txt",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents/2025-14217.json",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        }
+      ]
+    },
+    {
+      "id": "us-eo-14365",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/full_text/text/2025/12/16/2025-23092.txt",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents/2025-23092.json",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        }
+      ]
+    },
+    {
+      "id": "us-eo-14409",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/full_text/text/2026/06/05/2026-11415.txt",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents/2026-11415.json",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        }
+      ]
+    },
+    {
+      "id": "us-eo-14434",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/full_text/text/2026/10/02/2026-20321.txt",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents/2026-20321.json",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        }
+      ]
+    },
+    {
+      "id": "us-omb-m-25-21",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.whitehouse.gov/omb/information-resources/guidance/memoranda/",
+          "retrievedAt": "2026-10-04T05:12:00Z"
+        },
+        {
+          "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-omb-m-25-22",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.whitehouse.gov/omb/information-resources/guidance/memoranda/",
+          "retrievedAt": "2026-10-04T05:12:00Z"
+        },
+        {
+          "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-22-Driving-Efficient-Acquisition-of-Artificial-Intelligence-in-Government.pdf",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-omb-m-26-04",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.whitehouse.gov/omb/information-resources/guidance/memoranda/",
+          "retrievedAt": "2026-10-04T05:12:00Z"
+        },
+        {
+          "url": "https://www.whitehouse.gov/wp-content/uploads/2025/12/M-26-04-Increasing-Public-Trust-in-Artificial-Intelligence-Through-Unbiased-AI-Principles-1.pdf",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-ftc-ai-accuracy-policy",
+      "status": "proposed",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/full_text/text/2026/07/07/2026-13628.txt",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents.json?conditions[agencies][]=federal-trade-commission",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents/2026-13628.json",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        }
+      ]
+    },
+    {
+      "id": "us-fcc-tcpa-ai",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://docs.fcc.gov/public/attachments/FCC-24-17A1.pdf",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://docs.fcc.gov/public/attachments/FCC-24-84A1.pdf",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://docs.fcc.gov/public/attachments/DOC-424844A1.pdf",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-fec-ai",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents/2024-21983.json",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-nist-sp-800-53-cosais",
+      "status": "published",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://csrc.nist.gov/projects/cosais",
+          "retrievedAt": "2026-10-03T17:00:45Z"
+        },
+        {
+          "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+          "retrievedAt": "2026-10-03T17:00:45Z"
+        }
+      ]
+    },
+    {
+      "id": "us-nist-ir-8596",
+      "status": "proposed",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://csrc.nist.gov/pubs/ir/8596/iprd",
+          "retrievedAt": "2026-10-03T17:00:45Z"
+        }
+      ]
+    },
+    {
+      "id": "us-nist-csf-2",
+      "status": "published",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-nist-sp-800-63-4",
+      "status": "published",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://csrc.nist.gov/pubs/sp/800/63/b/4/final",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://csrc.nist.gov/pubs/sp/800/63/4/final",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-nist-sp-800-218a",
+      "status": "published",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://csrc.nist.gov/pubs/sp/800/218/a/final",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.nist.gov/news-events/news/2025/12/secure-software-development-framework-ssdf-version-12-available-public",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-cisa-sbom-2026",
+      "status": "published",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.cisa.gov/sites/default/files/2026-07/2026_cisa_sbom_minimum_elements_508c.pdf",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-circia",
+      "status": "proposed",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents.json?conditions[regulation_id_number]=1670-AA04",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.cisa.gov/topics/cyber-threats-and-advisories/information-sharing/circia/faqs",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-hipaa-security-nprm-2025",
+      "status": "proposed",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents.json?conditions[regulation_id_number]=0945-AA22",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2025/01/06/2024-30983/hipaa-security-rule-to-strengthen-the-cybersecurity-of-electronic-protected-health-information",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.reginfo.gov/public/do/eAgendaViewRule?pubId=202510&RIN=0945-AA22",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-42cfr2-2024",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2024/02/16/2024-02544/confidentiality-of-substance-use-disorder-sud-patient-records",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-cures-info-blocking",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents.json?conditions[regulation_id_number]=0955-AA09",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2024/07/01/2024-13793/21st-century-cures-act-establishment-of-disincentives-for-health-care-providers-that-have-committed",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2025/12/29/2025-23896/health-data-technology-and-interoperability-astponc-deregulatory-actions-to-unleash-prosperity",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.reginfo.gov/public/do/eAgendaViewRule?pubId=202510&RIN=0955-AA09",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-onc-hti1-dsi",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2024/01/09/2023-28857/health-data-technology-and-interoperability-certification-program-updates-algorithm-transparency-and",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2025/12/29/2025-23896/health-data-technology-and-interoperability-astponc-deregulatory-actions-to-unleash-prosperity",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2025/12/29/2025-23890/health-data-technology-and-interoperability-patient-engagement-information-sharing-and-public-health",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-aca-1557-92-210",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2024/05/06/2024-08711/nondiscrimination-in-health-programs-and-activities",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2026/06/02/2026-11015/notice-of-vacatur-regarding-certain-provisions-of-the-2024-nondiscrimination-in-health-programs-and",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-fda-cds-guidance-2026",
+      "status": "published",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.fda.gov/media/109618/download",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-fda-general-wellness-2026",
+      "status": "published",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.fda.gov/media/90652/download",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-fda-pccp-ai",
+      "status": "published",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2024/12/04/2024-28361/marketing-submission-recommendations-for-a-predetermined-change-control-plan-for-artificial",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/marketing-submission-recommendations-predetermined-change-control-plan-artificial-intelligence",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-fda-ai-dsf-draft",
+      "status": "proposed",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2025/01/07/2024-31543/artificial-intelligence-enabled-device-software-functions-lifecycle-management-and-marketing",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/artificial-intelligence-enabled-device-software-functions-lifecycle-management-and-marketing",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-fda-cyber-premarket-2025",
+      "status": "published",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2025/06/27/2025-11669/cybersecurity-in-medical-devices-quality-system-considerations-and-content-of-premarket-submissions",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-qmsr",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2024/02/02/2024-01709/medical-devices-quality-system-regulation-amendments",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-H/part-820",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-fda-ai-drug-draft",
+      "status": "proposed",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2025/01/07/2024-31542/considerations-for-the-use-of-artificial-intelligence-to-support-regulatory-decision-making-for-drug",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-fda-dht-2023",
+      "status": "published",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/digital-health-technologies-remote-data-acquisition-clinical-investigations",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-cms-0057-f",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents/2026-07205.json",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2024/02/08/2024-00895/medicare-and-medicaid-programs-patient-protection-and-affordable-care-act-advancing-interoperability",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-ca-ab3030",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240AB3030",
+          "retrievedAt": "2026-10-04T05:12:00Z"
+        }
+      ]
+    },
+    {
+      "id": "us-ca-sb1120",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB1120",
+          "retrievedAt": "2026-10-04T05:12:00Z"
+        }
+      ]
+    },
+    {
+      "id": "us-ca-sb243",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260SB243",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-ca-ab489",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260AB489",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-tx-sb1188",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://capitol.texas.gov/tlodocs/89R/billtext/html/SB01188F.htm",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-il-pa-104-0054",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://idfpr.illinois.gov/news/2025/gov-pritzker-signs-state-leg-prohibiting-ai-therapy-in-il.html",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-coppa",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.govinfo.gov/content/pkg/FR-2025-04-22/html/2025-05904.htm",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.ftc.gov/news-events/news/press-releases/2026/02/ftc-issues-coppa-policy-statement-incentivize-use-age-verification-technologies-protect-children",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-ppra",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.ecfr.gov/current/title-34/subtitle-A/part-98",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-ed-ai-guidance-2025",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/full_text/text/2025/04/28/2025-07368.txt",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.govinfo.gov/content/pkg/DCPD-202500511/html/DCPD-202500511.htm",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.ed.gov/about/news/press-release/us-department-of-education-issues-guidance-artificial-intelligence-use-schools-proposes-additional-supplemental-priority",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2026/04/13/2026-07087/final-priority-and-definitions-secretarys-supplemental-priority-and-definitions-on-advancing",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-ed-ai-resources-2024",
+      "status": "published",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://eric.ed.gov/?id=ED661949",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.ed.gov/media/document/avoiding-discriminatory-use-of-artificial-intelligence-112274.pdf",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-section-508",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.ecfr.gov/current/title-36/chapter-XI/part-1194",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-ada-title-ii-web",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.ecfr.gov/current/title-28/chapter-I/part-35/subpart-H/section-35.200",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.ada.gov/assets/pdfs/2026-ifr.pdf",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-ca-sopipa",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=BPC&sectionNum=22584",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-ny-edlaw-2d",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.nysed.gov/data-privacy-security/regulations-strengthen-data-privacy-and-security",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-oh-orc-3301-24",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://codes.ohio.gov/ohio-revised-code/section-3301.24",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-nerc-cip",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2025/07/02/2025-12309/critical-infrastructure-protection-reliability-standard-cip-015-1-cyber-security-internal-network",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.nerc.com/globalassets/standards/reliability-standards/cip/cip-015-1.pdf",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2025/09/23/2025-18394/supply-chain-risk-management-reliability-standards-revisions-equipment-and-services-produced-or",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.nerc.com/globalassets/who-we-are/news/2026/01/2026_1_5_standardscompliancebulletin.pdf",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-ferc-order-901",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.nerc.com/globalassets/standards/resources/documents/standards-development-mapping-of-ferc-order-901-directives-and-other-guidance-to-standards-development-project_031725.pdf",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2025/07/29/2025-14304/reliability-standards-for-frequency-and-voltage-protection-settings-and-ride-through-for",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-epa-pfas-npdwr",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.epa.gov/dwreginfo/pfas-rule-implementation",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.epa.gov/sdwa/proposed-pfoa-and-pfos-compliance-extension-rule",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-sdwa-1433",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.epa.gov/waterresilience/awia-section-2013",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-epa-lcri",
+      "status": "enacted-not-yet-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.epa.gov/ground-water-and-drinking-water/revised-lead-and-copper-rule",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-nhtsa-sgo-av-framework",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2026/07/31/2026-15483/av-framework-updates-and-request-for-comments-on-interim-guidance",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents.json?conditions[term]=%22Standing+General+Order%22&conditions[agencies][]=national-highway-traffic-safety-administration",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-fmcsa-ads",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.reginfo.gov/public/do/eAgendaViewRule?pubId=202504&RIN=2126-AC17",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2026/04/15/2026-07288",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-uscg-mts-cyber",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2025/01/17/2025-00708/cybersecurity-in-the-marine-transportation-system",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-eeoc-ai-ta",
+      "status": "superseded",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.eeoc.gov/laws/guidance/select-issues-assessing-adverse-impact-software-algorithms-and-artificial",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-genius-act",
+      "status": "enacted-not-yet-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2025/09/19/2025-18226/genius-act-implementation",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2026/08/18/2026-16796/genius-act-regulations-on-payment-stablecoin-issuance-offer-and-sale",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-sec-regulation-crypto-assets",
+      "status": "proposed",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2026/08/21/2026-17183/regulation-crypto-assets",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-ecoa-reg-b",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2025/11/13/2025-19864/equal-credit-opportunity-act-regulation-b",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2026/04/22/2026-07804/equal-credit-opportunity-act-regulation-b",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-cfpb-1033",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2024/11/18/2024-25079/required-rulemaking-on-personal-financial-data-rights",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2025/08/22/2025-16139/personal-financial-data-rights-reconsideration",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-sec-pda",
+      "status": "superseded",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2025/06/17/2025-11110/withdrawal-of-proposed-regulatory-actions",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-sec-climate",
+      "status": "enacted-not-yet-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents.json?conditions[agencies][]=securities-and-exchange-commission",
+          "retrievedAt": "2026-10-04T05:05:00Z"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2024/04/12/2024-07648/the-enhancement-and-standardization-of-climate-related-disclosures-for-investors-delay-of-effective",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2026/06/03/2026-11091/rescission-of-climate-related-disclosure-rules",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-sec-reg-s-p",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalregister.gov/documents/2024/06/03/2024-11116/regulation-s-p-privacy-of-consumer-financial-information-and-safeguarding-customer-information",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-sr-26-2",
+      "status": "published",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-finra-ai",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.finra.org/rules-guidance/notices/24-09",
+          "retrievedAt": "2026-10-03"
+        },
+        {
+          "url": "https://www.finra.org/rules-guidance/guidance/reports/2026-finra-annual-regulatory-oversight-report/gen-ai",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-tx-traiga",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00149F.htm",
+          "retrievedAt": "2026-10-04T05:12:00Z"
+        },
+        {
+          "url": "https://capitol.texas.gov/BillLookup/History.aspx?LegSess=89R&Bill=HB149",
+          "retrievedAt": "2026-10-03T17:02:19Z"
+        }
+      ]
+    },
+    {
+      "id": "us-ca-sb53",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://leginfo.legislature.ca.gov/faces/billStatusClient.xhtml?bill_id=202520260SB53",
+          "retrievedAt": "2026-10-03T17:02:19Z"
+        },
+        {
+          "url": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260SB53",
+          "retrievedAt": "2026-10-03T17:04:00Z"
+        }
+      ]
+    },
+    {
+      "id": "us-ca-ab2013",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240AB2013",
+          "retrievedAt": "2026-10-03T17:04:00Z"
+        }
+      ]
+    },
+    {
+      "id": "us-ca-cppa-admt",
+      "status": "partially-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://cppa.ca.gov/regulations/ccpa_updates.html",
+          "retrievedAt": "2026-10-03T17:02:19Z"
+        },
+        {
+          "url": "https://cppa.ca.gov/regulations/pdf/ccpa_updates_cyber_risk_admt_appr_text.pdf",
+          "retrievedAt": "2026-10-03T17:12:29Z"
+        }
+      ]
+    },
+    {
+      "id": "us-ca-crd-ads",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://calcivilrights.ca.gov/2025/06/30/civil-rights-council-secures-approval-for-regulations-to-protect-against-employment-discrimination-related-to-artificial-intelligence/",
+          "retrievedAt": "2026-10-03"
+        }
+      ]
+    },
+    {
+      "id": "us-ut-ai-policy-act",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://le.utah.gov/xcode/Title13/Chapter72/13-72-S1.html",
+          "retrievedAt": "2026-10-04T05:12:00Z"
+        }
+      ]
+    },
+    {
+      "id": "us-il-hb3773",
+      "status": "in-force",
+      "verified": false,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.ilga.gov/legislation/publicacts/fulltext.asp?Name=103-0804",
+          "retrievedAt": "2026-10-04T05:12:00Z"
+        }
+      ]
+    },
+    {
+      "id": "us-nyc-ll144",
+      "status": "in-force",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://www.nyc.gov/site/dca/about/automated-employment-decision-tools.page",
+          "retrievedAt": "2026-10-03T17:02:19Z"
+        }
+      ]
+    },
+    {
+      "id": "us-co-hb26-1263",
+      "status": "enacted-not-yet-applicable",
+      "verified": true,
+      "lastReviewed": "2026-10-03",
+      "windowDays": 90,
+      "currency": "current",
+      "sources": [
+        {
+          "url": "https://leg.colorado.gov/bills/hb26-1263",
+          "retrievedAt": "2026-10-04T05:12:00Z"
+        },
+        {
+          "url": "https://coag.gov/ai/",
+          "retrievedAt": "2026-10-03T17:02:19Z"
+        }
+      ]
+    }
+  ],
+  "verified": 108,
+  "unverified": 68,
+  "asOf": "2026-10-15",
+  "allowedHosts": [
+    "europa.eu",
+    "nist.gov",
+    "iso.org",
+    "federalregister.gov",
+    "hhs.gov",
+    "healthit.gov",
+    "fda.gov",
+    "nerc.com",
+    "ferc.gov",
+    "sec.gov",
+    "ed.gov",
+    "nhtsa.gov",
+    "transportation.gov",
+    "leg.colorado.gov",
+    "capitol.texas.gov",
+    "leginfo.legislature.ca.gov",
+    "gov.ca.gov",
+    "cppa.ca.gov",
+    "msit.go.kr",
+    "law.go.kr",
+    "pcisecuritystandards.org",
+    "cac.gov.cn",
+    "planalto.gov.br",
+    "pib.gov.in",
+    "indiacode.nic.in",
+    "ppc.go.jp",
+    "japaneselawtranslation.go.jp",
+    "gov.uk",
+    "ico.org.uk",
+    "cao.go.jp",
+    "korea.kr",
+    "imda.gov.sg",
+    "mddi.gov.sg",
+    "coe.int",
+    "oecd.org",
+    "oecd.ai",
+    "etsi.org",
+    "whitehouse.gov",
+    "ecfr.gov",
+    "govinfo.gov",
+    "reginfo.gov",
+    "ftc.gov",
+    "fcc.gov",
+    "cisa.gov",
+    "epa.gov",
+    "eeoc.gov",
+    "ada.gov",
+    "federalreserve.gov",
+    "finra.org",
+    "nyc.gov",
+    "coag.gov",
+    "calcivilrights.ca.gov",
+    "nysed.gov",
+    "ohio.gov",
+    "illinois.gov",
+    "ilga.gov",
+    "utah.gov"
+  ],
+  "counts": {
+    "entries": 176,
+    "verified": 108,
+    "unverified": 68
+  }
+}

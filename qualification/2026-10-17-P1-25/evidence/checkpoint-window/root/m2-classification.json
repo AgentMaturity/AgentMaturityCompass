@@ -1,0 +1,34 @@
+{
+  "at": "2026-10-16T23:43:52.358315+00:00",
+  "phase": "p125k-m2",
+  "sourceCommit": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+  "operator": "OMIT-REQUIRED-PENDING-REFUSAL",
+  "outcomeSha256": "1aa2de57e93277dbb5d14cea1de821764d3362112fa8bbfe9664d9a077c74835",
+  "rootAllFailuresRead": true,
+  "allFailuresClassified": true,
+  "firstSensitiveAssertionRead": true,
+  "noHookOrEnvironmentFailure": true,
+  "actualCohortAndHooksMatchCanonical": true,
+  "actualOwnedChildrenAndCleanupRead": true,
+  "allFailures": [
+    {
+      "test": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+      "message": "expected false to be true // Object.is equality",
+      "firstSensitiveFrame": "tests/time/checkpointWindow.test.ts:316:26",
+      "classification": "Required checkpoint caller incorrectly resolves after real HTTP500 when required pending throw is omitted."
+    }
+  ],
+  "firstSensitiveAssertion": "expect(rejected).toBe(true) receivedfalse at tests/time/checkpointWindow.test.ts:316:26",
+  "masking": [
+    "Only later expectedRejection assertion317 is masked by direct rejection flag failure. HTTP500 route, same signed pending checkpoint, absent token, unchanged valid ledger/no checkpoint event, pending timeline and verification assertions precede and passed."
+  ],
+  "actualPublicFacts": "Required body public rejectedfalse/expectedRejectionfalse, signatureValidtrue/tokenAbsenttrue/sequenceCount1/eventCount1/checkpointRowCount0, verifiedledgerok/errors0 and pendingtimeline. Genuine completion and other19 tests passed.",
+  "actualLifecycle": {
+    "childrenNatural0": 22,
+    "explicitStreamsHashMatched": 44,
+    "closedSockets": 6,
+    "closedLedgerOwners": 9,
+    "cleanupErrors": 0
+  },
+  "allHoldsRetained": true
+}

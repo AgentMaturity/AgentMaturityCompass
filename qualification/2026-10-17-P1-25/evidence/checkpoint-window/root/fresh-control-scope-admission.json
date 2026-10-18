@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-16T23:42:26.185157+00:00",
+  "sourceCommit": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-L7yNvq/checkout",
+  "target": "src/time/checkpoint.ts",
+  "onlyOwnedFreshSourceFile": true,
+  "operators": [
+    "OMIT-CHECKPOINT-EVENT",
+    "OMIT-REQUIRED-PENDING-REFUSAL"
+  ],
+  "sourcePhase": "p125k-source-after-eof",
+  "canonicalPhase": "p125k-fresh-canonical-corrected-path",
+  "failedOriginalPhaseRetained": "p125k-fresh-canonical",
+  "allGuardsUnchangedAndPhaseCorrectionReviewed": true,
+  "selectedPathsEachRoot": 94,
+  "compiledPairs": 19,
+  "protectedActiveInputs": 142,
+  "nativePins": 10,
+  "separateExplicitApplyClassifyRestoreThenGreen": true,
+  "rootReadExactRecipesFullHelperAndDelta": true,
+  "noProductionCandidateMutationOrGuardChanges": true,
+  "allHoldsRetained": true
+}

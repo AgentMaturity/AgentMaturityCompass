@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
 import { complianceReportToMarkdown, diffComplianceReports } from "../src/compliance/complianceReport.js";
 import type { ComplianceReportJson } from "../src/compliance/mappingSchema.js";
+import { renderClaimLegend } from "../src/claims/eligibility/render.js";
 
 const longHash = "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890";
 
@@ -59,6 +60,23 @@ function fixtureReport(): ComplianceReportJson {
 }
 
 describe("compliance report readability", () => {
+  test("renders each category's service-decided claim, separately from the aggregate", () => {
+    const base = fixtureReport();
+    const category = base.categories[0]!;
+    const mixed: ComplianceReportJson = { ...base, configTrusted: true, configReason: null,
+      coverage: { ...base.coverage, missing: 1, evaluated: 1, score: 0 },
+      categories: [category, { ...category, id: "observed-failure", category: "Observed failure", status: "MISSING",
+        claimKind: "observed", result: "fail", evidence: "sufficient", claimReasons: [],
+        dimensions: { ...category.dimensions, result: "fail", evidence: "sufficient", applicability: { state: "applicable" } } }]
+    };
+    const markdown = complianceReportToMarkdown(mixed);
+    expect(markdown).toContain("### Art. 9 Risk Management (NOT_EVALUATED)\n\n**Claim:** Self-reported · **Result:** not evaluated");
+    expect(markdown).toContain("### Observed failure (MISSING)\n\n**Claim:** Observed · **Result:** fail · **Evidence:** sufficient");
+    expect(markdown.split("\n").filter((line) => line.startsWith("**Claim:**"))).toHaveLength(3);
+    expect(markdown.split("\n").filter((line) => line.startsWith("**Claim:**"))).toMatchSnapshot();
+    expect(markdown).toContain(renderClaimLegend("markdown"));
+  });
+
   test("truncates evidence hashes and prints config remediation guidance", () => {
     const markdown = complianceReportToMarkdown(fixtureReport());
 

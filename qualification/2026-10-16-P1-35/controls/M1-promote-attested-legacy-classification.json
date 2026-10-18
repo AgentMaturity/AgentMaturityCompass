@@ -1,0 +1,15 @@
+{
+  "rootReadActualFailures": true,
+  "causalWitnessEstablished": true,
+  "unexplainedFailures": [],
+  "actual": {
+    "passed": 84,
+    "total": 85,
+    "failed": 1,
+    "witness": "legacyRelabel.test.ts:254:58 rejects observed promotion; later exact-kind/cap assertions masked"
+  },
+  "cleanupErrors": 0,
+  "publicRecords": 10,
+  "sourceOnlyControl": true,
+  "compiledChildSensitivity": false
+}

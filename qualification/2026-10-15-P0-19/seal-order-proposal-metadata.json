@@ -1,0 +1,12 @@
+{
+  "scope": "One existing session-seal statement moves before ordinary ledger verification; no source or live-dist edit.",
+  "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/src/assurance/assuranceRunner.ts",
+  "sourceSha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+  "proposedSha256": "bf6860b97cb26daa22ec06990280482b799964aea1089d4ff7f9da0bf865fe45",
+  "linesBefore": 975,
+  "linesAfter": 975,
+  "budget": 976,
+  "patch": "/private/tmp/p0-19-proposed-seal-order-repair-20261015.patch",
+  "patchSha256": "c837b6e8c3a5a84588f10da907818ae4a2ed50db3b2da1fc329761918b2fa6d5",
+  "status": "Unapplied private proposal; runtime proof and ownership decision pending. No waiver or guard modification."
+}

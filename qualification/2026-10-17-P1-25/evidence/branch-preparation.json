@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-16T18:29:03.944253+00:00",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceHead": "4f53ff7e5fa4363ccadad1995c679888b222173e",
+  "previousBranchPreserved": "codex/p1-07-gate-qualification",
+  "branch": "codex/p1-25-timestamp-qualification",
+  "ordinaryNewBranch": true,
+  "sourceClean": true,
+  "P107BoundedClosure": "/private/tmp/p1-07-gate-qualification-20261016/bounded-closure.json",
+  "proposedScope": [
+    "tests/time/verifyTimestamp.test.ts",
+    "tests/fixtures/rfc3161/"
+  ],
+  "admissionPending": true,
+  "allHoldsPreserved": true
+}

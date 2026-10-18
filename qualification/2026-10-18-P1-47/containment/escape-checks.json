@@ -1,0 +1,305 @@
+{
+  "schemaVersion": "p1-47-containment/1",
+  "environment": "local macOS arm64, colima Docker VM, not CI",
+  "recordedAt": "2026-10-18T10:44:45.237Z",
+  "claim": "These results describe the container runtime's isolation on this machine. They are not an AMC claim.",
+  "image": "sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392",
+  "versions": {
+    "docker": "29.5.2 linux/arm64"
+  },
+  "limits": [
+    "--read-only",
+    "--cap-drop",
+    "ALL",
+    "--security-opt",
+    "no-new-privileges",
+    "--user",
+    "1000:1000",
+    "--pids-limit",
+    "256",
+    "--memory",
+    "1g",
+    "--cpus",
+    "2",
+    "--tmpfs",
+    "/tmp:rw,size=64m,mode=1777",
+    "--tmpfs",
+    "/home/pilot:rw,size=128m,uid=1000,gid=1000,mode=0700"
+  ],
+  "mounts": [
+    {
+      "src": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P1-47-runs/f2-containment/workspace",
+      "dst": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P1-47-runs/f2-containment/workspace",
+      "readonly": false
+    },
+    {
+      "src": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-47/examples/harness-comparison/pilot/container/escapeProbe.mjs",
+      "dst": "/pilot/escapeProbe.mjs",
+      "readonly": true
+    }
+  ],
+  "topology": {
+    "network": "docker --internal",
+    "relayPorts": [
+      55462
+    ],
+    "hostGateway": "192.168.5.2"
+  },
+  "exit": {
+    "code": 0,
+    "timedOut": false,
+    "truncated": false
+  },
+  "probe": {
+    "identity": {
+      "uid": 1000,
+      "gid": 1000,
+      "capEff": "0000000000000000",
+      "noNewPrivs": "1",
+      "memoryMax": "1073741824",
+      "pidsMax": "256"
+    },
+    "hostHomeWrite": {
+      "ok": false,
+      "detail": "EROFS"
+    },
+    "symlinkWriteOutside": {
+      "ok": false,
+      "detail": "ENOENT"
+    },
+    "symlinkWriteEtc": {
+      "ok": false,
+      "detail": "EROFS"
+    },
+    "readHostCanary": {
+      "ok": false
+    },
+    "rootFsWrite": {
+      "ok": false,
+      "detail": "EROFS"
+    },
+    "dockerSocket": false,
+    "workspaceWrite": {
+      "ok": true,
+      "detail": "wrote"
+    },
+    "homeWrite": {
+      "ok": true,
+      "detail": "wrote"
+    },
+    "directTcpExternal": {
+      "ok": false,
+      "detail": "ENETUNREACH"
+    },
+    "dnsExternal": {
+      "ok": false,
+      "detail": "EAI_AGAIN"
+    },
+    "hostGatewayListed": {
+      "ok": false,
+      "detail": "ENETUNREACH"
+    },
+    "hostGatewayUnlisted": {
+      "ok": false,
+      "detail": "ENETUNREACH"
+    },
+    "relayListed": {
+      "ok": true,
+      "detail": "200 listed-ok"
+    },
+    "relayUnlisted": {
+      "ok": false,
+      "detail": "ECONNREFUSED"
+    },
+    "forkLoop": {
+      "requested": 5000,
+      "started": 245
+    }
+  },
+  "host": {
+    "hostHomeFile": false,
+    "escapedFile": false,
+    "canaryInOutput": false,
+    "insideFile": true,
+    "containerGone": true
+  },
+  "codingProbeContainer": {
+    "limits": [
+      "--network",
+      "none",
+      "--read-only",
+      "--cap-drop",
+      "ALL",
+      "--security-opt",
+      "no-new-privileges",
+      "--user",
+      "65534:65534",
+      "--pids-limit",
+      "64",
+      "--memory",
+      "256m",
+      "--cpus",
+      "1"
+    ],
+    "mounts": "none",
+    "rows": [
+      {
+        "id": "dynamic-import-error",
+        "outcome": "invalid-output",
+        "mutated": false
+      },
+      {
+        "id": "static-import",
+        "outcome": "load-failed",
+        "mutated": false
+      },
+      {
+        "id": "global-process",
+        "outcome": "returned",
+        "valueJson": "\"no process\"",
+        "mutated": false
+      }
+    ],
+    "direct": {
+      "uid": 65534,
+      "hostSentinel": "ENOENT",
+      "rootFs": "EROFS",
+      "tcp": "ENETUNREACH",
+      "dns": "EAI_AGAIN"
+    },
+    "host": {
+      "sentinelExists": false
+    }
+  },
+  "checks": [
+    {
+      "id": "non-root",
+      "attempt": "the agent runs without root",
+      "passed": true
+    },
+    {
+      "id": "no-capabilities",
+      "attempt": "effective capability set is empty",
+      "passed": true
+    },
+    {
+      "id": "no-new-privileges",
+      "attempt": "no_new_privs is set",
+      "passed": true
+    },
+    {
+      "id": "host-home-write",
+      "attempt": "write $HOME/amc-escape-<random> at the host's home path",
+      "passed": true
+    },
+    {
+      "id": "symlink-write-outside",
+      "attempt": "write through a workspace symlink to a host directory outside it",
+      "passed": true
+    },
+    {
+      "id": "symlink-write-etc",
+      "attempt": "write through a workspace symlink to /etc",
+      "passed": true
+    },
+    {
+      "id": "read-host-canary",
+      "attempt": "read a canary in a host .ssh directory outside the workspace",
+      "passed": true
+    },
+    {
+      "id": "root-fs-write",
+      "attempt": "write to the image's root filesystem",
+      "passed": true
+    },
+    {
+      "id": "no-docker-socket",
+      "attempt": "no container runtime socket inside",
+      "passed": true
+    },
+    {
+      "id": "direct-tcp-external",
+      "attempt": "direct TCP to 1.1.1.1:443",
+      "passed": true
+    },
+    {
+      "id": "dns-external",
+      "attempt": "resolve example.com",
+      "passed": true
+    },
+    {
+      "id": "host-gateway-direct",
+      "attempt": "TCP to the host gateway, listed and unlisted ports, bypassing the relay",
+      "passed": true
+    },
+    {
+      "id": "relay-unlisted-port",
+      "attempt": "a host service the relay does not list",
+      "passed": true
+    },
+    {
+      "id": "fork-cap",
+      "attempt": "start 5000 sleeping children",
+      "passed": true
+    },
+    {
+      "id": "positive-relay-listed-port",
+      "attempt": "the listed service is reachable through the relay",
+      "passed": true
+    },
+    {
+      "id": "positive-workspace-write",
+      "attempt": "a workspace write reaches the host",
+      "passed": true
+    },
+    {
+      "id": "probe-ran-contained",
+      "attempt": "the contained probe returned rows (positive control)",
+      "passed": true
+    },
+    {
+      "id": "probe-dynamic-import-escape",
+      "attempt": "import() error constructor reaching process",
+      "passed": true
+    },
+    {
+      "id": "probe-static-import",
+      "attempt": "a static import of node:fs",
+      "passed": true
+    },
+    {
+      "id": "probe-no-process-global",
+      "attempt": "process is not a context global",
+      "passed": true
+    },
+    {
+      "id": "probe-host-sentinel",
+      "attempt": "no payload or direct attempt wrote the host sentinel",
+      "passed": true
+    },
+    {
+      "id": "probe-direct-nobody",
+      "attempt": "code outside the vm runs as nobody",
+      "passed": true
+    },
+    {
+      "id": "probe-direct-host-write",
+      "attempt": "code outside the vm writing the host sentinel path",
+      "passed": true
+    },
+    {
+      "id": "probe-direct-root-fs",
+      "attempt": "code outside the vm writing the root filesystem",
+      "passed": true
+    },
+    {
+      "id": "probe-direct-network",
+      "attempt": "code outside the vm reaching 1.1.1.1:443 or DNS",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "passed": 25,
+    "total": 25
+  }
+}

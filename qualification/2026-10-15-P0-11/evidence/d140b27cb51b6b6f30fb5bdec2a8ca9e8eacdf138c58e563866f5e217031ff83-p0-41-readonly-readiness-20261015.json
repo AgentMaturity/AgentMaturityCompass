@@ -1,0 +1,525 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-41",
+  "kind": "READONLY_READINESS_AND_PRIVATE_FIXTURE_PROPOSAL",
+  "decision": "CONDITIONAL_PREPARATION_ONLY_NO_RUNTIME_RELEASE",
+  "formalAcceptanceClosed": false,
+  "scope": "After bounded P045/P011 handoffs, root may separately activate a private P041 qualification lane. This packet only inspects the previously released script/data/template and relevant test/runtime tools. No fixture, copy, controller, setup or product code was authored or run.",
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+    "requestedQualificationSource": "2024f25c79973987b44a4a1298488d55ee0d6227",
+    "productionCodeAnchor": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "observedWorktreeHeadMetadata": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+    "observedRef": "refs/heads/codex/p0-45-current-qualification",
+    "headMethod": "Read .git pointer, gitdir/HEAD, commondir and loose ref as text; no Git command. The ref advanced during root's canonical work. This packet does not prove the later commit's ancestry or whole-tree diff.",
+    "currentP041SelectedBytesMatch2024RoutingPins": true,
+    "currentSelectedProof": "All five script/data/template paths match the previously frozen2024 source hashes exactly. Future activation must repin actual source/HEAD and full preservation; qualification metadata commit history is not a product behavior measurement."
+  },
+  "authority": {
+    "routing": {
+      "path": "/private/tmp/amc-next-after-p0-11-readonly-routing-20261015.json",
+      "bytes": 19261,
+      "sha256": "304e5211228163818bcda63f8a9583ebf8a19f47db290e04e52ea1abc66b7116"
+    },
+    "recoveredSpec": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-41.md",
+      "bytes": 9022,
+      "sha256": "97510873b2cc9229fc94b3a291175bfee227a7e6cf0e8dc496d57846de99ff60"
+    },
+    "reservation": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "explicitSourceReleaseLines": "561–570,584–588",
+    "sourceAndCorrectionHistoryLines": "595–612,624–633,645–684",
+    "reservedPaths": [
+      "scripts/program-metrics.mjs",
+      "docs/program/gaps.json",
+      "docs/program/metrics.json",
+      "docs/program/metrics-manual.json",
+      "docs/program/status-update-template.md"
+    ],
+    "historicalScope": "Only script/data/template source was released to Codex; requested fixtures were expressly deferred under earlier source-only instructions. This new root assignment authorizes a readiness/proposal, not retroactive test authorship or runtime.",
+    "stillDeferred": [
+      "Monday external posting remains Sid's task",
+      "actual program measurements",
+      "any --online registry request",
+      "D01 funded/single-maintainer decision",
+      "source adoption, shared CLI/API/Studio/A4, held source transfers, tracker/Done/formal dependency closure"
+    ]
+  },
+  "graphNavigation": {
+    "method": "Read existing frozen P011 navigation receipt first, then existing graph vocabulary before direct source. No CLI query, refresh, imports, watcher, server or extraction.",
+    "graph": {
+      "path": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+      "bytes": 45692207,
+      "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395"
+    },
+    "builtAtCommit": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+    "nodes": 36459,
+    "currentP041NodeMatches": 0,
+    "otherComputeMetricsMatches": 3,
+    "meaning": "The three matches are unrelated computeMetrics/computeMetricStatus functions in ragGroundingEval, traceEvidenceMapper and governanceSlo. Stale graph is a locator only and does not cover this script. Prior navigation receipt records installed0.9.74 versus reviewed refresh pin0.9.56; no refresh/version compatibility claim."
+  },
+  "staticObservations": {
+    "script": {
+      "exports": [
+        "CANONICAL_METRIC_IDS",
+        "computeMetrics"
+      ],
+      "inputRoutes": [
+        "gaps",
+        "metrics",
+        "manual",
+        "vitestReport",
+        "workflowYaml",
+        "jsonSources"
+      ],
+      "defaultMode": "markdown",
+      "modes": [
+        "--markdown",
+        "--json",
+        "--check"
+      ],
+      "otherOptions": [
+        "--vitest-json <one repository-relative path>",
+        "--online (excluded from base proposal)"
+      ],
+      "sourceLines": {
+        "ids": "7–15",
+        "validation": "21–85",
+        "pendingVsMeasured": "87–93",
+        "vitest": "94–135",
+        "ci": "137–191",
+        "pureCompute": "203–248",
+        "markdown": "250–264",
+        "repoReadBounds": "265–277",
+        "options": "281–296",
+        "committedHeadAndClosureChecks": "298–346",
+        "npm": "347–358",
+        "outputsAndEntryGuard": "359–375"
+      }
+    },
+    "currentData": {
+      "metricRows": 15,
+      "expectedCanonicalIds": [
+        "critical_gaps_open",
+        "release_cadence",
+        "claim_kind_surfaces",
+        "contained_shell_oses",
+        "executed_catalog_controls",
+        "false_mandatory_passes",
+        "expert_signed_controls",
+        "benchmark_tasks_run",
+        "developer_verified_action_15m",
+        "reviewer_reconstruction_time",
+        "design_partners",
+        "independent_verifiers",
+        "independent_assessors",
+        "regulator_references",
+        "a4_bound_approval_projects"
+      ],
+      "gapRows": 26,
+      "critical": 7,
+      "high": 15,
+      "medium": 4,
+      "allGapStatuses": "open",
+      "allClosingFieldsNull": true,
+      "manualEntries": 0,
+      "nonnullMetricSources": [
+        "critical_gaps_open:gaps"
+      ],
+      "nullSources": 14,
+      "targetColumn": "funded",
+      "a4CurrentSource": null,
+      "a4G3AndSingleMaintainerTargets": "—",
+      "meaning": "7 is a static count of declared historical register rows, not newly measured/current qualified program risk. Fourteen missing sources must remain not_measured. Proposed target cells are never current values."
+    },
+    "targetTableComparison": {
+      "source": "AMC Ready-to-Deploy Implementation Plan.md:986–1004",
+      "rows": 15,
+      "labelsExact": true,
+      "sixTargetColumnsExact": true,
+      "ownersExact": true,
+      "comparison": "Direct JSON/Markdown text-cell comparison only; not computeMetrics execution or remote document freshness proof.",
+      "specDrift": "Recovered spec still says14. Reservation595–598 explicitly directs15 with A4 from current Plan; do not delete A4, substitute zero for em dashes or weaken exact15 validation."
+    },
+    "originalTestEvidence": {
+      "requestedPath": "tests/programMetrics.test.ts",
+      "exists": false,
+      "otherScriptCallersOrTestsFound": false,
+      "search": "rg programMetrics|program-metrics|computeMetrics over tests/scripts/package.json; only the script's own definition/call/error lines found.",
+      "originalCaseCount": "NONE_ESTABLISHED",
+      "meaning": "Do not describe a future fixture as an unchanged original suite or invent historical baseline totals."
+    },
+    "truthBoundaries": [
+      "Pure compute accepts supplied data/declarations; it checks neither Git history nor signatures.",
+      "CLI committed HEAD gap and JSON reads bind bytes independently of working tree; a closure requires evidence committed at HEAD, nonzero full SHA and ancestor proof.",
+      "A committed false declaration using an actual ancestor can still pass structural/ancestry checks; ancestry is not merge approval or receipt authenticity.",
+      "Vitest evidence is supplied report data. Nonempty all-passed assertion arrays are required; failed file/assertion outranks missing siblings; duplicate matching files are invalid. No source report is a fresh claim-label audit.",
+      "CI job YAML yields configured linux/macos/windows families only. Unsupported include/exclude/dynamic/unknown/conflicting families remain pending; no OS containment is proved.",
+      "Manual numeric0 and registered JSON numeric0 can be valid supplied values; absence, null or malformed data must never silently become0.",
+      "repoFile confines real paths to root, requires regular bounded file and caps32MiB; this is not full hostile-filesystem or concurrent-write proof."
+    ]
+  },
+  "proposedFixture": {
+    "status": "NEW_UNAUTHORED_UNEXECUTED",
+    "proposedSuite": "tests/p041ProgramMetricsQualification.test.ts in a future owned private source root only",
+    "caseRegistrationCount": "NOT_FIXED_OR_MEASURED; Q1–Q13 are scenario groups, not an actual collected corpus.",
+    "reuse": "Existing installed Vitest4.1.11 route/config/setup plus Node standard library and installed yaml2.9.0; tsconfig.tests.json allowJs:true permits the existing .mjs import pattern. No new dependency, import adapter, product edit or package command needed.",
+    "sourceImport": "Named direct import of the unchanged scripts/program-metrics.mjs; main's import.meta.url entry guard keeps imports query-free by source inspection only.",
+    "fixtures": "Fresh in-memory deep copies for pure functions. CLI fixtures use owned genuine Git history/private checkout with unchanged script and data variants explicitly labeled synthetic. No invented Git output, fake git executable, shared-index mutation, protected-root .amc use or inherited operator credentials.",
+    "scenarios": [
+      {
+        "id": "Q1",
+        "route": "pure/static fixture identity",
+        "assertions": "Read the15 canonical IDs and all15 label/owner/90 target cells against an independently encoded expected Plan table; verify26 unique G1–G26 with7/15/4 severity. Keep A4 and both unspecified em dashes.",
+        "status": "NEW_UNAUTHORED_UNEXECUTED_PROPOSAL"
+      },
+      {
+        "id": "Q2",
+        "route": "computeMetrics canonical supplied inputs",
+        "assertions": "First assert critical count7 and listed G1–G7. For each of14 other rows first assert value===null, then status===not_measured/current contains not measured/source===null/asOf===null. Explicitly assert these are register/input outputs, not real outcome measurements.",
+        "status": "NEW_UNAUTHORED_UNEXECUTED_PROPOSAL"
+      },
+      {
+        "id": "Q3",
+        "route": "computeMetrics closure declarations",
+        "assertions": "A critical row markedclosed without closingEvidence still counts open7 and adds the expected validation error. A fully shaped synthetic path/full SHA/closer/date declaration can count6 in pure compute; label this declaration-only and do not authenticate it.",
+        "status": "NEW_UNAUTHORED_UNEXECUTED_PROPOSAL"
+      },
+      {
+        "id": "Q4",
+        "route": "computeMetrics absent registered evidence",
+        "assertions": "Use a registered vitest surface with no report, registered CI job absent, and registered JSON path absent; each remains null/not_measured rather than0. Keep real source files/registrations unchanged.",
+        "status": "NEW_UNAUTHORED_UNEXECUTED_PROPOSAL"
+      },
+      {
+        "id": "Q5",
+        "route": "computeMetrics surface supplied report",
+        "assertions": "Register exactfive surfaces; CLI and MCP each have present passed file with nonempty passed assertions, API is observedfailed, remaining2 are absent. Expect2 of5, partially_measured, APIfailed and2not_measured. Supplied timestamps/source labels must be retained without calling them current product results.",
+        "status": "NEW_UNAUTHORED_UNEXECUTED_PROPOSAL"
+      },
+      {
+        "id": "Q6",
+        "route": "computeMetrics nonvacuous/failure precedence",
+        "assertions": "First use file statuspassed with assertionResults:[] and assert row.value===null. Exercise absent assertions, allskipped/todo/pending lists as further pending variants. Then one failed file plus missing sibling must yield surfacefailed/evaluated; duplicate path matches must yield invalid errors. Preserve first assertion and later masking if mutant fails.",
+        "status": "NEW_UNAUTHORED_UNEXECUTED_PROPOSAL"
+      },
+      {
+        "id": "Q7",
+        "route": "computeMetrics configured OS families",
+        "assertions": "Synthetic contained-shell job: ubuntu+macos gives2; two ubuntu versions give1; self-hosted unknown-only, conflictingOS labels, absentjob and unsupported include/exclude/dynamic expressions stay pending. Include runs-on arrays and simple matrix axis as source-supported variants; no containment claim.",
+        "status": "NEW_UNAUTHORED_UNEXECUTED_PROPOSAL"
+      },
+      {
+        "id": "Q8",
+        "route": "computeMetrics manual/JSON provenance",
+        "assertions": "Explicit sourced/dated/recorded manual0 is measured0; missing source/date/recorder, duplicate IDs and invaliddates produce errors. Registered JSON finite0 is measured0; missing/null stays pending, wrong type/nonfinite/invalidpointer produce errors. Test escapedpointer key without reading an unregistered file.",
+        "status": "NEW_UNAUTHORED_UNEXECUTED_PROPOSAL"
+      },
+      {
+        "id": "Q9",
+        "route": "real CLI unchanged canonical baseline",
+        "assertions": "Separately invoke --check, --json, explicit --markdown and default markdown in a genuine committed full-history private checkout. Require0, correct check message, JSON15rows, markdown15data rows and register7. Capture each command as separate process; no --online.",
+        "status": "NEW_UNAUTHORED_UNEXECUTED_PROPOSAL"
+      },
+      {
+        "id": "Q10",
+        "route": "real CLI committed HEAD independence",
+        "assertions": "In synthetic owned Git fixture only, dirty gap declarations must not override committed open rows. Registered JSON committed0 must be read even with working copy missing/changed; source label must say committedHEAD JSON. No copied-without-Git positive proof.",
+        "status": "NEW_UNAUTHORED_UNEXECUTED_PROPOSAL"
+      },
+      {
+        "id": "Q11",
+        "route": "real CLI structural refusal",
+        "assertions": "Commit an invalidclosed gap without evidence in the owned synthetic fixture, then require --check exit1 with exact validation error and no success/table. Independently invalidmanual provenance, mutually exclusive modes and invalid --vitest-json paths must refuse rather than print reassuring values.",
+        "status": "NEW_UNAUTHORED_UNEXECUTED_PROPOSAL"
+      },
+      {
+        "id": "Q12",
+        "route": "real CLI closure provenance negative/positive",
+        "assertions": "Use genuine local commits and full history: untracked-only/missing evidence path, zeroSHA, nonexistentSHA and genuine nonancestor commit are separate refusal variants; retain exact errors and suppressed table. A committed synthetic qualification path plus genuine ancestor can be a structural positive6open, explicitly not merge/signature/truth proof.",
+        "status": "NEW_UNAUTHORED_UNEXECUTED_PROPOSAL"
+      },
+      {
+        "id": "Q13",
+        "route": "real CLI rendered columns/escaping",
+        "assertions": "Using private synthetic metrics only, assert funded table omits single-maintainer column and singleMaintainer fixture adds it; escape pipe/markup/newline cells as currently coded. This fixture does not choose D01 policy or change canonical targetColumn.",
+        "status": "NEW_UNAUTHORED_UNEXECUTED_PROPOSAL"
+      }
+    ],
+    "sourceControls": [
+      {
+        "id": "P041-M1-missing-source-zero",
+        "find": "  return { value: null, current: `not measured (${reason}: ${metric.owner ?? \"owner not registered\"})`,\n    status: \"not_measured\", source: null, asOf: null };",
+        "replace": "  return measured(0, \"PRIVATE MUTATION: missing source\");",
+        "expectedFirstAssertion": "Q2: assert the first missing row value === null before status/current/source/asOf checks; mutant infers0.",
+        "file": "scripts/program-metrics.mjs",
+        "occurrences": 1,
+        "proposedMutantBytes": 23876,
+        "proposedMutantSha256": "3bae4d74178f588d98b1d960582b15e5754b80b9c0114bb83e15dc1781273ee6",
+        "status": "Unexecuted source-derived recipe; exact observable failure/masking must be reviewed after any authorized runtime.",
+        "baselineSha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9",
+        "scope": "Only the private script's one named anchor; every data/guard/config/helper and other source byte fixed.",
+        "schedule": "Future separately released baseline→mutant→restored with fresh worker/process; never reuse a cached imported baseline module as mutant proof.",
+        "survivorRule": "Record actual surviving/failing case identities and first error. Nonzero due setup, import/native, hook/global guard, pending or timeout is infrastructure, not a semantic kill."
+      },
+      {
+        "id": "P041-M2-vacuous-file-pass",
+        "find": "      if (file.status !== \"passed\" || !assertions?.length || assertions.some(assertion => assertion.status !== \"passed\")) complete = false;",
+        "replace": "      if (file.status !== \"passed\") complete = false;",
+        "expectedFirstAssertion": "Q6: with file passed and empty assertions, assert row value === null before further status/current/surface checks; mutant counts the CLI surface1.",
+        "file": "scripts/program-metrics.mjs",
+        "occurrences": 1,
+        "proposedMutantBytes": 23892,
+        "proposedMutantSha256": "440b3fb3ecad99f95a0e1bc74c6cd4e6e70be88e651204e580bb04d2c80001f8",
+        "status": "Unexecuted source-derived recipe; exact observable failure/masking must be reviewed after any authorized runtime.",
+        "baselineSha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9",
+        "scope": "Only the private script's one named anchor; every data/guard/config/helper and other source byte fixed.",
+        "schedule": "Future separately released baseline→mutant→restored with fresh worker/process; never reuse a cached imported baseline module as mutant proof.",
+        "survivorRule": "Record actual surviving/failing case identities and first error. Nonzero due setup, import/native, hook/global guard, pending or timeout is infrastructure, not a semantic kill."
+      }
+    ],
+    "acceptanceBeforeRuntime": [
+      "Root finishes bounded P011 handoff and explicitly assigns/reviews authoring scope; this packet supplies no activation or author/runtime release.",
+      "Fresh source/HEAD/reservation/plan/hold check; create an owned genuine Git checkout/fullhistory and independent protected source/artifact boundary only when separately authorized. No graph refresh or source transfer implicit.",
+      "Author one new private corpus, complete source fixtures/import/type review, freeze exactcase identities/inputs/source map and independently review code/setup/controller before root release.",
+      "Preserve normal freeze and required quality gates, original Vitest30s config/global/per-file .amc guards and existing helper behavior. No baseline/allowlist/floor edits or ignore-scripts substitutes.",
+      "Record precise argv/env/cwd/PID/PGID, child outputs/status, raw structured results, run-end file/suite/hook/unhandled/pending errors and complete-process knownlate/global-teardown diagnostics.",
+      "Future outer420s bound does not alter scriptGit5s/npm10s children or original30s tests. Timeout/unconfirmed group leaves persistent ACTIVE/HALTED ownership and blocks source restoration/new run; no forced-kill equivalence or automatic retry.",
+      "Positive recorded owned-group ESRCH before restoration; no universal detached-descendant or OS/network/cache isolation claim. Preserve parent/private source/dist/config/native/dependencies and all prior evidence byte-exact.",
+      "Attribution review of first assertions/masking, finalrestoration and retained effects/receipts; report expected controls as source-derived predictions until actual evidence exists."
+    ]
+  },
+  "offlineNpmCacheBoundary": {
+    "baseLane": "No --online; release_cadence remains manual/pending. No npm command, cache construction, fetch, seed or network action performed.",
+    "installedSourceOnly": {
+      "npmVersion": "10.9.9",
+      "view": "view.js:135–139 uses npm flatOptions then preferOnline:true/fullMetadata:true.",
+      "precedence": "npm-registry-fetch getCacheMode: offline→only-if-cached precedes preferOnline→no-cache. A special ?write=true GET resets offline, so any optional fixture must use ordinary packument GET without write query.",
+      "cache": "make-fetch-happen cache/index: missing entry underonly-if-cached throws NotCachedError; hit returns cached response even stale. fetch.js chooses cache only for a storable request; future fixture must prove this precondition with an owned cache path and ordinary GET."
+    },
+    "optionalFutureProposal": "Only if root separately elects/reviews an offline-cache fixture: actual installed npm, private HOME/userconfig/cache, explicit npm_config_offline=true and npm_config_cache, no auth/proxy/registry overrides that change request; genuine cache format with labeled synthetic bounded packument. Cover cache miss refusal and positive cache time map, retaining exact source/asOf/window. This would enter the script's --online branch but must be completely cache-only and described as synthetic cached-input calculation, never current registry cadence.",
+    "notAuthorized": [
+      "No external query or listener",
+      "No ordinary --online request",
+      "No fake npm/git executable",
+      "No transfer of user/shared cache or credentials",
+      "No cache seeding via network",
+      "No assumption that prefer-offline forbids network"
+    ],
+    "measurementLimits": "Cached metadata has no product signature verification or guaranteed freshness; pacote deliberately does not check packument integrity as an issuer attestation. Actual trailing30day Date timestamps are runtime-derived and must be retained if ever executed. A cached/synthetic count is not a real programme result."
+  },
+  "inheritedOpen": [
+    "P045 C2 byte-invariant criterion, retained CLI receipt sample/doctor unapproved gap and formalholds",
+    "P011 own residual-risk/signoff and formalhandoff until root completes it",
+    "1269duplicates/2751dead-code quality failures remain unwaived",
+    "P029 explicitskip, P022 arrays, P023 held API/Studio, P051 issuer/formal, P024 ISO/expert, P021literal20/10outsideR4, P019/P020proposals and P030 heldrunner/fullbatch/installedpack unresolved",
+    "Claude/sharedCLI/API/Studio/A4, pausedP202, pendingtransfers and all existing reservations remain preserved",
+    "No Monday posting, issueindex, mergedPR, hostedCI, release, G0 verdict or Done claim"
+  ],
+  "inputPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/scripts/program-metrics.mjs",
+      "bytes": 23978,
+      "sha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/program/gaps.json",
+      "bytes": 16375,
+      "sha256": "bb7eded5387d9b4bb1782b23720042b7c5b26d7fbff119cefc9ceefe7095f006"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/program/metrics.json",
+      "bytes": 5866,
+      "sha256": "541373a8e5ddb8ba1dfe4581f72d371afa7cdc4885ad25077def2ed85e8955ed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/program/metrics-manual.json",
+      "bytes": 20,
+      "sha256": "364b37738032a28a72829f4d2192b70bd9353c9ee8dddfc5b70c2785f995d6ac"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/docs/program/status-update-template.md",
+      "bytes": 6702,
+      "sha256": "34686a67909e18f776fb7054e5824a2c9f33689a05c10179b4af78eebb84898e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/yaml/package.json",
+      "bytes": 3254,
+      "sha256": "20b8b197cbd10dad245d45e463dfe58e4c8c25a47e24bc4256ad9ab58bf35683"
+    },
+    {
+      "path": "/private/tmp/amc-next-after-p0-11-readonly-routing-20261015.json",
+      "bytes": 19261,
+      "sha256": "304e5211228163818bcda63f8a9583ebf8a19f47db290e04e52ea1abc66b7116"
+    },
+    {
+      "path": "/private/tmp/amc-next-after-p0-11-readonly-routing-20261015.md",
+      "bytes": 5042,
+      "sha256": "e8227e6e11e174ca14994ceb0aee7d89027439c8ca14f87b9e1515ec75a62677"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-41.md",
+      "bytes": 9022,
+      "sha256": "97510873b2cc9229fc94b3a291175bfee227a7e6cf0e8dc496d57846de99ff60"
+    },
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    },
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "bytes": 38227,
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "bytes": 78486,
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04"
+    },
+    {
+      "path": "/Users/sid/Downloads/Agent contract.md",
+      "bytes": 25110,
+      "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f"
+    },
+    {
+      "path": "/Users/sid/Downloads/A4 · Forge.md",
+      "bytes": 47286,
+      "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+      "bytes": 45692207,
+      "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395"
+    },
+    {
+      "path": "/private/tmp/p0-45-qualification-20261015/initial-preflight.json",
+      "bytes": 13867,
+      "sha256": "c79bffa5d78f899acacc004aff4fa06e050cece48d7ddf459dab864c305dffb7"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/package.json",
+      "bytes": 6706,
+      "sha256": "7c04bf69824d17a1db64defd3a9a86d538781bf2d6ca2764e3f1143fa5b71166"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/lib/commands/view.js",
+      "bytes": 13106,
+      "sha256": "b1b8b6b5fabcee8d32f94bb1ad735cde2967c1287bb4e6b97782b1240d4883e8"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/node_modules/pacote/lib/registry.js",
+      "bytes": 14370,
+      "sha256": "f77f415d14cbef4da51bd95b1ecf6ba185819e6912ecad8de575c53f53679b7b"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/node_modules/npm-registry-fetch/lib/index.js",
+      "bytes": 6573,
+      "sha256": "70be42b89bf61f0fa8e69c7d671bf4baac5e8cda650ef3fddd693b0f285746d1"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/node_modules/make-fetch-happen/lib/cache/index.js",
+      "bytes": 1792,
+      "sha256": "b9a47e604b9d6ec9211e5129636ba7366c408c074ea1d4b8c859cf221c347071"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/node_modules/make-fetch-happen/lib/fetch.js",
+      "bytes": 3947,
+      "sha256": "7d57bfd656a6ae2a53738fb3f25365d074d9cb7364794005bc70317ff2bf81e8"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/node_modules/make-fetch-happen/lib/options.js",
+      "bytes": 1688,
+      "sha256": "b067a3566cf03d9a4cc77478efb88c2b3d8cc4081a311b2ae9ea67a500bf3c0e"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/node_modules/@npmcli/config/lib/definitions/definitions.js",
+      "bytes": 73793,
+      "sha256": "83b2068320f1a131c96658940e80522ec1f29150b338ce40eccf486e0ee05900"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/.git",
+      "bytes": 78,
+      "sha256": "6e57b731e5eb4c6528161591fd088f73250813c1a67fc9c1d67083ca80bffc54"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/.git/worktrees/AgentMaturityCompass28/HEAD",
+      "bytes": 50,
+      "sha256": "1cf8ca92f4a597f3c72500c0addc1d61e53c1550d4d1ec2c6f676e57626d1a8d"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/.git/refs/heads/codex/p0-45-current-qualification",
+      "bytes": 41,
+      "sha256": "55bbbad5edbec02494ecd92ac7ce10c3d66245ca8d37eb371dd33b833a8f0b12"
+    }
+  ],
+  "performed": {
+    "productImportOrRuntime": false,
+    "sourceParserCompiler": false,
+    "testsCollectionOrExecution": false,
+    "installBuild": false,
+    "copyFixtureControllerSetupAuthored": false,
+    "gitCommands": false,
+    "networkOrExternalWrites": false,
+    "productSourceTrackerChanges": false,
+    "onlyReadTextJsonHashesAndStat": true,
+    "inMemoryMutationAnchorHashCalculationsOnly": true,
+    "writes": "Only NEW private readiness JSON/MD pair."
+  },
+  "allReadsFinished": true,
+  "capturedUtc": "2026-10-15T06:31:03.839896+00:00",
+  "markdown": {
+    "path": "/private/tmp/p0-41-readonly-readiness-20261015.md",
+    "bytes": 3989,
+    "sha256": "d644f6b9856c6359778cd5f9c37578764771e4bd44429c1434f74345f308a659"
+  }
+}

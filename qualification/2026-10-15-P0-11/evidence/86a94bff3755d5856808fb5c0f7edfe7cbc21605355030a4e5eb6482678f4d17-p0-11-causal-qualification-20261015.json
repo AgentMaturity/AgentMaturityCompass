@@ -1,0 +1,1727 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "source": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T06:50:28.770330+00:00",
+  "state": "complete-pending-independent-review",
+  "formalAcceptanceClosed": false,
+  "runtimeArtifactIndex": {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/runtime-artifact-index.json",
+    "bytes": 83753,
+    "sha256": "cbb4b53af633b4879df157c1357df1c325310c64980f83cc7dd02f240ba874ed"
+  },
+  "finalSourcePreservation": {
+    "path": "/private/tmp/p0-11-qualification-20261015/final-source-preservation.json",
+    "bytes": 2832,
+    "sha256": "f3cd8c9a030493ef686ca1caabbf02372723660f1154041c5d042a646a360e53"
+  },
+  "controller": {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/driver/controller.py",
+    "bytes": 28317,
+    "sha256": "5c1981f23721d88c490c80f2e6c1f2324898f3f7acee719c8ece8c8c1f90e878"
+  },
+  "freezer": {
+    "path": "/private/tmp/p0-11-freeze-qualified-evidence-v2-20261015.py",
+    "bytes": 52709,
+    "sha256": "00c8fd2ef5d934aef19af621e45c07d6266a6bd6609a64a53b50f6ea5086e0fe"
+  },
+  "priorReviewContracts": [
+    {
+      "role": "original",
+      "pin": {
+        "path": "/private/tmp/p0-11-original-corpora-independent-review-20261015.json",
+        "bytes": 23426,
+        "sha256": "ad9128b687def99c672387e0c33ab1926a53082bb0b5087fa8a28905cb1d537a"
+      },
+      "blockingField": "blockingFindings",
+      "requiredFields": {
+        "allReadsFinished": true,
+        "formalAcceptanceClosed": false
+      },
+      "companionPins": [
+        {
+          "path": "/private/tmp/p0-11-original-corpora-independent-review-20261015.md",
+          "bytes": 3460,
+          "sha256": "1b42150ef1a54466cd24f81c739e506d103219e056c8bd00b4e09c0766cc95df"
+        }
+      ]
+    },
+    {
+      "role": "recipe",
+      "pin": {
+        "path": "/private/tmp/p0-11-recipes-static-review-20261015.json",
+        "bytes": 21585,
+        "sha256": "b7619c6e45d47c4782a6cd7be7607f4debc8a8180c649aa16e99a8b7a9b7b278"
+      },
+      "blockingField": "blockingFindings",
+      "requiredFields": {
+        "allReadsFinished": true,
+        "formalAcceptanceClosed": false
+      },
+      "companionPins": [
+        {
+          "path": "/private/tmp/p0-11-recipes-static-review-20261015.md",
+          "bytes": 5159,
+          "sha256": "8d86900942fd1dc460012bc27b75aab1d2d57633ea6aa39d90ef32ce5b40aee0"
+        }
+      ]
+    },
+    {
+      "role": "code",
+      "pin": {
+        "path": "/private/tmp/p0-11-controller-code-static-review-20261015.json",
+        "bytes": 5353,
+        "sha256": "94899d5f0c2c54ba5625432c1a24942102f447a946f34e0a30b7e940d2323aba"
+      },
+      "blockingField": "blockingFindings",
+      "requiredFields": {
+        "allReadsFinished": true,
+        "formalAcceptanceClosed": false
+      },
+      "companionPins": [
+        {
+          "path": "/private/tmp/p0-11-controller-code-static-review-20261015.md",
+          "bytes": 4118,
+          "sha256": "7c337761b5d9dae852ec2f75e42959f350e624778b8878162dfe3e48578b7413"
+        }
+      ]
+    },
+    {
+      "role": "sealed",
+      "pin": {
+        "path": "/private/tmp/p0-11-controller-sealed-setup-review-20261015.json",
+        "bytes": 15390,
+        "sha256": "17782c03541ccfe9be068809b2b25a1a4ffbba2d4bc0dde0b76354848b5ab76c"
+      },
+      "blockingField": "blockingFindings",
+      "requiredFields": {
+        "allReadsFinished": true,
+        "formalAcceptanceClosed": false
+      },
+      "companionPins": [
+        {
+          "path": "/private/tmp/p0-11-controller-sealed-setup-review-20261015.md",
+          "bytes": 3178,
+          "sha256": "5c7976bf076d45f9bf08adec369b8ca768252a1e7f115471ce813812987bf370"
+        }
+      ]
+    }
+  ],
+  "latePreparationHistory": [
+    {
+      "role": "release-helper-v1",
+      "pin": {
+        "path": "/private/tmp/p0-11-author-causal-release-20261015.py",
+        "bytes": 5152,
+        "sha256": "23eebeb4e9decca89cc5b6452ab2144a7d69d71b0374338cf4fbac4186c70475"
+      }
+    },
+    {
+      "role": "release-helper-v2",
+      "pin": {
+        "path": "/private/tmp/p0-11-author-causal-release-v2-20261015.py",
+        "bytes": 5153,
+        "sha256": "fbd1c829fd98444d69f913d45ecddd65e31581395c344ef7e661398ca13b817c"
+      }
+    },
+    {
+      "role": "release-helper-count-issue",
+      "pin": {
+        "path": "/private/tmp/p0-11-release-helper-count-issue-20261015.json",
+        "bytes": 975,
+        "sha256": "134ae70f43e5c702c71461e0e8541824f39905589c603989e5269f2549433eed"
+      }
+    },
+    {
+      "role": "root-causal-attribution",
+      "pin": {
+        "path": "/private/tmp/p0-11-root-causal-attribution-20261015.json",
+        "bytes": 4543,
+        "sha256": "275a99bc5f718abdfedd3d3688d99fc8645e4e0b47c2e859b5036f89b9e2a564"
+      }
+    }
+  ],
+  "controls": [
+    {
+      "control": "C1-map-missing-path-fail-open",
+      "corpusKey": "map",
+      "recipe": {
+        "id": "C1-map-missing-path-fail-open",
+        "file": "scripts/check-threat-model.mjs",
+        "baselineSha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b",
+        "anchors": [
+          {
+            "find": "      if (!existsSync(file)) {\n        errors.push(`channel ${channel.id}: ${path} does not exist`);\n        continue;\n      }",
+            "replace": "      if (!existsSync(file)) {\n        continue;\n      }"
+          }
+        ],
+        "proposedMutantSha256": "363ba9d901a0075c74705f13bc0d73efbb8a60d3f9cd506b6d1d281324a3d4f9",
+        "corpusKey": "map"
+      },
+      "result": {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/result--C1-map-missing-path-fail-open.json",
+        "bytes": 6106,
+        "sha256": "9ed90044c92da95a0a253ff2f70180d48662112e6fff2c3eed15b95b71c47dfd"
+      },
+      "release": {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/releases/C1-map-missing-path-fail-open.json",
+        "bytes": 3526,
+        "sha256": "a0edea9a4573b934e17cfdde9275d8d8932cf6ca4f2b83d4cbdeca4ac17345f2"
+      },
+      "verdict": "body-error-or-assertion-sensitivity-awaiting-root-attribution",
+      "phases": [
+        {
+          "phase": "C1-map-missing-path-fail-open--baseline",
+          "stage": "baseline",
+          "classification": {
+            "classification": "passed",
+            "total": 7,
+            "passed": 7,
+            "failed": 0,
+            "pending": 0,
+            "todo": 0,
+            "failures": [],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:43:01.536263+00:00",
+            "pid": 23367,
+            "sessionLeaderExpected": 23367,
+            "observedPgidAfterLaunch": 23367,
+            "ownedPgid": 23367,
+            "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/threatModelMap.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 0,
+            "endedUtc": "2026-10-15T06:43:02.623098+00:00",
+            "durationMs": 1089,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:43:02.622850+00:00",
+                "pgid": 23367,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 0
+          },
+          "directory": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline",
+          "raw": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/raw.json",
+            "bytes": 2569,
+            "sha256": "c86ec64b1f73b0f895216a13c8874333aa28edf15cc113060add04cda0cc1c30"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/observer.json",
+            "bytes": 3577,
+            "sha256": "86bcc4fa6d01684f3c20af6c81e1ac144d33184f6fe792c9b434e1ccc8e25e66"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/stdout-stderr.log",
+            "bytes": 417,
+            "sha256": "31c3081015ec78fa561634d7a7a99e114819ec47eb4c18a0ad6a18ab4c2f3dd4"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/artifacts.json",
+            "bytes": 2136,
+            "sha256": "2fc15568bb87da6284cd37a5687b74078b9f4b93a5b9095c9c221b7b29b4a235"
+          }
+        },
+        {
+          "phase": "C1-map-missing-path-fail-open--mutant",
+          "stage": "mutant",
+          "classification": {
+            "classification": "body-assertion-failures-observed",
+            "total": 7,
+            "passed": 6,
+            "failed": 1,
+            "pending": 0,
+            "todo": 0,
+            "failures": [
+              {
+                "file": "tests/threatModelMap.test.ts",
+                "fullName": "check-threat-model a cited path that does not exist fails and names the entry",
+                "failureKind": "body-assertion",
+                "rawFailureMessages": [
+                  "AssertionError: expected +0 to be 1 // Object.is equality\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts:29:20\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+                ],
+                "observerErrors": [
+                  {
+                    "message": "expected +0 to be 1 // Object.is equality",
+                    "actual": "0",
+                    "expected": "1",
+                    "showDiff": true,
+                    "operator": "strictEqual",
+                    "diff": "- Expected\n+ Received\n\n- 1\n+ 0",
+                    "name": "AssertionError",
+                    "ok": false,
+                    "stack": "AssertionError: expected +0 to be 1 // Object.is equality\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts:29:20\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+                    "stacks": [
+                      {
+                        "method": "",
+                        "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts",
+                        "line": 29,
+                        "column": 20
+                      }
+                    ]
+                  }
+                ],
+                "masking": "C2 await rejects before outcome assertions210-213; map first-failure frames require root attribution."
+              }
+            ],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:43:04.631995+00:00",
+            "pid": 23385,
+            "sessionLeaderExpected": 23385,
+            "observedPgidAfterLaunch": 23385,
+            "ownedPgid": 23385,
+            "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/threatModelMap.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--mutant/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 1,
+            "endedUtc": "2026-10-15T06:43:05.633140+00:00",
+            "durationMs": 1003,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:43:05.632824+00:00",
+                "pgid": 23385,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 0
+          },
+          "directory": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--mutant",
+          "raw": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--mutant/raw.json",
+            "bytes": 3830,
+            "sha256": "2f70aa88bbd88bf2aed2d21fc4670271182f654de96d364076664a3ac7fc7c3b"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--mutant/observer.json",
+            "bytes": 5437,
+            "sha256": "3cdc83158fd4ccc7d7159f5de538100cd7436564b8cc098e5fd0659e1bc82659"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--mutant/stdout-stderr.log",
+            "bytes": 1647,
+            "sha256": "cfdde523abb98662001bb885e24a144239d577a921bb2837d33fcbc2de107d76"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--mutant/artifacts.json",
+            "bytes": 2120,
+            "sha256": "3b11e3f3b2048291ba303a5d7a9bf270d6ea6c32d7ae47ea06791117b8d2d746"
+          }
+        },
+        {
+          "phase": "C1-map-missing-path-fail-open--restored",
+          "stage": "restored",
+          "classification": {
+            "classification": "passed",
+            "total": 7,
+            "passed": 7,
+            "failed": 0,
+            "pending": 0,
+            "todo": 0,
+            "failures": [],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:43:07.810163+00:00",
+            "pid": 23402,
+            "sessionLeaderExpected": 23402,
+            "observedPgidAfterLaunch": 23402,
+            "ownedPgid": 23402,
+            "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/threatModelMap.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--restored/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 0,
+            "endedUtc": "2026-10-15T06:43:08.777447+00:00",
+            "durationMs": 969,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:43:08.777190+00:00",
+                "pgid": 23402,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 0
+          },
+          "directory": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--restored",
+          "raw": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--restored/raw.json",
+            "bytes": 2558,
+            "sha256": "5e9e7eed153c9cf9e9ecd360155768fe30b4e57fd9414af07c1d0c895848c397"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--restored/observer.json",
+            "bytes": 3577,
+            "sha256": "83465fa2dbfc8829d0ecb7b8814d4582ed5edefbb401b2a6bbb92d7377488e40"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--restored/stdout-stderr.log",
+            "bytes": 417,
+            "sha256": "2b23e57cb5b61d9a94d9771a770dae4784542930b71029a7e1e54fbe80858806"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--restored/artifacts.json",
+            "bytes": 2136,
+            "sha256": "c592f2348164749cfea0f1be9bb44dc7f4efdd9070111bdd4c38b88de759bb99"
+          }
+        }
+      ]
+    },
+    {
+      "control": "C2-tool-recorder-error-propagates",
+      "corpusKey": "recording",
+      "recipe": {
+        "id": "C2-tool-recorder-error-propagates",
+        "file": "src/tools/toolPipeline.ts",
+        "baselineSha256": "de0791037badc8d0abc62642527d87e7a6030d1d364e322c30995d187ccaf794",
+        "anchors": [
+          {
+            "find": "      } catch {\n        // The guarantee belongs HERE, not to each recorder.",
+            "replace": "      } catch (error) {\n        throw error;\n        // The guarantee belongs HERE, not to each recorder."
+          }
+        ],
+        "proposedMutantSha256": "3a7f58aae191b877cea66f308648c0a330ad46c56259135dc14bf5828929eea0",
+        "corpusKey": "recording"
+      },
+      "result": {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/result--C2-tool-recorder-error-propagates.json",
+        "bytes": 5172,
+        "sha256": "b56fbd50718c0859878e75096f87ca79212aab112a924731a834d9d762599d2d"
+      },
+      "release": {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/releases/C2-tool-recorder-error-propagates.json",
+        "bytes": 3573,
+        "sha256": "40195ad6903383e4879b9517e16ba7eb23f84dd323ae5c6ab1e83b90b18cfb76"
+      },
+      "verdict": "body-error-or-assertion-sensitivity-awaiting-root-attribution",
+      "phases": [
+        {
+          "phase": "C2-tool-recorder-error-propagates--baseline",
+          "stage": "baseline",
+          "classification": {
+            "classification": "passed",
+            "total": 7,
+            "passed": 7,
+            "failed": 0,
+            "pending": 0,
+            "todo": 0,
+            "failures": [],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:43:53.759768+00:00",
+            "pid": 23479,
+            "sessionLeaderExpected": 23479,
+            "observedPgidAfterLaunch": 23479,
+            "ownedPgid": 23479,
+            "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/toolEvidenceRecording.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--baseline/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 0,
+            "endedUtc": "2026-10-15T06:43:57.899535+00:00",
+            "durationMs": 4142,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:43:57.899207+00:00",
+                "pgid": 23479,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 0
+          },
+          "directory": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--baseline",
+          "raw": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--baseline/raw.json",
+            "bytes": 2716,
+            "sha256": "d7585e754e367b7515c71ff705d5efeb1359f21fe1da6212bca03e6997dfc8d6"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--baseline/observer.json",
+            "bytes": 4535,
+            "sha256": "19bd54b8310e351d26480db2633d8b05e6b9e033caeb85366c3ac9031be19f77"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--baseline/stdout-stderr.log",
+            "bytes": 472,
+            "sha256": "8c0555c1f210986bce48d2136072cdf9ba5738a9abfb6bede647071f74977f79"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--baseline/artifacts.json",
+            "bytes": 2172,
+            "sha256": "1008642e61120cc82a9e9b91d04b5ff4fed08a0aa4074364e534e7bed08b72b9"
+          }
+        },
+        {
+          "phase": "C2-tool-recorder-error-propagates--mutant",
+          "stage": "mutant",
+          "classification": {
+            "classification": "body-failures-observed",
+            "total": 7,
+            "passed": 6,
+            "failed": 1,
+            "pending": 0,
+            "todo": 0,
+            "failures": [
+              {
+                "file": "tests/toolEvidenceRecording.test.ts",
+                "fullName": "recording never breaks the call returns the tool's real outcome when the recorder throws",
+                "failureKind": "exact-genuine-recorder-error-propagation",
+                "rawFailureMessages": [
+                  "Error: the evidence store is unreachable\n    at Object.record (/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:202:15)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/toolPipeline.ts:306:19\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:206:21\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+                ],
+                "observerErrors": [
+                  {
+                    "stack": "Error: the evidence store is unreachable\n    at Object.record (/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:202:15)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/toolPipeline.ts:306:19\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:206:21\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+                    "message": "the evidence store is unreachable",
+                    "constructor": "Function<Error>",
+                    "name": "Error",
+                    "toString": "Function<toString>",
+                    "stacks": [
+                      {
+                        "method": "Object.record",
+                        "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts",
+                        "line": 202,
+                        "column": 15
+                      },
+                      {
+                        "method": "",
+                        "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/toolPipeline.ts",
+                        "line": 306,
+                        "column": 19
+                      },
+                      {
+                        "method": "",
+                        "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts",
+                        "line": 206,
+                        "column": 21
+                      }
+                    ]
+                  }
+                ],
+                "masking": "C2 await rejects before outcome assertions210-213; map first-failure frames require root attribution."
+              }
+            ],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:43:59.909109+00:00",
+            "pid": 23484,
+            "sessionLeaderExpected": 23484,
+            "observedPgidAfterLaunch": 23484,
+            "ownedPgid": 23484,
+            "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/toolEvidenceRecording.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 1,
+            "endedUtc": "2026-10-15T06:44:03.994506+00:00",
+            "durationMs": 4088,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:44:03.994136+00:00",
+                "pgid": 23484,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 0
+          },
+          "directory": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant",
+          "raw": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/raw.json",
+            "bytes": 3299,
+            "sha256": "1c6f5afd33e772f77f8981ef0a0d11f5407561c03bee018035804ddfddb541de"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/observer.json",
+            "bytes": 6070,
+            "sha256": "a98eabb5be762caf62ef78da303f75b2c52474059bb53b352f3a832dcef6e47a"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/stdout-stderr.log",
+            "bytes": 1547,
+            "sha256": "e2a3d36a647ac9930392ed2d65613e9d5c29a6c4e22387f7c40868035e712a0e"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/artifacts.json",
+            "bytes": 2156,
+            "sha256": "eeb0f112ba337ed9729861dd8538ba4392544f876a7277912adb80fc59554daf"
+          }
+        },
+        {
+          "phase": "C2-tool-recorder-error-propagates--restored",
+          "stage": "restored",
+          "classification": {
+            "classification": "passed",
+            "total": 7,
+            "passed": 7,
+            "failed": 0,
+            "pending": 0,
+            "todo": 0,
+            "failures": [],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:44:06.024525+00:00",
+            "pid": 23525,
+            "sessionLeaderExpected": 23525,
+            "observedPgidAfterLaunch": 23525,
+            "ownedPgid": 23525,
+            "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/toolEvidenceRecording.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 0,
+            "endedUtc": "2026-10-15T06:44:10.284946+00:00",
+            "durationMs": 4262,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:44:10.284602+00:00",
+                "pgid": 23525,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 0
+          },
+          "directory": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored",
+          "raw": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/raw.json",
+            "bytes": 2708,
+            "sha256": "98917cba5f8cde22ed6571e5300bdc613a0d6c35c61cf16c6c597b2bcfcf39f5"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/observer.json",
+            "bytes": 4535,
+            "sha256": "b13a447c056981600d0bbed049a11142bfb34e02d33a40e48be41712bcf8c0e5"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/stdout-stderr.log",
+            "bytes": 472,
+            "sha256": "3b6bc52143e46a6a8baafa47f848826443d1cb030b2c60d4fba579f092eaeda4"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/artifacts.json",
+            "bytes": 2172,
+            "sha256": "b41a0d09cb8ae4c191c8bafde97f4839e1a023f1dd8474c6eeffb1516d6f6676"
+          }
+        }
+      ]
+    },
+    {
+      "control": "L1-optional-historical-literal-whole-branch-removal",
+      "corpusKey": "map",
+      "recipe": {
+        "id": "L1-optional-historical-literal-whole-branch-removal",
+        "file": "scripts/check-threat-model.mjs",
+        "baselineSha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b",
+        "anchors": [
+          {
+            "find": "      if (!existsSync(file)) {\n        errors.push(`channel ${channel.id}: ${path} does not exist`);\n        continue;\n      }",
+            "replace": ""
+          }
+        ],
+        "proposedMutantSha256": "c843f26336d00d65286202d0f56102ceee75ced5d0cc7048bbbd196b241e8ccc",
+        "corpusKey": "map"
+      },
+      "result": {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/result--L1-optional-historical-literal-whole-branch-removal.json",
+        "bytes": 6848,
+        "sha256": "da63e562496468eccf940f4dac0f7b44f0192c8c4fea648a679ed5a314aa208b"
+      },
+      "release": {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/releases/L1-optional-historical-literal-whole-branch-removal.json",
+        "bytes": 3650,
+        "sha256": "cde65f6afd39b4815df163a6286d6c2b12af62e56a61b845fd3baafb9d952477"
+      },
+      "verdict": "body-error-or-assertion-sensitivity-awaiting-root-attribution",
+      "phases": [
+        {
+          "phase": "L1-optional-historical-literal-whole-branch-removal--baseline",
+          "stage": "baseline",
+          "classification": {
+            "classification": "passed",
+            "total": 7,
+            "passed": 7,
+            "failed": 0,
+            "pending": 0,
+            "todo": 0,
+            "failures": [],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:44:39.789746+00:00",
+            "pid": 23577,
+            "sessionLeaderExpected": 23577,
+            "observedPgidAfterLaunch": 23577,
+            "ownedPgid": 23577,
+            "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/threatModelMap.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 0,
+            "endedUtc": "2026-10-15T06:44:40.730513+00:00",
+            "durationMs": 943,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:44:40.730281+00:00",
+                "pgid": 23577,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 0
+          },
+          "directory": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline",
+          "raw": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/raw.json",
+            "bytes": 2561,
+            "sha256": "a4bb6b16ea2953b39b9f2acaedfd23d6afe2a5b5034cc6f813516d06fd284c05"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/observer.json",
+            "bytes": 3577,
+            "sha256": "662baffcfbfa8cea5a05e42ddcfb742265f8716ded78539a252b431b1bd3c7aa"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/stdout-stderr.log",
+            "bytes": 439,
+            "sha256": "cea584b559bfdaf8caa134222563599bf4406691c65b21b99aead39bf5a61102"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/artifacts.json",
+            "bytes": 2334,
+            "sha256": "95c9c0a59f2ae9c758071eaf0efae670f8aa10f6be1a28dcb76220311c2bd56a"
+          }
+        },
+        {
+          "phase": "L1-optional-historical-literal-whole-branch-removal--mutant",
+          "stage": "mutant",
+          "classification": {
+            "classification": "body-assertion-failures-observed",
+            "total": 7,
+            "passed": 6,
+            "failed": 1,
+            "pending": 0,
+            "todo": 0,
+            "failures": [
+              {
+                "file": "tests/threatModelMap.test.ts",
+                "fullName": "check-threat-model a cited path that does not exist fails and names the entry",
+                "failureKind": "body-assertion",
+                "rawFailureMessages": [
+                  "AssertionError: expected 'check-threat-model: /private/tmp/p0-1\u2026' to contain 'channel network-egress'\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts:30:20\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+                ],
+                "observerErrors": [
+                  {
+                    "message": "expected 'check-threat-model: /private/tmp/p0-1\u2026' to contain 'channel network-egress'",
+                    "actual": "check-threat-model: /private/tmp/p0-11-causal-qualification-20261015/closure/tests/fixtures/threat-model/missing-path.json: ENOENT: no such file or directory, open '/private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/noSuchFile.ts'\n",
+                    "expected": "channel network-egress",
+                    "showDiff": true,
+                    "operator": "strictEqual",
+                    "diff": "- Expected\n+ Received\n\n- channel network-egress\n+ check-threat-model: /private/tmp/p0-11-causal-qualification-20261015/closure/tests/fixtures/threat-model/missing-path.json: ENOENT: no such file or directory, open '/private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/noSuchFile.ts'\n+",
+                    "name": "AssertionError",
+                    "ok": false,
+                    "stack": "AssertionError: expected 'check-threat-model: /private/tmp/p0-1\u2026' to contain 'channel network-egress'\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts:30:20\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+                    "stacks": [
+                      {
+                        "method": "",
+                        "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts",
+                        "line": 30,
+                        "column": 20
+                      }
+                    ]
+                  }
+                ],
+                "masking": "C2 await rejects before outcome assertions210-213; map first-failure frames require root attribution."
+              }
+            ],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:44:42.744553+00:00",
+            "pid": 23590,
+            "sessionLeaderExpected": 23590,
+            "observedPgidAfterLaunch": 23590,
+            "ownedPgid": 23590,
+            "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/threatModelMap.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 1,
+            "endedUtc": "2026-10-15T06:44:43.680491+00:00",
+            "durationMs": 938,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:44:43.680249+00:00",
+                "pgid": 23590,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 0
+          },
+          "directory": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant",
+          "raw": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/raw.json",
+            "bytes": 3874,
+            "sha256": "e90245b8ef522a819f6d59ecd93fe33de4ee64a31661509b8bffcf99c2f8ae5b"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/observer.json",
+            "bytes": 6066,
+            "sha256": "7c6ac02c787c9675dd82cdd74ce7adbec952f5870d858a180ae9382ced8817a6"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/stdout-stderr.log",
+            "bytes": 1913,
+            "sha256": "79b17d463eb5354de8664bfa5c8a4ca7994e06e381879bef6ef2a587039f9b8b"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/artifacts.json",
+            "bytes": 2318,
+            "sha256": "0ad324123775a77b079553357a7eea9307a26be8610cce447e1c02dbf31d8f17"
+          }
+        },
+        {
+          "phase": "L1-optional-historical-literal-whole-branch-removal--restored",
+          "stage": "restored",
+          "classification": {
+            "classification": "passed",
+            "total": 7,
+            "passed": 7,
+            "failed": 0,
+            "pending": 0,
+            "todo": 0,
+            "failures": [],
+            "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+          },
+          "command": {
+            "startedUtc": "2026-10-15T06:44:45.704193+00:00",
+            "pid": 23599,
+            "sessionLeaderExpected": 23599,
+            "observedPgidAfterLaunch": 23599,
+            "ownedPgid": 23599,
+            "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+            "argv": [
+              "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+              "run",
+              "tests/threatModelMap.test.ts",
+              "--cache=false",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
+              "--reporter=default",
+              "--reporter=json",
+              "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+              "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--restored/raw.json"
+            ],
+            "environmentKeys": [
+              "AMC_P021_RUNTIME_OBSERVER_PATH",
+              "GIT_NO_LAZY_FETCH",
+              "HOME",
+              "NODE_ENV",
+              "NO_COLOR",
+              "PATH",
+              "TMPDIR"
+            ],
+            "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+            "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+            "node": {
+              "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+              "bytes": 67024,
+              "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+            },
+            "exit": 0,
+            "endedUtc": "2026-10-15T06:44:46.663874+00:00",
+            "durationMs": 962,
+            "groupAbsentByESRCH": true,
+            "ownedGroupProbes": [
+              {
+                "capturedUtc": "2026-10-15T06:44:46.663566+00:00",
+                "pgid": 23599,
+                "signal": 0,
+                "absentByESRCH": true,
+                "errno": 3,
+                "detail": "[Errno 3] No such process"
+              }
+            ],
+            "groupPollingDurationMs": 0
+          },
+          "directory": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--restored",
+          "raw": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--restored/raw.json",
+            "bytes": 2566,
+            "sha256": "e60a611ec613a82856fd5e6f4780bc7a9760e0d97347b3b321106cffcf1e77e3"
+          },
+          "observer": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--restored/observer.json",
+            "bytes": 3577,
+            "sha256": "3569699afc13ece4be3e8d343fa5d281e5bee374c9602b9cfb41c3f27b0b6bac"
+          },
+          "combinedStream": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--restored/stdout-stderr.log",
+            "bytes": 439,
+            "sha256": "807f1c81fdf4246801006b32fa487994fd9c72ffddd263bbdfaebff4709a4089"
+          },
+          "artifactManifest": {
+            "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--restored/artifacts.json",
+            "bytes": 2334,
+            "sha256": "59b8ee79ae537bb6bae798741b1686589089d961216e206b9a1497434de6780b"
+          }
+        }
+      ]
+    }
+  ],
+  "causalCommandRecords": [
+    {
+      "startedUtc": "2026-10-15T06:43:01.536263+00:00",
+      "pid": 23367,
+      "sessionLeaderExpected": 23367,
+      "observedPgidAfterLaunch": 23367,
+      "ownedPgid": 23367,
+      "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/threatModelMap.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 0,
+      "endedUtc": "2026-10-15T06:43:02.623098+00:00",
+      "durationMs": 1089,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:43:02.622850+00:00",
+          "pgid": 23367,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 0
+    },
+    {
+      "startedUtc": "2026-10-15T06:43:04.631995+00:00",
+      "pid": 23385,
+      "sessionLeaderExpected": 23385,
+      "observedPgidAfterLaunch": 23385,
+      "ownedPgid": 23385,
+      "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/threatModelMap.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--mutant/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 1,
+      "endedUtc": "2026-10-15T06:43:05.633140+00:00",
+      "durationMs": 1003,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:43:05.632824+00:00",
+          "pgid": 23385,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 0
+    },
+    {
+      "startedUtc": "2026-10-15T06:43:07.810163+00:00",
+      "pid": 23402,
+      "sessionLeaderExpected": 23402,
+      "observedPgidAfterLaunch": 23402,
+      "ownedPgid": 23402,
+      "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/threatModelMap.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--restored/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 0,
+      "endedUtc": "2026-10-15T06:43:08.777447+00:00",
+      "durationMs": 969,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:43:08.777190+00:00",
+          "pgid": 23402,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 0
+    },
+    {
+      "startedUtc": "2026-10-15T06:43:53.759768+00:00",
+      "pid": 23479,
+      "sessionLeaderExpected": 23479,
+      "observedPgidAfterLaunch": 23479,
+      "ownedPgid": 23479,
+      "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/toolEvidenceRecording.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--baseline/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 0,
+      "endedUtc": "2026-10-15T06:43:57.899535+00:00",
+      "durationMs": 4142,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:43:57.899207+00:00",
+          "pgid": 23479,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 0
+    },
+    {
+      "startedUtc": "2026-10-15T06:43:59.909109+00:00",
+      "pid": 23484,
+      "sessionLeaderExpected": 23484,
+      "observedPgidAfterLaunch": 23484,
+      "ownedPgid": 23484,
+      "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/toolEvidenceRecording.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 1,
+      "endedUtc": "2026-10-15T06:44:03.994506+00:00",
+      "durationMs": 4088,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:44:03.994136+00:00",
+          "pgid": 23484,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 0
+    },
+    {
+      "startedUtc": "2026-10-15T06:44:06.024525+00:00",
+      "pid": 23525,
+      "sessionLeaderExpected": 23525,
+      "observedPgidAfterLaunch": 23525,
+      "ownedPgid": 23525,
+      "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/toolEvidenceRecording.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 0,
+      "endedUtc": "2026-10-15T06:44:10.284946+00:00",
+      "durationMs": 4262,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:44:10.284602+00:00",
+          "pgid": 23525,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 0
+    },
+    {
+      "startedUtc": "2026-10-15T06:44:39.789746+00:00",
+      "pid": 23577,
+      "sessionLeaderExpected": 23577,
+      "observedPgidAfterLaunch": 23577,
+      "ownedPgid": 23577,
+      "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/threatModelMap.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 0,
+      "endedUtc": "2026-10-15T06:44:40.730513+00:00",
+      "durationMs": 943,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:44:40.730281+00:00",
+          "pgid": 23577,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 0
+    },
+    {
+      "startedUtc": "2026-10-15T06:44:42.744553+00:00",
+      "pid": 23590,
+      "sessionLeaderExpected": 23590,
+      "observedPgidAfterLaunch": 23590,
+      "ownedPgid": 23590,
+      "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/threatModelMap.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--mutant/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 1,
+      "endedUtc": "2026-10-15T06:44:43.680491+00:00",
+      "durationMs": 938,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:44:43.680249+00:00",
+          "pgid": 23590,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 0
+    },
+    {
+      "startedUtc": "2026-10-15T06:44:45.704193+00:00",
+      "pid": 23599,
+      "sessionLeaderExpected": 23599,
+      "observedPgidAfterLaunch": 23599,
+      "ownedPgid": 23599,
+      "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/threatModelMap.test.ts",
+        "--cache=false",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--restored/raw.json"
+      ],
+      "environmentKeys": [
+        "AMC_P021_RUNTIME_OBSERVER_PATH",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "NODE_ENV",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+      "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+      "node": {
+        "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "bytes": 67024,
+        "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+      },
+      "exit": 0,
+      "endedUtc": "2026-10-15T06:44:46.663874+00:00",
+      "durationMs": 962,
+      "groupAbsentByESRCH": true,
+      "ownedGroupProbes": [
+        {
+          "capturedUtc": "2026-10-15T06:44:46.663566+00:00",
+          "pgid": 23599,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3,
+          "detail": "[Errno 3] No such process"
+        }
+      ],
+      "groupPollingDurationMs": 0
+    }
+  ],
+  "executionCounts": {
+    "total": 63,
+    "passed": 60,
+    "failed": 3,
+    "pending": 0,
+    "todo": 0
+  },
+  "failureKinds": {
+    "body-assertion": 2,
+    "exact-genuine-recorder-error-propagation": 1
+  },
+  "distinctRepeatedCorpusRegistrations": 14,
+  "distinctFailedFileTitlePairs": 2,
+  "mutantPassedCounts": [
+    6,
+    6,
+    6
+  ],
+  "survivingControls": [],
+  "failuresAndMasking": [
+    {
+      "file": "tests/threatModelMap.test.ts",
+      "fullName": "check-threat-model a cited path that does not exist fails and names the entry",
+      "failureKind": "body-assertion",
+      "rawFailureMessages": [
+        "AssertionError: expected +0 to be 1 // Object.is equality\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts:29:20\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ],
+      "observerErrors": [
+        {
+          "message": "expected +0 to be 1 // Object.is equality",
+          "actual": "0",
+          "expected": "1",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "- Expected\n+ Received\n\n- 1\n+ 0",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected +0 to be 1 // Object.is equality\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts:29:20\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts",
+              "line": 29,
+              "column": 20
+            }
+          ]
+        }
+      ],
+      "masking": "C2 await rejects before outcome assertions210-213; map first-failure frames require root attribution."
+    },
+    {
+      "file": "tests/toolEvidenceRecording.test.ts",
+      "fullName": "recording never breaks the call returns the tool's real outcome when the recorder throws",
+      "failureKind": "exact-genuine-recorder-error-propagation",
+      "rawFailureMessages": [
+        "Error: the evidence store is unreachable\n    at Object.record (/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:202:15)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/toolPipeline.ts:306:19\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:206:21\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "observerErrors": [
+        {
+          "stack": "Error: the evidence store is unreachable\n    at Object.record (/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:202:15)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/toolPipeline.ts:306:19\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:206:21\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "message": "the evidence store is unreachable",
+          "constructor": "Function<Error>",
+          "name": "Error",
+          "toString": "Function<toString>",
+          "stacks": [
+            {
+              "method": "Object.record",
+              "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts",
+              "line": 202,
+              "column": 15
+            },
+            {
+              "method": "",
+              "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/toolPipeline.ts",
+              "line": 306,
+              "column": 19
+            },
+            {
+              "method": "",
+              "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts",
+              "line": 206,
+              "column": 21
+            }
+          ]
+        }
+      ],
+      "masking": "C2 await rejects before outcome assertions210-213; map first-failure frames require root attribution."
+    },
+    {
+      "file": "tests/threatModelMap.test.ts",
+      "fullName": "check-threat-model a cited path that does not exist fails and names the entry",
+      "failureKind": "body-assertion",
+      "rawFailureMessages": [
+        "AssertionError: expected 'check-threat-model: /private/tmp/p0-1\u2026' to contain 'channel network-egress'\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts:30:20\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ],
+      "observerErrors": [
+        {
+          "message": "expected 'check-threat-model: /private/tmp/p0-1\u2026' to contain 'channel network-egress'",
+          "actual": "check-threat-model: /private/tmp/p0-11-causal-qualification-20261015/closure/tests/fixtures/threat-model/missing-path.json: ENOENT: no such file or directory, open '/private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/noSuchFile.ts'\n",
+          "expected": "channel network-egress",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "- Expected\n+ Received\n\n- channel network-egress\n+ check-threat-model: /private/tmp/p0-11-causal-qualification-20261015/closure/tests/fixtures/threat-model/missing-path.json: ENOENT: no such file or directory, open '/private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/noSuchFile.ts'\n+",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'check-threat-model: /private/tmp/p0-1\u2026' to contain 'channel network-egress'\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts:30:20\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/threatModelMap.test.ts",
+              "line": 30,
+              "column": 20
+            }
+          ]
+        }
+      ],
+      "masking": "C2 await rejects before outcome assertions210-213; map first-failure frames require root attribution."
+    }
+  ],
+  "manualRootAttribution": "Pending independent actual review. Preserve C1 status masks, same genuine C2 Error and L1 ENOENT/refusal difference; no generic nonzero-as-admission.",
+  "limits": [
+    "Formal acceptance is false; bounded evidence awaits independent actual review after freezing.",
+    "Original map 7 / telemetry 2 / preview 5 / recording 7 are four separate runs, 21 distinct registrations across 4 files. Primary 9 aggregates two runs, not one 9-case process. Nine causal phases repeat 14 distinct existing registrations: 63 executions, no new tests.",
+    "C1 semantic missing-path error removal retains continue. Status assertion 29 can mask diagnostic assertions 30-31. C1 is not historical literal L1.",
+    "L1 whole-branch removal can still refuse through ENOENT while changed text fails an output assertion. No invalid-map admission or historical pass-after-removal acceptance follows from nonzero/diagnostic sensitivity.",
+    "C2 rethrows the SAME original callback Error, possibly rejecting at await 206 before assertions 210-213. Preserve callback202/body-await 206/record306 frames, not inserted throwline. This is not a genuine durable-store outage, policy denial or journaled-effect reconciliation.",
+    "Actual AssertionErrors, exact C2 Error and survivors are derived from finished records. Generic setup/native/timeout/hook/late/pending/process uncertainty is never a kill; masked later assertions remain unobserved.",
+    "Map tests invoke actual Node MJS checker, not built amc. Text/schema/path checks are not sixteen-channel enforcement. Original checker children inherit environment, have no explicit timeout and no separately retained child PID/streams.",
+    "Telemetry has genuine workspace/vault/governed fs.read/SQLite plus throwing-exporter/canned-fetch seams. Ordinary fixture batch transaction completes before queue; nested callers may use savepoints, not universal outer durable commits. No real collector outage, independent seal or fully cold/WAL-free proof.",
+    "Preview 5 observes disabled serialization. Recording 7 uses local audit/metric rows plus direct READ_ONLY echo and genuinely throwing callback. No protected-effect or actual evidence-store failure claim.",
+    "Original wrappers inherit environment. Absent endpoint overrides/default loopback is preflight, not zero network/credential/OS isolation. Causal seven-key environment borrows parent dependencies, not complete dependency/cache/transport isolation.",
+    "Only owned process groups receive signal 0 probes after normal exits. Reporter precedes global teardown; full exits/streams/known banners are checked. The 420s supervisor sends no terminating signal and preserves original 30s deadlines; detached descendants are not universally excluded.",
+    "Current 16 channels / 8 failure rows are legitimate later coverage. Sid residual-risk/status review, ASI experimental/re-verify titles, stale stamp, occupied P1-56/57/58 proposed keys and complete behavioral truth remain open.",
+    "Required duplicate 1269 / dead 2751 source-quality debt remains failed/unwaived with prior exact-code attribution. Fullsuite/coverage/Node24/hosted/PR+merge/release/formal dependency/G0/Done are not established.",
+    "All earlier strict gaps/user skips, shared/Claude/A4/paused P2-02 holds and pending transfers remain intact. Historical Done is not acceptance or ownership clearance."
+  ]
+}

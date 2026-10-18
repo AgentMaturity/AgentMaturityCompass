@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/classification.json",
+    "bytes": 229,
+    "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/command.json",
+    "bytes": 1936,
+    "sha256": "bf0c1f53e90b541ec852cd5cae2aefcc9a7f4bdc0fc2be9545dcc7c81a0b340b"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/inputs-after.json",
+    "bytes": 830,
+    "sha256": "7667e9aad15e75c22b88103a53f4192c68c8e2059cfd098b28fef92dbbf0d3a5"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/inputs-before.json",
+    "bytes": 830,
+    "sha256": "b614617f36310379dca07d50910aa06fe0268c8f087070604fb24ed5f916331f"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/observer.json",
+    "bytes": 20517,
+    "sha256": "0bac6fdf9288fdf9d26944a08e941384946560225c8e0c596df99010267a7f54"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "ce2cdf964c0030aa14593b1ed7355f7682acb0fb927f3bd45925e07e7ff9a0e3"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/owned-process.json",
+    "bytes": 1561,
+    "sha256": "cb3aeb58d26b37ad6e30e19c776eebc6af580c5f90583e6cac3f31b6dbf20b43"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/raw.json",
+    "bytes": 13472,
+    "sha256": "85089bad985d007d8de6a911cacbd6584976c37a016c87bee6fdc2eed65e9733"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/stdout-stderr.log",
+    "bytes": 798,
+    "sha256": "2a2004738fd3cf297825e9be9f81f6aad83bc9bd2970805e2fcbdc70e261f871"
+  }
+]

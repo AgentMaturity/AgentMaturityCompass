@@ -1,0 +1,35 @@
+
+> agent-maturity-compass@1.2.0 check:duplicates /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass
+> node scripts/source-quality.mjs duplicates
+
+{
+  "status": "failed",
+  "tool": "jscpd",
+  "version": "5.4.0",
+  "findingCount": 1269,
+  "statistics": {
+    "clones": 1269,
+    "duplicatedLines": 14777,
+    "duplicatedTokens": 95693,
+    "lines": 526669,
+    "newClones": 0,
+    "newDuplicatedLines": 0,
+    "percentage": 2.8057470631459225,
+    "percentageTokens": 2.917495307123142,
+    "sources": 2143,
+    "tokens": 3279971
+  },
+  "representativeFindings": [
+    "[[\"a4/a4Router.ts\",\"a4/a4RouterStages.ts\"],\"typescript\",\"fbe506ebc7c545b7dcbf8bb34ca36814d6c2a7268dcea84a0126d45dcbf500de\"]",
+    "[[\"a4/a4Router.ts\",\"api/nativeTasksRouter.ts\"],\"typescript\",\"2d212c944cd82cd8804351171f9dd363da57ad9b7faccc2e163cdabb3c10b1a1\"]",
+    "[[\"a4/a4Router.ts\",\"mcp/a4Tools.ts\"],\"typescript\",\"df7ee641bc3ded1aec920ce188369e3c83b53b537e2a80387db9ef467a4a89aa\"]",
+    "[[\"a4/a4RouterStages.ts\",\"a4/spec/adapt.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+    "[[\"a4/a4RouterStages.ts\",\"a4/spec/aspire.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+    "[[\"a4/a4RouterStages.ts\",\"a4/spec/assemble.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+    "[[\"a4/adaptContextPlugin.ts\",\"a4/spec/assemble.ts\"],\"typescript\",\"324a2b47f6016f4093a5592c7ab29c67ba6eb9678640c4f1318bca92b62895ed\"]",
+    "[[\"a4/adaptPolicy.ts\",\"a4/stages/assemble.ts\"],\"typescript\",\"cdf8e0a57471dcc73b0808ed9fe7c69923343f7ab0ec1f773048e799d5e241d7\"]",
+    "[[\"a4/assembleBuild.ts\",\"a4/stages/adapt.ts\"],\"typescript\",\"d873f32d3eb5d538f041c3ebdf2e06ebc2edb70cec8839efc1ae78ee961c7c15\"]",
+    "[[\"a4/assembleResolve.ts\",\"a4/assembleResolve.ts\"],\"typescript\",\"58209a897c4b1182be8679b674d36d6b86046e208a3418b47250e958f32a0afe\"]"
+  ]
+}
+ ELIFECYCLE  Command failed with exit code 1.

@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/classification.json",
+    "bytes": 227,
+    "sha256": "91c20674729fcbed4fd622bf6f22112342c0af0fa9255787c8cde71ca5d4f34c"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/command.json",
+    "bytes": 1721,
+    "sha256": "7890dcaa2958001d9b226bcf4db324233e73bd0054b7da0e81b90d7c88dfa741"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/inputs-after.json",
+    "bytes": 830,
+    "sha256": "154b516977e0af16ae42afa2fabecd1c4cd51ff2f6bf79934cc4927eba72e2b2"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/inputs-before.json",
+    "bytes": 830,
+    "sha256": "f4ef7562ef8f825a9953a4a8f1aa36f344d661c722617de667ae8a5e0ba2cfcc"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/observer.json",
+    "bytes": 3577,
+    "sha256": "86bcc4fa6d01684f3c20af6c81e1ac144d33184f6fe792c9b434e1ccc8e25e66"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "f0b2c9c25e37a73595f12ae39d47c9859b59b5274d34c515790c23cca60dd734"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/owned-process.json",
+    "bytes": 1346,
+    "sha256": "a43125f61be1c7f6b9d12487b5bfac3bb2aada08f6c30e358fbf39ccccdc65de"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/raw.json",
+    "bytes": 2569,
+    "sha256": "c86ec64b1f73b0f895216a13c8874333aa28edf15cc113060add04cda0cc1c30"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/stdout-stderr.log",
+    "bytes": 417,
+    "sha256": "31c3081015ec78fa561634d7a7a99e114819ec47eb4c18a0ad6a18ab4c2f3dd4"
+  }
+]

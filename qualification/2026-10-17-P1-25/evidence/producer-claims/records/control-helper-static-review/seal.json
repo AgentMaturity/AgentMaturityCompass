@@ -1,0 +1,25 @@
+{
+  "schema": "p125pc-independent-control-helper-review-seal/1",
+  "at": "2026-10-17T01:54:47.585344+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-helper-static-review/review.json",
+      "bytes": 5302,
+      "sha256": "2097aa093ba9d583f387eb3164ce5140ce72bf79c6d7c8c86f7e5bb94cd995d0"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-helper-static-review/README.md",
+      "bytes": 1561,
+      "sha256": "9a8c9dbfb8a52f594a84908ed5d45b0fb2b5237b61f53937d9e82c5d177c74a5"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-helper-static-review/input-pins.json",
+      "bytes": 6252,
+      "sha256": "68999f7b0eeecde5e54a73eae90df355508864f87e51bb87f15fc6fa9047dded"
+    }
+  ],
+  "inputCount": 27,
+  "blockers": [],
+  "helperImportedParsedCompiledOrExecuted": false,
+  "sourceRuntimeOrControlAdmission": false
+}

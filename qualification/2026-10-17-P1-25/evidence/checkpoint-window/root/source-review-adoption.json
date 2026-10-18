@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-16T23:42:03.697384+00:00",
+  "sourceCommit": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+  "review": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/source-evidence-review/review.json",
+    "bytes": 87119,
+    "sha256": "eeb63585618873a6af13bb59ccf01a63699685c406884aaeb75a084056145ea4"
+  },
+  "seal": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/source-evidence-review/seal.json",
+    "bytes": 1376,
+    "sha256": "c825d19a334f2bcc6a3941bb77fbcf8ad02faee3741feefe062734c9dfb8bbf2"
+  },
+  "rootReadBoundedReviewFactsAndVerifiedSealedOutputs": true,
+  "blockers": [],
+  "freshFailureAndCorrectedRunRemainSeparate": true,
+  "noWholeIssueCredit": true
+}

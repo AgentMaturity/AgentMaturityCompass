@@ -1,0 +1,13 @@
+{
+  "schema": "p125pc-receipt-scope-read-only-attempt1-failure/1",
+  "at": "2026-10-17T02:10:34.183971+00:00",
+  "toolChunkId": "c24410",
+  "outerNaturalExit": 1,
+  "sessionId": null,
+  "stderr": "Traceback (most recent call last): File <stdin>, line 57, in <module>; KeyError: physicalCommonDir",
+  "reason": "The report constructor expected a different field name in the preserved prior history-authority rows. The Git scan and finite file reads had completed, but the observations dictionary was not saved.",
+  "observationsFileProduced": false,
+  "unpersistedChildFactsNotCredited": true,
+  "noProductHelperSourceIndexQaReservationOrNetworkMutation": true,
+  "correction": "Use the actual prior schema key and save raw read results before final comparisons; perform a distinct fresh read-only scan."
+}

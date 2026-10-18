@@ -16,8 +16,9 @@
  *     --monitor-pubkey <monitor_ed25519.pub> [--route /openai] [--model gpt-test]
  *     [--agent default] [--out result.json] [--timeout-ms 10000]
  *
- * The lease token is read from AMC_DEPLOY_VERIFY_LEASE or --lease-file and is
- * never printed or written. Exit: 0 pass, 1 fail, 2 usage error.
+ * The lease token is read from AMC_DEPLOY_VERIFY_LEASE or --lease-file. Exact
+ * plaintext reflections in public string values are redacted; non-scalar
+ * receipt metadata is displayed as a placeholder. Exit: 0 pass, 1 fail, 2 usage error.
  * Node built-ins only.
  */
 import { createHash, verify } from "node:crypto";
@@ -77,11 +78,14 @@ function parseArgs(argv) {
     else if (flag === "--agent") opts.agent = value;
     else if (flag === "--out") opts.out = value;
     else if (flag === "--lease-file") opts.leaseFile = value;
-    else if (flag === "--timeout-ms") opts.timeoutMs = Number.parseInt(value, 10);
+    else if (flag === "--timeout-ms") {
+      if (!/^[0-9]+$/.test(value)) throw new Error("--timeout-ms must be a positive integer");
+      opts.timeoutMs = Number(value);
+    }
   }
   if (!opts.target) throw new Error("--target <base-url> is required");
   for (const url of [opts.target, opts.gateway].filter(Boolean)) new URL(url);
-  if (!Number.isFinite(opts.timeoutMs) || opts.timeoutMs <= 0) throw new Error("--timeout-ms must be a positive integer");
+  if (!Number.isSafeInteger(opts.timeoutMs) || opts.timeoutMs <= 0) throw new Error("--timeout-ms must be a positive integer");
   return opts;
 }
 
@@ -123,6 +127,7 @@ export async function runDeployVerify(opts) {
   let targetReportedVersion = "unknown";
   const turn = { receipt: null, body: null, startedMs: 0, endedMs: 0, fingerprint: null };
   let verified = null;
+  let lease = "";
 
   checks.push(await runCheck("health", async () => {
     const res = await fetch(joinUrl(opts.target, "/healthz"), fetchOpts());
@@ -142,7 +147,7 @@ export async function runDeployVerify(opts) {
   }));
 
   checks.push(await runCheck("governed-turn", async () => {
-    const lease = readLease(opts);
+    lease = readLease(opts);
     if (!lease) throw new Error("no lease token: set AMC_DEPLOY_VERIFY_LEASE or pass --lease-file");
     turn.startedMs = Date.now();
     const res = await fetch(joinUrl(gateway, `${opts.route}/v1/chat/completions`), {
@@ -190,7 +195,7 @@ export async function runDeployVerify(opts) {
   const { pass, missingChecks } = evaluateChecks(checks);
   const finishedAt = new Date();
   const repo = gitState(dirname(fileURLToPath(import.meta.url)));
-  return {
+  const result = {
     schema: "amc-deploy-verify/v1",
     pass,
     target: opts.target,
@@ -224,6 +229,17 @@ export async function runDeployVerify(opts) {
       "tool execution, streaming responses and approvals are not exercised"
     ]
   };
+  // Metadata is displayed, not schema-validated here; all trust checks used the original payload.
+  if (result.receipt) {
+    for (const key of ["receiptId", "kind", "ts", "sessionId", "eventHash"]) {
+      const value = result.receipt[key];
+      if (value !== null && typeof value === "object") result.receipt[key] = "[non-scalar receipt metadata]";
+    }
+  }
+  // Scrub exact loaded-token reflections only after all trust checks are complete.
+  return lease
+    ? JSON.parse(JSON.stringify(result, (_key, value) => typeof value === "string" ? value.split(lease).join("[REDACTED]") : value))
+    : result;
 }
 
 async function main() {

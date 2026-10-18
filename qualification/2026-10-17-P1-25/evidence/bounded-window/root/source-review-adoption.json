@@ -1,0 +1,39 @@
+{
+  "at": "2026-10-17T00:13:00.854317+00:00",
+  "sourceOutcome": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-source-combined-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-source-combined-outcome.json",
+    "bytes": 6567,
+    "sha256": "3ab58da9f6baa979905fc4772b41199218d4c2572d97d57c85709018986d7580",
+    "dev": 16777231,
+    "inode": 543750164,
+    "nlink": 1
+  },
+  "publicAudit": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-source-combined-public-audit.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-source-combined-public-audit.json",
+    "bytes": 100163,
+    "sha256": "0aa2ad8f229c852ca6075aa44e3cfbc8c644d0cd02fc5551a98205d1d7267ac8",
+    "dev": 16777231,
+    "inode": 543750171,
+    "nlink": 1
+  },
+  "rootReviewedActualRawObserverAndPublicWindowAndAllAuditRows": true,
+  "actualTests": {
+    "total": 22,
+    "passed": 22,
+    "failed": 0,
+    "skipped": 0
+  },
+  "actualHookTaskEntries": 3,
+  "actualIndividualHookValues": 4,
+  "fiveGrantThreeCheckpointRows": true,
+  "allChildrenAndExplicitStreamHashesNaturalAndCleanupExact": true,
+  "all151PhysicalAndTenNativePinsExact": true,
+  "originalTwoCheckpointAndWholeGrantBodiesRemainExactByCandidateReview": true,
+  "twelveChecks0AndNoCountRegeneration": true,
+  "globalQuality2712And1268UnchangedRedUnwaived": true,
+  "issuerAccuracyNullNonzeroAccuracyUnqualified": true,
+  "firstHeadPublicOperandLimitRetained": true,
+  "fullP125AndF37AndHeldDecisionsOpen": true
+}

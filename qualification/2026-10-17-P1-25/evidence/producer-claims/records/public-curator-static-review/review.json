@@ -1,0 +1,289 @@
+{
+  "schema": "p125pc-public-curator-independent-static-review/1",
+  "at": "2026-10-17T02:12:25.969540+00:00",
+  "result": "No blockers found for this exact inert V2 and its pinned actual six-phase metadata inputs. Root adoption and separate execution remain required.",
+  "blockers": [],
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/prepare-public-output.py.source.txt",
+    "bytes": 24233,
+    "sha256": "5bd053f7d38cd345bc3cc357c605d2bed450f882695543b126c177a117e58ec7"
+  },
+  "preferredSeal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/seal.json",
+    "bytes": 2492,
+    "sha256": "77342bb5ff36b8a0ad9564daf5ac9da133d4aa42facf1355ce5e7b48323cf9ea"
+  },
+  "actualPhaseInputs": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/phase-inputs.json",
+    "bytes": 4256,
+    "sha256": "14508ad20b3144681ccd9a0768f981ea68e216fcfe9479ff5b22dcdce5cf1048"
+  },
+  "fullPreferredSourceRead": true,
+  "completeC39ToV1AndV1ToV2DeltasReadAndExact": true,
+  "all12V1And17V2InputPinsAndBothSealedOutputSetsExact": true,
+  "exactPreservedBlocks": [
+    {
+      "name": "generic file guards",
+      "bytes": 294,
+      "sha256": "f1a38781ef32ddf714fd393f8a4ddfca1ae9e19c4b016df4ff07c2c7ceb8f71a",
+      "byteExactToC39": true
+    },
+    {
+      "name": "child closure and certificate marker/conversion loop",
+      "bytes": 1859,
+      "sha256": "cdefa130136ca05065da5ab9d93e988bcde2cf95ebbcedb4db9afac3129701ae",
+      "byteExactToC39": true
+    },
+    {
+      "name": "old two-window query proof",
+      "bytes": 2477,
+      "sha256": "8d1b0b41bc714f89a31635f8a76935c2ae19ed16274d1ea5dd65dcfb66d778ca",
+      "byteExactToC39": true
+    },
+    {
+      "name": "old cadence complete/partial proof",
+      "bytes": 5077,
+      "sha256": "2a575a5850f427c1612c13813d7483848c3f5a366ed3eec5bc3091ef32fff37a",
+      "byteExactToC39": true
+    },
+    {
+      "name": "old non-window last reply",
+      "bytes": 165,
+      "sha256": "3290728a8261c9bb1124761c3478e6a5e926a4051c8b55f8038899233ae148bd",
+      "byteExactToC39": true
+    }
+  ],
+  "actualMetadataProjectionChecks": [
+    {
+      "phase": "p125pc-source-combined",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      },
+      "producerCompleteBody": true,
+      "producerAcceptance": true,
+      "reachedStagePrefix": [
+        "first-checkpoint",
+        "backdated-appended",
+        "postdated-appended",
+        "second-checkpoint"
+      ],
+      "independentGrantAndOwnProofCount": 2,
+      "capturedUnverifiedRequests": 0,
+      "coveredPresent": true,
+      "observationsPresent": true,
+      "finalPresent": true,
+      "manualFailureAndMaskClassificationRequired": false
+    },
+    {
+      "phase": "p125pc-fresh-canonical",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      },
+      "producerCompleteBody": true,
+      "producerAcceptance": true,
+      "reachedStagePrefix": [
+        "first-checkpoint",
+        "backdated-appended",
+        "postdated-appended",
+        "second-checkpoint"
+      ],
+      "independentGrantAndOwnProofCount": 2,
+      "capturedUnverifiedRequests": 0,
+      "coveredPresent": true,
+      "observationsPresent": true,
+      "finalPresent": true,
+      "manualFailureAndMaskClassificationRequired": false
+    },
+    {
+      "phase": "p125pc-m1",
+      "tests": {
+        "total": 24,
+        "passed": 23,
+        "failed": 1,
+        "skipped": 0
+      },
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 44,
+        "explicitChildStreamHashCount": 88,
+        "closedSockets": 11,
+        "closedLedgerOwners": 34
+      },
+      "producerCompleteBody": false,
+      "producerAcceptance": false,
+      "reachedStagePrefix": [
+        "first-checkpoint",
+        "backdated-appended"
+      ],
+      "independentGrantAndOwnProofCount": 1,
+      "capturedUnverifiedRequests": 0,
+      "coveredPresent": false,
+      "observationsPresent": false,
+      "finalPresent": false,
+      "manualFailureAndMaskClassificationRequired": true
+    },
+    {
+      "phase": "p125pc-restore1",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      },
+      "producerCompleteBody": true,
+      "producerAcceptance": true,
+      "reachedStagePrefix": [
+        "first-checkpoint",
+        "backdated-appended",
+        "postdated-appended",
+        "second-checkpoint"
+      ],
+      "independentGrantAndOwnProofCount": 2,
+      "capturedUnverifiedRequests": 0,
+      "coveredPresent": true,
+      "observationsPresent": true,
+      "finalPresent": true,
+      "manualFailureAndMaskClassificationRequired": false
+    },
+    {
+      "phase": "p125pc-m2",
+      "tests": {
+        "total": 24,
+        "passed": 23,
+        "failed": 1,
+        "skipped": 0
+      },
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 44,
+        "explicitChildStreamHashCount": 88,
+        "closedSockets": 11,
+        "closedLedgerOwners": 36
+      },
+      "producerCompleteBody": false,
+      "producerAcceptance": false,
+      "reachedStagePrefix": [
+        "first-checkpoint",
+        "backdated-appended",
+        "postdated-appended"
+      ],
+      "independentGrantAndOwnProofCount": 1,
+      "capturedUnverifiedRequests": 0,
+      "coveredPresent": false,
+      "observationsPresent": false,
+      "finalPresent": false,
+      "manualFailureAndMaskClassificationRequired": true
+    },
+    {
+      "phase": "p125pc-restore2",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      },
+      "producerCompleteBody": true,
+      "producerAcceptance": true,
+      "reachedStagePrefix": [
+        "first-checkpoint",
+        "backdated-appended",
+        "postdated-appended",
+        "second-checkpoint"
+      ],
+      "independentGrantAndOwnProofCount": 2,
+      "capturedUnverifiedRequests": 0,
+      "coveredPresent": true,
+      "observationsPresent": true,
+      "finalPresent": true,
+      "manualFailureAndMaskClassificationRequired": false
+    }
+  ],
+  "producerProofContract": {
+    "eachVerifiedGrantOwnQueryResponseNaturalChildAndStoredOwnToken": true,
+    "explicitNamedRootAndTsaPublicCertificateDERHashBindingInCode": true,
+    "signerEqualityAndEachSignerEqualNamedTsaDERHash": true,
+    "noStoredTokenPublicationRole": true,
+    "lastReplyOnlyLastVerifiedProof": true,
+    "unverifiedCapturedRequestBranchRetainsNullProofNoSignerOrStoredTokenCredit": true,
+    "noSecondProofOrCoveredReaderFinalCreditForActualM1OrM2": true
+  },
+  "privacyContract": {
+    "explicitEmittedPublicJSONAndNamedQueryResponseOnly": true,
+    "exactNamedRootPemAndTsaPemOnlyNoDirectoryTraversal": true,
+    "singleCertificateAndNoPrivateKeyMarkerGuardBeforeDERBase64": true,
+    "noRawPEMOrDefaultHomeTrustJSONPublication": true,
+    "noKeysOrChildStreamContentsReadByCurator": true,
+    "explicitSourcePathsAndRelativeDestinationsUnique": true,
+    "publicJSONRetainedAsExactBytesWithoutErrorScrubbing": true,
+    "exclusiveFutureBundleDirectoryBundleFilesAndAllowlist": true
+  },
+  "actualInputCompatibility": {
+    "rootSchema": "p125pc-root-completed-runtime-review/1",
+    "sourceCommit": "5d4e9e8d74bef32e68090369223947691c5fea21",
+    "sixActualPhasesOrderExact": true,
+    "actualRootQualityHoldIncompleteFieldsNotAliases": true,
+    "eachOutcomeTestsCommandAndAuditResourcesMatchRootActualResources": true,
+    "currentDiagnosticAbsentHistoricalDiagnosticOnlyInOldReceipt": true,
+    "canonicalCasesNotSummed": 24,
+    "derivedResourceTotalsAreInventoryOnly": true
+  },
+  "errorPreservation": {
+    "unreadyV1AndBothSealedOutputSetsUnchanged": true,
+    "v1SchemaFieldMismatchCorrectedOnlyInSeparateV2": true,
+    "actualRootPreparationReadErrorPreserved": "One guessed receipt delta filename was absent; actual rg inventory resolved c39-to-producer.patch.txt and root read it completely. No source/product/evidence mutation or rerun resulted.",
+    "partialProducerFactsAndManualClassificationFlagsRetained": true,
+    "noPrecomputedFactOrPublicPassShortcutIsAssertionExecutionCredit": true
+  },
+  "boundary": {
+    "independentRuntimeOrFullFailureFrameAudit": false,
+    "helperSourceParserImportCompileOrExecution": false,
+    "productTestOpenSslSslCryptoNativeOrNetworkExecution": false,
+    "rawCertificatePEMKeyQueryResponseOrChildStreamBodiesRead": false,
+    "signingRootDirectoryTraversal": false,
+    "sourceIndexQaOwnershipReservationOrPriorArtifactMutation": false,
+    "publicCopiesBundlesOrAllowlistProduced": false,
+    "rootAdoptionPerformed": false,
+    "wholeP125P101OrPlanCompletionCredit": false
+  },
+  "inputPinCount": 49
+}

@@ -1,0 +1,103 @@
+{
+  "schema": "p135-private-cli-actual-review/1",
+  "blockers": [],
+  "allFiniteRuntimeRecordsAndStreamsRead": true,
+  "outer": {
+    "exit": 0,
+    "durationMs": 1798,
+    "pid": 94862,
+    "ownedPgid": 94862,
+    "recordedAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "observerEnabled": false,
+    "testRawOrUnhandledObserverCreditClaimed": false,
+    "wrapperCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "wrapperHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "actualBuiltCliSource": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass"
+  },
+  "children": [
+    {
+      "label": "dry-run",
+      "pid": 94863,
+      "exit": 0,
+      "signal": null,
+      "expectedContractVerified": true,
+      "stdout": {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-cli-jUx5uy/dry-run.stdout",
+        "bytes": 241,
+        "sha256": "7662276258628fee1ac83fb96eac45a921db0bed4836badf6711d494d5732905"
+      },
+      "stderr": {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-cli-jUx5uy/dry-run.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "repair-refusal",
+      "pid": 94864,
+      "exit": 2,
+      "signal": null,
+      "expectedContractVerified": true,
+      "stdout": {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-cli-jUx5uy/repair-refusal.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-cli-jUx5uy/repair-refusal.stderr",
+        "bytes": 50,
+        "sha256": "7ac6fbea970f34ad21379314a67b42fb866d8bd534db1c0d975487cb5d34f7b4"
+      }
+    }
+  ],
+  "dryRun": {
+    "actualPinnedMonitorFingerprint": "28236b062e309c5643c2f65d1cf9c2261f4cbc682cf4590b5b87e8adeeceb6fe",
+    "ledgerVerdict": "PASSED",
+    "anchoredToExactOwnedActiveMonitor": true,
+    "scanned": 4,
+    "toRecord": 0,
+    "skipped": 0,
+    "exactDryRunMessageObserved": true,
+    "boundary": "CLI integration and no-write behavior on an already relabelled genuine owned workspace; no new persistent relabel records claimed"
+  },
+  "repairRefusal": {
+    "actualExit": 2,
+    "exactFixedDiagnosticObserved": true,
+    "expectedPositiveContractOnly": true,
+    "notAProductFailureOrBlanketExitNormalization": true
+  },
+  "preservation": {
+    "protectedFileCount": 8,
+    "completeInstalledDiagnosticAndAssuranceReportsBaseSqliteLogAndReceiptSignatureInventory": true,
+    "beforeAfterEachAndFinalPinsIdentical": true,
+    "currentWholeBytesRehashedAfterExecution": true,
+    "runtimeAndActiveKeyPinsRehashed": true,
+    "bodyError": null,
+    "preservationError": null,
+    "sidecars": {
+      "recordedAndIndependentlyVerifiedUnchanged": true,
+      "walBytes": 0,
+      "shmBytes": 32768,
+      "notOriginallyAssertedByBridge": true
+    }
+  },
+  "verificationTiming": {
+    "authorV1AndV2StaticSealsPredateExecution": true,
+    "rootInitialGenericPreLaunchAllPinCheck": "Root reports a KeyError after assuming the wrong input schema; bridge was launched despite that failed check. No successful complete pre-execution verification is claimed here.",
+    "rootCorrected31RowVerification": "Root reports it passed after execution.",
+    "independent31RowVerification": "All 27 v2 input rows plus four v2 output rows rehashed and stat-checked after execution by this review.",
+    "postExecutionVerificationRelabelledAsPreExecution": false
+  },
+  "limits": [
+    "No runtime branch for unforeseen child exit 3, launch failure or signal was exercised; v2 propagation was reviewed statically.",
+    "No observer/raw test evidence, test count, full-suite result, universal descendant closure or machine-wide isolation is inferred.",
+    "Outer wrapper inherited its environment; the CLI children use the reviewed private HOME and scrubbed environment helper."
+  ],
+  "reviewerActions": {
+    "productOrHelperExecution": false,
+    "rerun": false,
+    "checkoutSourceIndexOrQaWrites": false,
+    "processProbeOrSignal": false
+  }
+}

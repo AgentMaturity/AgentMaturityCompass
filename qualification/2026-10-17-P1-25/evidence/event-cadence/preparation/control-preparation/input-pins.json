@@ -1,0 +1,106 @@
+{
+  "schema": "p125ec-control-inert-preparation-input-pins/1",
+  "at": "2026-10-17T01:05:12.329251+00:00",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-control.py",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-control.py",
+      "bytes": 21942,
+      "sha256": "73203ebcbe63fcf8273510a79e5b4e72f78656c41c9ffd2c9228e8b266496b32",
+      "dev": 16777231,
+      "inode": 543812593,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/controls.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/controls.json",
+      "bytes": 5499,
+      "sha256": "20328ea86febed06507f121d56d4dc28b4389acbb494298367d73e828f53ff78",
+      "dev": 16777231,
+      "inode": 543742989,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-source-binding.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-source-binding.json",
+      "bytes": 116305,
+      "sha256": "3ded5106edab5d7512418ab2ba1c0021faca650d8e0886b691ea6dbe36d701e1",
+      "dev": 16777231,
+      "inode": 543811246,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/protected-inputs.json",
+      "bytes": 78167,
+      "sha256": "fba2c86d4c578b729658d50dc26a102d7b00f8b80a4ca392a29071d4b1066c11",
+      "dev": 16777231,
+      "inode": 543829325,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 80498,
+      "sha256": "78523e735a11a6aef300a4609d2ee79f45a1b56a0edc1bfd8536bb52b7abb49f",
+      "dev": 16777231,
+      "inode": 543829387,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+      "bytes": 8137,
+      "sha256": "02552fd970f0aff01496e9d954da4f554275a0aec076a461087c156662ce6083",
+      "dev": 16777231,
+      "inode": 543835908,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/seal.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/seal.json",
+      "bytes": 3655,
+      "sha256": "010ddd25dac8f9152cc0cfc2331196c4524c8f08ee7f4402a7ec57c10bb27861",
+      "dev": 16777231,
+      "inode": 543849506,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py",
+      "bytes": 2197,
+      "sha256": "1d72bdb7d77cbff0251219cf33884e51c24bff5862cffeb052c1bf24124a58be",
+      "dev": 16777231,
+      "inode": 543829389,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "bytes": 21005,
+      "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+      "dev": 16777231,
+      "inode": 542461050,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "bytes": 48568,
+      "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7",
+      "dev": 16777231,
+      "inode": 543658576,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/original-owned-source/checkpointWindow.test.ts.source.txt",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/original-owned-source/checkpointWindow.test.ts.source.txt",
+      "bytes": 34549,
+      "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+      "dev": 16777231,
+      "inode": 543829328,
+      "nlink": 1
+    }
+  ],
+  "noPrivateSigningKeyOrStreamInputs": true
+}

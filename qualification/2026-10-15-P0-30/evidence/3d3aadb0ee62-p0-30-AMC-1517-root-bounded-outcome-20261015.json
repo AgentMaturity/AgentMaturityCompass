@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-15T00:34:43.770955+00:00",
+  "key": "P0-30",
+  "oldIssue": "AMC-1517",
+  "sourceCommit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "mode": "bounded private current qualification; no issue closure",
+  "originalLiveBaseline": {
+    "registered": 13,
+    "passed": 13,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0
+  },
+  "originalMatrices": [
+    {
+      "id": "S7-M20-callback-allowlist-66",
+      "baselinePassed": 13,
+      "mutantPassed": 12,
+      "mutantFailed": 1,
+      "restoredPassed": 13
+    },
+    {
+      "id": "S7-M21-callback-sensitive-extension-66",
+      "baselinePassed": 13,
+      "mutantPassed": 12,
+      "mutantFailed": 1,
+      "restoredPassed": 13
+    },
+    {
+      "id": "S7-M22-callback-token-counter-exemption-66",
+      "baselinePassed": 13,
+      "mutantPassed": 12,
+      "mutantFailed": 1,
+      "restoredPassed": 13
+    },
+    {
+      "id": "S7-M23-callback-closed-113-equivalent",
+      "baselinePassed": 13,
+      "mutantPassed": 13,
+      "mutantFailed": 0,
+      "restoredPassed": 13,
+      "meaning": "Survival restricted to the unchanged original thirteen cases, which never call close or flush."
+    }
+  ],
+  "separatePrivateM23Supplement": {
+    "registered": 3,
+    "baselinePassed": 3,
+    "mutantPassed": 2,
+    "mutantFailed": 1,
+    "restoredPassed": 3,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "ordinaryCases": "The pending-close fulfillment and in-flight-flush rejection cases pass in every phase. Their public promise barriers, sink batches and full within-capture state checks remain bounded ordinary-input evidence.",
+    "reentrantCase": "One public options.name getter calls actual close before entry registration. The original closed disjunct refuses late recording; the exact mutant permits attribute, event, status and explicitStatus changes. Getter/callback counts remain1, fulfilled value identity is preserved, and source, stats, losses, actual IDs and pending settlement remain exact.",
+    "actualFailure": "reentrant.test.mjs:88:12; ERR_ASSERTION/testCodeFailure after all three late calls and faithful fulfillment, not setup/timeout/registration failure.",
+    "observations": {
+      "rawLines": 9,
+      "fullSnapshotHashes": 36,
+      "excludedMetadata": [
+        "recordedAt"
+      ],
+      "captureIds": "Nine genuine fresh capture IDs retained; no across-phase snapshot equality assumed."
+    }
+  },
+  "outcome": "All four distinct guards show current sensitivity within the declared corpora. The closed disjunct is necessary for the public-getter witness; its historical global-equivalence reason does not cover this supported input. The existing production guard protects this case, so this is a private removed-guard failure rather than a new production failure.",
+  "historicalPreservation": "The recovered specification, original test files, archived equivalent expectation and held batch are unchanged. The ordinary and reentrant scenarios remain separately identified.",
+  "counting": "Sixteen distinct cases in this old-issue qualification: thirteen original plus three private. Ten mapping cases overlap AMC-1516; repeated B/M/R runs and cross-issue corpora are not summed as distinct cases.",
+  "preservation": "Exact source/compiled/full private 12,268-file restoration and native identity verified. All 186 indexed references, 29 frozen phases and 63 protected entries/54 paths rehashed; live 7,739 source and 4,529 compiled files and prior packets remain unchanged.",
+  "reviewSeparation": "Original13/controller/restoration reviewed by a peer who authored the supplemental fixtures; actual supplemental meaning/effects reviewed independently by a different peer. Static supplemental design was also reviewed before execution.",
+  "residuals": [
+    "No permanent source/test transfer, original helper/guard edit, whole held batch rerun, full suite, Node24, coverage, hosted CI, upstream Pi conformance, real HTTP/tenant qualification, release or Done.",
+    "Ordinary baseline freeze passed; prior unresolved freeze exceptions, inherited duplicate/dead quality findings, paused work and ownership decisions remain unresolved."
+  ],
+  "evidence": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+      "bytes": 189825,
+      "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-original-independent-review-20261015.json",
+      "bytes": 54043,
+      "sha256": "8b26547d4bd22cd3aac98eab4ffdd7668c01a8c3f98b1d0c74b4cbe017645fb3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-supplement-independent-review-20261015.json",
+      "bytes": 82486,
+      "sha256": "7e23a25c052a393c8f26163066a1e72d570aad9c5f8dd5d8be9c680bfae3fe58"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-lifecycle-static-review-20261015.json",
+      "bytes": 23017,
+      "sha256": "84ae6261b55be5d3b6399aad71eec563156325fe4ff427964369f40011e93337"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-reentrant-static-review-20261015.json",
+      "bytes": 4208,
+      "sha256": "2febb1a895c5d0bfcc4638581c62a4a7fcb981967613cb98c589f1c1cc6e5fd2"
+    }
+  ],
+  "nextRuntimeOldIssue": "AMC-1542"
+}

@@ -1,0 +1,61 @@
+{
+  "schema": "p119-private-oracle-source-v4/1",
+  "capturedUtc": "2026-10-15T22:49:26.409530+00:00",
+  "state": "closed-unexecuted",
+  "allReadsFinished": true,
+  "allWritesFinished": true,
+  "formalAcceptanceClosed": false,
+  "files": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v4/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 21328,
+      "sha256": "cd745ddae7cce98a5285be95d4cce815f542d3c9f218e976be5c374d3b5f858f"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v4/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 29832,
+      "sha256": "92b25937b06aef01367007961944d479cf6febad3e8b3da5d52094d8741ae869"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v4/v3-to-v4.patch",
+      "bytes": 5736,
+      "sha256": "e05c950558f03fab54e8a443e1be59724c1d2bf1c818403b3caed0ec94c4ded8"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v4/README.md",
+      "bytes": 2670,
+      "sha256": "269d2bb4badae2c4cf4c650938b98f9301682da79a9475bf760e181f9f1e6e11"
+    }
+  ],
+  "preservedEvidenceReferences": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/diagnosis.json",
+      "bytes": 7479,
+      "sha256": "8f085b9c13cf8bf73d2124ad8e1250c9a0a06600c29b1dde50bc3dfa9c1787be"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/pins.json",
+      "bytes": 3963,
+      "sha256": "6f496508b1656109eef942426c18b85758bab69ab23f07435cf0427eb3dc1788"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 20151,
+      "sha256": "3b1ba99969949ebf2bcde9a25718216f362993272527f0828121b667d730c021"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 29506,
+      "sha256": "d7c2bf58e7cac21e36bf12117c237e840903d1aa0316a44b15f9a9671e31c921"
+    }
+  ],
+  "authorizedDelta": [
+    "Exact DB/key/history preparation guard",
+    "WAL exact or initial absent-to-regular-empty only before baseline",
+    "No active-interval equality exception",
+    "Independent rollback/close attempts and preservation/rendering of all errors"
+  ],
+  "runtimeExecuted": false,
+  "repositoryWrites": false,
+  "schemaOrParserExecuted": false
+}

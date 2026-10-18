@@ -1,0 +1,38 @@
+{
+  "schema": "p125-source-control-failure-classification/1",
+  "at": "2026-10-16T19:00:14.982212+00:00",
+  "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "phase": "p125-m2",
+  "allFailuresClassified": true,
+  "primarySemanticWitnessReached": true,
+  "tests": {
+    "numTotalTests": 47,
+    "numPassedTests": 45,
+    "numFailedTests": 2,
+    "numPendingTests": 0
+  },
+  "same47OrderedFileTitleOccurrences": true,
+  "primary": {
+    "name": "refuses the genuine token under a different real root with the same permitted policy",
+    "firstSensitiveAssertion": "tests/time/verifyTimestamp.test.ts:143:62",
+    "observed": "Expected TST_UNTRUSTED_TSA/ok:false; actual ok:true under genuinely unrelated nonempty root with same policy.",
+    "earlierWitness": "Same body original validAttestation completed. Signature/ESS/imprint/nonce/EKU/genTime remain valid under source-only path-refusal replacement."
+  },
+  "secondary": {
+    "name": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+    "firstSensitiveAssertion": "tests/time/verifyTimestamp.test.ts:199:23",
+    "observed": "Expected claimed/null; actual attested-upper-bound using anchorId p125-unrelated, preserving claimedAt.",
+    "earlierWitness": "Same-body original validAttestation completed before artifactTime call.",
+    "maskedAssertions": [
+      "line200 integrityError null",
+      "line201 warning includes TST_UNTRUSTED_TSA",
+      "line202 warning includes time basis stays claimed"
+    ]
+  },
+  "bodyFailures": 2,
+  "hookErrors": 0,
+  "all29IndividualHookValuesPass": true,
+  "unhandledErrors": [],
+  "unclassifiedErrors": [],
+  "causalScope": "Fresh source-only final-path-refusal operator. No compiled mutation, actual external TSA, checkpoint/issuance, full issue or global quality acceptance."
+}

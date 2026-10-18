@@ -1,0 +1,126 @@
+{
+  "issue": "P0-51",
+  "kind": "Actual owned source mutation; unchanged compiled CLI artifact",
+  "fault": "Replace guarded Merkle archive sink with original ensureDir + tar filename output in one export hook. All targets are fresh fixture-owned files.",
+  "sourceBeforeSha256": "f59f267bd79bfa35ab20601f126e4bf8f7283eef629454ddd171ae2ee3d8c7df",
+  "mutantSha256": "340884f6f2fb007eb5c5f2841dd00ddfe6151889ea1685145ab7b05a6ce67e60",
+  "sourceRestoredSha256": "f59f267bd79bfa35ab20601f126e4bf8f7283eef629454ddd171ae2ee3d8c7df",
+  "sourceRestoredExactly": true,
+  "testSha256": "e9e981cf0a0fff4633368f332764522a159f3860e3cdcea13db6a2fb658d69e9",
+  "patch": "/private/tmp/p0-51-f4-output-guard-removal-20261014.patch",
+  "patchSha256": "263384f3245efbdf3f234a5646027a024d9e266a9f1ebf695d23e75867381a58",
+  "raw": "/private/tmp/p0-51-export-guard-removed-mutant-20261014.json",
+  "rawSha256": "0661ec8cefd1c963129478bf8de937d591ef55bfe27b708bfd0883f3d54d6581",
+  "exit": 1,
+  "counts": {
+    "numTotalTests": 6,
+    "numPassedTests": 3,
+    "numFailedTests": 3,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "effectsDir": "/private/tmp/p0-51-export-links-mutant-1olfh3ns",
+  "effects": [
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/directory-control-rBugV4/control.amcproof",
+      "bytes": 1693,
+      "sha256": "ccf8f2797380ccc22d02c51874f18b1b372eba19a43f579d61f4fa0b2902f622"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/directory-control-rBugV4/effect.json",
+      "bytes": 433,
+      "sha256": "de2c94e0ce3bcb7f72ec2ac7120ddfc39c08debb22dc70b6d69c40021531284c"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/filename-control-KDvweb/control.amcproof",
+      "bytes": 1696,
+      "sha256": "c2d892a7f1222250cb503885a3f5436787f1dc3ebfffd87986fe783e7baae4d6"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/filename-control-KDvweb/effect.json",
+      "bytes": 433,
+      "sha256": "5a2747a3d895dd4bb053714a739ca72718bd4939a2165ff89b845c26e646c408"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/linked-directory-OOTu0O/effect.json",
+      "bytes": 1387,
+      "sha256": "cf10b449050fcb01fade2095a7636da12959e64f7aa43c467926606bac621a23"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/linked-directory-OOTu0O/sentinel-after.bin",
+      "bytes": 1697,
+      "sha256": "e647f81cca1c1dc2ee9a45326f99fec3fce4e9c626cd02cef82119ca18785d61"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/linked-directory-OOTu0O/sentinel-before.bin",
+      "bytes": 32,
+      "sha256": "54526c14867e5a5a23c6bc335ed58d7ce168a1ce96f820419b929500e25c15b0"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/linked-filename-4Ckumx/effect.json",
+      "bytes": 1385,
+      "sha256": "309f22c23d92569c3e7a24516ab7a06a73a9c36a36ed55a41de683334d44a32b"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/linked-filename-4Ckumx/sentinel-after.bin",
+      "bytes": 1692,
+      "sha256": "728e731e9a447c08a56a6578595d8ea26adfe8c90ef28aa37a0faa79c5d6b969"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/linked-filename-4Ckumx/sentinel-before.bin",
+      "bytes": 31,
+      "sha256": "f1b53a523083874861cd0e4b517858c504625ad4bfd162ab1d397e21c75edf7f"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/regular-caller-output-d51w4S/control.amcproof",
+      "bytes": 1686,
+      "sha256": "3b92ec909591226e2347946a4775009096054ec75812789d509c9ef4c3d5156d"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/regular-caller-output-d51w4S/effect.json",
+      "bytes": 413,
+      "sha256": "7ad3bcffd930b660d0ba29e693ef3629749b6c73dce4b28ad97dbb0f82582a7a"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/regular-new-parents-eKkrSU/control.amcproof",
+      "bytes": 1689,
+      "sha256": "9f5ff8199f34aedf75e85ddafaec4da9d752c0ec2e335e12bff748b4a3e43706"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/regular-new-parents-eKkrSU/effect.json",
+      "bytes": 417,
+      "sha256": "7aa90ae7e024690582847b0a45daa97469b5d030ede131a319f3b8b3f61e9903"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/regular-overwrite-GDoBI9/control.amcproof",
+      "bytes": 1687,
+      "sha256": "aef518a16441cb08dd8fa7dc3318ed0064ea6c0b70c88c8ac350841810384753"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/regular-overwrite-GDoBI9/effect.json",
+      "bytes": 413,
+      "sha256": "8e86a70299d191a7f726b82766d18822fa41a487357455d4b7afd4a5109cd197"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/regular-workspace-sRUBGV/control.amcproof",
+      "bytes": 1684,
+      "sha256": "4d74186cd28d73352b92a687ed7ffc72dd7fad16e4e85b816c33e0bcbb582c2a"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/regular-workspace-sRUBGV/effect.json",
+      "bytes": 433,
+      "sha256": "bb0abb0e9146cd2661a7b6a674c592223aeeb9f75a9e183df908f82dfbee3d6a"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/workspace-root-alias-nq32AW/control.amcproof",
+      "bytes": 1686,
+      "sha256": "9818b2f671f2c7dafa431e4660618e3104b34d410b859a9c9512e678ed24e2e8"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-mutant-1olfh3ns/workspace-root-alias-nq32AW/effect.json",
+      "bytes": 416,
+      "sha256": "f558d9c96b53ae9910f17149ede7403b82e3119aea973174f943198c0b7832da"
+    }
+  ],
+  "limits": "Static link and hardlink fixture effects only; no races, foreign targets, API/Studio handler edits or OS confinement claim."
+}

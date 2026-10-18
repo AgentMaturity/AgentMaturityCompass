@@ -1,0 +1,152 @@
+Usage: cms [options] [cert...]
+ -help                      Display this summary
+
+General options:
+ -in infile                 Input file
+ -out outfile               Output file
+ -config infile             Load a configuration file (this may load modules)
+
+Operation options:
+ -encrypt                   Encrypt message
+ -decrypt                   Decrypt encrypted message
+ -sign                      Sign message
+ -verify                    Verify signed message
+ -resign                    Resign a signed message
+ -sign_receipt              Generate a signed receipt for a message
+ -verify_receipt infile     Verify receipts; exit if receipt signatures do not verify
+ -digest val                Sign a pre-computed digest in hex notation
+ -digest_create             Create a CMS "DigestedData" object
+ -digest_verify             Verify a CMS "DigestedData" object and output it
+ -compress                  Create a CMS "CompressedData" object
+ -uncompress                Uncompress a CMS "CompressedData" object
+ -EncryptedData_encrypt     Create CMS "EncryptedData" object using symmetric key
+ -EncryptedData_decrypt     Decrypt CMS "EncryptedData" object using symmetric key
+ -data_create               Create a CMS "Data" object
+ -data_out                  Copy CMS "Data" object to output
+ -cmsout                    Output CMS structure
+
+File format options:
+ -inform parm               Input format SMIME (default), PEM or DER
+ -outform parm              Output format SMIME (default), PEM or DER
+ -rctform PEM|DER           Receipt file format
+ -stream                    Enable CMS streaming
+ -indef                     Same as -stream
+ -noindef                   Disable CMS streaming
+ -binary                    Treat input as binary: do not translate to canonical form
+ -crlfeol                   Use CRLF as EOL termination instead of LF only
+ -asciicrlf                 Perform CRLF canonicalisation when signing
+
+Keys and passwords options:
+ -pwri_password val         Specific password for recipient
+ -secretkey val             Use specified hex-encoded key to decrypt/encrypt recipients or content
+ -secretkeyid val           Identity of the -secretkey for CMS "KEKRecipientInfo" object
+ -inkey val                 Input private key (if not signer or recipient)
+ -passin val                Input file pass phrase source
+ -keyopt val                Set public key parameters as n:v pairs
+ -keyform format            Input private key format (ENGINE, other values ignored)
+ -engine val                Use engine e, possibly a hardware device
+
+Provider options:
+ -provider-path val         Provider load path (must be before 'provider' argument if required)
+ -provider val              Provider to load (can be specified multiple times)
+ -provparam val             Set a provider key-value parameter
+ -propquery val             Property query used when fetching algorithms
+
+Random state options:
+ -rand val                  Load the given file(s) into the random number generator
+ -writerand outfile         Write random data to the specified file
+
+Encryption and decryption options:
+ -originator val            Originator certificate file
+ -recip infile              Recipient cert file
+ -cert... parm              Recipient certs (optional; used only when encrypting)
+ -*                         The encryption algorithm to use (any supported cipher)
+ -kekcipher val             The key encryption algorithm to use
+ -wrap val                  Key wrap algorithm to use when encrypting with key agreement or key encapsulation
+ -aes128-wrap               Use AES128 to wrap key
+ -aes192-wrap               Use AES192 to wrap key
+ -aes256-wrap               Use AES256 to wrap key
+ -des3-wrap                 Use 3DES-EDE to wrap key
+ -debug_decrypt             Disable MMA protection, return error if no recipient found (see doc)
+ -recip_kdf val             Set KEMRecipientInfo KDF for current recipient
+ -recip_ukm val             KEMRecipientInfo user keying material for current recipient, in hex notation
+
+Signing options:
+ -md val                    Digest algorithm to use
+ -signer val                Signer certificate input file
+ -certfile infile           Extra signer and intermediate CA certificates to include when signing
+                            or to use as preferred signer certs and for chain building when verifying
+ -cades                     Include signingCertificate attribute (CAdES-BES)
+ -nodetach                  Use opaque signing
+ -nocerts                   Don't include signer's certificate when signing
+ -noattr                    Don't include any signed attributes
+ -nosmimecap                Omit the SMIMECapabilities attribute
+ -no_signing_time           Omit the signing time attribute
+ -receipt_request_all       When signing, create a receipt request for all recipients
+ -receipt_request_first     When signing, create a receipt request for first recipient
+ -receipt_request_from val  Create signed receipt request with specified email address
+ -receipt_request_to val    Create signed receipt targeted to specified address
+
+Verification options:
+ -signer val                Signer certificate(s) output file
+ -content infile            Supply or override content for detached signature
+ -no_content_verify         Do not verify signed content signatures
+ -no_attr_verify            Do not verify signed attribute signatures
+ -nosigs                    Don't verify message signature
+ -noverify                  Don't verify signers certificate
+ -nointern                  Don't search certificates in message for signer
+ -cades                     Check signingCertificate (CAdES-BES)
+ -verify_retcode            Exit non-zero on verification failure
+ -CAfile infile             Trusted certificates file
+ -CApath dir                Trusted certificates directory
+ -CAstore uri               Trusted certificates store URI
+ -no-CAfile                 Do not load the default certificates file
+ -no-CApath                 Do not load certificates from the default certificates directory
+ -no-CAstore                Do not load certificates from the default certificates store
+
+Output options:
+ -keyid                     Use subject key identifier
+ -econtent_type val         OID for external content
+ -text                      Include or delete text MIME headers
+ -certsout outfile          Certificate output file
+ -to val                    To address
+ -from val                  From address
+ -subject val               Subject
+
+Printing options:
+ -noout                     For the -cmsout operation do not output the parsed CMS structure
+ -print                     For the -cmsout operation print out all fields of the CMS structure
+ -nameopt val               For the -print option specifies various strings printing options
+ -receipt_request_print     Print CMS Receipt Request
+
+Validation options:
+ -policy val                adds policy to the acceptable policy set
+ -purpose val               certificate chain purpose
+ -verify_name val           verification policy name
+ -verify_depth int          chain depth limit
+ -auth_level int            chain authentication security level
+ -attime intmax             verification epoch time
+ -verify_hostname val       expected peer hostname
+ -verify_email val          expected peer email
+ -verify_ip val             expected peer IP address
+ -ignore_critical           permit unhandled critical extensions
+ -issuer_checks             (deprecated)
+ -crl_check                 check leaf certificate revocation
+ -crl_check_all             check full chain revocation
+ -policy_check              perform rfc5280 policy checks
+ -explicit_policy           set policy variable require-explicit-policy
+ -inhibit_any               set policy variable inhibit-any-policy
+ -inhibit_map               set policy variable inhibit-policy-mapping
+ -x509_strict               disable certificate compatibility work-arounds
+ -extended_crl              enable extended CRL features
+ -use_deltas                use delta CRLs
+ -policy_print              print policy processing diagnostics
+ -check_ss_sig              check root CA self-signatures
+ -trusted_first             search trust store first (default)
+ -suiteB_128_only           Suite B 128-bit-only mode
+ -suiteB_128                Suite B 128-bit mode allowing 192-bit algorithms
+ -suiteB_192                Suite B 192-bit-only mode
+ -partial_chain             accept chains anchored by intermediate trust-store CAs
+ -no_alt_chains             (deprecated)
+ -no_check_time             ignore certificate validity time
+ -allow_proxy_certs         allow the use of proxy certificates

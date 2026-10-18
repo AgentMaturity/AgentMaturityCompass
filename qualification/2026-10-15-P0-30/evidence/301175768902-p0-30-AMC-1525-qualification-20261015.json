@@ -1,0 +1,1775 @@
+{
+  "key": "P0-30",
+  "candidate": "AMC-1525 five existing corpus controls",
+  "date": "2026-10-15",
+  "sourceCommit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "root": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+  "branch": "codex/p0-30-current-qualification",
+  "privateRoot": "/private/tmp/p0-30-AMC-1525-qualification-20261015",
+  "runtime": {
+    "configuredNode": "/opt/homebrew/opt/node@22/bin/node",
+    "observedVersion": "v22.23.3",
+    "observedExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "observedNativeAbi": "127",
+    "actualObservation": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/runtime-observation.json",
+      "bytes": 762,
+      "sha256": "6647801ba4849f5b9f49f6ec8ce8084e0290b42be0a79d5f267745ae9c7ab3e3"
+    },
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "nativeRebuilt": false,
+    "dependencyInstallPerformed": false
+  },
+  "liveBaseline": {
+    "raw": {
+      "path": "/private/tmp/p0-30-unchanged-five-file-baseline-20261015.json",
+      "bytes": 22543,
+      "sha256": "d0d265048531db78fcdd876890a00c0c700bcb9fd933552deffb01558db3dfcd"
+    },
+    "counts": {
+      "numTotalTests": 62,
+      "numPassedTests": 62,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": true
+    },
+    "rootReportedDurationMs": 23018,
+    "scope": "Independent root run of the unchanged five live source tests; not another set of distinct cases."
+  },
+  "corpus": {
+    "files": [
+      "tests/crypto/keyHistoryAdmission.test.ts",
+      "tests/crypto/keyHistoryForgery.test.ts",
+      "tests/keyHistoryBundleCertificate.test.ts",
+      "tests/ledgerVerificationReadOnly.test.ts",
+      "tests/vaultUnlockCaching.test.ts"
+    ],
+    "perFileCases": [
+      22,
+      4,
+      15,
+      10,
+      11
+    ],
+    "totalUniqueCases": 62,
+    "names": [
+      "AMC-1525 portable authenticated key history export never launders a correctly hashed planted history into a signed bundle",
+      "AMC-1525 portable authenticated key history bundle rejects an attacker signer admitted by unsigned hash chain",
+      "AMC-1525 portable authenticated key history bundle rejects an attacker signer admitted by rehashed signed envelope",
+      "AMC-1525 portable authenticated key history bundle rejects an attacker signer admitted by transplanted signed envelope",
+      "AMC-1525 portable authenticated key history bundle accepts an auditor key only after explicit authenticated admission",
+      "AMC-1525 portable authenticated key history bundle preserves authenticated monitor rotation for offline ledger verification",
+      "AMC-1525 portable authenticated key history bundle still verifies current-key signatures with legacy arrays",
+      "AMC-1525 portable authenticated key history bundle still verifies current-key signatures with absent history",
+      "AMC-1525 portable authenticated key history certificate rejects an attacker signer admitted by unsigned hash chain",
+      "AMC-1525 portable authenticated key history certificate rejects an attacker signer admitted by rehashed signed envelope",
+      "AMC-1525 portable authenticated key history certificate rejects an attacker signer admitted by transplanted signed envelope",
+      "AMC-1525 portable authenticated key history certificate accepts an auditor key only after explicit authenticated admission",
+      "AMC-1525 portable authenticated key history certificate preserves authenticated monitor rotation for offline ledger verification",
+      "AMC-1525 portable authenticated key history certificate still verifies current-key signatures with legacy arrays",
+      "AMC-1525 portable authenticated key history certificate still verifies current-key signatures with absent history",
+      "cold-process current vault verification reads encrypted evidence without trust mutations",
+      "cold-process legacy vault verification reads encrypted evidence without trust mutations",
+      "cold-process encrypted evidence fails closed for missing-passphrase without modifying disk",
+      "cold-process encrypted evidence fails closed for wrong-passphrase without modifying disk",
+      "cold-process encrypted evidence fails closed for missing-vault without modifying disk",
+      "cold-process encrypted evidence fails closed for corrupt-vault without modifying disk",
+      "public-only ledger verification preserves the supplied trust anchors without creating a vault",
+      "JSONL-only verification checks signed rows without creating a SQLite ledger",
+      "a JSONL backend marker without its event log is not verified evidence",
+      "verification cannot initialize a missing ledger into an apparently valid empty workspace",
+      "unlocking an already-unlocked vault skips the key derivation entirely",
+      "unlocking an already-unlocked vault still rejects a wrong passphrase while unlocked",
+      "unlocking an already-unlocked vault does not serve a cached session for a vault replaced on disk",
+      "unlocking an already-unlocked vault re-reads after the vault is rewritten by a secret update",
+      "unlocking an already-unlocked vault reads a child process secret update without unlocking or rewriting trust files",
+      "unlocking an already-unlocked vault refreshes legacy secrets in memory without upgrading missing lease or session keys",
+      "unlocking an already-unlocked vault reads cold blob secrets without unlocking ordinary access or repeating the KDF",
+      "unlocking an already-unlocked vault refuses stale secrets when the on-disk vault is missing",
+      "unlocking an already-unlocked vault refuses stale secrets when the on-disk vault is corrupt",
+      "unlocking an already-unlocked vault refuses stale secrets when the on-disk vault is wrong-passphrase",
+      "unlocking an already-unlocked vault refuses stale secrets when the on-disk vault is invalid-payload",
+      "authenticated history admission initializes all four roles with authenticated private-derived current keys",
+      "authenticated history admission readers verify admissions with the vault locked",
+      "authenticated history admission rejects role tampering even when chain hashes remain unchanged",
+      "authenticated history admission rejects source tampering even when chain hashes remain unchanged",
+      "authenticated history admission rejects revision tampering even when chain hashes remain unchanged",
+      "authenticated history admission rejects fingerprint tampering even when chain hashes remain unchanged",
+      "authenticated history admission rejects unknown-field tampering even when chain hashes remain unchanged",
+      "authenticated history admission rejects a valid history signed by a different anchor",
+      "authenticated history admission ordinary digest signatures cannot authorize a history envelope",
+      "authenticated history admission digest-signing APIs refuse a raw tagged admission payload encoded as long hex",
+      "authenticated history admission rejects malformed or duplicate keys even if an owner signs the payload",
+      "authenticated history admission does not launder legacy history through unlock, initialization or secret changes",
+      "authenticated history admission does not launder malformed history through unlock, initialization or secret changes",
+      "authenticated history admission does not launder tampered-envelope history through unlock, initialization or secret changes",
+      "authenticated history admission does not seed a new vault from an existing planted history list",
+      "authenticated history admission refuses mismatched live public keys before a vault rewrite changes disk",
+      "authenticated history admission locked and no-sign admission refuse without modifying history",
+      "authenticated history admission migration admits only exact reviewed fingerprints and saves the original bytes",
+      "authenticated history admission explicit current-only migration can recover malformed history but cannot approve absent keys",
+      "authenticated history admission rotation preserves old signatures and emits independently pinned continuity proof",
+      "authenticated history admission rotation refuses untrusted legacy history before replacing the private key",
+      "authenticated history admission interrupted rotation refuses historical verification and retains recoverable encrypted state",
+      "key history forgery rejects a correctly hash-chained attacker key while the live key stays unchanged",
+      "key history forgery rejects a pubkey appended without chain fields",
+      "key history forgery rejects an appended entry with a fabricated chain hash",
+      "key history forgery accepts the workspace's own untampered history"
+    ],
+    "originalAssertionsInputsSetupCleanupDeadlinesPreserved": true,
+    "adaptations": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/adaptations.json",
+      "bytes": 2981,
+      "sha256": "0e22e3e769d6a0dbb11ff6bc62414e9274a72ffe6b8757fdac33af0c8de9ae3b"
+    },
+    "meaning": "Same corpus, generator inputs, configuration and criteria. Original fixtures generate fresh physical random keys, UUIDs and times per run; they are not the same physical data across phases."
+  },
+  "matrices": [
+    {
+      "id": "P30-1525-envelope-signature",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/isolated-P30-1525-envelope-signature-matrix.json",
+        "bytes": 33600,
+        "sha256": "f57552a2779b53a20451815e2d38a0a582382e7756ddddf0fd0c899dfde7df62"
+      },
+      "recipe": {
+        "id": "P30-1525-envelope-signature",
+        "oldIssue": "AMC-1525",
+        "file": "src/crypto/keyHistoryEnvelope.ts",
+        "find": "if (!verify(null, payloadBytes(base), currentPublicKeyPem, Buffer.from(signature, \"base64\"))) return fail(\"history admission signature is invalid\");",
+        "replace": "if (false && !verify(null, payloadBytes(base), currentPublicKeyPem, Buffer.from(signature, \"base64\"))) return fail(\"history admission signature is invalid\");",
+        "tests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts",
+          "tests/crypto/keyHistoryAdmission.test.ts",
+          "tests/crypto/keyHistoryForgery.test.ts"
+        ],
+        "expect": "killed",
+        "candidateOccurrences": 1,
+        "heldOccurrences": 1,
+        "candidateFindLine": 102,
+        "missingCandidateTests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts"
+        ],
+        "staticMatchAndTestsExist": false
+      },
+      "baseline": {
+        "numTotalTests": 62,
+        "numPassedTests": 62,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-baseline/raw-tests.json",
+          "bytes": 22472,
+          "sha256": "0c9c02407f1f19f19015c436d9b2b09803ea36a1d1e45865907557c84d1f039d"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-baseline/command.json",
+          "bytes": 2083,
+          "sha256": "abc6f6cf60ec1b1c4062c55443d1eb4582be405eb7e9c83c048dff8ecbe60fd0"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 62,
+        "numPassedTests": 55,
+        "numFailedTests": 7,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-mutant/raw-tests.json",
+          "bytes": 30704,
+          "sha256": "a14c09140f6312edece64d55499da4831ddcce9d674684eca00a07cf160b766d"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-mutant/command.json",
+          "bytes": 2069,
+          "sha256": "c10f24238c0ba9ef9da6a757b6da650ce2668373657e18101da8f2ba94e38b9c"
+        }
+      },
+      "restored": {
+        "numTotalTests": 62,
+        "numPassedTests": 62,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-restored/raw-tests.json",
+          "bytes": 22478,
+          "sha256": "57648f6fa67e0eaad368fa708e37280f209aa25586154eb489aaecd963844914"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-restored/command.json",
+          "bytes": 2083,
+          "sha256": "663a895022b605b978fea199421ec1eded4f7984a3d06550c2720719e73aafdb"
+        }
+      },
+      "sameCaseNames": true,
+      "classification": "assertion-specific behavioral failure",
+      "failedAssertions": [
+        {
+          "name": "AMC-1525 portable authenticated key history bundle rejects an attacker signer admitted by rehashed signed envelope",
+          "messages": [
+            "AssertionError: expected [] to include 'Manifest signature verification faile\u2026'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/keyHistoryBundleCertificate.test.ts:179:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "name": "AMC-1525 portable authenticated key history certificate rejects an attacker signer admitted by rehashed signed envelope",
+          "messages": [
+            "AssertionError: expected [] to include 'cert signature invalid'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/keyHistoryBundleCertificate.test.ts:179:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "name": "authenticated history admission rejects source tampering even when chain hashes remain unchanged",
+          "messages": [
+            "AssertionError: expected [ \u2026(2) ] to deeply equal [ Array(1) ]\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/crypto/keyHistoryAdmission.test.ts:66:55\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        },
+        {
+          "name": "authenticated history admission rejects revision tampering even when chain hashes remain unchanged",
+          "messages": [
+            "AssertionError: expected [ \u2026(2) ] to deeply equal [ Array(1) ]\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/crypto/keyHistoryAdmission.test.ts:66:55\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        },
+        {
+          "name": "authenticated history admission ordinary digest signatures cannot authorize a history envelope",
+          "messages": [
+            "AssertionError: expected true to be false // Object.is equality\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/crypto/keyHistoryAdmission.test.ts:80:101\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        },
+        {
+          "name": "authenticated history admission does not launder tampered-envelope history through unlock, initialization or secret changes",
+          "messages": [
+            "AssertionError: expected [ \u2026(2) ] to not include '-----BEGIN PUBLIC KEY-----\\nMCowBQYDK\u2026'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/crypto/keyHistoryAdmission.test.ts:116:59\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        },
+        {
+          "name": "key history forgery rejects a correctly hash-chained attacker key while the live key stays unchanged",
+          "messages": [
+            "AssertionError: expected true to be false // Object.is equality\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/crypto/keyHistoryForgery.test.ts:52:94\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "sourceAndCompiledRestoreExact": true,
+      "emitIsolation": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-compile-mutant/emit-isolation.json",
+          "bytes": 487,
+          "sha256": "8983bb54e73ac7a45eae89d71cdc90e61f55097b6bda9028a8cdf2e3ffc4ca0c"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/isolated-P30-1525-envelope-signature-compile-restored/emit-isolation.json",
+          "bytes": 413,
+          "sha256": "1357cdd96b39f0e7093173cca4ddc5d4a441232812b45ec37009600e3f69cbaa"
+        }
+      ]
+    },
+    {
+      "id": "P30-1525-unsigned-migration",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-unsigned-migration-matrix.json",
+        "bytes": 27702,
+        "sha256": "43ea9c264921eab93cc91724f8cbaa82c438262c6851b82945dc996b1d6c8e92"
+      },
+      "recipe": {
+        "id": "P30-1525-unsigned-migration",
+        "oldIssue": "AMC-1525",
+        "file": "src/vault/vault.ts",
+        "find": "    } else if (!existingVault || !pathExists(historyFile)) {\n      // Only a private-key-derived current key is admitted at initialization.\n      // Existing unsigned arrays are never imported into a fresh envelope.\n      history = JSON.stringify(sealKeyHistory(kind, [buildKeyHistoryEntry(publicPem, [])], params[`${kind}PrivateKeyPem`]), null, 2);\n    }",
+        "replace": "    } else {\n      let planted: Parameters<typeof buildKeyHistoryEntry>[1] = [];\n      try { const disk: unknown = JSON.parse(readUtf8(historyFile)); if (Array.isArray(disk)) planted = disk; } catch { /* no legacy list */ }\n      if (!existingVault || !pathExists(historyFile) || planted.length > 0) {\n        const entries = planted.some((entry) => entry.publicKeyPem === publicPem) ? [...planted] : [...planted, buildKeyHistoryEntry(publicPem, planted)];\n        history = JSON.stringify(sealKeyHistory(kind, entries, params[`${kind}PrivateKeyPem`]), null, 2);\n      }\n    }",
+        "tests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts",
+          "tests/crypto/keyHistoryAdmission.test.ts"
+        ],
+        "expect": "killed",
+        "candidateOccurrences": 1,
+        "heldOccurrences": 0,
+        "candidateFindLine": 201,
+        "missingCandidateTests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts"
+        ],
+        "staticMatchAndTestsExist": false
+      },
+      "baseline": {
+        "numTotalTests": 62,
+        "numPassedTests": 62,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-baseline/raw-tests.json",
+          "bytes": 22480,
+          "sha256": "6924a8e8de0d5c6bf3b2ea42fb016119b2b633af5c55494bed22324baa6a055e"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-baseline/command.json",
+          "bytes": 2020,
+          "sha256": "bcbcd9e4e12fa3c45347a2544bc43f7b07182e0de4eb3e991004fbdddfadd8ae"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 62,
+        "numPassedTests": 60,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-mutant/raw-tests.json",
+          "bytes": 25268,
+          "sha256": "f13da4e294f9a509801d50bbe85745e63428d89ac1721160126845e3d6b4a5c8"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-mutant/command.json",
+          "bytes": 2006,
+          "sha256": "809475f0226170ff68dc51a1d357cb484ba9caf07f3efbb54724e7c7ebb7dd47"
+        }
+      },
+      "restored": {
+        "numTotalTests": 62,
+        "numPassedTests": 62,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-restored/raw-tests.json",
+          "bytes": 22435,
+          "sha256": "6f526c55b5e30738b1c744842b5ebccc06c8d2fe367d6ef53962c2a2ec8b12c3"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-restored/command.json",
+          "bytes": 2020,
+          "sha256": "e9769cf6a2977fed8e2536d71163f5352babbba5da5685e736cbbe86f9ef4473"
+        }
+      },
+      "sameCaseNames": true,
+      "classification": "assertion-specific behavioral failure",
+      "failedAssertions": [
+        {
+          "name": "authenticated history admission does not launder legacy history through unlock, initialization or secret changes",
+          "messages": [
+            "AssertionError: expected '{\\n  \"v\": 1,\\n  \"purpose\": \"amc.key-h\u2026' to be '[{\"createdTs\":1792020709547,\"fingerpr\u2026' // Object.is equality\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/crypto/keyHistoryAdmission.test.ts:115:49\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        },
+        {
+          "name": "authenticated history admission does not seed a new vault from an existing planted history list",
+          "messages": [
+            "AssertionError: expected [ \u2026(2) ] to not include '-----BEGIN PUBLIC KEY-----\\nMCowBQYDK\u2026'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/crypto/keyHistoryAdmission.test.ts:127:57\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "sourceAndCompiledRestoreExact": true,
+      "emitIsolation": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-compile-mutant/emit-isolation.json",
+          "bytes": 431,
+          "sha256": "23d97977e6238ff734121030bfa128f5f22c7acb448e29e2553c0aa32ce97f5b"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-unsigned-migration-compile-restored/emit-isolation.json",
+          "bytes": 385,
+          "sha256": "4f125d66a5629492e6ede91f544da5e395aac33e3ec750ffb6f1147b638b9e47"
+        }
+      ]
+    },
+    {
+      "id": "P30-1525-bundle-raw-history",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-bundle-raw-history-matrix.json",
+        "bytes": 27079,
+        "sha256": "ae7a861fb076e94c1a6ad3e423faf9140338001d626a6c0b28c8db8914799463"
+      },
+      "recipe": {
+        "id": "P30-1525-bundle-raw-history",
+        "oldIssue": "AMC-1525",
+        "file": "src/bundles/bundle.ts",
+        "find": "const history = authenticatedHistoryFromBundle(root, kind);\n  return",
+        "replace": "const raw: unknown = bundleKeyHistory(root, kind);\n  const history = { entries: (Array.isArray(raw) ? raw : (raw as { entries?: unknown[] } | null | undefined)?.entries ?? []) as Array<{ publicKeyPem: string }> };\n  return",
+        "tests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts",
+          "tests/keyHistoryBundleCertificate.test.ts"
+        ],
+        "expect": "killed",
+        "candidateOccurrences": 1,
+        "heldOccurrences": 1,
+        "candidateFindLine": 578,
+        "missingCandidateTests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts"
+        ],
+        "staticMatchAndTestsExist": false
+      },
+      "baseline": {
+        "numTotalTests": 62,
+        "numPassedTests": 62,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-baseline/raw-tests.json",
+          "bytes": 22466,
+          "sha256": "f1ab88293dcada07c75e54c6393366b3e832ac7e6deeda6ffff8a824356e006f"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-baseline/command.json",
+          "bytes": 2020,
+          "sha256": "a7e8ecdd4f98c624f306d7d74d5f7f755bf0977ba759080004b9447af5f74c18"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 62,
+        "numPassedTests": 59,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-mutant/raw-tests.json",
+          "bytes": 25052,
+          "sha256": "aabfafac692814f1f6e6f2b5092cd323871c0b3b743fe3a8fb1b10b2f3f103e3"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-mutant/command.json",
+          "bytes": 2006,
+          "sha256": "9a55b069fc184d50eab45520d9e7bc825f801af3f581f04885712086ab049313"
+        }
+      },
+      "restored": {
+        "numTotalTests": 62,
+        "numPassedTests": 62,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-restored/raw-tests.json",
+          "bytes": 22465,
+          "sha256": "584dec579cbe73dd64659a66f0f61b356a16b9564319c5087f3c61145e053b3d"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-restored/command.json",
+          "bytes": 2020,
+          "sha256": "90c30226670f1d34ba09afca965485503960c27a7eb1dc7368bd88b5e319ccae"
+        }
+      },
+      "sameCaseNames": true,
+      "classification": "assertion-specific behavioral failure",
+      "failedAssertions": [
+        {
+          "name": "AMC-1525 portable authenticated key history bundle rejects an attacker signer admitted by unsigned hash chain",
+          "messages": [
+            "AssertionError: expected [] to include 'Manifest signature verification faile\u2026'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/keyHistoryBundleCertificate.test.ts:179:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "name": "AMC-1525 portable authenticated key history bundle rejects an attacker signer admitted by rehashed signed envelope",
+          "messages": [
+            "AssertionError: expected [] to include 'Manifest signature verification faile\u2026'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/keyHistoryBundleCertificate.test.ts:179:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "name": "AMC-1525 portable authenticated key history bundle rejects an attacker signer admitted by transplanted signed envelope",
+          "messages": [
+            "AssertionError: expected [] to include 'Manifest signature verification faile\u2026'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/keyHistoryBundleCertificate.test.ts:179:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "sourceAndCompiledRestoreExact": true,
+      "emitIsolation": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-compile-mutant/emit-isolation.json",
+          "bytes": 443,
+          "sha256": "c9d2c4076951acd5578c8fa90fbec69766efef4439f7c18ebf9dc0db4b0ce689"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-bundle-raw-history-compile-restored/emit-isolation.json",
+          "bytes": 391,
+          "sha256": "ed2ae181928af23b8cf12569972db7914634aa83d350fffa4652e8e6ed68e78a"
+        }
+      ]
+    },
+    {
+      "id": "P30-1525-certificate-raw-history",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-certificate-raw-history-matrix.json",
+        "bytes": 27069,
+        "sha256": "f786d29e56869c5c9d4b01472defb6fde64289db10c8f173054c0c48f533bc7a"
+      },
+      "recipe": {
+        "id": "P30-1525-certificate-raw-history",
+        "oldIssue": "AMC-1525",
+        "file": "src/assurance/certificate.ts",
+        "find": "const history = authenticatedHistoryFromCert(root, kind);\n  return",
+        "replace": "const raw: unknown = certKeyHistory(root, kind);\n  const history = { entries: (Array.isArray(raw) ? raw : (raw as { entries?: unknown[] } | null | undefined)?.entries ?? []) as Array<{ publicKeyPem: string }> };\n  return",
+        "tests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts",
+          "tests/keyHistoryBundleCertificate.test.ts"
+        ],
+        "expect": "killed",
+        "candidateOccurrences": 1,
+        "heldOccurrences": 1,
+        "candidateFindLine": 638,
+        "missingCandidateTests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts"
+        ],
+        "staticMatchAndTestsExist": false
+      },
+      "baseline": {
+        "numTotalTests": 62,
+        "numPassedTests": 62,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-baseline/raw-tests.json",
+          "bytes": 22482,
+          "sha256": "3d68e3a189f56d2c0e3bdc2a3a83b7cb983bc518f7d25478265f29b37e6ddc43"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-baseline/command.json",
+          "bytes": 2055,
+          "sha256": "f88db0750a6aabad1fc1db05a27d1b07e7fb38363052adf455658d99b8e7e3fc"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 62,
+        "numPassedTests": 59,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-mutant/raw-tests.json",
+          "bytes": 25044,
+          "sha256": "28d5697a8c157acfce95f3de0445d7d40e6215cac39719cf2ce602de575103d7"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-mutant/command.json",
+          "bytes": 2041,
+          "sha256": "d2eb37b728b79b6dc3fbdc0182e93f952bb447cf69141cfaaf58b60206043f6f"
+        }
+      },
+      "restored": {
+        "numTotalTests": 62,
+        "numPassedTests": 62,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-restored/raw-tests.json",
+          "bytes": 22465,
+          "sha256": "8a05a93768ffc333daad0b1f8443846b158725c7d737726987060d8fea9f599c"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-restored/command.json",
+          "bytes": 2055,
+          "sha256": "1c5cdb7a294af227604fa6859dd5c10e589771b74c10ce0719bf934c5ead4693"
+        }
+      },
+      "sameCaseNames": true,
+      "classification": "assertion-specific behavioral failure",
+      "failedAssertions": [
+        {
+          "name": "AMC-1525 portable authenticated key history certificate rejects an attacker signer admitted by unsigned hash chain",
+          "messages": [
+            "AssertionError: expected [] to include 'cert signature invalid'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/keyHistoryBundleCertificate.test.ts:179:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "name": "AMC-1525 portable authenticated key history certificate rejects an attacker signer admitted by rehashed signed envelope",
+          "messages": [
+            "AssertionError: expected [] to include 'cert signature invalid'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/keyHistoryBundleCertificate.test.ts:179:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "name": "AMC-1525 portable authenticated key history certificate rejects an attacker signer admitted by transplanted signed envelope",
+          "messages": [
+            "AssertionError: expected [] to include 'cert signature invalid'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/keyHistoryBundleCertificate.test.ts:179:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "sourceAndCompiledRestoreExact": true,
+      "emitIsolation": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-compile-mutant/emit-isolation.json",
+          "bytes": 471,
+          "sha256": "670c93349bb251ecab7bd5e470fffd9e7f54773f1967333886a5647225359d0f"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-certificate-raw-history-compile-restored/emit-isolation.json",
+          "bytes": 405,
+          "sha256": "aad4a52de6d379f0a186e9dfd57dc402cf5214a9159c94d04f5854c6b47b13fd"
+        }
+      ]
+    },
+    {
+      "id": "P30-1525-cold-vault-initializes",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/P30-1525-cold-vault-initializes-matrix.json",
+        "bytes": 27095,
+        "sha256": "6a90195514f488f54291c8c26b9c8019e16c5ed2cf26940a2be15d916c51432e"
+      },
+      "recipe": {
+        "id": "P30-1525-cold-vault-initializes",
+        "oldIssue": "AMC-1525",
+        "file": "src/ledger/ledgerVerification.ts",
+        "find": "ledger = openLedger(workspacePath, { readonly: true });",
+        "replace": "ledger = openLedger(workspacePath);",
+        "tests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts",
+          "tests/ledgerVerificationReadOnly.test.ts"
+        ],
+        "expect": "killed",
+        "candidateOccurrences": 1,
+        "heldOccurrences": 1,
+        "candidateFindLine": 702,
+        "missingCandidateTests": [
+          "tests/crypto/keyHistoryMutationGuards.test.ts"
+        ],
+        "staticMatchAndTestsExist": false
+      },
+      "baseline": {
+        "numTotalTests": 62,
+        "numPassedTests": 62,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-baseline/raw-tests.json",
+          "bytes": 22499,
+          "sha256": "7a334aa309a460875a6734ab338641fce6fc5ac56a2760cc8017968bed344ded"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-baseline/command.json",
+          "bytes": 2048,
+          "sha256": "0c5f5f6645f94da2bd4ce49db97cc0ed763a42800dd1abb98a7070c762aa3bc0"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 62,
+        "numPassedTests": 44,
+        "numFailedTests": 3,
+        "numPendingTests": 15,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-mutant/raw-tests.json",
+          "bytes": 25279,
+          "sha256": "050143b8176e713400a68a77d962de0d3f73a649f587cf8aa0d81bd8a4fb2b51"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-mutant/command.json",
+          "bytes": 2034,
+          "sha256": "8d8eedf190d7242cea88a320af930e6536de821e481a8dc7eb6fb71c42f08976"
+        }
+      },
+      "restored": {
+        "numTotalTests": 62,
+        "numPassedTests": 62,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-restored/raw-tests.json",
+          "bytes": 22460,
+          "sha256": "950cd909e799b29826ac9ebda0d15ec42791d4c00f6982c63d0a6caa26629016"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-restored/command.json",
+          "bytes": 2048,
+          "sha256": "4e250053e1db1f22e9e1a4d15de6974c6aaf60cbb230b945527189f97cad316f"
+        }
+      },
+      "sameCaseNames": true,
+      "classification": "partial assertion failures with pending portable cases after product fixture refusal; not a completed 62-case kill",
+      "failedAssertions": [
+        {
+          "name": "cold-process encrypted evidence fails closed for missing-passphrase without modifying disk",
+          "messages": [
+            "AssertionError: expected +0 to be 1 // Object.is equality\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/ledgerVerificationReadOnly.test.ts:99:27\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        },
+        {
+          "name": "cold-process encrypted evidence fails closed for missing-vault without modifying disk",
+          "messages": [
+            "AssertionError: expected { \u2026(84) } to deeply equal { \u2026(79) }\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/ledgerVerificationReadOnly.test.ts:102:42\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        },
+        {
+          "name": "public-only ledger verification preserves the supplied trust anchors without creating a vault",
+          "messages": [
+            "AssertionError: expected [ \u2026(2) ] to deeply equal []\n    at /private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/ledgerVerificationReadOnly.test.ts:125:25\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "suiteFailures": [
+        {
+          "name": "/private/tmp/p0-30-AMC-1525-qualification-20261015/closure/tests/keyHistoryBundleCertificate.test.ts",
+          "message": "Cannot issue certificate: bundle verification failed (Ledger verify: Event be935870-748a-44b0-9fee-eea242545847 writer signature invalid; Ledger verify: Session before-rotation seal signature invalid; Ledger verify: Run 0675eb2e-f955-4d8e-a36e-042619ac87d4 seal signature invalid; Ledger verify: Target profile signature invalid: bundle.target.json)"
+        }
+      ],
+      "sourceAndCompiledRestoreExact": true,
+      "emitIsolation": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-compile-mutant/emit-isolation.json",
+          "bytes": 487,
+          "sha256": "8a0eea20d65c26308a73e0883a6f42e6b37cffea8ec2a36d3c0a63a34a4fdd66"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/P30-1525-cold-vault-initializes-compile-restored/emit-isolation.json",
+          "bytes": 413,
+          "sha256": "88b9098a990dddcf793714bdef26b76e84a5a1331e7187d02f14eebffaf2ef4f"
+        }
+      ]
+    }
+  ],
+  "coldFixedFixtureObservations": {
+    "notAdditionalCorpusCases": true,
+    "frozenInputs": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/frozen-inputs.json",
+      "bytes": 57064,
+      "sha256": "be6f5742e6135ca91c53cae8b6b30038b86c295246b9b502873583543054a924"
+    },
+    "publicPinsBeforeEvidence": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/public-pins-before-evidence.json",
+      "bytes": 1028,
+      "sha256": "a8bad16b2e904e39ccae65062032d45b738997be62e9ac78d4c5d5f6d8b2f927"
+    },
+    "phases": [
+      {
+        "observations": [
+          {
+            "phase": "P30-1525-cold-vault-initializes-baseline",
+            "case": "legacy",
+            "fixedInputsMatchFrozen": true,
+            "beforeSnapshot": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-legacy-before-verifier-snapshot.json",
+              "bytes": 17727,
+              "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+            },
+            "afterSnapshot": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-legacy-after-verifier-snapshot.json",
+              "bytes": 17727,
+              "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+            },
+            "allVerifierChangedPaths": [],
+            "nonCoordinationChangedPaths": [],
+            "allRowsBeforeAfterMatch": true,
+            "beforeTableCounts": {
+              "a4_comments": 0,
+              "a4_decisions": 0,
+              "a4_deployments": 0,
+              "a4_effects": 0,
+              "a4_evidence_refs": 0,
+              "a4_gates": 0,
+              "a4_members": 0,
+              "a4_projects": 0,
+              "a4_releases": 0,
+              "a4_requests": 0,
+              "a4_revisions": 0,
+              "a4_transitions": 0,
+              "action_executions": 0,
+              "action_transitions": 0,
+              "amc_guard_events": 0,
+              "assurance_runs": 0,
+              "bridge_request_usage": 0,
+              "causal_edges": 0,
+              "claim_transitions": 0,
+              "claims": 0,
+              "evidence_corrections": 0,
+              "evidence_events": 1,
+              "evidence_incident_links": 0,
+              "incident_clock_events": 0,
+              "incident_transitions": 0,
+              "incidents": 0,
+              "outcome_contracts": 0,
+              "outcome_events": 0,
+              "runs": 0,
+              "schema_meta": 0,
+              "schema_migrations": 13,
+              "sessions": 1
+            },
+            "verdict": {
+              "ok": true,
+              "errors": [],
+              "chain": {
+                "ok": true,
+                "errors": []
+              },
+              "governance": {
+                "ok": true,
+                "errors": []
+              },
+              "trustRoot": {
+                "anchored": true,
+                "monitorFingerprint": "c3a9f59451f8456ff333a5e77a60dcc143f70c4b1e79b87b5819b759309c9b94",
+                "expectedFingerprint": "c3a9f59451f8456ff333a5e77a60dcc143f70c4b1e79b87b5819b759309c9b94"
+              },
+              "sessions": {
+                "open": [],
+                "released": [],
+                "interrupted": [],
+                "closed": []
+              }
+            },
+            "beforeInspectorEffects": false,
+            "afterInspectorEffects": false,
+            "verifierReport": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-legacy-verify.json",
+              "bytes": 935,
+              "sha256": "4202838069fd047434a64336c89deb8f57c70d65b34d8ad72c22be3d410e3d97"
+            },
+            "scope": "Finished initializer and child readers; coordinator never opens DB. Original62 test lifecycle and cleanup unchanged; this is a separate retained observation."
+          },
+          {
+            "phase": "P30-1525-cold-vault-initializes-baseline",
+            "case": "missing-vault",
+            "fixedInputsMatchFrozen": true,
+            "beforeSnapshot": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-missing-vault-before-verifier-snapshot.json",
+              "bytes": 17557,
+              "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+            },
+            "afterSnapshot": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-missing-vault-after-verifier-snapshot.json",
+              "bytes": 17557,
+              "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+            },
+            "allVerifierChangedPaths": [],
+            "nonCoordinationChangedPaths": [],
+            "allRowsBeforeAfterMatch": true,
+            "beforeTableCounts": {
+              "a4_comments": 0,
+              "a4_decisions": 0,
+              "a4_deployments": 0,
+              "a4_effects": 0,
+              "a4_evidence_refs": 0,
+              "a4_gates": 0,
+              "a4_members": 0,
+              "a4_projects": 0,
+              "a4_releases": 0,
+              "a4_requests": 0,
+              "a4_revisions": 0,
+              "a4_transitions": 0,
+              "action_executions": 0,
+              "action_transitions": 0,
+              "amc_guard_events": 0,
+              "assurance_runs": 0,
+              "bridge_request_usage": 0,
+              "causal_edges": 0,
+              "claim_transitions": 0,
+              "claims": 0,
+              "evidence_corrections": 0,
+              "evidence_events": 1,
+              "evidence_incident_links": 0,
+              "incident_clock_events": 0,
+              "incident_transitions": 0,
+              "incidents": 0,
+              "outcome_contracts": 0,
+              "outcome_events": 0,
+              "runs": 0,
+              "schema_meta": 0,
+              "schema_migrations": 13,
+              "sessions": 1
+            },
+            "verdict": {
+              "ok": false,
+              "errors": [
+                "Event 590bd0a7-a5d7-4f82-a094-dc5c7ad9a1e9 payload authentication failed"
+              ],
+              "chain": {
+                "ok": false,
+                "errors": [
+                  "Event 590bd0a7-a5d7-4f82-a094-dc5c7ad9a1e9 payload authentication failed"
+                ]
+              },
+              "governance": {
+                "ok": true,
+                "errors": []
+              },
+              "trustRoot": {
+                "anchored": true,
+                "monitorFingerprint": "c3a9f59451f8456ff333a5e77a60dcc143f70c4b1e79b87b5819b759309c9b94",
+                "expectedFingerprint": "c3a9f59451f8456ff333a5e77a60dcc143f70c4b1e79b87b5819b759309c9b94"
+              },
+              "sessions": {
+                "open": [],
+                "released": [],
+                "interrupted": [],
+                "closed": []
+              }
+            },
+            "beforeInspectorEffects": false,
+            "afterInspectorEffects": false,
+            "verifierReport": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-missing-vault-verify.json",
+              "bytes": 1113,
+              "sha256": "afae852992d9bccfdd449369f061fb20f0e2d20287a097dd646ddd50c9e0d735"
+            },
+            "scope": "Finished initializer and child readers; coordinator never opens DB. Original62 test lifecycle and cleanup unchanged; this is a separate retained observation."
+          }
+        ],
+        "fixedInputsRestored": true,
+        "coldProcessesFinishedBeforeInspection": true,
+        "notAdditional62Cases": true
+      },
+      {
+        "observations": [
+          {
+            "phase": "P30-1525-cold-vault-initializes-mutant",
+            "case": "legacy",
+            "fixedInputsMatchFrozen": true,
+            "beforeSnapshot": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-legacy-before-verifier-snapshot.json",
+              "bytes": 17727,
+              "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+            },
+            "afterSnapshot": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-legacy-after-verifier-snapshot.json",
+              "bytes": 17377,
+              "sha256": "42e0e007d83e1edb2d3188c50f945f4cb62760516a0a6ef2f8533f882769070d"
+            },
+            "allVerifierChangedPaths": [
+              ".amc/evidence.sqlite-shm",
+              ".amc/evidence.sqlite-wal"
+            ],
+            "nonCoordinationChangedPaths": [],
+            "allRowsBeforeAfterMatch": true,
+            "beforeTableCounts": {
+              "a4_comments": 0,
+              "a4_decisions": 0,
+              "a4_deployments": 0,
+              "a4_effects": 0,
+              "a4_evidence_refs": 0,
+              "a4_gates": 0,
+              "a4_members": 0,
+              "a4_projects": 0,
+              "a4_releases": 0,
+              "a4_requests": 0,
+              "a4_revisions": 0,
+              "a4_transitions": 0,
+              "action_executions": 0,
+              "action_transitions": 0,
+              "amc_guard_events": 0,
+              "assurance_runs": 0,
+              "bridge_request_usage": 0,
+              "causal_edges": 0,
+              "claim_transitions": 0,
+              "claims": 0,
+              "evidence_corrections": 0,
+              "evidence_events": 1,
+              "evidence_incident_links": 0,
+              "incident_clock_events": 0,
+              "incident_transitions": 0,
+              "incidents": 0,
+              "outcome_contracts": 0,
+              "outcome_events": 0,
+              "runs": 0,
+              "schema_meta": 0,
+              "schema_migrations": 13,
+              "sessions": 1
+            },
+            "verdict": {
+              "ok": true,
+              "errors": [],
+              "chain": {
+                "ok": true,
+                "errors": []
+              },
+              "governance": {
+                "ok": true,
+                "errors": []
+              },
+              "trustRoot": {
+                "anchored": true,
+                "monitorFingerprint": "c3a9f59451f8456ff333a5e77a60dcc143f70c4b1e79b87b5819b759309c9b94",
+                "expectedFingerprint": "c3a9f59451f8456ff333a5e77a60dcc143f70c4b1e79b87b5819b759309c9b94"
+              },
+              "sessions": {
+                "open": [],
+                "released": [],
+                "interrupted": [],
+                "closed": []
+              }
+            },
+            "beforeInspectorEffects": false,
+            "afterInspectorEffects": true,
+            "verifierReport": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-legacy-verify.json",
+              "bytes": 935,
+              "sha256": "de7068468fb30b016689ab2427e9fcaade59cd769671722f0770dc648097da78"
+            },
+            "scope": "Finished initializer and child readers; coordinator never opens DB. Original62 test lifecycle and cleanup unchanged; this is a separate retained observation."
+          },
+          {
+            "phase": "P30-1525-cold-vault-initializes-mutant",
+            "case": "missing-vault",
+            "fixedInputsMatchFrozen": true,
+            "beforeSnapshot": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-missing-vault-before-verifier-snapshot.json",
+              "bytes": 17557,
+              "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+            },
+            "afterSnapshot": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-missing-vault-after-verifier-snapshot.json",
+              "bytes": 18396,
+              "sha256": "aae0825835619480d7a3ab8452d5e77bc519acd7f032f7b3268421c4a56fe47e"
+            },
+            "allVerifierChangedPaths": [
+              ".amc/evidence.sqlite-shm",
+              ".amc/evidence.sqlite-wal",
+              ".amc/keys/auditor_ed25519.pub",
+              ".amc/keys/auditor_history.json",
+              ".amc/keys/auditor_history.json.previous-c51bd17bf7d6f5ed887998c05816632afacb93734592dfbf9b26d6c1e9e20154",
+              ".amc/keys/lease_ed25519.pub",
+              ".amc/keys/lease_history.json",
+              ".amc/keys/lease_history.json.previous-c5c67e8a10468fe9fe663a9dcb277655a5fbb5c717de61bf8f19974e27976df2",
+              ".amc/keys/monitor_ed25519.pub",
+              ".amc/keys/monitor_history.json",
+              ".amc/keys/monitor_history.json.previous-7a433e46ab3953e9f55db51a6d2ec5871c6c764e232eb582aec0d6fde19b8469",
+              ".amc/keys/session_ed25519.pub",
+              ".amc/keys/session_history.json",
+              ".amc/keys/session_history.json.previous-a94702d1fca92bcdc7033d9a9e514fbb4cf201c7e09d645a7661419f08b6738c",
+              ".amc/vault.amcvault",
+              ".amc/vault.amcvault.meta.json"
+            ],
+            "nonCoordinationChangedPaths": [
+              ".amc/keys/auditor_ed25519.pub",
+              ".amc/keys/auditor_history.json",
+              ".amc/keys/auditor_history.json.previous-c51bd17bf7d6f5ed887998c05816632afacb93734592dfbf9b26d6c1e9e20154",
+              ".amc/keys/lease_ed25519.pub",
+              ".amc/keys/lease_history.json",
+              ".amc/keys/lease_history.json.previous-c5c67e8a10468fe9fe663a9dcb277655a5fbb5c717de61bf8f19974e27976df2",
+              ".amc/keys/monitor_ed25519.pub",
+              ".amc/keys/monitor_history.json",
+              ".amc/keys/monitor_history.json.previous-7a433e46ab3953e9f55db51a6d2ec5871c6c764e232eb582aec0d6fde19b8469",
+              ".amc/keys/session_ed25519.pub",
+              ".amc/keys/session_history.json",
+              ".amc/keys/session_history.json.previous-a94702d1fca92bcdc7033d9a9e514fbb4cf201c7e09d645a7661419f08b6738c",
+              ".amc/vault.amcvault",
+              ".amc/vault.amcvault.meta.json"
+            ],
+            "allRowsBeforeAfterMatch": true,
+            "beforeTableCounts": {
+              "a4_comments": 0,
+              "a4_decisions": 0,
+              "a4_deployments": 0,
+              "a4_effects": 0,
+              "a4_evidence_refs": 0,
+              "a4_gates": 0,
+              "a4_members": 0,
+              "a4_projects": 0,
+              "a4_releases": 0,
+              "a4_requests": 0,
+              "a4_revisions": 0,
+              "a4_transitions": 0,
+              "action_executions": 0,
+              "action_transitions": 0,
+              "amc_guard_events": 0,
+              "assurance_runs": 0,
+              "bridge_request_usage": 0,
+              "causal_edges": 0,
+              "claim_transitions": 0,
+              "claims": 0,
+              "evidence_corrections": 0,
+              "evidence_events": 1,
+              "evidence_incident_links": 0,
+              "incident_clock_events": 0,
+              "incident_transitions": 0,
+              "incidents": 0,
+              "outcome_contracts": 0,
+              "outcome_events": 0,
+              "runs": 0,
+              "schema_meta": 0,
+              "schema_migrations": 13,
+              "sessions": 1
+            },
+            "verdict": {
+              "ok": false,
+              "errors": [
+                "Event 590bd0a7-a5d7-4f82-a094-dc5c7ad9a1e9 payload authentication failed",
+                "Event 590bd0a7-a5d7-4f82-a094-dc5c7ad9a1e9 writer signature invalid",
+                "Session p030-cold-vault-owned-proof seal signature invalid",
+                "Target profile signature invalid: default.target.json",
+                "Fleet config signature invalid: signature verify failed",
+                "Action policy signature invalid: signature verification failed",
+                "Tools config signature invalid: signature verification failed",
+                "Gateway config signature invalid: signature verification failed"
+              ],
+              "chain": {
+                "ok": false,
+                "errors": [
+                  "Event 590bd0a7-a5d7-4f82-a094-dc5c7ad9a1e9 payload authentication failed",
+                  "Event 590bd0a7-a5d7-4f82-a094-dc5c7ad9a1e9 writer signature invalid",
+                  "Session p030-cold-vault-owned-proof seal signature invalid"
+                ]
+              },
+              "governance": {
+                "ok": false,
+                "errors": [
+                  "Target profile signature invalid: default.target.json",
+                  "Fleet config signature invalid: signature verify failed",
+                  "Action policy signature invalid: signature verification failed",
+                  "Tools config signature invalid: signature verification failed",
+                  "Gateway config signature invalid: signature verification failed"
+                ]
+              },
+              "trustRoot": {
+                "anchored": true,
+                "monitorFingerprint": "c3a9f59451f8456ff333a5e77a60dcc143f70c4b1e79b87b5819b759309c9b94",
+                "expectedFingerprint": "c3a9f59451f8456ff333a5e77a60dcc143f70c4b1e79b87b5819b759309c9b94"
+              },
+              "sessions": {
+                "open": [],
+                "released": [],
+                "interrupted": [],
+                "closed": []
+              }
+            },
+            "beforeInspectorEffects": false,
+            "afterInspectorEffects": true,
+            "verifierReport": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-missing-vault-verify.json",
+              "bytes": 2112,
+              "sha256": "c549667ab7fb63ec1bddc87e261ef473d4073f782c461133ff386126596f718e"
+            },
+            "scope": "Finished initializer and child readers; coordinator never opens DB. Original62 test lifecycle and cleanup unchanged; this is a separate retained observation."
+          }
+        ],
+        "fixedInputsRestored": true,
+        "coldProcessesFinishedBeforeInspection": true,
+        "notAdditional62Cases": true
+      },
+      {
+        "observations": [
+          {
+            "phase": "P30-1525-cold-vault-initializes-restored",
+            "case": "legacy",
+            "fixedInputsMatchFrozen": true,
+            "beforeSnapshot": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-legacy-before-verifier-snapshot.json",
+              "bytes": 17727,
+              "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+            },
+            "afterSnapshot": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-legacy-after-verifier-snapshot.json",
+              "bytes": 17727,
+              "sha256": "2b6b73ac3a686372f7c640616a494b853b0c03e201700771dc4151850de48a6f"
+            },
+            "allVerifierChangedPaths": [],
+            "nonCoordinationChangedPaths": [],
+            "allRowsBeforeAfterMatch": true,
+            "beforeTableCounts": {
+              "a4_comments": 0,
+              "a4_decisions": 0,
+              "a4_deployments": 0,
+              "a4_effects": 0,
+              "a4_evidence_refs": 0,
+              "a4_gates": 0,
+              "a4_members": 0,
+              "a4_projects": 0,
+              "a4_releases": 0,
+              "a4_requests": 0,
+              "a4_revisions": 0,
+              "a4_transitions": 0,
+              "action_executions": 0,
+              "action_transitions": 0,
+              "amc_guard_events": 0,
+              "assurance_runs": 0,
+              "bridge_request_usage": 0,
+              "causal_edges": 0,
+              "claim_transitions": 0,
+              "claims": 0,
+              "evidence_corrections": 0,
+              "evidence_events": 1,
+              "evidence_incident_links": 0,
+              "incident_clock_events": 0,
+              "incident_transitions": 0,
+              "incidents": 0,
+              "outcome_contracts": 0,
+              "outcome_events": 0,
+              "runs": 0,
+              "schema_meta": 0,
+              "schema_migrations": 13,
+              "sessions": 1
+            },
+            "verdict": {
+              "ok": true,
+              "errors": [],
+              "chain": {
+                "ok": true,
+                "errors": []
+              },
+              "governance": {
+                "ok": true,
+                "errors": []
+              },
+              "trustRoot": {
+                "anchored": true,
+                "monitorFingerprint": "c3a9f59451f8456ff333a5e77a60dcc143f70c4b1e79b87b5819b759309c9b94",
+                "expectedFingerprint": "c3a9f59451f8456ff333a5e77a60dcc143f70c4b1e79b87b5819b759309c9b94"
+              },
+              "sessions": {
+                "open": [],
+                "released": [],
+                "interrupted": [],
+                "closed": []
+              }
+            },
+            "beforeInspectorEffects": false,
+            "afterInspectorEffects": false,
+            "verifierReport": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-legacy-verify.json",
+              "bytes": 935,
+              "sha256": "a6aa966827b51f3e454fe67cc718cc92cd65c8c7aa42b6baff9da08bb829e1c4"
+            },
+            "scope": "Finished initializer and child readers; coordinator never opens DB. Original62 test lifecycle and cleanup unchanged; this is a separate retained observation."
+          },
+          {
+            "phase": "P30-1525-cold-vault-initializes-restored",
+            "case": "missing-vault",
+            "fixedInputsMatchFrozen": true,
+            "beforeSnapshot": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-missing-vault-before-verifier-snapshot.json",
+              "bytes": 17557,
+              "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+            },
+            "afterSnapshot": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-missing-vault-after-verifier-snapshot.json",
+              "bytes": 17557,
+              "sha256": "e89ba733f0fde507ad37ef9aeea5d739bac97f049255f577ffb32876bb8a83da"
+            },
+            "allVerifierChangedPaths": [],
+            "nonCoordinationChangedPaths": [],
+            "allRowsBeforeAfterMatch": true,
+            "beforeTableCounts": {
+              "a4_comments": 0,
+              "a4_decisions": 0,
+              "a4_deployments": 0,
+              "a4_effects": 0,
+              "a4_evidence_refs": 0,
+              "a4_gates": 0,
+              "a4_members": 0,
+              "a4_projects": 0,
+              "a4_releases": 0,
+              "a4_requests": 0,
+              "a4_revisions": 0,
+              "a4_transitions": 0,
+              "action_executions": 0,
+              "action_transitions": 0,
+              "amc_guard_events": 0,
+              "assurance_runs": 0,
+              "bridge_request_usage": 0,
+              "causal_edges": 0,
+              "claim_transitions": 0,
+              "claims": 0,
+              "evidence_corrections": 0,
+              "evidence_events": 1,
+              "evidence_incident_links": 0,
+              "incident_clock_events": 0,
+              "incident_transitions": 0,
+              "incidents": 0,
+              "outcome_contracts": 0,
+              "outcome_events": 0,
+              "runs": 0,
+              "schema_meta": 0,
+              "schema_migrations": 13,
+              "sessions": 1
+            },
+            "verdict": {
+              "ok": false,
+              "errors": [
+                "Event 590bd0a7-a5d7-4f82-a094-dc5c7ad9a1e9 payload authentication failed"
+              ],
+              "chain": {
+                "ok": false,
+                "errors": [
+                  "Event 590bd0a7-a5d7-4f82-a094-dc5c7ad9a1e9 payload authentication failed"
+                ]
+              },
+              "governance": {
+                "ok": true,
+                "errors": []
+              },
+              "trustRoot": {
+                "anchored": true,
+                "monitorFingerprint": "c3a9f59451f8456ff333a5e77a60dcc143f70c4b1e79b87b5819b759309c9b94",
+                "expectedFingerprint": "c3a9f59451f8456ff333a5e77a60dcc143f70c4b1e79b87b5819b759309c9b94"
+              },
+              "sessions": {
+                "open": [],
+                "released": [],
+                "interrupted": [],
+                "closed": []
+              }
+            },
+            "beforeInspectorEffects": false,
+            "afterInspectorEffects": false,
+            "verifierReport": {
+              "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-missing-vault-verify.json",
+              "bytes": 1113,
+              "sha256": "5e47d55926c83852f4a1f25b4dd90b9b237adb2f4138013af8480ee93135aaa9"
+            },
+            "scope": "Finished initializer and child readers; coordinator never opens DB. Original62 test lifecycle and cleanup unchanged; this is a separate retained observation."
+          }
+        ],
+        "fixedInputsRestored": true,
+        "coldProcessesFinishedBeforeInspection": true,
+        "notAdditional62Cases": true
+      }
+    ],
+    "meaning": "Separate nonempty physical data frozen before baseline, exact restore before each cold reader. Initializer and all inspection/verifier children finish serially; coordinator never opens SQLite. WAL/SHM and inspector intervals are observed separately. This does not replace original fixture lifecycle assertions."
+  },
+  "initialIncompleteAttempt": {
+    "observer": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/compiler-isolation-observer.json",
+      "bytes": 1271,
+      "sha256": "5793407878a9be4e04d5f569afc2305b7a78aef9a3865e3eea9efa6febdd38a4"
+    },
+    "originalController": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/driver-original-controller.py",
+      "bytes": 11918,
+      "sha256": "41029bbcb6b6a276cf139139f582e80ee6d2dcde26a908f6db57b209126b3953"
+    },
+    "phases": [
+      "P30-1525-envelope-signature-baseline",
+      "P30-1525-envelope-signature-compile-mutant",
+      "P30-1525-envelope-signature-mutant",
+      "P30-1525-envelope-signature-compile-restored"
+    ],
+    "counts": "62\u219255; no restored corpus run",
+    "qualified": false,
+    "reason": "Actual tsc also rewrote the unrelated bundled kernel/amcRuntime.js. The restoration assertion caught it. The first attempt remains unqualified; it is not used as causal evidence."
+  },
+  "compilerIsolation": {
+    "meaning": "Actual installed tsc emits the private target. Changed non-target bundled kernel output is restored from a pinned baseline before testing, without restoring the mutant target. Only direct compiled targets are covered; standalone/kernel CLI mutation coverage is not claimed.",
+    "firstCorrectedEnvelopeStrictControllerTiming": "The isolated envelope run used the prior controller version before explicit source-delta assertions were added. Its retained exact recipe, emitted-change record and full restoration still show only the target compiled JS changed. Subsequent four matrices include the explicit target TS/JS assertions."
+  },
+  "preservation": {
+    "sourcePins": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/source-after.json",
+      "bytes": 12730,
+      "sha256": "d343a6dffe4cd6aeb778d88fdd9a0bb2bb3672ca994945e1545a47a537fefdbb"
+    },
+    "initialTrackedManifest": {
+      "path": "/private/tmp/p0-30-initial-tracked-manifest-20261015.json",
+      "bytes": 1449771,
+      "sha256": "a17289fed9769adb7e4985847b6698b013d2eb253928174f80a42839992ddfa0"
+    },
+    "rootPreflight": {
+      "path": "/private/tmp/p0-30-root-scope-preflight-20261015.json",
+      "bytes": 9648,
+      "sha256": "5a35eb722c60578da5f983e42d8dca457cbacc13bfab9d02cab2fe3cccbef88f"
+    },
+    "liveSource7739Exact": true,
+    "privateSource7739RestoredExact": true,
+    "liveCompiled4529Exact": true,
+    "privateCompiled4529RestoredExact": true,
+    "fullProtectedClosure": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/full-closure-restoration.json",
+      "bytes": 102,
+      "sha256": "bd7f546fb71b74003e0f70f1b3b3e38196720e1a65862985eee5daf6d2dc8d3b"
+    },
+    "nativeBytesDeviceInodeLinkCountExact": true,
+    "protectedNonexistentPathsRemainAbsent": true,
+    "heldTestAbsence": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/held-test-absence.json",
+      "bytes": 119,
+      "sha256": "c31957142c942b5e87323eb72bcbc1cb24078d6f9bf6d2557c00f2c24767753b"
+    },
+    "liveStatusCommand": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/final-live-source-status/command.json",
+      "bytes": 1422,
+      "sha256": "5a005cdded7f5d77a6c72348eae1b97a08741e2ff693f5f74e9f33610d89d150"
+    },
+    "liveStatusOutput": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/phases/final-live-source-status/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "journal": {
+    "frozen": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 97071,
+      "sha256": "03bf66c0e20c29a1e216e46edeebbf0eec4e678e5776f7818ff51cf6e99db060"
+    },
+    "phaseCount": 54,
+    "phases": [
+      {
+        "phase": "private-copy-setup",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 3821
+      },
+      {
+        "phase": "private-first-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 18893
+      },
+      {
+        "phase": "P30-1525-envelope-signature-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 19055
+      },
+      {
+        "phase": "P30-1525-envelope-signature-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28495
+      },
+      {
+        "phase": "P30-1525-envelope-signature-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 19281
+      },
+      {
+        "phase": "P30-1525-envelope-signature-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28909
+      },
+      {
+        "phase": "isolated-P30-1525-envelope-signature-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 19312
+      },
+      {
+        "phase": "isolated-P30-1525-envelope-signature-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28438
+      },
+      {
+        "phase": "isolated-P30-1525-envelope-signature-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 19664
+      },
+      {
+        "phase": "isolated-P30-1525-envelope-signature-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28963
+      },
+      {
+        "phase": "isolated-P30-1525-envelope-signature-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 19728
+      },
+      {
+        "phase": "P30-1525-unsigned-migration-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 19255
+      },
+      {
+        "phase": "P30-1525-unsigned-migration-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28742
+      },
+      {
+        "phase": "P30-1525-unsigned-migration-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 19616
+      },
+      {
+        "phase": "P30-1525-unsigned-migration-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28435
+      },
+      {
+        "phase": "P30-1525-unsigned-migration-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 19609
+      },
+      {
+        "phase": "P30-1525-bundle-raw-history-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 19297
+      },
+      {
+        "phase": "P30-1525-bundle-raw-history-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28750
+      },
+      {
+        "phase": "P30-1525-bundle-raw-history-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 19709
+      },
+      {
+        "phase": "P30-1525-bundle-raw-history-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28510
+      },
+      {
+        "phase": "P30-1525-bundle-raw-history-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 19635
+      },
+      {
+        "phase": "P30-1525-certificate-raw-history-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 19402
+      },
+      {
+        "phase": "P30-1525-certificate-raw-history-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28846
+      },
+      {
+        "phase": "P30-1525-certificate-raw-history-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 19530
+      },
+      {
+        "phase": "P30-1525-certificate-raw-history-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28511
+      },
+      {
+        "phase": "P30-1525-certificate-raw-history-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 19808
+      },
+      {
+        "phase": "effect-initializer",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 716
+      },
+      {
+        "phase": "effect-initial-cold-inspect",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 310
+      },
+      {
+        "phase": "effect-legacy-preparation",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 366
+      },
+      {
+        "phase": "P30-1525-cold-vault-initializes-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 19429
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-baseline-legacy-before-inspect",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 321
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-baseline-legacy-verify",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 316
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-baseline-legacy-after-inspect",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 322
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-baseline-missing-vault-before-inspect",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 323
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-baseline-missing-vault-verify",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 321
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-baseline-missing-vault-after-inspect",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 316
+      },
+      {
+        "phase": "P30-1525-cold-vault-initializes-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28746
+      },
+      {
+        "phase": "P30-1525-cold-vault-initializes-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 15965
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-mutant-legacy-before-inspect",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 311
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-mutant-legacy-verify",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 368
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-mutant-legacy-after-inspect",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 307
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-mutant-missing-vault-before-inspect",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 314
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-mutant-missing-vault-verify",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 369
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-mutant-missing-vault-after-inspect",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 315
+      },
+      {
+        "phase": "P30-1525-cold-vault-initializes-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28624
+      },
+      {
+        "phase": "P30-1525-cold-vault-initializes-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 19373
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-restored-legacy-before-inspect",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 315
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-restored-legacy-verify",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 321
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-restored-legacy-after-inspect",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 321
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-restored-missing-vault-before-inspect",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 312
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-restored-missing-vault-verify",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 308
+      },
+      {
+        "phase": "effect-P30-1525-cold-vault-initializes-restored-missing-vault-after-inspect",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 315
+      },
+      {
+        "phase": "final-preservation-pins",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 2525
+      },
+      {
+        "phase": "final-live-source-status",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 85
+      }
+    ]
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/artifact-index.json",
+    "bytes": 80407,
+    "sha256": "88c47cfa764cab70825d6bf67ac3e23615bf6b95fbb7aee6ac6959b8d1f30339"
+  },
+  "artifactCount": 322,
+  "limits": [
+    "No live repository, original tests, helpers, source, archives, native dependencies or counters were edited.",
+    "These are five newly bounded recipe controls, not a rerun or qualification of the old 76-case held runner batch. The absent held keyHistoryMutationGuards.test.ts remains absent.",
+    "A nonzero process alone is not a mutation kill. The report preserves exact assertion failures, remaining positives and any survivor or infrastructure issue.",
+    "Bundle/certificate overall refusal can remain false for issuer reasons; exact signature-error assertions determine the relevant observed failure.",
+    "Transport blocking covers selected Node interfaces and only private Unix IPC is allowed. It is not OS syscall isolation or an external network test.",
+    "Original test fixtures clean up their own workspaces; retained fixed cold-effect observations are separate from that lifecycle.",
+    "No authenticated human identity, external issuer truth, whole P0-30 acceptance, broader native/race batch, Node 24, full suite, coverage, hosted CI, release or Done approval is inferred."
+  ]
+}

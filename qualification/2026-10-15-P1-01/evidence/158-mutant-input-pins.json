@@ -1,0 +1,22 @@
+[
+  {
+    "path": "src/contracts/v1/receipt.ts",
+    "bytes": 2600,
+    "sha256": "29984f4a1d35052ee3f7df3bc8b4f937da09d6083632b4117cd2dd4eb3a6b770"
+  },
+  {
+    "path": "dist/contracts/index.d.ts",
+    "bytes": 195309,
+    "sha256": "4b3b42530b5dd5ee1a360227a8108b0775d383b54fcc4835ee97489905830f70"
+  },
+  {
+    "path": "dist/contracts/v1/receipt.d.ts",
+    "bytes": 5060,
+    "sha256": "89d660a19ed967de5febfce60dfec6e28acdf83954e81848b209071eb0b1f203"
+  },
+  {
+    "path": "dist/contracts/v1/receipt.js",
+    "bytes": 2228,
+    "sha256": "5fd09ce12eb377fe096b9ca2bb0fa255ab3775ed6f35d7a34ae9c32b7cc485fb"
+  }
+]

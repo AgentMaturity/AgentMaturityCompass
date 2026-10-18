@@ -1,0 +1,40 @@
+{
+  "source": "2d552741d727aaf3a26759b9df9343f7804d157a",
+  "atUtc": "2026-10-15T04:34:22.703057+00:00",
+  "raw": {
+    "path": "/private/tmp/p0-25-original-citations-mapping-20261015.json",
+    "bytes": 10220,
+    "sha256": "f9250d40691dfeb47f8186d21710526563f456ed088d07235bbe1b19f3fec2ce"
+  },
+  "observer": {
+    "path": "/private/tmp/p0-25-qualification-20261015/observers/original-citations-mapping.json",
+    "bytes": 15507,
+    "sha256": "face22b6fd610d8ed0dd32e94854b5c21ff4121da8d13afe62715146171df5ee"
+  },
+  "outerCombinedStream": {
+    "path": "/private/tmp/p0-25-original-citations-mapping-20261015.log",
+    "bytes": 519,
+    "sha256": "16c02be51040858b2b5745d5d19cc02211af2eb932f6aeda5e94ab33faa248be"
+  },
+  "registered": 32,
+  "passed": 32,
+  "failed": 0,
+  "pending": 0,
+  "todo": 0,
+  "fileCounts": [
+    {
+      "file": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/citations/checkCitationsCli.test.ts",
+      "registered": 9
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/citations/lintCitations.test.ts",
+      "registered": 21
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/compliance/mappingPackRefs.test.ts",
+      "registered": 2
+    }
+  ],
+  "recordedSuiteHookUnhandledKnownLateErrors": 0,
+  "boundary": "Original21 linter fixtures +9 in-process CLI injected-finding contracts +2 mappings against actual registered packs. Filled table metadata/host-subset checks are not legal correctness, expert content approval or actual whole collector/fullgate/hosted evidence. Reporter precedes global teardown; combined post-exit stream checks known late diagnostics, not universal child/side-effect absence."
+}

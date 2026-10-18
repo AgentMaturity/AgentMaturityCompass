@@ -1,0 +1,1439 @@
+{
+  "schema": "p107-fresh-control-peer-input-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/p107-fresh-canonical-outcome.json",
+      "bytes": 345207,
+      "sha256": "de21bec65b6dbcfe815396f32ece6047670f8db3dc82493dc12b40166823cbda",
+      "readScope": "Full actual root outcome JSON read; no rerun."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-fresh-canonical/command.json",
+      "bytes": 3136,
+      "sha256": "00c9b54074145c65d3f390011a96c01c81980dabb585d2c508b66f8eadb3cc3e",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-fresh-canonical/raw.json",
+      "bytes": 328107,
+      "sha256": "2bbabf822ec099ef675da420645791300ac912cdbc05f3784c13e867c669211c",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-fresh-canonical/observer.json",
+      "bytes": 440464,
+      "sha256": "ebc1dab4f38e93ab2b0d892d716ee3ad03cf979d12ace6db62e63a1d38edb6b6",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-fresh-canonical/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "7b8d506341252b30fd3802a537ff9c7678b6a2fafd854803b77379cd579dee37",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-fresh-canonical/stdout-stderr.log",
+      "bytes": 6498,
+      "sha256": "991b02be6e53e19a65efeba78a536d428758431b74e737bfc2cb988309d848eb",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-gDEMP5/public-evidence.json",
+      "bytes": 29136,
+      "sha256": "38b90d70b9e954e7ec66325acd61b57a02d7e4507b44f37fcbe318763d1b4b3b",
+      "readScope": "Full safe public runtime facts read and pin verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-gDEMP5/pre-call-public-pins.json",
+      "bytes": 5384,
+      "sha256": "6c786a7029a15c461eef57f0db0e1997d381733df50c1a08eb2a14a608bfdd2a",
+      "readScope": "Actual before-call monitor/input anchor read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/p107-m1-outcome.json",
+      "bytes": 356131,
+      "sha256": "0da168fa2382f504c92a38382771f33e51c462b77705fd5fc86f4148223356b8",
+      "readScope": "Full actual root outcome JSON read; no rerun."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m1/command.json",
+      "bytes": 3045,
+      "sha256": "9d3def44564b8fdfabef8e108034e7b1ca02ea69990eca1bc25989551953f153",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m1/raw.json",
+      "bytes": 332077,
+      "sha256": "e677159d0927110dd8ec35272f809b8f8051fc1c43c0666ef7704aec59290dea",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m1/observer.json",
+      "bytes": 446331,
+      "sha256": "b5a3f790d07a283226970fa0b314c211698b5a54ab51f3ab8c17c6198b2a53ee",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m1/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "dfb645aade83d2f35047c4c75e5a2700da0ee3212f76ca52f51788fbde51b39a",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m1/stdout-stderr.log",
+      "bytes": 9681,
+      "sha256": "7b2204fb8bd850ac515a65c0012bc811fbfaa62bbd48d899cab36b4ba3574572",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-3IqwGf/public-evidence.json",
+      "bytes": 29136,
+      "sha256": "42ab7768db9ecc3499febbad9a54fcb2370c46843eb04a3ecfaa2e11762ff5f3",
+      "readScope": "Full safe public runtime facts read and pin verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-3IqwGf/pre-call-public-pins.json",
+      "bytes": 5384,
+      "sha256": "a949526322577fc9f24b3b124f2f407d15ffb9f88445e9189cb9e08e4244da2b",
+      "readScope": "Actual before-call monitor/input anchor read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/p107-m1-restored-outcome.json",
+      "bytes": 345183,
+      "sha256": "518cc03e1efa783d49cee2369abe5e7946566360c9262eda340fdef02d2d62cc",
+      "readScope": "Full actual root outcome JSON read; no rerun."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m1-restored/command.json",
+      "bytes": 3108,
+      "sha256": "0d788c5efe043d22e7ecf13a74bc77504b07dbbebf8ab0af27cf812c3e4ff276",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m1-restored/raw.json",
+      "bytes": 328163,
+      "sha256": "039d93992aa0dab37da31bf8c9b0a2e960668939befbf90058cd619cb5259909",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m1-restored/observer.json",
+      "bytes": 440464,
+      "sha256": "486b23560ee27bc30ef2e7638ce06f74cd6d4d79c320a7bf393c0d42860ab84e",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m1-restored/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "90bcf80b59fc38f9dd2ebb3c7160085e2b6ce930324289c14ecb60af1c55cf41",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m1-restored/stdout-stderr.log",
+      "bytes": 6492,
+      "sha256": "7f3ca6fb7067e2823619c8bd5ffc7df671912a63f90aa878d7464b288f5e9a80",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-CjoLaF/public-evidence.json",
+      "bytes": 29136,
+      "sha256": "e49e19c50bca44684144fdfb113b9c1ec9a19e0b85d13ab8a9bd42b6d25605c9",
+      "readScope": "Full safe public runtime facts read and pin verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-CjoLaF/pre-call-public-pins.json",
+      "bytes": 5384,
+      "sha256": "30a23670d3c55b1803331519b09761f6af91664769a5f654760d912cc2d350d5",
+      "readScope": "Actual before-call monitor/input anchor read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/p107-m2-outcome.json",
+      "bytes": 387292,
+      "sha256": "08b400ad7c81d0b8c5eb4fbe5808a5ba6ed6d9002da0d75414358b6659d15419",
+      "readScope": "Full actual root outcome JSON read; no rerun."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m2/command.json",
+      "bytes": 3045,
+      "sha256": "1da928f24be45a739743f63cb527471f5ec0c9e88219876b8236a0b4f8d6a53c",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m2/raw.json",
+      "bytes": 330880,
+      "sha256": "a7dd48f79bef1b2d15559d929449736918a1631873144f006db7865d23b9ae85",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m2/observer.json",
+      "bytes": 479048,
+      "sha256": "15f726f65977ca526b08a73daf832177b431c6d175a45f83efdc02f86048d3d0",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m2/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "f25bb5510d3df1034d66d9f6f3c574ac168c0f8c564a144b0aab04c2e9df35b4",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m2/stdout-stderr.log",
+      "bytes": 26213,
+      "sha256": "74c7fc39761427be3261f9f4b0689f094f7e5ef19a1f54cd3e59cf350b308c5c",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-FrDZfv/public-evidence.json",
+      "bytes": 29136,
+      "sha256": "500c33980b76780a7707a41b4c60616bf2fde89ef5a2057ced4380c557202a7e",
+      "readScope": "Full safe public runtime facts read and pin verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-FrDZfv/pre-call-public-pins.json",
+      "bytes": 5384,
+      "sha256": "17922de5bcc44621fbbe5b4d2dec97785e0e0e941be900f9931393e654d69d16",
+      "readScope": "Actual before-call monitor/input anchor read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/p107-m2-restored-outcome.json",
+      "bytes": 345183,
+      "sha256": "8c99298c40a89af60af2afa8630ceb75dce5f246a8d05a60f249dc363ef986cb",
+      "readScope": "Full actual root outcome JSON read; no rerun."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m2-restored/command.json",
+      "bytes": 3108,
+      "sha256": "fd5c7940028161d97f9b952bb01e06cd26088cce9b8faca8cd108be9fd67730a",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m2-restored/raw.json",
+      "bytes": 328101,
+      "sha256": "d49f471c8e6a26e588bb9c1838823e45f0680f0c8801a7b352c15693185ef78f",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m2-restored/observer.json",
+      "bytes": 440464,
+      "sha256": "3bec0bd645c4193d28792ebde324d1780eff5f176fb36c3330fc8c2eb633102e",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m2-restored/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "860e80c99b47c37c6de1113aec58d1d53af77962515ada46e09e5ca9ae18afb4",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m2-restored/stdout-stderr.log",
+      "bytes": 6493,
+      "sha256": "001a3320d73ffe3caab6c8d85536a9373a65b3652faab9adffb6016110e18958",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-TCJYdx/public-evidence.json",
+      "bytes": 29136,
+      "sha256": "37ab7e8cc4562460056091a5c7382ea446551b40a04bde3bdfd55a3b9681d6ba",
+      "readScope": "Full safe public runtime facts read and pin verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-TCJYdx/pre-call-public-pins.json",
+      "bytes": 5384,
+      "sha256": "c36980558246fd857a0c2650f41f04cdbf3a93407ab6ec0131ba8d91dea9e291",
+      "readScope": "Actual before-call monitor/input anchor read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/p107-m3-outcome.json",
+      "bytes": 383317,
+      "sha256": "e114b59b2dba631e5bc056868bd11e34f9d06bde37807055ba4f26a2aca75d98",
+      "readScope": "Full actual root outcome JSON read; no rerun."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m3/command.json",
+      "bytes": 3045,
+      "sha256": "b1da02e67a4662f87a00a0c1d7905262a557c996a13ec07324534fd9c1032022",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m3/raw.json",
+      "bytes": 340845,
+      "sha256": "1c475e189017232314a99c078a175f36ad83f533077d45f618525d8d72fbd607",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m3/observer.json",
+      "bytes": 461758,
+      "sha256": "8d4897d2c6f56e38d33a67d4a66099a835656bdde65cd9e70cfd80bb60db388e",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m3/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "6a5fd3ce1bfa3247a5f48a9253503ebe7335df2fee7ba8015c8e4a4ed0e4be71",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m3/stdout-stderr.log",
+      "bytes": 18324,
+      "sha256": "d45d18c64dcd65fff5c12718cb5c96d82c87569bc1571fa28b976ee6f6a68e99",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/public-evidence.json",
+      "bytes": 29578,
+      "sha256": "a31988e4a9bfe76ba330b26d0132a2af08e18620af7aea7c5222d0f4815e0e19",
+      "readScope": "Full safe public runtime facts read and pin verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/pre-call-public-pins.json",
+      "bytes": 5384,
+      "sha256": "448cfbce426b1f9bac016a72dae1c52bfe065663d1bb065b352768179a5b753e",
+      "readScope": "Actual before-call monitor/input anchor read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/p107-m3-restored-outcome.json",
+      "bytes": 345183,
+      "sha256": "8d3c6400727b0adc635394474c68e6b3f200421d74f5af080f9ab3ab9cc4ecf1",
+      "readScope": "Full actual root outcome JSON read; no rerun."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m3-restored/command.json",
+      "bytes": 3108,
+      "sha256": "d17f8488f45e3dc5f925a27a6d729ea964509fda0d2cb51fb1eb30df2ecd757f",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m3-restored/raw.json",
+      "bytes": 328091,
+      "sha256": "0ade5050acc1e0e1eface6ec16975e2ef721ed4040c4fb8d8462e4d33e2adc02",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m3-restored/observer.json",
+      "bytes": 440464,
+      "sha256": "0d7614fc52bd419bd03194f1c59e2a74c41f8da839ac1a9d7679e17624cfdebe",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m3-restored/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "0e0b6724b30c29ac1ee5480b88b77b9a9c71e8d1383dac052acdeb4d52c307be",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-m3-restored/stdout-stderr.log",
+      "bytes": 6579,
+      "sha256": "3c32e922d58eb2c70204eaf27f933b9329512f2654457c2b98041dc6b08d4b0c",
+      "readScope": "Exact original phase artifact verified against root outcome."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/public-evidence.json",
+      "bytes": 29136,
+      "sha256": "732f599d87163e8dbadde43d9f3613e15a782417e03f54eefcc32f80ab382ad0",
+      "readScope": "Full safe public runtime facts read and pin verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/pre-call-public-pins.json",
+      "bytes": 5384,
+      "sha256": "7e0660ee4aa7b63c1c33e82ac687301eee7f421045b23655dcd2c1623b16511e",
+      "readScope": "Actual before-call monitor/input anchor read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m1-apply.json",
+      "bytes": 845,
+      "sha256": "876ac7f7fcd12bb12c8a0c36b948b3d2b518760741fbdb42a083363410144102",
+      "readScope": "Bound exact applied-source record verified."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m1-classification.json",
+      "bytes": 2252,
+      "sha256": "e760d57904b938f01092f8534de454b5ef24dcbec4eb5fcd24d7d52d1aedeae5",
+      "readScope": "Bound record points to unchanged original classification."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m1-classification-bound.json",
+      "bytes": 3211,
+      "sha256": "65dd8f8b1b051184d06d2244f376778e05fdabb2106bf7a8c8a2430ac34391ae",
+      "readScope": "Full actual source operation/classification/restoration record read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m1-restore.json",
+      "bytes": 847,
+      "sha256": "a3eaf8f65a4cbecf10e8814ece9c6640b056dc365190f0990c4ddf0a66d2a14c",
+      "readScope": "Full actual source operation/classification/restoration record read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-originals/m1-original.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+      "readScope": "Actual exclusive original backup verified."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/M1-highest-pass.patch",
+      "bytes": 459,
+      "sha256": "27d7f6fafeadc9e324280ae2f10599b61e917851988c41450f98996a0e065ff0",
+      "readScope": "Original sealed single source-control patch read; reconstructed only in memory."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-source-binding.json",
+      "bytes": 11026,
+      "sha256": "8b2dfb76a10435847b92e768b6eac044a012bf73c7184345d515cb0e3b3c7af7",
+      "readScope": "Full finite metadata/helper/control provenance read; helpers never executed by peer."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m2-apply.json",
+      "bytes": 850,
+      "sha256": "34b2a59b50e29fffd9148b90aa1c23aeab332b742b8149c86eca9e73a7e2951a",
+      "readScope": "Bound exact applied-source record verified."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m2-classification.json",
+      "bytes": 2413,
+      "sha256": "7d7a42826750430e61cd57a751b8ab9bf3e469cc75813f8dcf6372b336bf7f3c",
+      "readScope": "Bound record points to unchanged original classification."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m2-classification-bound.json",
+      "bytes": 3372,
+      "sha256": "cce130c3ecf4607a728987142710a2a9afe732eaffd2b1fc95e4846190cd5ae9",
+      "readScope": "Full actual source operation/classification/restoration record read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m2-restore.json",
+      "bytes": 852,
+      "sha256": "1f0b089a6e1cc3f43513c919725d7b2ba4ec6c62ddbc6bb40a8ff7bb81a67159",
+      "readScope": "Full actual source operation/classification/restoration record read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-originals/m2-original.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+      "readScope": "Actual exclusive original backup verified."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/M2-register-seeder.patch",
+      "bytes": 872,
+      "sha256": "ccacc51c961cc87b6fa386688b628d517e666e4d85eff9cfa647e98509a7d300",
+      "readScope": "Original sealed single source-control patch read; reconstructed only in memory."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m3-apply.json",
+      "bytes": 848,
+      "sha256": "2639af490377e4123644eab8376b261dbaa5aeb76a73a05c2dc7d194efe75822",
+      "readScope": "Bound exact applied-source record verified."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m3-classification.json",
+      "bytes": 7009,
+      "sha256": "4446d304cb3e8ee935396cc75181d15e8aee5683580105ca600c46e8c0b10fa0",
+      "readScope": "Bound record points to unchanged original classification."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m3-classification-bound.json",
+      "bytes": 7968,
+      "sha256": "3bb508bbf336e57c99e8a1097d62572a795daa80ed07222f4f09dab63d95743a",
+      "readScope": "Full actual source operation/classification/restoration record read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m3-restore.json",
+      "bytes": 850,
+      "sha256": "63912f283c30f99d8625b2040bf9c85b20a02d95aac50debdb492118c2c8ab9b",
+      "readScope": "Full actual source operation/classification/restoration record read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-originals/m3-original.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+      "readScope": "Actual exclusive original backup verified."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/M3-remove-denied.patch",
+      "bytes": 1190,
+      "sha256": "e55b8de720912fd4e8d4bea3c547b9b6ee8780a6cf1bb9234d79fcf54b25c6ed",
+      "readScope": "Original sealed single source-control patch read; reconstructed only in memory."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/src/diagnostic/evidenceEmitters.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/questionBank.ts",
+      "bytes": 287500,
+      "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/src/diagnostic/questionBank.ts",
+      "bytes": 287500,
+      "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+      "bytes": 3431,
+      "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/src/diagnostic/evidenceMaps/index.ts",
+      "bytes": 3431,
+      "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/evidenceEmitters.js",
+      "bytes": 10877,
+      "sha256": "30734f2d5ece2ad6ae597eb05ef9b36aebd10db3b6364378e774b2f97d6531d1",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/dist/diagnostic/evidenceEmitters.js",
+      "bytes": 10877,
+      "sha256": "30734f2d5ece2ad6ae597eb05ef9b36aebd10db3b6364378e774b2f97d6531d1",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/levelSemantics.js",
+      "bytes": 11020,
+      "sha256": "614c7b14826adc97a32a96e982abb59dc77217ae5966d2ef484efcc6a29d76ef",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/dist/diagnostic/levelSemantics.js",
+      "bytes": 11020,
+      "sha256": "614c7b14826adc97a32a96e982abb59dc77217ae5966d2ef484efcc6a29d76ef",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/gates.js",
+      "bytes": 9269,
+      "sha256": "88eaf2578733685a307512a54dea7b0508d37d8c1c8e17cb7372f061e54fff98",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/dist/diagnostic/gates.js",
+      "bytes": 9269,
+      "sha256": "88eaf2578733685a307512a54dea7b0508d37d8c1c8e17cb7372f061e54fff98",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/questionBank.js",
+      "bytes": 304412,
+      "sha256": "2e31419be55be2bed7fdc4369b96040b458eb8227edd344e548fee902c13493f",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/dist/diagnostic/questionBank.js",
+      "bytes": 304412,
+      "sha256": "2e31419be55be2bed7fdc4369b96040b458eb8227edd344e548fee902c13493f",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/evidenceMaps/index.js",
+      "bytes": 2392,
+      "sha256": "0390f2409fec897db17a5c52fa74d1d893be84921e30ed4e8bceebc81364d16a",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/dist/diagnostic/evidenceMaps/index.js",
+      "bytes": 2392,
+      "sha256": "0390f2409fec897db17a5c52fa74d1d893be84921e30ed4e8bceebc81364d16a",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/clean-source-check.mjs",
+      "bytes": 7910,
+      "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/scripts/clean-source-check.mjs",
+      "bytes": 7910,
+      "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/knip.json",
+      "bytes": 1928,
+      "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/knip.json",
+      "bytes": 1928,
+      "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/SCORING_METHODOLOGY.md",
+      "bytes": 828603,
+      "sha256": "c19cbb4f8afefedc79e5b73cab15463b311e1035a326251af4cdf619aa88bf80",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/docs/SCORING_METHODOLOGY.md",
+      "bytes": 828603,
+      "sha256": "c19cbb4f8afefedc79e5b73cab15463b311e1035a326251af4cdf619aa88bf80",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/methodology/publicMethodology.ts",
+      "bytes": 930822,
+      "sha256": "a86de215883618469ed69872823a8ad194b52290145427b3f66592c05b1df97a",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/src/methodology/publicMethodology.ts",
+      "bytes": 930822,
+      "sha256": "a86de215883618469ed69872823a8ad194b52290145427b3f66592c05b1df97a",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/levelCumulative.test.ts",
+      "bytes": 10722,
+      "sha256": "1265e5715bd3ceb3c342c44e3a65681f8d32d74dd962ede9e7f64c8227575c78",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts",
+      "bytes": 10722,
+      "sha256": "1265e5715bd3ceb3c342c44e3a65681f8d32d74dd962ede9e7f64c8227575c78",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/evidenceEmitterRegistry.test.ts",
+      "bytes": 10448,
+      "sha256": "01ba46f55bf1135306e8e55d9b8c41a4b106ced58aa3a9a5463557fede001061",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/evidenceEmitterRegistry.test.ts",
+      "bytes": 10448,
+      "sha256": "01ba46f55bf1135306e8e55d9b8c41a4b106ced58aa3a9a5463557fede001061",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+      "bytes": 28819,
+      "sha256": "5eb353a14bdaebf8cef9d14c1dec266c0deeb239c696eb3e3ca32fc250434714",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+      "bytes": 28819,
+      "sha256": "5eb353a14bdaebf8cef9d14c1dec266c0deeb239c696eb3e3ca32fc250434714",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/README.md",
+      "bytes": 59828,
+      "sha256": "fc8e82e4cbff27fd6ac308062343e2ebf2da7978ec67905b5389105fa4fa1571",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/README.md",
+      "bytes": 59828,
+      "sha256": "fc8e82e4cbff27fd6ac308062343e2ebf2da7978ec67905b5389105fa4fa1571",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "04ec7a6f7a8fa7df105e65122c593bd08fd24bafb2f0c54ad7edc17a8923a69c",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "04ec7a6f7a8fa7df105e65122c593bd08fd24bafb2f0c54ad7edc17a8923a69c",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/index.html",
+      "bytes": 43520,
+      "sha256": "44ee4804dfeefdb726e262c1beabfded1595ba1b7b0e4dfd0533941fd464bad8",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/website/index.html",
+      "bytes": 43520,
+      "sha256": "44ee4804dfeefdb726e262c1beabfded1595ba1b7b0e4dfd0533941fd464bad8",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/lite.html",
+      "bytes": 11197,
+      "sha256": "6fc9ccb3d7fa8e869dc162e4066e92ddf04f2653c0e4f7bbe0b2f18e8a8e24db",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/website/lite.html",
+      "bytes": 11197,
+      "sha256": "6fc9ccb3d7fa8e869dc162e4066e92ddf04f2653c0e4f7bbe0b2f18e8a8e24db",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "6c89dca1e3164179c606f610b9bf511075fdef223b8fd15d6ca8d474364897e4",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "6c89dca1e3164179c606f610b9bf511075fdef223b8fd15d6ca8d474364897e4",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "2b71a6b832ebdbcb8bab72a5cb0ab5078dc006061a976253239eaf6d1e284e6b",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "2b71a6b832ebdbcb8bab72a5cb0ab5078dc006061a976253239eaf6d1e284e6b",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "c3fcb3921c819287f2f4b4eacf3a96b2a98aa3df7b2f12a1cbfcef6c4d3b5c62",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "c3fcb3921c819287f2f4b4eacf3a96b2a98aa3df7b2f12a1cbfcef6c4d3b5c62",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "46f9b94a81e6dd4fbb576bfa2424e0bc59ea08545f3aff58eee969e236a503b0",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "46f9b94a81e6dd4fbb576bfa2424e0bc59ea08545f3aff58eee969e236a503b0",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "7e61a026c779d0fff7910b4e82b7090c304765cf34061756e1efc427305f300f",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "7e61a026c779d0fff7910b4e82b7090c304765cf34061756e1efc427305f300f",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "2895b4b277268192dfa36a1b55a4bb5426c0cfb9062a03644663fc5786da750b",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "2895b4b277268192dfa36a1b55a4bb5426c0cfb9062a03644663fc5786da750b",
+      "readScope": "Current exact selected S/Q restored-source/compiled/config/new-file bytes verified."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/p2-07-oidc-validation-policy.md",
+      "bytes": 672,
+      "sha256": "808776f4676986361dc85c9fbf30a21f66a3fb7f823b10b2d11da63453bf1bee",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "a817d07bd625ead95a0bfdf41e12cc8d3f95f6e67b364555da1b7ca49561155b",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+      "bytes": 59828,
+      "sha256": "c98011ad0705131dd25e177526fbc319c245e264511098278af366ef0fa2e4c6",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/SSO_OIDC.md",
+      "bytes": 7630,
+      "sha256": "8eb9a7b8e856a4d0a6219788596164138abae2d67278c69df856ff7e40c820e9",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "1f602ebcb718c77b0a51418b423f18f14b4bf127516717ac59012df508d410c4",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "01ff38f30497000d9f6de81b300f878e2bbb1266096f5f453c0585af96e4993f",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "96f6d68b97f1672774b7fbc1e72f65d065bc0d72a26773954a8436c5a6eeb13f",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "508f14a2e92fe79a5510820a7341ad2cc26ef75a8809ce22b392f015f67f6778",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/identityConfig.ts",
+      "bytes": 13743,
+      "sha256": "bc1bdcfea46856cab6569ee7df78e9f4323d9821a8130158fb7b23c525be9b41",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/jwtVerify.ts",
+      "bytes": 13771,
+      "sha256": "6505b2e201bba6b0d450f7d1760a2c4bad30dac2ea604930877973f113c84847",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/oidcRoutes.ts",
+      "bytes": 6089,
+      "sha256": "9fb46be0392a1164d6de12a32468c59dfc6c7840e4883e8f5d37ef933c091cf9",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts",
+      "bytes": 47452,
+      "sha256": "79776f1dfd4657b5bd28a0de3397ed333a7b3833f9c1f3ff2c619adf79b6c458",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/oidcValidationConfig.test.ts",
+      "bytes": 25711,
+      "sha256": "e0f92ce9257eda0a436b27e4ce60da948c4b73e2c8349fe85f0dd15031dca253",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "bytes": 18504,
+      "sha256": "6c8bbf1605de739c13c1645640f825af67edbf4ca1420d1718a55f453570cdf2",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "5d84d23da19c1d2bbeb125b7ae229e3658a70dacfd49e94ff037d23c819006dc",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+      "bytes": 43520,
+      "sha256": "0ba594cb3596def6823a57a7dc8154c6220e197c525e833ee9f8dee299db2886",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+      "bytes": 11197,
+      "sha256": "abbafaf85e349a46bbd50981a28ee8e6e174f0c9d50eeac94ae8023fdc7154e5",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "6c37880867226216d2b6cf9d2b84472a190668854dc28d1f10e77577594bea25",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/P2-07/src/identity/identityConfig.ts.landed",
+      "bytes": 13501,
+      "sha256": "0ffce36a3bf6c7ed6ea81b4f3024314ec6f1ecbd10058bf73e16a3888820659c",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p2-07-provider-validation-20261016/preserved-tracked-candidate.patch",
+      "bytes": 47279,
+      "sha256": "edda17505b7c80a22561c35753f9051cf1ff80b731f145671f5e437150367129",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p2-07-provider-validation-20261016/count-overlay-result.json",
+      "bytes": 3952,
+      "sha256": "8380ef85741b16eff973fb2851cdb2cf247ad881fbe489524a12255a69465546",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/classify.ts",
+      "bytes": 8451,
+      "sha256": "da93bdaf7af938ce1c75323440cd3c4be5c97e92f6bcb87b1509d9c228c324a0",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/notices.ts",
+      "bytes": 1187,
+      "sha256": "91380ebd370671d953181bac6ef2370091644fd36abf22a91d91366ed691d023",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/notices/AMC-LEGACY-2026-001.json",
+      "bytes": 1876,
+      "sha256": "165b430d830da41eb845144daa9fd151983516bbf7ccc95162da77dd186bebe4",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/relabelLog.ts",
+      "bytes": 5262,
+      "sha256": "8a6496aa3c1e6785ba27d74000251d5f4114f8a7ee3ecba8e2a2468c6f8cec39",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/receipt.ts",
+      "bytes": 4086,
+      "sha256": "0a3e40ddd273ae16e3503c1c0f7c58323d406b7f52315078dfda432bf40c9a89",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/scan.ts",
+      "bytes": 16329,
+      "sha256": "a857c9dc27a993db83036a2044a5de7da5d1b262d3ac60ec2840e6950d87f272",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/migration/LEGACY_RESULTS.md",
+      "bytes": 10048,
+      "sha256": "2602db07712be8b6e84acfe552bf2932d83a4ec20531cce3a482a72fba07b309",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/cli.ts",
+      "bytes": 1064495,
+      "sha256": "c4627270c37e5fe7e9314df604c01c0155f566df90e32a29ac690cb26113e5cb",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/crypto/signing/signerTypes.ts",
+      "bytes": 880,
+      "sha256": "4b9def9a2d936e47cd1e52467fb34992cca62fbbe8226bfb50bc842b2a386ad4",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/trust/trustConfig.ts",
+      "bytes": 14680,
+      "sha256": "39c8b85eda085b68984a52ca4e306b26f86eaee798730a60a33df95003e5039e",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/migration/LEGACY_RESULTS.md",
+      "bytes": 10048,
+      "sha256": "0a8e8c16753b59c02b68022d9db0dd7f1db5525936b59b4c5007acf0a3e0a3ed",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/cli.ts",
+      "bytes": 1064384,
+      "sha256": "a62167aa10f2aa04929a89c81316ba6213500462438494e81f119eab3b90614b",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/crypto/signing/signerTypes.ts",
+      "bytes": 864,
+      "sha256": "577fab774422f8644262f94bd725e81acf90f5eb2daccfe4f53dabfe3bb37068",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustConfig.ts",
+      "bytes": 14297,
+      "sha256": "db12a1f2f64c7feb2e23d0a2a2cdc6793ba4f93287df5d41dce41ca89ab730f6",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "bytes": 18181,
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+      "bytes": 9141,
+      "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-needs-snapshot/command.json",
+      "bytes": 2131,
+      "sha256": "488f67218e19e2cfdceae7ba10961f95f5785004933d8f6b5902aa0450e805cc",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-needs-snapshot/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "848bd7e62f1522e807111b96a4cd0f8956e9973d32ad46a67f2575bae9abf3fd",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-needs-snapshot/stdout-stderr.log",
+      "bytes": 5,
+      "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-check-before-update/command.json",
+      "bytes": 1377,
+      "sha256": "9a20823dbedab593bd1f1868bee4e04b56a6a2a1f436822e4442c9d6cc4bf505",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-check-before-update/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "188a62b531b34139956cf7c0370a6fe65d233a058a6527f1b53d08f088ee6071",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-check-before-update/stdout-stderr.log",
+      "bytes": 1436,
+      "sha256": "96fd6a707769192ec8e0ab5c651bb489482286ffdd8382591d803b43302a05d5",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-update/command.json",
+      "bytes": 1465,
+      "sha256": "bf0913173c78227f87a27baeecaa17766cd9287427c4c7a7286af27e613d060c",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-update/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "91d5de9359243206aa713bd25b939e5909790d9e34b980c25ab50743c45cc520",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-update/stdout-stderr.log",
+      "bytes": 20,
+      "sha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-check/command.json",
+      "bytes": 1349,
+      "sha256": "7f101973040ea53faa7488262da67e84682ba7e95ad68492ef4dad45e0e9c9e0",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-check/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "b6bd8917689a7d7455228c57ee8bc7f8095189cd492f3eae797b565d1f0262b0",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-count-check/stdout-stderr.log",
+      "bytes": 239,
+      "sha256": "82ac60039fcf8bc00dc663aabd78dcafc658cffc866e81929505bb199e8df7e4",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/count-surface-result.json",
+      "bytes": 3251,
+      "sha256": "f121e13518ad49e1617ef8cf43e8eae87aa9d79cf318fc4d69accf22b5c5a50c",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/count-surface.patch",
+      "bytes": 20310,
+      "sha256": "615d58bf948994eb38f9f898e5aea5750b975b94776cf8bb9c113ffe60b2e1c1",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/count-surface-admission.json",
+      "bytes": 12355,
+      "sha256": "0ec7cc190c87ee940cfec8bac507ef196351608645ef62adb32180819853c4d4",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/count-validator-setup-stop.json",
+      "bytes": 403,
+      "sha256": "f540fb60bbad849886d2e76cb7f1cf9773b8181c95bead3ba655735f88052f79",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-v3-materialization.json",
+      "bytes": 422,
+      "sha256": "359efb676098b51028109ecfe8c081513026761c60db12e4796d0389a25aaa4d",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v3/seal.json",
+      "bytes": 1109,
+      "sha256": "26dd244c06bc69d07176ba1c3e4b129ce4a5ad0c783ae07e8a8ddd3f2d973c0b",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v3/v2-to-v3.patch",
+      "bytes": 2491,
+      "sha256": "6861ba8882cf9c53e90f7eba7b6cf5ddbbd91f1e4ec77e6b74b5f98c7ce6bdee",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/p107-runtime-v3-outcome.json",
+      "bytes": 2759,
+      "sha256": "c9344a4fa35dd7182c39f8f655287d2af80f7eee72f375f6a834c43066fab6ec",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-proposal/seal.json",
+      "bytes": 1692,
+      "sha256": "2eb18533ccd1d58aebfee0ae5529ef8182f31aaed6b76b91eb43941bca5f1b02",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/ownership-audit/preservation.json",
+      "bytes": 364967,
+      "sha256": "994ac3b95d394e62ec29430f2b4d1a5ea6e112621eb85421b574b8dcf1952375",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/ownership-audit/pins.json",
+      "bytes": 12518,
+      "sha256": "596382738937cafdfb554d9bb9b3ad017efbabbfd0574c3dc7932c10651b8037",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/final-preservation.json",
+      "bytes": 1123,
+      "sha256": "fd184b8072c3e5ffd30e3222e901d35587426293a3eb9471942f687e53b85185",
+      "readScope": "Current full-byte precommit-preservation row independently rehashed; no status/owner release inferred."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-node-version/stdout-stderr.log",
+      "bytes": 9,
+      "sha256": "33e26f35db6e57ce0c486ddc815fe966867e4f649e418eaf323f75f4720eb8e9",
+      "readScope": "Full actual final version/count/gate/freeze log read."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-node-version/command.json",
+      "bytes": 1191,
+      "sha256": "04d578a368b3090216a6ac8a6445b0a744e0825af10dac9707d5815f38605fae",
+      "readScope": "Actual final closed command/group metadata read."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-node-version/owned-group-after-exit.json",
+      "bytes": 258,
+      "sha256": "4a2db6bbbe454f3c1aea14450d0b7d1ace3be79167f992142b29a94bad897343",
+      "readScope": "Actual final closed command/group metadata read."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-pnpm-version/stdout-stderr.log",
+      "bytes": 8,
+      "sha256": "62c33a14fe98185100efaeadf9bc76d70d6b76f1c026b4f7ead06cd6d417aacf",
+      "readScope": "Full actual final version/count/gate/freeze log read."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-pnpm-version/command.json",
+      "bytes": 1168,
+      "sha256": "788cc7d5739db85fc33932547eafa65fdbad72dfacb2703cf9822eae0d7a7e78",
+      "readScope": "Actual final closed command/group metadata read."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-pnpm-version/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "d72d246c8662904dfb05a9db4e8e84316d0dd381566c3eef10be90bdb8ad9625",
+      "readScope": "Actual final closed command/group metadata read."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-counts/stdout-stderr.log",
+      "bytes": 255,
+      "sha256": "69ddf339d15353e175547870481750757702c7dcff7988b45cb5c774151d66a0",
+      "readScope": "Full actual final version/count/gate/freeze log read."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-counts/command.json",
+      "bytes": 1387,
+      "sha256": "9a10544ec57a2e18ef63f245c9f74ed08725a7ccb50516bd28d48e26acaf6892",
+      "readScope": "Actual final closed command/group metadata read."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-counts/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "1cc7e130572fa128fd7c946ac75e6ac12aedea32f3653f87ccc3de214eae1e50",
+      "readScope": "Actual final closed command/group metadata read."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-gates/stdout-stderr.log",
+      "bytes": 837,
+      "sha256": "d626bac3bc2138bf4fb238b60503a1578ff29e6e3ed9407959005ed589c632f0",
+      "readScope": "Full actual final version/count/gate/freeze log read."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-gates/command.json",
+      "bytes": 1383,
+      "sha256": "8273b568b17e5743e4cbff108f4e073131e8ac219c011f56a9c2f49ba045eea0",
+      "readScope": "Actual final closed command/group metadata read."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-gates/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "0d7e1e422ed4ce5a768908973fb73eb4f628c0b4704580659ea738e1c01358f2",
+      "readScope": "Actual final closed command/group metadata read."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-freeze/stdout-stderr.log",
+      "bytes": 284,
+      "sha256": "95e14e63f3c79c51ab30c673bca2c71d8df94f6c5015e2302da9b79f20d9c070",
+      "readScope": "Full actual final version/count/gate/freeze log read."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-freeze/command.json",
+      "bytes": 1388,
+      "sha256": "d7bf909ee0150f0a71448347c55d22598515e9a323080c9851e73fcd27b76147",
+      "readScope": "Actual final closed command/group metadata read."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-freeze/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "80f45af44694e0402101e8cb77051084b90f474ebb0c6559ffd9bcc13caa6257",
+      "readScope": "Actual final closed command/group metadata read."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/source-native-compiled-pins.json",
+      "bytes": 6669,
+      "sha256": "c057f21a97021adce70d26af37d19d925ab0d0639129672b493bbc6310abaedc",
+      "readScope": "Full finite metadata/helper/control provenance read; helpers never executed by peer."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/precommit-source-review/pins.json",
+      "bytes": 37341,
+      "sha256": "04cec5b303a5fa951da98cd951f89b815332cdc94efbfb1fb7026afd8e61a70e",
+      "readScope": "Full finite metadata/helper/control provenance read; helpers never executed by peer."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/precommit-source-review/review.json",
+      "bytes": 13135,
+      "sha256": "819c741be5d0b2efa4eccd56113ec76e9c5246b3da437655b16b257e29a842d3",
+      "readScope": "Full finite metadata/helper/control provenance read; helpers never executed by peer."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/final-preservation.json",
+      "bytes": 2158,
+      "sha256": "b5990312dfcb50aaa828a8a731d292932aa2acb352723fdbe0f8c2497f3c5ae7",
+      "readScope": "Full finite metadata/helper/control provenance read; helpers never executed by peer."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/q-final-check-outcomes.json",
+      "bytes": 2224,
+      "sha256": "e06d189c6d3e8cb2a4e5874a8e58473ece3512498d214c56e28dc644134bd10a",
+      "readScope": "Full finite metadata/helper/control provenance read; helpers never executed by peer."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-chain-summary.json",
+      "bytes": 5938,
+      "sha256": "ccb9aeca8ab53407cd1587a007005b0cbafde6e713348c8e4ffbe9c2aaa2a0e8",
+      "readScope": "Full finite metadata/helper/control provenance read; helpers never executed by peer."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/operate-control.py",
+      "bytes": 5039,
+      "sha256": "c52b5151353d61ef9b7a34d9b85b3c315a08cd67a93b3b3a41c003c94ca980e0",
+      "readScope": "Full finite metadata/helper/control provenance read; helpers never executed by peer."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/audit-observed-run.py",
+      "bytes": 3470,
+      "sha256": "09ca539e09290657954dc7cbd07016057fa0b9837faf9b943799956a36af0c42",
+      "readScope": "Full finite metadata/helper/control provenance read; helpers never executed by peer."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/operators.json",
+      "bytes": 2410,
+      "sha256": "af520a085f57d1d0ad644a0a32cba474286a76d8c336f6ee151862c7e295748a",
+      "readScope": "Full finite metadata/helper/control provenance read; helpers never executed by peer."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/review.json",
+      "bytes": 6410,
+      "sha256": "73a74d109912fd76b961b20e0246f311d083339c70c357ccdd38a73e11243dd0",
+      "readScope": "Full finite metadata/helper/control provenance read; helpers never executed by peer."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/seal.json",
+      "bytes": 593,
+      "sha256": "943280286ec9ea8b5dd6fc936ef94b1b0a29cc9090b0920046d966e34e20dbf4",
+      "readScope": "Full finite metadata/helper/control provenance read; helpers never executed by peer."
+    }
+  ]
+}

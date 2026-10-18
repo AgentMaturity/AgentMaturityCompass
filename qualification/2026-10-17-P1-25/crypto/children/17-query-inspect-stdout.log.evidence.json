@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "crypto/children/17-query-inspect-stdout.log",
+    "bytes": 611,
+    "sha256": "b3017332c0a75681b72e393e1e49acfab84a2b2473f8c91b2cf4a85efdee80ed"
+  },
+  "dataBase64": "ICAgIDA6ZD0wICBobD0yIGw9ICA3NCBjb25zOiBTRVFVRU5DRSAgICAgICAgICAKICAgIDI6ZD0xICBobD0yIGw9ICAgMSBwcmltOiAgSU5URUdFUiAgICAgICAgICAgOjAxCiAgICA1OmQ9MSAgaGw9MiBsPSAgNDkgY29uczogIFNFUVVFTkNFICAgICAgICAgIAogICAgNzpkPTIgIGhsPTIgbD0gIDEzIGNvbnM6ICAgU0VRVUVOQ0UgICAgICAgICAgCiAgICA5OmQ9MyAgaGw9MiBsPSAgIDkgcHJpbTogICAgT0JKRUNUICAgICAgICAgICAgOnNoYTI1NgogICAyMDpkPTMgIGhsPTIgbD0gICAwIHByaW06ICAgIE5VTEwgICAgICAgICAgICAgIAogICAyMjpkPTIgIGhsPTIgbD0gIDMyIHByaW06ICAgT0NURVQgU1RSSU5HICAgICAgW0hFWCBEVU1QXTo2Njc5QzZDMkVDMzdDN0Q4NDc4MDUxNUJCRjcwOTc5OTZEQTFCNzZBMUZCRURBQjQxQ0RFNjREQTk3NDk3QUFCCiAgIDU2OmQ9MSAgaGw9MiBsPSAgIDQgcHJpbTogIE9CSkVDVCAgICAgICAgICAgIDoxLjIuMy40LjEKICAgNjI6ZD0xICBobD0yIGw9ICAgOSBwcmltOiAgSU5URUdFUiAgICAgICAgICAgOjg4OTlBQUJCQ0NEREVFRkYKICAgNzM6ZD0xICBobD0yIGw9ICAgMSBwcmltOiAgQk9PTEVBTiAgICAgICAgICAgOjI1NQo=",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. This envelope changes no command result or original evidence."
+}

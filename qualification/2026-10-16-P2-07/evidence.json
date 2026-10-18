@@ -1,0 +1,331 @@
+{
+  "schema": "p207-bounded-verifier-qualification/1",
+  "sourceCommit": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+  "canonicalTests": {
+    "total": 150,
+    "passed": 150,
+    "failed": 0,
+    "skipped": 0
+  },
+  "newVerifierCases": 128,
+  "existingCases": 22,
+  "existingBaseline": {
+    "at": "2026-10-16T11:18:11.731647+00:00",
+    "command": {
+      "phase": "p207-existing-identity-baseline",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/security/identityAccountBinding.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-existing-identity-baseline.raw.json",
+      "exit": 0,
+      "durationMs": 8554,
+      "startedUtc": "2026-10-16T11:17:08.873020+00:00",
+      "endedUtc": "2026-10-16T11:17:17.439463+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-existing-identity-baseline/stdout-stderr.log",
+      "head": "67c4fc34fc8602fe607e44de8d0eb61b9d89959b",
+      "headAfter": "67c4fc34fc8602fe607e44de8d0eb61b9d89959b",
+      "ownedProcess": {
+        "pid": 42148,
+        "ownedPgid": 42148,
+        "observedPgidAfterLaunch": 42148,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/enterpriseSsoScim.test.ts",
+          "tests/security/api-security.test.ts",
+          "tests/security/identityAccountBinding.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p207-existing-identity-baseline.raw.json"
+        ],
+        "startedUtc": "2026-10-16T11:17:08.873020+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/p207-existing-identity-baseline.raw.json",
+          "bytes": 8588,
+          "sha256": "13accbf6388545ced752b43114e1289d4fd25531e471bccf4fdb4147d2c64225"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-existing-identity-baseline/raw.json",
+          "bytes": 8588,
+          "sha256": "13accbf6388545ced752b43114e1289d4fd25531e471bccf4fdb4147d2c64225"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-existing-identity-baseline/observer.json",
+          "bytes": 12815,
+          "sha256": "fc248ad955b53af88e4badc648594a83cd6464c2b98f25f05c3ddea520ba84aa"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    "tests": {
+      "total": 22,
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0
+    },
+    "perFile": [
+      {
+        "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/enterpriseSsoScim.test.ts",
+        "cases": 10
+      },
+      {
+        "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/security/api-security.test.ts",
+        "cases": 8
+      },
+      {
+        "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/security/identityAccountBinding.test.ts",
+        "cases": 4
+      }
+    ],
+    "identities": [
+      "API security hardening CORS blocks non-allowlisted origins",
+      "API security hardening OIDC JWT verifier rejects expired, nonce-mismatched, EdDSA and non-loopback-opt-in HTTP tokens",
+      "API security hardening Studio sessions enforce least-privilege roles across protected /api/v1 routes",
+      "API security hardening console snapshot is no longer anonymously accessible",
+      "API security hardening expired signed session token is rejected",
+      "API security hardening host and workspace login flows are rate-limited",
+      "API security hardening internal /api/v1 routes require human/admin auth and reject lease principals",
+      "API security hardening workspace IDOR attempt with cross-workspace cookie is denied",
+      "enterprise identity (OIDC/SAML/SCIM) OIDC auth code + PKCE flow creates session and mapped workspace roles",
+      "enterprise identity (OIDC/SAML/SCIM) OIDC provider add bootstraps host identity config on a fresh host",
+      "enterprise identity (OIDC/SAML/SCIM) OIDC rejects bad state, bad nonce/signature, and missing email",
+      "enterprise identity (OIDC/SAML/SCIM) OIDC rejects identity tokens without an affirmative email_verified claim",
+      "enterprise identity (OIDC/SAML/SCIM) SAML ACS path verifies signed compact assertion and grants mapped roles",
+      "enterprise identity (OIDC/SAML/SCIM) SCIM init enables provisioning without resetting existing SSO providers",
+      "enterprise identity (OIDC/SAML/SCIM) SCIM users/groups provisioning applies and revokes workspace memberships by group source",
+      "enterprise identity (OIDC/SAML/SCIM) lease-auth cannot call host identity/scim endpoints and users without membership cannot access workspace routes",
+      "enterprise identity (OIDC/SAML/SCIM) responses do not leak client secrets, SCIM token, or private key markers",
+      "enterprise identity (OIDC/SAML/SCIM) tampered identity config signature fails closed for auth/scim endpoints",
+      "federated identity account binding does not convert an existing SAML binding into OIDC when provider and subject collide",
+      "federated identity account binding does not merge an OIDC login into a local administrator by email",
+      "federated identity account binding keys federated users by provider and subject, not mutable email",
+      "federated identity account binding rejects cross-provider email collision and incomplete federated identities"
+    ],
+    "rawObserverEqual": true,
+    "allHooksPassed": true,
+    "hooks": 25,
+    "unhandled": [],
+    "lateHits": [],
+    "boundary": "Existing local fixture behavior only; legacy compact SAML tests passing do not prove SAML2 XML or real IdP interoperability. No source/fixture changes.",
+    "formalDone": false
+  },
+  "publicFreshObservations": [
+    {
+      "label": "algorithm-RS256",
+      "pin": {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-meLLzh/observations/public-evidence.json",
+        "bytes": 1458,
+        "sha256": "ce24ae42eb05038c3e473728509cfcc9f095c3501c890174b21da9582e6bd067"
+      },
+      "requests": 1,
+      "scope": "Fresh Q source with borrowed R Vitest entry; synthetic local mechanism observation only."
+    },
+    {
+      "label": "algorithm-PS256",
+      "pin": {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-psElKs/observations/public-evidence.json",
+        "bytes": 1458,
+        "sha256": "a2c0abb5350064245e9b91bc31cda60569817e2d80843e58a80282aeaf974fed"
+      },
+      "requests": 1,
+      "scope": "Fresh Q source with borrowed R Vitest entry; synthetic local mechanism observation only."
+    },
+    {
+      "label": "algorithm-ES256",
+      "pin": {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-S4ZpIq/observations/public-evidence.json",
+        "bytes": 1458,
+        "sha256": "394f0ac5e24af11ec4d104f7b3714b93cf9d0d985da04903ccc4a8d5648b974b"
+      },
+      "requests": 1,
+      "scope": "Fresh Q source with borrowed R Vitest entry; synthetic local mechanism observation only."
+    },
+    {
+      "label": "rotation-real-clock",
+      "pin": {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-vb3NJb/observations/public-evidence.json",
+        "bytes": 1688,
+        "sha256": "6f39aa3ac7555c98b5b72646afd799926fd721b4ab20a18512c28ac6caf1cbd3"
+      },
+      "requests": 2,
+      "scope": "Fresh Q source with borrowed R Vitest entry; synthetic local mechanism observation only."
+    },
+    {
+      "label": "failed-refresh",
+      "pin": {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-ERnyxJ/observations/public-evidence.json",
+        "bytes": 1616,
+        "sha256": "fdfab89806e2761f717d88bab747381cbf4c9c7ee6f9b3bedc20d84c3cf188af"
+      },
+      "requests": 2,
+      "scope": "Fresh Q source with borrowed R Vitest entry; synthetic local mechanism observation only."
+    },
+    {
+      "label": "real-ten-second-timeout",
+      "pin": {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-jMgwzn/observations/public-evidence.json",
+        "bytes": 1121,
+        "sha256": "7892d7f5dc20dc8d8aa300cbca32351a3a8a21eed88fc636ab429262271147c0"
+      },
+      "requests": 1,
+      "scope": "Fresh Q source with borrowed R Vitest entry; synthetic local mechanism observation only."
+    }
+  ],
+  "outcomes": {
+    "p207-v2-four-files": {
+      "tests": {
+        "total": 150,
+        "passed": 149,
+        "failed": 1,
+        "skipped": 0
+      },
+      "failures": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts",
+          "title": "bounded real OIDC JSON transport and discovery enforces the real ten-second request timeout and naturally closes its owned endpoint",
+          "messages": [
+            "Error: owned HTTP server closure uncertain\n    at withFixture (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts:202:83)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts:548:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "physicalRoot": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "hookCount": 26,
+      "unhandledErrors": [],
+      "lateHits": []
+    },
+    "p207-v3-four-files": {
+      "tests": {
+        "total": 150,
+        "passed": 150,
+        "failed": 0,
+        "skipped": 0
+      },
+      "failures": [],
+      "physicalRoot": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "hookCount": 26,
+      "unhandledErrors": [],
+      "lateHits": []
+    },
+    "p207-fresh-canonical": {
+      "tests": {
+        "total": 150,
+        "passed": 150,
+        "failed": 0,
+        "skipped": 0
+      },
+      "failures": [],
+      "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout",
+      "hookCount": 26,
+      "unhandledErrors": [],
+      "lateHits": []
+    },
+    "p207-mutant-signature": {
+      "tests": {
+        "total": 150,
+        "passed": 148,
+        "failed": 2,
+        "skipped": 0
+      },
+      "failures": [
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts",
+          "title": "independent OIDC JWT verifier: genuine synthetic signatures refuses a genuine wrong-key RS256 signature before accepting any claims",
+          "messages": [
+            "AssertionError: expected { ok: true, claims: { \u2026(6) } } to deeply equal { ok: false, \u2026(1) }\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:267:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:200:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:265:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts",
+          "title": "independent OIDC JWT verifier: genuine synthetic signatures refuses a flipped signature without a second same-kid refresh",
+          "messages": [
+            "AssertionError: expected { ok: true, claims: { \u2026(6) } } to deeply equal { ok: false, \u2026(1) }\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:274:65\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:200:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:272:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout",
+      "hookCount": 26,
+      "unhandledErrors": [],
+      "lateHits": []
+    },
+    "p207-restored-signature": {
+      "tests": {
+        "total": 150,
+        "passed": 150,
+        "failed": 0,
+        "skipped": 0
+      },
+      "failures": [],
+      "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout",
+      "hookCount": 26,
+      "unhandledErrors": [],
+      "lateHits": []
+    },
+    "p207-mutant-exp": {
+      "tests": {
+        "total": 150,
+        "passed": 149,
+        "failed": 1,
+        "skipped": 0
+      },
+      "failures": [
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts",
+          "title": "independent OIDC JWT verifier: genuine synthetic signatures refuses a genuinely signed token missing exp independently of all other claim failures",
+          "messages": [
+            "AssertionError: expected { ok: true, claims: { \u2026(5) } } to deeply equal { ok: false, \u2026(1) }\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:281:10\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:200:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:279:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout",
+      "hookCount": 26,
+      "unhandledErrors": [],
+      "lateHits": []
+    },
+    "p207-restored-exp": {
+      "tests": {
+        "total": 150,
+        "passed": 150,
+        "failed": 0,
+        "skipped": 0
+      },
+      "failures": [],
+      "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout",
+      "hookCount": 26,
+      "unhandledErrors": [],
+      "lateHits": []
+    }
+  },
+  "runnerProvenance": "R-installed Vitest entry borrowed explicitly with Q --root; Q source and native from its separate documented install/build. Wrapper cwd remains R, reporter cwd is R. Selected compiled files in BOTH R and Q are pinned and compared. No universal transitive or OS-isolation claim.",
+  "qualityGreen": false,
+  "entireP207Complete": false,
+  "F37Skipped": true,
+  "remainingScope": {
+    "at": "2026-10-16T11:27:56.323515+00:00",
+    "reviewedFullAudit": true,
+    "auditSha256": "1b6b9777c1b96a4c35fe25a9de500c59d91c7d206a52e1eb98aa91a7e12bf84b",
+    "verifiedDirectPins": 21,
+    "adoptedNextRouting": "After current verifier checkpoint, allocate the absent pendingLoginStore test with actual restart/reuse/expiry assertions. No next implementation allocation or execution yet.",
+    "otherRequirements": "allowedAlgs/requireNbf and failed-JWKS logging are ordinary unfinished source requirements. Browser/session needs concrete shared ownership and net-zero line-budget-preserving scope. SAML approval/tenants/privateIdP inputs remain protected.",
+    "formalDone": false
+  },
+  "formalDone": false
+}

@@ -1,0 +1,18 @@
+{
+  "wrapper": {
+    "path": "/private/tmp/p0-41-final-command-wrapper-prepared-20261015.py",
+    "bytes": 10497,
+    "sha256": "4b51e4bc77a8e5f5b49b0172a4e8e9e424b54936b2ad69afd3c38c76090c619a"
+  },
+  "derivedFrom": {
+    "path": "/private/tmp/p0-41-run-command-prepared-20261015.py",
+    "bytes": 10488,
+    "sha256": "e1dc7f607d992d38b94ab8b12218de579bc1d58f2adee77a0d788190c345bbbe"
+  },
+  "exactChanges": [
+    "BASE private namespace only",
+    "JOURNAL private namespace only"
+  ],
+  "original13CommandJournalClosed": true,
+  "runtimeExecuted": false
+}

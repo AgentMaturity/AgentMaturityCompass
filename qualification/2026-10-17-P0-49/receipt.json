@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-49",
+  "date": "2026-10-17",
+  "commit": "076e4c79486f4b1669e0593bc374e56fcb9636e1",
+  "branch": "codex/p1-28-qualification",
+  "node": "22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "python3 -B -c 'import subprocess,sys\nr=subprocess.run(['\"'\"'/Users/sid/.local/share/uv/tools/graphifyy/bin/python3'\"'\"','\"'\"'-B'\"'\"','\"'\"'-m'\"'\"','\"'\"'graphify'\"'\"','\"'\"'query'\"'\"','\"'\"'proxy trust forwarded express'\"'\"','\"'\"'--budget'\"'\"','\"'\"'1000'\"'\"'],cwd='\"'\"'/Users/sid/AgentMaturityCompass'\"'\"')\nsys.exit(r.returncode)'",
+      "exit": 0,
+      "durationMs": 1331
+    },
+    {
+      "cmd": "rg -n -A 7 -B 2 'proxy-addr:|proxy-addr@2\\.0\\.8|express@5\\.2\\.1|@modelcontextprotocol/sdk@1\\.31\\.0' /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "exit": 0,
+      "durationMs": 32
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm view proxy-addr@2.0.8 dist.integrity dist.tarball --json",
+      "exit": 0,
+      "durationMs": 599
+    },
+    {
+      "cmd": "curl --fail --location --proto =https --proto-redir =https --no-clobber --output /private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz https://registry.npmjs.org/proxy-addr/-/proxy-addr-2.0.8.tgz",
+      "exit": 0,
+      "durationMs": 57
+    },
+    {
+      "cmd": "tar -tf /private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz",
+      "exit": 0,
+      "durationMs": 6
+    },
+    {
+      "cmd": "tar -xOf /private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz package/index.js",
+      "exit": 0,
+      "durationMs": 6
+    },
+    {
+      "cmd": "tar -xOf /private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz package/package.json",
+      "exit": 0,
+      "durationMs": 3
+    },
+    {
+      "cmd": "tar -xOf /private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz package/HISTORY.md",
+      "exit": 0,
+      "durationMs": 4
+    },
+    {
+      "cmd": "tar -xOf /private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz package/LICENSE",
+      "exit": 0,
+      "durationMs": 3
+    },
+    {
+      "cmd": "tar -xOf /private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz package/README.md",
+      "exit": 0,
+      "durationMs": 3
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-49-qualification-20261017/audit-ownership.py /private/tmp/p0-49-qualification-20261017/ownership-observations.actual.json",
+      "exit": 0,
+      "durationMs": 13794
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1784
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs original /private/tmp/p0-49-qualification-20261017/original-regression.actual.json",
+      "exit": 0,
+      "durationMs": 65
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs range-guard-control /private/tmp/p0-49-qualification-20261017/range-guard-control.actual.json",
+      "exit": 1,
+      "durationMs": 65
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs original /private/tmp/p0-49-qualification-20261017/original-after-control.actual.json",
+      "exit": 0,
+      "durationMs": 62
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run audit:runtime",
+      "exit": 0,
+      "durationMs": 772
+    },
+    {
+      "cmd": "git --no-optional-locks -c core.fsmonitor=false -C /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass status --porcelain=v1 -z --untracked-files=all",
+      "exit": 0,
+      "durationMs": 161
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:qualification",
+      "exit": 0,
+      "durationMs": 1179
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1553
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 461
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:docs-drift",
+      "exit": 0,
+      "durationMs": 331
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:dead-code",
+      "exit": 1,
+      "durationMs": 3308
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:duplicates",
+      "exit": 1,
+      "durationMs": 665
+    }
+  ],
+  "tests": {
+    "total": 39,
+    "passed": 39,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "39fa2496d4d5100fb8172267c5e49cd993a446c2eb5fff7b9b402a03f846ae05"
+    },
+    {
+      "path": "ordered-case-audit.json",
+      "sha256": "365d6fd6f72f71b67a9de0bd763f3767393933b4b2849da7272b03bac029a7f3"
+    }
+  ],
+  "notes": "Bounded existing installed proxy-addr2.0.8 direct API qualification only: original39/39, two-conjunct in-memory control30/9 with natural exit1, next original39/39. tests reports the final unchanged original corpus; repeated runs are not summed. Runtime prod moderate audit exit0/no known vulnerabilities. Earlier pre-H shell failure retained. All full-suite19 failures, RED2710/1268, D15/P207, F37, Claude/human/publication holds remain unwaived. No production/dependency change, deployed/Express/Studio/socket proof, current hosted CI, release-gate pass, complete P049 or plan completion."
+}

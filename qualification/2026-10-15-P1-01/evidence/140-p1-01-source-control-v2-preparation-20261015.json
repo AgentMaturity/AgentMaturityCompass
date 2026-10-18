@@ -1,0 +1,10 @@
+{
+  "kind": "preexecution-static-repair",
+  "v1": "/private/tmp/p1-01-source-control-prepared-20261015.py",
+  "v1Sha256": "4369a2058ecf174edd74036ec322180257aefbd62a0d4ec1df8340df70b8a0c0",
+  "v1Executed": false,
+  "v2": "/private/tmp/p1-01-source-control-v2-prepared-20261015.py",
+  "v2Sha256": "b5985003cd2d469ceb6800b84938e3389a09664414d35fc46a2425d9b8511205",
+  "v2Executed": false,
+  "fix": "Track successful exclusive BASE.mkdir ownership. Only this invocation may write HALTED. A pre-existing namespace is rejected without mutation. No runtime or source exists at BASE yet."
+}

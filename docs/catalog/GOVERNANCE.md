@@ -45,8 +45,10 @@ that effectiveSupport minted, naming its reviewers and records, for exactly the 
 digest, reviewed on or before `asOf` and not yet due. Promotions come only from `effectiveSupport(control, authority)`,
 which verifies the review records (below) at the server's clock; it freezes each promotion, records the digest of every
 review record it counted, and supportStanding refuses any object it did not mint (`GOV_REVIEW_PROMOTION_UNVERIFIED`) or
-one without reviewers and records (`GOV_REVIEW_PROMOTION_EMPTY`). P1-33 calls effectiveSupport for admission criteria
-2 and 9. `compilePlan` takes the promotions as an input (`promotions`), judges them with
+one without reviewers and records (`GOV_REVIEW_PROMOTION_EMPTY`). P1-33's admission checker calls effectiveSupport for
+criteria 2 and 9, and `packSignoffs` for a pack version's own sign-offs: records of subject kind `pack`, bound to the
+pack digest and verified by the same steps below (the pack's authors may not sign; its review falls due at the earliest
+of its controls'), from a domain lead, a legal reviewer and a risk owner who are three distinct people. `compilePlan` takes the promotions as an input (`promotions`), judges them with
 supportStanding at the plan's `asOf` and records the ones it accepted in the plan, so they are bound into its digest; without them every
 row is experimental, as today. Activation and its policy receipts, the A4 conformance and why-view rows, the OSCAL export
 (support, the review block, the approver and each citation's legal review) and `check:catalog-currency` read a
@@ -69,7 +71,9 @@ What this cannot close: git authors are unsigned, so an author can commit under 
 list, and one person with two roster entries whose identities never overlap counts as two people. Look-alike characters
 from other scripts (a Cyrillic "А" for a Latin "A"; UTS #39 confusables are not folded) and initials ("A. Smith" for
 "Alice Smith") also pass as different people. Only signed commits and a signed D-08 roster close those gaps; until then
-the roster's identities are the operator's word. Every record
+the roster's identities are the operator's word. The refusal of agent signers rests on the identity kind a record
+declares: an operator who pins an agent's key for `catalog-review` and puts it on the roster under a record declaring
+`human` is not stopped by it. Every record
 states `reviewer.credential` and `reviewer.conflictsDeclared`; both must be non-blank, and "none" is a declaration, not
 a blank.
 
@@ -226,7 +230,8 @@ ISO and CEN clauses by number and never reproduces their text (P1-09 enforces).
 
 - D-08: no expert is named, so there is no roster, no review record and no reviewed content.
 - Sid approves this document and the cadence.
-- P1-33 wires `effectiveSupport` into admission and passes review authority to compilation; P2-22 adds a review UI.
+- P1-33 wired `effectiveSupport` and `packSignoffs` into pack admission ([ADMISSION.md](ADMISSION.md)). No caller passes
+  review authority to compilation yet, so every compiled row stays experimental; P2-22 adds a review UI.
 - The re-verify items, F5 confirmations and standards costs need people, not code.
 
 Initial implementation by Codex (currency, changelog guard and review-record schema slices); completed and reconciled

@@ -7,6 +7,8 @@ import { startFakeAgentProcess, type FakeAgentServer } from "./helpers/fakeAgent
 
 const roots: string[] = [];
 const CLI_TIMEOUT_MS = 90_000;
+// The complete pack set makes real loopback requests under full-suite contention.
+const ALL_PACKS_CLI_TIMEOUT_MS = 300_000;
 
 function workspace(): string {
   const dir = mkdtempSync(join(tmpdir(), "amc-assurance-nosign-"));
@@ -14,7 +16,7 @@ function workspace(): string {
   return dir;
 }
 
-function runCli(cwd: string, args: string[]) {
+function runCli(cwd: string, args: string[], timeoutMs = CLI_TIMEOUT_MS) {
   // The scan invokes the real agent under test; point the child process at the
   // local endpoint started for this suite.
   const env: NodeJS.ProcessEnv = {
@@ -31,7 +33,7 @@ function runCli(cwd: string, args: string[]) {
     cwd,
     env,
     encoding: "utf8",
-    timeout: CLI_TIMEOUT_MS
+    timeout: timeoutMs
   });
 }
 
@@ -60,14 +62,15 @@ describe("assurance run --all --no-sign", () => {
     expect(help.status, `${help.stdout}\n${help.stderr}`).toBe(0);
     expect(help.stdout).toContain("--no-sign");
 
-    const unsigned = runCli(dir, ["assurance", "run", "--all", "--no-sign"]);
+    const unsigned = runCli(dir, ["assurance", "run", "--all", "--no-sign"], ALL_PACKS_CLI_TIMEOUT_MS);
+    expect(unsigned.error, `CLI signal: ${unsigned.signal}`).toBeUndefined();
     expect(unsigned.status, `${unsigned.stdout}\n${unsigned.stderr}`).toBe(0);
     expect(unsigned.stdout).toContain("Running without artifact signing");
     expect(unsigned.stdout).toContain("Assurance run complete:");
     expect(unsigned.stdout).toContain("Status: UNSIGNED");
     expect(unsigned.stdout).toContain("Total:");
     expect(unsigned.stdout).not.toContain("Vault locked");
-  }, CLI_TIMEOUT_MS);
+  }, CLI_TIMEOUT_MS + ALL_PACKS_CLI_TIMEOUT_MS);
 
   test("runs a single pack without a vault passphrase and marks the run unsigned", () => {
     const dir = workspace();

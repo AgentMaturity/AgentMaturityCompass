@@ -1,0 +1,69 @@
+{
+  "schema": "p125-openssl-capability/1",
+  "openssl": {
+    "invoked": "/opt/homebrew/opt/openssl@3/bin/openssl",
+    "physical": "/opt/homebrew/Cellar/openssl@3/3.6.5/bin/openssl",
+    "bytes": 880512,
+    "sha256": "b97303270fd2480cabccb2c78bbc96846c383b52eed8f3af169293fd7262aea6",
+    "dev": 16777231,
+    "ino": 494864884
+  },
+  "phases": [
+    {
+      "phase": "p125-openssl-version",
+      "exit": 0,
+      "pgid": 8826,
+      "durationMs": 292,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-openssl-version/stdout-stderr.log",
+        "bytes": 502,
+        "sha256": "c0b8ca03c6f033b92aeecefa3fab2dc66fdb4a24fc9b8b869834c7c5bc8e94a2"
+      }
+    },
+    {
+      "phase": "p125-openssl-cms-help",
+      "exit": 0,
+      "pgid": 8832,
+      "durationMs": 16,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-openssl-cms-help/stdout-stderr.log",
+        "bytes": 8644,
+        "sha256": "cd9649105019c1e992c51ae06689aaa1b30524c189eae6b9065e94a556561df9"
+      }
+    },
+    {
+      "phase": "p125-openssl-asn1parse-help",
+      "exit": 0,
+      "pgid": 8836,
+      "durationMs": 15,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-openssl-asn1parse-help/stdout-stderr.log",
+        "bytes": 937,
+        "sha256": "18b2bc82af70f6cebfaef61920c42375dc9d5b79ce4c765ae76b60b1c29eb42e"
+      }
+    },
+    {
+      "phase": "p125-openssl-ca-help",
+      "exit": 0,
+      "pgid": 8840,
+      "durationMs": 16,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-openssl-ca-help/stdout-stderr.log",
+        "bytes": 4558,
+        "sha256": "89a3828a9d016bec07e63a1692f34c4ee2843a770265c94acde9cbc2c1138ff3"
+      }
+    },
+    {
+      "phase": "p125-openssl-ts-help",
+      "exit": 0,
+      "pgid": 8844,
+      "durationMs": 14,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-openssl-ts-help/stdout-stderr.log",
+        "bytes": 4083,
+        "sha256": "2178d48e85eb284a523d6263abc694df5e8a9996d047b555fd492973e62edeb3"
+      }
+    }
+  ],
+  "boundary": "Installed binary/help capability only; no fixture generation, standard interop, or AMC verifier execution credit."
+}

@@ -1,0 +1,8 @@
+{
+  "originalDriver": "/private/tmp/p0-24-cold-cli-qualification-20261015.py",
+  "originalSha256": "f4af574c65260ea9bfd8c682120a075651662c16308b2c27bbe679a57912e627",
+  "correctedDriver": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015.py",
+  "correctedSha256": "f506ac882a9a43f9e562c9ffda6b864db0f41ba34595ebb49928cdbbfbaf7a59",
+  "initialObserverOutcome": "Three actual CLI processes exit 0 and all classifications match. Our added literal-experimental-label assertion incorrectly fails three observations. Original raw streams/results/driver remain unchanged and unqualified.",
+  "correction": "Assert the existing public claim contract: self_reported, result not_evaluated, review pending, applicability unresolved and enforcement none. Identical three argv fixtures; only observer contract corrected. Catalogue/PR experimental wording is distinct from structured CLI review state. No product change or legal/expert approval."
+}

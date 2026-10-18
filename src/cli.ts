@@ -1085,34 +1085,44 @@ async function wrapWithBridgeToken(params: {
   };
   process.stdin.on("data", stdinHandler);
 
-  child.stdout.on("data", (chunk: Buffer) => {
-    const text = redactBridgeText(chunk.toString("utf8"));
-    process.stdout.write(text);
-    queueTelemetry(
-      postBridgeTelemetry(base, leaseToken, {
-        sessionId: wrapSessionId,
-        eventType: "agent_stdout",
-        correlationId,
-        runId,
-        provider: params.provider,
-        payload: text
-      })
-    );
-  });
-  child.stderr.on("data", (chunk: Buffer) => {
-    const text = redactBridgeText(chunk.toString("utf8"));
-    process.stderr.write(text);
-    queueTelemetry(
-      postBridgeTelemetry(base, leaseToken, {
-        sessionId: wrapSessionId,
-        eventType: "agent_stderr",
-        correlationId,
-        runId,
-        provider: params.provider,
-        payload: text
-      })
-    );
-  });
+  // A telemetry row ends at a newline (or past 64 KiB), not at a write, so a value the agent prints over two writes reaches
+  // the bridge's evidence redaction in one row (P2-02). A partial line (a token stream, a spinner) waits at most 250 ms. The
+  // rest is flushed, and every row settled, before the exit row, or before amc exits on SIGINT or SIGTERM.
+  const telemetryLines = (eventType: "agent_stdout" | "agent_stderr", out: NodeJS.WriteStream) => {
+    let pending = "";
+    let timer: NodeJS.Timeout | undefined;
+    const post = (payload: string) => {
+      if (payload) queueTelemetry(postBridgeTelemetry(base, leaseToken, { sessionId: wrapSessionId, eventType, correlationId, runId, provider: params.provider, payload }));
+    };
+    const flush = () => { clearTimeout(timer); timer = undefined; post(pending); pending = ""; };
+    return {
+      write: (chunk: Buffer) => {
+        const text = redactBridgeText(chunk.toString("utf8"));
+        out.write(text);
+        pending += text;
+        const cut = pending.length > 65_536 ? pending.length : pending.lastIndexOf("\n") + 1;
+        post(pending.slice(0, cut));
+        pending = pending.slice(cut);
+        if (cut > 0) { clearTimeout(timer); timer = undefined; }
+        if (pending !== "") timer ??= setTimeout(flush, 250);
+      },
+      flush
+    };
+  };
+  const stdoutLines = telemetryLines("agent_stdout", process.stdout);
+  const stderrLines = telemetryLines("agent_stderr", process.stderr);
+  child.stdout.on("data", stdoutLines.write);
+  child.stderr.on("data", stderrLines.write);
+  // Ctrl+C or a supervisor's SIGTERM: post what is pending and settle it (at most 1 s), then die of the same signal.
+  const onSignal = (signal: NodeJS.Signals): void => {
+    stdoutLines.flush();
+    stderrLines.flush();
+    void Promise.race([Promise.allSettled(pendingTelemetry), new Promise((settle) => setTimeout(settle, 1_000))]).then(() => {
+      process.kill(process.pid, signal);
+    });
+  };
+  process.once("SIGINT", onSignal);
+  process.once("SIGTERM", onSignal);
 
   const exitCode = await new Promise<number>((resolvePromise, rejectPromise) => {
     child.on("error", rejectPromise);
@@ -1120,6 +1130,9 @@ async function wrapWithBridgeToken(params: {
   }).finally(() => {
     process.stdin.off("data", stdinHandler);
   });
+  stdoutLines.flush();
+  stderrLines.flush();
+  await Promise.allSettled(pendingTelemetry);
 
   await postBridgeTelemetry(base, leaseToken, {
     sessionId: wrapSessionId,
@@ -1132,6 +1145,8 @@ async function wrapWithBridgeToken(params: {
     }
   }).catch(() => {});
   await Promise.allSettled(pendingTelemetry);
+  process.off("SIGINT", onSignal);
+  process.off("SIGTERM", onSignal);
 
   console.log(chalk.hex('#4AEF79')("Unified Clarity"));
   console.log(`agent=${decoded.agentId} workspace=${decoded.workspaceId} provider=${params.provider}`);
@@ -11716,8 +11731,8 @@ withTrustFlags(notary
   .argument("<file>"), { pubkey: "pin the notary public key (notary)", json: true })
   .action((file: string, opts: TrustFlags) => {
     const result = notaryVerifyAttestCli(file, trustFromFlags(opts, ["notary"]), opts.pubkey);
-    printClaimResult(artifactClaim("notary:attestation"), { json: opts.json });
-    finishVerify("Notary attestation", result.report, { json: opts.json, result });
+    // finishVerify prints the claim, downgraded when verification fails.
+    finishVerify("Notary attestation", result.report, { json: opts.json, result, claim: artifactClaim("notary:attestation") });
   });
 
 notary
@@ -12454,8 +12469,7 @@ withTrustFlags(transparency
   .action((file: string, opts: TrustFlags) => {
     const verified = verifyTransparencyBundle(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]),
       opts.pubkey ? readFileSync(resolve(opts.pubkey), "utf8") : null);
-    printClaimResult(artifactClaim("transparency:log"), { json: opts.json });
-    finishVerify("Transparency bundle", verified.report, { json: opts.json, result: verified });
+    finishVerify("Transparency bundle", verified.report, { json: opts.json, result: verified, claim: artifactClaim("transparency:log") });
   });
 
 transparencyMerkle
@@ -18732,7 +18746,7 @@ program
   .requiredOption("--experiment <id>", "experiment ID")
   .action(async (opts: { experiment: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const results = lab.simulateExperiment(opts.experiment);
+    const results = lab.simulateExperiment(opts.experiment, process.cwd());
     if (results.length === 0) {
       console.log(chalk.red("No results — experiment not found or has no probes."));
       process.exitCode = 1;
@@ -18757,11 +18771,13 @@ program
   .requiredOption("--experiment <id>", "experiment ID")
   .action(async (opts: { experiment: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const report = lab.generateLabReport(opts.experiment);
-    if (!report) {
-      console.log(chalk.red("Experiment not found."));
-      return;
-    }
+    const report = lab.generateLabReport(opts.experiment, process.cwd());
+    if (!report) { console.log(chalk.red("Experiment not found.")); process.exitCode = 1; return; }
+    // The CLI records only lab-simulate placeholders, so a stored lab score is never a measurement.
+    const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
+    console.log(chalk.bold.yellow(EXAMPLE_BANNER));
+    printClaimResult(exampleEnvelope("lab:simulate"), {});
+    if (report.probeResults.length > 0) console.log(chalk.yellow("No model was called. Scores are deterministic placeholders derived from ids, not measurements."));
     console.log(lab.renderLabReportMarkdown(report));
   });
 
@@ -18772,11 +18788,11 @@ program
   .requiredOption("--candidate <id>", "candidate experiment ID")
   .action(async (opts: { baseline: string; candidate: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const pairs = lab.compareExperiments(opts.baseline, opts.candidate);
-    if (pairs.length === 0) {
-      console.log(chalk.yellow("No matching probes to compare."));
-      return;
-    }
+    const pairs = lab.compareExperiments(opts.baseline, opts.candidate, process.cwd());
+    if (pairs.length === 0) { console.log(chalk.yellow("No matching probes to compare.")); process.exitCode = 1; return; }
+    const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
+    console.log(chalk.bold.yellow(EXAMPLE_BANNER));
+    printClaimResult(exampleEnvelope("lab:simulate"), {});
     console.log(chalk.bold(`\nComparison: ${opts.baseline} vs ${opts.candidate}\n`));
     for (const p of pairs) {
       console.log(`  ${p.probeId}:`);

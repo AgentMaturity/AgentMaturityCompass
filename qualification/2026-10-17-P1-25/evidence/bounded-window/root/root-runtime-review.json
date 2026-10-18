@@ -1,0 +1,276 @@
+{
+  "schema": "p125w-root-bounded-runtime-review/1",
+  "at": "2026-10-17T00:19:25.859035+00:00",
+  "sourceCommit": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+  "acceptedPhases": [
+    {
+      "phase": "p125w-source-combined",
+      "tests": {
+        "total": 22,
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0
+      },
+      "outcome": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-source-combined-outcome.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-source-combined-outcome.json",
+        "bytes": 6567,
+        "sha256": "3ab58da9f6baa979905fc4772b41199218d4c2572d97d57c85709018986d7580",
+        "dev": 16777231,
+        "inode": 543750164,
+        "nlink": 1
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-source-combined-public-audit.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-source-combined-public-audit.json",
+        "bytes": 100163,
+        "sha256": "0aa2ad8f229c852ca6075aa44e3cfbc8c644d0cd02fc5551a98205d1d7267ac8",
+        "dev": 16777231,
+        "inode": 543750171,
+        "nlink": 1
+      },
+      "resources": {
+        "grantPublicCount": 5,
+        "checkpointPublicCount": 3,
+        "children": 30,
+        "explicitChildStreamHashCount": 60,
+        "closedSockets": 8,
+        "closedLedgerOwners": 16
+      }
+    },
+    {
+      "phase": "p125w-fresh-canonical",
+      "tests": {
+        "total": 22,
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0
+      },
+      "outcome": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-fresh-canonical-outcome.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-fresh-canonical-outcome.json",
+        "bytes": 6599,
+        "sha256": "961f1d0d234fce320cb20584c0c305f86d1a65f2cc177cc609376461449e6130",
+        "dev": 16777231,
+        "inode": 543812554,
+        "nlink": 1
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-fresh-canonical-public-audit.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-fresh-canonical-public-audit.json",
+        "bytes": 100175,
+        "sha256": "ed9d1c65e09b6915e98966d4d339c0bc907a9195691186d58efc9ca77413f772",
+        "dev": 16777231,
+        "inode": 543812561,
+        "nlink": 1
+      },
+      "resources": {
+        "grantPublicCount": 5,
+        "checkpointPublicCount": 3,
+        "children": 30,
+        "explicitChildStreamHashCount": 60,
+        "closedSockets": 8,
+        "closedLedgerOwners": 16
+      }
+    },
+    {
+      "phase": "p125w-m1-sequential",
+      "tests": {
+        "total": 22,
+        "passed": 21,
+        "failed": 1,
+        "skipped": 0
+      },
+      "outcome": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-m1-sequential-outcome.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-m1-sequential-outcome.json",
+        "bytes": 10011,
+        "sha256": "513c698db17a7e5a954bb5ab88484a27c5ae012a0a7702d2449a6c1554caa40b",
+        "dev": 16777231,
+        "inode": 543815173,
+        "nlink": 1
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-m1-sequential-public-audit.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-m1-sequential-public-audit.json",
+        "bytes": 95094,
+        "sha256": "4edb0f196672024eceba103324e0e1d6813d29a59f1c838773528a1116c27c94",
+        "dev": 16777231,
+        "inode": 543815180,
+        "nlink": 1
+      },
+      "resources": {
+        "grantPublicCount": 5,
+        "checkpointPublicCount": 3,
+        "children": 30,
+        "explicitChildStreamHashCount": 60,
+        "closedSockets": 8,
+        "closedLedgerOwners": 16
+      }
+    },
+    {
+      "phase": "p125w-restore1",
+      "tests": {
+        "total": 22,
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0
+      },
+      "outcome": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-restore1-outcome.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-restore1-outcome.json",
+        "bytes": 6585,
+        "sha256": "65d30a3d60679f02e78162b767f8da9ccbe1d8df132cebf726cc6cf6b411151e",
+        "dev": 16777231,
+        "inode": 543816480,
+        "nlink": 1
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-restore1-public-audit.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-restore1-public-audit.json",
+        "bytes": 100164,
+        "sha256": "3ca17b7603cfa169d39bc68a685004630c1bf66d2b193d170184a270e8a5dce3",
+        "dev": 16777231,
+        "inode": 543816488,
+        "nlink": 1
+      },
+      "resources": {
+        "grantPublicCount": 5,
+        "checkpointPublicCount": 3,
+        "children": 30,
+        "explicitChildStreamHashCount": 60,
+        "closedSockets": 8,
+        "closedLedgerOwners": 16
+      }
+    },
+    {
+      "phase": "p125w-m2",
+      "tests": {
+        "total": 22,
+        "passed": 20,
+        "failed": 2,
+        "skipped": 0
+      },
+      "outcome": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-m2-outcome.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-m2-outcome.json",
+        "bytes": 13337,
+        "sha256": "c9417b2cee2bed7fb57f19013071bf4370419aa11ca872df2d7d006d9a6849e7",
+        "dev": 16777231,
+        "inode": 543817768,
+        "nlink": 1
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-m2-public-audit.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-m2-public-audit.json",
+        "bytes": 95675,
+        "sha256": "0d02e0259e67599fa99787b4b2314c30d9a7141919ebb04d119dd881995f24c6",
+        "dev": 16777231,
+        "inode": 543817775,
+        "nlink": 1
+      },
+      "resources": {
+        "grantPublicCount": 5,
+        "checkpointPublicCount": 3,
+        "children": 30,
+        "explicitChildStreamHashCount": 60,
+        "closedSockets": 8,
+        "closedLedgerOwners": 16
+      }
+    },
+    {
+      "phase": "p125w-restore2",
+      "tests": {
+        "total": 22,
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0
+      },
+      "outcome": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-restore2-outcome.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-restore2-outcome.json",
+        "bytes": 6585,
+        "sha256": "5ca3279e8b346809859f31a2d731b9ab8ae2d1281a27f2e6951edc722ccdb712",
+        "dev": 16777231,
+        "inode": 543819093,
+        "nlink": 1
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-restore2-public-audit.json",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/p125w-restore2-public-audit.json",
+        "bytes": 100162,
+        "sha256": "d0224e296a55b5f15c8c831539131494cd4972078a63f3ad7d3140a8149ece4a",
+        "dev": 16777231,
+        "inode": 543819100,
+        "nlink": 1
+      },
+      "resources": {
+        "grantPublicCount": 5,
+        "checkpointPublicCount": 3,
+        "children": 30,
+        "explicitChildStreamHashCount": 60,
+        "closedSockets": 8,
+        "closedLedgerOwners": 16
+      }
+    }
+  ],
+  "same22OrderedCohortNotSummedAcrossPhases": true,
+  "actualHooks3Entries4ValuesExact": true,
+  "controlsActualFailures": {
+    "lower": {
+      "phase": "p125w-m1-sequential",
+      "failed": 1,
+      "firstSensitiveFrame": "checkpointWindow.test.ts:445:41"
+    },
+    "tolerance": {
+      "phase": "p125w-m2",
+      "failed": 2,
+      "firstSensitiveFrames": [
+        "checkpointWindow.test.ts:290:35",
+        "checkpointWindow.test.ts:452:47"
+      ]
+    }
+  },
+  "manualClassifications": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/m1-classification.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/m1-classification.json",
+      "bytes": 1988,
+      "sha256": "a5b0ee5ac481e5dc7925de570ad205843f6a2847eb1dfb8683c9572305c49c02",
+      "dev": 16777231,
+      "inode": 543815218,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/m2-classification.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/m2-classification.json",
+      "bytes": 3036,
+      "sha256": "0b37e69396ef038ddfb1d4e800b345a7cd39069a5204d144dd54afaefe22c17b",
+      "dev": 16777231,
+      "inode": 543817832,
+      "nlink": 1
+    }
+  ],
+  "allControlAndRestorationLaunchesAfterActualActionsClosed": true,
+  "excludedDiagnosticPhase": "p125w-m1",
+  "launchCorrection": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/m1-launch-order-diagnosis.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/m1-launch-order-diagnosis.json",
+    "bytes": 2314,
+    "sha256": "abb0b91b712e69491077266d607bd0e02c03526327a00c0fcd48884d4d3d8814",
+    "dev": 16777231,
+    "inode": 543813898,
+    "nlink": 1
+  },
+  "originalDiagnosticRawObserverLogCommandPublicAndBindingPreserved": true,
+  "rootReadActualErrorsFramesAllPublicAuditsAndWindowRows": true,
+  "allCleanupNoUnhandledNoLateNoSignals": true,
+  "issuerAccuracyNullNonzeroAccuracyUnqualified": true,
+  "firstSeedHashComparisonPublicOperandMissingSourceAssertionAndGreenCohortRetained": true,
+  "optionalChildStderrDiagnosticsRetainedNoAllStderrZeroClaim": true,
+  "sourceOnlySensitivityNoCompiledSensitivity": true,
+  "quality2712And1268RemainRedUnwaived": true,
+  "wholeP125PlanAndAllHoldsOpen": true,
+  "noF37QualificationOrResumption": true,
+  "metadataReceiptAndQaClosureStillPending": true
+}

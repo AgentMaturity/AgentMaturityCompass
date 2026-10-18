@@ -1,0 +1,303 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1537",
+  "slice": "Original source11/source8 and separate original mixed-built CLI-ACP2 plus exact source11 reviewed-pin control",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T03:34:15.139361+00:00",
+  "state": "BOUNDED_SOURCE_AND_BUILT_COMPANION_COMPLETE_PENDING_ACTUAL_REVIEW",
+  "setup": {
+    "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/setup-v2.json",
+    "bytes": 14381,
+    "sha256": "d2a256fda6e911d83a1a80754fb6e6d87d576aee0272f6b2eaaf2533e45c0ba3"
+  },
+  "release": {
+    "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/root-runtime-release.json",
+    "bytes": 2474,
+    "sha256": "f5a2cd11287be72dd024aef53b4c440c20e158c997c29b9315134d163696e1b2"
+  },
+  "frozenJournal": {
+    "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 16271,
+    "sha256": "645f8090ed4a248387ecd9c41c639ec658116f68c9bb27cf849d48600febd1a6"
+  },
+  "actualCommands": 7,
+  "corpusProcesses": 6,
+  "uniqueRegisteredCasesAcrossThreeSeparateOriginalFiles": 21,
+  "repeatedCaseExecutions": 54,
+  "phases": [
+    {
+      "phase": "original-pinned-schema-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/original-pinned-schema-baseline/summary.json",
+        "bytes": 7415,
+        "sha256": "5b2fa01d0762309b19e8a92c5f315110031b24e6516ba5edd5077e277e9482af"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/original-pinned-schema-baseline/raw-tests.json",
+        "bytes": 4415,
+        "sha256": "0be4ca6969a0a9e832f663ddf52b9201aef3d13cdc2f9bb00fb7a2bddca39bb6"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/original-pinned-schema-baseline/runtime-observer.json",
+        "bytes": 4618,
+        "sha256": "2208e6c074ba3ec9960721fadda88d789fda851fa2268538a72e88462af94cdd"
+      },
+      "counts": {
+        "numTotalTests": 11,
+        "numPassedTests": 11,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numPendingTestSuites": 0
+      },
+      "exit": 0,
+      "completeProcessAndRegistration": true
+    },
+    {
+      "phase": "original-native-subset-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/original-native-subset-baseline/summary.json",
+        "bytes": 5802,
+        "sha256": "18d36b3ec679d2aa5f9cbf9ca7014b21ec326b040b68dd095574cfb7e0637e82"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/original-native-subset-baseline/raw-tests.json",
+        "bytes": 3029,
+        "sha256": "b0ea198f4dac261cf400560274e7a4843ec728ed8027115d75374146f1e3352d"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/original-native-subset-baseline/runtime-observer.json",
+        "bytes": 3421,
+        "sha256": "5551cc275a0fa0cdae38c5fc50bda2d8577ab6434d9b9ae3d9e97403063096a3"
+      },
+      "counts": {
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numPendingTestSuites": 0
+      },
+      "exit": 0,
+      "completeProcessAndRegistration": true
+    },
+    {
+      "phase": "separate-original-built-cli-acp-companion",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/separate-original-built-cli-acp-companion/summary.json",
+        "bytes": 3762,
+        "sha256": "506237fb53a5b72f7491651f4d264068469147ea0895a7e1a8dcdbfea73f70dc"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/separate-original-built-cli-acp-companion/raw-tests.json",
+        "bytes": 1401,
+        "sha256": "bca248985d70a3c5b091afcd20e649f890c05a3771b2dea3541852ba350c2ed5"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/separate-original-built-cli-acp-companion/runtime-observer.json",
+        "bytes": 1569,
+        "sha256": "e5846080092efefb2aba5b1d387644cc45d1b11f63c55b4d6f42ac69bd8740de"
+      },
+      "counts": {
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numPendingTestSuites": 0
+      },
+      "exit": 0,
+      "completeProcessAndRegistration": true
+    },
+    {
+      "phase": "P30-1537-reviewed-pin-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/P30-1537-reviewed-pin-baseline/summary.json",
+        "bytes": 7406,
+        "sha256": "97733848833996346277ffcb311c58791de1bebeac3db3a6c66772a29a540406"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/P30-1537-reviewed-pin-baseline/raw-tests.json",
+        "bytes": 4414,
+        "sha256": "ec047f45d1772508e6e4e70e17e1a5af1f7dd83a57d7656c74d28f87be5d995b"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/P30-1537-reviewed-pin-baseline/runtime-observer.json",
+        "bytes": 4616,
+        "sha256": "7644c84954ce519eeace225bda092ba5958f70644cdc50929ea056a5f8417e90"
+      },
+      "counts": {
+        "numTotalTests": 11,
+        "numPassedTests": 11,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numPendingTestSuites": 0
+      },
+      "exit": 0,
+      "completeProcessAndRegistration": true
+    },
+    {
+      "phase": "P30-1537-reviewed-pin-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/P30-1537-reviewed-pin-mutant/summary.json",
+        "bytes": 25172,
+        "sha256": "57e40fa0886b6daf0be39cef51b5aacc0b406ab59c85d1e15d9c51c43045c1d6"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/P30-1537-reviewed-pin-mutant/raw-tests.json",
+        "bytes": 12732,
+        "sha256": "166e6450e1c860b2d03f73ffac69b14ef48ce7f1c35c8c7280e9ca2deecdfccf"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/P30-1537-reviewed-pin-mutant/runtime-observer.json",
+        "bytes": 16740,
+        "sha256": "7658a8b9e3d9e27bd1a75382290217f0ef696706730e2d95e9f93c93175b1217"
+      },
+      "counts": {
+        "numTotalTests": 11,
+        "numPassedTests": 5,
+        "numFailedTests": 6,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numPendingTestSuites": 0
+      },
+      "exit": 1,
+      "completeProcessAndRegistration": true
+    },
+    {
+      "phase": "P30-1537-reviewed-pin-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/P30-1537-reviewed-pin-restored/summary.json",
+        "bytes": 7399,
+        "sha256": "9ffd9576a12db088645b87f12c67b42d285f0b103a445418406e825ce61c7a9f"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/P30-1537-reviewed-pin-restored/raw-tests.json",
+        "bytes": 4407,
+        "sha256": "941488dc5ab3d91eb9f0d9e60aa6aa810cdbae5928bc8f0967d4ce7b64165c06"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/phases/P30-1537-reviewed-pin-restored/runtime-observer.json",
+        "bytes": 4616,
+        "sha256": "38d84d5cab9736a195415758186011f4df04c9dafe835f4b764a9edc709e2ff8"
+      },
+      "counts": {
+        "numTotalTests": 11,
+        "numPassedTests": 11,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numPendingTestSuites": 0
+      },
+      "exit": 0,
+      "completeProcessAndRegistration": true
+    }
+  ],
+  "reviewedPinBMR": [
+    11,
+    5,
+    11
+  ],
+  "failedAssertions": [
+    {
+      "phase": "P30-1537-reviewed-pin-mutant",
+      "name": "wider grants refuses pinned schema admission before native model preparation, without a no-tools fallback",
+      "messages": [
+        "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1537-source-qualification-20261015/closure/tests/nativePinnedToolSchemas.test.ts:94:29\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+      ]
+    },
+    {
+      "phase": "P30-1537-reviewed-pin-mutant",
+      "name": "same-name wider path refuses pinned schema admission before native model preparation, without a no-tools fallback",
+      "messages": [
+        "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1537-source-qualification-20261015/closure/tests/nativePinnedToolSchemas.test.ts:94:29\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+      ]
+    },
+    {
+      "phase": "P30-1537-reviewed-pin-mutant",
+      "name": "revoked subset refuses pinned schema admission before native model preparation, without a no-tools fallback",
+      "messages": [
+        "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1537-source-qualification-20261015/closure/tests/nativePinnedToolSchemas.test.ts:94:29\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+      ]
+    },
+    {
+      "phase": "P30-1537-reviewed-pin-mutant",
+      "name": "misclassified identity refuses pinned schema admission before native model preparation, without a no-tools fallback",
+      "messages": [
+        "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1537-source-qualification-20261015/closure/tests/nativePinnedToolSchemas.test.ts:94:29\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+      ]
+    },
+    {
+      "phase": "P30-1537-reviewed-pin-mutant",
+      "name": "the existing execution digest guard still records a signed denial after an operator widens the policy",
+      "messages": [
+        "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1537-source-qualification-20261015/closure/tests/nativePinnedToolSchemas.test.ts:104:27\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+      ]
+    },
+    {
+      "phase": "P30-1537-reviewed-pin-mutant",
+      "name": "pinned Code Mode and explicit extension schemas cannot bypass the same snapshot admission",
+      "messages": [
+        "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-30-AMC-1537-source-qualification-20261015/closure/tests/nativePinnedToolSchemas.test.ts:119:27\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+      ]
+    }
+  ],
+  "meaning": "Removing only the reviewed digest comparison causes six exact expected schema-refusal assertions to fail. Invalid-signature/unverified-policy guards, unchanged pin positive, live unpinned policy and prior cancellation cases still pass.",
+  "assertionMasking": [
+    "Four authentic re-signed policy changes first fail schema-refusal at94:29. Later runStep/model preparation, empty request/header/tools/call rows and policy-byte assertions95\u201398 do not run in those mutant cases. Actual returned schema arrays and model/provider effects are not independently retained.",
+    "Execution-guard case stops at schema refusal104:27 before body dispatch/denial/file/audit assertions105\u2013112; its title is not body-guard mutation evidence.",
+    "Code Mode/extension case first fails schema refusal119:27; it does not show Code Mode execution or OS confinement."
+  ],
+  "sourceNativeContext": "The separate unchanged8 source cases check actual read success, guessed write/bash signed denials, unsupported identity/readiness and live revocation. Their integrity.ok assertion does not independently pin external monitor identity; simulated shell-host selection is not OS confinement.",
+  "builtCompanionContext": "Separate original2 uses copied dist CLI/ACP and actual owned loopback provider/SSE, one actual read then completion, provider-valid aliases, signed original-input/audit assertions and fresh monitor-pinned verifier children. Original parent/listener/pools remain alive until cleanup; fresh verifier processes are not an ended-writer whole-cold interval. Neither route supplies expectedToolsDigest or attempts a write. Missing files do not become attempted-write denials. Passing assertions do not retain full fixture/rows/child transcripts for independent offline reconstruction.",
+  "runtime": "Separate actual launcher fingerprint Node22.23.3/ABI127/NAPI10. Native physical identity is pinned before/after; actual per-worker/service loaded-native/ABI/PID proof is not invented. All seven outer leader exits0/1, no signals/timeouts/forced group actions; observers retain zero hook/file/suite/unhandled/known late-close diagnostics.",
+  "preservation": {
+    "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/root-final-readonly-preservation.json",
+    "bytes": 975,
+    "sha256": "71e87de36b7366199338c64e82c5568f250ed7ebf746ef6f913757177cd463f5"
+  },
+  "finalClosure": {
+    "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/full-closure-final.json",
+    "bytes": 1399777,
+    "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/artifact-index.json",
+    "bytes": 1097854,
+    "sha256": "07801102d5284ab7583203db401d5161552dce41bb88c7b82a3531a8c41516fb"
+  },
+  "indexReferenceCount": 4392,
+  "metadataProvenance": "Original AUTHORED UNEXECUTED source comment and historical recipe-origin strings remain untouched. This retained raw execution supersedes those descriptions for this private run only.",
+  "installedAcceptance": {
+    "state": "OPEN_NOT_EXECUTED",
+    "basis": "Normal outer pack/release/freeze prerequisites remain unwaived. Exact-source duplicates1269 anddead2751 failures prevent crediting a current successful normal gate; this is reused current-source failure evidence, not a new actual npm-pack failure.",
+    "gateDecision": {
+      "path": "/private/tmp/p0-30-AMC-1537-pack-gate-decision-20261015.json",
+      "bytes": 2459,
+      "sha256": "6ac5242ee63d875c04479cf0e4abd807de81f35343395788ab21126175a15fd8"
+    },
+    "gateClarification": {
+      "path": "/private/tmp/p0-30-AMC-1537-normal-gate-scope-clarification-20261015.json",
+      "bytes": 2352,
+      "sha256": "60b7e5712fcc05d5f3a755a358be8de33fdf2854df8d79854d7ce4037c33ca4b"
+    },
+    "qualityPrerequisiteNote": {
+      "path": "/private/tmp/p0-30-AMC-1537-existing-quality-prerequisite-note-20261015.json",
+      "bytes": 3747,
+      "sha256": "b868d2c9a043d2f76e3dfeb69c02ff52b19d1913c8d61d697d83385db29cd7b8"
+    },
+    "noAgentShortcutOrFakeGit": true,
+    "installedObserverAuthoredOrRun": false
+  },
+  "limits": [
+    "Source11, source8 and mixed-built2 are separate processes/corpora, not one21 source-only process. Six corpus processes repeat54cases; not54unique.",
+    "No original test/config/guard/import/assertion/deadline/cleanup change, adapter, build/compiler, permanent source/test/counter/Git edit or dist mutation.",
+    "No public installed SDK/tarball proof, actual attempted provider-write denial or genuine signed live-policy change during installed ACP schemas. Those remain separately planned controls.",
+    "No universal no-effects, all-race-schedules, OS-confinement, external accreditation, P0-27 corruption repair, fullbatch/P0-30/fullsuite/coverage/Node24/hosted/release/G0/Done or dependency closure."
+  ],
+  "formalAcceptanceClosed": false,
+  "allRuntimeFinished": true,
+  "allRootFreezeReadsFinished": true
+}

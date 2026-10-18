@@ -1,0 +1,63 @@
+{
+  "schema": "p125ec-private-binder-author-input-pins/1",
+  "at": "2026-10-17T01:01:57.882070+00:00",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/bind-fresh.py",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/bind-fresh.py",
+      "bytes": 4948,
+      "sha256": "aa3eca5d09af75a3c12cc3062a81ae72d091b9da03f49d8c18a04bac05a64898",
+      "dev": 16777231,
+      "inode": 543750156,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-pinset.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-pinset.json",
+      "bytes": 6867,
+      "sha256": "68e48c9fa34740becdd93ff48cbabd548674a4064479a3ed2d2a8836f8292606",
+      "dev": 16777231,
+      "inode": 543742990,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-source-binding.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-source-binding.json",
+      "bytes": 116305,
+      "sha256": "3ded5106edab5d7512418ab2ba1c0021faca650d8e0886b691ea6dbe36d701e1",
+      "dev": 16777231,
+      "inode": 543811246,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/readonly-dependency-pairs-before-build.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/readonly-dependency-pairs-before-build.json",
+      "bytes": 2796,
+      "sha256": "3f3ff70af2d9ffe63bc268df67b2d14a71634c119343451e11f1bb6144462356",
+      "dev": 16777231,
+      "inode": 543829326,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 80498,
+      "sha256": "78523e735a11a6aef300a4609d2ee79f45a1b56a0edc1bfd8536bb52b7abb49f",
+      "dev": 16777231,
+      "inode": 543829387,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/protected-inputs.json",
+      "bytes": 78167,
+      "sha256": "fba2c86d4c578b729658d50dc26a102d7b00f8b80a4ca392a29071d4b1066c11",
+      "dev": 16777231,
+      "inode": 543829325,
+      "nlink": 1
+    }
+  ],
+  "allCurrentInputMetadataBytesAndPhysicalPinsVerified": true,
+  "underlying161ProtectedFilesOr11NativesNotClaimedReauditedByAuthor": true,
+  "noFutureSourceCheckpointOrQOrCompilerHashesAdopted": true
+}

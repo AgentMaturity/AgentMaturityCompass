@@ -1,0 +1,494 @@
+{
+  "schema": "p112-independent-actual-fresh-control-chain-review/1",
+  "at": "2026-10-16T20:14:07.962585+00:00",
+  "allReadsFinished": true,
+  "blockers": [],
+  "sourceCommit": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout",
+  "executionByReviewer": false,
+  "checkoutIndexQaWrites": false,
+  "canonical": {
+    "tests": 35,
+    "passed": 35,
+    "perFileBodies": {
+      "tests/policy/compiledPolicyGuard.test.ts": 11,
+      "tests/toolPipeline.test.ts": 18,
+      "tests/toolPolicyGuards.test.ts": 6
+    },
+    "boundary": "One actual three-file35-case run:11 new already-derived helper tests plus24 unchanged regression cases. Repeated runs are not added as more unique tests."
+  },
+  "phases": [
+    {
+      "phase": "p112-fresh-canonical",
+      "tests": {
+        "total": 35,
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0
+      },
+      "uniqueIdentities": 35,
+      "rawObserverOrderedJoin": true,
+      "orderedNamesWithinEachFileMatch": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 3,
+      "hookFailures": 0,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": [],
+      "exit": 0,
+      "durationMs": 4457,
+      "ownedPgid": 26079,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "p112-m1",
+      "tests": {
+        "total": 35,
+        "passed": 34,
+        "failed": 1,
+        "skipped": 0
+      },
+      "uniqueIdentities": 35,
+      "rawObserverOrderedJoin": true,
+      "orderedNamesWithinEachFileMatch": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 3,
+      "hookFailures": 0,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": [],
+      "exit": 1,
+      "durationMs": 3746,
+      "ownedPgid": 26183,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "p112-restore1",
+      "tests": {
+        "total": 35,
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0
+      },
+      "uniqueIdentities": 35,
+      "rawObserverOrderedJoin": true,
+      "orderedNamesWithinEachFileMatch": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 3,
+      "hookFailures": 0,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": [],
+      "exit": 0,
+      "durationMs": 3712,
+      "ownedPgid": 26239,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "p112-m2",
+      "tests": {
+        "total": 35,
+        "passed": 33,
+        "failed": 2,
+        "skipped": 0
+      },
+      "uniqueIdentities": 35,
+      "rawObserverOrderedJoin": true,
+      "orderedNamesWithinEachFileMatch": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 3,
+      "hookFailures": 0,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": [],
+      "exit": 1,
+      "durationMs": 3723,
+      "ownedPgid": 26288,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "p112-restore2",
+      "tests": {
+        "total": 35,
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0
+      },
+      "uniqueIdentities": 35,
+      "rawObserverOrderedJoin": true,
+      "orderedNamesWithinEachFileMatch": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 3,
+      "hookFailures": 0,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": [],
+      "exit": 0,
+      "durationMs": 3803,
+      "ownedPgid": 26339,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "p112-m3",
+      "tests": {
+        "total": 35,
+        "passed": 33,
+        "failed": 2,
+        "skipped": 0
+      },
+      "uniqueIdentities": 35,
+      "rawObserverOrderedJoin": true,
+      "orderedNamesWithinEachFileMatch": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 3,
+      "hookFailures": 0,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": [],
+      "exit": 1,
+      "durationMs": 3699,
+      "ownedPgid": 26390,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "p112-restore3",
+      "tests": {
+        "total": 35,
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0
+      },
+      "uniqueIdentities": 35,
+      "rawObserverOrderedJoin": true,
+      "orderedNamesWithinEachFileMatch": true,
+      "hookTaskEntries": 3,
+      "individualHookValues": 3,
+      "hookFailures": 0,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": [],
+      "exit": 0,
+      "durationMs": 3673,
+      "ownedPgid": 26434,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false
+    }
+  ],
+  "same35UniqueIdentitiesAcrossSevenPhases": true,
+  "orderedNamesWithinEachFileEqual": true,
+  "globalFileCompletionOrderRequired": false,
+  "controls": [
+    {
+      "operator": "visibility-refusal",
+      "targetRel": "src/tools/guards/compiledPolicyGuard.ts",
+      "sourceCommit": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+      "originalBytes": 7685,
+      "originalSha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710",
+      "mutantBytes": 7509,
+      "mutantSha256": "3a229eb16191eedd22930ada4f4af5a725aa6e9d42ff7076019c9cdaf0e0880c",
+      "livePatchPin": {
+        "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m1.patch",
+        "bytes": 1086,
+        "sha256": "096ca77b7b5df7b2990ad6b7af42ea8a5a207445d9515a8e629297bae6d1a2f5"
+      },
+      "recipeAndPatchExactOnce": true,
+      "exclusiveOriginalBackupMatches": true,
+      "classificationPin": {
+        "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m1-classification.json",
+        "bytes": 947,
+        "sha256": "6fd0e49adeeb52c8cf8c0274af16bcc5c92f6056ad9a2738566942aa1dfd16d9"
+      },
+      "outcomeHashBoundToClassification": true,
+      "physicalPreWriteChecksRecordedForApplyAndRestore": true,
+      "targetInode": 543265642,
+      "redNaturallyClosedBeforeRestore": true,
+      "afterPriorSameCorpusGreen": true,
+      "exactRestoration": true,
+      "restoredSameCorpus35": true,
+      "actualFirstFrames": [
+        80
+      ],
+      "maskedAssertionLines": [],
+      "failures": [
+        {
+          "file": "tests/policy/compiledPolicyGuard.test.ts",
+          "case": "compiled policy guard on already-derived unit inputs shows listed names and names a hidden-tool refusal",
+          "messages": [
+            "AssertionError: expected undefined to be 'compiled policy denied this call (too\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/policy/compiledPolicyGuard.test.ts:80:8\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ],
+          "frames": [
+            [
+              "80",
+              "8"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "operator": "lease-presence",
+      "targetRel": "src/tools/guards/compiledPolicyGuard.ts",
+      "sourceCommit": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+      "originalBytes": 7685,
+      "originalSha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710",
+      "mutantBytes": 7541,
+      "mutantSha256": "03f1c701e6b303252b9efcd2d7000b16df06d68d916fc99471d05a31308f26ba",
+      "livePatchPin": {
+        "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m2.patch",
+        "bytes": 978,
+        "sha256": "5161f7597ebbd9c29959be464fec86caf79039ef2a47ce646f910d49c2c3ca4f"
+      },
+      "recipeAndPatchExactOnce": true,
+      "exclusiveOriginalBackupMatches": true,
+      "classificationPin": {
+        "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m2-classification.json",
+        "bytes": 1595,
+        "sha256": "a2a32b5624e413394b8525dfa38dea6e1554e2cb873112086a5dab6f1ef02ec4"
+      },
+      "outcomeHashBoundToClassification": true,
+      "physicalPreWriteChecksRecordedForApplyAndRestore": true,
+      "targetInode": 543265642,
+      "redNaturallyClosedBeforeRestore": true,
+      "afterPriorSameCorpusGreen": true,
+      "exactRestoration": true,
+      "restoredSameCorpus35": true,
+      "actualFirstFrames": [
+        118,
+        135
+      ],
+      "maskedAssertionLines": [
+        119,
+        137
+      ],
+      "failures": [
+        {
+          "file": "tests/policy/compiledPolicyGuard.test.ts",
+          "case": "compiled policy guard on already-derived unit inputs requires the already-derived authorization to carry its lease identity",
+          "messages": [
+            "AssertionError: expected undefined to be 'compiled policy denied this call (con\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/policy/compiledPolicyGuard.test.ts:118:65\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ],
+          "frames": [
+            [
+              "118",
+              "65"
+            ]
+          ]
+        },
+        {
+          "file": "tests/policy/compiledPolicyGuard.test.ts",
+          "case": "compiled policy guard on already-derived unit inputs preserves lease-before-principal refusal when both identity requirements apply",
+          "messages": [
+            "AssertionError: expected 'compiled policy denied this call (con\u2026' to be 'compiled policy denied this call (con\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/policy/compiledPolicyGuard.test.ts:135:8\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ],
+          "frames": [
+            [
+              "135",
+              "8"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "operator": "principal-binding",
+      "targetRel": "src/tools/guards/compiledPolicyGuard.ts",
+      "sourceCommit": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+      "originalBytes": 7685,
+      "originalSha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710",
+      "mutantBytes": 7452,
+      "mutantSha256": "795d017b45195c9579a9e32769d1673d33c3e8ab010d5042bdacba3663df4463",
+      "livePatchPin": {
+        "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m3.patch",
+        "bytes": 887,
+        "sha256": "d80e5b2a542aa03d28b35cb90a1c5ddbcf898a6c3b43b5a9a4c1be5585e2ee0d"
+      },
+      "recipeAndPatchExactOnce": true,
+      "exclusiveOriginalBackupMatches": true,
+      "classificationPin": {
+        "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m3-classification.json",
+        "bytes": 1522,
+        "sha256": "fc95a817c34498e55df566f653315cb6be4f383a85b4796987c9cc62967a8265"
+      },
+      "outcomeHashBoundToClassification": true,
+      "physicalPreWriteChecksRecordedForApplyAndRestore": true,
+      "targetInode": 543265642,
+      "redNaturallyClosedBeforeRestore": true,
+      "afterPriorSameCorpusGreen": true,
+      "exactRestoration": true,
+      "restoredSameCorpus35": true,
+      "actualFirstFrames": [
+        127,
+        137
+      ],
+      "maskedAssertionLines": [
+        128
+      ],
+      "failures": [
+        {
+          "file": "tests/policy/compiledPolicyGuard.test.ts",
+          "case": "compiled policy guard on already-derived unit inputs rejects absent and OS-user principals while consuming the authenticated principal methods",
+          "messages": [
+            "AssertionError: expected undefined to be 'compiled policy denied this call (con\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/policy/compiledPolicyGuard.test.ts:127:65\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ],
+          "frames": [
+            [
+              "127",
+              "65"
+            ]
+          ]
+        },
+        {
+          "file": "tests/policy/compiledPolicyGuard.test.ts",
+          "case": "compiled policy guard on already-derived unit inputs preserves lease-before-principal refusal when both identity requirements apply",
+          "messages": [
+            "AssertionError: expected undefined to be 'compiled policy denied this call (con\u2026' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/policy/compiledPolicyGuard.test.ts:137:8\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ],
+          "frames": [
+            [
+              "137",
+              "8"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "causalInterpretation": {
+    "visibility": "M1 returns undefined for the hidden tool and fails exact refusal at80 after earlier neutral/name checks. No later body assertion is claimed.",
+    "lease": "M2 separate lease case fails missing-authorization refusal118 with undefined; null-lease assertion119 is masked. Combined requirements fail135 because principal refusal replaces earlier lease refusal; later OS-user assertion137 is masked. Supplied-lease neutral positives precede both failures.",
+    "principal": "M3 separate case fails127 with undefined after all three supplied principal-method neutral checks; OS-user assertion128 is masked. Combined case independently fails137 with undefined after its missing-lease assertion135 passed.",
+    "restoredBodies": "All three exact restored runs pass35/35. That separately verifies complete bodies; it does not make masked RED assertions observed.",
+    "scope": "These are visibility/lease-field/principal-field helper controls on supplied derived inputs. They are not the full specification destination, regulated-refusal or catalog-label mutation suite, and do not verify lease signatures, principal authentication, approvals, active policy loading or real effects."
+  },
+  "preservation": {
+    "actualPathsEachRoot": 59,
+    "currentSelectedRegularDistinctIdentities": 118,
+    "allCurrentBindingHashesRechecked": true,
+    "compiledPairs": [
+      {
+        "sourceRelativePath": "src/tools/guards/compiledPolicyGuard.ts",
+        "compiledRelativePath": "dist/tools/guards/compiledPolicyGuard.js"
+      },
+      {
+        "sourceRelativePath": "src/tools/guards/policyGuards.ts",
+        "compiledRelativePath": "dist/tools/guards/policyGuards.js"
+      },
+      {
+        "sourceRelativePath": "src/tools/toolPipeline.ts",
+        "compiledRelativePath": "dist/tools/toolPipeline.js"
+      },
+      {
+        "sourceRelativePath": "src/tools/toolRegistry.ts",
+        "compiledRelativePath": "dist/tools/toolRegistry.js"
+      },
+      {
+        "sourceRelativePath": "src/actions/authorize.ts",
+        "compiledRelativePath": "dist/actions/authorize.js"
+      },
+      {
+        "sourceRelativePath": "src/catalog/compiler/activate.ts",
+        "compiledRelativePath": "dist/catalog/compiler/activate.js"
+      },
+      {
+        "sourceRelativePath": "src/policy/effectivePolicyReceipt.ts",
+        "compiledRelativePath": "dist/policy/effectivePolicyReceipt.js"
+      },
+      {
+        "sourceRelativePath": "src/enforce/guardrailRuntimeBindings.ts",
+        "compiledRelativePath": "dist/enforce/guardrailRuntimeBindings.js"
+      }
+    ],
+    "compiledPairCount": 8,
+    "compiledMeaning": "Finite actual source/compiled parity and preservation only; no compiled output was mutated or rebuilt for controls.",
+    "protectedInputHashesRechecked": 88,
+    "fiveNativePhysicalPinsRechecked": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 542501039,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 539175547,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543125595,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543200130,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543305423,
+        "nlink": 1
+      }
+    ],
+    "fiveNativeIdentitiesDistinct": true,
+    "borrowedRunnerPinRechecked": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "bytes": 43,
+      "sha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+      "dev": 16777231,
+      "inode": 539152709,
+      "nlink": 1
+    },
+    "targetInode": 543265642,
+    "targetRegularSingleLinkNow": true,
+    "rootRecordedSAndQCleanAndEmptyIndex": true,
+    "rootRecordedHeldR18RowsHeadAndEmptyIndexExact": true,
+    "gitChecksByReviewer": false,
+    "limit": "Pre-write lstat facts are recorded for every apply/restore. Current checks corroborate finite identities and bytes; path-based writes and snapshots do not create an atomic descriptor or continuous-isolation guarantee."
+  },
+  "lifecycle": "All seven actual wrapper commands naturally close with owned-group ESRCH and no nonzero signals; three hook task entries/values pass in every phase, with no hook/unhandled/late failure. No PUBLIC_EVIDENCE records were emitted. The unchanged signed firewall/budget fixture has its existing removal/environment cleanup scope; passing hooks do not prove universal resource/descendant/filesystem/environment isolation. The new11 helper tests own no runtime resources.",
+  "authority": "Explicit --root Q governs the test/source imports. Borrowed R cwd/head is the runtime; this three-file corpus has no R/src source-literal census. Inherited environment/private HOME is not complete environment isolation.",
+  "metadataPreparationNote": "An initial private reader looked for prospective m1-restored naming and found no file after reading canonical/M1. Actual retained names are p112-restore1/2/3; all seven were then fully read and verified. That lookup produced no product execution or qualification credit.",
+  "staticHelperAndAssemblerReview": {
+    "preservationChecker": "Full read matches actual59/88/native union and held R state/root Git snapshot checks. It writes only an exclusive private preservation record, never restores source. No concrete static blocker.",
+    "assemblerPin": {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/assemble-receipt.py",
+      "bytes": 4119,
+      "sha256": "55a5d8ef05e6ae776e0f6e9b69e49e2dc6c948275b3da606122487e3f3217868"
+    },
+    "assembler": "Full read retains source SHA shape, exclusive output/files, exact same-read adopted input hashes, raw private-key check before lossless encoding, verified round trip, per-file cap and closed ESRCH/no-signal command adoption. Root-owned manifest supplies actual canonical counts/phase list/conclusions; ordinary receipt/schema/Git checks still apply. No execution or manifest/packet validity claim here.",
+    "controlHelperUnchangedFromReviewedPin": true
+  },
+  "remainingLimits": [
+    "Keep all full-issue signed activation/journal/live-head/approval strictness, real authorization and effective receipt/evidence binding, genuine payment threshold/destination, domain-only negative control, fourteen-label and regulated-pass requirements open.",
+    "P1-07 strict-binding closure stays intact; no opt-out/refusal is reopened. P1-02 held combinations, all other held decisions/F37 skip and Claude work remain unchanged.",
+    "Actual global quality remains unwaived RED1268 duplicates and dead-code2724\u21922723 due only to test import reachability. No production reachability, full-suite/release/publish/OS matrix or whole-issue Done credit.",
+    "Root final count/gate/freeze/metadata checks remain separate evidence and are not invented by this chain review."
+  ]
+}

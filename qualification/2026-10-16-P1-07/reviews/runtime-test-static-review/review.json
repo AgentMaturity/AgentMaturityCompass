@@ -1,0 +1,68 @@
+{
+  "schema": "p107-runtime-test-static-peer-review/1",
+  "at": "2026-10-16T17:54:38.989631+00:00",
+  "state": "STATIC_BLOCKED_UNEXECUTED_V1",
+  "candidate": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal/runtimeEvidenceEndToEnd.test.ts",
+    "bytes": 27005,
+    "sha256": "27fd19d0ad963d7221dd2c4c08b105d2b430abb3a49da22f07bdb2610910e9c9",
+    "readScope": "Full static read of exact sealed candidate or its accompanying metadata."
+  },
+  "target": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceHead": "bf8836cd38d2879ccef11c6cfd1423edf0a96c0f",
+  "executed": false,
+  "checkoutWrites": false,
+  "parserCompilerProductNativeSqlNetworkProbeExecution": false,
+  "inputHashChecks": {
+    "authorInputs": 66,
+    "proposalFiles": 4,
+    "mismatches": []
+  },
+  "blockers": [
+    {
+      "id": "TURN_SEAL_MISSING",
+      "candidateLocation": "closeOwnedSession: session.endTurn followed by session.close",
+      "sourceEvidence": [
+        "src/session/sessionService.ts:209-222 appends turn/end but does not seal or clear currentTurn",
+        "src/session/sessionService.ts:229-255 sealTurn seals window, appends turn/seal, records seal and clears currentTurn",
+        "src/session/sessionService.ts:779-781 session/close records window.sealCount",
+        "candidate root assertion requires sealCount===1"
+      ],
+      "consequence": "The proposed successful path contains no sealTurn call, so its one-turn root sealCount prerequisite cannot be 1. Existing anchor test endTurn/close pattern does not establish this stronger assertion.",
+      "smallestCorrection": "Retain v1, author preferred candidate with ordinary once-only sealTurn after a successful endTurn, track attempt/success, retain failures and never retry turn or session sealing."
+    }
+  ],
+  "checks": [
+    {
+      "area": "Public API/types",
+      "finding": "Explicit sqlite openSessionEventStore is retained before SessionService construction; actual sessionId follows successful open. AgentToolset accepts the live recorder and expectedToolsDigest. ToolCallOutcome content is string|Buffer and denied is boolean. allowJs:true in tsconfig.tests.json permits existing clean-source .mjs helper import. These are static compatibility findings, not compiler evidence."
+    },
+    {
+      "area": "Guard and environment ownership",
+      "finding": "The existing helper constructs private HOME/CI/vault environment and removes ambient AMC/loader/provider settings. Explicit owned guard paths and withWorkspaceScope pin product guard writes to this fixture. closeGuardDb runs before environment restoration; its best-effort public function offers invocation evidence only. Different baseline workers are not owned by this fixture."
+    },
+    {
+      "area": "Policy and native disposition",
+      "finding": "Default fs.read remains READ_ONLY scoped to ./workspace/** with protected deny globs. The additional existing denied path is a narrowing. Signed tool config and enabled block/firewall public APIs are used without source, clock or admission edits. AgentToolset still executes its normal confinement measurement and backend checks; no OS isolation proof is claimed."
+    },
+    {
+      "area": "Trust and mapping order",
+      "finding": "Pinned monitor identity is captured before calls outside the workspace; real readonly ledger getters, explicit trusted monitor verification, row/seal signatures and session descriptors precede mapping. Four independently call-correlated audit disposition IDs are compared before emitter/gate/final-level claims. Metrics/bookkeeping cannot satisfy this exact-ID witness. A removed denied emitter can make the canonical L2 gate not_evaluated and matchedEventIds empty; later assertions would be masked."
+    },
+    {
+      "area": "Continuity and levels",
+      "finding": "Actual audit UTC days and sessions determine the expected shipped threshold result; no clock advancement occurs. Same-day fixture cannot claim L2 continuity. Canonical L3-L5 remain not_evaluated. This is a native seam fixture without model-loop or external identity attestation."
+    },
+    {
+      "area": "Resource lifecycle and error preservation",
+      "finding": "Toolsets close before session closure. Injected stores are retained for constructor/open failure and fallback idempotent public release, without retrying non-idempotent session sealing. Readonly close failures are kept separately from body/getter errors. Owned ledger pool refuses forced close with active leases; vault lock is attempted after partial initialization; protected input/native pins and exact environment restore are checked. Missing ordinary turn seal is the concrete blocker above."
+    },
+    {
+      "area": "Public facts/privacy",
+      "finding": "Public facts contain IDs, hashes, descriptors, booleans, gate reasons and redacted errors; no canary content/raw private key/passphrase/raw environment/session payload is deliberately serialized. Known canaries/passphrase and PEM private-key blocks are redacted in body/cleanup messages and stacks while Error identity and first frame are preserved. Public evidence is written before two final ownership/cleanup assertions, and write failures cannot be reflected in an already constructed record; actual test/report output remains necessary. No universal cleanup or process closure is inferred."
+    }
+  ],
+  "readBoundary": "Candidate and README fully read; accompanying metadata fully read. Relevant public API, lifetime, policy, provenance, projection, gate, ledger, trust and descriptor spans read; not an exhaustive review of every large input file. All 66 full-byte pins independently matched. No runtime/result prediction other than deterministic missing-seal inconsistency.",
+  "pending": "Preferred corrected candidate review; root alone may materialize and execute. The reported 21/21 unit cohort and retained initial zero-test setup are separate evidence."
+}

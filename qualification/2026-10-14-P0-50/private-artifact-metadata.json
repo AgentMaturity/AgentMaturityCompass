@@ -1,0 +1,12 @@
+{
+  "tarball": "/private/tmp/p0-50-packed-artifact-20261014/agent-maturity-compass-1.2.0.tgz",
+  "sha256": "c3932ba3b2d693c018c874191c608fbb06709e9e83c77c95f7b9a4ff4d8d82aa",
+  "sourceRevision": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "cliSha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "packageVersion": "1.2.0",
+  "sdkSourceRange": "^1.31.0",
+  "purpose": "Private qualification artifact, npm pack --ignore-scripts avoids recursive prepack; no release/publication inferred",
+  "sourceGitStatus": ""
+}

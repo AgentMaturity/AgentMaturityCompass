@@ -1,0 +1,39 @@
+{
+  "schema": "p125pc-public-curator-independent-static-review-seal/1",
+  "at": "2026-10-17T02:12:25.969540+00:00",
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/prepare-public-output.py.source.txt",
+    "bytes": 24233,
+    "sha256": "5bd053f7d38cd345bc3cc357c605d2bed450f882695543b126c177a117e58ec7"
+  },
+  "preferredPhaseInputs": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/phase-inputs.json",
+    "bytes": 4256,
+    "sha256": "14508ad20b3144681ccd9a0768f981ea68e216fcfe9479ff5b22dcdce5cf1048"
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-static-review/review.json",
+      "bytes": 9847,
+      "sha256": "cf34c9d468a602ed71f5a2bd9d6d1879cab39844b81c89e0fea66155e16e9f89"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-static-review/review.md",
+      "bytes": 3926,
+      "sha256": "f4695d9371d7ca4a9bb6d2e9d43f4c6cce7459a10c0dc6d3727bcf257e0bf115"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-static-review/input-pins.json",
+      "bytes": 20739,
+      "sha256": "1b66fda196cbb8a142f2fdf60eeb6382098648b2a5d6eec7c908517a45102a25"
+    }
+  ],
+  "inputPinCount": 49,
+  "allInputByteAndPhysicalPinsRechecked": true,
+  "fullPreferredSourceAndBothDeltasRead": true,
+  "blockers": [],
+  "rootAdoptionRequired": true,
+  "helperExecuted": false,
+  "publicOutputsProduced": false,
+  "independentRuntimeQualificationCredit": false
+}

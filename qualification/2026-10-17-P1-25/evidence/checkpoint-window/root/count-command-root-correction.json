@@ -1,0 +1,43 @@
+{
+  "at": "2026-10-16T23:30:49.520425+00:00",
+  "wrongRootReadOnlyCheck": {
+    "phase": "p125k-counts-before",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs --check",
+    "exit": 0,
+    "durationMs": 379,
+    "startedUtc": "2026-10-16T23:29:52.382287+00:00",
+    "endedUtc": "2026-10-16T23:29:52.770631+00:00",
+    "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p125k-counts-before/stdout-stderr.log",
+    "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "ownedProcess": {
+      "pid": 63503,
+      "ownedPgid": 63503,
+      "observedPgidAfterLaunch": 63503,
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+        "--check"
+      ],
+      "startedUtc": "2026-10-16T23:29:52.382287+00:00",
+      "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+      "overriddenEnvironmentKeys": [
+        "PATH",
+        "HOME",
+        "GIT_NO_LAZY_FETCH"
+      ]
+    },
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "observed": false,
+    "artifacts": {},
+    "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+  },
+  "qualificationCredit": false,
+  "reason": "Direct generator script resolves process.cwd() to held R; --check is read-only and supplies no source count evidence. Correct explicit pnpm --dir S command ran separately.",
+  "correctSourcePhase": "p125k-counts-source-before",
+  "noSourceOrRMutation": true
+}

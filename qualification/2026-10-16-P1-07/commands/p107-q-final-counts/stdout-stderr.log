@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:counts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout
+> node scripts/gen-counts.mjs --check
+
+Published source counts match the repository; this check does not execute tests.

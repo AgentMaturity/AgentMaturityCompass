@@ -1,0 +1,83 @@
+{
+  "schema": "p125c-fresh-control-helper-independent-static-review/1",
+  "at": "2026-10-16T21:45:13.195383+00:00",
+  "blockers": [],
+  "preferredVersion": "fresh-control-preparation/v2",
+  "allReadsFinished": true,
+  "verdict": "The preferred V2 helpers fit the finite actual-binding, source-only apply/restore and read-only preservation contract. The optional-lock finding is resolved.",
+  "reviewedHelperPins": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/v2/source-control.py",
+      "bytes": 15702,
+      "sha256": "205390ed3c4d2a6637ca0c39c29804d5c1051ea3ff1eb8da3d7d9346a578f961"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/v2/check-preservation.py",
+      "bytes": 1461,
+      "sha256": "f1364b0928eab148f2007846bf4300470adab125f9b80be7664e4d05d702bdb4"
+    }
+  ],
+  "resolvedFinding": {
+    "issue": "V1 Git status calls could refresh indexes through optional locking.",
+    "fix": "V2 adds global --no-optional-locks to the shared Git reader; paired preservation importer selects V2.",
+    "exactTwoLineDeltaVerified": true,
+    "V1Preserved": true
+  },
+  "guards": {
+    "actualFutureBindingRequired": true,
+    "selectedPathsEachRoot": 71,
+    "compiledPreservationPairs": 8,
+    "protectedByteInputs": 121,
+    "oldNativePhysicalPins": 6,
+    "futureDistinctNativeRequired": true,
+    "allSelectedPhysicalRowsDistinctRegularSingleLink": true,
+    "sourceAndFreshSameActualCommitAndEmptyIndexes": true,
+    "heldRHeadStatusAndIndexRequiredExact": true,
+    "actualClosedCleanSourceHelperRequiredNoVitestCredit": true,
+    "actualSourceFresh28UniqueOrderedCaseJoinRequired": true,
+    "actualHookCountsComparedSeparately": true,
+    "actualPinnedRawObserverAndNaturalESRCHNoSignalsRequired": true,
+    "allFourCurrentNamespaceActiveHaltedNamesRefuse": true,
+    "exactBeforeOccurrenceAndOriginalProposedByteHashRecipes": true,
+    "descriptorNoFollowNoTruncateBeforeContentIdentityChecks": true,
+    "SAndQTargetCannotAlias": true,
+    "exclusiveBackupPreparedLivePatchAndOperationRecords": true,
+    "explicitApplyOrRestoreOnlyNoRetryOrAutomaticRecovery": true,
+    "M2RequiresActualM1ExactRestoreAndRestore1Green": true,
+    "manualAllFailureFirstSensitiveAssertionAndMaskingReviewBeforeRestore": true,
+    "exactMutantAndBackupPinsBeforeRestore": true,
+    "afterRestoreRequiresPristineQAndAllSelectedProtectedNativePins": true
+  },
+  "schemaFit": {
+    "currentB34OutcomeFieldsRead": true,
+    "pinnedB30ObservedJoinAndHookPassChecksRead": true,
+    "fixedCorpus": [
+      "tests/time/tsaClient.test.ts",
+      "tests/time/verifyTimestamp.test.ts"
+    ],
+    "closedRequiresTotal28AndNoSkippedCases": true,
+    "classificationBoundToSourceOperatorOutcomeHash": true,
+    "noPredictedFailureCount": true
+  },
+  "sourceControls": [
+    {
+      "id": "C1-certReq-false",
+      "target": "src/time/tsaClient.ts",
+      "oneExactMatch": true,
+      "originalAndProposedSha256Exact": true
+    },
+    {
+      "id": "C2-ignore-response-MIME",
+      "target": "src/time/tsaClient.ts",
+      "oneExactMatch": true,
+      "originalAndProposedSha256Exact": true
+    }
+  ],
+  "limits": [
+    "Static source/text/hash/JSON review only; neither helper was imported, parsed, compiled or executed.",
+    "Future actual binding, fresh canonical/control outcomes, manual classifications and restorations remain root-owned observations. This review supplies none of them.",
+    "Root must invoke ordinary Python without optimization and admit exact sealed helper bytes. Failures stop in place with retained private records; no recovery is inferred.",
+    "Compiled JavaScript/native files are preserved, not mutated or rebuilt by these controls. No crypto/grant, public TSA, ordered fallback, full suite, global quality, ownership release, whole issue or plan completion credit.",
+    "All existing namespace/compiler guards, deadlines, egress checks, Claude work, held decisions and missing-reservation/F37 limitations remain intact."
+  ]
+}

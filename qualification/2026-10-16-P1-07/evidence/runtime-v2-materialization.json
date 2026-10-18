@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-16T17:59:14.222922+00:00",
+  "sourceHead": "bf8836cd38d2879ccef11c6cfd1423edf0a96c0f",
+  "finiteRowsVerified": 159,
+  "staticReviewRead": true,
+  "fullV1AndExactV2DeltaRead": true,
+  "written": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+    "bytes": 28111,
+    "sha256": "4dfc2dc3a9c96a900286a728d5c2e0bace934a37c4ec549d45ef49486509c8ed"
+  },
+  "productionAndExistingTestsUntouched": true,
+  "executed": false
+}

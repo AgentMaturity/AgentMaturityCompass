@@ -1,0 +1,40 @@
+{
+  "schema": "p125-private-client-candidate-seal/1",
+  "at": "2026-10-16T21:21:58.586116+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-test-design/tsaClient.test.ts",
+      "bytes": 15569,
+      "sha256": "2e70ff1d331f9ec7263dc437119ce9ab505fc1e39c5fbbb27592569cad6c1cb8"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-test-design/README.md",
+      "bytes": 3964,
+      "sha256": "8f579095cd6e7f621099399ef452be9c63c3dd966d29064d3d53465f935379dc"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-test-design/matrix.json",
+      "bytes": 4298,
+      "sha256": "6e0c513e8c8137a867071bb1f56454ae49ee7aee8242eba0ac5fe9b1ea9ac615"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-test-design/resource-review.json",
+      "bytes": 3208,
+      "sha256": "5ebe657aeaf8f28651a0a0d34ca57a16f8bccd83f30349b5fe1730165bf232f8"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-test-design/author-review.json",
+      "bytes": 2593,
+      "sha256": "8c70915f7739c564e7df414c84f22eda1211abf51164d1f151c0b5d7e5dd0fe5"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-test-design/input-pins.json",
+      "bytes": 11482,
+      "sha256": "fe7e0d968c15e2c27274d08eabb8e990b892e1c0fce6d043e201036e2976b6d4"
+    }
+  ],
+  "fixedBodies": 11,
+  "sourceAllocated": false,
+  "execution": false,
+  "rootSoleMaterializerAndRunner": true
+}

@@ -1,0 +1,155 @@
+[
+  {
+    "name": "original-publication-contracts",
+    "cmd": "pnpm exec vitest run tests/publicationTruthfulness.test.ts tests/publicDistributionTruth.test.ts --reporter=json --outputFile=/private/tmp/p0-46-original-publication-contracts-20261015.json",
+    "exit": 0,
+    "durationMs": 1871,
+    "startedUtc": "2026-10-14T18:42:56.486767+00:00",
+    "log": "/private/tmp/p0-46-original-publication-contracts-20261015.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  },
+  {
+    "name": "action-shell-observer-first",
+    "cmd": "pnpm exec vitest run tests/amcActionLocalPnpmQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-46-action-shell-observer-first-20261015.json",
+    "exit": 0,
+    "durationMs": 3566,
+    "startedUtc": "2026-10-14T18:44:22.192912+00:00",
+    "log": "/private/tmp/p0-46-action-shell-observer-first-20261015.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  },
+  {
+    "name": "factual-count-update",
+    "cmd": "pnpm run gen-counts",
+    "exit": 0,
+    "durationMs": 500,
+    "startedUtc": "2026-10-14T18:44:51.810433+00:00",
+    "log": "/private/tmp/p0-46-factual-count-update-20261015.log",
+    "sourceHead": "d8e5168556aeea8e8c12cbc67848839824edbb48"
+  },
+  {
+    "name": "action-shell-order-historical-red",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-46-historical-shell-order-observer-20261015.mjs historical",
+    "exit": 1,
+    "durationMs": 725,
+    "startedUtc": "2026-10-14T18:46:38.075576+00:00",
+    "log": "/private/tmp/p0-46-action-shell-order-historical-red-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  },
+  {
+    "name": "final-build",
+    "cmd": "pnpm run build",
+    "exit": 0,
+    "durationMs": 29963,
+    "startedUtc": "2026-10-14T18:46:18.370325+00:00",
+    "log": "/private/tmp/p0-46-final-build-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  },
+  {
+    "name": "action-shell-order-current-green",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-46-historical-shell-order-observer-20261015.mjs current",
+    "exit": 0,
+    "durationMs": 469,
+    "startedUtc": "2026-10-14T18:46:57.201015+00:00",
+    "log": "/private/tmp/p0-46-action-shell-order-current-green-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  },
+  {
+    "name": "final-docs",
+    "cmd": "pnpm run check:docs-drift",
+    "exit": 0,
+    "durationMs": 867,
+    "startedUtc": "2026-10-14T18:47:50.664932+00:00",
+    "log": "/private/tmp/p0-46-final-docs-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  },
+  {
+    "name": "final-counts",
+    "cmd": "pnpm run check:counts",
+    "exit": 0,
+    "durationMs": 1474,
+    "startedUtc": "2026-10-14T18:47:50.677894+00:00",
+    "log": "/private/tmp/p0-46-final-counts-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  },
+  {
+    "name": "final-source-duplicates",
+    "cmd": "pnpm run check:duplicates",
+    "exit": 1,
+    "durationMs": 2667,
+    "startedUtc": "2026-10-14T18:47:50.644358+00:00",
+    "log": "/private/tmp/p0-46-final-source-duplicates-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  },
+  {
+    "name": "final-freeze",
+    "cmd": "pnpm run check:freeze",
+    "exit": 0,
+    "durationMs": 3201,
+    "startedUtc": "2026-10-14T18:47:50.673942+00:00",
+    "log": "/private/tmp/p0-46-final-freeze-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  },
+  {
+    "name": "final-architecture",
+    "cmd": "pnpm run check:architecture-boundaries",
+    "exit": 0,
+    "durationMs": 3850,
+    "startedUtc": "2026-10-14T18:47:50.659936+00:00",
+    "log": "/private/tmp/p0-46-final-architecture-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  },
+  {
+    "name": "final-bounded-node22",
+    "cmd": "pnpm exec vitest run tests/amcActionLocalPnpmQualification.test.ts tests/publicationTruthfulness.test.ts tests/publicDistributionTruth.test.ts --reporter=json --outputFile=/private/tmp/p0-46-final-bounded-node22-20261015.json",
+    "exit": 0,
+    "durationMs": 7585,
+    "startedUtc": "2026-10-14T18:47:50.670707+00:00",
+    "log": "/private/tmp/p0-46-final-bounded-node22-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  },
+  {
+    "name": "final-source-dead-code",
+    "cmd": "pnpm run check:dead-code",
+    "exit": 1,
+    "durationMs": 9177,
+    "startedUtc": "2026-10-14T18:47:50.671479+00:00",
+    "log": "/private/tmp/p0-46-final-source-dead-code-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  },
+  {
+    "name": "final-lint",
+    "cmd": "pnpm run lint",
+    "exit": 0,
+    "durationMs": 9545,
+    "startedUtc": "2026-10-14T18:47:50.665184+00:00",
+    "log": "/private/tmp/p0-46-final-lint-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  },
+  {
+    "name": "final-types",
+    "cmd": "pnpm run typecheck",
+    "exit": 0,
+    "durationMs": 36069,
+    "startedUtc": "2026-10-14T18:47:50.637093+00:00",
+    "log": "/private/tmp/p0-46-final-types-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  },
+  {
+    "name": "final-test-types",
+    "cmd": "pnpm run typecheck:tests",
+    "exit": 0,
+    "durationMs": 46949,
+    "startedUtc": "2026-10-14T18:47:50.678214+00:00",
+    "log": "/private/tmp/p0-46-final-test-types-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  },
+  {
+    "name": "final-clean-source",
+    "cmd": "pnpm run check:clean-source",
+    "exit": 0,
+    "durationMs": 57574,
+    "startedUtc": "2026-10-14T18:47:50.679769+00:00",
+    "log": "/private/tmp/p0-46-final-clean-source-20261015.log",
+    "sourceHead": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f"
+  }
+]

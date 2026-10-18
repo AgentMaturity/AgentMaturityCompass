@@ -4,7 +4,7 @@ AMC can mount an explicitly configured stdio or Streamable HTTP MCP server into 
 
 Review the discovered catalog and pin its SHA-256 digest. Select each remote tool and its action class explicitly. Mounted tools have stable names of the form `mcp_<server-id>_<tool-name-hash>`; the catalog retains the original name and description. They still need entries in the signed AMC tool allowlist and remain subject to the existing runtime firewall, budget, approval and evidence paths. No configuration or permission is widened automatically.
 
-At each invocation AMC re-reads the advertised catalog before dispatch. A changed digest, list-change notification, disconnect, timeout or cancellation disposes that connection and its registrations. Reconnection requires an explicit new mount with a reviewed catalog; stale grants are never reused automatically. Argument schemas are validated before calling the remote tool, and before a call that is not executed is simulated. A result that arrives after its grant was disposed is discarded, never replayed, and the failure says that the remote tool executed. Calls remain isolated to the owning toolset, agent and workspace; there is no global catalog cache.
+At each invocation AMC re-reads the advertised catalog before dispatch. A changed digest, list-change notification, disconnect, timeout or cancellation disposes that connection and its registrations. Reconnection requires an explicit new mount with a reviewed catalog; stale grants are never reused automatically. Argument schemas are validated before calling the remote tool, and before a call that is not executed is simulated. A result that arrives after its grant was disposed is discarded, never replayed, and the failure says that the remote tool executed. Any tool call that fails after it was sent (a timeout, a broken stream on any transport, or a result discarded because it fails the reviewed output schema or arrives after disposal) is reported `TOOL_OUTCOME_UNKNOWN` with an unknown effect, decided from AMC's own dispatch state, never from server text. A journaled call (by default every class except `READ_ONLY` and `WRITE_LOW`) then stays `outcome_unknown` and blocks the agent's journaled calls until it is reconciled. A call refused before it was sent stays an ordinary error. Calls remain isolated to the owning toolset, agent and workspace; there is no global catalog cache.
 
 The stdio server is a local program chosen by the operator; this is not a claim that its process or network activity is OS-sandboxed. A server can misrepresent its own implementation, so a schema digest proves the advertised contract was pinned, not that the server obeys it. The same limit applies to remote servers: an explicitly pinned endpoint is an operator trust decision, not proof of the server's implementation.
 
@@ -106,3 +106,33 @@ amc agent-loop mcp-catalog --config mcp.json --authorize
 AMC discovers the authorization server from the server's protected-resource metadata, checks that the metadata names this server, that the authorization server's metadata names the same issuer and that it supports S256 PKCE, then prints an authorization URL on stderr. Open it in a browser; AMC never opens one. The loopback callback checks `state` and the issuer (`iss`), exchanges the code with the PKCE verifier and the server's resource indicator, stores the grant in the AMC credential store under the issuer and resource, and reads the catalog. If the server answers `insufficient_scope`, AMC asks for the union of the granted and challenged scopes, at most twice. Server error text, codes and tokens are never printed.
 
 Later `agent-loop run` and `chat` invocations and ACP sessions rediscover the server's current issuer, use only the grant stored for that issuer and resource, refresh it when it is due, and send the token only in the `Authorization` header to the pinned endpoint. Without a usable grant they fail with `AUTH_REQUIRED` and the `--authorize` command. A token is never refreshed during a mount: if the server rejects it, the mount is disposed and the next mount refreshes or asks for `--authorize`. The `mcp-catalog` output and mount receipt record `auth: { issuer, scopes, tokenExpiresAt }`, never a token. Authorization-server endpoints must be HTTPS; literal loopback HTTP is accepted only for a loopback development MCP endpoint. Stdio servers keep using `envRefs`. Applications that call `mountNativeMcpServer` directly supply the resolved `Authorization` header themselves.
+
+## Limits and deliberate choices
+
+ADR 010's documented choices remain in force: every invocation rereads the catalog rather than using TTL/cache hints or `subscriptions/listen`; `input_required` fails closed without sampling, roots or elicitation; stdio termination requires a new reviewed mount. The protected-resource same-origin path-prefix relaxation and lack of a pinned authorization issuer in config remain documented limitations.
+
+Fixture-owned HTTP servers and callback-driver clients have observed request/response/socket closure. The product OAuth callback still calls `closeAllConnections()` and nonawaited `close()`; its internal server-close event was not observed. Public configuration resolution also retains its normal inherited environment and user dotenv layers, even with explicit credential paths. Direct fixture stores disable those layers. The evidence claims stay within those boundaries.
+
+A mount receipt for an OAuth server records the reviewed protocol and catalog and the issuer, scopes and expiry, never a token. This one comes from the synthetic loopback OAuth fixture; the issuer port is that run's, and its grant declared no expiry:
+
+```json
+{
+  "serverId": "oauth_fixture",
+  "catalogDigest": "25592d15431056566b4dde61e8de7fa3ceabbf6c4a25d497b21cb49446d11d48",
+  "protocol": {
+    "negotiatedVersion": "2026-07-28",
+    "mode": "stateless",
+    "serverInfo": {
+      "name": "synthetic-oauth-catalog",
+      "version": "1"
+    }
+  },
+  "auth": {
+    "issuer": "http://127.0.0.1:50185/issuer/path",
+    "scopes": [
+      "read"
+    ],
+    "tokenExpiresAt": null
+  }
+}
+```

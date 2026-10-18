@@ -1,0 +1,485 @@
+{
+  "kind": "actual current Node24 four-file MCP component qualification",
+  "fixture": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass",
+  "currentHead": "c4be164ea12d358ea30451391a6df29429fc6a7e",
+  "acceptedBase": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "node": "v24.21.0",
+  "pnpm": "10.33.0",
+  "gitNoLazyFetch": true,
+  "initialGitStatus": "",
+  "files": [
+    "tests/nativeMcpHttp.test.ts",
+    "tests/nativeMcpClient.test.ts",
+    "tests/reconciliationDefectsMcp.test.ts",
+    "tests/reconciliationDefectsMcpHttp.test.ts"
+  ],
+  "inputEquality": [
+    {
+      "path": "tests/nativeMcpHttp.test.ts",
+      "acceptedGitObject": "f5435997ab3528bcaa7ea3dfad00bc0ff6406aaf",
+      "fixtureGitObject": "f5435997ab3528bcaa7ea3dfad00bc0ff6406aaf",
+      "sha256": "20e91804c038935010788f95374607ee5fdcb8e7f57a9c089a00f9b2199f7eb6",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "tests/nativeMcpClient.test.ts",
+      "acceptedGitObject": "c66b99e9014a997c70323b2801a07490648d574d",
+      "fixtureGitObject": "c66b99e9014a997c70323b2801a07490648d574d",
+      "sha256": "258bd984c1bd4177501af51e6347dbedb11dfe9e4cab607c1e6325ae1ec23404",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "tests/reconciliationDefectsMcp.test.ts",
+      "acceptedGitObject": "cb096fca2b25a05b6147932c467f188dc6c8078d",
+      "fixtureGitObject": "cb096fca2b25a05b6147932c467f188dc6c8078d",
+      "sha256": "b666fe5f37a275b5ec8f452ada72467eeb4b3404709fd41fbe4215ff05d44b96",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "tests/reconciliationDefectsMcpHttp.test.ts",
+      "acceptedGitObject": "92edf1933317c328c2bcb7f05843d39e255e92cc",
+      "fixtureGitObject": "92edf1933317c328c2bcb7f05843d39e255e92cc",
+      "sha256": "f54e9b03d69b1df2788deb296616198982f28acef780d739f2bb1ee8a8e1948f",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "src/mcp/nativeMcpClient.ts",
+      "acceptedGitObject": "eb6f3e34141d3faf8a72a9385bf1332809c70676",
+      "fixtureGitObject": "eb6f3e34141d3faf8a72a9385bf1332809c70676",
+      "sha256": "d04eb8783176416a84f559c20d024a84823553888549d9f558a4347fadb50666",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "src/mcp/nativeMcpHttpTransport.ts",
+      "acceptedGitObject": "990e26b6d0c3e6679f2cecd8e95319b68234dcfc",
+      "fixtureGitObject": "990e26b6d0c3e6679f2cecd8e95319b68234dcfc",
+      "sha256": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "src/mcp/nativeMcpReconnect.ts",
+      "acceptedGitObject": "5f82845478de4781f49ce48bdf495e988e0c2ba3",
+      "fixtureGitObject": "5f82845478de4781f49ce48bdf495e988e0c2ba3",
+      "sha256": "fcd42ba8374d5571d45f788ef4f212ff42d96cec5efda5c33f3abf129cd255b6",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "src/mcp/nativeMcpReconnectStream.ts",
+      "acceptedGitObject": "5a26975c3fb6bc2dabb8266c2dfb868f1ccd1220",
+      "fixtureGitObject": "5a26975c3fb6bc2dabb8266c2dfb868f1ccd1220",
+      "sha256": "eb1acc7d1f7865490092e7e72b19e2353ba80e15db797a41db4bc25e492f35fc",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "src/setup/nativeMcpConfig.ts",
+      "acceptedGitObject": "469f7adc1badea4d5b1e7010b3b66747396da02e",
+      "fixtureGitObject": "469f7adc1badea4d5b1e7010b3b66747396da02e",
+      "sha256": "501c1076399b06878e14e7dabbcf3b0436648e0f1a9f9dc65c35151fc69a71a1",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "src/agent/agentToolset.ts",
+      "acceptedGitObject": "3dd1f0fdc22e57a8b6a338b339f7fe1252b88f02",
+      "fixtureGitObject": "3dd1f0fdc22e57a8b6a338b339f7fe1252b88f02",
+      "sha256": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "src/toolhub/toolhubValidators.ts",
+      "acceptedGitObject": "056b3ce86d4707e025d59ce383aa139e6bb3e9d5",
+      "fixtureGitObject": "056b3ce86d4707e025d59ce383aa139e6bb3e9d5",
+      "sha256": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "src/session/sessionService.ts",
+      "acceptedGitObject": "9e3b4d06f31b4dbd925eb2f622a9fc41ad8ef3c1",
+      "fixtureGitObject": "9e3b4d06f31b4dbd925eb2f622a9fc41ad8ef3c1",
+      "sha256": "748ea18097b8fd2cbd5b5636d2e13ad78e98b8cd5b1e2a8e972c6cb407d5ee28",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "src/workspace.ts",
+      "acceptedGitObject": "32e5e9c85c077fe84f2f4fb8d65b742208740d76",
+      "fixtureGitObject": "32e5e9c85c077fe84f2f4fb8d65b742208740d76",
+      "sha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "package.json",
+      "acceptedGitObject": "df32c3ae7f5f0ef1d21d590384f59e1aa6167fb8",
+      "fixtureGitObject": "df32c3ae7f5f0ef1d21d590384f59e1aa6167fb8",
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "acceptedGitObject": "97702e7ad5fc07b5d36a6f246a67f2394c25a13a",
+      "fixtureGitObject": "97702e7ad5fc07b5d36a6f246a67f2394c25a13a",
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "acceptedGitObject": "d03bdcfad97c928e1f415057176f1b5ec6ea9c03",
+      "fixtureGitObject": "d03bdcfad97c928e1f415057176f1b5ec6ea9c03",
+      "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+      "equalAcceptedBase": true
+    },
+    {
+      "path": "vitest.config.ts",
+      "acceptedGitObject": "e72e9654a9d602319c28febb5893da12eb5438b8",
+      "fixtureGitObject": "e72e9654a9d602319c28febb5893da12eb5438b8",
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "equalAcceptedBase": true
+    }
+  ],
+  "wholeProductionSrcTreeEqualAcceptedBase": true,
+  "sourceHashesBefore": {
+    "tests/nativeMcpHttp.test.ts": "20e91804c038935010788f95374607ee5fdcb8e7f57a9c089a00f9b2199f7eb6",
+    "tests/nativeMcpClient.test.ts": "258bd984c1bd4177501af51e6347dbedb11dfe9e4cab607c1e6325ae1ec23404",
+    "tests/reconciliationDefectsMcp.test.ts": "b666fe5f37a275b5ec8f452ada72467eeb4b3404709fd41fbe4215ff05d44b96",
+    "tests/reconciliationDefectsMcpHttp.test.ts": "f54e9b03d69b1df2788deb296616198982f28acef780d739f2bb1ee8a8e1948f",
+    "src/mcp/nativeMcpClient.ts": "d04eb8783176416a84f559c20d024a84823553888549d9f558a4347fadb50666",
+    "src/mcp/nativeMcpHttpTransport.ts": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b",
+    "src/mcp/nativeMcpReconnect.ts": "fcd42ba8374d5571d45f788ef4f212ff42d96cec5efda5c33f3abf129cd255b6",
+    "src/mcp/nativeMcpReconnectStream.ts": "eb1acc7d1f7865490092e7e72b19e2353ba80e15db797a41db4bc25e492f35fc",
+    "src/setup/nativeMcpConfig.ts": "501c1076399b06878e14e7dabbcf3b0436648e0f1a9f9dc65c35151fc69a71a1",
+    "src/agent/agentToolset.ts": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546",
+    "src/toolhub/toolhubValidators.ts": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f",
+    "src/session/sessionService.ts": "748ea18097b8fd2cbd5b5636d2e13ad78e98b8cd5b1e2a8e972c6cb407d5ee28",
+    "src/workspace.ts": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "pnpm-workspace.yaml": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+    "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+  },
+  "actualInstalledSdkVersion": "1.32.1",
+  "installedSdkHashes": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/node_modules/@modelcontextprotocol/sdk/package.json",
+      "sha256": "0216319ea53177f7ed419d660b2f52ccc7e3327e57f9ee2ef03225ff543aeae4",
+      "kind": "installed SDK package.json"
+    },
+    {
+      "module": "@modelcontextprotocol/sdk/client/index.js",
+      "url": "file:///Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/node_modules/@modelcontextprotocol/sdk/dist/esm/client/index.js",
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/node_modules/@modelcontextprotocol/sdk/dist/esm/client/index.js",
+      "sha256": "db6cc643f5cc095b2fd0b70bf691d1775f07a317e97555e3928559e815f5e32a"
+    },
+    {
+      "module": "@modelcontextprotocol/sdk/client/stdio.js",
+      "url": "file:///Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/node_modules/@modelcontextprotocol/sdk/dist/esm/client/stdio.js",
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/node_modules/@modelcontextprotocol/sdk/dist/esm/client/stdio.js",
+      "sha256": "298514feae7875117a119a2598b40f2346ef07c30152fa7ad2ffb6cfb51782bc"
+    },
+    {
+      "module": "@modelcontextprotocol/sdk/shared/protocol.js",
+      "url": "file:///Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/node_modules/@modelcontextprotocol/sdk/dist/esm/shared/protocol.js",
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/node_modules/@modelcontextprotocol/sdk/dist/esm/shared/protocol.js",
+      "sha256": "7ea9524fcde13f9bcb7ce4d1867fd28c7844b6311b43e3a816bb019a3b61e445"
+    }
+  ],
+  "reusedDependencyAudit": {
+    "receipt": "/private/tmp/p0-49-final-dependency-qualification-20261014.json",
+    "receiptSha256": "540d1e2ad26e116809935af868580028f2d4bbffa7d261dec337bc85785797f3",
+    "rawAudit": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/production-audit.stdout",
+    "rawAuditSha256": "c30e0af322a954d2a84a0b344aa586a7c82f6b8b477eaff81df8ddc26cc2f5f9",
+    "argv": [
+      "pnpm",
+      "audit",
+      "--prod",
+      "--audit-level=moderate",
+      "--json"
+    ],
+    "startedAt": "2026-10-14T14:50:10.063268+00:00",
+    "endedAt": "2026-10-14T14:50:10.902239+00:00",
+    "exitCode": 0,
+    "advisoryCount": 0,
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0
+      },
+      "dependencies": 192,
+      "devDependencies": 0,
+      "optionalDependencies": 0,
+      "totalDependencies": 192
+    },
+    "samePackageLockHashes": true,
+    "newAuditExecuted": false
+  },
+  "work": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-50-node24-mcp-components-20261014T150040Z",
+  "status": "MCP_COMPONENTS_QUALIFIED",
+  "execution": {
+    "argv": [
+      "/opt/homebrew/opt/node@24/bin/node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "tests/nativeMcpHttp.test.ts",
+      "tests/nativeMcpClient.test.ts",
+      "tests/reconciliationDefectsMcp.test.ts",
+      "tests/reconciliationDefectsMcpHttp.test.ts",
+      "--reporter=default",
+      "--reporter=json",
+      "--outputFile.json=/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-50-node24-mcp-components-20261014T150040Z/current-four-files.json"
+    ],
+    "startedAt": "2026-10-14T15:00:40.403632+00:00",
+    "endedAt": "2026-10-14T15:00:51.122511+00:00",
+    "durationSeconds": 10.719,
+    "exitCode": 0,
+    "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-50-node24-mcp-components-20261014T150040Z/current-four-files.log",
+    "logSha256": "cd5c922f84d871a9a85ad12701f115ca2c915b35f5e3039f0fa72011724f8c2b"
+  },
+  "actualReport": {
+    "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-50-node24-mcp-components-20261014T150040Z/current-four-files.json",
+    "sha256": "2a21f490d304c02413f90f7fc3f79f3baf26ba5261cee3a53a5aabac03006460",
+    "success": true,
+    "numTotalTests": 34,
+    "numPassedTests": 34,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "casesByFile": [
+    {
+      "path": "tests/nativeMcpClient.test.ts",
+      "caseCount": 15,
+      "cases": [
+        {
+          "fullName": "native MCP pinned stdio integration valid schemas execute through the signed allowlist; invalid arguments never reach the server",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "native MCP pinned stdio integration a mounted capability cannot bypass the independent signed allowlist",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "native MCP pinned stdio integration wrong catalog pins and absent remote grants leave no mounted capability",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "native MCP pinned stdio integration catalog drift is refused before dispatch and list-change notifications revoke active grants",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "native MCP pinned stdio integration output schemas on earlier catalog pages are enforced",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "native MCP pinned stdio integration input schemas sharing an id cannot reuse another tool's validator",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "native MCP pinned stdio integration output schemas sharing an id stay independent of SDK cache state",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "native MCP pinned stdio integration remote errors retain structured details and timeouts retain their separate failure fact",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "native MCP pinned stdio integration required task execution is explicitly refused instead of dispatching a synchronous call",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "native MCP pinned stdio integration explicit secrets are child-only, scrubbed from results and catalog leakage refuses",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "native MCP pinned stdio integration cancellation disposes the connection and prevents later calls",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "native MCP pinned stdio integration output schema validation precedes secret redaction",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "native MCP configuration admission a reviewed MCP-only policy is ready and late mounting still exposes and executes its pinned tool",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "native MCP configuration admission an explicitly wrong MCP context cannot qualify a reviewed subset",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "native MCP configuration admission pins exact config bytes, refuses literal secrets and checks the signed grant class",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "path": "tests/nativeMcpHttp.test.ts",
+      "caseCount": 15,
+      "cases": [
+        {
+          "fullName": "governed native Streamable HTTP executes false SSE with pinned origin/session and private header redaction",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "governed native Streamable HTTP executes true SSE with pinned origin/session and private header redaction",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "governed native Streamable HTTP configuration resolves header references only, pins bytes and refuses control/origin fields",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "governed native Streamable HTTP redirects never send credentials to a second origin",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "governed native Streamable HTTP authentication challenges do not enroll OAuth or expose response credentials",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "governed native Streamable HTTP session replacement is refused without using the replacement identity",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "governed native Streamable HTTP bounds declared oversized bodies",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "governed native Streamable HTTP bounds streamed oversized bodies",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "governed native Streamable HTTP catalog changes and credential leaks do not reach a remote tool",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "governed native Streamable HTTP catalog notifications dispose the grant without automatic reconnect",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "governed native Streamable HTTP idle notifications outlive request timeout, then expire at the independently configured bound",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "governed native Streamable HTTP protocol failure tolerates reentrant error and close handlers with one bounded termination",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "governed native Streamable HTTP a notification flood exhausts the bounded connection instead of accumulating state",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "governed native Streamable HTTP cancellation aborts the active stream, terminates the session and removes the grant",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "governed native Streamable HTTP timeouts and remote error results retain distinct failure facts",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "path": "tests/reconciliationDefectsMcp.test.ts",
+      "caseCount": 2,
+      "cases": [
+        {
+          "fullName": "AMC-1515 nativeMcpClient.ts:264 \u2014 a received result discarded after grant disposal a discarded received result says the remote tool executed and was not replayed",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "AMC-1515 nativeMcpClient.ts:236 \u2014 schema validation precedes simulation simulation refuses arguments that the reviewed schema refuses",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "path": "tests/reconciliationDefectsMcpHttp.test.ts",
+      "caseCount": 2,
+      "cases": [
+        {
+          "fullName": "AMC-1535 Streamable HTTP \u2014 AMC-1515 outcomes a non-EXECUTE call with schema-invalid arguments is refused without a remote call",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "AMC-1535 Streamable HTTP \u2014 AMC-1515 outcomes a result received after grant disposal is reported as executed and discarded",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    }
+  ],
+  "failedCases": [],
+  "allCurrentCasesPassed": true,
+  "sourceHashesAfter": {
+    "tests/nativeMcpHttp.test.ts": "20e91804c038935010788f95374607ee5fdcb8e7f57a9c089a00f9b2199f7eb6",
+    "tests/nativeMcpClient.test.ts": "258bd984c1bd4177501af51e6347dbedb11dfe9e4cab607c1e6325ae1ec23404",
+    "tests/reconciliationDefectsMcp.test.ts": "b666fe5f37a275b5ec8f452ada72467eeb4b3404709fd41fbe4215ff05d44b96",
+    "tests/reconciliationDefectsMcpHttp.test.ts": "f54e9b03d69b1df2788deb296616198982f28acef780d739f2bb1ee8a8e1948f",
+    "src/mcp/nativeMcpClient.ts": "d04eb8783176416a84f559c20d024a84823553888549d9f558a4347fadb50666",
+    "src/mcp/nativeMcpHttpTransport.ts": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b",
+    "src/mcp/nativeMcpReconnect.ts": "fcd42ba8374d5571d45f788ef4f212ff42d96cec5efda5c33f3abf129cd255b6",
+    "src/mcp/nativeMcpReconnectStream.ts": "eb1acc7d1f7865490092e7e72b19e2353ba80e15db797a41db4bc25e492f35fc",
+    "src/setup/nativeMcpConfig.ts": "501c1076399b06878e14e7dabbcf3b0436648e0f1a9f9dc65c35151fc69a71a1",
+    "src/agent/agentToolset.ts": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546",
+    "src/toolhub/toolhubValidators.ts": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f",
+    "src/session/sessionService.ts": "748ea18097b8fd2cbd5b5636d2e13ad78e98b8cd5b1e2a8e972c6cb407d5ee28",
+    "src/workspace.ts": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "pnpm-workspace.yaml": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+    "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+  },
+  "sourceUnchanged": true,
+  "finalHead": "c4be164ea12d358ea30451391a6df29429fc6a7e",
+  "finalGitStatus": "",
+  "privateRawCopies": [
+    {
+      "path": "/private/tmp/p0-50-node24-mcp-components-tests-20261014.log",
+      "sha256": "cd5c922f84d871a9a85ad12701f115ca2c915b35f5e3039f0fa72011724f8c2b",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-50-node24-mcp-components-20261014T150040Z/current-four-files.log"
+    },
+    {
+      "path": "/private/tmp/p0-50-node24-mcp-components-tests-20261014.json",
+      "sha256": "2a21f490d304c02413f90f7fc3f79f3baf26ba5261cee3a53a5aabac03006460",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-50-node24-mcp-components-20261014T150040Z/current-four-files.json"
+    }
+  ],
+  "limits": [
+    "Every currently registered case in four specified MCP files; no assumption of historical47count.",
+    "Local fixture HTTP/stdio operations only; no hosted CI/model/provider/release/publication calls.",
+    "Same-input P0-49 audit evidence is reused with actual hash/time and package/lock equality; no repeated audit.",
+    "No source/dependency/test edits, installs, rebuild, unrelated tests, broad suite or coverage qualification."
+  ]
+}

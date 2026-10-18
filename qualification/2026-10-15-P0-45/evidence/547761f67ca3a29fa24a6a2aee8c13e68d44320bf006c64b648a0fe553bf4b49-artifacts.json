@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/classification.json",
+    "bytes": 3920,
+    "sha256": "cba5e68aeaff48a717653d30fbea3ea224780fb696f5c7f989a154526ebb38d7"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/command.json",
+    "bytes": 1720,
+    "sha256": "77ed180097523781bc43f8e1a19d3493994da4d1d17053a15c4a819aff171394"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/inputs-after.json",
+    "bytes": 866,
+    "sha256": "b6c5d64aa7428b8ac875f493697a14c0064c8d40152b9ec3f258d0ae531c2aa2"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/inputs-before.json",
+    "bytes": 866,
+    "sha256": "c37d0555836994e9659484d9d54aae6ff755750e74ee841207a3ca1273c56139"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/observer.json",
+    "bytes": 8266,
+    "sha256": "99717e7631311c2284a14ebde0f323afc62cec4d73e720620f7de2d914a5412d"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "4594acb80aca9dd51c1f9be0366a6571b1b8563bf8c5158dca656af6328a7cd2"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/owned-process.json",
+    "bytes": 1345,
+    "sha256": "f0fb49ddbfc20eaccfcffafa7238dd2d22fb661fad27b5886c46fd2cb8b5d2b4"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/raw.json",
+    "bytes": 5523,
+    "sha256": "7c085e56dc6c4b1b0caa7be0625e6b6f1fd6842f369b1b4e7f1ef30f152fba62"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--mutant/stdout-stderr.log",
+    "bytes": 1959,
+    "sha256": "24debb849944edecfc72133344ab920c6f5804a250d5cc9304347b1e29db3c22"
+  }
+]

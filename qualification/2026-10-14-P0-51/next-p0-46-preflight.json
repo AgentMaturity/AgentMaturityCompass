@@ -1,0 +1,444 @@
+{
+  "issue": "P0-46",
+  "title": "Install the local AMC build with pnpm in the GitHub Action (merged e0fdc9c5)",
+  "mode": "Read-only next serial item preflight; no implementation or execution",
+  "createdUtc": "2026-10-14T18:12:51.155302+00:00",
+  "priority": {
+    "source": "/Users/sid/Downloads/Issues.md:56",
+    "priority": "High",
+    "due": "2026-10-07",
+    "route": "Agent-Doable",
+    "listedDependencies": [],
+    "exportStatus": "In review",
+    "eligibility": "Existing-source bounded qualification after P0-51 serial boundary; no Done inferred",
+    "selection": "P0-46 is an early ready High follow-up. P0-51 was chosen first for the Urgent P0-55 dependency chain; no plan numeric tie rule exists."
+  },
+  "authority": {
+    "standaloneSpec": "P0-46.md absent in inspected durable specs directory",
+    "associatedPullRequests": [],
+    "planTracker": "Agent contract.md:5 and105 specifies plan document, not Linear. Exact Linear title search returned zero and provides no authority.",
+    "boundedContractSources": [
+      "Issues.md:56",
+      "e0fdc9c5a40187bf73056752bb53cd1bed67f333 commit message and exact two-file diff",
+      ".changeset/amc-action-pnpm.md:5",
+      "amc-action/action.yml:64-86"
+    ],
+    "requirementsRecovered": [
+      "Set up pnpm/action-setup@v4 with version10.33.0 only when inputs.amc-version == local.",
+      "Resolve the action repository from GITHUB_ACTION_PATH/.., not caller working-directory.",
+      "Run pnpm --dir \"$ACTION_REPOSITORY\" install --frozen-lockfile and pnpm --dir \"$ACTION_REPOSITORY\" run build in local mode, replacing the nonworking npm ci pair.",
+      "Retain npm install -g \"$ACTION_REPOSITORY\" and normal local CLI usability.",
+      "Keep the release1.2.0 branch, unsupported-input refusal, existing scoring/outputs/comment/artifact/drop behavior and freeze unchanged.",
+      "Preserve source and record actual qualification. Contract requires CI green, merged source and a closing receipt before Done."
+    ],
+    "fullAcceptanceLimit": "No separate complete P0-46 acceptance checklist was recovered; bounded requirements come from original plan title and accepted authored fix. Do not fabricate a full issue specification."
+  },
+  "refs": {
+    "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+    "heldOnly": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+    "measuredQualificationSource": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+    "originalFix": "e0fdc9c5a40187bf73056752bb53cd1bed67f333"
+  },
+  "fixIsAncestorOf": {
+    "acceptedMain": true,
+    "heldOnly": true,
+    "measuredQualificationSource": true,
+    "originalFix": true
+  },
+  "originalFixScope": {
+    "paths": [
+      "amc-action/action.yml",
+      ".changeset/amc-action-pnpm.md"
+    ],
+    "addedLines": 14,
+    "deletedLines": 2,
+    "authorUtc": "2026-10-07T15:19:39Z",
+    "claudeCoauthored": true,
+    "unchangedAcceptedActionWorkflowChangeset": true,
+    "doNotRecreate": true
+  },
+  "sourcePins": [
+    {
+      "path": "amc-action/action.yml",
+      "sha256ByRef": {
+        "acceptedMain": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+        "heldOnly": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+        "measuredQualificationSource": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+        "originalFix": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970"
+      },
+      "measuredMatchesAccepted": true,
+      "heldMatchesAccepted": true
+    },
+    {
+      "path": ".github/workflows/amc-pr-gate.yml",
+      "sha256ByRef": {
+        "acceptedMain": "cac2129b01e6c3b4ce3717863de8baa39be15a7a1d825f012ede2c12c2754834",
+        "heldOnly": "cac2129b01e6c3b4ce3717863de8baa39be15a7a1d825f012ede2c12c2754834",
+        "measuredQualificationSource": "cac2129b01e6c3b4ce3717863de8baa39be15a7a1d825f012ede2c12c2754834",
+        "originalFix": "cac2129b01e6c3b4ce3717863de8baa39be15a7a1d825f012ede2c12c2754834"
+      },
+      "measuredMatchesAccepted": true,
+      "heldMatchesAccepted": true
+    },
+    {
+      "path": ".changeset/amc-action-pnpm.md",
+      "sha256ByRef": {
+        "acceptedMain": "9458151d5c9bcb9ef6afe881bcbef16f986fda99f1f5772620a41d190418fb51",
+        "heldOnly": "9458151d5c9bcb9ef6afe881bcbef16f986fda99f1f5772620a41d190418fb51",
+        "measuredQualificationSource": "9458151d5c9bcb9ef6afe881bcbef16f986fda99f1f5772620a41d190418fb51",
+        "originalFix": "9458151d5c9bcb9ef6afe881bcbef16f986fda99f1f5772620a41d190418fb51"
+      },
+      "measuredMatchesAccepted": true,
+      "heldMatchesAccepted": true
+    },
+    {
+      "path": "amc-action/README.md",
+      "sha256ByRef": {
+        "acceptedMain": "d89e6495329cc649f1b3d616df32bf2247752b60aa5f036b478b50618e7fcd77",
+        "heldOnly": "d89e6495329cc649f1b3d616df32bf2247752b60aa5f036b478b50618e7fcd77",
+        "measuredQualificationSource": "d89e6495329cc649f1b3d616df32bf2247752b60aa5f036b478b50618e7fcd77",
+        "originalFix": "d89e6495329cc649f1b3d616df32bf2247752b60aa5f036b478b50618e7fcd77"
+      },
+      "measuredMatchesAccepted": true,
+      "heldMatchesAccepted": true
+    },
+    {
+      "path": "package.json",
+      "sha256ByRef": {
+        "acceptedMain": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+        "heldOnly": "d05020f5cfb0e3d49b7fa1e6574331ad88a53053dfe3d51fb1c83f56405a4841",
+        "measuredQualificationSource": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+        "originalFix": "5036554ba9b936f825dd4d72ab173cf0b38b83c0d6f9e81855b09eb5c992b71f"
+      },
+      "measuredMatchesAccepted": true,
+      "heldMatchesAccepted": false
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256ByRef": {
+        "acceptedMain": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+        "heldOnly": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+        "measuredQualificationSource": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+        "originalFix": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+      },
+      "measuredMatchesAccepted": true,
+      "heldMatchesAccepted": true
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "sha256ByRef": {
+        "acceptedMain": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+        "heldOnly": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+        "measuredQualificationSource": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+        "originalFix": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23"
+      },
+      "measuredMatchesAccepted": true,
+      "heldMatchesAccepted": true
+    },
+    {
+      "path": "scripts/postinstall.js",
+      "sha256ByRef": {
+        "acceptedMain": "73c4c9530dbb3ea064113901077cf8cf74c440658f5aea304fd57ab349bb9ed6",
+        "heldOnly": "73c4c9530dbb3ea064113901077cf8cf74c440658f5aea304fd57ab349bb9ed6",
+        "measuredQualificationSource": "73c4c9530dbb3ea064113901077cf8cf74c440658f5aea304fd57ab349bb9ed6",
+        "originalFix": "73c4c9530dbb3ea064113901077cf8cf74c440658f5aea304fd57ab349bb9ed6"
+      },
+      "measuredMatchesAccepted": true,
+      "heldMatchesAccepted": true
+    },
+    {
+      "path": "tests/publicationTruthfulness.test.ts",
+      "sha256ByRef": {
+        "acceptedMain": "f7a25e5ed44edd81f9c0bdf3c1a0e431b6281b3e0620ff538e14bdb6bed13816",
+        "heldOnly": "f7a25e5ed44edd81f9c0bdf3c1a0e431b6281b3e0620ff538e14bdb6bed13816",
+        "measuredQualificationSource": "f7a25e5ed44edd81f9c0bdf3c1a0e431b6281b3e0620ff538e14bdb6bed13816",
+        "originalFix": "f7a25e5ed44edd81f9c0bdf3c1a0e431b6281b3e0620ff538e14bdb6bed13816"
+      },
+      "measuredMatchesAccepted": true,
+      "heldMatchesAccepted": true
+    },
+    {
+      "path": "tests/publicDistributionTruth.test.ts",
+      "sha256ByRef": {
+        "acceptedMain": "9e056b05fec82c95d542c726d01faf18b0928b90f5350520428232c8e64abb66",
+        "heldOnly": "414eeec30d8483a2cbbc258487338c53e982f237b316ff32ab3a4a0f6500e035",
+        "measuredQualificationSource": "9e056b05fec82c95d542c726d01faf18b0928b90f5350520428232c8e64abb66",
+        "originalFix": "9e056b05fec82c95d542c726d01faf18b0928b90f5350520428232c8e64abb66"
+      },
+      "measuredMatchesAccepted": true,
+      "heldMatchesAccepted": false
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "sha256ByRef": {
+        "acceptedMain": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+        "heldOnly": "58e2947e1841bac02d119827c08ee01477f345fc9f63131d569ed1637483eab7",
+        "measuredQualificationSource": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+        "originalFix": "8bd6da6d3f53e3b7ad170d3bd8c24550f6ade213b4f7bfef6a1c5c0fc9015b47"
+      },
+      "measuredMatchesAccepted": true,
+      "heldMatchesAccepted": false
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "sha256ByRef": {
+        "acceptedMain": "d83be1102ae95082028ab3bd1e35de8f36d83a5e7ddebb4278b7fd7a616ecb21",
+        "heldOnly": "8924e889f1c7d6fe43773f77d0a29dc530add8172971b9b4d502ff1c479a2e40",
+        "measuredQualificationSource": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+        "originalFix": "2fa724ef86dd56fea395808bae0e5ea08500202e7a77efa151e8c13e4ba69b2f"
+      },
+      "measuredMatchesAccepted": false,
+      "heldMatchesAccepted": false
+    }
+  ],
+  "existingTests": [
+    {
+      "path": "tests/publicationTruthfulness.test.ts:72-84",
+      "coverage": "Source/default distribution truth only; does not execute local installation or check pnpm ordering."
+    },
+    {
+      "path": "tests/publicDistributionTruth.test.ts:188-213",
+      "coverage": "Canonical amc launcher and no registry fallback only; does not execute action install."
+    }
+  ],
+  "dedicatedCurrentReceiptRecovered": false,
+  "pnpmSpecificActionRegressionTestRecovered": false,
+  "hostedEvidence": {
+    "queries": "Actual read-only gh run list, gh run view --json jobs/--log-failed and fix-associated PR API; no rerun triggered.",
+    "latestRuns": [
+      {
+        "conclusion": "failure",
+        "createdAt": "2026-10-07T14:40:17Z",
+        "databaseId": 37638657976,
+        "headBranch": "rtd/p0-21-typed-score-units",
+        "headSha": "8ca3b6e2b39ec179c5cdf5dbb46fda37d3178201",
+        "status": "completed",
+        "updatedAt": "2026-10-07T14:40:38Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37638657976"
+      },
+      {
+        "conclusion": "failure",
+        "createdAt": "2026-10-07T12:03:28Z",
+        "databaseId": 37618308406,
+        "headBranch": "rtd/p0-18-trust-tiers-from-provenance",
+        "headSha": "2a5d632588f5c198785aedf229a801ad0178938d",
+        "status": "completed",
+        "updatedAt": "2026-10-07T12:03:48Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37618308406"
+      },
+      {
+        "conclusion": "failure",
+        "createdAt": "2026-10-07T10:05:58Z",
+        "databaseId": 37605122889,
+        "headBranch": "rtd/p0-33-conformance-run-once",
+        "headSha": "b25e3d04a780b8b3350a844518214fb25f053765",
+        "status": "completed",
+        "updatedAt": "2026-10-07T10:06:20Z",
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37605122889"
+      }
+    ],
+    "latestJobs": {
+      "jobs": [
+        {
+          "completedAt": "2026-10-07T14:40:37Z",
+          "conclusion": "failure",
+          "databaseId": 112851464709,
+          "name": "amc-score",
+          "startedAt": "2026-10-07T14:40:21Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-07T14:40:22Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-07T14:40:21Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-07T14:40:27Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v6",
+              "number": 2,
+              "startedAt": "2026-10-07T14:40:22Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-07T14:40:34Z",
+              "conclusion": "failure",
+              "name": "Run ./amc-action",
+              "number": 3,
+              "startedAt": "2026-10-07T14:40:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-07T14:40:34Z",
+              "conclusion": "success",
+              "name": "Post Run ./amc-action",
+              "number": 5,
+              "startedAt": "2026-10-07T14:40:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-07T14:40:35Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v6",
+              "number": 6,
+              "startedAt": "2026-10-07T14:40:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-07T14:40:35Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 7,
+              "startedAt": "2026-10-07T14:40:35Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37638657976/job/112851464709"
+        }
+      ]
+    },
+    "confirmedOriginalFailure": {
+      "run": 37638657976,
+      "job": 112851464709,
+      "step": "Run ./amc-action",
+      "command": "npm ci --prefix \"$ACTION_REPOSITORY\"",
+      "error": "npm error code EUSAGE; The `npm ci` command can only install with an existing package-lock.json or npm-shrinkwrap.json with lockfileVersion >= 1.",
+      "rawLog": "/private/tmp/p0-46-hosted-readonly-20261014/original-failed-log.txt"
+    },
+    "latestReturnedRunPredatesFix": true,
+    "postFixPassingRunRecovered": false,
+    "currentMainPassingAmcScoreRecovered": false
+  },
+  "remainingWork": [
+    {
+      "kind": "Missing current qualification",
+      "detail": "The merged action bytes are unchanged, but no post-fix hosted pass or dedicated current action-install receipt is available."
+    },
+    {
+      "kind": "Runtime scope",
+      "detail": "Action default node-version is20; package.json engines is>=20, so no source engine mismatch exists. Local Node20 executable is absent; Node22/24 executables exist. A Node22 run covers selected input22 only, not the default20 or hostedUbuntu."
+    },
+    {
+      "kind": "Scope not repaired here",
+      "detail": "The existing initialize step swallows errors with || true; score-drop includes git fetch/stash/checkout/restore; comments and uploads are hosted effects. These are unchanged outside the two-file P0-46 fix; do not run them against shared checkout or claim all action behavior from install-only proof."
+    },
+    {
+      "kind": "Inherited acceptance debt",
+      "detail": "P0-22 two literal failures, P0-29 skipped reconciliation, P0-33/P0-47/P0-50 broad coverage/source-quality/CI obligations and P0-51 precedence conflict remain. This preflight makes no new measurement or closure of those tasks."
+    }
+  ],
+  "reservations": {
+    "source": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "explicitActionPathOrP046Match": false,
+    "genericSessionBucket": "RESERVATIONS.md:1496 claims every Agent-Doable item outside E17/Codex lanes, then lists issue keys without P0-46. Do not interpret absence of an explicit path match as blanket production ownership clearance.",
+    "protectedOverlaps": [
+      "src/cli.ts",
+      "src/cli/resultCommandRegistry.ts",
+      "src/repl/replParser.ts",
+      "API/Studio",
+      "src/a4/**",
+      "scripts/freeze-baseline.json"
+    ],
+    "qualifiedPath": "Existing-source, owned test/observer qualification needs no competing action rewrite. Root must recheck current reservations before any later production edit.",
+    "d15Registration": "Neither amc-action/action.yml nor amc-pr-gate.yml is named by the current plan-edits manifest. This is a lookup fact, not permission to alter snapshots or manifest."
+  },
+  "plannedAcceptanceCommands": {
+    "executeNow": false,
+    "existingFocused": "pnpm exec vitest run tests/publicationTruthfulness.test.ts tests/publicDistributionTruth.test.ts --reporter=default --reporter=json --outputFile.json=<owned-raw-report>",
+    "actualLocalInstallBlock": [
+      "ACTION_REPOSITORY=$(CDPATH= cd -- \"$GITHUB_ACTION_PATH/..\" && pwd)",
+      "pnpm --dir \"$ACTION_REPOSITORY\" install --frozen-lockfile",
+      "pnpm --dir \"$ACTION_REPOSITORY\" run build",
+      "npm install -g \"$ACTION_REPOSITORY\""
+    ],
+    "isolation": "Run the exact extracted local case from an owned fresh checkout with a fixture caller directory and GITHUB_ACTION_PATH. Scope npm_config_prefix, npm_config_cache, HOME and AMC_HOME to owned temporary paths, prepend prefix/bin to task PATH, set CI=true, and retain raw output plus before/after package/lock/freeze hashes. No global user prefix or shared checkout effects.",
+    "controls": [
+      "Install failure and build failure must stop before later commands under the original set -euo pipefail. An observation-only command shim can prove ordering/refusal; label it separately from real install proof.",
+      "A cold actual install/build plus selected installed amc --version and amc --help must pass through the private prefix; record actual resolved CLI path/hash.",
+      "Local setup is conditional; supported release1.2.0 must not run pnpm, while unsupported version refuses before network or installation. Observe branches without executing curl installer.",
+      "Keep dependency lock frozen and input bytes unchanged. A defect-removal witness must restore exact original bytes; do not update floors or weaken checks."
+    ],
+    "contractChecks": [
+      "npm run typecheck",
+      "npm run typecheck:tests",
+      "npm run lint",
+      "npm test",
+      "npm run check:counts",
+      "npm run check:docs-drift",
+      "npm run check:architecture-boundaries",
+      "npm run check:clean-source",
+      "npm run release:gate",
+      "npm run check:freeze",
+      "npm run check:qualification"
+    ],
+    "contractSource": "Agent contract.md:54-89,112; fresh measured baseline failures must remain explicit. This is a plan, not executed commands.",
+    "hostedBoundary": "Current-hosted action pass is still missing. Read-only current run queries may continue; this preflight authorizes no workflow trigger, PR comment, upload or publication."
+  },
+  "graph": {
+    "sourceGraph": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+    "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395",
+    "privateCopy": "/private/tmp/p0-46-graph-navigation-262iikrg",
+    "log": "/private/tmp/p0-46-graph-navigation-262iikrg/query.log",
+    "exit": 0,
+    "builtAtCommit": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+    "queries": [
+      "amc action workflow ci --budget1000",
+      "amc-action/README.md --budget600"
+    ],
+    "focusedLog": "/private/tmp/p0-46-graph-navigation-262iikrg/focused-query.log",
+    "result": "The root graph identified amc-action/README.md atL1 but broad traversal was truncated; YAML install/workflow paths are not modeled in the inspected graph nodes. Graph is stale and source pins are authoritative.",
+    "originalGraphUnchanged": true,
+    "modelTokenUsage": "No model extraction invoked; static query budgets1000/600 only."
+  },
+  "exactNextAction": "After root closes the bounded P0-51 receipt with its precedence conflict retained, pin its final measured source and protected input hashes. Create a new root-owned codex/P0-46 worktree from that measured source and qualify the unchanged accepted action locally through a private installation prefix. Add only a bounded observer/regression test if needed; preserve original action source and all foreign work. Record defaultNode20/hostedUbuntu limitations rather than mark Done.",
+  "evidence": [
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+    },
+    {
+      "path": "/Users/sid/Downloads/Agent contract.md",
+      "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f"
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04"
+    },
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-10-14-amc-current-plan-handoff/plan-evidence-index.json",
+      "sha256": "148a458e4e5375a41a57e49c917cbf94705387ca2f512c25ce363157dea76c8a"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/private/tmp/p0-46-hosted-readonly-20261014/fix-associated-prs.txt",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "/private/tmp/p0-46-hosted-readonly-20261014/latest-runs.txt",
+      "sha256": "bb2a760ebe34c1f327c53736e74ea2272d342888cefeed69773cc6a9438e3d2c",
+      "bytes": 987
+    },
+    {
+      "path": "/private/tmp/p0-46-hosted-readonly-20261014/original-failed-jobs.txt",
+      "sha256": "e378d398560ae68b6839803c365eb0ebc358ce3f1148c848f82788f3a7bc698b",
+      "bytes": 1232
+    },
+    {
+      "path": "/private/tmp/p0-46-hosted-readonly-20261014/original-failed-log.txt",
+      "sha256": "5cb702c9c69f2cdd9f0d67c27642a675346103d6557fd7dd597eab1e70d47384",
+      "bytes": 55053
+    }
+  ],
+  "noMutations": "Only reads, Git-object comparisons, read-only hosted queries and new private preflight/navigation evidence. No builds, tests, runtime imports, servers, source/test edits, refs, pushes, trackers, reservation/Claude notes or messages to Claude."
+}

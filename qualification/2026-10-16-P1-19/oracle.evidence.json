@@ -1,0 +1,907 @@
+{
+  "schema": "p119-oracle-bounded-evidence/1",
+  "source": "2e136618b1b011a7269f37f8c2715b180b5b5a46",
+  "formalAcceptanceClosed": false,
+  "componentCheckpoint": {
+    "source": "b9ba9a092f491d821c154679473b6f38c75b935d",
+    "tests": 120,
+    "preservedFiles": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/README.md",
+        "bytes": 8496,
+        "sha256": "b25a234319ae2148ec794e27d9db426d6880879aef36ade0e1331cf07d31486e"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/evidence.json",
+        "bytes": 164462,
+        "sha256": "d5083491b84693d0fc1ddc47b5d9108ed82cf913efd32a0b22eda42e3b4bdf46"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/fresh-components.observer.json",
+        "bytes": 59827,
+        "sha256": "89c18a7c1a8a7a280110de96ba239b0cde0863219ecfe1e66d02e72479b93c18"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/fresh-components.raw.json",
+        "bytes": 45656,
+        "sha256": "75648cf514242ed13cb3c504167439ba18194fc66551bddf85bd7049365d8e24"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/original-components.raw.json",
+        "bytes": 42304,
+        "sha256": "2c120b24d0281bca053e24b876f64548d88797ffd9a7973f08e8407d88397951"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/receipt.json",
+        "bytes": 8265,
+        "sha256": "9525e5ce3be3759dbddf59e37fc40f0195333f5e1459c4ffd7de808a32ab55ba"
+      }
+    ]
+  },
+  "freshTests": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0,
+    "identities": [
+      "P1-19 finite independent oracle with genuine signed action producers a real completed journaled payment passes every mandatory oracle check",
+      "P1-19 finite independent oracle with genuine signed action producers a second real payment under another key and the same reference specifically fails no-duplicate",
+      "P1-19 finite independent oracle with genuine signed action producers an actual post-authorization amount corruption specifically fails payload-bound",
+      "P1-19 finite independent oracle with genuine signed action producers a genuine provider-only commit has no matching completed AMC receipt",
+      "P1-19 finite independent oracle with genuine signed action producers a copied closed log with its final newline removed specifically fails txlog-chain",
+      "P1-19 finite independent oracle with genuine signed action producers adapter stdout pass and verified flags cannot manufacture a receipt or trust anchor",
+      "P1-19 finite independent oracle with genuine signed action producers changing a genuine pre-dispatch argument preimage cannot preserve authorization",
+      "P1-19 finite independent oracle with genuine signed action producers a corrupted genuine decision signature is refused without re-signing authority",
+      "P1-19 finite independent oracle with genuine signed action producers a genuine signed one-decision policy cannot weaken the external two-decision oracle profile",
+      "P1-19 finite independent oracle with genuine signed action producers unsupported case expectations fail inputs instead of being silently ignored"
+    ]
+  },
+  "commands": [
+    {
+      "phase": "p119-oracle-missing-positive-v3",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOracle.test.ts -t 'a real completed journaled payment passes every mandatory oracle check' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-missing-positive-v3.producer.json",
+      "exit": 1,
+      "durationMs": 2090,
+      "startedUtc": "2026-10-15T22:39:43.618100+00:00",
+      "endedUtc": "2026-10-15T22:39:45.720941+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/stdout-stderr.log",
+      "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "ownedProcess": {
+        "pid": 2459,
+        "ownedPgid": 2459,
+        "observedPgidAfterLaunch": 2459,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/lighthouse/financeOracle.test.ts",
+          "-t",
+          "a real completed journaled payment passes every mandatory oracle check",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-missing-positive-v3.producer.json"
+        ],
+        "startedUtc": "2026-10-15T22:39:43.618100+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-missing-positive-v3.producer.json",
+          "bytes": 5161,
+          "sha256": "d7624fdce5f8db92ce22a71e4b5fd111629b17e1ed8476d9671e4f4cc4194e9c"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/raw.json",
+          "bytes": 5161,
+          "sha256": "d7624fdce5f8db92ce22a71e4b5fd111629b17e1ed8476d9671e4f4cc4194e9c"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/observer.json",
+          "bytes": 8722,
+          "sha256": "a03cd32777c6dea8f5f193b57ed79481bd9c46f2db652393099edd81aa5ead4d"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-v2-tests-v4-initial",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOracle.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v2-tests-v4-initial.producer.json",
+      "exit": 1,
+      "durationMs": 23159,
+      "startedUtc": "2026-10-15T22:44:26.309934+00:00",
+      "endedUtc": "2026-10-15T22:44:49.482753+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/stdout-stderr.log",
+      "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "ownedProcess": {
+        "pid": 3089,
+        "ownedPgid": 3089,
+        "observedPgidAfterLaunch": 3089,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/lighthouse/financeOracle.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v2-tests-v4-initial.producer.json"
+        ],
+        "startedUtc": "2026-10-15T22:44:26.309934+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v2-tests-v4-initial.producer.json",
+          "bytes": 10219,
+          "sha256": "fb59655cfac82613cbfbbdedaf12fd30ed442bf8e59d109f764c505cb3a2cc93"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/raw.json",
+          "bytes": 10219,
+          "sha256": "fb59655cfac82613cbfbbdedaf12fd30ed442bf8e59d109f764c505cb3a2cc93"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/observer.json",
+          "bytes": 20987,
+          "sha256": "1231f47e723cbdac903e3f63a30ee089d6c633d3b58af07c8b41313dfbc383bc"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-tests-v4-typecheck",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 40324,
+      "startedUtc": "2026-10-15T22:46:16.430710+00:00",
+      "endedUtc": "2026-10-15T22:46:56.774865+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-tests-v4-typecheck/stdout-stderr.log",
+      "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "ownedProcess": {
+        "pid": 3487,
+        "ownedPgid": 3487,
+        "observedPgidAfterLaunch": 3487,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.tests.json",
+          "--noEmit"
+        ],
+        "startedUtc": "2026-10-15T22:46:16.430710+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-v4-positive",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOracle.test.ts -t 'a real completed journaled payment passes every mandatory oracle check' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v4-positive.producer.json",
+      "exit": 0,
+      "durationMs": 3369,
+      "startedUtc": "2026-10-15T22:51:00.514526+00:00",
+      "endedUtc": "2026-10-15T22:51:03.896368+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/stdout-stderr.log",
+      "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "ownedProcess": {
+        "pid": 4196,
+        "ownedPgid": 4196,
+        "observedPgidAfterLaunch": 4196,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/lighthouse/financeOracle.test.ts",
+          "-t",
+          "a real completed journaled payment passes every mandatory oracle check",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v4-positive.producer.json"
+        ],
+        "startedUtc": "2026-10-15T22:51:00.514526+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v4-positive.producer.json",
+          "bytes": 4794,
+          "sha256": "7aa8a0a6b885d51f2c98cc5360aa8a9e5d2cdd6f23dbb8c9144ca8842b47ebcb"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/raw.json",
+          "bytes": 4794,
+          "sha256": "7aa8a0a6b885d51f2c98cc5360aa8a9e5d2cdd6f23dbb8c9144ca8842b47ebcb"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/observer.json",
+          "bytes": 6486,
+          "sha256": "9f4f6f88886582872ac6cba363ab1df301d0939121c203117bc534e8244ad3f0"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-v4-all",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOracle.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v4-all.producer.json",
+      "exit": 0,
+      "durationMs": 26394,
+      "startedUtc": "2026-10-15T22:51:18.609232+00:00",
+      "endedUtc": "2026-10-15T22:51:45.017029+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/stdout-stderr.log",
+      "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "ownedProcess": {
+        "pid": 4240,
+        "ownedPgid": 4240,
+        "observedPgidAfterLaunch": 4240,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/lighthouse/financeOracle.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v4-all.producer.json"
+        ],
+        "startedUtc": "2026-10-15T22:51:18.609232+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v4-all.producer.json",
+          "bytes": 5041,
+          "sha256": "c371c63275f24e01ed89218cf994a1dae60a30dd449e227539c8ba5e4b502392"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/raw.json",
+          "bytes": 5041,
+          "sha256": "c371c63275f24e01ed89218cf994a1dae60a30dd449e227539c8ba5e4b502392"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/observer.json",
+          "bytes": 6504,
+          "sha256": "3741aa933153a06f73080f7e6859592c36e093b79c58cb0f85c9db97816767f8"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-counts-before",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 1,
+      "durationMs": 299,
+      "startedUtc": "2026-10-15T22:51:58.589763+00:00",
+      "endedUtc": "2026-10-15T22:51:58.901067+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-before/stdout-stderr.log",
+      "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "ownedProcess": {
+        "pid": 4384,
+        "ownedPgid": 4384,
+        "observedPgidAfterLaunch": 4384,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--check"
+        ],
+        "startedUtc": "2026-10-15T22:51:58.589763+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-counts-generate",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 261,
+      "startedUtc": "2026-10-15T22:52:31.608777+00:00",
+      "endedUtc": "2026-10-15T22:52:31.881339+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-generate/stdout-stderr.log",
+      "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "ownedProcess": {
+        "pid": 4476,
+        "ownedPgid": 4476,
+        "observedPgidAfterLaunch": 4476,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--write"
+        ],
+        "startedUtc": "2026-10-15T22:52:31.608777+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-lint",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 3101,
+      "startedUtc": "2026-10-15T22:53:24.606985+00:00",
+      "endedUtc": "2026-10-15T22:53:27.720139+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-lint/stdout-stderr.log",
+      "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "ownedProcess": {
+        "pid": 4562,
+        "ownedPgid": 4562,
+        "observedPgidAfterLaunch": 4562,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "lint"
+        ],
+        "startedUtc": "2026-10-15T22:53:24.606985+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+      "exit": 0,
+      "durationMs": 1481,
+      "startedUtc": "2026-10-15T22:53:27.838592+00:00",
+      "endedUtc": "2026-10-15T22:53:29.332792+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-freeze/stdout-stderr.log",
+      "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "ownedProcess": {
+        "pid": 4594,
+        "ownedPgid": 4594,
+        "observedPgidAfterLaunch": 4594,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/check-freeze.mjs"
+        ],
+        "startedUtc": "2026-10-15T22:53:27.838592+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-counts-final",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 223,
+      "startedUtc": "2026-10-15T22:53:29.448840+00:00",
+      "endedUtc": "2026-10-15T22:53:29.684126+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-final/stdout-stderr.log",
+      "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "ownedProcess": {
+        "pid": 4624,
+        "ownedPgid": 4624,
+        "observedPgidAfterLaunch": 4624,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--check"
+        ],
+        "startedUtc": "2026-10-15T22:53:29.448840+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-docs",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+      "exit": 0,
+      "durationMs": 159,
+      "startedUtc": "2026-10-15T22:53:29.796759+00:00",
+      "endedUtc": "2026-10-15T22:53:29.966890+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-docs/stdout-stderr.log",
+      "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "ownedProcess": {
+        "pid": 4630,
+        "ownedPgid": 4630,
+        "observedPgidAfterLaunch": 4630,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/docs-drift-check.mjs"
+        ],
+        "startedUtc": "2026-10-15T22:53:29.796759+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-architecture",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+      "exit": 0,
+      "durationMs": 1567,
+      "startedUtc": "2026-10-15T22:53:30.078727+00:00",
+      "endedUtc": "2026-10-15T22:53:31.657293+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-architecture/stdout-stderr.log",
+      "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "ownedProcess": {
+        "pid": 4636,
+        "ownedPgid": 4636,
+        "observedPgidAfterLaunch": 4636,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/architecture-boundaries-check.mjs"
+        ],
+        "startedUtc": "2026-10-15T22:53:30.078727+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-duplicates",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
+      "exit": 1,
+      "durationMs": 469,
+      "startedUtc": "2026-10-15T22:53:31.773333+00:00",
+      "endedUtc": "2026-10-15T22:53:32.254405+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-duplicates/stdout-stderr.log",
+      "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "ownedProcess": {
+        "pid": 4644,
+        "ownedPgid": 4644,
+        "observedPgidAfterLaunch": 4644,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/source-quality.mjs",
+          "duplicates"
+        ],
+        "startedUtc": "2026-10-15T22:53:31.773333+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-deadcode",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+      "exit": 1,
+      "durationMs": 2958,
+      "startedUtc": "2026-10-15T22:53:32.370892+00:00",
+      "endedUtc": "2026-10-15T22:53:35.341238+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-deadcode/stdout-stderr.log",
+      "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+      "ownedProcess": {
+        "pid": 4652,
+        "ownedPgid": 4652,
+        "observedPgidAfterLaunch": 4652,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/source-quality.mjs",
+          "dead-code"
+        ],
+        "startedUtc": "2026-10-15T22:53:32.370892+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-clean-source",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 52005,
+      "startedUtc": "2026-10-15T22:54:38.862918+00:00",
+      "endedUtc": "2026-10-15T22:55:30.881358+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-clean-source/stdout-stderr.log",
+      "head": "2e136618b1b011a7269f37f8c2715b180b5b5a46",
+      "headAfter": "2e136618b1b011a7269f37f8c2715b180b5b5a46",
+      "ownedProcess": {
+        "pid": 4813,
+        "ownedPgid": 4813,
+        "observedPgidAfterLaunch": 4813,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/clean-source-check.mjs",
+          "--keep"
+        ],
+        "startedUtc": "2026-10-15T22:54:38.862918+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-oracle-fresh",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-UizbGn/checkout --config /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-UizbGn/checkout/vitest.config.ts tests/lighthouse/financeOracle.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-fresh.producer.json",
+      "exit": 0,
+      "durationMs": 26801,
+      "startedUtc": "2026-10-15T22:56:00.750327+00:00",
+      "endedUtc": "2026-10-15T22:56:27.564531+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-fresh/stdout-stderr.log",
+      "head": "2e136618b1b011a7269f37f8c2715b180b5b5a46",
+      "headAfter": "2e136618b1b011a7269f37f8c2715b180b5b5a46",
+      "ownedProcess": {
+        "pid": 5217,
+        "ownedPgid": 5217,
+        "observedPgidAfterLaunch": 5217,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "--root",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-UizbGn/checkout",
+          "--config",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-UizbGn/checkout/vitest.config.ts",
+          "tests/lighthouse/financeOracle.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-fresh.producer.json"
+        ],
+        "startedUtc": "2026-10-15T22:56:00.750327+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-fresh.producer.json",
+          "bytes": 5059,
+          "sha256": "ebf749148ca790d1a366155c43349783fec134f8b669ea328e7f9575287f3c6b"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-fresh/raw.json",
+          "bytes": 5059,
+          "sha256": "ebf749148ca790d1a366155c43349783fec134f8b669ea328e7f9575287f3c6b"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-fresh/observer.json",
+          "bytes": 6544,
+          "sha256": "3207b1ccc87e3f2645a538f81b7d0be7cb54d9c26603a3160d97427c3f11f6a6"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    }
+  ],
+  "freshIndependentAuditSummary": {
+    "emptyWalCreated": 9,
+    "coldVerifiers": 12,
+    "fixtures": 10,
+    "providerRows": 105,
+    "paymentPosts": 11,
+    "commits": 11,
+    "launcherChildren": 33,
+    "providerChildren": 10,
+    "oracleOutputs": 13,
+    "passVerdicts": 4,
+    "failVerdicts": 9,
+    "walUnchanged": 3
+  },
+  "current17SourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/finance-independent-oracle.md",
+      "bytes": 289,
+      "sha256": "9cd61cf5e9c34b489394425f8d7d4232b8e5b91e68c22dcd4f1a55f955a303be"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "eb1178ec67cc7c3a2952a7285404aed69ff8abc612edaed0cbec627a602a33cb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+      "bytes": 59828,
+      "sha256": "dde61133a882de2c1a5bfd3fe936529fdc6731076a393cb053516cec63068c1a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+      "bytes": 11481,
+      "sha256": "37e41257bae8be1e8ec1177dc8e3083f36d3eaf44af1a75645dafc2a206d893c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "4cdf3ea7cc53d86f2b3d5c09132fd1235165a7f935a7f5cfcd1723d659399875"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "b2b659d6f50009b56cd7a10905b22ee542ccb1ac4a0b9a8cfae3a52ea6466492"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "6f4a0af209490501133fcf8cd8e31aa88be2a3fc7232a17f65b8cf727ce452ed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "a4e29065c022b69e8a722c715e7f256e1b72bdc24666bb91a78a774d1e1150ba"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/README.md",
+      "bytes": 2204,
+      "sha256": "4997a2c78ef77eadf16dadee40451f66f5016d4f1416ef8c7bb0c04d787a8406"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 21328,
+      "sha256": "cd745ddae7cce98a5285be95d4cce815f542d3c9f218e976be5c374d3b5f858f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 29832,
+      "sha256": "92b25937b06aef01367007961944d479cf6febad3e8b3da5d52094d8741ae869"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+      "bytes": 33264,
+      "sha256": "71a0979b2408cd6eb77261d184c2248387f5a938e0f95ef315ce465e511d9923"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+      "bytes": 5398,
+      "sha256": "080f70bc5ce81013b55735343a3ed7a504a5649f911bc5d05e499af96d3c863d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "c9d92217734286a75df14c64eb1921150ab7eda31854545ec88419e7cd9ec77a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+      "bytes": 43520,
+      "sha256": "3dd2cb17bbba6cc69572fdcdd72d17ab6fe5184c0f29bee4c8dcd931c6b076a4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+      "bytes": 11197,
+      "sha256": "2aaaabcf08756ed1c7840feec211bef1c220d680b34f9f4ed877314a69f2e1f9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "44987e4dca9d6872ac9c76ba2fb82646d6b042f3b3cbc7d7a9177b0f978a1cac"
+    }
+  ],
+  "protectedInputAttribution": {
+    "originalDesignPins": 52,
+    "unchangedDesignPins": 51,
+    "authorizedDesignPinAppend": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+      "originalPin": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+        "bytes": 8551,
+        "sha256": "1fe44a2e01c5ea8ea02199ff404312617117dd02f1621af5c1e09fbf7ebb9ab5"
+      },
+      "appendMetadataPin": {
+        "path": "/private/tmp/p1-19-oracle-implementation-20261016/finance-docs-oracle-update.json",
+        "bytes": 1322,
+        "sha256": "8acabeae011d2f9c4a03540082dee912c3f06af750de819232af52bf30a8aeb5"
+      },
+      "exactOriginalPrefixVerifiedAtPreparation": true
+    },
+    "protectedOriginalPins29": "Historical source manifest declares 29 protected originals. This materializer rechecks all52 direct design inputs with the explicit authorized documentation overlay, and preserves that declaration without inventing a separate29-file audit."
+  },
+  "historicalMetadata": "The source manifest was captured before commit. Its pending flag is superseded by source-commit-result and fresh root/audit evidence; original bytes are retained.",
+  "builder": {
+    "path": "/private/tmp/p1-19-oracle-implementation-20261016/qualification-supplement-proposal/build-oracle-supplement-v2.py",
+    "sha256": "c75c748724f13a6505ebc3e4c83a42a8356f46c0577defdf6c78a649628f0e33",
+    "inputsSha256": "523ad82dd10f0a4ced90a09f10a30667702d6eaeacc06071f20b8ee3c9a98a52"
+  },
+  "validation": "Pending root execution: unchanged validator on a byte-exact supplement mirror, then the whole qualification root. This builder does not run validation.",
+  "writeBoundary": "All bodies and output paths are checked before first write. Exclusive writes are nontransactional; retain partial outputs on any failure. No overwrite, trim, split, cleanup, product runtime, SQL or source edit."
+}

@@ -132,7 +132,9 @@ function verifyToolsConfigBytes(workspace: string, explicitPath?: string): Verif
     return {
       valid: false,
       signatureExists: true,
-      reason: typeof code === "string" ? `tools config unreadable (${code})` : `invalid signature payload: ${String(error)}`,
+      reason: typeof code === "string" ? `tools config unreadable (${code})`
+        : /is a symlink/.test(String(error)) ? "tools config path refused (symlink)"
+          : `invalid signature payload (${error instanceof Error ? error.name : "Error"})`,
       digestSha256: null,
       bytes: null
     };

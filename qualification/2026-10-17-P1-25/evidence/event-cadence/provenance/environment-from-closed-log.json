@@ -1,0 +1,21 @@
+{
+  "schema": "p125ec-author-environment-observation-from-actual-closed-log/1",
+  "command": {
+    "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125ec-actual-environment/command.json",
+    "bytes": 2000,
+    "sha256": "3ee125d9877cf3649a646aa7ef68139cbb850facb86c16e13a57253cfe639c26"
+  },
+  "log": {
+    "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125ec-actual-environment/stdout-stderr.log",
+    "bytes": 85,
+    "sha256": "c733bd35396cfc24b4c27868edabf2cd8f354ec0f6c19ba5c8a908d8808c12a7"
+  },
+  "environment": {
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "os": "Darwin 25.6.0",
+    "arch": "arm64"
+  },
+  "nativeAbiPrivateContext": "127",
+  "noNewCommandOrFabricatedRootEnvironmentFile": true
+}

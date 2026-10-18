@@ -1,0 +1,57 @@
+{
+  "schema": "p126-source-run-review-seal/1",
+  "at": "2026-10-16T20:40:51.507697+00:00",
+  "blockers": [],
+  "inputCount": 150,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-run-review/README.md",
+      "bytes": 2193,
+      "sha256": "13f4ab6972e804888e75f604dd3847fd8b346f2ffe6833ce01dc410d0bc1dbc8",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-run-review/README.md",
+      "dev": 16777231,
+      "inode": 543338912,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-run-review/review.json",
+      "bytes": 5854,
+      "sha256": "bfc94f80408ca111c22df8a1eb228fb40991f23262416d014c97560c473a7c37",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-run-review/review.json",
+      "dev": 16777231,
+      "inode": 543338911,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-run-review/joins.json",
+      "bytes": 4732,
+      "sha256": "2ef98525099754d2ccbcecbae8219ca913cdf8d60cfec38981ea1cf526e1b670",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-run-review/joins.json",
+      "dev": 16777231,
+      "inode": 543338909,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-run-review/preservation.json",
+      "bytes": 53434,
+      "sha256": "60889d5b0a09c6fe23354362a1f2228ef73ed0353ee5d45f48a4f84f3d42d64f",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-run-review/preservation.json",
+      "dev": 16777231,
+      "inode": 543338910,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-run-review/input-pins.json",
+      "bytes": 62729,
+      "sha256": "4d0e17915f1b58a62c7f123bc7da4b3f9c900d8307b0b732d54bba656b9c1148",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-run-review/input-pins.json",
+      "dev": 16777231,
+      "inode": 543338913,
+      "nlink": 1
+    }
+  ],
+  "allInputOutputPinsRechecked": true,
+  "productOrHelperExecution": false,
+  "privateOnly": true,
+  "fullIssueDone": false
+}

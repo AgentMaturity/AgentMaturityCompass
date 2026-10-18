@@ -3,6 +3,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { afterEach, describe, expect, test } from "vitest";
+import { writeExecutiveBriefArtifact } from "../src/executive/brief.js";
+import { getPublicMethodologyManifest } from "../src/methodology/publicMethodology.js";
+import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../src/claims/eligibility/render.js";
 
 const roots: string[] = [];
 
@@ -58,6 +61,34 @@ afterEach(() => {
 });
 
 describe("executive brief artifact", () => {
+  test.each(["html", "markdown"] as const)("the %s brief preserves a 1.1.1 run's legacy claim and legend", (format) => {
+    const root = tempRoot();
+    const runId = "55555555-5555-4555-8555-555555555555";
+    writeRun(root, runId, { methodology: { ...getPublicMethodologyManifest(), amcVersion: "1.1.1" } });
+    const artifact = writeExecutiveBriefArtifact({ workspace: root, runId, format, now: new Date("2026-06-16T00:00:00Z") });
+    const content = readFileSync(artifact.path, "utf8");
+    expect(content).toBe(artifact.content);
+    expect(artifact.claim.claimKind).toBe("self_reported");
+    expect(artifact.claim.provenance.legacy?.version).toBe("1.1.1");
+    expect(content).toContain("Legacy (1.x), self-reported");
+    expect(content.split("\n").find((line) => line.includes("Claim:"))).toMatchSnapshot();
+    expect(content).toContain(formatClaimLabel(renderClaimLabel(artifact.claim), format === "html" ? "studio" : "report"));
+    expect(content).toContain(renderClaimLegend(format === "html" ? "html" : "markdown"));
+  });
+
+  test.each(["html", "markdown"] as const)("the %s brief does not promote an unsealed current run", (format) => {
+    const root = tempRoot();
+    const runId = "66666666-6666-4666-8666-666666666666";
+    writeRun(root, runId, { methodology: getPublicMethodologyManifest() });
+    const artifact = writeExecutiveBriefArtifact({ workspace: root, runId, format, now: new Date("2026-06-16T00:00:00Z") });
+    expect(artifact.claim.claimKind).toBe("self_reported");
+    expect(artifact.claim.statusDimensions.result).toBe("not_evaluated");
+    expect(artifact.claim.statusDimensions.review).toBe("pending");
+    expect(artifact.content.split("\n").find((line) => line.includes("Claim:"))).toMatchSnapshot();
+    expect(artifact.content).toContain(formatClaimLabel(renderClaimLabel(artifact.claim), format === "html" ? "studio" : "report"));
+    expect(artifact.content).toContain(renderClaimLegend(format === "html" ? "html" : "markdown"));
+  });
+
   test("built CLI writes a print-ready board one-pager without vault signing", () => {
     const root = tempRoot();
     writeRun(root, "33333333-3333-3333-3333-333333333333");
@@ -89,6 +120,8 @@ describe("executive brief artifact", () => {
     expect(html).toContain("Top Maturity Gaps");
     expect(html).toContain("@media print");
     expect(html).toContain("Print-ready HTML");
+    expect(html).toContain("Legacy (1.x), self-reported");
+    expect(html).toContain(renderClaimLegend("html"));
   });
 
   test("public docs expose the board brief path and audit marks the gap resolved", () => {

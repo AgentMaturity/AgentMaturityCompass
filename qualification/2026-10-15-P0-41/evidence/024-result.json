@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "/private/tmp/p0-41-causal-qualification-v2-20261015/cli-artifacts/P041-M2-vacuous-file-pass--restored/Q12-nonexistent-p041-UpTykw/fixture/scripts/program-metrics.mjs",
+    "--json"
+  ],
+  "cwd": "/private/tmp/p0-41-causal-qualification-v2-20261015/cli-artifacts/P041-M2-vacuous-file-pass--restored/Q12-nonexistent-p041-UpTykw/fixture",
+  "pid": 32562,
+  "status": 1,
+  "signal": null,
+  "stdout": "",
+  "stderr": "program-metrics: G1: closing evidence not committed at HEAD or mergedSha not an ancestor of HEAD (shallow history cannot verify)\n",
+  "error": null
+}

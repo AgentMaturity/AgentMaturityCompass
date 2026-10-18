@@ -1,0 +1,101 @@
+{
+  "issue": "P0-46",
+  "kind": "Actual exact local action install block in owned checkout/private npm prefix",
+  "source": "d8e5168556aeea8e8c12cbc67848839824edbb48",
+  "runtime": {
+    "node": "v22.23.3",
+    "selectedActionInput": "22",
+    "declaredDefaultNode": "20",
+    "defaultNode20Executed": false,
+    "platform": "Darwin",
+    "arch": "arm64"
+  },
+  "evidenceDirectory": "/private/tmp/p0-46-local-install-b9uqoofn",
+  "callerCwd": "/private/tmp/p0-46-local-install-b9uqoofn/caller",
+  "actionPath": "/Users/sid/.codex/worktrees/p0-46-qualification/AgentMaturityCompass/amc-action",
+  "prefix": "/private/tmp/p0-46-local-install-b9uqoofn/prefix",
+  "inputHashesBefore": {
+    "amc-action/action.yml": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    ".github/workflows/amc-pr-gate.yml": "cac2129b01e6c3b4ce3717863de8baa39be15a7a1d825f012ede2c12c2754834",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "pnpm-workspace.yaml": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "unused-code/plan-edits/manifest.json": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+  },
+  "originalBlock": "/private/tmp/p0-46-local-install-b9uqoofn/original-install-block.sh",
+  "originalBlockSha256": "1f9e3c5b0e8ad4b1efbdaba00d7a39396cc96cc158b363ae8ad888702b00bb5a",
+  "executedBlock": "/private/tmp/p0-46-local-install-b9uqoofn/local-install-block.sh",
+  "executedBlockSha256": "b2bc5ddc3dca6880619d4248096a522a6a787a0bcf9ed5450ab0fdeaced0b4d8",
+  "substitution": "Only the one GitHub input placeholder is replaced with literal local; the parsed authored block is otherwise unchanged.",
+  "scope": "Only install/build/local global-link block; no initialization, scoring, branch/stash operations, release installer, comments, uploads or hosted workflow execution.",
+  "commands": [
+    {
+      "name": "exact-local-install",
+      "argv": [
+        "bash",
+        "/private/tmp/p0-46-local-install-b9uqoofn/local-install-block.sh"
+      ],
+      "cwd": "/private/tmp/p0-46-local-install-b9uqoofn/caller",
+      "exit": 0,
+      "durationMs": 36056,
+      "startedUtc": "2026-10-14T18:40:44.150875+00:00",
+      "log": "/private/tmp/p0-46-local-install-b9uqoofn/exact-local-install.log",
+      "logSha256": "570a81c460552b78a2f729ef91b151b4e16aede07b8c066c843de673ac5e4f47",
+      "logBytes": 2118
+    },
+    {
+      "name": "installed-version",
+      "argv": [
+        "/private/tmp/p0-46-local-install-b9uqoofn/prefix/bin/amc",
+        "--version"
+      ],
+      "cwd": "/private/tmp/p0-46-local-install-b9uqoofn/caller",
+      "exit": 0,
+      "durationMs": 1355,
+      "startedUtc": "2026-10-14T18:41:20.210506+00:00",
+      "log": "/private/tmp/p0-46-local-install-b9uqoofn/installed-version.log",
+      "logSha256": "1e5b51cde515396a9fa762909cf8ca6584ccc564b325d2eebeea76175fe95c4d",
+      "logBytes": 6
+    },
+    {
+      "name": "installed-help",
+      "argv": [
+        "/private/tmp/p0-46-local-install-b9uqoofn/prefix/bin/amc",
+        "--help"
+      ],
+      "cwd": "/private/tmp/p0-46-local-install-b9uqoofn/caller",
+      "exit": 0,
+      "durationMs": 695,
+      "startedUtc": "2026-10-14T18:41:21.565840+00:00",
+      "log": "/private/tmp/p0-46-local-install-b9uqoofn/installed-help.log",
+      "logSha256": "cc01a17b8d8d85c5ad052d2b0b1d02c0ca8c27498820f72df3014b43c9f436f7",
+      "logBytes": 3050
+    }
+  ],
+  "inputHashesAfter": {
+    "amc-action/action.yml": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    ".github/workflows/amc-pr-gate.yml": "cac2129b01e6c3b4ce3717863de8baa39be15a7a1d825f012ede2c12c2754834",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "pnpm-workspace.yaml": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "unused-code/plan-edits/manifest.json": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+  },
+  "inputsUnchanged": true,
+  "installedCli": {
+    "launcher": "/private/tmp/p0-46-local-install-b9uqoofn/prefix/bin/amc",
+    "isLink": true,
+    "realPath": "/Users/sid/.codex/worktrees/p0-46-qualification/AgentMaturityCompass/dist/cli.js",
+    "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+    "compiledCliSha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+  },
+  "exit": 0,
+  "sourceAfter": "d8e5168556aeea8e8c12cbc67848839824edbb48",
+  "workingTreeAfter": "",
+  "limits": [
+    "Selected Node22 on macOS arm64 only; defaultNode20 and hostedUbuntu remain unqualified.",
+    "Private local folder installation may link the built checkout; this is not standalone packed-artifact or release proof.",
+    "Frozen install and normal authored build run as written; no release gate or lifecycle policy is disabled."
+  ]
+}

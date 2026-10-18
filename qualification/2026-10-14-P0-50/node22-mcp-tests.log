@@ -1,0 +1,37 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-48-qualification/AgentMaturityCompass
+
+ ✓ tests/reconciliationDefectsMcpHttp.test.ts (2 tests) 653ms
+     ✓ a non-EXECUTE call with schema-invalid arguments is refused without a remote call  338ms
+     ✓ a result received after grant disposal is reported as executed and discarded  313ms
+ ✓ tests/reconciliationDefectsMcp.test.ts (2 tests) 815ms
+     ✓ a discarded received result says the remote tool executed and was not replayed  495ms
+     ✓ simulation refuses arguments that the reviewed schema refuses  317ms
+ ✓ tests/nativeMcpClient.test.ts (15 tests) 7393ms
+     ✓ valid schemas execute through the signed allowlist; invalid arguments never reach the server  496ms
+     ✓ a mounted capability cannot bypass the independent signed allowlist  372ms
+     ✓ wrong catalog pins and absent remote grants leave no mounted capability  408ms
+     ✓ catalog drift is refused before dispatch and list-change notifications revoke active grants  468ms
+     ✓ output schemas on earlier catalog pages are enforced  358ms
+     ✓ input schemas sharing an id cannot reuse another tool's validator  372ms
+     ✓ output schemas sharing an id stay independent of SDK cache state  368ms
+     ✓ remote errors retain structured details and timeouts retain their separate failure fact  2381ms
+     ✓ explicit secrets are child-only, scrubbed from results and catalog leakage refuses  398ms
+     ✓ cancellation disposes the connection and prevents later calls  399ms
+     ✓ output schema validation precedes secret redaction  341ms
+     ✓ a reviewed MCP-only policy is ready and late mounting still exposes and executes its pinned tool  389ms
+ ✓ tests/nativeMcpHttp.test.ts (15 tests) 7552ms
+     ✓ executes false SSE with pinned origin/session and private header redaction  411ms
+     ✓ executes true SSE with pinned origin/session and private header redaction  300ms
+     ✓ redirects never send credentials to a second origin  370ms
+     ✓ catalog notifications dispose the grant without automatic reconnect  347ms
+     ✓ idle notifications outlive request timeout, then expire at the independently configured bound  2715ms
+     ✓ cancellation aborts the active stream, terminates the session and removes the grant  301ms
+     ✓ timeouts and remote error results retain distinct failure facts  1461ms
+
+ Test Files  4 passed (4)
+      Tests  34 passed (34)
+   Start at  20:28:58
+   Duration  10.86s (transform 8.82s, setup 99ms, import 12.52s, tests 16.41s, environment 0ms)
+
+JSON report written to /private/tmp/p0-50-node22-mcp-components-20261014.json

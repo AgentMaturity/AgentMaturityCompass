@@ -1,0 +1,37 @@
+{
+  "quality": {
+    "at": "2026-10-16T12:27:49.371371+00:00",
+    "duplicates": {
+      "count": 1268,
+      "actualExit": 1,
+      "byteEqualPriorP207Summary": true,
+      "sha256": "1b1ba849c8834dbaae46182c501fe720fb6fb86d5f953ab27cd83fd01b4ba50d"
+    },
+    "deadCode": {
+      "previousCount": 2729,
+      "currentCount": 2727,
+      "added": [],
+      "removed": [
+        "[\"src/identity/hostVault.ts\",\"exports\",{\"name\":\"hostVaultStatus\"}]",
+        "[\"src/identity/hostVault.ts\",\"exports\",{\"name\":\"lockHostVault\"}]"
+      ],
+      "actualExit": 1,
+      "fullFindingsCount": 2727,
+      "logSha256": "10efe655e840d0a7cc1d388b56603a58db2ec91c7a8e587612a206ec99cadb37",
+      "interpretation": "New tests directly call both vault exports for real fixture lock/status assertions. Test-usage attribution changed; no production caller or production dead-code repair is claimed."
+    },
+    "architecture": {
+      "status": "passed",
+      "failures": [],
+      "prefixBranchCount": 2,
+      "entireJsonParsed": true,
+      "sha256": "789916e57e4e08b7f22e5c0c287cbfdff07ecf79231fbce1b97389a590c7e500",
+      "ratchetAdopted": false
+    },
+    "qualityChecksGreen": false,
+    "noBaselineAdoptionOrWaiver": true,
+    "formalDone": false
+  },
+  "freezeLog": "Freeze guard passed: {\"cliCommandPaths\":1236,\"cliInventoryPaths\":1236,\"stationPacks\":41,\"stationPackQuestions\":632}\n",
+  "baselineAdoptionOrWaiver": false
+}

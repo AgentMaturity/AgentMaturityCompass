@@ -1,0 +1,15 @@
+--- a/src/mcp/mcpClaimOutput.ts
++++ b/src/mcp/mcpClaimOutput.ts
+@@ -17,11 +17,7 @@
+ export function withClaim(text: string, envelope: ClaimEnvelope, structured: Record<string, unknown> = {}) {
+   const fields = claimFields(envelope);
+   return {
+-    content: [
+-      { type: "text" as const, text },
+-      { type: "text" as const, text: `${fields.claimLabel}\n${CLAIM_KINDS_POINTER}` }
+-    ],
+-    structuredContent: { ...structured, ...fields }
++    content: [{ type: "text" as const, text }]
+   };
+ }
+ 

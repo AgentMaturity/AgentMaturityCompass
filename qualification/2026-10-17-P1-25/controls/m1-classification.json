@@ -1,0 +1,28 @@
+{
+  "schema": "p125-source-control-failure-classification/1",
+  "at": "2026-10-16T18:58:23.220727+00:00",
+  "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "phase": "p125-m1",
+  "allFailuresClassified": true,
+  "primarySemanticWitnessReached": true,
+  "tests": {
+    "numTotalTests": 47,
+    "numPassedTests": 46,
+    "numFailedTests": 1,
+    "numPendingTests": 0
+  },
+  "same47OrderedFileTitleOccurrences": true,
+  "primary": {
+    "name": "refuses a different expected digest for the unchanged genuine signed token",
+    "firstSensitiveAssertion": "tests/time/verifyTimestamp.test.ts:127:63",
+    "observed": "Expected TST_IMPRINT_MISMATCH/ok:false; actual ok:true after removing comparison.",
+    "earlierWitness": "Same body validAttestation() completed before wrong-input assertion; genuine signature/ESS/path/nonce/EKU/validity positive remains verified."
+  },
+  "bodyFailures": 1,
+  "hookErrors": 0,
+  "all29IndividualHookValuesPass": true,
+  "unhandledErrors": [],
+  "unclassifiedErrors": [],
+  "maskedAssertions": [],
+  "causalScope": "Fresh source-only comparison operator. Does not establish compiled mutation, external TSA, full issue or global quality acceptance."
+}

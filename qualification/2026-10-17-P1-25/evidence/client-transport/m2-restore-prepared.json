@@ -1,0 +1,83 @@
+{
+  "at": "2026-10-16T21:50:00.492665+00:00",
+  "mode": "restore",
+  "operator": "C2-ignore-response-MIME",
+  "sourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "target": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout/src/time/tsaClient.ts",
+  "binding": {
+    "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-source-binding.json",
+    "physicalPath": "/private/tmp/p1-25-client-qualification-20261017/fresh-source-binding.json",
+    "bytes": 86754,
+    "sha256": "07e3fdcd86ccefd56c860ea0be0a4ab86312d6ddecf93f10ee24d2d5b1ac713b",
+    "dev": 16777231,
+    "inode": 543504487,
+    "nlink": 1
+  },
+  "sourceOutcome": {
+    "path": "/private/tmp/p1-25-client-qualification-20261017/p125c-source-combined-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-client-qualification-20261017/p125c-source-combined-outcome.json",
+    "bytes": 5432,
+    "sha256": "4f40f22dd614d169ff8f2e0b73dfc490c708fc8b82689ecf3862809d505d65ce",
+    "dev": 16777231,
+    "inode": 543445623,
+    "nlink": 1
+  },
+  "canonicalOutcome": {
+    "path": "/private/tmp/p1-25-client-qualification-20261017/p125c-fresh-canonical-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-client-qualification-20261017/p125c-fresh-canonical-outcome.json",
+    "bytes": 5464,
+    "sha256": "84d3a315b96018518bbb033a0e5ce3d572e1840090545394280b93e0ceacd4a6",
+    "dev": 16777231,
+    "inode": 543504810,
+    "nlink": 1
+  },
+  "compiledMutation": false,
+  "nativeMutation": false,
+  "automaticRestoreOrRetry": false,
+  "regularSingleLinkCheckedBeforeWrite": true,
+  "sourceOnlyMutant": true,
+  "original": {
+    "path": "/private/tmp/p1-25-client-qualification-20261017/m2-original.ts",
+    "physicalPath": "/private/tmp/p1-25-client-qualification-20261017/m2-original.ts",
+    "bytes": 10927,
+    "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+    "dev": 16777231,
+    "inode": 543505547,
+    "nlink": 1
+  },
+  "outcome": {
+    "path": "/private/tmp/p1-25-client-qualification-20261017/p125c-m2-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-client-qualification-20261017/p125c-m2-outcome.json",
+    "bytes": 8302,
+    "sha256": "136eeb32d61d5142d3621f24f2453c20b77f2b0d54e7658de25df321c35a0536",
+    "dev": 16777231,
+    "inode": 543505863,
+    "nlink": 1
+  },
+  "classification": {
+    "path": "/private/tmp/p1-25-client-qualification-20261017/m2-classification.json",
+    "physicalPath": "/private/tmp/p1-25-client-qualification-20261017/m2-classification.json",
+    "bytes": 2056,
+    "sha256": "e561c3e268c7f89f441ad19ae3134af1324a7083234776ec4303018fde303453",
+    "dev": 16777231,
+    "inode": 543505906,
+    "nlink": 1
+  },
+  "apply": {
+    "path": "/private/tmp/p1-25-client-qualification-20261017/m2-apply.json",
+    "physicalPath": "/private/tmp/p1-25-client-qualification-20261017/m2-apply.json",
+    "bytes": 2809,
+    "sha256": "a21188f10c98fe8eb1be2744d58ffd8b6b7d1f03742f8045a9eae3df7a28d644",
+    "dev": 16777231,
+    "inode": 543505550,
+    "nlink": 1
+  },
+  "preservationBeforeWrite": {
+    "selectedPathsEachRoot": 71,
+    "compiledPairs": 8,
+    "protectedInputs": 121,
+    "nativePhysicalPins": 7,
+    "allSelectedBytesAndPhysicalPinsExact": true,
+    "heldRHeadStatusIndexExact": true
+  }
+}

@@ -1,0 +1,44 @@
+
+ RUN  v4.1.11 /private/tmp/p0-21-causal-qualification-20261015/closure
+
+ ✓ tests/transparencyReport.test.ts (15 tests) 39ms
+ ✓ tests/noCertificationFromSelfAssessment.test.ts (7 tests) 2445ms
+     ✓ MCP sector-pack and trust-score text say self-assessment and evidence standing  2404ms
+ ❯ tests/selfReportedLevelCap.test.ts (5 tests | 1 failed) 20ms
+     ✓ L2 counts met only by SELF_REPORTED events support at most level 1 1ms
+     ✓ imported rows tagged to the question support exactly level 1 0ms
+     ✓ the same counts with OBSERVED events support level 2, the highest its evidence map evaluates (P1-07) 0ms
+     ✓ no base gate at L2 or above accepts SELF_REPORTED 12ms
+     × a gate that lists no tiers defaults to OBSERVED and ATTESTED 3ms
+ ✓ tests/logisticsIndustryPack.test.ts (2 tests) 6ms
+ ✓ tests/scoreUnits.test.ts (4 tests) 5ms
+ ✓ tests/domainAssessmentUnits.test.ts (4 tests) 12ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/selfReportedLevelCap.test.ts > self-reported evidence caps at L1 (P0-21) > a gate that lists no tiers defaults to OBSERVED and ATTESTED
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/selfReportedLevelCap.test.ts:77:64
+     75|       mustInclude: { metaKeys: [], auditTypes: [] }, mustNotInclude: {…
+     76|     };
+     77|     expect(evaluateGate(gate, evidence("SELF_REPORTED")).pass).toBe(fa…
+       |                                                                ^
+     78|     expect(evaluateGate(gate, evidence("ATTESTED")).pass).toBe(true);
+     79|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  1 failed | 36 passed (37)
+   Start at  10:53:13
+   Duration  3.85s (transform 2.23s, setup 73ms, import 687ms, tests 2.53s, environment 0ms)
+
+JSON report written to /private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/raw.json

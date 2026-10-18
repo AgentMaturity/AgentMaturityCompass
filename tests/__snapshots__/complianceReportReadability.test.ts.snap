@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`compliance report readability > renders each category's service-decided claim, separately from the aggregate 1`] = `
+[
+  "**Claim:** Self-reported · **Result:** fail · **Evidence:** untrusted · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Self-reported · **Result:** not evaluated (the signature does not verify) · **Evidence:** untrusted · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "**Claim:** Observed · **Result:** fail · **Evidence:** sufficient · **Enforcement:** none · **Review:** pending · **Applicability:** applicable",
+]
+`;

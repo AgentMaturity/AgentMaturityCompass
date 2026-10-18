@@ -1,0 +1,2599 @@
+{
+  "at": "2026-10-17T00:29:12.459629+00:00",
+  "onlyTheseExplicitPublicFilesMayBeCopied": true,
+  "noDirectoryTraversalOrRawPemPublication": true,
+  "count": 161,
+  "entries": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-voGhOg/public-evidence.json",
+      "bytes": 12989,
+      "sha256": "7634045df4e844368e31e60df912c346dd5bb37558d85ddd862689d2b886e26c",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-source-combined/FIRST-GRANT/public-evidence.json",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-source-combined-FIRST-GRANT.json",
+      "bytes": 3267,
+      "sha256": "7d3e58cc08877691f3565cf65dc3ff4bf5ea5fabc23d6ecf9a2665d888e2d5ad",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-source-combined/FIRST-GRANT/public-certificates.json",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-voGhOg/request-1.tsq",
+      "bytes": 76,
+      "sha256": "b73d6abc4611eeb37abaaef983256689f09c07c414ef7164c8ceb53a93bc519e",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-source-combined/FIRST-GRANT/request-1.tsq",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-voGhOg/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "62d0521f5df10e27f065d70fd07e7e8177ee7e5eafe3797bff91a0d359b8e4e4",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-source-combined/FIRST-GRANT/response-1.tsr",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-iOtiej/public-evidence.json",
+      "bytes": 13540,
+      "sha256": "4450cedfeefb2d59475a39e5d142a6fb675a69b0a4c2066ed7892a9caf09a92c",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-source-combined/HTTP500-THEN-GRANT/public-evidence.json",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-source-combined-HTTP500-THEN-GRANT.json",
+      "bytes": 3274,
+      "sha256": "6d5d8170de2bb2d4b5ac8a90d8f9551027c632ebd05e25d9904c5ef3e256d94f",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-source-combined/HTTP500-THEN-GRANT/public-certificates.json",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-iOtiej/request-2.tsq",
+      "bytes": 76,
+      "sha256": "7698d605e15204f23ed87bab9fdc0df8c030576d8c95531335bfa0cf2ef5401f",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-source-combined/HTTP500-THEN-GRANT/request-2.tsq",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-iOtiej/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "ef193467b196db4e3ae3b44070098d15ab96f9e0dd0adfaa73d5d31bedae4f8e",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-source-combined/HTTP500-THEN-GRANT/response-2.tsr",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-TzKi7I/public-evidence.json",
+      "bytes": 12898,
+      "sha256": "437eee2c97eaf00598c553dab1d537fdb15f9a7b595a8838f50ea8c01dba7f1a",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-source-combined-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3280,
+      "sha256": "ffaf16ad5fd827759c8336cec2527947f4f7c5502b019babc573ca6b4320d62d",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-TzKi7I/request-2.tsq",
+      "bytes": 76,
+      "sha256": "c51e6d03c54e0ab15190d37ae156e3972ef17b626c0585566e0273c1375e3c8e",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-TzKi7I/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "a715e8a76806c24d4ebe9a8e300de63d2c37cf58b780a323cf8a3030343318e1",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJwDIS/public-evidence.json",
+      "bytes": 8231,
+      "sha256": "0b32b6ed1f00af469891f5c850a126aacb2cff9bbc29c0661463e21cbf045223",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-source-combined-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3283,
+      "sha256": "d7fe25c42eb2fedce9ea4e985353969170359395c00b99bdd478684b17a12e1c",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/public-evidence.json",
+      "bytes": 16747,
+      "sha256": "3152819197f9afd57e0d056ec43803c3e7f4fe7b7203c169851b23828e09190a",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-source-combined-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3283,
+      "sha256": "9b01288b5d9980a652eb12f39dd7ba35cf8b5443b608d4a78374c084bb771815",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/request-1.tsq",
+      "bytes": 76,
+      "sha256": "ab5122007fca2585851b5523206426e761d047eb8faea89a81830741ff9e503e",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 1,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/request-1.tsq",
+          "bytes": 76,
+          "sha256": "ab5122007fca2585851b5523206426e761d047eb8faea89a81830741ff9e503e"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/response-1.tsr",
+          "bytes": 2307,
+          "sha256": "c045ca69463623ac9c882e28d040580920f5098a69ed158e3b59c391a308ace4"
+        },
+        "verificationChildPid": 69601,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/request-1.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/response-1.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:06:52.000Z",
+          "accuracyMs": null,
+          "digest": "9e34282d7f207fe95076e9c54cb97c69dc13309ece0883f5d2723185ba282dff",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "e6521be74374db73a80bcc24d2a108e4a339b29e6152a9c96c93db08a6ee1284",
+          "tokenSha256": "141e42fc8a70e16ee2038a8e85f8ec3e4ab838eaa549e99f60e753cb348711c6",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "c045ca69463623ac9c882e28d040580920f5098a69ed158e3b59c391a308ace4",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 1,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/request-1.tsq",
+          "bytes": 76,
+          "sha256": "ab5122007fca2585851b5523206426e761d047eb8faea89a81830741ff9e503e"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/response-1.tsr",
+          "bytes": 2307,
+          "sha256": "c045ca69463623ac9c882e28d040580920f5098a69ed158e3b59c391a308ace4"
+        },
+        "verificationChildPid": 69601,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/request-1.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/response-1.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:06:52.000Z",
+          "accuracyMs": null,
+          "digest": "9e34282d7f207fe95076e9c54cb97c69dc13309ece0883f5d2723185ba282dff",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "e6521be74374db73a80bcc24d2a108e4a339b29e6152a9c96c93db08a6ee1284",
+          "tokenSha256": "141e42fc8a70e16ee2038a8e85f8ec3e4ab838eaa549e99f60e753cb348711c6",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/request-2.tsq",
+      "bytes": 76,
+      "sha256": "843071a1aced993becf33ef1bc03760ec50f93ba31aac5224646cbfc8c981387",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 2,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/request-2.tsq",
+          "bytes": 76,
+          "sha256": "843071a1aced993becf33ef1bc03760ec50f93ba31aac5224646cbfc8c981387"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/response-2.tsr",
+          "bytes": 2307,
+          "sha256": "c89329583bb00d684731bce522dd825c019f71f7b32ba69ca52401e3c5febbbf"
+        },
+        "verificationChildPid": 69603,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/request-2.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/response-2.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:06:52.000Z",
+          "accuracyMs": null,
+          "digest": "f992b8bf455198b050dba5c0d15b7736c5ec95427435aa701676eb101eceadf0",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "e6521be74374db73a80bcc24d2a108e4a339b29e6152a9c96c93db08a6ee1284",
+          "tokenSha256": "cd2eabf60dd19c0639330fff38a35d2e1e2fb453e0fbc354b6c49c5ceb1ec625",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "c89329583bb00d684731bce522dd825c019f71f7b32ba69ca52401e3c5febbbf",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 2,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/request-2.tsq",
+          "bytes": 76,
+          "sha256": "843071a1aced993becf33ef1bc03760ec50f93ba31aac5224646cbfc8c981387"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/response-2.tsr",
+          "bytes": 2307,
+          "sha256": "c89329583bb00d684731bce522dd825c019f71f7b32ba69ca52401e3c5febbbf"
+        },
+        "verificationChildPid": 69603,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/request-2.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/response-2.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:06:52.000Z",
+          "accuracyMs": null,
+          "digest": "f992b8bf455198b050dba5c0d15b7736c5ec95427435aa701676eb101eceadf0",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "e6521be74374db73a80bcc24d2a108e4a339b29e6152a9c96c93db08a6ee1284",
+          "tokenSha256": "cd2eabf60dd19c0639330fff38a35d2e1e2fb453e0fbc354b6c49c5ceb1ec625",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-xYYnry/checkpoint-public-evidence.json",
+      "bytes": 10847,
+      "sha256": "ed64d624eed4f861207cb2003cd51fd364124fad4c689206ad38a59313a561f2",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-BqfcD8/checkpoint-public-evidence.json",
+      "bytes": 5098,
+      "sha256": "b0182a2901d1baf414e4ce826c2b89e114c7bb94174a8f5cd8a1443321d79374",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Euu7Fd/checkpoint-public-evidence.json",
+      "bytes": 62146,
+      "sha256": "2a4f29cec68881baa538d2c7d8b6e2889f9f4ad44748c89e34dce82022d6b4ab",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-source-combined/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dauw9G/public-evidence.json",
+      "bytes": 12998,
+      "sha256": "f26bd97907070d19e5e23c57d9b22864090f401baf8f02a73441c121c8f2397b",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-fresh-canonical/FIRST-GRANT/public-evidence.json",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-fresh-canonical-FIRST-GRANT.json",
+      "bytes": 3267,
+      "sha256": "904cb43e9b6a641f78e7d919b218747812216a855af571d3e8e8c98385c27192",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-fresh-canonical/FIRST-GRANT/public-certificates.json",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dauw9G/request-1.tsq",
+      "bytes": 76,
+      "sha256": "8a8f91f03b32afd70d311ec0fdd1ef0c54c7b0e0cafdd78b07ec34eaf85f8559",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-fresh-canonical/FIRST-GRANT/request-1.tsq",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dauw9G/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "8915a3a9e459411a9dd21b0e3c7db44a8bd0e36ea632f5bddd7769003f0ad031",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-fresh-canonical/FIRST-GRANT/response-1.tsr",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rcThX1/public-evidence.json",
+      "bytes": 13564,
+      "sha256": "01bc3b9b8e5b56d78bf8ff961ef0c348345578ed36b38242dcfade26e0681d19",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-fresh-canonical/HTTP500-THEN-GRANT/public-evidence.json",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-fresh-canonical-HTTP500-THEN-GRANT.json",
+      "bytes": 3274,
+      "sha256": "0e3e3d3023659ad033111f47e03ce9c59f93692ebf5485ef26865ca887970fce",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-fresh-canonical/HTTP500-THEN-GRANT/public-certificates.json",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rcThX1/request-2.tsq",
+      "bytes": 76,
+      "sha256": "565de66b23f8abf1fcf1ea536ad10d2e1275854b2fde26271820b5cdb6dd190d",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-fresh-canonical/HTTP500-THEN-GRANT/request-2.tsq",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rcThX1/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "eaa5983f36881e5937fab97b5a89dde6baf57c676b50a650d6b8d0298eff4f6f",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-fresh-canonical/HTTP500-THEN-GRANT/response-2.tsr",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-HulndR/public-evidence.json",
+      "bytes": 12912,
+      "sha256": "c05c236f5e157244e5dba7b7db6ea2c5036c59ef416a8919c61f64f67663ae38",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-fresh-canonical-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3280,
+      "sha256": "44308e1d0f515325185afb098309fa1c2bff3b9c1eb70c48fbc68d7cfb28fdc2",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-HulndR/request-2.tsq",
+      "bytes": 76,
+      "sha256": "cd649f9d8b8b60d86ae64c428d40fbbfb272ce4f6f6c0c46ba0a9ffd46da97f0",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-HulndR/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "b649d4f2d3aa1caa5660d61ccdc5e1923cf1743b8a5e0c7f31944fd52a572e62",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ylZzP5/public-evidence.json",
+      "bytes": 8249,
+      "sha256": "b55afb8c3976bbee0da00a4ac0fcc560450909db0b3c617808a095627165f8c4",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-fresh-canonical-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3283,
+      "sha256": "f1830e0c21991facdb07e479cc8a289d94040a03bb0d0f5b14f4c9d1f27edf6c",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/public-evidence.json",
+      "bytes": 16760,
+      "sha256": "fd382c0b9a4e9ca065aaf1eccf8dd88a0e123a1b265d8359e9d5cd629f1f8414",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-fresh-canonical-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3283,
+      "sha256": "4d4149b0ee3fa72f881b3ee994dba80b7cb46bc53c454a233a592dfd075eeaea",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/request-1.tsq",
+      "bytes": 76,
+      "sha256": "ec65863d68e002a861188882592a48c2c464d4f8ef28699ddcd3729eb5fcdf3b",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 1,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/request-1.tsq",
+          "bytes": 76,
+          "sha256": "ec65863d68e002a861188882592a48c2c464d4f8ef28699ddcd3729eb5fcdf3b"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/response-1.tsr",
+          "bytes": 2307,
+          "sha256": "ee2d484dbb862a6de9053df1b061cb0dec0e48b156459bdde960d7f48238a29c"
+        },
+        "verificationChildPid": 71252,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/request-1.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/response-1.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:14:13.000Z",
+          "accuracyMs": null,
+          "digest": "6b894355b811fdfd815b1efa193cc9ca4da0336c1100890c1c05ae35fb12f249",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "716207cef11ee63d9012d4a0b88d3bd75b6c55cda0b8a6d10c04d71d7de10983",
+          "tokenSha256": "5bb8bc7e2fe45c8112910de61af3abf41a9bc3fba4e4617fbad3f2a131816d7f",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "ee2d484dbb862a6de9053df1b061cb0dec0e48b156459bdde960d7f48238a29c",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 1,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/request-1.tsq",
+          "bytes": 76,
+          "sha256": "ec65863d68e002a861188882592a48c2c464d4f8ef28699ddcd3729eb5fcdf3b"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/response-1.tsr",
+          "bytes": 2307,
+          "sha256": "ee2d484dbb862a6de9053df1b061cb0dec0e48b156459bdde960d7f48238a29c"
+        },
+        "verificationChildPid": 71252,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/request-1.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/response-1.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:14:13.000Z",
+          "accuracyMs": null,
+          "digest": "6b894355b811fdfd815b1efa193cc9ca4da0336c1100890c1c05ae35fb12f249",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "716207cef11ee63d9012d4a0b88d3bd75b6c55cda0b8a6d10c04d71d7de10983",
+          "tokenSha256": "5bb8bc7e2fe45c8112910de61af3abf41a9bc3fba4e4617fbad3f2a131816d7f",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/request-2.tsq",
+      "bytes": 76,
+      "sha256": "0fdac1482acd5608278be20fc51ae226b155bc21fa071fae89cca00ea0280c62",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 2,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/request-2.tsq",
+          "bytes": 76,
+          "sha256": "0fdac1482acd5608278be20fc51ae226b155bc21fa071fae89cca00ea0280c62"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/response-2.tsr",
+          "bytes": 2307,
+          "sha256": "3fd688ca70a16e7283bf94fc1c958656abd9b7dd1ee47f03725eb352f12b2c91"
+        },
+        "verificationChildPid": 71254,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/request-2.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/response-2.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:14:13.000Z",
+          "accuracyMs": null,
+          "digest": "bc405e2b0ea95469a1f1a9da3788b69f1d43de547a4c50582ea7f2195a2d20ce",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "716207cef11ee63d9012d4a0b88d3bd75b6c55cda0b8a6d10c04d71d7de10983",
+          "tokenSha256": "bb50f9e247ea97f2bf0bdeede12d040d3f0b27bc9104e19511bf0beb96e827d9",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "3fd688ca70a16e7283bf94fc1c958656abd9b7dd1ee47f03725eb352f12b2c91",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 2,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/request-2.tsq",
+          "bytes": 76,
+          "sha256": "0fdac1482acd5608278be20fc51ae226b155bc21fa071fae89cca00ea0280c62"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/response-2.tsr",
+          "bytes": 2307,
+          "sha256": "3fd688ca70a16e7283bf94fc1c958656abd9b7dd1ee47f03725eb352f12b2c91"
+        },
+        "verificationChildPid": 71254,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/request-2.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/response-2.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:14:13.000Z",
+          "accuracyMs": null,
+          "digest": "bc405e2b0ea95469a1f1a9da3788b69f1d43de547a4c50582ea7f2195a2d20ce",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "716207cef11ee63d9012d4a0b88d3bd75b6c55cda0b8a6d10c04d71d7de10983",
+          "tokenSha256": "bb50f9e247ea97f2bf0bdeede12d040d3f0b27bc9104e19511bf0beb96e827d9",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-lBEF9u/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "5f6b439044ab969a5458bac6e379e56dde8c756e77efacc077bd61a4105b61d1",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-l6jsZU/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "95688d9bc2695d85f1d92b109980d4b8f513fff0d69817b989962b6dda3b83c6",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-szLe2c/checkpoint-public-evidence.json",
+      "bytes": 62226,
+      "sha256": "8f87c61241951cc0ea937d46fbe04dc1ac4433b02bedce1efb77dc3455fbccf4",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-fresh-canonical/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-JUEH2w/public-evidence.json",
+      "bytes": 13005,
+      "sha256": "b3bcd8cf1805d703ccfceb248837e964ad7022cbbe147e17fa7d0567e6bcacab",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m1-sequential/FIRST-GRANT/public-evidence.json",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m1-sequential-FIRST-GRANT.json",
+      "bytes": 3265,
+      "sha256": "43a39a1fe6e2f997659072e14fb13b2a7ec6cc1a1a302c22ab631b879ae05fe9",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m1-sequential/FIRST-GRANT/public-certificates.json",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-JUEH2w/request-1.tsq",
+      "bytes": 76,
+      "sha256": "7537b78f792aab82b0346de31161b98aff72ec4830dc2b3c72bf4bdae760934a",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m1-sequential/FIRST-GRANT/request-1.tsq",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-JUEH2w/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "90edf103629fb968831c3d69259c4440dcd2404c3d1ae9e40944100c1a9f1cae",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m1-sequential/FIRST-GRANT/response-1.tsr",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nH8Gh8/public-evidence.json",
+      "bytes": 13561,
+      "sha256": "10806adfd0fd5fcb448a4dbdc3240b22cb3a6dc9b3347e4d3eafbdb3562f945f",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m1-sequential/HTTP500-THEN-GRANT/public-evidence.json",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m1-sequential-HTTP500-THEN-GRANT.json",
+      "bytes": 3272,
+      "sha256": "09f7fb8910871e0deeabcf70bbc49aa4949cdb2a5d484280da58d7310e0db344",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m1-sequential/HTTP500-THEN-GRANT/public-certificates.json",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nH8Gh8/request-2.tsq",
+      "bytes": 76,
+      "sha256": "6b1fcda503bb56ae163edd3b490282121203416f2399676a39a1170d54fdcf1e",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m1-sequential/HTTP500-THEN-GRANT/request-2.tsq",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nH8Gh8/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "5db283be3e151286085da4ab94f03cf9c15861b42cbe01d785fb6d5507ef87dd",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m1-sequential/HTTP500-THEN-GRANT/response-2.tsr",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-MCwACA/public-evidence.json",
+      "bytes": 12919,
+      "sha256": "ec0fffe63a4900e373053a77a7ded5c6d48fd966061167cc0b6454b3c4a0f6aa",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m1-sequential-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3278,
+      "sha256": "4688ff1edc2361042f6a8070ce5d9e68be746cab8fcec74d82c305d160c1ce6b",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-MCwACA/request-2.tsq",
+      "bytes": 76,
+      "sha256": "294fe9ac2ec97e4e9b18317a5971040f03e50a9d75c38b1f617141d2491b3b7a",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-MCwACA/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "c83f6bc83ffdb268b2a96fff8c0af3dff8fdedb13ab40713748b0b4c276567fa",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-2AKdfX/public-evidence.json",
+      "bytes": 8254,
+      "sha256": "9c0d1c8008a3f42cf63c21c04887dbaf58ecd3048e8f014484fb766de7e0a1ad",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m1-sequential-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3281,
+      "sha256": "8e1dc0329ad6a96ba6d44cfe87a8808ff9d17822b30db05e7054389c9289f47b",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/public-evidence.json",
+      "bytes": 16755,
+      "sha256": "98e5b73f45456c35322c133d0248ee6bd07af064a6d483a4a6b0292bd68d6206",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m1-sequential-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3281,
+      "sha256": "e4d7d38d0389393c562b5eddaee00035041a2472d19804c5235bcc0cba32cd14",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/request-1.tsq",
+      "bytes": 76,
+      "sha256": "82cdf32f15eae601cf0ad09b271016b90afdea214774ba6e3339a7651939b5ed",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 1,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/request-1.tsq",
+          "bytes": 76,
+          "sha256": "82cdf32f15eae601cf0ad09b271016b90afdea214774ba6e3339a7651939b5ed"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/response-1.tsr",
+          "bytes": 2307,
+          "sha256": "d7589420e9d724bb5f82849b23d44cf5300c202736fb9f5a0f1671c29c5a340b"
+        },
+        "verificationChildPid": 71558,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/request-1.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/response-1.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:16:19.000Z",
+          "accuracyMs": null,
+          "digest": "37f7814fe9e48de8f8ae28bc16fc27a31eb1bef6e1a90bc348cf8fed2ca9da22",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "b31ef6f68ac794bdf993dd1348ef8c1b2531262e30187e59fa43e1c8c17d4640",
+          "tokenSha256": "d836b7ae5ea15622f67634dd7a7f218dae69c2ba945de836d213848271dee26d",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "d7589420e9d724bb5f82849b23d44cf5300c202736fb9f5a0f1671c29c5a340b",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 1,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/request-1.tsq",
+          "bytes": 76,
+          "sha256": "82cdf32f15eae601cf0ad09b271016b90afdea214774ba6e3339a7651939b5ed"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/response-1.tsr",
+          "bytes": 2307,
+          "sha256": "d7589420e9d724bb5f82849b23d44cf5300c202736fb9f5a0f1671c29c5a340b"
+        },
+        "verificationChildPid": 71558,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/request-1.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/response-1.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:16:19.000Z",
+          "accuracyMs": null,
+          "digest": "37f7814fe9e48de8f8ae28bc16fc27a31eb1bef6e1a90bc348cf8fed2ca9da22",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "b31ef6f68ac794bdf993dd1348ef8c1b2531262e30187e59fa43e1c8c17d4640",
+          "tokenSha256": "d836b7ae5ea15622f67634dd7a7f218dae69c2ba945de836d213848271dee26d",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/request-2.tsq",
+      "bytes": 76,
+      "sha256": "cb71a3a3dc7f6cd4f5ad341c65cd0334c345d0e81fd87b44e7746f6f1516a539",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 2,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/request-2.tsq",
+          "bytes": 76,
+          "sha256": "cb71a3a3dc7f6cd4f5ad341c65cd0334c345d0e81fd87b44e7746f6f1516a539"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/response-2.tsr",
+          "bytes": 2307,
+          "sha256": "d9f9b2e8252d2fd9886b6f28221ed59c02318c0d27ee5ba898b895f0a1903478"
+        },
+        "verificationChildPid": 71560,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/request-2.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/response-2.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:16:19.000Z",
+          "accuracyMs": null,
+          "digest": "0e4b11602090c94f96412a4f9b31f582d6e038db997cfa7bcbf75d89773026b7",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "b31ef6f68ac794bdf993dd1348ef8c1b2531262e30187e59fa43e1c8c17d4640",
+          "tokenSha256": "fe72949ab0f6381ed54e09303b219c06970ea7df02a16d9d88081ad6592a1707",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "d9f9b2e8252d2fd9886b6f28221ed59c02318c0d27ee5ba898b895f0a1903478",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 2,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/request-2.tsq",
+          "bytes": 76,
+          "sha256": "cb71a3a3dc7f6cd4f5ad341c65cd0334c345d0e81fd87b44e7746f6f1516a539"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/response-2.tsr",
+          "bytes": 2307,
+          "sha256": "d9f9b2e8252d2fd9886b6f28221ed59c02318c0d27ee5ba898b895f0a1903478"
+        },
+        "verificationChildPid": 71560,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/request-2.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/response-2.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:16:19.000Z",
+          "accuracyMs": null,
+          "digest": "0e4b11602090c94f96412a4f9b31f582d6e038db997cfa7bcbf75d89773026b7",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "b31ef6f68ac794bdf993dd1348ef8c1b2531262e30187e59fa43e1c8c17d4640",
+          "tokenSha256": "fe72949ab0f6381ed54e09303b219c06970ea7df02a16d9d88081ad6592a1707",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Zhj4bb/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "352245ccb3b20db37d2ba6852479ca75eb39ffbd77b82c862727701b65d8e68c",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-KotlUL/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "d5b54eaf177948285fd5e3b4d6a35988db4a89f9c6f0dc36dac9068008eac7de",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Y6xxDS/checkpoint-public-evidence.json",
+      "bytes": 61927,
+      "sha256": "12bd702bf3eebd1615d0aef7a842d45feef66423ad70a62b78215f9b176c6a03",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-m1-sequential/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-njEbha/public-evidence.json",
+      "bytes": 12999,
+      "sha256": "18e639c39a2a620f12afdd7ee21004e2701e44fd6550285139680c9e7befaecd",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-restore1/FIRST-GRANT/public-evidence.json",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-restore1-FIRST-GRANT.json",
+      "bytes": 3260,
+      "sha256": "72228745335921d6b6305c96a261abea3670af80b4f83cb5c6ab18ab33bb05ec",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-restore1/FIRST-GRANT/public-certificates.json",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-njEbha/request-1.tsq",
+      "bytes": 76,
+      "sha256": "c2bb11a4fb417010c0484121014a42ee24982c8533bfc10f19efe324eb5fe9ae",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-restore1/FIRST-GRANT/request-1.tsq",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-njEbha/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "b937a9823b02a9e565630df91ab9381aefe6c71d21fc43e5e91bf7368022496a",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-restore1/FIRST-GRANT/response-1.tsr",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-iUmvs1/public-evidence.json",
+      "bytes": 13559,
+      "sha256": "431032059248844ca3240abaa175f757c11ec58efb580981d9e36199aa53bd84",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-restore1/HTTP500-THEN-GRANT/public-evidence.json",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-restore1-HTTP500-THEN-GRANT.json",
+      "bytes": 3267,
+      "sha256": "503f7e4f5c4900b7ff4825effc333ad92743a20c5c671945508a898babdbb74a",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-restore1/HTTP500-THEN-GRANT/public-certificates.json",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-iUmvs1/request-2.tsq",
+      "bytes": 76,
+      "sha256": "72be8c3806e1a4bb4a17d67e069445354f04a1466e7652ee0b7e5c0e7c5dc21b",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-restore1/HTTP500-THEN-GRANT/request-2.tsq",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-iUmvs1/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "12a71a68856760662d80a825be0e4b4a5d574456147d060a02cc4910e5ea7835",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-restore1/HTTP500-THEN-GRANT/response-2.tsr",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ds56BJ/public-evidence.json",
+      "bytes": 12917,
+      "sha256": "b41e4ef799f47367d696f7b4efc954705d0716f3db25ea59d914f7c984a2099b",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-restore1-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3273,
+      "sha256": "d5f424abfb0e24a96840c253b4a8bf72852545f7befa960246ed7d8b0b1c7290",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ds56BJ/request-2.tsq",
+      "bytes": 76,
+      "sha256": "9e60f0cdbac4a283bc61c3dd5efcb57063f5e284a8bba99009e7014f7e905690",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ds56BJ/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "6984b8b6047c39d72b1eba6d7cd5d3487e172b1de6742f6aba834e2b31dd69fb",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bFhqUh/public-evidence.json",
+      "bytes": 8255,
+      "sha256": "057b1c5fb6473809ff691873df17d88efefe8c03e606c0f672acadf539c51d95",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-restore1-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3276,
+      "sha256": "786aaca5c58ed77a88fede5f617c45850a8d81284c8519525775eb09576aedad",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/public-evidence.json",
+      "bytes": 16771,
+      "sha256": "07abfa485cadb951750d9b885cff423bde60725c534593a8d5d70e96cfd9f829",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-restore1-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3276,
+      "sha256": "080b435fdfab92f13ae17cb3aa62726239e5923cdf171a43496b6515cbdea1b9",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/request-1.tsq",
+      "bytes": 76,
+      "sha256": "0d44a0ff9d91463957e39695e928ff3906ed468e0bba42e4330ef18e98e809c1",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 1,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/request-1.tsq",
+          "bytes": 76,
+          "sha256": "0d44a0ff9d91463957e39695e928ff3906ed468e0bba42e4330ef18e98e809c1"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/response-1.tsr",
+          "bytes": 2307,
+          "sha256": "c907203f3bb7d9cdd3ab5b0b2b673a95ad050c55ff4b17bb82a0337ad6476776"
+        },
+        "verificationChildPid": 71756,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/request-1.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/response-1.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:17:24.000Z",
+          "accuracyMs": null,
+          "digest": "b0e48de1fe3e09aa842e201388af020a9941e2c964e4687176a90db961aed428",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "3923378a439dc3f38c3375ad67ace732449bb3fb8b71fbb7c870035b68fb03de",
+          "tokenSha256": "2b38a9bbd73a8a979c4846975fed024d21e1e7fa9aca63cfaba06426a36ee1bc",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "c907203f3bb7d9cdd3ab5b0b2b673a95ad050c55ff4b17bb82a0337ad6476776",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 1,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/request-1.tsq",
+          "bytes": 76,
+          "sha256": "0d44a0ff9d91463957e39695e928ff3906ed468e0bba42e4330ef18e98e809c1"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/response-1.tsr",
+          "bytes": 2307,
+          "sha256": "c907203f3bb7d9cdd3ab5b0b2b673a95ad050c55ff4b17bb82a0337ad6476776"
+        },
+        "verificationChildPid": 71756,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/request-1.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/response-1.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:17:24.000Z",
+          "accuracyMs": null,
+          "digest": "b0e48de1fe3e09aa842e201388af020a9941e2c964e4687176a90db961aed428",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "3923378a439dc3f38c3375ad67ace732449bb3fb8b71fbb7c870035b68fb03de",
+          "tokenSha256": "2b38a9bbd73a8a979c4846975fed024d21e1e7fa9aca63cfaba06426a36ee1bc",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/request-2.tsq",
+      "bytes": 76,
+      "sha256": "b5103ddef7297bfca99d90f679732a56b9d786aac9619efeae54b884c828c970",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 2,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/request-2.tsq",
+          "bytes": 76,
+          "sha256": "b5103ddef7297bfca99d90f679732a56b9d786aac9619efeae54b884c828c970"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/response-2.tsr",
+          "bytes": 2307,
+          "sha256": "731feff69d0dd620fa3eb3aa3c1e312ff30da96d69c9279f14c81f6d9cc4cb19"
+        },
+        "verificationChildPid": 71758,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/request-2.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/response-2.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:17:24.000Z",
+          "accuracyMs": null,
+          "digest": "633d6c4760681202e18f02050bea627da9e4aee0358484c10749669db3d6e1d0",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "3923378a439dc3f38c3375ad67ace732449bb3fb8b71fbb7c870035b68fb03de",
+          "tokenSha256": "4c8acc2d8480d3e8b4cb17ca3f535b8ed5f7989022b9957e51023a6d571a09a0",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "731feff69d0dd620fa3eb3aa3c1e312ff30da96d69c9279f14c81f6d9cc4cb19",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 2,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/request-2.tsq",
+          "bytes": 76,
+          "sha256": "b5103ddef7297bfca99d90f679732a56b9d786aac9619efeae54b884c828c970"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/response-2.tsr",
+          "bytes": 2307,
+          "sha256": "731feff69d0dd620fa3eb3aa3c1e312ff30da96d69c9279f14c81f6d9cc4cb19"
+        },
+        "verificationChildPid": 71758,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/request-2.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/response-2.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:17:24.000Z",
+          "accuracyMs": null,
+          "digest": "633d6c4760681202e18f02050bea627da9e4aee0358484c10749669db3d6e1d0",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "3923378a439dc3f38c3375ad67ace732449bb3fb8b71fbb7c870035b68fb03de",
+          "tokenSha256": "4c8acc2d8480d3e8b4cb17ca3f535b8ed5f7989022b9957e51023a6d571a09a0",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-B1svDl/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "5556f3e6cdca7bf946856e549ed6fbac2b9b3794a7247f953948b3b9a4613806",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-aUgtpT/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "23b043e06da367f0e74d2aa38e0b01765176d5261a51ac3ab758b7aaf158205b",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-BB8USr/checkpoint-public-evidence.json",
+      "bytes": 62226,
+      "sha256": "32c922c7d23eaa5dfea1ad3b9db5743dde4e25aa37f14c3c7e6b471a6155485c",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-restore1/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-CfpWvf/public-evidence.json",
+      "bytes": 13006,
+      "sha256": "c95c506dee2dabc1a1cf4b280d4dbeb127ed7e37ca0d39075d2c540ba70f2c50",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m2/FIRST-GRANT/public-evidence.json",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m2-FIRST-GRANT.json",
+      "bytes": 3254,
+      "sha256": "7fb30a7d1350b1e1f63546202a8ee72e334db3e9ac8c6bdb2cf0af9d4595100c",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m2/FIRST-GRANT/public-certificates.json",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-CfpWvf/request-1.tsq",
+      "bytes": 76,
+      "sha256": "d342542ed54de40ff97db585b4cf7a2422469b381c4dba919ed2ff53780257ad",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m2/FIRST-GRANT/request-1.tsq",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-CfpWvf/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "8c3a5c9769b18d85921b72ae63abcb51dcdc27011b11b1b5cf4c2b35466d90de",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m2/FIRST-GRANT/response-1.tsr",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-PBntBx/public-evidence.json",
+      "bytes": 13561,
+      "sha256": "a2c800a1fa7dfa5a73ab26c5de588e538317a6c2b48df7b1ceced13bd1ceb273",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m2/HTTP500-THEN-GRANT/public-evidence.json",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m2-HTTP500-THEN-GRANT.json",
+      "bytes": 3261,
+      "sha256": "d8fa1b553141646a6a976925b1f62a37c489cf07fe0f94289a42071b29998d8b",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m2/HTTP500-THEN-GRANT/public-certificates.json",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-PBntBx/request-2.tsq",
+      "bytes": 76,
+      "sha256": "1f45d916ef5dfd46a2a3dbca3bb6f7ef718058eb1d8311a6fa3f996f7d1518dc",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m2/HTTP500-THEN-GRANT/request-2.tsq",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-PBntBx/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "34f443e6de75cece2657237fc57bfc72f4437b78af89c4c92d5c8887d86c3e4d",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m2/HTTP500-THEN-GRANT/response-2.tsr",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-14qn57/public-evidence.json",
+      "bytes": 12917,
+      "sha256": "ace63ebd1e1583ad4eb56bd369bf8661e1c2efba23d15d96855006861c9f36af",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m2-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3267,
+      "sha256": "4b5e29a87397356e69f7e7e56a7144f391d1b02caff15fdb67805985fb9947c3",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-14qn57/request-2.tsq",
+      "bytes": 76,
+      "sha256": "d9330674d29085ef412540ad757f1930b5b56544e532c5094276f08ced7dd89a",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-14qn57/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "17f2e085f418053e8ebfd1952a99d8682d2515b77dc645538a99b9623dbb3f4a",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-h2NbHi/public-evidence.json",
+      "bytes": 8253,
+      "sha256": "c8ab3e692b390949983d6aa93c2702aebceb9dbad8fa4c4383a157c43b536cb8",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m2-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3270,
+      "sha256": "27262c7b26919ed05a860387c2c3c56a5c7196703d59879e44d89f10e378ff14",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/public-evidence.json",
+      "bytes": 16761,
+      "sha256": "af57960dc09bc25a3bd6482e4522324a32a9cfbfb6c6009351df1e24d29ee144",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m2-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3270,
+      "sha256": "43828c19f47b4f786c397f565d5507c779953f781902303f7db26dedb6781a85",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/request-1.tsq",
+      "bytes": 76,
+      "sha256": "aaa41d0dd2c706cb6b92a0dd619787cfdd327c0d8d58543d31077d71b60fd7d7",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 1,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/request-1.tsq",
+          "bytes": 76,
+          "sha256": "aaa41d0dd2c706cb6b92a0dd619787cfdd327c0d8d58543d31077d71b60fd7d7"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/response-1.tsr",
+          "bytes": 2307,
+          "sha256": "cf78a3c7fffa79181047cc15c6382c1dc6b5578154e434efe770303d79b32a85"
+        },
+        "verificationChildPid": 71864,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/request-1.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/response-1.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:17:49.000Z",
+          "accuracyMs": null,
+          "digest": "3ca64fc33accd444bd0b290ca4ee0a1f869c017a51035eb9299a28c714cff2a2",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "ebc2b53442825a06c25a64fcd01868c3deae41769c809b7ac21de7c14f017ee2",
+          "tokenSha256": "11c0e9d67a50f48a7d2cfc3f66fddec2105f25ed2e490e7423cf4321e276d132",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "cf78a3c7fffa79181047cc15c6382c1dc6b5578154e434efe770303d79b32a85",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 1,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/request-1.tsq",
+          "bytes": 76,
+          "sha256": "aaa41d0dd2c706cb6b92a0dd619787cfdd327c0d8d58543d31077d71b60fd7d7"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/response-1.tsr",
+          "bytes": 2307,
+          "sha256": "cf78a3c7fffa79181047cc15c6382c1dc6b5578154e434efe770303d79b32a85"
+        },
+        "verificationChildPid": 71864,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/request-1.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/response-1.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:17:49.000Z",
+          "accuracyMs": null,
+          "digest": "3ca64fc33accd444bd0b290ca4ee0a1f869c017a51035eb9299a28c714cff2a2",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "ebc2b53442825a06c25a64fcd01868c3deae41769c809b7ac21de7c14f017ee2",
+          "tokenSha256": "11c0e9d67a50f48a7d2cfc3f66fddec2105f25ed2e490e7423cf4321e276d132",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/request-2.tsq",
+      "bytes": 76,
+      "sha256": "761c773c455940b2787a59c4d80336645158cc38bc36808503e7f54d8fadf86f",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 2,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/request-2.tsq",
+          "bytes": 76,
+          "sha256": "761c773c455940b2787a59c4d80336645158cc38bc36808503e7f54d8fadf86f"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/response-2.tsr",
+          "bytes": 2307,
+          "sha256": "1cc1a98484a78e3937aee51f5f47aae3ae069058136a196afec5d7644ad13c30"
+        },
+        "verificationChildPid": 71866,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/request-2.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/response-2.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:17:49.000Z",
+          "accuracyMs": null,
+          "digest": "b4361cb64ebb944a9e3b19d226f663fb8b977c1eb0c6957bb89e29600298df83",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "ebc2b53442825a06c25a64fcd01868c3deae41769c809b7ac21de7c14f017ee2",
+          "tokenSha256": "77ddd7942c07b5a2ef9174d1ee55880691287fbb9b2f0abd23dd573ea76d46d3",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "1cc1a98484a78e3937aee51f5f47aae3ae069058136a196afec5d7644ad13c30",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 2,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/request-2.tsq",
+          "bytes": 76,
+          "sha256": "761c773c455940b2787a59c4d80336645158cc38bc36808503e7f54d8fadf86f"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/response-2.tsr",
+          "bytes": 2307,
+          "sha256": "1cc1a98484a78e3937aee51f5f47aae3ae069058136a196afec5d7644ad13c30"
+        },
+        "verificationChildPid": 71866,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/request-2.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/response-2.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:17:49.000Z",
+          "accuracyMs": null,
+          "digest": "b4361cb64ebb944a9e3b19d226f663fb8b977c1eb0c6957bb89e29600298df83",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "ebc2b53442825a06c25a64fcd01868c3deae41769c809b7ac21de7c14f017ee2",
+          "tokenSha256": "77ddd7942c07b5a2ef9174d1ee55880691287fbb9b2f0abd23dd573ea76d46d3",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-goMvrJ/checkpoint-public-evidence.json",
+      "bytes": 10971,
+      "sha256": "1702abe36cdd58582c7bcb4bb7eacec9f121c2266d6b70815e7923e7d3858075",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-gChdxM/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "4a997006077a70f7bba3968877bbf3d0f2ed02da197cf949e9bc8b2c7ad28735",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Br8clH/checkpoint-public-evidence.json",
+      "bytes": 62389,
+      "sha256": "98fae2b86534ba27c71a7241ba146df29113a3a466ae986fc0a4415c43178a23",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-m2/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RZrdlp/public-evidence.json",
+      "bytes": 12995,
+      "sha256": "33a56b45558091181f6aeff429be3fecaa270561a6b37a08233e950f1f04f898",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-restore2/FIRST-GRANT/public-evidence.json",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-restore2-FIRST-GRANT.json",
+      "bytes": 3260,
+      "sha256": "3230f1a8ff457ba3c714ae1a2a12092dfe8b39b2faa54fdab2b93f17c03c32c9",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-restore2/FIRST-GRANT/public-certificates.json",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RZrdlp/request-1.tsq",
+      "bytes": 76,
+      "sha256": "6a66c41a59c96327963507b97f9fae37436b86decc65863600ca0fb1912703e7",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-restore2/FIRST-GRANT/request-1.tsq",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RZrdlp/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "6e773cb7477cdb6ca3e7e5d79602d47ff328ba15f0092b983369c9f8033129ab",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-restore2/FIRST-GRANT/response-1.tsr",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-kqY6Vx/public-evidence.json",
+      "bytes": 13557,
+      "sha256": "7c886bfc727b1bc61714e20b577ddf5a55325254aa80e4226c3a61619153eadd",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-restore2/HTTP500-THEN-GRANT/public-evidence.json",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-restore2-HTTP500-THEN-GRANT.json",
+      "bytes": 3267,
+      "sha256": "ad8f27bb81e1f3db853a75ae045e1861268792d1547862e333aae880fb13e9dc",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-restore2/HTTP500-THEN-GRANT/public-certificates.json",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-kqY6Vx/request-2.tsq",
+      "bytes": 76,
+      "sha256": "15499fed478ff53db6b2d6ac2f50b5269974915c1f4814a3a3b73b5f16ca4488",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-restore2/HTTP500-THEN-GRANT/request-2.tsq",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-kqY6Vx/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "bc9a14544ef276d1eb146ccbfa190ed1183b98aabf7163b9f838852272b7c1c7",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-restore2/HTTP500-THEN-GRANT/response-2.tsr",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Fuv0QY/public-evidence.json",
+      "bytes": 12908,
+      "sha256": "27ff9da699755829211f9e500faed5c3e12421cdff3928755ce75297ca3ed5bf",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-restore2-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3273,
+      "sha256": "1e0bace396c2e5f2ac6711f99badbf5b635ebff1fc32e3df1c52b0bc020e56de",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Fuv0QY/request-2.tsq",
+      "bytes": 76,
+      "sha256": "051de2d4664655a1d3d3bc1392a5f1c8e5c02d2a9cd756dcf76e3520b38f4ffe",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Fuv0QY/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "105d8797eb05d7b97b415155a68173995de338bf54765647f52913107816b094",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-N47pyN/public-evidence.json",
+      "bytes": 8249,
+      "sha256": "0fd658e5a3858ed2e79f61b72bf1cab590ce01889876d9a895a6e296c7b30c48",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-restore2-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3276,
+      "sha256": "df7f98d10997e20d35c4c8eadef894079ed0eec88a7f26c8eb68910ac75085ed",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/public-evidence.json",
+      "bytes": 16756,
+      "sha256": "9703a3387ec16b7c0e09afddf570670deb6a6708e0d59e1d9bee1bcf3549c5bf",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-restore2-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3276,
+      "sha256": "a0b536568e5f967c9749da65c2e60833cf2b86b614496822836508245db0cf1e",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/request-1.tsq",
+      "bytes": 76,
+      "sha256": "31235914d18e76710d76e256cdc46cd81ac23ade095337eefdab5bc3b8bb1709",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 1,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/request-1.tsq",
+          "bytes": 76,
+          "sha256": "31235914d18e76710d76e256cdc46cd81ac23ade095337eefdab5bc3b8bb1709"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/response-1.tsr",
+          "bytes": 2307,
+          "sha256": "0ef3dfd8fb79bbfd0695abaf228ba8b1c65f7bf728085f7e580b69f41f34cd76"
+        },
+        "verificationChildPid": 72047,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/request-1.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/response-1.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:18:55.000Z",
+          "accuracyMs": null,
+          "digest": "a68fbe686f36c93d45020682a9e66417b329c3092e094050a8e9da5555ad8e48",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "38b1571d0f12c28e3e1cd19c74ff52409fdd7df0dbc66820907f1eb9d130b495",
+          "tokenSha256": "21455186dee68f4705be4a1546fe9d0bed25166190add360bf3abc28d6feb94b",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "0ef3dfd8fb79bbfd0695abaf228ba8b1c65f7bf728085f7e580b69f41f34cd76",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 1,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/request-1.tsq",
+          "bytes": 76,
+          "sha256": "31235914d18e76710d76e256cdc46cd81ac23ade095337eefdab5bc3b8bb1709"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/response-1.tsr",
+          "bytes": 2307,
+          "sha256": "0ef3dfd8fb79bbfd0695abaf228ba8b1c65f7bf728085f7e580b69f41f34cd76"
+        },
+        "verificationChildPid": 72047,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/request-1.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/response-1.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:18:55.000Z",
+          "accuracyMs": null,
+          "digest": "a68fbe686f36c93d45020682a9e66417b329c3092e094050a8e9da5555ad8e48",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "38b1571d0f12c28e3e1cd19c74ff52409fdd7df0dbc66820907f1eb9d130b495",
+          "tokenSha256": "21455186dee68f4705be4a1546fe9d0bed25166190add360bf3abc28d6feb94b",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/request-2.tsq",
+      "bytes": 76,
+      "sha256": "a06ce828955d1b7fc2c1bf0baa37810bd1d99a88d8e427239097cd23aafb12a9",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 2,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/request-2.tsq",
+          "bytes": 76,
+          "sha256": "a06ce828955d1b7fc2c1bf0baa37810bd1d99a88d8e427239097cd23aafb12a9"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/response-2.tsr",
+          "bytes": 2307,
+          "sha256": "10a7b13aaebb2a1a8b12f70a0a17b5103557879b97126be55591ae6f24cabc3c"
+        },
+        "verificationChildPid": 72049,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/request-2.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/response-2.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:18:55.000Z",
+          "accuracyMs": null,
+          "digest": "ffd331b4deea5dd1f5b0c77cbfa310fb3330c0cda9f488a5a84e2550301882cb",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "38b1571d0f12c28e3e1cd19c74ff52409fdd7df0dbc66820907f1eb9d130b495",
+          "tokenSha256": "833709f5b38d852917c17f773fdf0ad831e4f37c94205cc331666d23c92e8bd9",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "10a7b13aaebb2a1a8b12f70a0a17b5103557879b97126be55591ae6f24cabc3c",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence",
+      "windowRequestBinding": {
+        "sequence": 2,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/request-2.tsq",
+          "bytes": 76,
+          "sha256": "a06ce828955d1b7fc2c1bf0baa37810bd1d99a88d8e427239097cd23aafb12a9"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/response-2.tsr",
+          "bytes": 2307,
+          "sha256": "10a7b13aaebb2a1a8b12f70a0a17b5103557879b97126be55591ae6f24cabc3c"
+        },
+        "verificationChildPid": 72049,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/request-2.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/response-2.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:18:55.000Z",
+          "accuracyMs": null,
+          "digest": "ffd331b4deea5dd1f5b0c77cbfa310fb3330c0cda9f488a5a84e2550301882cb",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "38b1571d0f12c28e3e1cd19c74ff52409fdd7df0dbc66820907f1eb9d130b495",
+          "tokenSha256": "833709f5b38d852917c17f773fdf0ad831e4f37c94205cc331666d23c92e8bd9",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-cZITfe/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "e642651b5f0efad84e3474682947c32f8bff5cd5419c05ea5d36d5e54c3aa14a",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-jjgtUY/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "a13e2ff357ebdc365dbbe4af7b173a695839c8ad9491e4c512a055681ce81293",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-lP6WsF/checkpoint-public-evidence.json",
+      "bytes": 62226,
+      "sha256": "e1531b4b5fbefcaf8cf0e1edd577e2ae1f83872f86e3471a9fb47144b211994c",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-restore2/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sljwcy/public-evidence.json",
+      "bytes": 12997,
+      "sha256": "505e50c8aa34b50a92f01c05825d8bd720fbebabc7f124da0e63d8a53effb163",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m1/FIRST-GRANT/public-evidence.json",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m1-FIRST-GRANT.json",
+      "bytes": 3241,
+      "sha256": "402bc131f372a97dec8f9c3b386e7410bbb2c78171010e239c66d15ccb3b7c62",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m1/FIRST-GRANT/public-certificates.json",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sljwcy/request-1.tsq",
+      "bytes": 76,
+      "sha256": "2e810b5ab5218b3088656e7491a10788a5fea33192e9df3fb9a7aae0a78bcfab",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m1/FIRST-GRANT/request-1.tsq",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sljwcy/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "72bdabb7441d821ff08db066b3eddba08a0f443215c5baf77fc18da953f97a13",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m1/FIRST-GRANT/response-1.tsr",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-5JNoi5/public-evidence.json",
+      "bytes": 13562,
+      "sha256": "025a378521003ac0eabc143037b232721a77909ac41fcd48399d9e2ce331e762",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m1/HTTP500-THEN-GRANT/public-evidence.json",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m1-HTTP500-THEN-GRANT.json",
+      "bytes": 3248,
+      "sha256": "e66bc9a408199c53591d0170da9b90e14e89e6ec9748041eefbd3963a998c370",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m1/HTTP500-THEN-GRANT/public-certificates.json",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-5JNoi5/request-2.tsq",
+      "bytes": 76,
+      "sha256": "cad1b281e72cd21c23535bfa49c9923b0b565233fcdba8982c60ad71d4be2344",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m1/HTTP500-THEN-GRANT/request-2.tsq",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-5JNoi5/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "cc5265fd0ba80661e227425422f81521a46404038208ec6c9c402e391292b1cc",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m1/HTTP500-THEN-GRANT/response-2.tsr",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BF15uV/public-evidence.json",
+      "bytes": 12918,
+      "sha256": "99852f34fecd48f0ddce2907204d37e15ff150bfb3697c196a44e8af9fe2fc8a",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-PENDING-GRANT/public-evidence.json",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m1-CHECKPOINT-PENDING-GRANT.json",
+      "bytes": 3254,
+      "sha256": "20bc83925aa7d0e0e42e2e800c440ba35d6b7a6e6c66def3bd11afa0d89daf7c",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-PENDING-GRANT/public-certificates.json",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BF15uV/request-2.tsq",
+      "bytes": 76,
+      "sha256": "bc60176e0253e48cde6a7af5988a461a1438a77f93fe1cdc0869c5e056e54d14",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-PENDING-GRANT/request-2.tsq",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BF15uV/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "007478efabd314704bb9743e45266911db37d03dde846a90916c7a3c181f33d2",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-PENDING-GRANT/response-2.tsr",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VtzCZh/public-evidence.json",
+      "bytes": 8254,
+      "sha256": "961df10021bd8590a4495791a14128932326b69ad8e494c61547581d946863fd",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-REQUIRED-REFUSAL/public-evidence.json",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m1-CHECKPOINT-REQUIRED-REFUSAL.json",
+      "bytes": 3257,
+      "sha256": "7a4c5295ed50f47546d5f831171668297f27ad09714bc5d0f45ab8afb4e034ee",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-REQUIRED-REFUSAL/public-certificates.json",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/public-evidence.json",
+      "bytes": 16766,
+      "sha256": "1498e81e57fa912030e2055b56d3b7a8c342fe82342cb6532a6bc01cf33f9fe2",
+      "role": "public-lifecycle",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-TWO-BOUND-WINDOW/public-evidence.json",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/public-certificate-bundles/p125w-m1-CHECKPOINT-TWO-BOUND-WINDOW.json",
+      "bytes": 3257,
+      "sha256": "e8ae577d5a63b209c3756a32175465393db2eef24eddc97b52f48a0b80292596",
+      "role": "public-certificates",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-TWO-BOUND-WINDOW/public-certificates.json",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/request-1.tsq",
+      "bytes": 76,
+      "sha256": "808adfbe7ce22e85b6080b0b7a2aefaf08fe08f126dfffb9d46a391b839dcbd8",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-TWO-BOUND-WINDOW/request-1.tsq",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only",
+      "windowRequestBinding": {
+        "sequence": 1,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/request-1.tsq",
+          "bytes": 76,
+          "sha256": "808adfbe7ce22e85b6080b0b7a2aefaf08fe08f126dfffb9d46a391b839dcbd8"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/response-1.tsr",
+          "bytes": 2307,
+          "sha256": "ac9fa3983e1c70a1d5e2183e52115c3ff74ac47d8735b64d8139931c1a9d6b56"
+        },
+        "verificationChildPid": 71465,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/request-1.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/response-1.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:15:33.000Z",
+          "accuracyMs": null,
+          "digest": "4ed37d50720d68939c75c49723b95327928de12a8134a1ae67ec4dacd5c50576",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "cb65cffcee05021fda9ea82f07309ea223fc4770a1ce4d132361f3d4c997784e",
+          "tokenSha256": "cc103ee3a32f2365e49ceca216b200dce5a8700cc2370b854b45fc8ba931f119",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/response-1.tsr",
+      "bytes": 2307,
+      "sha256": "ac9fa3983e1c70a1d5e2183e52115c3ff74ac47d8735b64d8139931c1a9d6b56",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-TWO-BOUND-WINDOW/response-1.tsr",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only",
+      "windowRequestBinding": {
+        "sequence": 1,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/request-1.tsq",
+          "bytes": 76,
+          "sha256": "808adfbe7ce22e85b6080b0b7a2aefaf08fe08f126dfffb9d46a391b839dcbd8"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/response-1.tsr",
+          "bytes": 2307,
+          "sha256": "ac9fa3983e1c70a1d5e2183e52115c3ff74ac47d8735b64d8139931c1a9d6b56"
+        },
+        "verificationChildPid": 71465,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/request-1.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/response-1.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:15:33.000Z",
+          "accuracyMs": null,
+          "digest": "4ed37d50720d68939c75c49723b95327928de12a8134a1ae67ec4dacd5c50576",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "cb65cffcee05021fda9ea82f07309ea223fc4770a1ce4d132361f3d4c997784e",
+          "tokenSha256": "cc103ee3a32f2365e49ceca216b200dce5a8700cc2370b854b45fc8ba931f119",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/request-2.tsq",
+      "bytes": 76,
+      "sha256": "aa2766b43b06b203e083aa6aeda3bbb0518facbbde72f8eae741223651a09cca",
+      "role": "public-query",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-TWO-BOUND-WINDOW/request-2.tsq",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only",
+      "windowRequestBinding": {
+        "sequence": 2,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/request-2.tsq",
+          "bytes": 76,
+          "sha256": "aa2766b43b06b203e083aa6aeda3bbb0518facbbde72f8eae741223651a09cca"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/response-2.tsr",
+          "bytes": 2307,
+          "sha256": "5bed8e701a24dc00baa54e7263dd33d3484dd1c56b9df027aa0d77d0e8b1cd66"
+        },
+        "verificationChildPid": 71467,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/request-2.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/response-2.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:15:33.000Z",
+          "accuracyMs": null,
+          "digest": "9eefbd650f5840a2459724ec8a0d323466a5cdb7f55ad82b3a11a1262821e652",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "cb65cffcee05021fda9ea82f07309ea223fc4770a1ce4d132361f3d4c997784e",
+          "tokenSha256": "5f8b70e689adac125b5fb15c5051142c9f3547d52ef126aa7f3419d016ed4779",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/response-2.tsr",
+      "bytes": 2307,
+      "sha256": "5bed8e701a24dc00baa54e7263dd33d3484dd1c56b9df027aa0d77d0e8b1cd66",
+      "role": "public-response",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-TWO-BOUND-WINDOW/response-2.tsr",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only",
+      "windowRequestBinding": {
+        "sequence": 2,
+        "query": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/request-2.tsq",
+          "bytes": 76,
+          "sha256": "aa2766b43b06b203e083aa6aeda3bbb0518facbbde72f8eae741223651a09cca"
+        },
+        "response": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/response-2.tsr",
+          "bytes": 2307,
+          "sha256": "5bed8e701a24dc00baa54e7263dd33d3484dd1c56b9df027aa0d77d0e8b1cd66"
+        },
+        "verificationChildPid": 71467,
+        "verificationChildArgv": [
+          "/opt/homebrew/bin/openssl",
+          "ts",
+          "-verify",
+          "-queryfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/request-2.tsq",
+          "-in",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/response-2.tsr",
+          "-CAfile",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/root.pem"
+        ],
+        "independentGrant": {
+          "genTime": "2026-10-17T00:15:33.000Z",
+          "accuracyMs": null,
+          "digest": "9eefbd650f5840a2459724ec8a0d323466a5cdb7f55ad82b3a11a1262821e652",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "cb65cffcee05021fda9ea82f07309ea223fc4770a1ce4d132361f3d4c997784e",
+          "tokenSha256": "5f8b70e689adac125b5fb15c5051142c9f3547d52ef126aa7f3419d016ed4779",
+          "revocationChecked": false
+        }
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-G0yjLo/checkpoint-public-evidence.json",
+      "bytes": 10927,
+      "sha256": "8d5105267ad6dca3d4aab7f8b3c56f2aa7cafb4c1a62123e8fea9dbaadca3f58",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-PENDING-GRANT/checkpoint-public-evidence.json",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-jQdcZs/checkpoint-public-evidence.json",
+      "bytes": 5178,
+      "sha256": "f5fb961012957c61a60c68af777a5395a1c0bf0910ace45e88b3445317fbb3fc",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-REQUIRED-REFUSAL/checkpoint-public-evidence.json",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-tjzsgB/checkpoint-public-evidence.json",
+      "bytes": 61927,
+      "sha256": "b5b47d4121d687d19486e722abe46fe7a549666e9e6b34e2e72f99355daabda8",
+      "role": "public-checkpoint",
+      "relativeDestination": "public/p125w-m1/CHECKPOINT-TWO-BOUND-WINDOW/checkpoint-public-evidence.json",
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only"
+    }
+  ],
+  "certificateBundleCount": 35,
+  "phaseInputs": [
+    {
+      "phase": "p125w-source-combined",
+      "qualificationRole": "accepted-sequential-evidence",
+      "outcome": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-source-combined-outcome.json",
+        "bytes": 6567,
+        "sha256": "3ab58da9f6baa979905fc4772b41199218d4c2572d97d57c85709018986d7580"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-source-combined-public-audit.json",
+        "bytes": 100163,
+        "sha256": "0aa2ad8f229c852ca6075aa44e3cfbc8c644d0cd02fc5551a98205d1d7267ac8"
+      },
+      "emittedGrantPaths": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-voGhOg/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-iOtiej/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-TzKi7I/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJwDIS/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ttjMoB/public-evidence.json"
+      ],
+      "emittedCheckpointPaths": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-xYYnry/checkpoint-public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-BqfcD8/checkpoint-public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Euu7Fd/checkpoint-public-evidence.json"
+      ]
+    },
+    {
+      "phase": "p125w-fresh-canonical",
+      "qualificationRole": "accepted-sequential-evidence",
+      "outcome": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-fresh-canonical-outcome.json",
+        "bytes": 6599,
+        "sha256": "961f1d0d234fce320cb20584c0c305f86d1a65f2cc177cc609376461449e6130"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-fresh-canonical-public-audit.json",
+        "bytes": 100175,
+        "sha256": "ed9d1c65e09b6915e98966d4d339c0bc907a9195691186d58efc9ca77413f772"
+      },
+      "emittedGrantPaths": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dauw9G/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rcThX1/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-HulndR/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ylZzP5/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-rgvUTi/public-evidence.json"
+      ],
+      "emittedCheckpointPaths": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-lBEF9u/checkpoint-public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-l6jsZU/checkpoint-public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-szLe2c/checkpoint-public-evidence.json"
+      ]
+    },
+    {
+      "phase": "p125w-m1-sequential",
+      "qualificationRole": "accepted-sequential-evidence",
+      "outcome": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-m1-sequential-outcome.json",
+        "bytes": 10011,
+        "sha256": "513c698db17a7e5a954bb5ab88484a27c5ae012a0a7702d2449a6c1554caa40b"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-m1-sequential-public-audit.json",
+        "bytes": 95094,
+        "sha256": "4edb0f196672024eceba103324e0e1d6813d29a59f1c838773528a1116c27c94"
+      },
+      "emittedGrantPaths": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-JUEH2w/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-nH8Gh8/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-MCwACA/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-2AKdfX/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-InTGwx/public-evidence.json"
+      ],
+      "emittedCheckpointPaths": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Zhj4bb/checkpoint-public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-KotlUL/checkpoint-public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Y6xxDS/checkpoint-public-evidence.json"
+      ]
+    },
+    {
+      "phase": "p125w-restore1",
+      "qualificationRole": "accepted-sequential-evidence",
+      "outcome": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-restore1-outcome.json",
+        "bytes": 6585,
+        "sha256": "65d30a3d60679f02e78162b767f8da9ccbe1d8df132cebf726cc6cf6b411151e"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-restore1-public-audit.json",
+        "bytes": 100164,
+        "sha256": "3ca17b7603cfa169d39bc68a685004630c1bf66d2b193d170184a270e8a5dce3"
+      },
+      "emittedGrantPaths": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-njEbha/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-iUmvs1/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-ds56BJ/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bFhqUh/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9U0Q1F/public-evidence.json"
+      ],
+      "emittedCheckpointPaths": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-B1svDl/checkpoint-public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-aUgtpT/checkpoint-public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-BB8USr/checkpoint-public-evidence.json"
+      ]
+    },
+    {
+      "phase": "p125w-m2",
+      "qualificationRole": "accepted-sequential-evidence",
+      "outcome": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-m2-outcome.json",
+        "bytes": 13337,
+        "sha256": "c9417b2cee2bed7fb57f19013071bf4370419aa11ca872df2d7d006d9a6849e7"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-m2-public-audit.json",
+        "bytes": 95675,
+        "sha256": "0d02e0259e67599fa99787b4b2314c30d9a7141919ebb04d119dd881995f24c6"
+      },
+      "emittedGrantPaths": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-CfpWvf/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-PBntBx/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-14qn57/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-h2NbHi/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-245uAU/public-evidence.json"
+      ],
+      "emittedCheckpointPaths": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-goMvrJ/checkpoint-public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-gChdxM/checkpoint-public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Br8clH/checkpoint-public-evidence.json"
+      ]
+    },
+    {
+      "phase": "p125w-restore2",
+      "qualificationRole": "accepted-sequential-evidence",
+      "outcome": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-restore2-outcome.json",
+        "bytes": 6585,
+        "sha256": "5ca3279e8b346809859f31a2d731b9ab8ae2d1281a27f2e6951edc722ccdb712"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-restore2-public-audit.json",
+        "bytes": 100162,
+        "sha256": "d0224e296a55b5f15c8c831539131494cd4972078a63f3ad7d3140a8149ece4a"
+      },
+      "emittedGrantPaths": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RZrdlp/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-kqY6Vx/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Fuv0QY/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-N47pyN/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-RQUXWf/public-evidence.json"
+      ],
+      "emittedCheckpointPaths": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-cZITfe/checkpoint-public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-jjgtUY/checkpoint-public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-lP6WsF/checkpoint-public-evidence.json"
+      ]
+    },
+    {
+      "phase": "p125w-m1",
+      "qualificationRole": "diagnostic-only",
+      "outcome": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-m1-outcome.json",
+        "bytes": 9989,
+        "sha256": "3bfa539cc6424568a1bf24b73845ad1d871ee1561fd4e0d0cd920bd474f50735"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/p125w-m1-public-audit.json",
+        "bytes": 95071,
+        "sha256": "1b4ca5644b654802c0a19e2cba13af8856971c96264be0d5c21c73c9bc7ff087"
+      },
+      "emittedGrantPaths": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-sljwcy/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-5JNoi5/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BF15uV/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-VtzCZh/public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-S5Q0a2/public-evidence.json"
+      ],
+      "emittedCheckpointPaths": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-G0yjLo/checkpoint-public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-jQdcZs/checkpoint-public-evidence.json",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-tjzsgB/checkpoint-public-evidence.json"
+      ]
+    }
+  ],
+  "noPrivateKeyOrChildStreamRead": true,
+  "originalM1DiagnosticOnly": true,
+  "diagnosticPhase": "p125w-m1",
+  "diagnosticHasNoSequentialQualificationCredit": true,
+  "twoWindowRequestsUseSeparateQueryBoundProofs": true
+}

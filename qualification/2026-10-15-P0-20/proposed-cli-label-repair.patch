@@ -1,0 +1,5 @@
+--- a/src/cli.ts
++++ b/src/cli.ts
+@@ -17224,1 +17224,1 @@
+-      finishVerify("Industry-pack audit", verify.report, { json: opts.json, result: verify,
++      finishVerify("Industry-pack audit", verify.report, { json: opts.json, result: verify, claim: artifactClaim("audit:industry-pack"),
