@@ -13,6 +13,7 @@
 
 import type { Domain } from "./domainRegistry.js";
 import type { DeepIndustryQuestion } from "./deep/shared.js";
+import { QUESTIONNAIRE_CONTENT_STATUS } from "./questionnaireLabel.js";
 import { HEALTHCARE_HAND_WRITTEN, HIPAA_PACKS, HEALTHCARE_CONTROLS, hipaaSource } from "./deep/health.js";
 import { FINANCE_HAND_WRITTEN, FINANCE_CONTROLS } from "./deep/wealth.js";
 import { GOVERNMENT_HAND_WRITTEN, FEDERAL_SYSTEM_PACKS, GOVERNMENT_CONTROLS, NIST_800_53 } from "./deep/governance.js";
@@ -120,6 +121,7 @@ export const DEEP_GOVERNMENT_QUESTIONS: DeepIndustryQuestion[] = [
   }),
 ];
 
+/** Every deep question, labelled experimental (AI-drafted; no expert has reviewed it). */
 export function getAllDeepIndustryQuestions(): DeepIndustryQuestion[] {
   return [
     ...DEEP_HEALTHCARE_QUESTIONS,
@@ -129,7 +131,7 @@ export function getAllDeepIndustryQuestions(): DeepIndustryQuestion[] {
     ...DEEP_ENVIRONMENT_QUESTIONS,
     ...DEEP_MOBILITY_QUESTIONS,
     ...DEEP_TECHNOLOGY_QUESTIONS,
-  ];
+  ].map((q) => ({ ...q, contentStatus: QUESTIONNAIRE_CONTENT_STATUS }));
 }
 
 export function getDeepQuestionsByIndustry(industry: string): DeepIndustryQuestion[] {

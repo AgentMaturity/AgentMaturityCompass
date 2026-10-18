@@ -7,6 +7,7 @@
 import { likertToPercent } from "../score/units.js";
 import type { Domain } from "./domainRegistry.js";
 import { selfAssessPack, type SelfAssessedPack } from "./packSelfAssessment.js";
+import { QUESTIONNAIRE_CONTENT_STATUS } from "./questionnaireLabel.js";
 import { withRegulatoryCurrency, type ComplianceFrameworkRef, type RegulatoryReference } from "./packs/regulatorySchema.js";
 import { farmToFork, weaveToWear, materialToMachines, sourceToSustenance, ubiquityToUtility, sipToSanitation } from "./packs/stations/environment.js";
 import { digitalHealthRecord, wellnessManagement, patientLifecycle, clinicalLifecycle, professionalPractice, lifeTechnology, drugDiscovery, clinicalTrials, specializedMedicine } from "./packs/stations/health.js";
@@ -101,6 +102,8 @@ export interface IndustryPack {
   regulatoryReferences?: RegulatoryReference[];
   /** Derived: complianceFrameworks entries normalized to built-in or catalogued external frameworks. */
   complianceFrameworkRefs?: ComplianceFrameworkRef[];
+  /** Stamped at registry build: AI-drafted content, experimental until a named expert signs it (P1-42, D-08). */
+  contentStatus?: typeof QUESTIONNAIRE_CONTENT_STATUS;
 }
 
 export interface IndustryPackAssessment {
@@ -165,9 +168,9 @@ const PACK_CONTENT: Record<IndustryPackId, IndustryPack> = {
   "public-private-collaboration": publicPrivateCollaboration,
 };
 
-/** Registry with derived regulatory currency (regulatoryReferences, complianceFrameworkRefs) attached. */
+/** Registry with derived regulatory currency (regulatoryReferences, complianceFrameworkRefs) and the content status attached. */
 export const INDUSTRY_PACKS = Object.fromEntries(
-  Object.entries(PACK_CONTENT).map(([id, pack]) => [id, withRegulatoryCurrency(pack)])
+  Object.entries(PACK_CONTENT).map(([id, pack]) => [id, { ...withRegulatoryCurrency(pack), contentStatus: QUESTIONNAIRE_CONTENT_STATUS }])
 ) as Record<IndustryPackId, IndustryPack>;
 
 // ---------------------------------------------------------------------------

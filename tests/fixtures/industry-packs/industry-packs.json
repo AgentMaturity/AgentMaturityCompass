@@ -55,6 +55,7 @@
       "IOSCO Crypto Recommendations",
       "5AMLD/6AMLD"
     ],
+    "contentStatus": "experimental",
     "description": "Decentralized finance, tokenization, and DeFi protocols — covering blockchain-based financial services including token issuance, decentralized exchanges, lending protocols, and digital asset custody with emphasis on regulatory compliance, smart contract security, and investor protection.",
     "euAIActClassification": "Not listed in Annex III unless used to evaluate the creditworthiness of natural persons (Annex III §5(b)); Art. 50 transparency applies",
     "id": "blockchain",
@@ -365,6 +366,7 @@
       "Basel III",
       "TCFD Recommendations"
     ],
+    "contentStatus": "experimental",
     "description": "Savings, investing, lending, borrowing, securitizing, and wealth growth — covering sustainable finance, ESG integration, green bonds, and circular economy investment with emphasis on greenwashing prevention, fiduciary duty, and sustainable value creation.",
     "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
     "id": "circular-economy",
@@ -677,6 +679,7 @@
       "EU AI Act Annex III point 5(a)",
       "ISO 9241-210:2019"
     ],
+    "contentStatus": "experimental",
     "description": "Citizens engaging in government services to lead law-abiding responsible lives — AI agents delivering public services with equity, accessibility, transparency, and accountability, covering digital service delivery, benefits administration, and public safety services.",
     "euAIActClassification": "Annex III §5(a) — eligibility for essential public assistance benefits (obligations from 2 Dec 2027); deployer duties Arts 26-27, explanation Art. 86, interaction disclosure Art. 50(1)",
     "id": "citizen-services",
@@ -997,6 +1000,7 @@
       "JCI Standards",
       "NICE TA Guidance"
     ],
+    "contentStatus": "experimental",
     "description": "Therapeutic, surgical, psychoanalysis, and alternative medicine — covering clinical practice modalities with emphasis on evidence-based practice, patient safety, clinical governance, and treatment efficacy monitoring.",
     "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage",
     "id": "clinical-lifecycle",
@@ -1310,6 +1314,7 @@
       "ISO 14155:2026",
       "CONSORT 2025"
     ],
+    "contentStatus": "experimental",
     "description": "Drug and therapy testing, efficacy assurance, and participant management — covering the clinical trial lifecycle from protocol design through participant recruitment, data collection, analysis, and reporting with emphasis on participant safety, data integrity, and regulatory compliance.",
     "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Art. 2(6) excludes systems developed and put into service solely for scientific research and development",
     "id": "clinical-trials",
@@ -1608,6 +1613,7 @@
       "ISO/IEC 42001:2023",
       "NIST AI RMF 1.0"
     ],
+    "contentStatus": "experimental",
     "description": "Contextual data interpretation moving from master data through meta, empirical, analytical, to contextual intelligence — profiled, personalized, and preferentiated — AI agents that transform raw data into actionable, trusted intelligence with explainability and bias controls.",
     "euAIActClassification": "General Purpose AI — Chapter V obligations for general-purpose AI models (Art. 53; Art. 51 classification with systemic risk) where the agent provides or integrates a GPAI model; Art. 50 transparency for systems interacting with natural persons",
     "id": "cognition-to-intelligence",
@@ -1897,6 +1903,7 @@
       "Council of Europe Rec CM/Rec(2017)5",
       "EU Political Advertising Regulation"
     ],
+    "contentStatus": "experimental",
     "description": "Electing candidates representing constituent aspirations in the process of governing — AI agents supporting democratic processes, voter engagement, electoral integrity, and political communication with strict safeguards against manipulation and disinformation.",
     "euAIActClassification": "Annex III §8(b) — influencing the outcome of an election or referendum or voting behaviour (obligations from 2 Dec 2027); PROHIBITED under Art. 5(1)(a)-(b) where techniques are manipulative or exploit vulnerabilities",
     "id": "dance-of-democracy",
@@ -2222,6 +2229,7 @@
       "EU Web Accessibility Directive",
       "UDL Guidelines 2.2"
     ],
+    "contentStatus": "experimental",
     "description": "Inclusive education, adaptive methods, and mainstream integration — covering AI in special education and disability support with emphasis on universal design, assistive technology, and dignity-preserving adaptive learning.",
     "euAIActClassification": "Annex III §3 — education and vocational training; Art. 5(1)(b) prohibits exploiting vulnerabilities due to disability",
     "id": "differently-abled",
@@ -2528,6 +2536,7 @@
       "ISO/IEC 29115:2013",
       "Council of Europe AI Convention 2024"
     ],
+    "contentStatus": "experimental",
     "description": "Citizen data tied with digital identity and tagged with government identities — supporting tax, travel documents, and rights to private and secure data — AI agents managing digital identity ecosystems, citizen data rights, and public trust infrastructure.",
     "euAIActClassification": "Annex III §1(a) — remote biometric identification (biometric verification that only confirms a claimed identity is excluded) and §5(a) — where identity gates public assistance benefits; Annex III obligations apply from 2 Dec 2027; PROHIBITED under Art. 5(1)(c), (g), (h) where those practices apply now",
     "id": "digital-citizens-rights",
@@ -2844,6 +2853,7 @@
       "EU EHDS Regulation",
       "IHE XDS.b"
     ],
+    "contentStatus": "experimental",
     "description": "Individual health data ownership from birth to death — covering hereditary, congenital, and socially acquired health information with emphasis on interoperability, patient consent, data portability, and longitudinal health record integrity.",
     "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(a) where public authorities use it to evaluate eligibility for healthcare services",
     "id": "digital-health-record",
@@ -3197,6 +3207,7 @@
       "MiCA 2023/1114",
       "Dodd-Frank Title X"
     ],
+    "contentStatus": "experimental",
     "description": "Cross-border payments, borrowing, credit, buying, and selling — covering the digital payment ecosystem including payment processing, credit scoring, lending, and cross-border transactions with emphasis on fraud prevention, consumer protection, and financial inclusion.",
     "euAIActClassification": "Annex III §5(b) — evaluating the creditworthiness of natural persons or establishing their credit score (financial-fraud detection excluded)",
     "id": "digital-payments",
@@ -3520,6 +3531,7 @@
       "FAIR Principles",
       "ICH M4 CTD"
     ],
+    "contentStatus": "experimental",
     "description": "Biological research, molecules, drug and therapy production — covering the drug discovery pipeline from target identification through lead optimization, preclinical development, and manufacturing with emphasis on data integrity, reproducibility, and regulatory compliance.",
     "euAIActClassification": "Out of scope under Art. 2(6) when developed and put into service solely for scientific research and development; otherwise Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device",
     "id": "drug-discovery",
@@ -3819,6 +3831,7 @@
       "EUDR 2023/1115",
       "Codex Alimentarius CAC/RCP 1-1969"
     ],
+    "contentStatus": "experimental",
     "description": "Sustainable farming, food nutrition, and responsible consumption — covering the entire agri-food value chain from primary production through processing, distribution, and consumption with emphasis on food safety, traceability, and environmental sustainability.",
     "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply (Annex III §2 covers critical digital infrastructure, road traffic and water, gas, heating or electricity supply, not food systems)",
     "id": "farm-to-fork",
@@ -4134,6 +4147,7 @@
       "EU NIS2 2022/2555",
       "ISO 9001:2026"
     ],
+    "contentStatus": "experimental",
     "description": "Operational logistics agents managing freight tenders, carrier scorecards, 3PL execution, warehouse events, delivery exceptions, cold-chain deviations, and traceability evidence across shippers, carriers, warehouses, and customers.",
     "euAIActClassification": "Annex III §4(b) where the agent allocates warehouse or driver tasks based on individual behaviour or personal traits, or monitors and evaluates worker performance; §2 only for safety components in road traffic",
     "id": "freight-3pl-warehouse",
@@ -4420,6 +4434,7 @@
       "EU AI Act Art. 26",
       "WEF Future of Jobs"
     ],
+    "contentStatus": "experimental",
     "description": "Income generation, intellectual property, and individual/collective work — covering the evolving labor landscape including gig economy, remote work, algorithmic management, and worker data rights with emphasis on fair labor practices and equitable opportunity.",
     "euAIActClassification": "Annex III §4 — employment, workers' management and access to self-employment (recruitment, task allocation, performance monitoring)",
     "id": "future-of-work",
@@ -4742,6 +4757,7 @@
       "ADA",
       "GDPR"
     ],
+    "contentStatus": "experimental",
     "description": "Undergraduate and postgraduate professional specialization — covering AI in higher education including admissions, research, assessment, and academic integrity with emphasis on academic freedom, research ethics, and equitable access.",
     "euAIActClassification": "Annex III §3 — education and vocational training (admission, evaluating learning outcomes, assessing education level, proctoring)",
     "id": "higher-education",
@@ -5094,6 +5110,7 @@
       "EU Copyright Directive 2019/790",
       "EU Media Freedom Act 2024"
     ],
+    "contentStatus": "experimental",
     "description": "The combination of information and entertainment shared and consumed by people — physically and digitally available on-demand — AI agents curating, generating, and distributing content with emphasis on accuracy, consumer protection, content moderation, and copyright compliance.",
     "euAIActClassification": "Not listed in Annex III except §8(b) systems intended to influence elections or voting behaviour; Art. 50(4) deep-fake disclosure and Art. 5(1)(a) manipulation prohibition apply",
     "id": "infotainment",
@@ -5442,6 +5459,7 @@
       "Section 508",
       "EU AI Act Annex III §3"
     ],
+    "contentStatus": "experimental",
     "description": "Kindergarten through grade 12 formal education foundation — covering AI in primary and secondary education with emphasis on child safety, age-appropriate content, parental consent, and equitable learning outcomes.",
     "euAIActClassification": "Annex III §3 — education and vocational training (admission, evaluating learning outcomes, assessing education level, proctoring)",
     "id": "k12-pm3",
@@ -5798,6 +5816,7 @@
       "GDPR",
       "21 CFR Part 11"
     ],
+    "contentStatus": "experimental",
     "description": "Digital technology in life, learning, and living — covering disease prevention, health technology assessment, and the integration of AI/digital tools into daily health management with emphasis on safety, efficacy, and equitable access.",
     "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device",
     "id": "life-technology",
@@ -6085,6 +6104,7 @@
       "ISO 14001:2026",
       "EU Battery Regulation 2023/1542"
     ],
+    "contentStatus": "experimental",
     "description": "Appliances, quality of life improvement, and manufacturing — covering the lifecycle of consumer and industrial products from raw material extraction through design, manufacturing, use, and end-of-life with emphasis on ecodesign, energy efficiency, and circular economy principles.",
     "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
     "id": "material-to-machines",
@@ -6386,6 +6406,7 @@
       "ISO/IEC 27001:2022",
       "OWASP API Top 10 2023"
     ],
+    "contentStatus": "experimental",
     "description": "Data connectivity across customer, enterprise, and industry ecosystems — flipping financial ecosystems to human ecosystems — AI agents orchestrating data flows, API ecosystems, and platform integrations with emphasis on interoperability, data rights, and ecosystem trust.",
     "euAIActClassification": "Annex III §2 where a safety component of critical digital infrastructure; otherwise not listed — Art. 50 transparency applies",
     "id": "networked-ecosystems",
@@ -6707,6 +6728,7 @@
       "UNHCR FI Guidelines",
       "EU Microfinance Reg §3"
     ],
+    "contentStatus": "experimental",
     "description": "Economic opportunities for socially displaced and disadvantaged populations — covering financial inclusion, microfinance, social protection, and economic empowerment with emphasis on equitable access, dignity preservation, and sustainable poverty reduction.",
     "euAIActClassification": "Annex III §5(a) — public assistance benefits and services; §5(b) — creditworthiness of natural persons",
     "id": "no-poverty",
@@ -7036,6 +7058,7 @@
       "EU NIS2 2022/2555",
       "ISO/IEC 20000-1:2018"
     ],
+    "contentStatus": "experimental",
     "description": "The transactional system orchestrating strategic movement of people, goods, and money — creating wealth and value while enabling sustainable outcomes — AI agents as the core orchestration layer for economic and social systems with resilience, accountability, and outcome measurement.",
     "euAIActClassification": "Annex III §2 (critical digital infrastructure) and §4 (workers' management) where those uses apply",
     "id": "os-sustainable-outcomes",
@@ -7356,6 +7379,7 @@
       "ISO 26000:2010",
       "UN SDG 17"
     ],
+    "contentStatus": "experimental",
     "description": "Global collaboration and sharing to create intellectual property in an open shared environment — AI agents facilitating multi-stakeholder partnerships, open innovation ecosystems, and IP co-creation with emphasis on governance, fair access, and prevention of exploitation.",
     "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
     "id": "partnerships-prosperity",
@@ -7686,6 +7710,7 @@
       "CMS 42 CFR §482",
       "HL7 FHIR R4"
     ],
+    "contentStatus": "experimental",
     "description": "Appointment through investigation, diagnosis, treatment, care, and prognosis — covering the complete patient journey with emphasis on clinical safety, informed consent, care coordination, and outcome measurement.",
     "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage; §5(a) for public-authority eligibility decisions on healthcare services",
     "id": "patient-lifecycle",
@@ -8000,6 +8025,7 @@
       "ISO/IEC 25000 SQuaRE",
       "EU AI Act Art. 50(4)"
     ],
+    "contentStatus": "experimental",
     "description": "The process from petition through bill, legislation, budgetary provision, to law — AI agents supporting legislative processes, democratic drafting, public consultation, and lawmaking transparency with safeguards for democratic integrity and inclusive participation.",
     "euAIActClassification": "Not listed in Annex III by default (point 8(a) covers judicial authorities; 8(b) applies only to systems intended to influence elections or voting); Art. 50(4) disclosure applies to AI-generated text published on matters of public interest; Art. 5 prohibitions apply",
     "id": "petition-to-law",
@@ -8342,6 +8368,7 @@
       "ISO/IEC 27701:2025",
       "NIST CSF 2.0"
     ],
+    "contentStatus": "experimental",
     "description": "Last-mile privacy and security through network and communications — AI agents protecting end-user privacy and security in local and wide-area networks, IoT ecosystems, connected vehicles, and smart infrastructure with emphasis on data protection, cybersecurity resilience, and zero-trust architecture.",
     "euAIActClassification": "Annex III §1 — biometrics (remote biometric identification, biometric categorisation, emotion recognition) where used; §6 only for law-enforcement use",
     "id": "privacy-security-mobility",
@@ -8646,6 +8673,7 @@
       "CMS 42 CFR §424",
       "ISO 27799:2025"
     ],
+    "contentStatus": "experimental",
     "description": "Healthcare professionals — appointments, transcription, billing, and practice management with emphasis on coding accuracy, documentation integrity, and regulatory compliance for healthcare business operations.",
     "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(a) for public-authority eligibility decisions on healthcare services",
     "id": "professional-practice",
@@ -8958,6 +8986,7 @@
       "ISO 26000:2010 §6.6",
       "OECD AI Principles"
     ],
+    "contentStatus": "experimental",
     "description": "Connecting public institutions (national/state governments, WHO, UN) and private institutions in growth-oriented transformations — AI agents orchestrating public-private partnerships for sustainable development with accountability, anti-corruption safeguards, and equitable value distribution.",
     "euAIActClassification": "Not listed in Annex III by default (not §8; §5(a) applies only where the agent evaluates eligibility for public assistance or similar listed uses); the GPAI systemic-risk designation applies to models, not to this pack's use cases",
     "id": "public-private-collaboration",
@@ -9290,6 +9319,7 @@
       "MARPOL Annex IV",
       "EU Drinking Water Directive 2020/2184"
     ],
+    "contentStatus": "experimental",
     "description": "River, ocean, sea, and marine resources — covering water sustainability from source protection through treatment, distribution, consumption, wastewater management, and marine ecosystem preservation.",
     "euAIActClassification": "Annex III §2 — safety components in the management and operation of the supply of water",
     "id": "sip-to-sanitation",
@@ -9603,6 +9633,7 @@
       "GDPR",
       "ADA"
     ],
+    "contentStatus": "experimental",
     "description": "Occupational skills including trades, crafts, and vocational education — covering AI in skills development, competency assessment, and workforce readiness with emphasis on practical skill validation, industry alignment, and equitable access to training.",
     "euAIActClassification": "Annex III §3 — education and vocational training; §4(a) where used for recruitment or selection",
     "id": "skills-training",
@@ -9914,6 +9945,7 @@
       "Nagoya Protocol",
       "FAO Code of Conduct for Responsible Fisheries"
     ],
+    "contentStatus": "experimental",
     "description": "Forests, wildlife, ecology cohabitation — covering biodiversity conservation, ecosystem services, and sustainable natural resource management with emphasis on species protection, habitat preservation, and ecological monitoring.",
     "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
     "id": "source-to-sustenance",
@@ -10291,6 +10323,7 @@
       "WCAG 2.1",
       "ISTE Standards"
     ],
+    "contentStatus": "experimental",
     "description": "Music, art, social sciences, and digital-age learning — covering AI in creative and specialized education with emphasis on creative expression protection, cultural sensitivity, and pedagogical innovation.",
     "euAIActClassification": "Annex III §3 — education and vocational training",
     "id": "specialized-education",
@@ -10614,6 +10647,7 @@
       "State Pharmacy Practice Acts",
       "DEA 21 CFR 1301-1321"
     ],
+    "contentStatus": "experimental",
     "description": "Prescription delivery, medicine administration, and payor disintermediation — covering pharmacy operations, medication dispensing, specialty drug management, and direct-to-patient pharmaceutical services with emphasis on drug safety, supply chain integrity, and equitable access.",
     "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage",
     "id": "specialized-medicine",
@@ -10924,6 +10958,7 @@
       "EU Urban Agenda",
       "C40 Cities"
     ],
+    "contentStatus": "experimental",
     "description": "Urban and rural community building with environmental goals — covering smart city AI, urban planning, community services, and sustainable development with emphasis on citizen participation, environmental sustainability, and equitable urban development.",
     "euAIActClassification": "Annex III §2 only for safety components in road traffic or in water, gas, heating or electricity supply; otherwise not listed",
     "id": "sustainable-communities",
@@ -11223,6 +11258,7 @@
       "C-TPAT",
       "IMDG Code"
     ],
+    "contentStatus": "experimental",
     "description": "Transportation infrastructure, ports of entry, and goods/people movement — covering AI in port operations, logistics, customs, and border management with emphasis on supply chain security, environmental compliance, and trade facilitation.",
     "euAIActClassification": "Not listed in Annex III (§2 covers road traffic, not port or maritime operations); Art. 6(1) where the agent is a safety component of a product covered by Annex I legislation",
     "id": "sustainable-ports",
@@ -11532,6 +11568,7 @@
       "GRESB",
       "EU Taxonomy Art. 10"
     ],
+    "contentStatus": "experimental",
     "description": "Industrial real estate, manufacturing facilities, travel/leisure, entertainment, and hospital infrastructure — AI agents managing buildings, facilities, and real estate portfolios with focus on energy performance, occupant wellbeing, sustainability certification, and climate resilience.",
     "euAIActClassification": "Not listed in Annex III unless a safety component in the supply of heating or electricity (§2); Art. 50 transparency applies",
     "id": "sustainable-real-estate",
@@ -11845,6 +11882,7 @@
       "IEEE 2030",
       "EU EED 2023/1791"
     ],
+    "contentStatus": "experimental",
     "description": "Sustainable energy generation to consumption — covering the full energy value chain from renewable generation through grid management, storage, distribution, and end-use optimization with emphasis on grid reliability, decarbonization, and energy equity.",
     "euAIActClassification": "Annex III §2 — safety components in the management and operation of the supply of gas, heating or electricity",
     "id": "ubiquity-to-utility",
@@ -12166,6 +12204,7 @@
       "ISO 22301:2019",
       "EU Data Act 2023"
     ],
+    "contentStatus": "experimental",
     "description": "Cloud, data virtualization, server infrastructure, and glocalization platforms — AI agents managing digital infrastructure enabling borderless commerce, secure global-local operations, and sustainable compute with emphasis on data sovereignty, operational resilience, and green computing.",
     "euAIActClassification": "Annex III §2 — safety components in the management and operation of critical digital infrastructure",
     "id": "virtual-infrastructure",
@@ -12482,6 +12521,7 @@
       "EU Textile Strategy",
       "Higg FEM/FSLM"
     ],
+    "contentStatus": "experimental",
     "description": "Fashion, circular economy, and textile sustainability — addressing the full textile lifecycle from fiber sourcing through manufacturing, retail, use, and end-of-life with emphasis on chemical safety, labor rights, and circularity.",
     "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
     "id": "weave-to-wear",
@@ -12782,6 +12822,7 @@
       "EU AI Act Annex III",
       "SAMHSA Guidelines"
     ],
+    "contentStatus": "experimental",
     "description": "Physical, emotional, and professional wellness — covering body performance optimization, mental health support, occupational wellness, and preventive health with emphasis on sensitive data protection and evidence-based interventions.",
     "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(c) where used for risk assessment and pricing in life or health insurance",
     "id": "wellness-management",

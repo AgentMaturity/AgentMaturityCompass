@@ -27,6 +27,8 @@ export interface DeepIndustryQuestion {
   levels: Record<number, string>;
   evidenceTypes: string[];
   source: RegulationSource;
+  /** Set by getAllDeepIndustryQuestions(): AI-drafted, experimental until a named expert signs it (P1-42, D-08). */
+  contentStatus?: "experimental";
 }
 
 export const RETRIEVED_AT = "2026-10-03";
