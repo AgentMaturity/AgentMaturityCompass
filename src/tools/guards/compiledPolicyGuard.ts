@@ -6,6 +6,7 @@ import { approvalPolicySchema } from "../../approvals/approvalPolicySchema.js";
 import { activeControlPlanHead, loadActiveCompiledPolicy, type ActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
 import type { ApprovalRule, ParamValue } from "../../catalog/compiler/types.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../../crypto/keys.js";
+import { loadVerifiedToolsConfigSnapshot, type VerifiedToolsConfigSnapshot } from "../../toolhub/toolhubValidators.js";
 import type { ActionClass } from "../../types.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { RUN_CODE_TOOL } from "../toolPipeline.js";
@@ -80,6 +81,22 @@ function approvalDenial(workspace: string, actionClass: ActionClass, rule: Appro
   }
 }
 
+/** The verified tools.yaml one guard pass decides from: the native toolset shares one read with its allowlist guards. */
+export type ToolsSnapshotRead = () => VerifiedToolsConfigSnapshot;
+
+/**
+ * P1-10F: a plan compiled from the workspace's signed tools.yaml records the SHA-256 of its bytes. Any other tools.yaml
+ * now (edited, re-signed or removed) denies, as the catalog lock does for the catalog, until the plan is recompiled and
+ * reactivated, so tools.yaml cannot change what an activated plan shows. The denial is model-visible: no host path.
+ */
+function toolsConfigDenial(pinned: string, snapshot: VerifiedToolsConfigSnapshot): string | null {
+  const live = snapshot.digestSha256;
+  if (live === pinned) return null;
+  return live === null
+    ? `the signed tools.yaml this plan was compiled from cannot be read or verified (${snapshot.reason ?? "unknown reason"}); recompile and reactivate the plan`
+    : `the signed tools.yaml changed since this plan was compiled (sha256 ${live.slice(0, 12)}, the plan records ${pinned.slice(0, 12)}); recompile and reactivate the plan`;
+}
+
 /**
  * Whether the policy's `toolPipeline.visibleTools` lists this tool. The guard denies what this refuses; native sessions
  * also leave it out of the tools offered to the model. The Code Mode transport dispatches sub-calls, and each one is
@@ -90,9 +107,12 @@ export function compiledPolicyShows(policy: ActiveCompiledPolicy, name: string):
 }
 
 /** Why the pinned policy denies this call, or undefined. */
-export function compiledPolicyDenial(policy: ActiveCompiledPolicy, workspace: string, execution: ToolExecution): string | undefined {
+export function compiledPolicyDenial(policy: ActiveCompiledPolicy, workspace: string, execution: ToolExecution,
+  readTools: ToolsSnapshotRead = () => loadVerifiedToolsConfigSnapshot(workspace)): string | undefined {
   const deny = (controlIds: readonly string[], why: string): string => `compiled policy denied this call (control ${named(policy, controlIds)}): ${why}`;
   const pipeline = policy.runtimePolicy.toolPipeline;
+  const toolsWhy = pipeline.toolsConfigSha256 === undefined ? null : toolsConfigDenial(pipeline.toolsConfigSha256, readTools());
+  if (toolsWhy) return `compiled policy denied this call (toolPipeline.toolsConfigSha256): ${toolsWhy}`;
   if (!compiledPolicyShows(policy, execution.name)) {
     return `compiled policy denied this call (toolPipeline.visibleTools): "${execution.name}" is not a visible tool`;
   }
@@ -109,7 +129,7 @@ export function compiledPolicyDenial(policy: ActiveCompiledPolicy, workspace: st
  * The guard. `pinned` is what the session loaded at start, or null. Any other head now (changed, removed, or a plan
  * activated since) denies: the receipt the session wrote names the policy every call ran under.
  */
-export function compiledPolicyGuard(workspace: string, pinned: ActiveCompiledPolicy | null): ToolGuard {
+export function compiledPolicyGuard(workspace: string, pinned: ActiveCompiledPolicy | null, readTools?: ToolsSnapshotRead): ToolGuard {
   return (execution) => {
     let head: string | null;
     try {
@@ -118,7 +138,7 @@ export function compiledPolicyGuard(workspace: string, pinned: ActiveCompiledPol
       return `compiled policy integrity failure: ${message(error)}`;
     }
     if (head !== (pinned?.entrySha256 ?? null)) return "the active compiled policy changed during this session; start a new session";
-    return pinned ? compiledPolicyDenial(pinned, workspace, execution) : undefined;
+    return pinned ? compiledPolicyDenial(pinned, workspace, execution, readTools) : undefined;
   };
 }
 

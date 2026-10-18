@@ -182,7 +182,8 @@ framework through a scaffold, connect instructions and a trace import.
   through `spawnSubagent` (depth limit, signed handoff packet, declared scope, a started/completed pair); AMC never
   starts helper agents on its own. Studio's native build sessions compose no delegation, so the plan lists the workflow
   as unsupported (`NATIVE_TASKS_NO_DELEGATION`) and it stays listed until an owner acknowledges it out of scope. Once a
-  compiled plan is active its default `visibleTools` hides the tool, and the plan names that denial
+  compiled plan is active its `visibleTools` hide the tool unless the signed tools.yaml it was compiled from lists it
+  (the built-in default list does not), and the plan names that denial
   (`C6_COMPILED_POLICY_DENIES`, with the plan revision and its tool-pipeline controls); an unreadable plan counts as
   hiding it.
 - **Build** (an owner) signs the agent's preset into `.amc/agents.yaml` (the presets file is verified and parsed from
@@ -261,7 +262,10 @@ the agent's prompt pack.
   stations are carried), excluded uses, data residency, retention and processors, and deployment needs. Understand
   carries `markets` and `stations` from Aspire. An empty or `unknown` fact stays unknown (null) and is never guessed;
   `jurisdictions` left empty uses the carried markets. Every fact is the member's assertion (`provenance: asserted`,
-  source `a4:<projectId>@r<revision>`). Understand compiles the plan with `compilePlan` on that profile and records the
+  source `a4:<projectId>@r<revision>`). Understand compiles the plan with `compilePlan` on that profile and the
+  workspace's signed `.amc/tools.yaml` (`signedTools`, read and verified by `compileInputs`, as `amc catalog
+  compile` reads it: its tools are the plan's visible tools and the plan binds its SHA-256; with no tools.yaml, the
+  built-in default list; one that does not verify is the compile refusal `TOOLS_CONFIG_UNVERIFIED`) and records the
   applicability per requirement with its reasons and missing facts, each citation's `appliesWhen`, the register entries
   of the stations with `verified` as recorded, the reporting-clock candidates (each `NEEDS_CLASSIFICATION`, with
   `CLOCK_REVIEW_STATUS`), the signed configs' states and the active plan's head. The missing facts name the questions
@@ -281,7 +285,9 @@ the agent's prompt pack.
   its own writes moved nothing but the agent's memory directory, signed: a manifest that cannot be written or signed is
   refused before anything is published (`requireSignature`), and Build is refused with 409 and that code
   (`MANIFEST_SIGNATURE_INVALID`, for example) with its writes put back. A plan weaker than the plan this project put in force
-  is refused (`POLICY_WIDENING_REFUSED`). Every refusal comes before Build writes, including the router's own size
+  is refused (`POLICY_WIDENING_REFUSED`); when the weakening is the tools.yaml binding (its digest dropped, more visible
+  tools or a wider tools entry) it adds `TOOLS_CONFIG_CHANGED` and says to re-sign tools.yaml or rebuild the plan instead
+  of changing the answers. Every refusal comes before Build writes, including the router's own size
   (256 KiB) and credential checks of the record Build makes (`413 INPUT_TOO_LARGE`; Propose already refuses a proposal
   that leaves Build no room). When a write fails, or the step is not recorded after Build returned (the head moved, the
   transition was refused, a replay answered), the memory policy, the context plugin and the Enforce manifest and its
@@ -370,7 +376,10 @@ the agent's prompt pack.
   verifies that grant and re-checks separation of duties and membership; `activateControlPlan` then consumes it itself
   (`activate-<digest32>`, recorded on `EFFECT_FINISHED`). A failed activation is not retried in place: re-open the
   effect gate (only after a failed, unfinished attempt; on a consumed gate anything else is `409 A4_GATE_STALE`,
-  `consumed`). Only a ready plan activates: opening the review on a blocked plan is `409 PLAN_BLOCKED`. Whenever
+  `consumed`). Only a ready plan activates: opening the review on a blocked plan is `409 PLAN_BLOCKED`, and on a plan
+  whose bound tools.yaml digest is not the workspace's verified tools.yaml now (re-signed, added or removed since Build;
+  absent on both sides matches) `409 TOOLS_CONFIG_CHANGED`: build the plan again. A weaker plan whose weakening is the
+  tools.yaml binding adds `TOOLS_CONFIG_CHANGED` to `PLAN_WEAKENS_ACTIVE_PLAN`. Whenever
   activation is due or opened, `plan_activated` is BLOCKED from Review on for a plan `activateControlPlan` would refuse
   (`PLAN_BLOCKED`, `PLAN_WEAKENS_ACTIVE_PLAN`, `ACTIVE_PLAN_UNREADABLE`); before Review the same codes show on a WAITING
   item that is not mandatory, so it never holds the direction gate. A workspace has one active plan for every agent:
