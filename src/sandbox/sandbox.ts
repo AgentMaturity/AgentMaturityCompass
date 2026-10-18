@@ -132,39 +132,27 @@ function recordSandboxAttestation(params: {
       imageHash = "unknown";
     }
 
+    const audit = {
+      auditType: "SANDBOX_EXECUTION_ENABLED",
+      severity: "LOW",
+      agentId: params.agentId,
+      image: params.image,
+      imageHash,
+      command: argv.command,
+      args: argv.args,
+      networkMode: params.networkName ? "internal_bridge" : "none",
+      networkName: params.networkName ?? null,
+      gatewayRoute: params.gatewayRoute ?? null,
+      gatewayProxyUrl: params.gatewayProxyUrl ?? null
+    };
     ledger.appendEvidence({
       sessionId,
       runtime: "sandbox",
       eventType: "audit",
-      payload: JSON.stringify({
-        auditType: "SANDBOX_EXECUTION_ENABLED",
-        severity: "LOW",
-        agentId: params.agentId,
-        image: params.image,
-        imageHash,
-        command: argv.command,
-        args: argv.args,
-        networkMode: params.networkName ? "internal_bridge" : "none",
-        networkName: params.networkName ?? null,
-        gatewayRoute: params.gatewayRoute ?? null,
-        gatewayProxyUrl: params.gatewayProxyUrl ?? null
-      }),
+      payload: JSON.stringify(audit),
       payloadExt: "json",
       inline: true,
-      meta: {
-        auditType: "SANDBOX_EXECUTION_ENABLED",
-        severity: "LOW",
-        agentId: params.agentId,
-        image: params.image,
-        imageHash,
-        command: argv.command,
-        args: argv.args,
-        networkMode: params.networkName ? "internal_bridge" : "none",
-        networkName: params.networkName ?? null,
-        gatewayRoute: params.gatewayRoute ?? null,
-        gatewayProxyUrl: params.gatewayProxyUrl ?? null,
-        trustTier: "OBSERVED"
-      }
+      meta: { ...audit, trustTier: "OBSERVED" }
     });
     ledger.sealSession(sessionId);
   } finally {
