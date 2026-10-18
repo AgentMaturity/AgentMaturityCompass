@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-42",
+  "date": "2026-10-18",
+  "commit": "2d02681e6315031bdfd9300bc70a96762af4b6dd",
+  "branch": "rtd/p1-42-s4-s10-questionnaires",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0, local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 63284
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 40126
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 87508
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 4306
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 1418
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 838
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 3066
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 3106
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 516
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 1020
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 327
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 344
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1608
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 9827
+    },
+    {
+      "cmd": "npm run -s check:industry-guides",
+      "exit": 0,
+      "durationMs": 1270
+    },
+    {
+      "cmd": "npm run -s check:regulatory-calendar",
+      "exit": 0,
+      "durationMs": 485
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 396
+    },
+    {
+      "cmd": "npm run -s build:pages",
+      "exit": 0,
+      "durationMs": 957
+    },
+    {
+      "cmd": "npx vitest run <the 47 test files listed in focused-tests.json>",
+      "exit": 1,
+      "durationMs": 100740
+    }
+  ],
+  "tests": {
+    "total": 513,
+    "passed": 510,
+    "failed": 3,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "b09ef36df9400d0ec1490b4268574d591720a03baddd2de85a14200faed230f2"
+    },
+    {
+      "path": "checks.json",
+      "sha256": "46064d0776558d7ef76be8ad8b57aee52c09e6878adedfa1503c17c97fd0cd77"
+    },
+    {
+      "path": "content-diff-education.json",
+      "sha256": "1c228f588db8ea556af03f835010818f5106855e89347905daac523935a5990a"
+    },
+    {
+      "path": "content-diff-environment.json",
+      "sha256": "2907072f4c0f3df336e3d58f3f528ac6bb3734100c1c0ab027a6aab75148b65d"
+    },
+    {
+      "path": "content-diff-governance.json",
+      "sha256": "a43e661180b76ba9a4f7afe5bb0a3beb2722ad68142372dba4aba36b4e5048d3"
+    },
+    {
+      "path": "content-diff-health.json",
+      "sha256": "a5276c35b971ea91eb04b25057bef786c21b81535cdb411714fd97874ad778e0"
+    },
+    {
+      "path": "content-diff-mobility.json",
+      "sha256": "6f9bf5dda143c71139e777764ade920097466120c0b3d13ff9bc904eb552f94e"
+    },
+    {
+      "path": "content-diff-technology.json",
+      "sha256": "7018e8a7c2061b8719390738771457f0996e03714940674c424218cfef7de432"
+    },
+    {
+      "path": "content-diff-wealth.json",
+      "sha256": "84e9703ee56a983bebdaa0d15d5a2e822063419a62abab60ecdd51daf7ec5ca2"
+    },
+    {
+      "path": "content-diff.json",
+      "sha256": "5052152c8d0ec5c4c5d5bd331ef3032539c9505abfb19825eccb3ccfbe106cd5"
+    },
+    {
+      "path": "content-diff.mts",
+      "sha256": "e92c66eee34f95ede819c04a6440f7b4e5cf8cda045b8821c5f979fb1debac57"
+    },
+    {
+      "path": "counts.json",
+      "sha256": "309185c0963a9cc9239e37f7df41dbbfb22038ff6369838429411d529a62fcf2"
+    },
+    {
+      "path": "focused-tests.json",
+      "sha256": "84c0a0daba20ce51058a4b5874c6668c8eb3814a0d009c038615f392e681273e"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "833f958ab19839f209f88cc117d541973cc7d7b3507ec0dad9d7632abc1af1e2"
+    },
+    {
+      "path": "restored-questions-round2-rule-gaps.txt",
+      "sha256": "c791862172bce4958ee8b99b77558b4dd50853d44fdddd191173744e5040c78d"
+    }
+  ],
+  "notes": "Slice content of the landing map (candidate 37c1466b) landed onto int as experimental, self-reported questionnaires: 676 pack questions (41 packs) and 235 deep questions. All 30 F5 drops are deferred by P0-26 and restored from main. The 3 focused-test failures also fail on int and are outside this change (see README). Sid must confirm in the PR that round-2 rewrites and merges land as experimental content (step 5); D-08 experts review content-diff.json. No AMC_OS path is landed or read."
+}

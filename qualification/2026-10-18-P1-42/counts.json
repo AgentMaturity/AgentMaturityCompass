@@ -1,0 +1,44 @@
+{
+ "packs": 41,
+ "packQuestions": 676,
+ "deepQuestions": 235,
+ "perStation": {
+  "environment": {
+   "packs": 6,
+   "questions": 99
+  },
+  "health": {
+   "packs": 9,
+   "questions": 151
+  },
+  "wealth": {
+   "packs": 5,
+   "questions": 83
+  },
+  "education": {
+   "packs": 5,
+   "questions": 87
+  },
+  "mobility": {
+   "packs": 6,
+   "questions": 94
+  },
+  "technology": {
+   "packs": 5,
+   "questions": 83
+  },
+  "governance": {
+   "packs": 5,
+   "questions": 79
+  }
+ },
+ "deepPerStation": {
+  "health": 58,
+  "wealth": 56,
+  "governance": 56,
+  "education": 16,
+  "environment": 17,
+  "mobility": 16,
+  "technology": 16
+ }
+}

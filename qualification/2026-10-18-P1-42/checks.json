@@ -1,0 +1,110 @@
+[
+ {
+  "cmd": "npm run -s build",
+  "exit": 0,
+  "durationMs": 63284,
+  "tail": "bundle-kernel: dist/kernel/amcRuntime.js 385 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp"
+ },
+ {
+  "cmd": "npm run -s typecheck",
+  "exit": 0,
+  "durationMs": 40126,
+  "tail": ""
+ },
+ {
+  "cmd": "npm run -s typecheck:tests",
+  "exit": 0,
+  "durationMs": 87508,
+  "tail": ""
+ },
+ {
+  "cmd": "npm run -s lint",
+  "exit": 0,
+  "durationMs": 4306,
+  "tail": "Lint contract passed: three unsafe patterns rejected; safe counterparts accepted.\ncheck-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 19; 16 random marker(s); 0 pending entries."
+ },
+ {
+  "cmd": "npm run -s check:counts",
+  "exit": 0,
+  "durationMs": 1418,
+  "tail": "Published source counts match the repository; this check does not execute tests."
+ },
+ {
+  "cmd": "npm run -s check:docs-drift",
+  "exit": 0,
+  "durationMs": 838,
+  "tail": "Docs drift check passed (336 files scanned; truth claims and commands checked in 258 public files; 5 logged exceptions)."
+ },
+ {
+  "cmd": "npm run -s check:freeze -- --base-ref int",
+  "exit": 0,
+  "durationMs": 3066,
+  "tail": "Freeze guard passed: {\"cliCommandPaths\":1255,\"cliInventoryPaths\":1255,\"stationPacks\":41,\"stationPackQuestions\":676}"
+ },
+ {
+  "cmd": "npm run -s check:architecture-boundaries",
+  "exit": 0,
+  "durationMs": 3106,
+  "tail": "  },\n  \"prefixBranchCount\": 2,\n  \"failures\": []\n}"
+ },
+ {
+  "cmd": "npm run -s check:gates",
+  "exit": 0,
+  "durationMs": 516,
+  "tail": "| L5 | 0 | 0 | 264 |\n\n11 registered emitters, 4 evidence maps, 281 literal audit emissions classified, 9 evaluated gate requirements checked.\ncheck:gates: every evaluated gate requirement has a registered, non-synthetic emitter."
+ },
+ {
+  "cmd": "npm run -s check:schemas",
+  "exit": 0,
+  "durationMs": 1020,
+  "tail": "gen-spec-schemas: 41 schemas current; 80 contract fixtures agree"
+ },
+ {
+  "cmd": "npm run -s check:api-ref",
+  "exit": 0,
+  "durationMs": 327,
+  "tail": "docs/API_REFERENCE.md matches the source."
+ },
+ {
+  "cmd": "npm run -s check:threat-model",
+  "exit": 0,
+  "durationMs": 344,
+  "tail": "check-threat-model: ok (/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-42/docs/security/channel-map.json)"
+ },
+ {
+  "cmd": "npm run -s check:duplicates",
+  "exit": 0,
+  "durationMs": 1608,
+  "tail": "{\"scan\":\"duplicates\",\"baseline\":1223,\"current\":1240,\"new\":0,\"stale\":0,\"accepted\":17}\nNo source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
+ },
+ {
+  "cmd": "npm run -s check:dead-code",
+  "exit": 0,
+  "durationMs": 9827,
+  "tail": "{\"scan\":\"dead-code\",\"baseline\":2703,\"current\":2718,\"new\":0,\"stale\":0,\"accepted\":15}\nNo source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
+ },
+ {
+  "cmd": "npm run -s check:industry-guides",
+  "exit": 0,
+  "durationMs": 1270,
+  "tail": "Industry guides match source (8 files in /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-42/docs/industries)."
+ },
+ {
+  "cmd": "npm run -s check:regulatory-calendar",
+  "exit": 0,
+  "durationMs": 485,
+  "tail": "Regulatory calendar matches the register (/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-42/docs/REGULATORY_CALENDAR.md)."
+ },
+ {
+  "cmd": "npm run -s release:notes -- --check",
+  "exit": 0,
+  "durationMs": 396,
+  "tail": ""
+ },
+ {
+  "cmd": "npm run -s build:pages",
+  "exit": 0,
+  "durationMs": 957,
+  "tail": "Pages artifact built: /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-42/tmp/pages-site (210 public guides)"
+ }
+]

@@ -1,0 +1,44 @@
+[
+ {
+  "id": "M1",
+  "guard": "tests/f5DropReconciliation.test.ts (restored F5 questions)",
+  "mutation": "delete restored TECH-PP-14 from src/domains/packs/stations/technology.ts",
+  "result": "2 failed / 2"
+ },
+ {
+  "id": "M2",
+  "guard": "tests/f5DropReconciliation.test.ts (restored text equals main's)",
+  "mutation": "reword restored TECH-PP-14 ('program' -> 'programme')",
+  "result": "1 failed / 2"
+ },
+ {
+  "id": "M3",
+  "guard": "tests/noAmcOsReads.test.ts",
+  "mutation": "point industryPacksSplitEquality.test.ts SNAPSHOT_DIR back at ../AMC_OS/RESEARCH/.../apply/split/",
+  "result": "1 failed / 3"
+ },
+ {
+  "id": "M4",
+  "guard": "scripts/gen-industry-guides.mts --check",
+  "mutation": "stale.length > 0 -> stale.length < 0",
+  "result": "tests/industryGuidesGenerator.test.ts 1 failed / 2"
+ },
+ {
+  "id": "M5",
+  "guard": "calendar register key-date section",
+  "mutation": "render only verified key dates",
+  "result": "tests/regulatoryCalendar.test.ts 3 failed / 27"
+ },
+ {
+  "id": "M6",
+  "guard": "no scheduled sidecar row past its date",
+  "mutation": "RED on the original sidecar (Colorado SB24-205 row, 2026-06-30, scheduled)",
+  "result": "1 failed before the sidecar fix"
+ },
+ {
+  "id": "M7",
+  "guard": "/1 audit receipts still verify",
+  "mutation": "verifyIndustryPackAuditChecksum rejects any schemaVersion other than the current one",
+  "result": "tests/industryPackAuditV1Compat.test.ts 2 failed / 3"
+ }
+]

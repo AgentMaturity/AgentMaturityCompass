@@ -1,0 +1,28 @@
+27
+ENV-SS-5: unresolved: IPBES NCP Framework — Habitat Connectivity Assessment
+ENV-SS-14: unresolved: EU Biodiversity Strategy 2030 — Target 4
+HLT-WM-17: weight 6 outside 8-15
+HLT-PL-17: weight 6 outside 8-15; unresolved: Joint Commission NPSG crosswalk expectations
+WLT-FW-6: 2 instruments cited; unresolved: ILO Centenary Declaration (2019)
+WLT-FW-14: weight 6 outside 8-15; unresolved: Jurisdictional scope gating for employment AI laws
+WLT-NP-6: 2 instruments cited; unresolved: World Bank Poverty Measurement
+WLT-NP-11: unresolved: Community Reinvestment Act (CRA) — community reinvestment and LMI outcomes
+WLT-NP-14: weight 6 outside 8-15
+WLT-CE-15: weight 6 outside 8-15; 2 instruments cited; unresolved: ESRS scope governance
+WLT-BC-15: weight 6 outside 8-15
+EDU-HE-3: 2 instruments cited; unresolved: Regional Accreditation Standards
+EDU-SE-15: weight 6 outside 8-15; unresolved: Accessibility scope gating
+MOB-SC-14: weight 6 outside 8-15
+MOB-RE-15: weight 6 outside 8-15
+MOB-VI-14: weight 6 outside 8-15; unresolved: Regulatory mapping governance
+MOB-F3W-8: 2 instruments cited
+TECH-OS-4: 2 instruments cited
+TECH-OS-15: weight 6 outside 8-15; unresolved: Citation mapping governance
+TECH-INF-15: weight 6 outside 8-15
+TECH-PP-7: 2 instruments cited; unresolved: GRI 203
+TECH-PP-13: unresolved: WTO SPS Agreement Art. 5.7
+TECH-PP-14: weight 6 outside 8-15; unresolved: WIPO WCT/WPPT (mapping governance)
+GOV-DCR-14: weight 6 outside 8-15
+GOV-DD-15: weight 6 outside 8-15; unresolved: Citation mapping governance
+GOV-PL-14: weight 6 outside 8-15; unresolved: Citation mapping governance; cites repealed Directive 2003/98/EC
+GOV-PPC-15: weight 6 outside 8-15; unresolved: Citation mapping governance
