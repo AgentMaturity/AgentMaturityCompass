@@ -260,9 +260,12 @@ function evidenceContracts(ctx: PackContext): CriterionResult {
 }
 
 const UNKNOWN_FACT = { value: null, provenance: "asserted", source: "admission check: every fact unknown", reviewedBy: null };
-const UNKNOWN_PROFILE = parseDeploymentProfile({ profileVersion: 1, profileId: "admission-unknown-facts",
+// Built on first use: compile.ts and this module import each other, so a module-load call can run before compile.ts
+// has initialised (determinism.test imports compile first).
+let unknownProfile: ReturnType<typeof parseDeploymentProfile> | undefined;
+const UNKNOWN_PROFILE = () => (unknownProfile ??= parseDeploymentProfile({ profileVersion: 1, profileId: "admission-unknown-facts",
   deployment: { tenantId: "admission", workspaceId: "admission", deploymentId: "admission", agentIds: ["admission"] },
-  ...Object.fromEntries(FACT_NAMES.map((name) => [name, UNKNOWN_FACT])), euRoleRecord: null, art63Record: null, operatingProfile: null, exceptions: [] });
+  ...Object.fromEntries(FACT_NAMES.map((name) => [name, UNKNOWN_FACT])), euRoleRecord: null, art63Record: null, operatingProfile: null, exceptions: [] }));
 /** The unknown-fact fixture class each enforcement point needs: authority for approvals, a hold for deletion, residency for egress. */
 const UNKNOWN_CLASS: Readonly<Record<string, FixtureEnvelope["evidenceClass"]>> = { approvals: "unknown_authority", deletion_executor: "unknown_hold", egress: "unknown_residency" };
 
@@ -272,7 +275,7 @@ function unknownFacts(ctx: PackContext): CriterionResult {
   const add = at(ctx, findings);
   let decided: ReturnType<typeof decideApplicability>["requirements"] = [];
   try {
-    decided = decideApplicability(UNKNOWN_PROFILE, ctx.cat, Date.now()).requirements;
+    decided = decideApplicability(UNKNOWN_PROFILE(), ctx.cat, Date.now()).requirements;
   } catch (error) {
     add("ADM8_COMPILER_ERROR", null, "", `the compiler failed on the unknown-facts profile: ${error instanceof Error ? error.message : String(error)}`);
   }
