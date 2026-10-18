@@ -1,5 +1,6 @@
 import { evaluateProviderHookControl, MAX_CONTROL_HOOK_BODY_BYTES, type ProviderHookControlResult } from "./hookControl.js";
 import { isPiSessionStart, registerPiSession, type PiSessionRegistrationResult } from "./piSessionRegistry.js";
+import { recordPiToolResult } from "./piObservations.js";
 import { registerClaudeCodeSession, type ClaudeCodeRegistrationResult } from "./claudeCodeSessionRegistry.js";
 import { recordClaudeCodePostExecution, recordClaudeCodeStop, type HookObservationResult } from "./claudeCodeObservations.js";
 import { admitClaudeCodePrompt } from "./hookAdmission.js";
@@ -24,7 +25,7 @@ function eventName(rawInput: string): unknown {
 }
 
 /**
- * The Bridge's hook control route: a Pi `session_start` registration; Claude Code's SessionStart registration,
+ * The Bridge's hook control route: a Pi `session_start` registration and `tool_result` outcome; Claude Code's SessionStart registration,
  * UserPromptSubmit admission, Stop and post-tool records; otherwise one provider tool request. Every request passes the
  * workspace's hook audit latch (hookAuditLatch.ts): refused while latched, and one that fails with a 5xx latches it.
  */
@@ -37,6 +38,7 @@ function route(input: Input): ProviderHookControlResult | PiSessionRegistrationR
   // The size cap comes before any parse.
   if (Buffer.byteLength(input.rawInput, "utf8") > MAX_CONTROL_HOOK_BODY_BYTES) throw new HookControlError("HOOK_CONTROL_INPUT_TOO_LARGE", 413, "hook input is too large");
   if (input.provider === "pi" && isPiSessionStart(input.rawInput)) return registerPiSession(input);
+  if (input.provider === "pi" && eventName(input.rawInput) === "tool_result") return recordPiToolResult(input);
   // A repeated key could be read one way by AMC and another by whoever sent it: refused for every Claude Code body.
   if (input.provider === "claude-code") assertUnambiguousJson(input.rawInput);
   const event = eventName(input.rawInput);

@@ -6,15 +6,17 @@
  * - Observations: over any cap, the observation is refused and listed in a signed summary row (count, at most
  *   `summaryIds` tool_use_ids and action ids, and the digest of that list), never dropped silently; the counter that hit
  *   its cap is put under backpressure, and every PreToolUse decision under it is denied until its window passes.
- * - Registrations: counted per lease and per workspace only, never per registration, so churning registrations cannot
- *   reset a counter; over a cap the registration is refused.
+ * - Registrations (`admitRegistration`, every provider's): counted per lease and per workspace only, never per
+ *   registration, so churning registrations cannot reset a counter; over a cap the registration is refused.
  * - Memory: at most `maxEntries` counters, each holding at most `summaryIds` pending ids. The least recently used counter
  *   is evicted only when it holds nothing (no count in its window, no backpressure, nothing pending), so an eviction is
  *   the same as a counter never seen and never turns into an allow; when no counter can be evicted, the request is
  *   refused as over the cap.
  */
+import { resolve } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { HookControlError } from "./hookProviders.js";
 
 export type IntakeLevel = "session" | "lease" | "workspace";
 const LEVELS: readonly IntakeLevel[] = ["session", "lease", "workspace"];
@@ -26,7 +28,7 @@ export type IntakeSummaryWriter = (shed: IntakeShed, level: IntakeLevel) => void
 interface Counter { windowStart: number; count: number; backpressure: boolean; shed: IntakeShed | null }
 
 export const OBSERVATION_LIMITS: IntakeLimits = { session: 120, lease: 360, workspace: 1_200, windowMs: 60_000, maxEntries: 4_096, summaryIds: 50 };
-export const REGISTRATION_LIMITS: IntakeLimits = { lease: 30, workspace: 60, windowMs: 60_000, maxEntries: 4_096, summaryIds: 0 };
+const REGISTRATION_LIMITS: IntakeLimits = { lease: 30, workspace: 60, windowMs: 60_000, maxEntries: 4_096, summaryIds: 0 };
 
 /** The digest a summary row carries of the ids it lists. */
 export const shedDigest = (shed: IntakeShed) => sha256Hex(canonicalize({ toolUseIds: shed.toolUseIds, actionIds: shed.actionIds }));
@@ -131,4 +133,17 @@ export class IntakeCounters {
     }
     return denied;
   }
+}
+
+// ponytail: in-memory per Bridge process (bounded, above); a restart resets the window.
+const registrationCounters = new IntakeCounters(REGISTRATION_LIMITS);
+
+/**
+ * Count one new session registration (never the replay of one recorded) of `provider` per lease and per workspace,
+ * never per session, so churning sessions cannot reset a cap; over a cap it is refused (429). Every provider shares the
+ * counters, as it shares the workspace's writer.
+ */
+export function admitRegistration(input: { workspace: string; agentId: string; leaseId: string | undefined; session: string; provider: string }, now: number): void {
+  const refused = registrationCounters.admit({ workspace: resolve(input.workspace), lease: `${input.agentId}\0${input.leaseId ?? "no-lease"}`, session: input.session }, now);
+  if (refused !== null) throw new HookControlError("HOOK_CONTROL_RATE_LIMITED", 429, `${input.provider} session registrations are over AMC's ${refused} limit; AMC refused this one`);
 }
