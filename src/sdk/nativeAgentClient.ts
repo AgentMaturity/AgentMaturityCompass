@@ -14,6 +14,12 @@ import { NATIVE_AUDIO_INPUT_FORMAT, type NativeAudioPart } from "../attachments/
 import { advertisesNativeAudio, materializeAcpAudio, nativeAudioPartsToAcp } from "../acp/acpAudioInput.js";
 import { MAX_WIRE_LINE_BYTES } from "../wire/ndjsonFraming.js";
 import { forwardNativeShellWarnings } from "./nativeShellWarnings.js";
+import { EXECUTION_API_VERSION, parseExecutionStatus, type ExecutionStatus } from "../execution/executionContract.js";
+import { admitVerifierReport, approveThroughCli, pendingApprovals, reportedExecution, runPinnedCli, type AMCNativeApproval,
+  type AMCNativePendingApproval, type PinnedCli } from "./nativeCli.js";
+export type { AMCNativeApproval, AMCNativePendingApproval } from "./nativeCli.js";
+export { EXECUTION_API_VERSION, EXECUTION_PHASES, EXECUTION_VERBS, PHASE_STATES, type ExecutionStatus, type ExecutionPhase, type ExecutionVerb,
+  type PhaseState } from "../execution/executionContract.js";
 export * as llm from "../llm/index.js";
 /** Native in-process and capability-negotiated subprocess image input. */
 export { openAgentSession, resumeAgentSession, type AgentSession, type OrderedAgentSession, type AgentSessionInit } from "../agent/agentSession.js";
@@ -25,61 +31,9 @@ export { loadSessionEventHistory, SessionHistoryRefused, type SessionHistoryRefu
 export { inspectJsonlSessionRecovery, type JsonlSessionRecoveryReadiness } from "../session/jsonlContinuation.js";
 export type { NativeValidationResult, NativeValidationCheckResult, NativeValidationStatus } from "../agent/nativeValidation.js";
 
-type JsonObject = Record<string, unknown>;
-const object = (value: unknown): value is JsonObject => value !== null && typeof value === "object" && !Array.isArray(value);
-const STOP_REASONS = new Set(["end_turn", "max_tokens", "max_turn_requests", "refusal", "cancelled"]);
-const UPDATE_KINDS = new Set(["agent_message_chunk", "user_message_chunk", "tool_call", "tool_call_update"]);
-const MAX_FRAME_BYTES = 1024 * 1024;
-const MAX_TURN_BYTES = 8 * 1024 * 1024;
-/** Hard retention ceilings, independently applied to each turn and each history replay. */
-export const AMC_NATIVE_EVENT_LIMITS = Object.freeze({ maxEvents: 8192, maxBytes: MAX_TURN_BYTES });
-const MAX_WRITE_QUEUE_BYTES = 8 * 1024 * 1024;
-const MAX_WRITE_QUEUE_FRAMES = 64;
-
-/** Lower the retention ceilings; no event is silently dropped when a ceiling is reached. @public */
-export interface AMCNativeEventBufferOptions {
-  readonly maxEvents?: number;
-  readonly maxBytes?: number;
-}
-
-function eventLimits(options: AMCNativeEventBufferOptions = {}): Required<AMCNativeEventBufferOptions> {
-  if (!object(options)) throw new AMCNativeInputError("eventBuffer must be an object");
-  // Read each ceiling as unknown: the caller's object is untrusted input, so a
-  // non-integer is refused here rather than narrowed away by the declared type.
-  const supplied: Readonly<Record<keyof Required<AMCNativeEventBufferOptions>, unknown>> =
-    { maxEvents: options.maxEvents, maxBytes: options.maxBytes };
-  const limits: { maxEvents: number; maxBytes: number } = { maxEvents: AMC_NATIVE_EVENT_LIMITS.maxEvents, maxBytes: AMC_NATIVE_EVENT_LIMITS.maxBytes };
-  for (const key of ["maxEvents", "maxBytes"] as const) {
-    const value = supplied[key];
-    if (value === undefined) continue;
-    if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 1 || value > AMC_NATIVE_EVENT_LIMITS[key]) {
-      throw new AMCNativeInputError(`${key} must be an integer between 1 and ${AMC_NATIVE_EVENT_LIMITS[key]}`);
-    }
-    limits[key] = value;
-  }
-  return Object.freeze(limits);
-}
-
-/** Only called on JSON data, never media Buffers or caller-owned capability objects. */
-function freezeJson<T>(value: T): T {
-  const stack: unknown[] = [value];
-  while (stack.length) {
-    const item = stack.pop();
-    if (item === null || typeof item !== "object" || Object.isFrozen(item)) continue;
-    Object.freeze(item);
-    for (const child of Object.values(item)) if (child !== null && typeof child === "object") stack.push(child);
-  }
-  return value;
-}
-
-const asError = (error: unknown): Error => error instanceof Error ? error : new AMCNativeProtocolError("native client operation failed");
-
-function assertSignal(signal: AbortSignal | undefined): void {
-  if (signal !== undefined && (!signal || typeof signal.aborted !== "boolean"
-    || typeof signal.addEventListener !== "function" || typeof signal.removeEventListener !== "function")) {
-    throw new AMCNativeInputError("Cancellation requires an AbortSignal");
-  }
-}
+import { AMC_NATIVE_EVENT_LIMITS, asError, assertSignal, eventLimits, freezeJson, MAX_FRAME_BYTES, MAX_WRITE_QUEUE_BYTES, MAX_WRITE_QUEUE_FRAMES,
+  object, STOP_REASONS, UPDATE_KINDS, type AMCNativeEventBufferOptions, type JsonObject } from "./nativeWire.js";
+export { AMC_NATIVE_EVENT_LIMITS, type AMCNativeEventBufferOptions } from "./nativeWire.js";
 
 import {
   AMCNativeCancelledError, AMCNativeInputError, AMCNativeLimitError, AMCNativeProcessError, AMCNativeProtocolError, AMCNativeRefusedError
@@ -143,6 +97,8 @@ export {
   readonly updates: readonly AMCNativeUpdate[];
   readonly meta: Readonly<JsonObject>;
   readonly verification: "not-verified";
+  /** The execution phases the runtime reported for this turn (P2-13); evidence verification stays pending until verifySession. */
+  readonly execution: ExecutionStatus | null;
   /** Public operator checks only; independent from turn completion and evidence verification. */
   readonly validation: NativeValidationResult;
 }
@@ -152,7 +108,10 @@ export {
   readonly state: "verified";
   readonly scope: "workspace-key-consistency" | "externally-anchored";
   readonly report: AgentRunVerification;
+  /** The phases the verifier reported, `evidence-verification: succeeded` included (P2-13). */
+  readonly execution: ExecutionStatus;
 }
+
 
 /** One prompt in flight. Cancelling requests a stop; only the result establishes its outcome. @public */
 export class AMCNativeTurn implements AsyncIterable<AMCNativeUpdate> {
@@ -213,6 +172,10 @@ export class AMCNativeTurn implements AsyncIterable<AMCNativeUpdate> {
       const error = new AMCNativeProtocolError("native prompt returned invalid AMC metadata"); this.fail(error); throw error;
     }
     const rawValidation = object(extension) ? extension.validation : undefined;
+    const execution = object(extension) && extension.execution !== undefined ? parseExecutionStatus(extension.execution) : null;
+    if (object(extension) && extension.execution !== undefined && (execution === null || execution.sessionId !== this.sessionId)) {
+      const error = new AMCNativeProtocolError("native prompt returned invalid execution metadata"); this.fail(error); throw error;
+    }
     const validation = rawValidation === undefined
       ? { status: "unavailable" as const, turn: null, configSha256: null, checks: [] }
       : parseNativeValidationResult(rawValidation);
@@ -225,7 +188,7 @@ export class AMCNativeTurn implements AsyncIterable<AMCNativeUpdate> {
     }).join("");
     const result: AMCNativeRunResult = freezeJson({ sessionId: this.sessionId, state: "completed" as const, stopReason: value.stopReason,
       text, updates: [...this.updates], meta: object(value._meta) ? JSON.parse(JSON.stringify(value._meta)) as JsonObject : {},
-      verification: "not-verified" as const, validation });
+      verification: "not-verified" as const, execution, validation });
     this.done = true; this.state = "completed";
     this.resolveResult(result);
     this.wake?.();
@@ -335,6 +298,7 @@ export class AMCNativeClient {
   private readonly child: ChildProcessWithoutNullStreams;
   private readonly command: readonly [string, ...string[]];
   private readonly env: NodeJS.ProcessEnv;
+  private readonly agentId: string;
   private readonly timeout: number;
   private readonly limits: Required<AMCNativeEventBufferOptions>;
   private readonly pending = new Map<number, PendingRequest>();
@@ -402,6 +366,7 @@ export class AMCNativeClient {
     // The cold verifier must use the very same pinned executable, even if the caller edits its options array.
     this.command = Object.freeze([...command]) as readonly [string, ...string[]];
     this.env = { ...process.env, ...options.env };
+    this.agentId = options.agentId ?? "default";
     const args = [...this.command.slice(1), "acp", "--provider", options.provider];
     for (const [flag, value] of [["--model", options.model], ["--credential", options.credential],
       ["--base-url", options.baseUrl], ["--agent-id", options.agentId], ["--tools", options.tools],
@@ -458,6 +423,10 @@ export class AMCNativeClient {
       const result = await client.request("initialize", { protocolVersion: 1, clientCapabilities: {} });
       if (result.protocolVersion !== 1 || !object(result.agentInfo) || result.agentInfo.name !== "agent-maturity-compass"
         || !object(result.agentCapabilities)) throw new AMCNativeProtocolError("unsupported native agent identity or protocol");
+      const meta = result.agentCapabilities._meta, extension = object(meta) ? meta["dev.agentmaturity.amc"] : undefined;
+      if (!object(extension) || extension.executionApi !== EXECUTION_API_VERSION) {
+        throw new AMCNativeProtocolError(`the runtime does not speak execution API v${EXECUTION_API_VERSION}; use the AMC CLI from this same package`);
+      }
       if (signal?.aborted) throw new AMCNativeCancelledError("native client startup was cancelled");
       client.assertAvailable();
       client.agentInfo = freezeJson(result.agentInfo);
@@ -469,7 +438,26 @@ export class AMCNativeClient {
   }
 
   async newSession(): Promise<AMCNativeSession> {
-    const result = await this.request("session/new", { cwd: this.workspace, mcpServers: [] });
+    return this.adopt(await this.request("session/new", { cwd: this.workspace, mcpServers: [] }));
+  }
+
+  /**
+   * fork (P2-13), the CLI's --fork-from: a new session whose signed open row names the parent's verified final row. It
+   * starts with no inherited model context; the parent, sealed or live, is read and never written. Its own lease applies.
+   */
+  async forkSession(parentSessionId: string): Promise<AMCNativeSession> {
+    this.assertAvailable();
+    if (this.extension().lineageFork !== "verified-parent-reference") throw new AMCNativeRefusedError(-32601, "This installed runtime does not support lineage forks.");
+    if (typeof parentSessionId !== "string" || !parentSessionId.trim()) throw new AMCNativeInputError("Choose the session to fork");
+    return this.adopt(await this.request("_amc/session/fork", { sessionId: parentSessionId, cwd: this.workspace, mcpServers: [] }));
+  }
+
+  private extension(): JsonObject {
+    const meta = this.negotiatedCapabilities._meta, extension = object(meta) ? meta["dev.agentmaturity.amc"] : undefined;
+    return object(extension) ? extension : {};
+  }
+
+  private adopt(result: JsonObject): AMCNativeSession {
     this.assertAvailable();
     if (typeof result.sessionId !== "string" || !result.sessionId.trim() || this.sessions.has(result.sessionId)
       || this.loading.has(result.sessionId)) {
@@ -505,9 +493,7 @@ export class AMCNativeClient {
     if (!this.sessions.has(sessionId)) throw new Error("Session is not owned by this client");
     if (this.turns.has(sessionId)) throw new Error("Wait for the active prompt before releasing its writer");
     if (this.releasing.has(sessionId)) throw new Error("Writer release is already in progress");
-    const meta = this.negotiatedCapabilities._meta;
-    const extension = object(meta) ? meta["dev.agentmaturity.amc"] : undefined;
-    if (!object(extension) || extension.releaseSession !== true) {
+    if (this.extension().releaseSession !== true) {
       throw new AMCNativeRefusedError(-32601, "This installed runtime does not support resumable writer release");
     }
     this.releasing.add(sessionId);
@@ -751,49 +737,44 @@ export class AMCNativeClient {
     finally { clearTimeout(terminate); clearTimeout(kill); }
   }
 
+  private get cli(): PinnedCli { return { command: this.command, cwd: this.workspace, env: this.env, timeoutMs: this.timeout }; }
+
   /** Runs the same installed CLI after shutdown. A live summary is never promoted to verification. */
   async verifySession(sessionId: string): Promise<AMCNativeReceipt> {
     if (!this.closed) throw new Error("Close the native client before cold verification");
     if (!this.sessions.has(sessionId)) throw new Error("Session is not owned by this client");
-    const output = await new Promise<string>((resolve_, reject) => {
-      const child = spawn(this.command[0], [...this.command.slice(1), "agent-loop", "verify", sessionId, "--json"],
-        { cwd: this.workspace, env: this.env, stdio: "pipe", shell: false });
-      let stdout = ""; let failure: Error | undefined;
-      const timer = setTimeout(() => { failure = new AMCNativeProtocolError("native verifier timed out"); child.kill("SIGKILL"); }, this.timeout);
-      child.stdin.on("error", () => { failure ??= new AMCNativeProtocolError("native verifier input failed"); child.kill("SIGKILL"); });
-      child.stdout.on("error", () => { failure ??= new AMCNativeProtocolError("native verifier output failed"); child.kill("SIGKILL"); });
-      child.stderr.on("error", () => { /* Do not publish verifier diagnostics. */ });
-      child.stdin.end(); child.stderr.resume(); child.stdout.setEncoding("utf8");
-      child.stdout.on("data", (chunk: string) => {
-        if (failure) return;
-        if (Buffer.byteLength(stdout) + Buffer.byteLength(chunk) > MAX_TURN_BYTES) {
-          failure = new AMCNativeProtocolError("native verifier exceeded the output limit"); child.kill("SIGKILL"); return;
-        }
-        stdout += chunk;
-      });
-      child.once("error", () => { failure = new AMCNativeProtocolError("could not start the installed native verifier"); });
-      child.once("close", (code) => { clearTimeout(timer);
-        if (failure || code !== 0) reject(failure ?? new AMCNativeRefusedError(code ?? -1, "Native evidence verification failed"));
-        else resolve_(stdout);
-      });
-    });
-    let report: unknown;
-    try { report = JSON.parse(output); } catch { throw new AMCNativeProtocolError("native verifier returned invalid JSON"); }
-    const empty = (value: unknown): boolean => Array.isArray(value) && value.length === 0;
-    if (!object(report) || report.sessionId !== sessionId || report.ok !== true || report.ledgerOk !== true
-      || !empty(report.ledgerErrors) || !empty(report.sessionChainErrors) || !empty(report.unsignedRowIds)
-      || !Array.isArray(report.requests) || !report.requests.every((r) => object(r) && typeof r.headerEventId === "string" && r.headerEventId.length > 0 && r.status === "reconstructed")
-      || new Set(report.requests.map(r => (r as JsonObject).headerEventId)).size !== report.requests.length
-      || !object(report.trustRoot) || typeof report.trustRoot.anchored !== "boolean"
-      || !(report.trustRoot.monitorFingerprint === null || typeof report.trustRoot.monitorFingerprint === "string")
-      || !(report.trustRoot.expectedFingerprint === null || typeof report.trustRoot.expectedFingerprint === "string")) {
-      throw new AMCNativeProtocolError("native verifier returned an inconsistent receipt");
+    const run = await runPinnedCli(this.cli, ["agent-loop", "verify", sessionId, "--json"], "native verifier");
+    if (run.code !== 0) {
+      const execution = reportedExecution(run.stdout);
+      throw new AMCNativeRefusedError(run.code ?? -1, "Native evidence verification failed", execution && execution.sessionId === sessionId ? { execution } : undefined);
     }
-    if (report.trustRoot.anchored && (!report.trustRoot.expectedFingerprint
-      || report.trustRoot.expectedFingerprint !== report.trustRoot.monitorFingerprint)) {
-      throw new AMCNativeProtocolError("native verifier returned an inconsistent trust anchor");
-    }
-    return { sessionId, state: "verified", scope: report.trustRoot.anchored ? "externally-anchored" : "workspace-key-consistency",
-      report: report as unknown as AgentRunVerification };
+    return { sessionId, state: "verified", ...admitVerifierReport(run.stdout, sessionId) };
   }
+
+  /** Pending signed approval requests for this agent, from the approval engine the CLI reads (approve, P2-13). */
+  pendingApprovals(): Promise<readonly AMCNativePendingApproval[]> { return pendingApprovals(this.cli, this.agentId); }
+
+  /**
+   * approve (P2-13): a reviewer's decision through `amc approvals approve`, the signed approval engine every surface uses.
+   * The engine refuses the run's initiator where the class needs distinct users, a stale or non-pending request, and a
+   * changed request when `expectRequestDigest` binds it; the refusal names why. Not the A4 gate decision (P2-37).
+   */
+  approve(input: AMCNativeApproval): Promise<void> { return approveThroughCli(this.cli, this.agentId, input); }
+
+  /** dispose (P2-13): release every idle owned writer (resumable), then close the process. Active turns are cancelled by close. */
+  async dispose(): Promise<void> {
+    let released = true;
+    if (!this.fatal && !this.closing && !this.closed && this.extension().releaseSession === true) {
+      for (const sessionId of [...this.sessions]) {
+        if (this.turns.has(sessionId) || this.releasing.has(sessionId)) continue;
+        try { await this.releaseSession(sessionId); } catch { released = false; }
+      }
+    }
+    await this.close();
+    if (!released) throw new AMCNativeProtocolError("A writer did not release cleanly; inspect its signed session before resuming it.");
+  }
+
+
+
+
 }

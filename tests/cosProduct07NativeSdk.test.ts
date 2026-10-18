@@ -50,7 +50,7 @@ class ControlledPeer extends EventEmitter {
   onPrompt: ((frame: Frame) => void) | undefined;
   onLoad: ((frame: Frame) => void) | undefined;
   capabilities: Record<string, unknown> = { loadSession: true, promptCapabilities: { image: false },
-    _meta: { "dev.agentmaturity.amc": { releaseSession: true } } };
+    _meta: { "dev.agentmaturity.amc": { releaseSession: true, executionApi: 1, lineageFork: "verified-parent-reference" } } };
   private sequence = 0;
   private ended = false;
   send(...frames: Frame[]): void { this.stdout.write(Buffer.from(frames.map(frame => JSON.stringify(frame) + "\n").join(""))); }
@@ -74,6 +74,7 @@ class ControlledPeer extends EventEmitter {
       }
       case "session/load": if (this.onLoad) this.onLoad(frame); else this.reply(frame, {}); break;
       case "_amc/session/release": this.reply(frame, {}); break;
+      case "_amc/session/fork": this.reply(frame, { sessionId: `forked-${++this.sequence}` }); break;
     }
   }
 }
@@ -420,5 +421,61 @@ describe("P0-06 SDK native-shell warning delivery", () => {
     const session = await client.newSession();
     expect(session.sessionId).toBeTruthy(); expect(client.state).toBe("open");
     await client.close();
+  });
+});
+
+describe("P2-13 execution verbs on the TypeScript SDK", () => {
+  const execution = (sessionId: string) => ({ sessionId, receiptStates: [],
+    phases: { admission: "succeeded", "model-completion": "succeeded", "side-effect-completion": "succeeded", "evidence-verification": "pending" } });
+
+  test.each([
+    ["no execution API", { loadSession: true, _meta: { "dev.agentmaturity.amc": { releaseSession: true } } }],
+    ["another execution API version", { _meta: { "dev.agentmaturity.amc": { executionApi: 2 } } }]
+  ])("start refuses a runtime with %s, before any session", async (_case, capabilities) => {
+    const peer = new ControlledPeer(); peer.capabilities = capabilities;
+    processMock.spawn.mockReturnValueOnce(peer);
+    await expect(AMCNativeClient.start({ workspace: process.cwd(), provider: "stub", timeoutMs: 1000 })).rejects.toThrow("does not speak execution API v1");
+    expect(peer.frames.map(frame => frame.method)).toEqual(["initialize"]);
+  });
+
+  test("a turn result carries the runtime's phases, and a malformed status fails the connection", async () => {
+    const { peer, client } = await connect();
+    const session = await client.newSession();
+    peer.onPrompt = frame => peer.reply(frame, { stopReason: "end_turn", _meta: { "dev.agentmaturity.amc": { execution: execution(session.sessionId) } } });
+    expect((await session.prompt("hello").result).execution).toEqual(execution(session.sessionId));
+    peer.onPrompt = frame => peer.reply(frame, { stopReason: "end_turn", _meta: { "dev.agentmaturity.amc": { execution: { ...execution(session.sessionId), extra: true } } } });
+    await expect(session.prompt("again").result).rejects.toThrow("invalid execution metadata");
+    expect(client.state).toBe("failed");
+  });
+
+  test("forkSession sends the lineage fork for the named parent and owns the child; an unadvertised runtime is refused", async () => {
+    const { peer, client } = await connect();
+    const parent = await client.newSession();
+    const child = await client.forkSession(parent.sessionId);
+    expect(peer.frames.find(frame => frame.method === "_amc/session/fork")?.params).toEqual({ sessionId: parent.sessionId, cwd: client.workspace, mcpServers: [] });
+    expect(child.sessionId).toMatch(/^forked-/);
+    await expect(client.forkSession(" ")).rejects.toBeInstanceOf(AMCNativeInputError);
+    const plain = new ControlledPeer(); plain.capabilities = { _meta: { "dev.agentmaturity.amc": { executionApi: 1 } } };
+    const other = await connect(plain);
+    await expect(other.client.forkSession(parent.sessionId)).rejects.toBeInstanceOf(AMCNativeRefusedError);
+  });
+
+  test("dispose releases each idle writer before closing the process", async () => {
+    const { peer, client } = await connect();
+    const one = await client.newSession(), two = await client.newSession();
+    await client.dispose();
+    expect(peer.frames.filter(frame => frame.method === "_amc/session/release").map(frame => frame.params?.sessionId)).toEqual([one.sessionId, two.sessionId]);
+    expect(client.processClosed).toBe(true);
+  });
+
+  test("approve refuses malformed decisions before anything runs", async () => {
+    const { client } = await connect();
+    for (const bad of [{ approvalRequestId: "--mode", reason: "r", username: "u", roles: ["APPROVER"] },
+      { approvalRequestId: "apr_1", reason: "r", username: "u", roles: ["APPROVER,OWNER"] },
+      { approvalRequestId: "apr_1", reason: " ", username: "u", roles: ["APPROVER"] },
+      { approvalRequestId: "apr_1", reason: "r", username: "u", roles: ["APPROVER"], mode: "auto" as never }]) {
+      await expect(client.approve(bad)).rejects.toBeInstanceOf(AMCNativeInputError);
+    }
+    expect(processMock.spawn).toHaveBeenCalledTimes(1);
   });
 });

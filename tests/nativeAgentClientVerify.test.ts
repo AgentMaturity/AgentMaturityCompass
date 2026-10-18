@@ -13,12 +13,13 @@ const [receiptPath, logPath] = process.argv.slice(2);
 const verify = process.argv.indexOf('verify');
 if (process.argv.includes('agent-loop') && verify > 0) {
   appendFileSync(logPath, 'verifier\n');
-  process.stdout.write(JSON.stringify({ ...JSON.parse(readFileSync(receiptPath, 'utf8')), sessionId: process.argv[verify + 1] }));
+  const receipt = JSON.parse(readFileSync(receiptPath, 'utf8')), sessionId = process.argv[verify + 1];
+  process.stdout.write(JSON.stringify({ ...receipt, sessionId, ...(receipt.execution ? { execution: { ...receipt.execution, sessionId } } : {}) }));
 } else {
   const reply = (frame, result) => process.stdout.write(JSON.stringify({ jsonrpc: '2.0', id: frame.id, result }) + '\n');
   createInterface({ input: process.stdin }).on('line', line => {
     const frame = JSON.parse(line);
-    if (frame.method === 'initialize') reply(frame, { protocolVersion: 1, agentInfo: { name: 'agent-maturity-compass' }, agentCapabilities: {} });
+    if (frame.method === 'initialize') reply(frame, { protocolVersion: 1, agentInfo: { name: 'agent-maturity-compass' }, agentCapabilities: { _meta: { 'dev.agentmaturity.amc': { executionApi: 1 } } } });
     else if (frame.method === 'session/new') reply(frame, { sessionId: 'verify-session' });
     else if (frame.id !== undefined) reply(frame, {});
   });
@@ -26,18 +27,19 @@ if (process.argv.includes('agent-loop') && verify > 0) {
 `;
 
 type TrustRoot = { anchored: boolean; monitorFingerprint: string | null; expectedFingerprint: string | null };
-const receipt = (trustRoot: TrustRoot) => ({ ok: true, ledgerOk: true, ledgerErrors: [], sessionChainErrors: [], unsignedRowIds: [],
-  requests: [{ headerEventId: "header-1", status: "reconstructed" }], trustRoot });
+const verifiedPhases = { admission: "succeeded", "model-completion": "succeeded", "side-effect-completion": "succeeded", "evidence-verification": "succeeded" };
+const receipt = (trustRoot: TrustRoot, phases: Record<string, string> = verifiedPhases) => ({ ok: true, ledgerOk: true, ledgerErrors: [], sessionChainErrors: [],
+  unsignedRowIds: [], requests: [{ headerEventId: "header-1", status: "reconstructed" }], trustRoot, execution: { sessionId: "", phases, receiptStates: [] } });
 const roots: string[] = [], clients: AMCNativeClient[] = [];
 afterEach(async () => {
   for (const client of clients.splice(0)) await client.close();
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 
-async function start(trustRoot: TrustRoot) {
+async function start(trustRoot: TrustRoot, phases?: Record<string, string>) {
   const root = realpathSync(mkdtempSync(join(tmpdir(), "amc-native-verify-"))); roots.push(root);
   const peer = join(root, "peer.mjs"), receiptPath = join(root, "receipt.json"), log = join(root, "invocations.log");
-  writeFileSync(peer, PEER); writeFileSync(receiptPath, JSON.stringify(receipt(trustRoot))); writeFileSync(log, "");
+  writeFileSync(peer, PEER); writeFileSync(receiptPath, JSON.stringify(receipt(trustRoot, phases))); writeFileSync(log, "");
   const client = await AMCNativeClient.start({ workspace: root, provider: "stub", command: [process.execPath, peer, receiptPath, log], timeoutMs: 10_000 });
   clients.push(client);
   const session = await client.newSession();
@@ -50,7 +52,8 @@ describe("native SDK cold verification admission", () => {
     await expect(client.verifySession(sessionId)).rejects.toThrow("Close the native client before cold verification");
     expect(verifierRuns()).toBe(0);
     await client.close();
-    await expect(client.verifySession(sessionId)).resolves.toMatchObject({ sessionId, state: "verified", scope: "workspace-key-consistency" });
+    await expect(client.verifySession(sessionId)).resolves.toMatchObject({ sessionId, state: "verified", scope: "workspace-key-consistency",
+      execution: { sessionId, phases: verifiedPhases } });
     expect(verifierRuns()).toBe(1);
   });
 
@@ -67,5 +70,12 @@ describe("native SDK cold verification admission", () => {
     const { client, sessionId } = await start({ anchored: true, monitorFingerprint: "f".repeat(64), expectedFingerprint });
     await client.close();
     await expect(client.verifySession(sessionId)).rejects.toThrow("native verifier returned an inconsistent trust anchor");
+  });
+
+  test("a passing report whose phases do not say the evidence verified is refused (P2-13)", async () => {
+    const { client, sessionId } = await start({ anchored: false, monitorFingerprint: null, expectedFingerprint: null },
+      { ...verifiedPhases, "evidence-verification": "pending" });
+    await client.close();
+    await expect(client.verifySession(sessionId)).rejects.toThrow("native verifier returned an inconsistent receipt");
   });
 });
