@@ -11,7 +11,7 @@ import { join } from "node:path";
 const readDecisions = (...parts: string[]) => JSON.parse(readFileSync(join(process.cwd(), ...parts), "utf8")) as {
   items: Array<{ id: string; decision: string }>;
 };
-export const F5_KEPT_IDS: ReadonlySet<string> = new Set(
+const F5_KEPT_IDS: ReadonlySet<string> = new Set(
   readDecisions("docs", "program", "f5", "decisions.json").items.filter((d) => d.decision !== "drop").map((d) => d.id));
 const ROUND2_MERGE_KEPT_IDS = readDecisions("docs", "program", "round2", "merge-decisions.json").items
   .filter((d) => d.decision !== "merge").map((d) => d.id);
