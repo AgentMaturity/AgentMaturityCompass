@@ -3,8 +3,9 @@
  * (`setup.harness: "evidence"`) runs through P1-11's evaluateControl as tests/catalog/l0/evidenceFixtures.test.ts runs
  * it. Any other fixture runs only through a guard harness the caller registered under its `setup.harness` name; the
  * executed harnesses live in the test suite (tests/catalog/l0/harness.ts), so `amc catalog check` registers none and
- * reports those fixtures as not run, never as passed. A negative fixture that yields pass or allow is a false mandatory
- * pass. Fixture content is untrusted: a setup that does not fit or a harness that throws is a failure, never a pass.
+ * reports those fixtures as not run, never as passed. Guard harnesses are asynchronous, so runGuardHarnesses runs them
+ * first and runFixtures (synchronous, so the loader's gate can recompute admission) reads their results. A negative
+ * fixture that yields pass or allow is a false mandatory pass. Fixture content is untrusted: a setup that does not fit or a harness that throws is a failure, never a pass.
  */
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
@@ -52,46 +53,71 @@ function runEvidence(envelope: FixtureEnvelope, control: ControlRecord, cat: Loa
   return { result: result.dimensions.result, reasons: [...result.rejected.map((r) => r.reason), result.dimensions.evidence] };
 }
 
-async function runOne(envelope: FixtureEnvelope, control: ControlRecord, cat: LoadedCatalog, harness: string,
-  harnesses: Readonly<Record<string, GuardHarness>>): Promise<{ actual: string | null; matches: boolean }> {
+/** What each registered guard harness gave, by fixture ref; a harness that threw is recorded as an error. */
+export type GuardResults = ReadonlyMap<string, { result: string; reasonCode: string | null } | { error: string }>;
+
+const fixtureRefs = (controls: readonly ControlRecord[]) =>
+  controls.flatMap((control) => control.tests.flatMap((t) => [...t.fixtures.positive, ...t.fixtures.negative]).map((ref) => ({ control, ref })));
+
+/** Runs the guard fixtures whose `setup.harness` is registered; the only asynchronous part of a check. */
+export async function runGuardHarnesses(cat: LoadedCatalog, controls: readonly ControlRecord[],
+  harnesses: Readonly<Record<string, GuardHarness>> = {}): Promise<GuardResults> {
+  const out = new Map<string, { result: string; reasonCode: string | null } | { error: string }>();
+  for (const { control, ref } of fixtureRefs(controls)) {
+    const envelope = cat.fixtures.get(ref)?.envelope;
+    const harness = String(envelope?.setup.harness ?? "");
+    const guard = envelope && harness !== "evidence" && Object.hasOwn(harnesses, harness) ? harnesses[harness] : undefined;
+    if (!guard || !envelope) continue;
+    try {
+      out.set(ref, await guard(envelope, control));
+    } catch (error) {
+      out.set(ref, { error: error instanceof Error ? error.message : String(error) });
+    }
+  }
+  return out;
+}
+
+function runOne(envelope: FixtureEnvelope, control: ControlRecord, cat: LoadedCatalog, harness: string, ref: string,
+  guards: GuardResults): { actual: string | null; matches: boolean } {
   const { result: expected, reasonCode } = envelope.expected;
   try {
     if (harness === "evidence") {
       const run = runEvidence(envelope, control, cat);
       return { actual: run.result, matches: run.result === expected && (reasonCode === null || run.reasons.includes(reasonCode)) };
     }
-    const guard = Object.hasOwn(harnesses, harness) ? harnesses[harness] : undefined;
-    if (!guard) return { actual: null, matches: false };
-    const run = await guard(envelope, control);
+    const run = guards.get(ref);
+    if (!run) return { actual: null, matches: false };
+    if ("error" in run) return { actual: `error: ${run.error}`, matches: false };
     return { actual: run.result, matches: run.result === expected && (reasonCode === null || run.reasonCode === reasonCode) };
   } catch (error) {
     return { actual: `error: ${error instanceof Error ? error.message : String(error)}`, matches: false };
   }
 }
 
-/** Every fixture of `controls`' tests, in test order; a fixture ref the catalog does not hold is a failure. */
-export async function runFixtures(cat: LoadedCatalog, controls: readonly ControlRecord[],
-  harnesses: Readonly<Record<string, GuardHarness>> = {}): Promise<{ run: FixtureRun; outcomes: FixtureOutcome[] }> {
+/**
+ * Every fixture of `controls`' tests, in test order: evidence fixtures run here, guard fixtures take what
+ * runGuardHarnesses recorded (none, in the loader's gate and in `amc catalog check`). A ref the catalog does not hold is
+ * a failure. `mandatoryControls` counts the mandatory ones among `controls`.
+ */
+export function runFixtures(cat: LoadedCatalog, controls: readonly ControlRecord[], guards: GuardResults = new Map()): { run: FixtureRun; outcomes: FixtureOutcome[] } {
   const outcomes: FixtureOutcome[] = [];
   const failures: FixtureRun["failures"] = [];
-  for (const control of controls) {
-    for (const ref of control.tests.flatMap((t) => [...t.fixtures.positive, ...t.fixtures.negative])) {
-      const envelope = cat.fixtures.get(ref)?.envelope;
-      if (!envelope) {
-        failures.push({ controlId: control.id, fixture: ref, expected: "a fixture envelope", actual: "missing or unparsable" });
-        continue;
-      }
-      const harness = String(envelope.setup.harness ?? "");
-      const { actual, matches } = await runOne(envelope, control, cat, harness, harnesses);
-      outcomes.push({ controlId: control.id, fixture: ref, envelope, harness, actual, matches });
-      const { result, reasonCode } = envelope.expected;
-      if (actual !== null && !matches) failures.push({ controlId: control.id, fixture: ref, expected: `${result}${reasonCode ? ` (${reasonCode})` : ""}`, actual });
+  for (const { control, ref } of fixtureRefs(controls)) {
+    const envelope = cat.fixtures.get(ref)?.envelope;
+    if (!envelope) {
+      failures.push({ controlId: control.id, fixture: ref, expected: "a fixture envelope", actual: "missing or unparsable" });
+      continue;
     }
+    const harness = String(envelope.setup.harness ?? "");
+    const { actual, matches } = runOne(envelope, control, cat, harness, ref, guards);
+    outcomes.push({ controlId: control.id, fixture: ref, envelope, harness, actual, matches });
+    const { result, reasonCode } = envelope.expected;
+    if (actual !== null && !matches) failures.push({ controlId: control.id, fixture: ref, expected: `${result}${reasonCode ? ` (${reasonCode})` : ""}`, actual });
   }
   return {
     outcomes,
     run: {
-      mandatoryControls: controls.length,
+      mandatoryControls: controls.filter((c) => c.mandatory).length,
       fixtures: outcomes.filter((o) => o.actual !== null).length,
       falseMandatoryPasses: outcomes.filter(isFalsePass).length,
       failures

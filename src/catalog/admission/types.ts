@@ -52,7 +52,10 @@ export const admissionReportSchema = z.strictObject({
   /** Null only when P1-11's evaluator is not available; it is on this branch, so the checker always fills it. */
   fixtureRun: fixtureRunSchema.nullable(),
   maxAdmissibleSupport: z.enum(["experimental", "reviewed"]),
+  /** The spec's decision; "admit" for a declared-experimental pack only means it stays experimental (see `support`). */
   decision: z.enum(["admit", "refuse"]),
+  /** The support the pack has after this verdict: never stronger than declared; a refused claim leaves experimental. */
+  support: z.enum(["experimental", "reviewed", "retired"]),
   reasons: z.array(z.string()),
   /** sha256 of the canonical report without `checkedAt` and `digest`. */
   digest

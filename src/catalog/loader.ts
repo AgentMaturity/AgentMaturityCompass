@@ -16,7 +16,6 @@ import {
   publisherHostsSchema, vocabularySchema, zodToCatalogIssues, type CatalogIssue, type CatalogManifest, type Vocabulary
 } from "./schema.js";
 import type { ControlRecord, FixtureEnvelope, PackManifest, ProducerRecord } from "./types.js";
-import { admissionGate } from "./admission/report.js";
 
 export interface LoadedFixture {
   /** Catalog-relative path, `fixtures/<controlId>/<polarity>/<name>.json`. */
@@ -55,7 +54,7 @@ const TOP_FILES = new Set(["README.md", "LICENSE.md", "CHANGELOG.md", "catalog.y
  * stay out of every digest and a changelog or review record never changes the catalog it describes.
  */
 const GOVERNANCE = /^(governance\/(f5-confirmations\.yaml|reverify-before-publishing\.yaml|standards-licences\.md)|reviews\/[^/]+\/[^/]+\/[^/]+\.json)$/;
-/** Admission reports (P1-33, docs/catalog/ADMISSION.md): checker output, outside every digest; only the gate reads them. */
+/** Admission reports (P1-33, docs/catalog/ADMISSION.md): checker output, outside every digest; nothing here reads them. */
 const ADMISSION = /^admission\/[^/]+\.json$/;
 const DECIMAL_INT = /^-?(0|[1-9][0-9]*)$/;
 const DATE_LIKE = /^\d{4}-\d{2}-\d{2}/;
@@ -154,13 +153,8 @@ function emptyCatalog(root: string): LoadedCatalog {
   };
 }
 
-/**
- * `enforceAdmission` (P1-33; the compiler and activation use it): a pack declaring reviewed or qualified support is
- * downgraded to experimental in memory, with warning ADM_SUPPORT_DOWNGRADED, unless its committed admission report is
- * intact, current (pack digest recomputed) and admits it. The YAML is never edited. A downgraded pack's lock row and
- * digest record the experimental support.
- */
-export function loadCatalog(opts: { root?: string; enforceAdmission?: boolean } = {}): LoadedCatalog {
+/** The catalog as written; compile, activation, the OSCAL export and A4 read it through loadAdmittedCatalog (P1-33). */
+export function loadCatalog(opts: { root?: string } = {}): LoadedCatalog {
   const root = opts.root ?? defaultCatalogRoot();
   const cat = emptyCatalog(root);
   const { issues } = cat;
@@ -215,14 +209,6 @@ export function loadCatalog(opts: { root?: string; enforceAdmission?: boolean } 
       cat.fixtures.set(parts.slice(1).join("/"), loadFixture(root, rel, issues));
     } else {
       issues.push(issue("CAT_STRAY_FILE", rel, "outside the documented catalog tree (docs/catalog/CONTROL_RECORD.md)"));
-    }
-  }
-  if (opts.enforceAdmission) {
-    for (const [id, entry] of cat.packs) {
-      const reason = admissionGate(cat, entry.manifest, (rel) => (present.has(rel) ? readFileSync(join(root, rel), "utf8") : null));
-      if (reason === null) continue;
-      cat.packs.set(id, { ...entry, manifest: { ...entry.manifest, support: "experimental" } });
-      issues.push({ ...issue("ADM_SUPPORT_DOWNGRADED", entry.file, `${reason}; loaded as experimental`, "support"), severity: "warning" });
     }
   }
   return cat;

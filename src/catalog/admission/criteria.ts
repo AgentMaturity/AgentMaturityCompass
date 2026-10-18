@@ -1,6 +1,7 @@
 /**
  * The ten pack admission criteria v1 (P1-33; strategy "Pack admission criteria"; docs/catalog/ADMISSION.md), each over
- * the pack's mandatory controls unless stated. Mechanical criteria read the records and run fixtures; record criteria
+ * every control the pack lists (stricter than the spec's mandatory controls; criterion 6's negative classes stay a
+ * mandatory-control rule). A criterion with nothing to check is not evaluated, never met. Mechanical criteria read the records and run fixtures; record criteria
  * (2's legal review, 9) read only P1-34's verified results (effectiveSupport, packSignoffs, the shown* helpers), never a
  * declared review field. A met record criterion shows that signed records exist, not that the reviewer was right.
  */
@@ -33,9 +34,9 @@ export interface PackContext {
   manifest: PackManifest;
   /** The pack.yaml path, catalog-relative. */
   file: string;
-  /** The pack's mandatory controls, in manifest order. */
+  /** Every control the pack lists that loaded, in manifest order. */
   controls: readonly ControlRecord[];
-  /** effectiveSupport's result for each mandatory control. */
+  /** effectiveSupport's result for each of `controls`. */
   support: ReadonlyMap<string, SupportResult>;
   signoffs: PackSignoffs;
   /** Raw review records, read only to name agent signers (a refusal, never a promotion). */
@@ -50,7 +51,7 @@ type Evidence = CriterionResult["evidence"][number];
 type CriterionNo = CriterionResult["criterion"];
 
 /** Codes that leave a criterion not evaluated (the check could not run), never met. */
-export const NOT_EVALUATED_CODES: ReadonlySet<string> = new Set(["ADM_TRUST_UNAVAILABLE", "ADM6_HARNESS_NOT_REGISTERED", "ADM8_HARNESS_NOT_REGISTERED"]);
+export const NOT_EVALUATED_CODES: ReadonlySet<string> = new Set(["ADM_NOTHING_CHECKED", "ADM_TRUST_UNAVAILABLE", "ADM6_HARNESS_NOT_REGISTERED", "ADM8_HARNESS_NOT_REGISTERED"]);
 
 const hex = (digest: string): string => digest.replace(/^sha256:/, "");
 const blank = (value: string | null | undefined): boolean => value == null || !/\S/.test(value);
@@ -60,6 +61,7 @@ const lockRow = (control: ControlRecord): Evidence => ({ kind: "lockfile", ref: 
 
 function finish(criterion: CriterionNo, title: string, kind: CriterionResult["kind"], checked: number, findings: AdmissionFinding[],
   evidence: Evidence[]): CriterionResult {
+  if (checked === 0) findings.push({ code: "ADM_NOTHING_CHECKED", severity: "warning", controlId: null, path: null, message: "nothing to check: not evaluated, never met" });
   const notMet = findings.some((f) => f.severity === "error" && !NOT_EVALUATED_CODES.has(f.code));
   const pending = findings.some((f) => NOT_EVALUATED_CODES.has(f.code));
   return { criterion, title, kind, status: notMet ? "not_met" : pending ? "not_evaluated" : "met", checked, findings, evidence };
@@ -111,14 +113,12 @@ function citations(ctx: PackContext): CriterionResult {
   const add = at(ctx, findings);
   const today = new Date().toISOString().slice(0, 10);
   const evidence: Evidence[] = [];
-  let checked = 0;
   for (const control of ctx.controls) {
     const res = ctx.support.get(control.id)!;
     const file = ctx.cat.controlFiles.get(control.id) ?? "";
     if (control.citations.length > 0) evidence.push(lockRow(control), ...(res.promotion?.recordDigests ?? []).map((d, i) =>
       ({ kind: "review_record" as const, ref: res.promotion!.recordIds[i]!, sha256: hex(d) })));
     control.citations.forEach((c, i) => {
-      checked += 1;
       const pointer = `citations/${i}`;
       if (blank(c.clause) || blank(c.edition)) add("ADM2_CITATION_INCOMPLETE", control, pointer, `${c.key}: needs a clause and an edition`);
       if ((c.effectiveDate === null || c.complianceDueDate === null) && blank(c.dateNote)) add("ADM2_CITATION_INCOMPLETE", control, pointer, `${c.key}: a null date needs a dateNote`);
@@ -134,7 +134,7 @@ function citations(ctx: PackContext): CriterionResult {
       }
     });
   }
-  return finish(2, "Citations verified and legally reviewed", "mixed", checked, findings, evidence);
+  return finish(2, "Citations verified and legally reviewed", "mixed", ctx.controls.length, findings, evidence);
 }
 
 const isAlways = (p: Predicate): boolean => canonicalize(p) === canonicalize({ always: true });
@@ -196,18 +196,16 @@ const ORACLES: Readonly<Record<TestType, readonly OracleKind[]>> = {
 function tests(ctx: PackContext): CriterionResult {
   const findings: AdmissionFinding[] = [];
   const add = at(ctx, findings);
-  let checked = 0;
   for (const control of ctx.controls) {
     if (control.tests.length === 0) add("ADM5_TEST_MISSING", control, "tests", "no test");
     control.tests.forEach((t, i) => {
-      checked += 1;
       if (blank(t.oracle.observes)) add("ADM5_ORACLE_UNOBSERVED", control, `tests/${i}/oracle/observes`, `${t.id}: the oracle names nothing it observes`);
       if (!ORACLES[t.type].includes(t.oracle.kind)) {
         add("ADM5_ORACLE_MISMATCH", control, `tests/${i}/oracle/kind`, `${t.id}: a ${t.type} test needs a ${ORACLES[t.type].join(" or ")} oracle, not ${t.oracle.kind}`);
       }
     });
   }
-  return finish(5, "Tests with an oracle that observes the effect", "mechanical", checked, findings, ctx.controls.map((c) => lockRow(c)));
+  return finish(5, "Tests with an oracle that observes the effect", "mechanical", ctx.controls.length, findings, ctx.controls.map((c) => lockRow(c)));
 }
 
 const REQUIRED_NEGATIVE: readonly FixtureEnvelope["evidenceClass"][] = ["stale", "replayed", "contradictory", "cross_tenant", "empty"];
@@ -226,7 +224,7 @@ function notRun(ctx: PackContext, outcomes: readonly FixtureOutcome[], code: str
 function fixtures(ctx: PackContext): CriterionResult {
   const findings: AdmissionFinding[] = [];
   const add = at(ctx, findings);
-  for (const control of ctx.controls) {
+  for (const control of ctx.controls.filter((c) => c.mandatory)) {
     const own = ctx.outcomes.filter((o) => o.controlId === control.id && o.envelope.polarity === "negative").map((o) => o.envelope.evidenceClass);
     const missing = REQUIRED_NEGATIVE.filter((c) => !own.includes(c));
     if (missing.length > 0) add("ADM6_NEGATIVE_CLASS_MISSING", control, "tests", `no negative fixture of class ${missing.join(", ")}`);
@@ -245,12 +243,10 @@ function fixtures(ctx: PackContext): CriterionResult {
 function evidenceContracts(ctx: PackContext): CriterionResult {
   const findings: AdmissionFinding[] = [];
   const add = at(ctx, findings);
-  let checked = 0;
   for (const control of ctx.controls) {
     if (control.evidence.length === 0) add("ADM7_EVIDENCE_MISSING", control, "evidence", "no evidence contract");
     if (control.invalidatedBy.length === 0) add("ADM7_INVALIDATION_MISSING", control, "invalidatedBy", "no invalidation trigger");
     control.evidence.forEach((e, i) => {
-      checked += 1;
       const producer = ctx.cat.producers.find((p) => p.id === e.producer);
       if (!producer) add("ADM7_PRODUCER_UNKNOWN", control, `evidence/${i}/producer`, `${e.id}: producer ${e.producer} is not in producers.yaml`);
       else if (producer.status !== "available") add("ADM7_PRODUCER_NOT_AVAILABLE", control, `evidence/${i}/producer`, `${e.id}: producer ${e.producer} is ${producer.status}${producer.plannedBy ? ` (${producer.plannedBy})` : ""}`);
@@ -260,7 +256,7 @@ function evidenceContracts(ctx: PackContext): CriterionResult {
       if (!(e.freshness.maxAgeDays >= 1) || !e.sampling.method) add("ADM7_FRESHNESS_SAMPLING", control, `evidence/${i}`, `${e.id}: needs freshness and sampling`);
     });
   }
-  return finish(7, "Evidence contracts with an available producer", "mechanical", checked, findings, ctx.controls.map((c) => lockRow(c)));
+  return finish(7, "Evidence contracts with an available producer", "mechanical", ctx.controls.length, findings, ctx.controls.map((c) => lockRow(c)));
 }
 
 const UNKNOWN_FACT = { value: null, provenance: "asserted", source: "admission check: every fact unknown", reviewedBy: null };

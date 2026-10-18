@@ -11,12 +11,14 @@ import { Command } from "commander";
 import { afterAll, describe, expect, it } from "vitest";
 import { catalogReviewAuthority, checkPackAdmission, renderCatalogCheck, runCatalogCheck } from "../../../src/catalog/admission/index.js";
 import type { GuardHarness } from "../../../src/catalog/admission/fixtureRunner.js";
+import { admitCatalog, loadAdmittedCatalog } from "../../../src/catalog/admission/gate.js";
 import { reportDigest, writeAdmissionReport } from "../../../src/catalog/admission/report.js";
 import type { AdmissionReport } from "../../../src/catalog/admission/types.js";
 import { registerCatalogCommands } from "../../../src/catalog/catalogCli.js";
 import { packDigest } from "../../../src/catalog/digest.js";
 import { signReviewRecord, type ReviewRecord } from "../../../src/catalog/governance/reviewRecord.js";
 import { defaultCatalogRoot, loadCatalog, type LoadedCatalog } from "../../../src/catalog/loader.js";
+import { buildCatalogLock } from "../../../src/catalog/lockfile.js";
 import type { ControlRecord, FixtureEnvelope, PackManifest, ProducerRecord } from "../../../src/catalog/types.js";
 import { author, AUTHOR, authority, keyA, keyB, keyC, keyLegal, operatorHome, ROSTER, sign, type Key } from "../governance/reviewers.js";
 
@@ -157,7 +159,41 @@ describe("pack admission checker (P1-33)", () => {
     expect(falsePass.fixtureRun).toMatchObject({ falseMandatoryPasses: 1 });
   });
 
+  const optional = editControl((c) => ({ ...c, mandatory: false }));
+  it("refuses a pack with no mandatory control, even with every review signed (R2)", async () => {
+    const packOnly = await check({ edit: optional, records: (cat) => records(cat).slice(2) });
+    expect(packOnly).toMatchObject({ decision: "refuse", maxAdmissibleSupport: "experimental", support: "experimental" });
+    const signed = await check({ edit: optional });
+    expect(signed).toMatchObject({ decision: "refuse", maxAdmissibleSupport: "experimental", support: "experimental" });
+    expect(signed.reasons).toContain("the pack has no mandatory control");
+  });
+
+  it("leaves a criterion with nothing to check not evaluated, never met", async () => {
+    const empty: Edit = (cat) => ({ ...editPack({ controls: [] })(cat), controls: new Map(), controlFiles: new Map(), fixtures: new Map() });
+    const report = await check({ edit: empty, records: () => [] });
+    for (const n of [2, 3, 4, 5, 6, 7, 8]) {
+      expect(report.criteria[n - 1], `criterion ${n}`).toMatchObject({ status: "not_evaluated", checked: 0 });
+      expect(codes(report, n)).toContain("ADM_NOTHING_CHECKED");
+    }
+    expect(report).toMatchObject({ decision: "refuse", maxAdmissibleSupport: "experimental" });
+  });
+
+  it("checks every member control, not only the mandatory ones", async () => {
+    const report = await check({ edit: both(optional, editControl((c) => ({ ...c, binding: { kind: "manual", points: [], mechanism: "a person checks",
+      parameters: [], manualDuty: { duty: "check", ownerRole: "", cadence: "monthly", evidenceOfPerformance: "checklist" } } }))) });
+    expect(report.criteria[3]!.status).toBe("not_met");
+    expect(codes(report, 4)).toContain("ADM4_MANUAL_DUTY_INCOMPLETE");
+  });
+
+  it("states the support each verdict leaves next to the decision", async () => {
+    expect(await check()).toMatchObject({ decision: "admit", support: "reviewed" });
+    expect(await check({ records: () => [] })).toMatchObject({ decision: "refuse", support: "experimental" });
+    expect(await check({ edit: editPack({ support: "experimental" }) })).toMatchObject({ decision: "admit", support: "experimental", maxAdmissibleSupport: "reviewed" });
+    expect(await check({ edit: editPack({ support: "retired" }) })).toMatchObject({ decision: "refuse", support: "retired" });
+  });
+
   it("refuses a qualified claim with all ten criteria met: no qualification rule is defined", async () => {
+
     const report = await check({ edit: editPack({ support: "qualified" }) });
     expect(statuses(report)).toEqual(Array(10).fill("met"));
     expect(report).toMatchObject({ decision: "refuse", maxAdmissibleSupport: "reviewed", pack: { declaredSupport: "qualified" } });
@@ -191,48 +227,64 @@ describe("pack admission checker (P1-33)", () => {
     for (const n of [2, 9, 10]) expect(report.criteria[n - 1]!.status, `criterion ${n}`).toBe("not_met");
     expect(report.criteria[5]!.status).toBe("not_evaluated");
     expect(codes(report, 6)).toContain("ADM6_HARNESS_NOT_REGISTERED");
-    expect(report.reasons.join(" ")).toMatch(/experimental.*unreviewed/);
+    expect(report.support).toBe("experimental");
+    expect(report.reasons).toContain("experimental, unreviewed: not admitted as reviewed or qualified");
+    expect(report.reasons.join("\n")).not.toMatch(/\badmitted as experimental/);
   });
 });
 
-describe("support gating in the loader (P1-33)", () => {
+describe("the admission gate: loadAdmittedCatalog recomputes admission (P1-33)", () => {
   const copy = (): string => {
     const dir = mkdtempSync(join(tmpdir(), "amc-admission-"));
     temps.push(dir);
     cpSync(FIXTURE, dir, { recursive: true });
-    return dir;
+    return join(dir, "catalog");
   };
-  const supportOf = (root: string, enforceAdmission: boolean) => {
-    const cat = loadCatalog({ root, enforceAdmission });
-    return { support: cat.packs.get(PACK)!.manifest.support, downgraded: cat.issues.filter((i) => i.code === "ADM_SUPPORT_DOWNGRADED") };
-  };
+  const view = (cat: LoadedCatalog) => ({ support: cat.packs.get(PACK)!.manifest.support,
+    codes: cat.issues.filter((i) => i.code.startsWith("ADM_")).map((i) => [i.code, i.severity]) });
+  const gate = (root: string, records: unknown[], home = HOME) => admitCatalog(loadCatalog({ root }), loadCatalog({ root }), authority(home, records));
+  /** A refusing report for `root` rewritten by hand to admit, with its unkeyed digest recomputed. */
+  async function forge(root: string): Promise<void> {
+    const real = await checkPackAdmission({ packId: PACK, load: () => loadCatalog({ root }), authority: authority(HOME, []) });
+    expect(real.decision).toBe("refuse");
+    const { digest: _digest, ...body } = { ...real, decision: "admit" as const, maxAdmissibleSupport: "reviewed" as const, support: "reviewed" as const, reasons: [],
+      criteria: real.criteria.map((c) => ({ ...c, status: "met" as const, findings: [] })) };
+    writeAdmissionReport(root, { ...body, digest: reportDigest(body) });
+  }
 
-  it("downgrades a pack declaring reviewed with no report to experimental, in memory only", () => {
+  it("downgrades a reviewed claim the recomputation refuses (no D-08 roster), in memory only", () => {
     const yaml = readFileSync(join(ROOT, "layers/l1-fixture/pack.yaml"));
-    expect(supportOf(ROOT, false)).toEqual({ support: "reviewed", downgraded: [] });
-    const gated = supportOf(ROOT, true);
-    expect(gated.support).toBe("experimental");
-    expect(gated.downgraded).toEqual([expect.objectContaining({ severity: "warning", file: "layers/l1-fixture/pack.yaml" })]);
+    expect(view(loadCatalog({ root: ROOT })).support).toBe("reviewed");
+    expect(view(loadAdmittedCatalog({ root: ROOT }))).toEqual({ support: "experimental", codes: [["ADM_SUPPORT_DOWNGRADED", "warning"]] });
     expect(readFileSync(join(ROOT, "layers/l1-fixture/pack.yaml")).equals(yaml), "the YAML is never edited").toBe(true);
   });
 
-  it("keeps reviewed only with a current, intact report that admits it", async () => {
-    const dir = copy();
-    const root = join(dir, "catalog");
-    writeAdmissionReport(root, await check());
-    expect(supportOf(root, true)).toEqual({ support: "reviewed", downgraded: [] });
-    const file = join(root, "admission", `${PACK}-1.0.0.json`);
-    const report = JSON.parse(readFileSync(file, "utf8")) as AdmissionReport;
-    writeFileSync(file, JSON.stringify({ ...report, reasons: ["edited by hand"] }));
-    expect(supportOf(root, true).support, "a report whose digest does not verify").toBe("experimental");
-    const refusing = await checkPackAdmission({ packId: PACK, load: () => loadCatalog({ root }), repoRoot: dir, authority: authority(HOME, []) });
-    expect(refusing.decision).toBe("refuse");
-    writeAdmissionReport(root, refusing);
-    expect(supportOf(root, true).support, "a current report that refuses").toBe("experimental");
-    writeAdmissionReport(root, report);
-    const pack = join(root, "layers/l1-fixture/pack.yaml");
-    writeFileSync(pack, readFileSync(pack, "utf8").replace("title: Admission fixture pack", "title: Admission fixture pack, edited"));
-    expect(supportOf(root, true).support, "a stale report").toBe("experimental");
+  it("keeps reviewed only when the recomputed admission admits it, whatever a committed report says", async () => {
+    const root = copy();
+    expect(view(gate(root, records(fresh())))).toEqual({ support: "reviewed", codes: [] });
+    expect(view(gate(root, [])).support).toBe("experimental");
+    writeAdmissionReport(root, await checkPackAdmission({ packId: PACK, load: () => loadCatalog({ root }), authority: authority(HOME, []) }));
+    expect(view(gate(root, records(fresh()))).support, "a committed refusal does not outvote the recomputation").toBe("reviewed");
+  });
+
+  it("ignores and flags a forged admitting report (R1): the gate, the lock and the check all refuse it", async () => {
+    const root = copy();
+    await forge(root);
+    const gated = gate(root, []);
+    expect(view(gated)).toEqual({ support: "experimental", codes: [["ADM_SUPPORT_DOWNGRADED", "warning"], ["ADM_REPORT_MISMATCH", "warning"]] });
+    expect(buildCatalogLock(gated).packs.find((p) => p.id === PACK)?.support).toBe("experimental");
+    const result = await runCatalogCheck({ catalogRoot: root });
+    expect(result.exitCode).toBe(1);
+    expect(result.problems).toEqual([expect.objectContaining({ code: "ADM_REPORT_MISMATCH", severity: "error", file: `admission/${PACK}-1.0.0.json` })]);
+  });
+
+  it("does not let an admitting report outlive the trust it was computed under (R3)", async () => {
+    const root = copy();
+    writeAdmissionReport(root, await checkPackAdmission({ packId: PACK, load: () => loadCatalog({ root }), authority: authority(HOME, records(fresh())) }));
+    const noTrust = mkdtempSync(join(tmpdir(), "amc-admission-no-trust-"));
+    temps.push(noTrust);
+    expect(view(gate(root, records(fresh()), noTrust))).toEqual({ support: "experimental",
+      codes: [["ADM_SUPPORT_DOWNGRADED", "warning"], ["ADM_REPORT_MISMATCH", "warning"]] });
   });
 });
 
@@ -253,8 +305,8 @@ describe("amc catalog check and check:catalog-admission (P1-33)", () => {
     expect(result.reports[0]).toMatchObject({ decision: "admit", maxAdmissibleSupport: "experimental", pack: { declaredSupport: "experimental" } });
     expect(result.reports[0]!.criteria[8]!.status).toBe("not_met");
     const text = renderCatalogCheck(result).join("\n");
-    expect(text).toContain("experimental, unreviewed");
-    expect(text).not.toMatch(/certif|compliant/i);
+    expect(text).toContain("experimental, unreviewed: not admitted as reviewed or qualified");
+    expect(text).not.toMatch(/\badmitted as experimental|certif|compliant/i);
   });
 
   it("refuses an experimental draft that fails P1-09 validation", async () => {
@@ -281,6 +333,10 @@ describe("amc catalog check and check:catalog-admission (P1-33)", () => {
     const result = await runCatalogCheck({ catalogRoot: root });
     expect(result.exitCode).toBe(1);
     expect(result.problems).toEqual([expect.objectContaining({ code: "ADM_REPORT_MALFORMED", file: `admission/${PACK}-1.0.0.json` })]);
+    const genuine = (await runCatalogCheck({ catalogRoot: root })).reports[0]!;
+    writeFileSync(join(root, "admission", `${PACK}-1.0.0.json`), JSON.stringify({ ...genuine, reasons: ["edited by hand"] }));
+    expect((await runCatalogCheck({ catalogRoot: root })).problems).toEqual([expect.objectContaining({ code: "ADM_REPORT_MALFORMED",
+      message: "its digest does not match its content" })]);
   });
 
   it("registers amc catalog check with --pack, --catalog, --json and --write", () => {

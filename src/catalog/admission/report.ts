@@ -1,13 +1,13 @@
 /**
  * Admission reports on disk (P1-33): catalog/admission/<pack-id>-<version>.json, deterministic (sorted findings and
- * evidence; the digest covers everything but `checkedAt`), outside every catalog digest. A committed report is the
- * checker's last verdict, not a trust anchor: the loader's gate (admissionGate) only ever lowers a pack's declared
- * support, and a reviewed row in a plan still needs promotions from verified review records (P1-34).
+ * evidence; the digest covers everything but `checkedAt`), outside every catalog digest. A committed report is an
+ * audit record of an earlier run and its digest an unkeyed hash, so nothing decides support from it: the gate
+ * (gate.ts) recomputes admission and only compares, and check:catalog-admission fails a report that claims more.
  */
 import { join } from "node:path";
 import { writeFileAtomic } from "../../utils/fs.js";
-import { digestOf, packDigest } from "../digest.js";
-import type { LoadedCatalog } from "../loader.js";
+import { canonicalize } from "../../utils/json.js";
+import { digestOf } from "../digest.js";
 import type { PackManifest } from "../types.js";
 import { admissionReportSchema, type AdmissionFinding, type AdmissionReport, type CriterionResult } from "./types.js";
 
@@ -51,23 +51,13 @@ export function parseAdmissionReport(text: string, rel: string): { report: Admis
   return { report };
 }
 
-/**
- * Why a pack's declared reviewed or qualified support may not stand under `loadCatalog({ enforceAdmission: true })`,
- * or null when it may (or when it declares nothing stronger than experimental). The committed report must parse, verify
- * its digest, cover this pack version at its current digest (recomputed here) and admit the declared support.
- */
-export function admissionGate(cat: LoadedCatalog, manifest: PackManifest, read: (rel: string) => string | null): string | null {
-  if (manifest.support !== "reviewed" && manifest.support !== "qualified") return null;
-  const rel = reportPath(manifest);
-  const text = read(rel);
-  if (text === null) return `declares ${manifest.support} but ${rel} does not exist`;
-  const parsed = parseAdmissionReport(text, rel);
-  if ("error" in parsed) return `${rel} is malformed: ${parsed.error}`;
-  const { report } = parsed;
-  const digest = packDigest(cat, manifest);
-  if (report.pack.digest !== digest) return `${rel} is stale: it covers ${report.pack.digest}, the pack is now ${digest}`;
-  if (report.decision !== "admit" || report.pack.declaredSupport !== manifest.support) {
-    return `${rel} does not admit ${manifest.support} (${report.reasons.slice(0, 3).join("; ") || report.decision})`;
-  }
-  return null;
-}
+const RANK: Readonly<Record<AdmissionReport["support"], number>> = { retired: 0, experimental: 1, reviewed: 2 };
+const verdictOf = (r: AdmissionReport) => canonicalize({ pack: r.pack, decision: r.decision, support: r.support,
+  maxAdmissibleSupport: r.maxAdmissibleSupport, criteria: r.criteria.map((c) => c.status) });
+
+/** Whether two reports reach a different verdict on the same pack (pack digest, decision, support or any criterion's status). */
+export const verdictDiffers = (a: AdmissionReport, b: AdmissionReport): boolean => verdictOf(a) !== verdictOf(b);
+
+/** Whether a committed report claims more than the recomputation: a stronger support or a reviewed ceiling it no longer has. */
+export const claimsMore = (committed: AdmissionReport, computed: AdmissionReport): boolean =>
+  RANK[committed.support] > RANK[computed.support] || (committed.maxAdmissibleSupport === "reviewed" && computed.maxAdmissibleSupport !== "reviewed");
