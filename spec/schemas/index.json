@@ -136,6 +136,11 @@
       "sha256": "f0c65d000622ab671c15a00f348e6d62e668b3e178a8c6529522fb46620e75b6"
     },
     {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/detokenization-receipt.schema.json",
+      "name": "detokenization-receipt.schema.json",
+      "sha256": "ebfd5f33e4bf5ddc1fdfec95398a18d30d964063765a47434aac3a295377ec74"
+    },
+    {
       "$id": "https://agentmaturity.co/spec/schemas/v1/evidence-event.schema.json",
       "name": "evidence-event.schema.json",
       "sha256": "b3f2e333528cde2e54a3e3d68e8f0691da122b688dab396d175d46aa5460100a"

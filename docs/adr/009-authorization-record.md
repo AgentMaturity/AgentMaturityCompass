@@ -61,6 +61,11 @@ Every call in an authorized class (by default every class except `READ_ONLY` and
   block records the deployment profile's `{ tenantId, deploymentId }`. With no active plan, or one compiled before
   P1-78, `deploymentId` is `not_bound` and `tenantId` null: the record is bound to its workspace and
   `deploymentDigest` only and claims no deployment. Recompile and reactivate to bind one.
+- **Purpose (P2-02, experimental).** In a workspace opted in to protected data, `resource` comes from the signed
+  processor registry's `runPurpose` (`{ purpose, dataClasses }` from that purpose), never from arguments; a tool the
+  purpose does not allow denies `purpose_violation`, a registry that does not verify denies `authority_store_unavailable`,
+  and any change in `resource` between bind and recheck denies `purpose_violation`. Elsewhere it stays
+  `{ purpose: null, dataClasses: [] }`.
 
 ## Consequences
 

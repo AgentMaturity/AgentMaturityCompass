@@ -170,6 +170,36 @@ export function openTokenLookup(workspace: string): TokenLookup {
   });
 }
 
+/**
+ * Decrypts; only the detokenization gate calls it. Every token's row is read before any key is loaded, so a token this
+ * workspace never issued (another workspace's, or token-shaped text) returns null without creating keys; a missing vault
+ * issued nothing and returns null too. The class column is not covered by the authenticated data, so a row whose class
+ * differs from its token's refuses (`vault_integrity`), as does a row that does not decrypt.
+ */
+export function revealTokens(workspace: string, tokens: readonly string[]): ReadonlyMap<string, TokenEntry> | null {
+  const path = tokenVaultPath(workspace);
+  if (!existsSync(path)) return null;
+  let db: Database.Database | undefined;
+  let rows: readonly (readonly [string, TokenRow | undefined])[];
+  try {
+    db = new Database(path, { readonly: true, fileMustExist: true });
+    const select = db.prepare("SELECT data_class, nonce, ciphertext, tag FROM tokens WHERE token = ?");
+    rows = tokens.map(token => [token, select.get(token) as TokenRow | undefined] as const);
+  } catch {
+    throw new RedactionRefused("vault_unavailable");
+  } finally {
+    db?.close();
+  }
+  if (rows.some(([, row]) => row === undefined)) return null;
+  const keys = loadTokenKeys(workspace);
+  const entries = new Map<string, TokenEntry>();
+  for (const [token, row] of rows) {
+    if (!token.startsWith(`[[amc:${row!.data_class}:`)) throw new RedactionRefused("vault_integrity");
+    entries.set(token, Object.freeze({ token, dataClass: row!.data_class as ProtectedDataClass, value: unseal(keys, token, row!) }));
+  }
+  return entries;
+}
+
 /** Deletes the named tokens' rows through the P2-01 deletion gate, so an active legal hold refuses. Returns rows deleted. */
 export function deleteTokens(workspace: string, executor: string, tokens: readonly string[]): number {
   return withDeletionGate({ workspace, executor, target: { kind: "token-vault" } }, () => {
