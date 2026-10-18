@@ -212,6 +212,9 @@
     const selectedDomain = domains.find((domain) => domain.id === state.selectedDomain) || domains[0];
     const selectedPacks = packs.filter((pack) => (pack.domain || pack.stationId) === selectedDomain.id);
     const lockedPacks = selectedPacks.some((pack) => pack.locked);
+    // The server's paywall text (src/domains/industryPackEntitlement.ts): one price source, no purchase step it cannot honour.
+    const access = (window.G && window.G.data && window.G.data.industryPacksAccess) || {};
+    const lockedMessage = access.message || 'Industry Packs are locked. Run amc domain pack access for details.';
 
     el.innerHTML = `
       <div class="dim-page-header" style="margin-bottom:14px">
@@ -242,7 +245,7 @@
           <div class="ch-sub">Assess readiness and apply guardrailed domain settings</div>
           ${lockedPacks ? `
             <div class="empty">
-              <span class="empty-t">Industry Packs are a planned commercial tier. Public checkout and automatic license issuance are not live; <code>amc domain pack access</code> reports the current state.</span>
+              <span class="empty-t" style="white-space:pre-line">${esc(lockedMessage)}</span>
             </div>
           ` : ''}
           <div class="pack-grid" id="domain-pack-grid">
@@ -260,8 +263,10 @@
                   ${(pack.regulatoryBasis || []).slice(0, 4).map((ref) => `<span class="reg-tag">${esc(ref)}</span>`).join('')}
                 </div>
                 <div class="pack-actions">
-                  <button class="action-btn" data-pack-action="${pack.locked ? 'unlock' : 'assess'}" data-pack-id="${esc(pack.id)}">${pack.locked ? 'Unlock' : 'Assess'}</button>
-                  <button class="action-btn ghost" data-pack-action="${pack.locked ? 'unlock' : 'apply'}" data-pack-id="${esc(pack.id)}">${pack.locked ? 'Subscribe' : 'Apply to Agent'}</button>
+                  ${pack.locked
+                    ? `<button class="action-btn" data-pack-action="locked" data-pack-id="${esc(pack.id)}">Locked: how to get access</button>`
+                    : `<button class="action-btn" data-pack-action="assess" data-pack-id="${esc(pack.id)}">Assess</button>
+                  <button class="action-btn ghost" data-pack-action="apply" data-pack-id="${esc(pack.id)}">Apply to Agent</button>`}
                 </div>
               </div>
             `).join('') || '<div class="empty"><span class="empty-i">📦</span><span class="empty-t">No packs found for this domain.</span></div>'}
@@ -285,9 +290,9 @@
         const action = btn.getAttribute('data-pack-action');
         const pack = selectedPacks.find((row) => row.id === packId);
         if (!pack) return;
-        if (action === 'unlock' || pack.locked) {
+        if (action === 'locked' || pack.locked) {
           if (typeof window.showViewToast === 'function') {
-            window.showViewToast('Industry Packs are $9.99/month per user. Run amc domain pack access to subscribe or activate.');
+            window.showViewToast(lockedMessage);
           }
           return;
         }

@@ -365,13 +365,13 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc domain list` | List all 7 domains with metadata | `--json` | `sector list` |
 | `amc domain modules` | Show module activation map for domain | `--domain <d>`<br>`--json` | `sector modules` |
 | `amc domain pack` | Industry sector packs — 41 packs across 7 domains | - | `sector pack` |
-| `amc domain pack access` | Show Industry Packs entitlement and public-checkout readiness | `--json` | `subscribe`, `sector pack access` |
-| `amc domain pack activate` | Activate Industry Packs with a valid issued license key | `--key <licenseKey>`<br>`--expires-at <isoDate>`<br>`--json` | `sector pack activate` |
-| `amc domain pack checkout` | Create a checkout link only when a verified provider is configured | `--success-url <url>`<br>`--cancel-url <url>`<br>`--email <email>`<br>`--reference <id>`<br>`--json` | `sector pack checkout` |
+| `amc domain pack access` | Show Industry Packs access, licence verification and checkout availability | `--json` | `subscribe`, `sector pack access` |
+| `amc domain pack activate` | Activate Industry Packs with a licence signed by a key pinned in the AMC trust list | `--key <licenseKey>`<br>`--json` | `sector pack activate` |
+| `amc domain pack checkout` | Print the checkout link when this deployment has a checkout and licence verification configured | `--success-url <url>`<br>`--cancel-url <url>`<br>`--email <email>`<br>`--reference <id>`<br>`--json` | `sector pack checkout` |
 | `amc domain pack describe` | Show details of a specific industry sector pack | `--pack <packId>`<br>`--json` | `sector pack describe` |
 | `amc domain pack list` | List all available industry sector packs | `--station <station>`<br>`--domain <d>`<br>`--json` | `sector pack list` |
 | `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score | `--pack <packId>`<br>`--baseline`<br>`--json` | `sector pack run` |
-| `amc domain pack verify` | Verify an Industry Packs license key | `--key <licenseKey>`<br>`--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | `sector pack verify` |
+| `amc domain pack verify` | Verify an Industry Packs license key against the licence key pinned in the AMC trust list | `--key <licenseKey>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | `sector pack verify` |
 | `amc domain report` | Build full domain report and write it to a file (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--output <file>`<br>`--example`<br>`--json` | `sector report` |
 | `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector roadmap` |
 | `amc down` | Stop AMC Studio local control plane | - | - |
@@ -408,9 +408,9 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc enforce tla-spec` | Generate a TLA+ specification for the AMC safety model | `--properties <list>`<br>`--output <path>` | - |
 | `amc enforce verify-certificate` | Verify the integrity of a proof certificate (pass JSON as string) | `--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc enterprise` | Enterprise tier — licensing, audit export, SSO, fleet governance | - | - |
-| `amc enterprise activate` | Activate an enterprise license key (format: AMC-ENT-XXXX-XXXX-XXXX) | - | - |
+| `amc enterprise activate` | Activate a signed enterprise licence key, verified against a key pinned in the AMC trust list | - | - |
 | `amc enterprise audit-export` | Export audit trail in SIEM format | `--format <format>`<br>`--output <path>`<br>`--limit <count>`<br>`--signed` | - |
-| `amc enterprise status` | Show current license status, tier, and enabled features | - | - |
+| `amc enterprise status` | Show whether enterprise licence verification is configured, and the licence it verifies | - | - |
 | `amc enterprise usage` | Show multi-tenant usage metering and quota utilization | - | - |
 | `amc eval` | Eval interop import and coverage status | - | - |
 | `amc eval import` | Import eval outputs (LangSmith, DeepEval, Promptfoo, OpenAI Evals, W&B, Langfuse, LangWatch) into signed AMC evidence | `--format <format>`<br>`--file <path>`<br>`--agent <agentId>`<br>`--historical`<br>`--json` | - |

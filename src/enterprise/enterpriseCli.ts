@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
-import { getLicenseStatus, activateLicenseKey, validateLicenseKeyFormat, type LicenseValidationResult } from "./license.js";
-import { TIER_DEFINITIONS, resolveTierFeatures, type LicenseTier } from "./tiers.js";
+import { getLicenseStatus, activateLicenseKey } from "./license.js";
+import { TIER_DEFINITIONS, type LicenseTier } from "./tiers.js";
+import { loadTrustContext, type TrustContext } from "../trust/index.js";
 import {
   exportEnterpriseAudit,
   buildSignedAuditTrail,
@@ -19,7 +20,9 @@ import {
   type UsageMeteringSummary
 } from "./fleetGovernance.js";
 
+/** An enterprise licence gates no AMC feature, so status reports the licence only, never a feature list. */
 export interface EnterpriseStatusResult {
+  readonly verificationConfigured: boolean;
   readonly tier: LicenseTier;
   readonly tierLabel: string;
   readonly licenseValid: boolean;
@@ -27,22 +30,24 @@ export interface EnterpriseStatusResult {
   readonly org: string | null;
   readonly expiresAt: string | null;
   readonly graceDaysRemaining: number;
-  readonly features: readonly string[];
   readonly errors: readonly string[];
 }
 
+/** `trust` defaults to the operator's AMC home trust list; tests pass their own. */
 export function enterpriseStatusCli(params: {
   workspace: string;
+  trust?: TrustContext;
 }): EnterpriseStatusResult {
   const status = getLicenseStatus({
     workspace: params.workspace,
-    publicKey: undefined as never
+    trust: params.trust ?? loadTrustContext()
   });
 
   const tier = status.validation.effectiveTier;
   const def = TIER_DEFINITIONS[tier];
 
   return {
+    verificationConfigured: status.validation.status !== "not_configured",
     tier,
     tierLabel: def.label,
     licenseValid: status.validation.valid,
@@ -50,7 +55,6 @@ export function enterpriseStatusCli(params: {
     org: status.validation.claims?.org ?? null,
     expiresAt: status.validation.claims?.expiresAt ?? null,
     graceDaysRemaining: status.validation.graceDaysRemaining,
-    features: [...resolveTierFeatures(tier)],
     errors: [...status.validation.errors]
   };
 }
@@ -67,11 +71,12 @@ export interface EnterpriseActivateResult {
 export function enterpriseActivateCli(params: {
   workspace: string;
   key: string;
+  trust?: TrustContext;
 }): EnterpriseActivateResult {
   const result = activateLicenseKey({
     workspace: params.workspace,
     key: params.key,
-    publicKey: undefined as never
+    trust: params.trust ?? loadTrustContext()
   });
 
   return {
