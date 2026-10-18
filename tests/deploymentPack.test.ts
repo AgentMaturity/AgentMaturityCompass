@@ -312,7 +312,7 @@ describe("Helm bootstrap Secret defaults and explicit values", () => {
   });
 
   it.each(PLACEHOLDERS)("refuses %s for bootstrap.values.%s", (placeholder, key) => {
-    expectRefusal({ ...VALID_VALUES, [key]: placeholder },
-      `bootstrap.values.${key} starts with the published placeholder prefix; supply a real value`);
+    // The chart's values.schema.json refuses a change-me value before the template's own check can run.
+    expectRefusal({ ...VALID_VALUES, [key]: placeholder }, `at '/bootstrap/values/${key}': 'not' failed`);
   });
 });
