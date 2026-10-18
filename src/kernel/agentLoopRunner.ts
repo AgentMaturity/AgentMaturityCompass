@@ -47,6 +47,7 @@ import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
 import type { NativeValidationPlan, NativeValidationResult } from "../agent/nativeValidation.js";
 import { projectNativeValidation } from "../agent/nativeValidationProjection.js";
 import type { ApprovalAnswerer } from "../approvals/seam/approvalSeamTypes.js";
+import { cliInitiator } from "../approvals/approvalEngine.js";
 import type { LlmRouteConfig } from "../llm/adapter/adapterRegistry.js";
 import type { HttpTransport } from "../llm/adapter/transport.js";
 import type { RequestEncoderRegistry } from "../llm/request/requestEncoder.js";
@@ -510,6 +511,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         session,
         workspace: options.workspace,
         agentId: options.agentId,
+        // P1-78 on the CLI too (P2-13): the OS account running this turn initiates its approvals, so it cannot approve them.
+        initiator: cliInitiator(),
         ...(gate.answerers === undefined ? {} : { answerers: gate.answerers }),
         ...(gate.onRaised === undefined ? {} : { onRaised: gate.onRaised })
       });

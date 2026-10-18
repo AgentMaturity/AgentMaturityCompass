@@ -6,6 +6,13 @@ import { join } from "node:path";
 import { Command } from "commander";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { registerAgentCommands } from "../src/cli-agent-commands.js";
+import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
+import { listApprovalRequests } from "../src/approvals/approvalChainStore.js";
+import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
+import { initBudgets } from "../src/budgets/budgets.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { userInfo } from "node:os";
 import { getPublicKeyPem } from "../src/crypto/keys.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { startAcpStdio } from "../src/acp/acpStdioMain.js";
@@ -146,5 +153,25 @@ describe("the CLI's --json reports carry the same phases (P2-13)", () => {
     const unknown = await cli(["agent-loop", "verify", randomUUID(), "--json", "--expect-monitor", sha256Hex(getPublicKeyPem(workspace, "monitor"))]);
     expect(unknown.failed).toBe(true);
     expect((unknown.json.execution as { phases: Record<string, string> }).phases).toMatchObject({ admission: "pending", "evidence-verification": "failed" });
+  }, 120_000);
+
+  it("a CLI run's approval names the OS user as initiator, who then cannot approve it, as on ACP and Studio (P1-78 on every surface)", async () => {
+    initBudgets(workspace, "default"); writeRuntimeFirewallPolicy({ workspace, mode: "observe" }); initApprovalPolicy(workspace);
+    mkdirSync(join(workspace, "workspace"), { recursive: true }); writeFileSync(join(workspace, "workspace", "n.txt"), "fixture");
+    const read = JSON.stringify({ tool: "fs.read", arguments: { path: "workspace/n.txt" } });
+    const running = cli(["agent-loop", "run", read, "--provider", "stub", "--tools", "workspace", "--approve-tools", "WRITE_HIGH",
+      "--credentials-home", home, "--json"]);
+    let request: ReturnType<typeof listApprovalRequests>[number] | undefined;
+    await vi.waitFor(() => { request = listApprovalRequests({ workspace, agentId: "default" }).find((r) => r.status === "PENDING"); expect(request).toBeDefined(); },
+      { timeout: 60_000, interval: 50 });
+    const osUser = userInfo().username;
+    expect(request!.initiator).toBe(osUser);
+    const decide = (user: string) => decideApprovalForIntent({ workspace, agentId: "default", approvalId: request!.approvalRequestId,
+      decision: "APPROVED", mode: "EXECUTE", reason: "P2-13 fixture reviewer", userId: user, username: user, userRoles: ["APPROVER"] });
+    expect(() => decide(osUser)).toThrow(/initiator cannot approve their own request/);
+    decide("p213-reviewer-1"); decide("p213-reviewer-2");
+    const run = await running;
+    expect(run.failed).toBe(false);
+    expect((run.json as { toolCalls: number }).toolCalls).toBe(1);
   }, 120_000);
 });
