@@ -2,6 +2,7 @@ import { dirname, resolve } from "node:path";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { envelopeForComplianceCategory, envelopeForComplianceReport } from "../claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
+import { familyReview, normalizeFrameworkName } from "./frameworks.js";
 import type { ComplianceReportJson } from "./mappingSchema.js";
 
 function shortEvidenceHash(hash: string): string {
@@ -52,6 +53,10 @@ export function complianceReportToMarkdown(report: ComplianceReportJson): string
   lines.push("");
   lines.push(formatClaimLabel(renderClaimLabel(envelopeForComplianceReport(report, report.ts)), "report"));
   lines.push("");
+  const framework = normalizeFrameworkName(report.framework);
+  lines.push("- Mappings: experimental: drafted and refuted by AI agents, not signed off by a named expert (D-08 pending). "
+    + "A result for another framework never sets a result here.");
+  for (const flag of framework ? familyReview(framework).flags : []) lines.push(`- Flag: ${flag}`);
   lines.push(`- Agent: ${report.agentId}`);
   if (report.station) lines.push(`- Station: ${report.station} (only mappings tagged with this station)`);
   lines.push(`- Window: ${new Date(report.windowStartTs).toISOString()} -> ${new Date(report.windowEndTs).toISOString()}`);
