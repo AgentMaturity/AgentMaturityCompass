@@ -9,7 +9,7 @@
  * every key its purposes use, so verifiers that read role histories keep verifying. After the commit each statement and
  * history revision is appended to the transparency log and raises this machine's marks.
  */
-import { generateKeyPairSync, sign, verify } from "node:crypto";
+import { generateKeyPairSync, sign } from "node:crypto";
 import { join } from "node:path";
 import { buildKeyHistoryEntry, type KeyHistoryEntry } from "../crypto/keyHistoryChain.js";
 import { publicKeyFromPrivate, sealKeyHistory, verifyKeyHistoryEnvelope, type KeyHistoryEnvelope, type KeyHistorySubject } from "../crypto/keyHistoryEnvelope.js";
@@ -31,11 +31,15 @@ import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { readPinnedTrustRoots } from "../trust/rootRotation.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { logSequence } from "./anchorLog.js";
-import { assertNeverAnchored, assertNotRolledBack, machineMark, markSequence } from "./anchors.js";
+import { assertNeverAnchored, assertNotRolledBack, machineMark, markSequence, preflightHistoryLog } from "./anchors.js";
 import { checkHighWater, keyHistoryMarkKey } from "./highWater.js";
 import { assertLocal, getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem, keyFile, readHistory } from "./signingKeys.js";
 export { getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem } from "./signingKeys.js";
-import { assertKeysetComplete, assertNoPendingKeyset, commitKeyset, keysetAnchoring, keysetDeclared, keysetFileRel, keysetIdentity, keysetPaths, keysetRecoveryDir, resumeKeyset, type KeysetWrite } from "./keyset.js";
+import {
+  assertKeysetComplete, assertNoPendingKeyset, boundKeyset, boundProviderKey, commitKeyset, keysetAnchoring, keysetDeclared, keysetFileRel, keysetIdentity, keysetPaths,
+  keysetRecoveryDir, resumeKeyset, type Keyset, type KeysetWrite
+} from "./keyset.js";
+import { signingKeyId, verifyWithKey } from "./algorithmPolicy.js";
 import { KEY_REVOCATION_REASONS, keyRevocationLocation, type KeyRevocationReason } from "./keyRevocations.js";
 export type { KeyRevocationReason } from "./keyRevocations.js";
 import {
@@ -117,6 +121,8 @@ export function rotatePurposeKeys(input: RotatePurposeKeysInput): RotationResult
   if (!passphrase) throw new Error("Key rotation requires the vault passphrase (AMC_VAULT_PASSPHRASE or interactive input).");
   const payload = unlockedPayloadForKeyChange(workspace, passphrase);
   assertKeysetComplete(workspace);
+  // The statements are logged after the commit: refuse now whatever would make that log append refuse then.
+  preflightHistoryLog(workspace);
   const keyOf = (purpose: LocalPurpose) => {
     const key = payload.keys[purpose];
     if (!key) throw new Error(`The vault holds no ${purpose} key.`);
@@ -279,7 +285,7 @@ export function resumeKeyRotation(workspace: string, passphrase: string | undefi
 
 const POP_TAG = "AMC_KEY_POP_V1";
 
-function popBytes(body: { keyId: string; purpose: string; issuedAt: string }): Buffer {
+export function popBytes(body: { keyId: string; purpose: string; issuedAt: string }): Buffer {
   return Buffer.concat([Buffer.from(POP_TAG, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(body), "utf8")]);
 }
 
@@ -296,18 +302,18 @@ export function exportPublicKey(workspace: string, purpose: KeyPurpose): { purpo
   return { purpose: local, keyId, publicKeyPem, proofOfPossession: { issuedAt, signature: sign(null, popBytes({ keyId, purpose: local, issuedAt }), privateKeyPem).toString("base64") } };
 }
 
+/** Ed25519, or (a provider-held key, P2-08) ECDSA P-256 in P1363. */
 export function verifyProofOfPossession(exported: { purpose: string; keyId: string; publicKeyPem: string; proofOfPossession: { issuedAt: string; signature: string } }): boolean {
-  if (ed25519KeyId(exported.publicKeyPem) !== exported.keyId || !(KEY_PURPOSES as readonly string[]).includes(exported.purpose)) return false;
-  try {
-    return verify(null, popBytes({ keyId: exported.keyId, purpose: exported.purpose, issuedAt: exported.proofOfPossession.issuedAt }),
-      exported.publicKeyPem, Buffer.from(exported.proofOfPossession.signature, "base64"));
-  } catch {
-    return false;
-  }
+  if (signingKeyId(exported.publicKeyPem) !== exported.keyId || !(KEY_PURPOSES as readonly string[]).includes(exported.purpose)) return false;
+  return verifyWithKey(popBytes({ keyId: exported.keyId, purpose: exported.purpose, issuedAt: exported.proofOfPossession.issuedAt }),
+    exported.publicKeyPem, Buffer.from(exported.proofOfPossession.signature, "base64"));
 }
 
 /** `amc keys list`: public information only, no vault unlock. */
-export function listKeys(workspace: string): { generation: number | null; digest: string | null; anchoring: ReturnType<typeof keysetAnchoring>["state"]; complete: boolean; detail: string | null; purposes: Array<{ purpose: LocalPurpose; role: string; keyId: string | null; sharedWith: LocalPurpose[]; historyKeys: number; rotations: number }> } {
+export function listKeys(workspace: string): { generation: number | null; digest: string | null; anchoring: ReturnType<typeof keysetAnchoring>["state"]; complete: boolean; detail: string | null; purposes: Array<{
+  purpose: LocalPurpose; role: string; keyId: string | null; sharedWith: LocalPurpose[]; historyKeys: number; rotations: number;
+  provider: string; algorithm: string; protection: string; protectionBasis: string; providerKeyId: string | null;
+}> } {
   let generation: number | null = null;
   let detail: string | null = null;
   try {
@@ -318,13 +324,19 @@ export function listKeys(workspace: string): { generation: number | null; digest
   const keyIds = new Map(LOCAL_PURPOSES.map(purpose => {
     try { return [purpose, ed25519KeyId(getSigningPublicKeyPem(workspace, purpose))] as const; } catch { return [purpose, null] as const; }
   }));
+  // P2-08: who holds each purpose's key, as the key set recorded it when the provider key was bound (no provider call).
+  let providers: NonNullable<Keyset["providers"]> = {};
+  try { providers = boundKeyset(workspace)?.providers ?? {}; } catch { /* reported in detail above */ }
   const purposes = LOCAL_PURPOSES.map(purpose => {
+    const held = providers[purpose];
+    const holder = { provider: held?.provider ?? "file", algorithm: held?.algorithm ?? "ed25519", protection: held?.protection ?? "software",
+      protectionBasis: held?.protectionBasis ?? "configured", providerKeyId: held?.keyId ?? null };
     let historyKeys = 0;
     let rotations = 0;
     try { historyKeys = getPurposeKeyHistory(workspace, purpose).length; } catch { /* reported as 0 */ }
     try { rotations = readStatements(workspace, purpose).length; } catch { /* reported as 0 */ }
     const keyId = keyIds.get(purpose) ?? null;
-    return { purpose, role: roleOfPurpose(purpose), keyId, sharedWith: LOCAL_PURPOSES.filter(other => other !== purpose && keyId !== null && keyIds.get(other) === keyId), historyKeys, rotations };
+    return { purpose, role: roleOfPurpose(purpose), keyId, sharedWith: LOCAL_PURPOSES.filter(other => other !== purpose && keyId !== null && keyIds.get(other) === keyId), historyKeys, rotations, ...holder };
   });
   // The digest another machine needs for `amc keys rotate --accept`, and how this machine holds the key set.
   return { generation, digest: keysetIdentity(workspace)?.sha256 ?? null, anchoring: keysetAnchoring(workspace).state, complete: detail === null, detail, purposes };
@@ -345,10 +357,10 @@ export function revokeKey(workspace: string, purpose: KeyPurpose, keyId: string,
   const local = assertLocal(purpose);
   if (!/^[0-9a-f]{64}$/.test(keyId)) throw new Error("--key-id must be a 64 hex key id");
   if (!(KEY_REVOCATION_REASONS as readonly string[]).includes(reason)) throw new Error(`--reason must be one of ${KEY_REVOCATION_REASONS.join(", ")}`);
-  if (LOCAL_PURPOSES.some(other => ed25519KeyId(getSigningPublicKeyPem(workspace, other)) === keyId)) {
+  if (LOCAL_PURPOSES.some(other => ed25519KeyId(getSigningPublicKeyPem(workspace, other)) === keyId || boundProviderKey(workspace, other)?.binding.keyId === keyId)) {
     throw new Error(`key ${keyId} still signs for this workspace; rotate it first (amc keys rotate --purpose ${local})`);
   }
-  if (!getPurposeKeyHistory(workspace, local).some(pem => ed25519KeyId(pem) === keyId)) throw new Error(`key ${keyId} is not in the ${local} key history`);
+  if (!getPurposeKeyHistory(workspace, local).some(pem => signingKeyId(pem) === keyId)) throw new Error(`key ${keyId} is not in the ${local} key history`);
   return withControlFileLock({ root: vaultPaths(workspace).keysDir, name: "key-revocations", operation: () => {
     const location = keyRevocationLocation(workspace);
     recoverPendingRevocationList(location);

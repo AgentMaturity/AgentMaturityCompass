@@ -5,7 +5,9 @@
 import { readFileSync } from "node:fs";
 import type { Command } from "commander";
 import { exportPublicKey, listKeys, resumeKeyRotation, revokeKey, rotatePurposeKeys, type KeyRevocationReason } from "./purposeKeys.js";
-import { acceptAdoptedKeyset, quarantineUnboundPurposeFiles, restoreCommittedKeyset } from "./keyset.js";
+import { acceptAdoptedKeyset, boundProviderKey, quarantineUnboundPurposeFiles, restoreCommittedKeyset } from "./keyset.js";
+import { configuredRef, loadKeysConfig } from "./keysConfig.js";
+import { bindPurposeProviderKey, exportPurposePublicKey } from "./purposeProviders.js";
 import { vaultEnvelopeKeyIds } from "../vault/vault.js";
 import { ROTATION_REASONS, type RotationReason } from "./rotationStatement.js";
 import { assertOwnerMode } from "../mode/mode.js";
@@ -46,6 +48,11 @@ export async function rotateKeysForCli(workspace: string, opts: RotateOptions): 
     return resumeKeyRotation(workspace, process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):")));
   }
   const purpose = purposeOption(opts.purpose);
+  // P2-08: a purpose whose keys.refs names a provider key is bound to that key (and, for ledger-row, its delegation renewed).
+  if (configuredRef(loadKeysConfig(workspace), purpose) !== null) {
+    if (opts.reason !== undefined || opts.overlapDays !== undefined || opts.rootKey !== undefined) throw new Error("--reason, --overlap-days and --root-key do not apply to a provider key (keys.refs); it is bound, not generated");
+    return bindPurposeProviderKey(workspace, purpose, { passphrase: process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):")) });
+  }
   if (opts.reason !== undefined && !(ROTATION_REASONS as readonly string[]).includes(opts.reason)) throw new Error(`--reason must be one of ${ROTATION_REASONS.join(", ")}`);
   const overlapDays = opts.overlapDays === undefined ? undefined : Number(opts.overlapDays);
   const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Passphrase for key rotation:"));
@@ -58,18 +65,19 @@ export async function rotateKeysForCli(workspace: string, opts: RotateOptions): 
 export function registerKeysCommands(program: Command): void {
   const keys = program.command("keys").description("Purpose signing keys: list, rotate, revoke and export public keys");
   keys.command("list")
-    .description("List each signing purpose's key id, shared keys, history size and rotations (public files only)")
+    .description("List each signing purpose's key id, shared keys, history size, rotations, provider, algorithm and protection (public files only)")
     .option("--json", "print JSON")
     .action((opts: { json?: boolean }) => {
       const listed = listKeys(process.cwd());
       if (opts.json) { console.log(JSON.stringify(listed, null, 2)); return; }
       console.log(`key set generation: ${listed.generation ?? "none"}${listed.complete ? "" : ` (INCOMPLETE: ${listed.detail})`}`);
       for (const row of listed.purposes) {
-        console.log(`${row.purpose.padEnd(18)} ${row.keyId ?? "missing"} history=${row.historyKeys} rotations=${row.rotations}${row.sharedWith.length ? ` shared with ${row.sharedWith.join(", ")}` : ""}`);
+        const holder = `${row.provider} ${row.algorithm} protection=${row.protection} (${row.protectionBasis})${row.providerKeyId ? ` provider key ${row.providerKeyId}` : ""}`;
+        console.log(`${row.purpose.padEnd(18)} ${row.keyId ?? "missing"} history=${row.historyKeys} rotations=${row.rotations}${row.sharedWith.length ? ` shared with ${row.sharedWith.join(", ")}` : ""} ${holder}`);
       }
     });
   keys.command("rotate")
-    .description("Rotate one purpose's key with a signed, chained statement; --resume completes or rolls back an interrupted change")
+    .description("Rotate one purpose's key with a signed, chained statement (or bind the provider key keys.refs names); --resume completes or rolls back an interrupted change")
     .option("--purpose <purpose>", "ledger-row, receipt, artifact-seal, revocation-list, config-signature, lease or session")
     .option("--reason <reason>", `${ROTATION_REASONS.join(", ")} (default: scheduled, or purpose-split for a shared key)`)
     .option("--overlap-days <n>", "days both keys may be valid (0-30, default 7; none for key-compromise)")
@@ -95,7 +103,10 @@ export function registerKeysCommands(program: Command): void {
   keys.command("export-public")
     .description("Print a purpose's public key, key id and proof of possession, for an organisation's trust list")
     .requiredOption("--purpose <purpose>", "the purpose to export")
-    .action((opts: { purpose: string }) => {
-      console.log(JSON.stringify(exportPublicKey(process.cwd(), purposeOption(opts.purpose)), null, 2));
+    .action(async (opts: { purpose: string }) => {
+      const purpose = purposeOption(opts.purpose);
+      // A provider-held key (P2-08): its public key and a proof of possession signed by the provider, nothing else.
+      const exported = boundProviderKey(process.cwd(), purpose) === null ? exportPublicKey(process.cwd(), purpose) : await exportPurposePublicKey(process.cwd(), purpose);
+      console.log(JSON.stringify(exported, null, 2));
     });
 }

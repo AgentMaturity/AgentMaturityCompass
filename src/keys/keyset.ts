@@ -26,6 +26,8 @@ import {
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize, parseCanonicalJson } from "../utils/json.js";
 import { ed25519KeyId } from "../trust/trustList.js";
+import { SIGNING_ALGORITHMS, signingKeyId } from "./algorithmPolicy.js";
+import { KEY_PROVIDER_IDS } from "./provider.js";
 import { LOCAL_PURPOSES, type LocalPurpose } from "../vault/vaultPayload.js";
 import { AntiRollbackError, compareHighWater, highWaterKey, highWaterPath, readHighWater, recordHighWater, workspaceScope } from "./highWater.js";
 
@@ -37,13 +39,23 @@ import { AntiRollbackError, compareHighWater, highWaterKey, highWaterPath, readH
 const KEYSET_FILE = /^(?:vault\.amcvault|vault\.amcvault\.meta\.json|previous-vault\.amcvault|keys\/(?:[a-z][a-z-]{0,31}(?:_ed25519)?\.pub|[a-z][a-z-]{0,31}_history\.json(?:\.previous-[0-9a-f]{64})?|revocations\.signed\.json|statements\/[a-z][a-z-]{0,31}\/[1-9][0-9]{0,15}\.json))$/;
 const relSchema = z.string().regex(KEYSET_FILE, "not a key-set file");
 const hex = z.string().regex(/^[0-9a-f]{64}$/);
+/** P2-08: a provider-held key bound to a purpose; its public key is `keys/<purpose>-provider.pub`, pinned in `files`. */
+const providerBindingSchema = z.strictObject({
+  provider: z.enum(KEY_PROVIDER_IDS).exclude(["file"]),
+  keyId: hex,
+  algorithm: z.enum(SIGNING_ALGORITHMS),
+  protection: z.enum(["software", "hsm", "external", "unknown"]),
+  protectionBasis: z.enum(["provider-metadata", "configured"])
+});
+export type ProviderBinding = z.infer<typeof providerBindingSchema>;
 const keysetSchema = z.strictObject({
   type: z.literal("amc.keyset"),
   version: z.literal(1),
   generation: z.number().int().positive().safe(),
   keys: z.partialRecord(z.enum(LOCAL_PURPOSES), hex),
   files: z.record(relSchema, hex),
-  statements: z.array(hex)
+  statements: z.array(hex),
+  providers: z.partialRecord(z.enum(LOCAL_PURPOSES), providerBindingSchema).optional()
 });
 const manifestSchema = z.strictObject({
   generation: z.number().int().positive().safe(),
@@ -351,6 +363,22 @@ export function assertBoundPublicKey(workspace: string, purpose: LocalPurpose, p
 }
 
 /**
+ * The provider key the committed key set binds to `purpose` (P2-08) and its pinned public key, or null when the purpose
+ * signs with the vault. Throws when the key set is incomplete or the public key is not the bound one.
+ */
+export function boundProviderKey(workspace: string, purpose: LocalPurpose): { binding: ProviderBinding; publicKeyPem: string } | null {
+  // Presence from the mark-bound key set; the digest checks only once a binding exists, so vault-only readers see no change.
+  const binding = boundKeyset(workspace)?.providers?.[purpose];
+  if (binding === undefined) return null;
+  const keyset = assertKeysetComplete(workspace)!;
+  const publicKeyPem = readContainedOrNull(workspace, keysetFileRel(`keys/${purpose}-provider.pub`), 64 * 1024)?.toString("utf8") ?? null;
+  if (publicKeyPem === null || signingKeyId(publicKeyPem) !== binding.keyId) {
+    throw new KeysetIncompleteError(keyset.generation, `keys/${purpose}-provider.pub is missing or is not the ${binding.provider} key generation ${keyset.generation} binds`);
+  }
+  return { binding, publicKeyPem };
+}
+
+/**
  * Signers: the bound key set (above), after checking that every public key and statement it pins still has its digest.
  * Null for a workspace that has none yet.
  */
@@ -381,7 +409,7 @@ function recoveryName(rel: string): string {
  * Commits one generation: recovery copies, staged files, the pending intent, renames, then the commit rename. Any
  * failure before the commit rename leaves a pending generation that every signer and verifier refuses until resume.
  */
-export function commitKeyset(workspace: string, change: { keys: Keyset["keys"]; writes: readonly KeysetWrite[]; statements?: readonly string[] }): Keyset {
+export function commitKeyset(workspace: string, change: { keys: Keyset["keys"]; writes: readonly KeysetWrite[]; statements?: readonly string[]; providers?: Keyset["providers"] }): Keyset {
   assertOwnerMode(workspace, "keys commit");
   ensureContainedDir(workspace, ".amc/keys");
   return withControlFileLock({ root: amcDir(workspace), name: "keyset", operation: () => {
@@ -395,7 +423,10 @@ export function commitKeyset(workspace: string, change: { keys: Keyset["keys"]; 
     // Every public key and statement in force stays pinned, not only the ones this generation rewrote.
     const carried = Object.entries(current?.files ?? {}).filter(([rel]) => pinned(rel) && !Object.hasOwn(written, rel));
     const files = { ...Object.fromEntries(carried), ...written };
-    const next = keysetSchema.parse({ type: "amc.keyset", version: 1, generation, keys: change.keys, files, statements: [...(change.statements ?? [])] });
+    // Provider bindings (P2-08) carry forward unless this generation sets them; none at all keeps the 1.x-era bytes.
+    const providers = change.providers ?? current?.providers;
+    const next = keysetSchema.parse({ type: "amc.keyset", version: 1, generation, keys: change.keys, files, statements: [...(change.statements ?? [])],
+      ...(providers && Object.keys(providers).length > 0 ? { providers } : {}) });
     const manifest = rows.map(({ rel, write }) => {
       const existed = containedExists(workspace, keysetFileRel(rel));
       return { rel, existed, mode: existed ? statSync(join(amcDir(workspace), rel)).mode & 0o777 : write.mode };

@@ -1,3 +1,4 @@
+import { signingKeyId } from "../keys/algorithmPolicy.js";
 import { existsSync, lstatSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
@@ -157,7 +158,8 @@ export function workspaceSelfTrust(workspace: string, now: Date = new Date()): T
   const migrated = keysetDeclared(workspace);
   const explicitPins = migrated
     ? LOCAL_PURPOSES.flatMap(purpose => getPurposeKeyHistory(workspace, purpose).flatMap(pem => {
-      const keyId = ed25519KeyId(pem);
+      // A provider key the key set binds (P2-08) may be ECDSA P-256.
+      const keyId = signingKeyId(pem);
       return keyId ? [{ keyId, purposes: [purpose], origin: `workspace-self:${purpose}` }] : [];
     }))
     : (Object.keys(ROLE_PURPOSES) as Array<keyof typeof ROLE_PURPOSES>).flatMap(role => {
