@@ -1,0 +1,30 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts (120 tests | 1 failed | 119 skipped) 12ms
+     × rejects malformed and unzoned CRA timestamps and nonboolean exploitation flags 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/catalog/stations/technology/fixtures.test.ts > Technology draft fixtures through the actual compiled platform-agent plan > rejects malformed and unzoned CRA timestamps and nonboolean exploitation flags
+AssertionError: 0: expected 'pass' to be 'not_evaluated' // Object.is equality
+
+Expected: "not_evaluated"
+Received: "pass"
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts:112:38
+    110|       const result = runTechnologyOracle({ ...spec, input: { ...spec.i…
+    111|         flaw: { ...spec.input.flaw, awareAt }, packet: { ...spec.input…
+    112|       expect(result.result, awareAt).toBe("not_evaluated");
+       |                                      ^
+    113|       expect(result.reasonCode, awareAt).toBe("awareness_missing");
+    114|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 119 skipped (120)
+   Start at  10:06:09
+   Duration  5.52s (transform 3.98s, setup 68ms, import 5.18s, tests 12ms, environment 0ms)
+
