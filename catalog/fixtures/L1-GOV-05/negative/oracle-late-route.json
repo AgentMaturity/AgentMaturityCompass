@@ -1,0 +1,85 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-GOV-05",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2026-01-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "governance-fixture-tenant",
+      "workspaceId": "governance-fixture-workspace",
+      "deploymentId": "governance-benefits-caseworker-fixture",
+      "agentId": "governance-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "governanceOracle": {
+      "kind": "explanation",
+      "input": {
+        "context": {
+          "tenantId": "governance-fixture-tenant",
+          "workspaceId": "governance-fixture-workspace",
+          "agentId": "governance-fixture-agent",
+          "deploymentId": "governance-benefits-caseworker-fixture",
+          "controlId": "L1-GOV-05",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-19T09:00:00.001Z",
+        "maxResponseMs": 86400000,
+        "routingLogAvailable": true,
+        "authorizedReviewers": [
+          "reviewer-1"
+        ],
+        "request": {
+          "binding": {
+            "tenantId": "governance-fixture-tenant",
+            "workspaceId": "governance-fixture-workspace",
+            "agentId": "governance-fixture-agent",
+            "deploymentId": "governance-benefits-caseworker-fixture",
+            "controlId": "L1-GOV-05",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "requestId": "request-1",
+          "caseId": "case-1",
+          "receivedAt": "2026-10-18T09:00:00.000Z"
+        },
+        "route": {
+          "binding": {
+            "tenantId": "governance-fixture-tenant",
+            "workspaceId": "governance-fixture-workspace",
+            "agentId": "governance-fixture-agent",
+            "deploymentId": "governance-benefits-caseworker-fixture",
+            "controlId": "L1-GOV-05",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "requestId": "request-1",
+          "caseId": "case-1",
+          "actorId": "reviewer-1",
+          "routedAt": "2026-10-19T09:00:00.001Z",
+          "mode": "human"
+        }
+      },
+      "expected": {
+        "result": "deny",
+        "reasonCode": "route_deadline_missed"
+      }
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

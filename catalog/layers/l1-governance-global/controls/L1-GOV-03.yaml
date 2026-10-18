@@ -1,0 +1,156 @@
+id: "L1-GOV-03"
+version: "0.1.0"
+support: "experimental"
+layer: 1
+family: "canary-never-reaches-vendor-training"
+stations:
+  - "governance"
+title: "Agency canaries stay on recorded no-training inference routes"
+statement: "In the selected agency-data policy, send canary-bearing input only to an allowlisted inference
+  endpoint with a current, context-bound no-training contract record. Refuse training, telemetry and unlisted
+  routes before capturing any request body."
+riskRationale: "An inference request can silently be repurposed into training or telemetry, and a contract label
+  without a bound record cannot establish the intended agency-data restriction."
+mandatory: true
+applicability:
+  predicate:
+    all:
+      - fact: "domains"
+        includesAny:
+          - "governance.public-services"
+      - fact: "jurisdictions"
+        includesAny:
+          - "US"
+      - fact: "roles"
+        includesAny:
+          - "deployer"
+      - fact: "entityTypes"
+        includesAny:
+          - "federal_agency"
+          - "state_agency"
+          - "public_service_provider"
+      - fact: "useCases"
+        includesAny:
+          - "agency_vendor_inference"
+  reasons:
+    - "Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected
+      domain and local fixture establish neither legal applicability nor production enforcement."
+  exclusions: []
+citations:
+  - key: "governance-omb-m25-22-no-training"
+    registerId: "us-omb-m-25-22"
+    instrument: "Driving Efficient Acquisition of Artificial Intelligence in Government"
+    clause: "Non-public agency data and vendor training"
+    edition: "Edition not read in P3-14; existing S5 locator only"
+    jurisdiction: "US"
+    statusType: "binding-now"
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: "No effective or compliance date is asserted by this unread draft. Instrument-level S5 status does not
+      establish clause-specific applicability or timing."
+    url: "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-22-Driving-Efficient-Acquisition-of-Artificial\
+      -Intelligence-in-Government.pdf"
+    retrieval:
+      state: "unverified"
+      reason: "Not fetched or hashed in P3-14. Existing S5 entries are navigation only; primary-source text, scope and
+        dates require verification before any review."
+    appliesWhen:
+      fact: "jurisdictions"
+      includesAny:
+        - "US"
+    legalReview: null
+    note: "Experimental, unreviewed candidate. The status value follows existing S5 instrument metadata and does not
+      establish verified legal applicability."
+binding:
+  kind: "enforcement_point"
+  points:
+    - "egress"
+  mechanism: "Draft egress target: inspect actual request bodies and purpose against the deployment endpoint and
+    contract records before egress. The local capture is synthetic and performs no network request; it cannot
+    establish vendor retention, downstream training or full contract performance."
+  parameters: []
+  manualDuty: null
+tests:
+  - id: "L1-GOV-03-T1"
+    type: "drill"
+    oracle:
+      kind: "system_of_record"
+      observes: "Test-only reference-agent effects, captures, refusals and local reason codes. Synthetic local
+        outcomes are separate from the envelope evidence result and never stand in for an agency, law firm or
+        defense deployment."
+    fixtures:
+      positive:
+        - "L1-GOV-03/positive/oracle-inference-only.json"
+      negative:
+        - "L1-GOV-03/negative/oracle-training-purpose.json"
+        - "L1-GOV-03/negative/oracle-telemetry-purpose.json"
+        - "L1-GOV-03/negative/oracle-unlisted-endpoint.json"
+        - "L1-GOV-03/negative/oracle-capture-unavailable.json"
+    passCriteria: "Each local reference-agent case matches its separately declared synthetic result. Missing
+      authorities or system records cause no effect. No local outcome supplies an observed production producer
+      or a positive regulated result."
+    attempts: 1
+  - id: "L1-GOV-03-T2"
+    type: "drill"
+    oracle:
+      kind: "system_of_record"
+      observes: "P1-11 evaluateControl admission, rejection and evidence/result dimensions for the actual admitted
+        questionnaire producer. The producer caps all records at self_reported."
+    fixtures:
+      positive:
+        - "L1-GOV-03/positive/evidence-valid.json"
+      negative:
+        - "L1-GOV-03/negative/evidence-stale.json"
+        - "L1-GOV-03/negative/evidence-replayed.json"
+        - "L1-GOV-03/negative/evidence-contradictory.json"
+        - "L1-GOV-03/negative/evidence-cross-tenant.json"
+        - "L1-GOV-03/negative/evidence-empty.json"
+        - "L1-GOV-03/negative/evidence-violation.json"
+    passCriteria: "The valid self-reported example cannot pass. Stale, replayed, contradictory, cross-tenant and
+      empty examples exercise their actual evidence rules; an admitted self-reported violation fails
+      conservatively. Empty production evidence remains not_evaluated with enforcement none."
+    attempts: 1
+evidence:
+  - id: "L1-GOV-03-E1"
+    producer: "amc.questionnaire"
+    bindingFields:
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    freshness:
+      maxAgeDays: 30
+    sampling:
+      method: "all"
+      ratePercent: null
+      minItems: 1
+    retention:
+      mode: "regime_max"
+    residency:
+      mode: "inherit_deployment"
+invalidatedBy:
+  - "model_version"
+  - "prompt_version"
+  - "tool_version"
+  - "corpus_version"
+  - "policy_version"
+  - "deployment_version"
+owner:
+  role: "senior_manager"
+clock: null
+levels:
+  - "L1"
+crosswalk: []
+review:
+  status: "pending"
+  expert: null
+  credential: null
+  reviewedAt: null
+  nextReview: null
+provenance:
+  draftedBy: "ai"
+  draftedAt: "2026-10-18"
+  approvedBy: null

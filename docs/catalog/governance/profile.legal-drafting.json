@@ -1,0 +1,85 @@
+{
+  "profileVersion": 1,
+  "profileId": "governance-legal-drafting-draft",
+  "deployment": {
+    "tenantId": "governance-fixture-tenant",
+    "workspaceId": "governance-fixture-workspace",
+    "deploymentId": "governance-legal-drafting-fixture",
+    "agentIds": [
+      "governance-fixture-agent"
+    ]
+  },
+  "primaryStation": {
+    "value": "governance",
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.legal-drafting.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "stations": {
+    "value": [
+      "governance",
+      "technology"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.legal-drafting.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "domains": {
+    "value": [
+      "governance.law-rights-democracy"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.legal-drafting.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "jurisdictions": {
+    "value": [
+      "US",
+      "EU"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.legal-drafting.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "roles": {
+    "value": [
+      "deployer"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.legal-drafting.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "entityTypes": {
+    "value": [
+      "law_firm"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.legal-drafting.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "riskClass": {
+    "value": null,
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.legal-drafting.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "useCases": {
+    "value": [
+      "legal_drafting",
+      "explanation_request"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.legal-drafting.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "dataClasses": {
+    "value": null,
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.legal-drafting.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "euRoleRecord": null,
+  "art63Record": null,
+  "operatingProfile": null,
+  "exceptions": []
+}

@@ -1,0 +1,1988 @@
+{
+  "station": "governance",
+  "domains": [
+    "governance.public-services",
+    "governance.law-rights-democracy",
+    "governance.defense"
+  ],
+  "support": "experimental",
+  "review": "pending",
+  "promotion": "none — experimental, unreviewed",
+  "sourceInventory": {
+    "integrationRevision": "227d1da6fa0185f00049d2a82efe55cc10108848",
+    "sourceHashes": [
+      {
+        "path": "src/domains/packs/stations/governance.ts",
+        "sha256": "575d78040abf28e9955f85ab4dd1a50d2da8c6486dd431076deb27480c6057b5",
+        "sourceRevision": "227d1da6fa0185f00049d2a82efe55cc10108848"
+      },
+      {
+        "path": "src/domains/packs/stations/shared.ts",
+        "sha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "sourceRevision": "227d1da6fa0185f00049d2a82efe55cc10108848"
+      },
+      {
+        "path": "src/domains/industryPacks.ts",
+        "sha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "sourceRevision": "227d1da6fa0185f00049d2a82efe55cc10108848"
+      },
+      {
+        "path": "src/domains/deep/governance.ts",
+        "sha256": "892ed66cc0a9615590248fc6d336769a72f31fa517ce85838d34ea9b050f45af",
+        "sourceRevision": "227d1da6fa0185f00049d2a82efe55cc10108848"
+      },
+      {
+        "path": "src/domains/deep/shared.ts",
+        "sha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "sourceRevision": "227d1da6fa0185f00049d2a82efe55cc10108848"
+      },
+      {
+        "path": "src/domains/deepIndustryPacks.ts",
+        "sha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "sourceRevision": "227d1da6fa0185f00049d2a82efe55cc10108848"
+      },
+      {
+        "path": "src/domains/questionnaireLabel.ts",
+        "sha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "sourceRevision": "227d1da6fa0185f00049d2a82efe55cc10108848"
+      }
+    ],
+    "packQuestions": 91,
+    "handWrittenDeepQuestions": 7,
+    "generatedDeepQuestions": 49,
+    "deepQuestions": 56,
+    "totalQuestions": 147,
+    "uniqueQuestions": 147
+  },
+  "specDrift": {
+    "packQuestions": {
+      "specExpected": 75,
+      "actual": 91,
+      "delta": 16
+    },
+    "handWrittenDeepQuestions": {
+      "specExpected": 7,
+      "actual": 7
+    },
+    "generatedDeepQuestions": {
+      "actual": 49,
+      "state": "active_on_pinned_source",
+      "note": "Included in exact coverage; no retirement or source edit is inferred."
+    },
+    "absentSpecIds": [
+      "GOV-CS-4"
+    ],
+    "retiredIds": [
+      {
+        "oldId": "GOV-CS-4",
+        "newId": "GOV-CS-4-v2",
+        "reason": "Current source keys the revised human-oversight question to the versioned ID."
+      }
+    ],
+    "actualIdsWithoutDisposition": [],
+    "extraDispositionIds": [],
+    "labelMismatches": [
+      {
+        "ids": [
+          "GOV-CS-4-v2"
+        ],
+        "target": "L1-GOV-01",
+        "reason": "The actual question concerns named competent human oversight and the ability to disregard, override, reverse or stop an output. A synthetic identity-bound decision for one benefit case tests only part of that scope."
+      },
+      {
+        "ids": [
+          "GOV-CS-15",
+          "gov-deep-51"
+        ],
+        "target": "L1-GOV-01",
+        "reason": "The notice question does not itself require a particular caseworker decision. The deep question also requires deployer-controlled logs retained for six months; a case decision and notice fixture does not prove that retention."
+      },
+      {
+        "ids": [
+          "GOV-CS-9",
+          "GOV-PPC-19",
+          "gov-deep-52"
+        ],
+        "target": "L1-GOV-02",
+        "reason": "A machine can check the six declared elements, reviewer-reference presence, notification evidence and order of dates. It cannot assess the FRIA content, establish lawful applicability or supply a human assessor."
+      },
+      {
+        "ids": [
+          "GOV-PPC-16"
+        ],
+        "target": "L1-GOV-03",
+        "reason": "A canary egress fixture does not establish the full vendor contract, agency consent, model and data portability, knowledge transfer, licensing, pricing or an exercised exit plan."
+      },
+      {
+        "ids": [
+          "GOV-CS-16",
+          "GOV-DCR-15",
+          "gov-deep-53"
+        ],
+        "target": "L1-GOV-05",
+        "reason": "A timely route to an authorized human tests delivery and authority only. It does not establish the substantive explanation of the actual decision, legal eligibility or the contents of the response."
+      },
+      {
+        "ids": [
+          "GOV-CS-1"
+        ],
+        "target": "P3-15",
+        "reason": "The question includes WCAG 2.1 AA, channel coverage, keyboard focus and an accessibility statement. The later WCAG output check is a pending dependency, not evidence for that complete scope."
+      },
+      {
+        "ids": [
+          "GOV-CS-13"
+        ],
+        "target": "P3-15",
+        "reason": "The question separates federal Section 508 WCAG 2.0 A/AA from state and local ADA duties. A generic later WCAG check does not establish equivalence, jurisdiction, dates or those legal duties."
+      },
+      {
+        "ids": [
+          "GOV-DD-4",
+          "GOV-PL-15",
+          "gov-deep-54"
+        ],
+        "target": "L1-TECH-01",
+        "reason": "These questions require deployer disclosure and may include editorial responsibility or first-interaction notice. Machine-readable marking alone does not establish disclosure, its exception or every channel notice."
+      },
+      {
+        "ids": [
+          "GOV-PPC-14"
+        ],
+        "target": "document_review",
+        "reason": "Accountability, an oversight rationale, separation of recommendations from final decisions and a bidder contest route require document and human review. No simulator substitutes for those records."
+      }
+    ],
+    "packNameNote": "The current pack label is Public and Private Collaboration; P1-13 maps its website label Public & Private Collaboration to governance.public-services. No name is changed."
+  },
+  "dispositions": [
+    {
+      "id": "GOV-DCR-1",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-2",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-3",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-4",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-5",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "layer0",
+      "target": "L0-TRN-01",
+      "reason": "The existing Layer 0 first-interaction disclosure control is the relevant starting point. Its scoped evidence is required; this mapping does not establish every identity channel or the cited convention duty."
+    },
+    {
+      "id": "GOV-DCR-6",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-7",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-8",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-9",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-10",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-11",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-12",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-13",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-14",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-15",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "test",
+      "target": "L1-GOV-05",
+      "reason": "Scoped synthetic test only. A timely route to an authorized human tests delivery and authority only. It does not establish the substantive explanation of the actual decision, legal eligibility or the contents of the response."
+    },
+    {
+      "id": "GOV-DCR-16",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-17",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DCR-18",
+      "origin": "pack",
+      "packId": "digital-citizens-rights",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-1",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-2",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-3",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-4",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "reuse_pending",
+      "target": "L1-TECH-01",
+      "dependencyPlan": "P2-30",
+      "dependencyState": "pending",
+      "reason": "These questions require deployer disclosure and may include editorial responsibility or first-interaction notice. Machine-readable marking alone does not establish disclosure, its exception or every channel notice.",
+      "productionResult": "not_evaluated",
+      "enforcement": "none"
+    },
+    {
+      "id": "GOV-DD-5",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-6",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-7",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-8",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-9",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-10",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-11",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-12",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-13",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-14",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-15",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-16",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-17",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-18",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-DD-19",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "reuse_pending",
+      "target": "L1-TECH-01",
+      "dependencyPlan": "P2-30",
+      "dependencyState": "pending",
+      "reason": "The actual question concerns machine-readable marking of synthetic election content. The P2-30 marking draft has not landed on this base; no reuse result is inferred.",
+      "productionResult": "not_evaluated",
+      "enforcement": "none"
+    },
+    {
+      "id": "GOV-DD-20",
+      "origin": "pack",
+      "packId": "dance-of-democracy",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-1",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-2",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-3",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-4",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-5",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-6",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-7",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-8",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-9",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-10",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-11",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-12",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-13",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-14",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-15",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "reuse_pending",
+      "target": "L1-TECH-01",
+      "dependencyPlan": "P2-30",
+      "dependencyState": "pending",
+      "reason": "These questions require deployer disclosure and may include editorial responsibility or first-interaction notice. Machine-readable marking alone does not establish disclosure, its exception or every channel notice.",
+      "productionResult": "not_evaluated",
+      "enforcement": "none"
+    },
+    {
+      "id": "GOV-PL-16",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-17",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PL-18",
+      "origin": "pack",
+      "packId": "petition-to-law",
+      "domain": "governance.law-rights-democracy",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-CS-1",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "reuse_pending",
+      "target": "P3-15",
+      "reason": "The question includes WCAG 2.1 AA, channel coverage, keyboard focus and an accessibility statement. The later WCAG output check is a pending dependency, not evidence for that complete scope.",
+      "dependencyState": "pending",
+      "productionResult": "not_evaluated",
+      "enforcement": "none"
+    },
+    {
+      "id": "GOV-CS-2",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-CS-3",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-CS-4-v2",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "test",
+      "target": "L1-GOV-01",
+      "reason": "Scoped synthetic test only. The actual question concerns named competent human oversight and the ability to disregard, override, reverse or stop an output. A synthetic identity-bound decision for one benefit case tests only part of that scope."
+    },
+    {
+      "id": "GOV-CS-5",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-CS-6",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-CS-7",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-CS-8",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-CS-9",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "test",
+      "target": "L1-GOV-02",
+      "reason": "Scoped synthetic test only. A machine can check the six declared elements, reviewer-reference presence, notification evidence and order of dates. It cannot assess the FRIA content, establish lawful applicability or supply a human assessor."
+    },
+    {
+      "id": "GOV-CS-10",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-CS-11",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-CS-12",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-CS-13",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "reuse_pending",
+      "target": "P3-15",
+      "reason": "The question separates federal Section 508 WCAG 2.0 A/AA from state and local ADA duties. A generic later WCAG check does not establish equivalence, jurisdiction, dates or those legal duties.",
+      "dependencyState": "pending",
+      "productionResult": "not_evaluated",
+      "enforcement": "none"
+    },
+    {
+      "id": "GOV-CS-14",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-CS-15",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "test",
+      "target": "L1-GOV-01",
+      "reason": "Scoped synthetic test only. The notice question does not itself require a particular caseworker decision. The deep question also requires deployer-controlled logs retained for six months; a case decision and notice fixture does not prove that retention."
+    },
+    {
+      "id": "GOV-CS-16",
+      "origin": "pack",
+      "packId": "citizen-services",
+      "domain": "governance.public-services",
+      "disposition": "test",
+      "target": "L1-GOV-05",
+      "reason": "Scoped synthetic test only. A timely route to an authorized human tests delivery and authority only. It does not establish the substantive explanation of the actual decision, legal eligibility or the contents of the response."
+    },
+    {
+      "id": "GOV-PPC-1",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-2",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-3",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-4",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-5",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-6",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-7",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-8",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-9",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-10",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-11",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-12",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-13",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-14",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "document_review",
+      "target": null,
+      "reason": "Accountability, an oversight rationale, separation of recommendations from final decisions and a bidder contest route require document and human review. No simulator substitutes for those records."
+    },
+    {
+      "id": "GOV-PPC-15",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-16",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "test",
+      "target": "L1-GOV-03",
+      "reason": "Scoped synthetic test only. A canary egress fixture does not establish the full vendor contract, agency consent, model and data portability, knowledge transfer, licensing, pricing or an exercised exit plan."
+    },
+    {
+      "id": "GOV-PPC-17",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-18",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. No local fixture establishes the full question, human judgement or deployment behaviour."
+    },
+    {
+      "id": "GOV-PPC-19",
+      "origin": "pack",
+      "packId": "public-private-collaboration",
+      "domain": "governance.public-services",
+      "disposition": "test",
+      "target": "L1-GOV-02",
+      "reason": "Scoped synthetic test only. A machine can check the six declared elements, reviewer-reference presence, notification evidence and order of dates. It cannot assess the FRIA content, establish lawful applicability or supply a human assessor."
+    },
+    {
+      "id": "gov-fedramp-auth-01",
+      "origin": "deep_hand_written",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. Authentication or prohibited-practice evidence is not supplied by this overlay fixture set."
+    },
+    {
+      "id": "gov-deep-51",
+      "origin": "deep_hand_written",
+      "packIds": [
+        "citizen-services",
+        "digital-citizens-rights"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "test",
+      "target": "L1-GOV-01",
+      "reason": "Scoped synthetic test only. The notice question does not itself require a particular caseworker decision. The deep question also requires deployer-controlled logs retained for six months; a case decision and notice fixture does not prove that retention."
+    },
+    {
+      "id": "gov-deep-52",
+      "origin": "deep_hand_written",
+      "packIds": [
+        "citizen-services",
+        "public-private-collaboration"
+      ],
+      "domains": [
+        "governance.public-services"
+      ],
+      "disposition": "test",
+      "target": "L1-GOV-02",
+      "reason": "Scoped synthetic test only. A machine can check the six declared elements, reviewer-reference presence, notification evidence and order of dates. It cannot assess the FRIA content, establish lawful applicability or supply a human assessor."
+    },
+    {
+      "id": "gov-deep-53",
+      "origin": "deep_hand_written",
+      "packIds": [
+        "citizen-services",
+        "digital-citizens-rights"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "test",
+      "target": "L1-GOV-05",
+      "reason": "Scoped synthetic test only. A timely route to an authorized human tests delivery and authority only. It does not establish the substantive explanation of the actual decision, legal eligibility or the contents of the response."
+    },
+    {
+      "id": "gov-deep-54",
+      "origin": "deep_hand_written",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "dance-of-democracy"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "reuse_pending",
+      "target": "L1-TECH-01",
+      "dependencyPlan": "P2-30",
+      "dependencyState": "pending",
+      "reason": "These questions require deployer disclosure and may include editorial responsibility or first-interaction notice. Machine-readable marking alone does not establish disclosure, its exception or every channel notice.",
+      "productionResult": "not_evaluated",
+      "enforcement": "none"
+    },
+    {
+      "id": "gov-deep-55",
+      "origin": "deep_hand_written",
+      "packIds": [
+        "dance-of-democracy",
+        "digital-citizens-rights"
+      ],
+      "domains": [
+        "governance.law-rights-democracy"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. Authentication or prohibited-practice evidence is not supplied by this overlay fixture set."
+    },
+    {
+      "id": "gov-deep-56",
+      "origin": "deep_hand_written",
+      "packIds": [
+        "digital-citizens-rights"
+      ],
+      "domains": [
+        "governance.law-rights-democracy"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "Retain as a self-reported questionnaire capped at L1. Authentication or prohibited-practice evidence is not supplied by this overlay fixture set."
+    },
+    {
+      "id": "gov-deep-02",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-03",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-04",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-05",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-06",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-07",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-08",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-09",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-10",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-11",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-12",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-13",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-14",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-15",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-16",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-17",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-18",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-19",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-20",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-21",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-22",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-23",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-24",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-25",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-26",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-27",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-28",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-29",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-30",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-31",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-32",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-33",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-34",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-35",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-36",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-37",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-38",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-39",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-40",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-41",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-42",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-43",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-44",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-45",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-46",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-47",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-48",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-49",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    },
+    {
+      "id": "gov-deep-50",
+      "origin": "deep_template",
+      "packIds": [
+        "citizen-services",
+        "petition-to-law",
+        "digital-citizens-rights",
+        "public-private-collaboration",
+        "virtual-infrastructure"
+      ],
+      "domains": [
+        "governance.law-rights-democracy",
+        "governance.public-services"
+      ],
+      "disposition": "questionnaire",
+      "target": null,
+      "reason": "This generated question remains active on the pinned source. Retain as a self-reported questionnaire capped at L1; future retirement is not assumed."
+    }
+  ]
+}

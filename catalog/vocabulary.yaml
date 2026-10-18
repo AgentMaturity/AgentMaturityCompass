@@ -5,7 +5,18 @@ stations: [education, environment, health, wealth, technology, mobility, governa
 jurisdictions: [US, US-CA, US-CO, US-NYC, US-NY, US-TX, US-IL, EU]
 # EU AI Act roles.
 roles: [provider, deployer]
-entityTypes: [hipaa_covered_entity, hipaa_business_associate, non_bank_financial_institution, bank, eu_financial_entity]
+entityTypes:
+  - hipaa_covered_entity
+  - hipaa_business_associate
+  - non_bank_financial_institution
+  - bank
+  - eu_financial_entity
+  # P3-14: Governance draft entity types; profile values are operator assertions.
+  - federal_agency
+  - state_agency
+  - public_service_provider
+  - law_firm
+  - defense_contractor
 riskClasses: []
 useCases:
   - consequential_decision_about_people
@@ -15,8 +26,21 @@ useCases:
   - publishes_synthetic_content
   - credit_decision
   - employment_decision
-dataClasses: []
-domains: []
+  # P3-14: Governance reference-agent use cases; these names establish no runtime enforcement.
+  - benefits_decision
+  - public_service_ai
+  - agency_vendor_inference
+  - legal_drafting
+  - explanation_request
+  - defense_analysis
+dataClasses:
+  # P3-14: Governance defense fixture data class; no real CUI is supplied by the draft.
+  - controlled_unclassified_information
+domains:
+  # P3-14: Exact Governance domain names from P1-13; experimental and unreviewed.
+  - governance.public-services
+  - governance.law-rights-democracy
+  - governance.defense
 ownerRoles: [ciso, dpo, senior_manager, head_of_qa]
 # amc-audit-map-v1: the built-in audit map amc.audit.map.builtin.v1 (src/audit/auditMapBuiltin.ts).
 # atlas: MITRE ATLAS technique ids (src/compliance/citations/reference/atlas.json holds the release they are checked against).

@@ -1062,6 +1062,130 @@
       "sourceNote": "S5 entry us-ecoa-reg-b records this source read on 2026-10-03 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
       "flags": {},
       "s5RegisterId": "us-ecoa-reg-b"
+    },
+    {
+      "id": "governance-omb-m25-21-human-review",
+      "row": "OMB M-25-21 — Human oversight, timely human review and appeal",
+      "stations": [
+        "governance"
+      ],
+      "meaning": "Candidate mapping to the existing S5 human oversight and human review/appeal duties; source wording and scope require verification.",
+      "keyDatesText": "Unverified; no issuance, applicability, compliance or suspension date is encoded.",
+      "statusText": "Instrument-level S5 binding status; candidate mapping is unverified and unreviewed.",
+      "citation": {
+        "instrument": "Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+        "clause": "Human oversight, timely human review and appeal",
+        "edition": "Edition not read in P3-14; existing S5 locator only",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "No effective or compliance date is asserted by this unread draft. Instrument-level S5 status does not establish clause-specific applicability or timing.",
+      "sourceKind": "official",
+      "sourceNote": "Not fetched or hashed in P3-14. Existing S5 entries are navigation only; primary-source text, scope and dates require verification before any review.",
+      "flags": {
+        "reverify": "Read and hash the primary text; confirm scope, provisions and timing before review.",
+        "applicationUncertain": "Agent-specific application and completeness of this draft mapping have not been legally assessed."
+      },
+      "s5RegisterId": "us-omb-m-25-21"
+    },
+    {
+      "id": "governance-omb-m25-21-impact-assessment",
+      "row": "OMB M-25-21 — Pre-deployment testing and impact assessment",
+      "stations": [
+        "governance"
+      ],
+      "meaning": "Candidate mapping to the existing S5 pre-deployment testing and impact-assessment duties; this is not an EU FRIA equivalence claim.",
+      "keyDatesText": "Unverified; no issuance, applicability, compliance or suspension date is encoded.",
+      "statusText": "Instrument-level S5 binding status; candidate mapping is unverified and unreviewed.",
+      "citation": {
+        "instrument": "Accelerating Federal Use of AI through Innovation, Governance, and Public Trust",
+        "clause": "Pre-deployment testing and impact assessment",
+        "edition": "Edition not read in P3-14; existing S5 locator only",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "No effective or compliance date is asserted by this unread draft. Instrument-level S5 status does not establish clause-specific applicability or timing.",
+      "sourceKind": "official",
+      "sourceNote": "Not fetched or hashed in P3-14. Existing S5 entries are navigation only; primary-source text, scope and dates require verification before any review.",
+      "flags": {
+        "reverify": "Read and hash the primary text; confirm scope, provisions and timing before review.",
+        "applicationUncertain": "Agent-specific application and completeness of this draft mapping have not been legally assessed."
+      },
+      "s5RegisterId": "us-omb-m-25-21"
+    },
+    {
+      "id": "governance-omb-m25-22-no-training",
+      "row": "OMB M-25-22 — Non-public agency data and vendor training",
+      "stations": [
+        "governance"
+      ],
+      "meaning": "Candidate mapping to the existing S5 prohibition on vendor training with non-public agency inputs and outputs. A canary drill does not establish full acquisition-contract performance.",
+      "keyDatesText": "Unverified; no issuance, applicability, compliance or suspension date is encoded.",
+      "statusText": "Instrument-level S5 binding status; candidate mapping is unverified and unreviewed.",
+      "citation": {
+        "instrument": "Driving Efficient Acquisition of Artificial Intelligence in Government",
+        "clause": "Non-public agency data and vendor training",
+        "edition": "Edition not read in P3-14; existing S5 locator only",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-22-Driving-Efficient-Acquisition-of-Artificial-Intelligence-in-Government.pdf",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "No effective or compliance date is asserted by this unread draft. Instrument-level S5 status does not establish clause-specific applicability or timing.",
+      "sourceKind": "official",
+      "sourceNote": "Not fetched or hashed in P3-14. Existing S5 entries are navigation only; primary-source text, scope and dates require verification before any review.",
+      "flags": {
+        "reverify": "Read and hash the primary text; confirm scope, provisions and timing before review.",
+        "applicationUncertain": "Agent-specific application and completeness of this draft mapping have not been legally assessed."
+      },
+      "s5RegisterId": "us-omb-m-25-22"
+    },
+    {
+      "id": "governance-omb-m26-04-procurement",
+      "row": "OMB M-26-04 — Procurement principles and user reporting",
+      "stations": [
+        "governance"
+      ],
+      "meaning": "Candidate mapping to the existing S5 procurement-principles and user output-reporting duties. Specific use-policy and model-card requirements from the plan remain unverified.",
+      "keyDatesText": "Unverified; no issuance, applicability, compliance or suspension date is encoded.",
+      "statusText": "Instrument-level S5 binding status; candidate mapping is unverified and unreviewed.",
+      "citation": {
+        "instrument": "Increasing Public Trust in Artificial Intelligence Through Unbiased AI Principles",
+        "clause": "Procurement principles and user reporting",
+        "edition": "Edition not read in P3-14; existing S5 locator only",
+        "jurisdiction": "US",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://www.whitehouse.gov/wp-content/uploads/2025/12/M-26-04-Increasing-Public-Trust-in-Artificial-Intelligence-Through-Unbiased-AI-Principles-1.pdf",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "No effective or compliance date is asserted by this unread draft. Instrument-level S5 status does not establish clause-specific applicability or timing.",
+      "sourceKind": "official",
+      "sourceNote": "Not fetched or hashed in P3-14. Existing S5 entries are navigation only; primary-source text, scope and dates require verification before any review.",
+      "flags": {
+        "reverify": "Read and hash the primary text; confirm scope, provisions and timing before review.",
+        "applicationUncertain": "Agent-specific application and completeness of this draft mapping have not been legally assessed."
+      },
+      "s5RegisterId": "us-omb-m-26-04"
     }
   ]
 }
