@@ -8,7 +8,7 @@ import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { closeSync, constants, fstatSync, lstatSync, openSync, readSync, realpathSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { isDeepStrictEqual } from "node:util";
 import vm from "node:vm";
 
@@ -19,7 +19,7 @@ const PROBE_TIMEOUT_MS = 2500;
 const sha256 = bytes => createHash("sha256").update(bytes).digest("hex");
 const valueCase = (id, args, expected) => ({ id, args, expected });
 const errorCase = (id, args, errorName) => ({ id, args, errorName });
-const suites = {
+export const suites = {
   "coding-range-normalization": { exportName: "normalizeRanges", cases: [
     valueCase("empty", [[]], []),
     valueCase("reverse-adjacent", [[[5, 3], [1, 2]]], [[1, 5]]),
@@ -279,9 +279,11 @@ async function runOracle() {
   process.stdout.write(JSON.stringify({ schemaVersion: VERSION, verdict: checks.every(row => row.passed) ? "pass" : "fail", checks }) + "\n");
 }
 
-if (process.argv[2] === "--probe") {
+// Run only when executed; the P1-47 pilot imports `suites` without running anything.
+const executed = process.argv[1] !== undefined && import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+if (executed && process.argv[2] === "--probe") {
   runProbe().catch(() => { process.stderr.write("Solution probe failed during module loading or observation.\n"); process.exitCode = 1; });
-} else {
+} else if (executed) {
   runOracle().catch(() => {
     process.stdout.write(JSON.stringify({ schemaVersion: VERSION, verdict: "fail", checks: [{ id: "oracle-error", passed: false, evidence: "The coding oracle could not complete; no successful behavior is inferred." }] }) + "\n");
   });

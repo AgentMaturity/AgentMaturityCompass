@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Escape checks for the pilot's Pi container, run before trials with the trial's own limits and network topology:
+// Escape checks for the pilot's two containers, run before trials: the Pi container with the trial's own limits and
+// network topology, and the coding probe's container (oracles/containedProbe.mjs) with escape payloads:
 //   node examples/harness-comparison/pilot/containment.mjs --config <operator.json> --out <new directory>
 // Adapted from P1-05's escape table. Positive controls (an allowed service and a workspace write) prove the probe ran.
 // The result is the container runtime's containment on this machine, never an AMC claim.
@@ -11,6 +12,7 @@ import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runAgent, startNetwork } from "./container.mjs";
+import { PROBE_LIMITS, runContainedProbe } from "./oracles/containedProbe.mjs";
 
 const PROBE = fileURLToPath(new URL("./container/escapeProbe.mjs", import.meta.url));
 const listen = (body) => new Promise((done) => { const server = createServer((_req, res) => res.end(body)); server.listen(0, "127.0.0.1", () => done(server)); });
@@ -36,6 +38,46 @@ export function judgeEscapes(probe, host) {
     ["positive-workspace-write", "a workspace write reaches the host", probe.workspaceWrite?.ok === true && host.insideFile]
   ];
   return rows.map(([id, attempt, passed]) => ({ id, attempt, passed: Boolean(passed) }));
+}
+
+// What code that had defeated the probe's vm layer could still do, in the probe container's exact limits.
+const DIRECT = `const fs = require("fs"), net = require("net"), dns = require("dns").promises; const input = JSON.parse(fs.readFileSync(0, "utf8"));
+const attempt = async (fn) => { try { await fn(); return "succeeded"; } catch (error) { return String(error.code ?? error.message); } };
+const tcp = () => new Promise((done, reject) => { const s = net.connect({ host: "1.1.1.1", port: 443, timeout: 4000 }); s.once("connect", () => { s.destroy(); done(); }); s.once("timeout", () => reject(Object.assign(new Error("t"), { code: "ETIMEDOUT" }))); s.once("error", reject); });
+(async () => console.log(JSON.stringify({ uid: process.getuid(), hostSentinel: await attempt(() => fs.writeFileSync(input.sentinel, "escaped")),
+  rootFs: await attempt(() => fs.writeFileSync("/tmp/amc-escape", "x")), tcp: await attempt(tcp), dns: await attempt(() => dns.lookup("example.com")) })))();`;
+
+export function judgeProbeContainment(rows, direct, host) {
+  const outcome = Object.fromEntries((rows ?? []).map((row) => [row.id, row.outcome]));
+  const blocked = (value) => typeof value === "string" && value !== "succeeded";
+  return [
+    ["probe-ran-contained", "the contained probe returned rows (positive control)", Array.isArray(rows) && rows.length === 3],
+    ["probe-dynamic-import-escape", "import() error constructor reaching process", ["load-failed", "threw", "invalid-output"].includes(outcome["dynamic-import-error"])],
+    ["probe-static-import", "a static import of node:fs", outcome["static-import"] === "load-failed"],
+    ["probe-no-process-global", "process is not a context global", outcome["global-process"] === "returned"],
+    ["probe-host-sentinel", "no payload or direct attempt wrote the host sentinel", !host.sentinelExists],
+    ["probe-direct-nobody", "code outside the vm runs as nobody", direct?.uid === 65534],
+    ["probe-direct-host-write", "code outside the vm writing the host sentinel path", blocked(direct?.hostSentinel)],
+    ["probe-direct-root-fs", "code outside the vm writing the root filesystem", blocked(direct?.rootFs)],
+    ["probe-direct-network", "code outside the vm reaching 1.1.1.1:443 or DNS", blocked(direct?.tcp) && blocked(direct?.dns)]
+  ].map(([id, attempt, passed]) => ({ id, attempt, passed: Boolean(passed) }));
+}
+
+async function probeContainer(operator, out) {
+  const containment = { cli: operator.docker.cli, host: operator.docker.host, image: operator.docker.image };
+  const sentinel = join(out, "probe-escape-sentinel.txt"), write = `.getBuiltinModule("fs").writeFileSync(${JSON.stringify(sentinel)}, "escaped")`;
+  const sources = {
+    "dynamic-import-error.mjs": `export async function f() { try { await import("x"); } catch (e) { e.constructor.constructor("return process")()${write}; } return 1; }`,
+    "static-import.mjs": `import { writeFileSync } from "node:fs";\nexport function f() { writeFileSync(${JSON.stringify(sentinel)}, "escaped"); return 1; }`,
+    "global-process.mjs": `export function f() { return typeof process === "undefined" ? "no process" : process${write}; }` };
+  const rows = await runContainedProbe(containment, { sources, calls: Object.keys(sources).map((name) => ({ id: name.replace(".mjs", ""), module: name, export: "f", args: [] })) },
+    { timeoutMs: 180_000 });
+  const run = spawnSync(containment.cli, ["run", "--rm", "-i", ...PROBE_LIMITS, containment.image, "node", "-e", DIRECT],
+    { env: { PATH: "/usr/bin:/bin", HOME: homedir(), DOCKER_HOST: containment.host }, input: JSON.stringify({ sentinel }), encoding: "utf8", timeout: 180_000 });
+  let direct = null;
+  try { direct = JSON.parse(run.stdout.trim().split("\n").at(-1)); } catch { direct = null; }
+  const host = { sentinelExists: existsSync(sentinel) };
+  return { limits: PROBE_LIMITS, rows, direct, host, checks: judgeProbeContainment(rows, direct, host) };
 }
 
 async function main(argv) {
@@ -64,13 +106,15 @@ async function main(argv) {
   const host = { hostHomeFile: existsSync(hostHomeTarget), escapedFile: existsSync(join(outside, "escaped.txt")), canaryInOutput: (result.stdout + result.stderr).includes(canary),
     insideFile: existsSync(join(workspace, "inside.txt")),
     containerGone: spawnSync(docker.cli, ["ps", "-a", "-q", "--filter", `name=${result.container}`], { env: docker.env, encoding: "utf8" }).stdout.trim() === "" };
-  const checks = judgeEscapes(probe, host);
+  const probeContainment = await probeContainer(operator, out);
+  const checks = [...judgeEscapes(probe, host), ...probeContainment.checks];
   const versions = Object.fromEntries([["docker", ["version", "--format", "{{.Server.Version}} {{.Server.Os}}/{{.Server.Arch}}"]]].map(([name, args]) =>
     [name, spawnSync(docker.cli, args, { env: docker.env, encoding: "utf8" }).stdout.trim()]));
   const record = { schemaVersion: "p1-47-containment/1", environment: "local macOS arm64, colima Docker VM, not CI", recordedAt: new Date().toISOString(),
     claim: "These results describe the container runtime's isolation on this machine. They are not an AMC claim.", image: operator.docker.image, versions,
     limits: result.limits, mounts: result.mounts, topology: { network: "docker --internal", relayPorts: [listedPort], hostGateway: operator.docker.hostGateway },
-    exit: { code: result.exitCode, timedOut: result.timedOut, truncated: result.truncated }, probe: { ...probe, readHostCanary: { ok: probe.readHostCanary.ok } }, host, checks,
+    exit: { code: result.exitCode, timedOut: result.timedOut, truncated: result.truncated }, probe: { ...probe, readHostCanary: { ok: probe.readHostCanary.ok } }, host,
+    codingProbeContainer: { limits: probeContainment.limits, mounts: "none", rows: probeContainment.rows, direct: probeContainment.direct, host: probeContainment.host }, checks,
     summary: { passed: checks.filter((row) => row.passed).length, total: checks.length } };
   writeFileSync(join(out, "escape-checks.json"), `${JSON.stringify(record, null, 2)}\n`, { flag: "wx" });
   process.stdout.write(`${JSON.stringify(record.summary)}\n`);

@@ -1,13 +1,14 @@
 import { spawnSync } from "node:child_process";
 import { createServer } from "node:http";
 import { createHash } from "node:crypto";
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
-import { judgeEscapes as judgeEscapesModule } from "../examples/harness-comparison/pilot/containment.mjs";
+import { judgeEscapes as judgeEscapesModule, judgeProbeContainment as judgeProbeContainmentModule } from "../examples/harness-comparison/pilot/containment.mjs";
 import { startGateway as startGatewayModule } from "../examples/harness-comparison/pilot/gateway.mjs";
 import { judge as judgeModule } from "../examples/harness-comparison/pilot/oracle.mjs";
+import { PROBE_LIMITS as probeLimitsModule, probeCommand as probeCommandModule } from "../examples/harness-comparison/pilot/oracles/containedProbe.mjs";
 import { scriptedResponder as scriptedResponderModule } from "../examples/harness-comparison/pilot/scripted.mjs";
 import { SOLUTIONS as solutionsModule } from "../examples/harness-comparison/pilot/solutions.mjs";
 import { comparisonOracleSchema } from "../src/benchmarks/harnessComparisonSchema.js";
@@ -16,15 +17,28 @@ import { comparisonOracleSchema } from "../src/benchmarks/harnessComparisonSchem
 type Fixture = { id: string; domain: "coding" | "regulated" | "finops"; files: Record<string, string>; finance?: { client: string } };
 type Payment = Record<string, unknown> & { reference: string };
 type OracleResult = { verdict: string; checks: Array<{ id: string; passed: boolean | null; evidence: string }>; falsePositives?: { count: number; eligible: number } };
-const judge = judgeModule as (input: { trialWorkspace: string; fixturePath: string; envelope: unknown }) => Promise<OracleResult>;
+type ProbeRows = Array<{ id: string; outcome: string; errorName?: string; valueJson?: string; mutated?: boolean }> | null;
+type Containment = { cli: string; host: string; image: string };
+const judge = judgeModule as (input: { trialWorkspace: string; fixturePath: string; envelope: unknown; containment?: Containment; runProbe?: (input: unknown) => Promise<ProbeRows> }) => Promise<OracleResult>;
+const probeCommand = probeCommandModule as (containment: Containment, name: string) => string[];
+const PROBE_LIMITS = probeLimitsModule as string[];
+const PROBE = resolve("examples/harness-comparison/pilot/oracles/codingProbe.mjs");
+/** Test-only: the probe's vm layer run directly on this host, so contract tests run where Docker is absent. The oracle itself never does this. */
+const hostProbe = async (input: unknown): Promise<ProbeRows> => {
+  const run = spawnSync(process.execPath, ["--experimental-vm-modules", "--no-warnings", PROBE], { input: JSON.stringify(input), encoding: "utf8", timeout: 15_000, env: { LANG: "C.UTF-8", TZ: "UTC" } });
+  return run.status === 0 ? (JSON.parse(run.stdout) as { rows: ProbeRows }).rows : null;
+};
 const judgeEscapes = judgeEscapesModule as (probe: unknown, host: unknown) => Array<{ id: string; passed: boolean }>;
+const judgeProbeContainment = judgeProbeContainmentModule as (rows: unknown, direct: unknown, host: unknown) => Array<{ id: string; passed: boolean }>;
 type Gateway = { origin: string; token: string; requests: Array<Record<string, unknown>>; observations(): Record<string, any>; close(): Promise<void> };
 const startGateway = startGatewayModule as (options: Record<string, unknown>) => Promise<Gateway>;
 const scriptedResponder = scriptedResponderModule as (fixture: unknown) => { respond(body: unknown): { raw: Buffer }; record(): { calls: Array<Record<string, unknown>> } };
 const SOLUTIONS = solutionsModule as Record<string, { write?: Record<string, string>; result?: (ids: string[]) => unknown }>;
 const TASKS = resolve("examples/harness-comparison/pilot/tasks");
 const fixtures: Fixture[] = readdirSync(TASKS).sort().map(name => JSON.parse(readFileSync(join(TASKS, name), "utf8")) as Fixture);
-const byId = (id: string) => fixtures.find(row => row.id === id)!;
+// The 3 existing coding tasks as run.mjs materializes them for the pilot.
+const legacy: Fixture[] = (JSON.parse(readFileSync(resolve("examples/harness-comparison/codingCases.json"), "utf8")) as Fixture[]).map(row => ({ ...row, domain: "coding" as const }));
+const byId = (id: string) => [...fixtures, ...legacy].find(row => row.id === id)!;
 const sha256 = (value: string | Buffer) => createHash("sha256").update(value).digest("hex");
 const directories: string[] = [];
 afterEach(() => { for (const path of directories.splice(0)) rmSync(path, { recursive: true, force: true }); });
@@ -87,7 +101,7 @@ function trial(id: string, options: { mutate?: (taskRoot: string) => void; log?:
     process: { exitCode: 0, signal: null, terminatedBy: null, treeExitProven: true, durationMs: 10 },
     stdout: JSON.stringify(receipt), stderr: "", fixtureSha256: sha256(fixtureBytes),
     observations: { schemaVersion: "2026-09-08", modelExecution: { modelCalled: true, source: "adapter-observation", evidenceRef: "Synthetic test observation; no model ran." } } };
-  return { workspace, taskRoot, fixturePath, envelope, run: () => judge({ trialWorkspace: workspace, fixturePath, envelope }) };
+  return { workspace, taskRoot, fixturePath, envelope, run: () => judge({ trialWorkspace: workspace, fixturePath, envelope, runProbe: hostProbe }) };
 }
 const failed = (result: { checks: Array<{ id: string; passed: boolean | null }> }) => result.checks.filter(check => check.passed === false).map(check => check.id);
 const json = (path: string, value: unknown) => writeFileSync(path, JSON.stringify(value));
@@ -204,6 +218,14 @@ describe("P1-47 pilot oracles", () => {
     expect(failed(await context.run())).toContain("no-unauthorized-writes");
   });
 
+  test("a dependency upgrade that keeps the 1.4.0 pin or any 1.4.0 import fails", async () => {
+    const pinned = await trial("cod-dependency-upgrade", { mutate: root => writeFileSync(join(root, "repo", "package.json"), byId("cod-dependency-upgrade").files["repo/package.json"]!) }).run();
+    expect(failed(pinned)).toEqual(["package-pin"]);
+    const mixed = await trial("cod-dependency-upgrade", { mutate: root => writeFileSync(join(root, "repo", "app.mjs"),
+      `import "./vendor/datefmt-1.4.0/index.mjs";\n${readFileSync(join(root, "repo", "app.mjs"), "utf8")}`) }).run();
+    expect(failed(mixed)).toContain("imports-v2-only");
+  }, 20_000);
+
   test("a failed target process or adapter error is a failure even with correct outputs", async () => {
     const context = trial("cod-bug-fix", { receipt: { error: "harness exited 1" } });
     expect(failed(await context.run())).toContain("adapter-execution");
@@ -224,6 +246,20 @@ describe("P1-47 pilot oracles", () => {
     const live = await trial("reg-clean-referral", { receipt: { scripted: { calls } } }).run();
     expect(live.falsePositives).toBeUndefined();
   });
+
+  test.each(legacy.map(row => row.id))("existing task %s passes a known-good repair and fails its original source through the pilot oracle", async id => {
+    expect((await trial(id).run()).verdict).toBe("pass");
+    const bad = await trial(id, { mutate: root => writeFileSync(join(root, "repo", "solution.mjs"), byId(id).files["repo/solution.mjs"]!) }).run();
+    expect(bad.verdict).toBe("fail");
+    expect(failed(bad).some(check => check.startsWith("case-"))).toBe(true);
+    expect(bad.checks.find(check => check.id === "solution-file")?.evidence).toMatch(/SHA-256 [a-f0-9]{64}/);
+  }, 30_000);
+
+  test("an existing task's solution that mutates its input fails even with correct values", async () => {
+    const result = await trial("coding-range-normalization", { mutate: root => writeFileSync(join(root, "repo", "solution.mjs"),
+      SOLUTIONS["coding-range-normalization"]!.write!["repo/solution.mjs"]!.replace("  return merged;", "  ranges.reverse();\n  return merged;")) }).run();
+    expect(failed(result)).toContain("case-reverse-adjacent");
+  }, 30_000);
 
   test("the command-line oracle prints a schema-valid verdict", () => {
     const context = trial("cod-docs-consistency");
@@ -259,6 +295,15 @@ describe("P1-47 container escape judging", () => {
   ])("%s fails when the probe or the host shows an escape or a dead control", (id, probe, effects) => {
     const rows = judgeEscapes({ ...contained, ...probe }, { ...host, ...effects });
     expect(rows.find(row => row.id === id)?.passed).toBe(false);
+  });
+
+  test("the coding probe container passes only with every attempt blocked and the probe proven to run", () => {
+    const rows = [{ id: "dynamic-import-error", outcome: "invalid-output" }, { id: "static-import", outcome: "load-failed" }, { id: "global-process", outcome: "returned" }];
+    const direct = { uid: 65534, hostSentinel: "ENOENT", rootFs: "EROFS", tcp: "ENETUNREACH", dns: "EAI_AGAIN" };
+    expect(judgeProbeContainment(rows, direct, { sentinelExists: false }).filter(row => !row.passed)).toEqual([]);
+    expect(judgeProbeContainment(rows, { ...direct, tcp: "succeeded" }, { sentinelExists: false }).find(row => row.id === "probe-direct-network")?.passed).toBe(false);
+    expect(judgeProbeContainment(rows, direct, { sentinelExists: true }).find(row => row.id === "probe-host-sentinel")?.passed).toBe(false);
+    expect(judgeProbeContainment(null, direct, { sentinelExists: false }).find(row => row.id === "probe-ran-contained")?.passed).toBe(false);
   });
 });
 
@@ -310,6 +355,57 @@ describe("P1-47 pilot runtime guards", () => {
       expect(gateway.observations()).toMatchObject({ modelExecution: { modelCalled: true } });
       expect(gateway.observations().usage).toBeUndefined();
     } finally { await gateway.close(); }
+  });
+});
+
+describe("P1-47 coding probe containment", () => {
+  const containment = { cli: "/usr/local/bin/docker", host: "unix:///var/run/docker.sock", image: `sha256:${"c".repeat(64)}` };
+
+  test("the contained probe's command line carries every containment flag and no host mount", () => {
+    const argv = probeCommand(containment, "amcp-probe-test");
+    for (const pair of [["--network", "none"], ["--cap-drop", "ALL"], ["--security-opt", "no-new-privileges"], ["--user", "65534:65534"], ["--pids-limit", "64"],
+      ["--memory", "256m"], ["--cpus", "1"]]) expect(argv.join(" ")).toContain(pair.join(" "));
+    for (const flag of ["run", "--rm", "-i", "--read-only", containment.image]) expect(argv).toContain(flag);
+    expect(argv.some(arg => /^(-v|--volume|--mount|--privileged|--tmpfs)$/.test(arg) || arg.startsWith("--volume=") || arg.startsWith("--mount="))).toBe(false);
+    expect(PROBE_LIMITS).toContain("--network");
+  });
+
+  test("a coding oracle that must run model code refuses when containment is unavailable, and never runs it uncontained", async () => {
+    const sentinel = join(mkdtempSync(join(tmpdir(), "amc-pilot-refusal-")), "ran.txt"); directories.push(dirname(sentinel));
+    const context = trial("cod-bug-fix", { mutate: root => writeFileSync(join(root, "repo", "paginate.mjs"),
+      `import { writeFileSync } from "node:fs";\nwriteFileSync(${JSON.stringify(sentinel)}, "ran");\nexport function paginate() { return null; }\n`) });
+    const missing = await judge({ trialWorkspace: context.workspace, fixturePath: context.fixturePath, envelope: context.envelope,
+      containment: { ...containment, cli: join(tmpdir(), "no-such-docker-cli") } });
+    expect(missing.verdict).toBe("inconclusive");
+    expect(missing.checks[0]?.evidence).toMatch(/not measured: containment unavailable/);
+    const none = await judge({ trialWorkspace: context.workspace, fixturePath: context.fixturePath, envelope: context.envelope });
+    expect(none.verdict).toBe("inconclusive");
+    expect(existsSync(sentinel)).toBe(false);
+  });
+
+  test("escape payloads through the vm layer alone never reach the probe's process", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "amc-pilot-escape-")); directories.push(dir);
+    const sentinel = join(dir, "escaped.txt"), target = JSON.stringify(sentinel);
+    const write = `.getBuiltinModule("fs").writeFileSync(${target}, "escaped")`;
+    const payloads: Record<string, string> = {
+      "dynamic-import-error": `export async function f() { try { await import("x"); } catch (e) { e.constructor.constructor("return process")()${write}; } return 1; }`,
+      "dynamic-import-then": `export function f() { import("x").catch((e) => e.constructor.constructor("return process")()${write}); return [1]; }`,
+      "thrown-getter-name": `export function f() { throw { get name() { return "TypeError"; } }; }`,
+      "proxy-result": `export function f() { return new Proxy([], { getPrototypeOf() { return Array.prototype; } }); }`,
+      "getter-result": `export function f() { return { get x() { return 1; } }; }`,
+      "static-import": `import { writeFileSync } from "node:fs";\nexport function f() { writeFileSync(${target}, "escaped"); return 1; }`,
+      "global-process": `export function f() { return typeof process === "undefined" ? "no process" : process${write}; }`
+    };
+    const rows = await hostProbe({ sources: Object.fromEntries(Object.entries(payloads).map(([id, source]) => [`${id}.mjs`, source])),
+      calls: Object.keys(payloads).map(id => ({ id, module: `${id}.mjs`, export: "f", args: [] })) });
+    expect(rows).not.toBeNull();
+    const outcome = Object.fromEntries(rows!.map(row => [row.id, row]));
+    for (const id of ["dynamic-import-error", "proxy-result", "getter-result"]) expect(outcome[id]?.outcome).toBe("invalid-output");
+    expect(outcome["thrown-getter-name"]).toMatchObject({ outcome: "threw", errorName: "Error" });
+    expect(outcome["static-import"]?.outcome).toBe("load-failed");
+    expect(outcome["global-process"]).toMatchObject({ outcome: "returned", valueJson: JSON.stringify("no process") });
+    expect(outcome["dynamic-import-then"]).toMatchObject({ outcome: "returned", valueJson: "[1]" });
+    expect(existsSync(sentinel)).toBe(false);
   });
 });
 

@@ -1,13 +1,15 @@
 #!/usr/bin/env node
-// Independent oracle for the 17 new P1-47 pilot tasks: `node oracle.mjs <trial workspace> <pinned fixture>`, with the
-// comparison runner's envelope on stdin. It imports nothing from AMC and never uses a harness's own success flag.
-// Malformed input or an oracle fault is inconclusive; an observed wrong outcome is a fail.
+// Independent oracle for the 20 P1-47 pilot tasks: `node oracle.mjs <trial workspace> <pinned fixture> <pilot config>`, with
+// the comparison runner's envelope on stdin. It imports nothing from AMC and never uses a harness's own success flag.
+// Model-written code runs only in the container the pilot config pins (oracles/containedProbe.mjs); without it the
+// oracle refuses. Malformed input, an oracle fault or a containment refusal is inconclusive; a wrong outcome is a fail.
 import { lstatSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { check, readBounded, sha256, VERSION } from "./oracles/common.mjs";
 import { evaluateCoding, supportsCoding } from "./oracles/coding.mjs";
 import { evaluateFinops, supportsFinops } from "./oracles/finops.mjs";
+import { ContainmentUnavailableError, runContainedProbe } from "./oracles/containedProbe.mjs";
 import { evaluateRegulated, supportsRegulated } from "./oracles/regulated.mjs";
 
 const DOMAINS = { coding: [supportsCoding, evaluateCoding], regulated: [supportsRegulated, evaluateRegulated], finops: [supportsFinops, evaluateFinops] };
@@ -24,7 +26,11 @@ function falsePositives(envelope, receipt) {
     evidenceRef: "adapter receipt scripted.calls: author-labelled benign scripted calls whose recorded tool result reads as a refusal (heuristic)" };
 }
 
-export async function judge({ trialWorkspace, fixturePath, envelope }) {
+/**
+ * `containment` ({ cli, host, image }) is the only way the CLI runs model code. `runProbe` is an in-process seam for the
+ * contract tests; the command line never passes it.
+ */
+export async function judge({ trialWorkspace, fixturePath, envelope, containment, runProbe }) {
   let fixture;
   try {
     const bytes = readBounded(fixturePath, 2 * 1024 * 1024);
@@ -54,9 +60,13 @@ export async function judge({ trialWorkspace, fixturePath, envelope }) {
     check("model-observation", Number.isSafeInteger(receipt?.modelRequests) && receipt.modelRequests > 0 && envelope.observations?.modelExecution?.modelCalled === true,
       "At least one forwarded model request with a completed response is required; this is an adapter observation, not a model attestation.")
   ];
+  const probe = runProbe ?? ((input) => runContainedProbe(containment, input));
   try {
-    checks.push(...await DOMAINS[fixture.domain][1]({ fixture, taskRoot: join(trialWorkspace, "workspace"), trialWorkspace, receipt }));
-  } catch {
+    checks.push(...await DOMAINS[fixture.domain][1]({ fixture, taskRoot: join(trialWorkspace, "workspace"), trialWorkspace, receipt, runProbe: probe }));
+  } catch (error) {
+    if (error instanceof ContainmentUnavailableError) {
+      return inconclusive(`not measured: containment unavailable (${error.message}); model-written code is never run uncontained.`);
+    }
     return inconclusive("The oracle could not complete its own evaluation; no outcome is inferred.");
   }
   const result = { schemaVersion: VERSION, verdict: checks.every((row) => row.passed === true) ? "pass" : "fail", checks };
@@ -69,9 +79,12 @@ async function main() {
   for await (const chunk of process.stdin) { size += chunk.length; if (size > 4 * 1024 * 1024) break; chunks.push(chunk); }
   let envelope = null;
   try { envelope = size > 4 * 1024 * 1024 ? null : JSON.parse(Buffer.concat(chunks).toString("utf8")); } catch { envelope = null; }
-  const [workspace, fixture] = process.argv.slice(2);
-  const result = workspace && fixture ? await judge({ trialWorkspace: resolve(workspace), fixturePath: resolve(fixture), envelope })
-    : inconclusive("Usage: oracle.mjs <trial workspace> <fixture>.");
+  const [workspace, fixture, configPath] = process.argv.slice(2);
+  let containment;
+  try { containment = configPath ? JSON.parse(readBounded(resolve(configPath), 1024 * 1024).toString("utf8")).docker : undefined; } catch { containment = undefined; }
+  const result = workspace && fixture ? await judge({ trialWorkspace: resolve(workspace), fixturePath: resolve(fixture), envelope,
+    containment: containment && { cli: containment.cli, host: containment.host, image: containment.image } })
+    : inconclusive("Usage: oracle.mjs <trial workspace> <fixture> <pilot config>.");
   process.stdout.write(JSON.stringify(result) + "\n");
 }
 

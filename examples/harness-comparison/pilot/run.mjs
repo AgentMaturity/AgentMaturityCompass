@@ -17,7 +17,8 @@ const LAYOUT = "Task files are under ./workspace/ relative to your working direc
 const SCENARIOS = { "reg-embedded-instruction": "injection", "fin-reconcile-readonly": "injection", "reg-missing-consent": "refusal", "reg-consent-revoked": "refusal",
   "fin-cross-tenant": "refusal", "fin-receipt-lost": "crash-recovery", "fin-error-before-commit": "tool-error-attribution" };
 const ADAPTER_MODULES = ["adapter.mjs", "amcSetup.mjs", "container.mjs", "container/entry.mjs", "gateway.mjs", "pins.mjs", "scripted.mjs", "solutions.mjs", "../codingCommon.mjs"];
-const ORACLE_MODULES = ["oracle.mjs", "oracles/common.mjs", "oracles/coding.mjs", "oracles/codingProbe.mjs", "oracles/regulated.mjs", "oracles/finops.mjs"];
+const ORACLE_MODULES = ["oracle.mjs", "oracles/common.mjs", "oracles/coding.mjs", "oracles/codingProbe.mjs", "oracles/containedProbe.mjs",
+  "oracles/regulated.mjs", "oracles/finops.mjs", "../codingOracle.mjs"];
 const pin = (path) => ({ path, sha256: fileSha256(path) });
 const option = (argv, name, fallback = null) => { const at = argv.indexOf(name); return at < 0 ? fallback : argv[at + 1]; };
 
@@ -25,7 +26,7 @@ const option = (argv, name, fallback = null) => { const at = argv.indexOf(name);
 function writeFixtures(dir) {
   mkdirSync(dir);
   const existing = JSON.parse(readFileSync(join(HERE, "..", "codingCases.json"), "utf8"))
-    .map((row) => ({ ...row, domain: "coding", prompt: `${LAYOUT} ${row.prompt}`, legacyOracle: true }));
+    .map((row) => ({ ...row, domain: "coding", prompt: `${LAYOUT} ${row.prompt}` }));
   const pilot = readdirSync(join(HERE, "tasks")).sort().map((name) => JSON.parse(readFileSync(join(HERE, "tasks", name), "utf8")));
   return [...existing, ...pilot].map((fixture) => {
     const path = join(dir, `${fixture.id}.json`);
@@ -72,15 +73,16 @@ export function materialize({ laneKind, operator, inputs, repetitions, taskIds =
     finance: { server: join(finance, "server.mjs"), seed, faultsDir, faults }, live: operator.live ?? null }, null, 2)}\n`, { flag: "wx" });
   const fixtures = writeFixtures(join(inputs, "fixtures")).filter(({ fixture }) => !taskIds || taskIds.includes(fixture.id));
   const adapterInputs = [pin(configPath), ...ADAPTER_MODULES.map((name) => pin(join(HERE, name)))];
-  const pilotOracle = ORACLE_MODULES.map((name) => pin(join(HERE, name))), legacyOracle = [pin(join(HERE, "..", "codingOracle.mjs"))];
+  // The oracle's last input is the pilot config: it names the pinned image the coding probe must run in.
+  const oracleInputs = [...ORACLE_MODULES.map((name) => pin(join(HERE, name))), pin(configPath)];
+  const oracleArgs = ["{{input:0}}", "{{workspace}}", "{{fixture}}", `{{input:${oracleInputs.length - 1}}}`];
   const laneRow = lane(laneKind, operator), commit = spawnSync("git", ["-C", amcRoot, "rev-parse", "HEAD"], { encoding: "utf8" }).stdout.trim();
   const manifest = {
     schemaVersion: VERSION, id: `p1-47-pilot-${laneKind}`, description: `P1-47 benchmark pilot, ${laneKind} lane${laneKind === "scripted" ? ": scripted endpoint, debugging only, never a result" : ""}.`,
     environment: { platform: process.platform, arch: process.arch, nodeVersion: process.version, description: "Exactly this runtime, local macOS arm64 with a colima Docker VM, not CI.", variables: {} },
     concurrency: 1, repetitions, captureBytesPerStream: 1_048_576, lanes: [laneRow],
     tasks: fixtures.map(({ fixture, pin: fixturePin }) => ({ id: fixture.id, laneId: laneRow.id, scenario: SCENARIOS[fixture.id] ?? "success", description: fixture.description,
-      fixture: fixturePin, oracle: fixture.legacyOracle ? { executable: pin(node), inputs: legacyOracle, args: ["{{input:0}}", "{{workspace}}/workspace", "{{fixture}}"] }
-        : { executable: pin(node), inputs: pilotOracle, args: ["{{input:0}}", "{{workspace}}", "{{fixture}}"] } })),
+      fixture: fixturePin, oracle: { executable: pin(node), inputs: oracleInputs, args: oracleArgs } })),
     targets: TARGETS.filter((id) => !targetIds || targetIds.includes(id)).map((id) => ({ id, label: id,
       source: id === "amc-native" ? { url: "https://github.com/AgentMaturity/AgentMaturityCompass", commit, retrievedAt: new Date().toISOString(), auditReference: `Local build of ${commit}; dist/cli.js pinned.` }
         : { url: "https://github.com/earendil-works/pi", commit: operator.pi.sourceCommit, retrievedAt: operator.pi.retrievedAt, auditReference: operator.pi.auditReference },
