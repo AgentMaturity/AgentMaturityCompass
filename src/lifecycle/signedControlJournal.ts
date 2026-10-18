@@ -4,8 +4,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { z } from "zod";
 import { ensureSigningKeys } from "../crypto/keys.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
-import { signatureEnvelopeSchema, verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
-import type { SignatureEnvelope } from "../crypto/signing/signerTypes.js";
+import { signatureEnvelopeSchema, verifySignatureEnvelope, type VerifiableSignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -189,7 +188,7 @@ function embeddedSignature(workspace: string, digestHex: string): JournalEntryRe
 function embeddedEnvelope(
   controlKind: SignedControlKind,
   signature: JournalEntryRecord["signature"]
-): SignatureEnvelope {
+): VerifiableSignatureEnvelope {
   const parsed = signatureEnvelopeSchema.safeParse(signature.envelope);
   if (!parsed.success) {
     throw new SignedControlJournalError(`Signed ${controlKind} record lacks a valid signer envelope.`);

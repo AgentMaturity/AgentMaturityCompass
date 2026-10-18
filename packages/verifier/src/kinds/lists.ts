@@ -1,5 +1,5 @@
 /** A signed trust list (its issuer is the pinned root set) and a signed revocation list (its issuer a `revocation-list` key). */
-import { canonicalize, tagged, verifyEd25519 } from "../bytes.js";
+import { canonicalize, tagged, verifySignature } from "../bytes.js";
 import type { Finding } from "../codes.js";
 import { result, type Env, type Evaluation } from "../evaluation.js";
 import { signedRevocationList } from "../records/statements.js";
@@ -39,7 +39,7 @@ export function evaluateRevocationList(value: unknown, bytes: Uint8Array, env: E
   const { list, signature, anchor } = parsed.value;
   const integrity: Finding<"integrity">[] = chainHead(list.sequence, list.previousSha256);
   const pem = listedPem(env.ctx, signature.keyId);
-  if (pem !== null && !verifyEd25519(tagged("AMC_REVOCATION_LIST_V1", canonicalize(list)), pem, Buffer.from(signature.signature, "base64"))) {
+  if (pem !== null && !verifySignature(tagged("AMC_REVOCATION_LIST_V1", canonicalize(list)), pem, Buffer.from(signature.signature, "base64"))) {
     integrity.push({ code: "SIGNATURE_INVALID", detail: "the signature does not verify" });
   }
   const admission = admit({ signature: "signature", keyId: signature.keyId, purpose: "revocation-list" }, env.ctx);

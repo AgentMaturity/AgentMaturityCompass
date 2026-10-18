@@ -4,7 +4,7 @@
  * signature only proves possession. A root-set rotation is authorized by the pinned root set it replaces. Neither ever
  * changes a pin: the trust-list owner publishes a new list.
  */
-import { canonicalize, ed25519KeyId, same, tagged, verifyEd25519 } from "../bytes.js";
+import { canonicalize, ed25519KeyId, same, tagged, verifySignature } from "../bytes.js";
 import type { Finding } from "../codes.js";
 import type { Env, Evaluation } from "../evaluation.js";
 import { signedKeyRotation, signedRootRotation } from "../records/statements.js";
@@ -47,7 +47,7 @@ export function evaluateKeyRotation(value: unknown, bytes: Uint8Array, env: Env)
     }
     const pem = row.by === "next" ? statement.nextPublicKeyPem : row.by === "previous" ? listedPem(env.ctx, row.keyId) : env.ctx.rootPems.get(row.keyId) ?? null;
     if (pem === null) unverifiable.push(`${row.by} signature by ${row.keyId}: its key is not in the supplied trust lists`);
-    else if (!verifyEd25519(message, pem, Buffer.from(row.signature, "base64"))) {
+    else if (!verifySignature(message, pem, Buffer.from(row.signature, "base64"))) {
       integrity.push({ code: "SIGNATURE_INVALID", detail: `the ${row.by} signature by ${row.keyId} does not verify` });
     } else if (row.by === "root") {
       const admission = rootAdmission(`root signature ${row.keyId}`, row.keyId, env.ctx);
@@ -100,7 +100,7 @@ export function evaluateRootRotation(value: unknown, bytes: Uint8Array, env: Env
       integrity.push({ code: "MALFORMED", detail: `the ${row.by} signature by ${row.keyId} is not by a key of the ${row.by} root set` });
     } else if (pem === null) {
       unverifiable.push(`current signature by ${row.keyId}: no supplied trust list carries this pinned root's key`);
-    } else if (!verifyEd25519(message, pem, Buffer.from(row.signature, "base64"))) {
+    } else if (!verifySignature(message, pem, Buffer.from(row.signature, "base64"))) {
       integrity.push({ code: "SIGNATURE_INVALID", detail: `the ${row.by} signature by ${row.keyId} does not verify` });
     } else if (row.by === "new") newSigned += 1;
     else {

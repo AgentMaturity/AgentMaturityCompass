@@ -1,12 +1,12 @@
 import { isSha256HexDigest } from "../keys.js";
 import { z } from "zod";
-import { verify } from "node:crypto";
-import type { SignatureEnvelope } from "./signerTypes.js";
+import { SIGNING_ALGORITHMS, verifyCanonical } from "../../keys/algorithmPolicy.js";
 import { sha256Hex } from "../../utils/hash.js";
 
 export const signatureEnvelopeSchema = z.object({
   v: z.literal(1),
-  alg: z.literal("ed25519"),
+  // P2-08: the key's own algorithm; ECDSA P-256 signatures are IEEE P1363, never DER.
+  alg: z.enum(SIGNING_ALGORITHMS),
   pubkeyB64: z.string().min(1),
   fingerprint: z.string().length(64),
   sigB64: z.string().min(1),
@@ -29,9 +29,12 @@ export interface VerifySignatureEnvelopeOptions {
   nowTs?: number;
 }
 
+/** What a verifier accepts: AMC's own envelopes (Ed25519) and ECDSA P-256 ones in P1363 (P2-08). */
+export type VerifiableSignatureEnvelope = z.infer<typeof signatureEnvelopeSchema>;
+
 export function verifySignatureEnvelope(
   digestHex: string,
-  envelope: SignatureEnvelope,
+  envelope: VerifiableSignatureEnvelope,
   options: VerifySignatureEnvelopeOptions = {}
 ): boolean {
   if (!isSha256HexDigest(digestHex)) return false;
@@ -58,12 +61,7 @@ export function verifySignatureEnvelope(
     if ((options.requireTrustedKey ?? false) && trusted.length === 0) {
       return false;
     }
-    return verify(
-      null,
-      Buffer.from(digestHex, "hex"),
-      pubPem,
-      Buffer.from(parsed.sigB64, "base64")
-    );
+    return verifyCanonical(parsed.alg, Buffer.from(digestHex, "hex"), pubPem, Buffer.from(parsed.sigB64, "base64"));
   } catch {
     return false;
   }

@@ -1,4 +1,5 @@
-import { sign, verify, type KeyObject } from "node:crypto";
+import { sign, type KeyObject } from "node:crypto";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { AntiRollbackError, checkHighWater, keyHistoryMarkKey, nextKeyHistoryRevision, recordHighWater } from "../keys/highWater.js";
@@ -202,13 +203,10 @@ export function signHexDigestWith(privateKey: KeyObject, digestHex: string): str
   return signature.toString("base64");
 }
 
+/** Ed25519, or ECDSA P-256 in IEEE P1363 (P2-08 algorithm policy); a DER-encoded ECDSA signature never verifies. */
 export function verifyHexDigest(digestHex: string, signatureB64: string, publicKeyPem: string): boolean {
   if (!isSha256HexDigest(digestHex)) return false;
-  try {
-    return verify(null, Buffer.from(digestHex, "hex"), publicKeyPem, Buffer.from(signatureB64, "base64"));
-  } catch {
-    return false;
-  }
+  return verifyWithKey(Buffer.from(digestHex, "hex"), publicKeyPem, Buffer.from(signatureB64, "base64"));
 }
 
 export function verifyHexDigestAny(digestHex: string, signatureB64: string, publicKeys: string[]): boolean {

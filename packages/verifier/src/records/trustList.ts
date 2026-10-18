@@ -1,6 +1,6 @@
 /** The signed trust list (P0-09, with P1-08's rootThreshold and P1-25/P1-26's optional anchors). Mirrors src/trust/trustList.ts. */
 import { createPublicKey, X509Certificate } from "node:crypto";
-import { canonicalEd25519Pem, ed25519KeyId, isCanonicalSignatureBase64 } from "../bytes.js";
+import { canonicalSigningPem, isCanonicalSignatureBase64, signingKeyId } from "../bytes.js";
 import { KEY_PURPOSES } from "../codes.js";
 import { arr, bool, int, isoTime, lit, nonEmpty, nullable, obj, oneOf, opt, refine, sha256, str, text } from "../schema.js";
 
@@ -9,7 +9,7 @@ const unique = <T>(key: (item: T) => string) => (items: T[]) => new Set(items.ma
 
 const entryShape = obj({
   keyId: sha256,
-  algorithm: lit("ed25519"),
+  algorithm: oneOf(["ed25519", "ecdsa-p256-sha256"] as const),
   publicKeyPem: str({ min: 1, max: 4096 }),
   purposes: refine(arr(oneOf(KEY_PURPOSES), { min: 1 }), unique(purpose => purpose), "purposes must be unique"),
   subject: nonEmpty,
@@ -27,12 +27,13 @@ const entryShape = obj({
 });
 export type TrustListEntry = ReturnType<typeof entryShape>;
 
-const entry = refine(entryShape, value => canonicalEd25519Pem(value.publicKeyPem) === value.publicKeyPem
-  && ed25519KeyId(value.publicKeyPem) === value.keyId
+const entry = refine(entryShape, value => canonicalSigningPem(value.publicKeyPem)?.pem === value.publicKeyPem
+  && canonicalSigningPem(value.publicKeyPem)?.algorithm === value.algorithm
+  && signingKeyId(value.publicKeyPem) === value.keyId
   && (value.validTo === null || Date.parse(value.validTo) > Date.parse(value.validFrom))
   && (value.revokedAt === undefined) === (value.revocationReason === undefined)
   && (!value.purposes.includes("evidence-authority") || value.authority !== undefined),
-"entry rules: canonical Ed25519 PEM whose sha256 is keyId, validTo after validFrom, revokedAt with revocationReason, evidence-authority with authority");
+"entry rules: canonical PEM of the entry's algorithm (Ed25519 or ECDSA P-256) whose sha256 is keyId, validTo after validFrom, revokedAt with revocationReason, evidence-authority with authority");
 
 const distrust = obj({
   keyId: sha256,

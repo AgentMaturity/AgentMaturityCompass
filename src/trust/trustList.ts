@@ -1,4 +1,5 @@
-import { createPublicKey, sign, verify, X509Certificate } from "node:crypto";
+import { createPublicKey, sign, X509Certificate } from "node:crypto";
+import { canonicalSigningKey, SIGNING_ALGORITHMS, signingKeyId, verifyWithKey } from "../keys/algorithmPolicy.js";
 import { z } from "zod";
 import { assertNoteKey } from "../transparency/checkpointNote.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
@@ -46,7 +47,8 @@ export function ed25519KeyId(publicKeyPem: string): string | null {
 
 export const trustListEntrySchema = z.strictObject({
   keyId: keyIdSchema,
-  algorithm: z.literal("ed25519"),
+  // P2-08: Ed25519, or ECDSA P-256 for keys held where Ed25519 is unavailable (src/keys/algorithmPolicy.ts).
+  algorithm: z.enum(SIGNING_ALGORITHMS),
   publicKeyPem: z.string().min(1).max(4096),
   purposes: z.array(z.enum(KEY_PURPOSES)).min(1).refine(purposes => new Set(purposes).size === purposes.length, "purposes must be unique"),
   subject: z.string().min(1),
@@ -63,8 +65,9 @@ export const trustListEntrySchema = z.strictObject({
   }).optional()
 }).superRefine((entry, ctx) => {
   const issue = (message: string) => ctx.addIssue({ code: "custom", message });
-  if (canonicalEd25519Pem(entry.publicKeyPem) !== entry.publicKeyPem) issue("publicKeyPem must be an Ed25519 SPKI public key in canonical PEM form");
-  else if (ed25519KeyId(entry.publicKeyPem) !== entry.keyId) issue("sha256 of publicKeyPem must equal keyId");
+  const canonical = canonicalSigningKey(entry.publicKeyPem);
+  if (canonical?.pem !== entry.publicKeyPem || canonical.algorithm !== entry.algorithm) issue("publicKeyPem must be a canonical SPKI PEM of the entry's algorithm (Ed25519 or ECDSA P-256)");
+  else if (signingKeyId(entry.publicKeyPem) !== entry.keyId) issue("sha256 of publicKeyPem must equal keyId");
   if (entry.validTo !== null && Date.parse(entry.validTo) <= Date.parse(entry.validFrom)) issue("validTo must be after validFrom");
   if ((entry.revokedAt === undefined) !== (entry.revocationReason === undefined)) issue("revokedAt and revocationReason go together");
   if (entry.purposes.includes("evidence-authority") && !entry.authority) issue("evidence-authority keys need an authority");
@@ -181,14 +184,8 @@ export function verifySignedTrustList(signed: unknown, opts: { pinnedRootKeyIds:
   const bytes = signedBytes(list);
   // Never below the floor the signed list declares: a weaker local policy cannot downgrade m-of-n.
   const threshold = Math.max(1, opts.threshold ?? 1, list.rootThreshold ?? 1);
-  const bad = signatures.find(({ keyId, publicKeyPem, signature }) => {
-    if (ed25519KeyId(publicKeyPem) !== keyId) return true;
-    try {
-      return !verify(null, bytes, publicKeyPem, Buffer.from(signature, "base64"));
-    } catch {
-      return true;
-    }
-  });
+  // A root may be Ed25519 or ECDSA P-256 (P1363 only, P2-08).
+  const bad = signatures.find(({ keyId, publicKeyPem, signature }) => signingKeyId(publicKeyPem) !== keyId || !verifyWithKey(bytes, publicKeyPem, Buffer.from(signature, "base64")));
   if (bad) throw new TrustListError("TRUST_LIST_SIGNATURE_INVALID", `list "${list.listId}" carries a signature by ${bad.keyId} that does not verify`);
   const pinned = signatures.filter(({ keyId }) => opts.pinnedRootKeyIds.includes(keyId)).length;
   if (pinned < threshold) {

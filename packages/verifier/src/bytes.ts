@@ -123,10 +123,35 @@ export function ed25519KeyId(publicKeyPem: string): string | null {
   return canonical === null ? null : sha256Hex(Buffer.from(canonical, "utf8"));
 }
 
-/** Ed25519 verification that never throws. */
-export function verifyEd25519(message: Uint8Array, publicKeyPem: string, signature: Uint8Array): boolean {
+/** Ed25519 or ECDSA P-256 (P2-08 algorithm policy): the key's algorithm and its canonical SPKI PEM; null for any other key. */
+export function canonicalSigningPem(publicKeyPem: string): { algorithm: "ed25519" | "ecdsa-p256-sha256"; pem: string } | null {
+  if (!publicKeyPem.trimStart().startsWith("-----BEGIN PUBLIC KEY-----")) return null;
   try {
-    return verify(null, message, publicKeyPem, signature);
+    const key = createPublicKey(publicKeyPem);
+    const algorithm = key.asymmetricKeyType === "ed25519" ? "ed25519"
+      : key.asymmetricKeyType === "ec" && key.asymmetricKeyDetails?.namedCurve === "prime256v1" ? "ecdsa-p256-sha256" : null;
+    return algorithm === null ? null : { algorithm, pem: key.export({ format: "pem", type: "spki" }).toString() };
+  } catch {
+    return null;
+  }
+}
+
+/** AMC key id of an Ed25519 or P-256 key (sha256 of the canonical PEM); null for any other key. */
+export function signingKeyId(publicKeyPem: string): string | null {
+  const canonical = canonicalSigningPem(publicKeyPem);
+  return canonical === null ? null : sha256Hex(Buffer.from(canonical.pem, "utf8"));
+}
+
+/**
+ * Verification in the key's own algorithm that never throws: Ed25519, or ECDSA P-256 with SHA-256 in IEEE P1363 (64
+ * bytes). A DER-encoded ECDSA signature never verifies, and any other key type is refused.
+ */
+export function verifySignature(message: Uint8Array, publicKeyPem: string, signature: Uint8Array): boolean {
+  const canonical = canonicalSigningPem(publicKeyPem);
+  if (canonical === null || signature.length !== 64) return false;
+  try {
+    return canonical.algorithm === "ed25519" ? verify(null, message, publicKeyPem, signature)
+      : verify("sha256", message, { key: publicKeyPem, dsaEncoding: "ieee-p1363" }, signature);
   } catch {
     return false;
   }

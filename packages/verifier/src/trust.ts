@@ -5,7 +5,7 @@
  */
 // The one admission rule AMC's verifiers also use; it imports only node: built-ins (check:architecture-boundaries).
 import { distrustAt, listsAt } from "../../../src/trust/admissionRule.js";
-import { canonicalize, ed25519KeyId, same, tagged, verifyEd25519 } from "./bytes.js";
+import { canonicalize, same, signingKeyId, tagged, verifySignature } from "./bytes.js";
 import type { Finding, KeyPurpose } from "./codes.js";
 import { signedTrustList, type DistrustEntry, type SignedTrustList, type TrustList, type TrustListEntry } from "./records/trustList.js";
 import { attempt } from "./schema.js";
@@ -49,8 +49,8 @@ export interface ListFacts {
 /** The key id of the first signature row whose key id or signature does not verify; null when every row verifies. */
 function badRow(signed: SignedTrustList): string | null {
   const bytes = tagged("AMC_TRUST_LIST_V1", canonicalize(signed.list));
-  return signed.signatures.find(row => !same(ed25519KeyId(row.publicKeyPem) ?? "", row.keyId)
-    || !verifyEd25519(bytes, row.publicKeyPem, Buffer.from(row.signature, "base64")))?.keyId ?? null;
+  return signed.signatures.find(row => !same(signingKeyId(row.publicKeyPem) ?? "", row.keyId)
+    || !verifySignature(bytes, row.publicKeyPem, Buffer.from(row.signature, "base64")))?.keyId ?? null;
 }
 
 const knownSequence = (known: Readonly<Record<string, number>>, id: string) => (Object.hasOwn(known, id) ? known[id] : undefined);

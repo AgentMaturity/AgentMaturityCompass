@@ -3,7 +3,7 @@
  * named by `controlResultsDigest` hold for one tenant, workspace, subject, deployment, profile and window.
  */
 import { createHash } from "node:crypto";
-import { canonicalEd25519Pem, canonicalize, isCanonicalSignatureBase64, same, sha256Hex, tagged, verifyEd25519 } from "../bytes.js";
+import { canonicalEd25519Pem, canonicalize, isCanonicalSignatureBase64, same, sha256Hex, tagged, verifySignature } from "../bytes.js";
 import type { Finding } from "../codes.js";
 import { notRecomputable, result, scopeResult, type Env, type Evaluation } from "../evaluation.js";
 import { ATTESTATION_DIGEST_TAG, scopedAttestation, type ScopedAttestation } from "../records/attestation.js";
@@ -125,7 +125,7 @@ export function evaluateAttestation(value: unknown, env: Env): Evaluation {
   } else if (!same(sha256Hex(pem), signature.fingerprint) || !same(attestation.issuerKeyId, signature.fingerprint)
     || (signature.signer.notaryFingerprint !== undefined && !same(signature.signer.notaryFingerprint, signature.fingerprint))) {
     integrity.push({ code: "DIGEST_MISMATCH", detail: "issuerKeyId, signature.fingerprint and the carried key do not agree" });
-  } else if (!isCanonicalSignatureBase64(signature.sigB64) || !verifyEd25519(attestationDigest(attestation), pem, Buffer.from(signature.sigB64, "base64"))) {
+  } else if (!isCanonicalSignatureBase64(signature.sigB64) || !verifySignature(attestationDigest(attestation), pem, Buffer.from(signature.sigB64, "base64"))) {
     integrity.push({ code: "SIGNATURE_INVALID", detail: "the signature does not verify over the attestation digest" });
   }
   const view = readEvidence(attestation, env, integrity);
