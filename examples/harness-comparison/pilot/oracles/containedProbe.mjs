@@ -17,7 +17,10 @@ export const probeCommand = (containment, name) => ["run", "--rm", "-i", "--name
   "node", "--experimental-vm-modules", "--no-warnings", "--max-old-space-size=64", "--input-type=module", "-e", PROBE_SOURCE];
 
 /** Probe rows, or null when the contained probe did not finish cleanly. Throws ContainmentUnavailableError when it cannot be contained. */
-export function runContainedProbe(containment, input, { timeoutMs = 60_000 } = {}) {
+export const runContainedProbe = (containment, input, options) => runContainedProbeDetailed(containment, input, options).then((result) => result.rows);
+
+/** { rows, timedOut }: rows is null when the contained probe did not finish cleanly. Rejects with ContainmentUnavailableError when it cannot be contained. */
+export function runContainedProbeDetailed(containment, input, { timeoutMs = 60_000 } = {}) {
   if (!containment?.cli || !containment.host || !/^(sha256:[a-f0-9]{64}|[^\s@]+@sha256:[a-f0-9]{64})$/.test(containment.image ?? "")) {
     return Promise.reject(new ContainmentUnavailableError("no pinned container runtime configuration"));
   }
@@ -36,7 +39,31 @@ export function runContainedProbe(containment, input, { timeoutMs = 60_000 } = {
       spawnSync(containment.cli, ["rm", "-f", name], { env, timeout: 30_000 });
       // docker run reports its own failures (daemon, image, runtime) as 125-127; none of them ran the probe.
       if (!timedOut && code !== null && code >= 125 && code <= 127) { fail(new ContainmentUnavailableError(`the container runtime refused the probe (status ${code})`)); return; }
-      try { done(code === 0 && !timedOut ? JSON.parse(Buffer.concat(out).toString("utf8")).rows : null); } catch { done(null); }
+      let rows = null;
+      try { rows = code === 0 && !timedOut ? JSON.parse(Buffer.concat(out).toString("utf8")).rows : null; } catch { rows = null; }
+      done({ rows, timedOut });
+    });
+    child.stdin.end(JSON.stringify(input));
+  });
+}
+
+/**
+ * TEST ONLY: runs the probe's vm layer in a child process on this host, for a test's own trusted fixture solutions.
+ * No oracle command line calls it; model-written code reaches only runContainedProbeDetailed. Not exported by the package.
+ */
+export function evaluateTrustedFixtureForTests(input, { timeoutMs = 2500 } = {}) {
+  return new Promise((done) => {
+    const child = spawn(process.execPath, ["--experimental-vm-modules", "--no-warnings", "--max-old-space-size=64", "--input-type=module", "-e", PROBE_SOURCE],
+      { env: { LANG: "C.UTF-8", TZ: "UTC" }, stdio: ["pipe", "pipe", "ignore"] });
+    const out = []; let timedOut = false;
+    const timer = setTimeout(() => { timedOut = true; child.kill("SIGKILL"); }, timeoutMs);
+    child.stdout.on("data", (chunk) => out.push(chunk));
+    child.stdin.on("error", () => {});
+    child.once("close", (code) => {
+      clearTimeout(timer);
+      let rows = null;
+      try { rows = code === 0 && !timedOut ? JSON.parse(Buffer.concat(out).toString("utf8")).rows : null; } catch { rows = null; }
+      done({ rows, timedOut });
     });
     child.stdin.end(JSON.stringify(input));
   });

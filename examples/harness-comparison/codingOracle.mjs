@@ -1,21 +1,23 @@
 #!/usr/bin/env node
 // Three controlled pure-JS repair tasks, not a representative coding benchmark.
+// `node codingOracle.mjs <workspace> <fixture> <containment.json>`, envelope on stdin.
 // The comparison runner pins this file and remains the authority for target
-// cleanup/provenance. This import-free VM child is bounded, not an OS sandbox.
-// Expected values are never in the target workspace or VM probe input; only
-// the parent compares them. No AMC-specific ledger or runtime is required.
-import { spawn } from "node:child_process";
+// cleanup/provenance. The model-written solution runs only in the pinned
+// container (pilot/oracles/containedProbe.mjs: no network, read-only, nobody, no
+// mounts); without one the oracle refuses ("not measured: containment
+// unavailable") and never runs it on the host. Expected values are never in the
+// target workspace or probe input; only this process compares them.
 import { createHash } from "node:crypto";
 import { closeSync, constants, fstatSync, lstatSync, openSync, readSync, realpathSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { pathToFileURL } from "node:url";
 import { isDeepStrictEqual } from "node:util";
-import vm from "node:vm";
+import { ContainmentUnavailableError, runContainedProbeDetailed } from "./pilot/oracles/containedProbe.mjs";
 
 const VERSION = "2026-09-08";
 const SOURCE_LIMIT = 128 * 1024;
 const INPUT_LIMIT = 2 * 1024 * 1024;
-const PROBE_TIMEOUT_MS = 2500;
+const PROBE_TIMEOUT_MS = 120_000; // container start included
 const sha256 = bytes => createHash("sha256").update(bytes).digest("hex");
 const valueCase = (id, args, expected) => ({ id, args, expected });
 const errorCase = (id, args, errorName) => ({ id, args, errorName });
@@ -112,117 +114,20 @@ function solutionSnapshot(workspace) {
   return { path, source, digest: sha256(bytes) };
 }
 
-async function probeSource(source, suite, workspace) {
-  return new Promise(resolveProbe => {
-    // Inherit the outer oracle's process group so its cancellation owns all
-    // descendants. Do not detach a nested group or launch via a shell.
-    const child = spawn(process.execPath, ["--experimental-vm-modules", "--no-warnings", "--max-old-space-size=64", fileURLToPath(import.meta.url), "--probe"], {
-      cwd: workspace, env: { LANG: "C.UTF-8", TZ: "UTC" }, stdio: ["pipe", "pipe", "pipe"], shell: false
-    });
-    const stdout = []; let stdoutBytes = 0, stderrBytes = 0, truncated = false, timedOut = false, spawnError = false;
-    const timer = setTimeout(() => { timedOut = true; child.kill("SIGKILL"); }, PROBE_TIMEOUT_MS);
-    child.on("error", () => { spawnError = true; });
-    child.stdout.on("data", chunk => {
-      stdoutBytes += chunk.length;
-      if (stdoutBytes > 64 * 1024) { truncated = true; child.kill("SIGKILL"); }
-      else stdout.push(chunk);
-    });
-    child.stderr.on("data", chunk => { stderrBytes += chunk.length; if (stderrBytes > 8 * 1024) { truncated = true; child.kill("SIGKILL"); } });
-    child.stdin.on("error", () => {});
-    child.on("close", (exitCode, signal) => {
-      clearTimeout(timer);
-      let output = null;
-      if (!timedOut && !truncated && !spawnError && exitCode === 0 && signal === null) {
-        try { output = JSON.parse(Buffer.concat(stdout).toString("utf8")); } catch { /* Explicit failed probe below. */ }
-      }
-      resolveProbe({ exitCode, signal, timedOut, truncated, spawnError, output });
-    });
-    child.stdin.end(JSON.stringify({ source, exportName: suite.exportName, cases: suite.cases.map(({ id, args }) => ({ id, args })) }));
-  });
-}
+const refusal = (reason) => ({ schemaVersion: VERSION, verdict: "inconclusive",
+  checks: [{ id: "containment", passed: null, evidence: `not measured: containment unavailable (${reason}); model-written code is never run on the host.` }] });
 
-async function runProbe() {
-  const input = await readInput(), rows = [];
-  for (const test of input.cases) {
-    // A fresh context prevents one case's globals or argument mutations from
-    // influencing another. All arguments belong to the target's own VM realm.
-    const context = vm.createContext(Object.create(null), { codeGeneration: { strings: false, wasm: false } });
-    const arrayPrototype = new vm.Script("Array.prototype").runInContext(context);
-    const objectPrototype = new vm.Script("Object.prototype").runInContext(context);
-    const module = new vm.SourceTextModule(input.source, { context, identifier: "solution.mjs",
-      importModuleDynamically: () => { throw new Error("imports-not-supported"); } });
-    await module.link(() => { throw new Error("imports-not-supported"); });
-    await module.evaluate({ timeout: 250 });
-    const fn = module.namespace[input.exportName];
-    if (typeof fn !== "function") throw new Error("missing-export");
-    const args = new vm.Script(`(${JSON.stringify(test.args)})`).runInContext(context);
-    let row, value;
-    try {
-      value = fn(...args);
-    } catch (error) {
-      const name = error?.name;
-      row = { id: test.id, outcome: "threw", errorName: ["TypeError", "RangeError", "SyntaxError"].includes(name) ? name : "Error" };
-    }
-    if (!row) {
-      // Copy only ordinary dense arrays and primitive leaves. Never call target
-      // toJSON/getters or interpret a serialization failure as its TypeError.
-      // These contracts return arrays, so objects/promises are invalid output.
-      let remaining = 8192;
-      const copy = (item, depth = 0) => {
-        if (--remaining < 0 || depth > 32) throw new Error("output-bound");
-        if (typeof item === "string" || typeof item === "number" && Number.isFinite(item)) return item;
-        if (!Array.isArray(item) || Object.getPrototypeOf(item) !== arrayPrototype || item.length > 4096) throw new Error("ordinary-array-required");
-        const descriptors = Object.getOwnPropertyDescriptors(item);
-        if (Reflect.ownKeys(descriptors).length !== item.length + 1) throw new Error("custom-array-properties");
-        return Array.from({ length: item.length }, (_, index) => {
-          const descriptor = descriptors[index];
-          if (!descriptor || !Object.hasOwn(descriptor, "value")) throw new Error("sparse-or-accessor-array");
-          return copy(descriptor.value, depth + 1);
-        });
-      };
-      try { row = { id: test.id, outcome: "returned", valueJson: JSON.stringify(copy(value)) }; }
-      catch { row = { id: test.id, outcome: "invalid-output" }; }
-    }
-    // Do not use target toJSON/prototype methods to decide input immutability.
-    // Reconstruct data through own descriptors and compare with trusted input.
-    let inputBudget = 8192;
-    const inputCopy = (item, depth = 0) => {
-      if (--inputBudget < 0 || depth > 32) throw new Error("input-observation-bound");
-      if (item === null || ["string", "boolean"].includes(typeof item) || typeof item === "number" && Number.isFinite(item)) return item;
-      const array = Array.isArray(item);
-      if (!item || typeof item !== "object" || Object.getPrototypeOf(item) !== (array ? arrayPrototype : objectPrototype)) throw new Error("changed-input-type");
-      const descriptors = Object.getOwnPropertyDescriptors(item);
-      if (array) {
-        if (item.length > 4096 || Reflect.ownKeys(descriptors).length !== item.length + 1) throw new Error("changed-array-properties");
-        return Array.from({ length: item.length }, (_, index) => {
-          const descriptor = descriptors[index];
-          if (!descriptor || !Object.hasOwn(descriptor, "value")) throw new Error("changed-array-property");
-          return inputCopy(descriptor.value, depth + 1);
-        });
-      }
-      const result = {};
-      for (const key of Reflect.ownKeys(descriptors)) {
-        const descriptor = descriptors[key];
-        if (typeof key !== "string" || !Object.hasOwn(descriptor, "value") || !descriptor.enumerable) throw new Error("changed-object-property");
-        Object.defineProperty(result, key, { value: inputCopy(descriptor.value, depth + 1), enumerable: true });
-      }
-      return result;
-    };
-    try { row.mutated = !isDeepStrictEqual(inputCopy(args), test.args); }
-    catch { row.mutated = true; }
-    rows.push(row);
-  }
-  process.stdout.write(JSON.stringify({ rows }) + "\n");
-}
-
-async function runOracle() {
+/**
+ * Judges one trial. `probe(input)` returns { rows, timedOut } from the shared hardened probe; the command line passes the
+ * contained runner, and only contract tests pass the test-only seam. A ContainmentUnavailableError is a refusal.
+ */
+export async function judgeCodingTrial({ workspace, fixturePath, envelope, probe }) {
   const checks = [];
   const check = (id, passed, evidence) => checks.push({ id, passed: Boolean(passed), evidence });
-  let input, fixture, suite, snapshot;
+  const input = envelope;
+  let fixture, suite, snapshot, receipt;
   try {
-    if (process.argv.length !== 4) throw new Error("arguments");
-    input = await readInput();
-    const bytes = regularBytes(resolve(process.argv[3]), INPUT_LIMIT);
+    const bytes = regularBytes(resolve(fixturePath), INPUT_LIMIT);
     fixture = JSON.parse(bytes.toString("utf8"));
     suite = Object.hasOwn(suites, fixture?.id) ? suites[fixture.id] : null;
     check("fixture-pin", /^[a-f0-9]{64}$/.test(input?.fixtureSha256) && sha256(bytes) === input.fixtureSha256,
@@ -231,7 +136,6 @@ async function runOracle() {
       "The pinned fixture and parent task must identify one supported versioned coding task.");
     check("target-process", input?.process?.exitCode === 0 && input.process.signal === null && input.process.terminatedBy === null && input.process.treeExitProven === true,
       "The parent runner must report a successful, settled target process with no forced termination.");
-    let receipt;
     try { receipt = JSON.parse(input?.stdout); } catch { receipt = null; }
     check("adapter-identity", receipt?.schemaVersion === VERSION && receipt.kind === "local-coding" && receipt.fixtureId === fixture.id &&
       typeof input.targetId === "string" && input.targetId.length > 0 && receipt.targetId === input.targetId,
@@ -242,7 +146,7 @@ async function runOracle() {
     check("model-observation", Number.isSafeInteger(receipt?.modelRequests) && receipt.modelRequests > 0 && input?.observations?.modelExecution?.modelCalled === true,
       "A forwarded model request and completed response are required adapter observations, not an attestation of serving identity or model quality.");
     try {
-      snapshot = solutionSnapshot(process.argv[2]);
+      snapshot = solutionSnapshot(workspace);
       check("solution-file", true, `Evaluated source snapshot SHA256 ${snapshot.digest}; regular unsymlinked repo/solution.mjs, at most ${SOURCE_LIMIT} bytes.`);
     } catch {
       check("solution-file", false, "repo/solution.mjs must be a stable, bounded, valid UTF-8 regular file in an unsymlinked repository directory.");
@@ -250,15 +154,23 @@ async function runOracle() {
   } catch {
     check("oracle-input", false, "Oracle arguments, comparison envelope or pinned fixture are missing, malformed, changed or exceed their bounds.");
   }
+  // The adapter could not contain the harness (Pi): no task outcome was observed.
+  if (receipt?.containment?.status === "unavailable") return refusal(`the adapter: ${String(receipt.containment.reason ?? "").slice(0, 200)}`);
   if (suite) {
     if (checks.every(row => row.passed) && snapshot) {
-      const result = await probeSource(snapshot.source, suite, realpathSync(resolve(process.argv[2])));
-      const successful = result.exitCode === 0 && result.signal === null && !result.timedOut && !result.truncated && !result.spawnError &&
-        Array.isArray(result.output?.rows) && result.output.rows.length === suite.cases.length;
-      check("probe-execution", successful, result.timedOut ? `Solution evaluation exceeded the ${PROBE_TIMEOUT_MS}ms child deadline.` :
-        result.truncated ? "Solution evaluation exceeded the child output bound." : "A bounded Node child must load the import-free module and finish every independent case without startup, syntax or export failure.");
+      let result;
+      try {
+        result = await probe({ sources: { "solution.mjs": snapshot.source }, calls: suite.cases.map(test => ({ id: test.id, module: "solution.mjs", export: suite.exportName, args: test.args })) });
+      } catch (error) {
+        if (error instanceof ContainmentUnavailableError) return refusal(error.message);
+        throw error;
+      }
+      const rows = Array.isArray(result?.rows) ? result.rows : null, loadFailed = rows?.some(row => row?.outcome === "load-failed");
+      const successful = rows !== null && rows.length === suite.cases.length && !loadFailed;
+      check("probe-execution", successful, result?.timedOut ? "Solution evaluation exceeded the probe's deadline." :
+        loadFailed ? "The module did not load: an import, a syntax or startup error, or a missing export." : "The contained probe must load the import-free module and finish every independent case.");
       for (const [index, test] of suite.cases.entries()) {
-        const actual = successful ? result.output.rows[index] : null;
+        const actual = successful ? rows[index] : null;
         let matched = false;
         if (actual?.id === test.id && actual.mutated === false) {
           if (test.errorName) matched = actual.outcome === "threw" && actual.errorName === test.errorName;
@@ -270,21 +182,29 @@ async function runOracle() {
           actual.mutated ? "The solution mutated its input, including on a possible error path." :
           matched ? "Actual function output or required exception matched the independent fixed expectation." : "Actual function output or exception did not match the independent fixed expectation.");
       }
-      try { check("source-unchanged", solutionSnapshot(process.argv[2]).digest === snapshot.digest, "The evaluated source bytes and repository boundary must remain unchanged after the probe."); }
+      try { check("source-unchanged", solutionSnapshot(workspace).digest === snapshot.digest, "The evaluated source bytes and repository boundary must remain unchanged after the probe."); }
       catch { check("source-unchanged", false, "The source or its repository boundary changed during evaluation."); }
     } else {
       for (const test of suite.cases) check(`case-${test.id}`, false, "Planned case was not run because prerequisite evidence or the solution file was invalid.");
     }
   }
-  process.stdout.write(JSON.stringify({ schemaVersion: VERSION, verdict: checks.every(row => row.passed) ? "pass" : "fail", checks }) + "\n");
+  return { schemaVersion: VERSION, verdict: checks.every(row => row.passed) ? "pass" : "fail", checks };
 }
 
-// Run only when executed; the P1-47 pilot imports `suites` without running anything.
-const executed = process.argv[1] !== undefined && import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
-if (executed && process.argv[2] === "--probe") {
-  runProbe().catch(() => { process.stderr.write("Solution probe failed during module loading or observation.\n"); process.exitCode = 1; });
-} else if (executed) {
-  runOracle().catch(() => {
+async function main() {
+  let input = null;
+  try { input = await readInput(); } catch { input = null; }
+  const [workspace, fixture, containmentPath] = process.argv.slice(2);
+  let containment;
+  try { containment = containmentPath ? JSON.parse(regularBytes(resolve(containmentPath), 64 * 1024).toString("utf8")).docker : undefined; } catch { containment = undefined; }
+  const result = await judgeCodingTrial({ workspace: workspace ?? "", fixturePath: fixture ?? "", envelope: input,
+    probe: (probeInput) => runContainedProbeDetailed(containment, probeInput, { timeoutMs: PROBE_TIMEOUT_MS }) });
+  process.stdout.write(JSON.stringify(result) + "\n");
+}
+
+// Run only when executed; tests and the P1-47 pilot import without running anything.
+if (process.argv[1] !== undefined && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  main().catch(() => {
     process.stdout.write(JSON.stringify({ schemaVersion: VERSION, verdict: "fail", checks: [{ id: "oracle-error", passed: false, evidence: "The coding oracle could not complete; no successful behavior is inferred." }] }) + "\n");
   });
 }

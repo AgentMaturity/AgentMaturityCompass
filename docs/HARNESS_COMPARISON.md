@@ -308,8 +308,12 @@ this runner.
 The [three-harness coding workflow](../examples/harness-comparison/codingREADME.md)
 materializes real installed AMC, DSH and Pi bindings, shared repository repair
 tasks and a target-neutral module-output oracle. AMC executes natively; comparator
-packages are optional study inputs. Materialization and scripted protocol checks
-do not establish real-model performance.
+packages are optional study inputs. The oracle evaluates the model-written module
+only in a pinned container (no network, read-only, the nobody user, no mounts)
+and Pi runs only in a container. Without a container runtime both refuse ("not
+measured: containment unavailable") and never run on the host; the reviewed
+configuration's `containment` block names the runtime and image. Materialization
+and scripted protocol checks do not establish real-model performance.
 
 Keyless conformance scenarios cover success, refusal, injection, redaction,
 budget exhaustion, cancellation, crash recovery, tool-error attribution, resume,
