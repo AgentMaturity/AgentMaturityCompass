@@ -9224,6 +9224,10 @@ paths:
       responses:
         '201':
           description: Confirmation completed with safe proof
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
         '200':
           description: Confirmation blocked by policy or scope gate
           content:
@@ -17149,3 +17153,733 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
   # END GENERATED A4 PATHS
+  # BEGIN GENERATED RESULT ROUTE PATHS
+  /v1/score/evidence-drilldown/{runId}/{questionId}:
+    get:
+      summary: GET /api/v1/score/evidence-drilldown/:runId/:questionId
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/industry/adjust:
+    post:
+      summary: POST /api/v1/score/industry/adjust
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/industry/models:
+    get:
+      summary: GET /api/v1/score/industry/models
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/industry/model/{industryId}:
+    get:
+      summary: GET /api/v1/score/industry/model/:industryId
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      parameters:
+        - name: industryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/lane/safety-research:
+    post:
+      summary: POST /api/v1/score/lane/safety-research
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/judge-calibration:
+    post:
+      summary: POST /api/v1/score/judge-calibration
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/live-drift:
+    post:
+      summary: POST /api/v1/score/live-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/provider-drift:
+    post:
+      summary: POST /api/v1/score/provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/promptfoo-provider-drift:
+    post:
+      summary: POST /api/v1/score/promptfoo-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/inspect-provider-drift:
+    post:
+      summary: POST /api/v1/score/inspect-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/tensorzero-provider-drift:
+    post:
+      summary: POST /api/v1/score/tensorzero-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/helm-provider-drift:
+    post:
+      summary: POST /api/v1/score/helm-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/patronus-provider-drift:
+    post:
+      summary: POST /api/v1/score/patronus-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/trust/verify-claim:
+    post:
+      summary: POST /api/v1/score/trust/verify-claim
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/trust/transitive:
+    post:
+      summary: POST /api/v1/score/trust/transitive
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/trust/decay:
+    post:
+      summary: POST /api/v1/score/trust/decay
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/trust/inherited:
+    post:
+      summary: POST /api/v1/score/trust/inherited
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/passport/trust-token/verify:
+    post:
+      summary: POST /api/v1/passport/trust-token/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/passport/trust-token/translate:
+    post:
+      summary: POST /api/v1/passport/trust-token/translate
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/badge/export:
+    post:
+      summary: POST /api/v1/badge/export
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/bundle/verify:
+    post:
+      summary: POST /api/v1/bundle/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/bundle/inspect:
+    post:
+      summary: POST /api/v1/bundle/inspect
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/bundle/diff:
+    post:
+      summary: POST /api/v1/bundle/diff
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/bundle/export:
+    post:
+      summary: POST /api/v1/bundle/export
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/bom/verify:
+    post:
+      summary: POST /api/v1/bom/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/enforce/formal/certificate:
+    post:
+      summary: POST /api/v1/enforce/formal/certificate
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/enforce/formal/verify:
+    post:
+      summary: POST /api/v1/enforce/formal/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance:
+    post:
+      summary: POST /api/v1/assurance
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+    get:
+      summary: GET /api/v1/assurance
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      runs:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            claim:
+                              $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/{runId}:
+    get:
+      summary: GET /api/v1/assurance/:runId
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/history:
+    get:
+      summary: GET /api/v1/assurance/history
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      runs:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            claim:
+                              $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/verify:
+    post:
+      summary: POST /api/v1/assurance/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/workspace/verify:
+    get:
+      summary: GET /api/v1/assurance/workspace/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/lab/{packName}:
+    post:
+      summary: POST /api/v1/assurance/lab/:packName
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      parameters:
+        - name: packName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/cert:
+    post:
+      summary: POST /api/v1/assurance/cert
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/cert/latest:
+    get:
+      summary: GET /api/v1/assurance/cert/latest
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/cert/verify:
+    post:
+      summary: POST /api/v1/assurance/cert/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/benchmarks/verify:
+    post:
+      summary: POST /api/v1/benchmarks/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/benchmarks/provider-drift:
+    post:
+      summary: POST /api/v1/benchmarks/provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/benchmarks/promptfoo-provider-drift:
+    post:
+      summary: POST /api/v1/benchmarks/promptfoo-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/benchmarks/inspect-provider-drift:
+    post:
+      summary: POST /api/v1/benchmarks/inspect-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/benchmarks/tensorzero-provider-drift:
+    post:
+      summary: POST /api/v1/benchmarks/tensorzero-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/benchmarks/helm-provider-drift:
+    post:
+      summary: POST /api/v1/benchmarks/helm-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/red-team/run:
+    post:
+      summary: POST /api/v1/shield/red-team/run
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/trust-pipeline/run:
+    post:
+      summary: POST /api/v1/shield/trust-pipeline/run
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/replay-corpus/verify:
+    post:
+      summary: POST /api/v1/shield/replay-corpus/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/live-drift/verify:
+    post:
+      summary: POST /api/v1/shield/live-drift/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/judge-calibration/verify:
+    post:
+      summary: POST /api/v1/shield/judge-calibration/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/provider-drift/verify:
+    post:
+      summary: POST /api/v1/shield/provider-drift/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/promptfoo-provider-drift/verify:
+    post:
+      summary: POST /api/v1/shield/promptfoo-provider-drift/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/inspect-provider-drift/verify:
+    post:
+      summary: POST /api/v1/shield/inspect-provider-drift/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/tensorzero-provider-drift/verify:
+    post:
+      summary: POST /api/v1/shield/tensorzero-provider-drift/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/helm-provider-drift/verify:
+    post:
+      summary: POST /api/v1/shield/helm-provider-drift/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/patronus-provider-drift/verify:
+    post:
+      summary: POST /api/v1/shield/patronus-provider-drift/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/compliance/regulatory/check:
+    post:
+      summary: POST /api/v1/compliance/regulatory/check
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/incidents/{id}/clocks:
+    get:
+      summary: GET /api/v1/incidents/:id/clocks
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  # END GENERATED RESULT ROUTE PATHS
