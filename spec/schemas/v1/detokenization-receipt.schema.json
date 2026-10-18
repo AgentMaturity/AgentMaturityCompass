@@ -1,0 +1,71 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/detokenization-receipt.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "contractReferences": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "dataClasses": {
+      "items": {
+        "enum": [
+          "phi",
+          "pii",
+          "card_number",
+          "bank_account",
+          "credential"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "destinationId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "executionId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "processorId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "purposeId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "registryDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "amc.detokenization-receipt/v1",
+      "type": "string"
+    },
+    "tokenCount": {
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema",
+    "executionId",
+    "processorId",
+    "contractReferences",
+    "purposeId",
+    "destinationId",
+    "dataClasses",
+    "tokenCount",
+    "registryDigest"
+  ],
+  "title": "AMC Detokenization Receipt",
+  "type": "object"
+}

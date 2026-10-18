@@ -155,6 +155,23 @@ maturity evidence. Rules the schema cannot express:
 - `findings` are heuristic detections and declared-field matches. They do not show that nothing was missed, and a
   token in the redacted text is a pseudonym, not de-identified or anonymized data.
 
+## detokenization-receipt
+
+Emitted in workspaces that opted in to protected-data redaction (P2-02): the `receipt` member of one
+`PROTECTED_DATA_DETOKENIZED` ops audit row, written by the detokenization gate when a sending tool body (`http.fetch`,
+native MCP over HTTP) restores tokens. It is local enforcement bookkeeping and is never maturity evidence. Rules the
+schema cannot express:
+
+- It is written before the send. It records a release, not a delivery; the action journal records the outcome.
+- `executionId` names the execution of a journaled or bound call: restoration requires a bound authorization record.
+- `registryDigest` is the SHA-256 of the signed `.amc/dataflow/processors.yaml` bytes that decided the release, and
+  `purposeId` is that registry's `runPurpose` and the bound record's `resource.purpose`.
+- `destinationId` is the P2-01 destination the egress check matched, and the processor lists it in `destinationIds`.
+- `contractReferences` lists every in-force contract of that processor covering a released class (for `phi`, BAAs
+  only). They are operator declarations: neither the receipt nor its signature shows that a contract exists, is in
+  force or is legally sufficient.
+- It never holds a value, a token, a URL or a hash of one. `tokenCount` counts distinct tokens restored.
+
 ## control-result
 
 Contract only: P1-11 emits it. The schema already refuses `pass` unless applicability is `applicable` and evidence is

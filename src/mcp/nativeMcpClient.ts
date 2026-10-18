@@ -9,10 +9,11 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { AjvJsonSchemaValidator } from "@modelcontextprotocol/sdk/validation/ajv";
 import type { AgentToolset } from "../agent/agentToolset.js";
+import { detokenize, DetokenizeRefused } from "../dataflow/detokenizeGate.js";
 import type { ActionClass } from "../types.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
-import { NativeMcpHttpTransport, NativeMcpHttpRefused, type NativeMcpHttpServer } from "./nativeMcpHttpTransport.js";
+import { NativeMcpHttpTransport, NativeMcpHttpRefused, nativeMcpHttpEndpoint, type NativeMcpHttpServer } from "./nativeMcpHttpTransport.js";
 import { NATIVE_MCP_RECONNECT_LIMITS } from "./nativeMcpReconnect.js";
 import {
   MCP_CLIENT_INFO, MCP_LEGACY_PROTOCOL_VERSIONS, MCP_STATELESS_PROTOCOL_VERSION, NativeMcpProtocolRefused,
@@ -346,8 +347,12 @@ export async function mountNativeMcpServer(options: {
             // listTools() resets the SDK output-validator cache for EACH page.
             // Accept only AMC's pinned per-tool schema, independently of that
             // mutable cache and before redaction changes returned values.
+            // P2-02: the last step before sending. Stdio has no destination, so arguments carrying tokens are refused.
+            const sent = detokenize({ ...execution.arguments }, { execution, strictText: false,
+              destination: server.transport === "streamable-http"
+                ? { channel: "mcp-http", url: nativeMcpHttpEndpoint(server.url, server.origin).href } : null });
             callStarted = true;
-            const result = await client.request(rpc("tools/call", requestParams(protocol, { name: remote.name, arguments: { ...execution.arguments } })), CallToolResultSchema, { timeout, signal });
+            const result = await client.request(rpc("tools/call", requestParams(protocol, { name: remote.name, arguments: sent.value })), CallToolResultSchema, { timeout, signal });
             responseReceived = true;
             if (!active || signal?.aborted) throw new Error("MCP grant was disposed while receiving the response");
             // basic/patterns/mrtr: AMC declares no sampling, roots or elicitation capability, so it cannot answer.
@@ -358,9 +363,11 @@ export async function mountNativeMcpServer(options: {
               if (result.structuredContent === undefined && result.isError !== true) throw new Error("MCP structured output is missing");
               if (result.structuredContent !== undefined && !validateOutput(result.structuredContent).valid) throw new Error("MCP structured output does not match the reviewed schema");
             }
-            const output = JSON.stringify(scrubResult(result, secrets, 0, transport));
+            const output = sent.retokenize(JSON.stringify(scrubResult(result, secrets, 0, transport)));
             return { ok: result.isError !== true, output, bytes: Buffer.byteLength(output), exitCode: result.isError === true ? 1 : 0 };
           } catch (error) {
+            // Nothing was sent: the mount stays open and the call is a definite failure.
+            if (error instanceof DetokenizeRefused) throw error;
             await close().catch(() => {});
             const notDispatched = error instanceof NativeMcpHttpRefused && (error.code === "NOT_DISPATCHED" || error.code === "CLOSED");
             const uncertainty = responseReceived
