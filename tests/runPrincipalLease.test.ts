@@ -17,8 +17,9 @@ import type { AcpForkSessionFactory, AcpForkSessionParams } from "../src/acp/acp
 import { startAcpStdio } from "../src/acp/acpStdioMain.js";
 import { checkLease } from "../src/actions/authorize.js";
 import { openAgentSession, resumeAgentSession, type AgentSessionInit } from "../src/agent/agentSession.js";
-import { agentToolset } from "../src/agent/agentToolset.js";
-import { delegateTool } from "../src/agent/delegateTool.js";
+import { rootIdentity } from "../src/agent/delegationIdentity.js";
+import { createDriverRunner } from "../src/agent/subagentRunner.js";
+import { spawnSubagent } from "../src/agent/subagentSpawn.js";
 import type { AgentRunSummary } from "../src/agent/runReport.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderRoute, stubProviderTransport } from "../src/agent/stubProvider.js";
 import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
@@ -31,7 +32,7 @@ import { compilePlan, parseDeploymentProfile } from "../src/catalog/compiler/com
 import { signPlan } from "../src/catalog/compiler/sign.js";
 import { registerAgentCommands } from "../src/cli-agent-commands.js";
 import { registerNativeScheduleCommands } from "../src/cli-native-schedule-commands.js";
-import { runComposedTurn, type ComposedToolSession } from "../src/kernel/agentLoopRunner.js";
+import { runComposedTurn } from "../src/kernel/agentLoopRunner.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { issueLeaseForPrincipal, LeasePrincipalRefused } from "../src/leases/leasePrincipal.js";
 import { issueLeaseToken } from "../src/leases/leaseSigner.js";
@@ -43,7 +44,7 @@ import { initDestinationRegistry } from "../src/residency/destinationRegistry.js
 import { readEventPayload } from "../src/session/eventPayload.js";
 import { readNativeSessionEvents } from "../src/session/readNativeSessionEvents.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
-import { initToolsConfig, loadToolsConfig, loadVerifiedToolsConfigSnapshot } from "../src/toolhub/toolhubValidators.js";
+import { loadVerifiedToolsConfigSnapshot } from "../src/toolhub/toolhubValidators.js";
 import { initWorkspace } from "../src/workspace.js";
 import { catalog } from "./catalog/l0/harness.js";
 import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTransport, textStep, toolStep, type ScriptedStream } from "./helpers/agentLoopHarness.js";
@@ -222,13 +223,6 @@ function agentSessionInit(steps: readonly ScriptedStream[]): AgentSessionInit {
     makeLlm: (session) => new LlmRuntime({ session, registry, credentials: new FixedCredentials(), transport: silentTransport }) };
 }
 
-/** The operator half of the two-party delegation grant: a signed allowlist naming `delegate`. */
-function permitDelegate(): void {
-  const config = loadToolsConfig(workspace);
-  initToolsConfig(workspace, { ...config, tools: { ...config.tools,
-    allowedTools: [...config.tools.allowedTools, { name: "delegate", actionClass: "READ_ONLY" }] } });
-}
-
 /** One due signed schedule whose single round asks the stub for one fs.write, and the digests a pass pins. */
 function signWriteSchedule(): { readonly schedules: string; readonly tools: string } {
   const goal = JSON.stringify({ tool: "fs.write", arguments: { path: "workspace/output/scheduled.txt", content: "scheduled" } });
@@ -314,45 +308,42 @@ describe("ACP session/fork under an activated identity-binding plan (P1-79)", ()
 });
 
 describe("in-process delegated children under an activated identity-binding plan (P1-79)", () => {
-  it("a child and a grandchild bind the run's lease: the OS user's principal, its lease id and the delegation scope", async () => {
-    permitDelegate();
+  // Under an activated plan the compiled visible tools come from the default tools config, which has no `delegate`, so a
+  // root turn's delegate call is refused (toolPipeline.visibleTools) before any child exists. The child is spawned through
+  // the driver runner directly, as the delegate tool does once the call is permitted.
+  it("a child spawned with the run's lease binds the OS user's principal, that lease id and the delegation scope; without it, the child is denied", async () => {
     const ownerId = activatePlan(OS_USER);
     // The lease `amc agent-loop run` mints once and hands to both its toolset and the kernel.
-    const lease = runLease({ workspace, agentId: "default", model: LOOP_MODEL, tools: "workspace" });
+    const { leaseToken } = runLease({ workspace, agentId: "default", model: LOOP_MODEL, tools: "workspace" });
     expect(minted, "one lease for the run").toHaveBeenCalledTimes(1);
     const leaseId = minted.mock.results[0]!.value.payload.leaseId;
-    let writer: ComposedToolSession | undefined;
-    const tools = agentToolset({ workspace, agentId: "default", sessionId: "lease-root", ...lease,
-      recorder: { recordProjectedEvidence: (row) => writer!.recordProjectedEvidence(row) } });
-    try {
-      await runComposedTurn({ workspace, agentId: "default", sessionId: "lease-root", prompt: "Delegate the read.", ...lease,
-        systemPrompt: "Use only approved tools.", tools: tools.seam, bindToolSession: (selected) => { writer = selected; },
-        route: FIXTURE_ROUTE, transport: silentTransport,
-        routes: [fixtureRoute([
-          toolStep("root_delegate", "delegate", JSON.stringify({ runAs: "child", goal: "Read the note, then delegate." })),
-          toolStep("child_read", "fs.read", READ_ARGS),
-          toolStep("child_delegate", "delegate", JSON.stringify({ runAs: "grandchild", goal: "Read the note." })),
-          toolStep("grandchild_read", "fs.read", READ_ARGS),
-          textStep("grandchild done"), textStep("child done"), textStep("root done")])],
-        config: { maxStepsPerTurn: 4, maxParallelToolCalls: 1 },
-        credentials: { homeDir: home, env: {}, watch: false, projectDir: null },
-        delegation: { maxDepth: 2, scope: ["READ_ONLY"], grant: (capability) => { tools.registry.define(delegateTool(capability)); } } });
-    } finally { tools.close(); }
-    const children = ledgerState().events.filter((row) => row.event_type === "agent_delegation_started")
-      .map((row) => JSON.parse(row.meta_json) as { depth: number; childSessionId: string });
-    expect(children.map((child) => child.depth).sort()).toEqual([1, 2]);
-    expect(minted, "children mint nothing: they inherit").toHaveBeenCalledTimes(1);
-    for (const { childSessionId } of children) {
-      const { allowed, denied, records } = governed(childSessionId);
-      expect(denied, "no child call was denied").toEqual([]);
-      expect(allowed, "the child's fs.read ran").toBeGreaterThan(0);
-      expect(records.length).toBeGreaterThan(0);
-      for (const record of records) {
-        expect(record.principal).toEqual({ principalId: ownerId, kind: "human", authenticatedVia: "lease" });
-        expect(record.delegation.leaseId).toBe(leaseId);
-        expect(record.delegation.allowedActionClasses).toEqual(["READ_ONLY"]);
-      }
+    const { makeLlm } = agentSessionInit([toolStep("child_read", "fs.read", READ_ARGS), textStep("child done"),
+      toolStep("bare_read", "fs.read", READ_ARGS), textStep("bare done")]);
+    const recorder = { recordLoopEvent: () => undefined, recordProjectedEvidence: () => undefined };
+    const spawn = async (inherit: boolean) => {
+      const runner = createDriverRunner({ workspace, makeLlm, route: FIXTURE_ROUTE, systemPrompt: "Use only approved tools.",
+        harnessVersion: "fixture", compositionDigest: "fixture", policyDigest: "fixture", ...(inherit ? { leaseToken } : {}) });
+      const childSessionId = randomUUID();
+      const outcome = await spawnSubagent({ workspace, parent: rootIdentity("default"), session: recorder, runner,
+        request: { runAs: inherit ? "child" : "bare", goal: READ, delegationScope: ["READ_ONLY"] }, mintSessionId: () => childSessionId });
+      return { outcome, ...governed(childSessionId) };
+    };
+
+    const child = await spawn(true);
+    expect(child.outcome.ok, JSON.stringify(child.outcome)).toBe(true);
+    expect(minted, "the child mints nothing: it inherits").toHaveBeenCalledTimes(1);
+    expect(child.denied, "no child call was denied").toEqual([]);
+    expect(child.allowed, "the child's fs.read ran").toBeGreaterThan(0);
+    expect(child.records.length).toBeGreaterThan(0);
+    for (const record of child.records) {
+      expect(record.principal).toEqual({ principalId: ownerId, kind: "human", authenticatedVia: "lease" });
+      expect(record.delegation.leaseId).toBe(leaseId);
+      expect(record.delegation.allowedActionClasses).toEqual(["READ_ONLY"]);
     }
+
+    const bare = await spawn(false);
+    expect(bare.allowed, "a child without the run's lease runs nothing").toBe(0);
+    expect(bare.denied.length, "its call is denied under L0-IDN-01").toBeGreaterThan(0);
   });
 
   it("runComposedTurn refuses in-process delegation without a lease, before any session row or lease", async () => {
