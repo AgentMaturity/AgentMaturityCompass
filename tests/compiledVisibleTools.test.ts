@@ -1,10 +1,11 @@
-import { readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import YAML from "yaml";
 import { describe, expect, it, vi } from "vitest";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
-import type { SubagentRunContext } from "../src/agent/subagentSpawn.js";
+import { createDriverRunner } from "../src/agent/subagentRunner.js";
+import type { SubagentRunContext, SubagentRunner } from "../src/agent/subagentSpawn.js";
 import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { initUsersConfig } from "../src/auth/authApi.js";
@@ -16,12 +17,19 @@ import type { MergedParameter } from "../src/catalog/compiler/merge.js";
 import { buildRuntimePolicy } from "../src/catalog/compiler/runtimePolicy.js";
 import { planWeakenings } from "../src/catalog/compiler/sign.js";
 import { issueLeaseToken } from "../src/leases/leaseSigner.js";
+import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
+import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
+import { ANTHROPIC_CAPABILITIES } from "../src/llm/adapter/providerCapabilities.js";
+import { initDestinationRegistry } from "../src/residency/destinationRegistry.js";
+import { readEventPayload } from "../src/session/eventPayload.js";
+import { readNativeSessionEvents } from "../src/session/readNativeSessionEvents.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { signToolsConfig, toolsConfigPath, toolsConfigSigPath } from "../src/toolhub/toolhubValidators.js";
 import { defaultToolsConfig, type ToolsConfig } from "../src/toolhub/toolsSchema.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { catalog } from "./catalog/l0/harness.js";
 import { newWorkspace } from "./catalog/l0/workspaces.js";
+import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTransport, textStep, toolStep } from "./helpers/agentLoopHarness.js";
 
 /**
  * P1-10F: the compiled `toolPipeline.visibleTools` are the tools the workspace's VERIFIED signed tools.yaml allows,
@@ -82,21 +90,65 @@ function ownerLease(ws: string): { token: string; leaseId: string; ownerId: stri
   return { token: lease.token, leaseId: lease.payload.leaseId, ownerId: owner.userId };
 }
 
-/** A native toolset under the active plan with the delegation capability composed in and a runner that records each child. */
-function compose(ws: string, leaseToken: string) {
+type GovernedRecord = { principal: Record<string, string>; delegation: { leaseId: string | null } };
+
+/**
+ * The real child runner (P1-79's createDriverRunner) with the run's lease, over the scripted fixture provider: the child
+ * reads workspace/n.txt once and answers. A plan's sessions store and call providers only at signed destinations
+ * (P2-01), so the fixture's storage and provider hosts are registered.
+ */
+function driverRunner(ws: string, leaseToken: string): SubagentRunner {
+  const us = { jurisdiction: "US", code: "us-fixture" };
+  initDestinationRegistry(ws, { schemaVersion: "amc.residency-destinations/v1",
+    profile: { path: "deployment-profile.json", storageUrl: "https://storage.example.test/amc" },
+    destinations: [
+      { destinationId: "fixture-storage", match: { hosts: ["storage.example.test"] }, channels: ["storage"], region: us, transferBasis: null },
+      { destinationId: "fixture-provider", match: { hosts: ["fixture.invalid"] }, channels: ["provider"], region: us, transferBasis: null }],
+    rules: [{ ruleId: "fixture-us", controlId: "L0-DAT-04", appliesTo: { dataClasses: ["customer_financial"], jurisdictions: ["US"] },
+      allowedJurisdictions: ["US"], acceptsTransferBasis: false }] });
+  mkdirSync(join(ws, "workspace"), { recursive: true });
+  writeFileSync(join(ws, "workspace", "n.txt"), "fixture");
+  const registry = new AdapterRegistry();
+  registry.register({ providerId: LOOP_PROVIDER, baseUrl: "https://fixture.invalid", credentialRef: null, models: [LOOP_MODEL],
+    adapter: { ...scriptedAdapter([toolStep("child_read", "fs.read", JSON.stringify({ path: "workspace/n.txt" })), textStep("child done")]),
+      capabilities: ANTHROPIC_CAPABILITIES } });
+  return createDriverRunner({ workspace: ws, route: { providerId: LOOP_PROVIDER, model: LOOP_MODEL, params: { max_tokens: 256 } },
+    makeLlm: (session) => new LlmRuntime({ session, registry, credentials: new FixedCredentials(), transport: silentTransport }),
+    systemPrompt: "Use only approved tools.", harnessVersion: "fixture", compositionDigest: "fixture", policyDigest: "fixture", leaseToken });
+}
+
+/** What a child session's governed calls committed: allowed calls, denials and authorization records. */
+function childCalls(ws: string, sessionId: string) {
+  const rows = readNativeSessionEvents(ws, sessionId).map((row) => {
+    const payload = readEventPayload(ws, row);
+    return { meta: JSON.parse(row.meta_json) as Record<string, unknown>, payload: payload.status === "ok" ? payload.bytes.toString("utf8") : null };
+  });
+  return {
+    allowed: rows.filter((row) => row.meta.auditType === "TOOL_CALL_ALLOWED").length,
+    denied: rows.filter((row) => row.meta.auditType === "TOOL_CALL_DENIED").map((row) => row.payload),
+    records: rows.filter((row) => row.meta.auditType === "AUTHORIZATION_RECORD").map((row) => (JSON.parse(row.payload!) as { record: GovernedRecord }).record)
+  };
+}
+
+/**
+ * A native toolset under the active plan with the delegation capability composed in. The default runner records each
+ * child without running it.
+ */
+function compose(ws: string, leaseToken: string, runner?: SubagentRunner) {
   const children: SubagentRunContext[] = [];
   const rows: Array<{ payload: string; meta: Record<string, unknown> }> = [];
   const toolset = agentToolset({ workspace: ws, agentId: "default", sessionId: SESSION, leaseToken,
     recorder: { recordProjectedEvidence: (row) => { rows.push(row as (typeof rows)[number]); return null; } },
     subagents: { identity: rootIdentity("default"), session: { recordLoopEvent: () => null, recordProjectedEvidence: () => null },
-      runner: async (ctx) => { children.push(ctx); return { ok: true, text: "the delegate's answer" }; } } });
+      mintSessionId: () => `p1-10f-child-${children.length + 1}`,
+      runner: async (ctx) => { children.push(ctx); return runner ? runner(ctx) : { ok: true, text: "the delegate's answer" }; } } });
   let n = 0;
   const call = async (toolName: string, args: Record<string, unknown>) => JSON.stringify(await toolset.seam.execute({
     callId: `p1-10f-${(n += 1)}`, toolName, rawArguments: JSON.stringify(args), sessionId: SESSION, turn: 1, step: n, parentToken: null,
     dispatch: "native", signal: new AbortController().signal }));
   const offered = () => (toolset.seam.schemas() ?? []).map((schema) => schema.name);
   const records = () => rows.filter((row) => row.meta.auditType === "AUTHORIZATION_RECORD")
-    .map((row) => (JSON.parse(row.payload) as { record: { principal: Record<string, string>; delegation: { leaseId: string | null } } }).record);
+    .map((row) => (JSON.parse(row.payload) as { record: GovernedRecord }).record);
   return { toolset, children, call, offered, records };
 }
 
@@ -181,23 +233,24 @@ describe("amc catalog compile reads tools.yaml only when it verifies (compileCat
 });
 
 describe("delegate under an activated plan (P1-10F)", () => {
-  // The runner records the child without composing its toolset: a child's own calls reusing the run lease are
-  // src/agent/subagentRunner.ts's (the 442cd919 follow-up to P1-79), not this item's.
-  it("allowed in the signed tools.yaml: offered, and the delegate call runs under the run's lease", async () => {
+  it("allowed in the signed tools.yaml: offered, and the delegate call and its child's call run under the run's lease", async () => {
     const ws = governedWorkspace();
     signTools(ws, ["delegate"]);
     activate(ws);
     const lease = ownerLease(ws);
-    const run = compose(ws, lease.token);
+    const run = compose(ws, lease.token, driverRunner(ws, lease.token));
     try {
       expect(run.offered()).toContain("delegate");
       const text = await run.call("delegate", DELEGATE);
       expect(text).toContain('"outcome":"OK"');
-      expect(run.children, "the child ran").toHaveLength(1);
-      const records = run.records();
-      expect(records.length, "the delegate call was bound to an authorization record").toBeGreaterThan(0);
-      for (const record of records) {
-        expect(record.delegation.leaseId).toBe(lease.leaseId);
+      expect(run.children, "one child").toHaveLength(1);
+      const child = childCalls(ws, run.children[0]!.childSessionId);
+      expect(child.denied, "no child call was denied").toEqual([]);
+      expect(child.allowed, "the child's fs.read ran").toBeGreaterThan(0);
+      expect(run.records().length, "the delegate call was bound to an authorization record").toBeGreaterThan(0);
+      expect(child.records.length, "so was the child's call").toBeGreaterThan(0);
+      for (const record of [...run.records(), ...child.records]) {
+        expect(record.delegation.leaseId, "the run's lease, reused by the child").toBe(lease.leaseId);
         expect(record.principal).toEqual({ principalId: lease.ownerId, kind: "human", authenticatedVia: "lease" });
       }
     } finally { run.toolset.close(); }
