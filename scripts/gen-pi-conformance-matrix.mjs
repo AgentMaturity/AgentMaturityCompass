@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * Renders the Pi conformance matrix in docs/adapters/pi.md from the P1-22 qualification record
- * (qualification/2026-10-12-P1-22/pi-conformance.json, hashed by that folder's receipt.json).
+ * Renders the Pi conformance matrix in docs/adapters/pi.md from the latest P1-22 qualification record
+ * (qualification/2026-10-18-P1-22/pi-conformance.json, hashed by that folder's receipt.json).
  * --write rewrites the section between the markers; --check fails when it differs from the record.
  */
 import { readFileSync, writeFileSync } from "node:fs";
 
-const RECEIPT = "qualification/2026-10-12-P1-22/pi-conformance.json";
+const RECEIPT = "qualification/2026-10-18-P1-22/pi-conformance.json";
 const DOC = "docs/adapters/pi.md";
 const START = "<!-- pi-conformance-matrix:start -->";
 const END = "<!-- pi-conformance-matrix:end -->";
@@ -14,6 +14,8 @@ const END = "<!-- pi-conformance-matrix:end -->";
 const yesNo = (value) => (value ? "yes" : "no");
 const ROWS = [
   ["Allowed `read` runs; recorded Pi version", (c) => `${yesNo(c.allowedRead?.ranTool)}; ${c.allowedRead?.piVersion ?? "none"}`],
+  ["Allowed `read` outcome recorded, bound to its decision", (c) => yesNo(c.allowedRead?.outcomeBound)],
+  ["Writer fault on an outcome: next call ran; ran after owner recovery", (c) => `${yesNo(c.auditLatch?.nextCallRan)}; ${yesNo(c.auditLatch?.ranAfterRecovery)}`],
   ["Session registered before its first call; claim", (c) => `${yesNo(c.allowedRead?.sessionRegistered)}; ${c.allowedRead?.claim ?? "none"}`],
   ["`write` needing approval: file created", (c) => yesNo(c.deniedWrite?.fileCreated)],
   ["Denied `bash`: effect", (c) => yesNo(c.deniedBash?.fileCreated)],

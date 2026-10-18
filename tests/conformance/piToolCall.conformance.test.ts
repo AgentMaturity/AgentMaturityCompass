@@ -16,6 +16,7 @@ import { getHookIntegrationStatus, installHookIntegration } from "../../src/adap
 import { createAmcPiExtension, type PiExtensionApi, type PiToolCallContext } from "../../src/adapters/pi/amcPiExtension.js";
 import { QUALIFIED_PI_VERSIONS } from "../../src/adapters/pi/piVersions.js";
 import { startBridgeServer } from "../../src/bridge/bridgeServer.js";
+import { recoverHookAuditLatch } from "../../src/bridge/hookAuditLatch.js";
 import { piGovernance } from "../../src/bridge/piSessionRegistry.js";
 import { getPurposeKeyHistory } from "../../src/keys/signingKeys.js";
 import { openLedger, verifyEvidenceEventIntegrity } from "../../src/ledger/ledger.js";
@@ -136,7 +137,8 @@ describe.runIf(enabled)("Pi tool_call conformance (P1-22)", () => {
         const port = await freePort();
         bridgeBase = `http://127.0.0.1:${port}`;
         bridge = await startBridgeServer({ workspace, host: "127.0.0.1", port, gatewayBaseUrl: "http://127.0.0.1:1" });
-        installHookIntegration({ workspace, provider: "pi", agentId, bridgeBase, mode: "control",
+        // The latency case sends 100 calls in a burst on top of the other runs: room above the default 120 a minute per route.
+        installHookIntegration({ workspace, provider: "pi", agentId, bridgeBase, mode: "control", rpm: 600,
           piPackageDir: join(prefix, "node_modules", "@earendil-works", "pi-coding-agent") });
       }, 120_000);
 
@@ -192,7 +194,29 @@ describe.runIf(enabled)("Pi tool_call conformance (P1-22)", () => {
         expect(result).toContain("public fixture");
         expect(decision).toMatchObject({ decision: "allow", piVersion: version });
         const lifecycle = inspectHookActionLifecycle({ workspace, agentId, actionId: decision!.actionId as string });
-        expect(lifecycle).toMatchObject({ status: "completed", valid: true });
+        // Pi's tool_result reached the control route too, bound to this decision, with the input AMC authorized.
+        cases.allowedRead = { ...(cases.allowedRead as object), outcomeBound: lifecycle.authorizationMismatch === false && !lifecycle.observationConflict };
+        expect(lifecycle).toMatchObject({ status: "completed", valid: true, authorizationMismatch: false, observationConflict: false });
+      });
+
+      test("a writer fault while recording an outcome latches the workspace: the next call is blocked until the owner recovers (P1-22 follow-up)", async () => {
+        const path = join(workspace, "workspace", "public.txt");
+        const ledger = openLedger(workspace);
+        // AMC's writer fails on the outcome row only, as a full disk would at that moment.
+        ledger.db.exec("CREATE TRIGGER conformance_failing_writer BEFORE INSERT ON evidence_events WHEN NEW.id LIKE 'pipost_%' BEGIN SELECT RAISE(ABORT, 'simulated write failure'); END");
+        ledger.close();
+        const faulted = await runPi([{ tool: "read", args: { path }, id: "call_read_faulted" }, { text: "done" }]);
+        const repair = openLedger(workspace);
+        repair.db.exec("DROP TRIGGER conformance_failing_writer");
+        repair.close();
+        const latched = await runPi([{ tool: "read", args: { path }, id: "call_read_latched" }, { text: "done" }]);
+        const recovered = recoverHookAuditLatch({ workspace, passphrase: process.env.AMC_VAULT_PASSPHRASE }).recovered;
+        const after = await runPi([{ tool: "read", args: { path }, id: "call_read_recovered" }, { text: "done" }]);
+        cases.auditLatch = { faultedCallRan: toolResult(faulted.requests, "call_read_faulted").includes("public fixture"),
+          nextCallRan: toolResult(latched.requests, "call_read_latched").includes("public fixture"), recovered,
+          ranAfterRecovery: toolResult(after.requests, "call_read_recovered").includes("public fixture") };
+        expect(cases.auditLatch).toEqual({ faultedCallRan: true, nextCallRan: false, recovered: true, ranAfterRecovery: true });
+        expect(toolResult(latched.requests, "call_read_latched")).toContain(UNAVAILABLE);
       });
 
       test("a write that needs approval is denied and leaves no file", async () => {
