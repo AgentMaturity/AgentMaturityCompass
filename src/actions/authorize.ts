@@ -86,7 +86,15 @@ type Facts = Pick<AuthorizationRecordV1, "scope" | "policy" | "action" | "bindin
   readonly effects: EffectDeclaration | null;
 };
 
-const message = (error: unknown): string => (error instanceof Error ? error.message : String(error));
+/**
+ * A failure reason reaches model-visible denials, approval questions and API responses, and an error's text can carry an
+ * absolute host path (an fs error, a verifier naming its file). Name the failure by its class only: the errno code, else
+ * the error's name.
+ */
+const message = (error: unknown): string => {
+  const code = (error as NodeJS.ErrnoException | null)?.code;
+  return typeof code === "string" ? code : error instanceof Error ? error.name : "unknown error";
+};
 const failed = (failure: RecheckFailure, reason: string): Failed => ({ ok: false, failures: [failure], reason });
 
 /** The digest of a policy file as the approvals engine binds it; absent is a named sentinel, unreadable throws. */
