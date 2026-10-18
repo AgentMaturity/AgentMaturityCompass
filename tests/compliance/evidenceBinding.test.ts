@@ -81,7 +81,7 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "workspace-key-revocations",
   // A4 Activate record labels (P1-62, reviewed 2026-10-12 at the 442cd919 merge): a monitor record field no source could
   // fill (src/a4/a4Monitor.ts) and a value claim's recommended lane (src/a4/a4Value.ts). Neither is a ledger meta.source.
-  "source_unavailable", "value_contract"
+  "source_unavailable", "value_contract",
   // P1-10F: compileCatalogPlan reports where visible tools came from (defaults or the signed tools.yaml); not evidence.
   "signed-tools-yaml",
 ]);
