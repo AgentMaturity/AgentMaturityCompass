@@ -32,16 +32,16 @@ Run `amc domain list` to see the same canonical domains, aliases, sector tags, a
 
 Industry sector packs (`src/domains/industryPacks.ts`) per station. The Questions column counts sector-pack questions (not the domain-pack questions in the table above). No pack may fall below 15 questions (`PACK_QUESTION_FLOOR`: the median pack size measured on 2026-10-03); the October 2026 review added 32 questions to the 19 packs below the floor. Counts are measured from the registry with `getStationSummary` and checked by `tests/industryPackDepthFloor.test.ts`.
 
-| Station | Packs | Questions |
+| Station | Packs | Questions (experimental, self-reported) |
 |---|---:|---:|
-| `environment` | 6 | 99 |
-| `health` | 9 | 151 |
-| `wealth` | 5 | 83 |
+| `environment` | 6 | 104 |
+| `health` | 9 | 161 |
+| `wealth` | 5 | 89 |
 | `education` | 5 | 87 |
 | `mobility` | 6 | 94 |
-| `technology` | 5 | 83 |
-| `governance` | 5 | 79 |
-| **Total** | **41** | **676** |
+| `technology` | 5 | 97 |
+| `governance` | 5 | 91 |
+| **Total** | **41** | **723** |
 
 Pack content is experimental: AI-drafted, not reviewed by a qualified expert, and not legal advice; answers are self-reported. The station guides in [industries/README](industries/README.md) are generated from the same registry (`npm run gen-industry-guides`; `npm run check:industry-guides` fails on drift).
 
