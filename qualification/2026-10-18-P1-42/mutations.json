@@ -1,0 +1,104 @@
+[
+ {
+  "id": "M1",
+  "guard": "tests/f5DropReconciliation.test.ts (restored F5 questions)",
+  "mutation": "delete restored TECH-PP-14 from src/domains/packs/stations/technology.ts",
+  "result": "2 failed / 2"
+ },
+ {
+  "id": "M2",
+  "guard": "tests/f5DropReconciliation.test.ts (restored text equals main's)",
+  "mutation": "reword restored TECH-PP-14 ('program' -> 'programme')",
+  "result": "1 failed / 2"
+ },
+ {
+  "id": "M3",
+  "guard": "tests/noAmcOsReads.test.ts",
+  "mutation": "point industryPacksSplitEquality.test.ts SNAPSHOT_DIR back at ../AMC_OS/RESEARCH/.../apply/split/",
+  "result": "1 failed / 3"
+ },
+ {
+  "id": "M4",
+  "guard": "scripts/gen-industry-guides.mts --check",
+  "mutation": "stale.length > 0 -> stale.length < 0",
+  "result": "tests/industryGuidesGenerator.test.ts 1 failed / 2"
+ },
+ {
+  "id": "M5",
+  "guard": "calendar register key-date section",
+  "mutation": "render only verified key dates",
+  "result": "tests/regulatoryCalendar.test.ts 3 failed / 27"
+ },
+ {
+  "id": "M6",
+  "guard": "no scheduled sidecar row past its date",
+  "mutation": "RED on the original sidecar (Colorado SB24-205 row, 2026-06-30, scheduled)",
+  "result": "1 failed before the sidecar fix"
+ },
+ {
+  "id": "M7",
+  "guard": "/1 audit receipts still verify",
+  "mutation": "verifyIndustryPackAuditChecksum rejects any schemaVersion other than the current one",
+  "result": "tests/industryPackAuditV1Compat.test.ts 2 failed / 3"
+ },
+ {
+  "id": "M8",
+  "guard": "/4 audits render",
+  "mutation": "drop the currency guard in renderIndustryPackAuditMarkdown",
+  "result": "tests/industryPackAuditV1Compat.test.ts 1 failed / 4"
+ },
+ {
+  "id": "M9",
+  "guard": "calendar past-due check (data-derived as-of)",
+  "mutation": "the original sidecar (Colorado SB24-205, 2026-06-30, scheduled)",
+  "result": "1 failed"
+ },
+ {
+  "id": "M10",
+  "guard": "kept merges",
+  "mutation": "delete kept WLT-NP-12",
+  "result": "tests/roundTwoMergeDecisions.test.ts 1 failed / 3"
+ },
+ {
+  "id": "M11",
+  "guard": "id versions",
+  "mutation": "revert WLT-NP-10-v2 to WLT-NP-10",
+  "result": "tests/questionIdVersions.test.ts 3 failed / 3"
+ },
+ {
+  "id": "M12",
+  "guard": "labels",
+  "mutation": "catalog item without contentStatus",
+  "result": "tests/questionnaireLabelSurfaces.test.ts 2 failed / 9"
+ },
+ {
+  "id": "M13",
+  "guard": "labels",
+  "mutation": "MCP sector-pack text without the Content line",
+  "result": "tests/questionnaireLabelSurfaces.test.ts 1 failed / 9"
+ },
+ {
+  "id": "M14",
+  "guard": "R4 phrase entries",
+  "mutation": "ignore the phrase when matching",
+  "result": "tests/checkNoFabrication.test.ts 2 failed / 31"
+ },
+ {
+  "id": "M15",
+  "guard": "guide citations",
+  "mutation": "skip the token check in the generator",
+  "result": "tests/industryGuidesGenerator.test.ts 1 failed / 4"
+ },
+ {
+  "id": "M16",
+  "guard": "guide citations",
+  "mutation": "put line numbers back in the appendix",
+  "result": "the src/cli.ts shift test fails"
+ },
+ {
+  "id": "M17",
+  "guard": "labelled counts",
+  "mutation": "hand-edit a station page count without the label",
+  "result": "check:counts exits 1 and tests/publicQuestionCountDrift.test.ts fails"
+ }
+]
