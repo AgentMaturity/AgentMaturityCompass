@@ -169,7 +169,7 @@
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "9a8e8f1da0a69c9dfc15dc319a946d046745f231613a31edc7129f2216fc83e8"
+      "sha256": "d05f1de005535bc986fb772b2c8b99acadc41282ede86e899fba11e10e807d41"
     },
     {
       "path": "candidate/O17-result.json",

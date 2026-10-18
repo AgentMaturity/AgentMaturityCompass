@@ -10,6 +10,10 @@ local uv cache.
 The candidate's program records are cited as `37c1466b:<path>` below, where `<program>` is
 `AMC_OS/RESEARCH/2026-10-03-regulated-platform-program`.
 
+After this receipt was first written, `int` moved to `84d1eae07` and was merged again as `74df19c87` (count conflicts
+only, taken from `int` and regenerated). At `74df19c87` every check in `receipt.json` passed again, the 227 focused tests
+passed, and `test_industry.py` passed 42/42 on Python 3.10 and 3.12; the fresh-clone runs were not repeated.
+
 ## Commit map
 
 Picked with `git cherry-pick -x` in slice-map order (`docs/program/landing/slice-map.json`, issue P1-44). The four
