@@ -353,10 +353,11 @@
       "disposition": "reuse_pending",
       "target": "L1-TECH-01",
       "dependencyPlan": "P2-30",
-      "dependencyState": "pending",
+      "dependencyState": "landed_scope_and_evidence_pending",
       "reason": "These questions require deployer disclosure and may include editorial responsibility or first-interaction notice. Machine-readable marking alone does not establish disclosure, its exception or every channel notice.",
       "productionResult": "not_evaluated",
-      "enforcement": "none"
+      "enforcement": "none",
+      "dependencyLanding": "9d739678f793100b5426c62e02a0a16b82afbf20"
     },
     {
       "id": "GOV-DD-5",
@@ -492,10 +493,11 @@
       "disposition": "reuse_pending",
       "target": "L1-TECH-01",
       "dependencyPlan": "P2-30",
-      "dependencyState": "pending",
-      "reason": "The actual question concerns machine-readable marking of synthetic election content. The P2-30 marking draft has not landed on this base; no reuse result is inferred.",
+      "dependencyState": "landed_scope_and_evidence_pending",
+      "reason": "The actual question concerns machine-readable marking of synthetic election content. P2-30 L1-TECH-01 is present after int 9d739678f; deployment-specific applicability and admitted evidence are still required. No evaluated reuse or production result is inferred.",
       "productionResult": "not_evaluated",
-      "enforcement": "none"
+      "enforcement": "none",
+      "dependencyLanding": "9d739678f793100b5426c62e02a0a16b82afbf20"
     },
     {
       "id": "GOV-DD-20",
@@ -640,10 +642,11 @@
       "disposition": "reuse_pending",
       "target": "L1-TECH-01",
       "dependencyPlan": "P2-30",
-      "dependencyState": "pending",
+      "dependencyState": "landed_scope_and_evidence_pending",
       "reason": "These questions require deployer disclosure and may include editorial responsibility or first-interaction notice. Machine-readable marking alone does not establish disclosure, its exception or every channel notice.",
       "productionResult": "not_evaluated",
-      "enforcement": "none"
+      "enforcement": "none",
+      "dependencyLanding": "9d739678f793100b5426c62e02a0a16b82afbf20"
     },
     {
       "id": "GOV-PL-16",
@@ -1070,10 +1073,11 @@
       "disposition": "reuse_pending",
       "target": "L1-TECH-01",
       "dependencyPlan": "P2-30",
-      "dependencyState": "pending",
+      "dependencyState": "landed_scope_and_evidence_pending",
       "reason": "These questions require deployer disclosure and may include editorial responsibility or first-interaction notice. Machine-readable marking alone does not establish disclosure, its exception or every channel notice.",
       "productionResult": "not_evaluated",
-      "enforcement": "none"
+      "enforcement": "none",
+      "dependencyLanding": "9d739678f793100b5426c62e02a0a16b82afbf20"
     },
     {
       "id": "gov-deep-55",

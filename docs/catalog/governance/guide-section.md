@@ -6,7 +6,7 @@ The current Governance inventory has 91 pack questions and 56 deep questions, in
 
 The domains are `governance.public-services`, `governance.law-rights-democracy` and `governance.defense`. Public-sector AI uses the existing Governance × Technology composition. The defense analyst JSON is a synthetic deployment example, not a new cross-station composition or an operating-profile change. The three example profiles assert scope only; they do not determine legal applicability or high-risk classification.
 
-P2-30's marking control, EU register and guide hook have not landed on this base; their reuse remains pending. P3-15's accessibility control is also pending. Machine-readable marking alone does not establish human-facing disclosure, and a generic WCAG check does not establish every public-sector accessibility duty. The owned fragment is ready for the shared guide hook; no duplicate generator hook is added.
+P2-30's experimental marking control, EU register and guide hook are merged from int `9d739678f`. Reuse still needs the deployment's scope and admitted evidence; their presence supplies no production result. P3-15's accessibility control is also pending. Machine-readable marking alone does not establish human-facing disclosure, and a generic WCAG check does not establish every public-sector accessibility duty. The owned fragment uses the shared guide hook; the current check must measure its inclusion. No duplicate generator hook is added.
 
 For A4 Adapt, a catalog-lock change is intended to render as `scope_changed`, never as a fault. Where a FRIA applies, it belongs before the completion gate under P3-23. This note does not alter A4 code or claim that the integration ran.
 
