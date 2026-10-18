@@ -1,7 +1,8 @@
 # P1-33 receipt: pack admission criteria v1 as a checker
 
 Environment: local macOS 26.6.2 arm64 (Darwin 25.6.0), Node v22.23.3, pnpm 10.33.0. Not CI. Branch
-`rtd/p1-33-catalog-reverify` at `c8a2cc119` (int `c952585c5` merged in). `receipt.json` lists every command with its exit
+`rtd/p1-33-catalog-reverify` at `f7119b39e` (int `6c317596e` merged in); the mutations ran at `c8a2cc119`, before that merge,
+which left the admission and governance code unchanged. `receipt.json` lists every command with its exit
 code and duration.
 
 Nothing here is a review or a promotion. Every catalog pack and control is still `experimental`; D-08 has named no

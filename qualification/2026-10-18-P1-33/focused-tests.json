@@ -1,6 +1,6 @@
 {
  "command": "npx vitest run tests/catalog/ tests/compiledVisibleTools.test.ts tests/compilerStationDefaults.test.ts tests/runPrincipalLease.test.ts tests/starterProfiles.test.ts tests/studioVaultModeLoop.test.ts tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/freezeGuard.test.ts --reporter=json",
- "commit": "c8a2cc11950314e264cb2db04312e14bcfe1ab95",
+ "commit": "f7119b39ee92f70f9a917a31e63378c3ef1cc8ce",
  "total": 808,
  "passed": 808,
  "failed": 0,

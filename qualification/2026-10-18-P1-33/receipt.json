@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P1-33",
   "date": "2026-10-18",
-  "commit": "c8a2cc11950314e264cb2db04312e14bcfe1ab95",
+  "commit": "f7119b39ee92f70f9a917a31e63378c3ef1cc8ce",
   "branch": "rtd/p1-33-catalog-reverify",
   "node": "v22.23.3",
   "pnpm": "10.33.0",
@@ -15,119 +15,119 @@
       "durationMs": 79000
     },
     {
-      "cmd": "npx vitest run tests/catalog/ tests/compiledVisibleTools.test.ts tests/compilerStationDefaults.test.ts tests/runPrincipalLease.test.ts tests/starterProfiles.test.ts tests/studioVaultModeLoop.test.ts tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/freezeGuard.test.ts --reporter=json",
-      "exit": 0,
-      "durationMs": 159000
-    },
-    {
-      "cmd": "python3 P1-33-work/mutate.py (29 mutations, tests/catalog/admission/checker.test.ts each)",
+      "cmd": "python3 P1-33-work/mutate.py (29 mutations at c8a2cc119, tests/catalog/admission/checker.test.ts each)",
       "exit": 0,
       "durationMs": 240000
     },
     {
       "cmd": "npm run -s typecheck",
       "exit": 0,
-      "durationMs": 45970
+      "durationMs": 37562
     },
     {
       "cmd": "npm run -s typecheck:tests",
       "exit": 0,
-      "durationMs": 80768
+      "durationMs": 60926
     },
     {
       "cmd": "npm run -s lint",
       "exit": 0,
-      "durationMs": 5068
+      "durationMs": 3701
     },
     {
       "cmd": "npm run -s check:counts",
       "exit": 0,
-      "durationMs": 1654
+      "durationMs": 1133
     },
     {
       "cmd": "npm run -s check:docs-drift",
       "exit": 0,
-      "durationMs": 745
+      "durationMs": 641
     },
     {
       "cmd": "npm run -s check:freeze -- --base-ref int",
       "exit": 1,
-      "durationMs": 2795
+      "durationMs": 2506
     },
     {
       "cmd": "npm run -s check:freeze -- --base-ref 710840d09",
       "exit": 0,
-      "durationMs": 1780
+      "durationMs": 1676
     },
     {
       "cmd": "npm run -s check:architecture-boundaries",
       "exit": 0,
-      "durationMs": 2326
+      "durationMs": 2237
     },
     {
       "cmd": "npm run -s check:gates",
       "exit": 0,
-      "durationMs": 402
+      "durationMs": 380
     },
     {
       "cmd": "npm run -s check:schemas",
       "exit": 0,
-      "durationMs": 772
+      "durationMs": 826
     },
     {
       "cmd": "npm run -s check:api-ref",
       "exit": 0,
-      "durationMs": 242
+      "durationMs": 261
     },
     {
       "cmd": "npm run -s check:threat-model",
       "exit": 0,
-      "durationMs": 312
+      "durationMs": 287
     },
     {
       "cmd": "npm run -s release:notes -- --check",
       "exit": 0,
-      "durationMs": 345
+      "durationMs": 289
     },
     {
       "cmd": "npm run -s check:duplicates",
       "exit": 0,
-      "durationMs": 1231
+      "durationMs": 1019
     },
     {
       "cmd": "npm run -s check:dead-code",
       "exit": 0,
-      "durationMs": 4644
+      "durationMs": 4572
     },
     {
       "cmd": "npm run -s check:catalog-admission",
       "exit": 0,
-      "durationMs": 1186
+      "durationMs": 1309
     },
     {
       "cmd": "npm run -s check:catalog-currency",
       "exit": 0,
-      "durationMs": 497
+      "durationMs": 501
     },
     {
       "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
       "exit": 0,
-      "durationMs": 3098
+      "durationMs": 3197
     },
     {
       "cmd": "npm run -s check:catalog-changelog -- --base-ref origin/main",
       "exit": 0,
-      "durationMs": 834
+      "durationMs": 907
     },
     {
       "cmd": "npm run -s check:package",
       "exit": 0,
-      "durationMs": 6563
+      "durationMs": 6789
     },
     {
       "cmd": "npm run -s check:clean-source",
       "exit": 0,
-      "durationMs": 279395
+      "durationMs": 249710
+    },
+    {
+      "cmd": "npx vitest run tests/catalog/ tests/compiledVisibleTools.test.ts tests/compilerStationDefaults.test.ts tests/runPrincipalLease.test.ts tests/starterProfiles.test.ts tests/studioVaultModeLoop.test.ts tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/freezeGuard.test.ts --reporter=json",
+      "exit": 0,
+      "durationMs": 148411
     },
     {
       "cmd": "npm run -s check:qualification",
@@ -144,7 +144,7 @@
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "0736aff512afb13b032a3096323a76a617c84becdfead5e80fa5ee7c2b391ee8"
+      "sha256": "ac48fd6a30ab705f9acd27079b5a52ba45ee165cdab8857e4c0675db33d62c36"
     },
     {
       "path": "amc.l0.baseline-0.1.0.json",
@@ -152,12 +152,12 @@
     },
     {
       "path": "focused-tests.json",
-      "sha256": "3b22a9d7782da85242177957f34a6927f3a432cdf56a6c335665de90706bf5eb"
+      "sha256": "1cdd4f19a850b654ff123d35ec55f7b45ed4fe3ef8d1e9a257ab814c4545a99b"
     },
     {
       "path": "mutations.json",
       "sha256": "23c143f3bcf418060b6de53b28978320309e395fc8b792535de6bd572079a316"
     }
   ],
-  "notes": "Focused tests only; the full suite was not run here. check:freeze -- --base-ref int exits 1 only because P1-33 is not yet in int's allowedExceptionKeys (a branch cannot authorize itself); commit 710840d09 adds the key alone and check:freeze -- --base-ref 710840d09 exits 0. All 29 mutations killed. Durations of the build, vitest, mutation and check:qualification rows are approximate. No pack is promoted: every pack is experimental and no D-08 reviewer exists."
+  "notes": "Focused tests only; the full suite was not run here. Checks and focused tests ran at the merge of int 6c317596e; the 29 mutations ran at c8a2cc119, whose src/catalog/admission and governance code the merge left unchanged. check:freeze -- --base-ref int exits 1 only because P1-33 is not yet in int's allowedExceptionKeys (a branch cannot authorize itself); commit 710840d09 adds the key alone and check:freeze -- --base-ref 710840d09 exits 0. Durations of the build, mutation and check:qualification rows are approximate. No pack is promoted: every pack is experimental and no D-08 reviewer exists."
 }
