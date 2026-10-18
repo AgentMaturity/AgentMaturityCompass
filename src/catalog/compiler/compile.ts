@@ -4,7 +4,6 @@
  * every parameter must map to an enforcement point, and every exception must name a real control. Unknown facts stay
  * unknown; a mandatory control left unresolved, or an unresolved conflict, blocks the plan.
  */
-import { REGULATORY_REGISTER } from "../../compliance/regulatory/index.js";
 import { canonicalize } from "../../utils/json.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { amcVersion } from "../../version.js";
@@ -65,12 +64,12 @@ export function compilePlan(input: CompileInput): CompiledPlan {
   checkParameters(cat);
   checkExceptions(profile, cat);
   const { requirements, retired } = decideApplicability(profile, cat, asOfMs);
-  // P1-34: reviewed or qualified support stands only with a current review and a verified quorum of pinned reviewers;
-  // otherwise this plan's row is experimental. The record, its digest (so the lock and past results) and the YAML stay.
+  // P1-34: a row's support is effectiveSupport's result (reviewed or qualified only with a current, verified quorum of
+  // pinned reviewers). The record, its digest (so the lock and past results) and the YAML stay as they are.
   for (const r of requirements) {
     const control = cat.controls.get(r.controlId);
     if (!control) continue;
-    const effective = effectiveSupport(control, REGULATORY_REGISTER, new Date(asOfMs).toISOString().slice(0, 10), input.reviewAuthority);
+    const effective = effectiveSupport(control, input.reviewAuthority);
     if (effective.support === r.support) continue;
     r.support = effective.support;
     r.reasons.push(`${effective.reasons.join(", ")}: compiled as ${effective.support} until a current, verified review (docs/catalog/GOVERNANCE.md)`);

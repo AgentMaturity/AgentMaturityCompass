@@ -1,15 +1,13 @@
-/** Catalog content governance (P1-34; docs/catalog/GOVERNANCE.md): review records, currency, the changelog guard. */
+/** Catalog content governance (P1-34; docs/catalog/GOVERNANCE.md): review records, effective support, currency, the changelog guard. */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { z } from "zod";
-import type { RegulatoryRegister } from "../../compliance/regulatory/index.js";
 import { parseWith, parseYaml, type LoadedCatalog } from "../loader.js";
 import { statusReviewDue } from "../register.js";
 import type { CatalogIssue } from "../schema.js";
-import { evaluateReviewCurrency } from "./currency.js";
-import { effectiveSupport, type ReviewAuthority } from "./support.js";
+import { effectiveSupport, shownReviewStatus, type ReviewAuthority } from "./support.js";
 import { f5ConfirmationsFileSchema, type F5Confirmation } from "./reviewRecord.js";
-import { reverifyChecklistSchema, reverifyOpenItems, type ReverifyItem } from "./reverify.js";
+import { reverifyChecklistSchema, type ReverifyItem } from "./reverify.js";
 
 export * from "./reviewRecord.js";
 export * from "./currency.js";
@@ -53,33 +51,32 @@ export function readGovernance(root: string): { reverify: ReverifyItem[]; f5Conf
 export interface GovernanceFinding { code: string; severity: "error" | "warning"; controlId: string | null; message: string }
 
 /**
- * What `check:catalog-currency` reports as of `asOf` (the server's date): reviews due within 14 days (warning); overdue
- * or stale reviews (error for reviewed and qualified content, warning for any other recorded review); reviewed or
- * qualified content without a valid quorum of pinned reviewers (GOV_REVIEW_UNVERIFIED), or citing an instrument tied to
- * an open re-verify item (GOV_REVERIFY_OPEN), as errors; register entries whose status is due for review (P1-18,
+ * What `check:catalog-currency` reports, all through effectiveSupport at `authority.now` (the server's clock): reviewed or
+ * qualified content whose support does not stand (error: GOV_REVERIFY_OPEN, GOV_REVIEW_TRUST_INVALID, GOV_REVIEW_OVERDUE
+ * when a review lapsed, otherwise GOV_REVIEW_UNVERIFIED); a review falling due within 14 days (warning); an approved
+ * review the YAML declares but no verified record supports (warning); register entries due a status review (P1-18,
  * warning). Retired content is skipped. Nothing is edited.
  */
-export function catalogCurrencyFindings(cat: LoadedCatalog, register: RegulatoryRegister, reverify: readonly ReverifyItem[], asOf: string,
-  authority?: ReviewAuthority): GovernanceFinding[] {
+export function catalogCurrencyFindings(cat: LoadedCatalog, authority: ReviewAuthority): GovernanceFinding[] {
   const out: GovernanceFinding[] = [];
+  const today = authority.now.toISOString().slice(0, 10);
   for (const control of cat.controls.values()) {
     if (control.support === "retired") continue;
-    const stronger = control.support !== "experimental";
     const add = (code: string, severity: GovernanceFinding["severity"], message: string) => out.push({ code, severity, controlId: control.id, message });
-    const currency = evaluateReviewCurrency(control, register, asOf);
-    if (currency.status === "due_soon") add("GOV_REVIEW_DUE_SOON", "warning", `review due ${currency.nextReviewDue}`);
-    if (currency.status === "overdue") add("GOV_REVIEW_OVERDUE", stronger ? "error" : "warning", `review was due ${currency.nextReviewDue}; new compilations treat it as experimental`);
-    // A stale review is reported whenever one is recorded; only content that never had a review has nothing to go stale.
-    if (currency.status === "stale" && (stronger || control.review.status !== "pending" || control.review.reviewedAt !== null)) {
-      add("GOV_REVIEW_STALE", stronger ? "error" : "warning", `${currency.reasons[1]}: the review date is missing, unparsable, in the future or unschedulable`);
+    const result = effectiveSupport(control, authority);
+    if (result.support !== control.support) {
+      const lapsed = result.rejected.some((r) => r.reason === "GOV_REVIEW_OVERDUE");
+      const code = result.reasons.find((r) => /^GOV_(REVERIFY_OPEN|REVIEW_TRUST_INVALID)/.test(r))?.split(":")[0] ?? (lapsed ? "GOV_REVIEW_OVERDUE" : "GOV_REVIEW_UNVERIFIED");
+      add(code, "error", `declared ${control.support} does not stand (${result.reasons.join("; ")}${result.rejected.length ? `; records not counted: ${result.rejected.map((r) => `#${r.index} ${r.reason}`).join(", ")}` : ""}); compiles as experimental`);
+    } else if (result.promotion && (Date.parse(`${result.promotion.nextReviewDue}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86_400_000 <= 14) {
+      add("GOV_REVIEW_DUE_SOON", "warning", `review due ${result.promotion.nextReviewDue}`);
     }
-    if (!stronger) continue;
-    const effective = effectiveSupport(control, register, asOf, authority);
-    if (effective.reasons.includes("GOV_REVIEW_UNVERIFIED")) add("GOV_REVIEW_UNVERIFIED", "error", `${control.support} without a valid quorum of pinned reviewers (${effective.reasons.join(", ")}); compiles as experimental`);
-    for (const m of reverifyOpenItems(control, reverify)) add("GOV_REVERIFY_OPEN", "error", `cites ${m.citationKeys.join(", ")}, tied to open re-verify item ${m.itemId}`);
+    if (shownReviewStatus(control, result.support) !== control.review.status) {
+      add("GOV_REVIEW_UNVERIFIED", "warning", "declares an approved review that no verified review record supports");
+    }
   }
   for (const r of cat.registers?.values() ?? []) {
-    for (const due of statusReviewDue(r.entries, asOf)) out.push({ code: "GOV_REGISTER_STATUS_REVIEW", severity: "warning", controlId: null, message: `${r.id}/${due.id}: ${due.reason}` });
+    for (const due of statusReviewDue(r.entries, today)) out.push({ code: "GOV_REGISTER_STATUS_REVIEW", severity: "warning", controlId: null, message: `${r.id}/${due.id}: ${due.reason}` });
   }
   return out;
 }

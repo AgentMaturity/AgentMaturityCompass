@@ -17,6 +17,7 @@ import type { CompiledPlan, RequirementDecision } from "../catalog/compiler/type
 import { evaluateControl } from "../catalog/evidence/evaluate.js";
 import { controlResultsSigPath, readSignedControlResults, writeSignedControlResults } from "../catalog/evidence/signedResults.js";
 import type { ControlResult } from "../catalog/evidence/types.js";
+import { shownReviewStatus } from "../catalog/governance/support.js";
 import type { LoadedCatalog } from "../catalog/loader.js";
 import { envelopeForAggregate, envelopeForUnverifiedResult, envelopeFromDimensions } from "../claims/eligibility/adapters/results.js";
 import { claimKindSchema, statusDimensionsSchema } from "../claims/eligibility/schemas.js";
@@ -229,7 +230,7 @@ export function recordControlResults(input: { workspace: string; projectId: stri
   }));
   if (check.status === "verified" && byId.size !== results.length) check = failed("CONTROL_RESULTS_SHAPE_INVALID");
   const controls = evaluated.map(({ row, record }): StoredControl => {
-    const base = { controlId: row.controlId, version: row.controlVersion, support: record?.support ?? row.support, reviewStatus: record?.review.status ?? "unknown",
+    const base = { controlId: row.controlId, version: row.controlVersion, support: row.support, reviewStatus: record ? shownReviewStatus(record, row.support) : "unknown",
       planApplicability: row.applicability };
     if (record === null) return unverifiedControl(base, applicabilityOf(row), NOT_IN_CATALOG);
     const stored = check.status === "verified" ? byId.get(row.controlId) : undefined;

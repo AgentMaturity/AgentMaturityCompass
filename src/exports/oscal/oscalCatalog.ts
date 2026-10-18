@@ -6,6 +6,7 @@
  * compliance statement.
  */
 import { controlDigest } from "../../catalog/digest.js";
+import { effectiveSupport } from "../../catalog/governance/support.js";
 import { buildCatalogLock } from "../../catalog/lockfile.js";
 import type { LoadedCatalog } from "../../catalog/loader.js";
 import type { Citation, ControlRecord } from "../../catalog/types.js";
@@ -22,7 +23,7 @@ const REMARKS = "Experimental AMC Regulated Control Catalog content, agent-draft
 
 function controlProps(r: ControlRecord) {
   return [
-    prop("version", r.version), prop("support", r.support), prop("layer", String(r.layer)),
+    prop("version", r.version), prop("support", effectiveSupport(r).support), prop("layer", String(r.layer)),
     ...(r.family ? [prop("family", r.family)] : []),
     ...r.stations.map((s) => prop("station", s)),
     prop("mandatory", String(r.mandatory)),

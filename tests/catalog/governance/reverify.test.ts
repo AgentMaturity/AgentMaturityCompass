@@ -7,13 +7,13 @@ import { catalogCurrencyFindings, readGovernance, reverifyChecklistSchema, rever
 import { defaultCatalogRoot, loadCatalog } from "../../../src/catalog/loader.js";
 import type { ControlRecord } from "../../../src/catalog/types.js";
 import { REGULATORY_REGISTER } from "../../../src/compliance/regulatory/index.js";
+import { authority, keyA, keyB, operatorHome, reviewedControl, sign } from "./reviewers.js";
 
 const catalog = loadCatalog();
 const governance = readGovernance(defaultCatalogRoot());
 const wealth = catalog.controls.get("L1-WLT-US-01")!; // cites Regulation E (S5 us-reg-e)
+const HOME = operatorHome();
 
-const asReviewed = (r: ControlRecord): ControlRecord => ({ ...r, support: "reviewed",
-  review: { status: "approved", expert: "fixture-expert", credential: "fixture credential", reviewedAt: "2026-10-15", nextReview: "2026-11-01" } });
 
 describe("governance files (P1-34 steps 9-10)", () => {
   it("loads cleanly; the re-verify checklist holds the 15 seeded facts, all open; no F5 verdict is confirmed yet", () => {
@@ -49,26 +49,30 @@ describe("GOV_REVERIFY_OPEN (P1-34 step 10)", () => {
   });
 
   it("a reviewed control citing an instrument tied to an open item is an error; experimental content is not", () => {
-    const reviewed = new Map(catalog.controls).set(wealth.id, asReviewed(wealth));
-    const errors = catalogCurrencyFindings({ ...catalog, controls: reviewed }, REGULATORY_REGISTER, governance.reverify, "2026-10-18")
-      .filter((f) => f.severity === "error");
-    expect(errors.map((f) => [f.code, f.controlId])).toEqual([["GOV_REVIEW_UNVERIFIED", wealth.id], ["GOV_REVERIFY_OPEN", wealth.id]]);
-    expect(catalogCurrencyFindings(catalog, REGULATORY_REGISTER, governance.reverify, "2026-10-18").filter((f) => f.severity === "error")).toEqual([]);
+    const reviewed = new Map(catalog.controls).set(wealth.id, reviewedControl(wealth));
+    const auth = authority(HOME, [], { reverify: governance.reverify });
+    const errors = catalogCurrencyFindings({ ...catalog, controls: reviewed }, auth).filter((f) => f.severity === "error");
+    expect(errors.map((f) => [f.code, f.controlId])).toEqual([["GOV_REVERIFY_OPEN", wealth.id]]);
+    expect(catalogCurrencyFindings(catalog, auth).filter((f) => f.severity === "error")).toEqual([]);
   });
 
-  it("overdue reviewed content is an error, overdue experimental content cannot exist, and register status reviews are warnings", () => {
-    const control = { ...asReviewed(catalog.controls.get("L0-ADV-01")!), review: { status: "approved" as const, expert: "x", credential: "x", reviewedAt: "2026-06-01", nextReview: "2026-07-01" } };
-    const findings = catalogCurrencyFindings({ ...catalog, controls: new Map(catalog.controls).set(control.id, control) }, REGULATORY_REGISTER, [], "2027-01-15");
-    expect(findings.filter((f) => f.severity === "error").map((f) => [f.code, f.controlId])).toEqual([["GOV_REVIEW_OVERDUE", control.id]]);
-    expect(findings.some((f) => f.code === "GOV_REGISTER_STATUS_REVIEW" && f.severity === "warning")).toBe(true);
+  it("lapsed reviewed content is an error, a review falling due is a warning, and so are register status reviews", () => {
+    const control = reviewedControl(catalog.controls.get("L0-ADV-01")!);
+    const cat = { ...catalog, controls: new Map(catalog.controls).set(control.id, control) };
+    const pair = (decidedAt: string) => [sign(control, keyA, "fixture-reviewer-a", { decidedAt }), sign(control, keyB, "fixture-reviewer-b", { decidedAt })];
+    const lapsed = catalogCurrencyFindings(cat, authority(HOME, pair("2026-06-01"), { now: new Date("2027-01-15T00:00:00Z") }));
+    expect(lapsed.filter((f) => f.severity === "error").map((f) => [f.code, f.controlId])).toEqual([["GOV_REVIEW_OVERDUE", control.id]]);
+    expect(lapsed.some((f) => f.code === "GOV_REGISTER_STATUS_REVIEW" && f.severity === "warning")).toBe(true);
+    const soon = catalogCurrencyFindings(cat, authority(HOME, pair("2026-10-15"), { now: new Date("2027-01-01T00:00:00Z") }));
+    expect(soon.filter((f) => f.controlId === control.id).map((f) => [f.code, f.severity, f.message])).toEqual([["GOV_REVIEW_DUE_SOON", "warning", "review due 2027-01-13"]]);
   });
 
-  it("a stale recorded review is never hidden: an error for reviewed content, a warning for experimental content", () => {
-    const stale = { ...catalog.controls.get("L0-ADV-01")!, review: { status: "approved" as const, expert: "x", credential: "x", reviewedAt: "2027-03-01", nextReview: null } };
-    const run = (control: ControlRecord) => catalogCurrencyFindings({ ...catalog, controls: new Map([[control.id, control]]) }, REGULATORY_REGISTER, [], "2026-12-01")
+  it("an approved review the YAML declares without a verified record is never hidden: an error when it claims reviewed support, else a warning", () => {
+    const declared = { ...catalog.controls.get("L0-ADV-01")!, review: { status: "approved" as const, expert: "x", credential: "x", reviewedAt: "2026-10-01", nextReview: null } };
+    const run = (control: ControlRecord) => catalogCurrencyFindings({ ...catalog, controls: new Map([[control.id, control]]) }, authority(HOME, []))
       .filter((f) => f.controlId === control.id).map((f) => [f.code, f.severity]);
-    expect(run(stale)).toEqual([["GOV_REVIEW_STALE", "warning"]]);
-    expect(run({ ...stale, support: "reviewed" })).toEqual([["GOV_REVIEW_STALE", "error"]]);
+    expect(run(declared)).toEqual([["GOV_REVIEW_UNVERIFIED", "warning"]]);
+    expect(run({ ...declared, support: "reviewed" })).toEqual([["GOV_REVIEW_UNVERIFIED", "error"], ["GOV_REVIEW_UNVERIFIED", "warning"]]);
     expect(run(catalog.controls.get("L0-ADV-01")!)).toEqual([]);
   });
 });
