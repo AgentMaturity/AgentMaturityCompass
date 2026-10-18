@@ -1,107 +1,107 @@
 {
  "schemaVersion": "p1-47-checks/1",
- "commit": "bd0a4c7c361b1ec3294b8b0c119beb1f610d92a4",
+ "commit": "cefb97ab5",
  "environment": "local macOS arm64, not CI",
  "checks": [
   {
    "cmd": "npm run -s build",
    "exit": 0,
-   "durationMs": 82273,
+   "durationMs": 91678,
    "lastLine": "bundle-kernel: dist/kernel/amcRuntime.js 385 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include,"
   },
   {
    "cmd": "npm run -s typecheck",
    "exit": 0,
-   "durationMs": 52355,
+   "durationMs": 37703,
    "lastLine": ""
   },
   {
    "cmd": "npm run -s typecheck:tests",
    "exit": 0,
-   "durationMs": 87354,
+   "durationMs": 70725,
    "lastLine": ""
   },
   {
    "cmd": "npm run -s lint",
    "exit": 0,
-   "durationMs": 6171,
-   "lastLine": "check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 10; 16 random marker(s); 0 pending entries."
+   "durationMs": 4523,
+   "lastLine": "check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 19; 16 random marker(s); 0 pending entries."
   },
   {
    "cmd": "npm run -s check:counts",
    "exit": 0,
-   "durationMs": 2160,
+   "durationMs": 1516,
    "lastLine": "Published source counts match the repository; this check does not execute tests."
   },
   {
    "cmd": "npm run -s check:docs-drift",
    "exit": 0,
-   "durationMs": 989,
-   "lastLine": "Docs drift check passed (336 files scanned; truth claims and commands checked in 249 public files; 4 logged exceptions)."
+   "durationMs": 766,
+   "lastLine": "Docs drift check passed (336 files scanned; truth claims and commands checked in 258 public files; 5 logged exceptions)."
   },
   {
    "cmd": "npm run -s check:freeze -- --base-ref int",
    "exit": 0,
-   "durationMs": 4590,
-   "lastLine": "Freeze guard passed: {\"cliCommandPaths\":1255,\"cliInventoryPaths\":1255,\"stationPacks\":41,\"stationPackQuestions\":632}"
+   "durationMs": 2801,
+   "lastLine": "Freeze guard passed: {\"cliCommandPaths\":1255,\"cliInventoryPaths\":1255,\"stationPacks\":41,\"stationPackQuestions\":723}"
   },
   {
    "cmd": "npm run -s check:architecture-boundaries",
    "exit": 0,
-   "durationMs": 3080,
+   "durationMs": 2437,
    "lastLine": "}"
   },
   {
    "cmd": "npm run -s check:gates",
    "exit": 0,
-   "durationMs": 987,
+   "durationMs": 467,
    "lastLine": "check:gates: every evaluated gate requirement has a registered, non-synthetic emitter."
   },
   {
    "cmd": "npm run -s check:schemas",
    "exit": 0,
-   "durationMs": 1266,
+   "durationMs": 867,
    "lastLine": "gen-spec-schemas: 41 schemas current; 80 contract fixtures agree"
   },
   {
    "cmd": "npm run -s check:api-ref",
    "exit": 0,
-   "durationMs": 503,
+   "durationMs": 368,
    "lastLine": "docs/API_REFERENCE.md matches the source."
   },
   {
    "cmd": "npm run -s check:threat-model",
    "exit": 0,
-   "durationMs": 450,
+   "durationMs": 348,
    "lastLine": "check-threat-model: ok (/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-47/docs/security/channel-map.json)"
   },
   {
    "cmd": "npm run -s check:duplicates",
    "exit": 0,
-   "durationMs": 1255,
+   "durationMs": 1049,
    "lastLine": "No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
   },
   {
    "cmd": "npm run -s check:dead-code",
    "exit": 0,
-   "durationMs": 5750,
+   "durationMs": 5102,
    "lastLine": "No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
   },
   {
    "cmd": "npm run -s release:notes -- --check",
    "exit": 0,
-   "durationMs": 370,
+   "durationMs": 404,
    "lastLine": ""
   },
   {
-   "cmd": "npx vitest run tests/harnessComparison.test.ts tests/harnessComparisonOutputOwnership.test.ts tests/harnessCodingOracle.test.ts tests/harnessCodingOutputSnapshot.test.ts tests/harnessCodingGateway.test.ts tests/benchmarkPilotOracles.test.ts tests/benchmarkPilotAnalysis.test.ts --reporter=json --outputFile=<scratch>/focused-final.json",
+   "cmd": "npx vitest run tests/harnessComparison.test.ts tests/harnessComparisonOutputOwnership.test.ts tests/harnessCodingOracle.test.ts tests/harnessCodingOutputSnapshot.test.ts tests/harnessCodingGateway.test.ts tests/benchmarkPilotOracles.test.ts tests/benchmarkPilotAnalysis.test.ts --reporter=json --outputFile=<scratch>/focused-final6.json",
    "exit": 0,
-   "durationMs": 11216,
-   "lastLine": "JSON report written to /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P1-47-scratch/focused-final.json"
+   "durationMs": 7217,
+   "lastLine": "JSON report written to /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P1-47-scratch/focused-final6.json"
   }
  ],
  "notes": [
   "needs-snapshot int: none",
-  "check:qualification runs after this receipt is written; its result is in the commit message and final report"
+  "check:qualification runs after this receipt is written"
  ]
 }

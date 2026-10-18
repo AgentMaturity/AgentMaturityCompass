@@ -736,6 +736,64 @@
   "pilot": {
    "total": 43,
    "killed": 43
+  },
+  "legacy": {
+   "total": 3,
+   "killed": 3
   }
- }
+ },
+ "legacy": [
+  {
+   "id": "legacy-oracle-refusal-removed",
+   "file": "examples/harness-comparison/codingOracle.mjs",
+   "mutation": "on ContainmentUnavailableError, judge again through the test-only seam instead of refusing",
+   "tests": [
+    "tests/harnessCodingOracle.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 the command-line oracle refuses without a container runtime, with or without settings, and evaluates nothing on the host 331ms",
+    "\u00d7 a working repair through the command line is refused, not passed, when containment is unavailable 170ms",
+    "FAIL  tests/harnessCodingOracle.test.ts > legacy coding oracle and Pi binding containment > the command-line oracle refuses without a container runtime, with or without settings, and evaluates nothing on the host",
+    "FAIL  tests/harnessCodingOracle.test.ts > legacy coding oracle and Pi binding containment > a working repair through the command line is refused, not passed, when containment is unavailable"
+   ],
+   "commit": "b7a936f2e",
+   "tree": "worktree"
+  },
+  {
+   "id": "legacy-oracle-cli-routed-to-seam",
+   "file": "examples/harness-comparison/codingOracle.mjs",
+   "mutation": "the command line probes through the test-only seam on the host",
+   "tests": [
+    "tests/harnessCodingOracle.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 the command-line oracle refuses without a container runtime, with or without settings, and evaluates nothing on the host 371ms",
+    "\u00d7 a working repair through the command line is refused, not passed, when containment is unavailable 197ms",
+    "FAIL  tests/harnessCodingOracle.test.ts > legacy coding oracle and Pi binding containment > the command-line oracle refuses without a container runtime, with or without settings, and evaluates nothing on the host",
+    "FAIL  tests/harnessCodingOracle.test.ts > legacy coding oracle and Pi binding containment > a working repair through the command line is refused, not passed, when containment is unavailable"
+   ],
+   "commit": "b7a936f2e",
+   "tree": "worktree"
+  },
+  {
+   "id": "legacy-adapter-pi-refusal-removed",
+   "file": "examples/harness-comparison/codingPiContainer.mjs",
+   "mutation": "without containment settings, run Pi on the host instead of refusing",
+   "tests": [
+    "tests/harnessCodingOracle.test.ts"
+   ],
+   "killed": true,
+   "exit": 1,
+   "evidence": [
+    "\u00d7 the Pi binding refuses without a container runtime and never starts Pi on the host 93ms",
+    "FAIL  tests/harnessCodingOracle.test.ts > legacy coding oracle and Pi binding containment > the Pi binding refuses without a container runtime and never starts Pi on the host"
+   ],
+   "commit": "b7a936f2e",
+   "tree": "worktree"
+  }
+ ]
 }
