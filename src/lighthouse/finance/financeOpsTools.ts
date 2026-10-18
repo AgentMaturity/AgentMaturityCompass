@@ -5,8 +5,12 @@ import type { ActionJournal } from "../../actions/actionJournal.js";
 import { authorizationRecordDigest } from "../../actions/authorizationRecord.js";
 import type { ReconcileAdapter } from "../../actions/reconcile.js";
 import { createApprovalForIntent } from "../../approvals/approvalEngine.js";
+import { loadActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
 import { loadVerifiedToolsConfigSnapshot } from "../../toolhub/toolhubValidators.js";
-import { toolhubAllowlistGuard } from "../../tools/guards/policyGuards.js";
+import { compiledPolicyGuard } from "../../tools/guards/compiledPolicyGuard.js";
+import {
+  budgetGuard, networkEgressGuard, promptInjectionGuard, runtimeFirewallGuard, toolhubAllowlistGuard
+} from "../../tools/guards/policyGuards.js";
 import { DEFAULT_AUTHORIZE_CLASSES, ToolPipeline, type ToolPipelineInit } from "../../tools/toolPipeline.js";
 import { ToolRegistry } from "../../tools/toolRegistry.js";
 import { DefiniteFailureError, type ToolBodyResult, type ToolDefinition, type ToolExecution } from "../../tools/toolTypes.js";
@@ -23,6 +27,13 @@ import { createPaymentServiceClient, type PaymentServiceClientOptions } from "./
 export interface FinanceOpsOptions {
   readonly workspace: string;
   readonly agentId: string;
+  /** The native session the calls run in; the signed budgets reserve against it. */
+  readonly sessionId: string;
+  /**
+   * The authenticated principal the session runs for (P1-78), recorded as the initiator of every payment approval so it
+   * can never approve its own payment: `LOCAL_USER:<id>`, `WORKSPACE_ROUTER:<id>` or a user id. Never model input.
+   */
+  readonly initiator: string;
   readonly reader: PaymentServiceClientOptions;
   readonly executorSecretKey: string;
   readonly shadow?: boolean;
@@ -74,9 +85,14 @@ export function createFinanceOpsTools(options: FinanceOpsOptions): {
 } {
   const workspace = realpathSync(options.workspace);
   if (!options.agentId || !options.executorSecretKey || typeof options.record !== "function"
-    || typeof options.journal !== "function" || typeof options.authorizationContext !== "function") {
-    throw new Error("Finance tools require explicit agent, vault secret name, journal, authorization context and recorder");
+    || typeof options.journal !== "function" || typeof options.authorizationContext !== "function"
+    || typeof options.sessionId !== "string" || !options.sessionId.trim()
+    || typeof options.initiator !== "string" || !options.initiator.trim()) {
+    throw new Error("Finance tools require explicit agent, session, initiator, vault secret name, journal, authorization context and recorder");
   }
+  // This composition binds no compiled authorization classes, so an active compiled policy is refused, as declared
+  // execution tickets and byte limits are below. compiledPolicyGuard still refuses a plan activated mid-session.
+  if (loadActiveCompiledPolicy(workspace) !== null) throw new Error("Finance composition cannot enforce an active compiled policy");
   const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
   if (!snapshot.signatureValid || !snapshot.config || !snapshot.digestSha256 || !snapshot.config.tools.denyByDefault) {
     throw new Error("Finance tools require a verifiable deny-by-default signed tools configuration");
@@ -171,7 +187,7 @@ export function createFinanceOpsTools(options: FinanceOpsOptions): {
         if (!intent.ok) throw new Error("Finance proposal could not bind an authorization intent");
         const created = createApprovalForIntent({ workspace, agentId: execution.agentId, intentId: execution.callId,
           toolName: EXECUTE, actionClass: "FINANCIAL", requestedMode: "EXECUTE", effectiveMode: "EXECUTE",
-          riskTier: "high", intentPayload: intent.payload });
+          riskTier: "high", intentPayload: intent.payload, initiator: options.initiator });
         return json({ schema: "lighthouse-finance-proposal/1", approvalRequestId: created.request.approvalRequestId,
           status: created.approval.status, toolName: EXECUTE, arguments: envelope, argumentsDigest: intent.payload.argumentsDigest,
           paymentBodySha256: paymentArgsDigest(financePaymentArgs(envelope)), intentHash: created.request.boundHashes.intentHash,
@@ -211,6 +227,13 @@ export function createFinanceOpsTools(options: FinanceOpsOptions): {
   ];
   for (const definition of definitions) registry.define(definition, options.agentId);
   if (options.shadow) registry.restrict({ deny: new Set([EXECUTE]) }, options.agentId);
+  // The guards every governed native call passes (agentToolset.ts), ahead of the finance guards: signed budgets are
+  // reserved and counted, and the firewall, injection and policy checks apply to finance calls too.
+  registry.guard("compiled-policy", compiledPolicyGuard(workspace, null));
+  registry.guard("prompt-injection", promptInjectionGuard());
+  registry.guard("runtime-firewall", runtimeFirewallGuard(workspace));
+  registry.guard("budgets", budgetGuard(workspace, options.sessionId));
+  registry.guard("network-egress", networkEgressGuard(workspace));
   registry.guard("finance-signed-allowlist", toolhubAllowlistGuard(workspace,
     execution => registry.visible(execution.agentId).get(execution.name), snapshot.digestSha256), options.agentId);
   registry.guard("finance-current-payee", execution => {

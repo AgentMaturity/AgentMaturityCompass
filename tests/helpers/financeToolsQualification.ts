@@ -27,6 +27,7 @@ export interface FinanceToolsRun {
   schema: string; outcome?: ToolOutcome; execution?: Record<string, unknown>;
   view?: Record<string, unknown> | null; request?: Record<string, unknown>; decisions?: Array<Record<string, unknown>>;
   consumed?: Record<string, unknown> | null; intent?: Record<string, unknown> | null;
+  refusals?: Array<{ actor: string; message: string }>;
   context?: Record<string, unknown> | null; observation?: Record<string, unknown>; query?: Record<string, unknown>;
   preimage?: Record<string, unknown> | null; reconciliation?: Record<string, unknown>;
   visible?: Array<{ name: string; parameters: Record<string, unknown> | null }>; adapterKeys?: string[];
@@ -37,6 +38,10 @@ interface Operation {
   name?: string; arguments?: Record<string, unknown>; approvalRequestIds?: string[]; agentId?: string;
   requestedMode?: "EXECUTE" | "SIMULATE"; aborted?: boolean; approvalRequestId?: string; executionId?: string;
   queryChanges?: Record<string, unknown>; tamper?: "missing" | "arguments" | "record";
+  /** The factory's authenticated initiator (P1-78); a fixed fixture operator unless a test names one. */
+  initiator?: string;
+  /** Explicit approvers for an "approve" operation; their refusals are returned instead of failing the producer. */
+  actors?: Array<{ id: string; role: "OWNER" | "AUDITOR" | "APPROVER" }>;
 }
 interface Child {
   label: string; pid: number | undefined; argv: string[]; exit: number | null; signal: NodeJS.Signals | null;
@@ -47,7 +52,7 @@ interface Child {
 interface Fixture {
   root: string; workspace: string; provider: FinanceFixture;
   run(operation: Operation): Promise<FinanceToolsRun>;
-  approve(approvalRequestId: string): Promise<FinanceToolsRun>;
+  approve(approvalRequestId: string, actors?: Operation["actors"]): Promise<FinanceToolsRun>;
   oracle(): Promise<{ schemaVersion: string; verdict: string; checks: Array<{ id: string; passed: boolean; evidence: string }> }>;
 }
 
@@ -72,13 +77,21 @@ try {
   if (stage === "init") {
     const { initWorkspace } = await load("workspace.js");
     const { initActionPolicy } = await load("governor/actionPolicyEngine.js");
-    const { initBudgets } = await load("budgets/budgets.js");
+    const { initBudgets, budgetsPath, loadBudgetsConfig, signBudgetsConfig } = await load("budgets/budgets.js");
     const { initApprovalPolicy } = await load("approvals/approvalPolicyEngine.js");
     const { initToolsConfig } = await load("toolhub/toolhubValidators.js");
+    const { writeRuntimeFirewallPolicy } = await load("runtime/firewall.js");
     createVault({ workspace: c.workspace, passphrase: c.passphrase, ...c.keys });
     unlockVault(c.workspace, c.passphrase);
     initWorkspace({ workspacePath: c.workspace, agentId: "default", trustBoundaryMode: "isolated" });
     initActionPolicy(c.workspace); initBudgets(c.workspace, "default"); initApprovalPolicy(c.workspace);
+    // The default signed budget allows no FINANCIAL executes; the fixture signs the allowance its case needs (JSON is YAML).
+    const budgets = loadBudgetsConfig(c.workspace);
+    budgets.budgets.perAgent.default.daily.maxToolExecutes.FINANCIAL = c.financialBudget;
+    writeFileSync(budgetsPath(c.workspace), JSON.stringify(budgets, null, 2) + "\n"); signBudgetsConfig(c.workspace);
+    // The finance guards include the runtime firewall; without a signed policy it blocks every call. Observe mode, as
+    // the other native fixtures use: in block mode the default secret-exposure rule matches destinationTokenSha256.
+    writeRuntimeFirewallPolicy({ workspace: c.workspace, mode: "observe" });
     initToolsConfig(c.workspace, { tools: { version: 1, denyByDefault: true, allowedTools: [
       { name: "finops_list_transactions", actionClass: "READ_ONLY" },
       { name: "finops_reconcile", actionClass: "READ_ONLY" },
@@ -105,15 +118,18 @@ try {
     const op = c.operation;
     if (op.kind === "approve" || op.kind === "approval") {
       const request = loadApprovalRequestRecord({ workspace: c.workspace, agentId: "default", approvalRequestId: op.approvalRequestId });
+      const refusals = [];
       if (op.kind === "approve") {
         assert.equal(request.requiredApprovals, 2); assert.equal(request.requireDistinctUsers, true);
-        for (const actor of [{ id: "finance-owner", role: "OWNER" }, { id: "finance-auditor", role: "AUDITOR" }]) {
-          decideApprovalForIntent({ workspace: c.workspace, agentId: "default", approvalId: request.approvalRequestId,
-            decision: "APPROVED", mode: "EXECUTE", userId: actor.id, username: actor.id, userRoles: [actor.role],
-            reason: "Review the exact owned synthetic payment", expectedRequestDigestSha256: approvalRequestBindingDigest(request) });
+        for (const actor of op.actors ?? [{ id: "finance-owner", role: "OWNER" }, { id: "finance-auditor", role: "AUDITOR" }]) {
+          try {
+            decideApprovalForIntent({ workspace: c.workspace, agentId: "default", approvalId: request.approvalRequestId,
+              decision: "APPROVED", mode: "EXECUTE", userId: actor.id, username: actor.id, userRoles: [actor.role],
+              reason: "Review the exact owned synthetic payment", expectedRequestDigestSha256: approvalRequestBindingDigest(request) });
+          } catch (error) { if (!op.actors) throw error; refusals.push({ actor: actor.id, message: error.message }); }
         }
       }
-      result = { schema: "finance-tools-operation/1", request,
+      result = { schema: "finance-tools-operation/1", refusals, request: loadApprovalRequestRecord({ workspace: c.workspace, agentId: "default", approvalRequestId: op.approvalRequestId }),
         decisions: listApprovalDecisions({ workspace: c.workspace, agentId: "default", approvalRequestId: request.approvalRequestId }),
         consumed: loadApprovalConsumed({ workspace: c.workspace, agentId: "default", approvalRequestId: request.approvalRequestId }) };
     } else if (op.kind === "block-preimages") {
@@ -165,6 +181,7 @@ try {
       }
       const recorderErrors = []; let observedExecution = null;
       const factory = createFinanceOpsTools({ workspace: c.workspace, agentId: "default", shadow: c.shadow,
+        sessionId, initiator: op.initiator ?? "finance-operator",
         reader: { socketPath: c.apiSocket, token: c.readerToken, timeoutMs: 2000 }, executorSecretKey: c.executorSecretKey,
         journal: getJournal, authorizationContext: () => ({ sessionId }),
         record(execution, outcome) {
@@ -254,7 +271,7 @@ function requireClosed(row: Child): void {
 }
 
 export async function withFinanceTools(body: (fixture: Fixture) => Promise<void>, options: {
-  shadow?: boolean; storeExecutorSecret?: boolean; readerClientId?: "reader-a" | "reader-b";
+  shadow?: boolean; storeExecutorSecret?: boolean; readerClientId?: "reader-a" | "reader-b"; financialBudget?: number;
 } = {}): Promise<void> {
   // /tmp keeps the run directory short enough for Unix socket paths; realpath gives the physical path on every OS.
   const root = realpathSync(mkdtempSync("/tmp/lhft-")); chmodSync(root, 0o700);
@@ -282,7 +299,7 @@ export async function withFinanceTools(body: (fixture: Fixture) => Promise<void>
     if (basename(cli) !== "cli.js" || basename(dirname(cli)) !== "dist") throw new Error("Selected CLI must be its real dist/cli.js");
     const buildRoot = realpathSync(join(dirname(cli), ".."));
     const direct = ["cli.js", "vault/vault.js", "storage/sqlitePool.js", "ledger/ledger.js", "utils/json.js", "fleet/paths.js", "crypto/keys.js",
-      "workspace.js", "governor/actionPolicyEngine.js", "budgets/budgets.js", "approvals/approvalPolicyEngine.js", "toolhub/toolhubValidators.js",
+      "workspace.js", "governor/actionPolicyEngine.js", "budgets/budgets.js", "approvals/approvalPolicyEngine.js", "toolhub/toolhubValidators.js", "runtime/firewall.js",
       "approvals/approvalChainStore.js", "approvals/approvalEngine.js", "actions/actionJournal.js", "actions/reconcile.js", "tools/toolEvidence.js"];
     const selected = direct.map(name => ({ path: realpathSync(join(buildRoot, "dist", name)), sha256: sha(readFileSync(join(buildRoot, "dist", name))) }));
     for (const path of [join(sourceRoot, "examples/lighthouse-finance/oracle.mjs"), join(sourceRoot, "examples/lighthouse-finance/oracleEvidence.mjs"),
@@ -315,12 +332,13 @@ export async function withFinanceTools(body: (fixture: Fixture) => Promise<void>
         const child = await childRun(label, [script, stage, config], root, env); children.push(child); requireClosed(child); unchanged();
         const result = readJson(resultFile) as unknown as FinanceToolsRun; observations.push({ operation: extra.operation ?? "initializer", result }); return result;
       }
-      const initialized = await invoke("init", { keys, executorToken: provider.token("executor-a"), storeExecutorSecret: options.storeExecutorSecret !== false }) as unknown as Record<string, unknown>;
+      const initialized = await invoke("init", { keys, executorToken: provider.token("executor-a"), storeExecutorSecret: options.storeExecutorSecret !== false,
+        financialBudget: options.financialBudget ?? 5 }) as unknown as Record<string, unknown>;
       if (initialized.monitor !== anchors.monitor.publicKeyPem || initialized.auditor !== anchors.auditor.publicKeyPem) throw new Error("Actual init changed pre-artifact keys");
       observations.push({ initializerClosedBeforeFactory: true, initialized, producerScriptSha256: sha(DRIVER) });
       await body({ root, workspace, provider,
         async run(operation) { if (stopped) throw new Error("Provider already stopped for final cold oracle"); return await invoke("operation", { operation }); },
-        async approve(approvalRequestId) { return await invoke("operation", { operation: { kind: "approve", approvalRequestId } }); },
+        async approve(approvalRequestId, actors) { return await invoke("operation", { operation: { kind: "approve", approvalRequestId, ...(actors ? { actors } : {}) } }); },
         async oracle() {
           if (stopped) throw new Error("Oracle may run only once after final dispatch");
           await provider.stop(); stopped = true;

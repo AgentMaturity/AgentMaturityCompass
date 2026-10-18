@@ -69,6 +69,24 @@ describe("P1-19 actual opt-in finance tools", () => {
       for (const row of oracle.checks) { expect(row.passed, row.id).toBe(true); expect(row.evidence.length, row.id).toBeGreaterThan(0); }
     });
   });
+  test("the signed FINANCIAL budget denies a genuinely approved payment before any POST", async () => {
+    await withFinanceTools(async f => {
+      const p = await granted(f), out = outcome(await dispatch(f, p));
+      expect(out.ok).toBe(false); expect(out.denied).toMatchObject({ stage: "guard", guardLabel: "budgets" });
+      expect(f.provider.snapshot().posts).toEqual([]); expect(f.provider.snapshot().commits).toEqual([]);
+    }, { financialBudget: 0 });
+  });
+  test("the proposing principal cannot approve its own payment; two other reviewers still reach quorum (P1-78)", async () => {
+    await withFinanceTools(async f => {
+      const p = proposal(await f.run({ kind: "call", name: propose, arguments: financeProposalInput(), initiator: "finance-owner" }));
+      const self = await f.approve(p.approvalRequestId, [{ id: "finance-owner", role: "OWNER" }]);
+      expect(self.refusals).toEqual([{ actor: "finance-owner", message: expect.stringContaining("initiator cannot approve their own request") }]);
+      expect(self.decisions).toEqual([]);
+      const others = await f.approve(p.approvalRequestId, [{ id: "finance-auditor", role: "AUDITOR" }, { id: "finance-owner-2", role: "OWNER" }]);
+      expect(others.refusals).toEqual([]); expect(others.decisions).toHaveLength(2);
+      expect(outcome(await dispatch(f, p)).ok).toBe(true); expect(f.provider.snapshot().commits).toHaveLength(1);
+    });
+  });
   test("post-decision destination changes cause a real refresh and zero dispatch", async () => {
     await withFinanceTools(async f => {
       const p = await granted(f);

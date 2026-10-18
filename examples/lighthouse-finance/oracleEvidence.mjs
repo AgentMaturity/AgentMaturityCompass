@@ -204,7 +204,10 @@ function approvals(record, view, pins, tracked) {
   for (const approval of named) {
     insist(ident(approval.approvalRequestId), 'unsafe approval id');
     const request = signedJson(insideFile(pins.workspace, join(pins.approvalsDir, 'requests', approval.approvalRequestId + '.json')), pins.auditor.publicKeyPem, tracked);
-    const binding = sha256(canonical({ ...request, status: 'PENDING' })), wantedIntent = sha256(canonical(intentPayload(record)));
+    // The binding digest leaves out the P1-78 initiator (approvalRequestBindingDigest); the initiator never approves.
+    const { initiator, ...bound } = request;
+    const binding = sha256(canonical({ ...bound, status: 'PENDING' })), wantedIntent = sha256(canonical(intentPayload(record)));
+    insist(initiator === undefined || (text(initiator) && !approval.approverIds.includes(initiator)), 'approval initiator approved its own request');
     insist(request.v === 1 && request.agentId === pins.agentId && request.approvalRequestId === approval.approvalRequestId
       && request.toolName === pins.toolName && request.actionClass === 'FINANCIAL' && request.effectiveMode === 'EXECUTE'
       && request.requestedMode === 'EXECUTE' && request.status === 'CONSUMED' && binding === approval.requestBindingDigest
