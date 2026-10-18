@@ -1,8 +1,8 @@
 # P1-10 follow-up (P1-10F) qualification: compiled visible tools from the signed tools.yaml
 
 Recorded on a local macOS arm64 machine (darwin 25.6.0, macOS 26.6.2), not in CI, at AMC commit
-`088221b19dfe6d0511384a66889ac68215b0b092` (branch `rtd/p1-10f-delegate-visible-tools` after merging `int`
-b9866b0fa), Node 22.23.3. Other worktrees' runs were active on the machine.
+`1e0989624b03fa665b55863a5f2c9dba7f2c8eda` (branch `rtd/p1-10f-delegate-visible-tools` after merging `int`
+7bc90f324), Node 22.23.3. Other worktrees' runs were active on the machine.
 
 - Change: `compilePlan` takes an optional `signedTools` (`{ config, sha256 }`) that its caller verified, and
   `toolPipeline.visibleTools` is its tools narrowed by the plan's `toolPipeline.visibleTools` parameter; the plan

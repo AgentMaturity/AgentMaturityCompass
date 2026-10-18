@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P1-10",
   "date": "2026-10-18",
-  "commit": "088221b19dfe6d0511384a66889ac68215b0b092",
+  "commit": "1e0989624b03fa665b55863a5f2c9dba7f2c8eda",
   "branch": "rtd/p1-10f-delegate-visible-tools",
   "node": "v22.23.3",
   "pnpm": "10.33.0",
@@ -12,82 +12,82 @@
     {
       "cmd": "npm run -s build",
       "exit": 0,
-      "durationMs": 48530
+      "durationMs": 104418
     },
     {
       "cmd": "npm run -s typecheck",
       "exit": 0,
-      "durationMs": 41588
+      "durationMs": 88197
     },
     {
       "cmd": "npm run -s typecheck:tests",
       "exit": 0,
-      "durationMs": 92589
+      "durationMs": 128294
     },
     {
       "cmd": "npm run -s lint",
       "exit": 0,
-      "durationMs": 3981
+      "durationMs": 5650
     },
     {
       "cmd": "npm run -s check:counts",
       "exit": 0,
-      "durationMs": 1102
+      "durationMs": 1990
     },
     {
       "cmd": "npm run -s check:docs-drift",
       "exit": 0,
-      "durationMs": 683
+      "durationMs": 784
     },
     {
       "cmd": "npm run -s check:freeze -- --base-ref int",
       "exit": 0,
-      "durationMs": 3396
+      "durationMs": 3942
     },
     {
       "cmd": "npm run -s check:architecture-boundaries",
       "exit": 0,
-      "durationMs": 2931
+      "durationMs": 5146
     },
     {
       "cmd": "npm run -s check:gates",
       "exit": 0,
-      "durationMs": 545
+      "durationMs": 624
     },
     {
       "cmd": "npm run -s check:schemas",
       "exit": 0,
-      "durationMs": 1267
+      "durationMs": 1562
     },
     {
       "cmd": "npm run -s check:api-ref",
       "exit": 0,
-      "durationMs": 323
+      "durationMs": 462
     },
     {
       "cmd": "npm run -s check:threat-model",
       "exit": 0,
-      "durationMs": 421
+      "durationMs": 486
     },
     {
       "cmd": "npm run -s check:duplicates",
       "exit": 0,
-      "durationMs": 1593
+      "durationMs": 1405
     },
     {
       "cmd": "npm run -s check:dead-code",
       "exit": 0,
-      "durationMs": 6611
+      "durationMs": 5916
     },
     {
       "cmd": "npm run -s release:notes -- --check",
       "exit": 1,
-      "durationMs": 408
+      "durationMs": 383
     },
     {
       "cmd": "npx vitest run tests/compiledVisibleTools.test.ts tests/catalog/l0 tests/compilerStationDefaults.test.ts tests/runPrincipalLease.test.ts tests/starterProfiles.test.ts tests/studioVaultModeLoop.test.ts tests/wealthOverlay.test.ts tests/claims/d03Gates.test.ts tests/delegateTool.test.ts tests/cliDelegateFlag.test.ts tests/amc1469ControlProjection.test.ts tests/toolEvidenceRecording.test.ts tests/keys/a4ActivateSigningProbe.test.ts tests/keys/a4SigningProbe.test.ts tests/agentToolsetSession.test.ts tests/codeMode.test.ts tests/nativeSignedToolSubset.test.ts tests/industryPacksPaywallSurfaces.test.ts",
       "exit": 0,
-      "durationMs": 134238
+      "durationMs": 150104
     }
   ],
   "tests": {
@@ -99,7 +99,7 @@
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "1e68c12ffa468201aa0fa579f1e887272cf99d2e26d75bb16ae107dc4a79f6bc"
+      "sha256": "31d3935bbc7fe23e5c49f804e511b40dfb7e10478a4c0752257a2a04bf29f7e2"
     },
     {
       "path": "focused-tests.json",
@@ -111,7 +111,7 @@
     },
     {
       "path": "plan-digests.json",
-      "sha256": "ed1754177426aa897d96c6841afbbd87297bac1433193d108be932d9b15e5e94"
+      "sha256": "c2a4d1e6e437843a54698b1397edda25a5182bb0137cc537b56cb2cd8f71b95a"
     }
   ],
   "notes": "P1-10 follow-up P1-10F. Focused tests only; the full suite was not run. release:notes --check exits 1 on four breaking changesets already on int that docs/releases/2.0.0.md's Migration section does not cite (claude-code-hooks, issuer-admission-at-verification-time, key-lifecycle-p1-08, layer0-enforcement-gaps); P1-10F's compiled-visible-tools-signed is cited. See README.md."
