@@ -49,9 +49,10 @@ describe("citation metadata", () => {
     const whitepaper = readProjectFile("whitepaper/AMC_WHITEPAPER_v1.md");
 
     expect(whitepaper).toContain(`${SECTOR_PACK_COUNT} industry-specific sector packs`);
-    expect(whitepaper).toContain(`${SECTOR_QUESTION_COUNT} sector-specific diagnostic questions`);
+    // P1-42 review: scripts/gen-counts.mjs states every sector count as experimental and self-reported.
+    expect(whitepaper).toContain(`${SECTOR_QUESTION_COUNT} experimental, self-reported sector-specific diagnostic questions`);
     expect(whitepaper).toContain(
-      `${TOTAL_QUESTION_COUNT} questions (${DEFAULT_QUESTION_COUNT} default + ${SECTOR_QUESTION_COUNT} sector-specific)`,
+      `${TOTAL_QUESTION_COUNT} questions (${DEFAULT_QUESTION_COUNT} default + ${SECTOR_QUESTION_COUNT} experimental, self-reported sector-specific)`,
     );
     expect(whitepaper).not.toContain("40 industry-specific sector packs");
     expect(whitepaper).not.toContain("593 sector-specific diagnostic questions");

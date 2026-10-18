@@ -45,6 +45,9 @@ export function assertSignedPlan(workspace: string, signed: Pick<SignedPlan, "pl
 
 const RUNTIME_RULES: Rules = [
   [/(^|\.|\])controlIds$/, { kind: "ignore" }],
+  // Names the tools.yaml the plan was compiled from (P1-10F). A new digest is judged by what it changes (visibleTools and
+  // the tools fragment); dropping it is checked in planWeakenings.
+  [/^toolPipeline\.toolsConfigSha256$/, { kind: "ignore" }],
   [/^(toolPipeline\.visibleTools|egress\.allowHosts|egress\.processorAllowlist)$|\.rolesAllowed$/, { kind: "addedIsWeaker" }],
   [/^toolPipeline\.approvalRequiredFor$|^toolPipeline\.guards\[[^\]]+\]$|^approvals\.[A-Z_]+$/, { kind: "removedIsWeaker" }],
   [/\.requiredApprovals$/, { kind: "floor", absent: -Infinity }],
@@ -89,6 +92,10 @@ export function planWeakenings(prev: CompiledPlan | null, next: CompiledPlan): s
     return [];
   });
   const fragments = (p: CompiledPlan) => p.runtimePolicy.proposedSignedConfigs as OperatingProfile["proposedSignedConfigs"];
+  // A plan that no longer binds tools.yaml (one compiled without it) would let it change unseen (P1-10F).
+  const pinned = prev.runtimePolicy.toolPipeline.toolsConfigSha256;
+  const unpinned = pinned !== undefined && next.runtimePolicy.toolPipeline.toolsConfigSha256 === undefined
+    ? [`runtimePolicy: toolPipeline.toolsConfigSha256 ${JSON.stringify(pinned)} -> absent`] : [];
   const mergeRules: Rules = [
     [/\.(controlIds|exceptionId)$/, { kind: "ignore" }],
     [/^\[[^\]]+\]$/, { kind: "removedIsWeaker" }]
@@ -96,6 +103,7 @@ export function planWeakenings(prev: CompiledPlan | null, next: CompiledPlan): s
   return [
     ...waived,
     ...dropped,
+    ...unpinned,
     ...weakenings("runtimePolicy", RUNTIME_RULES, policyView(prev.runtimePolicy), policyView(next.runtimePolicy)),
     ...fragmentWeakenings(fragments(prev), fragments(next)),
     ...weakenings("evidencePlan", EVIDENCE_RULES, evidenceView(prev.evidencePlan), evidenceView(next.evidencePlan)),

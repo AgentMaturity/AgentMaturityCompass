@@ -4,6 +4,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { toErrorMessage } from "../utils/errors.js";
 import type { IndustryPack } from "./industryPacks.js";
+import { QUESTIONNAIRE_CONTENT_STATUS } from "./questionnaireLabel.js";
 import {
   admitKey, admittedListKeys, buildVerifierReport, loadTrustContext, type TrustContext, type VerifierReportV1
 } from "../trust/index.js";
@@ -61,6 +62,8 @@ export interface IndustryPackCatalogItem {
   description: string;
   regulatoryBasis?: string[];
   complianceFrameworks?: string[];
+  /** AI-drafted pack content, experimental until a named expert signs it (P1-42). */
+  contentStatus: typeof QUESTIONNAIRE_CONTENT_STATUS;
 }
 
 interface StoredEntitlement {
@@ -492,6 +495,7 @@ export function toIndustryPackCatalogItem(
     locked: !entitlement.active,
     description: pack.description,
     regulatoryBasis: pack.regulatoryBasis,
-    complianceFrameworks: pack.complianceFrameworks
+    complianceFrameworks: pack.complianceFrameworks,
+    contentStatus: QUESTIONNAIRE_CONTENT_STATUS
   };
 }

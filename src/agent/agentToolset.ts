@@ -430,8 +430,13 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // the allowlist so a denial reads as "the firewall stopped this" rather than
   // "this tool is not listed", which is the more actionable of two true answers.
   // The compiled policy goes first so its receipt exists before any guard decides.
-  const policyGuard = compiledPolicyGuard(workspace, compiled);
+  // P1-10F: one verified read of tools.yaml per guard pass. The compiled-policy guard runs first in every pass and starts
+  // it; the plan's tools.yaml pin, egress, the allowlist and the native identity all decide from those same bytes.
+  let passTools: VerifiedToolsConfigSnapshot | null = null;
+  const toolsThisPass = (): VerifiedToolsConfigSnapshot => (passTools ??= loadVerifiedToolsConfigSnapshot(workspace));
+  const policyGuard = compiledPolicyGuard(workspace, compiled, toolsThisPass);
   registry.guard("compiled-policy", execution => {
+    passTools = null;
     try {
       assertEvidenceWritable();
     } catch (error) {
@@ -454,12 +459,13 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // no url and network-egress denies it.
   const governedArguments = (execution: ToolExecution): Readonly<Record<string, unknown>> =>
     execution.name === "web_search" ? { ...execution.arguments, url: options.webSearchProvider?.origin } : execution.arguments;
-  registry.guard("network-egress", networkEgressGuard(workspace, governedArguments));
-  registry.guard("tool-allowlist", toolhubAllowlistGuard(workspace, execution => registry.visible(execution.agentId).get(execution.name), options.expectedToolsDigest, governedArguments));
+  registry.guard("network-egress", networkEgressGuard(workspace, governedArguments, toolsThisPass));
+  registry.guard("tool-allowlist", toolhubAllowlistGuard(workspace, execution => registry.visible(execution.agentId).get(execution.name),
+    options.expectedToolsDigest, governedArguments, toolsThisPass));
   registry.guard("native-tool-identity", execution => {
     const identity = nativeIdentities.get(execution.name);
     if (!identity) return undefined; // Late reviewed extensions retain their own mount and policy guards.
-    const selected = selectSupportedNativeTools(loadVerifiedToolsConfigSnapshot(workspace), NATIVE_DELEGATION_CAPABILITIES);
+    const selected = selectSupportedNativeTools(toolsThisPass(), NATIVE_DELEGATION_CAPABILITIES);
     return execution.actionClass === identity.actionClass && selected.some(tool => tool.name === execution.name)
       ? undefined : "native tool is absent or its signed action class/context does not match the implementation";
   });

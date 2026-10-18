@@ -95,6 +95,12 @@ jobs:
       - name: Regulatory register currency
         run: npm run check:regulatory-currency
 
+      - name: Regulatory calendar matches its sources (P1-42)
+        run: npm run check:regulatory-calendar
+
+      - name: Industry guides match source (P1-42)
+        run: npm run check:industry-guides
+
       # P1-34: catalog reviews falling due, GOV_REVERIFY_OPEN, and one appended
       # catalog/CHANGELOG.md entry per catalog digest change (docs/catalog/GOVERNANCE.md).
       - name: Catalog currency and changelog
