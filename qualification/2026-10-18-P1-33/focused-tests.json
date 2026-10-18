@@ -1,13 +1,34 @@
 {
- "command": "npx vitest run tests/catalog/ tests/compiledVisibleTools.test.ts tests/compilerStationDefaults.test.ts tests/runPrincipalLease.test.ts tests/starterProfiles.test.ts tests/studioVaultModeLoop.test.ts tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/freezeGuard.test.ts --reporter=json",
- "commit": "f7119b39ee92f70f9a917a31e63378c3ef1cc8ce",
- "total": 808,
- "passed": 808,
- "failed": 0,
+ "command": "npx vitest run tests/catalog/ tests/compiledVisibleTools.test.ts tests/compilerStationDefaults.test.ts tests/runPrincipalLease.test.ts tests/starterProfiles.test.ts tests/studioVaultModeLoop.test.ts tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/freezeGuard.test.ts tests/keys/a4ActivateSigningProbe.test.ts tests/keys/a4SigningProbe.test.ts tests/approvalRecordCompatibility.test.ts tests/compliance/evidenceBinding.test.ts tests/claims/d03Gates.test.ts tests/architectureBoundaries.test.ts --reporter=json",
+ "commit": "c93ba2c3b409e6ac4129b9a31111f6163c98364d",
+ "total": 828,
+ "passed": 827,
+ "failed": 1,
+ "failedTests": [
+  {
+   "file": "tests/compliance/evidenceBinding.test.ts",
+   "test": "source-literal enumeration every source literal in src is classified"
+  }
+ ],
  "files": [
   {
+   "file": "tests/approvalRecordCompatibility.test.ts",
+   "passed": 5,
+   "failed": 0
+  },
+  {
+   "file": "tests/architectureBoundaries.test.ts",
+   "passed": 5,
+   "failed": 0
+  },
+  {
    "file": "tests/catalog/admission/checker.test.ts",
-   "passed": 30,
+   "passed": 36,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/admission/gatedLoads.test.ts",
+   "passed": 4,
    "failed": 0
   },
   {
@@ -17,12 +38,12 @@
   },
   {
    "file": "tests/catalog/governance/currency.test.ts",
-   "passed": 16,
+   "passed": 0,
    "failed": 0
   },
   {
    "file": "tests/catalog/governance/promotion.test.ts",
-   "passed": 7,
+   "passed": 0,
    "failed": 0
   },
   {
@@ -37,7 +58,7 @@
   },
   {
    "file": "tests/catalog/l0/catalogLoads.test.ts",
-   "passed": 11,
+   "passed": 0,
    "failed": 0
   },
   {
@@ -86,18 +107,38 @@
    "failed": 0
   },
   {
+   "file": "tests/claims/d03Gates.test.ts",
+   "passed": 9,
+   "failed": 0
+  },
+  {
    "file": "tests/compiledVisibleTools.test.ts",
    "passed": 23,
    "failed": 0
   },
   {
    "file": "tests/compilerStationDefaults.test.ts",
-   "passed": 14,
+   "passed": 0,
    "failed": 0
+  },
+  {
+   "file": "tests/compliance/evidenceBinding.test.ts",
+   "passed": 39,
+   "failed": 1
   },
   {
    "file": "tests/freezeGuard.test.ts",
    "passed": 16,
+   "failed": 0
+  },
+  {
+   "file": "tests/keys/a4ActivateSigningProbe.test.ts",
+   "passed": 5,
+   "failed": 0
+  },
+  {
+   "file": "tests/keys/a4SigningProbe.test.ts",
+   "passed": 1,
    "failed": 0
   },
   {
@@ -122,7 +163,7 @@
   },
   {
    "file": "tests/wealthOverlay.test.ts",
-   "passed": 7,
+   "passed": 0,
    "failed": 0
   }
  ]

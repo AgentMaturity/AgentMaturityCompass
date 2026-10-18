@@ -1,8 +1,7 @@
 {
- "commit": "c8a2cc11950314e264cb2db04312e14bcfe1ab95",
- "test": "tests/catalog/admission/checker.test.ts",
+ "commit": "6737a3a2a (before the counts regeneration; no source change since)",
  "method": "one mutation at a time, the named source restored after each run",
- "killed": 29,
+ "killed": 38,
  "survived": 0,
  "mutations": [
   {
@@ -10,10 +9,11 @@
    "file": "src/catalog/admission/fixtureRunner.ts",
    "from": "falseMandatoryPasses: outcomes.filter(isFalsePass).length,",
    "to": "falseMandatoryPasses: 0,",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 names the self-review behind the legal reviewer refusal, and counts a passing negative fixture 56ms",
-    "\u00d7 runs a guard fixture only through a registered harness, and otherwise leaves criterion 6 not evaluated, never met 48ms"
+    "\u00d7 names the self-review behind the legal reviewer refusal, and counts a passing negative fixture 39ms",
+    "\u00d7 runs a guard fixture only through a registered harness, and otherwise leaves criterion 6 not evaluated, never met 45ms"
    ]
   },
   {
@@ -21,11 +21,12 @@
    "file": "src/catalog/admission/fixtureRunner.ts",
    "from": "o.envelope.polarity === \"negative\" && (o.actual === \"pass\" || o.actual === \"allow\")",
    "to": "false",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses a negative fixture that passes: criterion 6, ADM6_FALSE_MANDATORY_PASS 31ms",
-    "\u00d7 names the self-review behind the legal reviewer refusal, and counts a passing negative fixture 50ms",
-    "\u00d7 runs a guard fixture only through a registered harness, and otherwise leaves criterion 6 not evaluated, never met 61ms"
+    "\u00d7 refuses a negative fixture that passes: criterion 6, ADM6_FALSE_MANDATORY_PASS 26ms",
+    "\u00d7 names the self-review behind the legal reviewer refusal, and counts a passing negative fixture 39ms",
+    "\u00d7 runs a guard fixture only through a registered harness, and otherwise leaves criterion 6 not evaluated, never met 42ms"
    ]
   },
   {
@@ -33,40 +34,10 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "r.reviewer?.identity?.kind !== \"human\" ? [index] : []",
    "to": "false ? [index] : []",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses a sign-off signed by an agent identity: criterion 9, ADM9_AGENT_SIGNER 19ms"
-   ]
-  },
-  {
-   "mutation": "loader gate off",
-   "file": "src/catalog/loader.ts",
-   "from": "if (opts.enforceAdmission) {",
-   "to": "if (false) {",
-   "result": "killed",
-   "failingTests": [
-    "\u00d7 downgrades a pack declaring reviewed with no report to experimental, in memory only 10ms",
-    "\u00d7 keeps reviewed only with a current, intact report that admits it 174ms"
-   ]
-  },
-  {
-   "mutation": "gate ignores a stale report",
-   "file": "src/catalog/admission/report.ts",
-   "from": "if (report.pack.digest !== digest) return",
-   "to": "if (false) return",
-   "result": "killed",
-   "failingTests": [
-    "\u00d7 keeps reviewed only with a current, intact report that admits it 333ms"
-   ]
-  },
-  {
-   "mutation": "gate ignores a refusing report",
-   "file": "src/catalog/admission/report.ts",
-   "from": "if (report.decision !== \"admit\" || report.pack.declaredSupport !== manifest.support) {",
-   "to": "if (false) {",
-   "result": "killed",
-   "failingTests": [
-    "\u00d7 keeps reviewed only with a current, intact report that admits it 374ms"
+    "\u00d7 refuses a sign-off signed by an agent identity: criterion 9, ADM9_AGENT_SIGNER 23ms"
    ]
   },
   {
@@ -74,9 +45,116 @@
    "file": "src/catalog/admission/report.ts",
    "from": "if (reportDigest(report) !== report.digest) return",
    "to": "if (false) return",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 keeps reviewed only with a current, intact report that admits it 200ms"
+    "\u00d7 fails a malformed committed admission report, and the loader admits the admission folder 59ms"
+   ]
+  },
+  {
+   "mutation": "gate never downgrades (fix 2)",
+   "file": "src/catalog/admission/gate.ts",
+   "from": "    if (refusal !== null) {",
+   "to": "    if (false) {",
+   "test": "tests/catalog/admission/checker.test.ts",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 downgrades a reviewed claim the recomputation refuses (no D-08 roster), in memory only 19ms",
+    "\u00d7 keeps reviewed only when the recomputed admission admits it, whatever a committed report says 65ms",
+    "\u00d7 ignores and flags a forged admitting report (R1): the gate, the lock and the check all refuse it 53ms",
+    "\u00d7 does not let an admitting report outlive the trust it was computed under (R3) 51ms"
+   ]
+  },
+  {
+   "mutation": "gate trusts an admitting committed report (fix 2)",
+   "file": "src/catalog/admission/gate.ts",
+   "from": "refusal = report.decision === \"admit\" ? null : report.reasons.slice(0, 3).join(\"; \");",
+   "to": "refusal = report.decision === \"admit\" || ((c) => c !== null && !(\"error\" in c) && c.report.decision === \"admit\")(committedReport(cat.root, entry.manifest)) ? null : report.reasons.slice(0, 3).join(\"; \");",
+   "test": "tests/catalog/admission/checker.test.ts",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 ignores and flags a forged admitting report (R1): the gate, the lock and the check all refuse it 61ms",
+    "\u00d7 does not let an admitting report outlive the trust it was computed under (R3) 117ms"
+   ]
+  },
+  {
+   "mutation": "gate does not flag a differing report (fix 2)",
+   "file": "src/catalog/admission/gate.ts",
+   "from": "if (committed !== null && (",
+   "to": "if (false && (",
+   "test": "tests/catalog/admission/checker.test.ts",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 ignores and flags a forged admitting report (R1): the gate, the lock and the check all refuse it 66ms",
+    "\u00d7 does not let an admitting report outlive the trust it was computed under (R3) 52ms"
+   ]
+  },
+  {
+   "mutation": "check does not fail a report claiming more (fix 2)",
+   "file": "src/catalog/admission/report.ts",
+   "from": "RANK[committed.support] > RANK[computed.support] || (committed.maxAdmissibleSupport",
+   "to": "false && (committed.maxAdmissibleSupport",
+   "test": "tests/catalog/admission/checker.test.ts",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 ignores and flags a forged admitting report (R1): the gate, the lock and the check all refuse it 192ms"
+   ]
+  },
+  {
+   "mutation": "no-mandatory refusal dropped (fix 1)",
+   "file": "src/catalog/admission/index.ts",
+   "from": "const empty = mandatory === 0 ? [\"the pack has no mandatory control\"] : [];",
+   "to": "const empty: string[] = [];",
+   "test": "tests/catalog/admission/checker.test.ts",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a pack with no mandatory control, even with every review signed (R2) 87ms"
+   ]
+  },
+  {
+   "mutation": "zero-subject rule dropped (fix 1)",
+   "file": "src/catalog/admission/criteria.ts",
+   "from": "  if (checked === 0) findings.push(",
+   "to": "  if (false) findings.push(",
+   "test": "tests/catalog/admission/checker.test.ts",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 leaves a criterion with nothing to check not evaluated, never met 23ms"
+   ]
+  },
+  {
+   "mutation": "members narrowed to mandatory (fix 1)",
+   "file": "src/catalog/admission/index.ts",
+   "from": "  const controls = manifest.controls.flatMap((id) => cat.controls.get(id) ?? []);\n  const digest",
+   "to": "  const controls = manifest.controls.flatMap((id) => cat.controls.get(id) ?? []).filter((c) => c.mandatory);\n  const digest",
+   "test": "tests/catalog/admission/checker.test.ts",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 checks every member control, not only the mandatory ones 31ms"
+   ]
+  },
+  {
+   "mutation": "wording: experimental admitted (fix 3)",
+   "file": "src/catalog/admission/index.ts",
+   "from": "`experimental${unreviewed}: not admitted as reviewed or qualified`",
+   "to": "`experimental${unreviewed}: admitted as experimental only`",
+   "test": "tests/catalog/admission/checker.test.ts",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 reports the shipped Layer 0 pack as experimental with criteria 2, 9 and 10 not met, and 6 not evaluated 375ms",
+    "\u00d7 reports an experimental, unreviewed draft without failing 32ms"
+   ]
+  },
+  {
+   "mutation": "support field says the declared support (fix 3)",
+   "file": "src/catalog/admission/index.ts",
+   "from": "decision: \"refuse\" as const, support: \"experimental\" as const, reasons };",
+   "to": "decision: \"refuse\" as const, support: declared === \"qualified\" ? \"reviewed\" as const : declared, reasons };",
+   "test": "tests/catalog/admission/checker.test.ts",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 refuses a pack with no mandatory control, even with every review signed (R2) 20ms",
+    "\u00d7 states the support each verdict leaves next to the decision 29ms"
    ]
   },
   {
@@ -84,9 +162,10 @@
    "file": "src/catalog/admission/index.ts",
    "from": "...(declared === \"qualified\" ? [\"qualification rule not defined\"] : [])",
    "to": "...([] as string[])",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses a qualified claim with all ten criteria met: no qualification rule is defined 21ms"
+    "\u00d7 refuses a qualified claim with all ten criteria met: no qualification rule is defined 20ms"
    ]
   },
   {
@@ -94,9 +173,10 @@
    "file": "src/catalog/admission/index.ts",
    "from": "decision: invalid.length === 0 ? \"admit\" as const : \"refuse\" as const,",
    "to": "decision: \"admit\" as const,",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses an experimental draft that fails P1-09 validation 130ms"
+    "\u00d7 refuses an experimental draft that fails P1-09 validation 73ms"
    ]
   },
   {
@@ -104,11 +184,13 @@
    "file": "src/catalog/admission/index.ts",
    "from": "exitCode: reports.every(admissible) && !problems.some((p) => p.severity === \"error\") ? 0 : 1",
    "to": "exitCode: 0",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses an experimental draft that fails P1-09 validation 135ms",
-    "\u00d7 fails a pack that claims reviewed support it does not meet 24ms",
-    "\u00d7 fails a malformed committed admission report, and the loader admits the admission folder 113ms"
+    "\u00d7 ignores and flags a forged admitting report (R1): the gate, the lock and the check all refuse it 70ms",
+    "\u00d7 refuses an experimental draft that fails P1-09 validation 109ms",
+    "\u00d7 fails a pack that claims reviewed support it does not meet 15ms",
+    "\u00d7 fails a malformed committed admission report, and the loader admits the admission folder 254ms"
    ]
   },
   {
@@ -116,9 +198,44 @@
    "file": "src/catalog/admission/index.ts",
    "from": "if (\"error\" in parsed) return [{ code: \"ADM_REPORT_MALFORMED\"",
    "to": "if (\"error\" in parsed) return []; if (false) return [{ code: \"ADM_REPORT_MALFORMED\"",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 fails a malformed committed admission report, and the loader admits the admission folder 80ms"
+    "\u00d7 fails a malformed committed admission report, and the loader admits the admission folder 65ms"
+   ]
+  },
+  {
+   "mutation": "OSCAL export ungated (fix 4)",
+   "file": "src/exports/oscal/oscalCli.ts",
+   "from": "import { loadAdmittedCatalog } from \"../../catalog/admission/gate.js\";",
+   "to": "import { loadCatalog as loadAdmittedCatalog } from \"../../catalog/loader.js\";",
+   "test": "tests/catalog/admission/gatedLoads.test.ts",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 publishes the gated pack support in the OSCAL catalog, never the declared claim 2598ms"
+   ]
+  },
+  {
+   "mutation": "A4 adaptPolicy ungated (item 6: lines 53, 144)",
+   "file": "src/a4/adaptPolicy.ts",
+   "from": "import { loadAdmittedCatalog } from \"../catalog/admission/gate.js\";",
+   "to": "import { loadCatalog as loadAdmittedCatalog } from \"../catalog/loader.js\";",
+   "test": "tests/catalog/admission/gatedLoads.test.ts",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 gives A4's shipped lock, A4 Understand's plan and the CLI compile one lock for the downgraded pack 3282ms",
+    "\u00d7 gives Adapt's shipped lock exactly the activated plan's lock right after activation 3035ms"
+   ]
+  },
+  {
+   "mutation": "CLI compile ungated",
+   "file": "src/catalog/catalogCli.ts",
+   "from": "import { loadAdmittedCatalog } from \"./admission/gate.js\";",
+   "to": "import { loadCatalog as loadAdmittedCatalog } from \"./loader.js\";",
+   "test": "tests/catalog/admission/gatedLoads.test.ts",
+   "result": "killed",
+   "failingTests": [
+    "\u00d7 gives A4's shipped lock, A4 Understand's plan and the CLI compile one lock for the downgraded pack 2805ms"
    ]
   },
   {
@@ -126,9 +243,10 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "if (!/^[A-Za-z0-9.+-]+$/.test(m.licence))",
    "to": "if (false)",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses a pack without a licence: criterion 1, ADM1_LICENCE_MISSING 44ms"
+    "\u00d7 refuses a pack without a licence: criterion 1, ADM1_LICENCE_MISSING 24ms"
    ]
   },
   {
@@ -136,9 +254,10 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "if (first !== second || (locked !== \"(absent)\" && locked !== first)) {",
    "to": "if (false) {",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses a digest that changes between loads (injected timestamp): criterion 1, ADM1_DIGEST_NOT_REPRODUCIBLE 34ms"
+    "\u00d7 refuses a digest that changes between loads (injected timestamp): criterion 1, ADM1_DIGEST_NOT_REPRODUCIBLE 25ms"
    ]
   },
   {
@@ -146,9 +265,10 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "if (c.retrieval.state !== \"verified\")",
    "to": "if (false)",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses an unverified citation in a reviewed pack: criterion 2, ADM2_CITATION_UNVERIFIED 44ms"
+    "\u00d7 refuses an unverified citation in a reviewed pack: criterion 2, ADM2_CITATION_UNVERIFIED 23ms"
    ]
   },
   {
@@ -156,10 +276,11 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "else if (shown === \"unverified\") {",
    "to": "else if (false) {",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses a legal reviewer who authored the control: criterion 2, ADM2_LEGAL_REVIEW_UNVERIFIED 26ms",
-    "\u00d7 names the self-review behind the legal reviewer refusal, and counts a passing negative fixture 19ms"
+    "\u00d7 refuses a legal reviewer who authored the control: criterion 2, ADM2_LEGAL_REVIEW_UNVERIFIED 27ms",
+    "\u00d7 names the self-review behind the legal reviewer refusal, and counts a passing negative fixture 16ms"
    ]
   },
   {
@@ -167,9 +288,10 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "if (a.exclusions.length === 0 && !isAlways(a.predicate)) {",
    "to": "if (false) {",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses empty exclusions with a non-trivial predicate: criterion 3, ADM3_EXCLUSIONS_MISSING 24ms"
+    "\u00d7 refuses empty exclusions with a non-trivial predicate: criterion 3, ADM3_EXCLUSIONS_MISSING 27ms"
    ]
   },
   {
@@ -177,9 +299,11 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "if (b.kind === \"manual\" && (",
    "to": "if (false && (",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses a manual binding without an owner: criterion 4, ADM4_MANUAL_DUTY_INCOMPLETE 36ms"
+    "\u00d7 refuses a manual binding without an owner: criterion 4, ADM4_MANUAL_DUTY_INCOMPLETE 21ms",
+    "\u00d7 checks every member control, not only the mandatory ones 17ms"
    ]
   },
   {
@@ -187,9 +311,10 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "if (!ORACLES[t.type].includes(t.oracle.kind)) {",
    "to": "if (false) {",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses a runtime_enforced test with a human_assessor oracle: criterion 5, ADM5_ORACLE_MISMATCH 21ms"
+    "\u00d7 refuses a runtime_enforced test with a human_assessor oracle: criterion 5, ADM5_ORACLE_MISMATCH 23ms"
    ]
   },
   {
@@ -197,9 +322,10 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "if (missing.length > 0) add(\"ADM6_NEGATIVE_CLASS_MISSING\"",
    "to": "if (false) add(\"ADM6_NEGATIVE_CLASS_MISSING\"",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses no cross_tenant fixture: criterion 6, ADM6_NEGATIVE_CLASS_MISSING 20ms"
+    "\u00d7 refuses no cross_tenant fixture: criterion 6, ADM6_NEGATIVE_CLASS_MISSING 19ms"
    ]
   },
   {
@@ -207,10 +333,11 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "  if (count > 0) {",
    "to": "  if (false) {",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 runs a guard fixture only through a registered harness, and otherwise leaves criterion 6 not evaluated, never met 23ms",
-    "\u00d7 reports the shipped Layer 0 pack as experimental with criteria 2, 9 and 10 not met, and 6 not evaluated 333ms"
+    "\u00d7 runs a guard fixture only through a registered harness, and otherwise leaves criterion 6 not evaluated, never met 52ms",
+    "\u00d7 reports the shipped Layer 0 pack as experimental with criteria 2, 9 and 10 not met, and 6 not evaluated 773ms"
    ]
   },
   {
@@ -218,9 +345,10 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "else if (producer.status !== \"available\")",
    "to": "else if (false)",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses a planned evidence producer: criterion 7, ADM7_PRODUCER_NOT_AVAILABLE 20ms"
+    "\u00d7 refuses a planned evidence producer: criterion 7, ADM7_PRODUCER_NOT_AVAILABLE 65ms"
    ]
   },
   {
@@ -228,9 +356,10 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "own.filter((x) => x.actual !== null && x.actual !== \"deny\" && x.actual !== \"not_evaluated\")",
    "to": "own.filter(() => false)",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses an unknown-authority fixture that passes: criterion 8, ADM8_UNKNOWN_FIXTURE_PASSED 25ms"
+    "\u00d7 refuses an unknown-authority fixture that passes: criterion 8, ADM8_UNKNOWN_FIXTURE_PASSED 31ms"
    ]
   },
   {
@@ -238,9 +367,10 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "if (decided.length > 0 && (!row || row.applicability === \"not_applicable\")) {",
    "to": "if (false) {",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses a control the compiler excludes with every fact unknown: criterion 8, ADM8_UNKNOWN_FACTS_DECIDED 21ms"
+    "\u00d7 refuses a control the compiler excludes with every fact unknown: criterion 8, ADM8_UNKNOWN_FACTS_DECIDED 23ms"
    ]
   },
   {
@@ -248,12 +378,13 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "    if (res.promotion === null) {",
    "to": "    if (false) {",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses a legal reviewer who authored the control: criterion 2, ADM2_LEGAL_REVIEW_UNVERIFIED 21ms",
-    "\u00d7 refuses an AI-drafted control without a human approval of the draft: criterion 9, ADM9_AI_DRAFT_UNAPPROVED 16ms",
-    "\u00d7 names the self-review behind the legal reviewer refusal, and counts a passing negative fixture 15ms",
-    "\u00d7 reports the shipped Layer 0 pack as experimental with criteria 2, 9 and 10 not met, and 6 not evaluated 327ms"
+    "\u00d7 refuses a legal reviewer who authored the control: criterion 2, ADM2_LEGAL_REVIEW_UNVERIFIED 33ms",
+    "\u00d7 refuses an AI-drafted control without a human approval of the draft: criterion 9, ADM9_AI_DRAFT_UNAPPROVED 87ms",
+    "\u00d7 names the self-review behind the legal reviewer refusal, and counts a passing negative fixture 26ms",
+    "\u00d7 refuses a pack with no mandatory control, even with every review signed (R2) 56ms"
    ]
   },
   {
@@ -261,9 +392,10 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "} else if (draftedBy === \"ai\" && (approvedBy === null || !res.promotion.reviewers.includes(approvedBy))) {",
    "to": "} else if (false) {",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses an AI draft whose approvedBy names no reviewer whose record counted: criterion 9, ADM9_AI_DRAFT_UNAPPROVED 18ms"
+    "\u00d7 refuses an AI draft whose approvedBy names no reviewer whose record counted: criterion 9, ADM9_AI_DRAFT_UNAPPROVED 37ms"
    ]
   },
   {
@@ -271,9 +403,10 @@
    "file": "src/catalog/admission/criteria.ts",
    "from": "if (!UNSUPPORTED_HEADING.test(bytes.toString(\"utf8\")))",
    "to": "if (false)",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses a coverage document without an Unsupported behaviour section: criterion 10, ADM10_COVERAGE_SECTION_MISSING 19ms"
+    "\u00d7 refuses a coverage document without an Unsupported behaviour section: criterion 10, ADM10_COVERAGE_SECTION_MISSING 41ms"
    ]
   },
   {
@@ -281,9 +414,10 @@
    "file": "src/catalog/governance/support.ts",
    "from": ".find((t) => people(t) === 3);",
    "to": ".find(() => true);",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses a risk owner who is also the domain lead: criterion 9, ADM9_SIGNOFF_NOT_DISTINCT 24ms"
+    "\u00d7 refuses a risk owner who is also the domain lead: criterion 9, ADM9_SIGNOFF_NOT_DISTINCT 59ms"
    ]
   },
   {
@@ -291,9 +425,10 @@
    "file": "src/catalog/governance/support.ts",
    "from": "holders(\"domain_lead\", pack.stations)",
    "to": "holders(\"domain_lead\", null)",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 refuses a domain lead not credentialed for the pack's stations: criterion 9, ADM9_SIGNOFF_MISSING 21ms"
+    "\u00d7 refuses a domain lead not credentialed for the pack's stations: criterion 9, ADM9_SIGNOFF_MISSING 24ms"
    ]
   },
   {
@@ -301,12 +436,13 @@
    "file": "src/catalog/governance/support.ts",
    "from": "holders(\"risk_owner\", null)",
    "to": "holders(\"domain_lead\", null)",
+   "test": "tests/catalog/admission/checker.test.ts",
    "result": "killed",
    "failingTests": [
-    "\u00d7 admits the complete pack as reviewed, with all ten criteria met and a reproducible digest 183ms",
-    "\u00d7 refuses a qualified claim with all ten criteria met: no qualification rule is defined 17ms",
-    "\u00d7 runs a guard fixture only through a registered harness, and otherwise leaves criterion 6 not evaluated, never met 30ms",
-    "\u00d7 keeps reviewed only with a current, intact report that admits it 268ms"
+    "\u00d7 admits the complete pack as reviewed, with all ten criteria met and a reproducible digest 109ms",
+    "\u00d7 states the support each verdict leaves next to the decision 19ms",
+    "\u00d7 refuses a qualified claim with all ten criteria met: no qualification rule is defined 19ms",
+    "\u00d7 runs a guard fixture only through a registered harness, and otherwise leaves criterion 6 not evaluated, never met 38ms"
    ]
   }
  ]
