@@ -233,6 +233,7 @@ export function notarySignCli(params: {
     signedTs: signed.signedTs,
     backend: signed.backend,
     attestationLevel: signed.attestationLevel,
+    attestationBasis: signed.attestationBasis,
     claims: signed.claims
   };
   writeFileAtomic(resolve(params.outFile), `${canonicalize(out)}\n`, 0o600);

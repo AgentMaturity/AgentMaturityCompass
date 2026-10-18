@@ -58,6 +58,7 @@ function buildNotaryAttestation(params: {
       pubkeyFingerprint: params.signer.pubkeyFingerprint(),
       backend: params.signer.backendType(),
       attestationLevel: params.signer.attestationLevel(),
+      attestationBasis: params.signer.attestationBasis(),
       claims: params.signer.claims()
     },
     runtime: {

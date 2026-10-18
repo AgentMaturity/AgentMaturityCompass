@@ -6,6 +6,7 @@ import { randomUUID } from "node:crypto";
 import { isIP, type Socket } from "node:net";
 import { loadNotaryConfig, resolveNotaryDir } from "./notaryConfigStore.js";
 import { loadNotarySigner } from "./notarySigner.js";
+import type { NotaryAttestationBasis } from "./notaryApiTypes.js";
 import { createNotaryReplayGuard, verifyNotaryRequestAuth } from "./notaryAuth.js";
 import { notarySignRequestSchema } from "./notaryApiTypes.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -35,6 +36,7 @@ interface NotaryRuntimeState {
   notaryDir: string;
   fingerprint: string | null;
   attestationLevel: "SOFTWARE" | "HARDWARE" | null;
+  attestationBasis: NotaryAttestationBasis | null;
 }
 
 function json(res: ServerResponse, status: number, payload: unknown): void {
@@ -128,7 +130,8 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
     reasons: [...reasons],
     notaryDir,
     fingerprint: signer ? signer.pubkeyFingerprint() : null,
-    attestationLevel: signer ? signer.attestationLevel() : null
+    attestationLevel: signer ? signer.attestationLevel() : null,
+    attestationBasis: signer ? signer.attestationBasis() : null
   };
   const limiter = rateLimiter(config.notary.rateLimitPerMinute);
   const markAuthReplay = createNotaryReplayGuard();
@@ -152,7 +155,8 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
           reasons: state.reasons,
           backend: config.notary.backend.type,
           fingerprint: state.fingerprint,
-          attestationLevel: state.attestationLevel
+          attestationLevel: state.attestationLevel,
+          attestationBasis: state.attestationBasis
         });
         return;
       }
@@ -167,6 +171,7 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
           fingerprint: signer.pubkeyFingerprint(),
           backend: signer.backendType(),
           attestationLevel: signer.attestationLevel(),
+          attestationBasis: signer.attestationBasis(),
           claims: signer.claims()
         });
         return;
@@ -259,6 +264,7 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
           signedTs: signed.signedTs,
           backend: signed.backend,
           attestationLevel: signed.attestationLevel,
+          attestationBasis: signed.attestationBasis,
           claims: signed.claims
         };
         const verified = verifyNotarySignResponse(out, payloadBytes);
