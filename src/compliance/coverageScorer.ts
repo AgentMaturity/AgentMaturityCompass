@@ -14,6 +14,10 @@ export function coverageScore(categories: ComplianceCategoryResult[]): Complianc
     notEvaluated: 0
   };
   for (const row of categories) {
+    // A row that cannot be traced to a control cannot count toward coverage (S6, ratified 2026-10-04).
+    if (row.id.trim() === "") {
+      throw new Error(`Compliance category "${row.category}" has no control id; refusing to score it.`);
+    }
     if (row.status === "SATISFIED" && (row.claimKind === "observed" || row.claimKind === "independently_reviewed")) counts.satisfied += 1;
     else if (row.status === "SATISFIED") counts.notEvaluated += 1;
     else if (row.status === "PARTIAL") counts.partial += 1;

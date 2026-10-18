@@ -40,3 +40,18 @@ describe("coverageScore (P0-17)", () => {
     expect(coverage).toEqual({ satisfied: 1, partial: 1, missing: 1, unknown: 0, notEvaluated: 1, evaluated: 3, score: 0.25 });
   });
 });
+
+describe("coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04)", () => {
+  test("zero rows: not evaluated, never a score of 0", () => {
+    expect(coverageScore([])).toEqual({ satisfied: 0, partial: 0, missing: 0, unknown: 0, notEvaluated: 0, evaluated: 0, score: null });
+  });
+
+  test("UNKNOWN earns 0 (it earned 0.25 before S6) and is not an evaluation", () => {
+    expect(coverageScore([row("UNKNOWN")]).score).toBeNull();
+    expect(coverageScore([row("SATISFIED"), row("UNKNOWN"), row("UNKNOWN"), row("UNKNOWN")]).score).toBe(0.25);
+  });
+
+  test.each(["", "   ", "\t"])("a row whose control id is %j throws instead of being scored", (id) => {
+    expect(() => coverageScore([row("SATISFIED"), { ...row("SATISFIED"), id }])).toThrow(/has no control id; refusing to score it/);
+  });
+});
