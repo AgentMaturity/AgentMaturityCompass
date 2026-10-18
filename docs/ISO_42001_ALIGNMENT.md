@@ -1,14 +1,14 @@
 # ISO/IEC 42001 Alignment — AMC Dimension Mapping
 
 Version: 1.0 | Date: 2026-02-23
-Standards: ISO/IEC 42001:2023, ISO/IEC 42005:2025, ISO/IEC 42006:2025
-Status: Engineering alignment mapping — not certification claim
+Standards: ISO/IEC 42001:2023; ISO/IEC 42005:2025 descoped (unverified: source unreachable); ISO/IEC 42006:2025 unverified
+Status: Engineering alignment mapping, experimental (no named-expert sign-off, D-08 pending) — not a certification claim
 
 ---
 
 ## 1. Overview
 
-ISO/IEC 42001 defines requirements for an AI Management System (AIMS). AMC provides automated, evidence-linked compliance signals for all AIMS clause families (4-10) plus companion standards ISO 42005 (AI impact assessment) and ISO 42006 (conformity assessment).
+ISO/IEC 42001 defines requirements for an AI Management System (AIMS). AMC provides automated, evidence-linked compliance signals for all AIMS clause families (4-10), plus impact-assessment and conformity-evidence signals filed under the ISO 42005 and ISO 42006 category names. No ISO/IEC 42005 or 42006 clause text was read: see section 7.
 
 AMC supports `ISO_42001` as a first-class compliance framework:
 
@@ -85,7 +85,7 @@ Risk assessment must account for deployment domain. AMC's domain packs adjust ri
 | AI system development lifecycle | Release management + CI controls | `src/release/`, `src/ci/` |
 | Third-party AI system management | Adapter framework + provider governance | `src/adapters/`, `src/providers/` |
 | Data management | Vault + DLP + data residency | `src/vault/`, `src/compliance/dataResidency.ts` |
-| AI system impact assessment | ISO 42005 impact assessment mappings | `src/compliance/builtInMappings.ts` |
+| AI system impact assessment | AMC impact-assessment signals (ISO 42005 category; ISO/IEC 42005 descoped) | `src/compliance/builtInMappings.ts` |
 
 ### AMC Compliance Mappings
 
@@ -146,9 +146,27 @@ Mapping ID: `iso42001_clause_10_improvement`
 
 ---
 
-## 7. ISO 42005 — AI Impact Assessment
+## 7. ISO 42005 — AI Impact Assessment (descoped)
 
-AMC maps three control categories to ISO/IEC 42005:2025:
+**Descoped on 2026-10-04 (P1-45).** ISO/IEC 42005:2025 is sold by ISO and was
+not readable: iso.org returned HTTP 403 to every fetch on 2026-10-03 and
+2026-10-04, and the IEC webstore page gives only the title, a one-line abstract
+and the publication date. No clause text may be paraphrased from memory, so:
+
+- `ISO_42005` is not a framework family. The name stays as an alias with zero
+  mapped controls and the status `unverified: source unreachable`:
+  `normalizeFrameworkName("ISO/IEC 42005:2025")` is `null` and
+  `classifyFrameworkString` reports `descoped-source-unreachable`
+  (`src/compliance/frameworks.ts`).
+- No clause-level control quotes ISO/IEC 42005 (`src/compliance/frameworks/controls.ts`).
+- The three mappings below keep their ids and the category name "ISO 42005
+  Impact Assessment", so evidence already bound to them still resolves. They
+  are AMC impact-assessment signals filed under `ISO_42001`, not ISO/IEC 42005
+  clause mappings, and the `ISO_42001` family prints this flag in every report.
+- A licensed copy of the standard is Sid's to supply; mapping its clauses then
+  needs a named expert's review (D-08).
+
+The three AMC impact-assessment signals:
 
 | Mapping ID | Category | Focus |
 |---|---|---|
@@ -162,7 +180,7 @@ Related AMC questions: AMC-2.12, AMC-2.13, AMC-2.14
 
 ## 8. ISO 42006 — Conformity Assessment
 
-AMC maps one control category to ISO/IEC 42006:2025:
+AMC files one conformity-evidence signal under the ISO 42006 category name. ISO/IEC 42006:2025 was not read either (its iso.org page was not reached), so this is an AMC signal, not a clause mapping:
 
 | Mapping ID | Category | Focus |
 |---|---|---|
@@ -177,17 +195,21 @@ Requirements:
 
 ## 9. AIMS Clause Coverage Summary
 
-| Clause | Mapping IDs | AMC Modules | Status |
+The mapping status is not a result. A report evaluates each mapping against the
+evidence in its window; without control-bound evidence a category is
+NOT_EVALUATED.
+
+| Clause | Mapping IDs | AMC Modules | Mapping status |
 |---|---|---|---|
-| 4 Context | `iso42001_clause_4_context` | setup, org, domains | PARTIAL |
-| 5 Leadership | `iso42001_clause_5_leadership` | approvals, governor, identity | PARTIAL |
-| 6 Planning | `iso42001_clause_6_planning` | forecast, ops, mechanic | PARTIAL |
-| 7 Support | `iso42001_clause_7_support` | docs, eval-harness | PARTIAL |
-| 8 Operation | `iso42001_clause_8_operation` | governor, workorders, vault | PARTIAL |
-| 9 Performance | `iso42001_clause_9_performance_evaluation` | drift, watch, audit, score | PARTIAL |
-| 10 Improvement | `iso42001_clause_10_improvement` | corrections, incidents, loop | PARTIAL |
-| 42005 Impact | 3 mappings | assurance, forecast, audit | PARTIAL |
-| 42006 Conformity | 1 mapping | certify, audit, passport | PARTIAL |
+| 4 Context | `iso42001_clause_4_context` | setup, org, domains | experimental |
+| 5 Leadership | `iso42001_clause_5_leadership` | approvals, governor, identity | experimental |
+| 6 Planning | `iso42001_clause_6_planning` | forecast, ops, mechanic | experimental |
+| 7 Support | `iso42001_clause_7_support` | docs, eval-harness | experimental |
+| 8 Operation | `iso42001_clause_8_operation` | governor, workorders, vault | experimental |
+| 9 Performance | `iso42001_clause_9_performance_evaluation` | drift, watch, audit, score | experimental |
+| 10 Improvement | `iso42001_clause_10_improvement` | corrections, incidents, loop | experimental |
+| 42005 Impact | 3 mappings | assurance, forecast, audit | experimental; ISO/IEC 42005 descoped (unverified: source unreachable) |
+| 42006 Conformity | 1 mapping | certify, audit, passport | experimental; ISO/IEC 42006 unverified |
 
 Technical controls are strong. Management-system formalization (signed policy docs, internal audit cadence, CAPA register) is the primary gap. See `docs/compliance/iso-42001-aims-manual.md` for the detailed 90-day remediation plan.
 
@@ -195,8 +217,14 @@ Technical controls are strong. Management-system formalization (signed policy do
 
 ## References
 
-- ISO/IEC 42001:2023: https://www.iso.org/standard/81230.html
-- ISO/IEC 42005:2025: https://www.iso.org/standard/44546.html
-- ISO/IEC 42006:2025: https://www.iso.org/standard/44547.html
+| Standard | Catalogue page | Status |
+|---|---|---|
+| ISO/IEC 42001:2023 | https://www.iso.org/standard/81230.html | unverified: iso.org answered HTTP 403 to every fetch on 2026-10-03 and 2026-10-04 |
+| ISO/IEC 42005:2025 | https://webstore.iec.ch/en/publication/107659 (IEC co-publishes ISO/IEC standards) | descoped, unverified: source unreachable. The IEC page, read 2026-10-04, gives the title, a one-line abstract, publication 2025-05-28 and edition 1.0; no clause text |
+| ISO/IEC 42006:2025 | iso.org page not reached | unverified: catalogue number not confirmed |
+
+The ISO texts are sold by ISO and were not read for these mappings, which carry
+no `sources` entries.
+
 - AMC Compliance Engine: `src/compliance/complianceEngine.ts`
 - AMC AIMS Manual (Draft): `docs/compliance/iso-42001-aims-manual.md`
