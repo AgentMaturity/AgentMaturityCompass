@@ -75,7 +75,7 @@
       "a key pinned for another purpose promotes nothing",
       "a review dated before its key was valid promotes nothing",
       "a trust list that does not verify (m-of-n unmet, tampered) or does not exist promotes nothing",
-      "a key some loaded list pins for another purpose is never admitted for catalog-review, even from a catalog-review-only entry",
+      "trust comes only from the operator's AMC home: caller-chosen roots and lists mint nothing, and no trust-roots.json promotes nothing",
       "trust and signatures are judged at the server's clock; asOf only looks ahead for due dates",
       "a catalog-review key that a list also pins for another purpose is refused for every purpose"
     ]
@@ -89,7 +89,6 @@
       "a revoked key promotes nothing",
       "a key pinned for another purpose promotes nothing",
       "a review dated before its key was valid promotes nothing",
-      "a key some loaded list pins for another purpose is never admitted for catalog-review, even from a catalog-review-only entry",
       "trust and signatures are judged at the server's clock; asOf only looks ahead for due dates",
       "a catalog-review key that a list also pins for another purpose is refused for every purpose"
     ]
@@ -128,6 +127,7 @@
     "killed": true,
     "failingTests": [
       "independence uses the roster's git identities and the declared name, not only the key's subject; off-roster reviewers never count",
+      "identities ignore default-ignorable code points (zero-width space, ZWJ, ZWNJ, soft hyphen)",
       "identities match after NFKC, whitespace collapsing, casefolding, +tag and trailing-dot stripping",
       "reviewers who share any normalized identifier (subject or roster git identity) are one person"
     ]
@@ -150,6 +150,7 @@
       "a self-review by a pinned author promotes nothing",
       "a self-review matched by the author's git email promotes nothing",
       "independence uses the roster's git identities and the declared name, not only the key's subject; off-roster reviewers never count",
+      "identities ignore default-ignorable code points (zero-width space, ZWJ, ZWNJ, soft hyphen)",
       "identities match after NFKC, whitespace collapsing, casefolding, +tag and trailing-dot stripping"
     ]
   },
@@ -161,6 +162,7 @@
     "failingTests": [
       "a self-review matched by the author's git email promotes nothing",
       "independence uses the roster's git identities and the declared name, not only the key's subject; off-roster reviewers never count",
+      "identities ignore default-ignorable code points (zero-width space, ZWJ, ZWNJ, soft hyphen)",
       "identities match after NFKC, whitespace collapsing, casefolding, +tag and trailing-dot stripping",
       "reviewers who share any normalized identifier (subject or roster git identity) are one person"
     ]
@@ -318,6 +320,51 @@
     "killed": true,
     "failingTests": [
       "trust and signatures are judged at the server's clock; asOf only looks ahead for due dates"
+    ]
+  },
+  {
+    "guard": "trust: roots must be configured",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "trust comes only from the operator's AMC home: caller-chosen roots and lists mint nothing, and no trust-roots.json promotes nothing"
+    ]
+  },
+  {
+    "guard": "trust: never from the caller",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "trust comes only from the operator's AMC home: caller-chosen roots and lists mint nothing, and no trust-roots.json promotes nothing"
+    ]
+  },
+  {
+    "guard": "identity: default-ignorables stripped",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "identities ignore default-ignorable code points (zero-width space, ZWJ, ZWNJ, soft hyphen)"
+    ]
+  },
+  {
+    "guard": "identity: names also match without spaces",
+    "file": "src/catalog/governance/support.ts",
+    "test": "tests/catalog/governance/reviewRecord.test.ts",
+    "killed": true,
+    "failingTests": [
+      "identities ignore default-ignorable code points (zero-width space, ZWJ, ZWNJ, soft hyphen)"
+    ]
+  },
+  {
+    "guard": "route: only accepted promotions bound",
+    "file": "src/catalog/compiler/compile.ts",
+    "test": "tests/catalog/governance/currency.test.ts",
+    "killed": true,
+    "failingTests": [
+      "only promotions effectiveSupport minted count; empty, hand-built and not-yet-reviewed ones are demoted; record digests are bound"
     ]
   },
   {
