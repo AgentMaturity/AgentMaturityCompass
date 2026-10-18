@@ -3,13 +3,13 @@
     "CIT001": {
       "zeroTolerance": true,
       "issue": "P0-24",
-      "reason": "P1-42: the round-2 station content adds 57 catalogue records (EU +18, US +34, intl +5 incomplete) without P1-09's instrument, clause, edition and statusType fields, which P1-09 and the D-08 experts complete; the per-station split moves pack findings out of industryPacks.ts (310 -> 206), so CIT004 falls from 620 to 573 overall. CIT002 unchanged from P0-24: it keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert.",
+      "reason": "P0-24: corrected superseded citations (OMB M-25-21, SR 26-2, QMSR, EEOC guidance withdrawn) and the ATLAS prompt-injection id; CIT001 is now zero tolerance; CIT002 keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert",
       "counts": {}
     },
     "CIT002": {
       "zeroTolerance": false,
       "issue": "P0-24",
-      "reason": "P1-42: the round-2 station content adds 57 catalogue records (EU +18, US +34, intl +5 incomplete) without P1-09's instrument, clause, edition and statusType fields, which P1-09 and the D-08 experts complete; the per-station split moves pack findings out of industryPacks.ts (310 -> 206), so CIT004 falls from 620 to 573 overall. CIT002 unchanged from P0-24: it keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert.",
+      "reason": "P0-24: corrected superseded citations (OMB M-25-21, SR 26-2, QMSR, EEOC guidance withdrawn) and the ATLAS prompt-injection id; CIT001 is now zero tolerance; CIT002 keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert",
       "counts": {
         "src/domains/industryPackAudit.ts": 2,
         "src/score/crossFrameworkMapping.ts": 1
@@ -18,16 +18,16 @@
     "CIT003": {
       "zeroTolerance": true,
       "issue": "P0-25",
-      "reason": "P1-42: the round-2 station content adds 57 catalogue records (EU +18, US +34, intl +5 incomplete) without P1-09's instrument, clause, edition and statusType fields, which P1-09 and the D-08 experts complete; the per-station split moves pack findings out of industryPacks.ts (310 -> 206), so CIT004 falls from 620 to 573 overall. CIT002 unchanged from P0-24: it keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert.",
+      "reason": "P0-24: corrected superseded citations (OMB M-25-21, SR 26-2, QMSR, EEOC guidance withdrawn) and the ATLAS prompt-injection id; CIT001 is now zero tolerance; CIT002 keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert",
       "counts": {}
     },
     "CIT004": {
       "zeroTolerance": false,
       "issue": "P1-09",
-      "reason": "P1-42: the round-2 station content adds 57 catalogue records (EU +18, US +34, intl +5 incomplete) without P1-09's instrument, clause, edition and statusType fields, which P1-09 and the D-08 experts complete; the per-station split moves pack findings out of industryPacks.ts (310 -> 206), so CIT004 falls from 620 to 573 overall. CIT002 unchanged from P0-24: it keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert.",
+      "reason": "P0-24: corrected superseded citations (OMB M-25-21, SR 26-2, QMSR, EEOC guidance withdrawn) and the ATLAS prompt-injection id; CIT001 is now zero tolerance; CIT002 keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert P1-42: CIT004 counts change with the landed round-2 content. scripts/check-citations.mjs credits every pack finding to src/domains/industryPacks.ts, so its 310 -> 224 comes from the content change (more round-2 citations resolve to catalogue records; the 77 questions kept pending Sid keep main's citations), not from the per-station split. The catalogue files rise because the 57 records round 2 adds carry citation, status and source but not P1-09's instrument, clause, edition and statusType (P1-09 and the D-08 experts complete them): catalogueEu 79 -> 97, catalogueUs 42 -> 76, catalogueIntl 146 -> 151.",
       "counts": {
         "src/domains/domainRegistry.ts": 14,
-        "src/domains/industryPacks.ts": 206,
+        "src/domains/industryPacks.ts": 224,
         "src/domains/packs/catalogueEu.ts": 97,
         "src/domains/packs/catalogueIntl.ts": 151,
         "src/domains/packs/catalogueUs.ts": 76,
@@ -37,10 +37,10 @@
     "CIT005": {
       "zeroTolerance": true,
       "issue": "P0-25",
-      "reason": "P1-42: the round-2 station content adds 57 catalogue records (EU +18, US +34, intl +5 incomplete) without P1-09's instrument, clause, edition and statusType fields, which P1-09 and the D-08 experts complete; the per-station split moves pack findings out of industryPacks.ts (310 -> 206), so CIT004 falls from 620 to 573 overall. CIT002 unchanged from P0-24: it keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert.",
+      "reason": "P0-24: corrected superseded citations (OMB M-25-21, SR 26-2, QMSR, EEOC guidance withdrawn) and the ATLAS prompt-injection id; CIT001 is now zero tolerance; CIT002 keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert",
       "counts": {}
     }
   },
-  "reason": "P1-42: the round-2 station content adds 57 catalogue records (EU +18, US +34, intl +5 incomplete) without P1-09's instrument, clause, edition and statusType fields, which P1-09 and the D-08 experts complete; the per-station split moves pack findings out of industryPacks.ts (310 -> 206), so CIT004 falls from 620 to 573 overall. CIT002 unchanged from P0-24: it keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert.",
+  "reason": "P0-24: corrected superseded citations (OMB M-25-21, SR 26-2, QMSR, EEOC guidance withdrawn) and the ATLAS prompt-injection id; CIT001 is now zero tolerance; CIT002 keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert P1-42: CIT004 counts change with the landed round-2 content. scripts/check-citations.mjs credits every pack finding to src/domains/industryPacks.ts, so its 310 -> 224 comes from the content change (more round-2 citations resolve to catalogue records; the 77 questions kept pending Sid keep main's citations), not from the per-station split. The catalogue files rise because the 57 records round 2 adds carry citation, status and source but not P1-09's instrument, clause, edition and statusType (P1-09 and the D-08 experts complete them): catalogueEu 79 -> 97, catalogueUs 42 -> 76, catalogueIntl 146 -> 151.",
   "updatedAt": "2026-10-18"
 }
