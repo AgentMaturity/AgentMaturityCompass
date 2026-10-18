@@ -6,7 +6,7 @@ import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from ".
 import { toErrorMessage } from "./utils/errors.js";
 import { envelopeFromDimensions } from "./claims/eligibility/adapters/results.js";
 import type { ClaimEnvelope, ClaimKind, StatusDimensions } from "./claims/eligibility/types.js";
-import { printClaimResult, selfAnswerClaim, withClaimFields } from "./cli/claimOutput.js";
+import { printClaimResult, withClaimFields } from "./cli/claimOutput.js";
 import type { Station } from "./domains/stations.js";
 import type { ConformanceStationProfile, PackResponseEvidence } from "./domains/conformance/index.js";
 
@@ -229,11 +229,12 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .command("run")
     .description("Run an industry sector pack — interactive assessment or baseline score")
     .requiredOption("--pack <packId>", "Pack ID")
-    .option("--baseline", "Score with L1 defaults (no interaction needed)", false)
+    .option("--baseline", "Run with no answers: every question is not evaluated and no score is computed (no interaction needed)", false)
     .option("--json", "Output as JSON")
     .action(async (opts: { pack: string; baseline: boolean; json?: boolean }) => {
       const { getPackById, scoreIndustryPack } = await import("./domains/industryPacks.js");
       const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
+      const { packSelfAssessmentEnvelope } = await import("./domains/packSelfAssessment.js");
       type PackIdType = Parameters<typeof scoreIndustryPack>[0];
       const pack = getPackById(opts.pack);
       if (!pack) {
@@ -256,8 +257,8 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
         console.log(chalk.gray(`  Questions: ${pack.questions.length}\n`));
       }
 
-      // Baseline and non-interactive runs answer nothing: unanswered questions count as 1 and the
-      // self-assessment reads incomplete, so a default is never reported as an answer.
+      // Baseline and non-interactive runs answer nothing: every question is not evaluated, so no
+      // score or level is computed (packSelfAssessment.ts), and the self-assessment reads incomplete.
       const responses: Record<string, number> = {};
 
       if (!opts.baseline && process.stdin.isTTY) {
@@ -279,14 +280,16 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       }
 
       const result = scoreIndustryPack(opts.pack as PackIdType, responses);
-      // The same envelope scoreIndustryPack derives its claimKind and eligibleLevel from (src/domains/packSelfAssessment.ts).
-      const claim = selfAnswerClaim(`industry-pack:${pack.id}`, Object.values(responses), true);
+      // The same envelope scoreIndustryPack derives its claimKind and eligibleLevel from.
+      const claim = packSelfAssessmentEnvelope(pack, responses, Date.now());
       if (opts.json) { console.log(JSON.stringify(withClaimFields(result, claim), null, 2)); return; }
 
       console.log(chalk.bold("  Results:"));
       printClaimResult(claim, opts);
       console.log(`    Pack:       ${result.packId}`);
-      console.log(`    Self-reported score: ${result.percentage.toFixed(1)} / 100 (L${result.level})`);
+      console.log(result.percentage === null
+        ? `    Self-reported score: not evaluated (${result.notEvaluatedQuestionIds.length} of ${result.selfAssessment.total} questions unanswered)`
+        : `    Self-reported score: ${result.percentage.toFixed(1)} / 100 (L${result.level})`);
       const { complete, answered, total } = result.selfAssessment;
       console.log(`    Self-assessment:     ${complete ? "complete" : "incomplete"} (${answered}/${total} answered; self-reported; not a certification)`);
       console.log(`    Eligible level:      ${result.eligibleLevel === null ? "none" : `L${result.eligibleLevel}`} (self-reported answers cap at L1)`);

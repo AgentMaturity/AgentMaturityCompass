@@ -43,9 +43,13 @@ describe("freight, 3PL, and warehouse industry pack", () => {
       "MOB-F3W-15"
     ]));
     expect(pack.questions.length).toBeGreaterThanOrEqual(15);
-    expect(baseline.level).toBe(1);
+    // P1-44: with no answers nothing is evaluated: no level, no gap, every question listed (was L1 and a gap each).
+    expect(baseline.level).toBeNull();
     expect(baseline.selfAssessment).toEqual({ complete: false, answered: 0, total: pack.questions.length });
-    expect(baseline.complianceGaps.length).toBe(pack.questions.length);
+    expect(baseline.complianceGaps).toEqual([]);
+    expect(baseline.notEvaluatedQuestionIds).toEqual(pack.questions.map((question) => question.id));
+    const low = scoreIndustryPack("freight-3pl-warehouse", Object.fromEntries(pack.questions.map((question) => [question.id, 1])));
+    expect(low.complianceGaps.length).toBe(pack.questions.length);
     // P0-21: all-5 answers are a complete self-assessment, self-reported and capped at L1, never certified.
     expect(mature.level).toBe(5);
     expect(mature.percentage).toBe(100);

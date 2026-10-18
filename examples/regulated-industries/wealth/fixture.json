@@ -1,0 +1,8 @@
+{
+  "station": "wealth",
+  "note": "Synthetic fixture. No client data. Capability flags describe a hypothetical agent for the CLI's risk classifier.",
+  "industryPack": "digital-payments",
+  "assurancePack": "wealthManagementMiFID",
+  "capabilities": { "chatbot": true, "essentialServices": true },
+  "prompt": "List the disclosures a suitability note for a synthetic test client should contain."
+}

@@ -1,0 +1,173 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-44
+
+ ❯ tests/industryPackMcpClaims.test.ts (12 tests | 9 failed) 1748ms
+     × all questions answered: self_reported with status dimensions, and no certified key anywhere 213ms
+     × one question unanswered: listed as not evaluated, and no level or percentage is computed 134ms
+     × the tool description says unanswered questions are not evaluated 45ms
+     × amc_list_industry_packs 176ms
+     × amc_get_industry_pack 188ms
+     × amc_score_industry_pack 176ms
+     × amc_industry_station_summary 152ms
+     × list and station summary return the same result with and without a licence, apart from the locked flag 366ms
+     × pack content and scoring are refused with the one paywall message while locked 157ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/industryPackMcpClaims.test.ts > amc_score_industry_pack claims > all questions answered: self_reported with status dimensions, and no certified key anywhere
+AssertionError: expected undefined to be 'self_reported' // Object.is equality
+
+- Expected:
+"self_reported"
+
++ Received:
+undefined
+
+ ❯ tests/industryPackMcpClaims.test.ts:87:39
+     85|     const out = await call(await connect(options(true)), "amc_score_in…
+     86|     expect(out.isError).toBe(false);
+     87|     expect(out.structured?.claimKind).toBe("self_reported");
+       |                                       ^
+     88|     expect(out.structured?.statusDimensions).toMatchObject({ result: "…
+     89|     expect(out.texts[1]).toMatch(/self-reported/i);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  tests/industryPackMcpClaims.test.ts > amc_score_industry_pack claims > one question unanswered: listed as not evaluated, and no level or percentage is computed
+AssertionError: expected undefined to deeply equal [ 'WLT-DP-1' ]
+
+- Expected:
+[
+  "WLT-DP-1",
+]
+
++ Received:
+undefined
+
+ ❯ tests/industryPackMcpClaims.test.ts:104:46
+    102|     const out = await call(await connect(options(true)), "amc_score_in…
+    103|     expect(out.isError).toBe(false);
+    104|     expect(out.body.notEvaluatedQuestionIds).toEqual([missing!.id]);
+       |                                              ^
+    105|     expect(out.body.result).toBeNull();
+    106|     expect(out.body.selfAssessment).toEqual({ complete: false, answere…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  tests/industryPackMcpClaims.test.ts > amc_score_industry_pack claims > the tool description says unanswered questions are not evaluated
+AssertionError: expected 'Score self-reported question levels (…' to match /not evaluated/i
+
+- Expected:
+/not evaluated/i
+
++ Received:
+"Score self-reported question levels (1-5) against an industry pack. Unanswered questions score as L1. Requires an Industry Packs entitlement. (read-only)"
+
+ ❯ tests/industryPackMcpClaims.test.ts:118:31
+    116|     const { tools } = await (await connect(options(false))).listTools(…
+    117|     const score = tools.find((t) => t.name === "amc_score_industry_pac…
+    118|     expect(score.description).toMatch(/not evaluated/i);
+       |                               ^
+    119|     expect(score.description).not.toMatch(/score as L1/i);
+    120|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  tests/industryPackMcpClaims.test.ts > every O17 result carries a claim kind > amc_list_industry_packs
+ FAIL  tests/industryPackMcpClaims.test.ts > every O17 result carries a claim kind > amc_get_industry_pack
+ FAIL  tests/industryPackMcpClaims.test.ts > every O17 result carries a claim kind > amc_score_industry_pack
+ FAIL  tests/industryPackMcpClaims.test.ts > every O17 result carries a claim kind > amc_industry_station_summary
+AssertionError: expected [ 'synthetic_example', …(3) ] to include undefined
+ ❯ tests/industryPackMcpClaims.test.ts:132:90
+    130|     const out = await call(await connect(options(true)), name, args);
+    131|     expect(out.isError).toBe(false);
+    132|     expect(["synthetic_example", "self_reported", "observed", "indepen…
+       |                                                                                          ^
+    133|     expect(out.structured?.statusDimensions).toBeDefined();
+    134|     expect(out.texts[1]).toContain("Claim kinds: see docs/CLAIM_KINDS.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  tests/industryPackMcpClaims.test.ts > a licence changes access, never a result (D-06 = B) > list and station summary return the same result with and without a licence, apart from the locked flag
+AssertionError: expected { ok: true, locked: null, …(1) } to deeply equal { ok: true, locked: null, …(1) }
+
+- Expected
++ Received
+
+  {
+    "locked": null,
+    "ok": true,
+    "summary": {
++     "frameworks": [
++       "EU eIDAS 2.0 2024/1183",
++       "GDPR Art. 6/9/22",
++       "EU AI Act Annex III §8",
++       "ISO/IEC 29115:2013",
++       "Council of Europe AI Convention 2024",
++       "EU AI Act Art. 5(1)(a)",
++       "EU DSA Art. 34",
++       "EU GDPR Art. 9(d)",
++       "Council of Europe Rec CM/Rec(2017)5",
++       "EU Code of Practice on Disinformation 2022",
++       "EU EIF v2",
++       "EU Open Data Directive 2019/1024",
++       "GDPR Art. 6(1)(e)",
++       "US FOIA (5 U.S.C. §552)",
++       "ISO 25000 SQuaRE",
++       "EU SDG 2018/1724",
++       "eIDAS 2.0",
++       "WCAG 2.1 AA",
++       "EU AI Act Annex III §5/8",
++       "ISO 9241-210:2019",
++       "UN SDG 17",
++       "UNGPs",
++       "OECD PPP Framework",
++       "UNCAC",
++       "ISO 26000:2010 §6.6",
++       "G20 Responsible AI Principles",
++     ],
+      "packCount": 5,
+      "stationId": "governance",
+      "totalQuestions": 75,
+    },
+  }
+
+ ❯ tests/industryPackMcpClaims.test.ts:164:30
+    162|     ] as const) {
+    163|       const [a, b] = [await call(on, name, args), await call(off, name…
+    164|       expect(unlock(a.body)).toEqual(unlock(b.body));
+       |                              ^
+    165|       expect(a.structured?.claimKind).toBe(b.structured?.claimKind);
+    166|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  tests/industryPackMcpClaims.test.ts > a licence changes access, never a result (D-06 = B) > pack content and scoring are refused with the one paywall message while locked
+AssertionError: expected 'Industry Packs are locked: pack quest…' to contain 'amc_get_industry_pack'
+
+- Expected
++ Received
+
+- amc_get_industry_pack
++ Industry Packs are locked: pack questions and pack runs need an Industry Packs licence (CLI: amc domain pack describe|run and amc domain assess|gaps|report|assurance|roadmap|apply; Studio: GET /industry-packs/<id>; MCP: amc_score_sector_pack).
++ Pack names and descriptions stay visible. A licence unlocks access only; it never changes a score, gap, report or other result.
++ Price: US$9.99/month (plan industry-packs-monthly).
++ Checkout is not available in this deployment; contact sales for access.
++ If you already hold a licence: amc domain pack activate --key <licence-key>
+
+ ❯ tests/industryPackMcpClaims.test.ts:180:29
+    178|       expect(error.code).toBe("industry_packs_locked");
+    179|       expect(error.message).toContain("Industry Packs are locked");
+    180|       expect(error.message).toContain(name);
+       |                             ^
+    181|       expect(error.message).toContain("it never changes a score");
+    182|       expect(out.texts.join("\n")).not.toContain(PACK.questions[0]!.te…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  9 failed | 3 passed (12)
+   Start at  06:49:47
+   Duration  4.45s (transform 2.06s, setup 219ms, import 2.27s, tests 1.75s, environment 0ms)
+

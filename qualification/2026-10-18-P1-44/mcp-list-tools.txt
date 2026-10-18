@@ -1,0 +1,40 @@
+# node dist/cli.js mcp list-tools --json at b237fda5f (local macOS arm64, not CI)
+## without AMC_A4_PREVIEW
+count 15
+amc_list_agents
+amc_quickscore
+amc_get_guide
+amc_check_compliance
+amc_transparency_report
+amc_score_sector_pack
+amc_score_agent
+amc_list_evidence
+amc_query_diagnostic
+amc_get_recommendations
+amc_incident_clocks
+amc_list_industry_packs
+amc_get_industry_pack
+amc_score_industry_pack
+amc_industry_station_summary
+## with AMC_A4_PREVIEW=1
+count 20
+amc_list_agents
+amc_quickscore
+amc_get_guide
+amc_check_compliance
+amc_transparency_report
+amc_score_sector_pack
+amc_score_agent
+amc_list_evidence
+amc_query_diagnostic
+amc_get_recommendations
+amc_incident_clocks
+amc_list_industry_packs
+amc_get_industry_pack
+amc_score_industry_pack
+amc_industry_station_summary
+amc_a4_list_projects
+amc_a4_project
+amc_a4_readiness
+amc_a4_conformance
+amc_a4_comment

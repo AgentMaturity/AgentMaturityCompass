@@ -230,6 +230,10 @@ jobs:
       - name: Changelog page drift
         run: npm run check:changelog-page
 
+      # P1-38: docs/providers/CAPABILITY_MATRIX.md is the rendering of its test evidence.
+      - name: Capability matrix drift
+        run: npm run check:capability-matrix
+
       - name: Vendored kernel integrity
         run: |
           npm run check:vendor-links

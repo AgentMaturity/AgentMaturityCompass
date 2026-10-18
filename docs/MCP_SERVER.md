@@ -114,7 +114,8 @@ The same fields are in `structuredContent`: `{ claimKind, statusDimensions, clai
 | `amc_quickscore`, `amc_get_guide`, `amc_transparency_report`, `amc_score_agent`, `amc_get_recommendations` | The agent's latest diagnostic run when this workspace's auditor key sealed it (`envelopeForDiagnosticReport`); otherwise not evaluated |
 | `amc_query_diagnostic` | The run it shows, on the same terms |
 | `amc_check_compliance` | A regulated result that is not evaluated: the gaps come from dimension scores, not from evidence bound to a control |
-| `amc_score_sector_pack` | The regulated self-assessment envelope: self-reported, never a pass, at most level 1 |
+| `amc_score_sector_pack`, `amc_score_industry_pack` | The regulated self-assessment envelope: self-reported, never a pass, at most level 1 |
+| `amc_list_industry_packs`, `amc_get_industry_pack`, `amc_industry_station_summary` | Catalog data, not a result about an agent: not evaluated |
 | `amc_list_agents`, `amc_list_evidence` | The listing itself is not evaluated; each agent shows its latest run's claim kind, and each evidence event shows the kind of its effective trust tier |
 | `amc_incident_clocks` | A regulated listing that is not evaluated: deadlines run from operator-recorded trigger and notice times, and applicability is unresolved |
 | `amc_a4_project`, `amc_a4_readiness` (A4 preview) | The readiness evaluator's own envelope (`claim` of `amc.a4-readiness/v1`), never one composed by the tool; it is evaluated in the MCP process, where `signing.available` reads `WAITING` (see A4 Forge tools) |
@@ -211,12 +212,12 @@ Score an agent against an industry-specific Sector Pack.
 
 ```
 Input:  { packId: string, responses: Record<questionId, integer 1-5> }
-Output: self-reported score and level, "Self-assessment: complete (self-reported; not a certification)", complianceGaps
+Output: self-reported score and level, or "not evaluated: N of M questions unanswered", "Self-assessment: complete (self-reported; not a certification)", complianceGaps
 ```
 
-Responses are self-declared Likert answers; a value that is not an integer 1-5 fails the call. A complete self-assessment is not a certification and caps at L1 (see [CLAIM_KINDS.md](CLAIM_KINDS.md)). Its claim line reads `Claim: Self-reported · Result: not evaluated (self-reported answers or records cannot satisfy a regulated control) · …`. Only a pack's own id is accepted: inherited names such as `__proto__` or `constructor` return "Unknown sector pack".
+Responses are self-declared Likert answers; a value that is not an integer 1-5 fails the call. An unanswered question is not evaluated: it gets no level and no gap, and no score is printed until every question is answered. A complete self-assessment is not a certification and caps at L1 (see [CLAIM_KINDS.md](CLAIM_KINDS.md)). Its claim line reads `Claim: Self-reported · Result: not evaluated (self-reported answers or records cannot satisfy a regulated control) · …`. Only a pack's own id is accepted: inherited names such as `__proto__` or `constructor` return "Unknown sector pack".
 
-Available pack IDs (40 total across 7 stations):
+Example pack IDs (`amc_list_industry_packs` lists every pack):
 
 | Station | Example Packs |
 |---|---|
@@ -229,6 +230,18 @@ Available pack IDs (40 total across 7 stations):
 | Governance | `digital-citizens-rights`, `dance-of-democracy`, `citizen-services` |
 
 **Example prompt:** *"Score my healthcare agent against the clinical-trials sector pack"*
+
+---
+
+### Industry pack tools
+`amc_list_industry_packs`, `amc_get_industry_pack`, `amc_score_industry_pack` and `amc_industry_station_summary` list, show and score the industry packs. Pack questions and scoring need an Industry Packs licence; a licence changes access, never a result. `amc_score_industry_pack` returns the same scorer's result: unanswered questions are listed in `notEvaluatedQuestionIds`, and `percentage` and `level` are `null` until every question is answered. See [MCP_INDUSTRY_PACKS.md](MCP_INDUSTRY_PACKS.md).
+
+```
+amc_list_industry_packs       { station?: string }
+amc_get_industry_pack         { packId: string }
+amc_score_industry_pack       { packId: string, responses: Record<questionId, integer 1-5> }
+amc_industry_station_summary  { station: string }
+```
 
 ---
 
@@ -329,7 +342,7 @@ No network ports are opened. No data leaves your machine. The server reads from 
 - **Read-mostly** — the MCP server reads AMC data; it does not run diagnostics or modify agent configs
 - **Read-only tools** — no tool modifies agent configs or runs diagnostics; the only write is the A4 preview's `amc_a4_comment`, which asks the running Studio to record a self-reported comment as the configured signed-in user
 - **Workspace-scoped** — all data comes from the local `.amc/` directory in your project
-- **Credentials** — the eleven core tools need none. The A4 preview's `amc_a4_comment` needs the `amc approvals login` session file named by `AMC_A4_SESSION_TOKEN_FILE`, and when it is set the A4 reads verify it too. That file is a live Studio session that the agent host can read, so the server accepts only a `VIEWER`-only user's session (see A4 Forge tools)
+- **Credentials** — the fifteen core tools need none; the pack-content tools (`amc_score_sector_pack`, `amc_get_industry_pack`, `amc_score_industry_pack`) need an Industry Packs licence that verifies against a key pinned in the trust list. The A4 preview's `amc_a4_comment` needs the `amc approvals login` session file named by `AMC_A4_SESSION_TOKEN_FILE`, and when it is set the A4 reads verify it too. That file is a live Studio session that the agent host can read, so the server accepts only a `VIEWER`-only user's session (see A4 Forge tools)
 - **No vault in the agent host** — never set `AMC_VAULT_PASSPHRASE` or `AMC_VAULT_PASSPHRASE_FILE` in the MCP server's environment (its MCP config `env` or the agent host's shell). The passphrase, or the file holding it, opens the vault that holds the auditor key signing users.yaml, so an agent host holding it could make itself an `OWNER`. The server signs nothing: `amc_a4_comment` is signed by Studio, and every A4 tool refuses with 403 `A4_SIGNING_KEY_IN_AGENT_HOST` while either variable is set
 
 ---
