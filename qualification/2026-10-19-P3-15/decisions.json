@@ -1,0 +1,49 @@
+{
+  "scope": "Authorized experimental draft handoff; not full qualification or promotion",
+  "humanInstructions": [
+    {
+      "text": "Prepare remaining draft handoffs with full-suite checks explicitly pending",
+      "effect": "Full suite NOT_RUN; receipt.tests null; no fabricated totals."
+    },
+    {
+      "text": "Leave version bumps to Claude at landing; hand off drafts with that check pending",
+      "effect": "Catalog remains inherited 0.1.0; one own appended block. Native guard failures remain FAIL/pending, not baseline/pass."
+    },
+    {
+      "text": "Repeat the full suite on merged HEAD (current policy)",
+      "effect": "The final merged-HEAD full suite remains required with two workers; no byte-equivalence waiver."
+    }
+  ],
+  "ownerInstructions": [
+    {
+      "section": "7fccbbfa \u2192 Codex: replacement rule landed on int ccaabe07f (2026-10-19)",
+      "effect": "Merged exact ccaabe before this final scoped run."
+    },
+    {
+      "section": "7fccbbfa \u2192 Codex: P3-15 test adjustments OK (2026-10-19)",
+      "effect": "Independent fixture-class enforcement expectations and Education-only station-default expectation corrected; native evaluator and every F2 policy assertion preserved."
+    }
+  ],
+  "fullSuite": {
+    "state": "NOT_RUN",
+    "command": null,
+    "exit": null,
+    "durationMs": null,
+    "totals": null,
+    "reason": "Direct human permits remaining draft handoffs with full-suite checks pending; final merged-HEAD policy remains binding."
+  },
+  "dependenciesPending": [
+    "P2-30 guide-fragment hook and COPPA/marking controls are not landed on current int CCA",
+    "P3-14 FRIA control is not landed",
+    "P2-27 two-institution FERPA fixture/adapter is absent",
+    "P2-11 dated EU profiles and P2-28 full profile composition are outside this draft"
+  ],
+  "notDone": [
+    "No full-suite result",
+    "No catalog patch bump; Claude owns landing bump",
+    "No integrated guide fragment until hook lands",
+    "No live FERPA permission fixture",
+    "No production enforcement/evidence or real institutional outcomes",
+    "No primary-source/legal review, named experts, independent sign-offs, manual WCAG assessment, partner/stewardship/licence decision or promotion"
+  ]
+}

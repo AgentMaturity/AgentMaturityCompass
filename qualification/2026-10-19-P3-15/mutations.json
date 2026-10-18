@@ -1,0 +1,1444 @@
+{
+  "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+  "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625",
+  "node": "v22.23.3",
+  "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15-mutations-a625",
+  "initialGreenReportSha256": "d1cbd679c990b637aa92ea59189b2164af6ce052fb38df803bdbe4640e6c0790",
+  "mutationScope": "Intentional dirty-source negative probes; each starts/ends at clean same HEAD. No mutant is a qualification result.",
+  "initialGreen": {
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "tests/catalog/stations/education",
+      "--maxWorkers=1",
+      "--reporter=dot",
+      "--reporter=json",
+      "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/initial-green-report.json"
+    ],
+    "startedAt": "2026-10-18T21:34:17.364291+00:00",
+    "durationMs": 20653,
+    "exit": 0,
+    "before": {
+      "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+      "statusPorcelain": ""
+    },
+    "after": {
+      "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+      "statusPorcelain": ""
+    },
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/initial-green.log",
+    "rawLogSha256": "91bb793c97a5da95b49406ab47f20e8533ecd26b1052697731109dbbf4acd478",
+    "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/initial-green-report.json",
+    "rawReportSha256": "b062a3708e51babecbeef39cda4cd6241a4e30d0c3ceb0d1e7e325096f672a7c",
+    "counts": {
+      "numTotalTests": 118,
+      "numPassedTests": 118,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "failedAssertions": []
+  },
+  "mutations": [
+    {
+      "id": "grade-exact-value",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/gradebook.ts",
+      "guardScope": "Only exact grade equality is bypassed.",
+      "specRequired": true,
+      "launchesBrowser": false,
+      "originalSha256": "c395b43f40bda1eb8ee60bb0fd29999d9cea84f231605cc2b36056507aaf161b",
+      "mutatedSha256": "25577cabce8227dd889109ffdc32b3aec492e8c2510515a898cca11ecd6defc1",
+      "restoredSha256": "c395b43f40bda1eb8ee60bb0fd29999d9cea84f231605cc2b36056507aaf161b",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "    || approval.assessmentId !== value.request.assessmentId || approval.gradeValue !== value.request.gradeValue",
+        "replacement": "    || approval.assessmentId !== value.request.assessmentId"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "requires approval for the exact grade value",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/grade-exact-value-report.json"
+      ],
+      "startedAt": "2026-10-18T21:34:39.294550+00:00",
+      "durationMs": 2556,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/gradebook.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/gradebook.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/grade-exact-value.log",
+      "rawLogSha256": "f19fe39715a6afd709c84be82065efbb5048df80502cd510a78162fdd853a44c",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/grade-exact-value-report.json",
+      "rawReportSha256": "43499467b2c53f128fde53d478e9fe40ea55cd3ec66ed71914f9f54a082e5720",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results requires approval for the exact grade value",
+          "failureMessages": [
+            "AssertionError: expected [ 'allow', 'pass' ] to not include 'allow'\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:35:33)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:54:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "emotion-capability-refusal",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/toolCapabilityLog.ts",
+      "guardScope": "Only registered emotion refusal is bypassed.",
+      "specRequired": true,
+      "launchesBrowser": false,
+      "originalSha256": "848e17950435f55fee636dd3d4dc65cd8fe52ed496537ec7984680fc96eaaa06",
+      "mutatedSha256": "e3705aa4b6f3b600f41f26e3341e8d23c234469bcd3a637d7d283f9c9e0321ca",
+      "restoredSha256": "848e17950435f55fee636dd3d4dc65cd8fe52ed496537ec7984680fc96eaaa06",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "    if (capabilityClass === \"emotion_inference\") return finish(\"deny\", \"emotion_inference_refused\");",
+        "replacement": "    if (false) return finish(\"deny\", \"emotion_inference_refused\");"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "refuses an emotion-inference capability before execution",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/emotion-capability-refusal-report.json"
+      ],
+      "startedAt": "2026-10-18T21:34:43.555368+00:00",
+      "durationMs": 2595,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/toolCapabilityLog.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/toolCapabilityLog.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/emotion-capability-refusal.log",
+      "rawLogSha256": "5f9f2bd4ff54a264968149bc221044cf835fd1f91509295953390f9292a433cc",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/emotion-capability-refusal-report.json",
+      "rawReportSha256": "9863263f96632ce2ceebd7a0d214adb1279401397c200a065b0c8e11672ceb97",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results refuses an emotion-inference capability before execution",
+          "failureMessages": [
+            "AssertionError: expected [ 'allow', 'pass' ] to not include 'allow'\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:35:33)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:106:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shared-context-binding",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/protocol.ts",
+      "guardScope": "One shared implementation covers subject/control/version/plan; no perfield explosion.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "5d64c9f0ccbcabb12c5ad98046bcbe36c55ec95ca810849cbb3bbb7d617d8446",
+      "mutatedSha256": "6562e12daf732bc9cf02e463fc9a801c0c321c8475b95f81b34a8769985d7404",
+      "restoredSha256": "5d64c9f0ccbcabb12c5ad98046bcbe36c55ec95ca810849cbb3bbb7d617d8446",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "return expected.tenantId === actual.tenantId && expected.workspaceId === actual.workspaceId\n    && expected.deploymentId === actual.deploymentId && expected.agentId === actual.agentId\n    && expected.controlId === actual.controlId && expected.controlVersion === actual.controlVersion\n    && expected.planDigest === actual.planDigest;",
+        "replacement": "return true;"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "compares every subject, control, version and plan binding field",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/shared-context-binding-report.json"
+      ],
+      "startedAt": "2026-10-18T21:34:47.524302+00:00",
+      "durationMs": 2378,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/protocol.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/protocol.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/shared-context-binding.log",
+      "rawLogSha256": "a593b6435d6aeadf6d4ea1a2900717299468d1b730179f7d205932ad81249d95",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/shared-context-binding-report.json",
+      "rawReportSha256": "769bae21e074647527e53bd4059522fd0b8a290da3e6a51e224c59989354352d",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results compares every subject, control, version and plan binding field",
+          "failureMessages": [
+            "AssertionError: tenantId: expected true to be false // Object.is equality\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:81:95\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "approval-store-availability",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/gradebook.ts",
+      "guardScope": "Independent approval-store availability guard.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "c395b43f40bda1eb8ee60bb0fd29999d9cea84f231605cc2b36056507aaf161b",
+      "mutatedSha256": "7797ad9568a0796e098f92579e91345e010035f0d13147b305fc1cb340f0c95e",
+      "restoredSha256": "c395b43f40bda1eb8ee60bb0fd29999d9cea84f231605cc2b36056507aaf161b",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "  if (!value.storeAvailable) return finish(\"not_evaluated\", \"approval_store_unavailable\");",
+        "replacement": "  if (false) return finish(\"not_evaluated\", \"approval_store_unavailable\");"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "refuses writes when the approval store is unavailable",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/approval-store-availability-report.json"
+      ],
+      "startedAt": "2026-10-18T21:34:51.402271+00:00",
+      "durationMs": 1915,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/gradebook.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/gradebook.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/approval-store-availability.log",
+      "rawLogSha256": "368abc609d1effa2aaca38026fc8b3d808dae83537f9f0047c52383725181114",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/approval-store-availability-report.json",
+      "rawReportSha256": "e37e2863e8043d11854ac9013be5fe8e8aea2b5f0cc92575cce92b8db315f5f7",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results refuses writes when the approval store is unavailable",
+          "failureMessages": [
+            "AssertionError: expected [ 'allow', 'pass' ] to not include 'allow'\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:35:33)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:65:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "approval-expiry",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/gradebook.ts",
+      "guardScope": "Remove only strict expiry comparison; retain issue order.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "c395b43f40bda1eb8ee60bb0fd29999d9cea84f231605cc2b36056507aaf161b",
+      "mutatedSha256": "a2bb343786d23f43e9e897f8460d1fc4935d4cd6089c293793cfcdf9e6326721",
+      "restoredSha256": "c395b43f40bda1eb8ee60bb0fd29999d9cea84f231605cc2b36056507aaf161b",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "  if (!(issued <= at && at < expires && issued < expires)) return finish(\"deny\", \"approval_expired\");",
+        "replacement": "  if (!(issued <= at && issued < expires)) return finish(\"deny\", \"approval_expired\");"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "requires an issued, unexpired approval with a nonempty time window",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/approval-expiry-report.json"
+      ],
+      "startedAt": "2026-10-18T21:34:54.971168+00:00",
+      "durationMs": 1826,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/gradebook.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/gradebook.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/approval-expiry.log",
+      "rawLogSha256": "72ac7e44bb37881a66f16a300be84b598fbd02bdea383a808a8a7a4704b0d8de",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/approval-expiry-report.json",
+      "rawReportSha256": "6c43689475bca840a20630fd891d3b00b7fa7884d23331b592c9f6862bca6c3c",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results requires an issued, unexpired approval with a nonempty time window",
+          "failureMessages": [
+            "AssertionError: expected [ 'allow', 'pass' ] to not include 'allow'\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:35:33)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:72:7\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "teacher-authority",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/gradebook.ts",
+      "guardScope": "One teacher authority guard, not one mutation peridentity.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "c395b43f40bda1eb8ee60bb0fd29999d9cea84f231605cc2b36056507aaf161b",
+      "mutatedSha256": "75407b8df538136b1e8d0d0dfef1f13d8f0a012eabdb02c26a6960e547142214",
+      "restoredSha256": "c395b43f40bda1eb8ee60bb0fd29999d9cea84f231605cc2b36056507aaf161b",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "    || !value.authorizedTeacherIds.includes(approval.teacherId)) return finish(\"deny\", \"approval_mismatch\");",
+        "replacement": "    || false) return finish(\"deny\", \"approval_mismatch\");"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "requires the same student, assessment, request and authorized teacher",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/teacher-authority-report.json"
+      ],
+      "startedAt": "2026-10-18T21:34:58.043921+00:00",
+      "durationMs": 2185,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/gradebook.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/gradebook.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/teacher-authority.log",
+      "rawLogSha256": "37c3a1a5e258847b08c39cbe7bb97cbf75a11d6beba8a460794fcb877d388c4c",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/teacher-authority-report.json",
+      "rawReportSha256": "2ecf7eab979cdc53f36850054f36ad3dc96642758bf91a498ffd1f0f9ed389a1",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results requires the same student, assessment, request and authorized teacher",
+          "failureMessages": [
+            "AssertionError: expected [ 'allow', 'pass' ] to not include 'allow'\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:35:33)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:59:78\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "capability-log-availability",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/toolCapabilityLog.ts",
+      "guardScope": "Independent observation-store gate.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "848e17950435f55fee636dd3d4dc65cd8fe52ed496537ec7984680fc96eaaa06",
+      "mutatedSha256": "55fce411fa9de8fbf9b4b0abd7257dcabae6e071f227b15ce3d0a08c5d246fa4",
+      "restoredSha256": "848e17950435f55fee636dd3d4dc65cd8fe52ed496537ec7984680fc96eaaa06",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "  if (!value.logAvailable) return finish(\"not_evaluated\", \"capability_log_unavailable\");",
+        "replacement": "  if (false) return finish(\"not_evaluated\", \"capability_log_unavailable\");"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "requires the registry and capability log, and binds both registry and calls",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/capability-log-availability-report.json"
+      ],
+      "startedAt": "2026-10-18T21:35:02.236713+00:00",
+      "durationMs": 2448,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/toolCapabilityLog.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/toolCapabilityLog.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/capability-log-availability.log",
+      "rawLogSha256": "2e59917e282dceeba382e6886aa9b907679abdf9b929f992cc4b73521d8fb9c5",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/capability-log-availability-report.json",
+      "rawReportSha256": "430490955472c69c1aac1e93756ef5eb97ff3e597beb8776b55b611beacf5253",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results requires the registry and capability log, and binds both registry and calls",
+          "failureMessages": [
+            "AssertionError: expected [ 'allow', 'pass' ] to not include 'allow'\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:35:33)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:124:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "capability-registry-availability",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/toolCapabilityLog.ts",
+      "guardScope": "Separate source guard from log availability; cheap independent kill.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "848e17950435f55fee636dd3d4dc65cd8fe52ed496537ec7984680fc96eaaa06",
+      "mutatedSha256": "06b31464be72a74d136e4aadbda7812f86cc6a2ae7ba62b1511d41e2ab2fe0de",
+      "restoredSha256": "848e17950435f55fee636dd3d4dc65cd8fe52ed496537ec7984680fc96eaaa06",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "  if (!value.registryAvailable) return finish(\"not_evaluated\", \"capability_registry_unavailable\");",
+        "replacement": "  if (false) return finish(\"not_evaluated\", \"capability_registry_unavailable\");"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "requires the registry and capability log, and binds both registry and calls",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/capability-registry-availability-report.json"
+      ],
+      "startedAt": "2026-10-18T21:35:06.020988+00:00",
+      "durationMs": 2170,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/toolCapabilityLog.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/toolCapabilityLog.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/capability-registry-availability.log",
+      "rawLogSha256": "4c622f4b64534b9b1b7a5d203f566766627c3707814c7a983b09e200fc21d645",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/capability-registry-availability-report.json",
+      "rawReportSha256": "ce969e8b0eabf7bdac778aba2b621ed2d1b6b3fd5a87a3a360b627dd68cb0b49",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results requires the registry and capability log, and binds both registry and calls",
+          "failureMessages": [
+            "AssertionError: expected [ 'allow', 'pass' ] to not include 'allow'\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:35:33)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:123:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "capability-resolution",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/toolCapabilityLog.ts",
+      "guardScope": "One composite ambiguity/classification guard.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "848e17950435f55fee636dd3d4dc65cd8fe52ed496537ec7984680fc96eaaa06",
+      "mutatedSha256": "018900cb3c7814de2af63e16207e40ca441ff60e8fe34807cf2239587186fbf9",
+      "restoredSha256": "848e17950435f55fee636dd3d4dc65cd8fe52ed496537ec7984680fc96eaaa06",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "    if (registered.length !== 1 || registered[0]!.capabilityClass === null) return finish(\"not_evaluated\", \"capability_unresolved\");",
+        "replacement": "    if (registered.length === 0) return finish(\"not_evaluated\", \"capability_unresolved\");"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "requires a uniquely registered capability class and exact tool version",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/capability-resolution-report.json"
+      ],
+      "startedAt": "2026-10-18T21:35:09.909485+00:00",
+      "durationMs": 2519,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/toolCapabilityLog.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/toolCapabilityLog.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/capability-resolution.log",
+      "rawLogSha256": "329e95f2ec48005fa638b0de5b7aaf3385a59a6859b297101cc2180ac2e1d2b4",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/capability-resolution-report.json",
+      "rawReportSha256": "1c076dad3f6af5bbddfb58b1d1a4dac6ddbfe24182bdf25e4886665abc270aa2",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results requires a uniquely registered capability class and exact tool version",
+          "failureMessages": [
+            "AssertionError: expected [ 'allow', 'pass' ] to not include 'allow'\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:35:33)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:118:87\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tool-version-binding",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/toolCapabilityLog.ts",
+      "guardScope": "Independent exact tool/version identity predicate.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "848e17950435f55fee636dd3d4dc65cd8fe52ed496537ec7984680fc96eaaa06",
+      "mutatedSha256": "627a10c384794db3ee09942d03dc6e9c09d012067ae0ff9d9da095a3288482d2",
+      "restoredSha256": "848e17950435f55fee636dd3d4dc65cd8fe52ed496537ec7984680fc96eaaa06",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "    const registered = value.tools.filter(tool => tool.toolId === request.toolId && tool.toolVersion === request.toolVersion);",
+        "replacement": "    const registered = value.tools.filter(tool => tool.toolId === request.toolId);"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "requires a uniquely registered capability class and exact tool version",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/tool-version-binding-report.json"
+      ],
+      "startedAt": "2026-10-18T21:35:13.832749+00:00",
+      "durationMs": 2674,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/toolCapabilityLog.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/toolCapabilityLog.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/tool-version-binding.log",
+      "rawLogSha256": "cc33fce1938bfabd3f6af1f878f01f530e78e4e499db2c2a288383a39d74a0d0",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/tool-version-binding-report.json",
+      "rawReportSha256": "e854ba0b92eedb5b635f04cde7f69043d1cb53370c30962ac7486057907c7d7d",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results requires a uniquely registered capability class and exact tool version",
+          "failureMessages": [
+            "AssertionError: expected [ 'allow', 'pass' ] to not include 'allow'\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:35:33)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:117:71\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "missing-ferpa-dependency",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/exportLog.ts",
+      "guardScope": "Fail-closed missing-adapter return only; not FERPA authorization/egress proof.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "8dc65157a4386805aea3eea029a5d3f7d70186a7c2e27e0c7a94b117034849aa",
+      "mutatedSha256": "821c90a8af6addbaeab7cd26c2d8dcc6c522e7355114b4a2b00c0212817121a7",
+      "restoredSha256": "8dc65157a4386805aea3eea029a5d3f7d70186a7c2e27e0c7a94b117034849aa",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "  return outcome(\"not_evaluated\", \"dependency_unavailable\", { pendingDependency: \"P2-27\", adapterAvailable: false,",
+        "replacement": "  return outcome(\"allow\", \"dependency_unavailable\", { pendingDependency: \"P2-27\", adapterAvailable: false,"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "does not invent a FERPA permission adapter or accept an availability claim",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/missing-ferpa-dependency-report.json"
+      ],
+      "startedAt": "2026-10-18T21:35:17.931094+00:00",
+      "durationMs": 2272,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/exportLog.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/exportLog.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/missing-ferpa-dependency.log",
+      "rawLogSha256": "3f7f0dd32a1bb88e18184f2be3903bd0a6da0d80b7297ba090f6c22be6164887",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/missing-ferpa-dependency-report.json",
+      "rawReportSha256": "4f3bfd73af2b5d54a424aee5340e1f7b3992bedede73f5de41dcca12a289a9c3",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results does not invent a FERPA permission adapter or accept an availability claim",
+          "failureMessages": [
+            "AssertionError: expected [ 'allow', 'pass' ] to not include 'allow'\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:35:33)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:131:7\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "utc-precision",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/protocol.ts",
+      "guardScope": "Shared precision guard; calendar parsing retained.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "5d64c9f0ccbcabb12c5ad98046bcbe36c55ec95ca810849cbb3bbb7d617d8446",
+      "mutatedSha256": "3fbf3d284d687a9b4cb817e298b3eae31a4d1d99abfad4302398d79f9b146081",
+      "restoredSha256": "5d64c9f0ccbcabb12c5ad98046bcbe36c55ec95ca810849cbb3bbb7d617d8446",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "export const utcTime = z.iso.datetime().regex(/T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,3})?Z$/);",
+        "replacement": "export const utcTime = z.iso.datetime().regex(/T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$/);"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "rejects impossible or lossy timestamps: .*0001Z",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/utc-precision-report.json"
+      ],
+      "startedAt": "2026-10-18T21:35:21.709322+00:00",
+      "durationMs": 2856,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/protocol.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/protocol.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/utc-precision.log",
+      "rawLogSha256": "e9056053e6ef78616a49d37f92157623ac4a04398501c16c2b11d7f4cd3c0ffe",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/utc-precision-report.json",
+      "rawReportSha256": "8785c021ed8c2360a49314f32758f11e6a1589558a5179c5e1a64cd699896b8a",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results rejects impossible or lossy timestamps: 2026-10-18T12:00:00.0001Z",
+          "failureMessages": [
+            "AssertionError: expected true to be false // Object.is equality\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:86:46\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "strict-availability-boolean",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/gradebook.ts",
+      "guardScope": "Representative strict boolean schema; do not mutate every Zod builtin/value.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "c395b43f40bda1eb8ee60bb0fd29999d9cea84f231605cc2b36056507aaf161b",
+      "mutatedSha256": "ceb51d3cafa0a1468ea1c5b810436757a5cb1dd7c9e0eb61a56dffb04be11e54",
+      "restoredSha256": "c395b43f40bda1eb8ee60bb0fd29999d9cea84f231605cc2b36056507aaf161b",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "const schema = z.object({ context: contextFor(\"L1-EDU-01\"), at: utcTime, storeAvailable: z.boolean(),",
+        "replacement": "const schema = z.object({ context: contextFor(\"L1-EDU-01\"), at: utcTime, storeAvailable: z.coerce.boolean(),"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "never treats string availability flags as authority",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/strict-availability-boolean-report.json"
+      ],
+      "startedAt": "2026-10-18T21:35:26.198885+00:00",
+      "durationMs": 3015,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/gradebook.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/gradebook.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/strict-availability-boolean.log",
+      "rawLogSha256": "c8acc7ceb19830ab081be407d566cca74e98142b54facfd2e66873bc32e5474f",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/strict-availability-boolean-report.json",
+      "rawReportSha256": "32b488e574a87c325039b7df186258dbee353e6ea9f60846e1b5595fe168c253",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results never treats string availability flags as authority",
+          "failureMessages": [
+            "AssertionError: expected [ 'allow', 'pass' ] to not include 'allow'\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:35:33)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:143:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "axe-violation-classifier",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/accessibilityCheck.ts",
+      "guardScope": "Cheap pure classification proof, explicitly not a browser observation.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a",
+      "mutatedSha256": "d589fd6b4baddf91b836fa87bb714e7fa12426aa18f263e15c88a2d1d9246489",
+      "restoredSha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "  if (parsed.data.violations > 0) return { result: \"fail\", reasonCode: \"automated_wcag_violation\" };",
+        "replacement": "  if (false) return { result: \"fail\", reasonCode: \"automated_wcag_violation\" };"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "keeps synthetic checker-summary units separate from browser observations",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/axe-violation-classifier-report.json"
+      ],
+      "startedAt": "2026-10-18T21:35:30.542590+00:00",
+      "durationMs": 1976,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/accessibilityCheck.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/accessibilityCheck.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/axe-violation-classifier.log",
+      "rawLogSha256": "43c5ca6d4a5f8535ff292a5ca7be694bca32f9e26a6c83b0cd68b840e3608042",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/axe-violation-classifier-report.json",
+      "rawReportSha256": "fdb917b4a7cc9dee669ba6a45fad65abc9ce37d4a394ef75902400461716481a",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results keeps synthetic checker-summary units separate from browser observations",
+          "failureMessages": [
+            "AssertionError: expected { result: 'pass', \u2026(1) } to deeply equal { result: 'fail', \u2026(1) }\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:148:95\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "axe-incomplete-or-no-rules",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/accessibilityCheck.ts",
+      "guardScope": "One composite missing/incomplete guard; no fabricated real checker claim.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a",
+      "mutatedSha256": "505c093f640d986d22937616afedf5c72c656bc849be5548f166f6f5b5fc8690",
+      "restoredSha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "  if (parsed.data.incomplete > 0 || parsed.data.executedRules === 0) return { result: \"not_evaluated\", reasonCode: \"automated_wcag_incomplete\" };",
+        "replacement": "  if (false) return { result: \"not_evaluated\", reasonCode: \"automated_wcag_incomplete\" };"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "keeps synthetic checker-summary units separate from browser observations",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/axe-incomplete-or-no-rules-report.json"
+      ],
+      "startedAt": "2026-10-18T21:35:33.707701+00:00",
+      "durationMs": 2091,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/accessibilityCheck.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/accessibilityCheck.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/axe-incomplete-or-no-rules.log",
+      "rawLogSha256": "adc9a5272c6911171c8c8d7d940538f71d4f1e126b7b86f433e43c78975da279",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/axe-incomplete-or-no-rules-report.json",
+      "rawReportSha256": "e9c83134275bf3140fb503a649d30e36d5c8df4c3e5bb8f71b6494f9e04c691e",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results keeps synthetic checker-summary units separate from browser observations",
+          "failureMessages": [
+            "AssertionError: expected { result: 'pass', \u2026(1) } to deeply equal { result: 'not_evaluated', \u2026(1) }\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:149:95\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "checker-disabled-fails-open",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/accessibilityCheck.ts",
+      "guardScope": "Cheap result mutation; does not measure a native launch failure.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a",
+      "mutatedSha256": "9891205e387cdf2ff86ccb2808691069ae8d54d4cfb615ee2c4c9ede6b9bc09f",
+      "restoredSha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "  if (!value.checkerEnabled) return outcome(\"not_evaluated\", \"checker_unavailable\", observations);",
+        "replacement": "  if (!value.checkerEnabled) return outcome(\"pass\", \"checker_unavailable\", observations);"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "L1-EDU-04/negative/oracle-checker-unavailable\\.json",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/checker-disabled-fails-open-report.json"
+      ],
+      "startedAt": "2026-10-18T21:35:36.933393+00:00",
+      "durationMs": 1838,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/accessibilityCheck.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/accessibilityCheck.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/checker-disabled-fails-open.log",
+      "rawLogSha256": "36849ba4c6ac41df5214bf8a93a5c307f61bd1dc1e406caeac092aafc2b1cdb7",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/checker-disabled-fails-open-report.json",
+      "rawReportSha256": "dd45bbaa275767afee3129baf9063e5c555fbbf53a65d66e8e8d819698fc8eae",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Canonical Education local observations remain empty production evidence L1-EDU-04/negative/oracle-checker-unavailable.json",
+          "failureMessages": [
+            "AssertionError: expected { result: 'pass', \u2026(1) } to deeply equal { result: 'not_evaluated', \u2026(1) }\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:193:70\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "actual-axe-violations-binding",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/accessibilityCheck.ts",
+      "guardScope": "Retain one actual checker mutation to prove real findings drive result.",
+      "specRequired": false,
+      "launchesBrowser": true,
+      "originalSha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a",
+      "mutatedSha256": "0573aa28eba5aa02e37023c2081e7ce688f47cc9ce9e53940eece9de446cbdd6",
+      "restoredSha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "    const summary = classifyAccessibilityFindings({ violations: results.violations.length,",
+        "replacement": "    const summary = classifyAccessibilityFindings({ violations: 0,"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "L1-EDU-04/negative/oracle-image-alt-missing\\.json",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/actual-axe-violations-binding-report.json"
+      ],
+      "startedAt": "2026-10-18T21:35:39.907399+00:00",
+      "durationMs": 3912,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/accessibilityCheck.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/accessibilityCheck.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/actual-axe-violations-binding.log",
+      "rawLogSha256": "4a93ee42e664f90b6504bf8ea0d9ed923d9adefa621bdd076c206abad75407db",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/actual-axe-violations-binding-report.json",
+      "rawReportSha256": "a408b9b23cf4334e9c8db324f11c0a41368700ea8d818de9b636354071e880b9",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Canonical Education local observations remain empty production evidence L1-EDU-04/negative/oracle-image-alt-missing.json",
+          "failureMessages": [
+            "AssertionError: expected { result: 'pass', \u2026(1) } to deeply equal { result: 'fail', \u2026(1) }\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:193:70\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "empty-rendered-lesson",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/accessibilityCheck.ts",
+      "guardScope": "Input evidence guard only, not an accessibility heuristic; require intended assertion failure.",
+      "specRequired": false,
+      "launchesBrowser": true,
+      "originalSha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a",
+      "mutatedSha256": "aa4c3442f01f86317ec618234339936fe20921bfa8ade0f27bfe485044253cc5",
+      "restoredSha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "    if ((await page.locator(\"body\").innerText()).trim().length === 0) return outcome(\"not_evaluated\", \"generated_lesson_missing\", observations);",
+        "replacement": "    if (false) return outcome(\"not_evaluated\", \"generated_lesson_missing\", observations);"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "does not treat an empty rendered document as a generated lesson",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/empty-rendered-lesson-report.json"
+      ],
+      "startedAt": "2026-10-18T21:35:44.960672+00:00",
+      "durationMs": 2182,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/accessibilityCheck.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/accessibilityCheck.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/empty-rendered-lesson.log",
+      "rawLogSha256": "b3f18cd21ff3c20693bb59fdb2de8401618696186436035895c3c0c1c37e864b",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/empty-rendered-lesson-report.json",
+      "rawReportSha256": "7dc2394b781cfb2486137ce365b5cec1b9fe23c727fb7c1f2975e80466823400",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results does not treat an empty rendered document as a generated lesson",
+          "failureMessages": [
+            "AssertionError: expected [ 'allow', 'pass' ] to not include 'pass'\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:35:33)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:160:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "external-resource-result",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/accessibilityCheck.ts",
+      "guardScope": "Mutate only result refusal. Retain offline:true/serviceWorkers:block/route interception/route.abort, so no external request can leave.",
+      "specRequired": false,
+      "launchesBrowser": true,
+      "originalSha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a",
+      "mutatedSha256": "de2cc26bad000103a4f210a45bd8d83835a8c76489e9284344d4ce673078f762",
+      "restoredSha256": "5a4f4efd2833f531a5341c626ba96df892574b811e08baa445bd1259d8a6353a",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "    if (blockedRequests.length > 0) return outcome(\"not_evaluated\", \"external_resource_refused\", observations);",
+        "replacement": "    if (false) return outcome(\"not_evaluated\", \"external_resource_refused\", observations);"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/fixtures.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "refuses external resources without sending a network request",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/external-resource-result-report.json"
+      ],
+      "startedAt": "2026-10-18T21:35:48.342824+00:00",
+      "durationMs": 3228,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/accessibilityCheck.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/accessibilityCheck.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/external-resource-result.log",
+      "rawLogSha256": "806e950aad85c086959d4463f2463e2d1d15e4c1b73c31d8f0dc7f95ea7d94c7",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/external-resource-result-report.json",
+      "rawReportSha256": "2835815beed64ffaa13d302ddf462f0f180be1ee2bb0e474c2ec73a07757cec6",
+      "counts": {
+        "numTotalTests": 62,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 61
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts",
+          "fullName": "Education synthetic reference protocols, never institution or production results refuses external resources without sending a network request",
+          "failureMessages": [
+            "AssertionError: expected [ 'allow', 'pass' ] to not include 'pass'\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:35:33)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/fixtures.test.ts:165:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "compiled-subject-profile-binding",
+      "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "sourcePath": "tests/catalog/stations/education/harness.ts",
+      "guardScope": "Actual compiled-profile subject guard; no compiler mock or expected-exception shortcut.",
+      "specRequired": false,
+      "launchesBrowser": false,
+      "originalSha256": "8f25b60f434345455a9be4ec9dcca113928d7f4d29486c9c146a2df4b127d18f",
+      "mutatedSha256": "214219a2c9386f69553405f601fde6e2701c4bafa4b8ef61f230982816393871",
+      "restoredSha256": "8f25b60f434345455a9be4ec9dcca113928d7f4d29486c9c146a2df4b127d18f",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": ""
+      },
+      "appliedReplacement": {
+        "original": "if (setup.subject.tenantId !== tenantId || setup.subject.workspaceId !== workspaceId\n    || setup.subject.deploymentId !== deploymentId || !agentIds.includes(setup.subject.agentId ?? \"\")) {",
+        "replacement": "if (false) {"
+      },
+      "intendedAssertionFailure": true,
+      "nonAssertionError": false,
+      "killed": true,
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/catalog/stations/education/compiledPolicy.test.ts",
+        "--maxWorkers=1",
+        "--testNamePattern",
+        "refuses a fixture subject outside the actual compiled deployment",
+        "--reporter=dot",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/compiled-subject-profile-binding-report.json"
+      ],
+      "startedAt": "2026-10-18T21:35:52.749084+00:00",
+      "durationMs": 10668,
+      "exit": 1,
+      "before": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/harness.ts"
+      },
+      "after": {
+        "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+        "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+        "statusPorcelain": "M tests/catalog/stations/education/harness.ts"
+      },
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/compiled-subject-profile-binding.log",
+      "rawLogSha256": "2a5f31ba924e7851c8f22c5db75bf46e5d39022a7d5155b279dd2bdbcd4d4da9",
+      "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/compiled-subject-profile-binding-report.json",
+      "rawReportSha256": "c95328f8a93b3e442c87e279daeb285d673f0302baca4ff4749e7922e2d04487",
+      "counts": {
+        "numTotalTests": 50,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 49
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/compiledPolicy.test.ts",
+          "fullName": "Education actual compiled policy and evidence admission (P3-15) refuses a fixture subject outside the actual compiled deployment",
+          "failureMessages": [
+            "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/tests/catalog/stations/education/compiledPolicy.test.ts:76:80\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-mutations-a625/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        }
+      ]
+    }
+  ],
+  "restored": {
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "tests/catalog/stations/education",
+      "--maxWorkers=1",
+      "--reporter=dot",
+      "--reporter=json",
+      "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/restored-green-report.json"
+    ],
+    "startedAt": "2026-10-18T21:36:04.040486+00:00",
+    "durationMs": 17390,
+    "exit": 0,
+    "before": {
+      "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+      "statusPorcelain": ""
+    },
+    "after": {
+      "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+      "statusPorcelain": ""
+    },
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/restored-green.log",
+    "rawLogSha256": "0addc02806cea804ac075bdbae4187799ac5a36e255ebdcddc2f504e94c4763f",
+    "rawReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/restored-green-report.json",
+    "rawReportSha256": "67a60e0837df7e648b7ca627c27307d565efd35748620c6fa24db3f091ae0e85",
+    "counts": {
+      "numTotalTests": 118,
+      "numPassedTests": 118,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "failedAssertions": [],
+    "exactAllFilesRestored": true
+  }
+}
