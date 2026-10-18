@@ -416,15 +416,16 @@ export function createAmcMcpServer(defaultWorkspace = process.cwd()): McpServer 
         const gapList =
           result.complianceGaps.length > 0
             ? result.complianceGaps.slice(0, 5).map((g) => `  ⚠️ ${g}`).join("\n")
-            : "  ✅ No compliance gaps";
+            : result.percentage === null ? "  None among the answered questions" : "  ✅ No compliance gaps";
 
         return withClaim(
           [
             `## AMC Sector Pack Score: ${result.packName}`,
             ``,
             `**Station:** ${result.stationId}`,
-            `**Score:** ${result.percentage}%`,
-            `**Maturity Level:** L${result.level}`,
+            result.percentage === null // unanswered questions are not evaluated (packSelfAssessment.ts)
+              ? `**Score:** not evaluated: ${result.notEvaluatedQuestionIds.length} of ${result.selfAssessment.total} questions unanswered`
+              : `**Score:** ${result.percentage}% · **Maturity Level:** L${result.level}`,
             `Self-assessment: ${result.selfAssessment.complete ? "complete" : `incomplete (${result.selfAssessment.answered}/${result.selfAssessment.total} answered)`} (self-reported; not a certification)`,
             `**Risk Tier:** ${result.riskTier}`,
             ``,

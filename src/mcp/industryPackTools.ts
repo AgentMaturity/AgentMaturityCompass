@@ -128,7 +128,7 @@ export function registerIndustryPackTools(server: McpServer, options: IndustryPa
   server.registerTool(
     "amc_score_industry_pack",
     {
-      description: "Score self-reported question levels (1-5) against an industry pack. The result is self-reported, never a certification. Unanswered questions are not evaluated: they are listed in notEvaluatedQuestionIds and no score or level is computed until every question is answered. Requires an Industry Packs licence. (read-only)",
+      description: "Score self-reported question levels (1-5) against an industry pack. The result is self-reported, never a certification. Unanswered questions are not evaluated: the result lists them in notEvaluatedQuestionIds, and its percentage and level are null until every question is answered. Requires an Industry Packs licence. (read-only)",
       inputSchema: z
         .object({
           packId: packIdSchema,
@@ -147,15 +147,8 @@ export function registerIndustryPackTools(server: McpServer, options: IndustryPa
       if (unknown.length > 0) {
         return refuse("unknown_question_id", `Response keys are not questions of ${pack.id}`, { questionIds: unknown });
       }
-      const notEvaluatedQuestionIds = pack.questions.filter((q) => !Object.hasOwn(responses, q.id)).map((q) => q.id);
-      // scoreIndustryPack counts a missing answer as 1 (P0-21); a missing answer is not evaluated, so no score is shown.
-      const scored = scoreIndustryPack(pack.id, responses);
-      return ok({
-        packId: pack.id,
-        selfAssessment: scored.selfAssessment,
-        notEvaluatedQuestionIds,
-        result: notEvaluatedQuestionIds.length === 0 ? scored : null,
-      }, packSelfAssessmentEnvelope(pack, responses, Date.now()));
+      // The shared scorer leaves an unanswered question not evaluated (notEvaluatedQuestionIds, no score or level).
+      return ok({ result: scoreIndustryPack(pack.id, responses) }, packSelfAssessmentEnvelope(pack, responses, Date.now()));
     }),
   );
 

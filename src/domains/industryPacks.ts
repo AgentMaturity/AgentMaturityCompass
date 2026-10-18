@@ -2536,7 +2536,8 @@ export function scoreIndustryPack(
   const complianceGaps: string[] = [];
 
   pack.questions.forEach((q, i) => {
-    const level = answers[i]!;
+    const level = answers[i];
+    if (level === null || level === undefined) return; // not evaluated: no result and no gap
     const levelPct = likertToPercent(level);
     questionResults.push({
       id: q.id,

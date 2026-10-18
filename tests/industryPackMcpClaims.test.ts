@@ -87,8 +87,8 @@ describe("amc_score_industry_pack claims", () => {
     expect(out.structured?.claimKind).toBe("self_reported");
     expect(out.structured?.statusDimensions).toMatchObject({ result: "not_evaluated", evidence: "incomplete" });
     expect(out.texts[1]).toMatch(/self-reported/i);
-    expect(out.body.notEvaluatedQuestionIds).toEqual([]);
     const result = out.body.result as Record<string, unknown>;
+    expect(result.notEvaluatedQuestionIds).toEqual([]);
     expect(result.claimKind).toBe("self_reported");
     expect(result.eligibleLevel).toBeLessThanOrEqual(1);
     expect(result.selfAssessment).toEqual({ complete: true, answered: PACK.questions.length, total: PACK.questions.length });
@@ -101,14 +101,13 @@ describe("amc_score_industry_pack claims", () => {
     const responses = Object.fromEntries(answered.map((q) => [q.id, 4]));
     const out = await call(await connect(options(true)), "amc_score_industry_pack", { packId: PACK.id, responses });
     expect(out.isError).toBe(false);
-    expect(out.body.notEvaluatedQuestionIds).toEqual([missing!.id]);
-    expect(out.body.result).toBeNull();
-    expect(out.body.selfAssessment).toEqual({ complete: false, answered: answered.length, total: PACK.questions.length });
-    for (const view of [out.body, out.structured]) {
-      expect(keysOf(view)).not.toContain("level");
-      expect(keysOf(view)).not.toContain("percentage");
-      expect(keysOf(view)).not.toContain("certified");
-    }
+    const result = out.body.result as Record<string, unknown>;
+    expect(result.notEvaluatedQuestionIds).toEqual([missing!.id]);
+    expect(result.percentage).toBeNull();
+    expect(result.level).toBeNull();
+    expect(result.eligibleLevel).toBeNull();
+    expect(result.selfAssessment).toEqual({ complete: false, answered: answered.length, total: PACK.questions.length });
+    for (const view of [out.body, out.structured]) expect(keysOf(view)).not.toContain("certified");
     expect(out.structured?.claimKind).toBe("self_reported");
   });
 

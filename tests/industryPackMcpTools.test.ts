@@ -234,19 +234,18 @@ describe("amc_score_industry_pack", () => {
     }
   });
 
-  it("returns the scoreIndustryPack result only when every question is answered", async () => {
+  it("returns the shared scoreIndustryPack result, which leaves unanswered questions not evaluated", async () => {
     const client = await connect(activeOptions());
     const pack = INDUSTRY_PACKS["digital-payments"];
     const all = Object.fromEntries(pack.questions.map((q) => [q.id, 4]));
     const full = await call(client, SCORE, { packId: pack.id, responses: all });
     expect(full.isError).toBe(false);
     expect(full.body.result).toEqual(scoreIndustryPack(pack.id, all));
-    expect(full.body.notEvaluatedQuestionIds).toEqual([]);
     const partial = Object.fromEntries(pack.questions.slice(0, 3).map((q) => [q.id, 4]));
     const out = await call(client, SCORE, { packId: pack.id, responses: partial });
     expect(out.isError).toBe(false);
-    expect(out.body.result).toBeNull();
-    expect(out.body.notEvaluatedQuestionIds).toEqual(pack.questions.slice(3).map((q) => q.id));
+    expect(out.body.result).toEqual(scoreIndustryPack(pack.id, partial));
+    expect((out.body.result as { notEvaluatedQuestionIds: string[] }).notEvaluatedQuestionIds).toEqual(pack.questions.slice(3).map((q) => q.id));
   });
 });
 
