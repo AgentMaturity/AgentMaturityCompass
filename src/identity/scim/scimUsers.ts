@@ -31,6 +31,20 @@ function parseActive(value: unknown): boolean {
   throw new Error("invalidValue");
 }
 
+/**
+ * Core and enterprise User attributes AMC receives but does not store through PATCH (docs/SCIM.md). An operation on one
+ * is accepted as a no-op, so it cannot reject a deprovisioning change in the same request; any other unknown attribute
+ * is still invalidPath. Lower-case names; sub-attributes (`name.familyName`) and filters (`emails[type eq "work"]`) match
+ * their parent.
+ */
+const IGNORED_USER_ATTRIBUTES = new Set(["externalid", "emails", "name", "title", "preferredlanguage", "phonenumbers", "addresses"]);
+const ENTERPRISE_USER_URN = "urn:ietf:params:scim:schemas:extension:enterprise:2.0:user";
+
+function ignoredUserAttribute(path: string): boolean {
+  if (path === ENTERPRISE_USER_URN || path.startsWith(`${ENTERPRISE_USER_URN}:`)) return true;
+  return IGNORED_USER_ATTRIBUTES.has(path.split(/[.[]/, 1)[0] ?? "");
+}
+
 function toScimUser(row: {
   userId: string;
   username: string;
@@ -252,6 +266,9 @@ export function scimPatchUser(params: {
       throw new Error("invalidPath");
     }
     const path = (op.path ?? "").toLowerCase();
+    if (path !== "" && ignoredUserAttribute(path)) {
+      continue;
+    }
     if (path !== "active" && path !== "displayname" && path !== "") {
       throw new Error("invalidPath");
     }
@@ -283,7 +300,7 @@ export function scimPatchUser(params: {
             throw new Error("invalidValue");
           }
           nextDisplayName = value;
-        } else {
+        } else if (!ignoredUserAttribute(field)) {
           throw new Error("invalidPath");
         }
       }

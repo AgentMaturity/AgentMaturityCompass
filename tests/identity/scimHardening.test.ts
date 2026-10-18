@@ -322,6 +322,29 @@ describe("SCIM parser, filters and deprovisioning", () => {
     });
   });
 
+  test("a deprovisioning PATCH still applies when the request also carries known attributes AMC does not store", async () => {
+    await owned("user-patch-ignored-attributes", async f => {
+      const host = await authRouter(f), user = await createUser(f, host, "ignored-attributes");
+      const session = createIdentitySession({ hostDir: f.hostDir, userId: user.id, authType: "SCIM", ttlMinutes: 5 });
+      f.secrets.push(session.token, encodeURIComponent(session.token));
+      const patched = userView(f, await scim(f, host, "active-false-with-name", `/Users/${user.id}`, "PATCH", { Operations: [
+        { op: "replace", path: "active", value: false },
+        { op: "replace", path: "name.familyName", value: "X" },
+        { op: "replace", path: "emails[type eq \"work\"].value", value: "x@example.test" },
+        { op: "replace", value: { externalId: "x", title: "T", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User": { department: "D" } } }
+      ] }));
+      const direct = resolveIdentitySession({ hostDir: f.hostDir, token: session.token });
+      f.observations.push({ kind: "ignored-attributes", patched, directOk: direct.ok });
+      expect(patched.status).toBe(200); expect(patched.active).toBe(false);
+      expect(direct).toMatchObject({ ok: false, error: "user disabled" });
+      // An attribute outside the documented set is still refused, whole request.
+      const refused = responseView(f, await scim(f, host, "unknown-with-active", `/Users/${user.id}`, "PATCH", { Operations: [
+        { op: "replace", path: "active", value: true }, { op: "replace", path: "nickName2", value: "x" }] }));
+      expect(refused).toEqual(expectedError("invalidPath"));
+      expect((await getUser(f, host, user.id, "after-unknown")).active).toBe(false);
+    });
+  });
+
   test("filtered removal revokes only the removed member's SCIM group grant", async () => {
     await owned("filtered-member-role-revocation", async f => {
       const host = await authRouter(f), group = await mappedGroup(f, host), path = `/Groups/${group.id}`;
