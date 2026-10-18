@@ -16,7 +16,10 @@
  * legal reviewer when it cites law, a confirmation naming the control when AI drafted it, no objection, and no open
  * re-verify item.
  */
+import { lstatSync } from "node:fs";
+import { join } from "node:path";
 import type { RegulatoryRegister } from "../../compliance/regulatory/index.js";
+import { resolveAmcHome } from "../../credentials/credentialsPaths.js";
 import { verifyHexDigest } from "../../crypto/keys.js";
 import { checkSignature } from "../../trust/signatureCheck.js";
 import { loadTrustContext, type TrustContext } from "../../trust/trustContext.js";
@@ -32,9 +35,12 @@ import { reverifyOpenItems, type ReverifyItem } from "./reverify.js";
  */
 export interface RosterEntry { domains: readonly string[]; identities: readonly string[] }
 
+/**
+ * What effectiveSupport needs besides trust. Trust is never an input: it is the operator's AMC home (AMC_HOME, else
+ * ~/.config/amc), its trust/trust-roots.json and its signed trust list, loaded by loadTrustContext. Only a list entry
+ * pins a reviewer: no caller list or root, no --pubkey, no --allow-unpinned.
+ */
 export interface ReviewAuthority {
-  /** Where the operator's signed trust lists and pinned roots live. Only a list entry pins a reviewer: no --pubkey, no --allow-unpinned. */
-  trust: { amcHome?: string; trustLists?: readonly string[]; trustRoots?: readonly string[] };
   /** YYYY-MM-DD to judge due dates at, to look ahead; never earlier than the server's date. Trust and signatures always use the server's clock. */
   asOf?: string;
   /** Raw review record files (catalog/reviews/**); each is verified here and trusted for nothing else. */
@@ -71,17 +77,26 @@ export interface SupportResult {
 }
 
 type Verified = { record: ReviewRecord; reviewer: string; identities: Set<string>; nextReviewDue: string };
-/** NFKC, every run of whitespace (NBSP and other Unicode spaces too) as one space, trimmed, then case-folded. */
-const norm = (value: string): string => value.normalize("NFKC").replace(/\s+/gu, " ").trim().toUpperCase().toLowerCase();
+/**
+ * NFKC without default-ignorable code points (zero-width space, ZWJ, ZWNJ, soft hyphen, word joiner, BOM), every run of
+ * whitespace (NBSP and other Unicode spaces too) as one space, trimmed, then case-folded. Confusables (UTS #39) are not
+ * folded; GOVERNANCE.md states that limit.
+ */
+const norm = (value: string): string =>
+  value.normalize("NFKC").replace(/\p{Default_Ignorable_Code_Point}/gu, "").replace(/\s+/gu, " ").trim().toUpperCase().toLowerCase();
 /** An email without a +tag on its local part or trailing dots on its domain. */
 const mailbox = (email: string): string => {
   const at = email.lastIndexOf("@");
   return `${email.slice(0, at).replace(/\+.*$/u, "")}@${email.slice(at + 1).replace(/\.+$/u, "")}`;
 };
-/** A principal's identifiers: the whole string, its name part before "<", and any email in it. */
+/**
+ * A principal's identifiers: the whole string, its name part before "<", the name without spaces (so a zero-width or
+ * missing space still matches; a false match only refuses a review), and any email in it.
+ */
 const ids = (principal: string): string[] => {
   const p = norm(principal);
-  return [p, norm(p.split("<")[0] ?? ""), ...(p.match(/[^\s<>()]+@[^\s<>()]+/gu) ?? []).map(mailbox)].filter(Boolean);
+  const name = norm(p.split("<")[0] ?? "");
+  return [p, name, name.replace(/ /gu, ""), ...(p.match(/[^\s<>()]+@[^\s<>()]+/gu) ?? []).map(mailbox)].filter(Boolean);
 };
 const stronger = (support: SupportLevel): boolean => support === "reviewed" || support === "qualified";
 const dateOf = (at: Date): string => at.toISOString().slice(0, 10);
@@ -178,10 +193,13 @@ export function effectiveSupport(control: ControlRecord, authority?: ReviewAutho
   const now = new Date(); // the server's clock; no caller can move it back
   const today = dateOf(now);
   const dueAsOf = authority.asOf !== undefined && authority.asOf > today ? authority.asOf : today;
+  // The operator must have pinned trust roots; without them no list can verify, so nothing is promoted.
+  if (lstatSync(join(resolveAmcHome(), "trust", "trust-roots.json"), { throwIfNoEntry: false }) === undefined) {
+    return stays(["GOV_REVIEW_TRUST_INVALID: trust roots not configured"]);
+  }
   let trust: TrustContext;
   try {
-    const { amcHome, trustLists, trustRoots } = authority.trust;
-    trust = loadTrustContext({ amcHome, trustLists, trustRoots, now });
+    trust = loadTrustContext({ now });
   } catch (error) {
     return stays([`GOV_REVIEW_TRUST_INVALID: ${error instanceof Error ? error.message : String(error)}`]);
   }

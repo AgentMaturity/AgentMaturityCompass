@@ -178,6 +178,10 @@ describe("overdue content compiles as experimental, in memory only (P1-34 step 7
     const early = at("2026-10-14T00:00:00Z", promotions); // the records say 2026-10-15
     expect([early.support, early.reasons.join()]).toEqual(["experimental", expect.stringMatching(/GOV_REVIEW_IN_FUTURE/)]);
     expect(Object.isFrozen(minted) && Object.isFrozen(minted.recordDigests)).toBe(true);
+    // Only promotions supportStanding accepted are bound into the plan: not refused ones, not ones for unknown controls.
+    const mixed = compile("2026-10-18T12:00:00Z", { [control.id]: minted, "L9-FAKE-01": minted, "L0-ADV-02": { ...minted } });
+    expect(Object.keys(mixed.promotions ?? {})).toEqual([control.id]);
+    expect(compile("2026-10-18T12:00:00Z", { [control.id]: { ...minted }, "L9-FAKE-01": minted }).promotions).toBeUndefined();
   });
 
   it("without promotions every row is experimental; a current verified quorum keeps reviewed", () => {

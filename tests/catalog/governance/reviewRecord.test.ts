@@ -8,8 +8,9 @@ import type { ReviewRecord } from "../../../src/catalog/governance/reviewRecord.
 import { effectiveSupport, type ReviewAuthority } from "../../../src/catalog/governance/support.js";
 import { digestOf } from "../../../src/catalog/digest.js";
 import { loadCatalog } from "../../../src/catalog/loader.js";
-import { admitKey, ed25519KeyId, loadTrustContext } from "../../../src/trust/index.js";
-import { writeFileSync } from "node:fs";
+import { admitKey, ed25519KeyId, loadTrustContext, signTrustList } from "../../../src/trust/index.js";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { KeyPurpose } from "../../../src/trust/index.js";
 import { AUTHOR, NOW, PINS, ROSTER, author, authority, keyA, keyB, keyC, keyLegal, keypair, operatorHome, reviewedControl, sign, signedList } from "./reviewers.js";
@@ -86,6 +87,44 @@ describe("effectiveSupport: the only path to reviewed support (P1-34 steps 3-4)"
     expect(effectiveSupport(control, authority(home, [as("A. S."), b], authored)).rejected).toEqual([{ index: 0, reason: "GOV_REVIEW_NOT_ON_ROSTER" }]);
   });
 
+  it("trust comes only from the operator's AMC home: caller-chosen roots and lists mint nothing, and no trust-roots.json promotes nothing", () => {
+    const [evilRoot, k1, k2] = [keypair(), keypair(), keypair()];
+    const evilDir = mkdtempSync(join(tmpdir(), "amc-gov-evil-"));
+    try {
+      // A list the caller signed with its own root, pinning fresh keys under the roster's subjects.
+      const evilList = join(evilDir, "evil.json");
+      writeFileSync(evilList, JSON.stringify(signTrustList({ type: "amc.trust-list", version: 1, listId: "evil", sequence: 1, issuedAt: "2026-01-01T00:00:00.000Z",
+        expiresAt: "2099-01-01T00:00:00.000Z", distrust: [], entries: [k1, k2].map((k, n) => ({ keyId: ed25519KeyId(k.publicKeyPem)!, algorithm: "ed25519" as const,
+          publicKeyPem: k.publicKeyPem, purposes: ["catalog-review" as const], subject: n === 0 ? "fixture-reviewer-a" : "fixture-reviewer-b",
+          validFrom: "2026-01-01T00:00:00.000Z", validTo: null, source: "operator" })) }, evilRoot.privateKeyPem)));
+      const evilRecords = [sign(control, k1, "fixture-reviewer-a"), sign(control, k2, "fixture-reviewer-b")];
+      const callerTrust = (home: string) => ({ ...authority(home, evilRecords),
+        trust: { trustLists: [evilList], trustRoots: [ed25519KeyId(evilRoot.publicKeyPem)!] } }) as ReviewAuthority;
+      const withRoots = effectiveSupport(control, callerTrust(HOME));
+      expect(withRoots).toMatchObject({ support: "experimental", promotion: null });
+      expect(withRoots.rejected.map((r) => r.reason)).toEqual(["GOV_REVIEW_SIGNER_UNPINNED", "GOV_REVIEW_SIGNER_UNPINNED"]);
+      expect(effectiveSupport(control, callerTrust(mkdtempSync(join(evilDir, "home-")))).reasons)
+        .toEqual(["GOV_REVIEW_UNVERIFIED", "GOV_REVIEW_TRUST_INVALID: trust roots not configured"]);
+      const unrooted = operatorHome();
+      rmSync(join(unrooted, "trust", "trust-roots.json"));
+      expect(effectiveSupport(control, authority(unrooted, [a, b])).reasons).toEqual(["GOV_REVIEW_UNVERIFIED", "GOV_REVIEW_TRUST_INVALID: trust roots not configured"]);
+      expect(effectiveSupport(control, authority(HOME, [a, b])).support).toBe("reviewed");
+    } finally {
+      rmSync(evilDir, { recursive: true, force: true });
+    }
+  });
+
+  it("identities ignore default-ignorable code points (zero-width space, ZWJ, ZWNJ, soft hyphen)", () => {
+    const alice = keypair();
+    const home = operatorHome([...PINS, { key: alice, subject: "asmith" }]);
+    const experts = new Map([...ROSTER, ["asmith", { domains: ["wealth"], identities: ["Alice Smith", "alice@corp.example"] }]]);
+    const as = sign(control, alice, "asmith", { reviewer: { ...a.reviewer, name: "A. S.", identity: { userId: "asmith", kind: "human" } } });
+    for (const authors of [["Alice\u200bSmith"], ["Al\u00adice Smith"], ["Ali\u200dce Smi\u200cth"], ["x <alice@corp\u200b.example>"], ["\u2060Alice Smith\ufeff"]]) {
+      expect(effectiveSupport(control, authority(home, [as, b], { experts, authorsOf: () => authors })).rejected, JSON.stringify(authors))
+        .toEqual([{ index: 0, reason: "GOV_REVIEW_SELF_REVIEW" }]);
+    }
+  });
+
   it("identities match after NFKC, whitespace collapsing, casefolding, +tag and trailing-dot stripping", () => {
     const alice = keypair();
     const home = operatorHome([...PINS, { key: alice, subject: "asmith" }]);
@@ -112,7 +151,6 @@ describe("effectiveSupport: the only path to reviewed support (P1-34 steps 3-4)"
       return path;
     };
     const trustLists = [list("reviewers", ["catalog-review"]), list("receipts", ["receipt"])];
-    expect(effectiveSupport(control, authority(dir, [a, b], { trust: { amcHome: dir, trustLists } })).rejected).toEqual([{ index: 1, reason: "GOV_REVIEW_SIGNER_UNPINNED" }]);
     const context = loadTrustContext({ amcHome: dir, trustLists, now: NOW });
     expect(admitKey({ publicKeyPem: keyB.publicKeyPem, purpose: "catalog-review", signature: "fixture", context }).status).toBe("wrong-purpose");
     expect(admitKey({ publicKeyPem: keyA.publicKeyPem, purpose: "catalog-review", signature: "fixture", context }).status).toBe("admitted");

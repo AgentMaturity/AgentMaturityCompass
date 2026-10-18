@@ -34,6 +34,7 @@ const homes: string[] = [];
 beforeAll(() => { vi.useFakeTimers({ toFake: ["Date"] }); vi.setSystemTime(NOW); });
 afterAll(() => {
   vi.useRealTimers();
+  vi.unstubAllEnvs();
   for (const home of homes.splice(0)) rmSync(home, { recursive: true, force: true });
 });
 
@@ -87,6 +88,11 @@ export const ROSTER = new Map<string, RosterEntry>([
   [AUTHOR, { domains: ["wealth"], identities: [AUTHOR] }]
 ]);
 
+/**
+ * effectiveSupport reads trust only from the operator's AMC home, which AMC resolves from AMC_HOME; building an authority
+ * points AMC_HOME at `home` for the effectiveSupport call that follows (unstubbed after the file).
+ */
 export function authority(home: string, records: readonly unknown[], over: Partial<ReviewAuthority> = {}): ReviewAuthority {
-  return { trust: { amcHome: home }, records, experts: ROSTER, authorsOf: () => [AUTHOR], f5Confirmations: [], reverify: [], register: REGULATORY_REGISTER, ...over };
+  vi.stubEnv("AMC_HOME", home);
+  return { records, experts: ROSTER, authorsOf: () => [AUTHOR], f5Confirmations: [], reverify: [], register: REGULATORY_REGISTER, ...over };
 }

@@ -159,7 +159,7 @@ export interface CompiledPlan {
   profile: { profileId: string; sha256: string; factProvenance: Record<FactName, FactProvenance | "unknown">;
              deployment?: { tenantId: string; deploymentId: string } };
   lock: CatalogLockfile;                // P1-09's lock: pins catalog and sources
-  promotions?: Readonly<Record<string, Promotion>>;  // P1-34: the promotions compiled in, when any were passed
+  promotions?: Readonly<Record<string, Promotion>>;  // P1-34: the promotions supportStanding accepted, when any
   status: "ready" | "blocked";          // blocked: unresolved conflict or unresolved mandatory control
   requirements: RequirementDecision[];  // sorted by controlId
   conflicts: Conflict[];

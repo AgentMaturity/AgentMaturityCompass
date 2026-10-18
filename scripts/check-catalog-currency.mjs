@@ -4,7 +4,7 @@
  * whose support does not stand (overdue, unverified, open re-verify item or unverifiable trust) is an error; a review
  * due within 14 days, an approved review the YAML declares without a verified record, and register entries due a
  * status review are warnings. A malformed catalog or governance file is an error. Exit 1 on any error. Review records
- * are verified against this machine's operator trust (the AMC home's signed trust lists and pinned roots) at the
+ * are verified against this machine's operator trust (the AMC home's trust-roots.json and signed trust list) at the
  * server's clock; `--as-of` only moves due dates ahead (a preview) and CI never passes it. The D-08 expert roster does not exist yet, so
  * no reviewed content can stand. Nothing is edited. Reads dist/ (build first).
  *
@@ -39,7 +39,7 @@ async function main(argv) {
   };
   // Trust and signatures are checked at the server's clock inside effectiveSupport; asOf only moves due dates ahead.
   // The D-08 roster (subject -> { domains, identities }) does not exist yet, so no reviewer can count.
-  const authority = { trust: {}, asOf, records: governance.reviews, experts: new Map(), authorsOf,
+  const authority = { asOf, records: governance.reviews, experts: new Map(), authorsOf,
     f5Confirmations: governance.f5Confirmations, reverify: governance.reverify, register: REGULATORY_REGISTER };
   const findings = [
     ...[...cat.issues, ...governance.issues].filter((i) => i.severity === "error")

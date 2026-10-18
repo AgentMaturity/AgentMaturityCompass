@@ -8,7 +8,7 @@ import { canonicalize } from "../../utils/json.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { amcVersion } from "../../version.js";
 import { digestOf } from "../digest.js";
-import { supportStanding } from "../governance/support.js";
+import { supportStanding, type Promotion } from "../governance/support.js";
 import { buildCatalogLock } from "../lockfile.js";
 import { FACT_NAMES } from "../schema.js";
 import type { FactName } from "../types.js";
@@ -65,13 +65,15 @@ export function compilePlan(input: CompileInput): CompiledPlan {
   checkExceptions(profile, cat);
   const { requirements, retired } = decideApplicability(profile, cat, asOfMs);
   // P1-34: a row's support is supportStanding's verdict on the promotions the caller decided (effectiveSupport) outside
-  // this pure function, judged at asOf; without one, reviewed or qualified content is experimental. The promotions are
-  // bound into the digest. The record, its digest (so the lock and past results) and the YAML stay as they are.
+  // this pure function, judged at asOf; without one, reviewed or qualified content is experimental. Only the promotions
+  // it accepted are bound into the digest. The record, its digest (so the lock and past results) and the YAML stay.
   const asOfDay = new Date(asOfMs).toISOString().slice(0, 10);
+  const accepted: Record<string, Promotion> = {};
   for (const r of requirements) {
     const control = cat.controls.get(r.controlId);
     if (!control) continue;
     const effective = supportStanding(control, input.promotions?.[r.controlId], asOfDay);
+    if (effective.promotion) accepted[r.controlId] = effective.promotion; // only accepted promotions are bound
     if (effective.support === r.support) continue;
     r.support = effective.support;
     r.reasons.push(`${effective.reasons.join(", ")}: compiled as ${effective.support} until a current, verified review (docs/catalog/GOVERNANCE.md)`);
@@ -103,7 +105,7 @@ export function compilePlan(input: CompileInput): CompiledPlan {
     profile: { profileId: profile.profileId, sha256: sha256Hex(canonicalize(profile)), factProvenance,
       deployment: { tenantId: profile.deployment.tenantId, deploymentId: profile.deployment.deploymentId } },
     lock,
-    ...(input.promotions && Object.keys(input.promotions).length > 0 ? { promotions: input.promotions } : {}),
+    ...(Object.keys(accepted).length > 0 ? { promotions: accepted } : {}),
     status: blocked ? "blocked" : "ready",
     requirements,
     conflicts,
