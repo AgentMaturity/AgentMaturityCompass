@@ -257,7 +257,8 @@ function publicChild(row: ChildObservation): Record<string, unknown> {
 }
 
 export async function withOracleFixture(mode: OracleFixtureMode, body: (fixture: OracleFixture) => Promise<void>): Promise<void> {
-  const root = mkdtempSync("/private/tmp/lhfo-"); chmodSync(root, 0o700);
+  // /tmp keeps the run directory short enough for Unix socket paths; realpath gives the physical path on every OS.
+  const root = realpathSync(mkdtempSync("/tmp/lhfo-")); chmodSync(root, 0o700);
   const workspace = join(root, "workspaces", `p119-oracle-${randomUUID()}`), trust = join(root, "operator"), home = join(root, "home");
   const providerRunDir = join(root, "provider-evidence"), preimagesDir = join(workspace, ".amc", "finance-oracle-preimages");
   for (const dir of [workspace, trust, home, providerRunDir, preimagesDir]) mkdirSync(dir, { recursive: true, mode: 0o700 });

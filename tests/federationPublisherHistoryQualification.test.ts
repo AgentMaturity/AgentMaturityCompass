@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { verify } from "node:crypto";
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
@@ -25,7 +26,7 @@ let claimedBase: number;
 beforeAll(() => {
   expect(process.versions.node.split(".")[0], "Use the prepared Node 22 or 24 runtime").toMatch(/^(22|24)$/);
   expect(existsSync(fileURLToPath(new URL("../dist/cli.js", import.meta.url))), "Parent must finish the normal build first").toBe(true);
-  evidence = mkdtempSync("/private/tmp/amc-p0-52-publisher-history-");
+  evidence = realpathSync(mkdtempSync(join(tmpdir(), "amc-p0-52-publisher-history-")));
   const paths = ["src/federation/federationSync.ts", "src/federation/federationStore.ts", "src/federation/federationSchema.ts",
     "src/federation/federationIdentity.ts", "src/utils/pathSafety.ts", "tests/helpers/trustContext.ts", "dist/federation/federationSync.js"];
   const repo = fileURLToPath(new URL("../", import.meta.url));
@@ -40,7 +41,7 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-  state = mkdtempSync("/private/tmp/amc-p0-52-history-state-");
+  state = realpathSync(mkdtempSync(join(tmpdir(), "amc-p0-52-history-state-")));
   stateRoots.push(state);
   home = join(state, "home"); mkdirSync(home, { mode: 0o700 });
   vi.stubEnv("HOME", home);

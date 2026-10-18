@@ -1,4 +1,5 @@
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, realpathSync, renameSync, rmSync, rmdirSync, symlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
@@ -20,7 +21,7 @@ beforeAll(() => {
   expect(process.versions.node.split(".")[0]).toMatch(/^(22|24)$/);
   const repo = fileURLToPath(new URL("../", import.meta.url));
   expect(existsSync(join(repo, "dist/cli.js"))).toBe(true);
-  evidence = mkdtempSync("/private/tmp/amc-p0-52-destination-evidence-");
+  evidence = realpathSync(mkdtempSync(join(tmpdir(), "amc-p0-52-destination-evidence-")));
   const inputs = ["src/federation/federationSync.ts", "src/federation/federationStore.ts", "src/utils/pathSafety.ts", "dist/federation/federationSync.js"];
   writeFileSync(join(evidence, "inputs.json"), JSON.stringify({
     node: process.version, executable: process.execPath,
@@ -32,7 +33,7 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-  state = mkdtempSync("/private/tmp/amc-p0-52-destination-state-");
+  state = realpathSync(mkdtempSync(join(tmpdir(), "amc-p0-52-destination-state-")));
   const home = join(state, "home"); mkdirSync(home, { mode: 0o700 });
   vi.stubEnv("HOME", home);
   vi.stubEnv("AMC_HOME", home);

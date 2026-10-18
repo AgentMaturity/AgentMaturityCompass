@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
 import { generateKeyPairSync } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { delimiter, dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
@@ -22,7 +23,7 @@ let paidControl: Promise<void> | undefined;
 beforeAll(() => {
   expect(process.versions.node.split(".")[0], "CLI qualification requires the prepared Node 22 or 24 runtime").toMatch(/^(22|24)$/);
   expect(existsSync(cli), "Build P0-23 normally before running this CLI contract").toBe(true);
-  root = mkdtempSync("/private/tmp/amc-p0-23-industry-pack-cli-");
+  root = realpathSync(mkdtempSync(join(tmpdir(), "amc-p0-23-industry-pack-cli-")));
   workspace = join(root, "workspace");
   fixtureHome = join(root, "home");
   logs = join(root, "logs");

@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { z } from "zod";
@@ -137,7 +138,7 @@ process.exitCode=report.success?0:1;
 
 beforeAll(() => {
   expect([22, 24]).toContain(Number(process.versions.node.split(".")[0]));
-  evidence = mkdtempSync("/private/tmp/p0-27-session-evidence-");
+  evidence = realpathSync(mkdtempSync(join(tmpdir(), "p0-27-session-evidence-")));
   writeFileSync(join(evidence, "actual-session-helper.mjs"), helper, { mode: 0o600 });
   writeFileSync(join(evidence, "deny-transport.mjs"),
     "import http from 'node:http';import https from 'node:https';import net from 'node:net';import dns from 'node:dns';import {syncBuiltinESMExports} from 'node:module';"

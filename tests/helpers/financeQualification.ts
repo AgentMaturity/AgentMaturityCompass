@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { createHash } from "node:crypto";
-import { chmodSync, closeSync, copyFileSync, mkdirSync, mkdtempSync, openSync, readFileSync, rmSync, statSync, writeFileSync, writeSync } from "node:fs";
+import { chmodSync, closeSync, copyFileSync, mkdirSync, mkdtempSync, openSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync, writeSync } from "node:fs";
 import { request as httpRequest, type IncomingHttpHeaders } from "node:http";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -45,7 +45,8 @@ export interface FinanceFixture {
   finish(success: boolean): Promise<void>;
 }
 async function createFinanceFixture(options: { port?: 0; seed?: unknown; faultsPath?: string } = {}): Promise<FinanceFixture> {
-  const root = mkdtempSync("/private/tmp/lhf-"); chmodSync(root, 0o700);
+  // /tmp keeps the run directory short enough for Unix socket paths; realpath gives the physical path on every OS.
+  const root = realpathSync(mkdtempSync("/tmp/lhf-")); chmodSync(root, 0o700);
   const runDir = join(root, "run"), home = join(root, "home"), seedPath = join(root, "seed.json");
   mkdirSync(home, { mode: 0o700 });
   if (options.seed === undefined) { copyFileSync(financeSeedPath, seedPath); chmodSync(seedPath, 0o600); }

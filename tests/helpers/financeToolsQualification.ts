@@ -256,7 +256,8 @@ function requireClosed(row: Child): void {
 export async function withFinanceTools(body: (fixture: Fixture) => Promise<void>, options: {
   shadow?: boolean; storeExecutorSecret?: boolean; readerClientId?: "reader-a" | "reader-b";
 } = {}): Promise<void> {
-  const root = mkdtempSync("/private/tmp/lhft-"); chmodSync(root, 0o700);
+  // /tmp keeps the run directory short enough for Unix socket paths; realpath gives the physical path on every OS.
+  const root = realpathSync(mkdtempSync("/tmp/lhft-")); chmodSync(root, 0o700);
   const workspace = join(root, "workspaces", `p119-tools-${randomUUID()}`), trust = join(root, "operator"), home = join(root, "home");
   const preimagesDir = join(workspace, ".amc", "lighthouse-finance", "preimages"), evidenceDir = join(root, "closed-provider");
   for (const path of [workspace, trust, home, preimagesDir, evidenceDir]) mkdirSync(path, { recursive: true, mode: 0o700 });

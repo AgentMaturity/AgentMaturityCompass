@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { isAbsolute, join } from "node:path";
+import { basename, isAbsolute, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import type { AgentCapabilities, EuAiActRiskTier } from "../src/compliance/euAiActClassifier.js";
@@ -10,7 +10,7 @@ import type { AgentCapabilities, EuAiActRiskTier } from "../src/compliance/euAiA
 // establish current law, expert approval, applicability, or release acceptance.
 const root = fileURLToPath(new URL("..", import.meta.url));
 const privateRoot = process.env.AMC_P024_PRIVATE_ROOT;
-if (privateRoot && (!isAbsolute(privateRoot) || !privateRoot.startsWith("/private/tmp/p0-24-emotion-"))) {
+if (privateRoot && (!isAbsolute(privateRoot) || !basename(privateRoot).startsWith("p0-24-emotion-"))) {
   throw new Error("AMC_P024_PRIVATE_ROOT must identify the owned private emotion fixture");
 }
 const phase = process.env.AMC_P024_PHASE ?? "ordinary";

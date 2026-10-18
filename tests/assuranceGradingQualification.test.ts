@@ -1,7 +1,8 @@
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { createHash } from "node:crypto";
-import { mkdtempSync, writeFileSync } from "node:fs";
-import { isAbsolute, join } from "node:path";
+import { mkdtempSync, realpathSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { basename, isAbsolute, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { getAssurancePack, listAssurancePacks } from "../src/assurance/packs/index.js";
 import { EXAMPLE_ASSURANCE_REPLY } from "../src/claims/eligibility/exampleMode.js";
@@ -25,8 +26,8 @@ const methods: GradingMethod[] = ["token-claim", "keyword", "structured", "execu
 
 beforeAll(async () => {
   const privateRoot = process.env.AMC_P019_PRIVATE_GRADING_MODULES;
-  if (privateRoot && (!isAbsolute(privateRoot) || !privateRoot.startsWith("/private/tmp/p0-19-grading-"))) {
-    throw new Error("Private grading modules must be an owned /private/tmp/p0-19-grading-* root");
+  if (privateRoot && (!isAbsolute(privateRoot) || !basename(privateRoot).startsWith("p0-19-grading-"))) {
+    throw new Error("Private grading modules must be an owned absolute p0-19-grading-* root");
   }
   // The optional seam selects copied existing modules for causal checks. It never mutates live source or dist.
   grading = privateRoot ? await import(pathToFileURL(join(privateRoot, "scenarioGrading.mjs")).href)
@@ -35,7 +36,7 @@ beforeAll(async () => {
     : await import("../src/assurance/scorers.js");
   validators = privateRoot ? await import(pathToFileURL(join(privateRoot, "validators.mjs")).href)
     : await import("../src/assurance/validators.js");
-  evidenceRoot = mkdtempSync("/private/tmp/p0-19-grading-evidence-");
+  evidenceRoot = realpathSync(mkdtempSync(join(tmpdir(), "p0-19-grading-evidence-")));
   const packs = listAssurancePacks();
   writeFileSync(join(evidenceRoot, "inventory.json"), JSON.stringify({
     node: process.version, executable: process.execPath, privateModules: privateRoot ?? null,
@@ -47,7 +48,7 @@ beforeAll(async () => {
   }, null, 2) + "\n", { mode: 0o600 });
   const phase = process.env.AMC_P019_GRADING_PHASE ?? "first";
   if (!/^[a-z0-9-]+$/.test(phase)) throw new Error("Invalid private evidence phase");
-  writeFileSync(`/private/tmp/p0-19-grading-${phase}-location-20261015.json`, JSON.stringify({ path: evidenceRoot }) + "\n", { mode: 0o600 });
+  writeFileSync(join(evidenceRoot, `p0-19-grading-${phase}-location.json`), JSON.stringify({ path: evidenceRoot }) + "\n", { mode: 0o600 });
 });
 
 afterAll(() => {

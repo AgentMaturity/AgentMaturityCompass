@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import { spawn } from "node:child_process";
 import { createHash, randomBytes, verify } from "node:crypto";
 import { chmodSync, closeSync, lstatSync, mkdirSync, mkdtempSync, openSync, readFileSync, realpathSync, writeFileSync, writeSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
@@ -153,7 +154,7 @@ async function child(root: string, workspace: string, label: string, args: strin
   return result;
 }
 async function fixture(body: (f: { root: string; workspace: string; seed: Json; run(stage: "http" | "mcp"): Promise<Json>; cli(): Promise<Json>; observe(value: unknown): void }) => Promise<void>): Promise<void> {
-  const root = realpathSync(mkdtempSync("/private/tmp/p117-surface-")); chmodSync(root, 0o700);
+  const root = realpathSync(mkdtempSync(join(tmpdir(), "p117-surface-"))); chmodSync(root, 0o700);
   const workspace = join(root, "workspace"), home = join(root, "home"), checkpoints = join(root, "checkpoints");
   for (const path of [workspace, home, checkpoints]) mkdirSync(path, { mode: 0o700 });
   const passphrase = randomBytes(24).toString("hex"), script = join(root, "surface-driver.mjs");

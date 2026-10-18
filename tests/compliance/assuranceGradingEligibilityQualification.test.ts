@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { verify } from "node:crypto";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
@@ -11,7 +12,7 @@ import type { ComplianceReportJson } from "../../src/compliance/mappingSchema.js
 // callback, executed tool, compiled applicability plan or regulated verdict.
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const runtime = process.execPath;
-const evidenceRoot = process.env.P0_19_COMPLIANCE_EVIDENCE_ROOT ?? mkdtempSync("/private/tmp/p0-19-compliance-evidence-");
+const evidenceRoot = process.env.P0_19_COMPLIANCE_EVIDENCE_ROOT ?? realpathSync(mkdtempSync(join(tmpdir(), "p0-19-compliance-evidence-")));
 mkdirSync(evidenceRoot, { recursive: true, mode: 0o700 });
 const distRoot = process.env.P0_19_COMPLIANCE_DIST_ROOT ?? repo;
 const replayIndex = process.env.P0_19_COMPLIANCE_REPLAY_INDEX;
