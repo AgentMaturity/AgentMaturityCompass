@@ -79,7 +79,9 @@ export const SECRET_PATTERNS: readonly SecretPattern[] = [
   { type: "private_key", source: "secretBlind", pattern: /-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----/ },
   { type: "connection_string", source: "secretBlind", pattern: /(mongodb|postgres|mysql|redis|amqp):\/\/[^\s"']+/i },
   { type: "generic_api_key", source: "secretBlind", pattern: /(?:api[_-]?key|apikey|api_secret)["\s:=]+["']?[A-Za-z0-9_\-]{16,}["']?/i },
-  { type: "password_in_url", source: "secretBlind", pattern: /\/\/[^:\s]+:[^@\s]+@/ },
+  // Bounded, and never across "/" or a quote: unbounded, one URL's "//" ran on through JSON members to any later "@"
+  // (an email), and rescanning from every "//" took quadratic time on text without whitespace.
+  { type: "password_in_url", source: "secretBlind", pattern: /\/\/[^:\s/@"]{1,256}:[^@\s/"]{1,256}@/ },
   { type: "bearer_token", source: "both", pattern: /Bearer\s+[A-Za-z0-9._-]{8,}/i },
   { type: "jwt", source: "both", pattern: /eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}/ },
   { type: "amc_lease", source: "bridge", pattern: /\blease_[a-z0-9]{10,}\b/i },

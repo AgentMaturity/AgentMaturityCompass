@@ -37,7 +37,8 @@ const MAX_BRIDGE_SCAN_CHARS = MAX_REQUEST_SCAN_CHARS / 4;
 
 /**
  * Redaction for what the bridge STORES as evidence: telemetry text, telemetry object payloads and `POST /bridge/evidence`
- * payloads, and the stored output and argv of adapter runs and monitored processes. Secrets always, as `redactBridgeText`
+ * payloads, and the stored argv of adapter runs and monitored processes (and, where the workspace opted in, their output:
+ * `processOutputRedactor`). Secrets always, as `redactBridgeText`
  * (every key and leaf of a JSON payload). In a workspace that opted in to protected-data redaction (P2-02, read once per
  * redactor) the protected-data detectors too, with the same anonymous marker: text over their per-leaf limit or holding a
  * zero byte (UTF-16 output read as UTF-8) is replaced whole, an integer JSON.parse rounded (a card number sent as a number)
@@ -47,7 +48,8 @@ const MAX_BRIDGE_SCAN_CHARS = MAX_REQUEST_SCAN_CHARS / 4;
  * hands back to an agent (control responses, deny reasons, `amc wrap`'s terminal output) keeps secrets-only
  * `redactBridgeText`, so an opted-in workspace's detectors never alter what an agent is told.
  */
-export function bridgeEvidenceRedactor(workspace: string): { readonly text: (input: string) => string; readonly json: (value: unknown) => unknown } {
+export function bridgeEvidenceRedactor(workspace: string):
+  { readonly text: (input: string, key?: string) => string; readonly json: (value: unknown) => unknown } {
   const protectedData = protectedDataOptedIn(workspace);
   let scanned = 0;
   const charge = (length: number) => { scanned += length; if (scanned > MAX_BRIDGE_SCAN_CHARS) throw new RangeError("bridge scan budget"); };
@@ -62,24 +64,47 @@ export function bridgeEvidenceRedactor(workspace: string): { readonly text: (inp
   if (!protectedData) return Object.freeze({ text: scan, json: (value: unknown) => redactJsonLeaves(value, scan) });
   const opaque = () => MARKER;
   const text = nestedJsonRedactor(scan, opaque);
-  const budgeted = <T, R>(redact: (value: T) => R) => (value: T): R | typeof MARKER => {
+  const budgeted = <A extends unknown[], R>(redact: (...args: A) => R) => (...args: A): R | typeof MARKER => {
     scanned = 0;
-    try { return redact(value); } catch { return MARKER; }
+    try { return redact(...args); } catch { return MARKER; }
   };
   return Object.freeze({ text: budgeted(text), json: budgeted((value: unknown) => redactJsonLeaves(value, text, opaque)) });
 }
 
 /**
+ * The stored output rows of adapter runs and monitored processes (stdout, stderr, forwarded stdin). Where the workspace
+ * opted in to protected-data redaction (P2-02), `bridgeEvidenceRedactor`'s text. Elsewhere the payload as it was before:
+ * the diagnostic's transcript audits (POLICY_VIOLATION) and a delegated child's folded answer read these rows, and the
+ * shared secret table would take out the keyword (`api_key=...`) or the plain value (a password-less connection string)
+ * they need.
+ */
+export function processOutputRedactor(workspace: string): (payload: string | Buffer) => string | Buffer {
+  if (!protectedDataOptedIn(workspace)) return (payload) => payload;
+  const evidence = bridgeEvidenceRedactor(workspace);
+  return (payload) => evidence.text(typeof payload === "string" ? payload : payload.toString("utf8"));
+}
+
+/**
+ * The flag an argument is the value of (`--password` for `hunter2`), as a member name. curl's `-u name:password` is a
+ * password; docker's `-u 1000:1000` (uid:gid) is not.
+ */
+function flagMember(flag: string | undefined, value: string): string | undefined {
+  const name = /^--?([A-Za-z][\w.-]*)$/.exec(flag ?? "")?.[1];
+  return name !== undefined && /^(?:u|user)$/.test(name) && value.includes(":") && !/^\d+:\d+$/.test(value) ? "password" : name;
+}
+
+/**
  * A process's command and arguments as evidence stores them (P2-02): `scrubValues`, AMC's own lease and the vault
  * passphrase replaced as the output scrub replaces them, then the secret table and, where the workspace opted in, the
- * protected-data detectors (`bridgeEvidenceRedactor`), as its output is. The process runs with the real ones.
+ * protected-data detectors (`bridgeEvidenceRedactor`), each argument under the flag before it as its member name, so
+ * `--password hunter2` and `--mrn A1234567` are checked as `--password=hunter2` is. The process runs with the real ones.
  */
 export function recordedArgv(workspace: string, command: string, args: readonly string[], scrubValues: readonly string[] = []):
-  { readonly command: string; readonly args: unknown } {
+  { readonly command: string; readonly args: readonly string[] } {
   const secrets = [...scrubValues, process.env.AMC_LEASE ?? "", process.env.AMC_VAULT_PASSPHRASE ?? ""].filter((value) => value.length >= 8);
   const scrub = (text: string) => secrets.reduce((out, secret) => out.split(secret).join(SCRUB_PLACEHOLDER), text);
   const evidence = bridgeEvidenceRedactor(workspace);
-  return { command: evidence.text(scrub(command)), args: evidence.json(args.map(scrub)) };
+  return { command: evidence.text(scrub(command)), args: args.map((arg, index) => evidence.text(scrub(arg), flagMember(args[index - 1], arg))) };
 }
 
 export function bridgeSha256(bytes: Buffer | string): string {

@@ -92,7 +92,7 @@ redaction:
   headerKeysDenylist: ["authorization", "x-api-key", "api-key", "x-openai-key", "x-amc-lease", "x-goog-api-key", "x-anthropic-api-key", "cookie", "set-cookie"]
   jsonPathsDenylist: ["$.api_key", "$.key"]
   textRegexDenylist:
-    - "(?i)\\bsk-[A-Za-z0-9_-]{10,}"
+    - "(?i)sk-[A-Za-z0-9_-]{10,}"
     - "(?i)bearer\\s+[A-Za-z0-9._-]{10,}"
 upstreams:
   openai:

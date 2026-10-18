@@ -5,7 +5,7 @@ import { openLedger, hashBinaryOrPath } from "./ledger.js";
 import { runProcess } from "../exec/runProcess.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { dummyProviderKeyEnv, stripProviderKeys } from "../utils/providerKeys.js";
-import { bridgeEvidenceRedactor, recordedArgv } from "../bridge/bridgeRedaction.js";
+import { processOutputRedactor, recordedArgv } from "../bridge/bridgeRedaction.js";
 
 /** How long any single `--version` attempt may take before it is abandoned. */
 const VERSION_PROBE_TIMEOUT_MS = 3_000;
@@ -128,9 +128,9 @@ async function spawnMonitoredProcess(params: {
 
     const recorded = { stdout: 0, stderr: 0 };
     const truncationAnnounced = { stdout: false, stderr: false };
-    // What the process wrote and was sent is stored like `amc wrap`'s bridge telemetry (P2-02): the shared secret table,
-    // and where the workspace opted in the protected-data detectors. The operator's terminal sees the scrubbed text.
-    const evidence = bridgeEvidenceRedactor(params.workspace);
+    // What the process wrote and was sent: where the workspace opted in to protected-data redaction (P2-02), stored as
+    // `amc wrap`'s bridge telemetry is; elsewhere as it was (`processOutputRedactor`). The terminal sees the scrubbed text.
+    const evidence = processOutputRedactor(params.workspace);
     const record = (stream: "stdout" | "stderr", text: string): void => {
       const bytes = Buffer.byteLength(text, "utf8");
       if (recorded[stream] >= MAX_RECORDED_OUTPUT_BYTES) {
@@ -158,7 +158,7 @@ async function spawnMonitoredProcess(params: {
         sessionId,
         runtime: params.runtime,
         eventType: stream,
-        payload: evidence.text(text),
+        payload: evidence(text),
         payloadExt: "txt",
         inline: true,
         meta: {
@@ -178,8 +178,8 @@ async function spawnMonitoredProcess(params: {
         AMC_EVALUATED_AGENT: "1"
       },
       stdin: "pipe",
-      // Tee AND record: the operator and the log both see the scrubbed text; the
-      // log stores it after the evidence redaction above, which only removes more.
+      // Tee AND record: the operator and the log both see the scrubbed text; in an
+      // opted-in workspace the log stores it after the redaction above, which only removes more.
       stdout: "tee",
       stderr: "tee",
       maxCaptureBytes: MAX_RECORDED_OUTPUT_BYTES,
@@ -200,7 +200,7 @@ async function spawnMonitoredProcess(params: {
           sessionId,
           runtime: params.runtime,
           eventType: "stdin",
-          payload: evidence.text(chunk.toString("utf8")),
+          payload: evidence(chunk),
           payloadExt: "txt",
           inline: true,
           meta: {
@@ -474,15 +474,15 @@ export async function startMonitor(opts: {
     });
 
     if (opts.stdin) {
-      // Stored like `amc wrap`'s stdout telemetry (P2-02): the shared secret table, and the detectors where opted in.
-      const evidence = bridgeEvidenceRedactor(opts.workspace);
+      // Where the workspace opted in (P2-02), stored as `amc wrap`'s stdout telemetry is; elsewhere as it was.
+      const evidence = processOutputRedactor(opts.workspace);
       await new Promise<void>((resolve) => {
         process.stdin.on("data", (chunk: Buffer) => {
           ledger.appendEvidence({
             sessionId,
             runtime: opts.runtime,
             eventType: "stdout",
-            payload: evidence.text(chunk.toString("utf8")),
+            payload: evidence(chunk),
             payloadExt: "txt",
             inline: true,
             meta: { source: "stdin_pipe", trustTier: "OBSERVED", agentId }

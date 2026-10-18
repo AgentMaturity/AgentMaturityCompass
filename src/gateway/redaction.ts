@@ -176,9 +176,10 @@ function unscannedJsonBody(): RedactionResult {
 
 // The string leaves a streamed delta carries: Anthropic's delta.text, .partial_json and .thinking, OpenAI's
 // choices[i].delta.content, .reasoning_content (DeepSeek and compatible) and tool_calls[j].function.arguments,
-// OpenRouter's delta.reasoning, the Responses API's delta, Gemini's and Ollama's parts[k].text and message.content.
+// OpenRouter's delta.reasoning, the Responses API's delta, Gemini's parts[k].text, Ollama's /api/chat message.content and
+// /api/generate response (only string leaves join, so the Responses API's response object is not one).
 const STREAM_DELTA_LEAVES = new Set(["text", "partial_json", "thinking", "content", "arguments", "delta", "refusal", "reasoning",
-  "reasoning_content"]);
+  "reasoning_content", "response"]);
 /** The JSON chunks of a stored event stream (`data:` lines) or JSON-lines body (one value per non-empty line). */
 function* streamChunks(stored: string, sse: boolean): Generator<unknown> {
   for (const line of stored.split(/\r?\n/)) {

@@ -61,6 +61,18 @@ const IPV6_SOURCE = String.raw`\b(?:[A-F0-9]{1,4}:){2,7}[A-F0-9]{1,4}\b`;
 // Email lengths are bounded (RFC 5321: local part 64, domain 253, TLD 63), so a longer one is not matched. The keyword
 // separator (?:\s*[:#=-])?\s* matches the same text as \s*[:#=-]?\s* without its two adjacent ambiguous \s* runs. A keyword's
 // words may also be joined by "_" (medical_record_number, passport_no, national_id) and its value follow "=" (mrn=...).
+// The keywords that bind an ID to the value after them; each keyword-bound pattern below is one of these, the separator,
+// then its value shape.
+const KEYWORDS = Object.freeze({
+  eu_vat: String.raw`VAT(?:[\s_]+ID)?|VATIN|USt-?IdNr\.?|TVA|IVA|BTW|NIP|NIF`,
+  eu_national_id: String.raw`national[\s_]+(?:id|identity|identification)(?:[\s_]+(?:number|card))?|identity[\s_]+card|id[\s_]+card|DNI|NIE|NIF|CNP|PESEL|BSN|personalausweis|carte\s+nationale|carta\s+d['’]?identit[aà]|documento\s+nacional\s+de\s+identidad`,
+  passport_number: String.raw`passport(?:[\s_]+(?:number|no\.?|id))?|passaporte|passeport|pasaporte|reisepass`,
+  health_record_id: String.raw`MRN|medical[\s_]+record(?:[\s_]+(?:number|id))?|health[\s_]+record(?:[\s_]+(?:number|id))?|NHS[\s_]+number|EHIC`
+});
+const keywordBound = (keywords: string, value: string) => new RegExp(String.raw`\b(?:${keywords})(?:\s*[:#=-])?\s*${value}`, "gi");
+/** Whether `text` holds a keyword a keyword-bound pattern starts with (VAT, national ID, passport, health record). */
+export const KEYWORD_BOUND = new RegExp(String.raw`\b(?:${Object.values(KEYWORDS).join("|")})`, "i");
+
 const PII_PATTERNS: PiiPattern[] = [
   { type: "email", re: /\b[A-Za-z0-9._%+-]{1,64}@[A-Za-z0-9.-]{1,253}\.[A-Z]{2,63}\b/gi, replacement: "[EMAIL_REDACTED]" },
   { type: "phone", re: /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g, replacement: "[PHONE_REDACTED]" },
@@ -68,10 +80,10 @@ const PII_PATTERNS: PiiPattern[] = [
   { type: "credit_card", re: /\b(?:\d[ -]*?){13,19}\b/g, replacement: "[CC_REDACTED]", validate: isValidCreditCard, validatorRevision: "luhn-v1" },
   { type: "iban", re: /\b[A-Z]{2}\d{2}(?:\s?[A-Z0-9]{4}){2,7}(?:\s?[A-Z0-9]{1,3})?\b/gi, replacement: "[IBAN_REDACTED]", validate: isValidIban, validatorRevision: "iban-mod97-v1" },
   { type: "ip_address", re: new RegExp(`${IPV4_SOURCE}|${IPV6_SOURCE}`, "gi"), replacement: "[IP_ADDRESS_REDACTED]" },
-  { type: "eu_vat", re: /\b(?:VAT(?:[\s_]+ID)?|VATIN|USt-?IdNr\.?|TVA|IVA|BTW|NIP|NIF)(?:\s*[:#=-])?\s*[A-Z]{2}[A-Z0-9]{2,12}\b/gi, replacement: "[EU_VAT_REDACTED]" },
-  { type: "eu_national_id", re: /\b(?:national[\s_]+(?:id|identity|identification)(?:[\s_]+(?:number|card))?|identity[\s_]+card|id[\s_]+card|DNI|NIE|NIF|CNP|PESEL|BSN|personalausweis|carte\s+nationale|carta\s+d['’]?identit[aà]|documento\s+nacional\s+de\s+identidad)(?:\s*[:#=-])?\s*[A-Z0-9][A-Z0-9 ./-]{5,20}\b/gi, replacement: "[EU_NATIONAL_ID_REDACTED]" },
-  { type: "passport_number", re: /\b(?:passport(?:[\s_]+(?:number|no\.?|id))?|passaporte|passeport|pasaporte|reisepass)(?:\s*[:#=-])?\s*[A-Z0-9][A-Z0-9< -]{5,14}\b/gi, replacement: "[PASSPORT_REDACTED]" },
-  { type: "health_record_id", re: /\b(?:MRN|medical[\s_]+record(?:[\s_]+(?:number|id))?|health[\s_]+record(?:[\s_]+(?:number|id))?|NHS[\s_]+number|EHIC)(?:\s*[:#=-])?\s*[A-Z0-9][A-Z0-9 -]{5,24}\b/gi, replacement: "[HEALTH_RECORD_REDACTED]" },
+  { type: "eu_vat", re: keywordBound(KEYWORDS.eu_vat, String.raw`[A-Z]{2}[A-Z0-9]{2,12}\b`), replacement: "[EU_VAT_REDACTED]" },
+  { type: "eu_national_id", re: keywordBound(KEYWORDS.eu_national_id, String.raw`[A-Z0-9][A-Z0-9 ./-]{5,20}\b`), replacement: "[EU_NATIONAL_ID_REDACTED]" },
+  { type: "passport_number", re: keywordBound(KEYWORDS.passport_number, String.raw`[A-Z0-9][A-Z0-9< -]{5,14}\b`), replacement: "[PASSPORT_REDACTED]" },
+  { type: "health_record_id", re: keywordBound(KEYWORDS.health_record_id, String.raw`[A-Z0-9][A-Z0-9 -]{5,24}\b`), replacement: "[HEALTH_RECORD_REDACTED]" },
   // Legacy keys, and the project, service-account and admin keys whose body also holds "-" and "_".
   { type: "api_key_openai", re: /sk-[A-Za-z0-9]{20,}|\bsk-(?:proj|svcacct|admin)-[A-Za-z0-9_-]{20,}/g, replacement: "[API_KEY_REDACTED]" },
   { type: "api_key_github", re: /gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{22,}/g, replacement: "[API_KEY_REDACTED]" },
@@ -113,6 +125,9 @@ export interface PiiSpan { readonly type: string; readonly start: number; readon
 export const PII_SPAN_SCAN_REVISION = "exec-retry-next-index-trailing-group-prefixes-caller-reject-retries-v2";
 const TRAILING_GROUP = /[\s-]?[A-Z0-9]{1,4}$/i;
 const WHOLE_MATCH = new Map(PII_PATTERNS.map(pattern => [pattern, new RegExp(`^(?:${pattern.re.source})$`, pattern.re.flags.replace("g", ""))]));
+// findPIISpans' scanners, compiled once (per short leaf, compiling them again cost more than the scan). Each scan starts at
+// 0 and sets lastIndex after its caller's `reject`, which may itself call findPIISpans.
+const SCANNERS = new Map(PII_PATTERNS.map(pattern => [pattern, cloneGlobal(pattern.re)]));
 
 /**
  * Length of the validated part of a match at `start`: the whole match, else the longest prefix left by stripping trailing
@@ -143,7 +158,8 @@ export function findPIISpans(text: string, reject?: (span: PiiSpan) => boolean):
   // what one request may scan in total. If the constant matters: resume after the first absorbed group.
   const spans: PiiSpan[] = [];
   for (const pattern of PII_PATTERNS) {
-    const re = cloneGlobal(pattern.re);
+    const re = SCANNERS.get(pattern)!;
+    re.lastIndex = 0;
     for (let match = re.exec(text); match !== null; match = re.exec(text)) {
       const start = match.index;
       const length = validatedLength(pattern, text, start, match[0]);
