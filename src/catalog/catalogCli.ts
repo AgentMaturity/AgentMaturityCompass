@@ -54,7 +54,9 @@ export function runCatalogCompile(workspace: string, opts: CompileFlags): number
   const outDir = resolve(workspace, opts.out ?? join("amc-control-plans", plan.profile.profileId, plan.digest.slice("sha256:".length, "sha256:".length + 12)));
   try {
     assertCompilerOutputOutsideSignedConfigTree(workspace, outDir);
-  } catch {
+  } catch (error) {
+    // A file-system failure (ENOENT, ENOTDIR, EACCES...) is not the .amc boundary: report it as it is.
+    if ((error as NodeJS.ErrnoException).code !== undefined) throw error;
     throw new Error(`Refusing to write a control plan under ${join(resolve(workspace), ".amc")}: .amc/** is reserved for signed configs.`);
   }
   const { signed, weakenings } = signPlan({

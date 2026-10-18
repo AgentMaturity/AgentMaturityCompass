@@ -52,7 +52,8 @@ export function physicalPathWithMissingSuffix(target: string): string {
       prefix = parent;
       continue;
     }
-    // lstat succeeds for a dangling link; realpath then throws instead of walking past it.
-    return join(realpathSync(prefix), ...suffix);
+    // lstat succeeds for a dangling link; realpath then throws instead of walking past it. The native realpath returns
+    // the case the file system stores, so `.AMC` on a case-insensitive volume compares equal to `.amc`.
+    return join(realpathSync.native(prefix), ...suffix);
   }
 }

@@ -2,10 +2,22 @@ import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { compilePlan } from "../../../src/catalog/compiler/compile.js";
 import { digestOf } from "../../../src/catalog/digest.js";
+import { amcVersion } from "../../../src/version.js";
 import { AS_OF, CONTROL_IDS, createCompilerFixture } from "./helpers.js";
 
 const ids = [CONTROL_IDS.layer0, CONTROL_IDS.technology, CONTROL_IDS.wealth, CONTROL_IDS.jurisdiction];
 const stationIds = [CONTROL_IDS.technology, CONTROL_IDS.wealth];
+const VERSION = "<amcVersion>";
+type Plan = ReturnType<typeof compilePlan>;
+/**
+ * The golden with the AMC version replaced by a placeholder and the plan digest recomputed over that body, so a release
+ * bump alone does not change it; the real versions are asserted against amcVersion separately.
+ */
+function versionFree(plan: Plan): string {
+  const { digest: _digest, ...body } = { ...plan, compiler: { ...plan.compiler, version: VERSION },
+    lock: { ...plan.lock, generatedBy: { ...plan.lock.generatedBy, version: VERSION } } };
+  return `${JSON.stringify({ ...body, digest: digestOf(body) }, null, 2)}\n`;
+}
 
 describe("compiler reviewed synthetic finance contract", () => {
   test("the complete plan matches the independently reviewed frozen bytes and compiles twice identically", () => {
@@ -68,10 +80,12 @@ describe("compiler reviewed synthetic finance contract", () => {
       const { policyDigest, ...policyBody } = plan.runtimePolicy;
       expect(digest).toBe(digestOf(body));
       expect(policyDigest).toBe(digestOf(policyBody));
+      expect(plan.compiler.version).toBe(amcVersion); expect(plan.lock.generatedBy.version).toBe(amcVersion);
       const expected = readFileSync(new URL("../../fixtures/catalog/compiler/golden/finance-ops-us.plan.json", import.meta.url), "utf8");
-      expect(`${JSON.stringify(plan, null, 2)}\n`).toBe(expected);
+      expect(versionFree(plan)).toBe(expected);
       const repeated = compilePlan({ catalog: fixture.catalog, profile: fixture.profile, asOf: AS_OF });
-      expect(`${JSON.stringify(repeated, null, 2)}\n`).toBe(expected);
+      expect(`${JSON.stringify(repeated, null, 2)}\n`).toBe(`${JSON.stringify(plan, null, 2)}\n`);
+      expect(versionFree(repeated)).toBe(expected);
       expect(repeated.digest).toBe(digest);
     } finally { fixture.cleanup(); }
   });

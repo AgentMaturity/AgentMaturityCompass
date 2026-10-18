@@ -11,7 +11,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 const repository = fileURLToPath(new URL("../../../", import.meta.url));
 const catalogSource = join(repository, "tests", "fixtures", "catalog", "compiler", "catalog");
 const profileSource = join(repository, "tests", "fixtures", "catalog", "compiler", "finance-ops-us.profile.json");
-const node22 = process.versions.node.split(".")[0] === "22" ? process.execPath : "/opt/homebrew/opt/node@22/bin/node";
+const nodeBin = process.execPath;
 type JsonObject = Record<string, unknown>;
 interface FilePin { path: string; bytes: number; sha256: string }
 interface Receipt { status: number | null; signal: NodeJS.Signals | null; error: string | null; stdout: string; stderr: string; pid: number }
@@ -65,7 +65,6 @@ import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 const [workspace, dist] = process.argv.slice(2);
-assert.equal(process.versions.node.split('.')[0], '22');
 const load = p => import(pathToFileURL(join(dist,p)).href);
 const { initWorkspace } = await load('workspace.js');
 const { initApprovalPolicy } = await load('approvals/approvalPolicyEngine.js');
@@ -86,7 +85,6 @@ import { readFileSync,writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 const [workspace,dist,outDir] = process.argv.slice(2);
-assert.equal(process.versions.node.split('.')[0],'22');
 const load = p => import(pathToFileURL(join(dist,p)).href);
 const chain=await load('approvals/approvalChainStore.js');
 const engine=await load('approvals/approvalEngine.js');
@@ -110,9 +108,9 @@ writeFileSync(join(workspace,'review-inspection.json'),JSON.stringify({request,p
 function run(f: Fixture, name: string, argv: string[]): Receipt {
   const stem = `${String(++f.sequence).padStart(2, "0")}-${name}`;
   const startedAt = Date.now();
-  save(join(f.root, "logs", `${stem}.intent.json`), { executable: node22, argv, cwd: f.workspace, environmentKeys: Object.keys(f.env).sort(), startedAt });
+  save(join(f.root, "logs", `${stem}.intent.json`), { executable: nodeBin, argv, cwd: f.workspace, environmentKeys: Object.keys(f.env).sort(), startedAt });
   // No shell, retries or extra deadline. The repository's unchanged test timeout still applies.
-  const result = spawnSync(node22, argv, { cwd: f.workspace, env: f.env, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
+  const result = spawnSync(nodeBin, argv, { cwd: f.workspace, env: f.env, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
   const receipt: Receipt = { status: result.status, signal: result.signal, error: result.error ? String(result.error) : null,
     stdout: result.stdout ?? "", stderr: result.stderr ?? "", pid: result.pid };
   writeFileSync(join(f.root, "logs", `${stem}.stdout.log`), receipt.stdout, { flag: "wx", mode: 0o600 });
@@ -130,7 +128,7 @@ function newFixture(): Fixture {
   fixtures.push(f); // Retain even a genuine setup failure.
   for (const name of ["workspace", "home", "tmp", "checkpoints", "logs", "public"]) mkdirSync(join(root, name), { mode: 0o700 });
   mkdirSync(join(workspace, "inputs"));
-  f.env = { PATH: `${dirname(node22)}:${process.env.PATH ?? ""}`, HOME: join(root, "home"), AMC_HOME: join(root, "home"),
+  f.env = { PATH: `${dirname(nodeBin)}:${process.env.PATH ?? ""}`, HOME: join(root, "home"), AMC_HOME: join(root, "home"),
     TMPDIR: join(root, "tmp"), AMC_CONTROL_CHECKPOINT_DIR: join(root, "checkpoints"), AMC_NO_SIGN: "0",
     AMC_VAULT_PASSPHRASE: randomUUID(), NO_COLOR: "1", LANG: "C", LC_ALL: "C" };
   const setup = join(root, "setup.mjs");
@@ -264,6 +262,17 @@ describe("catalog compiler actual cold CLI with a synthetic disk catalog", () =>
     expect(result.stderr).toContain(`Refusing to write a control plan under ${join(realpathSync(f.workspace), ".amc")}`);
     expect(result.stderr).toContain(".amc/** is reserved for signed configs.");
     expect(existsSync(out)).toBe(false);
+    expect(treePins(join(f.workspace, ".amc"))).toEqual(before);
+  });
+
+  test("a file-system error on the output path is reported as itself, not as the .amc boundary", () => {
+    const f = newFixture(), input = profile(f, "not-a-directory"), prefix = join(f.workspace, "regular-file");
+    writeFileSync(prefix, "owned regular file\n", { flag: "wx" });
+    const before = treePins(join(f.workspace, ".amc"));
+    const result = cli(f, input, join(prefix, "plan"));
+    assertExit(result, 1);
+    expect(result.stderr).toContain("ENOTDIR");
+    expect(result.stderr).not.toContain(".amc/** is reserved for signed configs.");
     expect(treePins(join(f.workspace, ".amc"))).toEqual(before);
   });
 

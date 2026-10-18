@@ -1,4 +1,4 @@
-import { lstatSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
@@ -49,6 +49,17 @@ describe("compiler output path protection with real filesystem aliases", () => {
     expect(() => assertCompilerOutputOutsideSignedConfigTree(workspace, join(signed, "missing", "plan"))).toThrow("reserved for signed configs");
     expect(() => assertCompilerOutputOutsideSignedConfigTree(workspace, join(physical, "missing", "plan"))).toThrow("reserved for signed configs");
     expect(readFileSync(join(physical, "sentinel"), "utf8")).toBe("owned synthetic protected-tree sentinel\n");
+  });
+
+  test("a case alias of .amc is refused wherever the file system folds case", () => {
+    const target = join(workspace, ".AMC", "policy");
+    // Runs on both kinds of volume: where .AMC names .amc it must refuse, elsewhere it is an ordinary sibling.
+    if (existsSync(join(workspace, ".AMC", "sentinel"))) {
+      expect(() => assertCompilerOutputOutsideSignedConfigTree(workspace, target)).toThrow("reserved for signed configs");
+    } else {
+      expect(() => assertCompilerOutputOutsideSignedConfigTree(workspace, target)).not.toThrow();
+    }
+    expect(readFileSync(join(workspace, ".amc", "sentinel"), "utf8")).toBe("owned synthetic protected-tree sentinel\n");
   });
 
   test("a dangling output link fails closed instead of treating the existing link as a missing name", () => {
