@@ -29,16 +29,21 @@ catalog/
   CHANGELOG.md                   append-only catalog changelog (P1-34, GOVERNANCE.md)
   governance/                    f5-confirmations.yaml, reverify-before-publishing.yaml, standards-licences.md (P1-34)
   reviews/<subject>/<version>/<record>.json   review records (P1-34)
+  admission/<pack-id>-<version>.json         pack admission reports (P1-33, ADMISSION.md)
 ```
 
 The P1-34 governance files are read by `src/catalog/governance/`, never as catalog content, so they change no digest.
+Admission reports are checker output, outside every digest; only the admission gate below and `amc catalog check` read them.
 
 `package.json` ships `catalog/**`, and `loadCatalog()` finds it from `src/catalog/` and `dist/catalog/` alike
 (`new URL("../../catalog/", import.meta.url)`). `npm run check:packed-install` loads and validates the installed copy.
 
 ## Loading
 
-`loadCatalog({ root? })` reads the documented tree and nothing else. It never imports or evaluates content. It refuses:
+`loadCatalog({ root? })` reads the documented tree and nothing else. It never imports or evaluates content. The
+compiler, activation, the OSCAL export and A4 read it through `loadAdmittedCatalog()`, which loads a pack declaring
+`reviewed` or `qualified` support as `experimental` (warning `ADM_SUPPORT_DOWNGRADED`) unless its recomputed admission
+admits it ([ADMISSION.md](ADMISSION.md)). It refuses:
 
 | Refusal | Code |
 | --- | --- |
@@ -148,7 +153,7 @@ counts as neither observed nor available.
 ## Pack manifest, producers and fixtures
 
 A pack manifest has `id`, `version`, `layer`, `title`, `stations`, `jurisdictions`, `compilerCompat` (a semver range),
-`publisher`, `maintainers`, `licence` (an SPDX id; `MIT` until D-04), `support` (declared; P1-33 gates it), `controls`
+`publisher`, `maintainers`, `licence` (an SPDX id; `MIT` until D-04), `support` (declared; P1-33 gates it, [ADMISSION.md](ADMISSION.md)), `controls`
 and `stewardship`. A producer record has `id`, `module` (the emitting source path), `emits`, `maxClaimKind`
 (`observed`, `self_reported` or `synthetic_example`), `status` (`available` or `planned`) and `plannedBy`, which is set
 exactly when the producer is planned. A fixture envelope has `fixtureVersion: 1`, `controlId`, `polarity`,

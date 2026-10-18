@@ -1,7 +1,13 @@
 import { envelopeForUnverifiedResult } from "../claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
 import type { ClaimEnvelope } from "../claims/eligibility/types.js";
-import type { ComplianceGap, DomainAssessmentResult, DomainRoadmapItem } from "./domainAssessmentEngine.js";
+import { QUESTIONNAIRE_NOTICE } from "./questionnaireLabel.js";
+import type {
+  ComplianceGap,
+  DomainAssessmentResult,
+  DomainRoadmapItem,
+  EuAIActClassification
+} from "./domainAssessmentEngine.js";
 
 const LEGEND = ["## How to read claim kinds", "", renderClaimLegend("markdown"), ""].join("\n");
 
@@ -38,6 +44,7 @@ export interface DomainReport {
   complianceGapAnalysis: ComplianceGapGroup[];
   roadmap: DomainRoadmapItem[];
   regulatoryWarnings: string[];
+  euAIActClassification: EuAIActClassification;
   markdown: string;
 }
 
@@ -76,6 +83,28 @@ function renderExecutiveSummary(summary: ExecutiveSummary): string {
     `- Composite Score: ${summary.compositeScore}`,
     ""
   ].join("\n");
+}
+
+function renderEuAIActClassification(classification: EuAIActClassification): string {
+  const lines = [
+    "## EU AI Act Classification",
+    `- Status: ${classification.contentStatus}. ${QUESTIONNAIRE_NOTICE}`,
+    `- Station category: ${classification.domainCategory}`,
+    "",
+    "| Pack | Classification | Annex III Points | General Purpose AI |",
+    "|---|---|---|---|"
+  ];
+  for (const pack of classification.packs) {
+    lines.push(
+      `| ${pack.packId} | ${pack.classification.replace(/\|/g, "\\|")} | ${pack.annexIIIPoints.join(", ") || "-"} | ${pack.generalPurpose ? "yes" : "no"} |`
+    );
+  }
+  const prohibited = classification.packs.filter((pack) => pack.prohibitedFlag).map((pack) => pack.packId);
+  if (prohibited.length > 0) {
+    lines.push("", `- Cites an Article 5 prohibited practice; check the deployment: ${prohibited.join(", ")}`);
+  }
+  lines.push("");
+  return lines.join("\n");
 }
 
 function renderModuleActivationTable(rows: ModuleActivationRow[]): string {
@@ -146,24 +175,32 @@ function renderRegulatoryWarnings(warnings: string[]): string {
   ].join("\n");
 }
 
-/** Without `claim` the scores are the caller's own inputs, so the report is labelled self-reported. */
-export function renderDomainReportMarkdown(result: DomainAssessmentResult, claim = callerInputClaim(result)): string {
-  const summary: ExecutiveSummary = {
+function executiveSummary(result: DomainAssessmentResult): ExecutiveSummary {
+  return {
     domain: result.domainMetadata.name,
     level: result.level,
     baseScore: result.baseScore,
     domainScore: result.domainScore,
     compositeScore: result.compositeScore
   };
+}
 
+/**
+ * Without `claim` the scores are the caller's own inputs, so the report is labelled self-reported.
+ * `now` (epoch ms) makes the rendered report deterministic; it defaults to the current time.
+ */
+export function renderDomainReportMarkdown(
+  result: DomainAssessmentResult, claim = callerInputClaim(result), now: number = Date.now()
+): string {
   const sections = [
     `# AMC Domain Report: ${result.domainMetadata.name}`,
     "",
     formatClaimLabel(renderClaimLabel(claim), "report"),
     "",
-    `Generated: ${new Date().toISOString()}`,
+    `Generated: ${new Date(now).toISOString()}`,
     "",
-    renderExecutiveSummary(summary),
+    renderExecutiveSummary(executiveSummary(result)),
+    renderEuAIActClassification(result.euAIActClassification),
     renderModuleActivationTable(moduleRows(result)),
     renderComplianceGaps(groupGapsByRegulation(result.complianceGaps)),
     renderRoadmap(result.roadmap),
@@ -192,20 +229,18 @@ export function renderNotEvaluatedDomainReport(domainName: string, reasons: read
   ].join("\n");
 }
 
-export function buildDomainReport(result: DomainAssessmentResult, claim = callerInputClaim(result)): DomainReport {
+/** `now` (epoch ms) makes the report deterministic; it defaults to the current time. */
+export function buildDomainReport(
+  result: DomainAssessmentResult, claim = callerInputClaim(result), now: number = Date.now()
+): DomainReport {
   return {
-    generatedAt: new Date().toISOString(),
-    executiveSummary: {
-      domain: result.domainMetadata.name,
-      level: result.level,
-      baseScore: result.baseScore,
-      domainScore: result.domainScore,
-      compositeScore: result.compositeScore
-    },
+    generatedAt: new Date(now).toISOString(),
+    executiveSummary: executiveSummary(result),
     moduleActivationTable: moduleRows(result),
     complianceGapAnalysis: groupGapsByRegulation(result.complianceGaps),
     roadmap: [...result.roadmap],
     regulatoryWarnings: [...result.regulatoryWarnings],
-    markdown: renderDomainReportMarkdown(result, claim)
+    euAIActClassification: result.euAIActClassification,
+    markdown: renderDomainReportMarkdown(result, claim, now)
   };
 }

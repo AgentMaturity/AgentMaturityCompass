@@ -113,7 +113,9 @@ export const TRUTH_CLAIM_EXCEPTIONS = [
   { file: "website/blog/amc-philosophy.html", phrase: "Its documentation says it's compliant",
     reason: "describes what an agent's own documentation claims, which the post argues against trusting" },
   { file: "docs/API_REFERENCE.md", phrase: "standard-compliant content credentials",
-    reason: "generated from a question's text (src/assurance/packs), which asks whether content credentials follow a standard" }
+    reason: "generated from a question's text (src/assurance/packs), which asks whether content credentials follow a standard" },
+  { file: "docs/REGULATORY_CALENDAR.md", phrase: "Authorities must accept eFTI data from certified platforms",
+    reason: "a key date copied from the sourced register (eu-efti); certified eFTI platforms are a term of Regulation (EU) 2020/1056, not a claim about AMC (P1-42)" }
 ];
 
 /** Commands a promoted doc may name although the inventory lacks them, each with its reason. */

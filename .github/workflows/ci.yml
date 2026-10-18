@@ -91,11 +91,22 @@ jobs:
       - name: Build
         run: npm run build
 
+      # P1-33: each pack's declared support against the ten admission criteria; fails a reviewed or qualified
+      # claim the pack does not meet and a malformed catalog/admission/ report, never an experimental draft.
+      - name: Catalog pack admission
+        run: npm run check:catalog-admission
+
       - name: Published schemas match the enforced schemas (P1-01)
         run: npm run check:schemas
 
       - name: Regulatory register currency
         run: npm run check:regulatory-currency
+
+      - name: Regulatory calendar matches its sources (P1-42)
+        run: npm run check:regulatory-calendar
+
+      - name: Industry guides match source (P1-42)
+        run: npm run check:industry-guides
 
       # P1-34: catalog reviews falling due, GOV_REVERIFY_OPEN, and one appended
       # catalog/CHANGELOG.md entry per catalog digest change (docs/catalog/GOVERNANCE.md).

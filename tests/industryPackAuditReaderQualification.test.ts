@@ -68,7 +68,7 @@ function genuine(result: unknown) {
     keyFingerprint: `sha256:${sha256Hex(publicPem)}`, fileSha256: sha256Hex(bytes), errors: [] });
   expect(actual.report).toMatchObject({ trusted: true, integrity: { status: "pass" }, issuerAdmission: { status: "pass" },
     satisfaction: { status: "not-evaluated" }, completeness: { status: "not-evaluated" } });
-  expect(actual.audit).toMatchObject({ schemaVersion: "amc.industry-pack-audit/4",
+  expect(actual.audit).toMatchObject({ schemaVersion: "amc.industry-pack-audit/5",
     overall: { claimKind: "self_reported", eligibleLevel: 1 } });
 }
 

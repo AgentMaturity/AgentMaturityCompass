@@ -12,7 +12,7 @@
  */
 import { existsSync, lstatSync, readFileSync, rmdirSync, rmSync } from "node:fs";
 import { dirname } from "node:path";
-import { loadCatalog } from "../../catalog/loader.js";
+import { loadAdmittedCatalog } from "../../catalog/admission/gate.js";
 import { activeControlPlanHead } from "../../catalog/compiler/activate.js";
 import { renderPlanDiffMarkdown } from "../../catalog/compiler/diff.js";
 import { CONTROL_PLAN_REVIEW_TOOL, planReviewIntent } from "../../catalog/compiler/sign.js";
@@ -155,7 +155,7 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
         : `From your answers, ${count("applicable")} catalog requirement(s) apply, ${count("not_applicable")} do not, and ${count("unresolved")} cannot be decided until some answers are known.`,
       practitioner: plan === null ? `Compile refused: ${facts?.compileError?.code ?? "not compiled"}.`
         : requirements.map((row) => `${row.controlId} ${row.applicability}${row.missingFacts.length > 0 ? ` (missing ${row.missingFacts.join(", ")})` : ""}; pulled in by ${row.pulledInBy.join(", ")}`).join(". "),
-      expert: plan === null ? "parseDeploymentProfile/compilePlan threw." : `compilePlan({ profile, catalog: loadCatalog(), asOf, signedTools }) → ${plan.digest}, status ${plan.status}; `
+      expert: plan === null ? "parseDeploymentProfile/compilePlan threw." : `compilePlan({ profile, catalog: loadAdmittedCatalog(), asOf, signedTools }) → ${plan.digest}, status ${plan.status}; `
         + requirements.map((row) => `${row.controlId}@${row.controlVersion}: ${row.reasons.join("; ")}`).join(" | ") },
     { id: "sources", sources: ["catalog/README.md", "src/compliance/regulatory"], dataStatus: "experimental",
       novice: `The catalog says: "${CATALOG_EXPERIMENTAL_NOTICE}" (D-08)`,
@@ -479,7 +479,7 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
   assertBuiltCurrent(ctx);
   const created = ctx.state.chain.find((link) => link.kind === "CREATED")?.body.ts;
   const conformance = recordControlResults({ workspace: ctx.workspace, projectId: project.project_id, workspaceId: project.workspace_id, agentId: project.agent_id,
-    plan, catalog: loadCatalog(), windowStartTs: typeof created === "number" ? created : project.created_ts, now: ctx.now });
+    plan, catalog: loadAdmittedCatalog(), windowStartTs: typeof created === "number" ? created : project.created_ts, now: ctx.now });
   // Review records a new revision, and an acknowledgement counts only on its own: none that counts on the reviewed
   // revision exists yet, so the owner's out-of-scope and the two acknowledgements are left empty here; the conformance
   // view fills them live from that revision (conformanceView), never from this record.

@@ -60,7 +60,7 @@ describe("evidenceProducer", () => {
 const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "", "active", "adapter-observation", "adapters", "agent", "agents", "amc", "amc-registered", "amc.audit", "api",
   "approvals", "assurance", "audit-logs", "backoff", "backup", "both", "bridge", "budgets", "built-in-mcp-agent-provider",
-  "builtin", "catalog-only", "cli", "compliance", "correlation", "decision", "derived", "detector",
+  "builtin", "catalog-only", "cli", "compliance", "correlation", "decision", "defaults", "derived", "detector",
   "diagnostic-eval-replay-corpus-boundary", "env", "eoc", "eval-replay-corpus", "eval.run.layer", "eval.run.question",
   "events", "failed-evaluation", "file", "filesystem", "firewall", "fleet", "forecast", "gateway", "hook", "hook_control",
   "host", "identity", "incident-regression", "inference-strategy-comparison", "judge-calibration", "ledger", "leases",
@@ -84,7 +84,9 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "source_unavailable", "value_contract",
   // A secret pattern's contributing engine (P2-02 hardening, src/shield/redaction/secretPatterns.ts SecretPatternSource),
   // reviewed 2026-10-18 at the codex-full merge. It labels where a redaction pattern came from, never a ledger meta.source.
-  "dataflow"
+  "dataflow",
+  // P1-10F: compileCatalogPlan reports where visible tools came from (defaults or the signed tools.yaml); not evidence.
+  "signed-tools-yaml",
 ]);
 
 function sourceFiles(dir: string): string[] {

@@ -159,6 +159,8 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       }
 
       console.log(chalk.bold.hex('#4AEF79')(`\n🏭  Industry Sector Packs (${packs.length} packs)\n`));
+      const { QUESTIONNAIRE_NOTICE } = await import("./domains/questionnaireLabel.js");
+      console.log(chalk.gray(`  Experimental, self-reported questionnaires. ${QUESTIONNAIRE_NOTICE}\n`));
       const maxName = Math.max(...packs.map(p => p.name.length), 10);
       console.log(`  ${"Pack ID".padEnd(30)} ${"Name".padEnd(maxName + 2)} ${"Domain".padEnd(14)} ${"Questions".padEnd(12)} ${"Access".padEnd(10)} Risk`);
       console.log(chalk.gray(`  ${"─".repeat(30)} ${"─".repeat(maxName + 2)} ${"─".repeat(14)} ${"─".repeat(12)} ${"─".repeat(10)} ${"─".repeat(10)}`));
@@ -286,6 +288,8 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
 
       console.log(chalk.bold("  Results:"));
       printClaimResult(claim, opts);
+      const { QUESTIONNAIRE_NOTICE } = await import("./domains/questionnaireLabel.js");
+      console.log(`    Content: ${result.contentStatus}. ${QUESTIONNAIRE_NOTICE}`);
       console.log(`    Pack:       ${result.packId}`);
       console.log(result.percentage === null
         ? `    Self-reported score: not evaluated (${result.notEvaluatedQuestionIds.length} of ${result.selfAssessment.total} questions unanswered)`

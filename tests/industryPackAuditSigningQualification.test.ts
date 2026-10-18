@@ -57,7 +57,7 @@ function rechecksum(value: IndustryPackAudit): void {
 }
 
 function selfReported(value: IndustryPackAudit): void {
-  expect(value.schemaVersion).toBe("amc.industry-pack-audit/4"); // P1-44 bumped /3 to /4 (NOT_EVALUATED controls)
+  expect(value.schemaVersion).toBe("amc.industry-pack-audit/5"); // P1-44 bumped /3 to /4 (NOT_EVALUATED controls), P1-42 to /5
   expect(value.overall.claimKind).toBe("self_reported");
   expect(value.overall.eligibleLevel).toBe(1);
   expect(industryPackAuditClaim(value)).toMatchObject({ claimKind: "self_reported", eligibleLevel: 1,
