@@ -13,13 +13,13 @@ import type { SandboxOutcome, ShellEgressRow } from "../../src/sandbox/sandboxTy
 import { ToolPipeline } from "../../src/tools/toolPipeline.js";
 import { ToolRegistry } from "../../src/tools/toolRegistry.js";
 import { toolhubAllowlistGuard } from "../../src/tools/guards/policyGuards.js";
-import type { ToolExecution, ToolOutcome } from "../../src/tools/toolTypes.js";
+import type { RecordedToolCall, ToolExecution, ToolOutcome } from "../../src/tools/toolTypes.js";
 import { closeSqlitePool } from "../../src/storage/sqlitePool.js";
 import { lockVault } from "../../src/vault/vault.js";
 
 const hash = (bytes: Buffer): string => createHash("sha256").update(bytes).digest("hex");
 const quote = (text: string): string => `'${text.replaceAll("'", "'\\''")}'`;
-export type NativeCall = { outcome: ToolOutcome; receipt: SandboxOutcome; execution: ToolExecution; data: Record<string, any> };
+export type NativeCall = { outcome: ToolOutcome; receipt: SandboxOutcome; execution: RecordedToolCall; data: Record<string, any> };
 export type NativeContainmentFixture = ReturnType<typeof nativeContainmentFixture>;
 
 /** Real signed tools, default P1-02 binding and private native permit; no injected backend or body. */
@@ -41,7 +41,7 @@ export function nativeContainmentFixture(options: { allowHosts?: string[]; maxPr
   assign(chosen);
   const receipts: Array<{ execution: ToolExecution; outcome: SandboxOutcome }> = [];
   const egress: Array<{ execution: ToolExecution; row: ShellEgressRow }> = [];
-  const calls: Array<{ execution: ToolExecution; outcome: ToolOutcome }> = [];
+  const calls: Array<{ execution: RecordedToolCall; outcome: ToolOutcome }> = [];
   const facts: Record<string, unknown>[] = [];
   const closers: Array<() => Promise<void>> = [];
   let closed = false;

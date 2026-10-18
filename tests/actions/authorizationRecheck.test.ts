@@ -26,7 +26,7 @@ import { initToolsConfig } from "../../src/toolhub/toolhubValidators.js";
 import { toolEvidenceFor, type ToolEvidenceRecord } from "../../src/tools/toolEvidence.js";
 import { ToolPipeline, type ToolCallInput } from "../../src/tools/toolPipeline.js";
 import { defineTool, ToolRegistry } from "../../src/tools/toolRegistry.js";
-import type { ToolExecution, ToolOutcome } from "../../src/tools/toolTypes.js";
+import type { RecordedToolCall, ToolExecution, ToolOutcome } from "../../src/tools/toolTypes.js";
 import type { ActionClass } from "../../src/types.js";
 import { sha256Hex } from "../../src/utils/hash.js";
 import { canonicalize } from "../../src/utils/json.js";
@@ -57,7 +57,7 @@ const BINDING_FIELDS: NonNullable<SignedToolDefinition["bindingFields"]> = {
 };
 
 interface RecordedCall {
-  execution: ToolExecution;
+  execution: RecordedToolCall;
   outcome: ToolOutcome;
   rows: ToolEvidenceRecord[];
 }

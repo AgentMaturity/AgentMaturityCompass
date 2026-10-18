@@ -17,7 +17,7 @@ function policy(pipeline: Partial<EffectiveRuntimePolicy["toolPipeline"]> = {},
   approvals: EffectiveRuntimePolicy["approvals"] = {}): ActiveCompiledPolicy {
   return {
     revision: 7, entrySha256: "b".repeat(64), planDigest: `sha256:${"c".repeat(64)}`,
-    profileSha256: "d".repeat(64), lockDigest: `sha256:${"e".repeat(64)}`,
+    profileSha256: "d".repeat(64), lockDigest: `sha256:${"e".repeat(64)}`, deployment: null,
     controls: [
       { controlId: CONTROL, controlVersion: "1.0.0", points: ["tool_pipeline"], compiledPoints: ["tool_pipeline"], review: "pending" },
       { controlId: APPROVAL_CONTROL, controlVersion: "2.0.0", points: ["approvals"], compiledPoints: ["approvals"], review: "pending" }

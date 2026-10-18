@@ -36,7 +36,7 @@ import { closeSqlitePool } from "../../src/storage/sqlitePool.js";
 import { initToolsConfig, loadToolsConfig } from "../../src/toolhub/toolhubValidators.js";
 import { ToolPipeline, type ToolPipelineInit } from "../../src/tools/toolPipeline.js";
 import { defineTool, ToolRegistry } from "../../src/tools/toolRegistry.js";
-import { DefiniteFailureError, type ToolBodyResult, type ToolExecution, type ToolOutcome } from "../../src/tools/toolTypes.js";
+import { DefiniteFailureError, type RecordedToolCall, type ToolBodyResult, type ToolExecution, type ToolOutcome } from "../../src/tools/toolTypes.js";
 import type { ActionClass } from "../../src/types.js";
 import { canonicalize } from "../../src/utils/json.js";
 import { lockVault } from "../../src/vault/vault.js";
@@ -680,7 +680,7 @@ function grantedGateFixture() {
   }
   const bodies: ToolExecution[] = [];
   const guards: ToolExecution[] = [];
-  const recorded: Array<{ execution: ToolExecution; outcome: ToolOutcome }> = [];
+  const recorded: Array<{ execution: RecordedToolCall; outcome: ToolOutcome }> = [];
   const registry = new ToolRegistry();
   for (const definition of faultTools(f.sor)) registry.define({ ...definition, body: execution => {
     bodies.push(execution);

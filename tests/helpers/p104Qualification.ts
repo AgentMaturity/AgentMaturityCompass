@@ -18,7 +18,7 @@ import type { ToolsConfig } from "../../src/toolhub/toolsSchema.js";
 import { ToolPipeline } from "../../src/tools/toolPipeline.js";
 import { ToolRegistry } from "../../src/tools/toolRegistry.js";
 import { toolhubAllowlistGuard } from "../../src/tools/guards/policyGuards.js";
-import type { ToolExecution, ToolOutcome } from "../../src/tools/toolTypes.js";
+import type { RecordedToolCall, ToolExecution, ToolOutcome } from "../../src/tools/toolTypes.js";
 import { canonicalize } from "../../src/utils/json.js";
 import { sha256Hex } from "../../src/utils/hash.js";
 import { lockVault } from "../../src/vault/vault.js";
@@ -33,7 +33,7 @@ export interface P104Options {
 export interface P104Fixture {
   root: string; workspace: string; home: string; sessionId: string; monitor: string; auditor: string; oracleFile: string;
   sor: FakeSystemOfRecord; registry: ToolRegistry; pipeline: ToolPipeline; journal: ActionJournal; readonly ledger: Ledger;
-  recordings: Array<{ execution: ToolExecution; outcome: ToolOutcome }>; beforeEffects: unknown[]; observations: unknown[];
+  recordings: Array<{ execution: RecordedToolCall; outcome: ToolOutcome }>; beforeEffects: unknown[]; observations: unknown[];
   closeStores(): void;
   run(tool?: FaultTool, args?: Record<string, unknown>): Promise<ToolOutcome>;
   /** The same call through a second pipeline over the same registry and journal whose recorder does not throw. */
@@ -54,7 +54,7 @@ export function createP104Fixture(options: P104Options = {}): P104Fixture {
   };
   assign(chosen);
   let journal: ActionJournal | null = null, ledger: Ledger | null = null, finished = false;
-  const recordings: Array<{ execution: ToolExecution; outcome: ToolOutcome }> = [];
+  const recordings: Array<{ execution: RecordedToolCall; outcome: ToolOutcome }> = [];
   const beforeEffects: unknown[] = [], observations: unknown[] = [];
   function closeStores(): void {
     journal?.close(); journal = null; ledger?.close(); ledger = null;
