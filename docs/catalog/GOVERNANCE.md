@@ -31,9 +31,10 @@ operator pinned for `catalog-review`, and a record declaring any other identity 
 
 `reviewed` support needs verified approvals from at least two distinct people, one of them credentialed for one of the
 control's domains (stations). Reviewers who share any identifier (trust-list subject, roster git identity or declared
-name) are one person. Identifiers are compared after NFKC normalization, collapsing every run of whitespace (NBSP and
-other Unicode spaces included) and case folding; names and emails are split out of `Name <email>`, an email's `+tag`
-and a trailing dot on its domain are dropped. A control that
+name) are one person. Identifiers are compared after NFKC normalization, removing default-ignorable code points
+(zero-width space, ZWJ, ZWNJ, soft hyphen), collapsing every run of whitespace (NBSP and other Unicode spaces
+included) and case folding; names and emails are split out of `Name <email>`, a name also matches without its spaces,
+and an email's `+tag` and a trailing dot on its domain are dropped. A control that
 cites law also needs an approval from a credentialed legal reviewer. Content an AI drafted needs a human approval whose
 `aiInputs` confirm a `draft` naming this control (`<id>@<version>` or its digest). Any verified objection (`reject` or
 `request_changes`) blocks the quorum until new records resolve it.
@@ -46,7 +47,7 @@ which verifies the review records (below) at the server's clock; it freezes each
 review record it counted, and supportStanding refuses any object it did not mint (`GOV_REVIEW_PROMOTION_UNVERIFIED`) or
 one without reviewers and records (`GOV_REVIEW_PROMOTION_EMPTY`). P1-33 calls effectiveSupport for admission criteria
 2 and 9. `compilePlan` takes the promotions as an input (`promotions`), judges them with
-supportStanding at the plan's `asOf` and records them in the plan, so they are bound into its digest; without them every
+supportStanding at the plan's `asOf` and records the ones it accepted in the plan, so they are bound into its digest; without them every
 row is experimental, as today. Activation and its policy receipts, the A4 conformance and why-view rows, the OSCAL export
 (support, the review block, the approver and each citation's legal review) and `check:catalog-currency` read a
 control's support and review fields only through these results, and a test scans the source for any other read.
@@ -65,8 +66,10 @@ subject, every roster git identity and the record's declared name) matches any n
 control's file (`git log --follow`, so renames keep their authors; a file without history is refused).
 
 What this cannot close: git authors are unsigned, so an author can commit under a new identity the roster does not
-list, and one person with two roster entries whose identities never overlap counts as two people. Only signed commits
-and a signed D-08 roster close those gaps; until then the roster's identities are the operator's word. Every record
+list, and one person with two roster entries whose identities never overlap counts as two people. Look-alike characters
+from other scripts (a Cyrillic "А" for a Latin "A"; UTS #39 confusables are not folded) and initials ("A. Smith" for
+"Alice Smith") also pass as different people. Only signed commits and a signed D-08 roster close those gaps; until then
+the roster's identities are the operator's word. Every record
 states `reviewer.credential` and `reviewer.conflictsDeclared`; both must be non-blank, and "none" is a declaration, not
 a blank.
 
@@ -89,9 +92,11 @@ data, not catalog content: they never change a digest. The format (`reviewRecord
 | `decidedAt`, `nextReviewDue` | `YYYY-MM-DD`. `decidedAt` is the signing time the record claims. |
 | `signature` | `{ publicKeyPem, value }`: Ed25519 over sha256 of `amc.catalog-review/v1`, a zero byte and the canonical record without `signature`. |
 
-A record is a declaration. effectiveSupport reads the server's clock itself and loads the operator's trust at it
-(`loadTrustContext`: the AMC home's signed trust lists, verified against the pinned roots with the operator's m-of-n
-policy and anti-rollback, plus distrust); a list that does not verify stops everything (`GOV_REVIEW_TRUST_INVALID`). An
+A record is a declaration. effectiveSupport reads the server's clock itself and loads the operator's trust at it; trust
+is never a caller's input. It comes only from the operator's AMC home (`AMC_HOME`, else `~/.config/amc`): its
+`trust/trust-roots.json` must exist (otherwise nothing is promoted: "trust roots not configured"), and
+`loadTrustContext` verifies its signed trust list against those roots with the operator's m-of-n policy and
+anti-rollback, plus distrust; a list that does not verify stops everything (`GOV_REVIEW_TRUST_INVALID`). An
 entry that pins a key for `catalog-review` and anything else is refused for every purpose, and a key any loaded list pins
 for another purpose is never admitted for `catalog-review`. A record counts only when,
 in order:
