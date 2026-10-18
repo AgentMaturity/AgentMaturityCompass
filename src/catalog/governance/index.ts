@@ -90,6 +90,15 @@ export function catalogCurrencyFindings(cat: LoadedCatalog, authority: ReviewAut
     if (shownReviewStatus(control, result.support) !== control.review.status) {
       add("GOV_REVIEW_UNVERIFIED", "warning", "declares an approved review that no verified review record supports");
     }
+    // A future clause whose compliance date has passed is binding now: relabel and re-verify. Dates never fail validation
+    // (src/catalog/citations.ts), so this is where they surface; an error for content that declares reviewed or qualified
+    // support (its currency is claimed), a warning for a draft.
+    for (const c of control.citations) {
+      if (c.statusType === "binding-future" && c.superseded === null && c.complianceDueDate !== null && c.complianceDueDate <= asOf) {
+        add("GOV_CITATION_DUE_PASSED", control.support === "experimental" ? "warning" : "error",
+          `${c.key}: complianceDueDate ${c.complianceDueDate} has passed; the clause is binding now: cite it binding-now and re-verify`);
+      }
+    }
   }
   for (const r of cat.registers?.values() ?? []) {
     for (const due of statusReviewDue(r.entries, asOf)) out.push({ code: "GOV_REGISTER_STATUS_REVIEW", severity: "warning", controlId: null, message: `${r.id}/${due.id}: ${due.reason}` });

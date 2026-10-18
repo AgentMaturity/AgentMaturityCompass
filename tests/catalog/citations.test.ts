@@ -70,9 +70,10 @@ describe("catalog citation rules", () => {
     const input: Citation = { ...citation(), registerId: "us-ca-cppa-admt", statusType: "binding-future", instrument: "Synthetic future-clause fixture",
       clause: "11 CCR §7220", effectiveDate: "2026-01-01", complianceDueDate: "2027-01-01" };
     expect(validateCitation(input, context())).toEqual([]);
-    // A due date at or before asOf, or none, is not a future clause: the instrument's own status decides.
+    // Without a due date the instrument's own status decides. A due date that has passed stays valid here; the
+    // currency check reports it (GOV_CITATION_DUE_PASSED), so no date can turn the shipped catalog invalid by itself.
     expect(validateCitation({ ...input, complianceDueDate: null }, context()).map((i) => i.code)).toContain("CAT_CITATION_STATUS_MISMATCH");
-    expect(validateCitation({ ...input, complianceDueDate: asOf }, context()).map((i) => i.code)).toContain("CAT_CITATION_STATUS_MISMATCH");
+    expect(validateCitation({ ...input, complianceDueDate: asOf }, context())).toEqual([]);
   });
 
   it("refuses an unknown register ID", () => {
