@@ -4,7 +4,6 @@
   "dataRegistries": [
     "src/compliance/builtInMappings.ts",
     "src/diagnostic/questionBank.ts",
-    "src/domains/industryPacks.ts",
     "src/methodology/publicMethodology.ts",
     "src/types.ts"
   ],

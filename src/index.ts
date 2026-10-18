@@ -2335,6 +2335,8 @@ export {
 export type {
   DeepIndustryQuestion,
 } from "./domains/deepIndustryPacks.js";
+// The DEEP_* arrays and every pack question are AI-drafted and experimental: self-reported questionnaires (P1-42).
+export { QUESTIONNAIRE_CONTENT_STATUS, QUESTIONNAIRE_NOTICE } from "./domains/questionnaireLabel.js";
 
 // ── Adapter Standardization (MF-11) ─
 export {

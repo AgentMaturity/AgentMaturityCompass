@@ -79,6 +79,22 @@ async function layer0Counts() {
   return { controls: controls.length, executed: executed.length, awaiting: controls.length - executed.length };
 }
 
+/** Sector-pack totals from the built registry, overall and per station (P1-42 review). */
+async function sectorCounts() {
+  const built = join(root, "dist/domains/industryPacks.js");
+  if (!existsSync(built)) return null;
+  const { listIndustryPacks } = await import(built);
+  const stations = {};
+  let questions = 0;
+  for (const pack of listIndustryPacks()) {
+    stations[pack.stationId] ??= { packs: 0, questions: 0 };
+    stations[pack.stationId].packs += 1;
+    stations[pack.stationId].questions += pack.questions.length;
+    questions += pack.questions.length;
+  }
+  return { packs: listIndustryPacks().length, questions, stations };
+}
+
 export async function collectCounts() {
   const testFiles = walk(join(root, "tests"), (n) => n.endsWith(".test.ts")).length;
   // Retained for inventory consumers: lexical matches, not discovered cases
@@ -91,6 +107,7 @@ export async function collectCounts() {
 
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
   const layer0 = await layer0Counts();
+  const sector = await sectorCounts();
 
   return {
     adapters: countFiles("src/adapters/builtins", isTs),
@@ -107,6 +124,9 @@ export async function collectCounts() {
     })(),
     testFiles,
     testBlocks,
+    sectorPacks: sector?.packs ?? null,
+    sectorPackQuestions: sector?.questions ?? null,
+    sectorStations: sector?.stations ?? null,
     layer0Controls: layer0?.controls ?? null,
     layer0ExecutedControls: layer0?.executed ?? null,
     layer0AwaitingProducer: layer0?.awaiting ?? null,
@@ -142,6 +162,15 @@ const CLI_COUNT_SURFACES = new Set([
 const ADAPTER_COUNT_SURFACES = new Set([
   "README.md", "website/index.html", "docs/PRICING.md", "docs/PRICING_FAQ.md"
 ]);
+// P1-42 review: sector-pack question counts, always stated with what the questions are.
+const SECTOR_LABEL = "experimental, self-reported";
+const SECTOR_COUNT_SURFACES = new Set([
+  "whitepaper/AMC_WHITEPAPER_v1.md",
+  "website/blog/langchain-scoring-tutorial.html",
+  "docs/adr/005-free-core-paid-industry-packs.md",
+  "docs/DOMAIN_PACKS.md",
+  ...["education", "environment", "governance", "health", "mobility", "technology", "wealth"].map((s) => `website/station-${s}.html`)
+]);
 const PUBLIC_SURFACES = new Set([
   "README.md",
   "CONTRIBUTING.md",
@@ -164,8 +193,39 @@ const PUBLIC_SURFACES = new Set([
   "website/blog/langchain-scoring-tutorial.html",
   // P1-14: the Layer 0 baseline's control totals.
   "docs/catalog/LAYER0.md",
-  ...CLI_COUNT_SURFACES
+  ...CLI_COUNT_SURFACES,
+  ...SECTOR_COUNT_SURFACES
 ]);
+
+/** Rewrites sector-pack counts in `text` from the registry, adding the experimental, self-reported label. */
+function sectorTemplates(rel, text) {
+  const sector = counts.sectorPackQuestions;
+  if (sector === null || counts.diagnosticQuestions === null) {
+    failures.push(`${rel}: the built pack registry is unavailable; cannot verify sector-pack counts (run the build).`);
+    return text;
+  }
+  const station = /^website\/station-(\w+)\.html$/.exec(rel)?.[1];
+  let out = text
+    .replace(/\b\d[\d,]*(?: experimental, self-reported)? sector-specific(?=(?: diagnostic)? questions\b|\))/g, `${sector} ${SECTOR_LABEL} sector-specific`)
+    .replace(/\b\d[\d,]*(?= questions \(\d+ default \+ [\d,]+ experimental, self-reported sector-specific\))/g, String(counts.diagnosticQuestions + sector))
+    .replace(/\b\d[\d,]*(?= total when domain coverage is enabled)/g, String(counts.diagnosticQuestions + sector));
+  if (rel === "docs/DOMAIN_PACKS.md") {
+    out = out
+      .replace(/^\| Station \| Packs \| Questions(?: \(experimental, self-reported\))? \|$/m, `| Station | Packs | Questions (${SECTOR_LABEL}) |`)
+      .replace(/^\| `(\w+)` \| \d+ \| \d+ \|$/gm, (row, id) => {
+        const s = counts.sectorStations[id];
+        return s ? `| \`${id}\` | ${s.packs} | ${s.questions} |` : row;
+      })
+      .replace(/^\| \*\*Total\*\* \| \*\*\d+\*\* \| \*\*\d+\*\* \|$/m, `| **Total** | **${counts.sectorPacks}** | **${sector}** |`);
+  }
+  if (station) {
+    const s = counts.sectorStations[station];
+    if (!s) failures.push(`${rel}: no packs for station ${station}`);
+    else out = out.replace(/(Station: |■ )\d+ (packs|diagnostic packs) · \d+(?: experimental, self-reported)? questions/g,
+      (_, lead, packs) => `${lead}${s.packs} ${packs} · ${s.questions} ${SECTOR_LABEL} questions`);
+  }
+  return out;
+}
 const failures = [];
 const updates = new Map();
 const marker = /<!-- amc:count:(\w+) -->(.*?)<!-- \/amc:count -->/g;
@@ -237,6 +297,7 @@ for (const rel of PUBLIC_SURFACES) {
       });
     }
   }
+  if (SECTOR_COUNT_SURFACES.has(rel)) updated = sectorTemplates(rel, updated);
   if (ADAPTER_COUNT_SURFACES.has(rel)) {
     updated = updated.replace(/\b\d[\d,]*(?= (?:built-in |framework )?adapters\b)/gi, String(counts.adapters));
   }

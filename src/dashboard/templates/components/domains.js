@@ -257,7 +257,7 @@
                 </div>
                 <div class="pack-desc">${esc(pack.description || '')}</div>
                 <div class="pack-meta">
-                  <span>${Number(pack.questionCount || 0)} questions</span>
+                  <span>${Number(pack.questionCount || 0)} questions</span>${pack.contentStatus ? `<span>${esc(pack.contentStatus)}, self-reported</span>` : ''}
                 </div>
                 <div class="pack-regs">
                   ${(pack.regulatoryBasis || []).slice(0, 4).map((ref) => `<span class="reg-tag">${esc(ref)}</span>`).join('')}

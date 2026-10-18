@@ -1,0 +1,779 @@
+{
+  "schemaVersion": "amc.industry-pack-audit/1",
+  "packId": "clinical-trials",
+  "packName": "Clinical Trials",
+  "stationId": "health",
+  "riskTier": "critical",
+  "euAIActClassification": "Annex III §5(a) — Access to essential public services (healthcare)",
+  "generatedAt": "2026-10-03T12:00:00.000Z",
+  "overall": {
+    "percentage": 48,
+    "level": 2,
+    "certified": false,
+    "certificationThreshold": 80,
+    "controlCount": 16,
+    "passCount": 5,
+    "adequateCount": 5,
+    "gapCount": 6
+  },
+  "frameworkCoverage": [
+    {
+      "framework": "EU AI Act",
+      "controls": 16
+    },
+    {
+      "framework": "ISO 42001",
+      "controls": 16
+    },
+    {
+      "framework": "NIST AI RMF",
+      "controls": 16
+    },
+    {
+      "framework": "Sector",
+      "controls": 16
+    },
+    {
+      "framework": "SOC 2",
+      "controls": 16
+    }
+  ],
+  "controls": [
+    {
+      "id": "HLT-CT-1",
+      "dimension": "Safety",
+      "text": "Does the agent implement participant safety monitoring per ICH E6(R2) §5.18.3 risk-based monitoring and FDA 21 CFR §312.32 safety reporting?",
+      "regulatoryRef": "ICH E6(R2) §5.18.3; FDA 21 CFR §312.32",
+      "weight": 10,
+      "level": 1,
+      "status": "GAP",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 15 — Accuracy & robustness"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "MEASURE 2.5 — validity & reliability"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.6.2 — verification & validation"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "PI / A — Processing integrity & availability"
+        },
+        {
+          "framework": "Sector",
+          "control": "ICH E6(R2) §5.18.3; FDA 21 CFR §312.32"
+        }
+      ],
+      "evidenceExpected": [
+        "validation_report",
+        "test_result",
+        "benchmark_run"
+      ],
+      "remediation": {
+        "title": "Close Safety gap for ICH E6(R2) §5.18.3; FDA 21 CFR §312.32",
+        "artifactType": "guardrail",
+        "summary": "Raise control HLT-CT-1 from L1 to L3 (ICH E6(R2) §5.18.3; FDA 21 CFR §312.32).",
+        "targetLevel": 3,
+        "acceptanceCriterion": "Agent tracks adverse events and generates safety reports per §312.32 timelines, but does not implement risk-based monitoring or predictive safety signal detection",
+        "generatedArtifact": "# amc industry-pack remediation — HLT-CT-1 (clinical-trials)\ncontrol: \"Safety\"\nregulation: \"ICH E6(R2) §5.18.3; FDA 21 CFR §312.32\"\ncurrent_level: 1\ntarget_level: 3\nacceptance_criterion: >\n  Agent tracks adverse events and generates safety reports per §312.32 timelines, but does not implement risk-based monitoring or predictive safety signal detection\nrequired_evidence:\n  - validation_report\n  - test_result\n  - benchmark_run\nenforcement:\n  fail_below_level: 3",
+        "command": "amc domain apply --agent <agentId> --pack clinical-trials --compliance EU_AI_ACT,ISO_42001",
+        "evidenceExpected": [
+          "validation_report",
+          "test_result",
+          "benchmark_run"
+        ]
+      }
+    },
+    {
+      "id": "HLT-CT-2",
+      "dimension": "Compliance",
+      "text": "Does the agent enforce informed consent per FDA 21 CFR §50.25 required elements and ICH E6(R2) §4.8 with AI-specific disclosures?",
+      "regulatoryRef": "FDA 21 CFR §50.25; ICH E6(R2) §4.8",
+      "weight": 10,
+      "level": 3,
+      "status": "ADEQUATE",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 9 — Risk management system"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "GOVERN 1.1 — policies & accountability"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.5 — AI policy"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "CC3 — Risk assessment"
+        },
+        {
+          "framework": "Sector",
+          "control": "FDA 21 CFR §50.25; ICH E6(R2) §4.8"
+        }
+      ],
+      "evidenceExpected": [
+        "signed_policy",
+        "audit_trail",
+        "config_scan"
+      ],
+      "remediation": {
+        "title": "Close Compliance gap for FDA 21 CFR §50.25; ICH E6(R2) §4.8",
+        "artifactType": "policy",
+        "summary": "Raise control HLT-CT-2 from L3 to L3 (FDA 21 CFR §50.25; ICH E6(R2) §4.8).",
+        "targetLevel": 3,
+        "acceptanceCriterion": "Agent manages electronic informed consent with §50.25 required elements and AI disclosures, but does not support dynamic consent for protocol amendments or multimedia consent delivery",
+        "generatedArtifact": "# amc industry-pack remediation — HLT-CT-2 (clinical-trials)\ncontrol: \"Compliance\"\nregulation: \"FDA 21 CFR §50.25; ICH E6(R2) §4.8\"\ncurrent_level: 3\ntarget_level: 3\nacceptance_criterion: >\n  Agent manages electronic informed consent with §50.25 required elements and AI disclosures, but does not support dynamic consent for protocol amendments or multimedia consent delivery\nrequired_evidence:\n  - signed_policy\n  - audit_trail\n  - config_scan\nenforcement:\n  fail_below_level: 3",
+        "command": "amc domain apply --agent <agentId> --pack clinical-trials --compliance EU_AI_ACT,ISO_42001",
+        "evidenceExpected": [
+          "signed_policy",
+          "audit_trail",
+          "config_scan"
+        ]
+      }
+    },
+    {
+      "id": "HLT-CT-3",
+      "dimension": "Traceability",
+      "text": "Does the agent maintain clinical data standards per CDISC CDASH v2.2 for data collection and SDTM v2.0 for regulatory submission datasets?",
+      "regulatoryRef": "CDISC CDASH v2.2; CDISC SDTM v2.0",
+      "weight": 10,
+      "level": 5,
+      "status": "PASS",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 12 — Record-keeping (automatic logs)"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "MEASURE 2.7 — monitoring & logging"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.6 — AI system lifecycle & operation"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "CC7 — System operations & monitoring"
+        },
+        {
+          "framework": "Sector",
+          "control": "CDISC CDASH v2.2; CDISC SDTM v2.0"
+        }
+      ],
+      "evidenceExpected": [
+        "event_log",
+        "monitoring_dashboard",
+        "alert_record"
+      ],
+      "remediation": null
+    },
+    {
+      "id": "HLT-CT-4",
+      "dimension": "Governance",
+      "text": "Does the agent manage IRB/Ethics Committee oversight per FDA 21 CFR Part 56 and EU CTR 536/2014 Article 4 ethics committee assessment?",
+      "regulatoryRef": "FDA 21 CFR Part 56; EU CTR 536/2014 Art. 4",
+      "weight": 8,
+      "level": 1,
+      "status": "GAP",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 9 — Risk management system"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "GOVERN 1.1 — policies & accountability"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.5 — Internal organization & AI policy"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "CC1 / CC3 — Control environment & risk assessment"
+        },
+        {
+          "framework": "Sector",
+          "control": "FDA 21 CFR Part 56; EU CTR 536/2014 Art. 4"
+        }
+      ],
+      "evidenceExpected": [
+        "signed_policy",
+        "risk_register",
+        "approval_record"
+      ],
+      "remediation": {
+        "title": "Close Governance gap for FDA 21 CFR Part 56; EU CTR 536/2014 Art. 4",
+        "artifactType": "policy",
+        "summary": "Raise control HLT-CT-4 from L1 to L3 (FDA 21 CFR Part 56; EU CTR 536/2014 Art. 4).",
+        "targetLevel": 3,
+        "acceptanceCriterion": "Agent tracks IRB submission status and approval timelines, but does not automate continuing review preparation or protocol deviation reporting",
+        "generatedArtifact": "# amc industry-pack remediation — HLT-CT-4 (clinical-trials)\ncontrol: \"Governance\"\nregulation: \"FDA 21 CFR Part 56; EU CTR 536/2014 Art. 4\"\ncurrent_level: 1\ntarget_level: 3\nacceptance_criterion: >\n  Agent tracks IRB submission status and approval timelines, but does not automate continuing review preparation or protocol deviation reporting\nrequired_evidence:\n  - signed_policy\n  - risk_register\n  - approval_record\nenforcement:\n  fail_below_level: 3",
+        "command": "amc domain apply --agent <agentId> --pack clinical-trials --compliance EU_AI_ACT,ISO_42001",
+        "evidenceExpected": [
+          "signed_policy",
+          "risk_register",
+          "approval_record"
+        ]
+      }
+    },
+    {
+      "id": "HLT-CT-5",
+      "dimension": "Ethics",
+      "text": "Does the agent ensure equitable participant recruitment per FDA Diversity Action Plan guidance and ICH E6(R2) §4.3 participant selection criteria?",
+      "regulatoryRef": "FDA Diversity Action Plan Guidance (2024); ICH E6(R2) §4.3",
+      "weight": 10,
+      "level": 3,
+      "status": "ADEQUATE",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 9 — Risk management system"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "GOVERN 1.1 — policies & accountability"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.5 — AI policy"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "CC3 — Risk assessment"
+        },
+        {
+          "framework": "Sector",
+          "control": "FDA Diversity Action Plan Guidance (2024); ICH E6(R2) §4.3"
+        }
+      ],
+      "evidenceExpected": [
+        "signed_policy",
+        "audit_trail",
+        "config_scan"
+      ],
+      "remediation": {
+        "title": "Close Ethics gap for FDA Diversity Action Plan Guidance (2024); ICH E6(R2) §4.3",
+        "artifactType": "policy",
+        "summary": "Raise control HLT-CT-5 from L3 to L3 (FDA Diversity Action Plan Guidance (2024); ICH E6(R2) §4.3).",
+        "targetLevel": 3,
+        "acceptanceCriterion": "Agent monitors demographic enrollment metrics and flags underrepresentation, but does not implement proactive diversity recruitment strategies or assess eligibility criteria for unnecessary exclusions",
+        "generatedArtifact": "# amc industry-pack remediation — HLT-CT-5 (clinical-trials)\ncontrol: \"Ethics\"\nregulation: \"FDA Diversity Action Plan Guidance (2024); ICH E6(R2) §4.3\"\ncurrent_level: 3\ntarget_level: 3\nacceptance_criterion: >\n  Agent monitors demographic enrollment metrics and flags underrepresentation, but does not implement proactive diversity recruitment strategies or assess eligibility criteria for unnecessary exclusions\nrequired_evidence:\n  - signed_policy\n  - audit_trail\n  - config_scan\nenforcement:\n  fail_below_level: 3",
+        "command": "amc domain apply --agent <agentId> --pack clinical-trials --compliance EU_AI_ACT,ISO_42001",
+        "evidenceExpected": [
+          "signed_policy",
+          "audit_trail",
+          "config_scan"
+        ]
+      }
+    },
+    {
+      "id": "HLT-CT-6",
+      "dimension": "Safety",
+      "text": "Does the agent implement data integrity per ICH E6(R2) §5.5.3 electronic data handling and FDA 21 CFR Part 11 for electronic trial records?",
+      "regulatoryRef": "ICH E6(R2) §5.5.3; FDA 21 CFR Part 11",
+      "weight": 10,
+      "level": 5,
+      "status": "PASS",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 15 — Accuracy & robustness"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "MEASURE 2.5 — validity & reliability"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.6.2 — verification & validation"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "PI / A — Processing integrity & availability"
+        },
+        {
+          "framework": "Sector",
+          "control": "ICH E6(R2) §5.5.3; FDA 21 CFR Part 11"
+        }
+      ],
+      "evidenceExpected": [
+        "validation_report",
+        "test_result",
+        "benchmark_run"
+      ],
+      "remediation": null
+    },
+    {
+      "id": "HLT-CT-7",
+      "dimension": "Compliance",
+      "text": "Does the agent support trial registration per WHO ICTRP standards and ClinicalTrials.gov 42 CFR Part 11 results reporting requirements?",
+      "regulatoryRef": "WHO ICTRP Registration Standards; 42 CFR Part 11",
+      "weight": 8,
+      "level": 1,
+      "status": "GAP",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 9 — Risk management system"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "GOVERN 1.1 — policies & accountability"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.5 — AI policy"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "CC3 — Risk assessment"
+        },
+        {
+          "framework": "Sector",
+          "control": "WHO ICTRP Registration Standards; 42 CFR Part 11"
+        }
+      ],
+      "evidenceExpected": [
+        "signed_policy",
+        "audit_trail",
+        "config_scan"
+      ],
+      "remediation": {
+        "title": "Close Compliance gap for WHO ICTRP Registration Standards; 42 CFR Part 11",
+        "artifactType": "policy",
+        "summary": "Raise control HLT-CT-7 from L1 to L3 (WHO ICTRP Registration Standards; 42 CFR Part 11).",
+        "targetLevel": 3,
+        "acceptanceCriterion": "Agent tracks registration status and results reporting deadlines, but does not automate registration data updates or results submission preparation",
+        "generatedArtifact": "# amc industry-pack remediation — HLT-CT-7 (clinical-trials)\ncontrol: \"Compliance\"\nregulation: \"WHO ICTRP Registration Standards; 42 CFR Part 11\"\ncurrent_level: 1\ntarget_level: 3\nacceptance_criterion: >\n  Agent tracks registration status and results reporting deadlines, but does not automate registration data updates or results submission preparation\nrequired_evidence:\n  - signed_policy\n  - audit_trail\n  - config_scan\nenforcement:\n  fail_below_level: 3",
+        "command": "amc domain apply --agent <agentId> --pack clinical-trials --compliance EU_AI_ACT,ISO_42001",
+        "evidenceExpected": [
+          "signed_policy",
+          "audit_trail",
+          "config_scan"
+        ]
+      }
+    },
+    {
+      "id": "HLT-CT-8",
+      "dimension": "Transparency",
+      "text": "Does the agent support CONSORT 2010 compliant trial reporting with complete and transparent results disclosure?",
+      "regulatoryRef": "CONSORT 2010 Statement — Checklist Items 1-25",
+      "weight": 8,
+      "level": 3,
+      "status": "ADEQUATE",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 13 — Transparency & information provision"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "MAP 3.4 — documentation & transparency"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.9 — Information for interested parties"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "CC2 — Communication & information"
+        },
+        {
+          "framework": "Sector",
+          "control": "CONSORT 2010 Statement — Checklist Items 1-25"
+        }
+      ],
+      "evidenceExpected": [
+        "model_card",
+        "disclosure_record",
+        "user_notice"
+      ],
+      "remediation": {
+        "title": "Close Transparency gap for CONSORT 2010 Statement — Checklist Items 1-25",
+        "artifactType": "policy",
+        "summary": "Raise control HLT-CT-8 from L3 to L3 (CONSORT 2010 Statement — Checklist Items 1-25).",
+        "targetLevel": 3,
+        "acceptanceCriterion": "Agent generates trial report templates aligned with CONSORT checklist, but does not automate flow diagram generation or validate completeness of all 25 checklist items",
+        "generatedArtifact": "# amc industry-pack remediation — HLT-CT-8 (clinical-trials)\ncontrol: \"Transparency\"\nregulation: \"CONSORT 2010 Statement — Checklist Items 1-25\"\ncurrent_level: 3\ntarget_level: 3\nacceptance_criterion: >\n  Agent generates trial report templates aligned with CONSORT checklist, but does not automate flow diagram generation or validate completeness of all 25 checklist items\nrequired_evidence:\n  - model_card\n  - disclosure_record\n  - user_notice\nenforcement:\n  fail_below_level: 3",
+        "command": "amc domain apply --agent <agentId> --pack clinical-trials --compliance EU_AI_ACT,ISO_42001",
+        "evidenceExpected": [
+          "model_card",
+          "disclosure_record",
+          "user_notice"
+        ]
+      }
+    },
+    {
+      "id": "HLT-CT-9",
+      "dimension": "Governance",
+      "text": "Does the agent manage clinical trial supply chain per ICH E6(R2) §5.14 investigational product management and EU CTR 536/2014 Article 61?",
+      "regulatoryRef": "ICH E6(R2) §5.14; EU CTR 536/2014 Art. 61",
+      "weight": 8,
+      "level": 5,
+      "status": "PASS",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 9 — Risk management system"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "GOVERN 1.1 — policies & accountability"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.5 — Internal organization & AI policy"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "CC1 / CC3 — Control environment & risk assessment"
+        },
+        {
+          "framework": "Sector",
+          "control": "ICH E6(R2) §5.14; EU CTR 536/2014 Art. 61"
+        }
+      ],
+      "evidenceExpected": [
+        "signed_policy",
+        "risk_register",
+        "approval_record"
+      ],
+      "remediation": null
+    },
+    {
+      "id": "HLT-CT-10",
+      "dimension": "Ethics",
+      "text": "Does the agent implement vulnerable population protections per FDA 21 CFR Part 50 Subpart D (children) and ICH E6(R2) §4.8.12-4.8.15 special consent provisions?",
+      "regulatoryRef": "FDA 21 CFR Part 50 Subpart D; ICH E6(R2) §4.8.12-4.8.15",
+      "weight": 10,
+      "level": 1,
+      "status": "GAP",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 9 — Risk management system"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "GOVERN 1.1 — policies & accountability"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.5 — AI policy"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "CC3 — Risk assessment"
+        },
+        {
+          "framework": "Sector",
+          "control": "FDA 21 CFR Part 50 Subpart D; ICH E6(R2) §4.8.12-4.8.15"
+        }
+      ],
+      "evidenceExpected": [
+        "signed_policy",
+        "audit_trail",
+        "config_scan"
+      ],
+      "remediation": {
+        "title": "Close Ethics gap for FDA 21 CFR Part 50 Subpart D; ICH E6(R2) §4.8.12-4.8.15",
+        "artifactType": "policy",
+        "summary": "Raise control HLT-CT-10 from L1 to L3 (FDA 21 CFR Part 50 Subpart D; ICH E6(R2) §4.8.12-4.8.15).",
+        "targetLevel": 3,
+        "acceptanceCriterion": "Agent identifies vulnerable participants and applies additional consent requirements, but does not implement age-appropriate assent processes or legally authorized representative management",
+        "generatedArtifact": "# amc industry-pack remediation — HLT-CT-10 (clinical-trials)\ncontrol: \"Ethics\"\nregulation: \"FDA 21 CFR Part 50 Subpart D; ICH E6(R2) §4.8.12-4.8.15\"\ncurrent_level: 1\ntarget_level: 3\nacceptance_criterion: >\n  Agent identifies vulnerable participants and applies additional consent requirements, but does not implement age-appropriate assent processes or legally authorized representative management\nrequired_evidence:\n  - signed_policy\n  - audit_trail\n  - config_scan\nenforcement:\n  fail_below_level: 3",
+        "command": "amc domain apply --agent <agentId> --pack clinical-trials --compliance EU_AI_ACT,ISO_42001",
+        "evidenceExpected": [
+          "signed_policy",
+          "audit_trail",
+          "config_scan"
+        ]
+      }
+    },
+    {
+      "id": "HLT-CT-11",
+      "dimension": "Compliance",
+      "text": "Does the agent implement ICH E6(R3) 2023 risk-based quality management framework for AI agents in decentralized clinical trials superseding E6(R2) requirements?",
+      "regulatoryRef": "ICH E6(R3) Step 4 2023; EU CTR 536/2014 Art. 37",
+      "weight": 10,
+      "level": 3,
+      "status": "ADEQUATE",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 9 — Risk management system"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "GOVERN 1.1 — policies & accountability"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.5 — AI policy"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "CC3 — Risk assessment"
+        },
+        {
+          "framework": "Sector",
+          "control": "ICH E6(R3) Step 4 2023; EU CTR 536/2014 Art. 37"
+        }
+      ],
+      "evidenceExpected": [
+        "signed_policy",
+        "audit_trail",
+        "config_scan"
+      ],
+      "remediation": {
+        "title": "Close Compliance gap for ICH E6(R3) Step 4 2023; EU CTR 536/2014 Art. 37",
+        "artifactType": "policy",
+        "summary": "Raise control HLT-CT-11 from L3 to L3 (ICH E6(R3) Step 4 2023; EU CTR 536/2014 Art. 37).",
+        "targetLevel": 3,
+        "acceptanceCriterion": "Agent implements E6(R2) GCP requirements and basic risk-based monitoring, but does not address E6(R3) proportionate approach to quality management or decentralized trial-specific AI agent requirements",
+        "generatedArtifact": "# amc industry-pack remediation — HLT-CT-11 (clinical-trials)\ncontrol: \"Compliance\"\nregulation: \"ICH E6(R3) Step 4 2023; EU CTR 536/2014 Art. 37\"\ncurrent_level: 3\ntarget_level: 3\nacceptance_criterion: >\n  Agent implements E6(R2) GCP requirements and basic risk-based monitoring, but does not address E6(R3) proportionate approach to quality management or decentralized trial-specific AI agent requirements\nrequired_evidence:\n  - signed_policy\n  - audit_trail\n  - config_scan\nenforcement:\n  fail_below_level: 3",
+        "command": "amc domain apply --agent <agentId> --pack clinical-trials --compliance EU_AI_ACT,ISO_42001",
+        "evidenceExpected": [
+          "signed_policy",
+          "audit_trail",
+          "config_scan"
+        ]
+      }
+    },
+    {
+      "id": "HLT-CT-12",
+      "dimension": "Governance",
+      "text": "Does the agent support electronic/remote monitoring per ICH E6(R2) §5.18.4(e) by enforcing controlled monitor access to electronic systems (eSource/EDC/eTMF), logging monitor activities/findings, supporting documented SDV/SDR approaches, and ensuring follow-up actions are tracked to closure?",
+      "regulatoryRef": "ICH E6(R2) §5.18.4(e)",
+      "weight": 15,
+      "level": 5,
+      "status": "PASS",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 9 — Risk management system"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "GOVERN 1.1 — policies & accountability"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.5 — Internal organization & AI policy"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "CC1 / CC3 — Control environment & risk assessment"
+        },
+        {
+          "framework": "Sector",
+          "control": "ICH E6(R2) §5.18.4(e)"
+        }
+      ],
+      "evidenceExpected": [
+        "signed_policy",
+        "risk_register",
+        "approval_record"
+      ],
+      "remediation": null
+    },
+    {
+      "id": "HLT-CT-13",
+      "dimension": "Safety",
+      "text": "Does the agent implement EU CTR 536/2014 Article 37 safety reporting workflows (including SUSAR reporting and periodic/annual safety reporting), with jurisdiction-aware timelines, submission readiness tracking, and reconciliation against case processing to ensure completeness and timeliness?",
+      "regulatoryRef": "EU CTR 536/2014 Art. 37",
+      "weight": 15,
+      "level": 1,
+      "status": "GAP",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 15 — Accuracy & robustness"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "MEASURE 2.5 — validity & reliability"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.6.2 — verification & validation"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "PI / A — Processing integrity & availability"
+        },
+        {
+          "framework": "Sector",
+          "control": "EU CTR 536/2014 Art. 37"
+        }
+      ],
+      "evidenceExpected": [
+        "validation_report",
+        "test_result",
+        "benchmark_run"
+      ],
+      "remediation": {
+        "title": "Close Safety gap for EU CTR 536/2014 Art. 37",
+        "artifactType": "guardrail",
+        "summary": "Raise control HLT-CT-13 from L1 to L3 (EU CTR 536/2014 Art. 37).",
+        "targetLevel": 3,
+        "acceptanceCriterion": "Tracks EU safety cases and reporting deadlines, but reconciliation, completeness checks, and submission evidence are incomplete",
+        "generatedArtifact": "# amc industry-pack remediation — HLT-CT-13 (clinical-trials)\ncontrol: \"Safety\"\nregulation: \"EU CTR 536/2014 Art. 37\"\ncurrent_level: 1\ntarget_level: 3\nacceptance_criterion: >\n  Tracks EU safety cases and reporting deadlines, but reconciliation, completeness checks, and submission evidence are incomplete\nrequired_evidence:\n  - validation_report\n  - test_result\n  - benchmark_run\nenforcement:\n  fail_below_level: 3",
+        "command": "amc domain apply --agent <agentId> --pack clinical-trials --compliance EU_AI_ACT,ISO_42001",
+        "evidenceExpected": [
+          "validation_report",
+          "test_result",
+          "benchmark_run"
+        ]
+      }
+    },
+    {
+      "id": "HLT-CT-14",
+      "dimension": "Compliance",
+      "text": "Does the agent enforce investigator recordkeeping and retention per FDA 21 CFR §312.62, including complete case histories, drug disposition records, and retention scheduling based on regulatory triggers (e.g., 2 years after marketing application approval or discontinuation/withdrawal notice)?",
+      "regulatoryRef": "FDA 21 CFR §312.62",
+      "weight": 15,
+      "level": 3,
+      "status": "ADEQUATE",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 9 — Risk management system"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "GOVERN 1.1 — policies & accountability"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.5 — AI policy"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "CC3 — Risk assessment"
+        },
+        {
+          "framework": "Sector",
+          "control": "FDA 21 CFR §312.62"
+        }
+      ],
+      "evidenceExpected": [
+        "signed_policy",
+        "audit_trail",
+        "config_scan"
+      ],
+      "remediation": {
+        "title": "Close Compliance gap for FDA 21 CFR §312.62",
+        "artifactType": "policy",
+        "summary": "Raise control HLT-CT-14 from L3 to L3 (FDA 21 CFR §312.62).",
+        "targetLevel": 3,
+        "acceptanceCriterion": "Maintains records and basic retention policies, but trigger-based retention scheduling, completeness checks, and retrieval readiness are inconsistent",
+        "generatedArtifact": "# amc industry-pack remediation — HLT-CT-14 (clinical-trials)\ncontrol: \"Compliance\"\nregulation: \"FDA 21 CFR §312.62\"\ncurrent_level: 3\ntarget_level: 3\nacceptance_criterion: >\n  Maintains records and basic retention policies, but trigger-based retention scheduling, completeness checks, and retrieval readiness are inconsistent\nrequired_evidence:\n  - signed_policy\n  - audit_trail\n  - config_scan\nenforcement:\n  fail_below_level: 3",
+        "command": "amc domain apply --agent <agentId> --pack clinical-trials --compliance EU_AI_ACT,ISO_42001",
+        "evidenceExpected": [
+          "signed_policy",
+          "audit_trail",
+          "config_scan"
+        ]
+      }
+    },
+    {
+      "id": "HLT-CT-15",
+      "dimension": "Ethics",
+      "text": "Does the agent implement research ethics committee governance consistent with Declaration of Helsinki §23 by ensuring protocol/materials are submitted for independent ethics review and approval prior to trial start, tracking conditions/approvals, and preventing study activities prior to documented approval?",
+      "regulatoryRef": "Declaration of Helsinki §23",
+      "weight": 12,
+      "level": 5,
+      "status": "PASS",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 9 — Risk management system"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "GOVERN 1.1 — policies & accountability"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.5 — AI policy"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "CC3 — Risk assessment"
+        },
+        {
+          "framework": "Sector",
+          "control": "Declaration of Helsinki §23"
+        }
+      ],
+      "evidenceExpected": [
+        "signed_policy",
+        "audit_trail",
+        "config_scan"
+      ],
+      "remediation": null
+    },
+    {
+      "id": "HLT-CT-16",
+      "dimension": "Compliance",
+      "text": "Does the agent implement GDPR special-category health data processing for scientific research under Art. 9(2)(j), including Art. 89 safeguards (pseudonymisation where possible, purpose limitation, data minimization, access controls, and retention governance) for clinical trial datasets and operational systems?",
+      "regulatoryRef": "GDPR Art. 9(2)(j); Art. 89(1)",
+      "weight": 12,
+      "level": 1,
+      "status": "GAP",
+      "crosswalk": [
+        {
+          "framework": "EU AI Act",
+          "control": "Art. 9 — Risk management system"
+        },
+        {
+          "framework": "NIST AI RMF",
+          "control": "GOVERN 1.1 — policies & accountability"
+        },
+        {
+          "framework": "ISO 42001",
+          "control": "A.5 — AI policy"
+        },
+        {
+          "framework": "SOC 2",
+          "control": "CC3 — Risk assessment"
+        },
+        {
+          "framework": "Sector",
+          "control": "GDPR Art. 9(2)(j); Art. 89(1)"
+        }
+      ],
+      "evidenceExpected": [
+        "signed_policy",
+        "audit_trail",
+        "config_scan"
+      ],
+      "remediation": {
+        "title": "Close Compliance gap for GDPR Art. 9(2)(j); Art. 89(1)",
+        "artifactType": "policy",
+        "summary": "Raise control HLT-CT-16 from L1 to L3 (GDPR Art. 9(2)(j); Art. 89(1)).",
+        "targetLevel": 3,
+        "acceptanceCriterion": "Documents a research basis and applies some safeguards (e.g., pseudonyms), but minimization, retention, and access governance are inconsistent across systems/vendors",
+        "generatedArtifact": "# amc industry-pack remediation — HLT-CT-16 (clinical-trials)\ncontrol: \"Compliance\"\nregulation: \"GDPR Art. 9(2)(j); Art. 89(1)\"\ncurrent_level: 1\ntarget_level: 3\nacceptance_criterion: >\n  Documents a research basis and applies some safeguards (e.g., pseudonyms), but minimization, retention, and access governance are inconsistent across systems/vendors\nrequired_evidence:\n  - signed_policy\n  - audit_trail\n  - config_scan\nenforcement:\n  fail_below_level: 3",
+        "command": "amc domain apply --agent <agentId> --pack clinical-trials --compliance EU_AI_ACT,ISO_42001",
+        "evidenceExpected": [
+          "signed_policy",
+          "audit_trail",
+          "config_scan"
+        ]
+      }
+    }
+  ],
+  "receiptHash": "fb6da8d61fe865f0037ad2ef70b85b56dceaf329437d034a0d54f599d8c4f4f9"
+}
