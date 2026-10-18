@@ -424,7 +424,8 @@ describe("P2-02 detokenization at http.fetch", () => {
     }, { contract: { ...BAA, effective: "2025-01-01", expires: "2026-01-01" } });
   });
 
-  it("6: a token in a form body is refused, a whole-token header is restored, and a value holding CR or LF is refused", async () => {
+  it("6: a token in a form body, a value holding CR or LF and a declared content-length beside a token body are refused; " +
+    "a whole-token header, JSON header text and a whole-token text body are restored", async () => {
     await withReferral(async (f) => {
       refusedAtEgress(await f.pipeline.execute(post(f, "/referral/form", { headers: { "content-type": "application/x-www-form-urlencoded" },
         body: `name=${f.tokens.name}&ward=3` })), "payload_not_restorable");
@@ -436,6 +437,18 @@ describe("P2-02 detokenization at http.fetch", () => {
       const injected = (JSON.parse(f.mint({ patient: { name: "Odalys\r\nX-Injected: yes" } }, { "patient.name": "phi" })) as { patient: { name: string } }).patient.name;
       refusedAtEgress(await f.pipeline.execute(post(f, "/referral/submit", { headers: { "x-patient-name": injected } })), "payload_not_restorable");
       expect(f.seen, "the header injection never reaches the wire").toHaveLength(1);
+      // Node does not hold a body to a declared content-length, so the restored body would go out mis-framed.
+      const tokenized = JSON.stringify({ patient: { name: f.tokens.name, mrn: f.tokens.mrn } });
+      refusedAtEgress(await f.pipeline.execute(post(f, "/referral/submit", { headers: { "content-type": "application/json",
+        "Content-Length": String(Buffer.byteLength(tokenized)) } })), "payload_not_restorable");
+      expect(f.seen, "a declared length beside a restored body never reaches the wire").toHaveLength(1);
+      const note = await f.pipeline.execute(post(f, "/referral/submit", { headers: { "content-type": "application/json",
+        "x-note": JSON.stringify({ note: `patient ${f.tokens.name} referred` }) } }));
+      expect(note.ok, note.output).toBe(true);
+      expect(f.seen[1]!.headers["x-note"], "JSON header text is restored leaf by leaf").toBe(JSON.stringify({ note: `patient ${NAME} referred` }));
+      const plain = await f.pipeline.execute(post(f, "/referral/submit", { headers: { "content-type": "text/plain" }, body: f.tokens.name }));
+      expect(plain.ok, plain.output).toBe(true);
+      expect(f.seen[2]!.body, "a text body that is one whole token is restored").toBe(NAME);
     });
   });
 

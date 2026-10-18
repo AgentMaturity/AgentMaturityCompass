@@ -78,6 +78,13 @@ function restoreText(text: string, values: ReadonlyMap<string, TokenEntry>, stri
   return value;
 }
 
+/** In strict mode the payload is `{ headers, body }`: is there a content-length header beside a body `restoreText` rewrites? */
+function rewritesDeclaredLengthBody(payload: unknown): boolean {
+  const { headers, body } = payload as { headers?: Record<string, string>; body?: unknown };
+  return typeof body === "string" && body.includes("[[amc:")
+    && Object.keys(headers ?? {}).some(name => name.toLowerCase() === "content-length");
+}
+
 // ponytail: echoes come back as whole JSON leaves, or inside other text as substrings of 4+ chars; shorter values
 // inside text and escaped/transformed echoes are left to the session redactor at commit.
 function retokenizer(entries: readonly TokenEntry[]): (text: string) => string {
@@ -156,6 +163,9 @@ export function detokenize<T>(payload: T, scope: DetokenizeScope): Detokenized<T
     const values = entries;
     let value: T;
     try {
+      // Node does not hold a body to a declared content-length (`strictContentLength` is off), so a declared length beside a
+      // body this gate rewrites would mis-frame the request on the wire.
+      if (scope.strictText && rewritesDeclaredLengthBody(payload)) throw new DetokenizeRefused("payload_not_restorable");
       value = redactJsonLeaves(payload, (text, key) => {
         if (scope.strictText && key === undefined) {
           if (text.includes("[[amc:")) throw new DetokenizeRefused("payload_not_restorable");
