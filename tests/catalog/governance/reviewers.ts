@@ -7,15 +7,15 @@ import { generateKeyPairSync } from "node:crypto";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterAll } from "vitest";
+import { afterAll, beforeAll, vi } from "vitest";
 import { signReviewRecord, type ReviewRecord } from "../../../src/catalog/governance/reviewRecord.js";
-import type { ReviewAuthority } from "../../../src/catalog/governance/support.js";
+import type { ReviewAuthority, RosterEntry } from "../../../src/catalog/governance/support.js";
 import { controlDigest } from "../../../src/catalog/digest.js";
 import type { ControlRecord } from "../../../src/catalog/types.js";
 import { REGULATORY_REGISTER } from "../../../src/compliance/regulatory/index.js";
 import { ed25519KeyId, signTrustList, type DistrustEntry, type KeyPurpose } from "../../../src/trust/index.js";
 
-const NOW = new Date("2026-10-18T12:00:00Z");
+export const NOW = new Date("2026-10-18T12:00:00Z");
 export type Key = { privateKeyPem: string; publicKeyPem: string };
 export const keypair = (): Key => {
   const k = generateKeyPairSync("ed25519");
@@ -25,12 +25,17 @@ const root = keypair();
 export const [keyA, keyB, keyC, keyLegal, author] = [keypair(), keypair(), keypair(), keypair(), keypair()];
 export const AUTHOR = "Fixture Author <author@fixture.test>";
 
-type Pin = { key: Key; subject: string; purposes?: KeyPurpose[]; revoked?: boolean; validFrom?: string };
+type Pin = { key: Key; subject: string; purposes?: KeyPurpose[]; revoked?: boolean; supersededAt?: string; validFrom?: string };
 export const PINS: Pin[] = [{ key: keyA, subject: "fixture-reviewer-a" }, { key: keyB, subject: "fixture-reviewer-b" },
   { key: keyC, subject: "fixture-reviewer-c" }, { key: keyLegal, subject: "fixture-legal" }, { key: author, subject: AUTHOR }];
 
 const homes: string[] = [];
-afterAll(() => { for (const home of homes.splice(0)) rmSync(home, { recursive: true, force: true }); });
+// effectiveSupport reads the server's clock itself; the tests fix it at NOW.
+beforeAll(() => { vi.useFakeTimers({ toFake: ["Date"] }); vi.setSystemTime(NOW); });
+afterAll(() => {
+  vi.useRealTimers();
+  for (const home of homes.splice(0)) rmSync(home, { recursive: true, force: true });
+});
 
 /** An operator AMC home: a trust list signed by the fixture root pinning `pins`, and trust-roots.json pinning the root. */
 export function operatorHome(pins: Pin[] = PINS, opts: { distrust?: DistrustEntry[]; threshold?: number; tamper?: boolean } = {}): string {
@@ -40,7 +45,8 @@ export function operatorHome(pins: Pin[] = PINS, opts: { distrust?: DistrustEntr
     issuedAt: "2026-01-01T00:00:00.000Z", expiresAt: "2099-01-01T00:00:00.000Z", distrust: opts.distrust ?? [],
     entries: pins.map((p) => ({ keyId: ed25519KeyId(p.key.publicKeyPem)!, algorithm: "ed25519" as const, publicKeyPem: p.key.publicKeyPem,
       purposes: p.purposes ?? ["catalog-review"], subject: p.subject, validFrom: p.validFrom ?? "2026-01-01T00:00:00.000Z", validTo: null, source: "operator",
-      ...(p.revoked ? { revokedAt: "2026-06-01T00:00:00.000Z", revocationReason: "key-compromise" as const } : {}) })) }, root.privateKeyPem);
+      ...(p.revoked ? { revokedAt: "2026-06-01T00:00:00.000Z", revocationReason: "key-compromise" as const } : {}),
+      ...(p.supersededAt ? { revokedAt: p.supersededAt, revocationReason: "superseded" as const } : {}) })) }, root.privateKeyPem);
   if (opts.tamper) signed.list.entries[0]!.subject = "someone-else";
   const roots = [ed25519KeyId(root.publicKeyPem)!, ...(opts.threshold && opts.threshold > 1 ? [ed25519KeyId(keyC.publicKeyPem)!] : [])];
   mkdirSync(join(home, "trust"), { recursive: true, mode: 0o700 });
@@ -67,7 +73,15 @@ export function sign(control: ControlRecord, key: Key, userId: string, over: Par
   }, key);
 }
 
+/** The D-08 roster the tests assume: each pinned subject, its credentialed domains and its git identities. */
+export const ROSTER = new Map<string, RosterEntry>([
+  ["fixture-reviewer-a", { domains: ["wealth"], identities: ["Reviewer A <a@fixture.test>"] }],
+  ["fixture-reviewer-b", { domains: [], identities: ["b@fixture.test"] }],
+  ["fixture-reviewer-c", { domains: [], identities: ["c@fixture.test"] }],
+  ["fixture-legal", { domains: ["legal"], identities: ["legal@fixture.test"] }],
+  [AUTHOR, { domains: ["wealth"], identities: [AUTHOR] }]
+]);
+
 export function authority(home: string, records: readonly unknown[], over: Partial<ReviewAuthority> = {}): ReviewAuthority {
-  return { trust: { amcHome: home }, now: NOW, records, experts: new Map([["fixture-reviewer-a", ["wealth"]], ["fixture-legal", ["legal"]]]),
-    authorsOf: () => [AUTHOR], f5Confirmations: [], reverify: [], register: REGULATORY_REGISTER, ...over };
+  return { trust: { amcHome: home }, records, experts: ROSTER, authorsOf: () => [AUTHOR], f5Confirmations: [], reverify: [], register: REGULATORY_REGISTER, ...over };
 }

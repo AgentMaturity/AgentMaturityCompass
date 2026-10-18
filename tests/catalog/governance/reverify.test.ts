@@ -60,10 +60,10 @@ describe("GOV_REVERIFY_OPEN (P1-34 step 10)", () => {
     const control = reviewedControl(catalog.controls.get("L0-ADV-01")!);
     const cat = { ...catalog, controls: new Map(catalog.controls).set(control.id, control) };
     const pair = (decidedAt: string) => [sign(control, keyA, "fixture-reviewer-a", { decidedAt }), sign(control, keyB, "fixture-reviewer-b", { decidedAt })];
-    const lapsed = catalogCurrencyFindings(cat, authority(HOME, pair("2026-06-01"), { now: new Date("2027-01-15T00:00:00Z") }));
+    const lapsed = catalogCurrencyFindings(cat, authority(HOME, pair("2026-06-01"), { asOf: "2027-01-15" }));
     expect(lapsed.filter((f) => f.severity === "error").map((f) => [f.code, f.controlId])).toEqual([["GOV_REVIEW_OVERDUE", control.id]]);
     expect(lapsed.some((f) => f.code === "GOV_REGISTER_STATUS_REVIEW" && f.severity === "warning")).toBe(true);
-    const soon = catalogCurrencyFindings(cat, authority(HOME, pair("2026-10-15"), { now: new Date("2027-01-01T00:00:00Z") }));
+    const soon = catalogCurrencyFindings(cat, authority(HOME, pair("2026-10-15"), { asOf: "2027-01-01" }));
     expect(soon.filter((f) => f.controlId === control.id).map((f) => [f.code, f.severity, f.message])).toEqual([["GOV_REVIEW_DUE_SOON", "warning", "review due 2027-01-13"]]);
   });
 

@@ -7,8 +7,8 @@ import { describe, expect, it } from "vitest";
 import type { ReviewRecord } from "../../../src/catalog/governance/reviewRecord.js";
 import { effectiveSupport, type ReviewAuthority } from "../../../src/catalog/governance/support.js";
 import { loadCatalog } from "../../../src/catalog/loader.js";
-import { ed25519KeyId } from "../../../src/trust/index.js";
-import { AUTHOR, PINS, author, authority, keyA, keyB, keyC, keyLegal, keypair, operatorHome, reviewedControl, sign } from "./reviewers.js";
+import { admitKey, ed25519KeyId, loadTrustContext } from "../../../src/trust/index.js";
+import { AUTHOR, NOW, PINS, ROSTER, author, authority, keyA, keyB, keyC, keyLegal, keypair, operatorHome, reviewedControl, sign } from "./reviewers.js";
 
 const catalog = loadCatalog();
 const control = reviewedControl(catalog.controls.get("L0-ADV-01")!); // all seven stations, AI-drafted, no citations
@@ -22,7 +22,8 @@ describe("effectiveSupport: the only path to reviewed support (P1-34 steps 3-4)"
     const elsewhere = sign(reviewedControl(catalog.controls.get("L0-ADV-02")!), keyC, "fixture-reviewer-c");
     const result = effectiveSupport(control, authority(HOME, [a, b, elsewhere]));
     expect(result).toMatchObject({ support: "reviewed", reasons: [], rejected: [] });
-    expect(result.promotion).toEqual({ reviewers: ["fixture-reviewer-a", "fixture-reviewer-b"], recordIds: [a.id, b.id], reviewedAt: "2026-10-15", nextReviewDue: "2027-01-13" });
+    expect(result.promotion).toEqual({ controlId: control.id, controlVersion: control.version, controlDigest: a.subject.digest,
+      reviewers: ["fixture-reviewer-a", "fixture-reviewer-b"], recordIds: [a.id, b.id], reviewedAt: "2026-10-15", nextReviewDue: "2027-01-13" });
   });
 
   const older = { ...control, statement: `${control.statement} (before an edit)` };
@@ -68,6 +69,37 @@ describe("effectiveSupport: the only path to reviewed support (P1-34 steps 3-4)"
     expect(empty.rejected.map((r) => r.reason)).toEqual(["GOV_REVIEW_SIGNER_UNPINNED", "GOV_REVIEW_SIGNER_UNPINNED"]);
   });
 
+  it("independence uses the roster's git identities and the declared name, not only the key's subject; off-roster reviewers never count", () => {
+    const alice = keypair();
+    const home = operatorHome([...PINS, { key: alice, subject: "asmith" }]);
+    const authored = { authorsOf: () => ["Alice Smith <alice@corp>"] };
+    const roster = (identities: string[]) => new Map([...ROSTER, ["asmith", { domains: ["wealth"], identities }]]);
+    const as = (name: string) => sign(control, alice, "asmith", { reviewer: { ...a.reviewer, name, identity: { userId: "asmith", kind: "human" } } });
+    expect(effectiveSupport(control, authority(home, [as("A. S."), b], { ...authored, experts: roster(["alice@corp"]) })).rejected)
+      .toEqual([{ index: 0, reason: "GOV_REVIEW_SELF_REVIEW" }]);
+    expect(effectiveSupport(control, authority(home, [as("Alice Smith"), b], { ...authored, experts: roster([]) })).rejected)
+      .toEqual([{ index: 0, reason: "GOV_REVIEW_SELF_REVIEW" }]);
+    expect(effectiveSupport(control, authority(home, [as("A. S."), b], authored)).rejected).toEqual([{ index: 0, reason: "GOV_REVIEW_NOT_ON_ROSTER" }]);
+  });
+
+  it("trust and signatures are judged at the server's clock; asOf only looks ahead for due dates", () => {
+    const home = operatorHome(pinsWith(keyB, { supersededAt: "2026-10-18T08:00:00.000Z" }));
+    expect(effectiveSupport(control, authority(home, [a, b], { asOf: "2026-10-18" })).rejected).toEqual([{ index: 1, reason: "GOV_REVIEW_SIGNER_UNPINNED" }]);
+    expect(effectiveSupport(control, authority(HOME, [a, b], { asOf: "2026-01-01" })).support).toBe("reviewed");
+    const lapsed = [sign(control, keyA, "fixture-reviewer-a", { decidedAt: "2026-06-01" }), sign(control, keyB, "fixture-reviewer-b", { decidedAt: "2026-06-01" })];
+    expect(effectiveSupport(control, authority(HOME, lapsed, { asOf: "2026-07-01" })).rejected.map((r) => r.reason)).toEqual(["GOV_REVIEW_OVERDUE", "GOV_REVIEW_OVERDUE"]);
+    expect(effectiveSupport(control, authority(HOME, [a, b], { asOf: "2027-02-01" })).rejected.map((r) => r.reason)).toEqual(["GOV_REVIEW_OVERDUE", "GOV_REVIEW_OVERDUE"]);
+    expect(Date.now()).toBe(NOW.getTime());
+  });
+
+  it("a catalog-review key that a list also pins for another purpose is refused for every purpose", () => {
+    const home = operatorHome(pinsWith(keyB, { purposes: ["catalog-review", "artifact-seal"] }));
+    expect(effectiveSupport(control, authority(home, [a, b])).rejected).toEqual([{ index: 1, reason: "GOV_REVIEW_SIGNER_UNPINNED" }]);
+    const context = loadTrustContext({ amcHome: home, now: NOW });
+    expect(admitKey({ publicKeyPem: keyB.publicKeyPem, purpose: "artifact-seal", signature: "fixture", context }).status).toBe("wrong-purpose");
+    expect(admitKey({ publicKeyPem: keyA.publicKeyPem, purpose: "catalog-review", signature: "fixture", context }).status).toBe("admitted");
+  });
+
   it("without review authority nothing stronger than experimental stands; it never raises a declaration", () => {
     expect(effectiveSupport(control)).toEqual({ support: "experimental", reasons: ["GOV_REVIEW_UNVERIFIED"], promotion: null, rejected: [] });
     const declared = catalog.controls.get("L0-ADV-01")!;
@@ -87,10 +119,25 @@ describe("the quorum (P1-34 step 4)", () => {
 
   it("needs a reviewer the D-08 roster credentials for the control's domain; the roster is empty until D-08", () => {
     expect(reasons([sign(control, keyB, "fixture-reviewer-b"), sign(control, keyC, "fixture-reviewer-c")])).toEqual(["GOV_REVIEW_UNVERIFIED", "GOV_QUORUM_DOMAIN_EXPERT"]);
-    expect(reasons([a, b], { experts: new Map() })).toEqual(["GOV_REVIEW_UNVERIFIED", "GOV_QUORUM_DOMAIN_EXPERT"]);
+    const uncredentialed = new Map([...ROSTER].map(([subject, entry]) => [subject, { ...entry, domains: [] }]));
+    expect(reasons([a, b], { experts: uncredentialed })).toEqual(["GOV_REVIEW_UNVERIFIED", "GOV_QUORUM_DOMAIN_EXPERT"]);
   });
 
-  it("AI-drafted content needs a confirmed draft; any verified objection blocks", () => {
+  it("reviewers who share any normalized identifier (subject or roster git identity) are one person", () => {
+    const [k1, k2] = [keypair(), keypair()];
+    const home = operatorHome([...PINS, { key: k1, subject: "bob@corp.example" }, { key: k2, subject: "Bob <bob@corp.example>" }]);
+    const roster = new Map([...ROSTER, ["bob@corp.example", { domains: ["wealth"], identities: [] }], ["Bob <bob@corp.example>", { domains: ["wealth"], identities: [] }]]);
+    const bob = [sign(control, k1, "bob@corp.example"), sign(control, k2, "Bob <bob@corp.example>")];
+    expect(effectiveSupport(control, authority(home, bob, { experts: roster })).reasons).toEqual(["GOV_REVIEW_UNVERIFIED", "GOV_QUORUM_TWO_HUMANS"]);
+    const sameGit = new Map([...ROSTER, ["fixture-reviewer-b", { domains: [], identities: ["Reviewer A <a@fixture.test>"] }]]);
+    expect(reasons([a, b], { experts: sameGit })).toEqual(["GOV_REVIEW_UNVERIFIED", "GOV_QUORUM_TWO_HUMANS"]);
+  });
+
+  it("AI-drafted content needs a confirmation naming this control (id@version or digest); any verified objection blocks", () => {
+    const vague = (key: typeof keyA, id: string) => sign(control, key, id, { aiInputs: [{ kind: "draft", ref: "some draft", confirmed: true }] });
+    expect(reasons([vague(keyA, "fixture-reviewer-a"), vague(keyB, "fixture-reviewer-b")])).toEqual(["GOV_REVIEW_UNVERIFIED", "GOV_QUORUM_AI_DRAFT"]);
+    const byDigest = sign(control, keyA, "fixture-reviewer-a", { aiInputs: [{ kind: "draft", ref: a.subject.digest, confirmed: true }] });
+    expect(effectiveSupport(control, authority(HOME, [byDigest, vague(keyB, "fixture-reviewer-b")])).support).toBe("reviewed");
     const plain = (key: typeof keyA, id: string) => sign(control, key, id, { aiInputs: [] });
     expect(reasons([plain(keyA, "fixture-reviewer-a"), plain(keyB, "fixture-reviewer-b")])).toEqual(["GOV_REVIEW_UNVERIFIED", "GOV_QUORUM_AI_DRAFT"]);
     expect(reasons([a, b, sign(control, keyC, "fixture-reviewer-c", { decision: "request_changes" })])).toEqual(["GOV_REVIEW_UNVERIFIED", "GOV_QUORUM_OBJECTION"]);

@@ -18,7 +18,8 @@ import { buildCatalogLock } from "../../../src/catalog/lockfile.js";
 import type { Citation, ControlRecord } from "../../../src/catalog/types.js";
 import { validateCatalog } from "../../../src/catalog/validate.js";
 import { REGULATORY_REGISTER, type RegulatoryRegister } from "../../../src/compliance/regulatory/index.js";
-import { authority, keyA, keyB, operatorHome, reviewedControl, sign } from "./reviewers.js";
+import { vi } from "vitest";
+import { NOW, authority, keyA, keyB, operatorHome, reviewedControl, sign } from "./reviewers.js";
 
 const catalog = loadCatalog();
 const base = catalog.controls.get("L0-ADV-01")!;
@@ -110,8 +111,12 @@ describe("overdue content compiles as experimental, in memory only (P1-34 step 7
   const control = reviewedControl(base);
   const pair = (decidedAt: string) => [sign(control, keyA, "fixture-reviewer-a", { decidedAt }), sign(control, keyB, "fixture-reviewer-b", { decidedAt })];
   const cat = { ...catalog, controls: new Map([...catalog.controls, [control.id, control]]) };
-  const row = (records?: unknown[]) => compilePlan({ profile, catalog: cat, asOf: "2026-10-18T12:00:00Z",
-    ...(records ? { reviewAuthority: authority(HOME, records) } : {}) }).requirements.find((r) => r.controlId === control.id)!;
+  const promotionsOf = (records: unknown[]) => {
+    const promotion = effectiveSupport(control, authority(HOME, records)).promotion;
+    return promotion ? { [control.id]: promotion } : {};
+  };
+  const compile = (asOf: string, promotions?: ReturnType<typeof promotionsOf>) => compilePlan({ profile, catalog: cat, asOf, ...(promotions ? { promotions } : {}) });
+  const row = (records?: unknown[]) => compile("2026-10-18T12:00:00Z", records ? promotionsOf(records) : undefined).requirements.find((r) => r.controlId === control.id)!;
 
   it("downgrades the plan requirement, leaves the record, its YAML bytes, its digest and a stored result unchanged", () => {
     const yamlPath = join(defaultCatalogRoot(), catalog.controlFiles.get(control.id)!);
@@ -138,7 +143,25 @@ describe("overdue content compiles as experimental, in memory only (P1-34 step 7
     }
   });
 
-  it("without review authority every row is experimental; a current verified quorum keeps reviewed", () => {
+  it("is pure: promotions decided outside it are an input bound into the digest, judged at asOf, never at the clock or trust state", () => {
+    const promotions = promotionsOf(pair("2026-10-15"));
+    const first = compile("2026-10-18T12:00:00Z", promotions);
+    vi.setSystemTime(new Date("2027-06-01T00:00:00Z"));
+    try {
+      expect(compile("2026-10-18T12:00:00Z", promotions).digest).toBe(first.digest);
+    } finally {
+      vi.setSystemTime(NOW);
+    }
+    expect(first.promotions).toEqual(promotions);
+    expect(compile("2026-10-18T12:00:00Z").digest).not.toBe(first.digest);
+    const at = (plan: ReturnType<typeof compile>) => plan.requirements.find((r) => r.controlId === control.id)!;
+    expect(at(compile("2027-02-01T00:00:00Z", promotions))).toMatchObject({ support: "experimental" });
+    expect(at(compile("2027-02-01T00:00:00Z", promotions)).reasons.join()).toMatch(/GOV_REVIEW_OVERDUE/);
+    const older = { [control.id]: { ...promotions[control.id]!, controlDigest: `sha256:${"0".repeat(64)}` } };
+    expect(at(compile("2026-10-18T12:00:00Z", older)).reasons.join()).toMatch(/GOV_REVIEW_SUBJECT_CHANGED/);
+  });
+
+  it("without promotions every row is experimental; a current verified quorum keeps reviewed", () => {
     expect(row()).toMatchObject({ support: "experimental" });
     expect(row().reasons.some((r) => r.startsWith("GOV_REVIEW_UNVERIFIED"))).toBe(true);
     expect(row(pair("2026-10-15"))).toMatchObject({ support: "reviewed" });

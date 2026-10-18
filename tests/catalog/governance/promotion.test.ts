@@ -9,19 +9,20 @@ import { beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 
 vi.mock("../../../src/catalog/governance/support.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../../src/catalog/governance/support.js")>();
-  return { ...actual, effectiveSupport: vi.fn(actual.effectiveSupport) };
+  return { ...actual, effectiveSupport: vi.fn(actual.effectiveSupport), supportStanding: vi.fn(actual.supportStanding) };
 });
 
 import { compilePlan, parseDeploymentProfile } from "../../../src/catalog/compiler/compile.js";
 import { catalogCurrencyFindings } from "../../../src/catalog/governance/index.js";
 import type { RequirementDecision } from "../../../src/catalog/compiler/types.js";
-import { effectiveSupport, shownLegalReview, shownReviewStatus, type ShownLegalReview, type SupportResult } from "../../../src/catalog/governance/support.js";
+import { effectiveSupport, shownLegalReview, shownReviewStatus, supportStanding, type ShownLegalReview, type SupportResult } from "../../../src/catalog/governance/support.js";
 import { loadCatalog, type LoadedCatalog } from "../../../src/catalog/loader.js";
 import type { ControlRecord, SupportLevel } from "../../../src/catalog/types.js";
 import { toOscalCatalog } from "../../../src/exports/oscal/oscalCatalog.js";
 import { author, AUTHOR, authority, keyA, keyB, keypair, operatorHome, reviewedControl, sign } from "./reviewers.js";
 
 const spy = vi.mocked(effectiveSupport);
+const standing = vi.mocked(supportStanding);
 const catalog = loadCatalog();
 const control = reviewedControl(catalog.controls.get("L0-ADV-01")!);
 const withControl: LoadedCatalog = { ...catalog, controls: new Map([...catalog.controls, [control.id, control]]) };
@@ -35,25 +36,45 @@ const fakes: unknown[][] = [
   [genuine[0], sign({ ...control, statement: "older" }, keyB, "fixture-reviewer-b")]
 ];
 const stronger = (s: string) => s === "reviewed" || s === "qualified";
-/** Every effectiveSupport result for `id` since the spy was reset. */
-const resultsFor = (id: string): SupportResult[] => spy.mock.calls.flatMap((call, i) =>
-  ((call[0] as ControlRecord).id === id && spy.mock.results[i]?.type === "return" ? [spy.mock.results[i]!.value as SupportResult] : []));
+/** Every result `fn` returned for `id` since the spies were reset. */
+const resultsFor = (id: string, fn: typeof spy | typeof standing = spy): SupportResult[] => fn.mock.calls.flatMap((call, i) =>
+  ((call[0] as ControlRecord).id === id && fn.mock.results[i]?.type === "return" ? [fn.mock.results[i]!.value as SupportResult] : []));
+/** The promotions effectiveSupport decides for `records`, as a caller passes them to compilePlan. */
+const promotionsOf = (records: unknown[]) => {
+  const promotion = effectiveSupport(control, authority(HOME, records)).promotion;
+  return promotion ? { [control.id]: promotion } : {};
+};
 
-beforeEach(() => { spy.mockClear(); });
+beforeEach(() => { spy.mockClear(); standing.mockClear(); });
 
 describe("effectiveSupport is the single source of a control's support (P1-34)", () => {
-  it("compilePlan: a row is reviewed only where effectiveSupport returned a promotion for it", () => {
-    const plan = compilePlan({ profile, catalog: withControl, asOf: "2026-10-18T12:00:00Z", reviewAuthority: authority(HOME, genuine) });
+  it("compilePlan: a row is reviewed only where supportStanding let a promotion from effectiveSupport stand", () => {
+    const promotions = promotionsOf(genuine);
+    expect(resultsFor(control.id).map((r) => r.promotion)).toEqual([promotions[control.id]]);
+    const plan = compilePlan({ profile, catalog: withControl, asOf: "2026-10-18T12:00:00Z", promotions });
     const promoted = plan.requirements.filter((r) => stronger(r.support));
     expect(promoted.map((r) => r.controlId)).toEqual([control.id]);
-    for (const row of promoted) expect(resultsFor(row.controlId).some((r) => r.support === row.support && r.promotion !== null)).toBe(true);
+    for (const row of promoted) expect(resultsFor(row.controlId, standing).some((r) => r.support === row.support && r.promotion === promotions[control.id])).toBe(true);
+    expect(plan.promotions).toEqual(promotions);
     for (const records of fakes) {
       spy.mockClear();
-      const fake = compilePlan({ profile, catalog: withControl, asOf: "2026-10-18T12:00:00Z", reviewAuthority: authority(HOME, records) });
+      standing.mockClear();
+      const fake = compilePlan({ profile, catalog: withControl, asOf: "2026-10-18T12:00:00Z", promotions: promotionsOf(records) });
       expect(fake.requirements.filter((r) => stronger(r.support))).toEqual([]);
       expect(resultsFor(control.id).every((r) => r.support === "experimental" && r.promotion === null)).toBe(true);
-      expect(resultsFor(control.id).length).toBeGreaterThan(0);
+      expect(resultsFor(control.id, standing).every((r) => r.support === "experimental")).toBe(true);
     }
+  });
+
+  it("the OSCAL export never shows an approval, approver or legal review that did not stand", () => {
+    const base = catalog.controls.get("L1-WLT-US-01")!;
+    const claimed = reviewedControl(base, { citations: base.citations.map((c) => ({ ...c, legalReview: { reviewer: "fixture-legal", credential: "x", date: "2026-10-01" } })) });
+    const doc = JSON.stringify(toOscalCatalog({ ...catalog, controls: new Map([...catalog.controls, [claimed.id, claimed]]) }).document);
+    expect(doc).not.toContain('\\"approved\\"');
+    expect(doc).not.toContain("fixture-approver");
+    expect(doc).not.toContain('\\"recorded\\"');
+    expect(doc).toContain('\\"legalReview\\":\\"unverified\\"');
+    expect(doc).toContain('\\"status\\":\\"pending\\"');
   });
 
   it("the OSCAL export and the currency report read support through it; without authority nothing is reviewed", () => {
@@ -97,29 +118,34 @@ describe("effectiveSupport is the single source of a control's support (P1-34)",
     expectTypeOf(shownLegalReview).returns.toEqualTypeOf<ShownLegalReview>();
   });
 
-  it("no other source reads a control's review status, reviewer, approval or support fields outside the reviewed allowlist", () => {
-    // file -> [number of reads, why each is allowed]. A new read anywhere changes a count and fails here: route it through
-    // effectiveSupport (or shownReviewStatus) instead, or add it with its reason.
+  it("no other source reads a control's review, provenance, support or legal review outside the reviewed allowlist", () => {
+    // Every source under src/catalog or importing from a catalog/ path: file -> [reads, why each is allowed]. Whole-object
+    // reads (r.review, control.provenance) and whole-object spreads (...c, ...record) count too. A new read changes a count
+    // and fails here: route it through effectiveSupport, supportStanding or a shown* helper instead, or add it with its reason.
     const allowed: Record<string, [number, string]> = {
-      "src/catalog/governance/support.ts": [4, "the single function, shownReviewStatus and shownLegalReview"],
+      "src/catalog/governance/support.ts": [12, "supportStanding, effectiveSupport and the shown* helpers"],
       "src/catalog/governance/index.ts": [4, "the report compares the declaration with effectiveSupport's result"],
       "src/catalog/governance/changelogGuard.ts": [2, "declared reviewed content needs review ids: stricter only"],
-      "src/catalog/compiler/compile.ts": [2, "writes effectiveSupport's result into each row"],
+      "src/catalog/compiler/compile.ts": [2, "writes supportStanding's verdict into each row"],
       "src/catalog/compiler/applicability.ts": [2, "the row's initial value, replaced by compile; retired never promotes"],
-      "src/catalog/schema.ts": [9, "P1-09 support gate: refuses incomplete declarations, never raises"],
+      "src/catalog/schema.ts": [11, "P1-09 support gate: refuses incomplete declarations, never raises"],
       "src/catalog/validate.ts": [5, "refuses an approved review citing an unreviewed register entry; stricter citation severity"],
       "src/catalog/types.ts": [1, "the type"],
-      "src/a4/a4Conformance.ts": [1, "a stored conformance row, copied from the plan row"],
+      "src/a4/a4Conformance.ts": [2, "the stored conformance row (StoredControl), copied from the plan row"],
       "src/a4/adaptPolicy.ts": [1, "the key of the shownLegalReview result"],
-      "src/exports/oscal/oscalCatalog.ts": [1, "reviewedAt as the metadata last-modified date, not a status"],
-      "src/diagnostic/questionBank.ts": [1, "an unrelated tuning-knob name"]
+      "src/exports/oscal/oscalCatalog.ts": [5, "the citation spread with legalReview replaced by shownLegalReview; metadata last-modified dates"],
+      "src/policy/effectivePolicyReceipt.ts": [1, "ActiveControl.review, which activation sets through shownReviewStatus"],
+      "src/cli.ts": [2, "a marketplace rating's review text, not a catalog record"]
     };
-    const pattern = /\breview\.(status|expert|credential|reviewedAt|nextReview)\b|provenance\.approvedBy\b|\b(record|control|r|c|rec)\??\.support\b|\blegalReview\b/g;
+    const pattern = /\breview\.(status|expert|credential|reviewedAt|nextReview)\b|provenance\.approvedBy\b|\b(record|control|r|c|rec)\??\.(review|provenance|support)\b|\blegalReview\b|\.\.\.(c|citation|cite|record|control|r)\b(?!\.)/g;
     const root = join(__dirname, "..", "..", "..");
     const found: Record<string, number> = {};
     for (const file of globSync("src/**/*.ts", { cwd: root })) {
-      const reads = readFileSync(join(root, file), "utf8").match(pattern)?.length ?? 0;
-      if (reads > 0) found[file.split("\\").join("/")] = reads;
+      const text = readFileSync(join(root, file), "utf8");
+      const path = file.split("\\").join("/");
+      if (!path.startsWith("src/catalog/") && !/from "[^"]*catalog\//.test(text)) continue;
+      const reads = text.match(pattern)?.length ?? 0;
+      if (reads > 0) found[path] = reads;
     }
     expect(found).toEqual(Object.fromEntries(Object.entries(allowed).map(([file, [count]]) => [file, count])));
   });

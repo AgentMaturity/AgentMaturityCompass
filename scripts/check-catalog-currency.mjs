@@ -5,7 +5,7 @@
  * due within 14 days, an approved review the YAML declares without a verified record, and register entries due a
  * status review are warnings. A malformed catalog or governance file is an error. Exit 1 on any error. Review records
  * are verified against this machine's operator trust (the AMC home's signed trust lists and pinned roots) at the
- * server's clock; `--as-of` previews a later date and CI never passes it. The D-08 expert roster does not exist yet, so
+ * server's clock; `--as-of` only moves due dates ahead (a preview) and CI never passes it. The D-08 expert roster does not exist yet, so
  * no reviewed content can stand. Nothing is edited. Reads dist/ (build first).
  *
  * Usage: node scripts/check-catalog-currency.mjs [--as-of YYYY-MM-DD] [--json]
@@ -35,12 +35,16 @@ async function main(argv) {
   const governance = readGovernance(catalogRoot);
   const authorsOf = (controlId) => {
     const file = cat.controlFiles.get(controlId);
-    const log = file ? spawnSync("git", ["log", "--format=%an%n%ae", "--", join("catalog", file)], { cwd: root, encoding: "utf8" }) : null;
+    // Every name and email that ever authored the file, across renames. Unsigned, so effectiveSupport also checks the
+    // reviewer's roster identities and declared name against them.
+    const log = file ? spawnSync("git", ["log", "--follow", "--format=%an%n%ae", "--", join("catalog", file)], { cwd: root, encoding: "utf8" }) : null;
     if (!log || log.status !== 0) throw new Error(`cannot read the git authors of ${controlId}; refusing to judge reviewer independence without them`);
     return [...new Set(log.stdout.split("\n").filter(Boolean))];
   };
-  const authority = { trust: {}, now: values["as-of"] ? new Date(`${asOf}T00:00:00Z`) : new Date(), records: governance.reviews,
-    experts: new Map(), authorsOf, f5Confirmations: governance.f5Confirmations, reverify: governance.reverify, register: REGULATORY_REGISTER };
+  // Trust and signatures are checked at the server's clock inside effectiveSupport; asOf only moves due dates ahead.
+  // The D-08 roster (subject -> { domains, identities }) does not exist yet, so no reviewer can count.
+  const authority = { trust: {}, asOf, records: governance.reviews, experts: new Map(), authorsOf,
+    f5Confirmations: governance.f5Confirmations, reverify: governance.reverify, register: REGULATORY_REGISTER };
   const findings = [
     ...[...cat.issues, ...governance.issues].filter((i) => i.severity === "error")
       .map((i) => ({ code: i.code, severity: "error", controlId: i.controlId, message: `${i.file} ${i.path}: ${i.message}` })),

@@ -38,6 +38,8 @@ export function distrustAt<D extends { keyId: string; distrustedFrom: string | n
 /** One trust-list entry at `at`: its purpose, its validity window, then any revocation. */
 function entryAt(entry: RuleEntry, purpose: string, at: number): RuleStatus {
   if (!entry.purposes.includes(purpose)) return "wrong-purpose";
+  // A catalog-review key is a named expert's own (P1-34); an entry that also pins it for anything else is refused for every purpose.
+  if (entry.purposes.includes("catalog-review") && entry.purposes.length > 1) return "wrong-purpose";
   if (at < Date.parse(entry.validFrom)) return "not-yet-valid";
   if (entry.validTo !== null && at >= Date.parse(entry.validTo)) return "expired";
   if (entry.revokedAt !== undefined && (entry.revocationReason === "key-compromise" || at >= Date.parse(entry.revokedAt))) return "revoked";
