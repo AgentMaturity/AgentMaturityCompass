@@ -99,7 +99,7 @@ function renderEuAIActClassification(classification: EuAIActClassification): str
   }
   const prohibited = classification.packs.filter((pack) => pack.prohibitedFlag).map((pack) => pack.packId);
   if (prohibited.length > 0) {
-    lines.push("", `- Art. 5 prohibition flagged (check the use against Art. 5): ${prohibited.join(", ")}`);
+    lines.push("", `- Cites an Article 5 prohibited practice; check the deployment: ${prohibited.join(", ")}`);
   }
   lines.push("");
   return lines.join("\n");

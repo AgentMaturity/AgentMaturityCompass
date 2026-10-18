@@ -79,7 +79,8 @@ describe("domain report — EU AI Act classification", () => {
     expect(md).toContain("## EU AI Act Classification");
     const flagged = result.euAIActClassification.packs.filter((p) => p.prohibitedFlag).map((p) => p.packId);
     expect(flagged).toContain("dance-of-democracy");
-    expect(md).toContain(`- Art. 5 prohibition flagged (check the use against Art. 5): ${flagged.join(", ")}`);
+    expect(md).toContain(`- Cites an Article 5 prohibited practice; check the deployment: ${flagged.join(", ")}`);
+    expect(md).not.toContain("prohibition flagged");
     expect(md).toContain("- Station category: high-risk");
     for (const p of result.euAIActClassification.packs) {
       expect(md).toContain(`| ${p.packId} | ${p.classification} | ${p.annexIIIPoints.join(", ") || "-"} | ${p.generalPurpose ? "yes" : "no"} |`);
