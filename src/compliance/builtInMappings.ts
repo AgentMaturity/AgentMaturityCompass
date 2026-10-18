@@ -922,7 +922,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
       },
       {
         type: "requires_no_audit",
-        auditTypesDenylist: ["POLICY_VIOLATION", "SCOPE_EXCEEDED"]
+        auditTypesDenylist: ["POLICY_VIOLATION"]
       }
     ],
     related: {
@@ -944,7 +944,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
       },
       {
         type: "requires_no_audit",
-        auditTypesDenylist: ["SECRET_EXFILTRATION_SUCCEEDED", "EXCESSIVE_DATA_COLLECTION"]
+        auditTypesDenylist: ["SECRET_EXFILTRATION_SUCCEEDED"]
       }
     ],
     related: {
@@ -1036,7 +1036,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
       },
       {
         type: "requires_no_audit",
-        auditTypesDenylist: ["EVIDENCE_CHAIN_BROKEN", "AUDIT_TRAIL_MISSING", "POLICY_VIOLATION"]
+        auditTypesDenylist: ["TRACE_RECEIPT_INVALID", "TRACE_EVENT_HASH_NOT_FOUND", "POLICY_VIOLATION"]
       }
     ],
     related: {
@@ -1150,7 +1150,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
       },
       {
         type: "requires_no_audit",
-        auditTypesDenylist: ["SECRET_EXFILTRATION_SUCCEEDED", "BREACH_UNDETECTED"]
+        auditTypesDenylist: ["SECRET_EXFILTRATION_SUCCEEDED"]
       }
     ],
     related: {
@@ -1797,7 +1797,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     description: "Change control for AI models, prompts, guardrails, and configurations in financial reporting scope.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.6 },
-      { type: "requires_no_audit", auditTypesDenylist: ["GOVERNANCE_BYPASS_SUCCEEDED", "UNSIGNED_POLICY_LOADED"] }
+      { type: "requires_no_audit", auditTypesDenylist: ["GOVERNANCE_BYPASS_SUCCEEDED", "CONFIG_SIGNATURE_INVALID"] }
     ],
     related: {
       questions: ["AMC-BCON-1", "AMC-1.1", "AMC-2.9"],
@@ -1934,7 +1934,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     description: "Baseline configuration, change control, least functionality, and software usage restrictions for AI model and infrastructure.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.6 },
-      { type: "requires_no_audit", auditTypesDenylist: ["UNSIGNED_POLICY_LOADED", "GOVERNANCE_BYPASS_SUCCEEDED"] }
+      { type: "requires_no_audit", auditTypesDenylist: ["CONFIG_SIGNATURE_INVALID", "GOVERNANCE_BYPASS_SUCCEEDED"] }
     ],
     related: {
       questions: ["AMC-BCON-1", "AMC-1.1", "AMC-2.9"],

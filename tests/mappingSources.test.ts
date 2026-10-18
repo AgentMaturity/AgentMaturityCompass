@@ -36,18 +36,19 @@ describe("built-in compliance mappings", () => {
     }
   });
 
-  // P1-45 review: a denylist naming only audit types AMC never emits can never fail, so it passed on any activity.
-  test("every no-audit requirement names an audit type that AMC source can emit", () => {
+  // P1-45 review: a denylist type no AMC source emits can never match, so it reads as a check that was never made.
+  // Literals in data files (the mappings themselves and the clause-control quotes and rationales) do not count.
+  test("every audit type a no-audit requirement names is one that AMC source can emit", () => {
     const literals = new Set<string>();
     for (const entry of readdirSync(new URL("../src", import.meta.url), { recursive: true, withFileTypes: true })) {
-      if (!entry.isFile() || !/\.(ts|js)$/.test(entry.name) || entry.name === "builtInMappings.ts") continue;
-      const text = readFileSync(`${entry.parentPath}/${entry.name}`, "utf8");
-      for (const match of text.matchAll(/["'`]([A-Z][A-Z0-9_]{3,})["'`]/g)) literals.add(match[1]!);
+      const path = `${entry.parentPath}/${entry.name}`;
+      if (!entry.isFile() || !/\.(ts|js)$/.test(entry.name) || entry.name === "builtInMappings.ts"
+        || path.includes("/compliance/frameworks/controls/")) continue;
+      for (const match of readFileSync(path, "utf8").matchAll(/["'`]([A-Z][A-Z0-9_]{3,})["'`]/g)) literals.add(match[1]!);
     }
-    const vacuous = builtInComplianceMappings.flatMap((row) => row.evidenceRequirements
-      .filter((req) => req.type === "requires_no_audit" && !req.auditTypesDenylist.some((type) => literals.has(type)))
-      .map(() => row.id));
-    expect(vacuous).toEqual([]);
+    const unemitted = builtInComplianceMappings.flatMap((row) => row.evidenceRequirements.flatMap((req) =>
+      req.type === "requires_no_audit" ? req.auditTypesDenylist.filter((type) => !literals.has(type)).map((type) => `${row.id}:${type}`) : []));
+    expect(unemitted).toEqual([]);
   });
 
   test("mapping ids are unique", () => {
