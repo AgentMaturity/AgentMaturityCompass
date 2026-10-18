@@ -134,7 +134,7 @@ inventing questions. The CRA clock remains `verified: false` because its article
 
 Promotion requires a real platform or content-safety partner under P1-29, all ten P1-33 admission criteria with
 evidence, independent human sign-offs and Sid's decision. D-14's credentialed Technology reviewer and P1-29's partner
-are not supplied. See [the Technology overlay record](../catalog/technology/README.md) for control boundaries,
+are not supplied. The source record at `docs/catalog/technology/README.md` describes control boundaries,
 composition profiles, admission status and unsupported behavior.
 
 ## Verification appendix
