@@ -9,6 +9,8 @@ SDK version is the package version.
 - Import path: `agent-maturity-compass/sdk/native`.
 - Node.js: 22 or 24 LTS. The package's `engines` floor (`>=20`) is a compatibility floor, not a tested target.
 - Reference: [NATIVE_SDK.md](../NATIVE_SDK.md) describes the lifecycle (turns, cancellation, resume, limits).
+- The execution verbs shared with the CLI, Python and Studio (`forkSession`, `approve`, `pendingApprovals`, `dispose`)
+  and the execution phases on every result are in [EXECUTION_API.md](EXECUTION_API.md).
 
 ## Quickstart: install to a verified synthetic action
 
