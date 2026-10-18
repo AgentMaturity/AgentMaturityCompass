@@ -330,6 +330,7 @@ export interface ExecutionStatus {
     readonly sessionId: string;
     readonly phases: Readonly<Record<ExecutionPhase, PhaseState>>;
     readonly receiptStates: readonly string[];
+    readonly recheckFailures: readonly string[];
 }
 ```
 
