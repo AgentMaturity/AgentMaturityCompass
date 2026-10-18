@@ -456,3 +456,54 @@ def test_invalid_launch_options_refuse_before_any_child(monkeypatch, tmp_path, o
     agent_options = {"workspace": str(tmp_path), "amc_bin": ["selected-amc"], **options}
     with pytest.raises(ValueError):
         AmcAgent(**agent_options)
+
+
+# P2-13: the execution contract on the Python wrapper, against the transport peer.
+@pytest.mark.parametrize("mode", ["no-execution-api", "execution-api-2"])
+def test_refuses_a_runtime_of_another_execution_api_version(peers, mode):
+    with pytest.raises(AmcProtocolError, match="execution API v1"):
+        peers(mode)
+
+
+def test_turn_results_carry_the_runtime_execution_phases(peers):
+    agent, _ = peers("execution")
+    session = agent.new_session()
+    result = session.prompt("hello")
+    assert result.execution is not None and result.execution.session_id == session.session_id
+    assert result.execution.phases == {"admission": "succeeded", "model-completion": "succeeded",
+                                       "side-effect-completion": "succeeded", "evidence-verification": "pending"}
+    assert agent.new_session().prompt("hello").execution is not None
+
+
+def test_a_malformed_execution_status_is_a_protocol_error(peers):
+    agent, _ = peers("bad-execution")
+    with pytest.raises(AmcProtocolError):
+        agent.new_session().prompt("hello")
+
+
+def test_fork_session_sends_the_lineage_fork_and_owns_the_child(peers):
+    agent, records = peers()
+    parent = agent.new_session()
+    child = agent.fork_session(parent.session_id)
+    assert child.session_id.startswith("p06-fork-")
+    assert requests(records, "_amc/session/fork")[0]["params"] == {"sessionId": parent.session_id, "cwd": agent.workspace, "mcpServers": []}
+    assert child.prompt("child turn").stop_reason == "end_turn"
+    with pytest.raises(AmcRefusedError) as refused:
+        agent.fork_session("missing-parent")
+    assert refused.value.data == {"reason": "MISSING"}
+
+
+def test_dispose_releases_each_idle_writer_then_closes(peers):
+    agent, records = peers()
+    first, second = agent.new_session(), agent.new_session()
+    agent.dispose()
+    assert sorted(row["params"]["sessionId"] for row in requests(records, "_amc/session/release")) == sorted([first.session_id, second.session_id])
+    assert agent.closed
+
+
+@pytest.mark.parametrize("bad", [{"approval_request_id": "--mode"}, {"roles": ["APPROVER,OWNER"]}, {"reason": " "}, {"mode": "auto"}])
+def test_approve_refuses_malformed_decisions_before_running_anything(peers, bad):
+    agent, _ = peers()
+    decision = {"approval_request_id": "apr_1", "reason": "r", "username": "u", "roles": ["APPROVER"], **bad}
+    with pytest.raises(ValueError):
+        agent.approve(decision.pop("approval_request_id"), **decision)

@@ -49,7 +49,10 @@ def main() -> None:
                 extension = {"releaseSession": True, "committedUpdates": "live-completed-blocks",
                              "orderedImageInput": "amc-image-input@2",
                              "audioInput": {"format": "amc-audio-input@1", "encoderId": "gemini-generate-content",
-                                            "encoderVersion": 2, "mimeTypes": ["audio/wav"]}}
+                                            "encoderVersion": 2, "mimeTypes": ["audio/wav"]},
+                             "executionApi": 2 if mode == "execution-api-2" else 1, "lineageFork": "verified-parent-reference"}
+                if mode == "no-execution-api":
+                    del extension["executionApi"]
                 reply(request_id, {"protocolVersion": 1, "agentInfo": {"name": "P06-regression-peer"},
                     "agentCapabilities": {"loadSession": True, "_meta": {EXT: extension},
                         "promptCapabilities": {"image": mode != "image-disabled", "audio": mode != "audio-disabled"}}})
@@ -60,6 +63,14 @@ def main() -> None:
                 reply(request_id, {"sessionId": identity})
             elif method == "_amc/session/release":
                 reply(request_id, {})
+            elif method == "_amc/session/fork":
+                sequence += 1
+                if session_id == "missing-parent":
+                    send({"jsonrpc": "2.0", "id": request_id,
+                          "error": {"code": -32602, "message": "verified session fork was refused", "data": {"reason": "MISSING"}}})
+                    continue
+                history.setdefault(f"p06-fork-{sequence}", [])
+                reply(request_id, {"sessionId": f"p06-fork-{sequence}"})
             elif method == "session/load":
                 blocks = history.get(session_id, [])
                 if mode == "image-disabled":
@@ -113,8 +124,12 @@ def main() -> None:
                 if mode == "clear-tool-content":
                     update(session_id, {"sessionUpdate": "tool_call_update", "toolCallId": tool_id, "content": []})
                 update(session_id, {"sessionUpdate": "agent_message_chunk", "content": {"type": "text", "text": "block"}})
-                reply(request_id, {"stopReason": "end_turn", "_meta": {EXT: {"validation": {
-                    "status": "not-requested", "turn": 1, "configSha256": None, "checks": []}}}})
+                extension = {"validation": {"status": "not-requested", "turn": 1, "configSha256": None, "checks": []}}
+                if mode in ("execution", "bad-execution"):
+                    extension["execution"] = {"sessionId": session_id, "receiptStates": [], "phases": {
+                        "admission": "succeeded", "model-completion": "succeeded", "side-effect-completion": "succeeded",
+                        "evidence-verification": "maybe" if mode == "bad-execution" else "pending"}}
+                reply(request_id, {"stopReason": "end_turn", "_meta": {EXT: extension}})
 
 
 if __name__ == "__main__":
