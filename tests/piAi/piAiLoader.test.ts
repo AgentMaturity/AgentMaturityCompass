@@ -83,7 +83,8 @@ describe("pi-ai loader (P1-38)", () => {
       }
     };
     walk("src");
-    const naming = files.filter((file) => readFileSync(file, "utf8").includes(PI_AI_PACKAGE));
+    // A quoted specifier is an import or the loader's constant; prose (help text) may name the package.
+    const naming = files.filter((file) => /["'`]@earendil-works\/pi-ai/.test(readFileSync(file, "utf8")));
     expect(naming).toEqual([join("src", "llm", "providers", "piAi", "piAiLoader.ts")]);
     const loader = readFileSync(naming[0]!, "utf8");
     expect(loader).not.toMatch(/^\s*import\s[^;()]*["']@earendil-works\/pi-ai/m);

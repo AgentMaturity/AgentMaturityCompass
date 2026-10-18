@@ -13,6 +13,7 @@ import { registerAgentCommands, type AgentLoopCliIo } from "../../src/cli-agent-
 import { PI_AI_ROUTES_HELP, registerNativeProviderCommands } from "../../src/cli-agent-options.js";
 import { registerAcpCommands } from "../../src/acp/acpCli.js";
 import { piAiRouteIds } from "../../src/llm/providers/piAi/piAiAdapter.js";
+import { PI_AI_PACKAGE, PI_AI_VERSION } from "../../src/llm/providers/piAi/piAiLoader.js";
 import { chatSse, fixtureServer, PI_FIXTURE_MODELS } from "../helpers/fixtureProviderHarness.js";
 
 let dir: string, home: string, cwd: string;
@@ -72,7 +73,7 @@ describe("amc agent-loop run with a pi-ai route (P1-38)", () => {
 
   test("help lists the pi routes apart from the native routes and names the pin", () => {
     expect(PI_AI_ROUTES_HELP).toContain(`Third-party library routes (agent-loop run only): ${piAiRouteIds().join(", ")}.`);
-    expect(PI_AI_ROUTES_HELP).toContain("@earendil-works/pi-ai@1.3.0, an optional peer pinned to a reviewed version");
+    expect(PI_AI_ROUTES_HELP).toContain(`${PI_AI_PACKAGE}@${PI_AI_VERSION}, an optional peer pinned to a reviewed version`);
     const program = new Command(), quiet = { log: () => {}, error: () => {}, fail: () => {} };
     registerAgentCommands(program, quiet);
     registerAcpCommands(program);
