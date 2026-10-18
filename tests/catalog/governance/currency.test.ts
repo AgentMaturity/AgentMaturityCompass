@@ -144,8 +144,7 @@ describe("overdue content compiles as experimental, in memory only (P1-34 step 7
   });
 
   it("is pure: promotions decided outside it are an input bound into the digest, judged at asOf, never at the clock or trust state", () => {
-    // Review expires 2026-12-14; probe it before the unrelated ADMT deadline on 2027-01-01.
-    const promotions = promotionsOf(pair("2026-09-15"));
+    const promotions = promotionsOf(pair("2026-10-15"));
     const first = compile("2026-10-18T12:00:00Z", promotions);
     vi.setSystemTime(new Date("2027-06-01T00:00:00Z"));
     try {
@@ -156,8 +155,8 @@ describe("overdue content compiles as experimental, in memory only (P1-34 step 7
     expect(first.promotions).toEqual(promotions);
     expect(compile("2026-10-18T12:00:00Z").digest).not.toBe(first.digest);
     const at = (plan: ReturnType<typeof compile>) => plan.requirements.find((r) => r.controlId === control.id)!;
-    expect(at(compile("2026-12-15T00:00:00Z", promotions))).toMatchObject({ support: "experimental" });
-    expect(at(compile("2026-12-15T00:00:00Z", promotions)).reasons.join()).toMatch(/GOV_REVIEW_OVERDUE/);
+    expect(at(compile("2027-02-01T00:00:00Z", promotions))).toMatchObject({ support: "experimental" });
+    expect(at(compile("2027-02-01T00:00:00Z", promotions)).reasons.join()).toMatch(/GOV_REVIEW_OVERDUE/);
     const edited = { ...control, statement: `${control.statement} (edited after the review)` };
     const changed = compilePlan({ profile, catalog: { ...catalog, controls: new Map([...catalog.controls, [control.id, edited]]) }, asOf: "2026-10-18T12:00:00Z", promotions });
     expect(changed.requirements.find((r) => r.controlId === control.id)!.reasons.join()).toMatch(/GOV_REVIEW_SUBJECT_CHANGED/);
