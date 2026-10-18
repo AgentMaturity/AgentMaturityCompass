@@ -55,8 +55,9 @@ const EVERY_STATION = {
   notExecutable: ["DATA_EXPORT", "FINANCIAL", "IDENTITY", "NETWORK_EXTERNAL", "SECURITY"],
   execTicket: ["DATA_EXPORT", "DEPLOY", "FINANCIAL", "IDENTITY", "NETWORK_EXTERNAL", "SECURITY", "WRITE_HIGH"]
 };
-/** Only Wealth has a Layer 1 overlay on int; a station's overlay never reaches another station's profile. */
+/** A station's Layer 1 overlay never reaches another station's profile. */
 const WEALTH_OVERLAY = Array.from({ length: 15 }, (_, i) => `L1-WLT-US-${String(i + 1).padStart(2, "0")}`);
+const EDUCATION_OVERLAY = ["L1-EDU-01", "L1-EDU-02", "L1-EDU-03", "L1-EDU-04"];
 
 describe("P1-46: the compiled plan holds F2's station-profile rules for every station", () => {
   test("seven stations", () => {
@@ -65,7 +66,7 @@ describe("P1-46: the compiled plan holds F2's station-profile rules for every st
 
   test.each(listDomainIds().sort())("golden: %s", (station) => {
     const plan = compilePlan({ profile: stationProfile(station) as never, catalog, asOf: AS_OF });
-    expect(f2View(plan)).toEqual({ ...EVERY_STATION, overlayControls: station === "wealth" ? WEALTH_OVERLAY : [] });
+    expect(f2View(plan)).toEqual({ ...EVERY_STATION, overlayControls: station === "wealth" ? WEALTH_OVERLAY : station === "education" ? EDUCATION_OVERLAY : [] });
   });
 });
 

@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
+import type { FixtureEnvelope } from "../../../../src/catalog/types.js";
 import { EDUCATION_IDS, educationHarness, evaluateEducationFixture, evaluateEducationProduction, type EducationFixture } from "./harness.js";
 
+// Native enforcement "observed" records admission presence, not an observed claim or an enforced boundary.
+const EXPECTED_FIXTURE_ENFORCEMENT: Partial<Record<FixtureEnvelope["evidenceClass"], "observed" | "none">> = {
+  valid: "observed", contradictory: "observed", violation: "observed",
+  stale: "none", replayed: "none", cross_tenant: "none", empty: "none"
+};
 const harness = educationHarness();
 describe("Education actual compiled policy and evidence admission (P3-15)", () => {
   it("selects exact US and EU draft controls through actual profile facts", () => {
@@ -32,7 +38,11 @@ describe("Education actual compiled policy and evidence admission (P3-15)", () =
     expect(actual.planDigest).toBe(compiled!.plan.digest);
     expect(actual.dimensions.result).toBe(fixture.envelope.expected.result);
     expect(actual.dimensions.result).not.toBe("pass");
-    expect(actual.dimensions.enforcement.state).toBe("none");
+    const expectedEnforcement = EXPECTED_FIXTURE_ENFORCEMENT[fixture.envelope.evidenceClass];
+    expect(expectedEnforcement, fixture.ref).toBeDefined();
+    expect(actual.dimensions.enforcement).toEqual({ state: expectedEnforcement });
+    expect(actual.dimensions.enforcement.state).not.toBe("enforced");
+    expect(actual.claimKind).toBe("self_reported");
     if (fixture.envelope.expected.reasonCode !== null) {
       expect([...actual.rejected.map(row => row.reason), actual.dimensions.evidence]).toContain(fixture.envelope.expected.reasonCode);
     }
