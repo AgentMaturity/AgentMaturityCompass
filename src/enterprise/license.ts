@@ -7,7 +7,7 @@ import type { LicenseTier } from "./tiers.js";
 
 /** Same purpose as Industry Packs licences (src/domains/industryPackEntitlement.ts); a dedicated one is a follow-up. */
 const LICENSE_PURPOSE = "artifact-seal";
-export const ENTERPRISE_LICENSE_NOT_CONFIGURED =
+const ENTERPRISE_LICENSE_NOT_CONFIGURED =
   "enterprise licence verification not configured: no licence signing key is pinned in the AMC trust list (purpose artifact-seal)";
 
 const GRACE_PERIOD_DAYS = 7;

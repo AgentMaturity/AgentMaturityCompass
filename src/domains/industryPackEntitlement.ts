@@ -16,9 +16,9 @@ export const INDUSTRY_PACKS_LICENSE_PREFIX = "AMC-INDUSTRY-PACKS";
  * The purpose a trust-list entry must carry for a gate to accept its key as a licence signer, as `amc domain pack verify`
  * (P0-51) already checks. ponytail: shares artifact-seal; a dedicated licence purpose needs a trust-list schema change.
  */
-export const INDUSTRY_PACKS_LICENSE_PURPOSE = "artifact-seal";
+const INDUSTRY_PACKS_LICENSE_PURPOSE = "artifact-seal";
 export const INDUSTRY_PACKS_CHECKOUT_NOT_AVAILABLE = "Checkout is not available in this deployment; contact sales for access.";
-export const LICENSE_VERIFICATION_NOT_CONFIGURED =
+const LICENSE_VERIFICATION_NOT_CONFIGURED =
   "Industry Packs licence verification is not configured: no licence signing key is pinned in this machine's AMC trust list (purpose artifact-seal).";
 
 export type IndustryPackLicenseStatus = "active" | "trialing" | "past_due" | "canceled";

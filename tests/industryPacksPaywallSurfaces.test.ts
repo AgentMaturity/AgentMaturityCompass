@@ -106,6 +106,11 @@ describe("Studio and console", () => {
       const activate = await call("POST", "/industry-packs/activate", { licenseKey: "AMC-INDUSTRY-PACKS.e30.AA" });
       expect(activate.status).toBe(422);
       expect((await activate.json()).error).toMatch(/licence verification is not configured/i);
+
+      const verify = await call("POST", "/industry-packs/license/verify", { licenseKey: "AMC-INDUSTRY-PACKS.e30.AA" });
+      expect(verify.status).toBe(422);
+      expect((await verify.json()).reason).toMatch(/licence verification is not configured/i);
+      expect((await call("POST", "/industry-packs/license/verify", {})).status).toBe(400);
     } finally {
       await api.close();
     }

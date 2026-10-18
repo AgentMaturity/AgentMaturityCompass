@@ -453,6 +453,13 @@ function json(res: ServerResponse, status: number, payload: unknown): void {
   res.end(JSON.stringify(withClaimBody(res, status, payload)));
 }
 
+/** The `licenseKey` of an Industry Packs licence request, or null when the body names none. */
+async function readLicenseKey(req: IncomingMessage, maxBytes = 1_048_576): Promise<string | null> {
+  const body = await readBody(req, maxBytes);
+  const key = (body ? (JSON.parse(body) as { licenseKey?: unknown }) : {}).licenseKey;
+  return typeof key === "string" && key.length > 0 ? key : null;
+}
+
 function ipToInt(ip: string): number | null {
   const parts = ip.split(".");
   if (parts.length !== 4) {
@@ -8557,16 +8564,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "users config signature invalid: read-only mode active" });
           return;
         }
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = body ? (JSON.parse(body) as { licenseKey?: string }) : {};
-        if (!parsed.licenseKey) {
-          json(res, 400, { error: "licenseKey is required" });
-          return;
-        }
+        const licenseKey = await readLicenseKey(req, options.maxRequestBytes);
+        if (!licenseKey) { json(res, 400, { error: "licenseKey is required" }); return; }
         const { activateIndustryPackAccess } = await import("../domains/industryPackEntitlement.js");
         let entitlement: ReturnType<typeof activateIndustryPackAccess>;
         // Not configured, unpinned, expired or forged: the reason goes back to the caller, nothing is stored.
-        try { entitlement = activateIndustryPackAccess({ workspace: options.workspace, licenseKey: parsed.licenseKey }); }
+        try { entitlement = activateIndustryPackAccess({ workspace: options.workspace, licenseKey }); }
         catch (error) { json(res, 422, { error: error instanceof Error ? error.message : String(error), entitlementNote: ENTITLEMENT_NOTE }); return; }
         writeStudioAuditEvent({
           workspace: options.workspace,
@@ -8587,14 +8590,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = body ? (JSON.parse(body) as { licenseKey?: string }) : {};
-        if (!parsed.licenseKey) {
-          json(res, 400, { error: "licenseKey is required" });
-          return;
-        }
+        const licenseKey = await readLicenseKey(req, options.maxRequestBytes);
+        if (!licenseKey) { json(res, 400, { error: "licenseKey is required" }); return; }
         const { verifyPinnedIndustryPackLicense } = await import("../domains/industryPackEntitlement.js");
-        const verification = verifyPinnedIndustryPackLicense(parsed.licenseKey, loadTrustContext());
+        const verification = verifyPinnedIndustryPackLicense(licenseKey, loadTrustContext());
         json(res, verification.valid ? 200 : 422, { ...verification, entitlementNote: ENTITLEMENT_NOTE });
         return;
       }
