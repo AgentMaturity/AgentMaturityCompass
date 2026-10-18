@@ -19,8 +19,8 @@ import { compilePlan, parseDeploymentProfile } from "./compiler/compile.js";
 import { renderPlanDiffMarkdown } from "./compiler/diff.js";
 import { signPlan } from "./compiler/sign.js";
 import type { CompiledPlan, SignedPlan } from "./compiler/types.js";
+import { loadAdmittedCatalog } from "./admission/gate.js";
 import { renderCatalogCheck, runCatalogCheck } from "./admission/index.js";
-import { loadCatalog } from "./loader.js";
 import { compileInputs } from "./compileInputs.js";
 import { verifyCatalogLock } from "./lockfile.js";
 
@@ -43,8 +43,8 @@ export function compileCatalogPlan(workspace: string, opts: CompileFlags) {
   if (ref && sha256Hex(readFileSync(resolve(workspace, ref.path))) !== ref.sha256) {
     throw new Error(`operating profile ${ref.path} does not match the sha256 the deployment profile records`);
   }
-  // P1-33: a pack's declared reviewed support stands only with a current admission report that admits it.
-  const catalog = loadCatalog({ enforceAdmission: true });
+  // P1-33: a pack's declared reviewed support stands only where its recomputed admission admits it.
+  const catalog = loadAdmittedCatalog();
   if (opts.lock) {
     const check = verifyCatalogLock(readJson(resolve(workspace, opts.lock)), catalog);
     if (!check.ok) {

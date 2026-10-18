@@ -16,7 +16,7 @@ import { assertOwnerMode } from "../../mode/mode.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import { digestOf } from "../digest.js";
-import { loadCatalog } from "../loader.js";
+import { loadAdmittedCatalog } from "../admission/gate.js";
 import { verifyCatalogLock } from "../lockfile.js";
 import { shownReviewStatus } from "../governance/support.js";
 import type { ControlRecord, EnforcementPoint } from "../types.js";
@@ -130,7 +130,7 @@ export function loadActiveCompiledPolicy(workspace: string): ActiveCompiledPolic
   const journal = readJournal(workspace);
   if (journal.integrity === "uninitialized" || !journal.payload) return null;
   const { plan } = journal.payload;
-  const catalog = loadCatalog({ enforceAdmission: true });
+  const catalog = loadAdmittedCatalog();
   const lock = verifyCatalogLock(plan.lock, catalog);
   if (!lock.ok) {
     const first = lock.mismatches[0];
@@ -167,7 +167,7 @@ export function activateControlPlan(input: ActivateInput): { revision: number; w
   const next: Activation = { schema: "amc.control-plan-activation/v1", plan: input.signed.plan, signature: input.signed.signature,
     compiledAt: input.signed.compiledAt, approvalRequestId: input.approvalRequestId };
   verifiedActivation(workspace, next);
-  const lock = verifyCatalogLock(next.plan.lock, loadCatalog({ enforceAdmission: true }));
+  const lock = verifyCatalogLock(next.plan.lock, loadAdmittedCatalog());
   if (!lock.ok) throw new Error("the shipped catalog differs from the plan's lockfile; recompile against this catalog");
   return withControlFileLock({ root: root(workspace), name: "activation", operation: () => {
     const previous = readJournal(workspace, true);

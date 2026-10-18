@@ -15,7 +15,8 @@ import { shownLegalReview, shownReviewStatus } from "../catalog/governance/suppo
 import { planWeakenings, signPlan } from "../catalog/compiler/sign.js";
 import type { CompiledPlan, DeploymentProfile, PlanDiff, SignedPlan } from "../catalog/compiler/types.js";
 import { digestOf } from "../catalog/digest.js";
-import { loadCatalog, type LoadedCatalog } from "../catalog/loader.js";
+import { loadAdmittedCatalog } from "../catalog/admission/gate.js";
+import type { LoadedCatalog } from "../catalog/loader.js";
 import { buildCatalogLock } from "../catalog/lockfile.js";
 import { compileInputs } from "../catalog/compileInputs.js";
 import { loadApprovalConsumed } from "../approvals/approvalChainStore.js";
@@ -49,7 +50,7 @@ let shippedLock: string | undefined;
 export function shippedLockDigest(): string {
   if (shippedLock !== undefined) return shippedLock;
   try {
-    shippedLock = lockDigestOf(buildCatalogLock(loadCatalog()));
+    shippedLock = lockDigestOf(buildCatalogLock(loadAdmittedCatalog()));
   } catch {
     throw fail(409, "RESOURCE_UNREADABLE", "plan.lockDigest: the shipped catalog did not load cleanly");
   }
@@ -140,7 +141,7 @@ export function understandAdapt(input: { workspace: string; projectId: string; w
   let catalog: LoadedCatalog | null = null;
   try {
     profile = parseDeploymentProfile(raw);
-    catalog = loadCatalog();
+    catalog = loadAdmittedCatalog();
     plan = compilePlan({ profile, catalog, asOf: new Date(input.now).toISOString(), ...compileInputs(input.workspace) });
   } catch (error) {
     compileError = { code: errorCodeOf(error, "COMPILE_FAILED"), message: (error instanceof Error ? error.message : String(error)).slice(0, 500) };
