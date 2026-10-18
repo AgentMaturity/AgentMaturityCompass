@@ -4,7 +4,7 @@
 // generated here, used for this throwaway workspace, and never written out.
 import { spawnSync } from "node:child_process";
 import { createHash, randomBytes } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { arch, platform, tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -40,25 +40,37 @@ function stationSteps(station, fixture) {
     { id: "init", args: ["init", "--skip-vault"] },
     { id: "domain-modules", args: ["domain", "modules", "--domain", station, "--json"], stdoutTo: "domain-modules.json" },
     { id: "pack-catalog", args: ["domain", "pack", "list", "--domain", station, "--json"], stdoutTo: "pack-catalog.json" },
-    // Industry pack scoring needs a license key; without one the CLI exits 1.
+    // Industry pack scoring needs an Industry Packs licence verified against a pinned key; without one the CLI exits 1.
     { id: "pack-run-gate", args: ["domain", "pack", "run", "--pack", fixture.industryPack, "--baseline", "--json"], stdoutTo: "pack-run-gate.json", expectExit: 1 },
     { id: "risk-classify", args: ["compliance", "risk-classify", "--agent", "default", "--capabilities", JSON.stringify(fixture.capabilities), "--json"], stdoutTo: "risk-classification.json" },
     { id: "assurance-pack", args: ["assurance", "describe", fixture.assurancePack], stdoutTo: "assurance-pack.json" },
     { id: "agent-run", args: ["--agent", "default", "agent-loop", "run", fixture.prompt, "--provider", "stub", "--model", STUB_MODEL, "--tools", "echo", "--max-steps", "2", "--max-tokens", "512", "--json"], stdoutTo: "agent-run.json" },
-    { id: "agent-verify", args: (out) => ["agent-loop", "verify", readJson(join(out, "agent-run.json")).sessionId, "--json"], stdoutTo: "agent-verify.json" },
+    { id: "agent-verify", args: (out, pins) => ["agent-loop", "verify", readJson(join(out, "agent-run.json")).sessionId, "--json", "--expect-monitor", pins.monitorSha256], stdoutTo: "agent-verify.json" },
     { id: "evidence-export", args: ["evidence", "export", "--format", "json", "--out", "out/evidence.json", "--agent", "default", "--include-chain"], writes: "evidence.json" },
     { id: "binder-create", args: ["audit", "binder", "create", "--scope", "agent", "--id", "default", "--out", "out/binder.amcaudit"], writes: "binder.amcaudit" },
-    { id: "binder-verify", args: ["audit", "binder", "verify", "out/binder.amcaudit"] },
+    { id: "binder-verify", args: (out, pins) => ["audit", "binder", "verify", "out/binder.amcaudit", "--pubkey", pins.auditorPub] },
     // No reachable agent under test and no key: the scan must abort (exit 2), not score.
-    // Last on purpose: at 8f57ce63 an aborted scan leaves an unsealed ledger session
-    // (and, with --no-sign, rows that fail the next stub turn's budget check), so
-    // nothing that verifies the ledger runs after it. See the O20 receipt.
+    // Last on purpose: at 8f57ce63 an aborted scan left an unsealed ledger session (O20
+    // finding F1; P0-27 now seals it as ASSURANCE_RUN_ABORTED), so every ledger check
+    // above runs before the scan touches the ledger.
     { id: "assurance-gate", args: ["assurance", "run", "--agent", "default", "--pack", fixture.assurancePack, "--model", STUB_MODEL], env: { AMC_AGENT_BASE_URL: UNUSED_AGENT_URL }, expectExit: 2 }
   ];
 }
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, "utf8"));
+}
+
+/**
+ * The keys verification pins, recorded right after `amc init` and kept outside the workspace, as an operator records
+ * them at creation (README "Verify with pinned keys"). Trust on first use: this detects a later key swap, not a
+ * compromised first bootstrap.
+ */
+function recordPins(workspace, pinsDir) {
+  mkdirSync(pinsDir, { recursive: true });
+  const auditorPub = join(pinsDir, "auditor.pub");
+  copyFileSync(join(workspace, ".amc", "keys", "auditor_ed25519.pub"), auditorPub);
+  return { monitorSha256: sha256(readFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub"))), auditorPub };
 }
 
 export function runStation(stationDir, argv = process.argv.slice(2)) {
@@ -96,8 +108,9 @@ export function runStation(stationDir, argv = process.argv.slice(2)) {
 
   const steps = [];
   const written = [];
+  let pins = null;
   for (const step of stationSteps(fixture.station, fixture)) {
-    const args = typeof step.args === "function" ? step.args(out) : step.args;
+    const args = typeof step.args === "function" ? step.args(out, pins) : step.args;
     const expectExit = step.expectExit ?? 0;
     const result = amc(args, step.env);
     if (step.stdoutTo) {
@@ -110,6 +123,7 @@ export function runStation(stationDir, argv = process.argv.slice(2)) {
       throw new Error(`${fixture.station}/${step.id}: expected exit ${expectExit}, got ${result.status}\n${result.stderr}`);
     }
     console.log(`ok ${step.id} (exit ${result.status})`);
+    if (step.id === "init") pins = recordPins(workspace, join(workdir, "pins"));
   }
 
   const attempts = existsSync(netLog)
@@ -131,6 +145,7 @@ export function runStation(stationDir, argv = process.argv.slice(2)) {
       arch: arch()
     },
     network: opts.denyNetwork ? { mode: "denied", attempts } : { mode: "not-enforced", attempts },
+    pins: { monitorSha256: pins.monitorSha256, auditorPubSha256: sha256(readFileSync(pins.auditorPub)), recorded: "after init, outside the workspace (trust on first use)" },
     steps,
     artifacts: written.map((name) => ({ path: `out/${name}`, sha256: sha256(readFileSync(join(out, name))) }))
   };

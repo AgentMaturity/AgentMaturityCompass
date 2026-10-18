@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { findTruthClaims, findUnknownCommands, loadKnownCommands } from "../scripts/docs-drift-check.mjs";
 
 /**
  * Runs each examples/regulated-industries/<station>/run.mjs against the built
@@ -65,6 +66,8 @@ describe("regulated-industry examples run keyless against the built CLI", () => 
         expect(summary.provenance.node).toBe(process.version);
         expect(summary.provenance.amcVersion).toMatch(/^\d+\.\d+\.\d+/);
         expect(summary.network).toEqual({ mode: "denied", attempts: [] });
+        expect(summary.pins.monitorSha256).toMatch(/^[0-9a-f]{64}$/);
+        expect(summary.pins.auditorPubSha256).toMatch(/^[0-9a-f]{64}$/);
 
         // Every listed artifact exists and matches its recorded digest.
         const listed = summary.artifacts.map((a: { path: string }) => a.path.replace(/^out\//, ""));
@@ -82,7 +85,10 @@ describe("regulated-industry examples run keyless against the built CLI", () => 
         expect(readJson(join(out, "domain-modules.json")).length).toBeGreaterThan(0);
         expect(readJson(join(out, "pack-catalog.json")).packs.some((p: { packId: string }) => p.packId === fixture.industryPack)).toBe(true);
         expect(readJson(join(out, "assurance-pack.json")).id).toBe(fixture.assurancePack);
-        expect(RISK_TIERS).toContain(readJson(join(out, "risk-classification.json")).riskTier);
+        const risk = readJson(join(out, "risk-classification.json"));
+        expect(RISK_TIERS).toContain(risk.riskTier);
+        expect(risk.claimKind).toBe("self_reported");
+        expect(risk.statusDimensions.result).toBe("not_evaluated");
 
         // Paid and target-dependent steps fail closed instead of producing a score.
         expect(readJson(join(out, "pack-run-gate.json")).error).toBe("industry_packs_locked");
@@ -94,6 +100,9 @@ describe("regulated-industry examples run keyless against the built CLI", () => 
         const verify = readJson(join(out, "agent-verify.json"));
         expect(verify.sessionId).toBe(agentRun.sessionId);
         expect(verify.ok).toBe(true);
+        // Anchored by the monitor key the runner recorded after init, not by the workspace's own copy.
+        expect(verify.trustRoot.monitorAdmission.status).toBe("admitted");
+        expect(verify.trustRoot.monitorFingerprint).toBe(summary.pins.monitorSha256);
         const evidence = readJson(join(out, "evidence.json"));
         expect(evidence.includeChain).toBe(true);
         expect(evidence.chainInvalidCount).toBe(0);
@@ -117,16 +126,26 @@ describe("regulated-industry examples run keyless against the built CLI", () => 
     const readme = readFileSync(join(EXAMPLES, "README.md"), "utf8");
     const [body, appendix] = readme.split(/^## Appendix: citations$/m);
     expect(appendix, "README needs an '## Appendix: citations' section").toBeDefined();
-    const rows = [...appendix.matchAll(/^\| (C\d+) \| `([^`]+):(\d+)` \| `(.+)` \|$/gm)];
+    // `file` plus an optional (context) label; the quoted text is resolved in the file, not at a line number (P1-44).
+    const rows = [...appendix.matchAll(/^\| (C\d+) \| `([^`:]+)`(?: \(`[^`]+`\))? \| `(.+)` \|$/gm)];
     expect(rows.length).toBeGreaterThan(0);
     const ids = new Set<string>();
-    for (const [, id, file, line, snippet] of rows) {
+    for (const [, id, file, snippet] of rows) {
+      expect(ids.has(id), `${id} is listed twice`).toBe(false);
       ids.add(id);
-      const lines = readFileSync(join(ROOT, file), "utf8").split("\n");
       // Markdown tables escape "|" as "\|" inside cells.
-      expect(lines[Number(line) - 1] ?? "", `${id} ${file}:${line}`).toContain(snippet.replace(/\\\|/g, "|"));
+      expect(readFileSync(join(ROOT, file), "utf8"), `${id} ${file}`).toContain(snippet.replace(/\\\|/g, "|"));
     }
+    expect(appendix.match(/^\| C\d+ \|/gm)?.length, "every appendix row must parse").toBe(rows.length);
     const cited = new Set([...body.matchAll(/\[(C\d+)\]/g)].map((m) => m[1]));
     expect([...cited].sort()).toEqual([...ids].sort());
+  });
+
+  it("README passes the docs-drift truth and command checks (P0-28)", () => {
+    const file = "examples/regulated-industries/README.md";
+    const readme = readFileSync(join(ROOT, file), "utf8");
+    expect(findTruthClaims(file, readme)).toEqual([]);
+    const known = loadKnownCommands(readFileSync(join(ROOT, "docs", "CLI_COMMAND_INVENTORY.md"), "utf8"));
+    expect(findUnknownCommands(file, readme, known)).toEqual([]);
   });
 });
