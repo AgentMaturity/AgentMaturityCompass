@@ -1,0 +1,150 @@
+# technology.ccpa-admt-optout. Experimental and unreviewed; synthetic fixtures do not establish production enforcement.
+"id": "L1-TECH-05"
+"version": "0.1.0"
+"support": "experimental"
+"layer": 1
+"family": "automated-decision-rights"
+"stations":
+  - "technology"
+"title": "Record automated-decision notice and opt-out handling"
+"statement": "A scoped automated-decision review links its notice, opt-out or qualifying human-appeal path to
+  the applicable decision and preserves the outcome record."
+"riskRationale": "A generic privacy notice does not show that a particular automated-decision request received
+  the applicable notice and rights workflow."
+"mandatory": true
+"applicability":
+  "predicate":
+    "all":
+      - "fact": "stations"
+        "includesAny":
+          - "technology"
+      - "fact": "domains"
+        "includesAny":
+          - "technology.platforms-data"
+      - "fact": "jurisdictions"
+        "includesAny":
+          - "US-CA"
+      - "fact": "useCases"
+        "includesAny":
+          - "consequential_decision_about_people"
+  "reasons":
+    - "Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator
+      assertions and require a scoped legal determination."
+  "exclusions":
+    - "when":
+        "not":
+          "fact": "domains"
+          "includesAny":
+            - "technology.platforms-data"
+      "reason": "The deployment is outside the Technology platforms-and-data domain; no legal applicability is
+        inferred from a station name."
+    - "when":
+        "not":
+          "fact": "jurisdictions"
+          "includesAny":
+            - "US-CA"
+      "reason": "The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not
+        treated as an exclusion or a pass."
+"citations":
+  - "key": "us-ccpa-admt"
+    "registerId": "us-ca-cppa-admt"
+    "instrument": "CCPA regulations on automated decisionmaking technology, risk assessments and cybersecurity audits"
+    "clause": "ADMT notice, opt-out and qualifying human appeal; paragraph pins unverified here"
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30"
+    "jurisdiction": "US-CA"
+    "statusType": "binding-now"
+    "superseded": null
+    "effectiveDate": null
+    "complianceDueDate": null
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review."
+    "url": "https://cppa.ca.gov/regulations/ccpa_updates.html"
+    "retrieval":
+      "state": "unverified"
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary
+        text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    "appliesWhen":
+      "fact": "jurisdictions"
+      "includesAny":
+        - "US-CA"
+    "legalReview": null
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+"binding":
+  "kind": "manual"
+  "points": []
+  "mechanism": "Experimental, unreviewed manual-duty draft. Fixture results establish only local exercise
+    behavior; a production result requires admitted evidence and a named human assessor."
+  "parameters": []
+  "manualDuty":
+    "duty": "Determine the California automated-decision rule's applicability and dates with counsel, then retain
+      the decision-specific notice, request and resulting opt-out or human-appeal record."
+    "ownerRole": "dpo"
+    "cadence": "Before an in-scope automated-decision deployment and after any workflow or rule change."
+    "evidenceOfPerformance": "The decision-bound notice, rights request and documented outcome; no questionnaire
+      response is treated as an observed rights workflow."
+"tests":
+  - "id": "L1-TECH-05-T1"
+    "type": "document_review"
+    "oracle":
+      "kind": "human_assessor"
+      "observes": "The decision-bound notice, rights request and documented outcome; no questionnaire response is
+        treated as an observed rights workflow."
+    "fixtures":
+      "positive":
+        - "L1-TECH-05/positive/evidence-valid.json"
+      "negative":
+        - "L1-TECH-05/negative/evidence-stale.json"
+        - "L1-TECH-05/negative/evidence-replayed.json"
+        - "L1-TECH-05/negative/evidence-contradictory.json"
+        - "L1-TECH-05/negative/evidence-cross-tenant.json"
+        - "L1-TECH-05/negative/evidence-empty.json"
+        - "L1-TECH-05/negative/evidence-violation.json"
+    "passCriteria": "A named human assessor must examine the applicable notice and rights records. This
+      agent-drafted, self-reported document template remains not evaluated."
+    "attempts": 1
+"evidence":
+  - "id": "L1-TECH-05-E1"
+    "producer": "amc.questionnaire"
+    "bindingFields":
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    "freshness":
+      "maxAgeDays": 30
+    "sampling":
+      "method": "all"
+      "ratePercent": null
+      "minItems": 1
+    "retention":
+      "mode": "regime_max"
+    "residency":
+      "mode": "inherit_deployment"
+"invalidatedBy":
+  - "model_version"
+  - "prompt_version"
+  - "tool_version"
+  - "policy_version"
+  - "deployment_version"
+"owner":
+  "role": "dpo"
+"clock": null
+"levels":
+  - "L1"
+"crosswalk":
+  - "framework": "amc-audit-map-v1"
+    "clause": "RISK_ASSURANCE_AND_TESTING.POLICY"
+    "relation": "partial"
+    "rationale": "The internal audit-map control is related, but does not cover this station-specific requirement,
+      legal scope or oracle. Mapping is experimental and unreviewed."
+"review":
+  "status": "pending"
+  "expert": null
+  "credential": null
+  "reviewedAt": null
+  "nextReview": null
+"provenance":
+  "draftedBy": "ai"
+  "draftedAt": "2026-10-18"
+  "approvedBy": null

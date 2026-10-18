@@ -1,0 +1,148 @@
+# technology.ai-claims-evidence. Experimental and unreviewed; synthetic fixtures do not establish production enforcement.
+"id": "L1-TECH-08"
+"version": "0.1.0"
+"support": "experimental"
+"layer": 1
+"family": "claims-traceability"
+"stations":
+  - "technology"
+"title": "Trace each public AI claim to scoped evidence"
+"statement": "Each proposed public AI capability claim identifies the exact product version, test conditions,
+  evidence and limits supporting its wording."
+"riskRationale": "Broad AI accuracy or capability statements can exceed evidence collected for a narrower
+  product version or test setting."
+"mandatory": true
+"applicability":
+  "predicate":
+    "all":
+      - "fact": "stations"
+        "includesAny":
+          - "technology"
+      - "fact": "domains"
+        "includesAny":
+          - "technology.platforms-data"
+      - "fact": "jurisdictions"
+        "includesAny":
+          - "US"
+  "reasons":
+    - "Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator
+      assertions and require a scoped legal determination."
+  "exclusions":
+    - "when":
+        "not":
+          "fact": "domains"
+          "includesAny":
+            - "technology.platforms-data"
+      "reason": "The deployment is outside the Technology platforms-and-data domain; no legal applicability is
+        inferred from a station name."
+    - "when":
+        "not":
+          "fact": "jurisdictions"
+          "includesAny":
+            - "US"
+      "reason": "The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not
+        treated as an exclusion or a pass."
+"citations":
+  - "key": "technology-ftc-act-section5"
+    "registerId": null
+    "instrument": "Federal Trade Commission Act, Section 5"
+    "clause": "Section 5; unsourced clause mapping pending primary-text read"
+    "edition": "Unverified; no edition pinned"
+    "jurisdiction": "US"
+    "statusType": "binding-now"
+    "superseded": null
+    "effectiveDate": null
+    "complianceDueDate": null
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review."
+    "url": "https://www.ftc.gov/"
+    "retrieval":
+      "state": "unverified"
+      "reason": "Unverified: official publisher homepage is a discovery locator only. No Section 5 primary-text URL
+        or content was read or pinned in P2-30."
+    "appliesWhen":
+      "fact": "jurisdictions"
+      "includesAny":
+        - "US"
+    "legalReview": null
+    "note": "The S5 register has no FTC Act entry. The proposed AI accuracy policy is separate and is not used as
+      a substitute legal basis."
+"binding":
+  "kind": "manual"
+  "points": []
+  "mechanism": "Experimental, unreviewed manual-duty draft. Fixture results establish only local exercise
+    behavior; a production result requires admitted evidence and a named human assessor."
+  "parameters": []
+  "manualDuty":
+    "duty": "Inventory proposed public AI claims, attach the supporting version-specific evidence and limitations,
+      and obtain named expert review before publishing regulated assertions."
+    "ownerRole": "senior_manager"
+    "cadence": "Before publishing a new claim and after any relevant product, evidence or wording change."
+    "evidenceOfPerformance": "The exact proposed wording and its scoped evidence references; the FTC Act citation
+      is unverified and is not replaced by a distinct proposed policy."
+"tests":
+  - "id": "L1-TECH-08-T1"
+    "type": "document_review"
+    "oracle":
+      "kind": "human_assessor"
+      "observes": "The exact proposed wording and its scoped evidence references; the FTC Act citation is unverified
+        and is not replaced by a distinct proposed policy."
+    "fixtures":
+      "positive":
+        - "L1-TECH-08/positive/evidence-valid.json"
+      "negative":
+        - "L1-TECH-08/negative/evidence-stale.json"
+        - "L1-TECH-08/negative/evidence-replayed.json"
+        - "L1-TECH-08/negative/evidence-contradictory.json"
+        - "L1-TECH-08/negative/evidence-cross-tenant.json"
+        - "L1-TECH-08/negative/evidence-empty.json"
+        - "L1-TECH-08/negative/evidence-violation.json"
+    "passCriteria": "A named human assessor compares each proposed claim with its supporting evidence and limits.
+      No legal or capability outcome is inferred from this self-reported template."
+    "attempts": 1
+"evidence":
+  - "id": "L1-TECH-08-E1"
+    "producer": "amc.questionnaire"
+    "bindingFields":
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    "freshness":
+      "maxAgeDays": 30
+    "sampling":
+      "method": "all"
+      "ratePercent": null
+      "minItems": 1
+    "retention":
+      "mode": "regime_max"
+    "residency":
+      "mode": "inherit_deployment"
+"invalidatedBy":
+  - "model_version"
+  - "prompt_version"
+  - "tool_version"
+  - "policy_version"
+  - "deployment_version"
+"owner":
+  "role": "senior_manager"
+"clock": null
+"levels":
+  - "L1"
+"crosswalk":
+  - "framework": "amc-audit-map-v1"
+    "clause": "RISK_ASSURANCE_AND_TESTING.POLICY"
+    "relation": "partial"
+    "rationale": "The internal audit-map control is related, but does not cover this station-specific requirement,
+      legal scope or oracle. Mapping is experimental and unreviewed."
+"review":
+  "status": "pending"
+  "expert": null
+  "credential": null
+  "reviewedAt": null
+  "nextReview": null
+"provenance":
+  "draftedBy": "ai"
+  "draftedAt": "2026-10-18"
+  "approvedBy": null

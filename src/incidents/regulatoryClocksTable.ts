@@ -166,6 +166,27 @@ const BSA_SAR_SOURCE: ClockSource = {
 
 export const REGULATORY_CLOCK_TABLE: readonly RegulatoryClock[] = [
   {
+    clockId: "eu-cra-early-warning-24h",
+    instrument: "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    article: "Not evaluated; article not read",
+    authority: "Not evaluated; authority not read",
+    jurisdiction: "EU",
+    stations: ["technology"],
+    trigger: "AWARENESS",
+    deadline: { amount: 24, unit: "hours" },
+    notify: ["Not evaluated; notification authority requires primary-text review"],
+    requiredContent: ["Not evaluated; required early-warning content requires primary-text review"],
+    condition:
+      "Experimental candidate for an actively exploited vulnerability affecting a product with digital elements; scope and exclusions are not evaluated.",
+    source: {
+      title: "CRA candidate source; inherited S5 eu-cra retrieval metadata, not independently read for this clock",
+      url: "https://publications.europa.eu/resource/celex/32024R2847",
+      retrievedAt: "2026-10-04T05:06:58Z",
+      verified: false,
+      reason: "article, authority and content not read"
+    }
+  },
+  {
     clockId: "eu-ai-act-73-2-serious-incident",
     instrument: "Regulation (EU) 2024/1689 (AI Act)",
     article: "Art. 73(2)",
