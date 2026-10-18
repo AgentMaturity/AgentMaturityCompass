@@ -20,8 +20,6 @@ import { runFixtures, type GuardHarness } from "./fixtureRunner.js";
 import { parseAdmissionReport, reportDigest, sortedCriterion, writeAdmissionReport } from "./report.js";
 import type { AdmissionReport, CriterionResult } from "./types.js";
 
-export type { AdmissionReport, CriterionResult } from "./types.js";
-
 export interface AdmissionOptions {
   packId: string;
   /** Loads the catalog; called twice, so criterion 1 can compare two fresh loads. */
@@ -105,7 +103,7 @@ export function catalogReviewAuthority(cat: LoadedCatalog, repoRoot: string): Re
     reverify: governance.reverify, register: REGULATORY_REGISTER };
 }
 
-export interface CatalogCheckProblem { code: string; severity: "error" | "warning"; file: string; message: string }
+interface CatalogCheckProblem { code: string; severity: "error" | "warning"; file: string; message: string }
 export interface CatalogCheckResult { reports: AdmissionReport[]; problems: CatalogCheckProblem[]; written: string[]; exitCode: 0 | 1 }
 
 /** Committed reports that are malformed (error), stale or for no pack version in the catalog (warnings). */
@@ -164,4 +162,3 @@ export function renderCatalogCheck(result: CatalogCheckResult): string[] {
   lines.push("A met record criterion shows that signed records exist, not that the content is right. Nothing here edits a pack.");
   return lines;
 }
-

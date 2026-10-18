@@ -112,7 +112,7 @@ export function runCatalogCompile(workspace: string, opts: CompileFlags): number
 interface CheckFlags { pack?: string; catalog?: string; json?: boolean; write?: boolean }
 
 /** `amc catalog check` (P1-33; named freeze exception): exit 0 when every declared support is admissible, 1 otherwise. */
-export async function runCatalogCheckCommand(opts: CheckFlags): Promise<number> {
+async function runCatalogCheckCommand(opts: CheckFlags): Promise<number> {
   const result = await runCatalogCheck({ catalogRoot: opts.catalog, packId: opts.pack, write: opts.write });
   if (opts.json) console.log(JSON.stringify({ ...result, claim: "admission reports: evidence of conformity planning; a met record criterion shows signed records exist, not that the content is right" }, null, 2));
   else for (const line of renderCatalogCheck(result)) console.log(line.startsWith("REFUSED") ? chalk.red(line) : line);

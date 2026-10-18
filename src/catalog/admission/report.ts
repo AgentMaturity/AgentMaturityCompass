@@ -27,7 +27,7 @@ export function sortedCriterion(result: CriterionResult): CriterionResult {
 }
 
 /** Catalog-relative path of a pack version's report. */
-export const reportPath = (manifest: Pick<PackManifest, "id" | "version">): string => `admission/${manifest.id}-${manifest.version}.json`;
+const reportPath = (manifest: Pick<PackManifest, "id" | "version">): string => `admission/${manifest.id}-${manifest.version}.json`;
 
 export function writeAdmissionReport(catalogRoot: string, report: AdmissionReport): string {
   const rel = reportPath(report.pack);

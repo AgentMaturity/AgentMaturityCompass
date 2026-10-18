@@ -8,10 +8,7 @@ const sha256Hex = z.string().regex(/^[0-9a-f]{64}$/);
 const digest = z.string().regex(/^sha256:[0-9a-f]{64}$/);
 const support = z.enum(["experimental", "reviewed", "qualified", "retired"]);
 
-export const criterionStatusSchema = z.enum(["met", "not_met", "not_evaluated"]);
-export type CriterionStatus = z.infer<typeof criterionStatusSchema>;
-
-export const admissionFindingSchema = z.strictObject({
+const admissionFindingSchema = z.strictObject({
   code: z.string().regex(/^ADM[0-9]*_[A-Z0-9_]+$/),
   severity: z.enum(["error", "warning"]),
   controlId: z.string().nullable(),
@@ -21,11 +18,11 @@ export const admissionFindingSchema = z.strictObject({
 });
 export type AdmissionFinding = z.infer<typeof admissionFindingSchema>;
 
-export const criterionResultSchema = z.strictObject({
+const criterionResultSchema = z.strictObject({
   criterion: z.number().int().min(1).max(10),
   title: z.string(),
   kind: z.enum(["mechanical", "record", "mixed"]),
-  status: criterionStatusSchema,
+  status: z.enum(["met", "not_met", "not_evaluated"]),
   /** Items examined. */
   checked: z.number().int().min(0),
   findings: z.array(admissionFindingSchema),
@@ -33,7 +30,7 @@ export const criterionResultSchema = z.strictObject({
 });
 export type CriterionResult = Omit<z.infer<typeof criterionResultSchema>, "criterion"> & { criterion: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 };
 
-export const fixtureRunSchema = z.strictObject({
+const fixtureRunSchema = z.strictObject({
   mandatoryControls: z.number().int().min(0),
   /** Fixtures that ran (evidence fixtures through evaluateControl, guard fixtures through a registered harness). */
   fixtures: z.number().int().min(0),
