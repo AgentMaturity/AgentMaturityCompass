@@ -60,7 +60,7 @@ describe("evidenceProducer", () => {
 const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "", "active", "adapter-observation", "adapters", "agent", "agents", "amc", "amc-registered", "amc.audit", "api",
   "approvals", "assurance", "audit-logs", "backoff", "backup", "both", "bridge", "budgets", "built-in-mcp-agent-provider",
-  "builtin", "catalog-only", "cli", "compliance", "correlation", "decision", "derived", "detector",
+  "builtin", "catalog-only", "cli", "compliance", "correlation", "decision", "defaults", "derived", "detector",
   "diagnostic-eval-replay-corpus-boundary", "env", "eoc", "eval-replay-corpus", "eval.run.layer", "eval.run.question",
   "events", "failed-evaluation", "file", "filesystem", "firewall", "fleet", "forecast", "gateway", "hook", "hook_control",
   "host", "identity", "incident-regression", "inference-strategy-comparison", "judge-calibration", "ledger", "leases",
@@ -82,6 +82,8 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   // A4 Activate record labels (P1-62, reviewed 2026-10-12 at the 442cd919 merge): a monitor record field no source could
   // fill (src/a4/a4Monitor.ts) and a value claim's recommended lane (src/a4/a4Value.ts). Neither is a ledger meta.source.
   "source_unavailable", "value_contract"
+  // P1-10F: compileCatalogPlan reports where visible tools came from (defaults or the signed tools.yaml); not evidence.
+  "signed-tools-yaml",
 ]);
 
 function sourceFiles(dir: string): string[] {
