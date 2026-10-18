@@ -10,7 +10,10 @@
  * whose AMC-signed receipt binds exactly this request (tool, arguments, Pi call id, session, version and a fresh
  * nonce). Any error, timeout, malformed or unbound answer, bad signature, lease failure, unknown event shape, input
  * that is not plain data or outage blocks the call. In both modes it records each call's request and outcome
- * (`tool_result`) as observations without arguments or output. Observe mode never blocks.
+ * (`tool_result`) as observations without arguments or output; a request AMC did not record (a 409 included) blocks
+ * the call. In control mode it also sends each outcome, naming the decision it follows, to the control route, where a
+ * fault of AMC's own writer latches the workspace's hooks, so every later call is blocked (hookAuditLatch.ts). An
+ * outcome AMC did not record is reported; the call already ran. Observe mode never blocks.
  *
  * Structural Pi types only: AMC has no Pi runtime dependency. The contract (event fields, `{ block: true, reason }`,
  * a throwing handler blocks, `ctx.mode`) is confirmed against Pi 1.0.2 and 1.0.4 in docs/adapters/pi.md. Enforcement
@@ -21,12 +24,15 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { types } from "node:util";
 import { sha256Hex } from "../../utils/hash.js";
-import { piControlAnswer, postToBridge, readPiHookConfig, verifyPiRegistrationAnswer, PI_CONTROL_PATH, PI_OBSERVE_PATH, type PiHookConfig } from "./piControlClient.js";
+import { piControlAnswer, postObservation, postToBridge, readPiHookConfig, verifyPiRegistrationAnswer, PI_CONTROL_PATH, type PiHookConfig } from "./piControlClient.js";
 import { piActionId, piSessionSha256 } from "./piIdentity.js";
 import { UNKNOWN_PI_VERSION } from "./piVersions.js";
 
 const AMC_CONTROL_UNAVAILABLE = "AMC control unavailable; action denied.";
 const DEFAULT_TIMEOUT_MS = 5_000;
+const PI_HEADERS = { "x-amc-hook-provider": "pi" };
+// ponytail: allowed calls awaiting their tool_result, bounded; past it the oldest is dropped and its outcome is recorded as unmatched.
+const MAX_PENDING_DECISIONS = 1_024;
 /** Pi's built-in tools; any other tool name is an extension's. */
 const PI_BUILTIN_TOOLS = new Set(["read", "bash", "edit", "write", "grep", "find", "ls", "powershell"]);
 
@@ -142,10 +148,28 @@ export function createAmcPiExtension(options: AmcPiExtensionOptions): (pi: PiExt
         if (!isPiToolEvent(event)) throw new Error("Pi sent a tool event AMC does not recognise");
         const config = readPiHookConfig(options.workspace, options.mode);
         const actionId = piActionId(ctx.sessionManager.getSessionId(), event.toolCallId);
-        await postToBridge(config, PI_OBSERVE_PATH, observation(config, version, actionId, event.toolName, type), timeoutMs);
+        await postObservation(config, observation(config, version, actionId, event.toolName, type), timeoutMs);
       } catch (error) {
         report(ctx, `the ${type} observation was not recorded: ${error instanceof Error ? error.message : String(error)}`);
       }
+    };
+
+    /** The receipt digest of each allowed call's decision, until its tool_result names it. */
+    const decisions = new Map<string, string>();
+    /** Control mode: record one call's outcome at the observed ingress, then, naming its decision, at the control route. */
+    const recordOutcome = async (event: unknown, ctx: PiToolCallContext) => {
+      if (!isPiToolEvent(event)) throw new Error("Pi sent a tool_result event AMC does not recognise");
+      const config = readPiHookConfig(options.workspace, "control");
+      const sessionId = ctx.sessionManager.getSessionId();
+      const actionId = piActionId(sessionId, event.toolCallId);
+      const decisionReceiptSha256 = decisions.get(actionId) ?? null;
+      decisions.delete(actionId);
+      // The control route records whether the observed ingress got this outcome; a miss is recorded and refused there.
+      const ingressRecorded = await postObservation(config, observation(config, version, actionId, event.toolName,
+        event.isError === true ? "action.failed" : "action.completed"), timeoutMs).then(() => true, () => false);
+      const answer = await postToBridge(config, PI_CONTROL_PATH, JSON.stringify({ hook_event_name: "tool_result", pi: { sessionId, toolCallId: event.toolCallId },
+        tool_name: event.toolName, tool_input: event.input, isError: event.isError === true, ingressRecorded, decisionReceiptSha256 }), timeoutMs, PI_HEADERS);
+      if ((answer as { recorded?: unknown } | null)?.recorded !== true) throw new Error("AMC's answer does not say it recorded the outcome");
     };
 
     const registered = new Set<string>();
@@ -155,7 +179,7 @@ export function createAmcPiExtension(options: AmcPiExtensionOptions): (pi: PiExt
       if (registered.has(sessionId)) return;
       const extensionSha256 = sha256Hex(readFileSync(options.modulePath ?? fileURLToPath(import.meta.url)));
       const body = JSON.stringify({ hook_event_name: "session_start", pi: { version, mode: ctx.mode, sessionId, extensionSha256 } });
-      const answer = await postToBridge(config, PI_CONTROL_PATH, body, timeoutMs, { "x-amc-hook-provider": "pi" });
+      const answer = await postToBridge(config, PI_CONTROL_PATH, body, timeoutMs, PI_HEADERS);
       verifyPiRegistrationAnswer(answer, { agentId: config.agentId, piSessionSha256: piSessionSha256(sessionId), piVersion: version,
         extensionSha256, requestSha256: sha256Hex(Buffer.from(body, "utf8")) }, config.receiptPublicKeys);
       registered.add(sessionId);
@@ -184,7 +208,7 @@ export function createAmcPiExtension(options: AmcPiExtensionOptions): (pi: PiExt
         const actionId = piActionId(sessionId, event.toolCallId);
         const config = readPiHookConfig(options.workspace, "control");
         await register(ctx, config);
-        await postToBridge(config, PI_OBSERVE_PATH, observation(config, version, actionId, event.toolName, "action.requested"), timeoutMs);
+        await postObservation(config, observation(config, version, actionId, event.toolName, "action.requested"), timeoutMs);
         const body = JSON.stringify({
           hook_event_name: "tool_call",
           tool_name: event.toolName,
@@ -192,11 +216,13 @@ export function createAmcPiExtension(options: AmcPiExtensionOptions): (pi: PiExt
           pi: { version, mode: ctx.mode, sessionId, toolCallId: event.toolCallId, parentToolCallId: event.parentToolCallId ?? null, nonce: randomUUID(),
             cwd: ctx.cwd, builtinTool: isPiBuiltinTool(pi, event.toolName) },
         });
-        const answer = await postToBridge(config, PI_CONTROL_PATH, body, timeoutMs, { "x-amc-hook-provider": "pi" });
+        const answer = await postToBridge(config, PI_CONTROL_PATH, body, timeoutMs, PI_HEADERS);
         const result = piControlAnswer(answer, { agentId: config.agentId, actionId, toolCallId: event.toolCallId,
           requestSha256: sha256Hex(Buffer.from(body, "utf8")) }, config.receiptPublicKeys);
         if (result.block) return result;
         if (JSON.stringify(event.input) !== input) throw new Error("Pi tool input changed while AMC decided");
+        if (decisions.size >= MAX_PENDING_DECISIONS) decisions.delete(decisions.keys().next().value!);
+        decisions.set(actionId, sha256Hex(Buffer.from((answer as { receipt: string }).receipt, "utf8")));
         return undefined;
       } catch (error) {
         report(ctx, `${AMC_CONTROL_UNAVAILABLE} ${error instanceof Error ? error.message : String(error)}`);
@@ -205,7 +231,15 @@ export function createAmcPiExtension(options: AmcPiExtensionOptions): (pi: PiExt
     });
 
     pi.on("tool_result", async (event: unknown, ctx: PiToolCallContext) => {
-      await observe(event, ctx, (event as PiToolEvent | null)?.isError === true ? "action.failed" : "action.completed");
+      if (options.mode === "observe") {
+        await observe(event, ctx, (event as PiToolEvent | null)?.isError === true ? "action.failed" : "action.completed");
+        return undefined;
+      }
+      try {
+        await recordOutcome(event, ctx);
+      } catch (error) {
+        report(ctx, `AMC could not record this tool outcome; the call already ran: ${error instanceof Error ? error.message : String(error)}`);
+      }
       return undefined;
     });
   };

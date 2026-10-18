@@ -54,6 +54,44 @@ export interface ToolEvidenceRecord {
 }
 
 /**
+ * What an fs.write or fs.edit call changed (P1-36): hashes and sizes of the bytes it read and wrote, and the digest of
+ * the redacted diff it returned. Never the content. `beforeSha256` is null for a created file; `replacements` is null
+ * for a write; `diffSha256` is null when no diff was shown.
+ */
+export interface FileChange {
+  readonly path: string;
+  readonly beforeSha256: string | null;
+  readonly afterSha256: string;
+  readonly bytesBefore: number;
+  readonly bytesAfter: number;
+  readonly replacements: number | null;
+  readonly diffSha256: string | null;
+  readonly diffTruncated: boolean;
+}
+
+const FILE_CHANGE_TOOLS: ReadonlySet<string> = new Set(["fs.write", "fs.edit"]);
+const fileChanges = new Map<string, FileChange>();
+
+/**
+ * Hand a call's file change to its audit row, keyed by the call's token.
+ *
+ * ponytail: a side channel because `ToolPipeline.bodyOutcome` copies only the outcome fields it knows and that file is
+ * not this change's to edit. Bounded so a composition with no recorder cannot grow it. Upgrade: carry `fileChange` on
+ * `ToolBodyResult`/`ToolOutcome` through `bodyOutcome` and delete this map.
+ */
+export function noteFileChange(token: string, change: FileChange): void {
+  fileChanges.set(token, change);
+  if (fileChanges.size > 256) fileChanges.delete(fileChanges.keys().next().value!);
+}
+
+function takeFileChange(execution: RecordedToolCall): FileChange | undefined {
+  if (!FILE_CHANGE_TOOLS.has(execution.name)) return undefined;
+  const change = fileChanges.get(execution.token);
+  fileChanges.delete(execution.token);
+  return change;
+}
+
+/**
  * Project one tool outcome into evidence rows.
  *
  * Two rows, deliberately, because they answer different questions and the
@@ -74,6 +112,7 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
   // borrowing a question it did not earn.
   const questionIds = projectQuestionIds(execution, outcome);
   const projectionRules = projectMatchingRuleIds(execution, outcome);
+  const fileChange = takeFileChange(execution);
 
   const call = {
     trustTier: "OBSERVED" as const,
@@ -115,7 +154,8 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
       // NOT the arguments. They are frozen and available on the tool_action
       // row; repeating them here would put the same untrusted content in a
       // second place with a second retention story.
-      outcome: outcome.ok ? "ok" : "not-ok"
+      outcome: outcome.ok ? "ok" : "not-ok",
+      ...(fileChange === undefined ? {} : { fileChange })
     }),
     meta: {
       ...common,

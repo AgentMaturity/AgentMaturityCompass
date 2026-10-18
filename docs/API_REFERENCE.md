@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-10-17
+> Auto-generated from source on 2026-10-18
 
 ## Table of Contents
 
@@ -378,13 +378,13 @@ AMC provides 1,255 public CLI command paths in the live command inventory.
 | 359 | `amc domain list` | List all 7 domains with metadata |
 | 360 | `amc domain modules` | Show module activation map for domain |
 | 361 | `amc domain pack` | Industry sector packs — 41 packs across 7 domains |
-| 362 | `amc domain pack access` | Show Industry Packs entitlement and public-checkout readiness |
-| 363 | `amc domain pack activate` | Activate Industry Packs with a valid issued license key |
-| 364 | `amc domain pack checkout` | Create a checkout link only when a verified provider is configured |
+| 362 | `amc domain pack access` | Show Industry Packs access, licence verification and checkout availability |
+| 363 | `amc domain pack activate` | Activate Industry Packs with a licence signed by a key pinned in the AMC trust list |
+| 364 | `amc domain pack checkout` | Print the checkout link when this deployment has a checkout and licence verification configured |
 | 365 | `amc domain pack describe` | Show details of a specific industry sector pack |
 | 366 | `amc domain pack list` | List all available industry sector packs |
 | 367 | `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score |
-| 368 | `amc domain pack verify` | Verify an Industry Packs license key |
+| 368 | `amc domain pack verify` | Verify an Industry Packs license key against the licence key pinned in the AMC trust list |
 | 369 | `amc domain report` | Build full domain report and write it to a file (not evaluated without evidence) |
 | 370 | `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain (not evaluated without evidence) |
 | 371 | `amc down` | Stop AMC Studio local control plane |
@@ -421,9 +421,9 @@ AMC provides 1,255 public CLI command paths in the live command inventory.
 | 402 | `amc enforce tla-spec` | Generate a TLA+ specification for the AMC safety model |
 | 403 | `amc enforce verify-certificate` | Verify the integrity of a proof certificate (pass JSON as string) |
 | 404 | `amc enterprise` | Enterprise tier — licensing, audit export, SSO, fleet governance |
-| 405 | `amc enterprise activate` | Activate an enterprise license key (format: AMC-ENT-XXXX-XXXX-XXXX) |
+| 405 | `amc enterprise activate` | Activate a signed enterprise licence key, verified against a key pinned in the AMC trust list |
 | 406 | `amc enterprise audit-export` | Export audit trail in SIEM format |
-| 407 | `amc enterprise status` | Show current license status, tier, and enabled features |
+| 407 | `amc enterprise status` | Show whether enterprise licence verification is configured, and the licence it verifies |
 | 408 | `amc enterprise usage` | Show multi-tenant usage metering and quota utilization |
 | 409 | `amc eval` | Eval interop import and coverage status |
 | 410 | `amc eval import` | Import eval outputs (LangSmith, DeepEval, Promptfoo, OpenAI Evals, W&B, Langfuse, LangWatch) into signed AMC evidence |
@@ -3587,6 +3587,7 @@ Verify signed hook setup and show the latest verified provider event
 | Option | Description |
 |--------|-------------|
 | `--provider <provider>` | - |
+| `--recover-latch` | - |
 | `--json` | - |
 
 #### `amc connect hooks install`
@@ -4142,7 +4143,7 @@ Alias: `amc sector pack`
 
 #### `amc domain pack access`
 
-Show Industry Packs entitlement and public-checkout readiness
+Show Industry Packs access, licence verification and checkout availability
 
 Alias: `amc domain pack subscribe`, `amc sector pack access`
 
@@ -4152,19 +4153,18 @@ Alias: `amc domain pack subscribe`, `amc sector pack access`
 
 #### `amc domain pack activate`
 
-Activate Industry Packs with a valid issued license key
+Activate Industry Packs with a licence signed by a key pinned in the AMC trust list
 
 Alias: `amc sector pack activate`
 
 | Option | Description |
 |--------|-------------|
 | `--key <licenseKey>` | - |
-| `--expires-at <isoDate>` | - |
 | `--json` | - |
 
 #### `amc domain pack checkout`
 
-Create a checkout link only when a verified provider is configured
+Print the checkout link when this deployment has a checkout and licence verification configured
 
 Alias: `amc sector pack checkout`
 
@@ -4213,14 +4213,13 @@ Alias: `amc sector pack run`
 
 #### `amc domain pack verify`
 
-Verify an Industry Packs license key
+Verify an Industry Packs license key against the licence key pinned in the AMC trust list
 
 Alias: `amc sector pack verify`
 
 | Option | Description |
 |--------|-------------|
 | `--key <licenseKey>` | - |
-| `--pubkey <path>` | - |
 | `--trust-list <file>` | - |
 | `--trust-root <sha256>` | - |
 | `--allow-unpinned` | - |

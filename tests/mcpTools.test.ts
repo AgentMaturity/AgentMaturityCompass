@@ -33,9 +33,10 @@ describe("MCP Tool Metadata", () => {
     }
   });
 
-  test("all tool descriptions include (read-only)", () => {
+  test("all tool descriptions include (read-only), except the named write tools, which say what they write", () => {
+    const writeTools = new Set(["amc_a4_comment"]); // AMC_A4_PREVIEW=1; posts a self-reported comment through Studio
     for (const tool of MCP_TOOL_METADATA) {
-      expect(tool.description).toContain("read-only");
+      expect(tool.description).toMatch(writeTools.has(tool.name) ? /\(writes [^)]+\)/ : /\(read-only\)/);
     }
   });
 

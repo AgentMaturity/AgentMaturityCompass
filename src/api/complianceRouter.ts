@@ -44,7 +44,7 @@ function actionEvidenceLogicErrorCode(error: unknown): string | null {
 }
 
 function actionEvidenceLogicHttpStatus(error: unknown): number {
-  if (isRequestBodyError(error)) return 400;
+  if (isRequestBodyError(error)) return error.statusCode;
   const code = actionEvidenceLogicErrorCode(error);
   if (!code) return 500;
   if (code === 'LOCK_BUSY') return 423;
@@ -61,6 +61,7 @@ function actionEvidenceLogicHttpStatus(error: unknown): number {
 function actionEvidenceLogicHttpMessage(error: unknown): string {
   const code = actionEvidenceLogicErrorCode(error);
   if (code && error instanceof Error) return `${code}: ${error.message}`;
+  if (isRequestBodyError(error) && error.statusCode === 413) return error.message;
   return isRequestBodyError(error)
     ? 'LOGIC_INVALID: Invalid Action Policy evidence-logic request.'
     : 'APPLY_FAILED: Action Policy evidence-logic operation failed.';
@@ -73,7 +74,7 @@ function scopeTemplateErrorCode(error: unknown): string | null {
 }
 
 function scopeTemplateHttpStatus(error: unknown): number {
-  if (isRequestBodyError(error)) return 400;
+  if (isRequestBodyError(error)) return error.statusCode;
   const code = scopeTemplateErrorCode(error);
   if (!code) return 500;
   if (code === 'LOCK_BUSY') return 423;
@@ -89,6 +90,7 @@ function scopeTemplateHttpStatus(error: unknown): number {
 function scopeTemplateHttpMessage(error: unknown): string {
   const code = scopeTemplateErrorCode(error);
   if (code && error instanceof Error) return `${code}: ${error.message}`;
+  if (isRequestBodyError(error) && error.statusCode === 413) return error.message;
   return isRequestBodyError(error) ? 'INVALID_REQUEST: Invalid scope template request.' : 'APPLY_FAILED: Scope template operation failed.';
 }
 
