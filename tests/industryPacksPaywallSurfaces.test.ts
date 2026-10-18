@@ -72,6 +72,17 @@ describe("CLI amc domain pack", () => {
     expect(describe.status).toBe(1);
     expectTruthfulLock(describe.stderr);
 
+    // An option that cannot be honoured is refused and hidden, never silently ignored.
+    const expires = amc(["domain", "pack", "activate", "--key", "AMC-INDUSTRY-PACKS.e30.AA", "--expires-at", "2099-01-01T00:00:00Z"]);
+    expect(expires.status).toBe(1);
+    expect(expires.stderr).toContain("--expires-at is not accepted");
+    expect(amc(["domain", "pack", "activate", "--help"]).stdout).not.toContain("--expires-at");
+    // verify pins only the trust-list key, like the gate: no --pubkey, and "not configured" without one.
+    expect(amc(["domain", "pack", "verify", "--help"]).stdout).not.toContain("--pubkey");
+    const verify = amc(["domain", "pack", "verify", "--key", "AMC-INDUSTRY-PACKS.e30.AA"]);
+    expect(verify.status).toBe(1);
+    expect(`${verify.stdout}${verify.stderr}`).toMatch(/licence verification is not configured/i);
+
     const run = amc(["domain", "pack", "run", "--pack", pack.id, "--baseline", "--json"]);
     expect(run.status).toBe(1);
     const locked = JSON.parse(run.stdout) as { error: string; message: string };
@@ -106,6 +117,10 @@ describe("Studio and console", () => {
       const activate = await call("POST", "/industry-packs/activate", { licenseKey: "AMC-INDUSTRY-PACKS.e30.AA" });
       expect(activate.status).toBe(422);
       expect((await activate.json()).error).toMatch(/licence verification is not configured/i);
+
+      const expires = await call("POST", "/industry-packs/activate", { licenseKey: "AMC-INDUSTRY-PACKS.e30.AA", expiresAt: "2099-01-01T00:00:00Z" });
+      expect(expires.status).toBe(400);
+      expect((await expires.json()).error).toContain("expiresAt is not accepted");
 
       const verify = await call("POST", "/industry-packs/license/verify", { licenseKey: "AMC-INDUSTRY-PACKS.e30.AA" });
       expect(verify.status).toBe(422);

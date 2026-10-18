@@ -453,11 +453,11 @@ function json(res: ServerResponse, status: number, payload: unknown): void {
   res.end(JSON.stringify(withClaimBody(res, status, payload)));
 }
 
-/** The `licenseKey` of an Industry Packs licence request, or null when the body names none. */
-async function readLicenseKey(req: IncomingMessage, maxBytes = 1_048_576): Promise<string | null> {
+/** An Industry Packs licence request: its `licenseKey` (null when none) and whether it also names an `expiresAt`. */
+async function readLicenseRequest(req: IncomingMessage, maxBytes = 1_048_576): Promise<{ licenseKey: string | null; expiresAt: boolean }> {
   const body = await readBody(req, maxBytes);
-  const key = (body ? (JSON.parse(body) as { licenseKey?: unknown }) : {}).licenseKey;
-  return typeof key === "string" && key.length > 0 ? key : null;
+  const parsed = (body ? JSON.parse(body) : {}) as { licenseKey?: unknown; expiresAt?: unknown };
+  return { licenseKey: typeof parsed.licenseKey === "string" && parsed.licenseKey.length > 0 ? parsed.licenseKey : null, expiresAt: "expiresAt" in parsed };
 }
 
 function ipToInt(ip: string): number | null {
@@ -8564,8 +8564,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "users config signature invalid: read-only mode active" });
           return;
         }
-        const licenseKey = await readLicenseKey(req, options.maxRequestBytes);
-        if (!licenseKey) { json(res, 400, { error: "licenseKey is required" }); return; }
+        const { licenseKey, expiresAt } = await readLicenseRequest(req, options.maxRequestBytes);
+        if (!licenseKey || expiresAt) {
+          json(res, 400, { error: licenseKey ? "expiresAt is not accepted: the expiry is the one the issuer signed into the licence" : "licenseKey is required" });
+          return;
+        }
         const { activateIndustryPackAccess } = await import("../domains/industryPackEntitlement.js");
         let entitlement: ReturnType<typeof activateIndustryPackAccess>;
         // Not configured, unpinned, expired or forged: the reason goes back to the caller, nothing is stored.
@@ -8590,7 +8593,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        const licenseKey = await readLicenseKey(req, options.maxRequestBytes);
+        const { licenseKey } = await readLicenseRequest(req, options.maxRequestBytes);
         if (!licenseKey) { json(res, 400, { error: "licenseKey is required" }); return; }
         const { verifyPinnedIndustryPackLicense } = await import("../domains/industryPackEntitlement.js");
         const verification = verifyPinnedIndustryPackLicense(licenseKey, loadTrustContext());
