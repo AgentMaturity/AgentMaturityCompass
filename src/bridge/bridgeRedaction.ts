@@ -1,7 +1,6 @@
 import { redactSecrets } from "../shield/redaction/redactSecrets.js";
 import { createHash } from "node:crypto";
-import { keyedSpan, MAX_PROTECTED_TEXT_CHARS, MAX_REQUEST_SCAN_CHARS, nestedJsonRedactor, redactJsonLeaves, redactProtectedText,
-  secretMember } from "../dataflow/detectors.js";
+import { MAX_REQUEST_SCAN_CHARS, protectedWalk, redactJsonLeaves } from "../dataflow/detectors.js";
 import { protectedDataOptedIn } from "../dataflow/processorRegistry.js";
 import { SCRUB_PLACEHOLDER } from "../exec/outputCollector.js";
 import { canonicalize } from "../utils/json.js";
@@ -38,37 +37,26 @@ const MAX_BRIDGE_SCAN_CHARS = MAX_REQUEST_SCAN_CHARS / 4;
 /**
  * Redaction for what the bridge STORES as evidence: telemetry text, telemetry object payloads and `POST /bridge/evidence`
  * payloads, and the stored argv of adapter runs and monitored processes (and, where the workspace opted in, their output:
- * `processOutputRedactor`). Secrets always, as `redactBridgeText`
- * (every key and leaf of a JSON payload). In a workspace that opted in to protected-data redaction (P2-02, read once per
- * redactor) the protected-data detectors too, with the same anonymous marker: text over their per-leaf limit or holding a
- * zero byte (UTF-16 output read as UTF-8) is replaced whole, an integer JSON.parse rounded (a card number sent as a number)
- * is replaced, a member's value is checked with its name (`secretMember`, `keyedSpan`), and text that holds JSON (stdout, a
- * string leaf) is read one level deep, then searched decoded (`nestedJsonRedactor`). Each `text` or `json` call may scan
- * MAX_BRIDGE_SCAN_CHARS; past that, or on any failure of the scan, the whole value stored is the marker. Text the bridge
+ * `processOutputRedactor`). Secrets always, as `redactBridgeText` (every key and leaf of a JSON payload). In a workspace
+ * that opted in to protected-data redaction (P2-02, read once per redactor) the protected-data walk runs first
+ * (`protectedWalk`, as in the gateway, `key` being a value's member or flag name), with the same anonymous marker for each
+ * finding and for a unit or line it cannot read (over the per-text limit, a zero byte, as UTF-16 output read as UTF-8 has,
+ * a rounded JSON integer), and then the secret table, so JSON reaches the walk intact. Each `text` or `json` call may scan
+ * MAX_BRIDGE_SCAN_CHARS; past that, or on any failure of the walk, the whole value stored is the marker. Text the bridge
  * hands back to an agent (control responses, deny reasons, `amc wrap`'s terminal output) keeps secrets-only
  * `redactBridgeText`, so an opted-in workspace's detectors never alter what an agent is told.
  */
 export function bridgeEvidenceRedactor(workspace: string):
   { readonly text: (input: string, key?: string) => string; readonly json: (value: unknown) => unknown } {
-  const protectedData = protectedDataOptedIn(workspace);
-  let scanned = 0;
-  const charge = (length: number) => { scanned += length; if (scanned > MAX_BRIDGE_SCAN_CHARS) throw new RangeError("bridge scan budget"); };
-  const scan = (input: string, key?: string): string => {
-    if (protectedData) charge(input.length);
-    const secretsRedacted = redactBridgeText(input);
-    if (!protectedData) return secretsRedacted;
-    if (secretsRedacted.length > MAX_PROTECTED_TEXT_CHARS || input.includes("\u0000") || secretMember(key, input)) return MARKER;
-    const redacted = redactProtectedText(secretsRedacted, () => MARKER).text;
-    return keyedSpan(key, redacted, undefined, charge) === undefined ? redacted : MARKER;
-  };
-  if (!protectedData) return Object.freeze({ text: scan, json: (value: unknown) => redactJsonLeaves(value, scan) });
-  const opaque = () => MARKER;
-  const text = nestedJsonRedactor(scan, opaque);
-  const budgeted = <A extends unknown[], R>(redact: (...args: A) => R) => (...args: A): R | typeof MARKER => {
-    scanned = 0;
-    try { return redact(...args); } catch { return MARKER; }
-  };
-  return Object.freeze({ text: budgeted(text), json: budgeted((value: unknown) => redactJsonLeaves(value, text, opaque)) });
+  if (!protectedDataOptedIn(workspace)) {
+    return Object.freeze({ text: (input: string) => redactBridgeText(input), json: (value: unknown) => redactJsonLeaves(value, redactBridgeText) });
+  }
+  const walkFor = () => protectedWalk({ budget: MAX_BRIDGE_SCAN_CHARS, replace: () => MARKER, opaque: () => MARKER });
+  const guarded = <R>(redact: () => R): R | typeof MARKER => { try { return redact(); } catch { return MARKER; } };
+  return Object.freeze({
+    text: (input: string, key?: string) => guarded(() => redactBridgeText(walkFor().text(input, key))),
+    json: (value: unknown) => guarded(() => redactJsonLeaves(walkFor().value(value), redactBridgeText))
+  });
 }
 
 /**
