@@ -38,7 +38,7 @@ export interface AcpForkSessionParams {
 export type AcpForkSessionFactory = (params: AcpForkSessionParams) => AgentSession | Promise<AgentSession>;
 /** `_amc/session/fork` (P2-13): the CLI's --fork-from. The child's signed open row names the verified parent's final row;
  * it starts with no inherited model context, so it is never advertised as the standard context-inheriting `session/fork`. */
-export const ACP_LINEAGE_FORK = "verified-parent-reference";
+const ACP_LINEAGE_FORK = "verified-parent-reference";
 
 export function nativeAcpCapabilities(options: {
   readonly route?: AcpPromptRoute;
@@ -58,8 +58,8 @@ export function nativeAcpCapabilities(options: {
     promptCapabilities: Object.freeze({ image, audio, embeddedContext: false }),
     _meta: Object.freeze({ [ACP_RUNTIME_META_KEY]: Object.freeze({
       ...(options.nativeExecution ?? {}),
-      // The execution contract version each SDK pins (P2-13); only the native runtime composition reports it.
-      ...(options.nativeExecution ? { executionApi: EXECUTION_API_VERSION } : {}),
+      // The execution contract version each SDK pins (P2-13). Phases ride on prompt results of native compositions only.
+      executionApi: EXECUTION_API_VERSION,
       runtimeFormat: ACP_RUNTIME_FORMAT,
       committedUpdates: "live-completed-blocks" as const,
       verification: "not-verified" as const,

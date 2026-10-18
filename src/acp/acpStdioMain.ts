@@ -265,7 +265,8 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
     const identity = sessionOptions({ ...params, sessionId: params.parentSessionId }, lease);
     const { service } = forkSession({ workspace: params.workspace, parentSessionId: params.parentSessionId, claimant, agentId: params.agentId,
       harnessVersion: identity.harnessVersion, compositionDigest: identity.compositionDigest, policyDigest: identity.policyDigest });
-    redactingSessionFor(service).releaseWithoutClosing();
+    const forked = redactingSessionFor(service);
+    try { forked.releaseWithoutClosing(); } catch (error) { forked.disposeWithoutClosing(); throw error; }
     return nativeSession(sessionOptions({ ...params, sessionId: service.sessionId }, lease), params.signal, true);
   };
 

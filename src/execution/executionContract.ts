@@ -59,7 +59,6 @@ export const EXECUTION_SURFACES = {
     dispose: "POST /api/v1/native-tasks/{taskId}/release", verify: "POST /api/v1/native-tasks/{taskId}/verify"
   }
 } as const satisfies Record<string, Record<ExecutionVerb, string>>;
-export type ExecutionSurface = keyof typeof EXECUTION_SURFACES;
 
 /** What a surface observed. Each field feeds exactly one phase. */
 export interface ExecutionFacts {
