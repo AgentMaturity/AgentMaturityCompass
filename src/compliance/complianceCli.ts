@@ -1,4 +1,4 @@
-import type { ComplianceFramework } from "./frameworks.js";
+import { familyReview, type ComplianceFramework, type FamilyReview } from "./frameworks.js";
 import type { Station } from "../domains/stations.js";
 import { generateComplianceReport, initComplianceMaps, verifyComplianceMapsSignature } from "./complianceEngine.js";
 import { writeComplianceReport, diffComplianceReports } from "./complianceReport.js";
@@ -58,6 +58,8 @@ export function complianceFleetReportCli(params: {
 }): {
   framework: ComplianceFramework;
   generatedTs: number;
+  /** Experimental until a named expert signs off, with the family's currency flags (P1-45). */
+  familyReview: FamilyReview;
   agents: Array<{
     agentId: string;
     /** Null when no category was evaluated for this agent. */
@@ -76,6 +78,7 @@ export function complianceFleetReportCli(params: {
   return {
     framework: params.framework,
     generatedTs: Date.now(),
+    familyReview: familyReview(params.framework),
     agents: agents.map((agentId) => {
       const report = generateComplianceReport({
         workspace: params.workspace,

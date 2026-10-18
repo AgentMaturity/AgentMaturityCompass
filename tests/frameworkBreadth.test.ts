@@ -63,10 +63,14 @@ describe("family review status", () => {
 
   test("Colorado records the retrieval date of the SB26-189 text and asks for re-verification", () => {
     const flags = familyReview("CO_AI_ACT").flags.join(" ");
-    expect(flags).toContain("retrieved 2026-10-04");
-    expect(flags).toContain("re-verify the final text before publishing");
+    expect(flags).toContain("SB26-189 re-verified 2026-10-18");
+    expect(flags).toContain("re-verify before publishing");
     const sources = builtInComplianceMappings.filter((row) => row.framework === "CO_AI_ACT").flatMap((row) => row.sources ?? []);
     expect(new Set(sources.map((source) => source.retrievedAt))).toEqual(new Set(["2026-10-04"]));
+  });
+
+  test("Korea says its pinpoints were not verified against an official text", () => {
+    expect(familyReview("KR_AI_BASIC_ACT").flags.join(" ")).toContain("The Art. 31-35 pinpoints were not verified against an official text");
   });
 
   test("ISO/IEC 42001 says its ISO 42005 and 42006 categories are unverified", () => {

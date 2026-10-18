@@ -198,7 +198,8 @@ export const complianceFrameworkFamilies: ComplianceFrameworkFamily[] = [
     ]
   },
   {
-    // Categories are the article headings of Regulation (EU) 2022/2554, applicable from 17 January 2025 (Art. 64).
+    // Regulation (EU) 2022/2554, applicable from 17 January 2025 (Art. 64). Categories are the article headings (Art. 12 and
+    // 19 shortened), except Art. 24-25, which carries the Chapter IV title, and Art. 28 (heading "General principles").
     framework: "DORA",
     displayName: "DORA (Regulation (EU) 2022/2554) — Digital Operational Resilience",
     categories: [
@@ -268,7 +269,7 @@ export const complianceFrameworkFamilies: ComplianceFrameworkFamily[] = [
     ]
   },
   {
-    // SB26-189 repealed and reenacted C.R.S. 6-1-1701 to 6-1-1709 (signed 2026-05-14; takes effect 2027-01-01).
+    // SB26-189 repealed and reenacted C.R.S. 6-1-1701 to 6-1-1709 (signed 2026-05-14; its duties apply from 2027-01-01).
     framework: "CO_AI_ACT",
     displayName: "Colorado SB26-189 (C.R.S. 6-1-1701 to 1709) — ADMT in Consequential Decisions",
     categories: [
@@ -375,13 +376,28 @@ export interface FamilyReview {
 
 const FAMILY_FLAGS: Partial<Record<ComplianceFramework, readonly string[]>> = {
   HHS_HTI_1: ["At risk: an HTI-5 final rule may delete model-card requirements; re-verify before publishing. The HTI-5 proposed rule "
-    + "(90 FR 60970, 2025-12-29) proposes removing the §170.315(b)(11) source-attribute and risk-management requirements; "
-    + "whether it was finalized was not verified."],
-  CO_AI_ACT: ["SB26-189 final act text (leg.colorado.gov bill 116432) and bill page retrieved 2026-10-04; not re-read in P1-45 "
-    + "(no network access); re-verify the final text before publishing."],
+    + "(90 FR 60970, 2025-12-29) proposes removing the §170.315(b)(11) source-attribute and risk-management requirements. "
+    + "On 2026-10-18 the eCFR showed no amendment to §170.315 after 2025-10-01, so (b)(11) was still in the CFR then."],
+  CO_AI_ACT: ["SB26-189 re-verified 2026-10-18: the bill page lists it as law (signed 2026-05-14, Session Laws ch. 131), and every "
+    + "quoted clause matches the final act text (leg.colorado.gov bill file 116432). Its duties apply from 2027-01-01; "
+    + "re-verify before publishing."],
+  KR_AI_BASIC_ACT: ["Article text comes from the KLRI English reference translation, not an official publisher, and the Korean text "
+    + "governs. The Art. 31-35 pinpoints were not verified against an official text; re-verify before publishing."],
   ISO_42001: ["ISO/IEC 42005 descoped 2026-10-04 (iso.org unreachable): an alias with zero mapped controls, status "
-    + "\"unverified: source unreachable\". The ISO 42005 and 42006 categories are AMC signals, not clause mappings."]
+    + "\"unverified: source unreachable\". Its three categories are listed, never evaluated or counted. The ISO 42006 "
+    + "category is an AMC signal, not a clause mapping."]
 };
+
+/** Categories whose source text is descoped: listed in a report, never evaluated or counted (root ruling 2026-10-04). */
+const DESCOPED_CATEGORIES: Readonly<Record<string, string>> = {
+  "ISO_42001:ISO 42005 Impact Assessment": "not evaluated: descoped (licensed text unavailable)"
+};
+
+/** Why a mapping is descoped, or null when it is evaluated. */
+export function descopedReason(mapping: { framework: string; category: string }): string | null {
+  const key = `${mapping.framework}:${mapping.category}`;
+  return Object.hasOwn(DESCOPED_CATEGORIES, key) ? DESCOPED_CATEGORIES[key]! : null;
+}
 
 export function familyReview(framework: ComplianceFramework): FamilyReview {
   return { status: "experimental", expertSignOff: null, flags: FAMILY_FLAGS[framework] ?? [] };

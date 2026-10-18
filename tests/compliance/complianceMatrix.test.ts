@@ -43,7 +43,10 @@ describe("generateCoverageMatrix", () => {
     expect(matrix.overallScore).toBeNull();
     expect(matrix.gaps).toEqual([]);
     const total = matrix.frameworks.reduce((sum, fw) => sum + fw.total, 0);
-    expect(matrix.notEvaluated.length).toBe(total);
+    // P1-45: the descoped ISO/IEC 42005 categories are listed as not evaluated but not counted in a framework's total.
+    const descoped = matrix.frameworks.reduce((sum, fw) => sum + fw.categories.filter((cat) => cat.descoped !== undefined).length, 0);
+    expect(descoped).toBe(3);
+    expect(matrix.notEvaluated.length).toBe(total + descoped);
     expect(matrix.ts).toBeGreaterThan(0);
 
     const fwNames = matrix.frameworks.map((f) => f.framework);

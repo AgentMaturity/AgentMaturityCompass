@@ -113,7 +113,7 @@ describe("compliance report readability", () => {
     const hti1 = complianceReportToMarkdown({ ...fixtureReport(), framework: "HHS_HTI_1" });
     expect(hti1).toContain(experimental);
     expect(hti1).toContain("- Flag: At risk: an HTI-5 final rule may delete model-card requirements; re-verify before publishing.");
-    expect(complianceReportToMarkdown({ ...fixtureReport(), framework: "CO_AI_ACT" })).toContain("retrieved 2026-10-04");
+    expect(complianceReportToMarkdown({ ...fixtureReport(), framework: "CO_AI_ACT" })).toContain("SB26-189 re-verified 2026-10-18");
     // A report from an older version with a framework this build does not know still says experimental.
     expect(complianceReportToMarkdown({ ...fixtureReport(), framework: "RETIRED_FRAMEWORK" })).toContain(experimental);
   });

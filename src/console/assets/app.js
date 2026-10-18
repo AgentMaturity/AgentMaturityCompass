@@ -2389,6 +2389,8 @@ async function renderCompliance() {
           .join("")}
       </div>
       <p>Config signature: <strong>${verify.valid ? "VALID" : "INVALID"}</strong></p>
+      <p>Mappings: <strong>${htmlEscape(report.familyReview?.status || "experimental")}</strong>: drafted and refuted by AI agents, not signed off by a named expert (D-08 pending).</p>
+      ${(report.familyReview?.flags || []).map((flag) => `<p class="muted">Flag: ${htmlEscape(flag)}</p>`).join("")}
       <p>Coverage score: <strong>${report.coverage?.score == null ? "not evaluated" : Number(report.coverage.score).toFixed(3)}</strong></p>
       <p>Trust coverage (OBS/ATT/SELF): ${((report.trustTierCoverage?.observed || 0) * 100).toFixed(1)}% /
       ${((report.trustTierCoverage?.attested || 0) * 100).toFixed(1)}% /

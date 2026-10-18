@@ -3,7 +3,7 @@ import type { EvidenceEventType } from "../types.js";
 import type { ClaimKind, ClaimReasonCode, EvidenceState, ResultState, StatusDimensions } from "../claims/eligibility/types.js";
 import type { ControlResult } from "../catalog/evidence/types.js";
 import { questionIds } from "../diagnostic/questionBank.js";
-import { frameworkChoices } from "./frameworks.js";
+import { frameworkChoices, type FamilyReview } from "./frameworks.js";
 import { STATIONS, type Station } from "../domains/stations.js";
 
 const frameworkEnum = z.enum(frameworkChoices() as [string, ...string[]]);
@@ -154,6 +154,8 @@ export interface ComplianceCategoryResult {
   admitted: ControlResult["admitted"];
   rejected: ControlResult["rejected"];
   neededToSatisfy: string[];
+  /** Set when the category's source text is descoped: listed, never evaluated, left out of `coverage` (P1-45). */
+  descoped?: string;
 }
 
 export interface ComplianceReportJson {
@@ -187,4 +189,6 @@ export interface ComplianceReportJson {
   };
   categories: ComplianceCategoryResult[];
   nonClaims: string[];
+  /** The framework family's review status and currency flags (P1-45). Absent in reports written before it. */
+  familyReview?: FamilyReview;
 }
