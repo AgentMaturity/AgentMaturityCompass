@@ -1,0 +1,9 @@
+# Test fixture for the P1-33 admission checker: a synthetic catalog, not AMC content. Its single pack claims reviewed
+# support so the tests can show every criterion met with review records signed at test time by fixture keys.
+id: amc.admission-fixture
+version: 0.1.0
+compilerCompat: ">=1.0.0"
+publisher: AgentMaturity (test fixture)
+maintainers:
+  - { name: Fixture Maintainer, role: maintainer }
+licence: MIT

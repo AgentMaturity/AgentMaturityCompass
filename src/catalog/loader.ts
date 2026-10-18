@@ -54,6 +54,8 @@ const TOP_FILES = new Set(["README.md", "LICENSE.md", "CHANGELOG.md", "catalog.y
  * stay out of every digest and a changelog or review record never changes the catalog it describes.
  */
 const GOVERNANCE = /^(governance\/(f5-confirmations\.yaml|reverify-before-publishing\.yaml|standards-licences\.md)|reviews\/[^/]+\/[^/]+\/[^/]+\.json)$/;
+/** Admission reports (P1-33, docs/catalog/ADMISSION.md): checker output, outside every digest; nothing here reads them. */
+const ADMISSION = /^admission\/[^/]+\.json$/;
 const DECIMAL_INT = /^-?(0|[1-9][0-9]*)$/;
 const DATE_LIKE = /^\d{4}-\d{2}-\d{2}/;
 
@@ -151,6 +153,7 @@ function emptyCatalog(root: string): LoadedCatalog {
   };
 }
 
+/** The catalog as written; compile, activation, the OSCAL export and A4 read it through loadAdmittedCatalog (P1-33). */
 export function loadCatalog(opts: { root?: string } = {}): LoadedCatalog {
   const root = opts.root ?? defaultCatalogRoot();
   const cat = emptyCatalog(root);
@@ -176,7 +179,7 @@ export function loadCatalog(opts: { root?: string } = {}): LoadedCatalog {
       else if (rel === "vocabulary.yaml") cat.vocabulary = parseWith(vocabularySchema, read(rel), rel, issues);
       else if (rel === "producers.yaml") cat.producers = parseWith(producersFileSchema, read(rel), rel, issues)?.producers ?? [];
       else if (rel === "publisher-hosts.yaml") cat.publisherHosts = parseWith(publisherHostsSchema, read(rel), rel, issues)?.hosts.map((h) => h.host) ?? [];
-    } else if (GOVERNANCE.test(rel)) {
+    } else if (GOVERNANCE.test(rel) || ADMISSION.test(rel)) {
       continue;
     } else if (rel === "profiles/cross-station.json") {
       cat.crossStationProfiles = readJson(root, rel, crossStationProfilesSchema, issues) ?? [];

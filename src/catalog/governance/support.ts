@@ -14,7 +14,7 @@
  * every confirmed F5 verdict has a confirmation row, and the review is current. The quorum then needs two distinct people
  * (reviewers sharing any normalized identifier are one), one roster-credentialed for the control's domain, a credentialed
  * legal reviewer when it cites law, a confirmation naming the control when AI drafted it, no objection, and no open
- * re-verify item.
+ * re-verify item. packSignoffs (P1-33 admission) verifies a pack version's records by the same steps.
  */
 import { lstatSync } from "node:fs";
 import { join } from "node:path";
@@ -47,8 +47,8 @@ export interface ReviewAuthority {
   records: readonly unknown[];
   /** The D-08 roster. A reviewer who is not on it never counts. */
   experts: ReadonlyMap<string, RosterEntry>;
-  /** The git identities (names and emails) of a control's authors, who may not review it. */
-  authorsOf: (controlId: string) => readonly string[];
+  /** The git identities (names and emails) of a control's or pack's authors, who may not review it. */
+  authorsOf: (subjectId: string) => readonly string[];
   f5Confirmations: readonly F5Confirmation[];
   reverify: readonly ReverifyItem[];
   register: RegulatoryRegister;
@@ -77,6 +77,8 @@ export interface SupportResult {
 }
 
 type Verified = { record: ReviewRecord; reviewer: string; identities: Set<string>; nextReviewDue: string };
+/** What a record must name: one control, or one pack version with its controls (P1-33 sign-offs), at its current digest. */
+interface Subject { kind: "control" | "pack"; id: string; version: string; digest: string; controls: readonly ControlRecord[] }
 /**
  * NFKC without default-ignorable code points (zero-width space, ZWJ, ZWNJ, soft hyphen, word joiner, BOM), every run of
  * whitespace (NBSP and other Unicode spaces too) as one space, trimmed, then case-folded. Confusables (UTS #39) are not
@@ -101,13 +103,24 @@ const ids = (principal: string): string[] => {
 const stronger = (support: SupportLevel): boolean => support === "reviewed" || support === "qualified";
 const dateOf = (at: Date): string => at.toISOString().slice(0, 10);
 
-function verifyRecord(raw: unknown, control: ControlRecord, digest: string, trust: TrustContext, authority: ReviewAuthority,
+/** The earliest next review over the subject's controls; any it cannot establish leaves the record uncounted. */
+function dueOf(controls: readonly ControlRecord[], register: RegulatoryRegister, decidedAt: string): ReturnType<typeof nextReviewDue> {
+  let earliest: ReturnType<typeof nextReviewDue> = { status: "unresolved", reason: "GOV_REVIEW_POLICY_INVALID" };
+  for (const control of controls) {
+    const due = nextReviewDue(control, register, decidedAt);
+    if (due.status === "unresolved") return due;
+    if (earliest.status === "unresolved" || due.nextReviewDue < earliest.nextReviewDue) earliest = due;
+  }
+  return earliest;
+}
+
+function verifyRecord(raw: unknown, subject: Subject, trust: TrustContext, authority: ReviewAuthority,
   dates: { today: string; dueAsOf: string }): Verified | string {
   const parsed = reviewRecordSchema.safeParse(raw);
   if (!parsed.success) return "GOV_REVIEW_RECORD_INVALID";
   const record = parsed.data;
-  if (record.subject.kind !== "control" || record.subject.id !== control.id || record.subject.version !== control.version) return "GOV_REVIEW_OTHER_SUBJECT";
-  if (record.subject.digest !== digest) return "GOV_REVIEW_SUBJECT_CHANGED";
+  if (record.subject.kind !== subject.kind || record.subject.id !== subject.id || record.subject.version !== subject.version) return "GOV_REVIEW_OTHER_SUBJECT";
+  if (record.subject.digest !== subject.digest) return "GOV_REVIEW_SUBJECT_CHANGED";
   if (record.decidedAt > dates.today) return "GOV_REVIEW_IN_FUTURE";
   const { signature, ...unsigned } = record;
   const signed = reviewRecordDigest(unsigned);
@@ -125,10 +138,10 @@ function verifyRecord(raw: unknown, control: ControlRecord, digest: string, trus
   if (!person.identities.some((identity) => ids(identity).length > 0)) return "GOV_REVIEW_ROSTER_NO_IDENTITY";
   // Git authors are unsigned claims, so independence is judged on every identity the reviewer has, the declared name included.
   const identities = new Set([reviewer, ...person.identities, record.reviewer.name].flatMap(ids));
-  if (authority.authorsOf(control.id).flatMap(ids).some((id) => identities.has(id))) return "GOV_REVIEW_SELF_REVIEW";
+  if (authority.authorsOf(subject.id).flatMap(ids).some((id) => identities.has(id))) return "GOV_REVIEW_SELF_REVIEW";
   if (record.aiInputs.some((a) => a.kind === "f5_verdict" && a.confirmed && !authority.f5Confirmations.some((row) =>
     row.reviewRecordId === record.id && a.ref === `${row.station}/${row.packId}/${row.questionId}`))) return "GOV_REVIEW_F5_UNCONFIRMED";
-  const due = nextReviewDue(control, authority.register, record.decidedAt);
+  const due = dueOf(subject.controls, authority.register, record.decidedAt);
   if (due.status === "unresolved") return due.reason;
   if (due.nextReviewDue < dates.dueAsOf) return "GOV_REVIEW_OVERDUE";
   return { record, reviewer, identities, nextReviewDue: due.nextReviewDue };
@@ -146,9 +159,13 @@ function people(approvals: readonly Verified[]): number {
   return groups.length;
 }
 
+/** Whether the roster credentials `reviewer` for any of `domains` ("legal" for legal review). */
+const credentialedIn = (experts: ReviewAuthority["experts"], reviewer: string, domains: readonly string[]): boolean =>
+  (experts.get(reviewer)?.domains ?? []).some((d) => domains.includes(d));
+
 function quorum(control: ControlRecord, digest: string, valid: readonly Verified[], experts: ReviewAuthority["experts"]): string[] {
   const approvals = valid.filter(({ record }) => record.decision === "approve");
-  const credentialed = (reviewer: string, domains: readonly string[]) => (experts.get(reviewer)?.domains ?? []).some((d) => domains.includes(d));
+  const credentialed = (reviewer: string, domains: readonly string[]) => credentialedIn(experts, reviewer, domains);
   const draft = [`${control.id}@${control.version}`, digest];
   const reasons: string[] = [];
   if (people(approvals) < 2) reasons.push("GOV_QUORUM_TWO_HUMANS");
@@ -187,25 +204,35 @@ export function supportStanding(control: ControlRecord, promotion: Promotion | u
   return { support: control.support, reasons: [], promotion, rejected: [] };
 }
 
+/** The server's clock (no caller can move it back) and the dates records are judged at; `asOf` only looks ahead. */
+function clock(authority: ReviewAuthority): { now: Date; dates: { today: string; dueAsOf: string } } {
+  const now = new Date();
+  const today = dateOf(now);
+  return { now, dates: { today, dueAsOf: authority.asOf !== undefined && authority.asOf > today ? authority.asOf : today } };
+}
+
+/** The operator's trust at `now`, or why none loads: without pinned trust roots no list can verify, so nothing counts. */
+function operatorTrust(now: Date): TrustContext | string {
+  if (lstatSync(join(resolveAmcHome(), "trust", "trust-roots.json"), { throwIfNoEntry: false }) === undefined) {
+    return "GOV_REVIEW_TRUST_INVALID: trust roots not configured";
+  }
+  try {
+    return loadTrustContext({ now });
+  } catch (error) {
+    return `GOV_REVIEW_TRUST_INVALID: ${error instanceof Error ? error.message : String(error)}`;
+  }
+}
+
 /** Verifies `authority.records` for `control` (the only source of promotions) and returns supportStanding's verdict. */
 export function effectiveSupport(control: ControlRecord, authority?: ReviewAuthority): SupportResult {
   if (!stronger(control.support) || !authority) return supportStanding(control, undefined, "");
-  const now = new Date(); // the server's clock; no caller can move it back
-  const today = dateOf(now);
-  const dueAsOf = authority.asOf !== undefined && authority.asOf > today ? authority.asOf : today;
-  // The operator must have pinned trust roots; without them no list can verify, so nothing is promoted.
-  if (lstatSync(join(resolveAmcHome(), "trust", "trust-roots.json"), { throwIfNoEntry: false }) === undefined) {
-    return stays(["GOV_REVIEW_TRUST_INVALID: trust roots not configured"]);
-  }
-  let trust: TrustContext;
-  try {
-    trust = loadTrustContext({ now });
-  } catch (error) {
-    return stays([`GOV_REVIEW_TRUST_INVALID: ${error instanceof Error ? error.message : String(error)}`]);
-  }
+  const { now, dates } = clock(authority);
+  const trust = operatorTrust(now);
+  if (typeof trust === "string") return stays([trust]);
   if (reverifyOpenItems(control, authority.reverify).length > 0) return stays(["GOV_REVERIFY_OPEN"]);
   const digest = controlDigest(control);
-  const results = authority.records.map((raw) => verifyRecord(raw, control, digest, trust, authority, { today, dueAsOf }));
+  const subject: Subject = { kind: "control", id: control.id, version: control.version, digest, controls: [control] };
+  const results = authority.records.map((raw) => verifyRecord(raw, subject, trust, authority, dates));
   const rejected = results.flatMap((r, index) => (typeof r === "string" && r !== "GOV_REVIEW_OTHER_SUBJECT" ? [{ index, reason: r }] : []));
   const valid = results.filter((r): r is Verified => typeof r !== "string");
   const missing = quorum(control, digest, valid, authority.experts);
@@ -216,7 +243,55 @@ export function effectiveSupport(control: ControlRecord, authority?: ReviewAutho
     recordIds: Object.freeze(approvals.map(({ record }) => record.id)), recordDigests: Object.freeze(approvals.map(({ record }) => digestOf(record))),
     reviewedAt: approvals.map(({ record }) => record.decidedAt).sort()[0] as string, nextReviewDue: approvals.map((a) => a.nextReviewDue).sort()[0] as string });
   minted.add(promotion);
-  return { ...supportStanding(control, promotion, dueAsOf), rejected };
+  return { ...supportStanding(control, promotion, dates.dueAsOf), rejected };
+}
+
+/** A pack version's sign-offs (P1-33 admission criterion 9). */
+export interface PackSignoffs {
+  /** Why the sign-offs do not stand; empty when they do. */
+  reasons: string[];
+  /** Records naming this pack that did not count, by index in `authority.records`, with the first failed check. */
+  rejected: SupportResult["rejected"];
+  /** The domain lead, legal reviewer and risk owner counted (set only when the sign-offs stand), with each record's digest. */
+  signers: Array<{ role: ReviewRecord["role"]; reviewer: string; recordId: string; recordDigest: string }>;
+}
+
+const SIGNOFF_ROLES = ["GOV_SIGNOFF_DOMAIN_LEAD", "GOV_SIGNOFF_LEGAL_REVIEWER", "GOV_SIGNOFF_RISK_OWNER"] as const;
+
+/**
+ * P1-33 admission criterion 9: records for subject kind "pack" at this version and current pack digest, verified by the
+ * same steps as a control's (trust at the server's clock, pinned catalog-review key, reviewer from the key, D-08 roster,
+ * independence from the pack's authors, F5, currency at the earliest of its controls' cadences). The pack needs
+ * approvals from a domain lead credentialed for one of its stations, a credentialed legal reviewer and a risk owner who
+ * are three distinct people, no objection and no open re-verify item on any of its controls. When no record names the
+ * pack, trust is not loaded and every role is missing. A sign-off shows who approved the pack, not that it is right.
+ */
+export function packSignoffs(pack: { id: string; version: string; digest: string; stations: readonly string[] },
+  controls: readonly ControlRecord[], authority: ReviewAuthority): PackSignoffs {
+  const none = (reasons: string[]): PackSignoffs => ({ reasons, rejected: [], signers: [] });
+  const named = authority.records.some((raw) => {
+    const subject = (raw as { subject?: { kind?: unknown; id?: unknown } } | null)?.subject;
+    return subject?.kind === "pack" && subject.id === pack.id;
+  });
+  if (!named) return none([...SIGNOFF_ROLES]);
+  const { now, dates } = clock(authority);
+  const trust = operatorTrust(now);
+  if (typeof trust === "string") return none([trust]);
+  if (controls.some((control) => reverifyOpenItems(control, authority.reverify).length > 0)) return none(["GOV_REVERIFY_OPEN"]);
+  const subject: Subject = { kind: "pack", id: pack.id, version: pack.version, digest: pack.digest, controls };
+  const results = authority.records.map((raw) => verifyRecord(raw, subject, trust, authority, dates));
+  const rejected = results.flatMap((r, index) => (typeof r === "string" && r !== "GOV_REVIEW_OTHER_SUBJECT" ? [{ index, reason: r }] : []));
+  const valid = results.filter((r): r is Verified => typeof r !== "string");
+  const approvals = valid.filter(({ record }) => record.decision === "approve");
+  const holders = (role: ReviewRecord["role"], domains: readonly string[] | null) => approvals.filter(({ record, reviewer }) =>
+    record.role === role && (domains === null || credentialedIn(authority.experts, reviewer, domains)));
+  const roles = [holders("domain_lead", pack.stations), holders("legal_reviewer", ["legal"]), holders("risk_owner", null)] as const;
+  const reasons: string[] = SIGNOFF_ROLES.filter((_, i) => roles[i]!.length === 0);
+  const trio = roles[0].flatMap((d) => roles[1].flatMap((l) => roles[2].map((r) => [d, l, r]))).find((t) => people(t) === 3);
+  if (reasons.length === 0 && !trio) reasons.push("GOV_SIGNOFF_THREE_HUMANS");
+  if (valid.some(({ record }) => record.decision !== "approve")) reasons.push("GOV_QUORUM_OBJECTION");
+  const signers = reasons.length > 0 || !trio ? [] : trio.map(({ record, reviewer }) => ({ role: record.role, reviewer, recordId: record.id, recordDigest: digestOf(record) }));
+  return { reasons, rejected, signers };
 }
 
 /** The review status a view may show: "approved" only where support stood. */

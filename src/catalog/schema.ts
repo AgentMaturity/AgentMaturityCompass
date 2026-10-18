@@ -23,7 +23,8 @@ export interface CatalogIssue {
 
 export const STATIONS = ["education", "environment", "health", "wealth", "technology", "mobility", "governance"] as const satisfies readonly Station[];
 export const FACT_NAMES = ["stations", "primaryStation", "domains", "jurisdictions", "roles", "entityTypes", "riskClass", "useCases", "dataClasses"] as const satisfies readonly FactName[];
-const SCOPE_FIELDS = ["tenantId", "workspaceId", "deploymentId", "agentId"] as const;
+/** Evidence binding fields that scope a record to a tenant, workspace, deployment or agent; a contract binds one. */
+export const SCOPE_FIELDS = ["tenantId", "workspaceId", "deploymentId", "agentId"] as const;
 const CONTROL_ID = /^L[0-3](-[A-Z0-9]{2,8}){1,2}-[0-9]{2,3}$/;
 const SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$/;
 
