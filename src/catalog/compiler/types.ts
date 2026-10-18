@@ -10,6 +10,7 @@ import { LEGACY_OPERATING_PROFILE_SCHEMA_VERSION, OPERATING_PROFILE_SCHEMA_VERSI
 import type { ToolsConfig } from "../../toolhub/toolsSchema.js";
 import type { ActionClass } from "../../types.js";
 import type { TrustContext } from "../../trust/trustContext.js";
+import type { Promotion } from "../governance/support.js";
 import type { CatalogLockfile } from "../lockfile.js";
 import type { LoadedCatalog } from "../loader.js";
 import { STATIONS } from "../schema.js";
@@ -103,6 +104,12 @@ export interface CompileInput {
    * bytes (P1-10F). The compiler reads no file. Absent, the visible tools are the built-in default list.
    */
   signedTools?: SignedToolsInput;
+  /**
+   * P1-34: promotions effectiveSupport decided, keyed by control id, bound into the plan digest. Only these let reviewed or
+   * qualified support stand; without them it compiles experimental. Deciding them reads the clock and trust state, so it
+   * happens before compilePlan, which stays pure.
+   */
+  promotions?: Readonly<Record<string, Promotion>>;
 }
 export interface SignedToolsInput { config: ToolsConfig; sha256: string }
 
@@ -161,6 +168,7 @@ export interface CompiledPlan {
   profile: { profileId: string; sha256: string; factProvenance: Record<FactName, FactProvenance | "unknown">;
              deployment?: { tenantId: string; deploymentId: string } };
   lock: CatalogLockfile;                // P1-09's lock: pins catalog and sources
+  promotions?: Readonly<Record<string, Promotion>>;  // P1-34: the promotions supportStanding accepted, when any
   status: "ready" | "blocked";          // blocked: unresolved conflict or unresolved mandatory control
   requirements: RequirementDecision[];  // sorted by controlId
   conflicts: Conflict[];

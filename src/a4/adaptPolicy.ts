@@ -11,6 +11,7 @@ import { activateControlPlan, activeControlPlan, loadActiveCompiledPolicy } from
 import { compilePlan, parseDeploymentProfile } from "../catalog/compiler/compile.js";
 import { diffPlans } from "../catalog/compiler/diff.js";
 import { evaluatePredicate } from "../catalog/compiler/evaluatePredicate.js";
+import { shownLegalReview, shownReviewStatus } from "../catalog/governance/support.js";
 import { planWeakenings, signPlan } from "../catalog/compiler/sign.js";
 import type { CompiledPlan, DeploymentProfile, PlanDiff, SignedPlan } from "../catalog/compiler/types.js";
 import { digestOf } from "../catalog/digest.js";
@@ -111,16 +112,16 @@ export function activePlanRecord(workspace: string): { revision: number; planDig
  */
 export const activationWeakenings = (workspace: string, plan: CompiledPlan): string[] => planWeakenings(activeControlPlan(workspace), plan);
 
-/** Per requirement: the catalog's own status of the record (verbatim) and each citation's appliesWhen, three-valued. */
+/** Per requirement: the record's status as effectiveSupport lets it show (P1-34) and each citation's appliesWhen, three-valued. */
 function whyView(plan: CompiledPlan, profile: DeploymentProfile, catalog: LoadedCatalog) {
   return plan.requirements.map((row) => {
     const record = catalog.controls.get(row.controlId);
     return { controlId: row.controlId, version: row.controlVersion, applicability: row.applicability, mandatory: row.mandatory, support: row.support,
-      reviewStatus: record?.review.status ?? "unknown", missingFacts: row.missingFacts, pulledInBy: row.pulledInBy,
+      reviewStatus: record ? shownReviewStatus(record, row.support) : "unknown", missingFacts: row.missingFacts, pulledInBy: row.pulledInBy,
       citations: (record?.citations ?? []).map((citation) => {
         const decided = citation.appliesWhen === null ? null : evaluatePredicate(citation.appliesWhen, profile);
         return { key: citation.key, instrument: citation.instrument, clause: citation.clause, jurisdiction: citation.jurisdiction, statusType: citation.statusType,
-          retrieval: citation.retrieval.state, legalReview: citation.legalReview === null ? "none" : "recorded", appliesWhen: decided?.value ?? "true",
+          retrieval: citation.retrieval.state, legalReview: shownLegalReview(citation, row.support), appliesWhen: decided?.value ?? "true",
           missingFacts: decided?.missingFacts ?? [], inScope: row.citationsInScope.includes(citation.key) };
       }) };
   });
