@@ -1,10 +1,10 @@
 # P1-34 receipt: catalog content governance and currency reviews
 
 Environment: local macOS 26.6.2 arm64 (Darwin 25.6.0), Node v22.23.3, pnpm 10.33.0. Not CI. Branch
-`rtd/p1-34-catalog-governance`, run at the commit `receipt.json` names, with `int` (`737c8738c`) merged in, after the independent review's
-third round. `receipt.json` lists every command with its exit code and duration.
+`rtd/p1-34-catalog-governance`, run at the commit `receipt.json` names, with `int` (`737c8738c`) merged in, after
+the independent review's third round. `receipt.json` lists every command with its exit code and duration.
 
-The spec asks for no receipt; this one records the mutation checks, the comparison with `int` and the checks after both
+The spec asks for no receipt; this one records the mutation checks, the comparison with `int` and the checks after all three
 review rounds. Nothing here is a review: every catalog record is still `experimental`, D-08 has named no expert, and
 docs/catalog/GOVERNANCE.md is a draft awaiting Sid's approval.
 
