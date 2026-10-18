@@ -2,8 +2,8 @@
  * The P1-02 authorization record for a provider hook decision, and the v2 receipt that binds it (P1-22, P1-23).
  *
  * The provider, not AMC, runs the effect, so AMC binds the record when it decides and cannot recheck it at execution
- * the way the tool pipeline does (`recheckAuthorization`). The record says who authorized what at decision time; for
- * Claude Code, PostToolUse compares the input that ran with the authorized digest (hookPostExecution.ts).
+ * the way the tool pipeline does (`recheckAuthorization`). The record says who authorized what at decision time;
+ * Claude Code's PostToolUse and Pi's tool_result compare the input that ran with the authorized digest (claudeCodeObservations.ts).
  */
 import { authorizationRecordDigest, type AuthorizationRecordV1 } from "../actions/authorizationRecord.js";
 import { bindAuthorization, leasePrincipal } from "../actions/authorize.js";
@@ -105,7 +105,8 @@ function governedSession(input: { ledger: Parameters<typeof piSessionRegistratio
   const { call } = input;
   if (call.pi) {
     const found = piSessionRegistration(input.ledger, input.agentId, call.sessionId);
-    const refusal = registrationRefusal(found, call.pi);
+    const refusal = registrationRefusal(found, call.pi)
+      ?? intakeBackpressure({ workspace: input.ledger.workspace, agentId: input.agentId, sessionId: call.sessionId, leaseId: input.leaseId, now: input.now, provider: "pi" });
     return { refusal, enforced: !refusal && found.status === "registered" && found.record.qualified, version: call.pi.version };
   }
   const found = claudeCodeSessionRegistration(input.ledger, input.agentId, call.sessionId);
@@ -153,8 +154,8 @@ export function authorizeHookDecision<R extends { decision: string; reason: stri
 
 /**
  * What a decision's ledger row records about its call: the provider version its session bound, the authorization
- * record digest, and the tool, class and argument digest it authorized, which PostToolUse compares with what ran. For
- * Claude Code also the lease that obtained it (only that lease may report the call's outcome), the SHA-256 of the
+ * record digest, the tool, class and argument digest it authorized, which the call's outcome is compared with, and the
+ * lease that obtained it (only that lease may report the call's outcome). For Claude Code also the SHA-256 of the
  * payload bytes as Claude Code sent them, and of the targets AMC resolved (paths followed through symlinks) when it
  * decided: what the decision covers.
  */
@@ -166,7 +167,8 @@ export function boundDecisionFacts(call: HookCall, facts: { version: string | nu
     authorizationRecordDigest: authorization?.ok ? authorization.digest : null,
     ...(authorization?.ok ? { authorizedAction: { toolName: authorization.record.action.toolName, actionClass: authorization.record.action.actionClass,
       argumentsDigest: authorization.record.action.argumentsDigest } } : {}),
-    ...(call.pi ? {} : { leaseId: facts.lease?.leaseId ?? null, claudePayloadSha256: call.payloadSha256,
+    leaseId: facts.lease?.leaseId ?? null,
+    ...(call.pi ? {} : { claudePayloadSha256: call.payloadSha256,
       resolvedTargetsSha256: sha256Hex(canonicalize(facts.targets.map(({ name, args }) => ({ name, args })))) }),
   };
 }

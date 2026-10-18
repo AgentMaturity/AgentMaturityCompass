@@ -102,7 +102,8 @@ function registrationAnswer(workspace: string, body: string, key = getPrivateKey
 
 /**
  * A loopback server installed as the workspace's Bridge. It answers session registrations as AMC would (signed with the
- * real receipt key) and every other request with `respond`, so the control answer is what each case varies.
+ * real receipt key), records observations, and answers every other request with `respond`, so the control answer is
+ * what each case varies.
  */
 async function withFakeBridge(workspace: string, respond: (res: ServerResponse, body: string, req: IncomingMessage) => void,
   registrationKey?: () => string) {
@@ -111,7 +112,8 @@ async function withFakeBridge(workspace: string, respond: (res: ServerResponse, 
     req.on("data", (chunk) => { body += String(chunk); });
     req.on("end", () => body.includes('"session_start"')
       ? void res.writeHead(201, { "content-type": "application/json" }).end(registrationAnswer(workspace, body, registrationKey?.()))
-      : respond(res, body, req));
+      : req.url === PI_OBSERVE_PATH ? void res.writeHead(201, { "content-type": "application/json" }).end('{"observed":true}')
+        : respond(res, body, req));
   });
   servers.push(server);
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
@@ -147,7 +149,8 @@ describe("AMC Pi extension", () => {
 
     const actionId = piActionId("pi-session-1", "toolu_read_1");
     const lifecycle = inspectHookActionLifecycle({ workspace, agentId, actionId });
-    expect(lifecycle).toMatchObject({ status: "completed", valid: true, failClosed: false, provider: "pi" });
+    // The outcome is recorded at the control route too, bound to the decision it follows, with the input AMC authorized.
+    expect(lifecycle).toMatchObject({ status: "completed", valid: true, failClosed: false, provider: "pi", authorizationMismatch: false, observationConflict: false });
     const ledger = openLedger(workspace);
     const all = JSON.stringify(ledger.getAllEvents());
     ledger.close();
@@ -292,8 +295,7 @@ describe("AMC Pi extension", () => {
     for (const signer of signers) {
       const workspace = controlledWorkspace(agentId);
       let signing: ReturnType<typeof signer> = { key: forged };
-      await withFakeBridge(workspace, (res, body, req) => {
-        if (req.url === PI_OBSERVE_PATH) return void res.writeHead(201, { "content-type": "application/json" }).end("{}");
+      await withFakeBridge(workspace, (res, body) => {
         const actionId = signing.actionId ?? piActionId("pi-session-1", "c");
         const providerResponse = { block: false, requestSha256: sha256Hex(Buffer.from(signing.request ?? body, "utf8")) };
         const providerResponseSha256 = sha256Hex(Buffer.from(canonicalize(providerResponse), "utf8"));

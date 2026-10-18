@@ -12,7 +12,7 @@
  */
 import { randomUUID } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, isAbsolute, join, resolve } from "node:path";
+import { dirname, isAbsolute, join } from "node:path";
 import { z } from "zod";
 import {
   CLAUDE_MANAGED_SETTINGS_DIRS, claudeCodeBindingSchema, claudeHookSourcesDigest, claudeSessionHookSources, claudeSessionSha256, processExecutable, QUALIFIED_CLAUDE_CODE_VERSIONS,
@@ -26,7 +26,7 @@ import { verifyReceipt } from "../receipts/receipt.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { writerFault } from "./hookAuditLatch.js";
-import { IntakeCounters, REGISTRATION_LIMITS } from "./hookIntake.js";
+import { admitRegistration } from "./hookIntake.js";
 import { HookControlError } from "./hookProviders.js";
 
 export const CLAUDE_NOT_GOVERNED_NOTE = "AMC cannot see Claude Code sessions that ran none of AMC's hooks; they are reported as not governed.";
@@ -85,8 +85,6 @@ const manifestPath = (workspace: string) => join(workspace, ".amc", "hooks", "cl
 const prefixFor = (agentId: string, sessionId: string, manifestSha256: string) =>
   `cc_registration_${sha256Hex(canonicalize({ agentId, session: claudeSessionSha256(sessionId), manifest: manifestSha256 })).slice(0, 44)}`;
 const PREFIX_LENGTH = "cc_registration_".length + 44;
-// ponytail: in-memory per Bridge process (bounded, hookIntake.ts); a restart resets the window.
-const registrationCounters = new IntakeCounters(REGISTRATION_LIMITS);
 const bodySha256 = (record: ClaudeCodeRegistrationRecord) => sha256Hex(Buffer.from(canonicalize(record), "utf8"));
 const bindings = (manifest: Manifest): ClaudeHookBinding[] => manifest.handlers.map(({ eventName, handlerSha256 }) => ({ eventName, handlerSha256 }));
 const defaultManagedDir = () => CLAUDE_MANAGED_SETTINGS_DIRS[process.platform] ?? null;
@@ -231,9 +229,7 @@ export function registerClaudeCodeSession(input: { workspace: string; authentica
     }
     // A new registration, or one that supersedes the session's earlier one: counted per lease and per workspace, never per
     // registration, so churning registrations cannot reset the count. Intake counters are kept by session and lease.
-    const refused = registrationCounters.admit({ workspace: resolve(input.workspace), lease: `${input.authenticatedAgentId}\0${input.lease?.leaseId ?? "no-lease"}`,
-      session: prefix }, now);
-    if (refused !== null) throw new HookControlError("HOOK_CONTROL_RATE_LIMITED", 429, `Claude Code session registrations are over AMC's ${refused} limit; AMC refused this one`);
+    admitRegistration({ workspace: input.workspace, agentId: input.authenticatedAgentId, leaseId: input.lease?.leaseId, session: prefix, provider: "Claude Code" }, now);
     const eventId = `${prefix}_${sha256Hex(`${canonicalize(record)}\0${now}\0${randomUUID()}`).slice(0, 16)}`;
     const sessionId = `cc-registration-session-${sha256Hex(eventId).slice(0, 36)}`;
     try {
