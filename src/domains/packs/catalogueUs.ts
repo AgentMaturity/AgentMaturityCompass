@@ -277,8 +277,6 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     }),
   unverified("us-nyc-ll144", "NYC Local Law 144 of 2021 (NYC Admin Code §20-870 et seq.) and DCWP rules", "US-NYC", "law", ["NYC Local Law 144"],
     "Read on 2026-10-03: https://www.nyc.gov/site/dca/about/automated-employment-decision-tools.page (bias audit within one year of use, public summary, notices; enforcement from 2023-07-05). Unverified only because www.nyc.gov is not in OFFICIAL_SOURCE_HOSTS."),
-  unverified("us-sr-26-2", "Federal Reserve SR 26-2 / OCC / FDIC Revised Guidance on Model Risk Management (supersedes SR 11-7 and SR 21-8)", "US", "guidance", ["SR 26-2"],
-    "Read on 2026-10-04: https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm (dated 2026-04-17; supersedes SR 11-7 and SR 21-8) and attachment SR2602a1.pdf, page 3 footnote 3: generative and agentic AI models are not within the scope of the guidance. Unverified only because www.federalreserve.gov is not in OFFICIAL_SOURCE_HOSTS."),
   unverified("us-ca-sb253", "California Health and Safety Code §38532 (SB 253, Climate Corporate Data Accountability Act)", "US-CA", "law", ["California Health and Safety Code §38532"],
     "Read on 2026-10-04: https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=HSC&sectionNum=38532; CARB program page gives the first scope 1 and 2 report deadline as 2026-11-10. Unverified only because leginfo.legislature.ca.gov is not in OFFICIAL_SOURCE_HOSTS."),
 ];

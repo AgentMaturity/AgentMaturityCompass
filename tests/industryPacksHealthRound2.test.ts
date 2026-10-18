@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { getDeepQuestionsByStation } from "../src/domains/deepIndustryPacks.js";
 import { getIndustryPacksByStation } from "../src/domains/industryPacks.js";
 import { PACK_QUESTION_FLOOR, resolveRegulatoryRefParts } from "../src/domains/packs/regulatorySchema.js";
+import { F5_KEPT_IDS } from "./helpers/f5Deferred.js";
 
 /**
  * Health station, round-2 content (the candidate's round2/content/health/questions.json + review.json
@@ -17,10 +18,11 @@ describe("health station round-2 content", () => {
     const merged = ["HLT-DHR-13", "HLT-DHR-14", "HLT-DHR-18", "HLT-PL-15", "HLT-PP-7", "HLT-PP-11", "HLT-LT-12", "HLT-DD-15", "HLT-DD-16", "HLT-SM-11"];
     const dropped = ["HLT-WM-17", "HLT-PL-17"];
     const added = ["HLT-DHR-19", "HLT-DHR-20", "HLT-DHR-21", "HLT-DHR-22", "HLT-WM-18", "HLT-PL-18", "HLT-PP-18", "HLT-PP-19", "HLT-DD-17", "HLT-DD-18"];
-    expect([...merged, ...dropped].filter((id) => ids.has(id))).toEqual([]);
+    expect(merged.filter((id) => ids.has(id))).toEqual([]);
+    expect(dropped.filter((id) => ids.has(id) !== F5_KEPT_IDS.has(id)), "F5 drops leave only once Sid confirms them").toEqual([]);
     expect(added.filter((id) => !ids.has(id))).toEqual([]);
     expect(packs).toHaveLength(9);
-    expect(questions).toHaveLength(149);
+    expect(questions).toHaveLength(149 + dropped.filter((id) => F5_KEPT_IDS.has(id)).length);
     for (const pack of packs) expect(pack.questions.length, pack.id).toBeGreaterThanOrEqual(PACK_QUESTION_FLOOR);
   });
 

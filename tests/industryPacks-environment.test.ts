@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import * as environment from "../src/domains/packs/stations/environment.js";
 import type { IndustryPack } from "../src/domains/industryPacks.js";
 import { PACK_QUESTION_FLOOR, resolveRegulatoryRefParts } from "../src/domains/packs/regulatorySchema.js";
+import { F5_KEPT_IDS } from "./helpers/f5Deferred.js";
 
 /**
  * Round-2 content rules for the environment station
@@ -47,10 +48,10 @@ describe("environment station packs (round-2 content)", () => {
     }
   });
 
-  test("merged and dropped questions are gone; retired citations do not return", () => {
+  test("merged and dropped questions are gone (F5 drops only once Sid confirms them); retired citations do not return", () => {
     const ids = new Set(packs.flatMap((p) => p.questions.map((q) => q.id)));
     for (const gone of ["ENV-FF-2", "ENV-WW-13", "ENV-SS-5", "ENV-SS-14", "ENV-SS-15", "ENV-UU-15", "ENV-STS-4"]) {
-      expect(ids.has(gone), gone).toBe(false);
+      expect(ids.has(gone), gone).toBe(F5_KEPT_IDS.has(gone));
     }
     const refs = packs.flatMap((p) => p.questions.map((q) => `${q.id} ${q.regulatoryRef}`)).join("\n");
     expect(refs).not.toMatch(/Order 887|CIP-013-1|CAC\/RCP 1-1969|Farm to Fork Strategy|Rev\. CoP19|91\/271\/EEC Art/);

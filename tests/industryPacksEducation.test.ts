@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { getIndustryPacksByStation } from "../src/domains/industryPacks.js";
 import { resolveRegulatoryRefParts } from "../src/domains/packs/regulatorySchema.js";
+import { F5_KEPT_IDS } from "./helpers/f5Deferred.js";
 
 /**
  * Education station content rules from the round-2 review
@@ -22,7 +23,8 @@ describe("education station industry packs", () => {
     );
   });
 
-  test.each(EDUCATION.flatMap((pack) => pack.questions.map((q) => ({ packId: pack.id, q }))))(
+  // Kept F5 proposed drops carry main's text until Sid decides them (P0-26).
+  test.each(EDUCATION.flatMap((pack) => pack.questions.filter((q) => !F5_KEPT_IDS.has(q.id)).map((q) => ({ packId: pack.id, q }))))(
     "$packId/$q.id cites exactly one instrument",
     ({ q }) => {
       expect(instrumentsCited(q.regulatoryRef)).toHaveLength(1);

@@ -6,6 +6,7 @@ import { describe, expect, test } from "vitest";
 import { INDUSTRY_PACKS } from "../src/domains/industryPacks.js";
 import { getDeepQuestionsByStation } from "../src/domains/deepIndustryPacks.js";
 import { PACK_QUESTION_FLOOR, validatePackRegulatoryCurrency } from "../src/domains/packs/regulatorySchema.js";
+import { F5_KEPT_IDS } from "./helpers/f5Deferred.js";
 
 const packs = Object.values(INDUSTRY_PACKS).filter((p) => p.stationId === "mobility");
 const question = (id: string) => packs.flatMap((p) => p.questions).find((q) => q.id === id);
@@ -24,10 +25,11 @@ describe("mobility station packs", () => {
     }
   });
 
-  test("merged and dropped questions are gone", () => {
+  test("merged and dropped questions are gone (F5 drops only once Sid confirms them)", () => {
     for (const id of ["MOB-SC-1", "MOB-SC-11", "MOB-SC-14", "MOB-SP-3", "MOB-SP-13", "MOB-RE-9", "MOB-RE-11", "MOB-RE-12",
       "MOB-RE-13", "MOB-RE-14", "MOB-RE-15", "MOB-VI-5", "MOB-VI-14", "MOB-PS-5", "MOB-PS-9", "MOB-PS-13", "MOB-F3W-8"]) {
-      expect(question(id), id).toBeUndefined();
+      if (F5_KEPT_IDS.has(id)) expect(question(id), id).toBeDefined();
+      else expect(question(id), id).toBeUndefined();
     }
   });
 
