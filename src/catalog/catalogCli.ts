@@ -20,7 +20,7 @@ import { renderPlanDiffMarkdown } from "./compiler/diff.js";
 import { signPlan } from "./compiler/sign.js";
 import type { CompiledPlan, SignedPlan } from "./compiler/types.js";
 import { loadCatalog } from "./loader.js";
-import { verifiedSignedTools } from "./signedTools.js";
+import { compileInputs } from "./compileInputs.js";
 import { verifyCatalogLock } from "./lockfile.js";
 
 interface CompileFlags { profile: string; previous?: string; lock?: string; out?: string; json?: boolean; requestReview?: boolean; allowWeakening?: boolean; activate?: string }
@@ -51,10 +51,11 @@ export function compileCatalogPlan(workspace: string, opts: CompileFlags) {
   }
   const previous = opts.previous ? readSignedPlan(resolve(workspace, opts.previous)) : null;
   const now = new Date();
-  // P1-10F: visible tools come from the verified .amc/tools.yaml; with none, the built-in default list; one that does not verify refuses.
-  const tools = verifiedSignedTools(workspace);
-  const visibleToolsSource = tools.signedTools ? { source: "signed-tools-yaml" as const, sha256: tools.signedTools.sha256 } : { source: "defaults" as const };
-  const plan = compilePlan({ profile, catalog, asOf: now.toISOString(), ...tools,
+  // P1-10F: the same workspace inputs A4 Adapt compiles with: the verified .amc/tools.yaml, or with none the built-in
+  // default list; one that does not verify refuses.
+  const inputs = compileInputs(workspace);
+  const visibleToolsSource = inputs.signedTools ? { source: "signed-tools-yaml" as const, sha256: inputs.signedTools.sha256 } : { source: "defaults" as const };
+  const plan = compilePlan({ profile, catalog, asOf: now.toISOString(), ...inputs,
     ...(profile.mergeExceptions?.length ? { mergeExceptionTrust: loadTrustContext({ now }) } : {}) });
   const outDir = resolve(workspace, opts.out ?? join("amc-control-plans", plan.profile.profileId, plan.digest.slice("sha256:".length, "sha256:".length + 12)));
   try {

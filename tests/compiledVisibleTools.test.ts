@@ -1,5 +1,5 @@
 import { generateKeyPairSync } from "node:crypto";
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import YAML from "yaml";
 import { describe, expect, it, vi } from "vitest";
@@ -16,7 +16,9 @@ vi.mock("node:fs", async (importOriginal) => {
 });
 
 import { driftedSlots, RESOURCE_SLOTS } from "../src/a4/a4Gates.js";
-import { understandAdapt } from "../src/a4/adaptPolicy.js";
+import type { A4GateRow, A4ReadinessState } from "../src/a4/a4Readiness.js";
+import { activationExecutionId, openPlanReview, signAdaptPlan, understandAdapt } from "../src/a4/adaptPolicy.js";
+import { ACTIVATE_PLAN_EFFECT_ID, ADAPT_SPEC_SCHEMA, type AdaptBuild } from "../src/a4/spec/adapt.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import { createDriverRunner } from "../src/agent/subagentRunner.js";
@@ -26,10 +28,12 @@ import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { initUsersConfig } from "../src/auth/authApi.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { compileCatalogPlan } from "../src/catalog/catalogCli.js";
+import { compileInputs } from "../src/catalog/compileInputs.js";
 import { compilePlan, parseDeploymentProfile } from "../src/catalog/compiler/compile.js";
 import type { MergedParameter } from "../src/catalog/compiler/merge.js";
 import { buildRuntimePolicy } from "../src/catalog/compiler/runtimePolicy.js";
 import { planWeakenings } from "../src/catalog/compiler/sign.js";
+import type { CompiledPlan } from "../src/catalog/compiler/types.js";
 import { signHexDigest } from "../src/crypto/keys.js";
 import { issueLeaseToken } from "../src/leases/leaseSigner.js";
 import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
@@ -93,11 +97,11 @@ function refusal(run: () => unknown): { code?: unknown; message: string } | unde
 const compile = (ws: string, flags: { requestReview?: boolean; activate?: string; allowWeakening?: boolean } = {}) =>
   compileCatalogPlan(ws, { profile: "deployment-profile.json", ...flags });
 
-/** `amc catalog compile --request-review`, two distinct owners approve, then `--activate`. */
-function activate(ws: string, allowWeakening = false) {
+/** `amc catalog compile --request-review`, two distinct owners approve, then `--activate` (agentId: the profile's first agent). */
+function activate(ws: string, allowWeakening = false, agentId = "default") {
   const approvalId = compile(ws, { requestReview: true }).signed.review.approvalRequestId!;
   for (const userId of ["owner-1", "owner-2"]) {
-    decideApprovalForIntent({ workspace: ws, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE",
+    decideApprovalForIntent({ workspace: ws, agentId, approvalId, decision: "APPROVED", mode: "EXECUTE",
       reason: "P1-10F fixture plan review", userId, username: userId, userRoles: ["OWNER"] });
   }
   const result = compile(ws, { activate: approvalId, allowWeakening });
@@ -263,6 +267,18 @@ describe("amc catalog compile reads tools.yaml only when it verifies (compileCat
       return "signature verification failed";
     }
   };
+  it("an unreadable tools.yaml (chmod 000): the compile refuses with its error class and no host path", () => {
+    const ws = governedWorkspace();
+    signTools(ws, ["delegate"]);
+    chmodSync(toolsConfigPath(ws), 0o000);
+    try {
+      const error = refusal(() => compile(ws));
+      expect(error?.code).toBe("TOOLS_CONFIG_UNVERIFIED");
+      expect(error?.message).toContain(".amc/tools.yaml does not verify (tools config unreadable (EACCES))");
+      expect(error?.message, "no host path").not.toContain(ws);
+    } finally { chmodSync(toolsConfigPath(ws), 0o644); }
+  });
+
   for (const [state, breakIt] of Object.entries(unverified)) {
     it(`a tools.yaml ${state}: the compile refuses TOOLS_CONFIG_UNVERIFIED, naming the file, the reason and the fix`, () => {
       const ws = governedWorkspace();
@@ -278,9 +294,104 @@ describe("amc catalog compile reads tools.yaml only when it verifies (compileCat
   }
 });
 
+/** P1-46's station profiles: the synthetic finance-ops sample with one station (agent finance-ops-agent). */
+const FINANCE = JSON.parse(readFileSync("tests/fixtures/catalog/compiler/finance-ops-us.profile.json", "utf8")) as Record<string, any>;
+const stationProfile = (station: string) => ({ ...FINANCE, profileId: `station-${station}`, primaryStation: { ...FINANCE.primaryStation, value: station },
+  stations: { ...FINANCE.stations, value: [station] } });
+
+/** A plan compiled as Adapt compiles it: the profile plus compileInputs(workspace), the CLI's own inputs. */
+const adaptCompile = (ws: string, profile: unknown = PROFILE) =>
+  compilePlan({ profile: parseDeploymentProfile(profile), catalog, asOf: new Date().toISOString(), ...compileInputs(ws) });
+
+/** The slice of an A4 project's state Adapt's Build and Review read: adapt revisions (plan and build) and the chain. */
+function a4State(revisions: Array<{ plan: CompiledPlan; build?: AdaptBuild }>, inForce: CompiledPlan[] = []): A4ReadinessState {
+  return { project: { agent_id: "default" },
+    revisions: revisions.map((row, i) => ({ revision_no: i + 1, stage: "adapt",
+      spec_json: JSON.stringify({ schema: ADAPT_SPEC_SCHEMA, plan: row.plan, ...(row.build ? { build: row.build } : {}) }) })),
+    chain: inForce.map((plan) => ({ kind: "EFFECT_FINISHED", body: { effect: ACTIVATE_PLAN_EFFECT_ID, executionId: activationExecutionId(plan) } })) } as unknown as A4ReadinessState;
+}
+
+/** Adapt's Build (signAdaptPlan), then a Review that opens the effect gate's plan review (openPlanReview) on that revision. */
+function built(ws: string, plan: CompiledPlan): () => string {
+  const state = a4State([{ plan, build: signAdaptPlan(ws, a4State([]), plan) }]);
+  return () => openPlanReview({ workspace: ws, state, gate: { revision_no: 1 } as unknown as A4GateRow, quorumFloor: undefined });
+}
+
+type A4Refusal = { status?: number; code?: string; message: string; detail?: { reasonCodes?: string[] } };
+const TOOLS_WIDER = "The plan's tools.yaml binding is missing or wider than the active plan's; re-sign tools.yaml or rebuild the plan.";
+
 describe("A4 Adapt compiles from the same verified tools.yaml (P1-10F)", () => {
   const adapt = (ws: string) => understandAdapt({ workspace: ws, projectId: "a4p_p110f", workspaceId: "ws-p110f", agentId: "default", answers: [],
     now: Date.parse("2026-10-18T00:00:00Z") });
+
+  it("the same workspace and profile give the same plan digest from amc catalog compile and from Adapt's Understand", () => {
+    const ws = governedWorkspace();
+    signTools(ws, ["delegate"]);
+    const understood = understandAdapt({ workspace: ws, projectId: "a4p_p110f", workspaceId: "ws-p110f", agentId: "default", answers: [], now: Date.now() });
+    writeFileSync(join(ws, "adapt-profile.json"), JSON.stringify(understood.profile));
+    const cli = compileCatalogPlan(ws, { profile: "adapt-profile.json" }).plan;
+    expect(cli.runtimePolicy.toolPipeline.toolsConfigSha256).toBe(sha256Hex(readFileSync(toolsConfigPath(ws))));
+    expect(understood.plan!.digest).toBe(cli.digest);
+  });
+
+  it("Review refuses TOOLS_CONFIG_CHANGED when tools.yaml was re-signed since Build; with the same bytes it opens", () => {
+    const ws = governedWorkspace();
+    signTools(ws, ["delegate"]);
+    const review = built(ws, adaptCompile(ws));
+    signTools(ws, ["delegate", "workflow"]);
+    const refused = refusal(review) as A4Refusal | undefined;
+    expect(refused).toMatchObject({ status: 409, code: "TOOLS_CONFIG_CHANGED", detail: { reasonCodes: ["TOOLS_CONFIG_CHANGED"] } });
+    expect(refused?.message).toMatch(/tools\.yaml changed since Build/);
+    signTools(ws, ["delegate"]);
+    expect(review()).toMatch(/^apprreq_/);
+  });
+
+  it("absent counts as a value: no tools.yaml at Build and at Review opens; one signed after Build refuses", () => {
+    const ws = governedWorkspace();
+    rmSync(toolsConfigPath(ws));
+    rmSync(toolsConfigSigPath(ws), { force: true });
+    const plan = adaptCompile(ws);
+    expect(plan.runtimePolicy.toolPipeline).not.toHaveProperty("toolsConfigSha256");
+    const review = built(ws, plan);
+    expect(review()).toMatch(/^apprreq_/);
+    signTools(ws, []);
+    expect(refusal(review)).toMatchObject({ code: "TOOLS_CONFIG_CHANGED" });
+  });
+
+  it("Build's widening refusal names tools.yaml when the weakening is the tools binding, and keeps its text otherwise", () => {
+    const ws = governedWorkspace();
+    signTools(ws, []);
+    const inForce = adaptCompile(ws);
+    const state = a4State([{ plan: inForce, build: signAdaptPlan(ws, a4State([]), inForce) }], [inForce]);
+    signTools(ws, ["delegate"]);
+    const wider = refusal(() => signAdaptPlan(ws, state, adaptCompile(ws))) as A4Refusal | undefined;
+    expect(wider).toMatchObject({ code: "POLICY_WIDENING_REFUSED", detail: { reasonCodes: ["POLICY_WIDENING_REFUSED", "TOOLS_CONFIG_CHANGED"] } });
+    expect(wider?.message).toBe(`POLICY_WIDENING_REFUSED: ${TOOLS_WIDER}`);
+    // A weakening that is not the tools binding: the in-force plan is Wealth's, this one Technology's, with the same tools.yaml.
+    const wealth = adaptCompile(ws, stationProfile("wealth"));
+    const wealthState = a4State([{ plan: wealth, build: signAdaptPlan(ws, a4State([]), wealth) }], [wealth]);
+    const other = refusal(() => signAdaptPlan(ws, wealthState, adaptCompile(ws, stationProfile("technology")))) as A4Refusal | undefined;
+    expect(other).toMatchObject({ code: "POLICY_WIDENING_REFUSED", detail: { reasonCodes: ["POLICY_WIDENING_REFUSED"] } });
+    expect(other?.message).toBe("POLICY_WIDENING_REFUSED: The plan weakens the plan this project put in force; change the answers.");
+  });
+
+  it("Review's refusal against the active plan names tools.yaml when the weakening is the tools binding, and keeps its text otherwise", () => {
+    const ws = governedWorkspace();
+    signTools(ws, []);
+    activate(ws);
+    signTools(ws, ["delegate"]);
+    const wider = refusal(built(ws, adaptCompile(ws))) as A4Refusal | undefined;
+    expect(wider).toMatchObject({ code: "PLAN_WEAKENS_ACTIVE_PLAN", detail: { reasonCodes: ["PLAN_WEAKENS_ACTIVE_PLAN", "TOOLS_CONFIG_CHANGED"] } });
+    expect(wider?.message).toBe(`PLAN_WEAKENS_ACTIVE_PLAN: ${TOOLS_WIDER}`);
+
+    const other = governedWorkspace();
+    signTools(other, []);
+    writeFileSync(join(other, "deployment-profile.json"), JSON.stringify(stationProfile("wealth")));
+    activate(other, false, "finance-ops-agent");
+    const narrower = refusal(built(other, adaptCompile(other, stationProfile("technology")))) as A4Refusal | undefined;
+    expect(narrower).toMatchObject({ code: "PLAN_WEAKENS_ACTIVE_PLAN", detail: { reasonCodes: ["PLAN_WEAKENS_ACTIVE_PLAN"] } });
+    expect(narrower?.message).toMatch(/^PLAN_WEAKENS_ACTIVE_PLAN: Activation would weaken the active plan/);
+  });
 
   it("a tools.yaml that does not verify: Understand reports TOOLS_CONFIG_UNVERIFIED, not COMPILE_FAILED", () => {
     const ws = governedWorkspace();
@@ -364,6 +475,13 @@ describe("delegate under an activated plan (P1-10F)", () => {
     const first = compose(ws, lease.token);
     try {
       expect(await first.call("delegate", DELEGATE)).toContain('"outcome":"OK"');
+      chmodSync(toolsConfigPath(ws), 0o000);
+      try {
+        const text = await first.call("fs.read", { path: "workspace/n.txt" });
+        expect(text).not.toContain('"outcome":"OK"');
+        expect(text).toContain("EACCES");
+        expect(text, "a model-visible denial names no host path").not.toContain(ws);
+      } finally { chmodSync(toolsConfigPath(ws), 0o644); }
       signTools(ws, ["delegate", "workflow"]);
       for (const [tool, args] of [["delegate", DELEGATE], ["fs.read", { path: "workspace/n.txt" }]] as const) {
         const text = await first.call(tool, args);
