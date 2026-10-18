@@ -1,5 +1,5 @@
 {
- "note": "Each mutation was applied alone, the named tests run with vitest -t, then the file restored from a byte copy. Run before merging int, at 88e8ad22a's sources; the two unsigned/tampered compile tests were renamed afterwards to 'tools.yaml unsigned|tampered, with delegate: ...'. M6-M9 (the independent review's three findings and the A4 Adapt wiring) were run on dbb25fb78's sources the same way.",
+ "note": "Each mutation was applied alone, the named tests run with vitest -t, then the file restored from a byte copy. Run before merging int, at 88e8ad22a's sources; the two unsigned/tampered compile tests were renamed afterwards to 'tools.yaml unsigned|tampered, with delegate: ...'. M6-M9 (the independent review's three findings and the A4 Adapt wiring) were run on dbb25fb78's sources the same way. M10-M13 (the re-review's items) were run on 453bc2afe's sources the same way.",
  "mutations": [
   {
    "mutation": "M1 ignore the signed tools.yaml: proposedConfigs always starts from defaultToolsConfig()",
@@ -67,7 +67,7 @@
    ]
   },
   {
-   "mutation": "M7 fall back to the default list when tools.yaml is present but does not verify (verifiedSignedTools returns {})",
+   "mutation": "M7 fall back to the default list when tools.yaml is present but does not verify (compileInputs (then verifiedSignedTools) returns {})",
    "file": "src/catalog/signedTools.ts",
    "test": "tests/compiledVisibleTools.test.ts",
    "exit": 1,
@@ -90,7 +90,7 @@
    ]
   },
   {
-   "mutation": "M9 A4 Adapt compiles without the verified tools.yaml (drop ...verifiedSignedTools at adaptPolicy.ts:143)",
+   "mutation": "M9 A4 Adapt compiles without the verified tools.yaml (drop ...compileInputs (then verifiedSignedTools) at adaptPolicy.ts:144)",
    "file": "src/a4/adaptPolicy.ts",
    "test": "tests/compiledVisibleTools.test.ts",
    "exit": 1,
@@ -98,6 +98,49 @@
    "failing": [
     "a tools.yaml that does not verify: Understand reports TOOLS_CONFIG_UNVERIFIED, not COMPILE_FAILED",
     "tools.yaml changed after Propose: Understand compiles another plan digest, and the revision's tools slot reads drifted"
+   ]
+  },
+  {
+   "mutation": "M10 Review skips the tools.yaml binding check in openPlanReview",
+   "file": "src/a4/adaptPolicy.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "Review refuses TOOLS_CONFIG_CHANGED when tools.yaml was re-signed since Build; with the same bytes it opens",
+    "absent counts as a value: no tools.yaml at Build and at Review opens; one signed after Build refuses"
+   ]
+  },
+  {
+   "mutation": "M11 the tools-binding wording never applies (toolsBindingWeakened always false)",
+   "file": "src/a4/adaptPolicy.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "Build's widening refusal names tools.yaml when the weakening is the tools binding, and keeps its text otherwise",
+    "Review's refusal against the active plan names tools.yaml when the weakening is the tools binding, and keeps its text otherwise"
+   ]
+  },
+  {
+   "mutation": "M12 an unreadable tools.yaml's reason quotes the exception, with its absolute path",
+   "file": "src/toolhub/toolhubValidators.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "an unreadable tools.yaml (chmod 000): the compile refuses with its error class and no host path",
+    "tools.yaml changed after activation: every call refused until the plan is recompiled and reactivated"
+   ]
+  },
+  {
+   "mutation": "M13 Adapt compiles without the CLI's inputs (drop ...compileInputs at adaptPolicy.ts:144)",
+   "file": "src/a4/adaptPolicy.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "the same workspace and profile give the same plan digest from amc catalog compile and from Adapt's Understand"
    ]
   }
  ]

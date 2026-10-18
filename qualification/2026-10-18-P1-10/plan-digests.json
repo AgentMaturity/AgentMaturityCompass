@@ -88,5 +88,6 @@
    ]
   }
  },
- "byteIdentical": true
+ "byteIdentical": true,
+ "note": "before/after: the seven station plans at d03e63daf and at the P1-10F commit before the P1-34 merge (dist build). plan-digests-int.json: the seven station plans and every catalog fixture profile compiled from int dc416268d's sources (tsx), identical to this branch at 9c83b6bed209d7a586a147cc5aa7f5e63e5b02b2, without signedTools."
 }
