@@ -10,7 +10,7 @@ import { canonicalize } from "../../../../src/utils/json.js";
 import { sha256Hex } from "../../../../src/utils/hash.js";
 
 export const GOVERNANCE_IDS = Array.from({ length: 6 }, (_, i) => `L1-GOV-${String(i + 1).padStart(2, "0")}`);
-export const PROFILE_NAMES = ["benefits-caseworker", "legal-drafting", "defense-analyst"] as const;
+const PROFILE_NAMES = ["benefits-caseworker", "legal-drafting", "defense-analyst"] as const;
 export interface GovernancePlan { profile: DeploymentProfile; plan: CompiledPlan }
 export interface GovernanceFixture { ref: string; control: ControlRecord; envelope: FixtureEnvelope }
 interface EvidenceSetup {

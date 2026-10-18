@@ -33,6 +33,13 @@ const ROWS: Record<string, string[]> = {
 };
 /** Rows beyond the strategy's eleven: Reg B supports the Wealth overlay's credit-decision controls. */
 const ADDED_ROWS: Record<string, string[]> = { "ECOA Regulation B, 12 CFR 1002.9": ["wealth"] };
+/** P3-14 appends these four exact Governance entries without changing the P1-18 jurisdiction profiles. */
+const GOVERNANCE_ROWS: Record<string, string> = {
+  "governance-omb-m25-21-human-review": "OMB M-25-21 — Human oversight, timely human review and appeal",
+  "governance-omb-m25-21-impact-assessment": "OMB M-25-21 — Pre-deployment testing and impact assessment",
+  "governance-omb-m25-22-no-training": "OMB M-25-22 — Non-public agency data and vendor training",
+  "governance-omb-m26-04-procurement": "OMB M-26-04 — Procurement principles and user reporting"
+};
 const REVERIFY_ROWS = ["Reg E, 12 CFR 1005.2", "SR 26-2", "SR 23-4 and its replacement proposal", "Colorado SB 26-189; California CCPA rules on automated decisions"];
 const sorted = (xs: readonly string[]) => [...xs].sort();
 
@@ -56,7 +63,13 @@ describe("catalog/registers/us.json encodes the US register (P1-18)", () => {
       expect(own.length, row).toBeGreaterThan(0);
       for (const e of own) expect(sorted(e.stations), e.id).toEqual(sorted(stations));
     }
-    for (const e of entries) expect(Object.keys({ ...ROWS, ...ADDED_ROWS }), e.id).toContain(e.row);
+    for (const [id, row] of Object.entries(GOVERNANCE_ROWS)) {
+      const own = entries.filter((e) => e.row === row);
+      expect(own.map((e) => e.id), row).toEqual([id]);
+      expect(own[0]?.stations, id).toEqual(["governance"]);
+    }
+    const knownRows = [...Object.keys({ ...ROWS, ...ADDED_ROWS }), ...Object.values(GOVERNANCE_ROWS)];
+    for (const e of entries) expect(knownRows, e.id).toContain(e.row);
     expect(new Set(entries.map((e) => e.id)).size).toBe(entries.length);
   });
 
