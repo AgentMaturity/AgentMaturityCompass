@@ -31,16 +31,21 @@ operator pinned for `catalog-review`, and a record declaring any other identity 
 
 `reviewed` support needs verified approvals from at least two distinct people, one of them credentialed for one of the
 control's domains (stations). Reviewers who share any identifier (trust-list subject, roster git identity or declared
-name, compared case-insensitively, with names and emails split out of `Name <email>`) are one person. A control that
+name) are one person. Identifiers are compared after NFKC normalization, collapsing every run of whitespace (NBSP and
+other Unicode spaces included) and case folding; names and emails are split out of `Name <email>`, an email's `+tag`
+and a trailing dot on its domain are dropped. A control that
 cites law also needs an approval from a credentialed legal reviewer. Content an AI drafted needs a human approval whose
 `aiInputs` confirm a `draft` naming this control (`<id>@<version>` or its digest). Any verified objection (`reject` or
 `request_changes`) blocks the quorum until new records resolve it.
 
 In src/catalog/governance/support.ts, `supportStanding(control, promotion, asOf)` is the only function that lets a
-control's declared reviewed or qualified support stand. It is pure: it needs a promotion for exactly the control's id,
-version and current digest whose next review has not passed at `asOf`. Promotions come only from
-`effectiveSupport(control, authority)`, which verifies the review records (below) at the server's clock; P1-33 calls it
-for admission criteria 2 and 9. `compilePlan` takes the promotions as an input (`promotions`), judges them with
+control's declared reviewed or qualified support stand. It is pure (a date comparison, no clock): it needs a promotion
+that effectiveSupport minted, naming its reviewers and records, for exactly the control's id, version and current
+digest, reviewed on or before `asOf` and not yet due. Promotions come only from `effectiveSupport(control, authority)`,
+which verifies the review records (below) at the server's clock; it freezes each promotion, records the digest of every
+review record it counted, and supportStanding refuses any object it did not mint (`GOV_REVIEW_PROMOTION_UNVERIFIED`) or
+one without reviewers and records (`GOV_REVIEW_PROMOTION_EMPTY`). P1-33 calls effectiveSupport for admission criteria
+2 and 9. `compilePlan` takes the promotions as an input (`promotions`), judges them with
 supportStanding at the plan's `asOf` and records them in the plan, so they are bound into its digest; without them every
 row is experimental, as today. Activation and its policy receipts, the A4 conformance and why-view rows, the OSCAL export
 (support, the review block, the approver and each citation's legal review) and `check:catalog-currency` read a
@@ -48,8 +53,8 @@ control's support and review fields only through these results, and a test scans
 Nothing raises support above what the YAML declares.
 
 The D-08 roster is keyed by the reviewer's trust-list subject and lists, for each person, the domains they are
-credentialed for (`legal` for legal review) and every git identity (name and email) they commit under. A reviewer who
-is not on the roster never counts. The roster is an input, not a field a record can declare. Until D-08 supplies the
+credentialed for (`legal` for legal review) and every git identity (name and email) they commit under, at least one.
+A reviewer who is not on the roster, or whose entry lists no identity, never counts. The roster is an input, not a field a record can declare. Until D-08 supplies the
 experts, their pinned keys and the roster, no quorum can be met, so no control can compile as reviewed.
 
 ### Independence and conflicts of interest
@@ -57,7 +62,11 @@ experts, their pinned keys and the roster, no quorum can be met, so no control c
 A reviewer may not review a subject they authored or a change they made. Git authors are unsigned (`--author` can
 claim anything), so the check is broad: a record is refused when any of the reviewer's identities (the trust-list
 subject, every roster git identity and the record's declared name) matches any name or email that ever authored the
-control's file (`git log --follow`). Every record
+control's file (`git log --follow`, so renames keep their authors; a file without history is refused).
+
+What this cannot close: git authors are unsigned, so an author can commit under a new identity the roster does not
+list, and one person with two roster entries whose identities never overlap counts as two people. Only signed commits
+and a signed D-08 roster close those gaps; until then the roster's identities are the operator's word. Every record
 states `reviewer.credential` and `reviewer.conflictsDeclared`; both must be non-blank, and "none" is a declaration, not
 a blank.
 
@@ -83,7 +92,8 @@ data, not catalog content: they never change a digest. The format (`reviewRecord
 A record is a declaration. effectiveSupport reads the server's clock itself and loads the operator's trust at it
 (`loadTrustContext`: the AMC home's signed trust lists, verified against the pinned roots with the operator's m-of-n
 policy and anti-rollback, plus distrust); a list that does not verify stops everything (`GOV_REVIEW_TRUST_INVALID`). An
-entry that pins a key for `catalog-review` and anything else is refused for every purpose. A record counts only when,
+entry that pins a key for `catalog-review` and anything else is refused for every purpose, and a key any loaded list pins
+for another purpose is never admitted for `catalog-review`. A record counts only when,
 in order:
 
 1. it parses (human identity, non-blank credential and conflicts, a signature) (`GOV_REVIEW_RECORD_INVALID`);
@@ -96,7 +106,8 @@ in order:
    (`GOV_REVIEW_SIGNER_UNPINNED`);
 5. `reviewer.identity.userId` equals that entry's `subject`: the reviewer principal comes from the key, never from a
    field (`GOV_REVIEW_REVIEWER_UNKNOWN`);
-6. that subject is on the D-08 roster (`GOV_REVIEW_NOT_ON_ROSTER`);
+6. that subject is on the D-08 roster with at least one identity (`GOV_REVIEW_NOT_ON_ROSTER`,
+   `GOV_REVIEW_ROSTER_NO_IDENTITY`);
 7. none of the reviewer's identities matches the control's authors (`GOV_REVIEW_SELF_REVIEW`);
 8. every `f5_verdict` input marked confirmed has a row in `catalog/governance/f5-confirmations.yaml` naming this record
    (`GOV_REVIEW_F5_UNCONFIRMED`);
