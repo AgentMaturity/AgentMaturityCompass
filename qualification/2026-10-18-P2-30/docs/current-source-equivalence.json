@@ -1,0 +1,78 @@
+{
+  "observedAt": "2026-10-18T09:31:43.993280+00:00",
+  "inventoryCommit": "3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+  "integrationBase": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+  "frozenSource": "b37f2630b74084282abccb777f41f275813e4103",
+  "files": [
+    {
+      "path": "src/domains/industryPacks.ts",
+      "identical": true,
+      "hashes": [
+        {
+          "commit": "3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+          "sha256": "ecd96a308a442af09d5b61bc5419be56d1075323b081ce0442d1e643df14c7e7"
+        },
+        {
+          "commit": "7bc90f3245e5232c936a3912beb730f0237c5b2d",
+          "sha256": "ecd96a308a442af09d5b61bc5419be56d1075323b081ce0442d1e643df14c7e7"
+        },
+        {
+          "commit": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561",
+          "sha256": "ecd96a308a442af09d5b61bc5419be56d1075323b081ce0442d1e643df14c7e7"
+        },
+        {
+          "commit": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+          "sha256": "ecd96a308a442af09d5b61bc5419be56d1075323b081ce0442d1e643df14c7e7"
+        },
+        {
+          "commit": "a564e359cbbe1b0deb0c278124bc7401b5029944",
+          "sha256": "ecd96a308a442af09d5b61bc5419be56d1075323b081ce0442d1e643df14c7e7"
+        },
+        {
+          "commit": "3eaa98d0856299f53beb4d0659058f7d9c36be46",
+          "sha256": "ecd96a308a442af09d5b61bc5419be56d1075323b081ce0442d1e643df14c7e7"
+        },
+        {
+          "commit": "b37f2630b74084282abccb777f41f275813e4103",
+          "sha256": "ecd96a308a442af09d5b61bc5419be56d1075323b081ce0442d1e643df14c7e7"
+        }
+      ]
+    },
+    {
+      "path": "src/domains/deepIndustryPacks.ts",
+      "identical": true,
+      "hashes": [
+        {
+          "commit": "3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+          "sha256": "5e64b50d0d9b1ae5dc78b5c4940a521edc35e604774383a1e939fc44f3895777"
+        },
+        {
+          "commit": "7bc90f3245e5232c936a3912beb730f0237c5b2d",
+          "sha256": "5e64b50d0d9b1ae5dc78b5c4940a521edc35e604774383a1e939fc44f3895777"
+        },
+        {
+          "commit": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561",
+          "sha256": "5e64b50d0d9b1ae5dc78b5c4940a521edc35e604774383a1e939fc44f3895777"
+        },
+        {
+          "commit": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+          "sha256": "5e64b50d0d9b1ae5dc78b5c4940a521edc35e604774383a1e939fc44f3895777"
+        },
+        {
+          "commit": "a564e359cbbe1b0deb0c278124bc7401b5029944",
+          "sha256": "5e64b50d0d9b1ae5dc78b5c4940a521edc35e604774383a1e939fc44f3895777"
+        },
+        {
+          "commit": "3eaa98d0856299f53beb4d0659058f7d9c36be46",
+          "sha256": "5e64b50d0d9b1ae5dc78b5c4940a521edc35e604774383a1e939fc44f3895777"
+        },
+        {
+          "commit": "b37f2630b74084282abccb777f41f275813e4103",
+          "sha256": "5e64b50d0d9b1ae5dc78b5c4940a521edc35e604774383a1e939fc44f3895777"
+        }
+      ]
+    }
+  ],
+  "note": "Recorded inventory source and deep pack source are unchanged across these commits; no question or deep question was invented.",
+  "previousFrozenSource": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561"
+}

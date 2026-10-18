@@ -76,6 +76,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/budgets/budgets.ts", why: "operator budget reset" },
   { module: "src/cli.ts", why: "operator pairing and ad hoc guard checks" },
   { module: "src/correlation/correlate.ts", why: "trace correlation failures; they lower the integrity index" },
+  { module: "src/dataflow/detokenizeGate.ts", why: "detokenization receipts and protected-egress refusals (P2-02): AMC enforcement bookkeeping, never maturity evidence" },
   { module: "src/dataflow/redactingSession.ts", why: "redaction receipts (P2-02): classes, detector names, counts and the redacted digest only; AMC enforcement bookkeeping, never maturity evidence" },
   { module: "src/diagnostic/audits.ts", why: "the diagnostic's own derived findings; excluded from scoring and read as penalties" },
   { module: "src/diagnostic/runner.ts", why: "the diagnostic's own findings about a run" },

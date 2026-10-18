@@ -1,0 +1,32 @@
+{
+  "recordedAt": "2026-10-18T09:25:39.716Z",
+  "baselineRevision": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+  "candidateRevision": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561",
+  "comparisons": [
+    {
+      "path": "tests/publicDocsGraph.test.ts",
+      "baselineSha256": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104",
+      "frozenCandidateSha256": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104",
+      "identical": true
+    },
+    {
+      "path": "docs/MCP_SERVER.md",
+      "baselineSha256": "0e34f376e9e8355e2c663b8b323c09adacc0db18ddf3d7bf18f3410787bf4c44",
+      "frozenCandidateSha256": "0e34f376e9e8355e2c663b8b323c09adacc0db18ddf3d7bf18f3410787bf4c44",
+      "identical": true
+    },
+    {
+      "path": "docs/MCP_INDUSTRY_PACKS.md",
+      "baselineSha256": "ae2c64aad89c878d44b42714f92ef5fd2c6a901fb8b0a50b11006075272bae2f",
+      "frozenCandidateSha256": "ae2c64aad89c878d44b42714f92ef5fd2c6a901fb8b0a50b11006075272bae2f",
+      "identical": true
+    },
+    {
+      "path": "website/docs/docs.js",
+      "baselineSha256": "052fffdaf747fe1463e8748f99002542e23820a336ce153618737258138ab228",
+      "frozenCandidateSha256": "052fffdaf747fe1463e8748f99002542e23820a336ce153618737258138ab228",
+      "identical": true
+    }
+  ],
+  "originalFullRunFailure": " FAIL  tests/publicDocsGraph.test.ts > AMC public Docs graph > every local guide edge resolves to another promoted guide\nAssertionError: expected [ { source: 'MCP_SERVER', …(2) } ] to deeply equal []\n\n- Expected\n+ Received\n\n- []\n+ [\n+   {\n+     \"href\": \"MCP_INDUSTRY_PACKS.md\",\n+     \"source\": \"MCP_SERVER\",\n+     \"target\": \"MCP_INDUSTRY_PACKS\",\n+   },\n+ ]\n\n ❯ tests/publicDocsGraph.test.ts:70:21\n     68|     }\n     69|\n     70|     expect(defects).toEqual([]);\n       |                     ^\n     71|   });\n     72|\n\n"
+}

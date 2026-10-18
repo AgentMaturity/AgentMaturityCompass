@@ -28,8 +28,8 @@ import { RUN_CODE_TOOL } from "../tools/toolPipeline.js";
 import { sha256Hex } from "../utils/hash.js";
 import { assertNoDuplicateJsonKeys, canonicalize } from "../utils/json.js";
 import type { ProtectedDataClass } from "../vault/dataClassification.js";
-import { decodedFinds, detectProtectedText, DETECTOR_SET_DIGEST, isRawJson, keyedSpan, MAX_PROTECTED_TEXT_CHARS,
-  redactJsonLeaves, redactProtectedText, secretMember, type ProtectedDataSpan } from "./detectors.js";
+import { decodedFinds, detectProtectedText, DETECTOR_SET_DIGEST, isRawJson, keyedSpan, MAX_PROTECTED_TEXT_CHARS, NOT_JSON,
+  parseExact, rawJSON, redactJsonLeaves, redactProtectedText, secretMember, type ProtectedDataSpan } from "./detectors.js";
 import { protectedDataOptedIn } from "./processorRegistry.js";
 import { digestField, keyedOutputDigest, RedactionRefused, TOKEN_PATTERN_SOURCE, tokenFor } from "./tokenizer.js";
 import { loadTokenKeys, openTokenLookup, storeTokens, type TokenEntry, type TokenKeys } from "./tokenVault.js";
@@ -56,27 +56,6 @@ const MAX_REDACTION_SCAN_CHARS = 32 * MAX_PROTECTED_TEXT_CHARS;
 // about three times, so raise this only with a scan budget. Declared fields follow JSON strings at any depth.
 const MAX_NESTED_JSON = 1;
 const WHOLE_TOKEN = new RegExp(`^${TOKEN_PATTERN_SOURCE}$`);
-const rawJSON = (JSON as unknown as { rawJSON?: (text: string) => unknown }).rawJSON;
-const NOT_JSON = Symbol("not JSON");
-
-/**
- * Parses JSON text so that re-serializing it reproduces every number's source text (`JSON.rawJSON`, Node 21 and later;
- * redaction refuses without it); `NOT_JSON` when the text is not JSON. A duplicate key keeps its last value, as the parse
- * does. Anything else that stops the parse (nesting too deep) refuses.
- */
-function parseExact(text: string): unknown {
-  try {
-    return JSON.parse(text, (_key, value: unknown, context?: { readonly source?: unknown }) => {
-      if (typeof value !== "number") return value;
-      if (rawJSON === undefined || typeof context?.source !== "string") throw new RedactionRefused("runtime_unsupported");
-      return rawJSON(context.source);
-    });
-  } catch (error) {
-    if (error instanceof SyntaxError) return NOT_JSON;
-    throw error instanceof RedactionRefused ? error : new RedactionRefused("detector_invalid");
-  }
-}
-
 /** Whether JSON text the parse accepted repeats a key: the parse kept the last value, and the earlier one was never read. */
 function hasDuplicateKey(source: string): boolean {
   try { assertNoDuplicateJsonKeys(source); return false; } catch { return true; }
@@ -438,8 +417,8 @@ export function createRedactingSession(session: SessionService, redactor: Redact
     },
     recordUserAttachment(params: Parameters<SessionService["recordUserAttachment"]>[0]): SessionEventRef {
       if (!active()) return session.recordUserAttachment(params);
-      // ponytail: image and audio bytes are refused outright, whatever the provider's processor contract covers; admitting
-      // them under a covering contract needs processors on destinations (P2-02 step 7, slice 3).
+      // ponytail: image and audio are refused in every opted-in session whatever the provider contract covers; admitting
+      // them under a BAA needs the pinned provider route at commit time (composition sites), with P2-04.
       if (params.kind !== "text") throw new RedactionRefused("attachment_not_redactable");
       const content = redact(decodeText(params.content, "attachment_not_redactable"), "user/attachment", null);
       return session.recordUserAttachment({ ...params, filename: redact(params.filename, "user/attachment", null), content });

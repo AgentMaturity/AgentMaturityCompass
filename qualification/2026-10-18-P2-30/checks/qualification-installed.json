@@ -1,0 +1,15 @@
+{
+  "name": "qualification-installed",
+  "phase": "post_install_before_evidence_hash_refresh",
+  "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "cmd": "npm run -s check:qualification",
+  "exit": 0,
+  "durationMs": 606,
+  "checkedReceiptSha256": "450e5e547d9d4b45ad85f7764c9d76f0a32c29fdd0b774d19a22ca7a0c8b2774",
+  "receiptUnchangedByCommand": true,
+  "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/qualification-installed.log",
+  "rawLogSha256": "936bfa0dcdc0d073bd3cbd657d72b877df71c8e40b076ddb2f497149299135a5",
+  "node": "v22.23.3",
+  "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+  "note": "This measured validation precedes inclusion of its own evidence and final baseline observation. After artifact hash refresh the installed receipt is revalidated without further qualification writes; that final validation is retained off-tree."
+}

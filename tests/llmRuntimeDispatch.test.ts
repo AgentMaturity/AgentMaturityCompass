@@ -25,6 +25,9 @@ import {
 import type { HttpTransport, LlmAdapter, StreamChunk } from "../src/llm/index.js";
 import type { EvidenceEvent } from "../src/types.js";
 import { ANTHROPIC_CAPABILITIES } from "../src/llm/adapter/providerCapabilities.js";
+import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
+import { DataFlowRefused } from "../src/dataflow/purposePolicy.js";
+import { createWorkspaceRedactor } from "../src/dataflow/redactingSession.js";
 import {
   anthropicTextStream,
   errorResponse,
@@ -696,5 +699,36 @@ describe("P3.1 — the LLM adapter seam dispatches, records, and fails typed", (
         headerEventId: only(h.sessionId, "request/header").id, encoderId: anthropicAdapter.encoderId,
         encoderVersion: anthropicAdapter.encoderVersion }, content: 'shell{"command":"rm -rf'
     });
+  });
+
+  test("P2-02: a committed message holding only PHI tokens still needs a BAA route, and nothing is sent", () => {
+    // Opted in: the route is bound to a processor whose only contract is a DPA, so PHI has no BAA to travel under.
+    initProcessorRegistry(dir, { schemaVersion: "amc.dataflow-processors/v1", experimental: true,
+      processors: [{ processorId: "proc-general", legalName: "Fixture General Processor",
+        contracts: [{ kind: "DPA", reference: "DPA-GENERAL-1", effective: "2026-01-01", expires: null, dataClasses: ["phi", "pii"] }] }],
+      purposes: [{ purposeId: "support", allowedDataClasses: ["phi", "pii"], allowedTools: ["model.request"], allowedProcessors: ["proc-general"] }],
+      bindings: [{ providerId: PROVIDER, baseUrl: "https://api.anthropic.invalid", processorId: "proc-general", purposeId: "support" }] });
+    const minted = createWorkspaceRedactor(dir).redact(JSON.stringify({ patient: { name: "Odalys Fenwick-Brandt" } }), { "patient.name": "phi" });
+    const token = (JSON.parse(minted.text) as { patient: { name: string } }).patient.name;
+    expect(token).toMatch(/^\[\[amc:phi:[0-9a-f]{16}\]\]$/);
+    const session = new SessionService(dir);
+    openSessions.push(session);
+    session.open({ agentId: "default", harnessVersion: "3.1.0", compositionDigest: "composition-digest", policyDigest: "policy-digest" });
+    const systemPrompt = session.recordSystemPrompt("You are a careful assistant.");
+    session.startTurn({ trigger: "user" });
+    session.recordUserMessage(token);
+    session.startStep();
+    const h: Harness = { dir, session, sessionId: session.sessionId, systemPromptEventId: systemPrompt.eventId };
+    const upstream = stubUpstream([() => okStream([])]);
+    const { runtime } = runtimeFor({ harness: h, transport: upstream.transport });
+
+    let refusal: unknown;
+    try { runtime.prepare(callSpec(h)); } catch (error) { refusal = error; }
+    expect(refusal).toBeInstanceOf(DataFlowRefused);
+    expect((refusal as DataFlowRefused).reason).toBe("baa_required");
+    const detected = events(h.sessionId).filter((event) => metaOf(event).auditType === "PROTECTED_DATA_DETECTED");
+    expect(detected).toHaveLength(1);
+    expect(metaOf(detected[0]!)).toMatchObject({ classes: [], declaredClasses: ["phi"], processorId: "proc-general" });
+    expect(upstream.sent, "the transport is never called").toHaveLength(0);
   });
 });

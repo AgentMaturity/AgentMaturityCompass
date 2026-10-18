@@ -1,0 +1,37 @@
+{
+  "phase": "green",
+  "head": "158d4387b75831598cea037fdf97046805c9602d",
+  "command": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "run",
+    "tests/catalog/stations/technology/overlay.test.ts",
+    "--maxWorkers=1"
+  ],
+  "nodeVersion": "v22.23.3",
+  "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30-content",
+  "startedAtUtc": "2026-10-18T11:29:08.774Z",
+  "finishedAtUtc": "2026-10-18T11:29:11.041Z",
+  "exitCode": 0,
+  "signal": null,
+  "sourceStatusBefore": " M docs/catalog/technology/README.md\n M docs/catalog/technology/dispositions.json\n M docs/industries/technology.md\n M scripts/gen-industry-guides.mts\n M tests/catalog/stations/technology/overlay.test.ts\n M tests/industryGuidesGenerator.test.ts\n?? docs/catalog/technology/guide-section.md\n?? qualification/2026-10-18-P2-30/catalog-governance-integration.json\n?? qualification/2026-10-18-P2-30/catalog-version-authorization.json\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/final-scope-audit.json\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/inventory-drift.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/run-full-suite-final.py\n?? qualification/2026-10-18-P2-30/run-post-governance-checks.mjs\n?? qualification/2026-10-18-P2-30/source-git-log.txt\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json\n",
+  "sourceStatusAfter": " M docs/catalog/technology/README.md\n M docs/catalog/technology/dispositions.json\n M docs/industries/technology.md\n M scripts/gen-industry-guides.mts\n M tests/catalog/stations/technology/overlay.test.ts\n M tests/industryGuidesGenerator.test.ts\n?? docs/catalog/technology/guide-section.md\n?? qualification/2026-10-18-P2-30/catalog-governance-integration.json\n?? qualification/2026-10-18-P2-30/catalog-version-authorization.json\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/final-scope-audit.json\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/inventory-drift.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/run-full-suite-final.py\n?? qualification/2026-10-18-P2-30/run-post-governance-checks.mjs\n?? qualification/2026-10-18-P2-30/source-git-log.txt\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json\n",
+  "ownedInputHashes": [
+    {
+      "path": "tests/catalog/stations/technology/overlay.test.ts",
+      "sha256": "ad40fe068d5f95b419d4ebd585ec54b7ceca3b4a12e5c41cada4a728f291515e"
+    },
+    {
+      "path": "docs/catalog/technology/dispositions.json",
+      "sha256": "7f04727ebecd2754c1f30688945e78baa9ae249f58084077d786f830e278154d"
+    },
+    {
+      "path": "docs/catalog/technology/README.md",
+      "sha256": "91a33b0ca7fd79b749f54720b3d5c2c7a6f1741aa5611ef8d995da607a9264f0"
+    }
+  ],
+  "logPath": "qualification/2026-10-18-P2-30/content/p1-42-integration/green.log",
+  "logSha256": "d33a89d7b6a580571bdf98af2668059ef12e3ee72b9716989a8f622b1fc18c93",
+  "scope": "One overlay regression file only; source is uncommitted, other documentation-agent edits are recorded in status and no final qualification is claimed."
+}

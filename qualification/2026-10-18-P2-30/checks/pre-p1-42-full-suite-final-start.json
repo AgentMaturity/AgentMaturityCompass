@@ -1,0 +1,69 @@
+{
+  "head": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+  "int": "83641bceb68659737d7678daeff3fbb2728e2301",
+  "node": "v22.23.3",
+  "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+  "cmd": "npm test -- --maxWorkers=4 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json",
+  "timeUtc": "2026-10-18T10:20:24.051407+00:00",
+  "statusBeforeRun": "M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+  "workingTreeClean": false,
+  "allowedGeneratedOutputPaths": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/content/show-hn-draft.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "website/i18n.js",
+    "website/index.html",
+    "website/lite.html",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "generatedOutputInputs": [
+    {
+      "path": "README.md",
+      "sha256": "a1b41be7359d1d84726410f47e8632dd23c8732254837131c5eaf82e9caf3fcc"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "sha256": "45a6c02ec79335592b6117e71b76e821e3b166fbabd3710ea15e311b9a9b1d77"
+    },
+    {
+      "path": "website/i18n.js",
+      "sha256": "01dcac0db3dd03708782c4d0bfa2bf0e8e44404f14047394666b4b2edaffca70"
+    },
+    {
+      "path": "website/index.html",
+      "sha256": "e0b8e8c5c2919f7be5ead60c27195ef0d3c1c7bd0ca2380fd118c5d1defed4e0"
+    },
+    {
+      "path": "website/lite.html",
+      "sha256": "9e0598e7750cbd89a3f1a6836a727ed38718796650cd04cb7f92d19973810e88"
+    },
+    {
+      "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "sha256": "1cfcf912c333486a41574df74e28e90fcdb24019d0e1c61e0c6c68b2382c1670"
+    },
+    {
+      "path": "docs/content/show-hn-draft.md",
+      "sha256": "679689be0f6f6a1f43a9f835c1eafc804b80a2609dfd7c59bdbc99ca1e12568e"
+    },
+    {
+      "path": "docs/content/reddit-launch-drafts.md",
+      "sha256": "17fe65eabe76dfc398eae82eeda49cf51c13c626f1a8bc6a4e86f5946f6d6fb9"
+    },
+    {
+      "path": "docs/internal/competitive-landscape.md",
+      "sha256": "53687ea2250eaa1da0578aa7e2688e898ccc74a7c8ecb7dd36e6f2700fe1ed82"
+    },
+    {
+      "path": "docs/internal/mirofish-simulation-council.md",
+      "sha256": "8ccda4c19b0aeaf8f449163733cef65609626452936893fac770b574ca8e21b6"
+    }
+  ],
+  "statusPorcelain": "M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? qualification/2026-10-18-P2-30/catalog-governance-integration.json\n?? qualification/2026-10-18-P2-30/catalog-version-authorization.json\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/final-scope-audit.json\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/run-full-suite-final.py\n?? qualification/2026-10-18-P2-30/run-post-governance-checks.mjs\n?? qualification/2026-10-18-P2-30/source-git-log.txt\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json",
+  "committedImplementationSourceAtStart": true,
+  "generatedOutputsBackup": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/generated-counts-before-final-full-a7e6be69f149bfdeb2845077f3412092443ad6b2",
+  "generatedOutputPolicy": "Required regenerated count outputs remain uncommitted and hashed. publicStatsDrift.test.ts compares them with the actual test-file inventory; reverting them to old HEAD counts would create artificial failures. No other uncommitted source or test input is admitted.",
+  "policy": "One measured full-suite run on final source; no all-green claim required. Four workers on a 12 logical CPU host; no test budgets or assertions changed."
+}

@@ -25,7 +25,8 @@ const SIGNATURE = ["L1-WLT-US-02", "L1-WLT-US-03", "L1-WLT-US-04", "L1-WLT-US-12
 const EXECUTED = ["L1-WLT-US-01", "L1-WLT-US-02", "L1-WLT-US-05", "L1-WLT-US-06", "L1-WLT-US-07", "L1-WLT-US-11"];
 const pack = catalog.packs.get("amc.l1.wealth.us")?.manifest;
 const wealth = Object.keys(SPEC).map((id) => catalog.controls.get(id)).filter((c): c is ControlRecord => c !== undefined);
-const entries = new Map((catalog.registers?.get("us")?.entries ?? []).map((e) => [e.id, e]));
+// Other station overlays append US entries; this page documents the Wealth references.
+const entries = new Map((catalog.registers?.get("us")?.entries ?? []).filter((e) => e.stations.includes("wealth")).map((e) => [e.id, e]));
 const text = (rel: string) => readFileSync(join(process.cwd(), rel), "utf8");
 const CLAIM = /\b(reviewed|approved|certified|compliant)\b/i;
 const unclaimed = (s: string) => s.replace(/not\s+independently\s+reviewed/gi, "").replace(/\b(reviewedAt|reviewedBy|approvedBy|legalReview)\b/g, "");

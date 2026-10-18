@@ -8,6 +8,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
+import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName, type MountedNativeMcpServer } from "../src/mcp/nativeMcpClient.js";
@@ -88,7 +89,7 @@ async function fixture(state: State = {}, options: Partial<NativeMcpHttpServer> 
   return { workspace, server, state, calls, toolset, notifications,
     mount: async () => { const reviewed = await discoverNativeMcpCatalog(server, workspace); const mount = await mountNativeMcpServer({
       server, workspace, agentId: "default", toolset, expectedCatalogDigest: reviewed.digest, grants: [{ name: "lookup", actionClass: "READ_ONLY" }] }); mounts.push(mount); return mount; },
-    call: (signal = new AbortController().signal) => toolset.seam.execute({ callId: `http-call-${++sequence}`, toolName: name, rawArguments: '{"query":"fixture"}',
+    call: (signal = new AbortController().signal, rawArguments = '{"query":"fixture"}') => toolset.seam.execute({ callId: `http-call-${++sequence}`, toolName: name, rawArguments,
       sessionId: session.sessionId, turn: 1, step: 1, parentToken: null, dispatch: "native", signal }) };
 }
 
@@ -187,6 +188,17 @@ describe("governed native Streamable HTTP", () => {
     await vi.waitFor(() => expect(f.calls.filter(call => call.rpc === "tools/call")).toHaveLength(1)); controller.abort();
     expect((await call).outcome).toBe("CANCELLED"); expect((await f.call()).outcome).toBe("DENIED");
     await vi.waitFor(() => expect(f.calls.filter(call => call.method === "DELETE")).toHaveLength(2));
+  });
+  test("P2-02: a token argument on an unbound grant is refused purpose_violation before tools/call, and the mount stays open", async () => {
+    const f = await fixture();
+    // Opted in with nothing restorable: a READ_ONLY grant binds no record, so no token can be restored for it.
+    initProcessorRegistry(f.workspace, { schemaVersion: "amc.dataflow-processors/v1", experimental: true, processors: [], purposes: [], bindings: [] });
+    await f.mount();
+    const refused = await f.call(undefined, JSON.stringify({ query: "[[amc:phi:0123456789abcdef]]" }));
+    expect(refused).toMatchObject({ outcome: "ERROR", content: "Protected data egress refused: purpose_violation" });
+    expect(f.calls.filter(call => call.rpc === "tools/call")).toEqual([]);
+    expect((await f.call()).outcome).toBe("OK");
+    expect(f.calls.filter(call => call.rpc === "tools/call")).toHaveLength(1);
   });
   test("timeouts and remote error results retain distinct failure facts", async () => {
     const f = await fixture({ remoteError: true }); const mount = await f.mount();

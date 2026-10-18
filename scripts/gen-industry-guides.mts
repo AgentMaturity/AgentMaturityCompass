@@ -233,6 +233,13 @@ function stationGuide(station: Domain): { md: string; packs: number; questions: 
   L.push("- Pack results from `amc domain pack run` are self-assessments capped at L1 (see Sector packs).");
   L.push("- Pack questions, deep questions and this guide are AI-drafted and experimental: no qualified expert has reviewed them.", "");
 
+  try {
+    const section = textOf(`docs/catalog/${station}/guide-section.md`).trimEnd();
+    if (section) L.push(section, "");
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+  }
+
   L.push(...appendix(c, station));
   return { md: L.join("\n").trimEnd() + "\n", packs: packs.length, questions: total };
 }

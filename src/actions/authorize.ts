@@ -14,6 +14,7 @@ import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalReques
 import { cliInitiator, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
 import { activeUserRecord } from "../auth/authApi.js";
 import { assertContract } from "../contracts/index.js";
+import { purposeResource } from "../dataflow/purposePolicy.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import type { LeasePayload } from "../leases/leaseSchema.js";
@@ -81,7 +82,7 @@ export type BindResult =
 export type AuthorizationIntentResult =
   | { readonly ok: true; readonly payload: AuthorizationIntent; readonly question: string } | Failed;
 type Call = Pick<ToolExecution, "workspace" | "name" | "actionClass" | "effectiveMode" | "arguments">;
-type Facts = Pick<AuthorizationRecordV1, "scope" | "policy" | "action" | "bindings"> & {
+type Facts = Pick<AuthorizationRecordV1, "scope" | "policy" | "action" | "bindings" | "resource"> & {
   readonly agentSuppliedMetadata: Record<string, unknown> | null;
   readonly effects: EffectDeclaration | null;
 };
@@ -114,6 +115,9 @@ function actionFacts(call: Call, compiled?: CompiledPolicyFacts): { readonly ok:
     // Binding fields come from the SIGNED entry only; an unverifiable config has none.
     const signed = snapshot.config ? findToolDefinition(snapshot.config, call.name) : null;
     if (signed && signed.actionClass !== call.actionClass) return failed("tool_changed", "the signed tools config gives this tool another action class");
+    // P2-02: the purpose comes from the signed processor registry only, for the intent, the binding and the recheck alike.
+    const purpose = purposeResource(call.workspace, call.name);
+    if (!purpose.ok) return failed(purpose.failure, purpose.reason);
     const args = normalizeArguments(signed, call.actionClass, call.arguments);
     if (!args.ok) return failed(args.failure, args.reason);
     const policy = {
@@ -135,6 +139,7 @@ function actionFacts(call: Call, compiled?: CompiledPolicyFacts): { readonly ok:
       action: { toolName: call.name, adapterId: signed?.context?.kind === "mcp" ? `mcp:${signed.context.server.id}` : "native",
         actionClass: call.actionClass, mode: call.effectiveMode, argumentsDigest: args.argumentsDigest, normalizer: args.normalizer },
       bindings: args.bindings,
+      resource: { purpose: purpose.resource.purpose, dataClasses: [...purpose.resource.dataClasses] },
       agentSuppliedMetadata: args.agentSuppliedMetadata,
       effects: signed?.effects ?? null
     } };
@@ -273,7 +278,7 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
       control: ctx.compiledPolicy?.controlFor(execution.actionClass) ?? { controlId: null, controlVersion: null },
       policy: facts.facts.policy,
       action: facts.facts.action,
-      resource: { purpose: null, dataClasses: [] },
+      resource: facts.facts.resource,
       bindings: facts.facts.bindings,
       authority: { approvals, exceptions: [] },
       // Minted here, before dispatch, never taken from a caller (P1-04).
@@ -345,6 +350,7 @@ export function recheckAuthorization(record: AuthorizationRecordV1, execution: T
   else {
     add(...intentDifferences(intentPayloadFor(record), intentPayloadFor(current.facts)));
     if (canonicalize(record.policy) !== canonicalize(current.facts.policy)) add("policy_revision_changed");
+    if (canonicalize(record.resource) !== canonicalize(current.facts.resource)) add("purpose_violation");
   }
   for (const approval of record.authority.approvals) add(...recheckApproval(record, execution, approval));
   if (ctx.leaseToken !== undefined || record.delegation.leaseId !== null) {

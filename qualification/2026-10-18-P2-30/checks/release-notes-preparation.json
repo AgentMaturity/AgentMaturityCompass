@@ -1,0 +1,20 @@
+[
+  {
+    "name": "release-notes-generation",
+    "cmd": "npm run -s release:notes",
+    "exit": 0,
+    "durationMs": 2776,
+    "sourceHeadBeforeDocGeneration": "a564e359cbbe1b0deb0c278124bc7401b5029944",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/release-notes-generation.log",
+    "rawLogSha256": "6d02a501fef2cd4c7d3211732d683405643027bac73b01bad205f094caf7d798"
+  },
+  {
+    "name": "release-notes-precheck",
+    "cmd": "npm run -s release:notes -- --check",
+    "exit": 0,
+    "durationMs": 419,
+    "sourceHeadBeforeDocGeneration": "a564e359cbbe1b0deb0c278124bc7401b5029944",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/release-notes-precheck.log",
+    "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]
