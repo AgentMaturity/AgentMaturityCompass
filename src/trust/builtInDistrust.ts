@@ -9,7 +9,11 @@ import { distrustEntrySchema, parseTrustValue, type DistrustEntry } from "./trus
 
 const builtInDistrustSchema = z.strictObject({ distrust: z.array(distrustEntrySchema) });
 
+let shipped: DistrustEntry[] | null = null;
+
+/** Read once per process: the file ships with the package and never changes under it (signing calls this per key use). */
 export function builtInDistrust(): DistrustEntry[] {
-  const text = readFileSync(new URL("./amc-distrust.json", import.meta.url), "utf8");
-  return parseTrustValue(builtInDistrustSchema, JSON.parse(text) as unknown, "built-in amc-distrust.json").distrust;
+  shipped ??= parseTrustValue(builtInDistrustSchema, JSON.parse(readFileSync(new URL("./amc-distrust.json", import.meta.url), "utf8")) as unknown,
+    "built-in amc-distrust.json").distrust;
+  return shipped;
 }
