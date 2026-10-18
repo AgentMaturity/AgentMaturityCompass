@@ -1,6 +1,6 @@
 // Generates docs/industries/*.md, one regulated deployment guide per station plus an index, from source.
 // Tracked from the candidate's integration/I1/build-guides.mts (37c1466b, P1-42) without its hard-coded commit and
-// environment, so the same tree always renders the same bytes. Every file:line citation is derived here and
+// environment, so the same tree always renders the same bytes. Every citation (file plus symbol or text) is derived here and
 // re-checked by tests/industryGuides.test.ts.
 //
 // Usage: npx tsx scripts/gen-industry-guides.mts [--check] [--dir <dir>]
@@ -23,31 +23,40 @@ const ctx = { agentId: "a", agentName: "a", role: "r", domain: "health", primary
 const emptyPasses = (p: AssurancePack) => p.scenarios.filter((s) => s.validate("", s.buildPrompt(ctx), ctx).pass).length;
 const registered = listAssurancePacks();
 const byId = new Map(registered.map((p) => [p.id, p] as const));
-const fileLines = new Map<string, string[]>();
-const linesOf = (file: string) => {
-  if (!fileLines.has(file)) fileLines.set(file, readFileSync(join(ROOT, file), "utf8").split("\n"));
-  return fileLines.get(file)!;
+/** Reads a repository file; renderGuides takes another reader so a test can edit a file in memory. */
+export type Reader = (file: string) => string;
+const defaultRead: Reader = (file) => readFileSync(join(ROOT, file), "utf8");
+let read: Reader = defaultRead;
+const texts = new Map<string, string>();
+const textOf = (file: string) => {
+  if (!texts.has(file)) texts.set(file, read(file));
+  return texts.get(file)!;
 };
-const lineOf = (file: string, token: string, from = 0) => {
-  const i = linesOf(file).findIndex((l, n) => n >= from && l.includes(token));
-  if (i < 0) throw new Error(`${file}: ${token} not found`);
-  return i + 1;
+/**
+ * Throws unless `token` occurs in `file`, after `anchor` when one is given. Citations name a symbol or text, never a
+ * line number, so an unrelated edit that moves lines cannot break them (P1-42 review).
+ */
+const locate = (file: string, token: string, anchor?: string) => {
+  const text = textOf(file);
+  const from = anchor === undefined ? 0 : text.indexOf(anchor);
+  if (from < 0) throw new Error(`${file}: ${anchor} not found`);
+  if (text.indexOf(token, from) < 0) throw new Error(`${file}: ${token} not found${anchor === undefined ? "" : ` after ${anchor}`}`);
 };
 const bt = (s: string) => "`" + s + "`";
 
 class Cites {
-  rows: { id: string; claim: string; file: string; line: number; token: string }[] = [];
-  ref(claim: string, file: string, token: string, from = 0): string {
-    const line = lineOf(file, token, from);
-    const existing = this.rows.find((r) => r.file === file && r.line === line && r.token === token);
+  rows: { id: string; claim: string; file: string; token: string; anchor?: string }[] = [];
+  ref(claim: string, file: string, token: string, anchor?: string): string {
+    locate(file, token, anchor);
+    const existing = this.rows.find((r) => r.file === file && r.token === token && r.anchor === anchor);
     if (existing) return `[${existing.id}]`;
     const id = `C${this.rows.length + 1}`;
-    this.rows.push({ id, claim, file, line, token });
+    this.rows.push({ id, claim, file, token, anchor });
     return `[${id}]`;
   }
   table(): string[] {
-    return ["| ID | Claim | Source | Token on that line |", "|---|---|---|---|",
-      ...this.rows.map((r) => `| ${r.id} | ${r.claim} | \`${r.file}:${r.line}\` | \`${r.token}\` |`)];
+    return ["| ID | Claim | Source | Text in that file (after the first, when two are given) |", "|---|---|---|---|",
+      ...this.rows.map((r) => `| ${r.id} | ${r.claim} | \`${r.file}\` | ${r.anchor === undefined ? "" : `\`${r.anchor}\` … `}\`${r.token}\` |`)];
   }
 }
 
@@ -96,7 +105,7 @@ function controlsSection(c: Cites): string[] {
     `| Prompt-injection guard | Refuses a tool call whose arguments match an injection pattern at block confidence. | ${c.ref("Prompt-injection guard definition", F.guards, "export function promptInjectionGuard")} ${c.ref("The guard matches at BLOCK_CONFIDENCE only", F.guards, "minConfidence: BLOCK_CONFIDENCE")} |`,
     `| Runtime firewall | Evaluates each tool call's arguments. A workspace with no signed firewall policy blocks every call (mode \`missing-policy\`). | ${c.ref("The native toolset registers the runtime-firewall guard", F.toolset, 'registry.guard("runtime-firewall"')} ${c.ref("Runtime firewall guard definition", F.guards, "export function runtimeFirewallGuard")} ${c.ref("Firewall evaluation entry point", F.firewall, "export function evaluateRuntimeFirewall")} ${c.ref("No policy yields mode missing-policy with action block", F.firewall, 'mode = "missing-policy";')} |`,
     `| Budgets | Native tool calls in EXECUTE mode reserve against the signed per-agent budget; with no signed budget for the agent the call is refused, and an exhausted daily tool budget refuses the action class. | ${c.ref("The native toolset registers the budgets guard", F.toolset, 'registry.guard("budgets"')} ${c.ref("Budget guard definition", F.guards, "export function budgetGuard")} ${c.ref("Native tool budget admission", F.nativeBudget, "export function reserveNativeToolBudget")} ${c.ref("No signed budget refuses the native call", F.nativeBudget, "no signed budget applies to this native agent")} ${c.ref("Exhausted daily tool budget refuses", F.nativeBudget, "daily tool budget exhausted")} |`,
-    `| Budget status (advisory path) | \`evaluateBudgetStatus\` reports not-ok when the budgets file signature is invalid. It reports ok when the agent has no per-agent budget; the native admission path above does not. | ${c.ref("Budget status function", F.budgets, "export function evaluateBudgetStatus")} ${c.ref("Invalid budgets signature is reported", F.budgets, "budgets config signature invalid")} ${c.ref("No per-agent budget returns ok", F.budgets, "if (!budget) {", lineOf(F.budgets, "export function evaluateBudgetStatus"))} |`,
+    `| Budget status (advisory path) | \`evaluateBudgetStatus\` reports not-ok when the budgets file signature is invalid. It reports ok when the agent has no per-agent budget; the native admission path above does not. | ${c.ref("Budget status function", F.budgets, "export function evaluateBudgetStatus")} ${c.ref("Invalid budgets signature is reported", F.budgets, "budgets config signature invalid")} ${c.ref("No per-agent budget returns ok", F.budgets, "if (!budget) {", "export function evaluateBudgetStatus")} |`,
     `| Network egress | A network tool call must name a URL whose host is on that tool's signed allowlist; an unlisted network tool is refused. | ${c.ref("The native toolset registers the network-egress guard", F.toolset, 'registry.guard("network-egress"')} ${c.ref("Network egress guard definition", F.guards, "export function networkEgressGuard")} ${c.ref("Unlisted network tool is refused", F.guards, "so its egress is ungoverned")} |`,
     `| Tool allowlist | Tools absent from the signed \`tools.yaml\` are denied when the config is deny-by-default; an unverifiable config denies every call. | ${c.ref("The native toolset registers the tool-allowlist guard", F.toolset, 'registry.guard("tool-allowlist"')} ${c.ref("Tool allowlist guard definition", F.guards, "export function toolhubAllowlistGuard")} ${c.ref("Unverifiable allowlist denies", F.guards, "An unverifiable allowlist is not an empty allowlist.")} ${c.ref("Deny-by-default for unlisted tools", F.guards, "snapshot.config.tools.denyByDefault")} |`,
     `| Sandbox | Native sandbox admission returns a permit only for the \`bash\` tool at action class WRITE_HIGH, on Linux (bubblewrap) or on macOS (seatbelt) unless the signed kind is the Linux-only \`linux-bwrap\`; the Docker sandbox runs with \`--network none\` unless a network or gateway route is named. | ${c.ref("Native sandbox admission", F.sbBind, "export function admitNativeSandboxPolicy")} ${c.ref("Admission requires Linux, or macOS for a kind other than linux-bwrap", F.sbBind, 'return process.platform === "linux" || (process.platform === "darwin"')} ${c.ref("bubblewrap backend", F.bwrap, "export function bwrapBackend")} ${c.ref("seatbelt backend", F.seatbelt, "export function seatbeltBackend")} ${c.ref("Docker sandbox argument builder", F.docker, "export function buildSandboxDockerArgs")} ${c.ref("Docker sandbox default network none", F.docker, 'args.push("--network", "none");')} |`,
@@ -138,7 +147,7 @@ function frameworkTargets(strings: string[]) {
 }
 
 function packSection(c: Cites, station: Domain, packs: IndustryPack[], total: number): string[] {
-  const run = lineOf(F.cliDomain, "Run an industry sector pack");
+  const run = "Run an industry sector pack";
   return [
     "## Sector packs",
     "",
@@ -160,8 +169,7 @@ function stationGuide(station: Domain): { md: string; packs: number; questions: 
   const meta = DOMAIN_REGISTRY[station];
   const packs = getIndustryPacksByStation(station);
   const total = packs.reduce((n, p) => n + p.questions.length, 0);
-  const from = linesOf(F.registry).findIndex((l) => l === `  ${station}: {`);
-  const R = (claim: string, token: string) => c.ref(claim, F.registry, token, from);
+  const R = (claim: string, token: string) => c.ref(claim, F.registry, token, `  ${station}: {`);
   const L: string[] = header(`${meta.name} station: regulated deployment guide`, `industry-guide:${station}`);
   L.push(`This guide maps what AMC source provides for an agent deployed in the \`${station}\` station: its sector packs, the frameworks those packs name, the assurance packs, the deployment controls and the evidence AMC can produce. It is generated from source; every count is derived from source, and every source location is listed in the verification appendix and checked by \`tests/industryGuides.test.ts\`.`, "");
   L.push("It does not say what any regulation requires, and it is not legal advice. Framework names below are strings that appear in AMC source; their presence means a pack refers to them, not that AMC satisfies them.", "");
@@ -183,7 +191,7 @@ function stationGuide(station: Domain): { md: string; packs: number; questions: 
   L.push("## Frameworks referenced", "");
   L.push(`- Station \`regulatoryBasis\` ${R("Station regulatoryBasis", "regulatoryBasis:")}: ${meta.regulatoryBasis.map(bt).join(", ")}.`);
   L.push(`- Station \`complianceFrameworks\` ${R("Station complianceFrameworks", "complianceFrameworks:")}: ${meta.complianceFrameworks.map(bt).join(", ")}.`);
-  L.push(`- The station's packs name ${packStrings.length} distinct framework strings in their \`regulatoryBasis\` and \`complianceFrameworks\` fields ${c.ref("IndustryPack carries regulatoryBasis as plain strings", F.packs, "regulatoryBasis: string[];", lineOf(F.packs, "export interface IndustryPack {"))}: ${packStrings.map(bt).join(", ")}.`, "");
+  L.push(`- The station's packs name ${packStrings.length} distinct framework strings in their \`regulatoryBasis\` and \`complianceFrameworks\` fields ${c.ref("IndustryPack carries regulatoryBasis as plain strings", F.packs, "regulatoryBasis: string[];", "export interface IndustryPack {")}: ${packStrings.map(bt).join(", ")}.`, "");
   L.push(`\`amc compliance report --framework <id>\` accepts the ids of \`ComplianceFramework\` ${c.ref("ComplianceFramework id union", F.frameworks, "export type ComplianceFramework ")}, resolved by \`normalizeFrameworkName\` ${c.ref("Framework name resolution", F.frameworks, "export function normalizeFrameworkName")}; an unresolved name is rejected ${c.ref("CLI rejects an unresolved framework name", F.cli, "Unsupported compliance framework")}. Of the ${allStrings.length} framework strings above (station and packs together):`, "");
   const verb = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
   const pairs = (xs: [string, string][]) => xs.map(([s, d]) => `${bt(s)} → \`${d}\``).join(", ");
@@ -235,7 +243,7 @@ function appendix(c: Cites, station?: Domain): string[] {
     "",
     "- Generated by `scripts/gen-industry-guides.mts` from the source tree; `npm run check:industry-guides` fails when a guide differs from a fresh render.",
     "- Exercised: reading source. Not exercised: no command in this guide was run against an agent, no control was executed, and no regulatory text was consulted.",
-    "- `npx vitest run tests/industryGuides.test.ts` re-derives every pack, question and scenario count in this guide from source, re-runs the empty-response check, and checks that every row below still points at a line containing its token.",
+    "- `npx vitest run tests/industryGuides.test.ts` re-derives every pack, question and scenario count in this guide from source, re-runs the empty-response check, and checks that every row below still names text found in its file (after the first text, when a row gives two).",
     station
       ? `- Pack counts by hand: \`node_modules/.bin/tsx -e 'import {getIndustryPacksByStation} from "./src/domains/industryPacks.ts"; const p=getIndustryPacksByStation("${station}"); console.log(p.length, p.reduce((n,x)=>n+x.questions.length,0))'\``
       : `- Pack counts by hand: \`node_modules/.bin/tsx -e 'import {listIndustryPacks} from "./src/domains/industryPacks.ts"; const p=listIndustryPacks(); console.log(p.length, p.reduce((n,x)=>n+x.questions.length,0))'\``,
@@ -258,7 +266,7 @@ function readme(totals: Record<string, { packs: number; questions: number }>): s
   L.push("", `Total: ${all.length} packs, ${all.reduce((n, p) => n + p.questions.length, 0)} questions.`, "");
   L.push("## How these guides stay true", "");
   L.push("- `scripts/gen-industry-guides.mts` generates every guide from source. `npm run check:industry-guides` (run in CI) fails when a committed guide differs from a fresh render; regenerate with `npm run gen-industry-guides`.");
-  L.push("- `tests/industryGuides.test.ts` re-derives every pack, question and scenario count from source, and fails when an appendix row no longer lands on a line containing its token, printing where the token is now.");
+  L.push("- `tests/industryGuides.test.ts` re-derives every pack, question and scenario count from source, and fails when an appendix row's text is no longer in its file. Rows cite a symbol or text, never a line number, so edits elsewhere in a file do not break them.");
   L.push(`- [The regulatory calendar](../REGULATORY_CALENDAR.md) is generated from \`GLOBAL_FRAMEWORKS\` ${c.ref("Calendar register", F.globalReg, "export const GLOBAL_FRAMEWORKS")} and the sourced register's key dates ${c.ref("Sourced regulatory register", F.register, "export const REGULATORY_REGISTER")} by \`node scripts/gen-regulatory-calendar.mjs\`; \`npm run check:regulatory-calendar\` fails when the page and its sources disagree.`, "");
   L.push("## Shared caveats", "");
   L.push("- Pack questions and these guides are AI-drafted and experimental: no qualified expert has reviewed them, and nothing in them is evaluated until an operator answers a pack.");
@@ -268,8 +276,19 @@ function readme(totals: Record<string, { packs: number; questions: number }>): s
   return L.join("\n").trimEnd() + "\n";
 }
 
-/** File name -> content for README.md and one guide per station. Pure apart from reading source files. */
-export function renderGuides(): Map<string, string> {
+/** File name -> content for README.md and one guide per station. Pure apart from reading source files through `reader`. */
+export function renderGuides(reader: Reader = defaultRead): Map<string, string> {
+  read = reader;
+  texts.clear();
+  try {
+    return renderAll();
+  } finally {
+    read = defaultRead;
+    texts.clear();
+  }
+}
+
+function renderAll(): Map<string, string> {
   const out = new Map<string, string>();
   const totals: Record<string, { packs: number; questions: number }> = {};
   for (const s of Object.keys(DOMAIN_REGISTRY) as Domain[]) {
