@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-30",
+  "date": "2026-10-18",
+  "commit": "b9866b0fa29d2efdb7a8f8c176cdf12e1af959d0",
+  "branch": "codex/p2-30-technology-overlay",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0, local macOS; not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "node qualification/2026-10-18-P2-30/preflight.mjs",
+      "exit": 0,
+      "durationMs": 704
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "preflight.mjs",
+      "sha256": "b3ee5dfce3fe0e64d5abc4255edfb0bcd03e464c355a92cdb069fb12c39ae2a8"
+    },
+    {
+      "path": "preflight.json",
+      "sha256": "e62e45a12977e473526769b927fe3efc7573b9547e3c60ae324dcfedd9a4ac17"
+    },
+    {
+      "path": "preflight.log",
+      "sha256": "334ccc610da4fa28d945c6c9cdb73cfba32686e95ee0fc3198a6a1883c2d954a"
+    },
+    {
+      "path": "graph-navigation.json",
+      "sha256": "585b1b39607e9938cb6af5fff9d4c71261095b23bd1104cdc6912bd9c7d147ef"
+    },
+    {
+      "path": "install.log",
+      "sha256": "49ff481f7e31a7cf5ff53beda8633d31ec8a0f7e6f9ae891590c8f52a478378d"
+    },
+    {
+      "path": "setup-build.log",
+      "sha256": "f7837c85d5f421e943ee93b1b207f225ba6a46ab470ac38608379cb1a1e7ca9d"
+    },
+    {
+      "path": "README.md",
+      "sha256": "a722681a29acc4f0cfbcc5cb712f2d387814757d00fa7c196f5c72235ecebd74"
+    },
+    {
+      "path": "qualification-check.log",
+      "sha256": "4742ece4f02d2def40476ddf9f1449cf8d880fa46b19900b7d61ae60395bce20"
+    },
+    {
+      "path": "integration-blocker-path-diff.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "notes": "Blocked before implementation by the P2-30 layout/schema contract and source-question inventory mismatch. Setup install and build completed with exit 0; their durations were not instrumented and only their logs are included. No Vitest, full suite, mutations or overlay qualification ran. All production source and catalog files remain unchanged. preflight.json records git HEAD/status, the baseline catalog digest and concrete rejection evidence. See README.md for every deferred check and integrator action."
+}
