@@ -2,7 +2,7 @@
   "planVersion": 1,
   "compiler": {
     "name": "amc-catalog-compiler",
-    "version": "1.2.0"
+    "version": "<amcVersion>"
   },
   "profile": {
     "profileId": "finance-ops-us",
@@ -17,13 +17,17 @@
       "riskClass": "reviewed",
       "useCases": "reviewed",
       "dataClasses": "reviewed"
+    },
+    "deployment": {
+      "tenantId": "tenant-example",
+      "deploymentId": "finance-ops-us-1"
     }
   },
   "lock": {
     "lockfileVersion": 1,
     "generatedBy": {
       "tool": "agent-maturity-compass",
-      "version": "1.2.0"
+      "version": "<amcVersion>"
     },
     "catalog": {
       "id": "amc.fixture.compiler",
@@ -1028,5 +1032,5 @@
       }
     ]
   },
-  "digest": "sha256:a65d451a0207971e9a82af01c62038e6a6aed2adbc28aede2d12e27e3b6553a0"
+  "digest": "sha256:0eba75a5b401311300f6dd2261fe176a0dccc17475677a87ddc6443d4dba7021"
 }
