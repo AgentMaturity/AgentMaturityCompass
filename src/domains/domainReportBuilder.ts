@@ -1,6 +1,7 @@
 import { envelopeForUnverifiedResult } from "../claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
 import type { ClaimEnvelope } from "../claims/eligibility/types.js";
+import { QUESTIONNAIRE_NOTICE } from "./questionnaireLabel.js";
 import type {
   ComplianceGap,
   DomainAssessmentResult,
@@ -87,6 +88,7 @@ function renderExecutiveSummary(summary: ExecutiveSummary): string {
 function renderEuAIActClassification(classification: EuAIActClassification): string {
   const lines = [
     "## EU AI Act Classification",
+    `- Status: ${classification.contentStatus}. ${QUESTIONNAIRE_NOTICE}`,
     `- Station category: ${classification.domainCategory}`,
     "",
     "| Pack | Classification | Annex III Points | General Purpose AI |",

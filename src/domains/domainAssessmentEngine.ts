@@ -4,6 +4,7 @@ import {
 } from "../score/units.js";
 import { getDomainMetadata, type Domain, type DomainMetadata } from "./domainRegistry.js";
 import { getDomainModuleActivations } from "./domainModuleMap.js";
+import { QUESTIONNAIRE_CONTENT_STATUS } from "./questionnaireLabel.js";
 import { getIndustryPacksByStation } from "./industryPacks.js";
 
 export interface DomainAssessmentInput {
@@ -32,6 +33,8 @@ export interface DomainAssessmentResult {
 /** Station-level EU AI Act category plus each station pack's Annex III classification. */
 export interface EuAIActClassification {
   domainCategory: DomainMetadata["euAIActCategory"];
+  /** The pack classifications are AI-drafted and unreviewed (P1-42). */
+  contentStatus: typeof QUESTIONNAIRE_CONTENT_STATUS;
   packs: Array<{
     packId: string;
     packName: string;
@@ -258,6 +261,7 @@ export function parseAnnexIIIPoints(classification: string): { points: number[];
 function buildEuAIActClassification(domain: Domain, metadata: DomainMetadata): EuAIActClassification {
   return {
     domainCategory: metadata.euAIActCategory,
+    contentStatus: QUESTIONNAIRE_CONTENT_STATUS,
     packs: getIndustryPacksByStation(domain).map((pack) => {
       const parsed = parseAnnexIIIPoints(pack.euAIActClassification);
       return {

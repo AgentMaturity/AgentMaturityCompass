@@ -32,6 +32,7 @@ import {
 } from "../trust/index.js";
 import type { IndustryPack, IndustryPackQuestion } from "./industryPacks.js";
 import { selfAssessPack, type PackSelfAssessment } from "./packSelfAssessment.js";
+import { QUESTIONNAIRE_CONTENT_STATUS, QUESTIONNAIRE_NOTICE } from "./questionnaireLabel.js";
 
 /**
  * /2 (P0-21): the overall pass flag and its threshold gave way to the self-assessment fields.
@@ -203,7 +204,10 @@ export interface IndustryPackAudit {
     gapCount: number;
   };
   frameworkCoverage: Array<{ framework: AuditFramework; controls: number }>;
+  /** Absent from receipts older than /5. */
   currency: AuditCurrency;
+  /** /5 (P1-42): the pack's questions are AI-drafted, experimental content; absent from older receipts. */
+  contentStatus?: typeof QUESTIONNAIRE_CONTENT_STATUS;
   controls: AuditControl[];
   /** Unkeyed sha256 over the canonical audit without `receiptHash` and `signature`: a checksum, not a signature. */
   receiptHash: string;
@@ -428,6 +432,7 @@ export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): Indu
     },
     frameworkCoverage,
     currency,
+    contentStatus: QUESTIONNAIRE_CONTENT_STATUS,
     controls,
   };
   const receiptHash = sha256Hex(canonicalize(body));
@@ -587,6 +592,7 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
   lines.push(`- Pack: \`${audit.packId}\` · Station: ${audit.stationId} · Risk tier: ${audit.riskTier}`);
   lines.push(`- EU AI Act classification: ${audit.euAIActClassification}`);
   lines.push(`- Generated: ${audit.generatedAt}`);
+  if (audit.contentStatus) lines.push(`- Content: ${audit.contentStatus}. ${QUESTIONNAIRE_NOTICE}`);
   const overall = audit.overall;
   const score = overall.percentage === null
     ? `not evaluated (${overall.notEvaluatedQuestionIds.length} of ${overall.controlCount} controls unanswered)` : `${overall.percentage}%`;

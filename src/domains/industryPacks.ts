@@ -211,6 +211,8 @@ export interface IndustryPackScoreResult extends Omit<SelfAssessedPack, "answers
   }>;
   complianceGaps: string[];
   riskTier: string;
+  /** AI-drafted questions no expert has reviewed (P1-42): the result is an experimental, self-reported questionnaire. */
+  contentStatus: typeof QUESTIONNAIRE_CONTENT_STATUS;
 }
 
 export function scoreIndustryPack(
@@ -246,6 +248,7 @@ export function scoreIndustryPack(
     questionResults,
     complianceGaps,
     riskTier: pack.riskTier,
+    contentStatus: QUESTIONNAIRE_CONTENT_STATUS,
   };
 }
 

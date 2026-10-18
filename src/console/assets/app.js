@@ -2332,7 +2332,7 @@ async function renderIndustryPacks() {
         </div>
         <p class="muted">${htmlEscape(pack.description || "")}</p>
         <div class="row spaced">
-          <span class="muted">${htmlEscape(pack.domain || "")} · ${Number(pack.questionCount || 0)} questions</span>
+          <span class="muted">${htmlEscape(pack.domain || "")} · ${Number(pack.questionCount || 0)} questions${pack.contentStatus ? ` · ${htmlEscape(pack.contentStatus)}, self-reported` : ""}</span>
           <button class="secondary" data-industry-pack="${htmlEscape(pack.packId)}">${pack.locked ? "Locked" : "Open"}</button>
         </div>
       </div>
