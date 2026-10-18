@@ -98,7 +98,7 @@ async function runPi({ config, lane, fixture, workspace, model, gateway, finance
   if (amc) {
     const bridgePort = await freePort(); ports.push(bridgePort);
     const amcEnv = amcEnvironment(env); secrets.push(...amcEnv.secrets); Object.assign(process.env, { AMC_VAULT_PASSPHRASE: amcEnv.env.AMC_VAULT_PASSPHRASE });
-    receipt.setup.push(...await prepareAmcForPi({ amc: config.amc, workspace, env: amcEnv.env, control, piBin: join(config.pi.prefix, "node_modules", ".bin"), bridgePort, tuned }));
+    await prepareAmcForPi({ amc: config.amc, workspace, env: amcEnv.env, control, piBin: join(config.pi.prefix, "node_modules", ".bin"), bridgePort, tuned, setup: receipt.setup });
     const bridge = await startBridge({ amc: config.amc, workspace, port: bridgePort }); cleanups.push(() => bridge.close());
     mounts.push({ src: join(workspace, ".amc"), readonly: true }, { src: join(workspace, ".pi"), readonly: true }, { src: join(config.amc.root, "dist"), readonly: true });
   }
@@ -121,8 +121,8 @@ async function runPi({ config, lane, fixture, workspace, model, gateway, finance
 
 async function runAmcNative({ config, fixture, workspace, model, gateway, env, deadline }) {
   const amcEnv = amcEnvironment(env); secrets.push(...amcEnv.secrets);
-  const native = await prepareAmcNative({ amc: config.amc, workspace, env: amcEnv.env, domain: fixture.domain });
-  secrets.push(...native.secrets); receipt.setup.push(...native.setup);
+  const password = randomBytes(24).toString("base64url"); secrets.push(password); // scrubbed even if a step fails
+  const native = await prepareAmcNative({ amc: config.amc, workspace, env: amcEnv.env, domain: fixture.domain, password, setup: receipt.setup });
   const args = ["agent-loop", "run", "--provider", "openai", "--model", model, "--base-url", gateway.origin, "--credential", "PILOT_GATEWAY_TOKEN",
     "--credentials-home", env.HOME, "--credentials-file", join(env.HOME, ".credentials.yaml"), "--tools", "workspace", ...native.preset, "--max-steps", "24", "--json"];
   receipt.setup.push({ label: "amc-native-binding", args });

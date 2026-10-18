@@ -43,9 +43,10 @@ async function step(setup, label, program, args, options) {
   return result;
 }
 
-/** `amc init`, then `amc connect hooks install --provider pi --mode control` binding the Pi on PATH; tuned adds the signed policy. */
-export async function prepareAmcForPi({ amc, workspace, env, control, piBin, bridgePort, tuned, rpm = 120 }) {
-  const setup = [], options = { cwd: workspace, env: { ...env, PATH: `${piBin}:${env.PATH}` } };
+/** `amc init`, then `amc connect hooks install --provider pi --mode control` binding the Pi on PATH; tuned adds the signed policy.
+ * Each step lands in `setup` (the caller's receipt) before its outcome is checked, so a failed step keeps its stderr. */
+export async function prepareAmcForPi({ amc, workspace, env, control, piBin, bridgePort, tuned, rpm = 120, setup = [] }) {
+  const options = { cwd: workspace, env: { ...env, PATH: `${piBin}:${env.PATH}` } };
   await step(setup, "init", amc.cli, ["init", "--trust-boundary", "isolated"], options);
   await step(setup, "hooks-install", amc.cli, ["connect", "hooks", "install", "--provider", "pi", "--mode", "control", "--agent", "default",
     "--bridge-url", `http://127.0.0.1:${bridgePort}`, "--rpm", String(rpm), "--json"], options);
@@ -65,9 +66,8 @@ export async function startBridge({ amc, workspace, port }) {
 }
 
 /** `amc init --coding` for coding tasks; `amc init --regulated` for regulated-document and fin-ops tasks (P1-40). */
-export async function prepareAmcNative({ amc, workspace, env, domain }) {
-  const setup = [], password = randomBytes(24).toString("base64url");
+export async function prepareAmcNative({ amc, workspace, env, domain, password, setup = [] }) {
   const options = { cwd: workspace, env: { ...env, AMC_BOOTSTRAP_OWNER_USERNAME: "pilot-owner", AMC_BOOTSTRAP_OWNER_PASSWORD: password } };
   await step(setup, "init", amc.cli, ["init", domain === "coding" ? "--coding" : "--regulated"], options);
-  return { setup, secrets: [password], preset: domain === "coding" ? [] : ["--preset", "regulated"] };
+  return { setup, preset: domain === "coding" ? [] : ["--preset", "regulated"] };
 }
