@@ -164,9 +164,9 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/demo/demoRun.ts:375:1",
+      "siteId": "src/demo/demoRun.ts:378:1",
       "path": "src/demo/demoRun.ts",
-      "line": 375,
+      "line": 378,
       "call": "fetch(",
       "status": "gated",
       "reason": "Released no-vault internal runDemo caller installs prepared workspace scope; private helper captures it, prepares same-endpoint manual-redirect gateway POST, and gates bridge immediately before fetch with null facts/caller-declared demo actor. Typed denial propagates without a complete run result. Source-only: frozen CLI caller cli-late-stage-commands.ts:348 remains deferred for explicit workspace wiring, and external library callers own their scope. Earlier temp setup/lease/servers/requests can have effects; synthetic output, cleanup and transport/region limits remain unqualified."
@@ -260,17 +260,17 @@
       "reason": "Both final gateway HTTP paths check the trusted workspace registry before every attempt, outside breaker accounting. CONNECT tunnels are listed separately."
     },
     {
-      "siteId": "src/gateway/server.ts:1014:1",
+      "siteId": "src/gateway/server.ts:1016:1",
       "path": "src/gateway/server.ts",
-      "line": 1014,
+      "line": 1016,
       "call": "netConnect(",
       "status": "gated",
       "reason": "Strict CONNECT authority parsing supplies the actual socket host and port and an HTTPS root registry locator. After DNS and allowlist admission, a final synchronous checkEgress precedes netConnect using the trusted gateway workspace, lease-verified agent, network-tool channel and explicit unknown data classes. Typed residency refusal returns before socket creation. This seam does not prove TLS, an encrypted request path or payload classification, or physical region."
     },
     {
-      "siteId": "src/gateway/server.ts:1760:1",
+      "siteId": "src/gateway/server.ts:1766:1",
       "path": "src/gateway/server.ts",
-      "line": 1760,
+      "line": 1766,
       "call": "httpRequest(",
       "status": "exempt",
       "reason": "gatewayStatus probes the gateway health endpoint with a GET and no protected agent body or credentials; final provider requests are separate gated rows."
@@ -300,9 +300,9 @@
       "reason": "Prepared native webhook POST checks callback residency immediately before request construction; each captured injected-client attempt is also checked before invocation. Queue installs captured explicit ALS scope and typed denials bypass retry/queue round accounting, leaving PENDING. Shared dispatcher isolates only that typed refusal to its channel, letting other drains/finalization and truthful queued status continue. ALS supplies workspace only: actor system/unknown, classes/purpose null. Source-only; prior attempts/2xx callback failure, ordered blocking, lost partial receipts, trusted custom-client hops, DNS/default-agent and body limits remain."
     },
     {
-      "siteId": "src/lighthouse/finance/paymentServiceClient.ts:108:1",
+      "siteId": "src/lighthouse/finance/paymentServiceClient.ts:104:1",
       "path": "src/lighthouse/finance/paymentServiceClient.ts",
-      "line": 108,
+      "line": 104,
       "call": "httpRequest(",
       "status": "exempt",
       "reason": "Synthetic finance fixture client is restricted to a local Unix socket or literal 127.0.0.1; no real payment provider is supported."

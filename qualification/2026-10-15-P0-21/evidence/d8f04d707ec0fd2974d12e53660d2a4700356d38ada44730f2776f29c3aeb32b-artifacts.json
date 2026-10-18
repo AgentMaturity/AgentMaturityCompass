@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/classification.json",
+    "bytes": 229,
+    "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/command.json",
+    "bytes": 1944,
+    "sha256": "a487f9487baf7d133e1170737f55a889bf7687b670ac5405a7f167a89b9444d6"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/inputs-after.json",
+    "bytes": 830,
+    "sha256": "fbfe5a4c39a6d372d268da22d6cfc5c8d5f19d9c7511eb811cc318625f5c7649"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/inputs-before.json",
+    "bytes": 830,
+    "sha256": "098951f9ae0a5a3a431ff789b1b2fc6117351c3b5ffa7924de833646040836b1"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/observer.json",
+    "bytes": 20517,
+    "sha256": "58768c79ed15c47331e9c0c858b6cf5d45b2663b60d1a9938492d1de3817289e"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "050f7e51c41904f26f986c1199615faf73774ae6449e128a817bd42e22e0aa35"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/owned-process.json",
+    "bytes": 1569,
+    "sha256": "40c81bcc07f069d7b0ded429c2038d2eb5dc913de0617d2ecdd85c5ca9303075"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/raw.json",
+    "bytes": 13483,
+    "sha256": "63eef61af74ab5b956c0bc813260f5ada0c33e9bbc728db027047347d6f0b288"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/stdout-stderr.log",
+    "bytes": 806,
+    "sha256": "703665058ba0b9b6a556257f58cedb5e6f69b40e992a22fde5d509f40ec33e63"
+  }
+]

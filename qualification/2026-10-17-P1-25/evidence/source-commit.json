@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-16T18:55:18.215532+00:00",
+  "parent": "4f53ff7e5fa4363ccadad1995c679888b222173e",
+  "argv": [
+    "git",
+    "commit",
+    "-m",
+    "test(time): qualify offline RFC 3161 timestamp verification"
+  ],
+  "exit": 0,
+  "stdout": "[codex/p1-25-timestamp-qualification 2792ccc6a] test(time): qualify offline RFC 3161 timestamp verification\n 22 files changed, 2486 insertions(+), 15 deletions(-)\n create mode 100644 tests/fixtures/rfc3161/README.md\n create mode 100644 tests/fixtures/rfc3161/expired.token.der\n create mode 100644 tests/fixtures/rfc3161/missing-eku.token.der\n create mode 100644 tests/fixtures/rfc3161/noncritical-eku.token.der\n create mode 100644 tests/fixtures/rfc3161/provenance.json\n create mode 100644 tests/fixtures/rfc3161/public-certificates.json\n create mode 100644 tests/fixtures/rfc3161/query.der\n create mode 100644 tests/fixtures/rfc3161/tampered-attribute.token.der\n create mode 100644 tests/fixtures/rfc3161/tstinfo.der\n create mode 100644 tests/fixtures/rfc3161/valid.response.der\n create mode 100644 tests/fixtures/rfc3161/valid.token.der\n create mode 100644 tests/time/verifyTimestamp.test.ts\n",
+  "stderr": "",
+  "force": false,
+  "noVerify": false,
+  "PRPushMergeRelease": false,
+  "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "branch": "codex/p1-25-timestamp-qualification",
+  "status": ""
+}

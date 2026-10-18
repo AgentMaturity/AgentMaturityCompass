@@ -1,0 +1,255 @@
+{
+  "capturedUtc": "2026-10-14T21:19:59.724882+00:00",
+  "source": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+  "base": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+  "files": {
+    "CONTRIBUTING.md": {
+      "sha256": "5af3ba77f82438a449c2f52be802478da74525a0dab79cd8e9e66dbb20f0ba1c",
+      "bytes": 16220,
+      "lines": 485
+    },
+    "README.md": {
+      "sha256": "acb2751e76a57dfaedd18d21542f86cc7b07f2a05d45e999690d384c52b52ea8",
+      "bytes": 59828,
+      "lines": 941
+    },
+    "docs/content/reddit-launch-drafts.md": {
+      "sha256": "8ad32fc0d1cd9c64e0c9811799725195c722382959ae52d2e54e3bdd71661f8e",
+      "bytes": 3075,
+      "lines": 52
+    },
+    "docs/content/show-hn-draft.md": {
+      "sha256": "cc7113daf785243064eff280dfc18c9ded8d0bd6ecf66f29877cc74453fbe104",
+      "bytes": 1951,
+      "lines": 35
+    },
+    "docs/internal/competitive-landscape.md": {
+      "sha256": "034667a0d8f6a9c97637ed79bdc65ef2f5670e95576a5ad23cc5516d65ea579a",
+      "bytes": 3880,
+      "lines": 71
+    },
+    "docs/internal/mirofish-simulation-council.md": {
+      "sha256": "793de82b238630afcdff4041e842879b3e57e35972504bbef3643f50e39af6c4",
+      "bytes": 2489,
+      "lines": 32
+    },
+    "tests/assuranceGradingQualification.test.ts": {
+      "sha256": "13607bc9ffe886bb399792bad520c08f43e9920ec03362ed280d1ada4d438f04",
+      "bytes": 17322,
+      "lines": 239
+    },
+    "tests/assuranceRunnerInconclusiveQualification.test.ts": {
+      "sha256": "56b9227f46e054c8cd800ebac9bba7d58c567751988a9779c9a3373d9508270b",
+      "bytes": 18326,
+      "lines": 217
+    },
+    "tests/compliance/assuranceGradingEligibilityQualification.test.ts": {
+      "sha256": "c83a77b468373230a6c4fbb140a7deb8092bb1679585d4c2153c4a541df3ae82",
+      "bytes": 17716,
+      "lines": 192
+    },
+    "website/i18n.js": {
+      "sha256": "b5e9eb8b1fe6d9b2409c29c44a4e0b8032ca1b4ade9a55f58dd896ed3402ec1f",
+      "bytes": 44169,
+      "lines": 568
+    },
+    "website/index.html": {
+      "sha256": "3e68d48455c8b49fd2d4217ae536d3ec4347147466f1dc11ce02dd5984b81e80",
+      "bytes": 43520,
+      "lines": 461
+    },
+    "website/lite.html": {
+      "sha256": "b20dd481ec643a5589e8871cd292be77cc64b42a814c4f49c376dad8923238de",
+      "bytes": 11197,
+      "lines": 195
+    },
+    "whitepaper/AMC_WHITEPAPER_v1.md": {
+      "sha256": "5d0595645351dc6e2b0c8691d03dec8d3d1c03dec5076570b9bdc97305fcb799",
+      "bytes": 107509,
+      "lines": 1216
+    }
+  },
+  "protectedEqualBase": {
+    "src/assurance/scenarioGrading.ts": {
+      "sha256": "552aa7235f50a5f835d4d33259c500a997e3a8e05664dca633b77ee1917c4af0",
+      "bytes": 4413
+    },
+    "src/assurance/validators.ts": {
+      "sha256": "df359ee58e875b298804e643c0c5905c6cac4c35e68ee8af9d575f87acca424f",
+      "bytes": 12568
+    },
+    "src/assurance/scorers.ts": {
+      "sha256": "46a1c75c36b7c8ba4d3b619eb2aff1d14c4ebc0333251f46f342df82a5a53cea",
+      "bytes": 1777
+    },
+    "src/assurance/assuranceRunner.ts": {
+      "sha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "bytes": 34718
+    },
+    "src/assurance/evidenceWriters.ts": {
+      "sha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "bytes": 9181
+    },
+    "src/assurance/agentResponder.ts": {
+      "sha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "bytes": 21889
+    },
+    "src/assurance/assuranceFindings.ts": {
+      "sha256": "0521777e1b8946b79729a87b671433687b0aa0d037b184d54560613f1c28879b",
+      "bytes": 1640
+    },
+    "src/assurance/assuranceSchema.ts": {
+      "sha256": "8444586cbf5c3521e4592a9a40baa58394a14edb4405d7bc38d2390ae15baa8f",
+      "bytes": 8932
+    },
+    "src/assurance/assurancePolicyStore.ts": {
+      "sha256": "8fd209dabfd5734f9642893672eba7ffa7dd93a0e557a9b3151a275b58aa2e40",
+      "bytes": 10269
+    },
+    "src/assurance/assuranceStore.ts": {
+      "sha256": "c4d54b585ff8cd232983357a7dcbaa6a6b2cef850ed6aa436804ea37c8a29fc9",
+      "bytes": 2320
+    },
+    "src/redteam/runner.ts": {
+      "sha256": "f6b0ab0b426ccbf3a7b5fa102c1f6997ff606e08fe9ebf51fe851afb0118ed9a",
+      "bytes": 22925
+    },
+    "src/catalog/evidence/mappingAdapter.ts": {
+      "sha256": "42c738451e97d0a11475ea76eb63e68577f52364a3ef8606da750c3334c96dbd",
+      "bytes": 13302
+    },
+    "src/compliance/complianceEngine.ts": {
+      "sha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+      "bytes": 14631
+    },
+    "src/types.ts": {
+      "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+      "bytes": 124482
+    },
+    "src/claims/eligibility/exampleMode.ts": {
+      "sha256": "a5a8379e6b2eb37d9bb7ab6e59ae1abadb5f6e19a5694fd13667c28b79a0a76f",
+      "bytes": 6167
+    },
+    "tests/helpers/fakeAgentServer.ts": {
+      "sha256": "d0d3d34258748a87358d7c144b70c6292ee5290551959ec36424d7e82c1c6d58",
+      "bytes": 6825
+    },
+    "src/assurance/packs/industryPackManifest.ts": {
+      "sha256": "7a0a926bfc0f3dbbc249ecc63a09df97aa764338ae8a57e606f8984a81ee6ca6",
+      "bytes": 17325
+    },
+    "src/assurance/packs/index.ts": {
+      "sha256": "ef7acc6ac3dd7ba874042fe1d140ed35ce67a723af30716c37f12c19c95ea17b",
+      "bytes": 16079
+    },
+    "src/cli.ts": {
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "bytes": 1064339
+    },
+    "src/cli/resultCommandRegistry.ts": {
+      "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "bytes": 16898
+    },
+    "src/repl/replParser.ts": {
+      "sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "bytes": 20875
+    },
+    "scripts/graphify-navigation.py": {
+      "sha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a",
+      "bytes": 23480
+    },
+    "scripts/freeze-baseline.json": {
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "bytes": 554
+    },
+    "scripts/line-budgets.json": {
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "bytes": 2713
+    },
+    "unused-code/plan-edits/manifest.json": {
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "bytes": 18181
+    },
+    "src/utils/json.ts": {
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b",
+      "bytes": 540
+    },
+    "src/utils/hash.ts": {
+      "sha256": "1507e34cf2dcc614e9b7bf05a790806a18ab878e8d282c16cb673718f92a6601",
+      "bytes": 259
+    },
+    "src/ledger/ledgerVerification.ts": {
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e",
+      "bytes": 35501
+    },
+    "src/trust/trustContext.ts": {
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "bytes": 7037
+    },
+    "tests/helpers/trustContext.ts": {
+      "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+      "bytes": 4280
+    },
+    "src/org/orgSigner.ts": {
+      "sha256": "bdaa0eca7235251e66e653a1d1dd4d7d16e383581c01a6bc14d049d95c7f75cf",
+      "bytes": 4289
+    },
+    "src/assurance/assurancePolicySchema.ts": {
+      "sha256": "eb71063c0587731ef98d937af87db67dfd80658bd924138b30fcfde3af14b8a4",
+      "bytes": 2790
+    },
+    "spec/schemas/v1/evidence-event.schema.json": {
+      "sha256": "b3f2e333528cde2e54a3e3d68e8f0691da122b688dab396d175d46aa5460100a",
+      "bytes": 4615
+    },
+    "docs/ASSURANCE_LAB.md": {
+      "sha256": "60f6caaec74936a7911f63ce82c5c8b26ad4a437abbdbb85f8f97f80029aa857",
+      "bytes": 12738
+    },
+    ".changeset/assurance-grading-inconclusive.md": {
+      "sha256": "7ec571de1ca47c940e38b31e621a952b6efe05e0604fa46dc9f8d4f3b91d983e",
+      "bytes": 2973
+    },
+    ".changeset/assurance-v1-inconclusive.md": {
+      "sha256": "216b42fa0f472d5099dfc95c7f2aceae4de2ae026bd21282a98c8d4bc64cb6c2",
+      "bytes": 433
+    },
+    "tests/assuranceLab.test.ts": {
+      "sha256": "1be062745968429e010387a4929d963c6eef923b9d8343055faee1c30fe628f6",
+      "bytes": 9537
+    },
+    "tests/assuranceAgentResponder.test.ts": {
+      "sha256": "4e2aaba81d0e12e63fa571902e63770511a0cef24892d858765f5dd679e24b30",
+      "bytes": 5357
+    },
+    "tests/regulatoryAssurancePacks.test.ts": {
+      "sha256": "b5601b3e44b127b677bdf351b78cd74c359c157726a6cf8ae91f04fc09d97853",
+      "bytes": 10836
+    },
+    "tests/assurance/industryPackFailClosed.test.ts": {
+      "sha256": "0fe16ae6c7727ea1aa381c35a4611b6d814098800c4212b4565009cb41798b32",
+      "bytes": 12547
+    },
+    "tests/compliance/complianceFailClosed.test.ts": {
+      "sha256": "0f503d86bb822b93308a46144f8a107cf08e7084982e4f9d8dfcb91fbdf64297",
+      "bytes": 20978
+    },
+    "tests/redteam.test.ts": {
+      "sha256": "dc060dd4394fbac18421f8d57cfd7b0599aaee11aa40e519743581f3a2e70237",
+      "bytes": 7021
+    },
+    "tests/validators.test.ts": {
+      "sha256": "290c6970177de5d1414a36371e8447a388d5d2d94c4516441b39b836b092bca7",
+      "bytes": 8120
+    },
+    "tests/assuranceScenarioContextParity.test.ts": {
+      "sha256": "0c2220eb87d67d239523f5cb4db805c3cb9c49cce586c02fc95757fbbc8535da",
+      "bytes": 15244
+    },
+    "tests/assurance/inMemoryStorePersistence.test.ts": {
+      "sha256": "732cb3236df44a0b3aded8f2756a27be71bfa38f9c77c7a7d93966f6e2e016ac",
+      "bytes": 4813
+    }
+  },
+  "scope": "Three new test files and ten factual1633\u21921636 inventory references only. Production/originaltests/scripts/deps/freeze/budgets/archives/shared/held/paused source preserved; no production proposal applied."
+}

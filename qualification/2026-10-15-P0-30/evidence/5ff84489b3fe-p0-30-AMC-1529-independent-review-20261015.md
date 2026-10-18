@@ -1,0 +1,17 @@
+# AMC-1529 independent actual review
+
+No actionable findings were found in the bounded frozen-packet audit. The original baseline passed 16/16. Exact source controls produced bytes binding **16 → 13 → 16** and lifetime **6 → 5 → 6**. Seven corpus processes repeat 82 case executions; the distinct original union remains 16 cases.
+
+Both pure bytes-binding failures stop at `notaryAuthReplay.test.ts:47:38`, after original map admission and uppercase authentication pass. Key inequality masks the uppercase map check and the later whitespace iteration. The HTTP failure at `notaryComposeIntegration.test.ts:191:39` observes 200 instead of 401, after original-digest signing/verification, wrong-secret 401, checksum 400, valid-response verification and exact replay 401 all pass. Its response-reason assertion and entire GET-tail sequence are masked. No uppercase response signature, duplicate-log effect or GET-tail bypass is inferred.
+
+Lifetime failure at `notaryAuthReplay.test.ts:70:29` observes `{ok:true}` for the retained authentication after expiry. Earlier inclusive replay boundaries and fresh helper timestamp-skew refusal pass. This matrix runs only six pure cases under mocked time. Line 69 constructs headers; it is not an HTTP request. HTTP reauthentication before replay checking is source ordering, not lifetime runtime coverage. A separately pinned root wording clarification records this limit without editing the original packet, raw observations or index.
+
+All 4,211 indexed references, eight command records, raw statuses, recursive observers and exact two source deltas match. The four failures are direct AssertionErrors. No recorded non-test error, failed hook, unhandled error, pending/todo or named late teardown/guard diagnostic is present. Expected failed ancestor states remain valid propagated assertion failures. Every actual outer exit is 0 or 1 with no signal, timeout or forced group action; outer groups end empty.
+
+That result does not establish each internal child exit signal. The original service helper requests SIGTERM and has a five-second SIGKILL fallback; exact child code/signal is not retained. Child stdout is ignored and stderr drained. The launcher prints Node 22.23.3/ABI 127, but no per-service loaded-native/ABI proof exists. The deliberate 0.0.0.0 listener is accessed over loopback, and port reservation is released before bind. No blanket network isolation is claimed.
+
+All 7,739 source files, 4,529 compiled files and the full 12,268-file private closure are exact. Both private TS controls restore fully; dist is never changed. All 205 protected pins, 2,964 prior references, four readiness pins, nine explicit release/predecessor pins, 14 actual prior closures, 307 dependency links and native physical identity match. Named fixture roots are absent; other HOME/tmp/cache effects are not claimed absent. Original imports, Vitest setup/guards, assertions, deadlines and cleanup remain unchanged.
+
+The signer is local FILE_SEALED/SOFTWARE Ed25519 with `hardware:false`; its public-key pin is fixture trust. Compose/Caddy coverage reads configuration only. No container/TLS deployment, independent cold-reader interval, P0-27 corruption repair, installed package, full batch, full suite, Node 24, hosted/release/Done or dependency closure follows. Duplicate 1,269/dead-code 2,751 prerequisites remain unwaived.
+
+All reads are finished. This reviewer wrote only this pair and ran no product import, test, native loading, product parser, compiler, build, listener, network or Git command.

@@ -1,0 +1,37 @@
+{
+  "phase": "p107-two-unit-files-materialized",
+  "tests": {
+    "numTotalTests": 21,
+    "numPassedTests": 21,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "actualFiles": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/evidenceEmitterRegistry.test.ts",
+      "total": 9
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/levelCumulative.test.ts",
+      "total": 12
+    }
+  ],
+  "uniqueObserverTestIds": 21,
+  "unhandledErrors": [],
+  "taskErrors": [],
+  "hooks": [
+    [
+      "tests/diagnostic/evidenceEmitterRegistry.test.ts",
+      {
+        "afterAll": "pass"
+      }
+    ],
+    [
+      "tests/diagnostic/levelCumulative.test.ts",
+      {
+        "afterAll": "pass"
+      }
+    ]
+  ],
+  "coverageBoundary": "Dirty source with two exact reviewed new unit files only; not fresh-source, native runtime, crypto or mutation evidence."
+}

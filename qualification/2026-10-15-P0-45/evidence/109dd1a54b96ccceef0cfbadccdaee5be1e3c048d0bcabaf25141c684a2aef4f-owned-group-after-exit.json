@@ -1,0 +1,23 @@
+{
+  "observations": [
+    {
+      "capturedUtc": "2026-10-15T06:14:44.385374+00:00",
+      "pgid": 19555,
+      "signal": 0,
+      "absentByESRCH": true,
+      "errno": 3,
+      "detail": "[Errno 3] No such process"
+    }
+  ],
+  "lastProbe": {
+    "capturedUtc": "2026-10-15T06:14:44.385374+00:00",
+    "pgid": 19555,
+    "signal": 0,
+    "absentByESRCH": true,
+    "errno": 3,
+    "detail": "[Errno 3] No such process"
+  },
+  "maxPollingSeconds": 5,
+  "pollIntervalSeconds": 0.05,
+  "signalsOtherThanZeroSent": false
+}

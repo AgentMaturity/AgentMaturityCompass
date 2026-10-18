@@ -1,0 +1,883 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1508",
+  "slice": "NEW_ONE_CASE_OWNER_COOKIE_HTTP",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "reviewKind": "Independent actual frozen HTTP receipt review",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "findings": [],
+  "conclusion": "The frozen packet's bounded actual HTTP and SQLite claims agree with the raw reports, retained responses/row arrays, byte-exact fixture, exact source controls and restoration evidence. M2 loses the strict input contract while retaining the owner principal; the exact historical composite stores the different supplied principal.",
+  "artifactIndexVerification": {
+    "artifactReferences": 1792,
+    "uniquePaths": 1792,
+    "allRecordedBytesAndHashesMatch": true,
+    "frozenCommands": 9,
+    "mutableRootOrLaneJournalsNotUsed": true
+  },
+  "actualProof": {
+    "frozenCommands": 9,
+    "actualCaseProcesses": 7,
+    "uniqueDefinitions": 1,
+    "firstBaselinePasses": 1,
+    "bothBmrSequences": [
+      1,
+      0,
+      1
+    ],
+    "originalAssertionFailures": [
+      {
+        "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-mutant",
+        "kind": "AssertionError",
+        "location": "portalHttpAttributionQualification.test.ts:222:57",
+        "firstLine": "AssertionError: {\"status\":201,\"body\":\"{\\\"ok\\\":true,\\\"data\\\":{\\\"id\\\":\\\"d5fc2acb-116e-4caa-8d5f-1b036d3ac69d\\\",\\\"name\\\":\\\"forged-top-level-job\\\",\\\"type\\\":\\\"scan\\\",\\\"status\\\":\\\"submitted\\\",\\\"submittedBy\\\":\\\"portal-http-owner\\\",\\\"payload\\\":{},\\\"error\\\":null,\\\"progress\\\":0,\\\"createdAt\\\":\\\"2026-10-15T01:31:27.400Z\\\",\\\"startedAt\\\":null,\\\"completedAt\\\":null}}\"}: expected 201 to be 400 // Object.is equality",
+        "failureMessageSha256": "93f390448f6cbb6ae90ae5865d6e04a398149238318603747ed91c98d70b8570"
+      },
+      {
+        "phase": "P30-1508-submittedby-from-body-mutant",
+        "kind": "AssertionError",
+        "location": "portalHttpAttributionQualification.test.ts:222:57",
+        "firstLine": "AssertionError: {\"status\":201,\"body\":\"{\\\"ok\\\":true,\\\"data\\\":{\\\"id\\\":\\\"87358dfd-dca4-4d52-9b28-67fec360bf4c\\\",\\\"name\\\":\\\"forged-top-level-job\\\",\\\"type\\\":\\\"scan\\\",\\\"status\\\":\\\"submitted\\\",\\\"submittedBy\\\":\\\"different-forged-owner\\\",\\\"payload\\\":{},\\\"error\\\":null,\\\"progress\\\":0,\\\"createdAt\\\":\\\"2026-10-15T01:33:20.320Z\\\",\\\"startedAt\\\":null,\\\"completedAt\\\":null}}\"}: expected 201 to be 400 // Object.is equality",
+        "failureMessageSha256": "0dd31cdd230ab9d8bab1f65ea8aef4b92a18a3c4f829f5de4e1773527ec7a116"
+      }
+    ],
+    "allSameName": "attributes a real OWNER-cookie portal submission and refuses a forged top-level submitter",
+    "allSetupAuthTransportCleanupAndPendingChecksClear": true,
+    "effectFilesAllFreshSeparateAnd0600": true,
+    "allSevenWorkersNode22Abi127Direct": true,
+    "allSevenRealLoopbackListenerObservations": true,
+    "allPrivateLaunchEnvironmentsExactAllowlist0700": true,
+    "allObservedRowsAndSummaryCountsAgree": true,
+    "rootReadOnlyHeadCleanReceiptsAgree": true,
+    "releaseMarkerHasNoTimestamp": true,
+    "phases": [
+      {
+        "phase": "actual-owner-cookie-http-baseline",
+        "counts": {
+          "numTotalTests": 1,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/effects/actual-owner-cookie-http-baseline.json",
+          "bytes": 7953,
+          "sha256": "b690f9f148d26126e224bf06663ed7f4b9cd5950c866d2c6a2ce37003c988374"
+        },
+        "forgedStatus": 400,
+        "healthyStatus": 201,
+        "rowCounts": [
+          2,
+          2,
+          3
+        ],
+        "forgedResponseAndStoredPrincipal": null,
+        "healthyResponseAndStoredPrincipal": "portal-http-owner",
+        "bothNamedPriorRowsExact": true,
+        "forgedRowRetainedExactThroughHealthyRequest": true,
+        "fullRowsCanonicalJsonSha256": {
+          "beforeRows": "bce5ee9372ffdd7813272dfb108b097511904c7239e7377f83f347a6669177a9",
+          "afterForgedRows": "bce5ee9372ffdd7813272dfb108b097511904c7239e7377f83f347a6669177a9",
+          "afterHealthyRows": "c08b7b2ccfc982cf17b526db3f7c59d7d74f7f209800e2111b379a894e759ec6"
+        },
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "listener": {
+          "host": "127.0.0.1",
+          "port": 50837
+        },
+        "publicPinsMatch": true,
+        "localTrackedOwnerAndThreeCryptoBooleansAgree": true,
+        "ownedDbPrimed": true,
+        "modes": {
+          "fixture": 448,
+          "dbDirectory": 448,
+          "database": 384
+        },
+        "cleanup": {
+          "listenerClosed": true,
+          "productDbOpenAfterClose": false,
+          "sqlitePoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      },
+      {
+        "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-baseline",
+        "counts": {
+          "numTotalTests": 1,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/effects/P30-1508-M2-portal-strict-schema-current-reanchored-baseline.json",
+          "bytes": 8115,
+          "sha256": "8cff81a279fc3875c2e7ff175257cc397b0f667f0367879dad47af52e6191239"
+        },
+        "forgedStatus": 400,
+        "healthyStatus": 201,
+        "rowCounts": [
+          2,
+          2,
+          3
+        ],
+        "forgedResponseAndStoredPrincipal": null,
+        "healthyResponseAndStoredPrincipal": "portal-http-owner",
+        "bothNamedPriorRowsExact": true,
+        "forgedRowRetainedExactThroughHealthyRequest": true,
+        "fullRowsCanonicalJsonSha256": {
+          "beforeRows": "2c54e7539c7f94ca863860b9f22612e474fd23146e0ad83559101414913d5f99",
+          "afterForgedRows": "2c54e7539c7f94ca863860b9f22612e474fd23146e0ad83559101414913d5f99",
+          "afterHealthyRows": "1baa5531a177d23db3f774399f40f706467aee301546254d7145335507eb9007"
+        },
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "listener": {
+          "host": "127.0.0.1",
+          "port": 50860
+        },
+        "publicPinsMatch": true,
+        "localTrackedOwnerAndThreeCryptoBooleansAgree": true,
+        "ownedDbPrimed": true,
+        "modes": {
+          "fixture": 448,
+          "dbDirectory": 448,
+          "database": 384
+        },
+        "cleanup": {
+          "listenerClosed": true,
+          "productDbOpenAfterClose": false,
+          "sqlitePoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      },
+      {
+        "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-mutant",
+        "counts": {
+          "numTotalTests": 1,
+          "numPassedTests": 0,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false
+        },
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/effects/P30-1508-M2-portal-strict-schema-current-reanchored-mutant.json",
+          "bytes": 9100,
+          "sha256": "05f6b93e0157dbc82b26f44a570ac0a0753783bc36a6d47ccc3cb5d52a271351"
+        },
+        "forgedStatus": 201,
+        "healthyStatus": 201,
+        "rowCounts": [
+          2,
+          3,
+          4
+        ],
+        "forgedResponseAndStoredPrincipal": "portal-http-owner",
+        "healthyResponseAndStoredPrincipal": "portal-http-owner",
+        "bothNamedPriorRowsExact": true,
+        "forgedRowRetainedExactThroughHealthyRequest": true,
+        "fullRowsCanonicalJsonSha256": {
+          "beforeRows": "6c39506f274ec60f76b2fcb3e7951464b46fbe7a55e42acd3696c6bf5d387a63",
+          "afterForgedRows": "1ffa4e8ad1d0ee5fbb3c65a2c142edb22d99608bc42b023aaa36965db19d20a8",
+          "afterHealthyRows": "4a4e5c8078eff23c51147f5ef388ee4c485a03e14eeeffae9abd37bebb504969"
+        },
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "listener": {
+          "host": "127.0.0.1",
+          "port": 50873
+        },
+        "publicPinsMatch": true,
+        "localTrackedOwnerAndThreeCryptoBooleansAgree": true,
+        "ownedDbPrimed": true,
+        "modes": {
+          "fixture": 448,
+          "dbDirectory": 448,
+          "database": 384
+        },
+        "cleanup": {
+          "listenerClosed": true,
+          "productDbOpenAfterClose": false,
+          "sqlitePoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      },
+      {
+        "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-restored",
+        "counts": {
+          "numTotalTests": 1,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/effects/P30-1508-M2-portal-strict-schema-current-reanchored-restored.json",
+          "bytes": 8115,
+          "sha256": "7da949682b33fbb367b72106dd52c6e5a435c61c487ed5262ca1849c2ec07636"
+        },
+        "forgedStatus": 400,
+        "healthyStatus": 201,
+        "rowCounts": [
+          2,
+          2,
+          3
+        ],
+        "forgedResponseAndStoredPrincipal": null,
+        "healthyResponseAndStoredPrincipal": "portal-http-owner",
+        "bothNamedPriorRowsExact": true,
+        "forgedRowRetainedExactThroughHealthyRequest": true,
+        "fullRowsCanonicalJsonSha256": {
+          "beforeRows": "73058095ff0dd6189e9083bb41c095c0703f411d1ab21f4303dfa84e26fc1edb",
+          "afterForgedRows": "73058095ff0dd6189e9083bb41c095c0703f411d1ab21f4303dfa84e26fc1edb",
+          "afterHealthyRows": "e5448fcf281d4f270002a2a8c51f63ea8c9dc1997d8d1bbeb0a4bef816beeb0a"
+        },
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "listener": {
+          "host": "127.0.0.1",
+          "port": 50879
+        },
+        "publicPinsMatch": true,
+        "localTrackedOwnerAndThreeCryptoBooleansAgree": true,
+        "ownedDbPrimed": true,
+        "modes": {
+          "fixture": 448,
+          "dbDirectory": 448,
+          "database": 384
+        },
+        "cleanup": {
+          "listenerClosed": true,
+          "productDbOpenAfterClose": false,
+          "sqlitePoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      },
+      {
+        "phase": "P30-1508-submittedby-from-body-baseline",
+        "counts": {
+          "numTotalTests": 1,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/effects/P30-1508-submittedby-from-body-baseline.json",
+          "bytes": 7989,
+          "sha256": "5155731a2f2629e650fe9f7507e322bda1a9197cc662c953e8eb89a71de1d70d"
+        },
+        "forgedStatus": 400,
+        "healthyStatus": 201,
+        "rowCounts": [
+          2,
+          2,
+          3
+        ],
+        "forgedResponseAndStoredPrincipal": null,
+        "healthyResponseAndStoredPrincipal": "portal-http-owner",
+        "bothNamedPriorRowsExact": true,
+        "forgedRowRetainedExactThroughHealthyRequest": true,
+        "fullRowsCanonicalJsonSha256": {
+          "beforeRows": "a5b1cf8ce03f44ba6fc17ec899e30d7ac09a4dd8a74db0dd2103118cc39435dc",
+          "afterForgedRows": "a5b1cf8ce03f44ba6fc17ec899e30d7ac09a4dd8a74db0dd2103118cc39435dc",
+          "afterHealthyRows": "1bde2d67be82e7ce9bf2fadec18311d8d185a8e919f18d4e58e77396f2fe79f1"
+        },
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "listener": {
+          "host": "127.0.0.1",
+          "port": 50944
+        },
+        "publicPinsMatch": true,
+        "localTrackedOwnerAndThreeCryptoBooleansAgree": true,
+        "ownedDbPrimed": true,
+        "modes": {
+          "fixture": 448,
+          "dbDirectory": 448,
+          "database": 384
+        },
+        "cleanup": {
+          "listenerClosed": true,
+          "productDbOpenAfterClose": false,
+          "sqlitePoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      },
+      {
+        "phase": "P30-1508-submittedby-from-body-mutant",
+        "counts": {
+          "numTotalTests": 1,
+          "numPassedTests": 0,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false
+        },
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/effects/P30-1508-submittedby-from-body-mutant.json",
+          "bytes": 8989,
+          "sha256": "c4614de7fa04920df55b817b94bce9ff562a9ee5a5c88be9440666070b82944d"
+        },
+        "forgedStatus": 201,
+        "healthyStatus": 201,
+        "rowCounts": [
+          2,
+          3,
+          4
+        ],
+        "forgedResponseAndStoredPrincipal": "different-forged-owner",
+        "healthyResponseAndStoredPrincipal": "portal-http-owner",
+        "bothNamedPriorRowsExact": true,
+        "forgedRowRetainedExactThroughHealthyRequest": true,
+        "fullRowsCanonicalJsonSha256": {
+          "beforeRows": "cacbdc47cc13e7de69e556d41ece42d508d2497c01fce293fe02e0e71b8d1628",
+          "afterForgedRows": "c7248418de0c218dbe3a96d4c6cf725b710dd155c7047356f806ef58be7bfaab",
+          "afterHealthyRows": "529608fcfba5e64e77efe24458ce3b69301d4243419403ea9ffeceb859fde89f"
+        },
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "listener": {
+          "host": "127.0.0.1",
+          "port": 50948
+        },
+        "publicPinsMatch": true,
+        "localTrackedOwnerAndThreeCryptoBooleansAgree": true,
+        "ownedDbPrimed": true,
+        "modes": {
+          "fixture": 448,
+          "dbDirectory": 448,
+          "database": 384
+        },
+        "cleanup": {
+          "listenerClosed": true,
+          "productDbOpenAfterClose": false,
+          "sqlitePoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      },
+      {
+        "phase": "P30-1508-submittedby-from-body-restored",
+        "counts": {
+          "numTotalTests": 1,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/effects/P30-1508-submittedby-from-body-restored.json",
+          "bytes": 7989,
+          "sha256": "039d6408990e03df98bf368bb91414c0b0231a9749f7aead13eb22b8e495210c"
+        },
+        "forgedStatus": 400,
+        "healthyStatus": 201,
+        "rowCounts": [
+          2,
+          2,
+          3
+        ],
+        "forgedResponseAndStoredPrincipal": null,
+        "healthyResponseAndStoredPrincipal": "portal-http-owner",
+        "bothNamedPriorRowsExact": true,
+        "forgedRowRetainedExactThroughHealthyRequest": true,
+        "fullRowsCanonicalJsonSha256": {
+          "beforeRows": "8e5d57b481f726132b0b3a49ecee79ea07a9b7fa5795769f423dc999b183d57d",
+          "afterForgedRows": "8e5d57b481f726132b0b3a49ecee79ea07a9b7fa5795769f423dc999b183d57d",
+          "afterHealthyRows": "351dda1bef2e173fcf85366b91de56a630e7fb3ce85751309f5a02fe8f846012"
+        },
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "listener": {
+          "host": "127.0.0.1",
+          "port": 50956
+        },
+        "publicPinsMatch": true,
+        "localTrackedOwnerAndThreeCryptoBooleansAgree": true,
+        "ownedDbPrimed": true,
+        "modes": {
+          "fixture": 448,
+          "dbDirectory": 448,
+          "database": 384
+        },
+        "cleanup": {
+          "listenerClosed": true,
+          "productDbOpenAfterClose": false,
+          "sqlitePoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      }
+    ]
+  },
+  "preservationProof": {
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "newByteExactPrivateCase": {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/closure/tests/portalHttpAttributionQualification.test.ts",
+      "bytes": 15407,
+      "sha256": "0ff0e03e04b0082bba938f4eee3dd1a39a6ab61b0647e88eb9b6dd1928c8be3e"
+    },
+    "newCaseAbsentInLiveRoot": true,
+    "completePrivateClosureFiles": 12269,
+    "allRootAndPrivateBytesExact": true,
+    "privateRegularFilesHaveIndependentInodes": true,
+    "beforeAfterPinGroups": {
+      "protected-pins": 92,
+      "prior-reference-pins": 1680,
+      "author-review-pins": 5,
+      "runtime-input-pins": 2
+    },
+    "priorIndexPins": 12,
+    "priorFinalClosuresDirectlyVerified": [
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      }
+    ],
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "dependencyLinksVerified": 307,
+    "privateViteDirectories": true,
+    "controls": [
+      {
+        "id": "P30-1508-M2-portal-strict-schema-current-reanchored",
+        "target": "src/api/productRouter.ts",
+        "sourceFindMatchesOnce": true,
+        "frozenMutant": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/P30-1508-M2-portal-strict-schema-current-reanchored-mutant-source.ts",
+          "bytes": 4340,
+          "sha256": "eaf49d6b069a3a2eb5ebcb84762d7a26fd2d4a17995f4729f59e61ef4662b63f"
+        },
+        "onlySourceDeltaAndExactPatch": true,
+        "allDistAndNewCaseHashesUnchanged": true,
+        "fullRestorationExact": true,
+        "sameRecipeAsOriginalPacketExceptFixedNewCorpus": true
+      },
+      {
+        "id": "P30-1508-submittedby-from-body",
+        "target": "src/api/productRouter.ts",
+        "sourceFindMatchesOnce": true,
+        "frozenMutant": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/P30-1508-submittedby-from-body-mutant-source.ts",
+          "bytes": 4461,
+          "sha256": "1728a1fe454e9ac09c172b2e119ae3106aadf7632aafc634bd3afcbc58f6ae85"
+        },
+        "onlySourceDeltaAndExactPatch": true,
+        "allDistAndNewCaseHashesUnchanged": true,
+        "fullRestorationExact": true,
+        "sameRecipeAsOriginalPacketExceptFixedNewCorpus": true
+      }
+    ]
+  },
+  "independentMeaning": {
+    "baseline": "The initial one-case process and both controls' intact baseline/restored phases receive forged-request 400 with an unrecognized submittedBy error, retain both prior rows exactly, then receive healthy-request 201 with one new portal-http-owner row. Counts are 2 \u2192 2 \u2192 3.",
+    "strictSchemaControl": "The exact current M2 control receives 201 for both requests. The first new response and actual SQLite row both name portal-http-owner, so this is observed input-contract loss without changed attribution for this input. Counts are 2 \u2192 3 \u2192 4.",
+    "historicalComposite": "The separate exact historical body composite receives 201 for both requests. The first new response and actual SQLite row both name different-forged-owner; the healthy request still names portal-http-owner. Counts are 2 \u2192 3 \u2192 4.",
+    "priorEffects": "Both complete named prior row values are retained in all seven phases. In the two mutants, the first newly inserted row is also retained exactly through the healthy request. Each healthy request adds one row with the expected nested payload marker, selected ID and owner principal.",
+    "failureClassification": "Both mutants fail the unchanged first forged-status assertion at portalHttpAttributionQualification.test.ts:222:57: actual 201, expected 400. The original pre-status authentication, key, priming, mode and prior-count assertions at 213\u2013221 passed. No setup, authentication, transport, timeout or cleanup failure is counted as a guard result.",
+    "masking": "Assertions from 223 onward are masked by the status failure, but both actual responses, all three full SELECT * portal row arrays and normal cleanup were already collected at 173\u2013209. The independent conclusions about mutant rows come from those retained arrays and responses, not from unreached assertions.",
+    "caseIdentity": "One named definition is repeated across seven source-product processes. No seven-unique-tests claim or cross-phase UUID/key/token/physical-row equality is made.",
+    "originalAndOtherGuards": "This one-case actual HTTP supplement remains separate from the immutable original Portal21 injected-auth packet. It measures only M2 and the exact historical composite; M1/M3/M4 cookie or credential outcomes are not inferred."
+  },
+  "publicAuthAndCrypto": {
+    "chronology": "The unchanged fixture generates four local Ed25519 pairs, persists their public PEM/SPKI hashes, then calls public createVault and initWorkspace. It compares resulting public files to the original generated public PEMs before initializing signed users and creating the tracked session. Persisted code order precedes signed artifacts; the final effect body is not an immutable retained intermediate timeline.",
+    "credential": "Both actual requests use only the same amc_session cookie produced by createSession. post() supplies no admin-token or agent header, and the random server-required token is never transmitted. The actual Studio authenticate path resolves sessionFromRequest before agent authentication; there is no injected authenticate callback in this case.",
+    "trackedOwner": "All seven actual worker records report the local initUsersConfig OWNER and verifyTrackedSessionToken verdict with the same userId/username, roles [OWNER] and LOCAL_USER authSource. The actual server then accepts the same cookie for the successful healthy request.",
+    "usersProcedure": "The fixture hashes actual users.yaml bytes and checks the recorded digest plus Node Ed25519 verification over the decoded 32-byte digest with the pre-artifact auditor key. Product users-config verification independently supplies its selected current verdict.",
+    "sessionProcedure": "The fixture uses Node verify on actual base64url-decoded token payload bytes and signature with the pre-artifact session public key. This matches the actual session signing byte domain. It does not independently decode or validate every token field, policy, time or tracked-store rule.",
+    "retainedLimit": "Public fingerprints, hashes and actual verification booleans/procedure are retained. The raw key, token and signed-users bytes are deleted with the fixture, so this review does not independently replay the complete signatures offline. Local fixture authority is not an independently authenticated external person or issuer truth.",
+    "workerRuntime": "Each actual worker directly records Node v22.23.3, the observed Node executable and modules ABI 127. This is stronger than an unrelated launcher fingerprint and remains scoped to those seven workers."
+  },
+  "lifecycleAndScope": {
+    "priming": "The original new-case code explicitly sets AMC_PRODUCT_DB_PATH and primes the owned product singleton before createVault, initWorkspace or server initialization. All seven effects observe the intended path open.",
+    "network": "Each record contains an actual 127.0.0.1 listener with a nonzero port. The fixture uses node:http requests and the actual Studio app; it does not substitute injected route handlers or claim blanket external network isolation.",
+    "effects": "Each controller phase has a fresh absolute mode-0600 effects path outside the disposable fixture. Within that phase persist() overwrites the same file. No immutable intermediate-history claim follows.",
+    "cleanup": "The retained records show listener closure, the actual product database handle no longer open after normal close, pool closure, vault lock, fixture absence and environment restoration, without errors. Current filesystem reads confirm each named fixture directory is absent. This covers selected recorded lifecycle facts, not every filesystem side effect.",
+    "isolation": "The single file runs alone in one private worker, with process-global product DB and pool operations. This is not per-request tenant selection, concurrent isolation, browser/session UX, CSRF or installed-service qualification.",
+    "deadlines": "The byte-exact case keeps its authored 45,000 ms deadline and 10,000 ms HTTP request timeout. Normal config, setup and guards remain unchanged; no transport blocker or source-to-dist adapter is introduced."
+  },
+  "recipeAndHistory": {
+    "provenance": "The two recipes exactly reuse the previously frozen original packet's literals and source hashes, with only corpus/count changed to the new one-case fixture. M2 remains a current reconstruction; the body composite remains the single exact recovered historical recipe.",
+    "sourceOnly": "Each frozen mutated source and patch reproduce exactly, and the complete mutant manifest differs in the one expected TS file. The private case and all compiled bytes remain unchanged. Each restored complete manifest equals the prepared 12,269-file map.",
+    "strictContract": "The retained old spec describes storing the authenticated principal for supplied submittedBy; current strict schema returns 400 instead. No source repair, changed expectation or policy resolution is inferred.",
+    "previousPackets": "The original Portal21 packet and all prior indexed inputs/file manifests were verified as immutable bytes, without re-auditing or combining their semantics into a new whole-batch result."
+  },
+  "observerPrecision": "An initial read-only analysis script expected capturedUtc in the runtime release marker. The marker has no timestamp; the check was corrected without changing any input. The review verifies marker authorization/scope and the controller's require_start checks, and does not invent marker timestamp evidence.",
+  "operations": {
+    "filesystemJsonHashAnalysisOnly": true,
+    "productImports": 0,
+    "productRuntime": 0,
+    "testsOrReruns": 0,
+    "parserOrSyntaxChecks": 0,
+    "typeChecks": 0,
+    "compilerBuilds": 0,
+    "installs": 0,
+    "network": 0,
+    "gitCommands": 0,
+    "sourceOrInputEdits": 0,
+    "writeOnlyAssignedReviewPair": true
+  },
+  "limits": [
+    "Observed cryptographic booleans and selected tracked/product verdicts are retained evidence, not an independent full token decoder or offline replay of deleted raw credentials.",
+    "SELECT * portal table arrays and named setup/cleanup facts are actual bounded effects evidence, not universal database/filesystem immutability, tenant isolation or race coverage.",
+    "No permanent source/new test, held test/helper/runner transfer, source ownership clearance, product repair, compiled mutation, browser/hosted/installed service, other roles/routes or CSRF qualification is claimed.",
+    "No full P0-30/old batch, Node24, full suite, coverage, G0, release or tracker Done acceptance is established."
+  ],
+  "allReadsFinished": true,
+  "capturedUtc": "2026-10-15T01:39:22.423151+00:00",
+  "inputPins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015.json",
+      "bytes": 48220,
+      "sha256": "f33581d913273e0ae0b2cf5048b35850df6a9429581959d5e1a8bca8bc313c3a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015.md",
+      "bytes": 3666,
+      "sha256": "f69170a10c2c4664d22fe4362a66af0a689944e37d78bbace843472023e82b6e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/artifact-index.json",
+      "bytes": 434796,
+      "sha256": "c81e5ade81ec393a0cc32a16c771b6cf2a4302c3cdba32d401442ad0023ee556"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 17093,
+      "sha256": "c0b884463d1cb08ae5f93b501ce88e3dbd8281ce15d3fdfbcf55053c93b48e88"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/controller.py",
+      "bytes": 10647,
+      "sha256": "2850584553feb79ac9a9f56057ad3dfe754cfc7cd0aa3d299e0e9af54dce49d5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/prepare.py",
+      "bytes": 8178,
+      "sha256": "c0998336fd37f5df7829995addf8ea182b15d39c2643c5ece0012ae81626c684"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/semantic-classification.json",
+      "bytes": 78459,
+      "sha256": "cc57d3bfb86c88e277b191c770c8cad1adfe51e49a548909664002b5cb6c93dd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/setup-prepared.json",
+      "bytes": 3057,
+      "sha256": "4339b4cf3ea2aa5ce2c47a8b7a4cf1ec0acc4e6dc861103bc0583287306df4aa"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/setup-prepared.md",
+      "bytes": 1758,
+      "sha256": "5466d6454315787b23a9a7e1ddfa7cce79f0b43ffbd2e8ef1bcd789522b0db64"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/index/setup-artifact-index.json",
+      "bytes": 412898,
+      "sha256": "32f540eb9a862b3947e285e889da74c4ac4784bc6af646e84cca76b9639a0913"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/root-runtime-release.json",
+      "bytes": 306,
+      "sha256": "9ae66b6e7768e6f73a6afa82f0b21562c5fd20cd7238ee3c6ab9cdc47929f61f"
+    }
+  ],
+  "currentPublicFlowPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/workspace.ts",
+      "bytes": 27587,
+      "lines": 784,
+      "sha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/vault/vault.ts",
+      "bytes": 29540,
+      "lines": 701,
+      "sha256": "f37212a91c1e9ea1f35dac7bcfd03481e5ce26a1fe80a56f6843e3fbb8e02e84"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "lines": 190,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/auth/authApi.ts",
+      "bytes": 15848,
+      "lines": 509,
+      "sha256": "bb0481156d7d5958910030f6183e498c29e65ddbc898e3197467e9198ee9f137"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/auth/sessionTokens.ts",
+      "bytes": 3213,
+      "lines": 98,
+      "sha256": "c0e42fd336bb67112a048773bb159cc40e57470a463d7043f3bbf7b3179126bb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/auth/userSchema.ts",
+      "bytes": 1405,
+      "lines": 42,
+      "sha256": "6f6e8a900cbfbe62931bad5666ab46d121c98fb88adf022773311e5986885f3c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/auth/roles.ts",
+      "bytes": 629,
+      "lines": 27,
+      "sha256": "70bc95aa15d85a2f1f50e8af6acd8b697809f2fe4906c066809b3940fac23c75"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/auth/rbac.ts",
+      "bytes": 1468,
+      "lines": 65,
+      "sha256": "a2bfad9168deba43e9e4ae539812ad29e58ce5ddc1b8812d2a34b9ca3020dbe8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/studio/studioServer.ts",
+      "bytes": 323521,
+      "lines": 8857,
+      "sha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/studio/apiDelegation.ts",
+      "bytes": 5670,
+      "lines": 141,
+      "sha256": "fcf33617981088c66f3b6c8620948dc016eea953ca65fb942af294dbcfa0c38a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/api/productRouter.ts",
+      "bytes": 4349,
+      "lines": 115,
+      "sha256": "14327afcd9fed2440c0f8c6d97a04f7095053220699a937c596564b77c0e3a4d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/api/index.ts",
+      "bytes": 19070,
+      "lines": 574,
+      "sha256": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/api/accessPolicy.ts",
+      "bytes": 8057,
+      "lines": 207,
+      "sha256": "3472bd7573ee644aea651fbc44e5890a7abbb8e3fc299f57450e32a6ff445bde"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/product/productDb.ts",
+      "bytes": 1716,
+      "lines": 50,
+      "sha256": "16227dd98c41d6813bcb2a84b338a78fd055830cafa2cbec1bc2311ca015fe03"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/product/portal.ts",
+      "bytes": 11842,
+      "lines": 307,
+      "sha256": "d59fa7e26e712a06de09170839d5bccbaca1b9e86130323ce1083853559d6f33"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/studioAgentCredentialBinding.test.ts",
+      "bytes": 25124,
+      "lines": 393,
+      "sha256": "ae9eb796f2e0e8fc8591fbbccb9b2ae1559ee7de09a06f5ddd88581d09186697"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/studioAgentTokenScopes.test.ts",
+      "bytes": 18146,
+      "lines": 288,
+      "sha256": "7bed2e206ea6a664e3cb0d2fe6f1a4a5eb75b8b0fd593748762305d3b3ab5a6d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/portalAttribution.test.ts",
+      "bytes": 9290,
+      "lines": 176,
+      "sha256": "ce02dbd776fa32448d0623bc45411c9df7ca6775b194d05a67fde7c5fe389b3a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "lines": 33,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "lines": 20,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "lines": 82,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "lines": 36,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "lines": 218,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "lines": 4839,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "lines": 210,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "lines": 32,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/storage/sqlitePool.ts",
+      "bytes": 5804,
+      "lines": 251,
+      "sha256": "021dfe8f275c90273d1821d36431f182bbde538a3417f2375e96013c91867bfc"
+    }
+  ]
+}

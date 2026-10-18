@@ -1,0 +1,8 @@
+{
+  "operation": "Corrected read-only 181-root count ownership and private candidate preparation",
+  "execSessionId": 96859,
+  "naturalExit": 0,
+  "completionChunkId": "1f4201",
+  "productOrGeneratorExecuted": false,
+  "originalStop": "initial-static-preparation-stop.json"
+}

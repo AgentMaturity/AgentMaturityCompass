@@ -1,0 +1,11 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass
+
+ ✓ tests/ledgerVerifySeparation.test.ts (4 tests) 710ms
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  11:25:54
+   Duration  3.11s (transform 1.69s, setup 21ms, import 2.27s, tests 710ms, environment 0ms)
+
+JSON report written to /private/tmp/p0-45-qualification-20261015/command-original-separation/raw-producer.json

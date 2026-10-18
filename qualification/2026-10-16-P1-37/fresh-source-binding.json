@@ -1,0 +1,402 @@
+{
+  "at": "2026-10-16T10:59:45.420409+00:00",
+  "sourceCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "sourceCommit": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+  "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout",
+  "freshClean": true,
+  "sourceClean": true,
+  "independentCloneInstallBuild": true,
+  "installAndBuildCommand": {
+    "phase": "p137-clean-source",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+    "exit": 0,
+    "durationMs": 46759,
+    "startedUtc": "2026-10-16T10:58:39.622848+00:00",
+    "endedUtc": "2026-10-16T10:59:26.391946+00:00",
+    "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-clean-source/stdout-stderr.log",
+    "head": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+    "headAfter": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+    "ownedProcess": {
+      "pid": 39824,
+      "ownedPgid": 39824,
+      "observedPgidAfterLaunch": 39824,
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/clean-source-check.mjs",
+        "--keep"
+      ],
+      "startedUtc": "2026-10-16T10:58:39.622848+00:00",
+      "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+      "overriddenEnvironmentKeys": [
+        "PATH",
+        "HOME",
+        "GIT_NO_LAZY_FETCH"
+      ]
+    },
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "observed": false,
+    "artifacts": {},
+    "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+  },
+  "corpus": [
+    "tests/autoCompaction.test.ts",
+    "tests/surfaceCompaction.test.ts",
+    "tests/surfaceHistoryCompaction.test.ts"
+  ],
+  "corpusAndSource": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "afc55d16c70d6b3a5a4bf68fbe071d902cf6d7853bb90db92e03a44c22415fe6"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/README.md",
+      "bytes": 59828,
+      "sha256": "ccd0c1404c37fc70022968a28fe58c7199f470e45ab07b756816291ba686288a"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "4531d5a2ccd8d164bc27d306588cc7efe92509447920f7ff66ceb45d1907b710"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "25c52168c201bff93fa61ea6932de0ac6d23a75cadc760306b3eb9dbf32316fa"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "79c12a5ecda93fb303b2a6eee2848165c8ce053a639b38d95b05a83cde2977f3"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "16b4d8f7abf5c56280d0d13d6b0ef7050e214090c042567bde83372aedd781dd"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/scripts/quality/coverage-baseline.json",
+      "bytes": 636550,
+      "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/agent/agentDriver.ts",
+      "bytes": 26416,
+      "sha256": "6feef547719a4eb9f58c863517643c5f3236a422f9fe2419edab8fec06b320db"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/agent/compaction/autoCompact.ts",
+      "bytes": 15090,
+      "sha256": "18c7389dd676b3fea419b1f326f75c5bcf586886eddf8edb87a87f9ee35c70bb"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/agent/compaction/promptPressure.ts",
+      "bytes": 3326,
+      "sha256": "8a6af01c5fe75ce4f252ad2d5be88a6f33f740165d8772c820a9052fc1d3b605"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/agent/compaction/summaryPrompt.ts",
+      "bytes": 2312,
+      "sha256": "3f8efa1f61951a26893d63c3fa4dd0cb866749fec94c12fff271188765362d0d"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/agent/loopTypes.ts",
+      "bytes": 12761,
+      "sha256": "9ddef9301d6d162f96db4008a542abb350e4d77a966748153ed637c44bce70a4"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/agent/requestRetry.ts",
+      "bytes": 12746,
+      "sha256": "15721e3ffd552925e87fc6b0cf01a1aa309dbf0bcca925196eb777da7b7f4fd7"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/agent/runReport.ts",
+      "bytes": 15920,
+      "sha256": "a7fdfec75e77a4316b1b0a40d05055e98c3f7b02aff3a3a5587362129d915bcf"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/agent/stepRunner.ts",
+      "bytes": 8399,
+      "sha256": "49faf852d7927fa4020d4df9d3ad5b8cec214d312d86510cd2a0bb7f1015ac45"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/agent/toolCalls.ts",
+      "bytes": 17381,
+      "sha256": "82b3f54910352d80704741a75fa896f5ec553881bc433465379711ad29587675"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/agent/toolSeam.ts",
+      "bytes": 5145,
+      "sha256": "0b4e2945a09a6581252eb7148aa8f89e6a06bb27b6f493412c0320b47f907798"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/cli-agent-commands.ts",
+      "bytes": 48184,
+      "sha256": "616e0c6888f8a50b3a0bb82269a29f370e74d58f3bfbb53fd97b528fa9b76582"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/cli-trust-flags.ts",
+      "bytes": 6277,
+      "sha256": "fe92104ef1561ca0d45c0b9db46c346a0fc9f77e1e11d428c22205300739a081"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/ledger/ledgerConnection.ts",
+      "bytes": 3137,
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/ledger/ledgerVerification.ts",
+      "bytes": 35501,
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/llm/adapter/streamRecorder.ts",
+      "bytes": 16249,
+      "sha256": "e43dde982dd9f622fdc29864bf97cb095ebd220a441eea61094818ac66e040b7"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/llm/adapter/transport.ts",
+      "bytes": 6837,
+      "sha256": "7c62c87aeace4fccdc2d851492e296fe72d373419d88c3b250b51632949b5b7d"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/llm/request/deriveRequest.ts",
+      "bytes": 10626,
+      "sha256": "37cdbd9eb18d1d98f533c4a4a93c6a299e8f9a95742cd2d2b66b0e82ff42de50"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/llm/request/requestSources.ts",
+      "bytes": 22773,
+      "sha256": "01ff5b3b11495d9a2759a36e26b0fa4184c745d44ea08aff94fb76bafc0158d4"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/session/eventPayload.ts",
+      "bytes": 3228,
+      "sha256": "184cafbb80a100ee7f68b4273868305f8c3ca049497cd9caa5b888d1417bc900"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/session/requestHeaderMeta.ts",
+      "bytes": 5768,
+      "sha256": "791e9ff55896af78f413abb7af3911ec744a212345abb236ba68cfaaa2d6e178"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/session/sessionService.ts",
+      "bytes": 36194,
+      "sha256": "748ea18097b8fd2cbd5b5636d2e13ad78e98b8cd5b1e2a8e972c6cb407d5ee28"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/session/sessionSpine.ts",
+      "bytes": 14439,
+      "sha256": "a5bf435606892bb27645b0c7629bf20b0dc6207fdbbfc14e226cbcb854989641"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/session/sessionTypes.ts",
+      "bytes": 12503,
+      "sha256": "9dafd965d894cee2cd7eb886c24ff867f09e09814915a48ae615002bab5ef9b7"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/session/spill/spillPolicy.ts",
+      "bytes": 9984,
+      "sha256": "813d7233b609a2787c32da1317eceea7ec205bc176fb4389b5727e82dc636296"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/session/spill/spillStore.ts",
+      "bytes": 17533,
+      "sha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/session/spill/spillTypes.ts",
+      "bytes": 11981,
+      "sha256": "20f7135239a5bd1ed419194e869b450334bd92a2a04f57fc89a6ea8ca523dd8a"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/session/surfaceCompaction.ts",
+      "bytes": 12527,
+      "sha256": "53ac23c1d5485e1fb15d551acb4fcea765f0e9cd76f17682e8ed71da6620ff02"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/session/surfaceCompactionValidation.ts",
+      "bytes": 11644,
+      "sha256": "447f32b89135f0485f931a64c19c9492f59d2d732ab119fc6d4f55a2fa24a883"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/session/surfaceProjection.ts",
+      "bytes": 10043,
+      "sha256": "f1e18326b343ecb3f3ae9b63928d1ce5fb1f348c29b4a9f141983b72a2106956"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/storage/sqlitePool.ts",
+      "bytes": 5804,
+      "sha256": "021dfe8f275c90273d1821d36431f182bbde538a3417f2375e96013c91867bfc"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/src/vault/vault.ts",
+      "bytes": 29540,
+      "sha256": "f37212a91c1e9ea1f35dac7bcfd03481e5ce26a1fe80a56f6843e3fbb8e02e84"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/agentLoopReconstructable.test.ts",
+      "bytes": 20421,
+      "sha256": "831e3c2751f18d4e14664181566bdfb6beeed2d86b0e3610ea25d5b930e4c4bb"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/agentRunJsonlVerification.test.ts",
+      "bytes": 5352,
+      "sha256": "51a8958eda674ada192f12afc23867286bc09045ab828d5bcc79f8cef9986bc0"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/autoCompaction.test.ts",
+      "bytes": 44184,
+      "sha256": "f81a60b6b46acc37f4003bd76d384e22637225100a7b805623db540ea8bc0f48"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/helpers/agentLoopHarness.ts",
+      "bytes": 13071,
+      "sha256": "959a72a75aafc499307b3cdfa0466478dd9a29572edc2b457a1fccfd16d97873"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/helpers/trustContext.ts",
+      "bytes": 4280,
+      "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/surfaceCompaction.test.ts",
+      "bytes": 8961,
+      "sha256": "81440b4f3a587de870a2a4301abb0fc4e49eec8d4d5a13bee2ea264f8f0a2393"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/surfaceHistoryCompaction.test.ts",
+      "bytes": 17065,
+      "sha256": "655ea7fc64c19c7afda75cd46accba3bc0ed3821d984cca638ae8fdf2bd1888a"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "d9ac61410f8fb2c23d8e91dd66dfc50bff9b7d2f187647b282978d6353810c79"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/website/index.html",
+      "bytes": 43520,
+      "sha256": "531623bbee6cef5529e60d4d385781292afab4b2f58123d9662df8cd3a7e2022"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/website/lite.html",
+      "bytes": 11197,
+      "sha256": "3a946fe5aa9d6ec644b86f6ca8c0d501632b29891c1d8d0d7e8e70a7fe29ab3f"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "3f1983cb7f5474b53ee195ff509cd7763c0784a08473d072b9e08ce7cae66c39"
+    }
+  ],
+  "nativeSource": {
+    "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "dev": 16777231,
+    "inode": 539175547,
+    "nlink": 1
+  },
+  "nativeFresh": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "dev": 16777231,
+    "inode": 542184874,
+    "nlink": 1
+  },
+  "nativeBorrowedCopiedOrLinked": false,
+  "compiledSelected": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli.js",
+      "bytes": 1054132,
+      "sha256": "ce387d2f113699e2399ecabfdba288cc45748c15c28efc24f2bf0d68e0e9261f"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli-agent-commands.js",
+      "bytes": 48429,
+      "sha256": "315b02f9a5ccda05bd37ccca6e1476e732774c5e8fe7110139c47cdaa81745e2"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/agent/runReport.js",
+      "bytes": 12428,
+      "sha256": "f8dc735b17d9e5c72ce17e4af03643cf97bbc6805f2942447f6636abec92c30a"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/session/surfaceCompactionValidation.js",
+      "bytes": 10826,
+      "sha256": "00943e902f6750499939a6abd6fd1e638799a6abea1b2d5d45bb16ec7bd47c96"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/llm/request/deriveRequest.js",
+      "bytes": 6191,
+      "sha256": "a27e9757918026e86278652ead4caf3ab1ed80460833335c4ae54aab716edbd9"
+    }
+  ],
+  "runnerPin": {
+    "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+    "bytes": 43,
+    "sha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+    "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+    "dev": 16777231,
+    "inode": 539152709
+  },
+  "node": {
+    "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "bytes": 67024,
+    "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd",
+    "physicalPath": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "dev": 16777231,
+    "inode": 494874661,
+    "nlink": 1
+  },
+  "runnerProvenance": "R Vitest entry, explicit Q --root. Q tests resolve installed Q packages/config. Not a self-contained Q runner invocation.",
+  "formalDone": false
+}

@@ -1,0 +1,317 @@
+{
+  "schema": "amc-p135-canonical-source-independent-review/1",
+  "phase": "p135-canonical-source",
+  "allReadsFinished": true,
+  "blockers": [],
+  "method": "Read completed actual artifacts and finite public records; metadata/hash arithmetic only. No product/runtime execution or checkout writes.",
+  "sourceAuthority": {
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "testPin": {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+      "bytes": 43120,
+      "sha256": "c4fafd3e5a0e471d5652cffca85d1e9b7115daac3cdeec0619ab0b1ce0eec56f",
+      "role": "actual selected test module",
+      "read": "full migration source previously read; relevant assurance setup and teardown refreshed; regression source pin",
+      "dev": 16777231,
+      "inode": 542859605
+    },
+    "workingTreeOnly": true,
+    "wrapperCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "wrapperHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "wrapperHeadAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "runnerHeadIsNotSourceAuthority": true
+  },
+  "actual": {
+    "files": 6,
+    "testOccurrences": 85,
+    "uniqueObserverTestIds": 85,
+    "uniqueFileDisplayNames": 81,
+    "passed": 85,
+    "failed": 0,
+    "skipped": 0,
+    "todo": 0,
+    "rawSuiteNodes": 15,
+    "observerNodes": {
+      "file": 6,
+      "suite": 9,
+      "test": 85
+    },
+    "hooksPassed": 20,
+    "unhandledErrors": 0,
+    "taskErrors": 0,
+    "bodyOrHookFailures": 0,
+    "exit": 0,
+    "durationMs": 4777,
+    "ownedPid": 93764,
+    "ownedPgid": 93764,
+    "ownedGroupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "rawObserverOrderedOccurrencesMatch": true,
+    "countsAreNotSummedCohorts": true
+  },
+  "inventory": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/assuranceReportProvenance.test.ts",
+      "cases": 8
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "cases": 15
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/sourceQuality.test.ts",
+      "cases": 5
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/claims/claimAdapters.test.ts",
+      "cases": 39
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/claims/claimLabels.test.ts",
+      "cases": 8
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+      "cases": 10
+    }
+  ],
+  "duplicateDisplayNames": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/claims/claimAdapters.test.ts",
+      "displayName": "tier adapters TrustTier OBSERVED -> observed",
+      "occurrences": 2
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/claims/claimAdapters.test.ts",
+      "displayName": "tier adapters TrustTier ATTESTED -> self_reported",
+      "occurrences": 2
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/claims/claimAdapters.test.ts",
+      "displayName": "tier adapters TrustTier SELF_REPORTED -> self_reported",
+      "occurrences": 2
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/claims/claimAdapters.test.ts",
+      "displayName": "tier adapters uppercase status NOT_EVALUATED maps as documented",
+      "occurrences": 2
+    }
+  ],
+  "migrationPublics": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-DvSGIw/public-evidence.json",
+      "label": "R2-synthetic-edges",
+      "genuine": false,
+      "bodyFailed": false,
+      "cleanupErrors": 0,
+      "environmentUnchanged": true,
+      "vaultLocked": true,
+      "ownedLedgerPoolClosed": true,
+      "nativeUnchanged": true,
+      "delegatedTarAPIInvoked": false,
+      "childProcessCreatedByFixture": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-DEjtV2/public-evidence.json",
+      "label": "R4-never-promoted",
+      "genuine": false,
+      "bodyFailed": false,
+      "cleanupErrors": 0,
+      "environmentUnchanged": true,
+      "vaultLocked": true,
+      "ownedLedgerPoolClosed": true,
+      "nativeUnchanged": true,
+      "delegatedTarAPIInvoked": false,
+      "childProcessCreatedByFixture": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-krqkEN/public-evidence.json",
+      "label": "current-envelope-positive",
+      "genuine": false,
+      "bodyFailed": false,
+      "cleanupErrors": 0,
+      "environmentUnchanged": true,
+      "vaultLocked": true,
+      "ownedLedgerPoolClosed": true,
+      "nativeUnchanged": true,
+      "delegatedTarAPIInvoked": false,
+      "childProcessCreatedByFixture": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-5pROlz/public-evidence.json",
+      "label": "postfix-assurance-R5-strict",
+      "genuine": false,
+      "bodyFailed": false,
+      "cleanupErrors": 0,
+      "environmentUnchanged": true,
+      "vaultLocked": true,
+      "ownedLedgerPoolClosed": true,
+      "nativeUnchanged": true,
+      "delegatedTarAPIInvoked": false,
+      "childProcessCreatedByFixture": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-e09pmu/public-evidence.json",
+      "label": "postfix-assurance-lazy-strict",
+      "genuine": false,
+      "bodyFailed": false,
+      "cleanupErrors": 0,
+      "environmentUnchanged": true,
+      "vaultLocked": true,
+      "ownedLedgerPoolClosed": true,
+      "nativeUnchanged": true,
+      "delegatedTarAPIInvoked": false,
+      "childProcessCreatedByFixture": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-yb6ZzQ/public-evidence.json",
+      "label": "synthetic-persistent-roundtrip",
+      "genuine": false,
+      "bodyFailed": false,
+      "cleanupErrors": 0,
+      "environmentUnchanged": true,
+      "vaultLocked": true,
+      "ownedLedgerPoolClosed": true,
+      "nativeUnchanged": true,
+      "delegatedTarAPIInvoked": false,
+      "childProcessCreatedByFixture": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-KobU4G/public-evidence.json",
+      "label": "synthetic-log-tamper",
+      "genuine": false,
+      "bodyFailed": false,
+      "cleanupErrors": 0,
+      "environmentUnchanged": true,
+      "vaultLocked": true,
+      "ownedLedgerPoolClosed": true,
+      "nativeUnchanged": true,
+      "delegatedTarAPIInvoked": false,
+      "childProcessCreatedByFixture": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-YmnMdl/public-evidence.json",
+      "label": "synthetic-receipt-signature-tamper",
+      "genuine": false,
+      "bodyFailed": false,
+      "cleanupErrors": 0,
+      "environmentUnchanged": true,
+      "vaultLocked": true,
+      "ownedLedgerPoolClosed": true,
+      "nativeUnchanged": true,
+      "delegatedTarAPIInvoked": false,
+      "childProcessCreatedByFixture": false
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-LXcbU1/public-evidence.json",
+      "label": "genuine-classifier-inputs",
+      "genuine": true,
+      "bodyFailed": false,
+      "cleanupErrors": 0,
+      "environmentUnchanged": true,
+      "vaultLocked": true,
+      "ownedLedgerPoolClosed": true,
+      "nativeUnchanged": true,
+      "delegatedTarAPIInvoked": true,
+      "childProcessCreatedByFixture": null
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-wfQfku/public-evidence.json",
+      "label": "genuine-persistent-roundtrip",
+      "genuine": true,
+      "bodyFailed": false,
+      "cleanupErrors": 0,
+      "environmentUnchanged": true,
+      "vaultLocked": true,
+      "ownedLedgerPoolClosed": true,
+      "nativeUnchanged": true,
+      "delegatedTarAPIInvoked": true,
+      "childProcessCreatedByFixture": null
+    }
+  ],
+  "genuineRoundTrip": {
+    "ledgerOK": true,
+    "anchored": true,
+    "relabelRecords": 6,
+    "skippedUnversioned": 2,
+    "verifiedSessionRules": [
+      "R2-dogfood-seeded",
+      "R4-operator-tier"
+    ],
+    "receiptSignatureVerifiedByActualTest": true,
+    "reviewerReexecutedCrypto": false,
+    "originalsDigestMatches": true,
+    "relabelLogVerified": true,
+    "repeatNewRecords": 0,
+    "repeatLogUnchanged": true,
+    "receiptCountBeforeRepeat": 1,
+    "receiptCountAfterRepeat": 2,
+    "postExitHashChecks": [
+      {
+        "label": "genuine-classifier-inputs",
+        "encoded": 4,
+        "decoded": 8,
+        "installed": 0
+      },
+      {
+        "label": "genuine-persistent-roundtrip",
+        "encoded": 4,
+        "decoded": 8,
+        "installed": 3
+      }
+    ],
+    "generationGapsRetained": [
+      {
+        "step": "genuine-L3",
+        "reason": "Actual diagnostic does not have mean level exactly L3; original bytes and seal retained unchanged."
+      },
+      {
+        "step": "diagnostic-certificate",
+        "reason": "Natural exit 1; retained original streams; no success or retry claimed."
+      },
+      {
+        "step": "run.amccert",
+        "reason": "No output file was emitted."
+      }
+    ],
+    "independentHistoricalProvenanceClaim": false
+  },
+  "existingAssuranceEffects": {
+    "pin": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-19-runner-effects-He7N5m/runner-effects.json",
+      "bytes": 1567019,
+      "sha256": "b678fa03aa5695454aa753d4766416d15a0d4d25c039146b5cb654ba0f447236",
+      "role": "existing assurance regression effects",
+      "read": "finite record-label/error/key projection only; no full payload-body review",
+      "dev": 16777231,
+      "inode": 542891292
+    },
+    "recordCount": 28,
+    "review": "finite record names/phases/keys and deliberate fault-error metadata only; full payloads not reviewed",
+    "unexpectedFixtureFailureRecords": 0,
+    "intentionalFaults": [
+      "SQLITE_CONSTRAINT_TRIGGER/P019_COMPLETION_SEAL_FAULT",
+      "EEXIST/owned Markdown parent file"
+    ],
+    "sourceHashCaptureCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "sourceHashCaptureNotSAuthority": true,
+    "cleanupBoundary": "Existing unchanged afterAll locks its owned vaults, removes its own temporary fixture roots and restores stubbed environments; actual hook passed."
+  },
+  "outerStreamReview": {
+    "completeLogRead": true,
+    "expectedStderr": [
+      "explicit imported monitor admission",
+      "explicit imported auditor admission"
+    ],
+    "lateFailureDiagnostics": []
+  },
+  "limits": [
+    "Working-tree source qualification only; no fresh clean-source claim.",
+    "No fresh controls, certificate/CLI bridge, full P1-35 acceptance, global suite/quality or release credit.",
+    "No universal child lifecycle, historical provenance, cryptographic theorem, or blob-decryption call-trace claim.",
+    "Delegated synchronous tar API does not expose child process identities.",
+    "sourceQuality five cases are finite scanner fixtures, not global quality green.",
+    "Held Knip proposal and one additional unwaived dead-code finding remain held."
+  ],
+  "writes": "Only this private review directory; no checkout/index/QA/guard changes."
+}

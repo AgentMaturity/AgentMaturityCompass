@@ -1,0 +1,109 @@
+{
+  "schema": "p125w-future-source-control-recipes/1",
+  "at": "2026-10-17T00:07:27.461475+00:00",
+  "operators": [
+    {
+      "id": "OMIT-LOWER-BOUND-SELECTION",
+      "target": "src/time/checkpoint.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "bytes": 21005,
+        "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+        "dev": 16777231,
+        "inode": 542461050,
+        "nlink": 1
+      },
+      "before": "      lower: pick(lower.filter(row => row.index < index).map(row => row.attested), -1)\n",
+      "after": "      lower: null\n",
+      "matchCountRequired": 1,
+      "beforeLine": 339,
+      "beforeSha256": "259fd928567484d156b56fc41a2e4630c37bcd45aa57918f56004780770d4766",
+      "afterSha256": "c1cd00f6133363f5db8270190962dab1f70ec28a8caaff65341bd7661903f1a0",
+      "proposedWholeFile": {
+        "bytes": 20936,
+        "sha256": "492cbca9163651bee10387953dba73420e81c31393a5292f68fa2f2f23c51335"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-LOWER-BOUND-SELECTION.patch.txt",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-LOWER-BOUND-SELECTION.patch.txt",
+        "bytes": 418,
+        "sha256": "3fb680e293fb0011ca12bd6b689f40163d585812b4cd66ce5d1fb0d114957e71",
+        "dev": 16777231,
+        "inode": 543742987,
+        "nlink": 1
+      },
+      "witness": {
+        "candidateLines": [
+          445
+        ],
+        "candidatePin": {
+          "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+          "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+          "bytes": 34549,
+          "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+          "dev": 16777231,
+          "inode": 543727816,
+          "nlink": 1
+        },
+        "masking": "Real independent grants, both checkpoint signatures/head links, stored tokens, checkpoint-event metadata and ledger positives precede the new middle attested-window basis assertion. Later exact window/default/zero findings are masked if that basis fails. No total or first actual failure is predicted.",
+        "actualFailureCount": null
+      },
+      "actualFailureCount": null,
+      "applied": false
+    },
+    {
+      "id": "OMIT-TOLERANCE-CONTRIBUTION",
+      "target": "src/time/timeEvidence.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+        "bytes": 3278,
+        "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+        "dev": 16777231,
+        "inode": 542461052,
+        "nlink": 1
+      },
+      "before": "  const slack = (bound: AttestedTime) => (bound.accuracyMs ?? 0) + (input.toleranceMinutes ?? DEFAULT_TOLERANCE_MINUTES) * 60_000;\n",
+      "after": "  const slack = (bound: AttestedTime) => (bound.accuracyMs ?? 0);\n",
+      "matchCountRequired": 1,
+      "beforeLine": 54,
+      "beforeSha256": "81ded297f8e388e007c2a6449ca03022dc2450351437901bbcfed198c14f9ddc",
+      "afterSha256": "4c994f0caf89b8410f4d4fe92221d994058e0cbf737ccecdfe0f9f78a9383331",
+      "proposedWholeFile": {
+        "bytes": 3213,
+        "sha256": "cd890d24392ea5db9a6ed9747032036cf237db950c2eed209e17152725bccb01"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-TOLERANCE-CONTRIBUTION.patch.txt",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-TOLERANCE-CONTRIBUTION.patch.txt",
+        "bytes": 756,
+        "sha256": "ac8aae830ca233586d291e0bd3b0f636e8a0000ebdf8126a0f19070f1d5e94da",
+        "dev": 16777231,
+        "inode": 543742988,
+        "nlink": 1
+      },
+      "witness": {
+        "candidateLines": [
+          452
+        ],
+        "candidatePin": {
+          "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+          "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+          "bytes": 34549,
+          "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+          "dev": 16777231,
+          "inode": 543727816,
+          "nlink": 1
+        },
+        "masking": "The new case collects all ten reader observations before the default-lower-inclusive finding assertion. Existing upper-bound cases may also fail because genuine timestamps can precede host claimed times. Root must read and classify every actual failure, including old cases, plus later masked assertions. No total or first actual failure is predicted.",
+        "actualFailureCount": null
+      },
+      "actualFailureCount": null,
+      "applied": false
+    }
+  ],
+  "noSourceMutantStored": true,
+  "futureQualificationHashesNotPredicted": true,
+  "noPredictedFailuresHooksOrQualificationCredit": true
+}

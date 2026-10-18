@@ -1,0 +1,9 @@
+# Inert cadence source controls
+
+The preferred candidate is source-control.py.source.txt, derived from the exact adopted B38 source-control.py. The complete delta, two literal recipes/patches, UNREADY root-binding template and field instructions are adjacent. No helper was imported, parsed, compiled or executed and no source/index/QA or prior artifact was changed.
+
+COUNT-CHECKPOINT-ROWS removes only the42-byte event_type checkpoint exclusion plus its joining AND from the due query. STRICT-THRESHOLD removes only the equality character from n>=everyEvents. The initial !last and real-minute branches stay exact. Prospective test witnesses are582 and597; no actual RED, total or sensitivity is predicted. The same src/time/checkpoint.ts target is used for both operations only in a later actual fresh Q, with an explicit exact restoration and identical-cohort GREEN between them.
+
+Current C161inputs/11old natives, one source successor and initial161Pinset are bound exactly. The helper consumes the other agent's sealed source-selection.json, deriving98selected paths/21compiled pairs from immutable B38 sets plus the two readonly pairs. It adopts no future source commit, Q, build/native/outcome or action hash. All prior ACTIVE/HALTED, source/fresh/native/R, physical same-inode, manual all-failure, source-only and no-auto-restore guards remain; protected input verification is strengthened to full physical pins. Actual helper-action endedUtc now gates dependent test chronology at restore and before the next apply.
+
+Root must independently review and fill actual bindings after source/build/fresh GREEN. Each direct helper return must naturally close before a test starts; root records actual action provenance, never guesses it. All holds, missing-reservation limitations, Claude work, ignored archive, unwaived quality/freeze checks and F37skip remain intact.

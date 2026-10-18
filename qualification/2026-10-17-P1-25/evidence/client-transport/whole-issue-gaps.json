@@ -1,0 +1,36 @@
+{
+  "schema": "p125c-current-whole-issue-gaps/1",
+  "at": "2026-10-16T21:54:48.445466+00:00",
+  "sourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "boundedImplemented": "Independent DER request and real raw HTTP client qualification:11 new cases beside17 unchanged genuine-token verifier cases;28 canonical only.",
+  "stillOpen": [
+    "P1-01/schema dependencies and its recorded gaps",
+    "Existing held package review/approval criterion; no dependency was added",
+    "Admitted reproducible source generator and broader genuine signature/algorithm matrix",
+    "requestTimestamp successful matching-fresh-nonce grants, ordered fallback and no-anchor/refusal behavior",
+    "timestampDigest no-config offline fallback and required-time behavior",
+    "checkpoint time windows and pending-to-verified integration; no separate token/checkpoint TTL contract established in the inspected APIs/spec",
+    "session sealing and issuance token embedding",
+    "report/CLI trusted-time integration",
+    "CI interoperability, full suite and coverage",
+    "global duplicates/dead-code gates remain RED without waiver or baseline adoption"
+  ],
+  "nextIndependentCandidate": "Read-only routing is evaluating a unique tsaFallback test lane for no-config offline fallback/no-anchor skip/ordered refusals. Successful fresh-nonce response requires a real signing responder: technical fixture gap, not a newly invented human hold.",
+  "priorDecisionsRetained": [
+    "F37 skipped/unfixed/unqualified",
+    "P1-01 gaps",
+    "P0-29 unmatched successors",
+    "P0-22 empty-result contract",
+    "P0-09/P0-51 key precedence",
+    "D-03 written live-health skip until P2-06",
+    "provider D15 archive staging held",
+    "all existing ownership/private integration decisions"
+  ],
+  "noWholeIssueOrPlanCompletion": true,
+  "noPublicTsaCiReleasePrPushMergeTrackerDone": true,
+  "supersedesPrivateGapWording": {
+    "path": "/private/tmp/p1-25-client-qualification-20261017/whole-issue-gaps.json",
+    "sha256": "5a357b8d95d73de80ff066fa7230328f386974ad9c7573cd110b2ab9cf4ab293",
+    "reason": "Do not invent a TTL requirement from cadence or certificate validity at signed genTime."
+  }
+}

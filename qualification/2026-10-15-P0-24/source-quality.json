@@ -1,0 +1,85 @@
+{
+  "duplicates": {
+    "path": "/private/tmp/p0-24-final-source-duplicates-20261015.log",
+    "sha256": "02406a6fa7a6a1bf907f4cde90d0290e3d4f9ed354c53b2107ce044a62bc12fa",
+    "actual": {
+      "status": "failed",
+      "tool": "jscpd",
+      "version": "5.4.0",
+      "findingCount": 1269,
+      "statistics": {
+        "clones": 1269,
+        "duplicatedLines": 14777,
+        "duplicatedTokens": 95693,
+        "lines": 526669,
+        "newClones": 0,
+        "newDuplicatedLines": 0,
+        "percentage": 2.8057470631459225,
+        "percentageTokens": 2.917495307123142,
+        "sources": 2143,
+        "tokens": 3279971
+      },
+      "representativeFindings": [
+        "[[\"a4/a4Router.ts\",\"a4/a4RouterStages.ts\"],\"typescript\",\"fbe506ebc7c545b7dcbf8bb34ca36814d6c2a7268dcea84a0126d45dcbf500de\"]",
+        "[[\"a4/a4Router.ts\",\"api/nativeTasksRouter.ts\"],\"typescript\",\"2d212c944cd82cd8804351171f9dd363da57ad9b7faccc2e163cdabb3c10b1a1\"]",
+        "[[\"a4/a4Router.ts\",\"mcp/a4Tools.ts\"],\"typescript\",\"df7ee641bc3ded1aec920ce188369e3c83b53b537e2a80387db9ef467a4a89aa\"]",
+        "[[\"a4/a4RouterStages.ts\",\"a4/spec/adapt.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+        "[[\"a4/a4RouterStages.ts\",\"a4/spec/aspire.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+        "[[\"a4/a4RouterStages.ts\",\"a4/spec/assemble.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+        "[[\"a4/adaptContextPlugin.ts\",\"a4/spec/assemble.ts\"],\"typescript\",\"324a2b47f6016f4093a5592c7ab29c67ba6eb9678640c4f1318bca92b62895ed\"]",
+        "[[\"a4/adaptPolicy.ts\",\"a4/stages/assemble.ts\"],\"typescript\",\"cdf8e0a57471dcc73b0808ed9fe7c69923343f7ab0ec1f773048e799d5e241d7\"]",
+        "[[\"a4/assembleBuild.ts\",\"a4/stages/adapt.ts\"],\"typescript\",\"d873f32d3eb5d538f041c3ebdf2e06ebc2edb70cec8839efc1ae78ee961c7c15\"]",
+        "[[\"a4/assembleResolve.ts\",\"a4/assembleResolve.ts\"],\"typescript\",\"58209a897c4b1182be8679b674d36d6b86046e208a3418b47250e958f32a0afe\"]"
+      ]
+    }
+  },
+  "initialNewTestDeadCode": {
+    "path": "/private/tmp/p0-24-source-dead-code-20261015.log",
+    "sha256": "8f5120fd4bfef22b8a11f7d1fc57858fc80e74d8e48f2cf5675e45b27760d560",
+    "actual": {
+      "status": "failed",
+      "tool": "knip",
+      "version": "6.39.0",
+      "findingCount": 2751,
+      "representativeFindings": [
+        "[\"examples/score-history-example.ts\",\"files\",{\"name\":\"examples/score-history-example.ts\"}]",
+        "[\"package.json\",\"binaries\",{\"name\":\"graphify\"}]",
+        "[\"package.json\",\"devDependencies\",{\"name\":\"date-fns\"}]",
+        "[\"scripts/program-metrics.mjs\",\"files\",{\"name\":\"scripts/program-metrics.mjs\"}]",
+        "[\"scripts/vendor/build-workspace.mjs\",\"files\",{\"name\":\"scripts/vendor/build-workspace.mjs\"}]",
+        "[\"src/a4/a4Binder.ts\",\"files\",{\"name\":\"src/a4/a4Binder.ts\"}]",
+        "[\"src/a4/a4Blobs.ts\",\"exports\",{\"name\":\"destroyProjectKey\"}]",
+        "[\"src/a4/a4Conformance.ts\",\"exports\",{\"name\":\"checkControlResults\"}]",
+        "[\"src/a4/a4Conformance.ts\",\"exports\",{\"name\":\"recheckedConformance\"}]",
+        "[\"src/a4/a4Conformance.ts\",\"types\",{\"name\":\"StoredControl\"}]"
+      ]
+    }
+  },
+  "finalTypedTestDeadCode": {
+    "path": "/private/tmp/p0-24-final-source-dead-code-20261015.log",
+    "sha256": "8f5120fd4bfef22b8a11f7d1fc57858fc80e74d8e48f2cf5675e45b27760d560",
+    "actual": {
+      "status": "failed",
+      "tool": "knip",
+      "version": "6.39.0",
+      "findingCount": 2751,
+      "representativeFindings": [
+        "[\"examples/score-history-example.ts\",\"files\",{\"name\":\"examples/score-history-example.ts\"}]",
+        "[\"package.json\",\"binaries\",{\"name\":\"graphify\"}]",
+        "[\"package.json\",\"devDependencies\",{\"name\":\"date-fns\"}]",
+        "[\"scripts/program-metrics.mjs\",\"files\",{\"name\":\"scripts/program-metrics.mjs\"}]",
+        "[\"scripts/vendor/build-workspace.mjs\",\"files\",{\"name\":\"scripts/vendor/build-workspace.mjs\"}]",
+        "[\"src/a4/a4Binder.ts\",\"files\",{\"name\":\"src/a4/a4Binder.ts\"}]",
+        "[\"src/a4/a4Blobs.ts\",\"exports\",{\"name\":\"destroyProjectKey\"}]",
+        "[\"src/a4/a4Conformance.ts\",\"exports\",{\"name\":\"checkControlResults\"}]",
+        "[\"src/a4/a4Conformance.ts\",\"exports\",{\"name\":\"recheckedConformance\"}]",
+        "[\"src/a4/a4Conformance.ts\",\"types\",{\"name\":\"StoredControl\"}]"
+      ]
+    }
+  },
+  "requiredGateExits": {
+    "duplicates": 1,
+    "deadCode": 1
+  },
+  "scope": "Current source-quality tool outcomes. Only our new qualification test and ten factual test-source inventory documents changed; production is unchanged. Count differences from prior contexts do not prove production cleanup, a causal explanation or a passing quality gate. Initial type and observer failures remain separately retained."
+}

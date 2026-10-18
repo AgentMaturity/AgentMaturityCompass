@@ -1,0 +1,522 @@
+{
+  "schema": "p119-missing-oracle-audit-pins/1",
+  "closedOutputs": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/missing-oracle-audit/README.md",
+      "bytes": 3163,
+      "sha256": "deb3cc949723a939b1bc06c18e36338bccbe7630e39c9d2a6c4a503a24977da4",
+      "device": 16777231,
+      "inode": 541767463,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/missing-oracle-audit/review.json",
+      "bytes": 37050,
+      "sha256": "7a13a9435a1f9ee414fd5448f09920951dd0358fc04a6d8502a0a0e324320de0",
+      "device": 16777231,
+      "inode": 541767464,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    }
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/command.json",
+      "bytes": 2938,
+      "sha256": "89145ea407724cd59442e924efcc13fd328712c53d3bcba4e07c8d1510ed41b6",
+      "device": 16777231,
+      "inode": 541767247,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/raw.json",
+      "bytes": 5161,
+      "sha256": "d7624fdce5f8db92ce22a71e4b5fd111629b17e1ed8476d9671e4f4cc4194e9c",
+      "device": 16777231,
+      "inode": 541767246,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/observer.json",
+      "bytes": 8722,
+      "sha256": "a03cd32777c6dea8f5f193b57ed79481bd9c46f2db652393099edd81aa5ead4d",
+      "device": 16777231,
+      "inode": 541767244,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/stdout-stderr.log",
+      "bytes": 22584,
+      "sha256": "0a5e3912c3c99311d65a064b4d57b01b00cf3850fc0d66a016b4107ee9395d11",
+      "device": 16777231,
+      "inode": 541767023,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/owned-process.json",
+      "bytes": 900,
+      "sha256": "cf420f1607ddd7d0bf0843eef81937efe19b578ab0a95a08206f12c23f548d2e",
+      "device": 16777231,
+      "inode": 541767024,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "6dd04bbb76f46770e4bc34ad9a5491828da1cc842dbfc8cc52a89ffc0b106826",
+      "device": 16777231,
+      "inode": 541767245,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/public-observations.json",
+      "bytes": 10331,
+      "sha256": "9bdf88ff168512f046b96684cb653aee2ce58e16287a37445535b019c008a9ac",
+      "device": 16777231,
+      "inode": 541767242,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/oracle-1.stderr.log",
+      "bytes": 743,
+      "sha256": "4565a793719217df0b4d364536bc615384e55710bbaf41d703d6066ecec9fe63",
+      "device": 16777231,
+      "inode": 541767240,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/oracle-1.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "device": 16777231,
+      "inode": 541767239,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/initializer.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "device": 16777231,
+      "inode": 541767202,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/initializer.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "device": 16777231,
+      "inode": 541767201,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/producer.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "device": 16777231,
+      "inode": 541767233,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/producer.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "device": 16777231,
+      "inode": 541767232,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/producer.mjs",
+      "bytes": 12144,
+      "sha256": "8e661c83f486851dd375ca6891e092e9e789735fc6e078ecf7fe6467d7ad33b4",
+      "device": 16777231,
+      "inode": 541767046,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/produced.json",
+      "bytes": 727,
+      "sha256": "3ef2df785fb5d45cd471447ce7ae5f326e7364a6bd733075badd1c45db9b6744",
+      "device": 16777231,
+      "inode": 541767231,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/initialized.json",
+      "bytes": 504,
+      "sha256": "04642d2e44606ed870d019648731aa8efe7ef3f69197cd40a1109c433eb2029c",
+      "device": 16777231,
+      "inode": 541767200,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/case.json",
+      "bytes": 280,
+      "sha256": "0d05b724e33ea975abe118e045a5be5a5dbab872fbab127033352e01753e780a",
+      "device": 16777231,
+      "inode": 541767047,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/operator/before-artifacts.json",
+      "bytes": 446,
+      "sha256": "7c7bb23bd32ab16cfc39e617777c7c6e89f40b4dcbc9e43ae5b9b2c7e2e00bcf",
+      "device": 16777231,
+      "inode": 541767045,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/operator/pins.json",
+      "bytes": 1597,
+      "sha256": "5dd421e7608f27a1d05d217668b56ccb6a5b51d23ab8fd629dfeb5fd49f682cc",
+      "device": 16777231,
+      "inode": 541767203,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhf-ETIJH1/qualification-observations.json",
+      "bytes": 14350,
+      "sha256": "963fd07020872d98399ecc3c096428b31db9ebaffc6bf85cbdd3b4e6632b70cd",
+      "device": 16777231,
+      "inode": 541767241,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhf-ETIJH1/child-1.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "device": 16777231,
+      "inode": 541767052,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhf-ETIJH1/child-1.stdout.log",
+      "bytes": 173,
+      "sha256": "2283c9af42f7e3fc0fa6461b0db99bb13994c9a2712f11ed2ca1ef50fd831b4a",
+      "device": 16777231,
+      "inode": 541767051,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-v3-application.json",
+      "bytes": 953,
+      "sha256": "a99cfcd91fe9f2e2f2bca65d3ef2ca5aa538119cca30c6be43a9e6c38715f05d",
+      "device": 16777231,
+      "inode": 541766983,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/actual-missing-oracle-red.json",
+      "bytes": 6719,
+      "sha256": "a4ea0dfbafda9e805afa8418dd8c1681d8bcd32df3702d2cc8c7bf31a850256c",
+      "device": 16777231,
+      "inode": 541767335,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+      "bytes": 30699,
+      "sha256": "9ffa86ac0ba2fefc0d92b7f0553886c43d19bcc4bb1eb41716e5c339ed6f137b",
+      "device": 16777231,
+      "inode": 541766981,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+      "bytes": 4470,
+      "sha256": "d6eb1814e0106dfc5773e6791a8c7856e43e717e3573cf3ced82029a18cf9ed5",
+      "device": 16777231,
+      "inode": 541766982,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/cli.js",
+      "bytes": 1054132,
+      "sha256": "ce387d2f113699e2399ecabfdba288cc45748c15c28efc24f2bf0d68e0e9261f",
+      "device": 16777231,
+      "inode": 541763565,
+      "nlink": 1,
+      "modeOctal": "0o755"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/vault/vault.js",
+      "bytes": 27868,
+      "sha256": "f1152e1ace9f772e01a9c3720c66f39fef60ba30f4e3269bba35dc4b2d0e6545",
+      "device": 16777231,
+      "inode": 541759530,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/storage/sqlitePool.js",
+      "bytes": 5308,
+      "sha256": "b30b74682cc61bd1d03d08cced571cfc7ee2fcd0f43105965346d4fff80be55e",
+      "device": 16777231,
+      "inode": 541759904,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/ledger/ledger.js",
+      "bytes": 40649,
+      "sha256": "b555d1a81c0033f2af9a5004e209eae0f11ceb46f665b9f52b17cf9978796da2",
+      "device": 16777231,
+      "inode": 541760079,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/fleet/paths.js",
+      "bytes": 4966,
+      "sha256": "4f2aac1a5368c51797e00ac554100ea25c14bf2ebd09dcc93094bd9f776cf961",
+      "device": 16777231,
+      "inode": 541759450,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/crypto/keys.js",
+      "bytes": 8403,
+      "sha256": "33c4b7aef14b5794cd59f7300c6672e499ae308e6f0ef2c9ab32e89acbe8b4ee",
+      "device": 16777231,
+      "inode": 541759532,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/utils/json.js",
+      "bytes": 496,
+      "sha256": "f2440acd31b7d86a041ec312d766116a389b90efba539d473ebb2116290052ba",
+      "device": 16777231,
+      "inode": 541759483,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/workspace.js",
+      "bytes": 28184,
+      "sha256": "5b50d81f0ba2619bc7a6b5651f0e6179d542d7febbbfa513a30e218ea2215c06",
+      "device": 16777231,
+      "inode": 541761270,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/governor/actionPolicyEngine.js",
+      "bytes": 33861,
+      "sha256": "402da40586bb5dcee9beadc4d840ffdc8460806d151ca7780f74789b04b4bf53",
+      "device": 16777231,
+      "inode": 541760085,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/budgets/budgets.js",
+      "bytes": 10569,
+      "sha256": "8db0137168bbd0c5dacb315a4f802e608a62de44758130af6c1cf1e8ab439017",
+      "device": 16777231,
+      "inode": 541760044,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/approvals/approvalPolicyEngine.js",
+      "bytes": 12271,
+      "sha256": "e06cd71aee239306352689b9c280ac86afcd079386881188187e57b49aa6af20",
+      "device": 16777231,
+      "inode": 541760010,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/toolhub/toolhubValidators.js",
+      "bytes": 14162,
+      "sha256": "a5b356bd5c0747445d1c2c157583aeb30686897716b743b371557a014c1f819c",
+      "device": 16777231,
+      "inode": 541759858,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/lighthouse/finance/paymentServiceClient.js",
+      "bytes": 11068,
+      "sha256": "4c9232628d7c4cfd70338a28cfaa7f4188c045ce271eab6e85a3349cf973e502",
+      "device": 16777231,
+      "inode": 541763952,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/lighthouse/finance/paymentAdapter.js",
+      "bytes": 6126,
+      "sha256": "be6f00d368636901b86bd6bd41fe735ffad5c7e1141f4dd5af4f6cd47b620704",
+      "device": 16777231,
+      "inode": 541763954,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/lighthouse/finance/paymentArgs.js",
+      "bytes": 1792,
+      "sha256": "59ae4986a498e0130b7ac8c794dc3d8b0d45b5c1a8a1df561c4a9a0e6aed939d",
+      "device": 16777231,
+      "inode": 541763950,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/actions/authorize.js",
+      "bytes": 17905,
+      "sha256": "3c078af911e6f4bf2e987bef21399247c9a9cc79d02ecc523a3ac6a125f0f0ea",
+      "device": 16777231,
+      "inode": 541759813,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/actions/authorizationRecord.js",
+      "bytes": 2718,
+      "sha256": "36e25d0388ac84c7c18f3d561031258dbf1e611f79313dfc44a70eea97ae3043",
+      "device": 16777231,
+      "inode": 541759785,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/approvals/approvalEngine.js",
+      "bytes": 18280,
+      "sha256": "d2d4d643e1769dac299e427c4b3ebe0fea5650ffa77d9fd1ba69668916a03268",
+      "device": 16777231,
+      "inode": 541760089,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/approvals/approvalChainStore.js",
+      "bytes": 24605,
+      "sha256": "f52d7e09969d571cd6c74fcb662329d4dfe98267f3df0f52f0250107fba46d17",
+      "device": 16777231,
+      "inode": 541759749,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/actions/actionJournal.js",
+      "bytes": 27971,
+      "sha256": "51dcef1e2aac552e92f2fadd55eba6101b9b128d7df0459118a97e622f3c0f1e",
+      "device": 16777231,
+      "inode": 541759787,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/tools/toolRegistry.js",
+      "bytes": 7054,
+      "sha256": "b5fa412d5fc5fac3612974a6366041a9794732218ec2150ec9429452691f35fc",
+      "device": 16777231,
+      "inode": 541759794,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/tools/toolPipeline.js",
+      "bytes": 26855,
+      "sha256": "d104405e18c44b14146b1a0f24035744315705bc8b28f553d0ec4e3569dc55af",
+      "device": 16777231,
+      "inode": 541759817,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/tools/toolEvidence.js",
+      "bytes": 5077,
+      "sha256": "d0339550d6d2a41ec59c9c317f115506b3497648a79cc5d391769cf7fd3ac26d",
+      "device": 16777231,
+      "inode": 541760237,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/tools/guards/policyGuards.js",
+      "bytes": 10115,
+      "sha256": "55ccd85f9c07e9bab72871ead7dbf977dfda80e302ece56a814fa9de4685107f",
+      "device": 16777231,
+      "inode": 541760226,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/workspaces/p119-oracle-de96ae92-5143-4fa9-8f6e-32fd90025929/.amc/finance-oracle-preimages/exec_f27c1a30-627c-429c-9c13-c1440e9e25d0.json",
+      "bytes": 2818,
+      "sha256": "966551e2c34d9ba3ae525d600785fa7644825014f6076973d69867d804b941a9",
+      "device": 16777231,
+      "inode": 541767227,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhf-ETIJH1/run/txlog.jsonl",
+      "bytes": 5415,
+      "sha256": "db58e765485dc8bc289060f7cc47608b2c3396e67ae5621ceff85e7b5f50bcbc",
+      "device": 16777231,
+      "inode": 541767056,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/provider-evidence/txlog.jsonl",
+      "bytes": 5415,
+      "sha256": "db58e765485dc8bc289060f7cc47608b2c3396e67ae5621ceff85e7b5f50bcbc",
+      "device": 16777231,
+      "inode": 541767237,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhf-ETIJH1/run/txlog-head.json",
+      "bytes": 85,
+      "sha256": "21ff601bd1167ae3d1333b16fd024f656b4a425a71e01865e883fd91b861f53d",
+      "device": 16777231,
+      "inode": 541767236,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/provider-evidence/txlog-head.json",
+      "bytes": 85,
+      "sha256": "21ff601bd1167ae3d1333b16fd024f656b4a425a71e01865e883fd91b861f53d",
+      "device": 16777231,
+      "inode": 541767238,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    }
+  ],
+  "inputsRecheckedAtClosure": true,
+  "allReadsAndWritesFinished": true
+}

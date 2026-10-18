@@ -1,0 +1,13 @@
+{
+  "classification": "passed",
+  "total": 27,
+  "passed": 27,
+  "failed": 0,
+  "pending": 0,
+  "todo": 0,
+  "failures": [],
+  "killClaim": false,
+  "formalAcceptanceClosed": false,
+  "ownedGroupAbsentByESRCH": true,
+  "cliArtifactRoot": "/private/tmp/p0-41-causal-qualification-v2-20261015/cli-artifacts/P041-M1-missing-source-zero--restored"
+}

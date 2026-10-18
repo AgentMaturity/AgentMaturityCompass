@@ -1,0 +1,1299 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 104,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/tests/lighthouse/financeClientAdapter.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/tests/lighthouse/financeFixtureService.test.ts"
+  ],
+  "testCount": 120,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-75272978",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/tests/lighthouse/financeClientAdapter.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-75272978_0",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_0",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization uses the provider-only canonical payload digest, independently specified as literal bytes",
+      "fullName": "P1-19 finite payment normalization uses the provider-only canonical payload digest, independently specified as literal bytes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_1",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization converts 1 minor units exactly to canonical decimal 0.01",
+      "fullName": "P1-19 finite payment normalization converts 1 minor units exactly to canonical decimal 0.01",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_2",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization converts 10 minor units exactly to canonical decimal 0.1",
+      "fullName": "P1-19 finite payment normalization converts 10 minor units exactly to canonical decimal 0.1",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_3",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization converts 100 minor units exactly to canonical decimal 1",
+      "fullName": "P1-19 finite payment normalization converts 100 minor units exactly to canonical decimal 1",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_4",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization converts 12001 minor units exactly to canonical decimal 120.01",
+      "fullName": "P1-19 finite payment normalization converts 12001 minor units exactly to canonical decimal 120.01",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_5",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization converts 9007199254740991 minor units exactly to canonical decimal 90071992547409.91",
+      "fullName": "P1-19 finite payment normalization converts 9007199254740991 minor units exactly to canonical decimal 90071992547409.91",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_6",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization refuses invalid decimal input 0",
+      "fullName": "P1-19 finite payment normalization refuses invalid decimal input 0",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_7",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization refuses invalid decimal input -1",
+      "fullName": "P1-19 finite payment normalization refuses invalid decimal input -1",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_8",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization refuses invalid decimal input 0.1",
+      "fullName": "P1-19 finite payment normalization refuses invalid decimal input 0.1",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_9",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization refuses invalid decimal input NaN",
+      "fullName": "P1-19 finite payment normalization refuses invalid decimal input NaN",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_10",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization refuses invalid decimal input Infinity",
+      "fullName": "P1-19 finite payment normalization refuses invalid decimal input Infinity",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_11",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization refuses invalid decimal input 9007199254740992",
+      "fullName": "P1-19 finite payment normalization refuses invalid decimal input 9007199254740992",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_12",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects zero without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects zero without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_13",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects negative without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects negative without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_14",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects fraction without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects fraction without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_15",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects unsafe integer without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects unsafe integer without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_16",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects NaN without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects NaN without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_17",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects infinity without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects infinity without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_18",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects numeric string without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects numeric string without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_19",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects other currency without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects other currency without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_20",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects unknown kind without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects unknown kind without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_21",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects path in payee without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects path in payee without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_22",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects path in source without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects path in source without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_23",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects free-text reference without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects free-text reference without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_24",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects long reference without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects long reference without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_25",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects approval metadata without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects approval metadata without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_26",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects destination override without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects destination override without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_0_27",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 finite payment normalization rejects actor metadata without silently stripping authority or provider fields",
+      "fullName": "P1-19 finite payment normalization rejects actor metadata without silently stripping authority or provider fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-75272978_1",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_0",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://localhost before a request",
+      "fullName": "P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://localhost before a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_1",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses noncanonical or nonlocal origin https://127.0.0.1 before a request",
+      "fullName": "P1-19 local client construction boundaries refuses noncanonical or nonlocal origin https://127.0.0.1 before a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_2",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://127.0.0.1/ before a request",
+      "fullName": "P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://127.0.0.1/ before a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_3",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://127.0.0.1:0 before a request",
+      "fullName": "P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://127.0.0.1:0 before a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_4",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://127.0.0.1:65536 before a request",
+      "fullName": "P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://127.0.0.1:65536 before a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_5",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://127.0.0.1:0001 before a request",
+      "fullName": "P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://127.0.0.1:0001 before a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_6",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://127.1 before a request",
+      "fullName": "P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://127.1 before a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_7",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://[::1] before a request",
+      "fullName": "P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://[::1] before a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_8",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://user:pass@127.0.0.1 before a request",
+      "fullName": "P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://user:pass@127.0.0.1 before a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_9",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://127.0.0.1/path before a request",
+      "fullName": "P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://127.0.0.1/path before a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_10",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://127.0.0.1?token=x before a request",
+      "fullName": "P1-19 local client construction boundaries refuses noncanonical or nonlocal origin http://127.0.0.1?token=x before a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_11",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries requires exactly one endpoint and a non-NUL absolute socket path",
+      "fullName": "P1-19 local client construction boundaries requires exactly one endpoint and a non-NUL absolute socket path",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_12",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses malformed token vector 0",
+      "fullName": "P1-19 local client construction boundaries refuses malformed token vector 0",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_13",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses malformed token vector 1",
+      "fullName": "P1-19 local client construction boundaries refuses malformed token vector 1",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_14",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses malformed token vector 2",
+      "fullName": "P1-19 local client construction boundaries refuses malformed token vector 2",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_15",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses malformed token vector 3",
+      "fullName": "P1-19 local client construction boundaries refuses malformed token vector 3",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_16",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses malformed token vector 4",
+      "fullName": "P1-19 local client construction boundaries refuses malformed token vector 4",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_17",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses out-of-contract timeout 0",
+      "fullName": "P1-19 local client construction boundaries refuses out-of-contract timeout 0",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_18",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses out-of-contract timeout -1",
+      "fullName": "P1-19 local client construction boundaries refuses out-of-contract timeout -1",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_19",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses out-of-contract timeout 0.5",
+      "fullName": "P1-19 local client construction boundaries refuses out-of-contract timeout 0.5",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_20",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses out-of-contract timeout NaN",
+      "fullName": "P1-19 local client construction boundaries refuses out-of-contract timeout NaN",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_21",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses out-of-contract timeout Infinity",
+      "fullName": "P1-19 local client construction boundaries refuses out-of-contract timeout Infinity",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_1_22",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 local client construction boundaries refuses out-of-contract timeout 60001",
+      "fullName": "P1-19 local client construction boundaries refuses out-of-contract timeout 60001",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-75272978_2",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_0",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls invalid dispatch arguments never call even an injected provider client",
+      "fullName": "P1-19 explicitly injected adapter boundary controls invalid dispatch arguments never call even an injected provider client",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_1",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls preserves the unknown dispatch outcome without inventing success",
+      "fullName": "P1-19 explicitly injected adapter boundary controls preserves the unknown dispatch outcome without inventing success",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_2",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls preserves the provider refusal dispatch outcome without inventing success",
+      "fullName": "P1-19 explicitly injected adapter boundary controls preserves the provider refusal dispatch outcome without inventing success",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_3",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls an injected client exception remains unknown without exposing its raw message",
+      "fullName": "P1-19 explicitly injected adapter boundary controls an injected client exception remains unknown without exposing its raw message",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_4",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls refuses a hand-shaped response with changed key",
+      "fullName": "P1-19 explicitly injected adapter boundary controls refuses a hand-shaped response with changed key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_5",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls refuses a hand-shaped response with changed reference",
+      "fullName": "P1-19 explicitly injected adapter boundary controls refuses a hand-shaped response with changed reference",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_6",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls refuses a hand-shaped response with changed declared body hash",
+      "fullName": "P1-19 explicitly injected adapter boundary controls refuses a hand-shaped response with changed declared body hash",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_7",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls refuses a hand-shaped response with changed body despite matching declared hash",
+      "fullName": "P1-19 explicitly injected adapter boundary controls refuses a hand-shaped response with changed body despite matching declared hash",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_8",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls two key matches are ambiguous, not a completed payment",
+      "fullName": "P1-19 explicitly injected adapter boundary controls two key matches are ambiguous, not a completed payment",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_9",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls does not fall back after uncertain key lookup",
+      "fullName": "P1-19 explicitly injected adapter boundary controls does not fall back after uncertain key lookup",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_10",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls does not fall back after unauthorized key lookup",
+      "fullName": "P1-19 explicitly injected adapter boundary controls does not fall back after unauthorized key lookup",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_11",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls a key404 can try reference, but absent results never establish not_applied",
+      "fullName": "P1-19 explicitly injected adapter boundary controls a key404 can try reference, but absent results never establish not_applied",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_12",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls missing trusted mapping makes zero provider calls",
+      "fullName": "P1-19 explicitly injected adapter boundary controls missing trusted mapping makes zero provider calls",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_13",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls an explicitly absent mapping also makes zero provider calls",
+      "fullName": "P1-19 explicitly injected adapter boundary controls an explicitly absent mapping also makes zero provider calls",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_14",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls refuses a context with changed execution before reading the provider",
+      "fullName": "P1-19 explicitly injected adapter boundary controls refuses a context with changed execution before reading the provider",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_15",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls refuses a context with changed generic digest before reading the provider",
+      "fullName": "P1-19 explicitly injected adapter boundary controls refuses a context with changed generic digest before reading the provider",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_16",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls refuses a context with changed malformed provider digest before reading the provider",
+      "fullName": "P1-19 explicitly injected adapter boundary controls refuses a context with changed malformed provider digest before reading the provider",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_17",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls refuses a context with changed invalid reference before reading the provider",
+      "fullName": "P1-19 explicitly injected adapter boundary controls refuses a context with changed invalid reference before reading the provider",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_2_18",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 explicitly injected adapter boundary controls mapping errors remain unknown without echoing arbitrary error content",
+      "fullName": "P1-19 explicitly injected adapter boundary controls mapping errors remain unknown without echoing arbitrary error content",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-75272978_3",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 real child provider through client and adapter, without AMC authorization",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_3_0",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 real child provider through client and adapter, without AMC authorization reads only token-scoped public data and validates bad calls synchronously before transport",
+      "fullName": "P1-19 real child provider through client and adapter, without AMC authorization reads only token-scoped public data and validates bad calls synchronously before transport",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_3_1",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 real child provider through client and adapter, without AMC authorization literal TCP dispatch replays once and read-only mapped lookup observes exact provider bindings",
+      "fullName": "P1-19 real child provider through client and adapter, without AMC authorization literal TCP dispatch replays once and read-only mapped lookup observes exact provider bindings",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_3_2",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 real child provider through client and adapter, without AMC authorization expired live key falls back to reference using GET only, without another payment",
+      "fullName": "P1-19 real child provider through client and adapter, without AMC authorization expired live key falls back to reference using GET only, without another payment",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_3_3",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 real child provider through client and adapter, without AMC authorization two authentic payments under one reference remain ambiguous after key expiry",
+      "fullName": "P1-19 real child provider through client and adapter, without AMC authorization two authentic payments under one reference remain ambiguous after key expiry",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_3_4",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 real child provider through client and adapter, without AMC authorization missing provider rows do not become a not_applied observation",
+      "fullName": "P1-19 real child provider through client and adapter, without AMC authorization missing provider rows do not become a not_applied observation",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_3_5",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 real child provider through client and adapter, without AMC authorization reader tokens cannot pay and another tenant cannot read the committed payment",
+      "fullName": "P1-19 real child provider through client and adapter, without AMC authorization reader tokens cannot pay and another tenant cannot read the committed payment",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_3_6",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 real child provider through client and adapter, without AMC authorization provider destination updates remain observable rather than masquerading as approval binding",
+      "fullName": "P1-19 real child provider through client and adapter, without AMC authorization provider destination updates remain observable rather than masquerading as approval binding",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_3_7",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 real child provider through client and adapter, without AMC authorization error_before_commit remains unknown and causes exactly one POST, with 0 commits",
+      "fullName": "P1-19 real child provider through client and adapter, without AMC authorization error_before_commit remains unknown and causes exactly one POST, with 0 commits",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_3_8",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 real child provider through client and adapter, without AMC authorization error_after_commit remains unknown and causes exactly one POST, with 1 commits",
+      "fullName": "P1-19 real child provider through client and adapter, without AMC authorization error_after_commit remains unknown and causes exactly one POST, with 1 commits",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_3_9",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 real child provider through client and adapter, without AMC authorization drop_response_after_commit remains unknown and causes exactly one POST, with 1 commits",
+      "fullName": "P1-19 real child provider through client and adapter, without AMC authorization drop_response_after_commit remains unknown and causes exactly one POST, with 1 commits",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_3_10",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 real child provider through client and adapter, without AMC authorization a real configured client deadline returns unknown without automatic retry",
+      "fullName": "P1-19 real child provider through client and adapter, without AMC authorization a real configured client deadline returns unknown without automatic retry",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_3_11",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 real child provider through client and adapter, without AMC authorization a timed-out provider payment is later found by GET-only reconciliation before owned shutdown",
+      "fullName": "P1-19 real child provider through client and adapter, without AMC authorization a timed-out provider payment is later found by GET-only reconciliation before owned shutdown",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_3_12",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 real child provider through client and adapter, without AMC authorization a pre-aborted client request produces no provider request or effect",
+      "fullName": "P1-19 real child provider through client and adapter, without AMC authorization a pre-aborted client request produces no provider request or effect",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-75272978_4",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 actual owned HTTP-peer client response controls",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_4_0",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 actual owned HTTP-peer client response controls malformed-json is bounded and refused without reflecting a bearer token",
+      "fullName": "P1-19 actual owned HTTP-peer client response controls malformed-json is bounded and refused without reflecting a bearer token",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_4_1",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 actual owned HTTP-peer client response controls invalid-schema is bounded and refused without reflecting a bearer token",
+      "fullName": "P1-19 actual owned HTTP-peer client response controls invalid-schema is bounded and refused without reflecting a bearer token",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_4_2",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 actual owned HTTP-peer client response controls redirect is bounded and refused without reflecting a bearer token",
+      "fullName": "P1-19 actual owned HTTP-peer client response controls redirect is bounded and refused without reflecting a bearer token",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_4_3",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 actual owned HTTP-peer client response controls oversized is bounded and refused without reflecting a bearer token",
+      "fullName": "P1-19 actual owned HTTP-peer client response controls oversized is bounded and refused without reflecting a bearer token",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_4_4",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 actual owned HTTP-peer client response controls unrecognized-4xx is bounded and refused without reflecting a bearer token",
+      "fullName": "P1-19 actual owned HTTP-peer client response controls unrecognized-4xx is bounded and refused without reflecting a bearer token",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-75272978_4_5",
+      "name": "tests/lighthouse/financeClientAdapter.test.ts P1-19 actual owned HTTP-peer client response controls server-5xx is bounded and refused without reflecting a bearer token",
+      "fullName": "P1-19 actual owned HTTP-peer client response controls server-5xx is bounded and refused without reflecting a bearer token",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-306973956",
+      "name": "tests/lighthouse/financeFixtureService.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/tests/lighthouse/financeFixtureService.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-306973956_0",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_0",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI reads tenant seed, inclusive ledger dates and redacted current payees without payments",
+      "fullName": "synthetic finance provider: actual independent service CLI reads tenant seed, inclusive ledger dates and redacted current payees without payments",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_1",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI refuses malformed/reversed ledger range from=2026-02-30 without an effect",
+      "fullName": "synthetic finance provider: actual independent service CLI refuses malformed/reversed ledger range from=2026-02-30 without an effect",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_2",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI refuses malformed/reversed ledger range from=not-a-date without an effect",
+      "fullName": "synthetic finance provider: actual independent service CLI refuses malformed/reversed ledger range from=not-a-date without an effect",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_3",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI refuses malformed/reversed ledger range from=2026-09-09&to=2026-09-08 without an effect",
+      "fullName": "synthetic finance provider: actual independent service CLI refuses malformed/reversed ledger range from=2026-09-09&to=2026-09-08 without an effect",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_4",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI refuses missing bearer and reader writes; executor has no ledger scope",
+      "fullName": "synthetic finance provider: actual independent service CLI refuses missing bearer and reader writes; executor has no ledger scope",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_5",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI derives tenant from token, hides foreign payment and permits the same key independently per tenant",
+      "fullName": "synthetic finance provider: actual independent service CLI derives tenant from token, hides foreign payment and permits the same key independently per tenant",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_6",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI replays same key/body and refuses changed body with one actual commit",
+      "fullName": "synthetic finance provider: actual independent service CLI replays same key/body and refuses changed body with one actual commit",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_7",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI serializes concurrent identical-key requests into one commit and one replay",
+      "fullName": "synthetic finance provider: actual independent service CLI serializes concurrent identical-key requests into one commit and one replay",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_8",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI serializes concurrent changed bodies under one key into a commit and conflict",
+      "fullName": "synthetic finance provider: actual independent service CLI serializes concurrent changed bodies under one key into a commit and conflict",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_9",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI refuses 'invalid JSON' without a commit",
+      "fullName": "synthetic finance provider: actual independent service CLI refuses 'invalid JSON' without a commit",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_10",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI refuses 'unrecognized metadata' without a commit",
+      "fullName": "synthetic finance provider: actual independent service CLI refuses 'unrecognized metadata' without a commit",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_11",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI refuses 'fractional minor units' without a commit",
+      "fullName": "synthetic finance provider: actual independent service CLI refuses 'fractional minor units' without a commit",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_12",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI refuses 'zero amount' without a commit",
+      "fullName": "synthetic finance provider: actual independent service CLI refuses 'zero amount' without a commit",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_13",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI refuses 'unsafe integer' without a commit",
+      "fullName": "synthetic finance provider: actual independent service CLI refuses 'unsafe integer' without a commit",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_14",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI refuses 'unsupported currency' without a commit",
+      "fullName": "synthetic finance provider: actual independent service CLI refuses 'unsupported currency' without a commit",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_15",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI requires a provider idempotency key without claiming AMC authorization",
+      "fullName": "synthetic finance provider: actual independent service CLI requires a provider idempotency key without claiming AMC authorization",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_16",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI remains permissive: current destination is used and different keys may pay the same reference",
+      "fullName": "synthetic finance provider: actual independent service CLI remains permissive: current destination is used and different keys may pay the same reference",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_17",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI expires the live key index while retaining historical payment/reference lookup",
+      "fullName": "synthetic finance provider: actual independent service CLI expires the live key index while retaining historical payment/reference lookup",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_18",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI records actual error_before_commit fault and its precise commit boundary",
+      "fullName": "synthetic finance provider: actual independent service CLI records actual error_before_commit fault and its precise commit boundary",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_19",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI records actual error_after_commit fault and its precise commit boundary",
+      "fullName": "synthetic finance provider: actual independent service CLI records actual error_after_commit fault and its precise commit boundary",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_20",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI records actual drop_response_after_commit fault and its precise commit boundary",
+      "fullName": "synthetic finance provider: actual independent service CLI records actual drop_response_after_commit fault and its precise commit boundary",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_21",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI records actual delay_then_commit fault and its precise commit boundary",
+      "fullName": "synthetic finance provider: actual independent service CLI records actual delay_then_commit fault and its precise commit boundary",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_22",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI records actual crash_after_commit fault and its precise commit boundary",
+      "fullName": "synthetic finance provider: actual independent service CLI records actual crash_after_commit fault and its precise commit boundary",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_23",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI records actual reset_before_body fault and its precise commit boundary",
+      "fullName": "synthetic finance provider: actual independent service CLI records actual reset_before_body fault and its precise commit boundary",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_24",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI refuses startup after edited-line without silently repairing history",
+      "fullName": "synthetic finance provider: actual independent service CLI refuses startup after edited-line without silently repairing history",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_25",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI refuses startup after truncated-log without silently repairing history",
+      "fullName": "synthetic finance provider: actual independent service CLI refuses startup after truncated-log without silently repairing history",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_26",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI refuses startup after checkpoint-mismatch without silently repairing history",
+      "fullName": "synthetic finance provider: actual independent service CLI refuses startup after checkpoint-mismatch without silently repairing history",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_27",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI refuses payee-version overflow from a valid maximum-safe seed without changing destination or effects",
+      "fullName": "synthetic finance provider: actual independent service CLI refuses payee-version overflow from a valid maximum-safe seed without changing destination or effects",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_28",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI proves delayed same-key overlap before commit: 'identical body replays'",
+      "fullName": "synthetic finance provider: actual independent service CLI proves delayed same-key overlap before commit: 'identical body replays'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_29",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI proves delayed same-key overlap before commit: 'changed body conflicts'",
+      "fullName": "synthetic finance provider: actual independent service CLI proves delayed same-key overlap before commit: 'changed body conflicts'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-306973956_0_30",
+      "name": "tests/lighthouse/financeFixtureService.test.ts synthetic finance provider: actual independent service CLI loads CLI --faults and restores its consumed nth counter after natural restart",
+      "fullName": "synthetic finance provider: actual independent service CLI loads CLI --faults and restores its consumed nth counter after natural restart",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

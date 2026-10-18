@@ -1,0 +1,11 @@
+{
+  "rootError": "Generic materializer assumed inputs but author manifest declares rows; KeyError occurred before source writes.",
+  "firstPhase": "p107-two-new-unit-files",
+  "actualTests": 0,
+  "actualExit": 1,
+  "ownedPgid": 1270,
+  "groupAbsentESRCH": true,
+  "rawAndObserverRetained": true,
+  "productFailureOrTestCoverageClaimed": false,
+  "correction": "Read exact manifest schema; verified all41 rows and materialized both reviewed candidates before a distinct next run."
+}

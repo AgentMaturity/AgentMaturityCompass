@@ -1,0 +1,58 @@
+{
+  "utc": "2026-10-15T08:30:38.823789+00:00",
+  "kind": "integrator-bounded-source-selection",
+  "selectedKey": "P1-01",
+  "acceptedSource": "559fafc4fb52e586606f5fdf471ce65f44c5cf58",
+  "productionAnchor": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "root": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass",
+  "reason": "First ranked available G1 existing-source lane after remaining G0 ownership/dependency/user holds. Plan permits later-gate work. ExportedDone P0-08/P0-09 inputs are directly imported without forks. Fresh non-Dependabot WIP0.",
+  "authorized": "Serial bounded source qualification and necessary isolated control; no formal acceptance or transfer inferred.",
+  "sourceEditScope": "No accepted product/test/schema/config/baseline changes. Receipt source mutation only in reviewed new private control copy, with real compilation and restoration.",
+  "preserve": [
+    "Claude/source/shared/A4/native reservations",
+    "held P0-57/P1-65 normal accepted-base freeze barrier",
+    "paused P2-02",
+    "pending P0-19/P0-20/P0-52 transfers",
+    "P0-29/P0-22 unresolved user decisions",
+    "D03 live-health skip only untilP2-06",
+    "quality1269/2751 unwaived"
+  ],
+  "formalDone": false,
+  "pins": [
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "bytes": 38227,
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+    },
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-01.md",
+      "bytes": 15658,
+      "sha256": "4d9743e9bbbdba999f36ccf45ec7d6e5252ada6267c2bb498da88e19ab43ad57"
+    },
+    {
+      "path": "/private/tmp/amc-dependabot-wip-decision-20261015.md",
+      "bytes": 1019,
+      "sha256": "893fc80ad0597a95d83b5c996aa2ec1f82973fb0c4cec3043fb97c452701b920"
+    },
+    {
+      "path": "/private/tmp/amc-wip-after-dependabot-exclusion-readonly-20261015.json",
+      "bytes": 20710,
+      "sha256": "3856facfad75ab3600dc352e8e951a9607d06d3c29d5e607c33bf09a7ae906cd"
+    },
+    {
+      "path": "/private/tmp/amc-next-unblocked-user-wip-routing-20261015.json",
+      "bytes": 18177,
+      "sha256": "14cbe20a63b3e7e01e672d0c8bdd0c73f6c433703d98dd2980728001f925875f"
+    },
+    {
+      "path": "/private/tmp/p1-01-wrapper-static-review-20261015.json",
+      "bytes": 1901,
+      "sha256": "c9cf7c1da4b3cfa1c4c17d922bf6084c0a9a9f82963f3c22104b6bc8f35cbdf3"
+    }
+  ]
+}

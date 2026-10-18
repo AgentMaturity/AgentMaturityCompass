@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -38,6 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     strategy:
+      fail-fast: false
       matrix:
         node-version: ["22", "24"]
     steps:
@@ -89,6 +91,11 @@ jobs:
       - name: Build
         run: npm run build
 
+      # P1-33: each pack's declared support against the ten admission criteria; fails a reviewed or qualified
+      # claim the pack does not meet and a malformed catalog/admission/ report, never an experimental draft.
+      - name: Catalog pack admission
+        run: npm run check:catalog-admission
+
       - name: Published schemas match the enforced schemas (P1-01)
         run: npm run check:schemas
 
@@ -118,10 +125,8 @@ jobs:
       # scripts/quality/source-quality-baseline.json (P1-52) and fail only on
       # new or stale findings, on config/tool drift, or on a baseline entry
       # missing from the target branch's baseline at the merge-base (only
-      # --accept may add one). Still report-only here until P0-33 makes the
-      # step required.
+      # --accept may add one). P0-33 requires both checks to pass.
       - name: Source duplication and reachability
-        continue-on-error: true
         env:
           QUALITY_BASE: origin/${{ github.base_ref || 'main' }}
         run: |
@@ -173,6 +178,11 @@ jobs:
       # non-synthetic emitter; prints the per-level reachability table.
       - name: Diagnostic gate reachability
         run: npm run check:gates
+
+      - name: Set up Helm for full test suite
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5
+        with:
+          version: "v4.3.0"
 
       # Both gates existed as npm scripts that no workflow ran, so docs drift
       # and incident-readiness regressions could merge and ship unchecked.
@@ -258,6 +268,69 @@ jobs:
       - name: Tests left the checkout clean (end of job)
         if: always()
         run: git status --porcelain=v1 --untracked-files=all > /tmp/after-tests.txt; if [ -s /tmp/after-tests.txt ]; then cat /tmp/after-tests.txt; exit 1; fi
+
+  release-gate:
+    if: github.event_name != 'pull_request'
+    # The full native-test corpus exercises Darwin confinement; Ubuntu matrix jobs remain separate.
+    runs-on: macos-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Full release gate
+        env:
+          AMC_RELEASE_GATE_LIVE_URL: ${{ vars.AMC_RELEASE_GATE_LIVE_URL }}
+        run: npm run release:gate -- --json --out tmp/release-gate/ci.json
+      - name: Upload release gate receipts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-gate-receipts
+          path: |
+            tmp/release-gate/
+            coverage/coverage-summary.json
+          if-no-files-found: ignore
+
+  e2e-playwright:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium and system dependencies
+        run: npx playwright install --with-deps chromium
+      - name: Playwright suite
+        run: npm run test:e2e -- --reporter=line,html
+      - name: Upload Playwright failure report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
 
   e2e-smoke-local:
     runs-on: ubuntu-latest

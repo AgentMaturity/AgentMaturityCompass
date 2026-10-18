@@ -1,0 +1,284 @@
+{
+  "kind": "P0-23 actual CLI inherited-pack refusal receipt, SDK parser update and bounded source review",
+  "atUtc": "2026-10-14T17:31:21.044471+00:00",
+  "worktree": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass",
+  "testedSourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+  "currentHeadAtReceipt": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+  "childScope": "Prepared CLI file and explicitly reauthorized MCP test-types parser repair only. No production, dependency, docs, held source, test expectation or freeze edit by this child.",
+  "actualCli": {
+    "phase": {
+      "name": "cli-industry-pack-ownkeys-first",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/industryPackCli.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-cli-industry-pack-ownkeys-first-20261014.actual.json",
+      "exit": 0,
+      "durationMs": 5701,
+      "startedUtc": "2026-10-14T17:28:24.047704+00:00",
+      "log": "/private/tmp/p0-23-cli-industry-pack-ownkeys-first-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+    },
+    "actualJson": "/private/tmp/p0-23-cli-industry-pack-ownkeys-first-20261014.actual.json",
+    "actualSha256": "e9d79dc802b28af66c5cf4a7c36ba98ad2a0dcc0283015d5bca0f017e65ddcc2",
+    "logSha256": "b0acd8b1d1d37eeaf52a9de81ea6e83e1409555b74d0e7206bca85ec047f812f",
+    "tests": 5,
+    "passed": 5,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "runtime": "Node 22.23.3 through explicit binary and journal-prefixed PATH",
+    "caseResults": [
+      {
+        "name": "Industry Pack CLI inherited-name refusal a locally signed paid fixture accepts a legitimate pack with current syntax",
+        "status": "passed"
+      },
+      {
+        "name": "Industry Pack CLI inherited-name refusal refuses inherited pack ID __proto__ after valid paid control",
+        "status": "passed"
+      },
+      {
+        "name": "Industry Pack CLI inherited-name refusal refuses inherited pack ID constructor after valid paid control",
+        "status": "passed"
+      },
+      {
+        "name": "Industry Pack CLI inherited-name refusal refuses inherited pack ID toString after valid paid control",
+        "status": "passed"
+      },
+      {
+        "name": "Industry Pack CLI inherited-name refusal refuses inherited pack ID hasOwnProperty after valid paid control",
+        "status": "passed"
+      }
+    ]
+  },
+  "childCommands": {
+    "manifest": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/commands.json",
+    "manifestSha256": "cd9dc4b160aa1272fa4c635bb7f6c8ef4f3d9d40018ed0ce57d5b2eac49fc9e8",
+    "fixtureMetadata": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/fixture.json",
+    "fixtureSha256": "1834e6d65b21822d3cacfe155ea04b7d2f53f1d73f791ceb400f072cd34573da",
+    "commands": [
+      {
+        "name": "paid-entitlement",
+        "args": [
+          "domain",
+          "pack",
+          "access",
+          "--json"
+        ],
+        "status": 0,
+        "signal": null,
+        "durationMs": 754,
+        "stdoutPath": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/paid-entitlement.stdout",
+        "stderrPath": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/paid-entitlement.stderr",
+        "stdoutSha256": "8c00022f842acf770d92e4029478fd95dfa69a4d95821d8f5bf33a886307d527",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutHashVerified": true,
+        "stderrHashVerified": true
+      },
+      {
+        "name": "paid-valid-pack",
+        "args": [
+          "domain",
+          "pack",
+          "run",
+          "--pack",
+          "clinical-trials",
+          "--baseline",
+          "--json"
+        ],
+        "status": 0,
+        "signal": null,
+        "durationMs": 724,
+        "stdoutPath": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/paid-valid-pack.stdout",
+        "stderrPath": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/paid-valid-pack.stderr",
+        "stdoutSha256": "92edc56e160ef15c147c91a9c89329c5f3fc2b65ed4a88b3e916912d25965a1d",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutHashVerified": true,
+        "stderrHashVerified": true
+      },
+      {
+        "name": "refused-__proto__",
+        "args": [
+          "domain",
+          "pack",
+          "run",
+          "--pack",
+          "__proto__",
+          "--baseline",
+          "--json"
+        ],
+        "status": 1,
+        "signal": null,
+        "durationMs": 685,
+        "stdoutPath": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-__proto__.stdout",
+        "stderrPath": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-__proto__.stderr",
+        "stdoutSha256": "8d08dfaef3f3ac292dc99ca15642f51509d13d64e0907e895c5f694451f60be6",
+        "stderrSha256": "78d4d5702447ed72d0efeb41d3b497d0a6654d690f43e9f0c7c82ed18d5a4800",
+        "stdoutHashVerified": true,
+        "stderrHashVerified": true
+      },
+      {
+        "name": "refused-constructor",
+        "args": [
+          "domain",
+          "pack",
+          "run",
+          "--pack",
+          "constructor",
+          "--baseline",
+          "--json"
+        ],
+        "status": 1,
+        "signal": null,
+        "durationMs": 703,
+        "stdoutPath": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-constructor.stdout",
+        "stderrPath": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-constructor.stderr",
+        "stdoutSha256": "8d08dfaef3f3ac292dc99ca15642f51509d13d64e0907e895c5f694451f60be6",
+        "stderrSha256": "efd5cfa93eed62c4a0ffb8451aaee89bb2906249cbfb940099d5ba5d5522a42f",
+        "stdoutHashVerified": true,
+        "stderrHashVerified": true
+      },
+      {
+        "name": "refused-toString",
+        "args": [
+          "domain",
+          "pack",
+          "run",
+          "--pack",
+          "toString",
+          "--baseline",
+          "--json"
+        ],
+        "status": 1,
+        "signal": null,
+        "durationMs": 702,
+        "stdoutPath": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-toString.stdout",
+        "stderrPath": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-toString.stderr",
+        "stdoutSha256": "8d08dfaef3f3ac292dc99ca15642f51509d13d64e0907e895c5f694451f60be6",
+        "stderrSha256": "30fa9b9f97ba23ad4c183281e7fb67458c022f81d4f5dbd701eac3031b2f1437",
+        "stdoutHashVerified": true,
+        "stderrHashVerified": true
+      },
+      {
+        "name": "refused-hasOwnProperty",
+        "args": [
+          "domain",
+          "pack",
+          "run",
+          "--pack",
+          "hasOwnProperty",
+          "--baseline",
+          "--json"
+        ],
+        "status": 1,
+        "signal": null,
+        "durationMs": 683,
+        "stdoutPath": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-hasOwnProperty.stdout",
+        "stderrPath": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/logs/refused-hasOwnProperty.stderr",
+        "stdoutSha256": "8d08dfaef3f3ac292dc99ca15642f51509d13d64e0907e895c5f694451f60be6",
+        "stderrSha256": "83afeceb6149b76f589bc8e1bedcc1fe1331f67c81dddbbf896578898e8468ee",
+        "stdoutHashVerified": true,
+        "stderrHashVerified": true
+      }
+    ],
+    "allStreamHashesVerified": true
+  },
+  "nonVacuity": {
+    "actualEntitlement": {
+      "active": true,
+      "source": "env"
+    },
+    "actualValidPackControl": {
+      "packId": "clinical-trials",
+      "claimKind": "self_reported",
+      "result": "not_evaluated",
+      "selfAssessment": {
+        "complete": false,
+        "answered": 0,
+        "total": 16
+      },
+      "questionResultsCount": 16
+    },
+    "actualInheritedRefusals": "All four inherited IDs exit 1, with exact Pack not found: <id> in stderr. None is an unsupported option, required-argument failure, paywall refusal, timeout, signal, transport refusal or strict exit 70.",
+    "controlOrder": "The actual admitted access command and legitimate clinical-trials baseline both exit 0 before any inherited-ID case can pass. Current syntax is domain pack run --pack <id> --baseline --json.",
+    "license": "An actual local Ed25519 test license and its public key are admitted. No live activation, checkout, unsigned ACTIVE bypass or fixture-key allowlist was used. Canonical artifacts contain no raw license or private-key values."
+  },
+  "isolation": {
+    "execPath": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "node": "v22.23.3",
+    "strict": true,
+    "transport": "denied",
+    "environmentKeys": [
+      "AMC_CLAIM_LABELS_STRICT",
+      "AMC_INDUSTRY_PACKS_LICENSE_KEY",
+      "AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY",
+      "HOME",
+      "NODE_ENV",
+      "NODE_OPTIONS",
+      "NO_COLOR",
+      "PATH",
+      "TERM"
+    ],
+    "hostCredentialsInherited": false,
+    "noGlobalCwdChange": true,
+    "noListeningServer": true,
+    "noModelCall": true,
+    "noLiveRequest": true,
+    "retention": "Raw streams, exact hashes, guard and manifests remain under the new private root. Only its workspace and HOME subdirectories were removed."
+  },
+  "sourceHashes": {
+    "mcpProduction": {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/mcp/mcpClaimOutput.ts",
+      "sha256": "5585b461f2abe8e240cb5547e422e81e1eb758bb887119f22250bdc4aaf644ac",
+      "matchesParentBuildInput": true
+    },
+    "mcpParserTest": {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/mcpClaimLabels.test.ts",
+      "sha256": "eccea41c533bfa66365c1a745cb3451da2a049f9ac04df8fca3fc55a43d6d1fc"
+    },
+    "cliTest": {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/industryPackCli.test.ts",
+      "sha256": "66539767422adcbb6d47232433da927b7fa9f1616e503b1a46b7f22b7f3f5ad0",
+      "matchesExecutedTest": true
+    },
+    "executedCli": {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/dist/cli.js",
+      "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+      "currentSha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+    },
+    "transportGuard": {
+      "path": "/private/tmp/amc-p0-23-industry-pack-cli-CqnEWS/deny-transport.mjs",
+      "sha256": "e43dbece3869e7bc8b9662c4bffd324bfec696222439ca1eb9ba668231bf9468",
+      "matchesExecutedGuard": true
+    }
+  },
+  "typedSdkRepair": {
+    "originalErrorLog": "/private/tmp/p0-23-candidate-test-types-20261014.log",
+    "originalErrorSha256": "453c221adab6ee1bbdfa1420b7043d0051360cd84a1e75b9380c125d39960e7f",
+    "cause": "SDK callTool compatibility union exposed unknown content and {} structuredContent; runtime passing cases did not prove test types.",
+    "repair": "Official CallToolResultSchema.parse validates each actual response and gives CallToolResult to the helper. Canonical zod schemas parse payload and per-agent claim fields. No any, suppression or compatibility-output cast was added. Assertions are preserved.",
+    "actualRestoredSourceRun": "/private/tmp/p0-23-mcp-sdk-standard-parser-green-20261014.actual.json",
+    "actualSha256": "78f7fa862fffafe82f89460bc2f24fa3d031e99759d3a1b4a015246cd98cbb78",
+    "tests": 23,
+    "passed": 23,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "types": "Parent reports typed MCP/parser suite is good and owns final combined test-types/static checks; this child did not rerun the whole types command."
+  },
+  "productionSourceReview": {
+    "result": "Pass for the bounded MCP stored-run selection repair, with inherited limits.",
+    "current": "Correctly sealed current records reuse existing diagnostic readiness/evidence rules; actual controlled SDK current record remains observed/pass.",
+    "unsealed": "A self-declared VALID record with an unverified seal becomes self_reported/not_evaluated through the existing adapter, with untrusted evidence; stored bytes are unchanged. Actual SDK control verifies this.",
+    "legacy": "Even a correctly sealed 1.1.1 fixture remains Legacy (1.x), self-reported/not_evaluated. The original actual SDK RED and subsequent GREEN demonstrate this boundary.",
+    "unknown": "Resolver or adapter failure falls back to the existing unbound self_reported/not_evaluated envelope by source inspection. SDK no-run responses are covered, but every unknown exact ID, alias or malformed-file path was not independently executed.",
+    "signatureBoundary": "An auditor writer seal provides integrity only. The repair introduces no reviewer or pinned independent approval and cannot convert a signature to independently_reviewed.",
+    "limits": [
+      "Existing resolver alias selection, permissive legacy loading, partial record validation and inherited scope fallbacks remain.",
+      "The catch provides a generic not-bound envelope rather than a granular typed failure reason.",
+      "API/domain-evidence direct adapter paths remain untouched; this review and these tests do not qualify them.",
+      "No source write, report-history rewrite, A4 handler, privacy/P2-02 resumption, licensing retirement, publication or freeze bypass follows."
+    ]
+  },
+  "overallLimits": [
+    "Final focused MCP 23 and CLI five cases are bounded evidence, not the complete P0-23 acceptance or G0 gate.",
+    "Whole-source tests, final build/static/combined runs, source review/commit and freeze checks remain parent responsibilities.",
+    "P0-22 failures and the user-directed unresolved raw-array contract remain preserved."
+  ]
+}

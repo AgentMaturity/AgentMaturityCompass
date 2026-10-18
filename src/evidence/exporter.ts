@@ -51,6 +51,13 @@ export interface VerifierEvidenceAgentFilter {
   sessionsIncluded: string[];
   /** Ledger rows left out of this export. */
   rowsExcluded: number;
+  /** The shared `system` session is always left out, even a row that names the agent. */
+  systemSession: "excluded";
+  /**
+   * Control types this export cannot recompute. System rows count against an agent (violation-only evidence,
+   * src/compliance/evidenceBinding.ts), so a requires_no_audit control needs the unfiltered workspace export.
+   */
+  insufficientFor: ["requires_no_audit"];
 }
 
 /** Version 2 replaced the bare agent id in `agentFilter` with {@link VerifierEvidenceAgentFilter}. */
@@ -288,7 +295,7 @@ function hashChainStatus(rows: EvidenceRow[]): Map<string, { index: number; vali
   return status;
 }
 
-// The shared "system" session is never owned by one agent, so its rows enter an agent's export only by naming the agent.
+// Named-agent exports exclude the shared "system" session, even when a row directly names the agent.
 const OWNED_SESSIONS_SQL =
   "SELECT session_id FROM evidence_events WHERE event_type = 'session/open' AND session_id <> 'system' AND json_extract(meta_json, '$.agentId') = ?";
 
@@ -298,7 +305,7 @@ function activeAgentFilterClause(agentId: string | undefined): { sql: string; pa
   }
   const normalized = agentId.trim();
   return {
-    sql: ` WHERE json_extract(meta_json, '$.agentId') = ? OR json_extract(meta_json, '$.agent_id') = ? OR session_id IN (${OWNED_SESSIONS_SQL})`,
+    sql: ` WHERE session_id <> 'system' AND (json_extract(meta_json, '$.agentId') = ? OR json_extract(meta_json, '$.agent_id') = ? OR session_id IN (${OWNED_SESSIONS_SQL}))`,
     params: [normalized, normalized, normalized]
   };
 }
@@ -375,7 +382,9 @@ export function collectVerifierEvidence(params: CollectVerifierEvidenceParams): 
           agentId,
           mode: "row-meta-or-owned-session",
           sessionsIncluded: [...new Set(db.prepare(`${OWNED_SESSIONS_SQL} ORDER BY rowid ASC`).pluck().all(agentId) as string[])],
-          rowsExcluded: allRows.length - selectedRows.length
+          rowsExcluded: allRows.length - selectedRows.length,
+          systemSession: "excluded",
+          insufficientFor: ["requires_no_audit"]
         }
       : null;
 

@@ -1,0 +1,159 @@
+{
+  "schema": "p111-decisive-unit-matrix/1",
+  "target": "tests/catalog/evidence/decisive.test.ts",
+  "fixedTestCount": 25,
+  "cases": [
+    {
+      "case": 1,
+      "title": "returns all five dimensions for fresh bound observed evidence at its enforcement point",
+      "line": 75,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 2,
+      "title": "withholds a pass from an empty stream",
+      "line": 91,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 3,
+      "title": "requires every declared binding field",
+      "line": 100,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 4,
+      "title": "refuses individually changed subject, control, version, policy and scope bindings",
+      "line": 112,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 5,
+      "title": "refuses another tenant and treats its evidence as untrusted",
+      "line": 122,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 6,
+      "title": "requires an available producer named by the contract",
+      "line": 127,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 7,
+      "title": "requires verified provenance proving the claimed producer and a derived tier",
+      "line": 134,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 8,
+      "title": "uses recorded time for freshness even when claimed time looks fresh",
+      "line": 145,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 9,
+      "title": "admits the exact freshness boundary despite an old claimed time",
+      "line": 150,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 10,
+      "title": "refuses recorded times outside either window boundary or with invalid syntax",
+      "line": 154,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 11,
+      "title": "refuses prefixed ref and receipt identities previously used in another window",
+      "line": 161,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 12,
+      "title": "admits a receipt identity once per evaluation",
+      "line": 172,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 13,
+      "title": "refuses the loader's derived foreign-receipt decision",
+      "line": 181,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 14,
+      "title": "invalidates evidence only for a listed trigger after its recorded time",
+      "line": 186,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 15,
+      "title": "withholds passes for absent, unresolved and not-applicable plan decisions",
+      "line": 194,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 16,
+      "title": "withholds a pass when admitted nonviolating observations contradict each other",
+      "line": 215,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 17,
+      "title": "preserves trusted violation failure despite incomplete sampling",
+      "line": 227,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 18,
+      "title": "lets an unadmitted violation block a pass without crediting its provenance",
+      "line": 238,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 19,
+      "title": "rejects system-session positives but retains their violation-only agent rule",
+      "line": 248,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 20,
+      "title": "consumes the derived SELF_REPORTED tier despite an ignored OBSERVED attribute label",
+      "line": 259,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 21,
+      "title": "caps observed provenance at the producer's self-reported or synthetic maximum",
+      "line": 271,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 22,
+      "title": "withholds a pass when the required observed sampling ratio is not met",
+      "line": 284,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 23,
+      "title": "distinguishes advisory and observed behavior from enforcement at the binding point",
+      "line": 296,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 24,
+      "title": "keeps input order and input objects unchanged while binding the result digest to admitted refs",
+      "line": 310,
+      "boundary": "already-derived typed unit inputs only"
+    },
+    {
+      "case": 25,
+      "title": "binds already-verified review decisions to the digest without promoting claim kind",
+      "line": 326,
+      "boundary": "already-derived typed unit inputs only"
+    }
+  ],
+  "tableRowsAreObservationsNotTests": true,
+  "futureRuntimeResult": null
+}

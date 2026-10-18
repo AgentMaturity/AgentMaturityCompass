@@ -1,0 +1,37 @@
+
+ RUN  v4.1.11 /private/tmp/p0-21-causal-qualification-20261015/closure
+
+ ✓ tests/transparencyReport.test.ts (15 tests) 39ms
+ ✓ tests/noCertificationFromSelfAssessment.test.ts (7 tests) 2502ms
+     ✓ MCP sector-pack and trust-score text say self-assessment and evidence standing  2462ms
+ ❯ tests/selfReportedLevelCap.test.ts (5 tests | 1 failed) 7ms
+     ✓ L2 counts met only by SELF_REPORTED events support at most level 1 1ms
+     ✓ imported rows tagged to the question support exactly level 1 0ms
+     ✓ the same counts with OBSERVED events support level 2, the highest its evidence map evaluates (P1-07) 0ms
+     × no base gate at L2 or above accepts SELF_REPORTED 2ms
+     ✓ a gate that lists no tiers defaults to OBSERVED and ATTESTED 0ms
+ ✓ tests/logisticsIndustryPack.test.ts (2 tests) 6ms
+ ✓ tests/scoreUnits.test.ts (4 tests) 5ms
+ ✓ tests/domainAssessmentUnits.test.ts (4 tests) 11ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/selfReportedLevelCap.test.ts > self-reported evidence caps at L1 (P0-21) > no base gate at L2 or above accepts SELF_REPORTED
+AssertionError: AMC-1.1 L3: expected [ 'OBSERVED', 'ATTESTED', …(1) ] to not include 'SELF_REPORTED'
+ ❯ tests/selfReportedLevelCap.test.ts:67:84
+     65|     for (const question of questionBank) {
+     66|       for (const gate of question.gates.filter((g) => g.level >= 2)) {
+     67|         expect(gate.acceptedTrustTiers ?? [], `${question.id} L${gate.…
+       |                                                                                    ^
+     68|       }
+     69|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  1 failed | 36 passed (37)
+   Start at  10:52:36
+   Duration  3.83s (transform 2.25s, setup 72ms, import 627ms, tests 2.57s, environment 0ms)
+
+JSON report written to /private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/raw.json

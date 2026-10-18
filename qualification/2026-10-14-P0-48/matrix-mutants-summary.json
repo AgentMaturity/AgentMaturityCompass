@@ -1,0 +1,38 @@
+{
+  "cases": [
+    {
+      "name": "fail-fast-true",
+      "fixture": "/private/tmp/p0-48-matrix-fail-fast-true-pgrscgb4",
+      "workflowSha256": "152cb95187e50674eaf78244e41f32c7bc8d5f827c25f9a380cc1e6764150c06",
+      "report": "/private/tmp/p0-48-fail-fast-true-20261014.json",
+      "rawSha256": "e3bf7042c607f164332750e4d94b446aec65188430329d5b588fb9efa887202a",
+      "exit": 1,
+      "result": {
+        "success": false,
+        "numTotalTests": 4,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 3,
+        "numTodoTests": 0
+      }
+    },
+    {
+      "name": "continue-on-error-expression",
+      "fixture": "/private/tmp/p0-48-matrix-continue-on-error-expression-08zych9w",
+      "workflowSha256": "0bb5b72e407a3accd9c34db073a975ad8843bfd95dc5d822927f258212b02a9a",
+      "report": "/private/tmp/p0-48-continue-on-error-expression-20261014.json",
+      "rawSha256": "6bd0873f50aaf4dc8e7d2cf46eeceb8ce6b7c6cfe5b98475488e9d47e3d5c623",
+      "exit": 1,
+      "result": {
+        "success": false,
+        "numTotalTests": 4,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 3,
+        "numTodoTests": 0
+      }
+    }
+  ],
+  "rootWorkflowUnchanged": true,
+  "note": "Actual fixture mutations using existing AMC_RECONCILE_ROOT seam. Each selected case fails; three existing cases are intentionally filtered and pending. Root source was never mutated."
+}

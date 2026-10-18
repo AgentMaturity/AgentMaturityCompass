@@ -1,0 +1,39 @@
+{
+  "capturedUtc": "2026-10-14T22:15:47.902591+00:00",
+  "base": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "initialTrackedFiles": 7737,
+  "unchangedTrackedFiles": 7727,
+  "factualCountOnlyChangedPaths": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/content/show-hn-draft.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "website/i18n.js",
+    "website/index.html",
+    "website/lite.html",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "exactStagedPaths": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/content/show-hn-draft.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "tests/citationCorrections.test.ts",
+    "website/i18n.js",
+    "website/index.html",
+    "website/lite.html",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "newTest": {
+    "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts",
+    "bytes": 10628,
+    "lines": 171,
+    "sha256": "c184101b8dc302cfaf2980b6b2900cac26bbe9965d2f5ba3dbc68f2468bd0712"
+  },
+  "productionAndOldTestChanges": 0,
+  "remainingStrictFailure": "Two ISO A.5 policy anchors remain, with expert choice unresolved; full collector still reports the existing CIT002 baseline. No source or baseline repair is authorized or applied."
+}

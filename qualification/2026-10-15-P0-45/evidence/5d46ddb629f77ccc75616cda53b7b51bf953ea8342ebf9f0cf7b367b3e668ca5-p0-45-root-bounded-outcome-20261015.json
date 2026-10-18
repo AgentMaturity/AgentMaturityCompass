@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-45",
+  "capturedUtc": "2026-10-15T06:25:01.902539+00:00",
+  "source": "2024f25c79973987b44a4a1298488d55ee0d6227",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "decision": "BOUND_EXISTING_SOURCE_EVIDENCE_AND_CONTINUE_WITH_FORMAL_GAPS_OPEN",
+  "formalAcceptanceClosed": false,
+  "dependencyReady": false,
+  "done": false,
+  "packet": {
+    "path": "/private/tmp/p0-45-bounded-qualification-20261015.json",
+    "bytes": 66642,
+    "sha256": "449f3d99f3ed644be2694797a241c92292497acf6557450cdb47296248baac30"
+  },
+  "causal": {
+    "packet": {
+      "path": "/private/tmp/p0-45-causal-qualification-20261015.json",
+      "bytes": 76872,
+      "sha256": "16a37b402eb7777b01ff68d205845f29616f4ce73c9259e1b1a78901dfc8b13e"
+    },
+    "separateProcesses": 6,
+    "executionCounts": {
+      "total": 72,
+      "passed": 68,
+      "failed": 4,
+      "pending": 0,
+      "todo": 0
+    },
+    "distinctFailedCases": 4,
+    "matrices": [
+      {
+        "control": "P045-C1-fail-closed-hold-admission",
+        "passCounts": [
+          12,
+          9,
+          12
+        ],
+        "failedCounts": [
+          0,
+          3,
+          0
+        ]
+      },
+      {
+        "control": "P045-C2-forward-copy-then-unlink",
+        "passCounts": [
+          12,
+          11,
+          12
+        ],
+        "failedCounts": [
+          0,
+          1,
+          0
+        ]
+      }
+    ],
+    "attribution": "Four original AssertionErrors stop at refusal helper99:18, C1 callers221/213/203:5 and C2 caller268:5. Later reason/snapshot/quarantine/byte checks are masked. C1 proves injected-callback/stub-signer refusal sensitivity. C2 proves rename-fault-path sensitivity; positive byte-reachability case stays green. No observed byte loss, separately retained failed-case effects/receipts or fulfilled stronger byte-invariant mutation criterion is inferred."
+  },
+  "index": {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/runtime-artifact-index.json",
+    "bytes": 50431,
+    "sha256": "032e4ec6ee8e1041c4116ec8ac571620bda7871459c7572f3a51be0dac7978bb"
+  },
+  "review": {
+    "path": "/private/tmp/p0-45-bounded-independent-review-20261015.json",
+    "bytes": 24023,
+    "sha256": "69e169f00be3600589dbd91e19320c37f15aa1d77c304fe9557c73d136b2a09a"
+  },
+  "runtimeAttribution": {
+    "path": "/private/tmp/p0-45-root-runtime-attribution-20261015.json",
+    "bytes": 954,
+    "sha256": "2508c7a978579259826991dd2f458e6fc682fb40c244ae2ef657129d0df80f87"
+  },
+  "blockingPacketFindings": [],
+  "independentFindingsPreserved": [
+    {
+      "id": "A1",
+      "kind": "qualified-bounded-result",
+      "finding": "Four original runs pass separately12/5/4/10. Two controls repeat the same12 source-mode cases in six phases:72 executions68 passes4 body AssertionErrors across4 distinct file/title cases, zero pending/todo; no whole-control survivor. This adds no new unique cases and is not a combined31- or72-case corpus."
+    },
+    {
+      "id": "A2",
+      "kind": "causal-meaning-and-masking",
+      "finding": "C1 removes both unknown/active hold refusals. Three fixture callbacks then fail at expectRefused99:18 with callers221:5,213:5,203:5 because caught is undefined. Reason100 and subsequent snapshot/quarantine/byte-reachability assertions are masked. The callback's throw-to-unknown normalization remains; these failures support injected-callback admission sensitivity with a stub signer, not actual signed-registry or built-CLI hold bypass. Failed-case receipt/effects are not independently retained after cleanup."
+    },
+    {
+      "id": "A3",
+      "kind": "open-acceptance-gap",
+      "finding": "C2 changes only forward rename to faithful copy/unlink; rollback rename is unchanged. Its one failed case reaches expectRefused99:18 from268:5 because the rename-fault spy no longer causes refusal. Inline restore269, counter270, snapshot271, quarantine272 and every-byte273 are masked; original afterEach restores mocks/cleans roots and recorded hooks pass. Other11 mutant cases, including the positive byte-reachability case, pass. This establishes mechanism/fault-path sensitivity, not observed lost bytes, crash danger or the spec's stronger byte-invariant mutation criterion. That criterion remains open."
+    },
+    {
+      "id": "A4",
+      "kind": "preservation-and-packet",
+      "finding": "All224 indexed refs and235 unique recursive pin triples match. Frozen15-row journal equals the now-closed original byte-for-byte;14 exit0 plus exactly the designated empty grep exit1. Final8205 source+4529dist=12734 parent/private files and physical manifest are exact; private regular nlink1 files have12734 unique inodes disjoint from12734 parent inodes. Borrowed node_modules link, current native inode538734665,108 immutable external pins and10 own inputs match. No ACTIVE/HALTED remains."
+    },
+    {
+      "id": "A5",
+      "kind": "unapproved-adjacent-source-gap",
+      "finding": "Retained doctor static note identifies a dangling top-level .amc symlink-unlink branch without evidence-name exclusion/deletion gate; cache deletion already uses its existing gate. This is unapproved adjacent follow-up with no owner, not observed deletion/byte loss or a verify-repair-path runtime defect. No doctor/hold source was changed."
+    },
+    {
+      "id": "A6",
+      "kind": "open-formal-and-quality-limits",
+      "finding": "formalAcceptanceClosed remains false. No separately retained CLI repair-receipt sample, historical origin/main red, PR/merge/full-suite/installed-P031/formal-dependency acceptance is established. Older1269 duplicates/2751 dead-code quality failures remain failed/unwaived, not fresh P045 runs. All existing held ownership and prior unresolved work stay open."
+    }
+  ],
+  "originalRuns": {
+    "separatePassedCounts": [
+      12,
+      5,
+      4,
+      10
+    ],
+    "uniqueFileTitleRegistrations": 31,
+    "files": 4,
+    "single31CaseRunClaimed": false,
+    "primaryReceiptCoreTests": 12
+  },
+  "rootJournal": {
+    "frozen": {
+      "path": "/private/tmp/p0-45-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 23738,
+      "sha256": "20d514fee74f4725688d26b05a315199d5cf3decda33cc4cb73158eaf45793b3"
+    },
+    "count": 15,
+    "exit0": 14,
+    "designatedNegativeGrepExit1": 1,
+    "allOtherExit0": true,
+    "causalProcessesCountedSeparately": true
+  },
+  "preservation": {
+    "final": {
+      "path": "/private/tmp/p0-45-qualification-20261015/final-source-preservation.json",
+      "bytes": 3063,
+      "sha256": "eb68c2db7cf340cda1dcf4652cd71459fd94fd57b35a5d9711351f1273e2ffd7"
+    },
+    "trackedBefore": 8205,
+    "compiled": 4529,
+    "physicalCopy": 12734,
+    "nativeInode": 538734665,
+    "noProductSourceChange": true,
+    "sourceControlsRestored": true
+  },
+  "remainingAcceptance": [
+    "Bounded qualification is complete pending independent actual review; formalAcceptanceClosed remains false.",
+    "Original12 core,5 built CLI,4 separation and10 readonly verifier are four separate invocations. Six causal phases repeat only the same12 source-mode cases;72 executions add no new unique registrations.",
+    "C1 removes unknown and active legal-hold refusals together under injected callbacks and a stub signer. Shared expectRefused99 can fail before reason/snapshot/quarantine/reachability assertions; retain actual first frames and masking.",
+    "C2 changes only the forward rename to faithful copy then unlink; rollback rename remains unchanged. Byte-reachability checks may survive. A rename-fault-spy assertion failure is mechanism/fault-path sensitivity, not observed byte loss or proof of the spec invariant mutation criterion.",
+    "Actual mutant outcomes, including survivors, are derived from completed raw/observer/process records. Body AssertionErrors await semantic attribution; generic nonzero, setup/hook/native/late/timeout/pending or group uncertainty is not a kill.",
+    "Core12 uses real owned encrypted-blob writer/verifier and SHA256 snapshots, injected hold callbacks and stub SignedDigest signatures. Writers and pools close before repair; this is not active-writer or crash-atomic proof.",
+    "Original builtCLI5 combines a source fixture parent with actual dist/cli.js children, real local REPAIR_RECEIPT signature verification and altered-byte refusal. It is separate from TS-only mutations with all4529 compiled files unchanged; no independently pinned external issuer or separate per-child ABI/transcript is inferred.",
+    "Original CLI environment is inherited with per-call AMC_HOME/passphrase; the causal copy has a seven-key allowlist and borrowed unchanged parent dependencies. Neither proves OS/network, universal descendant or all-cache isolation.",
+    "Only the owned process group was probed with signal zero after exit. The run-end reporter precedes global teardown; complete process exits and known late diagnostics are checked separately. Supervisor420s sends no terminating signal and does not alter original30s tests or CLI60s children.",
+    "Original CLI assertions verify a real local repair receipt and altered-byte refusal, but afterAll deletes the owned fixture. Retained source/raw/observer/outer streams are not a separately retained CLI repair-receipt sample; no sample criterion is closed. Historical origin/main red, PR/merge, full suite and installed P031 remain formal open.",
+    "Full JSONL repair, live writer/WAL race, interactive TTY, genuine active/unknown signed registry, second signing failure, rollback failure, crash/interrupted publication and arbitrary hostile-plan/symlink containment remain unqualified.",
+    "The adjacent doctor static note identifies a dangling top-level .amc symlink deletion branch without the evidence-name exclusion/gate; its cache branch has an existing gate. This is an unapproved adjacent follow-up with no owner assigned, not observed deletion/byte loss or a verify-repair-path defect. No doctor/hold source was changed.",
+    "Required source quality remains failed and unwaived:1269duplicates/2751dead-code findings. Older exact-code type/lint/clean-source/quality evidence retains its original command/source attribution; these are not fresh P045 runs.",
+    "P021 literal20/10-outside-R4 reconciliation, P029 skip, P022 arrays, P023 held API/Studio, P051 issuer/formal, P024 ISO/expert gaps, P019/P020 proposals and P030 held runner/fullbatch/installed-pack gaps remain unresolved.",
+    "Claude/shared CLI/API/Studio/A4 and paused P2-02 reservations and all pending transfers remain intact. Historical Done is not acceptance or ownership clearance.",
+    "Historical original-red requirement, full suite, coverage, Node24, hosted CI, PR/merge, release, formal dependency/G0/Done are not established. P011 remains conditional read-only preparation after this bounded handoff."
+  ],
+  "unwaivedQuality": {
+    "duplicateFindings": 1269,
+    "deadCodeFindings": 2751,
+    "status": "failed, not rerun or waived in P045"
+  },
+  "adjacentDoctor": {
+    "review": {
+      "path": "/private/tmp/p0-45-qualification-20261015/adjacent-doctor-static-review.json",
+      "bytes": 1920,
+      "sha256": "f64c23ecee537efe4eb5cc50d34785c9d325ed954ee30f64bdd43cb3754ec544"
+    },
+    "approvedSuccessor": null,
+    "owner": null,
+    "meaning": "Static adjacent symlink concern only; no doctor execution/deletion, byte loss or repair-path runtime defect observed."
+  },
+  "ownership": "All Claude/shared/paused reservations, existing user skips and unresolved contracts, pending P052/P020/P019 transfers and earlier qualification debt remain unchanged. No approval or transfer is inferred.",
+  "next": {
+    "key": "P0-11",
+    "mode": "Bounded existing-source qualification after canonical preservation/freeze checks; no production edit or formal prerequisite closure inferred."
+  },
+  "hashCycleBoundary": "This outcome precedes the final bound builder and does not pin its future body. A later postcommit handoff may bind both."
+}

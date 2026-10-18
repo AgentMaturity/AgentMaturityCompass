@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "freezeActive": true,
-  "measuredAt": "2026-10-18T10:49:08.205Z",
-  "measuredOn": "e5ab2b19f7769264bf5075024c4c0baba32cd8c9",
+  "measuredAt": "2026-10-18T11:09:37.870Z",
+  "measuredOn": "8718202e660a7fab7e9cf4fff74447e28305bec5",
   "counts": {
-    "cliCommandPaths": 1255,
-    "cliInventoryPaths": 1255,
+    "cliCommandPaths": 1256,
+    "cliInventoryPaths": 1256,
     "stationPacks": 41,
     "stationPackQuestions": 723
   },
@@ -22,6 +22,7 @@
     "P1-16",
     "P1-17",
     "P1-28",
+    "P1-33",
     "P1-40",
     "P1-42",
     "P1-43",

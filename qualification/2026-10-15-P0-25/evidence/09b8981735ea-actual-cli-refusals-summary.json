@@ -1,0 +1,69 @@
+{
+  "source": "2d552741d727aaf3a26759b9df9343f7804d157a",
+  "capturedUtc": "2026-10-15T04:37:03.910890+00:00",
+  "processRefusals": [
+    {
+      "command": {
+        "phase": "cli-unknown-flag",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+        "cmd": "npm run check:citations -- --frobnicate",
+        "exit": 1,
+        "durationMs": 258,
+        "startedUtc": "2026-10-15T04:36:01.968523+00:00",
+        "log": "/private/tmp/p0-25-cli-unknown-flag-20261015.log",
+        "head": "2d552741d727aaf3a26759b9df9343f7804d157a"
+      },
+      "actualRefusal": "unknown argument \"--frobnicate\"",
+      "log": {
+        "path": "/private/tmp/p0-25-cli-unknown-flag-20261015.log",
+        "bytes": 228,
+        "sha256": "118600b01abf1f156a260ff505e2b33c1bfdb75bd9098f236c27c54ce2a64792"
+      }
+    },
+    {
+      "command": {
+        "phase": "cli-update-without-reason",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+        "cmd": "npm run check:citations -- --update-baseline",
+        "exit": 1,
+        "durationMs": 185,
+        "startedUtc": "2026-10-15T04:36:02.337768+00:00",
+        "log": "/private/tmp/p0-25-cli-update-without-reason-20261015.log",
+        "head": "2d552741d727aaf3a26759b9df9343f7804d157a"
+      },
+      "actualRefusal": "--update-baseline requires --reason",
+      "log": {
+        "path": "/private/tmp/p0-25-cli-update-without-reason-20261015.log",
+        "bytes": 246,
+        "sha256": "ad39e1e7ae9da59b2ff8e582ba3423c8a2b1dd2811fd32cb5fa31c7662fbe725"
+      }
+    },
+    {
+      "command": {
+        "phase": "cli-reason-without-update",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+        "cmd": "npm run check:citations -- --reason p0-25-stray-reason",
+        "exit": 1,
+        "durationMs": 177,
+        "startedUtc": "2026-10-15T04:36:02.672490+00:00",
+        "log": "/private/tmp/p0-25-cli-reason-without-update-20261015.log",
+        "head": "2d552741d727aaf3a26759b9df9343f7804d157a"
+      },
+      "actualRefusal": "--reason is only valid with --update-baseline",
+      "log": {
+        "path": "/private/tmp/p0-25-cli-reason-without-update-20261015.log",
+        "bytes": 257,
+        "sha256": "7df94903fdbcd419d864eb2d602e0efe2a8557d9bb33d2f20bebef43eaf4e01d"
+      }
+    }
+  ],
+  "baselineUnchanged": {
+    "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/citations-baseline.json",
+    "bytes": 2413,
+    "sha256": "31d07b0f9ea2022e1994f0b9692a3a55c87271d4aaf5e645d9b68a3583d69f59"
+  },
+  "boundary": "Three real npm child command exits1 are intended parser refusals, not citation data failures or test registration counts. No --update-baseline with a reason was invoked against the project."
+}

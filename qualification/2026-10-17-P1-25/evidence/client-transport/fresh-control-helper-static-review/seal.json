@@ -1,0 +1,25 @@
+{
+  "schema": "p125c-helper-static-review-seal/1",
+  "at": "2026-10-16T21:45:13.195383+00:00",
+  "status": "closed",
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-helper-static-review/review.json",
+      "bytes": 4049,
+      "sha256": "5071804ad9cc1b1177bb4298548db5c91bc5bd7a62633a4d6217942aa1f64f96"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-helper-static-review/README.md",
+      "bytes": 1107,
+      "sha256": "7ac855e455359a6590d62df793f5b5c22f001e1eebf4c14a3db3b974e95c8ef0"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-helper-static-review/input-pins.json",
+      "bytes": 5955,
+      "sha256": "6c6b37c02213868421147b202913e5c79ab11144e312329efc7696c9ec3c7077"
+    }
+  ],
+  "helperOrProductExecution": false,
+  "checkoutOrIndexWrites": false
+}

@@ -1,0 +1,88 @@
+{
+  "schema": "p111-exact-scope-current-refresh-review/1",
+  "at": "2026-10-16T19:21:00.151825+00:00",
+  "blockers": [],
+  "recommendation": "Current finite evidence supports root admitting only the two proposed new paths after its ordinary hosted/D15/freeze checks. This report neither allocates source nor supplies those executions. Missing shared RES is a disclosed current-delta/append limitation, not ownership release or an automatic human approval hold.",
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "branch": "codex/p1-11-evidence-qualification",
+    "head": "315bac6aa7fe55596bc9d89ddb32755c9436ceb9",
+    "clean": true,
+    "indexEmpty": true,
+    "observationTimeOnly": true
+  },
+  "exactProposedPaths": [
+    "tests/catalog/evidence/decisive.test.ts",
+    "qualification/2026-10-17-P1-11/"
+  ],
+  "ownership": {
+    "currentRegistries": 3,
+    "registeredRoots": 170,
+    "retainedFreshRoots": 8,
+    "physicalRoots": 178,
+    "membershipAdded": [],
+    "membershipRemoved": [],
+    "includesQ125ObXeMvAndQ107To2oNk": true,
+    "targetAbsenceChecks": 356,
+    "all178TargetStatusesExit0Empty": true,
+    "all11TargetHistoriesExit0Empty": true,
+    "sourceFilePresenceAndHashPairsExact": 2705,
+    "sourceFilePairChanges": [],
+    "sourceStatusChangesFromPrior": [],
+    "existingDirtyBroadSourcePrefixes": [
+      {
+        "root": "/Users/sid/.codex/worktrees/global-regulatory-guidance/AgentMaturityCompass",
+        "status": " M src/compliance/regulatory/index.ts\n M src/compliance/regulatory/register.json\n?? src/compliance/regulatory/marketDirectory.json\n?? src/compliance/regulatory/marketInventory.json\n"
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/low-priority-jurisdictions/AgentMaturityCompass",
+        "status": " M src/compliance/regulatory/index.ts\n M src/compliance/regulatory/register.json\n"
+      }
+    ],
+    "interpretation": "The two dirty regulatory worktrees remain outside exact evaluator scope. All selected source/test/docs variants stay present and hash-identical; no existing source is made available by clean or absent target paths."
+  },
+  "preservation": {
+    "heldRAndClaudePins": 36,
+    "allMatchPrior": true,
+    "heldRHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "heldRExactStatusRows": 18,
+    "heldRFullStatusStringMatchesPrior": true,
+    "heldRIndexEmpty": true,
+    "ClaudeVariantsUnchangedWithinSelectedChecks": true,
+    "noSourceVariantTransplanted": true
+  },
+  "reservation": {
+    "exactPathExistenceChecks": 1,
+    "exactLivePathExists": false,
+    "lastKnownBinding": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "fullSnapshotOrCurrentDeltasRecovered": false,
+    "sharedAppendPerformed": false,
+    "pendingEntry": {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/pending-reservation-entry.md",
+      "bytes": 1615,
+      "sha256": "f14c853219f5a3beb026d5a76433c4df69b3db9f11c1b20f7705908f029faead"
+    },
+    "ruleBoundary": "Prior sealed evidence protects catalog evaluator/claims/runtime source and asks Codex to append its own section. All those source paths remain read-only. The real file is absent; do not create a substitute. No broad search, release inference or new approval requirement was introduced.",
+    "olderOptionalScan": "Its separately retained unestablished closure remains excluded from evidence; no process lookup, retry, signal or deletion here."
+  },
+  "fitAndLimits": {
+    "reusePriorSealedSourceFlowReview": {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/next-p111-admission/review.json",
+      "bytes": 8907,
+      "sha256": "77185bd18223bc003f541816aa4c97371736e8f7b36c72e2f058bccebbd8caba"
+    },
+    "newTestOnly": "Typed already-derived ItemProvenance/ControlPlan inputs qualify decision rules only. No actual crypto/ledger/receipt/plan/approval proof is fabricated. No candidate source code authored here.",
+    "publicFlow": "Current public complianceContext plan:null withholds passes. Full loader/report/compiled-plan integration remains outside this first scope.",
+    "formalAcceptance": "P1-11, P1-01, full P1-25 and all human holds remain open. No tracker or completion change."
+  },
+  "rootOwnsNext": [
+    "Exact two-path source admission, current hosted overlap/WIP, ordinary D15 and freeze before materialization.",
+    "Read separately sealed candidate and perform ordinary compiler/runtime/quality qualification with unchanged guards/deadlines/baselines.",
+    "Retain all actual nonzero history; allocate source repair only after qualifying an actual failure."
+  ],
+  "executionBoundary": "Finite read-only Git registry/status/log metadata, file existence/hash reads and new private evidence only. No hosted/D15/freeze, product/compiler/test/native/SQL/network, source or QA/index write, worktree creation or Claude message."
+}

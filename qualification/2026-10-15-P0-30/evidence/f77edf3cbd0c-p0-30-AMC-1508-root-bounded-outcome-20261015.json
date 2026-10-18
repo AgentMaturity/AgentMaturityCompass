@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1508",
+  "capturedUTC": "2026-10-15T01:40:12.214521+00:00",
+  "sourceCommit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "status": "BOUNDED ORIGINAL AND ACTUAL-COOKIE HTTP QUALIFICATION COMPLETE; FORMAL SPECIFICATION DISCREPANCY REMAINS OPEN",
+  "evidence": {
+    "originalActual": {
+      "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.json",
+      "bytes": 39183,
+      "sha256": "6b847d4156cfbb76674d38faccd6e2a998adcba5fed5b9aa355181f3f5f0c08e"
+    },
+    "originalIndependent": {
+      "path": "/private/tmp/p0-30-AMC-1508-independent-review-20261015.json",
+      "bytes": 51693,
+      "sha256": "d5ce510d9104e795d1d5a06d3defe85997c246c6ff9601871aad194848072f47"
+    },
+    "httpActual": {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015.json",
+      "bytes": 48220,
+      "sha256": "f33581d913273e0ae0b2cf5048b35850df6a9429581959d5e1a8bca8bc313c3a"
+    },
+    "httpIndependent": {
+      "path": "/private/tmp/p0-30-AMC-1508-http-independent-review-20261015.json",
+      "bytes": 40800,
+      "sha256": "81005e5a842229a19c8c2a708a3c8dd95381c9d4834d5b7eace48b0e58152cfd"
+    }
+  },
+  "originalOutcome": {
+    "path": "/private/tmp/p0-30-AMC-1508-original-root-bounded-outcome-20261015.json",
+    "bytes": 3499,
+    "sha256": "55df46871e685b2fad9e6bd4d5300db57c0136e76ccd621961acca23f26a010d"
+  },
+  "actual": {
+    "original": "Original21 and root separate21/21. Fixed21 B/M/R sequences21\u219220\u219221,21\u219217\u219221,21\u219218\u219221,21\u219219\u219221,21\u219217\u219221;14 original AssertionErrors with0pending/setup/transport/cleanup. Four current semantic reconstructions and separate exact historical composite; first-assertion masks retained in original outcome/reviews.",
+    "http": "Separately authored ONE actual OWNER-cookie HTTP case: initial1/1; sameM2 and historicalcomposite1\u21920\u21921. Two final original222:57 AssertionErrors201versus400, after bothrequests/fullSELECT*arrays/cleanup. No setup/auth/transport/cleanup/pending failure.",
+    "intactHttp": "Forged top-level submittedBy returns400/unrecognized field and no inserted row; same-cookie healthy nestedpayload returns201 and owner-attributed row. Actual row counts2\u21922\u21923, both prior rows retained.",
+    "m2Http": "With only strictness removed, forged and healthy requests both return201; rows2\u21923\u21924. Response and actual forged row keep portal-http-owner. This is accepted/ignored input, not forged principal.",
+    "historicalCompositeHttp": "The separately exact composite accepts the same forged request and stores different-forged-owner in both response and actual row. Healthy second request still stores portal-http-owner, rows2\u21923\u21924. This is measured attribution forgery in the deliberate private mutant, not original production behavior.",
+    "runtimeAndAuth": "All7 HTTP product phases directly record workerNode22.23.3/executable/ABI127. Genuine caller-generated local role public fingerprints precede createVault/artifacts; actual signed users config/trackedLOCAL_USER Owner cookie and runtimeNodecrypto checks pass. No injected HTTPauth or supplied admin request.",
+    "cleanupAndEffects": "Owned product singleton is primed before initializer/services; normal server\u2192productDB\u2192allpools\u2192vault\u2192ownedfixture cleanup succeeds, handle.openfalse. All actual prior SQL row values retained in everyphase. Healthy positive remains valid after both mutant forged calls.",
+    "counting": "Original21 plus one distinct new private HTTP case across separate corpora. No single22-case run, held22 adoption, sevenuniqueHTTPcases or moredistinctguard claims from repeatedgenerators/matrices."
+  },
+  "preservation": "No production/permanenttest/config/guard/counter/doc/dependency/native/tracker/Git edit. All private source mutations restored; source7739/dist4529 and newHTTP12269closure exact, original12268closure unchanged, primary/Claude/reservation/role/prior evidence pins stable. Rootsource58clean.",
+  "limits": [
+    "Current strict400 refusal conflicts with old override wording; no specification/policy decision, source repair or formalDone closure was made.",
+    "Local synthetic OWNER identity is not an independently authenticated person/external authority. Product verdict supplies selected identity/policy claims; crypto procedure does not independently decode/revalidate every credential policy field.",
+    "Cleanup removes raw crypto/session preimages. Fingerprints/hashes and runtime booleans do not permit offline replay; within-phase effect overwrites are not immutable intermediate history. Missing marker timestamp was not replaced by an invented chronology.",
+    "Selected row facts do not prove universal filesystem no-effects, tenant/race/CSRF/browser/hosted/installed/provider behavior. M1/M3/M4 seam-specific guard meanings are not generalized to all real HTTPcredentials.",
+    "No literal freshclone, full old76batch, wholeP030, Node24/fullsuite/coverage/hostedCI/G0/release/Done claim. Earlier ownership/quality/freeze/publication debt remains."
+  ],
+  "next": "Proceed serially to AMC-1547 spill original source-mode controls, then separately reviewed two-case parent/sibling supplement if required; AMC-1522 closure remains P0-32.",
+  "allBoundedReviewsComplete": true
+}

@@ -1,0 +1,2 @@
+[codex/p0-27-node-runtime-compatibility 75cbdf8a1] test: allow qualified Node 24 in assurance session witnesses
+ 1 file changed, 2 insertions(+), 2 deletions(-)

@@ -1,0 +1,585 @@
+{
+  "scope": "Read-only next-key selection after the active P0-52 bounded receipt. No P0-54/P0-55 test, server, build, implementation, tracker, reservation, source or ref mutation was performed.",
+  "capturedUtc": "2026-10-14T19:22:23.386937+00:00",
+  "worktree": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass",
+  "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+  "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "branch": "codex/p0-52-current-qualification",
+  "gitStatusAtCapture": "?? qualification/2026-10-15-P0-52/",
+  "acceptedImplementationRefs": {
+    "P054_source": {
+      "commit": "54b2ca30164cb3380fcd529494e7380eda71ece2",
+      "ancestorOfCurrent": true,
+      "ancestorOfAcceptedMain": true
+    },
+    "P054_merge": {
+      "commit": "4b036a8b7b45ff4125d515618da562bea29c9e39",
+      "ancestorOfCurrent": true,
+      "ancestorOfAcceptedMain": true
+    },
+    "P055_merge": {
+      "commit": "5d4740de268e513bfa63e6fecb3cd3fa1cb2a48b",
+      "ancestorOfCurrent": true,
+      "ancestorOfAcceptedMain": true
+    },
+    "P055_binder_followup": {
+      "commit": "dc14bf63dbd2f17d92f4bb7f56616d7769969e52",
+      "ancestorOfCurrent": true,
+      "ancestorOfAcceptedMain": true
+    }
+  },
+  "inputHashes": [
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541",
+      "bytes": 38227
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04",
+      "bytes": 78486
+    },
+    {
+      "path": "/Users/sid/Downloads/Agent contract.md",
+      "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f",
+      "bytes": 25110
+    },
+    {
+      "path": "/Users/sid/Downloads/A4 \u00b7 Forge.md",
+      "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65",
+      "bytes": 47286
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-54.md",
+      "sha256": "a9a7773d4336ef57424ebcb20e24eb7835766de077dec7619cd556f07de40a3e",
+      "bytes": 8728
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-55.md",
+      "sha256": "d77a082bd93e1dd71c16063854c1be74d574a0d9b73ecffdbc890bf31783398d",
+      "bytes": 9347
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-11.md",
+      "sha256": "ebf31f8e80615b05a449c62a0ef02da996fca57e12d770fe5226872a4ba5d4e8",
+      "bytes": 16346
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-16.md",
+      "sha256": "160133be570bedf991837bf0cd08db318cc5d6ea26073315344b2cd98614adbd",
+      "bytes": 12153
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-15.md",
+      "sha256": "673fffd2af872dc2da0efbd2fcbe35ebcfa3d785e7b4e339ece56714107619c0",
+      "bytes": 3052
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+      "bytes": 275376
+    }
+  ],
+  "sourceHashes": [
+    {
+      "path": "scripts/check-no-fabrication.mjs",
+      "sha256": "57bc9a8e3db3e49aad6703402555b995847dc5fd6ec811865a7b077b50d34dcc",
+      "bytes": 13211,
+      "lines": 243,
+      "acceptedMainSha256": "57bc9a8e3db3e49aad6703402555b995847dc5fd6ec811865a7b077b50d34dcc",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "57bc9a8e3db3e49aad6703402555b995847dc5fd6ec811865a7b077b50d34dcc",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "scripts/no-fabrication-allowlist.json",
+      "sha256": "33ed6db7299ffb7ef1cdb32ea4882e28d4601f5cb19334114820efcadddd5937",
+      "bytes": 2554,
+      "lines": 59,
+      "acceptedMainSha256": "33ed6db7299ffb7ef1cdb32ea4882e28d4601f5cb19334114820efcadddd5937",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "33ed6db7299ffb7ef1cdb32ea4882e28d4601f5cb19334114820efcadddd5937",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "scripts/check-gate-reachability.mjs",
+      "sha256": "e98e01722fd4cafcde62f49859d4ebf8ac6935c74a37343f3d8e9aa2921323ff",
+      "bytes": 9077,
+      "lines": 162,
+      "acceptedMainSha256": "e98e01722fd4cafcde62f49859d4ebf8ac6935c74a37343f3d8e9aa2921323ff",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "e98e01722fd4cafcde62f49859d4ebf8ac6935c74a37343f3d8e9aa2921323ff",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "scripts/check-threat-model.mjs",
+      "sha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b",
+      "bytes": 3560,
+      "lines": 84,
+      "acceptedMainSha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/diagnostic/evidenceEmitters.ts",
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+      "bytes": 12985,
+      "lines": 148,
+      "acceptedMainSha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "docs/security/channel-map.json",
+      "sha256": "261c15667a63b6a815dba312e6f2dce0d0d1b01cf02d1b282a33d060070d449e",
+      "bytes": 20174,
+      "lines": 369,
+      "acceptedMainSha256": "261c15667a63b6a815dba312e6f2dce0d0d1b01cf02d1b282a33d060070d449e",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "261c15667a63b6a815dba312e6f2dce0d0d1b01cf02d1b282a33d060070d449e",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "docs/security/THREAT_MODEL.md",
+      "sha256": "816600297a6dbc51487b993172ccd3b7ac920593582baba53c5d35f6873398fa",
+      "bytes": 49246,
+      "lines": 278,
+      "acceptedMainSha256": "816600297a6dbc51487b993172ccd3b7ac920593582baba53c5d35f6873398fa",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "816600297a6dbc51487b993172ccd3b7ac920593582baba53c5d35f6873398fa",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/mode/mode.ts",
+      "sha256": "3385444df603f5c537392c217839cb88d830ecea522ae6cd975b3198a841ecf0",
+      "bytes": 3807,
+      "lines": 164,
+      "acceptedMainSha256": "3385444df603f5c537392c217839cb88d830ecea522ae6cd975b3198a841ecf0",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "3385444df603f5c537392c217839cb88d830ecea522ae6cd975b3198a841ecf0",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/a4/a4Store.ts",
+      "sha256": "ab1d4b6efdf129ff25cefe37f3a3c401ee82430c0649ed1b6c5eabb8ff1525c0",
+      "bytes": 58187,
+      "lines": 798,
+      "acceptedMainSha256": "ab1d4b6efdf129ff25cefe37f3a3c401ee82430c0649ed1b6c5eabb8ff1525c0",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "ab1d4b6efdf129ff25cefe37f3a3c401ee82430c0649ed1b6c5eabb8ff1525c0",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/a4/a4Identity.ts",
+      "sha256": "6fa17fa2d5288738f447130cd28908fe2dce4fdc7321421fce9537ccbeaf57a2",
+      "bytes": 12907,
+      "lines": 204,
+      "acceptedMainSha256": "6fa17fa2d5288738f447130cd28908fe2dce4fdc7321421fce9537ccbeaf57a2",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "6fa17fa2d5288738f447130cd28908fe2dce4fdc7321421fce9537ccbeaf57a2",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "docs/program/metrics.json",
+      "sha256": "541373a8e5ddb8ba1dfe4581f72d371afa7cdc4885ad25077def2ed85e8955ed",
+      "bytes": 5866,
+      "lines": 233,
+      "acceptedMainSha256": "541373a8e5ddb8ba1dfe4581f72d371afa7cdc4885ad25077def2ed85e8955ed",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "541373a8e5ddb8ba1dfe4581f72d371afa7cdc4885ad25077def2ed85e8955ed",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "tests/checkNoFabrication.test.ts",
+      "sha256": "344b6f2dd9103b7a6f2a887978f3db8ce6cc4d75448d6acc8afdf9b8f65b9528",
+      "bytes": 11124,
+      "lines": 228,
+      "acceptedMainSha256": "344b6f2dd9103b7a6f2a887978f3db8ce6cc4d75448d6acc8afdf9b8f65b9528",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "344b6f2dd9103b7a6f2a887978f3db8ce6cc4d75448d6acc8afdf9b8f65b9528",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "tests/threatModelMap.test.ts",
+      "sha256": "47741b152a40bdfd164fa8b5708d243c530248043e2d3fd4fa1c7a380c046d30",
+      "bytes": 3263,
+      "lines": 76,
+      "acceptedMainSha256": "47741b152a40bdfd164fa8b5708d243c530248043e2d3fd4fa1c7a380c046d30",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "47741b152a40bdfd164fa8b5708d243c530248043e2d3fd4fa1c7a380c046d30",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "tests/portableVerifierServerQualification.test.ts",
+      "sha256": "22580eb50ff6786803aa529cd7c64e51404091bf8d4fe1322477c8d3b01fcc20",
+      "bytes": 14604,
+      "lines": 198,
+      "acceptedMainSha256": null,
+      "sameAsAcceptedMain": false,
+      "historyBaseSha256": "22580eb50ff6786803aa529cd7c64e51404091bf8d4fe1322477c8d3b01fcc20",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/api/apiHelpers.ts",
+      "sha256": "d645ef39b25422ae3dd2a771c3555daedafe134c07afb6ed9b7508fd30ffc46a",
+      "bytes": 6027,
+      "lines": 180,
+      "acceptedMainSha256": "d645ef39b25422ae3dd2a771c3555daedafe134c07afb6ed9b7508fd30ffc46a",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "d645ef39b25422ae3dd2a771c3555daedafe134c07afb6ed9b7508fd30ffc46a",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/api/passportRouter.ts",
+      "sha256": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405",
+      "bytes": 7479,
+      "lines": 196,
+      "acceptedMainSha256": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/api/enforceRouter.ts",
+      "sha256": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+      "bytes": 20708,
+      "lines": 477,
+      "acceptedMainSha256": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/api/index.ts",
+      "sha256": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+      "bytes": 19070,
+      "lines": 574,
+      "acceptedMainSha256": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/audit/auditApi.ts",
+      "sha256": "371901e70b53f446f5dfd1f0abc1d8c0e9dceee231eb656a46f0f20a770b803a",
+      "bytes": 18208,
+      "lines": 562,
+      "acceptedMainSha256": "371901e70b53f446f5dfd1f0abc1d8c0e9dceee231eb656a46f0f20a770b803a",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "371901e70b53f446f5dfd1f0abc1d8c0e9dceee231eb656a46f0f20a770b803a",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/claims/evidenceProvenance.ts",
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+      "bytes": 12211,
+      "lines": 242,
+      "acceptedMainSha256": "8500cb76d7dabbdf1198cfe4a44b4abfba18c66f9d47d15022526d05578ff4e8",
+      "sameAsAcceptedMain": false,
+      "historyBaseSha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/claims/eligibility/adapters/results.ts",
+      "sha256": "ce2b501208ca030e371bb1fb453d851b2e80556dc53ff5cc84ef1c24710e8e3b",
+      "bytes": 9797,
+      "lines": 164,
+      "acceptedMainSha256": "ce2b501208ca030e371bb1fb453d851b2e80556dc53ff5cc84ef1c24710e8e3b",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "ce2b501208ca030e371bb1fb453d851b2e80556dc53ff5cc84ef1c24710e8e3b",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/compliance/complianceEngine.ts",
+      "sha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+      "bytes": 14631,
+      "lines": 356,
+      "acceptedMainSha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "bytes": 18181,
+      "lines": 405,
+      "acceptedMainSha256": "d83be1102ae95082028ab3bd1e35de8f36d83a5e7ddebb4278b7fd7a616ecb21",
+      "sameAsAcceptedMain": false,
+      "historyBaseSha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "bytes": 554,
+      "lines": 32,
+      "acceptedMainSha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "bytes": 1064339,
+      "lines": 24430,
+      "acceptedMainSha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/cli/resultCommandRegistry.ts",
+      "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "bytes": 16898,
+      "lines": 314,
+      "acceptedMainSha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "sameAsHistoryBase": true
+    },
+    {
+      "path": "src/repl/replParser.ts",
+      "sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "bytes": 20875,
+      "lines": 520,
+      "acceptedMainSha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "sameAsAcceptedMain": true,
+      "historyBaseSha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "sameAsHistoryBase": true
+    }
+  ],
+  "recommendation": {
+    "nextKey": "P0-54",
+    "kind": "Existing-source guard qualification only",
+    "startCondition": "Finish and retain the P0-52 bounded receipt first; carry its actual unresolved failures. Recheck source pins and reservations before creating a new qualification worktree.",
+    "reason": "Workstreams.md explicitly orders P0-54 first in the E17 issues list (line 854), and Issues.md makes it High due October 12 with existing P0-11/P0-16 guard dependencies. Its accepted source is already merged; the next action should qualify that source rather than recreate historical A4 stubs.",
+    "wholeIssueLimit": "The dependency rows and old source merges are not current behavioral acceptance. P0-11 remains In review. The bounded guard receipt must preserve that distinction and cannot close A4, P0-11, GATE-G0, or a release."
+  },
+  "P054": {
+    "sourceFindings": [
+      {
+        "path": "scripts/check-no-fabrication.mjs",
+        "lines": [
+          13,
+          14
+        ],
+        "finding": "GUARDED_ROOTS includes a4. R1-R3 use this guarded-root scope; R4 scans all source text."
+      },
+      {
+        "path": "src/diagnostic/evidenceEmitters.ts",
+        "lines": [
+          63,
+          64
+        ],
+        "finding": "The existing a4Store classification has the required reason and makes governance audit rows non-maturity."
+      },
+      {
+        "path": "scripts/check-gate-reachability.mjs",
+        "lines": [
+          29,
+          62,
+          65,
+          77,
+          82
+        ],
+        "finding": "Imports the compiled registry and checks module/reason and literal classification. A fresh pinned build is required before execution."
+      },
+      {
+        "path": "tests/checkNoFabrication.test.ts",
+        "lines": [
+          19,
+          32,
+          40,
+          223
+        ],
+        "finding": "Meaningful isolated fixture/real-repository cases already exist, but none exercise src/a4. The spec certification scratch witness alone would not distinguish A4 root inclusion because R4 is global."
+      },
+      {
+        "path": "tests/threatModelMap.test.ts",
+        "lines": [
+          55,
+          62
+        ],
+        "finding": "Existing real-map test pins 16 channels and eight failure rows; preserve this original test."
+      },
+      {
+        "path": "src/mode/mode.ts",
+        "lines": [
+          142,
+          159
+        ],
+        "finding": "All original 16 A4 owner-gated strings remain, plus the later accepted a4 acknowledge string. These strings do not create CLI commands."
+      }
+    ],
+    "channelCount": 16,
+    "failureRowCount": 8,
+    "studioEnforcementPoints": [
+      {
+        "path": "src/studio/studioServer.ts",
+        "symbol": "authenticate"
+      },
+      {
+        "path": "src/studio/nativeAdmission.ts",
+        "symbol": "nativeCsrfTokenForSession"
+      },
+      {
+        "path": "src/studio/nativeAdmission.ts",
+        "symbol": "nativeAllowedBrowserOrigins"
+      },
+      {
+        "path": "src/studio/nativeAdmission.ts",
+        "symbol": "isNativeStudioPath"
+      },
+      {
+        "path": "src/studio/nativeAdmission.ts",
+        "symbol": "assertNativeBrowserAdmission"
+      },
+      {
+        "path": "src/a4/a4Identity.ts",
+        "symbol": "resolveA4Principal"
+      },
+      {
+        "path": "src/a4/a4Router.ts",
+        "symbol": "a4PreviewEnabled"
+      },
+      {
+        "path": "src/a4/a4Router.ts",
+        "symbol": "handleA4Route"
+      }
+    ],
+    "a4ModePaths": [
+      "a4 acknowledge",
+      "a4 approve",
+      "a4 complete",
+      "a4 deny",
+      "a4 deploy record",
+      "a4 deploy verify",
+      "a4 export",
+      "a4 gate-policy",
+      "a4 hold",
+      "a4 members",
+      "a4 release",
+      "a4 reopen",
+      "a4 request-changes",
+      "a4 resume",
+      "a4 retire",
+      "a4 rollback",
+      "a4 tune"
+    ],
+    "smallestNextSlice": "Run existing guard and threat-model contracts on a fresh pinned owned tree, and add one new bounded qualification test file only if needed. Use private isolated fixture roots for A4 R1 random output, R2 fabricated-result identifier, R3 path-presence scoring and R4 certification wording, plus an allowed ID-marker control. Record actual diagnostic/exit behavior. No scratch file in the reserved live src/a4 tree is needed. Separately assert the actual classification row, original 16 mode entries, and existing map symbols/counts.",
+    "commandsToQualify": [
+      "pnpm run build",
+      "pnpm exec vitest run tests/checkNoFabrication.test.ts tests/threatModelMap.test.ts --reporter=json --outputFile=<unique-private-report>",
+      "pnpm run check:no-fabrication -- --json",
+      "pnpm run check:gates",
+      "pnpm run check:threat-model",
+      "pnpm run typecheck",
+      "pnpm run typecheck:tests",
+      "pnpm run lint",
+      "pnpm run check:counts",
+      "pnpm run check:docs-drift",
+      "pnpm run check:architecture-boundaries",
+      "pnpm run check:clean-source",
+      "pnpm run check:freeze"
+    ],
+    "commandLimits": "These commands are recommended, not executed by this preflight. Build must precede check:gates. Use explicit Node 22 and matching child PATH, the current frozen pnpm lockfile, unique phase names, and actual raw results. Reuse parent receipts only if their source/build inputs match the final next-key pin. Retain no-fabrication --strict result separately for G0 if unresolved pending allowlist debt remains.",
+    "metricsBoundary": {
+      "reservationLines": [
+        563,
+        586
+      ],
+      "decision": "The missing conditional original metric duty was explicitly transferred to P0-41. The current metrics file exists but has no A4 row; do not silently move the duty back or edit it under P0-54."
+    }
+  },
+  "P055": {
+    "priority": "Urgent, October 21",
+    "dependencies": [
+      "P0-09",
+      "P0-18",
+      "P0-20",
+      "P0-22",
+      "P0-27",
+      "P0-51"
+    ],
+    "acceptedSourceAlreadyPresent": true,
+    "notNextWholeItemReason": "The accepted follow-up source is present, but P0-22 literal empty-result acceptance and P0-51 pin-versus-compromise precedence remain unresolved. The user preserved those failures. P0-55 also crosses currently reserved/shared production boundaries, so urgency does not clear them.",
+    "existingEvidence": "The accepted P0-51 server qualification file exercises real formal/HMAC verdict refusals and secret-body rejection. Existing general router tests mostly mock producers. Source contains the unsigned-store routing, exact provenance binding/deduplication, per-category claim adapters and contained binder read. These observations are navigation evidence; this preflight did not execute their behavior.",
+    "APIClaimLimit": "apiSuccess labels results only when the dispatcher installed labelResultsOn. Direct handler fixtures cannot establish the full Studio/API claim-label contract. The P0-55 acceptance requires the actual dispatcher/body path and its existing registry, while preserving held API/Studio scope. No missing-label defect is asserted from handler source alone.",
+    "laterIndependentSlices": [
+      "Actual HTTP dispatcher passport/formal refusal and canonical claim-label contracts without request pins/secrets.",
+      "AMC_NO_SIGN isolated signed-store byte/row checks and owned real seal-on-throw failure fixtures.",
+      "Exact attestation subject/session/timestamp/duplicate signature admission controls.",
+      "Counted per-category evidence tier controls, retaining incomplete/empty unresolved semantics.",
+      "Binder same-bytes verification and contained reads using real fixture-owned paths."
+    ],
+    "outOfScope": [
+      "P0-19 echo scenario expansion deferred to P2-27",
+      "P1-05 macOS/relay ADR",
+      "P1-24 residuals",
+      "New CLI path or shared CLI rewrite",
+      "New A4 implementation or paused P2-02 work"
+    ]
+  },
+  "otherRoutingLimits": [
+    "P0-53 still needs the accepted-main D-22/freeze-exception decision state; a held-line exception is not accepted-main clearance.",
+    "P0-29 successor routing was explicitly skipped by the user; do not invent successors.",
+    "Release/CI P0-33 and close-out P0-30/31/34 remain governed by their independent dependencies and reservations; these follow-up receipts do not mark a release or whole G0 green."
+  ],
+  "reservations": [
+    {
+      "lines": [
+        1583,
+        1603
+      ],
+      "paths": [
+        "src/a4/**",
+        "src/console/assets/a4*.js",
+        "docs/A4_FORGE.md"
+      ],
+      "action": "Read only; original stubs have been filled by accepted A4 source and must remain."
+    },
+    {
+      "lines": [
+        1585,
+        1588
+      ],
+      "paths": [
+        "src/cli.ts",
+        "src/cli/resultCommandRegistry.ts",
+        "src/repl/replParser.ts",
+        "scripts/freeze-baseline.json"
+      ],
+      "action": "Held/shared P1-65 work; no source change or new exception without concrete owner coordination and accepted decision. No Claude message was sent."
+    },
+    {
+      "lines": [
+        1577,
+        1596,
+        1607
+      ],
+      "paths": [
+        "tests/studioNativeTaskService.test.ts",
+        "src/dataflow/**",
+        "src/vault/dlp.ts",
+        "src/gateway/redaction.ts",
+        "src/bridge/bridgeRedaction.ts",
+        "src/kernel/agentLoopRunner.ts"
+      ],
+      "action": "Preserve fixture ownership and paused P2-02/tokenize scope."
+    }
+  ],
+  "D15": "No archive, baseline, or manifest was changed. Existing registered frozen paths must not be re-registered. Any future authorized edit needs the current frozen-path check and the existing snapshot-on-first-edit rule before mutation; this read-only recommendation supplies no broad clearance.",
+  "graph": {
+    "query": "a4 guard no fabrication ingress",
+    "log": "/private/tmp/p0-52-graph-navigation-w8xr443v/next-key-query.log",
+    "logSha256": "a17221fa29dad967e518dd823f00f05faaace79c15c6bc883a8c2532f0af70b7",
+    "nodes": 36459,
+    "freshness": "Existing graph predates October A4 implementation; query returned 50 nodes, showed 21, and was truncated. Treated strictly as stale navigation; direct source and accepted commit ancestry supplied current proof.",
+    "version": "Project navigation helper pins graphifyy==0.9.56; installed CLI was previously verified 0.9.74. No graph refresh, watcher or server."
+  },
+  "executed": "Only local reads, hashes, git read-only ancestry/object inspection and an existing-graph query. No P0-54/P0-55 runtime checks or implementation."
+}

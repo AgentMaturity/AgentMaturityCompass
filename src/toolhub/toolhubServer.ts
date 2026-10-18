@@ -16,11 +16,10 @@ import {
   validateToolRequest,
   verifyToolsConfigSignature
 } from "./toolhubValidators.js";
-import { appendToolEvidenceWithReceipt } from "./toolhubReceipts.js";
+import { redactedEvidenceValue } from "./toolhubReceipts.js";
 import {
   buildToolBlastRadiusConsent,
   buildToolExecutedScope,
-  hashToolBlastRadiusConsent,
   validateToolBlastRadiusConsent,
   withToolBlastRadiusDecision,
   type ToolBlastRadiusConsent,
@@ -35,6 +34,7 @@ import { executeProcessSpawn } from "./toolhubExecutors/process.js";
 import { loadWorkOrder } from "../workorders/workorderEngine.js";
 import { verifyExecTicket } from "../tickets/execTicketVerify.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import { evaluateBudgetStatus } from "../budgets/budgets.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import {
@@ -888,8 +888,11 @@ export class ToolHubService {
     const ledger = openLedger(this.workspace);
     const sessionId = `toolhub-deny-${randomUUID()}`;
     const eventIds: string[] = [];
-    const blastRadiusConsent = opts?.blastRadiusConsent;
-    const blastRadiusConsentHash = blastRadiusConsent ? hashToolBlastRadiusConsent(blastRadiusConsent) : null;
+    // A validator's reason quotes the agent's arguments (`path '...' not in allowlist`) and so does the consent: in an
+    // opted-in workspace both are stored redacted, in payload and meta, and the digest is over the redacted consent.
+    const blastRadiusConsent = redactedEvidenceValue(this.workspace, opts?.blastRadiusConsent);
+    const blastRadiusConsentHash = blastRadiusConsent ? sha256Hex(canonicalize(blastRadiusConsent)) : null;
+    const storedMessage = String(redactedEvidenceValue(this.workspace, message));
 
     try {
       ledger.startSession({
@@ -901,7 +904,7 @@ export class ToolHubService {
       const payload = {
         auditType,
         severity: "HIGH",
-        message,
+        message: storedMessage,
         intentId: intent.intentId,
         toolName: intent.request.toolName,
         agentId: intent.request.agentId,
@@ -968,7 +971,7 @@ export class ToolHubService {
           payload: JSON.stringify({
             auditType: "EXECUTE_WITHOUT_TICKET_ATTEMPTED",
             severity: "HIGH",
-            message,
+            message: storedMessage,
             intentId: intent.intentId,
             toolName: intent.request.toolName,
             agentId: intent.request.agentId,

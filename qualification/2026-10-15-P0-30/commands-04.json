@@ -1,0 +1,2165 @@
+{
+  "records": [
+    {
+      "journal": "/private/tmp/p0-30-AMC-1542-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1542-revoke-snapshot-mutant",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/leaseRevocationWriterIntegrity.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1542-qualification-20261015/homes/P30-1542-revoke-snapshot-mutant",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1542-qualification-20261015/homes/P30-1542-revoke-snapshot-mutant",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1542-qualification-20261015/tmp/P30-1542-revoke-snapshot-mutant",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T00:37:05.023479+00:00",
+        "durationMs": 4208,
+        "exit": 1,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/stdout.log",
+          "bytes": 128,
+          "sha256": "8fff9376a6eabd25853e8273973e5c171915c9f3e922ecf0760708a6cdce6cad"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "scope": "Normal source-mode Vitest. No import adaptation, compiler, compiled mutation, transport blocker, or consumer fixture."
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1542-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1542-revoke-snapshot-restored",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/leaseRevocationWriterIntegrity.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1542-qualification-20261015/homes/P30-1542-revoke-snapshot-restored",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1542-qualification-20261015/homes/P30-1542-revoke-snapshot-restored",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1542-qualification-20261015/tmp/P30-1542-revoke-snapshot-restored",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T00:37:09.763953+00:00",
+        "durationMs": 4241,
+        "exit": 0,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/stdout.log",
+          "bytes": 130,
+          "sha256": "71d1da469e2905c5e8828b846990af1a5c897597ac3269c9effed61753f4e637"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "scope": "Normal source-mode Vitest. No import adaptation, compiler, compiled mutation, transport blocker, or consumer fixture."
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1542-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "root-head-after",
+        "argv": [
+          "git",
+          "-C",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+          "rev-parse",
+          "HEAD"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1542-qualification-20261015/homes/root-head-after",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1542-qualification-20261015/homes/root-head-after",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1542-qualification-20261015/tmp/root-head-after",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T00:37:39.927144+00:00",
+        "durationMs": 24,
+        "exit": 0,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-head-after/stdout.log",
+          "bytes": 41,
+          "sha256": "4d6100c6870dbeb5ee06470bb88c465f6304ec0b7d1ef2684adc01718809997b"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-head-after/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "scope": "Normal source-mode Vitest. No import adaptation, compiler, compiled mutation, transport blocker, or consumer fixture."
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1542-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "root-status-after",
+        "argv": [
+          "git",
+          "-C",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1542-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1542-qualification-20261015/homes/root-status-after",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1542-qualification-20261015/homes/root-status-after",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1542-qualification-20261015/tmp/root-status-after",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T00:37:39.951751+00:00",
+        "durationMs": 45,
+        "exit": 0,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-status-after/stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-status-after/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "scope": "Normal source-mode Vitest. No import adaptation, compiler, compiled mutation, transport blocker, or consumer fixture."
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1546-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "actual-runtime-fingerprint",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "-p",
+          "JSON.stringify({node:process.version,executable:process.execPath,modulesABI:process.versions.modules,napi:process.versions.napi})"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/actual-runtime-fingerprint",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/actual-runtime-fingerprint",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1546-qualification-20261015/tmp/actual-runtime-fingerprint",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:06:22.164743+00:00",
+        "durationMs": 88,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/actual-runtime-fingerprint/stdout.log",
+          "bytes": 114,
+          "sha256": "6356112c023d338d4ce2eb165c4ea56d3e428ef958059d868a720d4b17a6639c"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/actual-runtime-fingerprint/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1546-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "combined-original-thirty-baseline",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/studioAgentCredentialBinding.test.ts",
+          "tests/studioAgentTokenScopes.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/combined-original-thirty-baseline/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/combined-original-thirty-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/combined-original-thirty-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1546-qualification-20261015/tmp/combined-original-thirty-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:06:26.230211+00:00",
+        "durationMs": 11756,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/combined-original-thirty-baseline/stdout.log",
+          "bytes": 743,
+          "sha256": "74c487abf00fcc9448fda6f337dd5fb918e7e595fa3a55a18705e210b6199296"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/combined-original-thirty-baseline/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1546-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1546-mixed-credentials-baseline",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/studioAgentCredentialBinding.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-baseline/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/P30-1546-mixed-credentials-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/P30-1546-mixed-credentials-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1546-qualification-20261015/tmp/P30-1546-mixed-credentials-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:06:58.690384+00:00",
+        "durationMs": 8750,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-baseline/stdout.log",
+          "bytes": 558,
+          "sha256": "e7eab689aa99056a2c0a94899d3283582c9cf372967fbe6ef6242a9f57eb9e1b"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-baseline/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1546-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1546-mixed-credentials-mutant",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/studioAgentCredentialBinding.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-mutant/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/P30-1546-mixed-credentials-mutant",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/P30-1546-mixed-credentials-mutant",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1546-qualification-20261015/tmp/P30-1546-mixed-credentials-mutant",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:07:08.061450+00:00",
+        "durationMs": 8930,
+        "exit": 1,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-mutant/stdout.log",
+          "bytes": 2439,
+          "sha256": "9482417d8fba455e452e9dba7a58749fe947cf55926c5d1103075b025e424a98"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-mutant/stderr.log",
+          "bytes": 12644,
+          "sha256": "47dd0a2f2a6cf1b52a5b86f59f389352391f85cda72a2eb085d7c3065b0932ec"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1546-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1546-mixed-credentials-restored",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/studioAgentCredentialBinding.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-restored/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/P30-1546-mixed-credentials-restored",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/P30-1546-mixed-credentials-restored",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1546-qualification-20261015/tmp/P30-1546-mixed-credentials-restored",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:07:18.197355+00:00",
+        "durationMs": 8785,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-restored/stdout.log",
+          "bytes": 558,
+          "sha256": "d9f158cf8e9f8a795d74f3b3214c070b0cfe2b56b49720f3da4036a60ec52552"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-restored/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1546-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1546-lease-narrowing-baseline",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/studioAgentCredentialBinding.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-baseline/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/P30-1546-lease-narrowing-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/P30-1546-lease-narrowing-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1546-qualification-20261015/tmp/P30-1546-lease-narrowing-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:08:07.584658+00:00",
+        "durationMs": 8756,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-baseline/stdout.log",
+          "bytes": 556,
+          "sha256": "aac07e775954e928f51da87302a33741a8a5b40ee8f68b5a4557005f3d5ed43d"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-baseline/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1546-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1546-lease-narrowing-mutant",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/studioAgentCredentialBinding.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-mutant/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/P30-1546-lease-narrowing-mutant",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/P30-1546-lease-narrowing-mutant",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1546-qualification-20261015/tmp/P30-1546-lease-narrowing-mutant",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:08:16.955799+00:00",
+        "durationMs": 8774,
+        "exit": 1,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-mutant/stdout.log",
+          "bytes": 2433,
+          "sha256": "c111e45d1920b1ac6186e017319307093495c88552c5f622b985a116d06da6ba"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-mutant/stderr.log",
+          "bytes": 18601,
+          "sha256": "62fd7b06d43d60b8b8f19bd661f59e341c35b356c75be9010772a1cdf51ef8b2"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1546-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1546-lease-narrowing-restored",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/studioAgentCredentialBinding.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-restored/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/P30-1546-lease-narrowing-restored",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/P30-1546-lease-narrowing-restored",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1546-qualification-20261015/tmp/P30-1546-lease-narrowing-restored",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:08:26.911321+00:00",
+        "durationMs": 8824,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-restored/stdout.log",
+          "bytes": 671,
+          "sha256": "f53e72d56d3f5a5342b939e9702a87c1995376cc08a7a2ce49050fff7891a077"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-restored/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1546-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "root-head-final",
+        "argv": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "cwd": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/combined-original-thirty-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/combined-original-thirty-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1546-qualification-20261015/tmp/combined-original-thirty-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:11:35.405127+00:00",
+        "durationMs": 14,
+        "exit": 0,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/root-head-final/stdout.log",
+          "bytes": 41,
+          "sha256": "4d6100c6870dbeb5ee06470bb88c465f6304ec0b7d1ef2684adc01718809997b"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/root-head-final/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1546-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "root-status-final",
+        "argv": [
+          "git",
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/combined-original-thirty-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1546-qualification-20261015/homes/combined-original-thirty-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1546-qualification-20261015/tmp/combined-original-thirty-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:11:35.419698+00:00",
+        "durationMs": 37,
+        "exit": 0,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/root-status-final/stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/root-status-final/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "combined-original-ten-file-baseline",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/bundleSpill.test.ts",
+          "tests/cliSpillCommands.test.ts",
+          "tests/retentionSpill.test.ts",
+          "tests/sessionAttachmentSpill.test.ts",
+          "tests/sessionInboxSpill.test.ts",
+          "tests/sessionSpill.test.ts",
+          "tests/sessionSpillCommitment.test.ts",
+          "tests/sessionSpillRead.test.ts",
+          "tests/spillEncryption.test.ts",
+          "tests/spillLifecycle.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/combined-original-ten-file-baseline/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/combined-original-ten-file-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/combined-original-ten-file-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/combined-original-ten-file-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:40:48.042566+00:00",
+        "durationMs": 44721,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/combined-original-ten-file-baseline/stdout.log",
+          "bytes": 2682,
+          "sha256": "210e9de689c3f6e4d073765d1e14b065c45a57d413ad5f99444be185066ff7a0"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/combined-original-ten-file-baseline/stderr.log",
+          "bytes": 1623,
+          "sha256": "357de30e004cc2f6e275ede61484b57f63e94a582e92f6205c4aeb562597b0da"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "actual-runtime-fingerprint",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "-p",
+          "JSON.stringify({node:process.version,executable:process.execPath,modulesABI:process.versions.modules,napi:process.versions.napi})"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/actual-runtime-fingerprint",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/actual-runtime-fingerprint",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/actual-runtime-fingerprint",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:41:51.653753+00:00",
+        "durationMs": 77,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/actual-runtime-fingerprint/stdout.log",
+          "bytes": 114,
+          "sha256": "6356112c023d338d4ce2eb165c4ea56d3e428ef958059d868a720d4b17a6639c"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/actual-runtime-fingerprint/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-write-before-commit-baseline",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillEncryption.test.ts",
+          "tests/sessionSpillCommitment.test.ts",
+          "tests/sessionAttachmentSpill.test.ts",
+          "tests/sessionInboxSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-baseline/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-write-before-commit-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-write-before-commit-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-write-before-commit-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:41:52.895026+00:00",
+        "durationMs": 19227,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-baseline/stdout.log",
+          "bytes": 1346,
+          "sha256": "6e6000fd9a90236fec1351316b2ba3b20bc9fd4ccfe5021b4ae85e80ac1da692"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-baseline/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-write-before-commit-mutant",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillEncryption.test.ts",
+          "tests/sessionSpillCommitment.test.ts",
+          "tests/sessionAttachmentSpill.test.ts",
+          "tests/sessionInboxSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-write-before-commit-mutant",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-write-before-commit-mutant",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-write-before-commit-mutant",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:42:12.741062+00:00",
+        "durationMs": 19124,
+        "exit": 1,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/stdout.log",
+          "bytes": 6368,
+          "sha256": "672e5e92172585189161ff110db5ca6d3d98babef17075dfc0cadcf719b33a61"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/stderr.log",
+          "bytes": 11966,
+          "sha256": "4947b7201de1935c8fca60c17f5b2fa8f6e43571c26a16ce694ee2159839b59d"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-write-before-commit-restored",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillEncryption.test.ts",
+          "tests/sessionSpillCommitment.test.ts",
+          "tests/sessionAttachmentSpill.test.ts",
+          "tests/sessionInboxSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-restored/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-write-before-commit-restored",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-write-before-commit-restored",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-write-before-commit-restored",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:42:33.034250+00:00",
+        "durationMs": 19668,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-restored/stdout.log",
+          "bytes": 1520,
+          "sha256": "47c4ce593d4751d551a2d16de4d78ffab52fb58106ff62b4a5d0a4f87c3d5aad"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-restored/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-default-key-baseline",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillEncryption.test.ts",
+          "tests/sessionSpillCommitment.test.ts",
+          "tests/sessionAttachmentSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-baseline/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-default-key-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-default-key-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-default-key-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:43:14.812757+00:00",
+        "durationMs": 16437,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-baseline/stdout.log",
+          "bytes": 942,
+          "sha256": "60c661641660012dcc6525c694dbbb4acaa1970a144078de29459f7dec065600"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-baseline/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-default-key-mutant",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillEncryption.test.ts",
+          "tests/sessionSpillCommitment.test.ts",
+          "tests/sessionAttachmentSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-mutant/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-default-key-mutant",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-default-key-mutant",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-default-key-mutant",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:43:31.922094+00:00",
+        "durationMs": 16807,
+        "exit": 1,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-mutant/stdout.log",
+          "bytes": 5532,
+          "sha256": "059545ff1caa6d3358c0279420bef25ab221b6e3a91e8c3dc563a40b5feebaa1"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-mutant/stderr.log",
+          "bytes": 7249,
+          "sha256": "5b247698371c8c6c2480f51376b204fc76c1e368e53d9d2bba163130d08d4799"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-default-key-restored",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillEncryption.test.ts",
+          "tests/sessionSpillCommitment.test.ts",
+          "tests/sessionAttachmentSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-restored/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-default-key-restored",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-default-key-restored",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-default-key-restored",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:43:50.015694+00:00",
+        "durationMs": 16988,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-restored/stdout.log",
+          "bytes": 942,
+          "sha256": "27bee37b7120e5ab8679a7ad7b4c77c6ee22132e0e8710cf0d0a8afb9666f01d"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-restored/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-skip-verify-baseline",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/sessionSpill.test.ts",
+          "tests/sessionAttachmentSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-baseline/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-skip-verify-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-skip-verify-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-skip-verify-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:44:27.866863+00:00",
+        "durationMs": 10646,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-baseline/stdout.log",
+          "bytes": 757,
+          "sha256": "68daf98a93d24ab24ec8d55bef12516116686b505f6a2bd5c61adb9ebeccf00f"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-baseline/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-skip-verify-mutant",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/sessionSpill.test.ts",
+          "tests/sessionAttachmentSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-mutant/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-skip-verify-mutant",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-skip-verify-mutant",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-skip-verify-mutant",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:44:39.133615+00:00",
+        "durationMs": 10613,
+        "exit": 1,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-mutant/stdout.log",
+          "bytes": 3007,
+          "sha256": "f1ec82f879e732c070b8c8425a58e0cd1384afee1df9cce9403eb4ce5a6d90ed"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-mutant/stderr.log",
+          "bytes": 3144,
+          "sha256": "de6a410c757041f73615eec37a336fa774dab93c2cd1b55ac42058443d5f5a4d"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-skip-verify-restored",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/sessionSpill.test.ts",
+          "tests/sessionAttachmentSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-restored/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-skip-verify-restored",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-skip-verify-restored",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-skip-verify-restored",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:44:50.908047+00:00",
+        "durationMs": 10513,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-restored/stdout.log",
+          "bytes": 757,
+          "sha256": "0f35c95f3b3638747004c6d9032b7880b3952e38c9cca0cf4352838c07c26ca3"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-restored/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-dotdot-path-baseline",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/sessionSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-dotdot-path-baseline/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-dotdot-path-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-dotdot-path-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-dotdot-path-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:46:22.312692+00:00",
+        "durationMs": 5808,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-dotdot-path-baseline/stdout.log",
+          "bytes": 422,
+          "sha256": "67917725c7d7cddbeb7a666999fd8b293885d4dd60550e964ebb71c76c6ed77a"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-dotdot-path-baseline/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-dotdot-path-mutant",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/sessionSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-dotdot-path-mutant/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-dotdot-path-mutant",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-dotdot-path-mutant",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-dotdot-path-mutant",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:46:28.739371+00:00",
+        "durationMs": 5827,
+        "exit": 1,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-dotdot-path-mutant/stdout.log",
+          "bytes": 1684,
+          "sha256": "3d6bb004fcc484520a128e068daa8a3473377446d2027a5f90c9a1e64c0bf11a"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-dotdot-path-mutant/stderr.log",
+          "bytes": 979,
+          "sha256": "e9850f5f28c1c90f3bf460f015ecc5d3ef734772701d0774d7b9759cee4e9a37"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-dotdot-path-restored",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/sessionSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-dotdot-path-restored/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-dotdot-path-restored",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-dotdot-path-restored",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-dotdot-path-restored",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:46:35.731184+00:00",
+        "durationMs": 5906,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-dotdot-path-restored/stdout.log",
+          "bytes": 422,
+          "sha256": "c361e4769ab0c67224ea0fd548521160b1b2fdebe5c867ed99226b44d5862f6b"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-dotdot-path-restored/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-export-unauthenticated-baseline",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillLifecycle.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-export-unauthenticated-baseline/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-export-unauthenticated-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-export-unauthenticated-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-export-unauthenticated-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:46:59.175328+00:00",
+        "durationMs": 5272,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-export-unauthenticated-baseline/stdout.log",
+          "bytes": 435,
+          "sha256": "6a66feb728602b1ad1d786a17d841a921c67bd4f8cc2e1bd212cb823920fe5ae"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-export-unauthenticated-baseline/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-export-unauthenticated-mutant",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillLifecycle.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-export-unauthenticated-mutant/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-export-unauthenticated-mutant",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-export-unauthenticated-mutant",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-export-unauthenticated-mutant",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:47:05.057041+00:00",
+        "durationMs": 5275,
+        "exit": 1,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-export-unauthenticated-mutant/stdout.log",
+          "bytes": 1872,
+          "sha256": "d18d627a444f9c26ce75ac37582c3dcb2d0c4a89e4c6669298d03c2b1bdbc37a"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-export-unauthenticated-mutant/stderr.log",
+          "bytes": 708,
+          "sha256": "b9584ccd62cf3d5c2b3ba384bb820eeff547363e6ef483af48110789d58649a8"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-export-unauthenticated-restored",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillLifecycle.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-export-unauthenticated-restored/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-export-unauthenticated-restored",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-export-unauthenticated-restored",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-export-unauthenticated-restored",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:47:11.497640+00:00",
+        "durationMs": 5279,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-export-unauthenticated-restored/stdout.log",
+          "bytes": 435,
+          "sha256": "43330f9b904e9fdf746ba06b53afb45ab0946eef1ddf960198f3bfdf6aa72972"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-export-unauthenticated-restored/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-erase-scope-baseline",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillLifecycle.test.ts",
+          "tests/retentionSpill.test.ts",
+          "tests/cliSpillCommands.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-baseline/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-erase-scope-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-erase-scope-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-erase-scope-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:47:31.155469+00:00",
+        "durationMs": 17102,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-baseline/stdout.log",
+          "bytes": 1015,
+          "sha256": "362f9ab70e9c85991f8a0bd01ed718103b40c5dc80c3b428892007ef8a6f849a"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-baseline/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-erase-scope-mutant",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillLifecycle.test.ts",
+          "tests/retentionSpill.test.ts",
+          "tests/cliSpillCommands.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-mutant/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-erase-scope-mutant",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-erase-scope-mutant",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-erase-scope-mutant",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:47:48.871596+00:00",
+        "durationMs": 17396,
+        "exit": 1,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-mutant/stdout.log",
+          "bytes": 8798,
+          "sha256": "e12cbf0767dda374edd2e31d67734b36b00b911d3ea92e8a9e68c9d3a11a368f"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-mutant/stderr.log",
+          "bytes": 5902,
+          "sha256": "1201787ef3d7403a66a9192aec099755c36d8e1d5cd4ed7a7a89be6f12ab73c2"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-erase-scope-restored",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillLifecycle.test.ts",
+          "tests/retentionSpill.test.ts",
+          "tests/cliSpillCommands.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-restored/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-erase-scope-restored",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-erase-scope-restored",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-erase-scope-restored",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:48:07.430346+00:00",
+        "durationMs": 17283,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-restored/stdout.log",
+          "bytes": 1015,
+          "sha256": "eea6d27c6219f3ca48397b7ce19115f3910dcb590c9826451fbddf38f7a1c45b"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-restored/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-store-root-baseline",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillLifecycle.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-store-root-baseline/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-store-root-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-store-root-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-store-root-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:49:00.301295+00:00",
+        "durationMs": 5459,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-store-root-baseline/stdout.log",
+          "bytes": 423,
+          "sha256": "d68ce2209df536f3329a4b625d121b85358874c3fc1e461e5c0ad337b220dce7"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-store-root-baseline/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-store-root-mutant",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillLifecycle.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-store-root-mutant/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-store-root-mutant",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-store-root-mutant",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-store-root-mutant",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:49:06.408506+00:00",
+        "durationMs": 5270,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-store-root-mutant/stdout.log",
+          "bytes": 421,
+          "sha256": "08fc223cf47ad008f58b4ed5109f4209bec9522bb3cca7c1b580aff897299009"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-store-root-mutant/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-store-root-restored",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillLifecycle.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-store-root-restored/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-store-root-restored",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-store-root-restored",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-store-root-restored",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:49:12.849648+00:00",
+        "durationMs": 5317,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-store-root-restored/stdout.log",
+          "bytes": 423,
+          "sha256": "310580c38babf88bba753577740697ccf19173f394f5d2723056ed36db6d2fb0"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-store-root-restored/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-transport-dotdot-baseline",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillLifecycle.test.ts",
+          "tests/sessionSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-transport-dotdot-baseline/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-transport-dotdot-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-transport-dotdot-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-transport-dotdot-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:49:54.317758+00:00",
+        "durationMs": 9264,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-transport-dotdot-baseline/stdout.log",
+          "bytes": 479,
+          "sha256": "8e374442a9a5b6e60d926663cf071a1c8450fff3935e415dc7e70a8246cc6ead"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-transport-dotdot-baseline/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-transport-dotdot-mutant",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillLifecycle.test.ts",
+          "tests/sessionSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-transport-dotdot-mutant/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-transport-dotdot-mutant",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-transport-dotdot-mutant",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-transport-dotdot-mutant",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:50:04.204396+00:00",
+        "durationMs": 9259,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-transport-dotdot-mutant/stdout.log",
+          "bytes": 477,
+          "sha256": "359103ade85dcc7d351012dc4cce785b1c86a24011cd9535d1ed84e006af65f8"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-transport-dotdot-mutant/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-transport-dotdot-restored",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/spillLifecycle.test.ts",
+          "tests/sessionSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-transport-dotdot-restored/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-transport-dotdot-restored",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/P30-1547-transport-dotdot-restored",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-transport-dotdot-restored",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:50:14.635464+00:00",
+        "durationMs": 9223,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-transport-dotdot-restored/stdout.log",
+          "bytes": 479,
+          "sha256": "74718e9362e9d528ca369c4a0d24c5a68c57fe4d099a5e8c00bfcb2fdbf52550"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-transport-dotdot-restored/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "root-head-final",
+        "argv": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "cwd": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/combined-original-ten-file-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/combined-original-ten-file-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/combined-original-ten-file-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:51:39.657900+00:00",
+        "durationMs": 17,
+        "exit": 0,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/root-head-final/stdout.log",
+          "bytes": 41,
+          "sha256": "4d6100c6870dbeb5ee06470bb88c465f6304ec0b7d1ef2684adc01718809997b"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/root-head-final/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "root-status-final",
+        "argv": [
+          "git",
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/combined-original-ten-file-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-qualification-20261015/homes/combined-original-ten-file-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/combined-original-ten-file-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T01:51:39.675308+00:00",
+        "durationMs": 51,
+        "exit": 0,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/root-status-final/stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/root-status-final/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "actual-runtime-fingerprint",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "-p",
+          "JSON.stringify({node:process.version,executable:process.execPath,modulesABI:process.versions.modules,napi:process.versions.napi})"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/homes/actual-runtime-fingerprint",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/homes/actual-runtime-fingerprint",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/tmp/actual-runtime-fingerprint",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test",
+          "AMC_P030_STORE_ROOT_EFFECTS_DIR": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/actual-runtime-fingerprint"
+        },
+        "startedUtc": "2026-10-15T02:00:26.084718+00:00",
+        "durationMs": 137,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/actual-runtime-fingerprint/stdout.log",
+          "bytes": 114,
+          "sha256": "6356112c023d338d4ce2eb165c4ea56d3e428ef958059d868a720d4b17a6639c"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/actual-runtime-fingerprint/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "effects": []
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "new-two-case-legacy-storage-root-baseline",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/storeRootQualification.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/new-two-case-legacy-storage-root-baseline/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/homes/new-two-case-legacy-storage-root-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/homes/new-two-case-legacy-storage-root-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/tmp/new-two-case-legacy-storage-root-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test",
+          "AMC_P030_STORE_ROOT_EFFECTS_DIR": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/new-two-case-legacy-storage-root-baseline"
+        },
+        "startedUtc": "2026-10-15T02:00:27.858376+00:00",
+        "durationMs": 1695,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/new-two-case-legacy-storage-root-baseline/stdout.log",
+          "bytes": 462,
+          "sha256": "efcf5de2bafdba9a10481a5dedddd4b44b0c892862b9822943360faad23b83fe"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/new-two-case-legacy-storage-root-baseline/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "effects": [
+          {
+            "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/new-two-case-legacy-storage-root-baseline/parent.json",
+            "bytes": 22060,
+            "sha256": "82f5c4a6d28da95a89cc71a863fe782108208642d1caf4b4211a7cb78788b934"
+          },
+          {
+            "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/new-two-case-legacy-storage-root-baseline/sibling.json",
+            "bytes": 22685,
+            "sha256": "2f6d6adbfffad889a9b28acaccb4c6870747d8aa1bab00f09f4749da2ba91512"
+          }
+        ]
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-store-root-baseline",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/storeRootQualification.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/P30-1547-store-root-baseline/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/homes/P30-1547-store-root-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/homes/P30-1547-store-root-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/tmp/P30-1547-store-root-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test",
+          "AMC_P030_STORE_ROOT_EFFECTS_DIR": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-baseline"
+        },
+        "startedUtc": "2026-10-15T02:00:51.547993+00:00",
+        "durationMs": 1579,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/P30-1547-store-root-baseline/stdout.log",
+          "bytes": 449,
+          "sha256": "9f3fadd965dc37153bcfd1b8f15ee601c79385425ae1b027d4741f3812c73a57"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/P30-1547-store-root-baseline/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "effects": [
+          {
+            "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-baseline/parent.json",
+            "bytes": 21969,
+            "sha256": "f03aa2781c7d8acc5fe0d0173773ddaf6b82c312a8e056af20836fa0a0ffa0d3"
+          },
+          {
+            "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-baseline/sibling.json",
+            "bytes": 22594,
+            "sha256": "0935aa877afbcce75b19bb69c7dcc0c3e53372e7e535c1b08fea5d58a234ad6f"
+          }
+        ]
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-store-root-mutant",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/storeRootQualification.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/P30-1547-store-root-mutant/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/homes/P30-1547-store-root-mutant",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/homes/P30-1547-store-root-mutant",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/tmp/P30-1547-store-root-mutant",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test",
+          "AMC_P030_STORE_ROOT_EFFECTS_DIR": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-mutant"
+        },
+        "startedUtc": "2026-10-15T02:00:53.752682+00:00",
+        "durationMs": 1551,
+        "exit": 1,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/P30-1547-store-root-mutant/stdout.log",
+          "bytes": 675,
+          "sha256": "878bea3da2d73052fb1174c03a02ebf8409b76928ddb624c973d50650ed5faad"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/P30-1547-store-root-mutant/stderr.log",
+          "bytes": 2262,
+          "sha256": "9c058140eb24748d6679a478464c7a95d67ee071c803ea2e086eb02ab1aff452"
+        },
+        "effects": [
+          {
+            "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-mutant/parent.json",
+            "bytes": 21963,
+            "sha256": "d31cba56ae5df4935a4f3ee281d3fa34f5d717927202182a4a432936d8245aea"
+          },
+          {
+            "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-mutant/sibling.json",
+            "bytes": 22588,
+            "sha256": "099aca15cf9073f4a58cc55de6be65990030895997324a0f3d5383651ff14865"
+          }
+        ]
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "P30-1547-store-root-restored",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/storeRootQualification.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/P30-1547-store-root-restored/raw-tests.json"
+        ],
+        "cwd": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/closure",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/homes/P30-1547-store-root-restored",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/homes/P30-1547-store-root-restored",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/tmp/P30-1547-store-root-restored",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test",
+          "AMC_P030_STORE_ROOT_EFFECTS_DIR": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-restored"
+        },
+        "startedUtc": "2026-10-15T02:00:56.475733+00:00",
+        "durationMs": 1605,
+        "exit": 0,
+        "signal": null,
+        "executionError": null,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/P30-1547-store-root-restored/stdout.log",
+          "bytes": 449,
+          "sha256": "7ccb9b9bf600edd7c8cc783e042f57307589ccbdc005d3d63299a02a2dc10cf2"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/P30-1547-store-root-restored/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "effects": [
+          {
+            "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-restored/parent.json",
+            "bytes": 21969,
+            "sha256": "a69e5bd8b9c52a4827f808490ffca4d6a31cd6c24ea5e4c3f902bcb9a97cdfc8"
+          },
+          {
+            "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-restored/sibling.json",
+            "bytes": 22594,
+            "sha256": "a44fcb1f9cfd1982380cc48c792bd7aa88f65dbda94a17a5cf64ce341c03b7d0"
+          }
+        ]
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "root-head-final",
+        "argv": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "cwd": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/homes/new-two-case-legacy-storage-root-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/homes/new-two-case-legacy-storage-root-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/tmp/new-two-case-legacy-storage-root-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T02:03:21.663288+00:00",
+        "durationMs": 15,
+        "exit": 0,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/root-head-final/stdout.log",
+          "bytes": 41,
+          "sha256": "4d6100c6870dbeb5ee06470bb88c465f6304ec0b7d1ef2684adc01718809997b"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/root-head-final/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "journal": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/commands.jsonl",
+      "record": {
+        "phase": "root-status-final",
+        "argv": [
+          "git",
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+        "environment": {
+          "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin",
+          "HOME": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/homes/new-two-case-legacy-storage-root-baseline",
+          "AMC_HOME": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/homes/new-two-case-legacy-storage-root-baseline",
+          "TMPDIR": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/tmp/new-two-case-legacy-storage-root-baseline",
+          "NO_COLOR": "1",
+          "TZ": "UTC",
+          "LANG": "C",
+          "NODE_ENV": "test"
+        },
+        "startedUtc": "2026-10-15T02:03:21.679346+00:00",
+        "durationMs": 78,
+        "exit": 0,
+        "stdout": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/root-status-final/stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/root-status-final/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "boundary": "These are repeated actual processes, not unique test counts. Incomplete command records retain their original missing/null exit, where present, outside the receipt schema."
+}

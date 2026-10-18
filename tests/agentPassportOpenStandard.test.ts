@@ -149,6 +149,18 @@ describe("agent passport + open standard", () => {
     expect(created.passport.status.reasons).toContain("MISSING_ASSURANCE_CERT_PASS");
   });
 
+  test("pii scanner accepts AMC's explainability sentences but still refuses an email inside one", () => {
+    const passport = (repairHint: string) => ({ v: 1, passportId: "pass_fixture", generatedTs: 1, maturity: {
+      questionExplainabilitySummary: { rows: [{ questionId: "AMC-1.1", repairHint,
+        rejectedEvidenceReasons: [{ evidenceId: "ev-1", reason: "The evidence row was rejected because its signature did not verify." }] }] } } });
+    expect(scanPassportForPii(passport("Record signed runtime evidence for this question, then rerun the diagnostic.") as never).status).toBe("PASS");
+    const leaked = scanPassportForPii(passport("Ask owner@example.com to record signed runtime evidence, then rerun the diagnostic.") as never);
+    expect(leaked.status).toBe("FAIL"); expect(leaked.findings.map((row) => row.type)).toEqual(["EMAIL"]);
+    // Elsewhere a long sentence is still free text.
+    expect(scanPassportForPii({ v: 1, passportId: "pass_fixture", generatedTs: 1, notes: "A long operator sentence that is not one of AMC's own explainability fields." } as never)
+      .findings.map((row) => row.type)).toEqual(["FREE_TEXT"]);
+  });
+
   test("pii scanner fails on email-like fields (fail-closed behavior trigger)", () => {
     const pii = scanPassportForPii({
       v: 1,

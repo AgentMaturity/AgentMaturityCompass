@@ -1,0 +1,25 @@
+{
+  "schema": "p125pc-root-static-control-helper-adoption/1",
+  "at": "2026-10-17T01:57:25.310211+00:00",
+  "helper": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/source-control.py",
+    "bytes": 28698,
+    "sha256": "44f1f8e540f111b8dd3a72202930a1a21fcbbf191096424e38cc6a8443c2d2a5"
+  },
+  "preferredSeal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/seal.json",
+    "bytes": 4870,
+    "sha256": "f3e9c73239e5671f8f115ed8dd3810a8deeb4aa7dd3d07bf431e6dd5238fb771"
+  },
+  "independentReview": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-helper-static-review/review.json",
+    "bytes": 5302,
+    "sha256": "2097aa093ba9d583f387eb3164ce5140ce72bf79c6d7c8c86f7e5bb94cd995d0"
+  },
+  "rootReadFullC39BaseAnd16690ByteDeltaRecipesTemplateAndFullInstructions": true,
+  "twoFunctionBoundedRecipesOnlyFreshLedgerSource": true,
+  "fiveTemplateFlagsRemainFalse": true,
+  "activeRootBindingsNotCreated": true,
+  "actualFreshQualificationAndPreservationStillRequiredBeforeControlAdmission": true,
+  "noControlExecutedOrSensitivityCredit": true
+}

@@ -1,0 +1,562 @@
+{
+  "kind": "actual existing installed Node22 POSIX stdio crash-recovery harness execution",
+  "sourceTree": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass",
+  "sourceRef": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "artifact": "/private/tmp/p0-50-packed-artifact-20261014/agent-maturity-compass-1.2.0.tgz",
+  "artifactSha256": "c3932ba3b2d693c018c874191c608fbb06709e9e83c77c95f7b9a4ff4d8d82aa",
+  "expectedInstalledCliSha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+  "node": "v22.23.3",
+  "nodeExecutable": "/opt/homebrew/opt/node@22/bin/node",
+  "nodeExecutableSha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd",
+  "gitNoLazyFetch": true,
+  "argv": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "scripts/installed-crash-recovery-check.mjs",
+    "--artifact",
+    "/private/tmp/p0-50-packed-artifact-20261014/agent-maturity-compass-1.2.0.tgz",
+    "--artifact-sha256",
+    "c3932ba3b2d693c018c874191c608fbb06709e9e83c77c95f7b9a4ff4d8d82aa",
+    "--cli-sha256",
+    "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+    "--source",
+    "07125b76cb17ecf063f19b914085a5bfc968df35",
+    "--source-tree",
+    "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass",
+    "--out",
+    "/private/tmp/p0-50-stdio-recovery-20261014T151342Z"
+  ],
+  "inputs": {
+    "readiness": {
+      "path": "/private/tmp/p0-50-final-readiness-audit-20261014.json",
+      "sha256": "deae5201c0623f84cc99378e14e99e37f6af75cb30220c1a28d88fd50bbd8603"
+    },
+    "artifactMeta": {
+      "path": "/private/tmp/p0-50-current-artifact-20261014.json",
+      "sha256": "26067e7aad6d5b1789f0cae9bbfb8ff6c786e13bf73ada54397239ad9073d06c"
+    }
+  },
+  "sourceHashesBefore": {
+    "scripts/installed-crash-recovery-check.mjs": "5d7e87682ff6bfc9db5cfdc399999156d4a151a435f8bf56d8104dbc0ac1c1a7",
+    "scripts/lib/installedCrashMcpServer.mjs": "1ce79eba9a6db019b6054e909453ba055d43c72e23e652036f1f582e677e611c",
+    "scripts/lib/ownedProcessCommand.mjs": "cad3be3fdb81c13b74b6650a8fa719677d97333ac447a9d76538e855364ea560",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "src/sdk/nativeAgentClient.ts": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5",
+    "src/session/sessionRecovery.ts": "01df1193bc877123c170b98b791bdd33c6239fbebc8072e8e367dd080e98452d",
+    "src/session/sessionResume.ts": "e3e8816d4eff762eb38712d8a9aad2bd1b959188aa29912c3398690ed634e131",
+    "src/mcp/nativeMcpClient.ts": "d04eb8783176416a84f559c20d024a84823553888549d9f558a4347fadb50666",
+    "src/mcp/nativeMcpHttpTransport.ts": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b"
+  },
+  "initialSourceStatus": "",
+  "ownedOutput": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z",
+  "outerLog": "/private/tmp/p0-50-installed-stdio-recovery-run-20261014T151342Z.log",
+  "status": "INSTALLED_STDIO_RECOVERY_PASSED",
+  "startedAt": "2026-10-14T15:13:42.797085+00:00",
+  "exitCode": 0,
+  "durationSeconds": 57.36,
+  "endedAt": "2026-10-14T15:14:40.157519+00:00",
+  "outerLogSha256": "e64a947e867bed52a4e2f9a096bb2280dc870ba0216fa1b31200cb381cfe47f6",
+  "actualReceipt": {
+    "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/receipt.json",
+    "sha256": "8e277e99544bc4b4e9f834ba05a41611217403b7859986e4ac2941d48aa20370",
+    "ok": true,
+    "sourceCommit": "07125b76cb17ecf063f19b914085a5bfc968df35",
+    "runtime": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "nodeSha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd",
+      "npmSha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+      "platform": "darwin",
+      "arch": "arm64"
+    },
+    "installed": {
+      "publicNativeExport": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js",
+      "publicNativeExportSha256": "6dead15ddabfc163b56c687d311cda2ffbdc4af6870d78e14b9e85a760ed93d1",
+      "cliSha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+    },
+    "checks": [
+      {
+        "name": "real-approved-effect-before-ack-and-authenticated-writer-kill",
+        "ok": true,
+        "sessionId": "ed05cc07-ac8a-4e8f-9d36-5e6ca4bf1418",
+        "approvalId": "apprreq_cbecee6009ae4ca6b8a8f32a91eb941c",
+        "toolName": "mcp_crashfixture_3b74c681a9b88de1",
+        "callId": "stub-call-1",
+        "killedPid": 28750,
+        "effects": 1,
+        "toolResultsBeforeKill": 0,
+        "originalPrefixSha256": "46d2c9f5de6df7ec19ba1fcb2acb45d14cd441388027131db439d80232e7a147",
+        "effectSha256": "cf1c764ab883b4473f7e76cb415d5d34f18a6ab3576a0ea6ba60b7d7e9d2d83c",
+        "pendingWriteLow": 1
+      },
+      {
+        "name": "resume-preserves-original-prefix-uncertain-outcome-and-reservation",
+        "ok": true,
+        "unknownToolOutcomes": 1,
+        "automaticModelCalls": 0,
+        "effectCount": 1
+      },
+      {
+        "name": "new-explicit-turn-without-side-effect-replay-and-cold-verification",
+        "ok": true,
+        "finalModelCalls": 2,
+        "finalToolCalls": 1,
+        "effectCount": 1,
+        "pendingWriteLow": 1,
+        "payloads": "verified",
+        "historySha256": "db8de9876c405f3900d92fdda821a5f36016ae3722710811db34e829f1df2d92"
+      }
+    ],
+    "commands": [
+      {
+        "label": "00-install",
+        "args": [
+          "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/bin/npm-cli.js",
+          "install",
+          "--no-audit",
+          "--no-fund",
+          "--loglevel=error",
+          "/private/tmp/p0-50-packed-artifact-20261014/agent-maturity-compass-1.2.0.tgz"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 25942
+      },
+      {
+        "label": "01-bootstrap",
+        "args": [
+          "bootstrap"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 27519
+      },
+      {
+        "label": "02-initialize",
+        "args": [
+          "--agent",
+          "default",
+          "--json"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 27773
+      },
+      {
+        "label": "03-firewall",
+        "args": [
+          "firewall",
+          "enable",
+          "--mode",
+          "block",
+          "--json"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 28078
+      },
+      {
+        "label": "04-budget-sign",
+        "args": [
+          "budgets",
+          "sign",
+          "--json"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 28233
+      },
+      {
+        "label": "05-owner-login",
+        "args": [
+          "approvals",
+          "login",
+          "--username",
+          "crash-owner",
+          "--token-file",
+          "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/private/approval-token",
+          "--password-stdin",
+          "--json"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 28406
+      },
+      {
+        "label": "06-mcp-catalog",
+        "args": [
+          "agent-loop",
+          "mcp-catalog",
+          "--config",
+          "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/private/mcp.json",
+          "--json"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 28710
+      },
+      {
+        "label": "07-tools-sign",
+        "args": [
+          "tools",
+          "sign",
+          "--json"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 28724
+      },
+      {
+        "label": "08-pending-1",
+        "args": [
+          "approvals",
+          "list",
+          "--agent",
+          "default",
+          "--status",
+          "pending",
+          "--json"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 28772
+      },
+      {
+        "label": "09-review",
+        "args": [
+          "approvals",
+          "show",
+          "--agent",
+          "default",
+          "apprreq_cbecee6009ae4ca6b8a8f32a91eb941c"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 28784
+      },
+      {
+        "label": "10-approve",
+        "args": [
+          "approvals",
+          "approve",
+          "--agent",
+          "default",
+          "apprreq_cbecee6009ae4ca6b8a8f32a91eb941c",
+          "--mode",
+          "execute",
+          "--reason",
+          "Explicit local crash-recovery acceptance",
+          "--username",
+          "crash-owner",
+          "--user-id",
+          "f891d2e3-31fe-46bc-a658-77b9d4fc61c7",
+          "--roles",
+          "OWNER",
+          "--session-token-file",
+          "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/private/approval-token",
+          "--expect-request-digest",
+          "b2532ad27cb975ba36939c78a122f13d7cf125738ca05dac833fd5cf722e7a60"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 28923
+      },
+      {
+        "label": "11-budget-before-resume",
+        "args": [
+          "budgets",
+          "status",
+          "--agent",
+          "default"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 29175
+      },
+      {
+        "label": "12-budget-after-resume",
+        "args": [
+          "budgets",
+          "status",
+          "--agent",
+          "default"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 29452
+      },
+      {
+        "label": "13-cold-native-verification",
+        "args": [
+          "agent-loop",
+          "verify",
+          "ed05cc07-ac8a-4e8f-9d36-5e6ca4bf1418",
+          "--json",
+          "--expect-monitor",
+          "4ff1efebb2c051f03ee62a9f9793149deaa28af6e8b2b9018ca96e0f2dfe8d1b"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 29661
+      },
+      {
+        "label": "14-cold-ledger-verification",
+        "args": [
+          "session",
+          "verify",
+          "--json",
+          "--expect-monitor",
+          "4ff1efebb2c051f03ee62a9f9793149deaa28af6e8b2b9018ca96e0f2dfe8d1b"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 30787
+      },
+      {
+        "label": "15-final-budget",
+        "args": [
+          "budgets",
+          "status",
+          "--agent",
+          "default"
+        ],
+        "code": 0,
+        "signal": null,
+        "closed": true,
+        "processGroupId": 31945
+      }
+    ],
+    "closedProcesses": {
+      "writerPids": [
+        29427
+      ],
+      "helperPids": [
+        28719,
+        28771,
+        29450
+      ],
+      "allObservedGone": true
+    },
+    "error": null,
+    "processClosureError": null,
+    "clientClosureError": null,
+    "limits": [
+      "Explicit deterministic stub provider and operator-trusted local stdio MCP tool; no live model or OS sandbox claim.",
+      "Monitor pin is captured locally before execution; it proves workspace-key consistency, not independent trust anchoring.",
+      "Artifact/source build correspondence is supplied by the release receipt; this runner independently pins artifact, installed CLI, and committed orchestration bytes.",
+      "Private fixture credentials and raw workspace evidence remain under the mode-0700 output directory; publish only reviewed redacted receipts."
+    ]
+  },
+  "failedCommandPhases": [],
+  "actualInstalledSdk": {
+    "version": "1.32.1",
+    "packagePath": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/consumer/node_modules/@modelcontextprotocol/sdk/package.json",
+    "packageSha256": "0216319ea53177f7ed419d660b2f52ccc7e3327e57f9ee2ef03225ff543aeae4"
+  },
+  "installedRuntimeHashes": {
+    "dist/cli.js": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+    "dist/sdk/nativeAgentClient.js": "6dead15ddabfc163b56c687d311cda2ffbdc4af6870d78e14b9e85a760ed93d1",
+    "dist/mcp/nativeMcpClient.js": "daefe810fc0f837580b5fa0536a72b41c6f5ff179bbb64cb59ee5b07304d35a0",
+    "dist/mcp/nativeMcpHttpTransport.js": "27c58b65b26db58e3ab142d3d97611a30a742bc45ec6e4dc38b77e89201cf260"
+  },
+  "retainedRawFileHashes": [
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/00-install.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/00-install.stdout",
+      "sha256": "9b2b803cd450f90f825806fd73df2a6bbc20784eeed5c437d355d57a21948a5e",
+      "bytes": 27
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/01-bootstrap.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/01-bootstrap.stdout",
+      "sha256": "5ced7916cd50e1442f606e81bdefc44f21074d5de31c2bd171524c9ae0726363",
+      "bytes": 410
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/02-initialize.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/02-initialize.stdout",
+      "sha256": "e96223b4e3f5b04e7f0445f3ce728189696dc84e7d48cd697abf1457c2ca4045",
+      "bytes": 3172
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/03-firewall.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/03-firewall.stdout",
+      "sha256": "b95f846d14a63af8328fd9305be528cd9cd0bef4c41ca60630c726a86362aaf2",
+      "bytes": 1076
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/04-budget-sign.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/04-budget-sign.stdout",
+      "sha256": "524dc46aed38ece1272aaa7f4af2b5da7ff1b95690a76758fb82b04b32d57aa5",
+      "bytes": 214
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/05-owner-login.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/05-owner-login.stdout",
+      "sha256": "b9180f598e9d0005757c7aa1b04ca82d91fc9a98d468902167c1874d0120221f",
+      "bytes": 331
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/06-mcp-catalog.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/06-mcp-catalog.stdout",
+      "sha256": "5d4c6bc3a23864c96ab1f00b6457a6dddc33260ab832cd72482703cc67a58bb4",
+      "bytes": 1365
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/07-tools-sign.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/07-tools-sign.stdout",
+      "sha256": "998cf5981f49552f5c56b284a2fadb812ab28b06fa202b5ee71143a06c745675",
+      "bytes": 210
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/08-pending-1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/08-pending-1.stdout",
+      "sha256": "f56e8188d13dd2702971eb166d84f8382854f93cd72fe18e56e84f85c741bf20",
+      "bytes": 1666
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/09-review.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/09-review.stdout",
+      "sha256": "b21a151dfdd025d6ff87814df09f22f99bbf376687a533442dd8bb0b71ca1285",
+      "bytes": 1559
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/10-approve.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/10-approve.stdout",
+      "sha256": "b1a30514b49349ff479659464d45100c92f80d5c33b1ccbb83537b30481c6373",
+      "bytes": 109
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/11-budget-before-resume.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/11-budget-before-resume.stdout",
+      "sha256": "8cd05373348072f34dbc7daa2de4bae736835f438842ff05353c46a60d64ddbe",
+      "bytes": 1681
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/12-budget-after-resume.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/12-budget-after-resume.stdout",
+      "sha256": "8cd05373348072f34dbc7daa2de4bae736835f438842ff05353c46a60d64ddbe",
+      "bytes": 1681
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/13-cold-native-verification.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/13-cold-native-verification.stdout",
+      "sha256": "5b76731a37b53608fe0ad4893a22b991ae39cda5dcdaf9bced332f498307eea8",
+      "bytes": 1017
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/14-cold-ledger-verification.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/14-cold-ledger-verification.stdout",
+      "sha256": "3ca457b569f8bb07bfa77027c809bb8eaacb5f790f797728df02c3ea428edb6c",
+      "bytes": 1232
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/15-final-budget.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-50-stdio-recovery-20261014T151342Z/logs/15-final-budget.stdout",
+      "sha256": "149ca875ab99aa902b987c499c0090036b10d339b181b94f4c11977dba373369",
+      "bytes": 1681
+    }
+  ],
+  "sourceHashesAfter": {
+    "scripts/installed-crash-recovery-check.mjs": "5d7e87682ff6bfc9db5cfdc399999156d4a151a435f8bf56d8104dbc0ac1c1a7",
+    "scripts/lib/installedCrashMcpServer.mjs": "1ce79eba9a6db019b6054e909453ba055d43c72e23e652036f1f582e677e611c",
+    "scripts/lib/ownedProcessCommand.mjs": "cad3be3fdb81c13b74b6650a8fa719677d97333ac447a9d76538e855364ea560",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "src/sdk/nativeAgentClient.ts": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5",
+    "src/session/sessionRecovery.ts": "01df1193bc877123c170b98b791bdd33c6239fbebc8072e8e367dd080e98452d",
+    "src/session/sessionResume.ts": "e3e8816d4eff762eb38712d8a9aad2bd1b959188aa29912c3398690ed634e131",
+    "src/mcp/nativeMcpClient.ts": "d04eb8783176416a84f559c20d024a84823553888549d9f558a4347fadb50666",
+    "src/mcp/nativeMcpHttpTransport.ts": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b"
+  },
+  "sourceHashesUnchanged": true,
+  "finalSourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "finalSourceStatus": "",
+  "scope": "Existing public installed AMC SDK/CLI, explicit deterministic current stub provider and operator-trusted local stdio MCP fixture on Node22POSIX. No live provider/credential, HTTP recovery, hosted CI, publication, full-suite or OS sandbox qualification.",
+  "protocolScope": {
+    "transport": "actual local stdio JSON-RPC MCP",
+    "helperProtocolBehavior": "Existing installedCrashMcpServer.mjs replies to initialize with request.params.protocolVersion and a tools capability, then withholds tools/call ACK only after fsync of its real effect.",
+    "protocolVersionPacketCapture": "The unchanged runner does not separately retain the negotiated protocol-version packet; no unobserved version claim is made.",
+    "provider": "explicit deterministic current installed AMC stub provider",
+    "boundaries": "No HTTP recovery, live provider, OS sandbox or independently anchored trust claim. Monitor pin is captured locally before execution."
+  }
+}

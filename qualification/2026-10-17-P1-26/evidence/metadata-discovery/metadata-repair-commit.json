@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-16T20:35:17.978668+00:00",
+  "argv": [
+    "git",
+    "commit",
+    "-m",
+    "fix(qualification): retain test candidate as inert source text"
+  ],
+  "exit": 0,
+  "stdout": "[codex/p1-26-tree-qualification 2aa32d5e4] fix(qualification): retain test candidate as inert source text\n 5 files changed, 62 insertions(+), 8 deletions(-)\n create mode 100644 qualification/2026-10-17-P1-12/evidence/discovery-correction.json\n rename qualification/2026-10-17-P1-12/evidence/test-design/{compiledPolicyGuard.test.ts => compiledPolicyGuard.test.ts.source.txt} (100%)\n",
+  "stderr": "",
+  "head": "2aa32d5e436e789037c6a8a161d6cf0424b4f4ac",
+  "status": "",
+  "ordinaryAddExit": 0,
+  "defaultWhitespaceCheckExit": 0,
+  "allCurrent279FilesExactToReviewedPacket": true,
+  "sourceCandidateBytesChanged": false,
+  "qualityRemainsRed": true,
+  "actualQualityDelta": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/actual-delta.json",
+  "preservedHistoricalV2Head": "fc2e64eb6ea0cf092c7a6ea86229f9628083eb35",
+  "noForceOrNoVerify": true
+}

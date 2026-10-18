@@ -1,0 +1,43 @@
+{
+  "kind": "P1-01-unbound-canonical-builder-v2-preparation",
+  "builder": {
+    "path": "/private/tmp/p1-01-build-canonical-packet-v2-prepared-20261015.py",
+    "bytes": 15566,
+    "sha256": "e2109ad1fdfd6cabbcd75d53a1b3645819ce5849e5cdd5833f2161dc2a835a79"
+  },
+  "priorPreserved": {
+    "path": "/private/tmp/p1-01-build-canonical-packet-prepared-20261015.py",
+    "bytes": 14982,
+    "sha256": "9f500ed7f3f18dc1df733dc342c1a44e5a6356c6574ebb33cf9362f2143ad7ae",
+    "unexecuted": true
+  },
+  "diff": {
+    "path": "/private/tmp/p1-01-canonical-builder-v2-preparation-20261015.diff",
+    "bytes": 5771,
+    "sha256": "263d15607c504f314a799b4d61c410d8dba40f068772cb50c6331d4198332772"
+  },
+  "changes": [
+    "Precompute every copied/generated canonical body, copiedSources/private references, summary, README and receipt artifact hashes/receipt bytes in memory. Apply all cap/secret checks before Q.mkdir. Receipt artifact hashes derive exact planned bytes and exclude itself.",
+    "README explicitly bounds v4 to real compiler exit0 followed by retained known thin kernel bytes and accepted-kernel restoration before direct contract probes; no fresh full mutant/kernel-route claim.",
+    "Return planned file count; all other selection, binding, result, failure preservation, original16 tests and formal-gap behavior retained."
+  ],
+  "bindingState": "FINAL_BINDINGS=None; root must author NEW bound version after actual audit/outcome pins. Actual seven-child success and closed21-row journal are reported by root but not newly audited or executed by this preparer.",
+  "runtimeReportedByRoot": {
+    "successfulControlResultBytes": 5188,
+    "successfulControlResultSha256": "75da6150f94040f1bdeda3ce71626e119c985cca77394ad93b38ff9a1e2186dc",
+    "closedRootRows": 21,
+    "zeroRootRows": 18,
+    "nonzeroRootRows": {
+      "duplicates": 1,
+      "dead-code": 1,
+      "sourcecontrol": 1
+    },
+    "formalAcceptanceClosed": false
+  },
+  "publicationLimit": "Own cap/secret failures occur before Q exists. File-system I/O errors after mkdir may leave partial Q; no cleanup/retry.",
+  "unexecuted": true,
+  "qualificationWrites": false,
+  "sourceWrites": false,
+  "allPreparationReadsFinished": true,
+  "formalAcceptanceClosed": false
+}

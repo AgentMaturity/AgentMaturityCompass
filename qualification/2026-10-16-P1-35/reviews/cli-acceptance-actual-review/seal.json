@@ -1,0 +1,38 @@
+{
+  "schema": "p135-private-cli-actual-review-seal/1",
+  "allReadsFinished": true,
+  "blockers": [],
+  "inputPinCount": 44,
+  "inputPinsVerified": true,
+  "verificationTiming": "post-execution",
+  "noRuntimeOrCheckoutWrites": true,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/cli-acceptance-actual-review/review.json",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/cli-acceptance-actual-review/review.json",
+      "bytes": 4233,
+      "sha256": "36e120731d6fb1ad02f2f08f64e5a0f7b459db205277eb15252aaf4be84b7be8",
+      "dev": 16777231,
+      "inode": 542944449,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/cli-acceptance-actual-review/README.md",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/cli-acceptance-actual-review/README.md",
+      "bytes": 1814,
+      "sha256": "d26871ff3e4fc2f307a122bd07e443658e04ac6a0fe512fdc12d944f7b0036ea",
+      "dev": 16777231,
+      "inode": 542944450,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/cli-acceptance-actual-review/pins.json",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/cli-acceptance-actual-review/pins.json",
+      "bytes": 18936,
+      "sha256": "901b15e4e7d430e9582f8d1657dc98ae3c57554957c4278c6b2f17d716b492dd",
+      "dev": 16777231,
+      "inode": 542944451,
+      "nlink": 1
+    }
+  ]
+}

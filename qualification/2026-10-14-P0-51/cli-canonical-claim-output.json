@@ -1,0 +1,126 @@
+{
+  "kind": "Actual six-success-output postvalidation; test and source files unchanged",
+  "node": "v22.23.3",
+  "rows": [
+    {
+      "name": "notary-pinned",
+      "status": 0,
+      "stdoutPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/notary-pinned.stdout",
+      "stdoutSha256": "66017b5abd18e81a0558dc2d3056d154bd3bb7e524e19dd7352e5390738ab07d",
+      "claimKind": "self_reported",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "sufficient",
+        "result": "not_evaluated",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable",
+      "reportTrusted": true
+    },
+    {
+      "name": "notary-pinned-unused-allows",
+      "status": 0,
+      "stdoutPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/notary-pinned-unused-allows.stdout",
+      "stdoutSha256": "800a8c38708e22ab319e8069e5d8b6b1a4633d34f0eb9931593b87fcce42debb",
+      "claimKind": "self_reported",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "sufficient",
+        "result": "not_evaluated",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable",
+      "reportTrusted": true
+    },
+    {
+      "name": "notary-listed",
+      "status": 0,
+      "stdoutPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/notary-listed.stdout",
+      "stdoutSha256": "13deb90a6ac29ff81bbb8f1810b7b7722ae7b05c0355798763611e4113bfe34e",
+      "claimKind": "self_reported",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "sufficient",
+        "result": "not_evaluated",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable",
+      "reportTrusted": true
+    },
+    {
+      "name": "transparency-pinned",
+      "status": 0,
+      "stdoutPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/transparency-pinned.stdout",
+      "stdoutSha256": "1854c6c75d0251107f3e359b5bc2fd9053fd4885968dd254648218c2af0c9052",
+      "claimKind": "self_reported",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "sufficient",
+        "result": "not_evaluated",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable",
+      "reportTrusted": true
+    },
+    {
+      "name": "transparency-pinned-unused-allows",
+      "status": 0,
+      "stdoutPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/transparency-pinned-unused-allows.stdout",
+      "stdoutSha256": "2a798114ea2acee02a33e8ce140e1fcb9c9afd23decdd58cec1b9a093d7beb0d",
+      "claimKind": "self_reported",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "sufficient",
+        "result": "not_evaluated",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable",
+      "reportTrusted": true
+    },
+    {
+      "name": "transparency-listed",
+      "status": 0,
+      "stdoutPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/transparency-listed.stdout",
+      "stdoutSha256": "a5f9609fe6b5f9f62621939f22fe79e525c7f56b750a009896226abe7de1d9be",
+      "claimKind": "self_reported",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "sufficient",
+        "result": "not_evaluated",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable",
+      "reportTrusted": true
+    }
+  ]
+}

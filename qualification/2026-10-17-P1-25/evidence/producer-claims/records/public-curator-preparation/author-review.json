@@ -1,0 +1,56 @@
+{
+  "schema": "p125pc-inert-public-curator-author-review/1",
+  "at": "2026-10-17T02:05:32.641682+00:00",
+  "blockers": [],
+  "fullParentActiveSourceAndNewProducerDeltaRead": true,
+  "exactParentActiveEqualsSealedC39InertSource": true,
+  "allOldGuardBodiesAndWindowCadenceNonwindowProofBlocksRecoverByteExact": true,
+  "completeDeltaReproducedAsPlainTextWithoutParsingOrExecutingCode": true,
+  "actualSourceAndFreshProducerPublicAuditStructuresReadOnly": [
+    {
+      "phase": "p125pc-source-combined",
+      "outcome": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-outcome.json",
+        "bytes": 7969,
+        "sha256": "6cc159f39b6256b255d459f323615b20fed9ce366df06b7c1c58f8dc7b09e045"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-public-audit.json",
+        "bytes": 235594,
+        "sha256": "850aa30e16efb39c41b1b8d53c18d1903d5cd63d568f4fbf60d81ec6d426512b"
+      }
+    },
+    {
+      "phase": "p125pc-fresh-canonical",
+      "outcome": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-outcome.json",
+        "bytes": 8001,
+        "sha256": "37a6fef970bca7282fecf5593f083bd672c1831f2f0f58b7aa8dec556d91ecac"
+      },
+      "publicAudit": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-public-audit.json",
+        "bytes": 235614,
+        "sha256": "c057c09eed76a6730a9f5bfbf0d41c6116c71e7d531bfc7c700ef416a42a909b"
+      }
+    }
+  ],
+  "newActualProofProjectionIncludesStoredTokenPin": true,
+  "namedQueryResponseNaturalChildAndPublicLeafDerBindingRequired": true,
+  "partialProducerStagesFactsAndObservationalRequestsNeverBecomeMissingProofCredit": true,
+  "allSelectionAndResourceCountersRemainDerived": true,
+  "wholeMarkerSourceEncodingNotIntroduced": true,
+  "inheritedCertificateMarkerGuardPrecedesDerEncoding": true,
+  "phaseInputsAndInputShaExplicitlyUnready": true,
+  "noAliasOfPartialRootSourceFreshReviewToCompleteRuntimeReview": true,
+  "noPriorPreparationVersionOrEvidenceWasModifiedOrDeleted": true,
+  "noHelperParserImportCompileProductOpenSslSslNativeSqlNetworkKeyChildStreamSourceIndexQaOrReservationOperations": true,
+  "publicOutputCopiesOrAllowlistProduced": false,
+  "remainingInputs": [
+    "actual completed full root-runtime-review schema and pin",
+    "actual six accepted source/fresh/control/restoration outcome/audit pins",
+    "actual current diagnostic predicates",
+    "root-reviewed final phase-inputs bytes and exact SHA",
+    "root full source read and independent static review",
+    "explicit root adoption and later actual curator execution"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "schema": "p135-genuine-inline-runtime-review-seal/1",
+  "files": [
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/genuine-inline-runtime-review/review.json",
+      "bytes": 11277,
+      "sha256": "9f6ac44744bebb34279d46820306366b539af0b2159f3ddb2697e886fd07d46a"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/genuine-inline-runtime-review/README.md",
+      "bytes": 3064,
+      "sha256": "81ace02184d4583fac930dc411abad66ef2902920cac7b6a5b685f9595931d06"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/genuine-inline-runtime-review/pins.json",
+      "bytes": 11705,
+      "sha256": "b8620adb3c40a9423debec956d5ae2613c3714652191b21a1038af964f917c88"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/genuine-inline-runtime-review/admitted-fixture-limit-delta.patch",
+      "bytes": 1162,
+      "sha256": "f6159096864c8edd893548db65ace52da0043054bcc127ff7884575b11c425f5"
+    }
+  ],
+  "all10PublicsRead": true,
+  "blockers": [],
+  "workingTree10CasePhaseOnly": true,
+  "noExecutionOrCheckoutWrites": true
+}

@@ -1,0 +1,102 @@
+{
+  "kind": "P0-23 SDK parser repair, prepared CLI contracts and independent MCP source review",
+  "atUtc": "2026-10-14T17:26:44.323283+00:00",
+  "worktree": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass",
+  "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+  "childOwnership": {
+    "newCliTest": "tests/industryPackCli.test.ts",
+    "mcpTypeRepair": "tests/mcpClaimLabels.test.ts, explicitly reauthorized by parent after candidate test-types errors",
+    "productionEdits": 0,
+    "dependencyEdits": 0,
+    "docsEdits": 0
+  },
+  "sdkParserRepair": {
+    "initialFailure": {
+      "origin": "Parent-owned candidate typecheck:tests",
+      "log": "/private/tmp/p0-23-candidate-test-types-20261014.log",
+      "sha256": "453c221adab6ee1bbdfa1420b7043d0051360cd84a1e75b9380c125d39960e7f",
+      "errors": "TS18046 for unknown result.content and TS2339 for structuredContent inferred as {}; SDK callTool has a compatibility union return type. Runtime passing cases alone did not satisfy test types."
+    },
+    "repair": "Every actual client.callTool response passes the official CallToolResultSchema.parse. claimResult accepts SDK CallToolResult. Transparency claim fields and per-agent fields parse zod schemas instead of broad output casts. Existing assertions and all 23 cases remain.",
+    "testPath": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/mcpClaimLabels.test.ts",
+    "testSha256": "eccea41c533bfa66365c1a745cb3451da2a049f9ac04df8fca3fc55a43d6d1fc",
+    "previousRuntimeOnlyTestSha256": "7b650560d33a25b793eba987063d269c40ba2a56987ff2d58fc16ba150e4d07e",
+    "phase": {
+      "name": "mcp-sdk-standard-parser-green",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-standard-parser-green-20261014.actual.json",
+      "exit": 0,
+      "durationMs": 7706,
+      "startedUtc": "2026-10-14T17:23:30.041062+00:00",
+      "log": "/private/tmp/p0-23-mcp-sdk-standard-parser-green-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+    },
+    "actualJson": "/private/tmp/p0-23-mcp-sdk-standard-parser-green-20261014.actual.json",
+    "actualSha256": "78f7fa862fffafe82f89460bc2f24fa3d031e99759d3a1b4a015246cd98cbb78",
+    "logSha256": "ce80ed973873ccd6cbef2cd90f3a491858275033968e9924a1b95faa80adda2b",
+    "tests": 23,
+    "passed": 23,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "typecheckStatus": "The parent owns the fresh test-types rerun; no new passing typecheck claim is made by this child.",
+    "mutationStatus": "The parent reports the real withClaim mutant caused 16 failures and seven passes, then production source was exactly restored. This child did not execute that mutant; the restored-source standard-parser run passed 23/23."
+  },
+  "preparedCli": {
+    "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/industryPackCli.test.ts",
+    "sha256": "66539767422adcbb6d47232433da927b7fa9f1616e503b1a46b7f22b7f3f5ad0",
+    "lines": 133,
+    "cases": 5,
+    "plannedChildInvocations": 6,
+    "executionStatus": "Prepared only. No CLI test or child CLI process has run; await the parent built-dist notice.",
+    "syntax": [
+      "domain pack access --json",
+      "domain pack run --pack clinical-trials --baseline --json",
+      "domain pack run --pack <inherited-name> --baseline --json"
+    ],
+    "sourceEvidence": [
+      "src/cli-domain-product-commands.ts:221-244 requires --pack, checks getPackById, prints Pack not found before entitlement, then actually admits entitlement for real packs.",
+      "src/cli-domain-product-commands.ts:256-279 takes baseline without interactive answers and adds canonical claim fields to JSON.",
+      "tests/cliClaimLabels.e2e.test.ts:117 and :391 already use domain pack run --pack clinical-trials --baseline --json."
+    ],
+    "validPaidControl": "A local Ed25519 test license is verified against its public key. Actual child pack access must report active/env, then a legitimate clinical-trials baseline must exit zero and return its pack ID, nonempty question results, incomplete zero-answer self-assessment and self_reported/not_evaluated dimensions. Every inherited-name case awaits this same successful control.",
+    "refusals": [
+      "__proto__",
+      "constructor",
+      "toString",
+      "hasOwnProperty"
+    ],
+    "refusalCriteria": "Exactly exit 1 and Pack not found: <id>. Parser errors, missing required options, paywall output, timeout, signal, transport guard failures and strict exit 70 do not qualify. No packId or claimKind JSON result may be fabricated.",
+    "childIsolation": "Use process.execPath with a Node 22/24 guard and prepend its directory to a minimal child PATH. Isolated HOME and cwd are newly created private fixture directories. No host credentials or environment are copied. Strict mode remains enabled.",
+    "transport": "Node child preloads a throwing HTTP/HTTPS/net/TLS/DNS/UDP/fetch/WebSocket denial guard. It returns no canned result. NODE_OPTIONS carries the same guard to inherited Node children.",
+    "secrets": "The child environment contains only the newly issued fixture license and public key, never its private key. Canonical fixture/command manifests contain environment key names, statuses, arguments, paths and exact file/stream hashes, not raw license or environment values. Raw stdout/stderr stay private. If a token appears in output, the test throws a generic error rather than quoting the token into canonical failure output.",
+    "artifacts": "After execution, /private/tmp/amc-p0-23-industry-pack-cli-*/logs retains each raw stream, commands.json and fixture.json with CLI/guard/test hashes. Only the new workspace/HOME subdirectories are removed; evidence remains.",
+    "globalEnvironment": "No process.env or global CWD mutation is introduced; child env is an explicit object.",
+    "scopeLimits": "This proves four refusal paths and one valid paid pack control only. It does not retire licensing, activate a subscription, alter legitimate IDs, qualify all CLI outputs, settle the P0-22 empty-array contract or run freeze."
+  },
+  "mcpProductionReview": {
+    "result": "Pass for the bounded canonical stored-run repair, with inherited limits.",
+    "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/mcp/mcpClaimOutput.ts",
+    "sha256": "5585b461f2abe8e240cb5547e422e81e1eb758bb887119f22250bdc4aaf644ac",
+    "sourceEditedBy": "Parent only",
+    "mechanism": "agentRunClaim resolves an existing report with the original resolver, verifies its auditor seal and calls the existing envelopeForStoredRun adapter. It returns the original unbound runtime-observation envelope on an exception. withClaim and unboundClaim remain unchanged.",
+    "currentSealed": "Current 1.2.0 report bytes with an actual checked seal reuse the diagnostic readiness and evidence rules. Observed/pass is preserved for the controlled qualifying fixture. No new eligibility, method, status or numeric rule is introduced.",
+    "unsealedCurrent": "A VALID-declared current report with a bad or missing seal cannot authenticate itself. The shared adapter evaluates a cloned INVALID status and limits the kind to self_reported; actual SDK parity demonstrates not_evaluated and untrusted evidence. Stored bytes are not rewritten.",
+    "legacy": "The shared version gate routes 1.1.1, absent or unparsable old version metadata through the existing legacy adapter, even when the writer seal is valid. The original real SDK RED and actual GREEN prove 1.1.1 self-report/no-evaluation parity. No version, notice or historical score is rewritten.",
+    "unknownRun": "Source review shows failed exact/alias/latest resolution or parsing/adapter failure is caught and yields unbound self_reported/not_evaluated. The focused SDK suite covers no-run behavior, but it does not directly execute every unknown alias/exact-ID or malformed-file fallback; those remain source-inspected limits.",
+    "signatureBoundary": "The patch only proves the workspace auditor wrote unchanged bytes. It neither supplies an independent reviewer nor reads a pinned third-party review claim. The diagnostic/legacy adapters do not introduce an approved independent review, so a valid signature cannot produce independently_reviewed through this repair.",
+    "scopePreservation": "workspace, agentId and requested run ID are passed to the existing resolver unchanged. Lookup alias behavior, permissive legacy loading, partial schema validation and any inherited scope fallback are not strengthened by this patch.",
+    "noWrites": "The repair reads and labels records; it does not write report state, keys, histories, a vault, an API registry, Studio, A4 or CLI source.",
+    "limits": [
+      "This is a review of MCP claim selection, not qualification of diagnostic evidence authenticity or every record schema.",
+      "The catch converts several missing/malformed cases to the existing generic not-bound envelope rather than an attributed typed diagnostic error; it does not retain a granular failure reason.",
+      "API resultEnvelope and domainEvidence still take their existing direct raw-adapter paths; this MCP repair does not qualify or change those held/shared surfaces.",
+      "Fresh all-source checks, freeze, platform breadth and final source commit remain parent responsibilities."
+    ]
+  },
+  "preservation": {
+    "p0-22Failures": "Retained without reinterpretation or empty-array waiver.",
+    "heldScopes": "No A4 preview handler, paused privacy/P2-02, shared CLI/registry/REPL, budgets, freeze baseline or Claude checkout changed.",
+    "mcpStandardParserNoProductionChange": true
+  },
+  "nextStep": "Await the parent built-dist notification, then run only the prepared CLI suite through the Node 22 journal and retain actual raw outputs and hashes. Do not claim the prepared cases passed."
+}

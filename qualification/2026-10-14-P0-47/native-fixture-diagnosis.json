@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "issue": "P0-47",
+  "scope": "Controlled native fixture diagnosis only",
+  "fixture": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass",
+  "head": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+  "node": "v24.21.0",
+  "pnpm": "10.33.0",
+  "gitNoLazyFetch": true,
+  "selectedCase": "real stub turns are committed once, survive release/restart/resume and cold verify",
+  "originalTestSha256": "745b411a2a57fd4f1663e2b6e6517dbf46dd363f73cdf0e2d664bc73564d62af",
+  "diagnosticTestSha256": "3302107b6e2c8f4aa9101b612fc236e5aca8cab718058281b3b22d31e504c6c5",
+  "productionHashesBefore": {
+    "src/studio/nativeTaskService.ts": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+    "src/sdk/nativeAgentClient.ts": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5",
+    "src/lifecycle/signedControlJournal.ts": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+    "src/credentials/credentialsPaths.ts": "e7eab84d9be8fc7018e80c1d3831702accfa112c7582a70a2a3109694bc575c0",
+    "src/budgets/budgets.ts": "bae506f230b0511759f795cb0099f9b8d3fdb77aa42789e70658e4f84d15243c"
+  },
+  "exactDiff": "--- a/tests/studioNativeTaskService.test.ts\n+++ b/tests/studioNativeTaskService.test.ts\n@@ -34,12 +34,12 @@\n beforeEach(() => {\n   prior = process.env.AMC_VAULT_PASSPHRASE; process.env.AMC_VAULT_PASSPHRASE = pass;\n   root = mkdtempSync(join(tmpdir(), \"amc-studio-service-\"));\n-  credentialHome = join(root, \"operator-home\"); mkdirSync(credentialHome, { mode: 0o700 });\n+  credentialHome = mkdtempSync(join(tmpdir(), \"amc-studio-operator-home-\"));\n   initWorkspace({ workspacePath: root, trustBoundaryMode: \"isolated\" });\n });\n afterEach(async () => {\n   const outcomes = await Promise.allSettled(services.splice(0).map(service => service.close()));\n-  lockVault(root); rmSync(root, { recursive: true, force: true });\n+  lockVault(root); rmSync(root, { recursive: true, force: true }); rmSync(credentialHome, { recursive: true, force: true });\n   if (prior === undefined) delete process.env.AMC_VAULT_PASSPHRASE; else process.env.AMC_VAULT_PASSPHRASE = prior;\n   expect(outcomes.filter(outcome => outcome.status === \"rejected\")).toEqual([]);\n });\n",
+  "phases": [
+    {
+      "label": "unchanged-selected",
+      "argv": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/studioNativeTaskService.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-native-fixture-diagnosis/unchanged-selected.json",
+        "--testNamePattern",
+        "^real\\ stub\\ turns\\ are\\ committed\\ once,\\ survive\\ release/restart/resume\\ and\\ cold\\ verify$"
+      ],
+      "startedAt": "2026-10-14T13:52:41.633992+00:00",
+      "endedAt": "2026-10-14T13:52:47.382944+00:00",
+      "durationSeconds": 5.748,
+      "exitCode": 1,
+      "testSha256": "745b411a2a57fd4f1663e2b6e6517dbf46dd363f73cdf0e2d664bc73564d62af",
+      "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-native-fixture-diagnosis/unchanged-selected.log",
+      "logSha256": "148a893510b783aef9220925d44224c1fb1dc0c236f56cb7621d79f0b20aaa1a",
+      "report": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-native-fixture-diagnosis/unchanged-selected.json",
+      "reportSha256": "e9fb0542852bc11d56ede7252bb06a7d2efcb1451128999eb5dd46d1644a3518",
+      "result": {
+        "success": false,
+        "numTotalTests": 10,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 9,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 1
+      },
+      "failedCases": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tests/studioNativeTaskService.test.ts",
+          "name": "real stub turns are committed once, survive release/restart/resume and cold verify",
+          "status": "failed",
+          "failureMessages": [
+            "AssertionError: expected 'Native startup did not finish. No mod\u2026' to be null\n    at idle (/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tests/studioNativeTaskService.test.ts:86:89)\n    at /Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tests/studioNativeTaskService.test.ts:95:20\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "selectedCaseResults": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tests/studioNativeTaskService.test.ts",
+          "name": "real stub turns are committed once, survive release/restart/resume and cold verify",
+          "status": "failed",
+          "failureMessages": [
+            "AssertionError: expected 'Native startup did not finish. No mod\u2026' to be null\n    at idle (/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tests/studioNativeTaskService.test.ts:86:89)\n    at /Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tests/studioNativeTaskService.test.ts:95:20\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "selectionNote": "Other current cases are intentionally filtered by testNamePattern; this is not a whole-file or zero-pending qualification."
+    },
+    {
+      "label": "outside-home-selected",
+      "argv": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/studioNativeTaskService.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-native-fixture-diagnosis/outside-home-selected.json",
+        "--testNamePattern",
+        "^real\\ stub\\ turns\\ are\\ committed\\ once,\\ survive\\ release/restart/resume\\ and\\ cold\\ verify$"
+      ],
+      "startedAt": "2026-10-14T13:52:47.384869+00:00",
+      "endedAt": "2026-10-14T13:52:53.796113+00:00",
+      "durationSeconds": 6.411,
+      "exitCode": 0,
+      "testSha256": "3302107b6e2c8f4aa9101b612fc236e5aca8cab718058281b3b22d31e504c6c5",
+      "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-native-fixture-diagnosis/outside-home-selected.log",
+      "logSha256": "a9071fe85a3a0d654da8385c62c7345a2ada53f5e784fab2549a74a500516f02",
+      "report": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-native-fixture-diagnosis/outside-home-selected.json",
+      "reportSha256": "514d925e0c2bd0efa66f2df5631e5d620c8d86d52de43db185be26588431958f",
+      "result": {
+        "success": true,
+        "numTotalTests": 10,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 9,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "failedCases": [],
+      "selectedCaseResults": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tests/studioNativeTaskService.test.ts",
+          "name": "real stub turns are committed once, survive release/restart/resume and cold verify",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ],
+      "selectionNote": "Other current cases are intentionally filtered by testNamePattern; this is not a whole-file or zero-pending qualification."
+    },
+    {
+      "label": "outside-home-whole-file",
+      "argv": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/studioNativeTaskService.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-native-fixture-diagnosis/outside-home-whole-file.json"
+      ],
+      "startedAt": "2026-10-14T13:52:53.796566+00:00",
+      "endedAt": "2026-10-14T13:53:11.902149+00:00",
+      "durationSeconds": 18.105,
+      "exitCode": 0,
+      "testSha256": "3302107b6e2c8f4aa9101b612fc236e5aca8cab718058281b3b22d31e504c6c5",
+      "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-native-fixture-diagnosis/outside-home-whole-file.log",
+      "logSha256": "51e1b0d5aeca167ac1303f052400657b7e31885293ce5976bb9a82a96616c047",
+      "report": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-native-fixture-diagnosis/outside-home-whole-file.json",
+      "reportSha256": "2175ecd989690cfd47c347e9f8fe7235c47e7b5294fe58ad76007dd7797a8d14",
+      "result": {
+        "success": true,
+        "numTotalTests": 10,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 0
+      },
+      "failedCases": [],
+      "selectedCaseResults": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tests/studioNativeTaskService.test.ts",
+          "name": "real stub turns are committed once, survive release/restart/resume and cold verify",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ],
+      "selectionNote": null
+    }
+  ],
+  "status": "DIAGNOSTIC_COMPLETE",
+  "selectedCasePassedWithOnlyFixtureChange": true,
+  "entireCurrentFilePassedWithOnlyFixtureChange": true,
+  "restoredTestSha256": "745b411a2a57fd4f1663e2b6e6517dbf46dd363f73cdf0e2d664bc73564d62af",
+  "testRestoredByteExactly": true,
+  "productionHashesAfter": {
+    "src/studio/nativeTaskService.ts": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+    "src/sdk/nativeAgentClient.ts": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5",
+    "src/lifecycle/signedControlJournal.ts": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+    "src/credentials/credentialsPaths.ts": "e7eab84d9be8fc7018e80c1d3831702accfa112c7582a70a2a3109694bc575c0",
+    "src/budgets/budgets.ts": "bae506f230b0511759f795cb0099f9b8d3fdb77aa42789e70658e4f84d15243c"
+  },
+  "productionUnchanged": true,
+  "finalGitStatus": "",
+  "limits": "Observed Node 24 case/file diagnosis only. No production edit, current Node 22 candidate change, full-suite qualification, commit, push or cleanup of preexisting artifacts.",
+  "rootCause": {
+    "observedScope": "The selected existing native case and the entire current studioNativeTaskService file on Node v24.21.0 at exact 7a81.",
+    "baselineObservedFailure": "AssertionError: expected 'Native startup did not finish. No mod\u2026' to be null",
+    "fixtureDefect": "The original fixture makes credentialHome equal <governed workspace>/operator-home and sends it as HOME to the real compiled SDK/CLI child. Its default HOME/.amc/control-checkpoints is therefore inside the governed workspace.",
+    "currentProductionRule": "src/lifecycle/signedControlJournal.ts:controlCheckpointDir resolves the checkpoint root and throws when it lies inside the governed workspace. NativeTaskService forwards the configured HOME and erases ambient checkpoint overrides absent from its supplied environment.",
+    "controlledProof": "The only changed test lines place credentialHome in a separately owned mkdtemp directory outside the workspace and remove that owned directory at teardown. The same selected case passes; all 10 existing cases pass with every original assertion/verdict intact.",
+    "limitation": "This confirms the invalid fixture layout at the observed Node24/file scope. It is not an active Node22 whole-run pass or qualification of later P0-33 native production changes."
+  }
+}

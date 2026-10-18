@@ -323,3 +323,102 @@ describe("P07 controlled native lifecycle and transport", () => {
     expect(client.state).toBe("open");
   });
 });
+
+describe("P0-06 SDK native-shell warning delivery", () => {
+  // Independent public warning bytes, not an expectation derived from the formatter.
+  const warning = "WARNING: the native shell is UNCONFINED on darwin (opt-in: cli-flag). Commands run with your full user rights: files outside the workspace, ~/.ssh and the network are reachable. Receipts record enforcement: none." + "\n";
+  afterEach(() => { vi.restoreAllMocks(); });
+
+  test("forwards the complete canonical warning across every byte split", async () => {
+    const output = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    const { peer } = await connect();
+    const bytes = Buffer.from(warning, "utf8");
+    for (let split = 0; split < bytes.length; split++) {
+      peer.stderr.write(bytes.subarray(0, split));
+      expect(output).toHaveBeenCalledTimes(split);
+      peer.stderr.write(bytes.subarray(split));
+      expect(output).toHaveBeenCalledTimes(split + 1);
+      expect(output).toHaveBeenLastCalledWith(warning);
+    }
+  });
+
+  test("does not infer an unconfined warning from an explicit option and a quiet child", async () => {
+    const output = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    const { client, peer } = await connect(new ControlledPeer(), { allowUnconfinedShell: true });
+    const session = await client.newSession();
+    peer.onPrompt = frame => {
+      peer.send(notification(update("ordinary reply", session.sessionId)));
+      peer.reply(frame, { stopReason: "end_turn" });
+    };
+    expect((await session.prompt("hello").result).text).toBe("ordinary reply");
+    expect(output).not.toHaveBeenCalled();
+    expect(client.state).toBe("open");
+  });
+
+  test("does not forward a warning without its newline, including at child closure", async () => {
+    const output = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    const { client, peer } = await connect();
+    peer.stderr.write(warning.slice(0, -1));
+    expect(output).not.toHaveBeenCalled();
+    await client.close();
+    expect(output).not.toHaveBeenCalled();
+  });
+
+  test("discards unrelated diagnostics and contaminated warning lines without copying their bytes", async () => {
+    const output = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    const { peer } = await connect();
+    const line = warning.slice(0, -1);
+    for (const diagnostic of ["synthetic-provider-secret", "prefix " + line, line + " suffix",
+      line + "\r", line.replace("cli-flag", "sdk-option"), line.replace("darwin", "linux")]) {
+      peer.stderr.write(diagnostic + "\n");
+    }
+    peer.stderr.write(Buffer.from([255, 10]));
+    expect(output).not.toHaveBeenCalled();
+    peer.stderr.write("synthetic-before\n" + warning + "synthetic-after\n");
+    expect(output.mock.calls).toEqual([[warning]]);
+  });
+
+  test("skips an overlong diagnostic line and recognizes the next exact line", async () => {
+    const output = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    const { peer } = await connect();
+    peer.stderr.write(Buffer.alloc(128 * 1024, 120));
+    peer.stderr.write(warning); // Still inside the unrelated line until this newline.
+    expect(output).not.toHaveBeenCalled();
+    peer.stderr.write(warning);
+    expect(output.mock.calls).toEqual([[warning]]);
+  });
+
+  test("forwards each actual session warning rather than suppressing later sessions", async () => {
+    const output = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    const { client, peer } = await connect(new ControlledPeer(), { allowUnconfinedShell: true });
+    const receive = peer.receive.bind(peer);
+    peer.receive = frame => {
+      if (frame.method === "session/new") peer.stderr.write(warning);
+      receive(frame);
+    };
+    const first = await client.newSession(), second = await client.newSession();
+    expect(first.sessionId).not.toBe(second.sessionId);
+    expect(output.mock.calls).toEqual([[warning], [warning]]);
+  });
+
+  test("fails through the existing client lifecycle if the operator warning write throws", async () => {
+    vi.spyOn(process.stderr, "write").mockImplementation(() => { throw new Error("synthetic output failure"); });
+    const { client, peer } = await connect();
+    expect(() => peer.stderr.write(warning)).not.toThrow();
+    expect(client.state).toBe("failed");
+    await expect(client.newSession()).rejects.toThrow("native shell warning output failed");
+    await client.close();
+  });
+
+  test("operator stderr backpressure queues the warning and keeps the session up", async () => {
+    // write() returning false means the bytes are queued, not lost: a healthy client must not fail on it.
+    const output = vi.spyOn(process.stderr, "write").mockReturnValue(false);
+    const { client, peer } = await connect(new ControlledPeer());
+    peer.stderr.write(warning + warning);
+    expect(output.mock.calls).toEqual([[warning], [warning]]);
+    expect(client.state).toBe("open");
+    const session = await client.newSession();
+    expect(session.sessionId).toBeTruthy(); expect(client.state).toBe("open");
+    await client.close();
+  });
+});

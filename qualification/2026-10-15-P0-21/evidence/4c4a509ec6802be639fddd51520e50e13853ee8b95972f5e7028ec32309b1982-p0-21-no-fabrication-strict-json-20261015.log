@@ -1,0 +1,33 @@
+
+> agent-maturity-compass@1.2.0 check:no-fabrication
+> node scripts/check-no-fabrication.mjs --strict --json
+
+{
+  "ok": true,
+  "strict": true,
+  "rules": {
+    "R1": {
+      "found": 0,
+      "allowlisted": 0,
+      "failing": 0
+    },
+    "R2": {
+      "found": 0,
+      "allowlisted": 0,
+      "failing": 0
+    },
+    "R3": {
+      "found": 303,
+      "allowlisted": 303,
+      "failing": 0
+    },
+    "R4": {
+      "found": 10,
+      "allowlisted": 10,
+      "failing": 0
+    }
+  },
+  "markers": 16,
+  "pending": 0,
+  "failures": []
+}

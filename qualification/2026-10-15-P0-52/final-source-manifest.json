@@ -1,0 +1,114 @@
+{
+  "base": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+  "source": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+  "files": {
+    "CONTRIBUTING.md": {
+      "sha256": "404eb094c9408a8d61d5d8f3d68a6d749e5290800a79c9c9ef5aff8b8191eaf2",
+      "lines": 485
+    },
+    "README.md": {
+      "sha256": "ef4112c66dedde1686c3570e90658651d14203f84e67d4ef485357cd9c6fc536",
+      "lines": 941
+    },
+    "docs/content/reddit-launch-drafts.md": {
+      "sha256": "40cbbc807b23e217e48246013db455c5089ecf8b1e759534a8863ac61bf3c845",
+      "lines": 52
+    },
+    "docs/content/show-hn-draft.md": {
+      "sha256": "b679f1786a644dea9c703f0b78aa4c3569b8d12c0ec781b8240507c9b68b250a",
+      "lines": 35
+    },
+    "docs/internal/competitive-landscape.md": {
+      "sha256": "0f580db96615e5e81a888ebb7f0074d1fcd88ebfeec1d27a3c079c040389abc6",
+      "lines": 71
+    },
+    "docs/internal/mirofish-simulation-council.md": {
+      "sha256": "a65183d9019a38311e2175acb42707319ec340bcc4a59e0af5cbc6c4b4eb4ab4",
+      "lines": 32
+    },
+    "tests/federationFollowupQualification.test.ts": {
+      "sha256": "405ae7dbe2d10929f15b8b6dd2c9aa4a24250ef0ca9b58bfdc81608f621eb57e",
+      "lines": 243
+    },
+    "tests/federationImportDestinationQualification.test.ts": {
+      "sha256": "49ca8059fc8c2d1e683c2c6f2bd5b0cb154ca6e99be4dfb06a4e29deb7758fae",
+      "lines": 134
+    },
+    "tests/federationPublisherHistoryQualification.test.ts": {
+      "sha256": "7954589131acf8be6f9761c2312a76e6adee65af897d482cca0ac496dcb88426",
+      "lines": 243
+    },
+    "website/i18n.js": {
+      "sha256": "086ba66a5b45a8d0d165abcdec539af11c934082ac3127fad26cf8a724fb8f6a",
+      "lines": 568
+    },
+    "website/index.html": {
+      "sha256": "f6e1c51b8fefdd1be57fe55b494b130a51eb90ef88ca1573496e0d36fca3e386",
+      "lines": 461
+    },
+    "website/lite.html": {
+      "sha256": "49b0938d67ecc8f0265996d4f77ade1bf68110d17c77cb9b6a98ba6f204aa1f7",
+      "lines": 195
+    },
+    "whitepaper/AMC_WHITEPAPER_v1.md": {
+      "sha256": "78f50dcdb90c8217f254df71c1d92c435e7e6d8738284c6475ec11bfb66028a4",
+      "lines": 1216
+    }
+  },
+  "protectedEqualAcceptedMain": {
+    "src/api/index.ts": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+    "src/api/accessPolicy.ts": "3472bd7573ee644aea651fbc44e5890a7abbb8e3fc299f57450e32a6ff445bde",
+    "src/api/resultRouteRegistry.ts": "466ccfc1d33f3c5de97414d9b0bb58b7bedd5bf3f356548dde55eada665954ec",
+    "src/studio/studioServer.ts": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+    "src/studio/openapi.ts": "610849db134d01c2f9a2a55381757905ce6f0917e6a549a2008ba8181265f33f",
+    "website/openapi.yaml": "0090187e7f9be1cdfe0eb6829b789c101533ef9b9e14097a6b47c95becefdbf6",
+    "src/console/assets/app.js": "6bdee3f49798480be259852993fdead87c6dc6faa2333751318ec25da1ed058a",
+    "src/console/assets/components/claimBadge.js": "b3e4f55239a8aa58a4abf203c1b408015a2bcf1c3408c634d46b08706eb0f2ca",
+    "src/mcp/amcMcpServer.ts": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a",
+    "src/mcp/a4Tools.ts": "4614662d0246743ea1949aa9fcb93f88b6f9268fb5bdafe2f4747148d953ebca",
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+    "src/repl/replParser.ts": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "scripts/line-budgets.json": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+    "scripts/quality/coverage-baseline.json": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+    "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "scripts/release-gate.mjs": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+    "src/api/enforceRouter.ts": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+    "src/api/passportRouter.ts": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405",
+    "src/api/cryptoRouter.ts": "1f2abcca570d95a2b918e807d46ff568a8337b108f456119c1b911c870a297d0",
+    "src/studio/nativeTaskService.ts": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+    "src/trust/admission.ts": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+    "src/notary/notaryAttestation.ts": "587ca09319f54d410f19bea10349279aa763ac1de4fe359cc08cdd8e8dca2b67",
+    "src/transparency/logChain.ts": "0c24f07dc888e382e4388bf89c06ac355a8ce67f2f2627ae5a7c87aa4f588fff"
+  },
+  "additionalProtectedEqualBase": {
+    "src/api/enforceRouter.ts": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+    "src/api/passportRouter.ts": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405",
+    "src/api/cryptoRouter.ts": "1f2abcca570d95a2b918e807d46ff568a8337b108f456119c1b911c870a297d0",
+    "src/studio/nativeTaskService.ts": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+    "src/trust/admission.ts": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+    "src/notary/notaryAttestation.ts": "587ca09319f54d410f19bea10349279aa763ac1de4fe359cc08cdd8e8dca2b67",
+    "src/transparency/logChain.ts": "0c24f07dc888e382e4388bf89c06ac355a8ce67f2f2627ae5a7c87aa4f588fff",
+    "unused-code/plan-edits/manifest.json": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+  },
+  "sourceArchivesScriptsDependenciesActionWorkflowUnchanged": true,
+  "federationInputs": {
+    "src/federation/federationSync.ts": "a91c5d067d887ba54e75285ff43e421bec80cafbdcde0b6e107d97ce082cc3ce",
+    "src/federation/federationStore.ts": "a2eba944db547fd275d08290766ff1c0e152ab3ed0b7bf641d6fce04c994bd87",
+    "src/federation/federationIdentity.ts": "9bd71d4cebe6116445bb6a2d9c07646529f9f205d6fe6ef5d6822a91f08293f3",
+    "src/federation/federationSchema.ts": "f83e5710f7ee0fe93d5bb150f9123de02f124de92040741accd6ab001d8c89a9",
+    "src/benchmarks/benchImport.ts": "9148079951dfd7bf00348dafe4654bba5c16f0f1ea470766c4f0b5903b757964",
+    "src/bench/benchRegistryStore.ts": "068c136aba2cda29f1789dfc2dd3e24fbfd87cf9728827d25866b825db255073",
+    "src/utils/pathSafety.ts": "e5cece43a2dcdf2640f39180aaedf1d29f6e87ac00b4fe326244bb4d8ebdf768",
+    "tests/federationImportContainment.test.ts": "b4d4fcf98735fb2052d73caa0abcd3afab9e8742fe8afa36daa3139d170813ed",
+    "tests/federationComplianceIntegrationMerkle.test.ts": "42c4dcf89049504439394f549f27a703ecbe495978e2af01a7e83486d3554add",
+    "tests/benchIdContainment.test.ts": "02249ca3c27bbe25c8ab443f9090d5e6dc3d2f609c0f02337782aceea3e77be7",
+    "tests/verifyFreshWorkspacePassport.test.ts": "bc31fa835874b66b3ff76bf2babb9cd42dcbe2acf60a700cdac32ed836dfb3c6",
+    "tests/privateModuleHelperVisibility.test.ts": "682c8c0317ddf4327746fa9f8801cc43574b6016c21b4f4cd79329b0c0eb15a3",
+    "tests/planEditsManifest.test.ts": "e86550ef5de6de0167fae124ac40019bd76381ef7cd71f51e3fd0df60e38b27d"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "schema": "p107-private-source-control-proposals/1",
+  "sourceBase": "bf8836cd38d2879ccef11c6cfd1423edf0a96c0f",
+  "operators": [
+    {
+      "name": "M1-highest-pass",
+      "target": "src/diagnostic/levelSemantics.ts",
+      "original": {
+        "bytes": 12367,
+        "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+      },
+      "mutant": {
+        "bytes": 12304,
+        "sha256": "923d8204905bb192a266857be27ec7a22842e0b1533f62fbf46057db169543fb"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/M1-highest-pass.patch",
+        "bytes": 459,
+        "sha256": "27d7f6fafeadc9e324280ae2f10599b61e917851988c41450f98996a0e065ff0"
+      },
+      "sourceOnly": true,
+      "executed": false
+    },
+    {
+      "name": "M2-register-seeder",
+      "target": "src/diagnostic/evidenceEmitters.ts",
+      "original": {
+        "bytes": 12985,
+        "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+      },
+      "mutant": {
+        "bytes": 13197,
+        "sha256": "5a837201d16449baf1c93da9342709510fa2fe8b0363dad5b94836af91684890"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/M2-register-seeder.patch",
+        "bytes": 872,
+        "sha256": "ccacc51c961cc87b6fa386688b628d517e666e4d85eff9cfa647e98509a7d300"
+      },
+      "sourceOnly": true,
+      "executed": false
+    },
+    {
+      "name": "M3-remove-denied",
+      "target": "src/diagnostic/evidenceEmitters.ts",
+      "original": {
+        "bytes": 12985,
+        "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+      },
+      "mutant": {
+        "bytes": 12795,
+        "sha256": "086ad9d62d267e3733b9d51d1ba2605484b228105d75e561ffc771859471ed47"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/M3-remove-denied.patch",
+        "bytes": 1190,
+        "sha256": "e55b8de720912fd4e8d4bea3c547b9b6ee8780a6cf1bb9234d79fcf54b25c6ed"
+      },
+      "sourceOnly": true,
+      "executed": false
+    }
+  ],
+  "boundary": "Unapplied proposals only. Future mutation is restricted to an owned fresh checkout after canonical positive qualification, followed by exact restoration and actual reruns. Claude source, S/R and compiled output remain unchanged. No current runtime sensitivity claim."
+}

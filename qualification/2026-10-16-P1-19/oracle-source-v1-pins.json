@@ -1,0 +1,52 @@
+{
+  "schema": "p1-19-private-oracle-source-proposal/1",
+  "state": "closed-unexecuted-awaiting-root-and-independent-review",
+  "capturedUtc": "2026-10-15T22:36:17.889344+00:00",
+  "allSourceWritesFinished": true,
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "runtimeExecuted": false,
+  "repositoryWrites": false,
+  "files": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/interface-proposal.json",
+      "bytes": 7286,
+      "sha256": "009727dbbcd6f2196b96a0122a3c7fc89094da6401adbc3965ffcca5e99520ce"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/interface-clarification.json",
+      "bytes": 1367,
+      "sha256": "9fc44bcbeb75f6d078979a7cced7e34bd3e8d7f6a2369e5a60a0b778a0128ae0"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19409,
+      "sha256": "f238a3dddc0f9aa5079ef1c8c859a5620948272fafefca5ca3081462a1d0eded"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 27458,
+      "sha256": "3a988d22647c9be6499b8df5c08fc3dde1d0281f1b1da4bda71c3f41e21b04f7"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/README.md",
+      "bytes": 7816,
+      "sha256": "2c34bfc3071cb5e1e759972cd18b79c95dc52d3382ead22d66a25711557dfad0"
+    }
+  ],
+  "prior52InputPins": {
+    "path": "/private/tmp/p1-19-oracle-design-20261016/input-pins.json",
+    "bytes": 14378,
+    "sha256": "9b3069281eb6817ed697daab19578f31a55fc0326ff4fee8da3b22c6fe6028ce"
+  },
+  "sourceCheckpoint": "335a3a9ae977f898391fdf2db186138e82d000ae",
+  "componentSource": "b9ba9a092f491d821c154679473b6f38c75b935d",
+  "staticSelfReview": [
+    "Every output has the same nonempty fixed16 check IDs; all cannot pass if a required stage was skipped.",
+    "No source/dist/provider helper imports, crypto or policy evaluator shared with the genuine test producer.",
+    "No writable database path, journal recovery, provider request, forced child signal or detached child group.",
+    "Every committed effect must have a unique authentic mapping; total effects and duplicate references/keys are both checked.",
+    "Closed v1 interface is retained; lifecycle clarification is additive."
+  ],
+  "limitations": "No syntax/type/import/runtime or positive/negative results are claimed. Nested cold verifier raw streams are reduced to bounded structured facts plus hashes in its check evidence; full raw nested streams are not separately written by this proposal."
+}

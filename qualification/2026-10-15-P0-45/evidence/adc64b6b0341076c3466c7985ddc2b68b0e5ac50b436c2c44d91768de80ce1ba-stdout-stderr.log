@@ -1,0 +1,65 @@
+
+ RUN  v4.1.11 /private/tmp/p0-45-causal-qualification-20261015/closure
+
+ ❯ tests/verifyRepair.test.ts (12 tests | 3 failed) 2650ms
+     ✓ plans nothing for a healthy store and apply moves nothing 275ms
+     ✓ leaves evidence alone when only a signed config failed 226ms
+     ✓ counts a tampered blob and plans to archive the ledger, the blobs, the index and its signature 222ms
+     ✓ counts a missing blob and keeps the ledger in plan mode 208ms
+     ✓ moves every planned file into quarantine with its original SHA-256 and leaves .amc/reports alone 217ms
+     × refuses when the legal hold state is unknown, and moves nothing 215ms
+     × refuses when the hold check itself throws 218ms
+     × refuses under an active hold and names it 207ms
+     ✓ refuses when the monitor key does not match the expected fingerprint 209ms
+     ✓ refuses before any move when signing fails 210ms
+     ✓ refuses when a planned file changed after the plan 219ms
+     ✓ puts moved files back when a rename fails part way 222ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/verifyRepair.test.ts > applyVerifyRepair > refuses when the legal hold state is unknown, and moves nothing
+AssertionError: expected undefined to be an instance of RepairRefused
+ ❯ expectRefused tests/verifyRepair.test.ts:99:18
+     97|     caught = error;
+     98|   }
+     99|   expect(caught).toBeInstanceOf(RepairRefused);
+       |                  ^
+    100|   expect((caught as Error).message).toMatch(message);
+    101| }
+ ❯ tests/verifyRepair.test.ts:203:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/verifyRepair.test.ts > applyVerifyRepair > refuses when the hold check itself throws
+AssertionError: expected undefined to be an instance of RepairRefused
+ ❯ expectRefused tests/verifyRepair.test.ts:99:18
+     97|     caught = error;
+     98|   }
+     99|   expect(caught).toBeInstanceOf(RepairRefused);
+       |                  ^
+    100|   expect((caught as Error).message).toMatch(message);
+    101| }
+ ❯ tests/verifyRepair.test.ts:213:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/verifyRepair.test.ts > applyVerifyRepair > refuses under an active hold and names it
+AssertionError: expected undefined to be an instance of RepairRefused
+ ❯ expectRefused tests/verifyRepair.test.ts:99:18
+     97|     caught = error;
+     98|   }
+     99|   expect(caught).toBeInstanceOf(RepairRefused);
+       |                  ^
+    100|   expect((caught as Error).message).toMatch(message);
+    101| }
+ ❯ tests/verifyRepair.test.ts:221:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 9 passed (12)
+   Start at  11:42:30
+   Duration  4.92s (transform 1.60s, setup 19ms, import 2.14s, tests 2.65s, environment 0ms)
+
+JSON report written to /private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--mutant/raw.json

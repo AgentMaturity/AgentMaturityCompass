@@ -1,0 +1,103 @@
+{
+  "schema": "p139-quality-checkpoint/1",
+  "commands": {
+    "p139-lint": {
+      "exit": 0,
+      "durationMs": 2867,
+      "ownedPgid": 81570,
+      "ESRCH": true
+    },
+    "p139-duplicates": {
+      "exit": 1,
+      "durationMs": 609,
+      "ownedPgid": 81604,
+      "ESRCH": true
+    },
+    "p139-deadcode-delta": {
+      "exit": 1,
+      "durationMs": 2783,
+      "ownedPgid": 81629,
+      "ESRCH": true
+    },
+    "p139-architecture": {
+      "exit": 0,
+      "durationMs": 2360,
+      "ownedPgid": 81863,
+      "ESRCH": true
+    },
+    "p139-threat-model": {
+      "exit": 0,
+      "durationMs": 262,
+      "ownedPgid": 81890,
+      "ESRCH": true
+    },
+    "p139-count-check": {
+      "exit": 0,
+      "durationMs": 370,
+      "ownedPgid": 82131,
+      "ESRCH": true
+    },
+    "p139-docs-drift": {
+      "exit": 0,
+      "durationMs": 308,
+      "ownedPgid": 82146,
+      "ESRCH": true
+    },
+    "p139-precommit-freeze": {
+      "exit": 0,
+      "durationMs": 1315,
+      "ownedPgid": 82161,
+      "ESRCH": true
+    }
+  },
+  "duplicates": {
+    "count": 1268,
+    "representativeFindings": [
+      "[[\"a4/a4Router.ts\",\"a4/a4RouterStages.ts\"],\"typescript\",\"fbe506ebc7c545b7dcbf8bb34ca36814d6c2a7268dcea84a0126d45dcbf500de\"]",
+      "[[\"a4/a4Router.ts\",\"api/nativeTasksRouter.ts\"],\"typescript\",\"2d212c944cd82cd8804351171f9dd363da57ad9b7faccc2e163cdabb3c10b1a1\"]",
+      "[[\"a4/a4Router.ts\",\"mcp/a4Tools.ts\"],\"typescript\",\"df7ee641bc3ded1aec920ce188369e3c83b53b537e2a80387db9ef467a4a89aa\"]",
+      "[[\"a4/a4RouterStages.ts\",\"a4/spec/adapt.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+      "[[\"a4/a4RouterStages.ts\",\"a4/spec/aspire.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+      "[[\"a4/a4RouterStages.ts\",\"a4/spec/assemble.ts\"],\"typescript\",\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\"]",
+      "[[\"a4/adaptContextPlugin.ts\",\"a4/spec/assemble.ts\"],\"typescript\",\"324a2b47f6016f4093a5592c7ab29c67ba6eb9678640c4f1318bca92b62895ed\"]",
+      "[[\"a4/adaptPolicy.ts\",\"a4/stages/assemble.ts\"],\"typescript\",\"cdf8e0a57471dcc73b0808ed9fe7c69923343f7ab0ec1f773048e799d5e241d7\"]",
+      "[[\"a4/assembleBuild.ts\",\"a4/stages/adapt.ts\"],\"typescript\",\"d873f32d3eb5d538f041c3ebdf2e06ebc2edb70cec8839efc1ae78ee961c7c15\"]",
+      "[[\"a4/assembleResolve.ts\",\"a4/assembleResolve.ts\"],\"typescript\",\"58209a897c4b1182be8679b674d36d6b86046e208a3418b47250e958f32a0afe\"]"
+    ],
+    "comparisonBoundary": "Prior count1268; full old findings not retained by CLI, no exact all-finding identity claim",
+    "unwaived": true
+  },
+  "deadCode": {
+    "schema": "amc-p139-deadcode-exact-delta-v1",
+    "previousPath": "/private/tmp/p1-37-post-typecheck-20261016/command-p207s-deadcode-delta/stdout-stderr.log",
+    "previousCount": 2727,
+    "currentCount": 2726,
+    "tool": "knip",
+    "version": "6.39.0",
+    "added": [],
+    "removed": [
+      "[\"src/mcp/oauth/authorize.ts\",\"exports\",{\"name\":\"validateNativeMcpAuthorizationResponse\"}]"
+    ],
+    "waived": false
+  },
+  "architecture": {
+    "status": "passed",
+    "failures": [],
+    "prefixBranchCount": 2,
+    "sourceFilesMeasured": 2181,
+    "changedSourceLineCounts": {
+      "src/agent/pipelineToolSeam.ts": 183,
+      "src/mcp/nativeMcpClient.ts": 393,
+      "src/tools/toolPipeline.ts": 625,
+      "src/tools/toolTypes.ts": 193
+    }
+  },
+  "frozenCounts": {
+    "cliCommandPaths": 1236,
+    "cliInventoryPaths": 1236,
+    "stationPacks": 41,
+    "stationPackQuestions": 632
+  },
+  "baselineOrWaiverOrRatchetUpdate": false,
+  "globalQualityGreen": false
+}

@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "scope": "Independent read-only review of P0-24 A's final qualification and original-body private causal matrix. No product imports, runtime, tests, builds, source or canonical edits. Only this review pair is written.",
+  "result": "no actionable findings within the bounded qualification scope",
+  "findings": [],
+  "measuredSource": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "qualificationReceipt": {
+    "path": "/private/tmp/p0-24-citations-qualification-20261015.json",
+    "sha256": "44c070e64894c54560de42727c233aaaebf695f280bcc06b6de035b18f2c492f"
+  },
+  "qualificationMarkdown": {
+    "path": "/private/tmp/p0-24-citations-qualification-20261015.md",
+    "sha256": "2afc041cde4e3c9969e729f91cfcc8c51181269333a457e142010e8f325b37df"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-24-citations-final-artifact-index-20261015.json",
+    "sha256": "61d5099c71500400e3421e192fa53ddcd0a4fec2d8d7a62927c9005f0a09a988",
+    "verifiedUniqueEntries": 70
+  },
+  "liveTest": {
+    "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts",
+    "sha256": "c184101b8dc302cfaf2980b6b2900cac26bbe9965d2f5ba3dbc68f2468bd0712",
+    "bytes": 10628,
+    "lines": 171
+  },
+  "caseInventory": {
+    "classifier": 7,
+    "catalogueCohort": 1,
+    "experimentalMetadata": 12,
+    "actualRubric": 2,
+    "strictIsoCriterion": 1,
+    "total": 23
+  },
+  "behaviorReview": {
+    "actualClassifier": true,
+    "nonvacuity": "Exact nonempty article/title arrays and real capabilities/function calls, explicit false-flag/empty controls. CRITICAL every() accompanies exact nonempty findings expectations for positive cases.",
+    "catalogueCohort": "Expected12-ID multiset equality and individual cardinality1 reject missing or duplicate selected records. Each preserves nonempty citations/aliases, recorded dates, official-host syntax and experimental expert-signoff hold. This does not establish current law or source accessibility.",
+    "actualRubrics": "HC-1 and FIN-1 require cardinality1 and actual resolver outputs. FDA/QMSR/SR text is current stored content, not a legal approval.",
+    "strictISO": "Unconditional actual9-anchor inspection and actual collectFindings result require zero A.5 policy pairs. Both actual violations remain red; no held baseline or zeroTolerance=false waiver."
+  },
+  "phases": [
+    {
+      "phase": "first",
+      "body": "original4d30",
+      "total": 23,
+      "passed": 22,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "success": false,
+      "exit": 1,
+      "rawSha256": "75a34c4d0189c765fcb6e987465171267d869f9164a23396fc0b74dece821146"
+    },
+    {
+      "phase": "private-baseline",
+      "body": "original4d30",
+      "total": 23,
+      "passed": 22,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "success": false,
+      "exit": 1,
+      "rawSha256": "e4fbab164f7411b29c8b5eaf8d8331ba0cad2393759a4e3e6b7387fbd34c7d1b"
+    },
+    {
+      "phase": "private-emotion-moved",
+      "body": "original4d30",
+      "total": 23,
+      "passed": 19,
+      "failed": 4,
+      "pending": 0,
+      "todo": 0,
+      "success": false,
+      "exit": 1,
+      "rawSha256": "6e83f1decbabd0a08cc9c831f52abd8a13d2c797138d88271db78caa0d9ddc8e"
+    },
+    {
+      "phase": "private-restored",
+      "body": "original4d30",
+      "total": 23,
+      "passed": 22,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "success": false,
+      "exit": 1,
+      "rawSha256": "73370900926fe2b616d2ba1be1a2e4fd1d050dddd4c06e4187ba75cbd3ef7941"
+    },
+    {
+      "phase": "final-typed",
+      "body": "c184",
+      "total": 23,
+      "passed": 22,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "success": false,
+      "exit": 1,
+      "rawSha256": "1a6ce18da6faf6bbd9aa708c3054f14662a3197d23760da14bab174eb64734db"
+    }
+  ],
+  "causalMeaning": {
+    "originalTestSha256": "4d30cbc37da28f5633edbd22260a8d086ce2983e6cd8556a2b855727e5728c2f",
+    "sameOriginalAssertionsAndInputs": true,
+    "changedPrivatePathOnly": "dist/compliance/euAiActClassifier.js",
+    "mutation": "Move actual emotionRecognition descriptor from unacceptableFlags to limitedRiskFlags with Art.50(3).",
+    "addedFailureNames": [
+      "workplace or education emotion recognition is prohibited",
+      "emotion prohibition precedes employment and chatbot tiers",
+      "social scoring and emotion prohibitions both survive"
+    ],
+    "persistentFailureName": "strict correction criterion excludes ISO A.5 policy labels from actual audit anchors and collector",
+    "addedFailureCount": 3,
+    "noSetupErrorUsedAsMutationKill": true,
+    "correctedTypedBodyCausalProofNotClaimed": true
+  },
+  "actualObservationChecks": {
+    "observationsEachPhase": 23,
+    "collectorFindingsEachPhase": 623,
+    "collectorRuleCounts": {
+      "CIT001": 0,
+      "CIT002": 3,
+      "CIT003": 0,
+      "CIT004": 620,
+      "CIT005": 0
+    },
+    "strictIsoAnchorViolations": [
+      {
+        "index": 2,
+        "id": "A.5",
+        "label": "Internal organization & AI policy"
+      },
+      {
+        "index": 8,
+        "id": "A.5",
+        "label": "AI policy"
+      }
+    ],
+    "strictIsoCollectorViolations": 2,
+    "anchorAndCollectorRecordsIndependentlyRecomputedAndMatched": true,
+    "twelveMetadataHoldsVerifiedEachPhase": true,
+    "testPinMatchesExecutedPhase": true
+  },
+  "preservation": {
+    "all70ReferencedFileSizesAndHashesVerified": true,
+    "protectedSourcePinsRehashed": 54,
+    "allFourSourceBeforeAfterManifestsByteEqual": true,
+    "all54CurrentSourceBytesMatchExpected": true,
+    "liveCompiledRehashed": 4529,
+    "liveCompiledBeforeAfterManifestByteEqual": true,
+    "privateRegularFilesRehashed": 4532,
+    "privateResolverSymlink": {
+      "relativePath": "node_modules",
+      "target": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules",
+      "actualReadlinkMatched": true
+    },
+    "completePrivateBaselineAndRestoredManifestsExactlyEqual": true,
+    "privateMutantDiffExactlyOneCompiledFile": true,
+    "productionOldTestsScriptsPackagesPackageLockWorkflowsDiffEmptyExcludingAuthorizedNewTest": true,
+    "currentGitDiffSourceScopeOnlyAuthorizedNewFile": "tests/citationCorrections.test.ts",
+    "rootMetadataPaths": [
+      "CONTRIBUTING.md",
+      "README.md",
+      "docs/content/reddit-launch-drafts.md",
+      "docs/content/show-hn-draft.md",
+      "docs/internal/competitive-landscape.md",
+      "docs/internal/mirofish-simulation-council.md",
+      "website/i18n.js",
+      "website/index.html",
+      "website/lite.html",
+      "whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "rootMetadataByteDiffOnly1636To1637ReplacementsVerified": true,
+    "largePrivateManifestsReferencedOnly": true
+  },
+  "chronologicalTypeCorrection": {
+    "originalBodyPreservedSha256": "4d30cbc37da28f5633edbd22260a8d086ce2983e6cd8556a2b855727e5728c2f",
+    "originalReceiptPreservedSha256": "02c1f4e04919ba1ea30454e9fc1a6d2482882f19bd56fc3f0a8844728bd512fb",
+    "originalOrdinaryTestTypeCheck": {
+      "exit": 2,
+      "logPath": "/private/tmp/p0-24-test-types-20261015.log",
+      "logSha256": "88172a2f3f75329c38ca3473fe450eae89afc438bc5010f01769971ae9435340",
+      "error": "TS7006 implicit any at new-file findings callback"
+    },
+    "exactTypeOnlyPatch": {
+      "path": "/private/tmp/p0-24-citations-qualification-20261015/type-only-annotation.patch",
+      "sha256": "a7d0ed8e958accc49c1162673696100d86041e5b4e9ffa177676e769df439fdc"
+    },
+    "exactReplacementVerified": true,
+    "onlyChange": "Findings variable typed with existing CitationFinding[] instead of Awaited<ReturnType<typeof MJS collectFindings>>. All remaining source bytes/assertions/descriptors/inputs unchanged.",
+    "finalTypedRuntime": [
+      23,
+      22,
+      1
+    ],
+    "correctedOrdinaryTestTypes": {
+      "parentReportedExit": 0,
+      "parentReportedDurationMs": 39337,
+      "attribution": "Parent notice; not rerun by this reviewer."
+    }
+  },
+  "reviewerObserverCorrections": [
+    "Initial metadata traversal assumed a path key on the resolver entry and raised KeyError. Its explicit relativePath/symlink schema was then read correctly; actual link and all4532 regular bytes validated. No product runtime or evidence changed.",
+    "A read-only Git diff assertion initially included the authorized newly staged test. The subsequent status/diff identifies only that new file in the source/test scope; production and original tests remain unchanged. No partial review file was written before the correction."
+  ],
+  "limits": [
+    "Strict ISO criterion remains red; no P0-24 Done approval.",
+    "Recorded metadata/official-host syntax is not a fresh fetch, legal currentness decision, expert endorsement or applicability/certification proof.",
+    "Expert and held rows remain unresolved; no production repair or reserved-path transfer inferred.",
+    "Existing emotionRecognition scope has no medical/safety/context override; no legal exception qualification.",
+    "Node22 bounded behavior only; no Node24/full-suite/coverage/live model/auth/enforcement/hostedCI/release claim.",
+    "Effects cover recorded intervals; no general all-lifecycle or transaction claim.",
+    "Current source-quality, freeze, expert and inherited holds remain open.",
+    "B causal packet awaits its separate independent review."
+  ],
+  "liveInputReadsComplete": true
+}

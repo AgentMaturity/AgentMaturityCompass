@@ -1,0 +1,11 @@
+{
+  "schema": "p125-window-private-report-assembly-type-correction/1",
+  "actualToolChunk": "3aab90",
+  "exit": 1,
+  "failure": "AssertionError at inline line11 before any report/pins/seal write",
+  "cause": "The report assembly compared actual R status splitlines list to protected-inputs heldRStatus string. The subsequent exact field inspection confirmed identical complete strings and empty index.",
+  "correction": "Compare the two exact status strings; retain separate18-row count assertion.",
+  "productSourceIndexQaEffects": false,
+  "sameObservationBytesRetained": true,
+  "newScanOrRuntimeRetry": false
+}

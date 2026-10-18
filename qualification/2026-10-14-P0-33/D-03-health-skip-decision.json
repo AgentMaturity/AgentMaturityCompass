@@ -1,0 +1,10 @@
+{
+  "recordedAt": "2026-10-14T11:47:19.921477+00:00",
+  "authority": "Direct user reply in this chat on 2026-10-14",
+  "userReply": "Record the written skip until P2-06",
+  "scope": "D-03 live-deploy-health only; no deployment, topology, namespace, vocabulary or repository-variable change",
+  "writtenReason": "live-deploy-health skipped: no supported deployment until D-03 names one",
+  "until": "P2-06",
+  "sourceSpec": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-03.md",
+  "implementation": "Persist in owned runbook and qualification receipt after active source-stable run completes."
+}

@@ -1,0 +1,74 @@
+{
+  "schema": "p125-client-future-source-control-recipes/1",
+  "operators": [
+    {
+      "id": "C1-certReq-false",
+      "target": "src/time/tsaClient.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+        "readScope": "full source/metadata read"
+      },
+      "before": "    Buffer.from([0x01, 0x01, 0xff]));\n",
+      "after": "    Buffer.from([0x01, 0x01, 0x00]));\n",
+      "matchCountRequired": 1,
+      "beforeLine": 67,
+      "beforeSha256": "95820a1a9df8d7e04e1b7baf24f7c7e3d0c033d16148d28075132b8c04826cc6",
+      "afterSha256": "f7182faffb27424ee1de0ca28b59d7c7c6f8b9930adf23f9bc4dd54f7f75976a",
+      "proposedWholeFile": {
+        "bytes": 10927,
+        "sha256": "07c5a901c577f845982b44e94059e396f057a6f94e8a66a43b3f407ff27abe42"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/C1-certReq-false.patch",
+        "bytes": 412,
+        "sha256": "1bb9fbacc7dda0e6bcf46dc55991334aef50f813205005c599a79b108a48499b",
+        "readScope": "exact unexecuted recipe"
+      },
+      "witness": {
+        "family": "DER-01",
+        "firstSemanticAssertion": "After the actual version/imprint/nonce positives, assert final BOOLEAN TLV bytes equal0101ff and valueff. Mutant produces010100. Expected bit is a fixed literal, not derived from the same encoder.",
+        "masking": "Earlier constructor/shape/imprint failures would mask the bit check; do not infer the bit witness unless it is actually reached."
+      },
+      "actualFailureCount": null,
+      "applied": false
+    },
+    {
+      "id": "C2-ignore-response-MIME",
+      "target": "src/time/tsaClient.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+        "readScope": "full source/metadata read"
+      },
+      "before": "      if (status !== expectedStatus || type !== accept) {\n",
+      "after": "      if (status !== expectedStatus) {\n",
+      "matchCountRequired": 1,
+      "beforeLine": 113,
+      "beforeSha256": "b70d664dbe672e3cea899eca615122e1915a6bdd5d7e3f8eae480d853ef4ff2a",
+      "afterSha256": "b7671a6d3fb67e5874021b486984ed96a20a48e09ac3296c0fd5b531610bb5df",
+      "proposedWholeFile": {
+        "bytes": 10908,
+        "sha256": "21321afdac587df4fd834909c5c0f44e4d32d79b11fe77369afa59fb2bc54baa"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/C2-ignore-response-MIME.patch",
+        "bytes": 648,
+        "sha256": "cda51cf7e9242a0acbdea9506e07096c43e3f65df545cec3b63f261384c8ed15",
+        "readScope": "exact unexecuted recipe"
+      },
+      "witness": {
+        "family": "HTTP-06",
+        "firstSemanticAssertion": "After the adjacent valid200/timestamp-reply positive, a200/text-plain response with the same finite public body must reject with the actual content-type refusal. With only MIME admission removed, it resolves raw bytes and the rejection assertion is the primary witness.",
+        "masking": "Do not place a server-count assertion or a verifier/token assertion before this promise-refusal witness. Preserve body/fixture-close errors separately. Actual failure identities/counts remain unknown."
+      },
+      "actualFailureCount": null,
+      "applied": false
+    }
+  ],
+  "futureProtocol": "Only after root admission and actual canonical qualification, one operator at a time in an owned bound fresh copy; exact physical single-link/source/protected guards, immutable originals/livepatch, actual closedRED/manual all-failure+masking classification, exact restore and identical-corpus actualGREEN. No source mutant stored/executed here.",
+  "noEgressOrDeadlineMutation": true,
+  "noVerificationOrGrantCredit": true
+}

@@ -1,0 +1,19 @@
+# Test fixture for the P1-33 admission checker (synthetic; not AMC content).
+id: amc.l1.fixture
+version: 1.0.0
+layer: 1
+title: Admission fixture pack
+stations: [wealth]
+jurisdictions: [US]
+compilerCompat: ">=1.0.0"
+publisher: AgentMaturity (test fixture)
+maintainers:
+  - { name: Fixture Maintainer, role: maintainer }
+licence: MIT
+support: reviewed
+controls: [L1-FIX-01]
+stewardship:
+  partner: Fixture Partner Bank
+  updatePlan: "owner: fixture-maintainer; funding: fixture budget line"
+  triageTargetDays: 14
+  coverageDoc: docs/coverage.md

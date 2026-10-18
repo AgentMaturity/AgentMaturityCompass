@@ -1,0 +1,87 @@
+{
+  "schema": "p125-window-history-peer-private-seal/1",
+  "at": "2026-10-17T00:03:43.331356+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/history-peer/closed-read-observations.json",
+      "bytes": 16616,
+      "sha256": "e433dc45b12d5a113b1ec8cf7504fd1c31b4c6d5dea7621de48ad77400061f86"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/history-peer/read-tool-results.json",
+      "bytes": 13691,
+      "sha256": "357eadf705c2a642a962dcaaaee6cb82c8373d0e63a897efc9d0b2fb3d155bf1"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/history-peer/review.json",
+      "bytes": 5019,
+      "sha256": "cc4b7d0dce759252ee7d07e5ae211618aa43c56e56d2d83ea1b5ae5d015ec5b0"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/history-peer/README.md",
+      "bytes": 2053,
+      "sha256": "985b178d66076d4ba74be6564cab3cb08e69257e078a3e6d20b1d8994595b77f"
+    }
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-scope-review/observations.json",
+      "bytes": 1099438,
+      "sha256": "596e26972f3bab7ac58805f712834eba26beea8dac05e1ac76eea9febdc6b81a",
+      "dev": 16777231,
+      "inode": 543653460,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-scope-review/history-authorities.json",
+      "bytes": 5532,
+      "sha256": "f8a37ef8668963d6a8673c33a0222d4011415fa14ecd9127c2057bb7b25ff41f",
+      "dev": 16777231,
+      "inode": 543653529,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-scope-review/three-path-history-with-names.json",
+      "bytes": 11614,
+      "sha256": "1fd88915a93e0fc81e259bb15f31c4592200eb51f66d6a3541a29002e65ae39e",
+      "dev": 16777231,
+      "inode": 543653484,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-scope-review/review.json",
+      "bytes": 5643,
+      "sha256": "4d4f8679f600fc3520f8c4b0c55139338e3c778c873a237fedec38658a007ce7",
+      "dev": 16777231,
+      "inode": 543653530,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-scope-preparation/review.json",
+      "bytes": 5536,
+      "sha256": "862243c0fa50a99f1d59284d3856c62da1bb503c3c2f7b1de0470d689be8214a",
+      "dev": 16777231,
+      "inode": 543659995,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-scope-preparation/closed-read-observations.json",
+      "bytes": 1456322,
+      "sha256": "c272e61da7834918d7001e0f168b7f8db3983e2d356287d002267e04cffb0767",
+      "dev": 16777231,
+      "inode": 543659909,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/protected-inputs.json",
+      "bytes": 73883,
+      "sha256": "d5e42ca4121f2cb2b098303d1e79e8645ba02045bd012c466a0b55ec5a0e62ca",
+      "dev": 16777231,
+      "inode": 543741190,
+      "nlink": 1
+    }
+  ],
+  "blockers": [],
+  "all12GitChildrenNaturalExit0": true,
+  "sourceAllocation": false
+}

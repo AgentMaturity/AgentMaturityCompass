@@ -291,16 +291,17 @@ export function verifyIndustryPackLicenseKey(
 /**
  * `amc domain pack verify` (P0-51): the licence verdict as a VerifierReportV1, against the same keys the gate uses
  * (P1-51): only a key the trust list pins for artifact-seal, never --pubkey or an environment key. With none pinned the
- * verdict is "not configured". An HMAC-signed or legacy allowlisted licence names no signer, so it is never trusted.
+ * verdict is "not configured". A list key the list refuses that did sign the licence is named with that refusal (P0-51).
+ * An HMAC-signed or legacy allowlisted licence names no signer, so it is never trusted.
  */
 export function verifyIndustryPackLicenseReport(licenseKey: string, trust: TrustContext, now = Date.now()):
   ReturnType<typeof verifyIndustryPackLicenseKey> & { report: VerifierReportV1 } {
-  const { signer, result } = pinnedLicenseVerdict(licenseKey, trust, now);
+  const { signer, refusal, checks, result } = pinnedLicenseVerdict(licenseKey, trust, now);
   const report = buildVerifierReport({ artifact: { kind: "industry-pack-license", path: "--key", sha256: sha256Hex(licenseKey.trim()) },
-    context: trust, integrityErrors: result.valid ? [] : [result.reason ?? "license verification failed"], anchoring: { status: "not-applicable", detail: null },
-    signatures: [admitKey({ publicKeyPem: signer, purpose: INDUSTRY_PACKS_LICENSE_PURPOSE, signature: "license signature", context: trust,
+    context: trust, integrityErrors: checks.valid ? [] : [checks.reason ?? "license verification failed"], anchoring: { status: "not-applicable", detail: null },
+    signatures: [refusal ?? admitKey({ publicKeyPem: signer, purpose: INDUSTRY_PACKS_LICENSE_PURPOSE, signature: "license signature", context: trust,
       claimedSignedAt: result.payload?.issuedAt ?? null })] });
-  return { ...result, valid: report.trusted, report };
+  return { ...result, valid: result.valid && report.trusted, report };
 }
 
 export function buildIndustryPackCheckoutUrl(params: {
@@ -346,14 +347,28 @@ export function verifyPinnedIndustryPackLicense(licenseKey: string, trust: Trust
 function pinnedLicenseVerdict(licenseKey: string, trust: TrustContext, now: number) {
   const keys = admittedListKeys(trust, INDUSTRY_PACKS_LICENSE_PURPOSE);
   const [prefix, payloadPart = "", signaturePart = ""] = licenseKey.trim().split(".");
-  const signer = prefix === INDUSTRY_PACKS_LICENSE_PREFIX ? keys.find((pem) => verifyPayloadEd25519(payloadPart, signaturePart, pem)) ?? null : null;
+  const signedBy = (pems: string[]) => prefix === INDUSTRY_PACKS_LICENSE_PREFIX
+    ? pems.find((pem) => verifyPayloadEd25519(payloadPart, signaturePart, pem)) ?? null : null;
+  // The licence's own checks (format, payload, status, expiry) against one key, with no secret or allowlist.
+  const checksBy = (pem: string) => verifyIndustryPackLicenseKey(licenseKey, { AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: pem }, now);
+  const signer = signedBy(keys);
+  if (signer !== null) {
+    const checks = checksBy(signer);
+    return { signer, refusal: null, checks, result: checks };
+  }
+  // Naming only: a list key the list refuses (distrusted, revoked, expired, wrong purpose) that did sign the licence is
+  // reported with that refusal, judged at the verification time as admittedListKeys judged it. It never makes it valid.
+  const refusedSigner = signedBy(trust.lists.flatMap((list) => list.entries.map((entry) => entry.publicKeyPem)));
+  if (refusedSigner !== null) {
+    const refusal = admitKey({ publicKeyPem: refusedSigner, purpose: INDUSTRY_PACKS_LICENSE_PURPOSE, signature: "license signature", context: trust });
+    const checks = checksBy(refusedSigner);
+    return { signer: refusedSigner, refusal, checks,
+      result: { valid: false, payload: checks.payload, reason: `the licence signing key is refused by the trust list: ${refusal.detail ?? refusal.status}` } };
+  }
   const result: ReturnType<typeof verifyIndustryPackLicenseKey> = keys.length === 0
     ? { valid: false, payload: null, reason: LICENSE_VERIFICATION_NOT_CONFIGURED }
-    : signer === null
-      ? { valid: false, payload: null, reason: "the licence is not signed by a pinned Industry Packs licence key" }
-      // The licence's own checks (format, payload, status, expiry) against that one key, with no secret or allowlist.
-      : verifyIndustryPackLicenseKey(licenseKey, { AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: signer }, now);
-  return { signer, result };
+    : { valid: false, payload: null, reason: "the licence is not signed by a pinned Industry Packs licence key" };
+  return { signer: null, refusal: null, checks: result, result };
 }
 
 function operatorTrust(env: NodeJS.ProcessEnv): { trust: TrustContext | null; error: string | null } {

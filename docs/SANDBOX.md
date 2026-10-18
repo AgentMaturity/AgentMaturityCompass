@@ -54,9 +54,10 @@ it: a child of a refused parent is refused.
 
 Every opted-in session prints this warning on stderr (never on the ACP protocol
 stream). Studio returns the same text as `shell.reason` in the native-task
-options and shows it as a banner in task setup. `AMCNativeClient` discards the
-spawned `amc acp` process's stderr, so an SDK caller that opts in does not see
-the warning; the receipts below still record it.
+options and shows it as a banner in task setup. `AMCNativeClient` forwards only this exact native-shell warning from
+the spawned `amc acp` process to the operator's stderr. Other child diagnostics
+remain private. An unsafe option alone does not print a warning when Seatbelt
+confines the shell; the warning must actually come from the child.
 
 ```text
 WARNING: the native shell is UNCONFINED on darwin (opt-in: cli-flag). Commands run with your full user rights: files outside the workspace, ~/.ssh and the network are reachable. Receipts record enforcement: none.

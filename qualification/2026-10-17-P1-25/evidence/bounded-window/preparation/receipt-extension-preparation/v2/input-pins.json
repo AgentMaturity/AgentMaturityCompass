@@ -1,0 +1,48 @@
+{
+  "schema": "p125w-private-extension-v2-skeleton-inputs/1",
+  "at": "2026-10-17T00:28:34.650328+00:00",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/assemble-extension.py.source.txt",
+      "bytes": 36920,
+      "sha256": "8ab30e2239b1a91b8338f09ed75be92ae478475a1ae9e293fce155f56198aa88"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/seal.json",
+      "bytes": 2187,
+      "sha256": "3d567d0b880166aefb17cffb460c9077221420e2c2de299883cfaff91b75fd1c"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/input-template.json",
+      "bytes": 8557,
+      "sha256": "cf795387ea0964bb501f84425c6263f766afd31a1572096ca7c972f9bc42eda7"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/input-pins.json",
+      "bytes": 4936,
+      "sha256": "dfef8c6b08ceeda9b9c316408ec3851a27030eb3327fec7fdf3980a6e0752ea0"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/README.md",
+      "bytes": 4911,
+      "sha256": "77f6822526867ee1f39fb70c4bef72e1b7891e8c0f9991295a2c14ded6941281"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/report.json",
+      "bytes": 1469,
+      "sha256": "3d2d110ef31760cd3f33d2aa5c7fab0f88b3fb74e4eb4f4c65d91ce8e7fb18e7"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-control.py",
+      "bytes": 21942,
+      "sha256": "73203ebcbe63fcf8273510a79e5b4e72f78656c41c9ffd2c9228e8b266496b32"
+    }
+  ],
+  "preservedV1DeclaredOutputPinsAllExact": true,
+  "preservedV1FullInputs": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/input-pins.json",
+    "bytes": 4936,
+    "sha256": "dfef8c6b08ceeda9b9c316408ec3851a27030eb3327fec7fdf3980a6e0752ea0"
+  },
+  "noHelperOrProductExecution": true
+}

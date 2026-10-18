@@ -1,0 +1,310 @@
+[
+  {
+    "source": "/private/tmp/p1-25-fallback-qualification-20261017/m1.patch",
+    "relativePath": "evidence/tsa-fallback/m1.patch",
+    "bytes": 624,
+    "sha256": "c62b9a4a7d71807af886c065889b1448cc9b6167711bcb0f21806a7c96fbdd22",
+    "envelope": "evidence/tsa-fallback/m1.patch.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-25-fallback-qualification-20261017/m2.patch",
+    "relativePath": "evidence/tsa-fallback/m2.patch",
+    "bytes": 513,
+    "sha256": "78c67228af26e6e4832291aef960142e8655bc09312b079fc3be217830ef4508",
+    "envelope": "evidence/tsa-fallback/m2.patch.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-25-fallback-qualification-20261017/m3.patch",
+    "relativePath": "evidence/tsa-fallback/m3.patch",
+    "bytes": 567,
+    "sha256": "ce4a036cde6be44ad26b1adbabd61a343041347d8d000ac0bfc4f56c0475eca6",
+    "envelope": "evidence/tsa-fallback/m3.patch.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/source-control.py.adaptation.patch",
+    "relativePath": "evidence/tsa-fallback/fresh-control-preparation/source-control.py.adaptation.patch",
+    "bytes": 8309,
+    "sha256": "7ecaf53d00768bcbc287ab4c754c27f148e3100a453c40695c2d8ac0b24e2688",
+    "envelope": "evidence/tsa-fallback/fresh-control-preparation/source-control.py.adaptation.patch.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/check-preservation.py.adaptation.patch",
+    "relativePath": "evidence/tsa-fallback/fresh-control-preparation/check-preservation.py.adaptation.patch",
+    "bytes": 1454,
+    "sha256": "21ca6b925d02cca942fed94671889235467e903ae9d20cfc7a89483cacf95985",
+    "envelope": "evidence/tsa-fallback/fresh-control-preparation/check-preservation.py.adaptation.patch.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/F1-order.patch",
+    "relativePath": "evidence/tsa-fallback/fresh-control-preparation/F1-order.patch",
+    "bytes": 483,
+    "sha256": "188026c7a797e261a231e0a1e7a4fc48b166da6e900de1a3c4ac44423d1fd02b",
+    "envelope": "evidence/tsa-fallback/fresh-control-preparation/F1-order.patch.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/F2-no-continue.patch",
+    "relativePath": "evidence/tsa-fallback/fresh-control-preparation/F2-no-continue.patch",
+    "bytes": 372,
+    "sha256": "acf155f0784b44bc37b6b86df4457d132519c21e02c363b6b60bb99f5fe67d15",
+    "envelope": "evidence/tsa-fallback/fresh-control-preparation/F2-no-continue.patch.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/F3-unpinned-dispatch.patch",
+    "relativePath": "evidence/tsa-fallback/fresh-control-preparation/F3-unpinned-dispatch.patch",
+    "bytes": 426,
+    "sha256": "ee3c4fa172414abbcc4f6cc9773e6044944a34db61efcc0a6604354676bcc3d3",
+    "envelope": "evidence/tsa-fallback/fresh-control-preparation/F3-unpinned-dispatch.patch.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-25-fallback-qualification-20261017/runtime-audit-preparation/audit-observed.py.patch",
+    "relativePath": "evidence/tsa-fallback/runtime-audit-preparation/audit-observed.py.patch",
+    "bytes": 1515,
+    "sha256": "756b47edc1f9782cc4e1bdacd0cd56121765a3a3d1192ccb6b29f7a779c4b1af",
+    "envelope": "evidence/tsa-fallback/runtime-audit-preparation/audit-observed.py.patch.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-25-fallback-qualification-20261017/runtime-audit-preparation/capture-quality.mjs.patch",
+    "relativePath": "evidence/tsa-fallback/runtime-audit-preparation/capture-quality.mjs.patch",
+    "bytes": 879,
+    "sha256": "f8b4b2957c61d93fa4a68d2daf839eb157b4025c906c018e9548f9ff3d5ee88a",
+    "envelope": "evidence/tsa-fallback/runtime-audit-preparation/capture-quality.mjs.patch.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-lint/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-lint/stdout-stderr.log",
+    "bytes": 447,
+    "sha256": "22a03ddf6f49358fb4bcfe04bd56da9a1a9e26cc5aa8ffde1b5892abef468b95",
+    "envelope": "evidence/tsa-fallback/commands/p125f-lint/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-counts/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-source-counts/stdout-stderr.log",
+    "bytes": 239,
+    "sha256": "82ac60039fcf8bc00dc663aabd78dcafc658cffc866e81929505bb199e8df7e4",
+    "envelope": "evidence/tsa-fallback/commands/p125f-source-counts/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-architecture/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-source-architecture/stdout-stderr.log",
+    "bytes": 95863,
+    "sha256": "b087df083209af89c9f69496ec867445d1dd69fb2b68b44665ac280965341751",
+    "envelope": "evidence/tsa-fallback/commands/p125f-source-architecture/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore2/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-restore2/stdout-stderr.log",
+    "bytes": 4664,
+    "sha256": "394a7fbead946cc491fc72fb9b7381821f746ed6e0b1d3cf2999aadc66b2883a",
+    "envelope": "evidence/tsa-fallback/commands/p125f-restore2/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore3/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-restore3/stdout-stderr.log",
+    "bytes": 4662,
+    "sha256": "2a3d2fb43bc32bf0e9c643dfd355713c90ce5b6ea779917009ef5099b9298fb5",
+    "envelope": "evidence/tsa-fallback/commands/p125f-restore3/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-metadata-scope-freeze/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-metadata-scope-freeze/stdout-stderr.log",
+    "bytes": 268,
+    "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad",
+    "envelope": "evidence/tsa-fallback/commands/p125f-metadata-scope-freeze/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-gates/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-source-gates/stdout-stderr.log",
+    "bytes": 821,
+    "sha256": "5664206ddf6d3b7a49d53c87907f78750517c4c583479f77268a1da353dba4ed",
+    "envelope": "evidence/tsa-fallback/commands/p125f-source-gates/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-docs/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-source-docs/stdout-stderr.log",
+    "bytes": 205,
+    "sha256": "ff57cb43abfed0a3cdba4ccb780bf3ee40b5fe7ddb1345e712cb8ca9a6e5461a",
+    "envelope": "evidence/tsa-fallback/commands/p125f-source-docs/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-types/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-source-types/stdout-stderr.log",
+    "bytes": 149,
+    "sha256": "ffc3342aa63f1c01882b849ff8dd0a3cd4e7b509f07c4fb8c69713242b5a98d5",
+    "envelope": "evidence/tsa-fallback/commands/p125f-source-types/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-node-version/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-node-version/stdout-stderr.log",
+    "bytes": 61,
+    "sha256": "7ab8034b4f8d37c15aaeb23382c1a47b4eaa359c395fb7ec1ca6f86a7bc0bac6",
+    "envelope": "evidence/tsa-fallback/commands/p125f-node-version/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-build/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-build/stdout-stderr.log",
+    "bytes": 955,
+    "sha256": "e6e36dcd7bda0fc5d63469c9f1781ef19fe59c3a49afbf5d2c7c6c0c8dd1acce",
+    "envelope": "evidence/tsa-fallback/commands/p125f-build/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-unchanged-verifier/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-unchanged-verifier/stdout-stderr.log",
+    "bytes": 414,
+    "sha256": "31e1b5e9d241488863ee7f83e39cdd6af74a4c150aecf037f45621ee9333dc1a",
+    "envelope": "evidence/tsa-fallback/commands/p125f-unchanged-verifier/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-test-types/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-test-types/stdout-stderr.log",
+    "bytes": 161,
+    "sha256": "fb4ed4c9025dd5e6271e65a32d037c413d19a08be3c3b2a5cac093c68f75f865",
+    "envelope": "evidence/tsa-fallback/commands/p125f-test-types/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m1/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-m1/stdout-stderr.log",
+    "bytes": 8276,
+    "sha256": "90b41083465e8c37f0ed1ee221d8ab3a00eac427d661ee880272acaa7682583d",
+    "envelope": "evidence/tsa-fallback/commands/p125f-m1/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-fresh-canonical/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-fresh-canonical/stdout-stderr.log",
+    "bytes": 4671,
+    "sha256": "30c158981f9eceaf1ae3287874f41c2aaea34e69a7fbb1782dd45fcfd231910e",
+    "envelope": "evidence/tsa-fallback/commands/p125f-fresh-canonical/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-clean-source/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-clean-source/stdout-stderr.log",
+    "bytes": 852,
+    "sha256": "d6ba61c563805786f467fa233da94d85ac671154a3d7ff71926605cfe5c70daa",
+    "envelope": "evidence/tsa-fallback/commands/p125f-clean-source/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-pnpm-version/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-pnpm-version/stdout-stderr.log",
+    "bytes": 8,
+    "sha256": "62c33a14fe98185100efaeadf9bc76d70d6b76f1c026b4f7ead06cd6d417aacf",
+    "envelope": "evidence/tsa-fallback/commands/p125f-pnpm-version/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-threat/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-source-threat/stdout-stderr.log",
+    "bytes": 294,
+    "sha256": "d8a37764ab52c8fe6a84b8aaf1de67c240c7f01698f2abf5b1a802764503d3f4",
+    "envelope": "evidence/tsa-fallback/commands/p125f-source-threat/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-dead-code-after/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-dead-code-after/stdout-stderr.log",
+    "bytes": 1207,
+    "sha256": "770a8a1d051a73cff8ccc73804b660ff07ced6240ab077a2ae0a6f516c784043",
+    "envelope": "evidence/tsa-fallback/commands/p125f-dead-code-after/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore1/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-restore1/stdout-stderr.log",
+    "bytes": 4670,
+    "sha256": "ff6fc10aaeeb93930ee392c0f371ba7a9bf668c6342fc75212a2e2408d57cd5a",
+    "envelope": "evidence/tsa-fallback/commands/p125f-restore1/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-count-scope-d15/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-count-scope-d15/stdout-stderr.log",
+    "bytes": 5,
+    "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345",
+    "envelope": "evidence/tsa-fallback/commands/p125f-count-scope-d15/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-quality-after-diagnostic/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-quality-after-diagnostic/stdout-stderr.log",
+    "bytes": 121,
+    "sha256": "306de4fc2d96e0d9d44a4aa59f3764830f719cbf336f2f37be06eee6f4130f90",
+    "envelope": "evidence/tsa-fallback/commands/p125f-quality-after-diagnostic/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-source-combined/stdout-stderr.log",
+    "bytes": 4581,
+    "sha256": "cc4fee427d9d010a54f3f789ce0f3249177b8197aba1264c2636072a16816a47",
+    "envelope": "evidence/tsa-fallback/commands/p125f-source-combined/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-count-scope-freeze/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-count-scope-freeze/stdout-stderr.log",
+    "bytes": 268,
+    "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad",
+    "envelope": "evidence/tsa-fallback/commands/p125f-count-scope-freeze/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-counts-before/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-counts-before/stdout-stderr.log",
+    "bytes": 1436,
+    "sha256": "e688944294e77493bcfdb36adbb6cbf3e6178b9a6ceed2587bce68213b653d9a",
+    "envelope": "evidence/tsa-fallback/commands/p125f-counts-before/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-notices/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-source-notices/stdout-stderr.log",
+    "bytes": 246,
+    "sha256": "b08a81bb4bc0bf41a60819f50f08086ced4d2a2e97ae8676d4948ca3695ecb00",
+    "envelope": "evidence/tsa-fallback/commands/p125f-source-notices/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-metadata-scope-d15/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-metadata-scope-d15/stdout-stderr.log",
+    "bytes": 5,
+    "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345",
+    "envelope": "evidence/tsa-fallback/commands/p125f-metadata-scope-d15/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-pre-freeze/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-pre-freeze/stdout-stderr.log",
+    "bytes": 268,
+    "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad",
+    "envelope": "evidence/tsa-fallback/commands/p125f-pre-freeze/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-freeze/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-source-freeze/stdout-stderr.log",
+    "bytes": 268,
+    "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad",
+    "envelope": "evidence/tsa-fallback/commands/p125f-source-freeze/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-pre-d15/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-pre-d15/stdout-stderr.log",
+    "bytes": 5,
+    "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345",
+    "envelope": "evidence/tsa-fallback/commands/p125f-pre-d15/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-generate-counts/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-generate-counts/stdout-stderr.log",
+    "bytes": 176,
+    "sha256": "01c62fa9c66c468bd10c769615d94804a36d50969143b181132a836158ebfbc4",
+    "envelope": "evidence/tsa-fallback/commands/p125f-generate-counts/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-duplicates-after/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-duplicates-after/stdout-stderr.log",
+    "bytes": 2064,
+    "sha256": "62545f898b95ab3125616ea8bf2872244314dd98d3db67b8ff58c707e6d31e29",
+    "envelope": "evidence/tsa-fallback/commands/p125f-duplicates-after/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m3/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-m3/stdout-stderr.log",
+    "bytes": 6211,
+    "sha256": "ad5d064fe989ab8f4b08338e6a5e8af476a6ce5a9d7b05c40fff73983166226a",
+    "envelope": "evidence/tsa-fallback/commands/p125f-m3/stdout-stderr.log.evidence.json"
+  },
+  {
+    "source": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m2/stdout-stderr.log",
+    "relativePath": "evidence/tsa-fallback/commands/p125f-m2/stdout-stderr.log",
+    "bytes": 6382,
+    "sha256": "c824aad1cc5cc213455b85e7e8d11adc6a0072aadf429094313ea1a1b635b433",
+    "envelope": "evidence/tsa-fallback/commands/p125f-m2/stdout-stderr.log.evidence.json"
+  }
+]

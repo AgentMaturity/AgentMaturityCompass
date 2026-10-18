@@ -1,0 +1,81 @@
+{
+  "schema": "p125ec-inert-binder-field-contract/1",
+  "selectionSpecification": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+    "schema": "p125ec-finite-fresh-source-selection/1",
+    "keys": [
+      "schema",
+      "sourceRoot",
+      "relativePaths",
+      "compiledPairs",
+      "selectedPathCount",
+      "compiledPairCount",
+      "priorProposalPin",
+      "readonlyDependencyPairsPin",
+      "priorRelativePathsOrderExact",
+      "priorCompiledPairsOrderExact",
+      "activeProtectedInputsRequired",
+      "existingNativePinsRequired",
+      "futureFreshNativeRequired",
+      "futureSourceCommit",
+      "freshRoot",
+      "compiledBeforeBuildObservationHashesAreNotAdopted",
+      "boundary",
+      "priorBindingPin"
+    ],
+    "namesKey": "relativePaths",
+    "pairsKey": "compiledPairs",
+    "priorBindingPinKey": "priorBindingPin"
+  },
+  "futureRootInputsNotYetConsumed": {
+    "sourceCheckpoint": {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-checkpoint.json",
+      "consumedField": "commit",
+      "actualCommit": null
+    },
+    "cleanSourceCommand": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125ec-clean-source/command.json",
+      "requiredClosedPhase": "p125ec-clean-source",
+      "actualExitOrRoot": null
+    }
+  },
+  "futureBindingOutput": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-source-binding.json",
+    "schema": "p125ec-actual-fresh-source-binding/1",
+    "keys": [
+      "schema",
+      "at",
+      "sourceRoot",
+      "freshRoot",
+      "sourceCommit",
+      "boundPaths",
+      "compiledPairs",
+      "existingNativePins",
+      "freshNative",
+      "helper",
+      "runtimeProtectedInputsPin",
+      "vitestCreditFromHelper",
+      "prospectiveCountOrCompiledHashesAdopted",
+      "all161ActiveProtectedInputsExact",
+      "selectedPathCount",
+      "compiledPairCount",
+      "selectedPhysicalFileCount",
+      "allSelectedPhysicalFilesDistinctRegularSingleLink",
+      "sourceSelectionPin",
+      "heldRHead18RowsIndexExact",
+      "bothTreesCleanAndIndexesEmpty",
+      "universalDescendantFilesystemEnvironmentLoaderIsolationClaim",
+      "allHoldsRetained"
+    ],
+    "relativePathRows": "Each boundPaths row retains relativePath, bytes, sha256, source and fresh full physical pins.",
+    "derivedNameAndPairCounts": [
+      98,
+      21
+    ],
+    "derivedPhysicalCountIfSuccessful": 196,
+    "oldNativeCount": 11,
+    "freshNativeMustBeAdditionalAndDistinct": true,
+    "noOld188Alias": true
+  },
+  "noOutputOrActualFutureHashCreated": true
+}

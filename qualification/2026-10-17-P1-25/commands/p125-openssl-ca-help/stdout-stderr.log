@@ -1,0 +1,82 @@
+Usage: ca [options] [certreq...]
+
+General options:
+ -help                   Display this summary
+ -verbose                Verbose output during processing
+ -quiet                  Terse output during processing
+ -outdir dir             Where to put output cert
+ -in infile              The input cert request(s)
+ -inform PEM|DER         CSR input format to use (PEM or DER; by default try PEM first)
+ -infiles                The last argument, requests to process
+ -out outfile            Where to put the output file(s)
+ -dateopt val            Datetime format used for printing. (rfc_822/iso_8601). Default is rfc_822.
+ -notext                 Do not print the generated certificate
+ -batch                  Don't ask questions
+ -msie_hack              msie modifications to handle all Universal Strings
+ -ss_cert infile         File contains a self signed cert to sign
+ -spkac infile           File contains DN and signed public key and challenge
+ -engine val             Use engine, possibly a hardware device
+
+Configuration options:
+ -config val             A config file
+ -name val               The particular CA definition to use
+ -section val            An alias for -name
+ -policy val             The CA 'policy' to support
+
+Certificate options:
+ -subj val               Use arg instead of request's subject
+ -utf8                   Input characters are UTF8; default ASCII
+ -create_serial          If reading serial fails, create a new random serial
+ -rand_serial            Always create a random serial; do not store it
+ -multivalue-rdn         Deprecated; multi-valued RDNs support is always on.
+ -startdate val          [CC]YYMMDDHHMMSSZ value for notBefore certificate field
+ -not_before val         An alias for -startdate
+ -enddate val            [CC]YYMMDDHHMMSSZ value for notAfter certificate field, overrides -days
+ -not_after val          An alias for -enddate
+ -days +int              Number of days from today to certify the cert for
+ -extensions val         Extension section (override value in config file)
+ -extfile infile         Configuration file with X509v3 extensions to add
+ -preserveDN             Don't re-order the DN
+ -noemailDN              Don't add the EMAIL field to the DN
+
+Signing options:
+ -md val                 Digest to use, such as sha256
+ -keyfile val            The CA private key
+ -keyform format         Private key file format (ENGINE, other values ignored)
+ -passin val             Key and cert input file pass phrase source
+ -key val                Key to decrypt the private key or cert files if encrypted. Better use -passin
+ -cert infile            The CA cert
+ -certform PEM|DER       Certificate input format (DER/PEM/P12); has no effect
+ -selfsign               Sign a cert with the key associated with it
+ -sigopt val             Signature parameter in n:v form
+ -vfyopt val             Verification parameter in n:v form
+
+Revocation options:
+ -gencrl                 Generate a new CRL
+ -valid val              Add a Valid(not-revoked) DB entry about a cert (given in file)
+ -status val             Shows cert status given the serial number
+ -updatedb               Updates db for expired cert
+ -crlexts val            CRL extension section (override value in config file)
+ -crl_reason val         revocation reason
+ -crl_hold val           the hold instruction, an OID. Sets revocation reason to certificateHold
+ -crl_compromise val     sets compromise time to val and the revocation reason to keyCompromise
+ -crl_CA_compromise val  sets compromise time to val and the revocation reason to CACompromise
+ -crl_lastupdate val     Sets the CRL lastUpdate time to val (YYMMDDHHMMSSZ or YYYYMMDDHHMMSSZ)
+ -crl_nextupdate val     Sets the CRL nextUpdate time to val (YYMMDDHHMMSSZ or YYYYMMDDHHMMSSZ)
+ -crldays +int           Days until the next CRL is due
+ -crlhours +int          Hours until the next CRL is due
+ -crlsec +int            Seconds until the next CRL is due
+ -revoke infile          Revoke a cert (given in file)
+
+Random state options:
+ -rand val               Load the given file(s) into the random number generator
+ -writerand outfile      Write random data to the specified file
+
+Provider options:
+ -provider-path val      Provider load path (must be before 'provider' argument if required)
+ -provider val           Provider to load (can be specified multiple times)
+ -provparam val          Set a provider key-value parameter
+ -propquery val          Property query used when fetching algorithms
+
+Parameters:
+ certreq                 Certificate requests to be signed (optional)

@@ -1,0 +1,10 @@
+--- a/src/diagnostic/evidenceEmitters.ts
++++ b/src/diagnostic/evidenceEmitters.ts
+@@ -40,7 +40,6 @@
+ export const EVIDENCE_EMITTERS: readonly EmitterEntry[] = [
+   // A governed tool call (src/tools/toolEvidence.ts). Rows carry `questionIds` from LIVE_PROJECTION_RULES.
+   { id: "tool-call-allowed", module: "src/tools/toolEvidence.ts", eventType: "audit", auditType: "TOOL_CALL_ALLOWED", claimKind: "observed", producer: "amc-runtime", levelUse: ["L1", "L2"] },
+-  { id: "tool-call-denied", module: "src/tools/toolEvidence.ts", eventType: "audit", auditType: "TOOL_CALL_DENIED", claimKind: "observed", producer: "amc-runtime", levelUse: ["L1", "L2"] },
+   { id: "tool-call-failed", module: "src/tools/toolEvidence.ts", eventType: "audit", auditType: "TOOL_CALL_FAILED", claimKind: "observed", producer: "amc-runtime", levelUse: ["L1"] },
+   { id: "tool-call-outcome", module: "src/tools/toolEvidence.ts", eventType: "metric", metricKey: "tool_call_outcome", claimKind: "observed", producer: "amc-runtime", levelUse: ["L1", "L2"] },
+   { id: "tool-output-digest", module: "src/tools/toolEvidence.ts", eventType: "stdout", claimKind: "observed", producer: "amc-runtime", levelUse: ["L1"] },

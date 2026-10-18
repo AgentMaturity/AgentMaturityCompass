@@ -1,0 +1,64 @@
+{
+  "source": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+  "counts": {
+    "numTotalTests": 418,
+    "numPassedTests": 411,
+    "numFailedTests": 7,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "success": false
+  },
+  "files": 9,
+  "components": {
+    "originalCases": 348,
+    "followupCases": 53,
+    "destinationCases": 4,
+    "historyCases": 13
+  },
+  "rawReportSha256": "deb1d5bc32542050eb8529da3b75b3540424c4f08e00da1e7736dbf68305c66f",
+  "failures": [
+    {
+      "file": "federationImportDestinationQualification.test.ts",
+      "name": "P0-52 genuine imports into static linked destinations refuses a static linked inbox before writing outside the recipient",
+      "status": "failed"
+    },
+    {
+      "file": "federationImportDestinationQualification.test.ts",
+      "name": "P0-52 genuine imports into static linked destinations refuses a static linked publisher before writing outside the recipient",
+      "status": "failed"
+    },
+    {
+      "file": "federationImportDestinationQualification.test.ts",
+      "name": "P0-52 genuine imports into static linked destinations refuses a static linked federation-root before writing outside the recipient",
+      "status": "failed"
+    },
+    {
+      "file": "federationPublisherHistoryQualification.test.ts",
+      "name": "publisher history across admitted-identity aliases signed-list key bucket to peer alias retains replay refusal",
+      "status": "failed"
+    },
+    {
+      "file": "federationPublisherHistoryQualification.test.ts",
+      "name": "publisher history across admitted-identity aliases signed-list key bucket to peer alias retains rollback refusal",
+      "status": "failed"
+    },
+    {
+      "file": "federationPublisherHistoryQualification.test.ts",
+      "name": "publisher history across admitted-identity aliases earlier duplicate peer alias retains the same publisher's replay refusal",
+      "status": "failed"
+    },
+    {
+      "file": "federationPublisherHistoryQualification.test.ts",
+      "name": "publisher history across admitted-identity aliases earlier duplicate peer alias retains the same publisher's rollback refusal",
+      "status": "failed"
+    }
+  ],
+  "cli": {
+    "commands": 10,
+    "exitAndEffectsMatched": 10,
+    "verifiedContentMatches": true,
+    "importedContentMatches": true,
+    "inputsUnchanged": true
+  },
+  "limits": "Selected Node22 only. Seven active production failures are retained; no full acceptance, mutation qualification, whole-suite/coverage/Node24/hosted/release claim."
+}

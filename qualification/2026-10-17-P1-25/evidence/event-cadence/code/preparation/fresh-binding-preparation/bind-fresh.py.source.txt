@@ -1,0 +1,66 @@
+"""Bind actual closed clean-source output; read-only source/fresh authority, private JSON only."""
+from pathlib import Path
+import json,hashlib,subprocess,datetime,stat,re
+B=Path('/private/tmp/p1-25-cadence-qualification-20261017');S=Path('/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass');R=Path('/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass');N=Path('/private/tmp/p1-39-post-typecheck-20261016')
+def git(root,*args):return subprocess.check_output(['git','--no-optional-locks',*args],cwd=root)
+def pin(p):
+ p=Path(p);s=p.lstat();assert stat.S_ISREG(s.st_mode) and s.st_nlink==1 and p.resolve()==p
+ d=p.read_bytes();e=p.lstat();assert (s.st_dev,s.st_ino,s.st_size,s.st_mtime_ns)==(e.st_dev,e.st_ino,e.st_size,e.st_mtime_ns)
+ return {'path':str(p),'physicalPath':str(p.resolve()),'bytes':len(d),'sha256':hashlib.sha256(d).hexdigest(),'dev':s.st_dev,'inode':s.st_ino,'nlink':s.st_nlink}
+def verify(row,physical=False):
+ a=pin(row['path']);keys=('bytes','sha256','physicalPath','dev','inode','nlink') if physical else ('bytes','sha256');assert all(a[k]==row[k] for k in keys),row['path'];return a
+assert all(not (N/n).exists() for n in ('ACTIVE','ACTIVE.json','HALTED','HALTED.json'))
+assert pin(B/'runtime-protected-inputs.json')['sha256']=='78523e735a11a6aef300a4609d2ee79f45a1b56a0edc1bfd8536bb52b7abb49f'
+p=json.loads((B/'runtime-protected-inputs.json').read_text());proposal=json.loads((B/'fresh-binding-preparation/source-selection.json').read_text());c=json.loads((N/'command-p125ec-clean-source/command.json').read_text());source=json.loads((B/'source-checkpoint.json').read_text());commit=source['commit'];assert re.fullmatch('[0-9a-f]{40}',commit)
+assert p['schema']=='p125ec-runtime-protected-inputs-after-one-own-test-successor/1'
+initial_pin=p['initial161Pinset'];verify(initial_pin,True);initial=json.loads(Path(initial_pin['path']).read_text())
+assert len(initial['inputs'])==len(p['inputs'])==161 and initial['nativePins']==p['nativePins']
+old_rows={row['path']:row for row in initial['inputs']};active_rows={row['path']:row for row in p['inputs']};assert len(old_rows)==len(active_rows)==161
+successor=p['oneAdmittedOwnSourceSuccessor'];old,new=successor['old'],successor['new']
+assert old['path']==new['path']==str(S/'tests/time/checkpointWindow.test.ts') and old_rows[old['path']]==old
+assert (old['bytes'],old['sha256'])!=(new['bytes'],new['sha256'])
+old_rows[new['path']]=new;assert old_rows==active_rows and p['allOther160MustRemainExactAfterSeparateSourceAdmission'] is True
+original=verify(successor['original'],True);candidate=verify(successor['candidate'],True)
+assert (original['bytes'],original['sha256'])==(old['bytes'],old['sha256']) and (candidate['bytes'],candidate['sha256'])==(new['bytes'],new['sha256'])
+assert (original['dev'],original['inode'])!=(new['dev'],new['inode'])
+verify(proposal['priorProposalPin'],True);verify(proposal['readonlyDependencyPairsPin'],True);verify(proposal['priorBindingPin'],True)
+prior=json.loads(Path(proposal['priorProposalPin']['path']).read_text());dependencies=json.loads(Path(proposal['readonlyDependencyPairsPin']['path']).read_text())
+assert len(prior['relativePaths'])==94 and len(prior['compiledPairs'])==19
+prior_binding=json.loads(Path(proposal['priorBindingPin']['path']).read_text());assert prior_binding['schema']=='p125w-actual-fresh-source-binding/1'
+assert [row['relativePath'] for row in prior_binding['boundPaths']]==prior['relativePaths'] and prior_binding['compiledPairs']==prior['compiledPairs']
+assert {(pair['sourceRelativePath'],pair['compiledRelativePath']) for pair in dependencies['pairs']}=={('src/credentials/credentialsPaths.ts','dist/credentials/credentialsPaths.js'),('src/transparency/anchors/anchor.ts','dist/transparency/anchors/anchor.js')}
+expected_names=list(prior['relativePaths']);expected_pairs=list(prior['compiledPairs'])
+for pair in dependencies['pairs']:
+ for name in (pair['sourceRelativePath'],pair['compiledRelativePath']):
+  if name not in expected_names:expected_names.append(name)
+ value={key:pair[key] for key in ('sourceRelativePath','compiledRelativePath')}
+ assert value not in expected_pairs;expected_pairs.append(value)
+assert proposal['relativePaths']==expected_names and proposal['compiledPairs']==expected_pairs
+assert proposal['futureSourceCommit'] is None and proposal['freshRoot'] is None
+assert proposal['compiledBeforeBuildObservationHashesAreNotAdopted'] is True
+assert len(p['inputs'])==proposal['activeProtectedInputsRequired']==161 and len(p['nativePins'])==proposal['existingNativePinsRequired']==11
+assert proposal['schema']=='p125ec-finite-fresh-source-selection/1' and proposal['sourceRoot']==str(S)
+assert len(proposal['relativePaths'])==len(set(proposal['relativePaths']))==proposal['selectedPathCount']==len(expected_names)
+assert len(proposal['compiledPairs'])==proposal['compiledPairCount']==len(expected_pairs)
+assert len({(pair['sourceRelativePath'],pair['compiledRelativePath']) for pair in proposal['compiledPairs']})==len(proposal['compiledPairs'])
+assert all(not Path(rel).is_absolute() and '..' not in Path(rel).parts for rel in proposal['relativePaths'])
+assert all(pair['sourceRelativePath'] in proposal['relativePaths'] and pair['compiledRelativePath'] in proposal['relativePaths'] for pair in proposal['compiledPairs'])
+assert c['phase']=='p125ec-clean-source' and c['log']==str(N/'command-p125ec-clean-source/stdout-stderr.log')
+assert c['exit']==0 and c['endedUtc'] and c['groupAbsentByESRCH'] and not c['signalsOtherThanZeroSent'] and c['cwd']==str(R) and c['head']==c['headAfter']==p['heldRHead']
+assert c['ownedProcess']['argv']==['/opt/homebrew/bin/pnpm','--dir',str(S),'exec','/opt/homebrew/opt/node@22/bin/node','scripts/clean-source-check.mjs','--keep']
+log=(N/'command-p125ec-clean-source/stdout-stderr.log').read_text();kept=re.findall('^kept: (/.+)$',log,re.M);assert len(kept)==1;q=(Path(kept[0])/'checkout').resolve();assert q.name=='checkout' and q.parent.name.startswith('amc-clean-source-') and q not in (S,R)
+for root in (S,q):
+ assert git(root,'rev-parse','HEAD').decode().strip()==commit and git(root,'status','--porcelain=v1')==b'' and git(root,'diff','--cached','--name-only')==b''
+assert git(R,'rev-parse','HEAD').decode().strip()==p['heldRHead'] and git(R,'status','--porcelain=v1').decode()==p['heldRStatus'] and git(R,'diff','--cached','--name-only').decode()==p['heldRStaged']==''
+for row in p['inputs']:verify(row,True)
+seen=set();rows=[]
+for rel in proposal['relativePaths']:
+ a,z=pin(S/rel),pin(q/rel);assert (a['bytes'],a['sha256'])==(z['bytes'],z['sha256']),rel
+ for t in (a,z):
+  k=(t['dev'],t['inode']);assert k not in seen;seen.add(k)
+ rows.append({'relativePath':rel,'bytes':a['bytes'],'sha256':a['sha256'],'source':a,'fresh':z})
+assert len(rows)==len(expected_names) and len(proposal['compiledPairs'])==len(expected_pairs)
+natives=[verify(r,True) for r in p['nativePins']];fresh=pin(q/'node_modules/better-sqlite3/build/Release/better_sqlite3.node');assert fresh['sha256']==natives[0]['sha256'] and fresh['bytes']==natives[0]['bytes'];alln=[*natives,fresh];ids={(a['dev'],a['inode']) for a in alln};assert len(ids)==len(natives)+1 and not ids&seen
+value={'schema':'p125ec-actual-fresh-source-binding/1','at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'sourceRoot':str(S),'freshRoot':str(q),'sourceCommit':commit,'boundPaths':rows,'compiledPairs':proposal['compiledPairs'],'existingNativePins':p['nativePins'],'freshNative':fresh,'helper':c,'runtimeProtectedInputsPin':pin(B/'runtime-protected-inputs.json'),'vitestCreditFromHelper':False,'prospectiveCountOrCompiledHashesAdopted':False,'all161ActiveProtectedInputsExact':True,'selectedPathCount':len(rows),'compiledPairCount':len(proposal['compiledPairs']),'selectedPhysicalFileCount':len(seen),'allSelectedPhysicalFilesDistinctRegularSingleLink':True,'sourceSelectionPin':pin(B/'fresh-binding-preparation/source-selection.json'),'heldRHead18RowsIndexExact':True,'bothTreesCleanAndIndexesEmpty':True,'universalDescendantFilesystemEnvironmentLoaderIsolationClaim':False,'allHoldsRetained':True}
+with (B/'fresh-source-binding.json').open('x') as f:json.dump(value,f,indent=2);f.write('\n')
+print(json.dumps({'commit':commit,'freshRoot':str(q),'selectedPathsEachRoot':len(rows),'compiledPairs':len(proposal['compiledPairs']),'activeProtectedPins':len(p['inputs']),'nativePins':len(alln),'freshNative':fresh}))

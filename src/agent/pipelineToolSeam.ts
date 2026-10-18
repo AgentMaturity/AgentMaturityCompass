@@ -37,6 +37,15 @@ export interface PipelineToolSeamInit {
 }
 
 /**
+ * What an unknown outcome's content starts with, before the tool's output: said to the model, so it does not retry on its
+ * own an effect that may already have happened. The redacting session sets exactly these aside (P2-02).
+ */
+export const OUTCOME_UNKNOWN_NOTICES = Object.freeze([
+  "[amc] outcome unknown: the action may have taken effect. It is not retried automatically. ",
+  "[amc] outcome unknown: the action may have taken effect. It is not retried automatically; it stays unreconciled. "
+] as const);
+
+/**
  * Map a pipeline outcome onto the loop's four independent facts.
  *
  * A journaled call (P1-03) reports its receipt, not the signal: CANCELLED only for a `cancelled` receipt, so a call
@@ -51,10 +60,7 @@ function toLoopOutcome(outcome: PipelineOutcome, aborted: boolean): ToolCallOutc
     || (state === undefined && outcome.effect === "unknown"))) {
     return {
       outcome: "TOOL_OUTCOME_UNKNOWN",
-      // Said to the model, so it does not retry on its own an effect that may already have happened.
-      content: state === undefined
-        ? `[amc] outcome unknown: the action may have taken effect. It is not retried automatically. ${outcome.output}`
-        : `[amc] outcome unknown: the action may have taken effect. It is not retried automatically; it stays unreconciled. ${outcome.output}`,
+      content: `${OUTCOME_UNKNOWN_NOTICES[state === undefined ? 0 : 1]}${outcome.output}`,
       exitCode: outcome.exitCode,
       timedOut: outcome.timedOut,
       denied: false

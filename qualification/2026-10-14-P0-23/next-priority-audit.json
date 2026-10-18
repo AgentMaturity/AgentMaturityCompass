@@ -1,0 +1,343 @@
+{
+  "kind": "Read-only next eligible current-plan item after bounded P0-23",
+  "createdAt": "2026-10-14T17:15:37.216949+00:00",
+  "recommendation": "P0-51",
+  "nextEligibleKey": "P0-51",
+  "selectionType": "Dependency-priority judgment among ready High follow-ups, not an exclusive or numeric-key rule",
+  "implementationStarted": false,
+  "why": "P0-51 is High, due 2026-10-07, Agent-Doable, with no listed index dependencies. It is the named verifier dependency of Urgent P0-55, whose qualification remains unresolved. Original and follow-up P0-51 source is already on accepted main, so reconcile and qualify existing behavior rather than recreate it. P0-46 is also ready at the same High priority/date; its omission from the older routing is corrected below. The plan does not state a numeric tie-breaker for these later-added keys.",
+  "authority": {
+    "request": "User serial current-plan priority/dependency order, preserve Claude work and freeze; parent confirms P0-22 bounded unresolved receipt and P0-23 API/Studio reservations.",
+    "primaryPlanInputs": [
+      {
+        "path": "/Users/sid/Downloads/Agent contract.md",
+        "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f",
+        "sameAsOctober14Handoff": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Issues.md",
+        "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541",
+        "sameAsOctober14Handoff": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Workstreams.md",
+        "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04",
+        "sameAsOctober14Handoff": true
+      },
+      {
+        "path": "/Users/sid/Downloads/A4 \u00b7 Forge.md",
+        "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65",
+        "sameAsOctober14Handoff": true
+      },
+      {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0",
+        "sameAsOctober14Handoff": true
+      }
+    ],
+    "issuesIndexRows": {
+      "P0-46": 56,
+      "P0-51": 61,
+      "P0-52": 62,
+      "P0-53": 63,
+      "P0-55": 65
+    },
+    "priorityScope": "Current G0 engineering qualification queue; no gate transition, tracker closure or publication inferred.",
+    "October12Reconciliation": "pending-checks.md:845 records15A4status edits (In progress/In review, noneDone) and D18/D20/D22 decision comments. This does not merge held source or approve accepted-base self-authorization.",
+    "ClaudeReservations": [
+      {
+        "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+        "lines": [
+          5,
+          10
+        ],
+        "meaning": "Original P0-54/P0-55 wave paths are merged/no longer in flight; do not invent a blanket issue reservation."
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+        "lines": [
+          342
+        ],
+        "meaning": "Original P0-51 verify-proof paths were explicitly released after merge."
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+        "lines": [
+          1496,
+          1504
+        ],
+        "meaning": "P0-14/30/31/32/34/35/36/40 and P1-52 remain in session7fccbbfa reservation; Codex lanes remain separate."
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+        "lines": [
+          1582,
+          1588
+        ],
+        "meaning": "Shared CLI registry/parser and API/Studio overlaps remain protected; no clearance comes from idle/merged source."
+      }
+    ]
+  },
+  "currentBoundaries": {
+    "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+    "heldClaudeIntegration": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+    "heldRoot": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+    "P0-22": {
+      "measuredSource": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+      "canonicalDocumentationCommit": "00fd180431317c253da6bcbd38f564d1a7f4f26b",
+      "state": "Bounded unresolved;512cases,510pass,2literalempty-arrayfailures,0pending/todo. No Done, full-suite or dependency closure."
+    },
+    "P0-23": "Active/bounded only; API/Studio reservations remain. This audit does not assert completion or invent a final source revision. Pin its final measured source and receipt before the next serial action.",
+    "P0-29": "Explicitly skipped; unresolved successor debt preserved.",
+    "P0-33/P0-47/P0-50": "Broad release/coverage/source-quality/hosted-CI acceptance remains open; no narrow component pass closes these obligations."
+  },
+  "priorityAndBlockerReconciliation": [
+    {
+      "key": "P0-53",
+      "priority": "Urgent",
+      "due": "2026-10-14",
+      "eligibleForIndependentImplementation": false,
+      "reason": "Needs-Sid accepted-main exception requirement remains unmet; P1-65 absent accepted-main allowedExceptionKeys. Held candidate D22 key cannot authorize itself. Step3 only is blocked; do not claim all other recording work absent."
+    },
+    {
+      "key": "P0-14",
+      "priority": "Urgent",
+      "due": "2026-10-20",
+      "eligibleForIndependentImplementation": false,
+      "reason": "Existing Claude candidate plus retained issue reservation and documented deployment/Secret disclosure/pinning decisions; preserve, do not overlay or resume."
+    },
+    {
+      "key": "P0-55",
+      "priority": "Urgent",
+      "due": "2026-10-21",
+      "eligibleForWholeIssueQualification": false,
+      "dependencies": [
+        "P0-09",
+        "P0-18",
+        "P0-20",
+        "P0-22",
+        "P0-27",
+        "P0-51"
+      ],
+      "reason": "Original guard source is merged; exact spec says all dependencies merged and this closes follow-ups. Current dependency acceptance and broad checks remain unresolved, including P0-22 literal failures. P0-51 reconciliation advances this chain. Shared source reservations remain; no paused A4 source resumption. P0-55 is not a GATE-G0 blocker unless Sid promotes it."
+    },
+    {
+      "key": "P1-52",
+      "priority": "Urgent",
+      "due": "2026-10-23",
+      "eligibleForIndependentImplementation": false,
+      "reason": "Explicit Claude session reservation; ratchet source/rebaseline remains held and not on accepted main. Do not overlay/rebaseline or weaken source-quality checks."
+    },
+    {
+      "key": "P0-30",
+      "priority": "Urgent",
+      "due": "2026-10-25",
+      "eligibleForIndependentImplementation": false,
+      "reason": "Explicit session7fccbbfa reservation; use preserved candidate later, not a fresh competing implementation."
+    },
+    {
+      "key": "P0-34/P0-35/P0-36/P0-37/P0-38/P0-39/P0-40",
+      "eligibleForIndependentImplementation": false,
+      "reason": "Reservations, release/deployment/human-only credentials/rotation/publish dependencies remain; no publication or live-deploy authority inferred."
+    },
+    {
+      "key": "P0-46",
+      "priority": "High",
+      "due": "2026-10-07",
+      "route": "Agent-Doable",
+      "indexDependencies": [],
+      "eligibleForBoundedQualification": true,
+      "reason": "Independent same-priority/date alternative. Accepted e0fdc9c5 already replaces npm ci with local-mode pnpm10.33.0 frozen install/build. No issue reservation or dedicated current P0-46 receipt found in inspected sources. Merged source is not passing behavior evidence. Dependency-priority recommendation chooses P0-51 first, without marking P0-46 Done."
+    },
+    {
+      "key": "P0-51",
+      "priority": "High",
+      "due": "2026-10-07",
+      "route": "Agent-Doable",
+      "indexDependencies": [],
+      "semanticParent": "P0-09",
+      "eligibleForBoundedQualification": true,
+      "reason": "Existing accepted-source verifier wiring and released original verify-proof paths permit owned read-only/test qualification. It feeds Urgent P0-55; shared production repairs remain reserved."
+    },
+    {
+      "key": "P0-52",
+      "priority": "High",
+      "due": "2026-10-07",
+      "eligibleForBoundedQualification": true,
+      "reason": "Already merged federation follow-ups; preserve source and qualify later. PR57 leaves fullci/release gate unchecked. It does not outrank P0-51 within this dependency tie judgment."
+    },
+    {
+      "key": "P0-54",
+      "priority": "High",
+      "due": "2026-10-12",
+      "eligibleForBoundedQualification": "Existing-source only after earlier High follow-up seams",
+      "reason": "Source guards already merged (54b2ca30/4b036a8b); no recreation or paused src/a4 ownership resumption. Dated Not started export is not source absence."
+    }
+  ],
+  "P0-51ExactAcceptanceEvidence": {
+    "dedicatedDurableSpec": "P0-51.md is absent from the inspected durable specs directory; no standalone invented full acceptance.",
+    "primaryOrigin": {
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/55",
+      "title": "[P0-09] Pin issuer keys in the PR 3 verifiers \u2014 PR 3 of 3 (breaking)",
+      "mergedAt": "2026-10-07T02:26:49Z",
+      "retrieval": "Actual read-only gh pr list --state merged --search P0-51; original body recovered.",
+      "remainingPortableCommands": [
+        "bench registry verify",
+        "bom verify",
+        "enforce verify-certificate",
+        "notary verify-attest",
+        "passport verify-token",
+        "transparency merkle verify-proof",
+        "transparency verify-bundle",
+        "domain pack verify",
+        "imports verify-profile",
+        "session verify-proof"
+      ],
+      "otherOpenSurfaces": [
+        "In-chat /verify and Studio nativeTaskService call verifyAgentRun without trust",
+        "release.yml public signing-key pin remains provisional untilP0-37/P0-38"
+      ],
+      "explicitUnchecked": "Full ci.yml, coverage floors and release:gate on the merged integration (orchestrator)."
+    },
+    "normativeParent": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-09.md",
+      "lines": [
+        234,
+        236,
+        240,
+        263,
+        272
+      ],
+      "rules": [
+        "Every portable verifier has --trust-list,--trust-root,--allow-unpinned,--allow-unanchored,--json; addpubkey/expect-monitor where specified; no new command paths.",
+        "0 trusted;1 failed;2 integrity-only with stderr UNTRUSTED: when an explicit allowed override is used.",
+        "Allow flags never come from environment or API request bodies. API trusts only server AMC home and returns the report.",
+        "Verifier signatures require TrustContext/VerifierReportV1; real embedded-key forgery, wrong-purpose/distrust/revocation controls, signed Merkle-root binding, docs/inventory/changeset and mutations are required.",
+        "Full suite and checks remain part of acceptance, not satisfied by source presence or flag-help inventory."
+      ]
+    },
+    "sourceReconciliation": {
+      "acceptedMainP051ActivityCount": 19,
+      "acceptedCommitExamples": [
+        "9c0ab015550f9507a3dc2bcecac3436fce9e1645",
+        "a02912e518bc67e7ef2c37c5064d9f8bba682635",
+        "ab600164d2d1b1b611d80ba818e5bc0aa6ae255c",
+        "de08f4aa04afdeb13e10a1a4ad564fd264bef4c0",
+        "c296badcdb50347d6cb987acae1a72c847a00845"
+      ],
+      "currentInventory": "docs/security/verifier-inventory.md:10-14 marks all23portable rows wired; verifySurfaces also includes assurance cert-verify for24help checks and an empty shrink-only remaining list. These are registration/source facts, not runtime qualification.",
+      "followupDebt": "pending-checks.md:271-275: disclosure F1-F3 closed on dated main; F4 prove writes through a planted proofs-directory symlink remained open. Verify current source/receipts before treating dated closed notes as present behavior.",
+      "heldTestEvidence": "a87f20d7 formal-certificate mock/issues/UNTRUSTED test follow-up appears held-only in the handoff index. Compare final measured source/test bytes and P0-47 reviewed reused slice before proposing any reuse; never overlay held code or treat the index as current behavior."
+    }
+  },
+  "liveP0-46Observation": {
+    "retrievedAt": "2026-10-14T17:15:37.217217+00:00",
+    "method": "Actual read-only gh run list --workflow amc-pr-gate.yml --limit3 and gh run view37638657976 --json jobs",
+    "latestReturned": {
+      "databaseId": 37638657976,
+      "headSha": "8ca3b6e2b39ec179c5cdf5dbb46fda37d3178201",
+      "headBranch": "rtd/p0-21-typed-score-units",
+      "createdAt": "2026-10-07T14:40:17Z",
+      "updatedAt": "2026-10-07T14:40:38Z",
+      "conclusion": "failure",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37638657976",
+      "amcScoreJob": {
+        "databaseId": 112851464709,
+        "conclusion": "failure",
+        "failedStep": "Run ./amc-action"
+      }
+    },
+    "localFixCommit": "e0fdc9c5a40187bf73056752bb53cd1bed67f333",
+    "fixAuthorTimeUtc": "2026-10-07T15:19:39Z",
+    "meaning": "Latest returned hosted AMC PR Gate evidence predates the pnpm fix and failed. No post-fix/current passing action qualification was recovered. No workflow was triggered."
+  },
+  "exactNextAction": {
+    "serialBoundary": "Finish and commit/validate the bounded P0-23 receipt first, keeping reserved API/Studio work and P0-22 literal failures open.",
+    "preflight": "Pin final P0-23 measured source, not documentation-only HEAD, and unchanged accepted-main freeze/coverage/package/lock. Use a new root-owned codex/p0-51-current-qualification branch/worktree from that measured source; do not import held990/3b4 or foreign candidates.",
+    "firstWork": "Read/hash-map P0-51 verifier inventory, actual implementation/callers, trust configuration and existing guard tests. Compare accepted main and authored follow-up bytes, including prior reviewed P0-47 fixtures, before changes. Inspect reservations before any path edit.",
+    "existingBoundedCommandsForLaterActiveQualification": [
+      "npm run build",
+      "pnpm exec vitest run tests/trust/verifySurfaces.test.ts tests/trust/trustContext.test.ts tests/trust/verifierReport.test.ts tests/trust/admission.test.ts tests/studioNativeTaskService.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-51-qualification/bounded-node22.json"
+    ],
+    "behaviorEvidenceNeeded": "Reuse existing real artifact/CLI/API fixtures to prove trusted issuer accepts, embedded/unpinned or wrong-purpose/distrusted/revoked signer refuses, explicit override is integrity-only exit2, HTTP bodies cannot supplypins/allow flags, actual chat/Studio trust source is operator-held, Merkle proofs bind to signed root, and current file confinement guards hold. Help text and test-route presence alone are insufficient.",
+    "remediationBoundary": "Owned tests/private fixtures may expose debt. If a required fix touches reserved src/cli.ts,resultCommandRegistry.ts,replParser.ts,API/Studio/A4 modules, record blocked scope and preserve candidate; this audit authorizes no Claude messages or ownership transfer.",
+    "closureBoundary": "Retain all failures, current source-quality/coverage/full-CI obligations and inherited P0-22 failures; do not mark P0-51 or P0-55 Done from bounded results.",
+    "runtimeForLaterExecution": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/opt/node@22/bin/node",
+      "pathPrefix": "/opt/homebrew/opt/node@22/bin",
+      "requirement": "Use a task-scoped PATH for npm/pnpm and verify native SQLite ABI in the owned checkout before any active execution; do not fall through to the default Node25 runtime."
+    }
+  },
+  "evidence": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-10-14-amc-current-plan-handoff/plan-evidence-index.json",
+      "sha256": "148a458e4e5375a41a57e49c917cbf94705387ca2f512c25ce363157dea76c8a"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/pending-checks.md",
+      "sha256": "6339ea6398fddcfbe18ea96a40b839241745ec138378772c77a581ede1b57870"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-09.md",
+      "sha256": "196a3dcbbcbb3b8d3f49aae88c7559c390c5224c5096a574b835266a7a58e8fd"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-53.md",
+      "sha256": "b4a8a466829205daff263d337f8e730d90570c614e36547063d9fc63b93ef219"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-55.md",
+      "sha256": "d77a082bd93e1dd71c16063854c1be74d574a0d9b73ecffdbc890bf31783398d"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-14.md",
+      "sha256": "ddbde43361411a3f7f7d848a9851788b6dd15852f63c32b323a2610ce0213b89"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-30.md",
+      "sha256": "f58d1716546c6f4525c5d9353a07f5e19fcaadd2737ef1d894f97d4dcdd4c97a"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/docs/security/verifier-inventory.md",
+      "sha256": "7785f82b41417f91f03c4c363d6b4b87f91a02afad2fe29c3da9a8fb245bbeea"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/tests/trust/verifySurfaces.test.ts",
+      "sha256": "851b7f5918d553560ad037a7f7d163eb48c2cbd991baba17c0e8bf927cea0812"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/src/studio/nativeTaskService.ts",
+      "sha256": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/.changeset/pinned-issuer-remaining-verifiers.md",
+      "sha256": "c8be0615a9f5c49acf725d47d4b3410cdf1599c400e87f082af42342f3650d71"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/amc-action/action.yml",
+      "sha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/.github/workflows/amc-pr-gate.yml",
+      "sha256": "cac2129b01e6c3b4ce3717863de8baa39be15a7a1d825f012ede2c12c2754834"
+    },
+    {
+      "path": "/private/tmp/amc-next-after-p0-50-20261014.json",
+      "sha256": "d82b4b34925d94c3a2774c0577f3a3d39dba31f2bdff15e369e448c38a1b03ea"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/qualification/2026-10-14-P0-22/receipt.json",
+      "sha256": "8438da42b78fa73070b56ee3083f6cdc524e7702be04791cc9ebe9f81a664fbf"
+    }
+  ],
+  "noMutations": "Only scoped reads, file hashes, Git-object reads and read-only GitHub run/PR queries. No source edit, runtime probe, test/build/server, tracker change, hosted rerun, Claude message or ownership resumption."
+}

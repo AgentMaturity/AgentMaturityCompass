@@ -1,0 +1,76 @@
+{
+  "at": "2026-10-16T18:19:42.244193+00:00",
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "actualCommands": [
+    {
+      "phase": "p107-node-version",
+      "exit": 0,
+      "durationMs": 23,
+      "pgid": 6142,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-node-version/stdout-stderr.log",
+        "bytes": 9,
+        "sha256": "33e26f35db6e57ce0c486ddc815fe966867e4f649e418eaf323f75f4720eb8e9"
+      }
+    },
+    {
+      "phase": "p107-pnpm-version",
+      "exit": 0,
+      "durationMs": 163,
+      "pgid": 6146,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-pnpm-version/stdout-stderr.log",
+        "bytes": 8,
+        "sha256": "62c33a14fe98185100efaeadf9bc76d70d6b76f1c026b4f7ead06cd6d417aacf"
+      }
+    },
+    {
+      "phase": "p107-q-final-counts",
+      "exit": 0,
+      "durationMs": 426,
+      "pgid": 6153,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-counts/stdout-stderr.log",
+        "bytes": 255,
+        "sha256": "69ddf339d15353e175547870481750757702c7dcff7988b45cb5c774151d66a0"
+      }
+    },
+    {
+      "phase": "p107-q-final-gates",
+      "exit": 0,
+      "durationMs": 439,
+      "pgid": 6174,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-gates/stdout-stderr.log",
+        "bytes": 837,
+        "sha256": "d626bac3bc2138bf4fb238b60503a1578ff29e6e3ed9407959005ed589c632f0"
+      }
+    },
+    {
+      "phase": "p107-q-final-freeze",
+      "exit": 0,
+      "durationMs": 1187,
+      "pgid": 6189,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-q-final-freeze/stdout-stderr.log",
+        "bytes": 284,
+        "sha256": "95e14e63f3c79c51ab30c673bca2c71d8df94f6c5015e2302da9b79f20d9c070"
+      }
+    }
+  ],
+  "runtime": {
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "os": "Darwin",
+    "arch": "arm64"
+  },
+  "freshFinalCountsGatesFreezeAllPassed": true,
+  "freezeCounts": {
+    "cliCommandPaths": 1236,
+    "cliInventoryPaths": 1236,
+    "stationPacks": 41,
+    "stationPackQuestions": 632
+  },
+  "qualityGreen": false,
+  "fullNpmTestRun": false
+}

@@ -1,0 +1,1564 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1534",
+  "slice": "NEW_ONE_CASE_TWO_PROCESS_ADMISSION",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "capturedUtc": "2026-10-15T02:55:15.089436+00:00",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "scope": "Independent read-only audit of the already frozen NEW one-case two-process supplement. This reviewer ran no product import, test, Node/native loading, parser, compiler, build, network, Git, retry or new experiment. Only this report pair was written.",
+  "findings": [],
+  "rawAndObservationAudit": {
+    "inputReceipts": [
+      {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015.json",
+        "bytes": 12191,
+        "sha256": "388932daefcc227c4a99c7a8227751a6f356c7b9744fdfeca4aa8074f791760c"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015.md",
+        "bytes": 2103,
+        "sha256": "db95cdd826e7d27967c9d435e1f01ab367e275e07a3407622b12ee21dca0466c"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/artifact-index.json",
+        "bytes": 709120,
+        "sha256": "25d34f5f6d14630ea8851fafbca444d7c65196c1544f84e7f0d297ca305e914e"
+      }
+    ],
+    "artifactReferences": 2961,
+    "allIndexedBytesExact": true,
+    "frozenJournal": {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 10617,
+      "sha256": "05ab32bfa8b591bb4c7cfa582c99c0d0e533d3795a1456ab13e10caa4a58b471"
+    },
+    "commands": 5,
+    "scenarioRegistrations": 1,
+    "repeatedExecutions": 4,
+    "phases": [
+      {
+        "phase": "initial-unchanged-v2-race-baseline",
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/phases/initial-unchanged-v2-race-baseline/command.json",
+          "bytes": 2391,
+          "sha256": "8b803a71f1e849f6a2d714f5b42c7360499e798a8bcccdda56241c70bb71921a"
+        },
+        "summary": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/phases/initial-unchanged-v2-race-baseline/summary.json",
+          "bytes": 40806,
+          "sha256": "63f9b55a9e0614253db471cb68f3fc4d10a87f1f6df628e0a0c8671229f8689a"
+        },
+        "observations": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/observations.json",
+          "bytes": 4702462,
+          "sha256": "82be02a414d1182b7f145f7514c1ec382eb370d6465ce8504da05f543d971226"
+        },
+        "cleanup": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/outer-cleanup.json",
+          "bytes": 138,
+          "sha256": "8177edb0b24ea0441acf83df82b111ff114bfa253dffc46389812054f442771e"
+        },
+        "tap": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "failedChecks": [],
+        "allFifteenChecksRetainedBeforeAggregate": true,
+        "positiveControlSucceeded": true,
+        "gateCountAtRelease": 1,
+        "gateInTransactionAtRelease": [
+          true
+        ],
+        "observedWindowMs": 252.91712499999994,
+        "publicRaceAdmissions": 1,
+        "exactCapRefusal": true,
+        "coldProofs": [
+          {
+            "workspace": "control",
+            "pending": 1,
+            "executed": 0,
+            "retainedAnchoredIntegrityValid": true,
+            "retainedEventAndSealChecksTrue": true,
+            "actualAdmissionRowBijection": [
+              [
+                "a46cee5d-2a21-454d-862f-aeeaec477547",
+                "0c8e4ba0-f2dc-4978-954d-9495243577fb",
+                "f01ae492-5af2-4a5d-88a9-a02e5c130faf"
+              ]
+            ],
+            "allRowsAndSessionsPresentInColdReaderFullResults": true,
+            "nativeOpenCloseCount": 1
+          },
+          {
+            "workspace": "race",
+            "pending": 1,
+            "executed": 0,
+            "retainedAnchoredIntegrityValid": true,
+            "retainedEventAndSealChecksTrue": true,
+            "actualAdmissionRowBijection": [
+              [
+                "7c4d4fa8-9d44-4827-9be9-bcc1445fdee6",
+                "a8699a02-fbec-46c6-a6fc-726812227242",
+                "81d0dc28-726b-4768-b310-8fb586ff0215"
+              ]
+            ],
+            "allRowsAndSessionsPresentInColdReaderFullResults": true,
+            "nativeOpenCloseCount": 2
+          }
+        ],
+        "intervals": [
+          {
+            "workspace": "control",
+            "allWritersClosedAt": 1792032024249,
+            "readerLaunch": 1792032024356,
+            "readerClosedAt": 1792032025091,
+            "beforeEntries": 1781,
+            "afterEntries": 2052,
+            "actualChanges": 273,
+            "allChangesIndependentlyReproduced": true,
+            "workspaceChanges": [
+              "workspaces/control/.amc",
+              "workspaces/control/.amc/evidence.sqlite-shm",
+              "workspaces/control/.amc/evidence.sqlite-wal"
+            ]
+          },
+          {
+            "workspace": "race",
+            "allWritersClosedAt": 1792032024249,
+            "readerLaunch": 1792032025203,
+            "readerClosedAt": 1792032025935,
+            "beforeEntries": 2052,
+            "afterEntries": 2323,
+            "actualChanges": 273,
+            "allChangesIndependentlyReproduced": true,
+            "workspaceChanges": [
+              "workspaces/race/.amc",
+              "workspaces/race/.amc/evidence.sqlite-shm",
+              "workspaces/race/.amc/evidence.sqlite-wal"
+            ]
+          }
+        ],
+        "allSixChildExitsAndDescriptorRestorationNormal": true,
+        "allRootCleanupNormal": true,
+        "groupsEmptyWithoutSignals": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-baseline",
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/phases/P30-1534-no-transaction-baseline/command.json",
+          "bytes": 2375,
+          "sha256": "e7d379ae38211996cf3897afdbaaab7fb902f9fe4dccd0395bfe02ef3aa9490f"
+        },
+        "summary": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/phases/P30-1534-no-transaction-baseline/summary.json",
+          "bytes": 40741,
+          "sha256": "66c5c23fabe8777a40e80a41de78b20a7127ea75c759c1542ecdccaff991efa8"
+        },
+        "observations": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/observations.json",
+          "bytes": 4702384,
+          "sha256": "6d1d430e59e44cb1f07429fd22222a70c6f33466668fa590b58497882a37fcde"
+        },
+        "cleanup": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/outer-cleanup.json",
+          "bytes": 138,
+          "sha256": "6199f5a6e1b81e4e95ef0dd2d9c1d45b7cc727f7d07daba05160fb5213fdee34"
+        },
+        "tap": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "failedChecks": [],
+        "allFifteenChecksRetainedBeforeAggregate": true,
+        "positiveControlSucceeded": true,
+        "gateCountAtRelease": 1,
+        "gateInTransactionAtRelease": [
+          true
+        ],
+        "observedWindowMs": 254.51879199999985,
+        "publicRaceAdmissions": 1,
+        "exactCapRefusal": true,
+        "coldProofs": [
+          {
+            "workspace": "control",
+            "pending": 1,
+            "executed": 0,
+            "retainedAnchoredIntegrityValid": true,
+            "retainedEventAndSealChecksTrue": true,
+            "actualAdmissionRowBijection": [
+              [
+                "773afa45-caef-4c8c-9334-fc9c78b0908f",
+                "13c0a986-46bb-4f08-85fe-9ac19c2c5f28",
+                "0447d5e7-80e0-42fa-9755-1069c7ac52a0"
+              ]
+            ],
+            "allRowsAndSessionsPresentInColdReaderFullResults": true,
+            "nativeOpenCloseCount": 1
+          },
+          {
+            "workspace": "race",
+            "pending": 1,
+            "executed": 0,
+            "retainedAnchoredIntegrityValid": true,
+            "retainedEventAndSealChecksTrue": true,
+            "actualAdmissionRowBijection": [
+              [
+                "c2a1a9ce-4614-48db-884a-e750b25fb234",
+                "4a497f11-8e62-470d-802b-ef49b0b84e8f",
+                "d5e5e692-00d5-41e1-baf4-689641df2b06"
+              ]
+            ],
+            "allRowsAndSessionsPresentInColdReaderFullResults": true,
+            "nativeOpenCloseCount": 2
+          }
+        ],
+        "intervals": [
+          {
+            "workspace": "control",
+            "allWritersClosedAt": 1792032097499,
+            "readerLaunch": 1792032097608,
+            "readerClosedAt": 1792032098350,
+            "beforeEntries": 1781,
+            "afterEntries": 2052,
+            "actualChanges": 273,
+            "allChangesIndependentlyReproduced": true,
+            "workspaceChanges": [
+              "workspaces/control/.amc",
+              "workspaces/control/.amc/evidence.sqlite-shm",
+              "workspaces/control/.amc/evidence.sqlite-wal"
+            ]
+          },
+          {
+            "workspace": "race",
+            "allWritersClosedAt": 1792032097499,
+            "readerLaunch": 1792032098457,
+            "readerClosedAt": 1792032099190,
+            "beforeEntries": 2052,
+            "afterEntries": 2323,
+            "actualChanges": 273,
+            "allChangesIndependentlyReproduced": true,
+            "workspaceChanges": [
+              "workspaces/race/.amc",
+              "workspaces/race/.amc/evidence.sqlite-shm",
+              "workspaces/race/.amc/evidence.sqlite-wal"
+            ]
+          }
+        ],
+        "allSixChildExitsAndDescriptorRestorationNormal": true,
+        "allRootCleanupNormal": true,
+        "groupsEmptyWithoutSignals": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-mutant",
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/phases/P30-1534-no-transaction-mutant/command.json",
+          "bytes": 2360,
+          "sha256": "e633b40ba2ee528dc3e33aa5a22463d2266d4e2613bfb191a106207712989178"
+        },
+        "summary": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/phases/P30-1534-no-transaction-mutant/summary.json",
+          "bytes": 51885,
+          "sha256": "41be7ab2286d03b9136a528b5a79771e8e11f1ec795caa3a49a5bd51600963e4"
+        },
+        "observations": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/observations.json",
+          "bytes": 4716185,
+          "sha256": "d62580199c6e52db1d7429f6db71a4093d0a72a31599fe4a4aff9af368aa37aa"
+        },
+        "cleanup": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/outer-cleanup.json",
+          "bytes": 2487,
+          "sha256": "120b8d6d5581c20bf842929bc952efab59554f456f0fb816983fb2bbe7b45c14"
+        },
+        "tap": {
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "failedChecks": [
+          {
+            "name": "exactly one race admission and one exact cap refusal",
+            "ok": false,
+            "error": {
+              "name": "AssertionError",
+              "message": "Expected values to be strictly equal:\n\n2 !== 1\n",
+              "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n2 !== 1\n\n    at file:///private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs:219:16\n    at check (file:///private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs:132:13)\n    at TestContext.<anonymous> (file:///private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs:217:7)\n    at async Test.run (node:internal/test_runner/test:1054:7)\n    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)"
+            }
+          },
+          {
+            "name": "race cold reader witnesses one genuine pending sealed reservation",
+            "ok": false,
+            "error": {
+              "name": "AssertionError",
+              "message": "Expected values to be strictly equal:\n\n2 !== 1\n",
+              "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n2 !== 1\n\n    at file:///private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs:228:18\n    at check (file:///private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs:132:13)\n    at TestContext.<anonymous> (file:///private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs:223:9)\n    at async Test.run (node:internal/test_runner/test:1054:7)\n    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)"
+            }
+          }
+        ],
+        "allFifteenChecksRetainedBeforeAggregate": true,
+        "positiveControlSucceeded": true,
+        "gateCountAtRelease": 2,
+        "gateInTransactionAtRelease": [
+          false,
+          false
+        ],
+        "observedWindowMs": 0.014749999999366992,
+        "publicRaceAdmissions": 2,
+        "exactCapRefusal": false,
+        "coldProofs": [
+          {
+            "workspace": "control",
+            "pending": 1,
+            "executed": 0,
+            "retainedAnchoredIntegrityValid": true,
+            "retainedEventAndSealChecksTrue": true,
+            "actualAdmissionRowBijection": [
+              [
+                "5b72d098-f264-4afa-b4aa-64c50fa65b0b",
+                "7ae4aec5-77b5-44f8-bf0f-4da1758818ee",
+                "44ead910-58fe-48f2-adcc-8af82ee3a94d"
+              ]
+            ],
+            "allRowsAndSessionsPresentInColdReaderFullResults": true,
+            "nativeOpenCloseCount": 1
+          },
+          {
+            "workspace": "race",
+            "pending": 2,
+            "executed": 0,
+            "retainedAnchoredIntegrityValid": true,
+            "retainedEventAndSealChecksTrue": true,
+            "actualAdmissionRowBijection": [
+              [
+                "61b66cff-3916-42e1-b1cc-165957a252c8",
+                "4346c201-6b16-4170-8464-ca0a6fdb577c",
+                "f22bc4e2-c27f-4cd0-8c57-f12f18d0b306"
+              ],
+              [
+                "ab6b4dd7-b7fd-4879-ac20-ebccc7471e7e",
+                "fc647d56-03a8-40d7-980b-44d411c9e124",
+                "79962dc2-3e70-461e-9d5b-1e54239f5620"
+              ]
+            ],
+            "allRowsAndSessionsPresentInColdReaderFullResults": true,
+            "nativeOpenCloseCount": 2
+          }
+        ],
+        "intervals": [
+          {
+            "workspace": "control",
+            "allWritersClosedAt": 1792032104965,
+            "readerLaunch": 1792032105064,
+            "readerClosedAt": 1792032105808,
+            "beforeEntries": 1782,
+            "afterEntries": 2053,
+            "actualChanges": 273,
+            "allChangesIndependentlyReproduced": true,
+            "workspaceChanges": [
+              "workspaces/control/.amc",
+              "workspaces/control/.amc/evidence.sqlite-shm",
+              "workspaces/control/.amc/evidence.sqlite-wal"
+            ]
+          },
+          {
+            "workspace": "race",
+            "allWritersClosedAt": 1792032104965,
+            "readerLaunch": 1792032105916,
+            "readerClosedAt": 1792032106658,
+            "beforeEntries": 2053,
+            "afterEntries": 2324,
+            "actualChanges": 273,
+            "allChangesIndependentlyReproduced": true,
+            "workspaceChanges": [
+              "workspaces/race/.amc",
+              "workspaces/race/.amc/evidence.sqlite-shm",
+              "workspaces/race/.amc/evidence.sqlite-wal"
+            ]
+          }
+        ],
+        "allSixChildExitsAndDescriptorRestorationNormal": true,
+        "allRootCleanupNormal": true,
+        "groupsEmptyWithoutSignals": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-restored",
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/phases/P30-1534-no-transaction-restored/command.json",
+          "bytes": 2375,
+          "sha256": "0b3323b5204e9c470caeffbe416dac879ccf931c02fc1e8990c9d6b621f79964"
+        },
+        "summary": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/phases/P30-1534-no-transaction-restored/summary.json",
+          "bytes": 40735,
+          "sha256": "cf692cd84a3f9fe847e623d07487df996160316794db0e06be6509fccd5904ce"
+        },
+        "observations": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/observations.json",
+          "bytes": 4702378,
+          "sha256": "18c16fc9b64487eab246b97ef7f3f9e517b361eb9f901a8e8a2137edf89f85b7"
+        },
+        "cleanup": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/outer-cleanup.json",
+          "bytes": 138,
+          "sha256": "655c9ea96c3bcaadff14d9fee554d08e56fa1a4df5d9b81d0c0301dcfdc53998"
+        },
+        "tap": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "failedChecks": [],
+        "allFifteenChecksRetainedBeforeAggregate": true,
+        "positiveControlSucceeded": true,
+        "gateCountAtRelease": 1,
+        "gateInTransactionAtRelease": [
+          true
+        ],
+        "observedWindowMs": 256.400584,
+        "publicRaceAdmissions": 1,
+        "exactCapRefusal": true,
+        "coldProofs": [
+          {
+            "workspace": "control",
+            "pending": 1,
+            "executed": 0,
+            "retainedAnchoredIntegrityValid": true,
+            "retainedEventAndSealChecksTrue": true,
+            "actualAdmissionRowBijection": [
+              [
+                "e86329d7-8f93-4a82-a4a2-c7486e0dd630",
+                "ee1e3e5c-8eb0-4665-a74e-738515d90fc9",
+                "e39f7216-fac2-49e1-82b1-c5da25f039ae"
+              ]
+            ],
+            "allRowsAndSessionsPresentInColdReaderFullResults": true,
+            "nativeOpenCloseCount": 1
+          },
+          {
+            "workspace": "race",
+            "pending": 1,
+            "executed": 0,
+            "retainedAnchoredIntegrityValid": true,
+            "retainedEventAndSealChecksTrue": true,
+            "actualAdmissionRowBijection": [
+              [
+                "7e9a157f-57b8-446b-ab78-a4964b479c37",
+                "399ecf04-b9de-4ada-8543-5024b5a2eae6",
+                "efa9c8b7-96ee-42c3-957f-b52ab1043b3d"
+              ]
+            ],
+            "allRowsAndSessionsPresentInColdReaderFullResults": true,
+            "nativeOpenCloseCount": 2
+          }
+        ],
+        "intervals": [
+          {
+            "workspace": "control",
+            "allWritersClosedAt": 1792032112817,
+            "readerLaunch": 1792032112926,
+            "readerClosedAt": 1792032113668,
+            "beforeEntries": 1781,
+            "afterEntries": 2052,
+            "actualChanges": 273,
+            "allChangesIndependentlyReproduced": true,
+            "workspaceChanges": [
+              "workspaces/control/.amc",
+              "workspaces/control/.amc/evidence.sqlite-shm",
+              "workspaces/control/.amc/evidence.sqlite-wal"
+            ]
+          },
+          {
+            "workspace": "race",
+            "allWritersClosedAt": 1792032112817,
+            "readerLaunch": 1792032113780,
+            "readerClosedAt": 1792032114518,
+            "beforeEntries": 2052,
+            "afterEntries": 2323,
+            "actualChanges": 273,
+            "allChangesIndependentlyReproduced": true,
+            "workspaceChanges": [
+              "workspaces/race/.amc",
+              "workspaces/race/.amc/evidence.sqlite-shm",
+              "workspaces/race/.amc/evidence.sqlite-wal"
+            ]
+          }
+        ],
+        "allSixChildExitsAndDescriptorRestorationNormal": true,
+        "allRootCleanupNormal": true,
+        "groupsEmptyWithoutSignals": true
+      }
+    ],
+    "actualChildProofs": [
+      {
+        "phase": "initial-unchanged-v2-race-baseline",
+        "label": "init",
+        "pid": 95118,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/init/result.json",
+          "bytes": 4502,
+          "sha256": "3b3c9ee231904f25c4ce0dae896b903209118a627b45c47aae7a3c6ab548b47d"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "initial-unchanged-v2-race-baseline",
+        "label": "positive",
+        "pid": 95126,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/positive/ready.json",
+          "bytes": 1750,
+          "sha256": "50eff0c4ac8a9c84b307e353ec254e0627293a4515a501882603f84b7e747816"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "initial-unchanged-v2-race-baseline",
+        "label": "left",
+        "pid": 95128,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/left/ready.json",
+          "bytes": 1742,
+          "sha256": "751cc52e8a788dbe8b504d7e1ac383df5fa475198e6f2ee6ff80ada5c0ac434f"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "initial-unchanged-v2-race-baseline",
+        "label": "right",
+        "pid": 95132,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/right/ready.json",
+          "bytes": 1744,
+          "sha256": "8471e00a30b7e88ced2da8a94d8cc8c3e800ba67a76dc5158ad8535eef5b88bc"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "initial-unchanged-v2-race-baseline",
+        "label": "read-control",
+        "pid": 95136,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/read-control/result.json",
+          "bytes": 15444,
+          "sha256": "59ce1b02b163618ccad577b49456feb3904827af730559febc0e7f424bcddc0d"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "initial-unchanged-v2-race-baseline",
+        "label": "read-race",
+        "pid": 95138,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/read-race/result.json",
+          "bytes": 22410,
+          "sha256": "760bee0ee762988e2e365ef0c1267a933cd7715addf46f099fa882bcf0fd2c39"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-baseline",
+        "label": "init",
+        "pid": 95221,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/init/result.json",
+          "bytes": 4490,
+          "sha256": "a8cfa3b34fee91366c4b45834fa20556f0851036319bd126e4b60d019f0af77e"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-baseline",
+        "label": "positive",
+        "pid": 95223,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/positive/ready.json",
+          "bytes": 1746,
+          "sha256": "6bf44dfc211977a8d2eee60e21fdf6d0d8b29d3b1babae7e13f96ef46ea40e48"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-baseline",
+        "label": "left",
+        "pid": 95225,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/left/ready.json",
+          "bytes": 1738,
+          "sha256": "546e93c09f06e4b0f28f65dff8ada9a49ae9cbfee35d28c39ce13613e5dcbc7e"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-baseline",
+        "label": "right",
+        "pid": 95231,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/right/ready.json",
+          "bytes": 1740,
+          "sha256": "dd8821249ea599fc37960c1dc81c42132b52332c3e135bddd647c9605f7eec4d"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-baseline",
+        "label": "read-control",
+        "pid": 95233,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/read-control/result.json",
+          "bytes": 15440,
+          "sha256": "97b4fb0f492f59d949322f262a99bb12b78a1ffc254ed25f1f581524c1bc838a"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-baseline",
+        "label": "read-race",
+        "pid": 95235,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/read-race/result.json",
+          "bytes": 22406,
+          "sha256": "1302e5e129243ffaa452fa22f90e1b266a96c0925c4db10318e9d6030e2ad6c9"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-mutant",
+        "label": "init",
+        "pid": 95247,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/init/result.json",
+          "bytes": 4478,
+          "sha256": "901e0366e0beb5da4e424dad8fde7ff7fa0f33c7ec5bc5c62041afb5d62d3484"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-mutant",
+        "label": "positive",
+        "pid": 95257,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/positive/ready.json",
+          "bytes": 1742,
+          "sha256": "e40f3ff8635533d23dc499b1309691e374fe1535998c787db84f02fd80d594fd"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-mutant",
+        "label": "left",
+        "pid": 95259,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/left/ready.json",
+          "bytes": 1734,
+          "sha256": "d0c0ce56fe4f59409943fd81918e0a638f07266806466e06d9460466a0b0134f"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-mutant",
+        "label": "right",
+        "pid": 95261,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/right/ready.json",
+          "bytes": 1736,
+          "sha256": "8e84d911c552674aa4f60dbf4499442153afa88eb26ab9bdc0b12658760c713c"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-mutant",
+        "label": "read-control",
+        "pid": 95263,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/read-control/result.json",
+          "bytes": 15436,
+          "sha256": "09376ef96f721fcb4843d762cbcad93331633d66618ec1457514f375a05a2f16"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-mutant",
+        "label": "read-race",
+        "pid": 95265,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/read-race/result.json",
+          "bytes": 27142,
+          "sha256": "d6f1a6597983145cd947dec7f82840a9d1b315afa709d0c519e78bd2bf8ebd6c"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-restored",
+        "label": "init",
+        "pid": 95274,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/init/result.json",
+          "bytes": 4490,
+          "sha256": "db27cf8bb632056abdea13dac2abbd01f0cb2e31c1899f9ec7499ad8b467125f"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-restored",
+        "label": "positive",
+        "pid": 95277,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/positive/ready.json",
+          "bytes": 1746,
+          "sha256": "b43fbe0cf6bba80deda9d10222bee26a6f8adb064c8c51e460e52823de38fc3e"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-restored",
+        "label": "left",
+        "pid": 95279,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/left/ready.json",
+          "bytes": 1738,
+          "sha256": "8fd5c9c219879d76dba4430da53c3fa5547f936698c2a42525b351224f67611f"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-restored",
+        "label": "right",
+        "pid": 95285,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/right/ready.json",
+          "bytes": 1740,
+          "sha256": "f6291e8de404af69bef8b21eb6b4d03b3bef0cc7160f8659425c211e16bce2b5"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-restored",
+        "label": "read-control",
+        "pid": 95287,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/read-control/result.json",
+          "bytes": 15440,
+          "sha256": "40ced8dea87f6f0a953abc4fe44a108648ea9503b750dd016e259be864ff9f82"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-restored",
+        "label": "read-race",
+        "pid": 95289,
+        "proof": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/read-race/result.json",
+          "bytes": 22406,
+          "sha256": "628d03192e08cc269651c979a717864d7faa9d330488cb05d08e668337cc2f00"
+        },
+        "node": "v22.23.3",
+        "modulesABI": "127",
+        "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "actualLoadedNativeCacheAndSelectOne": true,
+        "currentExecutableAndNativeFileProofsExact": true,
+        "exit": 0,
+        "normalCleanup": true
+      }
+    ],
+    "actualChildCount": 24,
+    "allActualChildFileNativeNodeProofsDirectlyChecked": true,
+    "sourceDelta": {
+      "target": "src/budgets/nativeBudgetAdmission.ts",
+      "findOnce": true,
+      "sourceOriginalSha256": "5c39db72dffdb8b4d3fe08119bc6e17b1ff0abced55b725c731c9c06a93642db",
+      "sourceMutantSha256": "2bbfda574cf689e5aacb62de9387a3a34dcfb6a924761cf99d5ff535de23fce1",
+      "patch": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction.patch",
+        "bytes": 576,
+        "sha256": "799d378af1ba70c4bb9c51ea5d9171f057200c36bf9d993c0d716a035770de18"
+      },
+      "singleTargetManifestDifference": true,
+      "restoredManifestExact": true,
+      "compiledBytesNeverChanged": true
+    },
+    "setupReleaseBeforeExecution": true,
+    "allFiveGroupsRecordedEmptyWithoutSignals": true,
+    "activeMarkerAbsent": true,
+    "observerCorrection": "The first read-only audit required a strictly earlier Date.now millisecond for positive completion and the subsequent left launch. The baseline records both at 1792032095515. Source awaits positive close before launch; the correct nondecreasing timestamp boundary passes. No runtime or producer result was changed.",
+    "cryptoScope": "Actual Node-crypto procedure/booleans, public pin chronology and all row/session/admission bindings checked; pure independent signature recomputation is a separately assigned peer lane, not performed or claimed here."
+  },
+  "preservationAudit": {
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "originalRootFiles": 12268,
+    "newPrivateFixtureFiles": 5,
+    "privateCompleteFiles": 12273,
+    "allOriginalRootCurrentExpectedBytesExact": true,
+    "rootCompiledCurrentPathSetExact": true,
+    "privatePreparedFinalAndRestoredFullPathSetAndBytesExact": true,
+    "allOriginalCopiedFileInodesDistinctFromRoot": true,
+    "stagedFiveFiles": [
+      {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs",
+        "bytes": 22462,
+        "sha256": "aa4df09b0a3db096b475b3e8788b2fcd6ce36e06f742a98d71129b095b4af788"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/initialize.ts",
+        "bytes": 5037,
+        "sha256": "1722948592782c4951d2ffb8dfb41606f03a0c13e6b8572926cdeb997ee569cc"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/worker.ts",
+        "bytes": 7537,
+        "sha256": "d1eb246719450f10a2ede72059dafad5bf2251ad060762b5d6d7ac694e9c2b3b"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/reader.ts",
+        "bytes": 3498,
+        "sha256": "eb59715562e4dfe3885cd83fcd49a7deafcf7577fa93f6d227b8f7347445e048"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/support.ts",
+        "bytes": 3894,
+        "sha256": "c77718b848d7086326c93ae2643b55253ad30ce4eddbf7645adec516330a1763"
+      }
+    ],
+    "pinGroups": [
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/protected-pins-before.json",
+          "bytes": 44989,
+          "sha256": "ff3298842ee7ef69776bc71ebe5a817af35e06707333edfd5b2750be6a33d297"
+        },
+        "references": 205,
+        "allCurrentBytesExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/prior-reference-pins-before.json",
+          "bytes": 535022,
+          "sha256": "7f0cd44b0d106fe1d7ecc6ebcd5a6ad303cd0e583969b5f9f59ed552d3373755"
+        },
+        "references": 2334,
+        "allCurrentBytesExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/proposal-review-pins-before.json",
+          "bytes": 87673,
+          "sha256": "0ed9784bc22205add3322647bcd371d1ca817740b49669199bf4090899f7ec58"
+        },
+        "references": 402,
+        "allCurrentBytesExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/late-predecessor-pins.json",
+          "bytes": 568,
+          "sha256": "a425b24a1ac4e7fd9ce4883d97c3cf6781094b1d710cf5d662272abbd68d939e"
+        },
+        "references": 3,
+        "allCurrentBytesExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/runtime-release-pins.json",
+          "bytes": 398,
+          "sha256": "8e398d70ac65bbc54ab2582c7050ed09bbafe0f74b48d2d6c66c62f716c83844"
+        },
+        "references": 2,
+        "allCurrentBytesExact": true
+      }
+    ],
+    "priorClosureCount": 13,
+    "allPriorActualClosurePathSetsAndBytesDirectlyCheckedExact": true,
+    "priorClosures": [
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/full-closure-final.json",
+          "bytes": 1399887,
+          "sha256": "299b0969cccf57ccf3b1b7f1c3a7763366d190e889786f42b8b0881f55de0228"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/full-closure-final.json",
+          "bytes": 1399899,
+          "sha256": "dda63cf4e8b307c8297550cb97a0ff4fd6510321c4cd160e0a35317bc723d4d9"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      }
+    ],
+    "dependencyLinks": 307,
+    "allSymlinkTargetsDirectlyCheckedExact": true,
+    "privateViteDirectoriesNotSymlinks": true,
+    "nativePhysicalIdentityDirectlyCheckedExact": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "heldMissingWorkerStillAbsent": true,
+    "rootFreezeFinalPreservation": {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/root-readonly-final-preservation.json",
+      "bytes": 1029,
+      "sha256": "9c9f60028b28a9b994a4735c7f84132608ce7e2106bcf617cca2b82b7ffa48ab"
+    },
+    "rootFreezeGroupAbsenceScope": "Read the frozen root numeric process-table inspection result; this independent review did not perform new process inspection or runtime.",
+    "allRuntimeFinishedBeforeRootFreeze": true
+  },
+  "causalMeaning": {
+    "observedInitialPassed": 1,
+    "observedBMRPassed": [
+      1,
+      0,
+      1
+    ],
+    "classification": "The exact private transaction-wrapper removal is observed by this new bounded scenario. Current production source passes the intact and restored scenario. This does not rewrite the separate original 25-case survivor.",
+    "intactAndRestored": "One actual pre-release INSERT gate reports inTransaction=true. One public reserveNativeToolBudget call returns undefined, the other returns exactly daily tool budget exhausted for READ_ONLY. Ended-writer cold readers retain pending1/executed0 and one signed sealed reservation matching the admitted native-session/token/call ID.",
+    "mutant": "Both actual pre-release INSERT gates report inTransaction=false before either real INSERT returns. Both distinct public calls succeed. The cold race reader retains pending2/executed0 and two distinct ended, sealed reservation sessions. The full retained rows match both admitted session/token/call triples bijectively, with exact default owner, tool kind, READ_ONLY action and reservationKey.",
+    "positiveControl": "The separate noncontended cap1 workspace admits one actual public call and retains one pending sealed reservation in all four phases, including the private mutant.",
+    "observerPosition": "The native Statement.run observer pauses the exact startSession INSERT after read/check. In intact source that point is inside the acquired IMMEDIATE transaction. In the private control it follows an unprotected read/check. It is not a barrier before baseline lock acquisition.",
+    "forwarding": "The wrapper gates only the normalized actual sessions INSERT with the native-budget-admission binary path and checked bindings. It forwards original receiver/arguments/result/error with Reflect.apply, completes the actual INSERT with changes1 and restores the full original descriptor. Other statements are forwarded directly. All actual completed-gate and cleanup records support this procedure.",
+    "scopeLimit": "The callers intentionally reserve only. No real tool body, ToolPipeline dispatch, provider transport or external identity is exercised. The result establishes one measured schedule at the reviewed local source/native combination, not universal atomicity or concurrency performance."
+  },
+  "assertionAndMasking": {
+    "nodeScenarioCount": 1,
+    "phaseExecutions": 4,
+    "childProcesses": 24,
+    "checkRecordsPerPhase": 15,
+    "allEffectsAndCleanupRetainedBeforeFinalAggregate": true,
+    "finalAggregateLocation": "tests/p030NativeBudgetQualification/race.test.mjs:277:12",
+    "mutantFailures": [
+      {
+        "check": "exactly one race admission and one exact cap refusal",
+        "location": "race.test.mjs:219:16",
+        "expected": 1,
+        "actual": 2,
+        "masking": "The second assertion at220, requiring one exact refusal, is not reached inside this failed check. The independently retained public results show two successes and no refusal."
+      },
+      {
+        "check": "race cold reader witnesses one genuine pending sealed reservation",
+        "location": "race.test.mjs:228:18",
+        "expected": 1,
+        "actual": 2,
+        "masking": "The later executed0 assertion on the same line and single-row criteria229\u2013241 are masked inside this failed check. Both readers had already completed and retained usage, full rows, sessions, Node-crypto booleans, anchored integrity and matching IDs before this parent assertion. This review directly checks those retained values; it does not claim the masked assertions ran."
+      }
+    ],
+    "errorClassification": "One final Node-test AssertionError aggregates two failed check records. No setup, observer, native binding, generic SQLite, timeout, child, cancellation, unhandled or cleanup error is credited as the guard result. Every actual child stderr/stdout is retained empty and all four Node test stderr streams are empty."
+  },
+  "processLifecycle": {
+    "all24ChildFingerprintsDirectlyRead": true,
+    "all24ActualNodeVersion": "v22.23.3",
+    "all24ActualModulesABI": "127",
+    "all24ActuallyLoadedNativeImagesAndSelectOneProofsRead": true,
+    "nativeFileProofCurrentExact": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "allSixChildrenPerPhaseExitZeroWithoutSignals": true,
+    "allTwelveWorkerDescriptorsExactlyRestored": true,
+    "initializerClosedBeforeOtherChildren": true,
+    "positiveControlClosedBeforeRaceLaunch": true,
+    "readersLaunchedOnlyAfterAllFourWritersClosed": true,
+    "allEightReadersCloseBeforeRootRemoval": true,
+    "allFourOwnedCredentialRootsNormallyRemoved": true,
+    "allFiveControllerGroupsRecordedEmptyWithoutSignals": true,
+    "groupScope": "The retained controller groups and the root freeze numeric process-table inspection are reviewed. This reviewer did not inspect current live processes or claim whole-machine isolation.",
+    "clockResolution": "In the BMR baseline, positive close and the subsequent left launch both have Date.now value 1792032095515. Source awaits the close event before launch, and the retained timestamps are nondecreasing. No submillisecond separation is invented.",
+    "deadlines": "The unchanged new Node scenario has a 120-second deadline and outer 180-second group bound. Worker gates wait 1500 ms; SQLite busy_timeout is actually measured at 5000 ms. The parent observes both private-control gates before releasing them; intact phases wait about 253\u2013256 ms with one gate. These finite observations do not guarantee host scheduling in future runs."
+  },
+  "effectsAndTrust": {
+    "allEightReaderIntervalsDirectlyRecomputed": true,
+    "actualChangesPerInterval": [
+      273,
+      273,
+      273,
+      273,
+      273,
+      273,
+      273,
+      273
+    ],
+    "workspaceChangesPerReader": "The retained changes include the corresponding .amc directory plus evidence.sqlite-wal and evidence.sqlite-shm. The remaining differences include the reader HOME/AMC_HOME/tmp and tsx cache files. All recorded before/after entries are compared; no zero-effects claim is made.",
+    "snapshotFields": "Path, type, mode, device, inode, link count, regular-file size/SHA256 and symlink target are retained. Timestamps are excluded. Full owned-root snapshots include intentional secret-file hashes, not their raw bodies.",
+    "pinChronology": "The initializer generates both independent local workspaces\u2019 four role-key pairs and writes public PEM/SPKI pin records before the first createVault/history/config signature. Actual emitted pins, initializer results, retained public PEM hashes and cold expected monitor fingerprints agree. This reviewer checks the recorded procedure and correspondence; it does not invent an independent external accreditation.",
+    "actualRuntimeCryptoProcedure": "Node crypto verifies the exact config-byte SHA256 digest under the auditor public key and each reservation event/seal digest signature under the pre-recorded monitor key. Product-pinned ledger integrity and readBudgetEvents/projectBudgetUsage are also captured. Product row canonicalization is reused. Actual public inputs, rows and sessions remain retained.",
+    "independentOfflineCryptoScope": "A separate reviewer is assigned pure offline cryptographic recalculation. This review does not claim to have repeated those signature calculations, loaded product/native modules or adopted a peer conclusion not yet received.",
+    "retentionLimit": "Normal cleanup removes the encrypted vault, private keys and original workspace fixture. Retained public inputs can support signature rechecking but cannot recreate the full deleted private fixture. These local keys establish fixture authority, not external person/provider truth."
+  },
+  "freezeAndSourceBoundary": {
+    "construction": "Independent physical filesystem copy, not a literal Git clone.",
+    "sourceOnlyControl": "Only src/budgets/nativeBudgetAdmission.ts changes in the private mutant. Its exact once-only find/replace, frozen mutant bytes, unified diff and complete mutant/restored manifests reproduce. All 4,529 compiled bytes remain unmutated.",
+    "newScenarioExecution": "The supplement uses a Node-test coordinator with standard-library imports and tsx source-mode children. It does not run Vitest global/per-file setup. Those original guard/config/source bytes remain pinned unchanged; no guard was edited or weakened.",
+    "fixtureFiles": "The same five frozen v2 private files and criteria execute in every phase with newly generated local data. No original or held corpus is amended or transferred.",
+    "copiedReadinessNotes": "The setup and recipe retain preparation-only/not-yet-executed wording as historical origin evidence. The actual five-command frozen journal and raw four-phase records define current execution status.",
+    "interruption": "The retained root interruption note records an automated possible-cybersecurity-risk interruption of the reporting agent after all runtime records and source restoration were saved. Root froze existing records and preservation with no experiment retry or product rerun. This is not described as a fabricated approval rejection or an experiment failure. This review performs only the assigned reads."
+  },
+  "limits": [
+    "The original native 25-case no-transaction survivor and separate CLI 9 remain immutable, distinct results. Held 27 and historical 26 are not current registrations. One new Node-test scenario repeated four times is not four unique tests or 24 additional tests.",
+    "This finite witness does not establish all quota classes, real tool execution, provider behavior, hard USD price ceilings, all race schedules, whole-cold platform behavior, whole-machine isolation or P0-27 corruption-cause repair.",
+    "No source release, held-source ownership clearance, full P0-30/old batch, Node24, full suite, coverage, hosted/G0/Done or dependency closure is inferred. All Claude, archive, freeze and prior-packet inputs remain preserved."
+  ],
+  "sourcePins": [
+    {
+      "relativePath": "src/budgets/nativeBudgetAdmission.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/src/budgets/nativeBudgetAdmission.ts",
+        "bytes": 5574,
+        "sha256": "5c39db72dffdb8b4d3fe08119bc6e17b1ff0abced55b725c731c9c06a93642db"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/budgets/nativeBudgetAdmission.ts",
+        "bytes": 5574,
+        "sha256": "5c39db72dffdb8b4d3fe08119bc6e17b1ff0abced55b725c731c9c06a93642db"
+      }
+    },
+    {
+      "relativePath": "src/budgets/nativeBudgetUsage.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/src/budgets/nativeBudgetUsage.ts",
+        "bytes": 17516,
+        "sha256": "45f561f1116d0f55f98439508a573b0a586ed060b3c6948d86b1240a50d5e980"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/budgets/nativeBudgetUsage.ts",
+        "bytes": 17516,
+        "sha256": "45f561f1116d0f55f98439508a573b0a586ed060b3c6948d86b1240a50d5e980"
+      }
+    },
+    {
+      "relativePath": "src/budgets/budgets.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/src/budgets/budgets.ts",
+        "bytes": 10695,
+        "sha256": "bae506f230b0511759f795cb0099f9b8d3fdb77aa42789e70658e4f84d15243c"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/budgets/budgets.ts",
+        "bytes": 10695,
+        "sha256": "bae506f230b0511759f795cb0099f9b8d3fdb77aa42789e70658e4f84d15243c"
+      }
+    },
+    {
+      "relativePath": "src/ledger/ledger.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/src/ledger/ledger.ts",
+        "bytes": 43792,
+        "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+        "bytes": 43792,
+        "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+      }
+    },
+    {
+      "relativePath": "src/ledger/ledgerConnection.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/src/ledger/ledgerConnection.ts",
+        "bytes": 3137,
+        "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+        "bytes": 3137,
+        "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854"
+      }
+    },
+    {
+      "relativePath": "src/ledger/ledgerSessionTransactions.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/src/ledger/ledgerSessionTransactions.ts",
+        "bytes": 3032,
+        "sha256": "0bba4d284e53916f52981b5ea0bd534ac4c77938dbe72970d26ab09c0bc6ed72"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ledger/ledgerSessionTransactions.ts",
+        "bytes": 3032,
+        "sha256": "0bba4d284e53916f52981b5ea0bd534ac4c77938dbe72970d26ab09c0bc6ed72"
+      }
+    },
+    {
+      "relativePath": "src/ledger/ledgerVerification.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/src/ledger/ledgerVerification.ts",
+        "bytes": 35501,
+        "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+        "bytes": 35501,
+        "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e"
+      }
+    },
+    {
+      "relativePath": "src/session/sessionService.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/src/session/sessionService.ts",
+        "bytes": 36194,
+        "sha256": "748ea18097b8fd2cbd5b5636d2e13ad78e98b8cd5b1e2a8e972c6cb407d5ee28"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/sessionService.ts",
+        "bytes": 36194,
+        "sha256": "748ea18097b8fd2cbd5b5636d2e13ad78e98b8cd5b1e2a8e972c6cb407d5ee28"
+      }
+    },
+    {
+      "relativePath": "src/storage/sqlitePool.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/src/storage/sqlitePool.ts",
+        "bytes": 5804,
+        "sha256": "021dfe8f275c90273d1821d36431f182bbde538a3417f2375e96013c91867bfc"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/storage/sqlitePool.ts",
+        "bytes": 5804,
+        "sha256": "021dfe8f275c90273d1821d36431f182bbde538a3417f2375e96013c91867bfc"
+      }
+    },
+    {
+      "relativePath": "src/vault/vault.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/src/vault/vault.ts",
+        "bytes": 29540,
+        "sha256": "f37212a91c1e9ea1f35dac7bcfd03481e5ce26a1fe80a56f6843e3fbb8e02e84"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/vault/vault.ts",
+        "bytes": 29540,
+        "sha256": "f37212a91c1e9ea1f35dac7bcfd03481e5ce26a1fe80a56f6843e3fbb8e02e84"
+      }
+    },
+    {
+      "relativePath": "src/tools/toolTypes.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/src/tools/toolTypes.ts",
+        "bytes": 7901,
+        "sha256": "e8b2c56d487a091506369fcf6d11db91fe1030957494bfc7d5bb04058f75077a"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/tools/toolTypes.ts",
+        "bytes": 7901,
+        "sha256": "e8b2c56d487a091506369fcf6d11db91fe1030957494bfc7d5bb04058f75077a"
+      }
+    },
+    {
+      "relativePath": "vitest.config.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      }
+    },
+    {
+      "relativePath": "tests/setup/guardWorkspace.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+      }
+    },
+    {
+      "relativePath": "tests/setup/repoWorkspaceGuard.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+      }
+    },
+    {
+      "relativePath": "tests/setup/repoWorkspaceGuard.global.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+      }
+    }
+  ],
+  "metadataPins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/controller.py",
+      "bytes": 20851,
+      "sha256": "a322583ddbc96bbf4efe5a3286031fe34ab326eee3741b0750d6344852a75953"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/recipe.json",
+      "bytes": 1458,
+      "sha256": "b9a77dd0884056f02f170d2b4182c65b9ff11b6a52b42a93cb59cba5cb542a9d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction-matrix.json",
+      "bytes": 140319,
+      "sha256": "8509281ac87eef29cefe68045ca2de1b9b93e6f71c660401bc2eadd9157ea693"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction-source-change.json",
+      "bytes": 1866,
+      "sha256": "81c4325a96d2b43d0baf6694f92b139ac3527d3c97eed6ce5ef82d1a108f2b43"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction-mutant-full-closure.json",
+      "bytes": 1400381,
+      "sha256": "6901d3730a48e65c62f46eeb0c5b391cb8041067434dbe8248ccdf366d68e4e3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction-restored-full-closure.json",
+      "bytes": 1400381,
+      "sha256": "8198cac2ab5fadefcb20247de3363e1df670a7b1692646853139725ca1fde6fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction-mutant-source.ts",
+      "bytes": 5617,
+      "sha256": "2bbfda574cf689e5aacb62de9387a3a34dcfb6a924761cf99d5ff535de23fce1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/root-runtime-release.json",
+      "bytes": 1592,
+      "sha256": "ea5395ec9e28dc5873bb18a92e1d07c8307c04a8f82404c529f069f9a9ca4897"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/runtime-release-pins.json",
+      "bytes": 398,
+      "sha256": "8e398d70ac65bbc54ab2582c7050ed09bbafe0f74b48d2d6c66c62f716c83844"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/setup.json",
+      "bytes": 8017,
+      "sha256": "18dc25e5e6bc581e803f9415e56719dc64cd839cdb9c1ca6a418298d48d4eeb8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/setup.md",
+      "bytes": 2476,
+      "sha256": "3e951e01016ca1f92f3f0cdc662fff0cdc6d37e567a29f30c9fbe0441653a346"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/setup-artifact-index.json",
+      "bytes": 633090,
+      "sha256": "76a86df0443b8ba3debe2cdfab735bbff7d4b5b821064f57b8fa84ac314dd39a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/root-post-runtime-interruption-note.json",
+      "bytes": 702,
+      "sha256": "772542f8c09a519391f6ea842d41028c6bc2dee238ebe5d35a0047fc209b7af7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/root-readonly-final-preservation.json",
+      "bytes": 1029,
+      "sha256": "9c9f60028b28a9b994a4735c7f84132608ce7e2106bcf617cca2b82b7ffa48ab"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/full-closure-prepared.json",
+      "bytes": 1400381,
+      "sha256": "feb16b31010fde25673a81c08416d40622c612a2a6d2a191cc806a3be6eecd91"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/full-closure-final.json",
+      "bytes": 1400381,
+      "sha256": "8198cac2ab5fadefcb20247de3363e1df670a7b1692646853139725ca1fde6fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/staged-files-before.json",
+      "bytes": 1183,
+      "sha256": "c55545d8be6db4e1c948f9ded32fada218fc125c3d4ec636e5b6798535626f94"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/dependency-links.json",
+      "bytes": 104367,
+      "sha256": "af2721890cc6ba54444b01dad74639b5bb005c715ee414e5d592aa81216fcc36"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/native-before.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    }
+  ],
+  "allReadsFinished": true,
+  "sourceProducerPriorPacketWrites": 0,
+  "productImports": 0,
+  "testReruns": 0,
+  "nativeLoading": 0,
+  "parserCompilerBuildRuns": 0,
+  "networkRuns": 0,
+  "gitRuns": 0
+}

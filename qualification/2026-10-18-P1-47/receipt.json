@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-47",
+  "date": "2026-10-18",
+  "commit": "cefb97ab57116858a095bdb2e5bed9b94cbbe9ce",
+  "branch": "rtd/p1-47-benchmark-pilot",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2), local machine with a colima Docker VM (Docker 29.5.2 linux/arm64), not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 91678
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 37703
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 70725
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 4523
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 1516
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 766
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 2801
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2437
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 467
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 867
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 368
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 348
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1049
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 5102
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 404
+    },
+    {
+      "cmd": "npx vitest run tests/harnessComparison.test.ts tests/harnessComparisonOutputOwnership.test.ts tests/harnessCodingOracle.test.ts tests/harnessCodingOutputSnapshot.test.ts tests/harnessCodingGateway.test.ts tests/benchmarkPilotOracles.test.ts tests/benchmarkPilotAnalysis.test.ts --reporter=json --outputFile=<scratch>/focused-final6.json",
+      "exit": 0,
+      "durationMs": 7217
+    },
+    {
+      "cmd": "node examples/harness-comparison/pilot/containment.mjs --config <operator.json> --out <new dir>",
+      "exit": 0,
+      "durationMs": 8000
+    },
+    {
+      "cmd": "node examples/harness-comparison/pilot/run.mjs --lane scripted --config <operator.json> --out <new dir> --repetitions 1",
+      "exit": 0,
+      "durationMs": 3606000
+    },
+    {
+      "cmd": "env -u PILOT_PROVIDER_API_KEY node examples/harness-comparison/pilot/run.mjs --lane live --config <operator.json> --out <new dir> --repetitions 3",
+      "exit": 0,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "node examples/harness-comparison/pilot/overhead.mjs --config <operator.json> --out <new dir> --sessions 5 --calls 200 (at ad0a271da)",
+      "exit": 0,
+      "durationMs": 2545586
+    },
+    {
+      "cmd": "python3 mutate.py mutations.json (43 pilot mutations, isolated export of 1ebdd8e09)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "python3 mutate.py m1518.json (2 AMC-1518 if(false) mutations)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "node legacy-e2e.mjs <new dir> (codingAdapter.mjs Pi binding contained + codingOracle.mjs contained probe, scripted loopback endpoint)",
+      "exit": 0,
+      "durationMs": 126000
+    },
+    {
+      "cmd": "python3 mutate.py legacy-mutations.json (3 legacy containment mutations)",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": {
+    "total": 215,
+    "passed": 215,
+    "failed": 0,
+    "skipped": 0
+  },
+  "notes": "Local macOS arm64 with colima, not CI; host shared with other sessions (load averages in each record). NO REAL-MODEL TRIAL RAN: no model credentials and no approved local model in this environment; every real-model gate is not measured. harness-compare exits 1 whenever any trial is not an executed pass, by design; run.mjs reported it and continued (exit 0). Commits: plan 9c2a17f0d before any trial; amendments ad0a271da and 585849ab4; containment, scripted lane and live lane at bd0a4c7c3 with AMC dist built from the int merge d04298282; overhead replay at ad0a271da with AMC dist built from base 3c23d1c50; 43 pilot mutations at 1ebdd8e09 (files they mutate are unchanged since); AMC-1518 mutations at 3c23d1c50. Tests: 215/215 in the 7 files the spec names at cefb97ab5. Checks: the brief's 16 checks pass at cefb97ab5 (after merging int 02ca43c58). Scripted lane (debugging only, never a result): 100/100 executed, 48 pass, 52 fail. Live lane without credentials: 300/300 unavailable. Local lane: no report (needs Sid's model digests). Containment 25/25. Overhead (scripted): AMC allow path adds p50 1,235 ms per read; decision latency p95 1,968 ms vs 50 ms (not met). AMC-1539: 15/15 digests match. Raw redacted runs: raw-runs.sha256 lists every file; scripted/report.json and live-no-credentials/report.json exceed 500 KB and are listed there by digest, not committed. The tarball for Sid's release asset is outside the repository; its path and SHA-256 are in raw-runs.sha256's last lines. Legacy coding workflow (plan amendment 3, code b7a936f2e): codingOracle.mjs judges only through the pinned contained probe or refuses; codingAdapter.mjs runs Pi only in a container or refuses; one contained colima run: Pi wrote the scripted repair (2 requests), the oracle passed it through the contained probe and failed the escape payload with no host sentinel; 3 legacy mutations killed.",
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "6f4eafbd267bc30c61c2f80428ce77f7d77778fe083ec3bcdf5b8d51dddacc57"
+    },
+    {
+      "path": "amc1539.json",
+      "sha256": "0b25aa115f653ea1f85526c61bbb06f804c67eff07edc80b1da134ad96fe0c48"
+    },
+    {
+      "path": "checks.json",
+      "sha256": "a2abfcac466e2f76cf631be4f9a75eeba1f2a68acd3bcc6fad8b05a4e7ce0bac"
+    },
+    {
+      "path": "containment/escape-checks.json",
+      "sha256": "ed197702abbdb66353291b1ff99afdafe954a4213de611fb17acbf230c6c8aaf"
+    },
+    {
+      "path": "legacy-containment/adapter-receipt.json",
+      "sha256": "18a005bc144474e1314fba4e6babff68220f09bfdbb803fb464c80a748d8b44c"
+    },
+    {
+      "path": "legacy-containment/legacy-containment.json",
+      "sha256": "06d53894d47831361b9975135136dc997dbadee779afcb1c56cd95994b117558"
+    },
+    {
+      "path": "live-no-credentials/analysis.json",
+      "sha256": "7ed67ff8207951368b176e188054ced5ae192085453964fd244e610caabd0133"
+    },
+    {
+      "path": "live-no-credentials/analysis.md",
+      "sha256": "0c3938e2c40ff6ed7e0a93438458da071156a7d780d768b90f4067cdc29a678d"
+    },
+    {
+      "path": "live-no-credentials/report.md",
+      "sha256": "5026cc5d5da13591483ef68f26351515a0079284a17f4b5d904f9315142c82a6"
+    },
+    {
+      "path": "live-no-credentials/summary.json",
+      "sha256": "6e2d418e493052c9b644c10e2709076af70b952dc08663b882f1a0cf6bdc939d"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "c25be70640f4786daae252e55873c5e708adad9edb725f882a40f34b8c45eaf2"
+    },
+    {
+      "path": "overhead/overhead.json",
+      "sha256": "69cdb668280480150b9dd468942b877c0a78a84d04b8a8d92cda8707b0f7afce"
+    },
+    {
+      "path": "raw-runs.sha256",
+      "sha256": "63c4c39cd570dc70490416df2c5ec95fbfe8fbade5e080d424944fe516f7dd28"
+    },
+    {
+      "path": "scripted/analysis.json",
+      "sha256": "c60a046e1a5931e9dd941b03280837f1aa8cdeae5c5ed28df2715227cb2ed806"
+    },
+    {
+      "path": "scripted/analysis.md",
+      "sha256": "76ef7d8253c2380413725e4f99cbfbce488033b911c746bd313c03b4956696a8"
+    },
+    {
+      "path": "scripted/manifest.json",
+      "sha256": "2cc08157e817d56f58749fe8c3925eab3dd74e2fee701b6a2ce12eb71ff1f445"
+    },
+    {
+      "path": "scripted/report.md",
+      "sha256": "38daae75770f7073af35efeb02df297a5862356f46d4adb3d77cfa553247df37"
+    },
+    {
+      "path": "scripted/summary.json",
+      "sha256": "e466ab4a2cdf01eca68d0bbbea0fff53666d5b92ad62cfc34f5f1fcb734812d0"
+    },
+    {
+      "path": "tests.json",
+      "sha256": "65f1d70f2ff0f133836febe7cefd7c457659b7c88c68a81ef6aeed53851ea2ab"
+    }
+  ]
+}

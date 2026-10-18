@@ -1,0 +1,108 @@
+{
+  "at": "2026-10-16T19:41:45.726119+00:00",
+  "notes": "This receipt closes only the typed evaluator test cohort at source commit a6909ac52ec7db1411696b82c4ef6c9cb61a89d2. It is not full P1-11 completion. Canonical fresh tests pass 88/88 across four files (25 new and 63 unchanged). Four source controls produce 87/1, 87/1, 87/1 and 85/3; each exact restoration passes 88/88. Every run has 29 passing hook entries/values and no unhandled or late errors. Only first failing RED assertions earn direct sensitivity credit; later assertions and the second prefixed replay iteration are masked. The tier control consumes supplied SELF_REPORTED provenance against an ignored OBSERVED attribute, not raw meta.trustTier derivation. Real signatures/receipts/external authorities, signed-plan/public-report positives and origin/main comparisons remain unqualified. Public plan:null, empty-score null versus requested 0, derived NOT_EVALUATED versus the step's UNKNOWN wording, and applicability/violation composition remain recorded gaps. Full suite/coverage, surface acceptance, semantic docs/changeset and merged PR remain open. Global duplicates/dead-code checks each fail before and after with unchanged 1268/2724 findings; no baseline, waiver, guard or deadline was changed. The initial count check genuinely failed after the new file; the unchanged generator changed only 15 numeric spans in 10 files from 1687 to 1688 and the subsequent checks pass. Ordinary source add returned 1 for an ignored docs/internal directory, but all 11 staged blobs were exact, default whitespace check passed and ordinary commit succeeded; no force operation occurred. Commands launch from borrowed R; explicit --root/--dir selects S or owned Q. The inherited source-literal census alone reads R/src. Existing source/work, held provider archive, all human holds and F37 skip remain untouched. The missing shared reservation retains its last-known binding and pending private append. All raw logs and patches use the existing lossless-original/1 base64 representation with original byte/hash verification; producer originals remain retained privately. No PR, push, merge, release or tracker Done.",
+  "fullIssueDone": false,
+  "goalActive": true,
+  "next": "P1-12",
+  "rows": [
+    {
+      "phase": "p111-fresh-canonical",
+      "exit": 0,
+      "durationMs": 7682,
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "phase": "p111-m1",
+      "exit": 1,
+      "durationMs": 7058,
+      "tests": {
+        "total": 88,
+        "passed": 87,
+        "failed": 1,
+        "skipped": 0
+      }
+    },
+    {
+      "phase": "p111-m1-restored",
+      "exit": 0,
+      "durationMs": 6907,
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "phase": "p111-m2",
+      "exit": 1,
+      "durationMs": 6896,
+      "tests": {
+        "total": 88,
+        "passed": 87,
+        "failed": 1,
+        "skipped": 0
+      }
+    },
+    {
+      "phase": "p111-m2-restored",
+      "exit": 0,
+      "durationMs": 7114,
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "phase": "p111-m3",
+      "exit": 1,
+      "durationMs": 7011,
+      "tests": {
+        "total": 88,
+        "passed": 87,
+        "failed": 1,
+        "skipped": 0
+      }
+    },
+    {
+      "phase": "p111-m3-restored",
+      "exit": 0,
+      "durationMs": 6885,
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "phase": "p111-m4",
+      "exit": 1,
+      "durationMs": 6879,
+      "tests": {
+        "total": 88,
+        "passed": 85,
+        "failed": 3,
+        "skipped": 0
+      }
+    },
+    {
+      "phase": "p111-m4-restored",
+      "exit": 0,
+      "durationMs": 7061,
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      }
+    }
+  ]
+}

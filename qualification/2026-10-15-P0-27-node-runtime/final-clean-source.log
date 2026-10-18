@@ -1,0 +1,20 @@
+
+> agent-maturity-compass@1.2.0 check:clean-source /Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass
+> node scripts/clean-source-check.mjs
+
+clean-source check of 75cbdf8a in /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-vxrhTH
+ok   git clone (committed tree only) (1.5s)
+ok   git checkout pinned commit (0.4s)
+ok   pnpm install --frozen-lockfile (5.9s)
+ok   pnpm run build (30.8s)
+ok   amc doctor (1.9s)
+ok   amc init (isolated workspace) (1.0s)
+ok   keyless native tool turn (1.0s)
+ok   amc session verify --json (0.8s)
+ok   amc agent-loop verify --json (0.8s)
+ok   signed evidence and request reconstruction (1 expected turns)
+ok   process A: leave a completed turn open for resume (0.9s)
+ok   process B: resume and seal the same session (0.9s)
+ok   amc session verify --json (0.8s)
+ok   amc agent-loop verify --json (0.8s)
+ok   signed evidence and request reconstruction (2 expected turns)

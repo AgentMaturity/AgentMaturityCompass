@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1534",
+  "slice": "NEW_ONE_CASE_TWO_PROCESS_ADMISSION",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T02:46:45.516872+00:00",
+  "state": "BOUNDED_COMPLETED_RUNTIME_FROZEN_BY_ROOT_PENDING_INDEPENDENT_ACTUAL_REVIEW",
+  "privateRoot": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015",
+  "construction": "Independent physical filesystem copy, not a Git clone.",
+  "setup": {
+    "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/setup.json",
+    "bytes": 8017,
+    "sha256": "18dc25e5e6bc581e803f9415e56719dc64cd839cdb9c1ca6a418298d48d4eeb8"
+  },
+  "controller": {
+    "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/controller.py",
+    "bytes": 20851,
+    "sha256": "a322583ddbc96bbf4efe5a3286031fe34ab326eee3741b0750d6344852a75953"
+  },
+  "fixtureFiles": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs",
+      "bytes": 22462,
+      "sha256": "aa4df09b0a3db096b475b3e8788b2fcd6ce36e06f742a98d71129b095b4af788"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/initialize.ts",
+      "bytes": 5037,
+      "sha256": "1722948592782c4951d2ffb8dfb41606f03a0c13e6b8572926cdeb997ee569cc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/worker.ts",
+      "bytes": 7537,
+      "sha256": "d1eb246719450f10a2ede72059dafad5bf2251ad060762b5d6d7ac694e9c2b3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/reader.ts",
+      "bytes": 3498,
+      "sha256": "eb59715562e4dfe3885cd83fcd49a7deafcf7577fa93f6d227b8f7347445e048"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/support.ts",
+      "bytes": 3894,
+      "sha256": "c77718b848d7086326c93ae2643b55253ad30ce4eddbf7645adec516330a1763"
+    }
+  ],
+  "initialAndMatrixPhases": [
+    {
+      "phase": "initial-unchanged-v2-race-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/phases/initial-unchanged-v2-race-baseline/summary.json",
+        "bytes": 40806,
+        "sha256": "63f9b55a9e0614253db471cb68f3fc4d10a87f1f6df628e0a0c8671229f8689a"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/observations.json",
+        "bytes": 4702462,
+        "sha256": "82be02a414d1182b7f145f7514c1ec382eb370d6465ce8504da05f543d971226"
+      },
+      "tap": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "exit": 0,
+      "failedChecks": [],
+      "candidateDoubleAdmissionEvidence": false,
+      "coldPending": 1,
+      "coldExecuted": 0
+    },
+    {
+      "phase": "P30-1534-no-transaction-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/phases/P30-1534-no-transaction-baseline/summary.json",
+        "bytes": 40741,
+        "sha256": "66c5c23fabe8777a40e80a41de78b20a7127ea75c759c1542ecdccaff991efa8"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/observations.json",
+        "bytes": 4702384,
+        "sha256": "6d1d430e59e44cb1f07429fd22222a70c6f33466668fa590b58497882a37fcde"
+      },
+      "tap": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "exit": 0,
+      "failedChecks": [],
+      "candidateDoubleAdmissionEvidence": false,
+      "coldPending": 1,
+      "coldExecuted": 0
+    },
+    {
+      "phase": "P30-1534-no-transaction-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/phases/P30-1534-no-transaction-mutant/summary.json",
+        "bytes": 51885,
+        "sha256": "41be7ab2286d03b9136a528b5a79771e8e11f1ec795caa3a49a5bd51600963e4"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/observations.json",
+        "bytes": 4716185,
+        "sha256": "d62580199c6e52db1d7429f6db71a4093d0a72a31599fe4a4aff9af368aa37aa"
+      },
+      "tap": {
+        "tests": 1,
+        "pass": 0,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "exit": 1,
+      "failedChecks": [
+        {
+          "name": "exactly one race admission and one exact cap refusal",
+          "ok": false,
+          "error": {
+            "name": "AssertionError",
+            "message": "Expected values to be strictly equal:\n\n2 !== 1\n",
+            "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n2 !== 1\n\n    at file:///private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs:219:16\n    at check (file:///private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs:132:13)\n    at TestContext.<anonymous> (file:///private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs:217:7)\n    at async Test.run (node:internal/test_runner/test:1054:7)\n    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)"
+          }
+        },
+        {
+          "name": "race cold reader witnesses one genuine pending sealed reservation",
+          "ok": false,
+          "error": {
+            "name": "AssertionError",
+            "message": "Expected values to be strictly equal:\n\n2 !== 1\n",
+            "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n2 !== 1\n\n    at file:///private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs:228:18\n    at check (file:///private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs:132:13)\n    at TestContext.<anonymous> (file:///private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs:223:9)\n    at async Test.run (node:internal/test_runner/test:1054:7)\n    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)"
+          }
+        }
+      ],
+      "candidateDoubleAdmissionEvidence": true,
+      "coldPending": 2,
+      "coldExecuted": 0
+    },
+    {
+      "phase": "P30-1534-no-transaction-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/phases/P30-1534-no-transaction-restored/summary.json",
+        "bytes": 40735,
+        "sha256": "cf692cd84a3f9fe847e623d07487df996160316794db0e06be6509fccd5904ce"
+      },
+      "observations": {
+        "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/observations.json",
+        "bytes": 4702378,
+        "sha256": "18c16fc9b64487eab246b97ef7f3f9e517b361eb9f901a8e8a2137edf89f85b7"
+      },
+      "tap": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "exit": 0,
+      "failedChecks": [],
+      "candidateDoubleAdmissionEvidence": false,
+      "coldPending": 1,
+      "coldExecuted": 0
+    }
+  ],
+  "matrix": {
+    "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction-matrix.json",
+    "bytes": 140319,
+    "sha256": "8509281ac87eef29cefe68045ca2de1b9b93e6f71c660401bc2eadd9157ea693"
+  },
+  "sourceChange": {
+    "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction-source-change.json",
+    "bytes": 1866,
+    "sha256": "81c4325a96d2b43d0baf6694f92b139ac3527d3c97eed6ce5ef82d1a108f2b43"
+  },
+  "finalPreservation": {
+    "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/root-readonly-final-preservation.json",
+    "bytes": 1029,
+    "sha256": "9c9f60028b28a9b994a4735c7f84132608ce7e2106bcf617cca2b82b7ffa48ab"
+  },
+  "finalClosure": {
+    "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/full-closure-final.json",
+    "bytes": 1400381,
+    "sha256": "8198cac2ab5fadefcb20247de3363e1df670a7b1692646853139725ca1fde6fd"
+  },
+  "frozenJournal": {
+    "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 10617,
+    "sha256": "05ab32bfa8b591bb4c7cfa582c99c0d0e533d3795a1456ab13e10caa4a58b471"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/artifact-index.json",
+    "bytes": 709120,
+    "sha256": "25d34f5f6d14630ea8851fafbca444d7c65196c1544f84e7f0d297ca305e914e"
+  },
+  "indexReferenceCount": 2961,
+  "actualCommands": 5,
+  "counting": "One new registered Node-test scenario, initialbaseline plus unchanged1\u21920\u21921 BMR:4 executions, not4unique cases. The24 actually measured child processes are not additional tests. Separate from original25/CLI9/held27/historical26.",
+  "meaning": "With the exact private transaction-wrapper removal both pre-release gates observe inTransaction=false, both real public reservations succeed, and ended-writer cold readers retain two distinct signed sealed pending reservations matched bijectively to both admissions. All intact/restored phases retain one inTransaction=true gate, one success plus exact READ_ONLY cap refusal, pending1/executed0.",
+  "failureClassification": "One mutant Node-test AssertionError at final aggregate assertion; it retains two failed checks at219 and228 after all actual effects and cleanup. Subsequent assertions inside the cold-row check are masked by pending2, but reader-captured row signatures/seals/anchored integrity were completed before the parent assertion and directly inspected. No setup, generic SQLite, timeout, native binding, observer, child or cleanup error is credited as a kill.",
+  "processAndRuntime": {
+    "everyCommandOwnedGroupInitiallyAndFinallyEmpty": true,
+    "forcedSignals": 0,
+    "all24ActualChildNodeVersions": "v22.23.3",
+    "all24ActualChildModulesABI": "127",
+    "nativeSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "noToolOrProviderInvocation": true,
+    "coordinatorOpensSqlite": false,
+    "allPhaseOwnedRootsRemoved": true,
+    "allWorkerDescriptorsRestored": true
+  },
+  "trust": "Initializer caller-generates both independent local role-key sets and public PEM/SPKI pins before vault/history/config signatures. Actual signed cap1 configuration and monitor-pinned cold ledger verification are measured. Local fixture authority is not external person accreditation. Product row canonicalization is shared; actual Node crypto checks event/seal digest signatures. Retained public inputs support later verification; deleted encrypted vault/private keys do not permit full offline fixture recreation.",
+  "effects": "Full owned-root snapshots include child homes and SQLite WAL/SHM effects; timestamps excluded. No universal no-effects statement, whole-machine process isolation or P0-27 corruption-cause repair.",
+  "interruption": {
+    "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/root-post-runtime-interruption-note.json",
+    "bytes": 702,
+    "sha256": "772542f8c09a519391f6ea842d41028c6bc2dee238ebe5d35a0047fc209b7af7"
+  },
+  "limits": [
+    "Original25 no-transaction survivor remains a separate fixed-corpus result; new one-case causal observer does not rewrite it.",
+    "No held test/helper/runner transfer, permanent source/test/CLI/counter/guard/archive/dependency/native/Git edit, compiler/build/import adapter or dist mutation.",
+    "No source release, whole P0-30, old batch, Node24, full suite/coverage/hosted/G0/Done or dependency closure."
+  ],
+  "allRuntimeFinishedBeforeRootFreeze": true,
+  "allRootFreezeReadsFinished": true
+}

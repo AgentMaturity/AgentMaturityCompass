@@ -1,0 +1,137 @@
+{
+  "schema": "p125pc-control-preparation-author-review/1",
+  "at": "2026-10-17T01:49:30.935979+00:00",
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/source-control.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/source-control.py.source.txt",
+    "bytes": 28698,
+    "sha256": "44f1f8e540f111b8dd3a72202930a1a21fcbbf191096424e38cc6a8443c2d2a5",
+    "dev": 16777231,
+    "inode": 543919790,
+    "nlink": 1
+  },
+  "preferredSeal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/seal.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/seal.json",
+    "bytes": 4870,
+    "sha256": "f3e9c73239e5671f8f115ed8dd3810a8deeb4aa7dd3d07bf431e6dd5238fb771",
+    "dev": 16777231,
+    "inode": 543919794,
+    "nlink": 1
+  },
+  "fullBaseDelta": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/source-control-from-C39.patch.txt",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/source-control-from-C39.patch.txt",
+    "bytes": 16690,
+    "sha256": "a988ad54e285166a3f456005305176cb3d40c6209f724d75823d7cb6bc0c9e6c",
+    "dev": 16777231,
+    "inode": 543919792,
+    "nlink": 1
+  },
+  "recipePin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/controls.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/controls.json",
+    "bytes": 7181,
+    "sha256": "02db629a3438a38970aabdda2d612a2a216a5d245c2e3b24d6142bea169ede06",
+    "dev": 16777231,
+    "inode": 543919671,
+    "nlink": 1
+  },
+  "rootBindingsTemplate": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v2/control-root-bindings.template.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v2/control-root-bindings.template.json",
+    "bytes": 3682,
+    "sha256": "37db95e678bd505194f3d913d258b1704e38af91b599fe78d2096ab17c47c7e2",
+    "dev": 16777231,
+    "inode": 543919760,
+    "nlink": 1
+  },
+  "exactBaseGuardFunctions": {
+    "sha": true,
+    "load": true,
+    "pin": true,
+    "verify": true,
+    "git": true,
+    "inactive": true,
+    "closed": true,
+    "green": true,
+    "action_closed": true,
+    "write_json": true,
+    "guarded_write": true
+  },
+  "completeRestoreClassificationWriteRecordAndMainEntryTailByteExact": true,
+  "fullPreferredHelperCompleteBaseDeltaRecipesTemplateInstructionsAndPinsRead": true,
+  "allSealedOutputsAndInputsStillPhysicalPinExact": true,
+  "twoV2CallIdentifierErrorsCorrectedByOnlyTwoCallParenthesesRepairs": true,
+  "earlierFullAuthorReadPendingResolvedByThisRecord": true,
+  "operators": [
+    {
+      "operator": "DROP-PRODUCER-TS",
+      "targetFunctionOnly": true,
+      "beforeLine": 580,
+      "witnessProspective": [
+        698
+      ],
+      "projection": {
+        "bytes": 43780,
+        "sha256": "57acf173f4fd336601e482fe5da13448f36eae72632eb1d603b407e5ed459634"
+      }
+    },
+    {
+      "operator": "CLAMP-FUTURE-PRODUCER-TS",
+      "targetFunctionOnly": true,
+      "beforeLine": 580,
+      "witnessProspective": [
+        707
+      ],
+      "projection": {
+        "bytes": 43838,
+        "sha256": "adf7767e241bdf1233f123a794eb1e550dadffc471160695cb25b169907607aa"
+      }
+    }
+  ],
+  "fiveAdmissionFlagsRemainFalse": [
+    "readyForControls",
+    "rootReviewedActualSourceAndFreshOutcomes",
+    "rootReviewedActualSourceAndFreshPublicEvidence",
+    "rootReviewedActualPreservationAndNativePins",
+    "rootReviewedExactHelperAndControlRecipes"
+  ],
+  "futureEvidenceFieldsRemainNull": true,
+  "knownFiniteSourceSelectionIsStaticOnly": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/source-selection.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/source-selection.json",
+    "bytes": 7899,
+    "sha256": "40618cf6cd152f4a56319124eb44aa967ae939b1dbdb454f2277634c30cf7431",
+    "dev": 16777231,
+    "inode": 543919580,
+    "nlink": 1
+  },
+  "selectionShapeDerivedFromActualPriorOrderedSetsAndTwoNamedPairs": true,
+  "baseProtectedInputCountDerived": 175,
+  "retainedNativeMetadataCountDerived": 12,
+  "noFutureFreshNativeHashPathCountOrAcceptanceAdopted": true,
+  "prebuildCompiledObservationPathsExcludedFromActiveInputs": true,
+  "requiredActualRuntimeFields": [
+    "initial175Pinset",
+    "oneAdmittedOwnSourceSuccessor",
+    "allOther174MustRemainExactAfterSeparateSourceAdmission"
+  ],
+  "requiredRootSourceSuccessorFields": [
+    "old",
+    "new",
+    "originalPreservedPin",
+    "originalGitCommits (80268079f804ed0ecb7659cd02a75e8b88ee3e0d, then actual source parent 8889784782c8f7413e1cccab579ae4b8b6f21cc1)"
+  ],
+  "remainingAdoptionPrerequisites": [
+    "Actual source semantic checkpoint and sole candidate successor/original physical records.",
+    "Actual post-build runtime pinset, finite source/fresh binding and fresh native physical pin.",
+    "Actual closed source/fresh GREEN outcomes, public lifecycle review, observed audit and exact phase names.",
+    "Root full read and independent static review of preferred helper, delta, recipes and field contract.",
+    "Exclusive active control manifest with all five actual admission flags; separate naturally closed action records only after each explicit action."
+  ],
+  "noSourceOrIndexQaPriorArtifactMutationOrSourceAllocationByAuthor": true,
+  "noParserImportCompilerHelperProductTestOpenSslNativeNetworkKeyPrivateStreamOrReservationOperation": true,
+  "noMutationOrQualificationResultClaim": true,
+  "blockers": []
+}

@@ -2,14 +2,25 @@ import { execFile, spawnSync } from "node:child_process";
 import { createServer } from "node:http";
 import { promisify } from "node:util";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, relative, resolve } from "node:path";
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { dirname, join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import { assertFileNotExample, assertNotExample, EXAMPLE_BANNER } from "../src/claims/eligibility/exampleMode.js";
 import { assessDomainForAgent, buildDomainReportForAgent, getDomainGaps, getDomainRoadmap } from "../src/domains/domainCliIntegration.js";
 import { initWorkspace } from "../src/workspace.js";
-import { openLedger } from "../src/ledger/ledger.js";
+import { openLedger, verifyLedgerIntegrity } from "../src/ledger/ledger.js";
+import { DEMO_AGENT_ID, noVaultDemoGatewayConfig, prepareNoVaultDemoWorkspace, runDemo } from "../src/demo/demoRun.js";
+import { startGateway } from "../src/gateway/server.js";
+import { initGatewayConfig, verifyGatewayConfigSignature } from "../src/gateway/config.js";
+import { issueLeaseForCli, verifyLeaseForCli } from "../src/leases/leaseCli.js";
+import { leasePayloadSchema } from "../src/leases/leaseSchema.js";
+import { initUsersConfig } from "../src/auth/authApi.js";
+import { workspaceIdFromDirectory } from "../src/workspaces/workspaceId.js";
+import { evidenceProducer, effectiveTrustTier, eventMeta, readerTrustFor } from "../src/claims/evidenceProvenance.js";
+import { runDiagnostic } from "../src/diagnostic/runner.js";
+import { withWorkspaceScope } from "../src/enforce/evidenceEmitter.js";
 import { testIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
 /**
@@ -18,7 +29,7 @@ import { testIndustryPackLicence } from "./helpers/industryPackLicence.js";
  * path that could carry a result.
  */
 
-const CLI = resolve(process.cwd(), "dist/cli.js");
+const CLI = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
 const roots: string[] = [];
 const licenseEnv: Record<string, string> = {};
 const EXAMPLE = { claimKind: "synthetic_example", banner: EXAMPLE_BANNER };
@@ -114,18 +125,38 @@ describe("--example on the five domain commands", () => {
 
 describe("other synthetic producers carry the label", () => {
   test("amc demo run through a gateway (the default vault mode) is labelled in text and --json", async () => {
-    // A stand-in gateway that accepts the demo's scripted requests; the CLI runs async so this server can answer.
+    // Keep the existing local upstream, but exercise actual signed gateway persistence.
     const server = createServer((req, res) => {
       req.resume();
       req.on("end", () => { res.setHeader("content-type", "application/json"); res.end("{}"); });
     });
     await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
     const address = server.address();
-    const gateway = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`;
-    const run = (extra: string[]) => promisify(execFile)(process.execPath, [CLI, "demo", "run", "--gateway", gateway, ...extra], {
-      cwd: workspace, env: { ...process.env, NO_COLOR: "1" }, encoding: "utf8", timeout: 60_000
-    });
+    const upstream = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`;
+    const demoWorkspace = tempDir("amc-p015-demo-ledger-");
+    let gateway: Awaited<ReturnType<typeof startGateway>> | undefined;
     try {
+      initWorkspace({ workspacePath: demoWorkspace, trustBoundaryMode: "isolated" });
+      initWorkspace({ workspacePath: demoWorkspace, agentId: DEMO_AGENT_ID, trustBoundaryMode: "isolated" });
+      const customAgentId = "p015-scripted-custom";
+      initWorkspace({ workspacePath: demoWorkspace, agentId: customAgentId, trustBoundaryMode: "isolated" });
+      initGatewayConfig(demoWorkspace, noVaultDemoGatewayConfig(upstream));
+      const workspaceId = workspaceIdFromDirectory(demoWorkspace);
+      gateway = await startGateway({ workspace: demoWorkspace, workspaceId, listenHost: "127.0.0.1", listenPort: 0, proxyPort: 0 });
+      const gatewayUrl = `http://${gateway.host}:${gateway.port}`;
+      const readEvents = () => {
+        const ledger = openLedger(demoWorkspace);
+        try {
+          return ledger.getAllEvents();
+        } finally {
+          ledger.close();
+        }
+      };
+      const readLlmRows = () => readEvents().filter((row) => row.event_type === "llm_request" || row.event_type === "llm_response");
+      const beforeDemoIds = new Set(readLlmRows().map((row) => row.id));
+      const run = (extra: string[]) => promisify(execFile)(process.execPath, [CLI, "demo", "run", "--gateway", gatewayUrl, ...extra], {
+        cwd: demoWorkspace, env: { ...process.env, NO_COLOR: "1" }, encoding: "utf8", timeout: 60_000
+      });
       const text = await run([]);
       const lines = text.stdout.trim().split("\n");
       expect([lines[0], lines.at(-1)]).toEqual([EXAMPLE_BANNER, EXAMPLE_BANNER]);
@@ -136,10 +167,162 @@ describe("other synthetic producers carry the label", () => {
       expect(parsed.claimKind).toBe("synthetic_example");
       expect(parsed.envelope?.claimKind).toBe("synthetic_example");
       expect(parsed.trustLabel).toBe("DEMO_ONLY");
+
+      const demoRows = readLlmRows().filter((row) => !beforeDemoIds.has(row.id));
+      const requests = demoRows.filter((row) => row.event_type === "llm_request");
+      const responses = demoRows.filter((row) => row.event_type === "llm_response");
+      expect(requests.length).toBeGreaterThan(0);
+      expect(responses.length).toBeGreaterThan(0);
+      expect(new Set(demoRows.map((row) => row.id)).size).toBe(demoRows.length);
+      expect(new Set(demoRows.map((row) => row.session_id))).toEqual(new Set([gateway.gatewaySessionId]));
+      for (const row of demoRows) {
+        const meta = eventMeta(row);
+        expect(meta.agentId).toBe(DEMO_AGENT_ID);
+        expect(typeof meta.request_id).toBe("string");
+        expect(String(meta.request_id).length).toBeGreaterThan(0);
+        expect(typeof meta.leaseId).toBe("string");
+        expect(String(meta.leaseId).length).toBeGreaterThan(0);
+      }
+      expect(new Set(requests.map((row) => eventMeta(row).request_id))).toEqual(new Set(responses.map((row) => eventMeta(row).request_id)));
+      for (const requestId of new Set(requests.map((row) => eventMeta(row).request_id))) {
+        expect(demoRows.filter((row) => eventMeta(row).request_id === requestId).map((row) => row.event_type).sort()).toEqual(["llm_request", "llm_response"]);
+      }
+
+      // Soft policy assertions retain independent failures after successful real setup.
+      const reader = readerTrustFor(demoWorkspace);
+      expect.soft(new Set(demoRows.map((row) => eventMeta(row).claimKind))).toEqual(new Set(["synthetic_example"]));
+      expect.soft(new Set(demoRows.map((row) => evidenceProducer(row)))).toEqual(new Set(["synthetic"]));
+      expect.soft(new Set(demoRows.map((row) => effectiveTrustTier(row, reader)))).toEqual(new Set([null]));
+
+      const markedLease = issueLeaseForCli({
+        workspace: demoWorkspace, workspaceId, agentId: customAgentId, ttl: "15m", scopes: "gateway:llm", routes: "/local",
+        models: "gpt-4o-demo", rpm: 60, tpm: 200000, maxCostUsdPerDay: null, claimKind: "synthetic_example"
+      });
+      const markedVerification = verifyLeaseForCli({ workspace: demoWorkspace, token: markedLease.token });
+      expect(markedVerification.ok).toBe(true);
+      const markedPayload = leasePayloadSchema.parse(markedVerification.payload);
+      expect.soft(markedPayload.claimKind).toBe("synthetic_example");
+      const beforeCustomIds = new Set(readLlmRows().map((row) => row.id));
+      const directResult = await withWorkspaceScope(demoWorkspace, () => runDemo(gatewayUrl, markedLease.token, customAgentId));
+      expect.soft(directResult.agentId).toBe(customAgentId);
+      expect.soft(directResult.demoOnly).toBe(true);
+      expect.soft(directResult.trustLabel).toBe("DEMO_ONLY");
+      const customRows = readLlmRows().filter((row) => !beforeCustomIds.has(row.id));
+      const customRequests = customRows.filter((row) => row.event_type === "llm_request");
+      const customResponses = customRows.filter((row) => row.event_type === "llm_response");
+      expect(customRequests.length).toBeGreaterThan(0);
+      expect(customResponses.length).toBeGreaterThan(0);
+      expect(new Set(customRows.map((row) => row.id)).size).toBe(customRows.length);
+      expect(new Set(customRows.map((row) => row.session_id))).toEqual(new Set([gateway.gatewaySessionId]));
+      for (const row of customRows) {
+        const meta = eventMeta(row);
+        expect(meta.agentId).toBe(customAgentId);
+        expect(meta.leaseId).toBe(markedPayload.leaseId);
+        expect(typeof meta.request_id).toBe("string");
+        expect(String(meta.request_id).length).toBeGreaterThan(0);
+      }
+      expect(new Set(customRequests.map((row) => eventMeta(row).request_id))).toEqual(new Set(customResponses.map((row) => eventMeta(row).request_id)));
+      for (const requestId of new Set(customRequests.map((row) => eventMeta(row).request_id))) {
+        expect(customRows.filter((row) => eventMeta(row).request_id === requestId).map((row) => row.event_type).sort()).toEqual(["llm_request", "llm_response"]);
+      }
+      expect.soft(new Set(customRows.map((row) => eventMeta(row).claimKind))).toEqual(new Set(["synthetic_example"]));
+      expect.soft(new Set(customRows.map((row) => evidenceProducer(row)))).toEqual(new Set(["synthetic"]));
+      expect.soft(new Set(customRows.map((row) => effectiveTrustTier(row, reader)))).toEqual(new Set([null]));
+
+      const ordinaryLease = issueLeaseForCli({
+        workspace: demoWorkspace, workspaceId, agentId: DEMO_AGENT_ID, ttl: "15m", scopes: "gateway:llm", routes: "/local",
+        models: "*", rpm: 60, tpm: 200000, maxCostUsdPerDay: null
+      }).token;
+      const beforeOrdinaryIds = new Set(readLlmRows().map((row) => row.id));
+      const ordinaryResponse = await fetch(`${gatewayUrl}/local/v1/chat/completions`, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-amc-agent-id": DEMO_AGENT_ID, "x-amc-lease": ordinaryLease, "x-amc-claim-kind": "synthetic_example" },
+        body: JSON.stringify({ model: "gpt-4o-demo", messages: [{ role: "user", content: "ordinary transport compatibility" }] })
+      });
+      expect(ordinaryResponse.status).toBe(200);
+      await ordinaryResponse.json();
+      const ordinaryRows = readLlmRows().filter((row) => !beforeOrdinaryIds.has(row.id));
+      expect(ordinaryRows.map((row) => row.event_type).sort()).toEqual(["llm_request", "llm_response"]);
+      expect.soft(ordinaryRows.some((row) => eventMeta(row).claimKind === "synthetic_example")).toBe(false);
+      expect.soft(new Set(ordinaryRows.map((row) => evidenceProducer(row)))).toEqual(new Set(["amc-runtime"]));
+      expect.soft(new Set(ordinaryRows.map((row) => effectiveTrustTier(row, reader)))).toEqual(new Set(["OBSERVED"]));
+
+      const tokenParts = markedLease.token.split(".");
+      expect(tokenParts).toHaveLength(2);
+      const changedSignature = Buffer.from(tokenParts[1]!, "base64url");
+      expect(changedSignature.length).toBeGreaterThan(0);
+      changedSignature[0] = changedSignature[0]! ^ 1;
+      const tamperedLease = `${tokenParts[0]}.${changedSignature.toString("base64url")}`;
+      expect(verifyLeaseForCli({ workspace: demoWorkspace, token: tamperedLease }).ok).toBe(false);
+      const refusals = [
+        { name: "missing", token: undefined, agentId: customAgentId },
+        { name: "unmarked", token: ordinaryLease, agentId: DEMO_AGENT_ID },
+        { name: "tampered signature", token: tamperedLease, agentId: customAgentId },
+        { name: "agent mismatch", token: markedLease.token, agentId: DEMO_AGENT_ID }
+      ];
+      const scriptedFetch = vi.spyOn(globalThis, "fetch");
+      try {
+        for (const refusal of refusals) {
+          scriptedFetch.mockClear();
+          const beforeRefusalIds = readEvents().map((row) => row.id);
+          let refusalError: unknown;
+          try {
+            await withWorkspaceScope(demoWorkspace, () => runDemo(gatewayUrl, refusal.token, refusal.agentId));
+          } catch (error) {
+            refusalError = error;
+          }
+          expect.soft(refusalError, refusal.name).toBeInstanceOf(Error);
+          expect.soft(scriptedFetch, refusal.name).not.toHaveBeenCalled();
+          expect.soft(readEvents().map((row) => row.id), refusal.name).toEqual(beforeRefusalIds);
+        }
+      } finally {
+        scriptedFetch.mockRestore();
+      }
+      const completedGateway = gateway;
+      gateway = undefined;
+      await completedGateway.close();
+      expect((await verifyLedgerIntegrity(demoWorkspace)).ok).toBe(true);
+      const demoIds = new Set([...demoRows, ...customRows].map((row) => row.id));
+      for (const agentId of ["default", DEMO_AGENT_ID, customAgentId]) {
+        const report = await runDiagnostic({ workspace: demoWorkspace, window: "14d", targetName: "default", claimMode: "auto", agentId });
+        expect.soft(report.questionScores.flatMap((row) => row.evidenceEventIds).filter((id) => demoIds.has(id))).toEqual([]);
+      }
+      // No total-zero observed-coverage assertion: gateway operational audits remain real observations.
     } finally {
+      if (gateway) await gateway.close();
       await new Promise((done) => server.close(done));
     }
   }, 60_000);
+
+  test("a prepared no-vault demo signs synthetic provenance for a custom agent", () => {
+    const dir = tempDir("amc-p015-prepared-custom-");
+    const customAgentId = "p015-prepared-custom";
+    const prepared = prepareNoVaultDemoWorkspace({
+      workspace: dir, upstreamBaseUrl: "http://127.0.0.1:8800", passphrase: "p015-example-mode", agentId: customAgentId
+    });
+    expect(prepared.workspace).toBe(dir);
+    expect(prepared.agentId).toBe(customAgentId);
+    const verification = verifyLeaseForCli({ workspace: dir, token: prepared.leaseToken });
+    expect(verification.ok).toBe(true);
+    const payload = leasePayloadSchema.parse(verification.payload);
+    expect(payload).toMatchObject({
+      claimKind: "synthetic_example", agentId: customAgentId, workspaceId: workspaceIdFromDirectory(dir)
+    });
+    expect(verifyGatewayConfigSignature(dir).valid).toBe(true);
+  });
+
+  test("a synthetic_example lease minted for an authenticated principal keeps both signed fields (P0-15 with P1-78)", () => {
+    const dir = tempDir("amc-p015-principal-");
+    initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
+    const { owner } = initUsersConfig({ workspace: dir, username: "p015-owner", password: "p015-fixture-password" });
+    const lease = issueLeaseForCli({ workspace: dir, workspaceId: workspaceIdFromDirectory(dir), agentId: DEMO_AGENT_ID,
+      claimKind: "synthetic_example", principalKey: `LOCAL_USER:${owner.userId}`, ttl: "15m", scopes: "gateway:llm",
+      routes: "/local", models: "gpt-4o-demo", rpm: 60, tpm: 200000, maxCostUsdPerDay: null });
+    const verification = verifyLeaseForCli({ workspace: dir, token: lease.token });
+    expect(verification.ok).toBe(true);
+    expect(leasePayloadSchema.parse(verification.payload)).toMatchObject({
+      claimKind: "synthetic_example", principal: { userId: owner.userId }, agentId: DEMO_AGENT_ID });
+  });
 
   test("lab-simulate placeholder results carry a synthetic_example envelope", async () => {
     const lab = await import("../src/lab/cognitionLab.js");
@@ -299,5 +482,102 @@ describe("signing paths refuse a synthetic_example result", () => {
     const { notarySignCli } = await import("../src/notary/notaryCli.js");
     expect(() => notarySignCli({ notaryDir: tempDir("amc-p015-notary-"), kind: "bundle", inFile, outFile: join(workspace, "x.sig") }))
       .toThrow(/synthetic_example results cannot be/);
+  });
+});
+
+// These fixed filesystem fixtures test the output boundary, not races with another writer.
+describe("example report output cannot become AMC state", () => {
+  test.each(["relative", "absolute", "normalized", "case-alias"] as const)("CLI refuses a %s .amc destination before creating state", (form) => {
+    const dir = tempDir("amc-p015-output-refusal-");
+    const state = join(dir, ".amc");
+    const before = treeHash(dir);
+    const output = form === "absolute"
+      ? join(state, "new-parent", "example.md")
+      : form === "normalized" ? "new-parent/../.amc/new-parent/example.md"
+        : form === "case-alias" ? ".AMC/new-parent/example.md" : ".amc/new-parent/example.md";
+    for (const json of [false, true]) {
+      const args = ["domain", "report", "--agent", "a", "--domain", "health", "--example", "--output", output];
+      const result = runCli(dir, json ? [...args, "--json"] : args);
+      expect(result.status, result.stderr).toBe(1);
+      expect(result.stderr).toMatch(/example/i);
+      expect(result.stderr).toContain(".amc");
+      expect(existsSync(state)).toBe(false);
+      expect(existsSync(join(dir, "new-parent"))).toBe(false);
+      expect(treeHash(dir)).toBe(before);
+    }
+  });
+
+  test("CLI refuses a directory alias into existing .amc without changing its contents", () => {
+    const dir = tempDir("amc-p015-output-alias-");
+    const state = join(dir, ".amc");
+    mkdirSync(state);
+    writeFileSync(join(state, "sentinel.txt"), "preserved state\n");
+    symlinkSync(state, join(dir, "state-alias"), "dir");
+    const before = treeHash(dir);
+    const result = runCli(dir, ["domain", "report", "--agent", "a", "--domain", "health", "--example", "--output", "state-alias/new-parent/example.md"]);
+    expect(result.status, result.stderr).toBe(1);
+    expect(result.stderr).toMatch(/example/i);
+    expect(result.stderr).toContain(".amc");
+    expect(existsSync(join(state, "new-parent"))).toBe(false);
+    expect(treeHash(dir)).toBe(before);
+  });
+
+  test("CLI refuses a sibling alias when .amc itself points to external state", () => {
+    const dir = tempDir("amc-p015-external-state-");
+    const external = tempDir("amc-p015-external-target-");
+    writeFileSync(join(external, "sentinel.txt"), "preserved external state\n");
+    symlinkSync(external, join(dir, ".amc"), "dir");
+    symlinkSync(external, join(dir, "sibling-alias"), "dir");
+    const before = treeHash(external);
+    const rootBefore = treeHash(dir);
+    const result = runCli(dir, ["domain", "report", "--agent", "a", "--domain", "health", "--example", "--json", "--output", "sibling-alias/new-parent/example.md"]);
+    expect(result.status, result.stderr).toBe(1);
+    expect(result.stderr).toMatch(/example/i);
+    expect(result.stderr).toContain(".amc");
+    expect(existsSync(join(external, "new-parent"))).toBe(false);
+    expect(treeHash(external)).toBe(before);
+    expect(treeHash(dir)).toBe(rootBefore);
+  });
+
+  test("a direct library call cannot write an example report into the supplied workspace's .amc", () => {
+    const dir = tempDir("amc-p015-library-refusal-");
+    const state = join(dir, ".amc");
+    mkdirSync(state);
+    writeFileSync(join(state, "sentinel.txt"), "preserved library state\n");
+    const before = treeHash(state);
+    expect(() => buildDomainReportForAgent({
+      agentId: "a", domain: "health", workspace: dir, example: true,
+      outputPath: join(state, "new-parent", "example.md")
+    })).toThrow(/example.*\.amc|\.amc.*example/i);
+    expect(existsSync(join(state, "new-parent"))).toBe(false);
+    expect(treeHash(state)).toBe(before);
+  });
+
+  test("an external nested .amc-lookalike output stays allowed and carries both banners", () => {
+    const dir = tempDir("amc-p015-allowed-output-");
+    const external = tempDir("amc-p015-allowed-external-");
+    const output = join(external, ".amc-lookalike", "nested", "example.md");
+    const before = treeHash(dir);
+    const result = runCli(dir, ["domain", "report", "--agent", "a", "--domain", "health", "--example", "--output", output]);
+    expect(result.status, result.stderr).toBe(0);
+    const lines = readFileSync(output, "utf8").trim().split("\n");
+    expect(lines[0]).toBe(EXAMPLE_BANNER);
+    expect(lines.at(-1)).toBe(EXAMPLE_BANNER);
+    expect(existsSync(join(dir, ".amc"))).toBe(false);
+    expect(treeHash(dir)).toBe(before);
+  });
+
+  test("ordinary not-evaluated reports still write to an explicitly requested .amc output", () => {
+    const dir = tempDir("amc-p015-real-output-");
+    const libraryPath = join(dir, ".amc", "reports", "library.md");
+    const report = buildDomainReportForAgent({ agentId: "a", domain: "health", workspace: dir, outputPath: libraryPath });
+    expect(report.assessment.status).toBe("not_evaluated");
+    expect(readFileSync(libraryPath, "utf8")).toContain("## Result: Not evaluated");
+    expect(readFileSync(libraryPath, "utf8")).not.toContain(EXAMPLE_BANNER);
+    const cliPath = join(dir, ".amc", "reports", "cli.md");
+    const result = runCli(dir, ["domain", "report", "--agent", "a", "--domain", "health", "--output", cliPath]);
+    expect(result.status, result.stderr).toBe(0);
+    expect(readFileSync(cliPath, "utf8")).toContain("## Result: Not evaluated");
+    expect(readFileSync(cliPath, "utf8")).not.toContain(EXAMPLE_BANNER);
   });
 });

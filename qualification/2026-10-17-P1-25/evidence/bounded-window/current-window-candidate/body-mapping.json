@@ -1,0 +1,53 @@
+{
+  "schema": "p125-next-window-exact-body-mapping/1",
+  "baseHelper": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+    "bytes": 24967,
+    "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c"
+  },
+  "baseCheckpoint": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+    "bytes": 22649,
+    "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7"
+  },
+  "unchangedGrant": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+    "bytes": 2964,
+    "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca"
+  },
+  "currentHelperIsExactOld8d466MinusOneExtraEofNewline": true,
+  "bothCandidatesExactlyOneFinalNewline": true,
+  "originalTwoCheckpointBodies": {
+    "bytes": 8211,
+    "sha256": "1f25db6ca8c2601611402079d31e9847f208b3401d69f1a76a3bd88294010cfe",
+    "oldStartLine": 218,
+    "newStartLine": 230,
+    "wholeBlockByteExact": true
+  },
+  "bothGrantBodiesWholeFileUntouched": true,
+  "targets": [
+    {
+      "path": "tests/time/tsaTestFixture.ts",
+      "candidate": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/tsaTestFixture.ts.source.txt",
+        "bytes": 25255,
+        "sha256": "72cff741f404bf83e49816be2141dad55042f037bf086b165381e344d47dddf1"
+      }
+    },
+    {
+      "path": "tests/time/checkpointWindow.test.ts",
+      "candidate": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+        "bytes": 34549,
+        "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7"
+      }
+    }
+  ],
+  "changes": [
+    "helper optional occurrence argument; original omitted selector still requires exactlyone/defaultDIGEST",
+    "narrow existing owned ledger append+seal operation exposed to checkpoint body",
+    "newcaseID added and wrapper public windowBoundary conditional only for this case",
+    "one literal thirdcase appended, original2bodyblock exact"
+  ],
+  "noProductionGrantEnvironmentDeadlineOrSourceWrites": true
+}

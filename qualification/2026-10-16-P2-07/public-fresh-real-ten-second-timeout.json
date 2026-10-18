@@ -1,0 +1,46 @@
+{
+  "schema": "amc-p207-local-oidc/2",
+  "label": "real-ten-second-timeout",
+  "synthetic": true,
+  "issuer": "http://127.0.0.1:63619/414d0dbb-7bbb-4ac3-a102-e95ac7cf9bc3",
+  "requests": [
+    {
+      "id": 1,
+      "connectionId": 1,
+      "method": "GET",
+      "path": "/slow",
+      "bodyBytes": 0,
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requestEnded": true,
+      "responseClosed": true,
+      "responseStatus": 200,
+      "responseBodyBytes": 2,
+      "responseDelayMs": 12000,
+      "headers": {
+        "accept": "application/json"
+      }
+    }
+  ],
+  "observations": [
+    {
+      "actualElapsedMs": 10006.714875,
+      "endpointFiniteFallbackMs": 12000
+    }
+  ],
+  "handlerErrors": [],
+  "transportErrors": [],
+  "transportErrorClassifications": [],
+  "lifecycle": {
+    "inProcessServer": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0,
+    "connectionCount": 1,
+    "childProcessCreated": false,
+    "signalsSent": false,
+    "exactOptInRestored": true
+  },
+  "failed": false,
+  "originalError": null,
+  "cleanupError": null
+}

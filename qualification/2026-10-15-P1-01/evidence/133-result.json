@@ -1,0 +1,23 @@
+{
+  "phase": "mutant-compile",
+  "argv": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "tsconfig.json"
+  ],
+  "cwd": "/private/tmp/p1-01-source-control-20261015/copy",
+  "pid": 39478,
+  "exit": 2,
+  "expectedExit": 0,
+  "durationMs": 29774,
+  "ownedGroupProbes": [
+    {
+      "utc": "2026-10-15T08:34:16.607362+00:00",
+      "signal": 0,
+      "errno": 3,
+      "absentByESRCH": true
+    }
+  ],
+  "signalsOtherThanZeroSent": false
+}

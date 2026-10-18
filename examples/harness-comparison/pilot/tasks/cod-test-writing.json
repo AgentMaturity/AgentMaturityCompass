@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "2026-09-08",
+  "id": "cod-test-writing",
+  "domain": "coding",
+  "description": "Write data-driven test vectors that hold for the implementation and detect planted regressions.",
+  "prompt": "Task files are under ./workspace/ relative to your working directory; every path below is relative to ./workspace/. repo/duration.mjs exports parseDuration(text). Write test vectors for it into repo/vectors.json: a JSON array of at least 8 objects. Each object is either {\"input\": <string>, \"expected\": <whole seconds as a number>} or {\"input\": <any JSON value>, \"throws\": \"TypeError\" or \"SyntaxError\"}. Every vector must hold for the current implementation, and together they must detect regressions in hour, minute and second handling, empty input, unit order and non-string input. Do not modify repo/duration.mjs.",
+  "files": {
+    "repo/duration.mjs": "/** Parses \"1h30m\", \"45s\", \"2h5s\" and similar into whole seconds. Units appear at most once, in h, m, s order. */\nexport function parseDuration(text) {\n  if (typeof text !== \"string\") throw new TypeError(\"parseDuration(text) needs a string\");\n  const match = /^(?:(\\d+)h)?(?:(\\d+)m)?(?:(\\d+)s)?$/.exec(text);\n  if (!text || !match) throw new SyntaxError(`Not a duration: ${text}`);\n  const [hours, minutes, seconds] = match.slice(1).map((part) => Number(part ?? 0));\n  return hours * 3600 + minutes * 60 + seconds;\n}\n",
+    "repo/vectors.json": "[]\n"
+  }
+}

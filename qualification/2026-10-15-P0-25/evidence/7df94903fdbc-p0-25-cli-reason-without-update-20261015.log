@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:citations
+> node scripts/check-citations.mjs --reason p0-25-stray-reason
+
+citations: --reason is only valid with --update-baseline; usage: node scripts/check-citations.mjs [--json] [--update-baseline --reason "<text>"]

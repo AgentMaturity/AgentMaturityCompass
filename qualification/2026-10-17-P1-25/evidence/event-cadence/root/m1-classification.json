@@ -1,0 +1,36 @@
+{
+  "at": "2026-10-17T01:09:17.150357+00:00",
+  "phase": "p125ec-m1",
+  "sourceCommit": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+  "operator": "COUNT-CHECKPOINT-ROWS",
+  "outcomeSha256": "05591fd30f6df13644c6e19d4f26658146c9c22992353bbddd444431ad54cb96",
+  "rootAllFailuresRead": true,
+  "allFailuresClassified": true,
+  "firstSensitiveAssertionRead": true,
+  "noHookOrEnvironmentFailure": true,
+  "actualCohortAndHooksMatchCanonical": true,
+  "actualOwnedChildrenAndCleanupRead": true,
+  "allFailures": [
+    {
+      "test": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+      "messages": [
+        "expected { ran: true, anchors: [] } to deeply equal { ran: false, anchors: [] }"
+      ],
+      "classification": "Direct cadence sensitivity: removing only checkpoint-row exclusion counts the existing checkpoint plus one real new audit as two, creating an early second timestamped checkpoint. The first genuine grant, default signed trust home, signed chain/token/event/head and first ledger verification, checkpoint-only negative and one real audit structure passed before this assertion.",
+      "firstSensitiveFrame": "at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout/tests/time/checkpointWindow.test.ts:582:28"
+    }
+  ],
+  "firstSensitiveAssertion": "checkpointWindow.test.ts:582:28 expect(one.result).toEqual({ ran: false, anchors: [] }); actual ran:true.",
+  "masking": [
+    "The one-stage event/chain/request/old-file assertions at583-586 are masked.",
+    "The second audit, exact-two threshold assertion, independent second grant, reset and final signature/config/ledger assertions never ran.",
+    "The pre-assertion early second checkpoint/reply is observational. Only the first grant was independently verified; the second request receives no such credit."
+  ],
+  "actualPublicResources": {
+    "children": 37,
+    "explicitChildStreamHashCount": 74,
+    "closedSockets": 10,
+    "closedLedgerOwners": 24
+  },
+  "noLaterAssertionOrCryptoAcceptanceCredit": true
+}

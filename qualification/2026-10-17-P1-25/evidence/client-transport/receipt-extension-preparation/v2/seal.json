@@ -1,0 +1,83 @@
+{
+  "schema": "p125c-assembler-v2-seal/1",
+  "at": "2026-10-16T21:54:47.672462+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/receipt-extension-preparation/v2/README.md",
+      "bytes": 2261,
+      "sha256": "5e7d19ae223d048fadc0557a6a7491595e946a18d871b114075a8ab552cf1a32"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py",
+      "bytes": 11264,
+      "sha256": "4dc62ec23720263b7d40c3cd9b9a7af3e35e4c711e502f38bd2d64f81bb45579"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/receipt-extension-preparation/v2/input-pins.json",
+      "bytes": 2479,
+      "sha256": "efe8f65446d0ee20c799f5111d6c9d0537d778ef647586f8dbbfcca64c414ac3"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/receipt-extension-preparation/v2/v1-v2.patch",
+      "bytes": 2920,
+      "sha256": "b6208a6958eebf0f8f4b937d638686e5fd71281a689532cd83ea4b5c26657f75"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/receipt-extension-preparation/assemble-extension.py",
+      "bytes": 9486,
+      "sha256": "4157aae71b3c0f0af72a6fd3ed2970946cf4349cf9bfdee3367a58af3d4a1285"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/receipt-extension-preparation/seal.json",
+      "bytes": 1936,
+      "sha256": "9ef5dd8c40e995459f59156f29fde5a49905a32ea5b1551e6a0c532eb76ab79e"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/receipt-extension-preparation/README.md",
+      "bytes": 2458,
+      "sha256": "a7cc27e5162e0d398110e88c4b4a8fab58ca2ac9d418a295997dcf4837f5eb36"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/receipt-extension-preparation/plan.json",
+      "bytes": 6631,
+      "sha256": "05692f9bb972392f2071c26e0722d3095b92dcdf6eb313d1cddffd00623426aa"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/receipt-extension-preparation/input-template.json",
+      "bytes": 3366,
+      "sha256": "9aa373bb0fc50f3b6825a5bdef06b8689cf3a1728fd34ad6afa7fe42eb341fd0"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-evidence-review/review.json",
+      "bytes": 8216,
+      "sha256": "28bdf11188e0a656d9208a89d8374a60f5ef31341ed99cfd7dda45eb4b1fd18e"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/preservation-final.json",
+      "bytes": 1635,
+      "sha256": "fa87138ec735e92711586a61676a339d80dd65651e90585032efe55f33b64585"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/whole-issue-gaps.json",
+      "bytes": 1793,
+      "sha256": "5a357b8d95d73de80ff066fa7230328f386974ad9c7573cd110b2ab9cf4ab293"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-source-binding.json",
+      "bytes": 86754,
+      "sha256": "07e3fdcd86ccefd56c860ea0be0a4ab86312d6ddecf93f10ee24d2d5b1ac713b"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/README-client-extension.md",
+      "bytes": 15980,
+      "sha256": "14ff4c7747694485db980c0041a210ccf1335271641d22f3ec1df40215438a7e"
+    }
+  ],
+  "allPinsRehashed": true,
+  "preferred": true,
+  "executed": false,
+  "checkoutIndexQaWrites": false,
+  "sourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb"
+}

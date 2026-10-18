@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/classification.json",
+    "bytes": 2809,
+    "sha256": "6ce1bc36e2cacb9bb6507d26b2b0ea3d3dd8ff75be0dbe5b21f329fa17835b11"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/command.json",
+    "bytes": 1730,
+    "sha256": "185d7ea9b8ba25847c520b7e61b741476ed243ae66812bc3293693a628825371"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/inputs-after.json",
+    "bytes": 865,
+    "sha256": "09ef8aea8d9d11f7159840f46fcfa5e637fe0c1d9941a3d09ad77e2624fa05e7"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/inputs-before.json",
+    "bytes": 865,
+    "sha256": "c86184a3d06e24b5745c168558ba27877ffcb2c41edba076224241e73ee839f9"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/observer.json",
+    "bytes": 6070,
+    "sha256": "a98eabb5be762caf62ef78da303f75b2c52474059bb53b352f3a832dcef6e47a"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "9759c6aba51adda81f900127f4280c165db16a06311b2b3db0032aa506026102"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/owned-process.json",
+    "bytes": 1355,
+    "sha256": "7a1ef652fc7a701748c5f32d09375d444945375ee3c0f88d26e0113e46f5adf6"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/raw.json",
+    "bytes": 3299,
+    "sha256": "1c6f5afd33e772f77f8981ef0a0d11f5407561c03bee018035804ddfddb541de"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/stdout-stderr.log",
+    "bytes": 1547,
+    "sha256": "e2a3d36a647ac9930392ed2d65613e9d5c29a6c4e22387f7c40868035e712a0e"
+  }
+]

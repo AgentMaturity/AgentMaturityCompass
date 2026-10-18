@@ -1,0 +1,853 @@
+{
+  "schema": "amc-p207-scim-hardening/1",
+  "label": "patch-parser-wire-and-typed-contract",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout",
+  "childProcessCreated": false,
+  "observations": [
+    {
+      "kind": "port-probe",
+      "started": true,
+      "closed": true,
+      "listening": false
+    },
+    {
+      "kind": "router",
+      "port": 55551,
+      "started": true,
+      "closed": true
+    },
+    {
+      "kind": "http",
+      "label": "auth-missing-bearer",
+      "path": "/host/scim/v2/ServiceProviderConfig",
+      "method": "GET",
+      "status": 401,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "auth-valid-bearer",
+      "path": "/host/scim/v2/ServiceProviderConfig",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "auth-controls",
+      "unauthenticated": {
+        "status": 401,
+        "contentType": "application/scim+json",
+        "body": {
+          "schemas": [
+            "urn:ietf:params:scim:api:messages:2.0:Error"
+          ],
+          "status": "401",
+          "detail": "missing SCIM bearer token"
+        }
+      },
+      "authenticated": {
+        "status": 200,
+        "contentType": "application/scim+json",
+        "body": {
+          "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
+          ],
+          "patch": {
+            "supported": true
+          },
+          "bulk": {
+            "supported": false,
+            "maxOperations": 0,
+            "maxPayloadSize": 0
+          },
+          "filter": {
+            "supported": true,
+            "maxResults": 200
+          },
+          "changePassword": {
+            "supported": false
+          },
+          "sort": {
+            "supported": false
+          },
+          "etag": {
+            "supported": false
+          },
+          "authenticationSchemes": [
+            {
+              "name": "Bearer Token",
+              "description": "Authorization: Bearer <token>",
+              "type": "oauthbearertoken",
+              "primary": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "http",
+      "label": "create-user-parser-user",
+      "path": "/host/scim/v2/Users",
+      "method": "POST",
+      "status": 201,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "create-user",
+      "label": "parser-user",
+      "view": {
+        "status": 201,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "id": "40af3690-328f-40e7-abba-4ac28dbe5b42",
+        "userName": "parser-user@example.test",
+        "active": true,
+        "displayName": "Synthetic parser-user",
+        "externalId": "ext-parser-user"
+      }
+    },
+    {
+      "kind": "http",
+      "label": "before-parser-refusals",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "parser-refusal-rows",
+      "initial": {
+        "status": 200,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "id": "40af3690-328f-40e7-abba-4ac28dbe5b42",
+        "userName": "parser-user@example.test",
+        "active": true,
+        "displayName": "Synthetic parser-user",
+        "externalId": "ext-parser-user"
+      },
+      "rows": [
+        {
+          "label": "missing-operations",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidValue"
+            }
+          },
+          "reflectedCanary": false,
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:User"
+            ],
+            "id": "40af3690-328f-40e7-abba-4ac28dbe5b42",
+            "userName": "parser-user@example.test",
+            "active": true,
+            "displayName": "Synthetic parser-user",
+            "externalId": "ext-parser-user"
+          }
+        },
+        {
+          "label": "non-array-operations",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidValue"
+            }
+          },
+          "reflectedCanary": false,
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:User"
+            ],
+            "id": "40af3690-328f-40e7-abba-4ac28dbe5b42",
+            "userName": "parser-user@example.test",
+            "active": true,
+            "displayName": "Synthetic parser-user",
+            "externalId": "ext-parser-user"
+          }
+        },
+        {
+          "label": "empty-operations",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidValue"
+            }
+          },
+          "reflectedCanary": false,
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:User"
+            ],
+            "id": "40af3690-328f-40e7-abba-4ac28dbe5b42",
+            "userName": "parser-user@example.test",
+            "active": true,
+            "displayName": "Synthetic parser-user",
+            "externalId": "ext-parser-user"
+          }
+        },
+        {
+          "label": "null-operation",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidValue"
+            }
+          },
+          "reflectedCanary": false,
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:User"
+            ],
+            "id": "40af3690-328f-40e7-abba-4ac28dbe5b42",
+            "userName": "parser-user@example.test",
+            "active": true,
+            "displayName": "Synthetic parser-user",
+            "externalId": "ext-parser-user"
+          }
+        },
+        {
+          "label": "array-operation",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidValue"
+            }
+          },
+          "reflectedCanary": false,
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:User"
+            ],
+            "id": "40af3690-328f-40e7-abba-4ac28dbe5b42",
+            "userName": "parser-user@example.test",
+            "active": true,
+            "displayName": "Synthetic parser-user",
+            "externalId": "ext-parser-user"
+          }
+        },
+        {
+          "label": "missing-op",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidValue"
+            }
+          },
+          "reflectedCanary": false,
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:User"
+            ],
+            "id": "40af3690-328f-40e7-abba-4ac28dbe5b42",
+            "userName": "parser-user@example.test",
+            "active": true,
+            "displayName": "Synthetic parser-user",
+            "externalId": "ext-parser-user"
+          }
+        },
+        {
+          "label": "unsupported-op",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidValue"
+            }
+          },
+          "reflectedCanary": false,
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:User"
+            ],
+            "id": "40af3690-328f-40e7-abba-4ac28dbe5b42",
+            "userName": "parser-user@example.test",
+            "active": true,
+            "displayName": "Synthetic parser-user",
+            "externalId": "ext-parser-user"
+          }
+        },
+        {
+          "label": "non-string-path-0",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidPath"
+            }
+          },
+          "reflectedCanary": false,
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:User"
+            ],
+            "id": "40af3690-328f-40e7-abba-4ac28dbe5b42",
+            "userName": "parser-user@example.test",
+            "active": true,
+            "displayName": "Synthetic parser-user",
+            "externalId": "ext-parser-user"
+          }
+        },
+        {
+          "label": "non-string-path-1",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidPath"
+            }
+          },
+          "reflectedCanary": false,
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:User"
+            ],
+            "id": "40af3690-328f-40e7-abba-4ac28dbe5b42",
+            "userName": "parser-user@example.test",
+            "active": true,
+            "displayName": "Synthetic parser-user",
+            "externalId": "ext-parser-user"
+          }
+        },
+        {
+          "label": "non-string-path-2",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidPath"
+            }
+          },
+          "reflectedCanary": false,
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:User"
+            ],
+            "id": "40af3690-328f-40e7-abba-4ac28dbe5b42",
+            "userName": "parser-user@example.test",
+            "active": true,
+            "displayName": "Synthetic parser-user",
+            "externalId": "ext-parser-user"
+          }
+        },
+        {
+          "label": "non-string-path-3",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidPath"
+            }
+          },
+          "reflectedCanary": false,
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:User"
+            ],
+            "id": "40af3690-328f-40e7-abba-4ac28dbe5b42",
+            "userName": "parser-user@example.test",
+            "active": true,
+            "displayName": "Synthetic parser-user",
+            "externalId": "ext-parser-user"
+          }
+        },
+        {
+          "label": "non-string-path-4",
+          "response": {
+            "status": 400,
+            "contentType": "application/scim+json",
+            "body": {
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:Error"
+              ],
+              "status": "400",
+              "detail": "invalidPath"
+            }
+          },
+          "reflectedCanary": false,
+          "after": {
+            "status": 200,
+            "schemas": [
+              "urn:ietf:params:scim:schemas:core:2.0:User"
+            ],
+            "id": "40af3690-328f-40e7-abba-4ac28dbe5b42",
+            "userName": "parser-user@example.test",
+            "active": true,
+            "displayName": "Synthetic parser-user",
+            "externalId": "ext-parser-user"
+          }
+        }
+      ],
+      "compatibility": [
+        {
+          "label": "omitted-path",
+          "count": 1,
+          "op": "replace",
+          "path": null,
+          "pathIsUndefined": true,
+          "valueSameObject": true,
+          "error": null
+        },
+        {
+          "label": "empty-string-path",
+          "count": 1,
+          "op": "replace",
+          "path": "",
+          "pathIsUndefined": false,
+          "valueSameObject": true,
+          "error": null
+        },
+        {
+          "label": "explicit-undefined-path",
+          "count": 1,
+          "op": "replace",
+          "path": null,
+          "pathIsUndefined": true,
+          "valueSameObject": true,
+          "error": null
+        },
+        {
+          "label": "mixed-case-member-id",
+          "count": 1,
+          "op": "remove",
+          "path": "members[value eq \"UserCaseA\"]",
+          "pathIsUndefined": false,
+          "valueSameObject": true,
+          "error": null
+        }
+      ]
+    },
+    {
+      "kind": "http",
+      "label": "missing-operations",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "missing-operations-get",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "non-array-operations",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "non-array-operations-get",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "empty-operations",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "empty-operations-get",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "null-operation",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "null-operation-get",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "array-operation",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "array-operation-get",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "missing-op",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "missing-op-get",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "unsupported-op",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "unsupported-op-get",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "non-string-path-0",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "non-string-path-0-get",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "non-string-path-1",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "non-string-path-1-get",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "non-string-path-2",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "non-string-path-2-get",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "non-string-path-3",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "non-string-path-3-get",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "non-string-path-4",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "PATCH",
+      "status": 400,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "non-string-path-4-get",
+      "path": "/host/scim/v2/Users/40af3690-328f-40e7-abba-4ac28dbe5b42",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    }
+  ],
+  "errors": [],
+  "exactEnvironmentRestored": true,
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "signalsSent": false,
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-i5P6pE"
+}

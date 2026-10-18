@@ -1,0 +1,32 @@
+{
+  "schema": "p107-runtime-design-seal/1",
+  "allReadsFinished": true,
+  "blockers": [],
+  "state": "PROPOSAL_ONLY_NOT_EXECUTED",
+  "inputPinCount": 45,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-evidence-design/ownership.json",
+      "bytes": 140164,
+      "sha256": "d3dcd561d6be4e3e2583d55e4eaa1cbc4e1f0a4b7999fe60523fc0e6e2672556"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-evidence-design/design.json",
+      "bytes": 12132,
+      "sha256": "fbf1d251754358cdc111a4b6f7b1ce6bed5dbc896b265f668fbfca12e6e949f7"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-evidence-design/README.md",
+      "bytes": 2969,
+      "sha256": "4ff393b3975b7b31d309934a0861b32ef7256e34abd28d958f501c297079ba68"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-evidence-design/pins.json",
+      "bytes": 15540,
+      "sha256": "9a5e6c173c9b9a4f011e156de09162b666e9bbbe93900cf8068a4d8b7b9e55f9"
+    }
+  ],
+  "candidateAuthored": false,
+  "runtimeExecuted": false,
+  "checkoutIndexQAWrites": false
+}

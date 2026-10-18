@@ -1,0 +1,1931 @@
+{
+  "at": "2026-10-16T23:00:01.460096+00:00",
+  "cases": [
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "FIRST-GRANT",
+      "publicRecord": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/public-evidence.json",
+        "bytes": 12992,
+        "sha256": "fb97ac2eb4d1a822cf337cf0142bd75ce6291eae7cf254d7307c11e3bc8b5373"
+      },
+      "requestPaths": [
+        "/good-first"
+      ],
+      "resultObservation": {
+        "failures": [],
+        "grantPresent": true,
+        "grant": {
+          "tsa": "good-first",
+          "tokenDerBytes": 2298,
+          "tokenDerSha256": "11112060644cc58f9c61c6d2ed3e077ed2e2119839bfb8703147b73f2c126557",
+          "genTime": "2026-10-16T22:47:30.000Z",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "1a34c09994345dac8e98cde9b3def9a74a92d50d0d0bd69e9799b0a779e30f28",
+          "policyOid": "1.2.3.4.1",
+          "messageImprint": {
+            "hashAlgorithm": "sha256",
+            "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+          },
+          "revocationChecked": false
+        }
+      },
+      "replyObservation": {
+        "path": "/good-first",
+        "querySha256": "5073a3d1498f6b3834248671598e90b70b1fc362bd97f1054a8b23a009671e59",
+        "responseSha256": "ee65d41f31a100b9e727a88934330c1f586775efa9391eedc66284e2ff42e270",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childCount": 6,
+      "socketCount": 1,
+      "cleanupErrors": 0,
+      "bodyFailed": false
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "publicRecord": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/public-evidence.json",
+        "bytes": 13547,
+        "sha256": "10b2deec9636d49bce10c4c2b1b600e8d8d21e87b13198efc30888d81f743167"
+      },
+      "requestPaths": [
+        "/http-first",
+        "/good-second"
+      ],
+      "resultObservation": {
+        "failures": [
+          "http-first: HTTP 500"
+        ],
+        "grantPresent": true,
+        "grant": {
+          "tsa": "good-second",
+          "tokenDerBytes": 2298,
+          "tokenDerSha256": "8ad122b89695df2393834fdc38860481959dd7b6686f52b4056eaba0df43870d",
+          "genTime": "2026-10-16T22:47:31.000Z",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "536a424fbff61b0d4cfba80eab8dd04d1d43a538267d3b474126d9aad115d390",
+          "policyOid": "1.2.3.4.1",
+          "messageImprint": {
+            "hashAlgorithm": "sha256",
+            "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+          },
+          "revocationChecked": false
+        }
+      },
+      "replyObservation": {
+        "path": "/good-second",
+        "querySha256": "f358126e49e55de9bad9fa028ccc91f02f2d56ead9cf174c69dedf4938aed6c8",
+        "responseSha256": "b94117e12cb466f0f9235beb3fe05d8f610f2ca4c9c0be45eecd29ad2faac86e",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childCount": 6,
+      "socketCount": 2,
+      "cleanupErrors": 0,
+      "bodyFailed": false
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "publicRecord": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/public-evidence.json",
+        "bytes": 13005,
+        "sha256": "6e68a440d774d9133b51ebcc2a26636798b202af913ad739384994e017827f31"
+      },
+      "requestPaths": [
+        "/good-first"
+      ],
+      "resultObservation": {
+        "failures": [],
+        "grantPresent": true,
+        "grant": {
+          "tsa": "good-first",
+          "tokenDerBytes": 2298,
+          "tokenDerSha256": "658c0e0c387143abd86df6035fb7c5b2c9b35eb1c53463125189cacd2768f3a3",
+          "genTime": "2026-10-16T22:57:54.000Z",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "ab55ce6cdf097859c596c2a49b83460fed2d267370304fa30b53d91e890dde37",
+          "policyOid": "1.2.3.4.1",
+          "messageImprint": {
+            "hashAlgorithm": "sha256",
+            "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+          },
+          "revocationChecked": false
+        }
+      },
+      "replyObservation": {
+        "path": "/good-first",
+        "querySha256": "c60e19b442a194bd34de6130aa99653f66181a0ce1b68e438116d1016bf16b6d",
+        "responseSha256": "8e50fb10adc46e523eede879128d1c00acf0e981624e1113c18854573fa936b4",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childCount": 6,
+      "socketCount": 1,
+      "cleanupErrors": 0,
+      "bodyFailed": false
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "publicRecord": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/public-evidence.json",
+        "bytes": 13563,
+        "sha256": "f00cb3856a2ff3bc1d3f4c7fb3f6ea8ea8b5350aa22e79aa7741c9d7aaaf1896"
+      },
+      "requestPaths": [
+        "/http-first",
+        "/good-second"
+      ],
+      "resultObservation": {
+        "failures": [
+          "http-first: HTTP 500"
+        ],
+        "grantPresent": true,
+        "grant": {
+          "tsa": "good-second",
+          "tokenDerBytes": 2298,
+          "tokenDerSha256": "1bea16546b12aff1985e4a3749d74e49b4d26b97ff30cf9e0642ff6457c53b70",
+          "genTime": "2026-10-16T22:57:54.000Z",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "e64365a15ea9ac12639cdc0bef86d141e8667af1c75b9bf34d89d1ac49c060f5",
+          "policyOid": "1.2.3.4.1",
+          "messageImprint": {
+            "hashAlgorithm": "sha256",
+            "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+          },
+          "revocationChecked": false
+        }
+      },
+      "replyObservation": {
+        "path": "/good-second",
+        "querySha256": "074585636f01902dbd0b187876daf545ecdcf62217a8ee9b30b52eeb09ea71b9",
+        "responseSha256": "33946b9182305192a181601719f707294416f43d551b5b56cda0c6a580f05522",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childCount": 6,
+      "socketCount": 2,
+      "cleanupErrors": 0,
+      "bodyFailed": false
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "FIRST-GRANT",
+      "publicRecord": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/public-evidence.json",
+        "bytes": 13549,
+        "sha256": "c4b3189cc318c9ab95c1f2dc9e7864e1cd658d77ce2e8d3297687464feb9eaa6"
+      },
+      "requestPaths": [
+        "/unused-last",
+        "/good-first"
+      ],
+      "resultObservation": {
+        "failures": [
+          "unused-last: HTTP 500"
+        ],
+        "grantPresent": true,
+        "grant": {
+          "tsa": "good-first",
+          "tokenDerBytes": 2298,
+          "tokenDerSha256": "0becc47205e1f439ab8b8aeb664531d3891daae32e770c44fad918560251f4f7",
+          "genTime": "2026-10-16T22:58:12.000Z",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "ebe0f41078acd14e92e07722b3d4b08ab9b4a344d8f1ede05713b04735e138f7",
+          "policyOid": "1.2.3.4.1",
+          "messageImprint": {
+            "hashAlgorithm": "sha256",
+            "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+          },
+          "revocationChecked": false
+        }
+      },
+      "replyObservation": {
+        "path": "/good-first",
+        "querySha256": "804cea5b926822458c04e5526dd194f26f3de3e07b025de5fa228e59bcd906b2",
+        "responseSha256": "803df082bc045dff2cb4a5b611affa90254c5069c393e179977e70a19aef127b",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childCount": 6,
+      "socketCount": 2,
+      "cleanupErrors": 0,
+      "bodyFailed": true
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "publicRecord": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/public-evidence.json",
+        "bytes": 13565,
+        "sha256": "2b88848da2342fda8a5dffdfadab10dac45d0de93b0904ff36179ccaba160d39"
+      },
+      "requestPaths": [
+        "/unused-last",
+        "/good-second"
+      ],
+      "resultObservation": {
+        "failures": [
+          "unused-last: HTTP 500"
+        ],
+        "grantPresent": true,
+        "grant": {
+          "tsa": "good-second",
+          "tokenDerBytes": 2298,
+          "tokenDerSha256": "5b4c2115e080ff85776227ba330d7db1c18e7d1d159761b7bee0fc9c6b7efcf4",
+          "genTime": "2026-10-16T22:58:12.000Z",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "dcab315d461577cdc9af04fc4b00a1f2d003ecdb42ddbb5119f6cd58ca48fd9b",
+          "policyOid": "1.2.3.4.1",
+          "messageImprint": {
+            "hashAlgorithm": "sha256",
+            "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+          },
+          "revocationChecked": false
+        }
+      },
+      "replyObservation": {
+        "path": "/good-second",
+        "querySha256": "90d2023d02d9ed44f45cd72994b13ed3b8017dce1997fe52c14289b18faf0f04",
+        "responseSha256": "0f69f61fc6422e0d7fbb9a7079a84016af76b24597ba8eebd47ee8501f91e075",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childCount": 6,
+      "socketCount": 2,
+      "cleanupErrors": 0,
+      "bodyFailed": true
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "FIRST-GRANT",
+      "publicRecord": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/public-evidence.json",
+        "bytes": 13001,
+        "sha256": "53de86ffd2782fd7c6016fffaf53f3c086e91ee273ba063711d99a1fa9d70056"
+      },
+      "requestPaths": [
+        "/good-first"
+      ],
+      "resultObservation": {
+        "failures": [],
+        "grantPresent": true,
+        "grant": {
+          "tsa": "good-first",
+          "tokenDerBytes": 2298,
+          "tokenDerSha256": "f0582bf86e8412ce03e183ee8d6c29e3d1bf4a3283bd07c2ef86e204bc2c472e",
+          "genTime": "2026-10-16T22:58:41.000Z",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "ea7c27944aa6a72868eb8bf66713c0748252cf39cde35ec6bd8fb5d34a4041d9",
+          "policyOid": "1.2.3.4.1",
+          "messageImprint": {
+            "hashAlgorithm": "sha256",
+            "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+          },
+          "revocationChecked": false
+        }
+      },
+      "replyObservation": {
+        "path": "/good-first",
+        "querySha256": "2c5e7aa953a6204e843d022584540de33b4de880cbcd987d01d52819bf9fbb94",
+        "responseSha256": "08b9f6d13a0ee76d49778d811a70d8ab82135fc518b5055a77b8df8210519ef7",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childCount": 6,
+      "socketCount": 1,
+      "cleanupErrors": 0,
+      "bodyFailed": false
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "publicRecord": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/public-evidence.json",
+        "bytes": 13559,
+        "sha256": "93162685e1315415ec4dac5b5223f2a89a8e31053c82964bc71451b07d66ed74"
+      },
+      "requestPaths": [
+        "/http-first",
+        "/good-second"
+      ],
+      "resultObservation": {
+        "failures": [
+          "http-first: HTTP 500"
+        ],
+        "grantPresent": true,
+        "grant": {
+          "tsa": "good-second",
+          "tokenDerBytes": 2298,
+          "tokenDerSha256": "9fe81c82042fdcb9ed2736c3d8bf827435271ad7615f6eb0965cc09699af0ea8",
+          "genTime": "2026-10-16T22:58:41.000Z",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "56a64ed3d00519a4b9564f48eae0a4072121aa917bc05da955d60bd47dff9636",
+          "policyOid": "1.2.3.4.1",
+          "messageImprint": {
+            "hashAlgorithm": "sha256",
+            "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+          },
+          "revocationChecked": false
+        }
+      },
+      "replyObservation": {
+        "path": "/good-second",
+        "querySha256": "ff0f1bd8fa3c44fb41169e382476d105e055c146b558eb00ad7f7e2694cbb238",
+        "responseSha256": "4ea5d379e69f03695aeecef9ac350a0f6763ef8f3cde2c0aa48a0b16b151a9bb",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childCount": 6,
+      "socketCount": 2,
+      "cleanupErrors": 0,
+      "bodyFailed": false
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "FIRST-GRANT",
+      "publicRecord": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/public-evidence.json",
+        "bytes": 12441,
+        "sha256": "801922e1e940b84bdb43f43976c8f0f305c8b054c21d63a42fa36b3718a83663"
+      },
+      "requestPaths": [
+        "/good-first"
+      ],
+      "resultObservation": {
+        "failures": [],
+        "grantPresent": false,
+        "grant": null
+      },
+      "replyObservation": {
+        "path": "/good-first",
+        "querySha256": "0a5e605925b9412b2c3d319fb982ac5292b5b13a139d08833b6dce6a5e9d9608",
+        "responseSha256": "3a240a9b90ec7a3ea0db33e9ae45ce62c6d16b5c586452d5ab5411a08d0169be",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childCount": 6,
+      "socketCount": 1,
+      "cleanupErrors": 0,
+      "bodyFailed": true
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "publicRecord": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/public-evidence.json",
+        "bytes": 13001,
+        "sha256": "1555f5c76ad7b9a121e8846c8dce228713057cc1b4e42301163d99853ed3b96f"
+      },
+      "requestPaths": [
+        "/http-first",
+        "/good-second"
+      ],
+      "resultObservation": {
+        "failures": [
+          "http-first: HTTP 500"
+        ],
+        "grantPresent": false,
+        "grant": null
+      },
+      "replyObservation": {
+        "path": "/good-second",
+        "querySha256": "06bec3d50377c043ccb38daeac7b585b45fcc3f5aa8b2cfeddb88ca60586497f",
+        "responseSha256": "b4332d5f72d68f9dc61a31f1efe73ab486e29e22d20d948ee98749a5218f7df8",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childCount": 6,
+      "socketCount": 2,
+      "cleanupErrors": 0,
+      "bodyFailed": true
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "FIRST-GRANT",
+      "publicRecord": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/public-evidence.json",
+        "bytes": 13006,
+        "sha256": "43798d053b50162a6e49a8a68020c0e01350ad616e4285985e51f378a65cafd6"
+      },
+      "requestPaths": [
+        "/good-first"
+      ],
+      "resultObservation": {
+        "failures": [],
+        "grantPresent": true,
+        "grant": {
+          "tsa": "good-first",
+          "tokenDerBytes": 2298,
+          "tokenDerSha256": "ddd398509f6887d286073aa0a5674f13f0d5f8fbb6ff5454b96f0c0a5f9d592c",
+          "genTime": "2026-10-16T22:59:18.000Z",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "349a9558973e7395df5f546899f6ffb9a3bc9dfb7584b9aa8f95bcf97a834748",
+          "policyOid": "1.2.3.4.1",
+          "messageImprint": {
+            "hashAlgorithm": "sha256",
+            "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+          },
+          "revocationChecked": false
+        }
+      },
+      "replyObservation": {
+        "path": "/good-first",
+        "querySha256": "23f8cf03f307824caaa6b9781a71ba55b619019f6c4931433e5c9960d7a581bc",
+        "responseSha256": "87e69abac6bf84a14e193bc6513edfb7ed52a05cb7fa8618b174ab3edb503e6a",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childCount": 6,
+      "socketCount": 1,
+      "cleanupErrors": 0,
+      "bodyFailed": false
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "publicRecord": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/public-evidence.json",
+        "bytes": 13562,
+        "sha256": "40fce9a15c4c12df4c7e30f32dc50c6a391f1e5579adf1887005fc4573f8a3f3"
+      },
+      "requestPaths": [
+        "/http-first",
+        "/good-second"
+      ],
+      "resultObservation": {
+        "failures": [
+          "http-first: HTTP 500"
+        ],
+        "grantPresent": true,
+        "grant": {
+          "tsa": "good-second",
+          "tokenDerBytes": 2298,
+          "tokenDerSha256": "08a472e8a49caada5f0f285a60906f55e5b35a234b6edec92385f5133a4de469",
+          "genTime": "2026-10-16T22:59:19.000Z",
+          "anchorId": "amc-p125-grant-test-root",
+          "signerCertSha256": "94fc3f679cfe837f99c3ff08e91b988aaa811e67bd47f80f7ea53771d41651bf",
+          "policyOid": "1.2.3.4.1",
+          "messageImprint": {
+            "hashAlgorithm": "sha256",
+            "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+          },
+          "revocationChecked": false
+        }
+      },
+      "replyObservation": {
+        "path": "/good-second",
+        "querySha256": "4fcebd43eaf484c1b22c763da67f50d8e47ac74321a7eecc1b83643e8dd1853b",
+        "responseSha256": "1834a0e1ae1873e112a92d4275604966b38104539bfe990b7272b473178cb2fb",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childCount": 6,
+      "socketCount": 2,
+      "cleanupErrors": 0,
+      "bodyFailed": false
+    }
+  ],
+  "all72ChildrenNaturalExitClose0SignalNull": true,
+  "all144ExplicitPrivateStreamBytesAndHashesExact": true,
+  "privateStreamFactsOnly": [
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "FIRST-GRANT",
+      "child": "tool-version",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/child-1.stdout",
+      "bytes": 63,
+      "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "FIRST-GRANT",
+      "child": "tool-version",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/child-1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "FIRST-GRANT",
+      "child": "create-root",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/child-2.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "FIRST-GRANT",
+      "child": "create-root",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/child-2.stderr",
+      "bytes": 1210,
+      "sha256": "6c54e2040a63f64a2814e2f1808cf5a58e0757055a16dd97cecec6ba0e6592c7"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "FIRST-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/child-3.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "FIRST-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/child-3.stderr",
+      "bytes": 1725,
+      "sha256": "28911bec2d57dfdb7bbeab635de75153faa89912413c367f69b4047116947fb4"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "FIRST-GRANT",
+      "child": "issue-tsa",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/child-4.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "FIRST-GRANT",
+      "child": "issue-tsa",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/child-4.stderr",
+      "bytes": 80,
+      "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "FIRST-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/child-5.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "FIRST-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/child-5.stderr",
+      "bytes": 354,
+      "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "FIRST-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/child-6.stdout",
+      "bytes": 17,
+      "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "FIRST-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/child-6.stderr",
+      "bytes": 120,
+      "sha256": "3e848ecd7dd4cd26a73d37cd8aa311250eab996bce6f132eaeacf65b12bb6e68"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "tool-version",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/child-1.stdout",
+      "bytes": 63,
+      "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "tool-version",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/child-1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-root",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/child-2.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-root",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/child-2.stderr",
+      "bytes": 2575,
+      "sha256": "bbb5c55cbbae100bdec6165d00a9734a95909a2d9a10fbe7560d27e5a4afdd8a"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/child-3.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/child-3.stderr",
+      "bytes": 1462,
+      "sha256": "73b037cc2c068f60978b65b533adb97f37dab0a15ec1356b54e5743b297c7abc"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "issue-tsa",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/child-4.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "issue-tsa",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/child-4.stderr",
+      "bytes": 80,
+      "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/child-5.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/child-5.stderr",
+      "bytes": 354,
+      "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/child-6.stdout",
+      "bytes": 17,
+      "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/child-6.stderr",
+      "bytes": 120,
+      "sha256": "0b3360b4499f2d01eb7d632b961a3cc1fb043b97079a4c262ef22aaba2dac5a8"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "child": "tool-version",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/child-1.stdout",
+      "bytes": 63,
+      "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "child": "tool-version",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/child-1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "child": "create-root",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/child-2.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "child": "create-root",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/child-2.stderr",
+      "bytes": 1056,
+      "sha256": "b6c88a52c56d9b45b046ed17c88546db43dab5d3cbf3cfb3574321b629d67a6c"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/child-3.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/child-3.stderr",
+      "bytes": 2512,
+      "sha256": "d16aee6f8a3dc23c1a1b452015bf01b9cf4156d2dad68566df65a687f4826805"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "child": "issue-tsa",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/child-4.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "child": "issue-tsa",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/child-4.stderr",
+      "bytes": 80,
+      "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/child-5.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/child-5.stderr",
+      "bytes": 354,
+      "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/child-6.stdout",
+      "bytes": 17,
+      "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/child-6.stderr",
+      "bytes": 120,
+      "sha256": "37526b04a652f6cc23f305981cae0b9fd0585400395b093f70c24c65e50a8b20"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "tool-version",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/child-1.stdout",
+      "bytes": 63,
+      "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "tool-version",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/child-1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-root",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/child-2.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-root",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/child-2.stderr",
+      "bytes": 1396,
+      "sha256": "96c06c92b8867f0137f6be4c256c2fd4a9e1814729bc0fa4e258df0d90bcdd8e"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/child-3.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/child-3.stderr",
+      "bytes": 990,
+      "sha256": "1b36ea3a02353e393bbe74d1e780f5ae5442f6405bd1b8f56189663e5e84c270"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "issue-tsa",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/child-4.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "issue-tsa",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/child-4.stderr",
+      "bytes": 80,
+      "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/child-5.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/child-5.stderr",
+      "bytes": 354,
+      "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/child-6.stdout",
+      "bytes": 17,
+      "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/child-6.stderr",
+      "bytes": 120,
+      "sha256": "d92631d22f285bc2c52ac67294f93ff80e664128d000f385fb270cacbacb8575"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "FIRST-GRANT",
+      "child": "tool-version",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/child-1.stdout",
+      "bytes": 63,
+      "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "FIRST-GRANT",
+      "child": "tool-version",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/child-1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "FIRST-GRANT",
+      "child": "create-root",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/child-2.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "FIRST-GRANT",
+      "child": "create-root",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/child-2.stderr",
+      "bytes": 1741,
+      "sha256": "b4894ef67d712ca9e6c0f4f9bedf7f5fd0910f90348a573677101b567edc89c1"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "FIRST-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/child-3.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "FIRST-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/child-3.stderr",
+      "bytes": 1738,
+      "sha256": "4e9595befd91ccbb2742e8a52961ab225aadbace6c62c1ca015779b5b90d1cfb"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "FIRST-GRANT",
+      "child": "issue-tsa",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/child-4.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "FIRST-GRANT",
+      "child": "issue-tsa",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/child-4.stderr",
+      "bytes": 80,
+      "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "FIRST-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/child-5.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "FIRST-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/child-5.stderr",
+      "bytes": 354,
+      "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "FIRST-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/child-6.stdout",
+      "bytes": 17,
+      "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "FIRST-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/child-6.stderr",
+      "bytes": 120,
+      "sha256": "849dea92de366984cfa0529864645f191077204ca75db16e303e24c9e516e290"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "tool-version",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/child-1.stdout",
+      "bytes": 63,
+      "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "tool-version",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/child-1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-root",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/child-2.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-root",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/child-2.stderr",
+      "bytes": 1718,
+      "sha256": "8b915a2f44af483607b8d7797b304b4cfa30fedec86106fe5602ef3f17e561b2"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/child-3.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/child-3.stderr",
+      "bytes": 1310,
+      "sha256": "972924e8d142f60b1e2fce03253a2ecfab29723c11397c3056bd2f3ec11e1db0"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "issue-tsa",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/child-4.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "issue-tsa",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/child-4.stderr",
+      "bytes": 80,
+      "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/child-5.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/child-5.stderr",
+      "bytes": 354,
+      "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/child-6.stdout",
+      "bytes": 17,
+      "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/child-6.stderr",
+      "bytes": 120,
+      "sha256": "915f4e60f7db75d776d461a62e45a35ac7453da72e9766689420f72605287971"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "FIRST-GRANT",
+      "child": "tool-version",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/child-1.stdout",
+      "bytes": 63,
+      "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "FIRST-GRANT",
+      "child": "tool-version",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/child-1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "FIRST-GRANT",
+      "child": "create-root",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/child-2.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "FIRST-GRANT",
+      "child": "create-root",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/child-2.stderr",
+      "bytes": 668,
+      "sha256": "388f6d015b7de1abf133f2ac21ba066eedbf0c0aa96f3f0ae9da2135d9367f72"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "FIRST-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/child-3.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "FIRST-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/child-3.stderr",
+      "bytes": 647,
+      "sha256": "085813068186fbda2d5b6b6037b0e503d60ee43145c5c3e80a975e9eea487438"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "FIRST-GRANT",
+      "child": "issue-tsa",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/child-4.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "FIRST-GRANT",
+      "child": "issue-tsa",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/child-4.stderr",
+      "bytes": 80,
+      "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "FIRST-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/child-5.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "FIRST-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/child-5.stderr",
+      "bytes": 354,
+      "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "FIRST-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/child-6.stdout",
+      "bytes": 17,
+      "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "FIRST-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/child-6.stderr",
+      "bytes": 120,
+      "sha256": "306236e683f5928f18f12d61b88d213d9ae01de5c4d7ef14076bfef0f8a550b3"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "tool-version",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/child-1.stdout",
+      "bytes": 63,
+      "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "tool-version",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/child-1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-root",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/child-2.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-root",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/child-2.stderr",
+      "bytes": 523,
+      "sha256": "33254ea3d16f290d9cc0baa9bdccf152dbf1a414d42f5a43d0ff17c5b882b1e0"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/child-3.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/child-3.stderr",
+      "bytes": 1266,
+      "sha256": "1015878203e78b448c48d816ef40c5151858643fd2bb4df7ac8e44569e4497b8"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "issue-tsa",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/child-4.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "issue-tsa",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/child-4.stderr",
+      "bytes": 80,
+      "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/child-5.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/child-5.stderr",
+      "bytes": 354,
+      "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/child-6.stdout",
+      "bytes": 17,
+      "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/child-6.stderr",
+      "bytes": 120,
+      "sha256": "bf25b6708b9a530c084651345dfe2bd2de5daadc20c092f48cc3128ef2d7fd33"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "FIRST-GRANT",
+      "child": "tool-version",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/child-1.stdout",
+      "bytes": 63,
+      "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "FIRST-GRANT",
+      "child": "tool-version",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/child-1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "FIRST-GRANT",
+      "child": "create-root",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/child-2.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "FIRST-GRANT",
+      "child": "create-root",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/child-2.stderr",
+      "bytes": 1983,
+      "sha256": "cb608aa0d3c22b318fa1fd5f0f89a199ce4e3fed59f5d944addea029b4c42a7e"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "FIRST-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/child-3.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "FIRST-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/child-3.stderr",
+      "bytes": 771,
+      "sha256": "95198a4d4bca38f10127bacc265e0557757c2fa0f2dfc954abeff3dcb8a8b040"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "FIRST-GRANT",
+      "child": "issue-tsa",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/child-4.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "FIRST-GRANT",
+      "child": "issue-tsa",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/child-4.stderr",
+      "bytes": 80,
+      "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "FIRST-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/child-5.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "FIRST-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/child-5.stderr",
+      "bytes": 354,
+      "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "FIRST-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/child-6.stdout",
+      "bytes": 17,
+      "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "FIRST-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/child-6.stderr",
+      "bytes": 120,
+      "sha256": "188cd9c8e1bab2d918925071857fb2a4b6e6966dd259910be1f745f989cf80a4"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "tool-version",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/child-1.stdout",
+      "bytes": 63,
+      "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "tool-version",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/child-1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-root",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/child-2.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-root",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/child-2.stderr",
+      "bytes": 1514,
+      "sha256": "1c9d5176ed4d75512e3a5cc2a264bdd35a29ea9122c5d1534f41b7c46ec54d07"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/child-3.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/child-3.stderr",
+      "bytes": 770,
+      "sha256": "77d7d12f2c0609ae500c7ba4f4b1ad1d874557d002120bbc9361ee765d54af0e"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "issue-tsa",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/child-4.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "issue-tsa",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/child-4.stderr",
+      "bytes": 80,
+      "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/child-5.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/child-5.stderr",
+      "bytes": 354,
+      "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/child-6.stdout",
+      "bytes": 17,
+      "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/child-6.stderr",
+      "bytes": 120,
+      "sha256": "40e8c363159819a48d5f1944e50c8e925bcadebb3b32f6463f2f95c2cb285f1e"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "FIRST-GRANT",
+      "child": "tool-version",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/child-1.stdout",
+      "bytes": 63,
+      "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "FIRST-GRANT",
+      "child": "tool-version",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/child-1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "FIRST-GRANT",
+      "child": "create-root",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/child-2.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "FIRST-GRANT",
+      "child": "create-root",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/child-2.stderr",
+      "bytes": 1378,
+      "sha256": "d3a79e3dd91ac7fc3c12a6256eb54ff1cffaf03c3e2854c52423cf172d53d96d"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "FIRST-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/child-3.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "FIRST-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/child-3.stderr",
+      "bytes": 782,
+      "sha256": "1f3e43ddfe5cee8946d1b950c217299909f9aca2a77f17d677cfea1e9f780d64"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "FIRST-GRANT",
+      "child": "issue-tsa",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/child-4.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "FIRST-GRANT",
+      "child": "issue-tsa",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/child-4.stderr",
+      "bytes": 80,
+      "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "FIRST-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/child-5.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "FIRST-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/child-5.stderr",
+      "bytes": 354,
+      "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "FIRST-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/child-6.stdout",
+      "bytes": 17,
+      "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "FIRST-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/child-6.stderr",
+      "bytes": 120,
+      "sha256": "7fded86acc63bc2bf169741ee468681f2d86d4cd36e8a6507d8df07fae2b3197"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "tool-version",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/child-1.stdout",
+      "bytes": 63,
+      "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "tool-version",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/child-1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-root",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/child-2.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-root",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/child-2.stderr",
+      "bytes": 2169,
+      "sha256": "5f71c9934bc9fbc740f16c097050f344890834824e56fb9fa82f817e108fc840"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/child-3.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "create-tsa-csr",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/child-3.stderr",
+      "bytes": 2674,
+      "sha256": "6605a189a0734587009d0b1a70c2fe3acf875389af1a8fbc145a8b39435f7095"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "issue-tsa",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/child-4.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "issue-tsa",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/child-4.stderr",
+      "bytes": 80,
+      "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/child-5.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "sign-captured-query",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/child-5.stderr",
+      "bytes": 354,
+      "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stdout",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/child-6.stdout",
+      "bytes": 17,
+      "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "child": "verify-query-bound-reply",
+      "stream": "stderr",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/child-6.stderr",
+      "bytes": 120,
+      "sha256": "be80eb74a73636d34cb07d478fd897594b337b211cac03bdfd31aa4958c872f9"
+    }
+  ],
+  "optionalConfigDiagnostics": [
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "FIRST-GRANT",
+      "streamPin": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/child-5.stderr",
+        "bytes": 354,
+        "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+      },
+      "classification": "Both optional OpenSSL config lookups emit diagnostics with actual natural exit0; exact query/root oracle and AMC verifier pass. Original stderr stays private."
+    },
+    {
+      "phase": "p125g-source-combined",
+      "caseId": "HTTP500-THEN-GRANT",
+      "streamPin": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/child-5.stderr",
+        "bytes": 354,
+        "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+      },
+      "classification": "Both optional OpenSSL config lookups emit diagnostics with actual natural exit0; exact query/root oracle and AMC verifier pass. Original stderr stays private."
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "FIRST-GRANT",
+      "streamPin": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/child-5.stderr",
+        "bytes": 354,
+        "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+      },
+      "classification": "Both optional OpenSSL config lookups emit diagnostics with actual natural exit0; exact query/root oracle and AMC verifier pass. Original stderr stays private."
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "caseId": "HTTP500-THEN-GRANT",
+      "streamPin": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/child-5.stderr",
+        "bytes": 354,
+        "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+      },
+      "classification": "Both optional OpenSSL config lookups emit diagnostics with actual natural exit0; exact query/root oracle and AMC verifier pass. Original stderr stays private."
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "FIRST-GRANT",
+      "streamPin": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/child-5.stderr",
+        "bytes": 354,
+        "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+      },
+      "classification": "Both optional OpenSSL config lookups emit diagnostics with actual natural exit0; exact query/root oracle and AMC verifier pass. Original stderr stays private."
+    },
+    {
+      "phase": "p125g-m1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "streamPin": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/child-5.stderr",
+        "bytes": 354,
+        "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+      },
+      "classification": "Both optional OpenSSL config lookups emit diagnostics with actual natural exit0; exact query/root oracle and AMC verifier pass. Original stderr stays private."
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "FIRST-GRANT",
+      "streamPin": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/child-5.stderr",
+        "bytes": 354,
+        "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+      },
+      "classification": "Both optional OpenSSL config lookups emit diagnostics with actual natural exit0; exact query/root oracle and AMC verifier pass. Original stderr stays private."
+    },
+    {
+      "phase": "p125g-restore1",
+      "caseId": "HTTP500-THEN-GRANT",
+      "streamPin": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/child-5.stderr",
+        "bytes": 354,
+        "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+      },
+      "classification": "Both optional OpenSSL config lookups emit diagnostics with actual natural exit0; exact query/root oracle and AMC verifier pass. Original stderr stays private."
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "FIRST-GRANT",
+      "streamPin": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/child-5.stderr",
+        "bytes": 354,
+        "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+      },
+      "classification": "Both optional OpenSSL config lookups emit diagnostics with actual natural exit0; exact query/root oracle and AMC verifier pass. Original stderr stays private."
+    },
+    {
+      "phase": "p125g-m2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "streamPin": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/child-5.stderr",
+        "bytes": 354,
+        "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+      },
+      "classification": "Both optional OpenSSL config lookups emit diagnostics with actual natural exit0; exact query/root oracle and AMC verifier pass. Original stderr stays private."
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "FIRST-GRANT",
+      "streamPin": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/child-5.stderr",
+        "bytes": 354,
+        "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+      },
+      "classification": "Both optional OpenSSL config lookups emit diagnostics with actual natural exit0; exact query/root oracle and AMC verifier pass. Original stderr stays private."
+    },
+    {
+      "phase": "p125g-restore2",
+      "caseId": "HTTP500-THEN-GRANT",
+      "streamPin": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/child-5.stderr",
+        "bytes": 354,
+        "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+      },
+      "classification": "Both optional OpenSSL config lookups emit diagnostics with actual natural exit0; exact query/root oracle and AMC verifier pass. Original stderr stays private."
+    }
+  ],
+  "allHttpAndSocketTerminalsClosed": true,
+  "privateKeysOrCsrConfigSerialPrivateRunReadOrCopied": false,
+  "rawChildStreamsPublished": false,
+  "allSixObservedPhasesAndTwelveCasesOnly": true,
+  "allHoldsRetained": true
+}

@@ -1,0 +1,75 @@
+{
+  "schema": "p111-decisive-unit-v2-author-seal/1",
+  "at": "2026-10-16T19:25:33.342591+00:00",
+  "preferred": true,
+  "candidate": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/decisive.test.ts",
+    "bytes": 18998,
+    "sha256": "db7c355932623e3babedc68e5ee3f6089df5bb6d05b2ee2636cb05d213e0f018",
+    "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/decisive.test.ts",
+    "dev": 16777231,
+    "inode": 543139944,
+    "nlink": 1
+  },
+  "inputsPin": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/input-pins.json",
+    "bytes": 14638,
+    "sha256": "ef2f5135c82f7c5da3324c27734a3d958e8d969768dad836d2d9df9ee1a3b30e",
+    "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/input-pins.json",
+    "dev": 16777231,
+    "inode": 543139947,
+    "nlink": 1
+  },
+  "inputCount": 35,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/decisive.test.ts",
+      "bytes": 18998,
+      "sha256": "db7c355932623e3babedc68e5ee3f6089df5bb6d05b2ee2636cb05d213e0f018",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/decisive.test.ts",
+      "dev": 16777231,
+      "inode": 543139944,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/README.md",
+      "bytes": 821,
+      "sha256": "bed3bec5e05e6424cc6e700fb8d1bc14d3af2811d54f6063d5d06e7c0d4cbd34",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/README.md",
+      "dev": 16777231,
+      "inode": 543139946,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/v1-v2.patch",
+      "bytes": 982,
+      "sha256": "6a03306f4b868db47fb1664cf9affe4a5d7e85aa9f4c405c8a8fc7baa341f0cd",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/v1-v2.patch",
+      "dev": 16777231,
+      "inode": 543139945,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/input-pins.json",
+      "bytes": 14638,
+      "sha256": "ef2f5135c82f7c5da3324c27734a3d958e8d969768dad836d2d9df9ee1a3b30e",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/input-pins.json",
+      "dev": 16777231,
+      "inode": 543139947,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/author-review.json",
+      "bytes": 406,
+      "sha256": "c52872928b71b86a7f5b830dd6cf74210fda8fe24585cc124d3b9065cfd30eeb",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/author-review.json",
+      "dev": 16777231,
+      "inode": 543139948,
+      "nlink": 1
+    }
+  ],
+  "allInputOutputBytePinsRechecked": true,
+  "v1Preserved": true,
+  "execution": "Unexecuted private candidate. No product/compiler/test/native/SQL/network or checkout writes.",
+  "blockers": []
+}

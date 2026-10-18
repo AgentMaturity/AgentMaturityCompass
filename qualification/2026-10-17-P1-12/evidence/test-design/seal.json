@@ -1,0 +1,73 @@
+{
+  "schema": "p112-compiled-guard-unit-author-seal/1",
+  "at": "2026-10-16T19:53:00.753105+00:00",
+  "candidate": {
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/compiledPolicyGuard.test.ts",
+    "bytes": 11155,
+    "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0",
+    "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/compiledPolicyGuard.test.ts",
+    "dev": 16777231,
+    "inode": 543244900,
+    "nlink": 1
+  },
+  "inputCount": 32,
+  "inputsPin": {
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/input-pins.json",
+    "bytes": 13665,
+    "sha256": "f2e56c9427d3479e12e8f6f1b6817f4ff4c9c8a9f4e31e8a2ec4ead469e74ca9",
+    "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/input-pins.json",
+    "dev": 16777231,
+    "inode": 543246571,
+    "nlink": 1
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/compiledPolicyGuard.test.ts",
+      "bytes": 11155,
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0",
+      "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/compiledPolicyGuard.test.ts",
+      "dev": 16777231,
+      "inode": 543244900,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/README.md",
+      "bytes": 3068,
+      "sha256": "4db49ae1b6fac7782c552a81d2761504c666181f1225fa67bee67d23644e2798",
+      "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/README.md",
+      "dev": 16777231,
+      "inode": 543246572,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/matrix.json",
+      "bytes": 1831,
+      "sha256": "872e1140f5c883c4bde3e9e3c56557e2e0b14d64ff9a4fcacb6123a291ce4214",
+      "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/matrix.json",
+      "dev": 16777231,
+      "inode": 543246570,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/input-pins.json",
+      "bytes": 13665,
+      "sha256": "f2e56c9427d3479e12e8f6f1b6817f4ff4c9c8a9f4e31e8a2ec4ead469e74ca9",
+      "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/input-pins.json",
+      "dev": 16777231,
+      "inode": 543246571,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/author-review.json",
+      "bytes": 1497,
+      "sha256": "bdc2cd6df14ea3f7dca8fab0197e711e04871e9d5a1f63110c70c6e7b5628735",
+      "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/author-review.json",
+      "dev": 16777231,
+      "inode": 543246573,
+      "nlink": 1
+    }
+  ],
+  "allInputOutputBytePinsRechecked": true,
+  "blockers": [],
+  "execution": "Private source authoring/read/hash/stat/JSON metadata only. No product, compiler, test, native, SQL, network, hosted, D15, freeze, checkout/index or Claude execution/write."
+}

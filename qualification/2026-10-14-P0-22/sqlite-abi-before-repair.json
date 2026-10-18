@@ -1,0 +1,9 @@
+{
+  "atUtc": "2026-10-14T15:48:47.554606+00:00",
+  "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+  "sha256": "381dcb4cc3bc2bed1ae5457313bdd58501b8365c4c36c0c347fec2db7b77ebbc",
+  "inode": 535894684,
+  "hardLinks": 1,
+  "version": "12.11.1",
+  "cause": "Signature-only CLI import used a nonexistent Node22 nvm PATH, fell through to Node25 and invoked existing ABI adaptation; source bytes untouched. Fleet failed-green retained, no application failure claim."
+}

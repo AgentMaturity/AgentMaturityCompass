@@ -1,0 +1,1233 @@
+{
+  "definitions": {
+    "schema": "p117-three-causal-controls-closed-design/1",
+    "inputRecipe": {
+      "path": "/private/tmp/p1-17-qualification-20261016/test-proposal/causal-recipes.json",
+      "bytes": 2040,
+      "sha256": "d3c009309c99a174d20ba3d98c68eb9a6a6d0d8083837faae740ed97db8deac4"
+    },
+    "sourceRootRead": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "sourceCandidateCommit": null,
+    "futureFreshRoot": null,
+    "bindingStatus": "Root must bind the actual committed source candidate and actual clean-source --keep output before execution. These definitions bind current bytes only.",
+    "controls": [
+      {
+        "id": "nydfs-72-to-71",
+        "target": "src/incidents/regulatoryClocksTable.ts",
+        "old": "    trigger: \"INCIDENT_DETERMINATION\",\n    deadline: { amount: 72, unit: \"hours\" },",
+        "new": "    trigger: \"INCIDENT_DETERMINATION\",\n    deadline: { amount: 71, unit: \"hours\" },",
+        "discriminator": "US table NYDFS literal due-date case and persisted signed NYDFS due72 case",
+        "limit": "Actual failure count/masking unmeasured.",
+        "literalFindCount": 1,
+        "sourceFrame": "src/incidents/regulatoryClocksTable.ts:509\u2013510",
+        "discriminatingCases": [
+          {
+            "fullName": "stored signed incident clock events persists a genuine signed row and verifies after closing and reopening SQLite",
+            "frame": "tests/incidentClockEvents.test.ts:153",
+            "oracle": "The returned NYDFS dueTs must equal literal T+72*HOUR. With this source delta the static arithmetic is T+71*HOUR, a one-hour difference. Earlier genuine-signature/persisted-event assertions precede this due-date assertion."
+          },
+          {
+            "fullName": "US financial clock literals at a fixed date nydfs-500-17-notice has an independent literal due-date expectation",
+            "frame": "tests/incidentClockEvents.test.ts:273",
+            "oracle": "The expected NYDFS value is written in the test table as T+72*HOUR, independent of the product clock table."
+          }
+        ],
+        "masking": "Additional notification/status/due-date and earlier-trigger cases may fail. Count only actual body failures. A first assertion inside a case can mask later expectations; no predicted global failure order or failure count.",
+        "preserved": "Only the INCIDENT_DETERMINATION72-hour row changes; other72-hour clocks and all guards remain unchanged.",
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/incidents/regulatoryClocksTable.ts",
+          "bytes": 35373,
+          "sha256": "3070fa3420062b58e5b3a85469e08b649b8de6a9f41b1380cee12caa2efe8ea0"
+        },
+        "anchorOccurrences": 1,
+        "patch": {
+          "path": "/private/tmp/p1-17-qualification-20261016/causal-design/nydfs-72-to-71.patch",
+          "bytes": 492,
+          "sha256": "2832f1278c208d1ea617d71ff7015465c29e8db937b045cddf28b2bd168e4a92"
+        },
+        "virtualMutantBytes": 35373,
+        "virtualMutantSha256": "f2f88428de9a4484f90d812f260c651d86a003fb47b42679866528eba6d4da65",
+        "sourceApplied": false,
+        "runtime": null
+      },
+      {
+        "id": "skip-clock-row-signature",
+        "target": "src/incidents/incidentClockEvents.ts",
+        "old": "    if (!verifyHexDigestAny(clockEventDigest(event), event.signature, publicKeys)) {\n      throw new Error(`clock event ${event.eventId} refused: signature verification failed`);\n    }\n",
+        "new": "",
+        "discriminator": "cold edited timestamp is refused by event id after valid original signature proof",
+        "limit": "Use timestamp corruption, not the already-red station-filter case, for causal sensitivity. The independent Node verification still detects edited bytes; only loader refusal is removed.",
+        "literalFindCount": 1,
+        "sourceFrame": "src/incidents/incidentClockEvents.ts:137\u2013139",
+        "discriminatingCases": [
+          {
+            "fullName": "stored signed incident clock events cold edited timestamp is refused by event id after valid original signature proof",
+            "frame": "tests/incidentClockEvents.test.ts:227",
+            "oracle": "The original row independently verifies, the cold-copy ts edit T\u2192T+1 independently fails Node verification, and the loader must throw the event-specific signature refusal. The edited timestamp still satisfies the semantic bounds, so those guards should not mask signature-check removal."
+          }
+        ],
+        "masking": "The original-database positive assertion at228 is after the expected refusal and is masked if toThrow fails. Station-tamper and wrong-key cases may also fail; retain them but do not count the station test as a separate map-before-filter control. Independent Node verification remains intact.",
+        "preserved": "Only the loader signature-refusal if block is removed; event digests, record signing, independent test verifier, map-before-filter and semantic guards stay unchanged. This deliberately leaves an unused import; mutation execution is source-mode sensitivity, not a typecheck/build qualification.",
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/incidents/incidentClockEvents.ts",
+          "bytes": 10800,
+          "sha256": "09e05ad6c36e9048d42eebce87ef6a884aa278bbc72233b0e3fafb52b57a1f2b"
+        },
+        "anchorOccurrences": 1,
+        "patch": {
+          "path": "/private/tmp/p1-17-qualification-20261016/causal-design/skip-clock-row-signature.patch",
+          "bytes": 585,
+          "sha256": "c00b7c92b255bde4aef6d8cc115893db30e0ffb8605ae88c3265016ea5e45a85"
+        },
+        "virtualMutantBytes": 10615,
+        "virtualMutantSha256": "461a8c02bb55784c36edf13ca039ed1a23cd91e9130ba38ac22f030ac301e813",
+        "sourceApplied": false,
+        "runtime": null
+      },
+      {
+        "id": "drop-created-ts-guard",
+        "target": "src/incidents/incidentClockEvents.ts",
+        "old": "  if (event.ts < incident.createdTs) {\n    return `is backdated: ${new Date(event.ts).toISOString()} precedes incident creation ${new Date(incident.createdTs).toISOString()}`;\n  }\n",
+        "new": "",
+        "discriminator": "rejects a pre-creation notice even when its trigger has not started, with no appended row",
+        "limit": "NOTIFIED for an unstarted NYDFS clock has no trigger guard to mask removal; ordinary backdated TRIGGER retains defense in attachRegulatoryClocks and alone would be an inconclusive guard control.",
+        "literalFindCount": 1,
+        "sourceFrame": "src/incidents/incidentClockEvents.ts:93\u201395",
+        "discriminatingCases": [
+          {
+            "fullName": "stored signed incident clock events rejects a pre-creation notice even when its trigger has not started, with no appended row",
+            "frame": "tests/incidentClockEvents.test.ts:173",
+            "oracle": "The actual record call uses NOTIFIED/NYDFS at T-1 with no INCIDENT_DETERMINATION. Removing only the admission guard should allow the ordinary sign/insert path: attachRegulatoryClocks returns NOT_STARTED when triggerTs is null before its satisfied-before-trigger check. The store schema does not add a createdTs constraint."
+          }
+        ],
+        "masking": "The empty-row assertion at174 is after the failed toThrow and must not be credited if masked. Retained observations/SQLite could establish a real append separately, but do not infer that measurement from a nonzero exit. An ordinary pre-creation TRIGGER retains the attachRegulatoryClocks trigger guard and is not by itself a discriminator.",
+        "preserved": "Only the event.ts<incident.createdTs guard is removed; timestamp finiteness, future skew, known station/clock, signature, duplicate-notice and trigger consistency remain unchanged.",
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/incidents/incidentClockEvents.ts",
+          "bytes": 10800,
+          "sha256": "09e05ad6c36e9048d42eebce87ef6a884aa278bbc72233b0e3fafb52b57a1f2b"
+        },
+        "anchorOccurrences": 1,
+        "patch": {
+          "path": "/private/tmp/p1-17-qualification-20261016/causal-design/drop-created-ts-guard.patch",
+          "bytes": 662,
+          "sha256": "43b0be550237649edd3ce4c39306d1a9e2dbcd43b9c728f38da2aafe595437f2"
+        },
+        "virtualMutantBytes": 10620,
+        "virtualMutantSha256": "33f7a126a07cbbb13c1dbacd849288c9ab3bad143d50c3f48b14678936d71207",
+        "sourceApplied": false,
+        "runtime": null
+      }
+    ],
+    "corpus": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/regulatoryClocks.test.ts",
+        "bytes": 9271,
+        "sha256": "93bf448e9b09b862f450f2a64e755c566e17d9fa52689ec0d69f95bcea6967f5"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/incidentEvidencePacket.test.ts",
+        "bytes": 12458,
+        "sha256": "265743f7ee7f3d4652e5ae142448d7d80f0b9dd6a3bca9e49b2067e57e8e9e04"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/mcpServer.test.ts",
+        "bytes": 7722,
+        "sha256": "b69d6035b38eaa0c284d3e41dd27e2af8b464a4fce9a2ebdc57c974c09ff13ed"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/incidentClockEvents.test.ts",
+        "bytes": 17140,
+        "sha256": "fca85f54ead2982898d15f1547f2710e002ba0b6d2cbed527a648ff9985639bc"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/incidentClockSurfaces.test.ts",
+        "bytes": 22743,
+        "sha256": "ded44f7549d6c56008b068f23761b6a92fde033a0a96dabf33b50a8b0d17ece5"
+      }
+    ],
+    "plannedRegistrationContext": 68,
+    "actualFreshBaseline": null,
+    "phaseContract": [
+      "Root alone mutates a physically owned freshQ source file after verifying the exact baseline hash and the one literal occurrence. Never substitute R forQ.",
+      "Retain original tests, config, global/per-file guards, deadlines and owned child lifecycle. The R Vitest runner is explicitly borrowed; --root must select the actual freshQ and source paths must be recorded.",
+      "For each distinct control, retain a complete unchanged baseline, mutant and byte-exact restored phase with actual statuses and closure; no automatic replay of completed phases. Root may bind shared prior baseline only if that attribution is explicit.",
+      "Baseline/restored require all registered cases passed with zero errors/pending/todo and normal owned closure. A mutant requires actual discriminating body failures or an explicitly reported survivor; setup/hook/timeout/unhandled/late-close/process uncertainty is not a kill.",
+      "No compiler, import adapter, test edits, filter, deadline extension, source repair or shared-source mutation is proposed. Preserve complete raw/observer/log/inputs/closure and any failed fixture observations."
+    ],
+    "mixedExecutionBoundary": {
+      "sourceMode": "The event/table originals and new event tests import TS source through Vitest. Causal sensitivity belongs to those actual loaded source paths.",
+      "compiledSurfaces": "incidentClockSurfaces.test.ts resolves its physical checkout and uses dist/cli.js plus dist incident/API/MCP modules. TS-only mutations leave those freshly built compiled children byte-exact. Their pass results remain real compiled baseline/compatibility observations and must not be called compiled-mutant sensitivity.",
+      "independentChildren": "Parent is Node built-ins only; child cold init/seed avoid a parent SQLite pool. HTTP is an owned loopback route fixture without outer authn; MCP uses real linked SDK transports, not external network auth.",
+      "fixtureRetention": "Event fixtures close SQLite and delete successes; failed bodies retain observations. Retained public files must be inspected before any extra append/effect claims. Surface fixtures retain public observations and child/stream/PID closure. No private key/secret config body is to be published."
+    },
+    "fourthControl": {
+      "recommendation": "Do not add a fourth runtime.",
+      "reason": "The original station-hiding baseline already failed at238:105 on the old pre-filter source and passed after the exact repair. That is direct regression sensitivity for map-before-filter. Restoring the old filter again would duplicate this proof rather than supply one of the three required specification controls.",
+      "ifLaterRequested": "Keep it a separate named regression control with original RED/post-repair attribution; do not count M2 station failures as this distinct source recipe."
+    },
+    "limits": [
+      "All predictions are static hypotheses. Actual fresh registration, failure values, masking, survivors and closure supersede them.",
+      "These three controls test implementation sensitivity; they do not provide legal/expert approval, whole-suite/full-build mutant proof, hosted execution, independent person identity or formal P117 Done.",
+      "Current repaired source and existing legal/content/source caveats remain unchanged."
+    ],
+    "allReadsFinished": true,
+    "formalAcceptanceClosed": false,
+    "productRuntimePerformed": false,
+    "repositoryWrites": false,
+    "privateSourceCopiesCreated": false
+  },
+  "binding": {
+    "sourceCommit": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+    "q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+    "sharedBaseline": "p117-fresh-canonical",
+    "canonicalTests": 68,
+    "compiledChildrenUnmutatedPins": [
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/cli.js",
+        "bytes": 1054132,
+        "sha256": "ce387d2f113699e2399ecabfdba288cc45748c15c28efc24f2bf0d68e0e9261f"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/incidents/incidentClockEvents.js",
+        "bytes": 9790,
+        "sha256": "079b235d38b02285c15f726653f42f1da60f707327faffd53d79ef8c8c8b8aa2"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/incidents/regulatoryClocksTable.js",
+        "bytes": 33673,
+        "sha256": "2871b63e5eee3d44c17223002184990dd5bee2d38d6a22753b3223a66037ef61"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/api/incidentRouter.js",
+        "bytes": 16028,
+        "sha256": "d6755b4523309abc79ed068ce3fd223d66a2bdcdfe5cf279d2d0e4839ea077c3"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/mcp/amcMcpServer.js",
+        "bytes": 32973,
+        "sha256": "3b233c3045d2a1ddee6225efb2967bc3272e8e08af788bda411491dbf2125fc8"
+      }
+    ],
+    "compiledMutantSensitivity": false,
+    "testFiles": [
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/regulatoryClocks.test.ts",
+        "bytes": 9271,
+        "sha256": "93bf448e9b09b862f450f2a64e755c566e17d9fa52689ec0d69f95bcea6967f5"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentEvidencePacket.test.ts",
+        "bytes": 12458,
+        "sha256": "265743f7ee7f3d4652e5ae142448d7d80f0b9dd6a3bca9e49b2067e57e8e9e04"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/mcpServer.test.ts",
+        "bytes": 7722,
+        "sha256": "b69d6035b38eaa0c284d3e41dd27e2af8b464a4fce9a2ebdc57c974c09ff13ed"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+        "bytes": 17140,
+        "sha256": "fca85f54ead2982898d15f1547f2710e002ba0b6d2cbed527a648ff9985639bc"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockSurfaces.test.ts",
+        "bytes": 22743,
+        "sha256": "ded44f7549d6c56008b068f23761b6a92fde033a0a96dabf33b50a8b0d17ece5"
+      }
+    ]
+  },
+  "outcomes": [
+    {
+      "phase": "p117-mutant-no-created-ts",
+      "counts": {
+        "numTotalTests": 68,
+        "numPassedTests": 66,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "command": {
+        "phase": "p117-mutant-no-created-ts",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout tests/regulatoryClocks.test.ts tests/incidentEvidencePacket.test.ts tests/mcpServer.test.ts tests/incidentClockEvents.test.ts tests/incidentClockSurfaces.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p117-mutant-no-created-ts.raw.json",
+        "exit": 1,
+        "durationMs": 5505,
+        "startedUtc": "2026-10-16T09:46:10.960213+00:00",
+        "endedUtc": "2026-10-16T09:46:16.477946+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-created-ts/stdout-stderr.log",
+        "head": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+        "headAfter": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+        "ownedProcess": {
+          "pid": 29758,
+          "ownedPgid": 29758,
+          "observedPgidAfterLaunch": 29758,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "--root",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+            "tests/regulatoryClocks.test.ts",
+            "tests/incidentEvidencePacket.test.ts",
+            "tests/mcpServer.test.ts",
+            "tests/incidentClockEvents.test.ts",
+            "tests/incidentClockSurfaces.test.ts",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p117-mutant-no-created-ts.raw.json"
+          ],
+          "startedUtc": "2026-10-16T09:46:10.960213+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p117-mutant-no-created-ts.raw.json",
+            "bytes": 26422,
+            "sha256": "3a872410899c3b47c2fb9cd2e576721888f1dcb052e4c57b462d62db2106a475"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-created-ts/raw.json",
+            "bytes": 26422,
+            "sha256": "3a872410899c3b47c2fb9cd2e576721888f1dcb052e4c57b462d62db2106a475"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-created-ts/observer.json",
+            "bytes": 40477,
+            "sha256": "ced3ad70e1b18804dbaabc383d422dd63ec7d46f26fb61b60874a576295fe8e7"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "failures": [
+        {
+          "name": "stored signed incident clock events rejects a pre-creation notice even when its trigger has not started, with no appended row",
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+          "failures": [
+            "AssertionError: expected function to throw an error, but it didn't\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:173:86\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:123:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:170:107\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+          ]
+        },
+        {
+          "name": "stored signed incident clock events rejects a trigger before creation without appending",
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+          "failures": [
+            "AssertionError: expected [Function] to throw error matching /backdated/ but got 'clock event refused: trigger INCIDENT\u2026'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:178:43\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:123:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:177:69\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)"
+          ]
+        }
+      ],
+      "bodyErrorNames": [
+        "AssertionError",
+        "AssertionError"
+      ],
+      "hooksPassed": true,
+      "unhandledErrors": [],
+      "rawObserverIdentitiesMatch": true,
+      "compiledChildrenUnchanged": true,
+      "surfaceRoots": [
+        "/private/tmp/p117-surface-4Z7Ojg",
+        "/private/tmp/p117-surface-KOZgi0",
+        "/private/tmp/p117-surface-rKmMty"
+      ],
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-created-ts/raw.json",
+          "bytes": 26422,
+          "sha256": "3a872410899c3b47c2fb9cd2e576721888f1dcb052e4c57b462d62db2106a475"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-created-ts/observer.json",
+          "bytes": 40477,
+          "sha256": "ced3ad70e1b18804dbaabc383d422dd63ec7d46f26fb61b60874a576295fe8e7"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-created-ts/stdout-stderr.log",
+          "bytes": 168110,
+          "sha256": "0e366d09231bde8a4e70185a515b4e30f4cd45533bab42e849b6a2fade1b7d20"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-created-ts/command.json",
+          "bytes": 3059,
+          "sha256": "c3b170b945c6f4e19fdbd5597579aab7531dee25dcba52995bb44c29d400e040"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-created-ts/owned-process.json",
+          "bytes": 985,
+          "sha256": "1f186b96c1c93ba3698b4a6729492f75b6bbbdeb9ce7318f31bf4a3edcdc99c5"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-created-ts/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "ebb5901737ebc1a44628b1a36382545ac19e431412d2cc5a0a338a51130ea811"
+        }
+      ],
+      "staticRecipeTitleAlias": {},
+      "control": {
+        "id": "drop-created-ts-guard",
+        "target": "src/incidents/incidentClockEvents.ts",
+        "old": "  if (event.ts < incident.createdTs) {\n    return `is backdated: ${new Date(event.ts).toISOString()} precedes incident creation ${new Date(incident.createdTs).toISOString()}`;\n  }\n",
+        "new": "",
+        "discriminator": "rejects a pre-creation notice even when its trigger has not started, with no appended row",
+        "limit": "NOTIFIED for an unstarted NYDFS clock has no trigger guard to mask removal; ordinary backdated TRIGGER retains defense in attachRegulatoryClocks and alone would be an inconclusive guard control.",
+        "literalFindCount": 1,
+        "sourceFrame": "src/incidents/incidentClockEvents.ts:93\u201395",
+        "discriminatingCases": [
+          {
+            "fullName": "stored signed incident clock events rejects a pre-creation notice even when its trigger has not started, with no appended row",
+            "frame": "tests/incidentClockEvents.test.ts:173",
+            "oracle": "The actual record call uses NOTIFIED/NYDFS at T-1 with no INCIDENT_DETERMINATION. Removing only the admission guard should allow the ordinary sign/insert path: attachRegulatoryClocks returns NOT_STARTED when triggerTs is null before its satisfied-before-trigger check. The store schema does not add a createdTs constraint."
+          }
+        ],
+        "masking": "The empty-row assertion at174 is after the failed toThrow and must not be credited if masked. Retained observations/SQLite could establish a real append separately, but do not infer that measurement from a nonzero exit. An ordinary pre-creation TRIGGER retains the attachRegulatoryClocks trigger guard and is not by itself a discriminator.",
+        "preserved": "Only the event.ts<incident.createdTs guard is removed; timestamp finiteness, future skew, known station/clock, signature, duplicate-notice and trigger consistency remain unchanged.",
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/incidents/incidentClockEvents.ts",
+          "bytes": 10800,
+          "sha256": "09e05ad6c36e9048d42eebce87ef6a884aa278bbc72233b0e3fafb52b57a1f2b"
+        },
+        "anchorOccurrences": 1,
+        "patch": {
+          "path": "/private/tmp/p1-17-qualification-20261016/causal-design/drop-created-ts-guard.patch",
+          "bytes": 662,
+          "sha256": "43b0be550237649edd3ce4c39306d1a9e2dbcd43b9c728f38da2aafe595437f2"
+        },
+        "virtualMutantBytes": 10620,
+        "virtualMutantSha256": "33f7a126a07cbbb13c1dbacd849288c9ab3bad143d50c3f48b14678936d71207",
+        "sourceApplied": false,
+        "runtime": null
+      },
+      "sensitivity": "source body assertion; compiled children unchanged controls",
+      "laterAssertionsMayBeMasked": "The empty-row assertion at174 is after the failed toThrow and must not be credited if masked. Retained observations/SQLite could establish a real append separately, but do not infer that measurement from a nonzero exit. An ordinary pre-creation TRIGGER retains the attachRegulatoryClocks trigger guard and is not by itself a discriminator.",
+      "restoredSource": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/src/incidents/incidentClockEvents.ts",
+        "bytes": 10800,
+        "sha256": "09e05ad6c36e9048d42eebce87ef6a884aa278bbc72233b0e3fafb52b57a1f2b"
+      }
+    },
+    {
+      "phase": "p117-mutant-no-signature",
+      "counts": {
+        "numTotalTests": 68,
+        "numPassedTests": 65,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "command": {
+        "phase": "p117-mutant-no-signature",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout tests/regulatoryClocks.test.ts tests/incidentEvidencePacket.test.ts tests/mcpServer.test.ts tests/incidentClockEvents.test.ts tests/incidentClockSurfaces.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p117-mutant-no-signature.raw.json",
+        "exit": 1,
+        "durationMs": 5436,
+        "startedUtc": "2026-10-16T09:45:09.458016+00:00",
+        "endedUtc": "2026-10-16T09:45:14.906999+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-signature/stdout-stderr.log",
+        "head": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+        "headAfter": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+        "ownedProcess": {
+          "pid": 28776,
+          "ownedPgid": 28776,
+          "observedPgidAfterLaunch": 28776,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "--root",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+            "tests/regulatoryClocks.test.ts",
+            "tests/incidentEvidencePacket.test.ts",
+            "tests/mcpServer.test.ts",
+            "tests/incidentClockEvents.test.ts",
+            "tests/incidentClockSurfaces.test.ts",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p117-mutant-no-signature.raw.json"
+          ],
+          "startedUtc": "2026-10-16T09:45:09.458016+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p117-mutant-no-signature.raw.json",
+            "bytes": 27854,
+            "sha256": "c667c6db4ad807e12fcd8856c4e08802eb21a9382705603307ee797acb4651bf"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-signature/raw.json",
+            "bytes": 27854,
+            "sha256": "c667c6db4ad807e12fcd8856c4e08802eb21a9382705603307ee797acb4651bf"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-signature/observer.json",
+            "bytes": 42872,
+            "sha256": "83761b8f338ad7fe3970009c03746ed2fca3a11295067a740eb6f836e0381df4"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "failures": [
+        {
+          "name": "stored signed incident clock events cold edited timestamp is refused by event id after valid original signature proof",
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+          "failures": [
+            "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:227:105\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:123:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:222:99\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)"
+          ]
+        },
+        {
+          "name": "stored signed incident clock events editing signed station cannot hide a corrupt row from its original station query",
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+          "failures": [
+            "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:238:105\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:123:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:231:98\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)"
+          ]
+        },
+        {
+          "name": "stored signed incident clock events authentic other-station rows remain independent and wrong trust keys refuse",
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+          "failures": [
+            "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:247:110\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:123:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:241:93\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)"
+          ]
+        }
+      ],
+      "bodyErrorNames": [
+        "AssertionError",
+        "AssertionError",
+        "AssertionError"
+      ],
+      "hooksPassed": true,
+      "unhandledErrors": [],
+      "rawObserverIdentitiesMatch": true,
+      "compiledChildrenUnchanged": true,
+      "surfaceRoots": [
+        "/private/tmp/p117-surface-VbQWXF",
+        "/private/tmp/p117-surface-VVE49L",
+        "/private/tmp/p117-surface-YocUWD"
+      ],
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-signature/raw.json",
+          "bytes": 27854,
+          "sha256": "c667c6db4ad807e12fcd8856c4e08802eb21a9382705603307ee797acb4651bf"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-signature/observer.json",
+          "bytes": 42872,
+          "sha256": "83761b8f338ad7fe3970009c03746ed2fca3a11295067a740eb6f836e0381df4"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-signature/stdout-stderr.log",
+          "bytes": 169185,
+          "sha256": "b73fa6002ab66d14686229c0dbfef27ac0f8dc065348c0b1712665fb716d16bf"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-signature/command.json",
+          "bytes": 3052,
+          "sha256": "c35c4f010b839c7972f89b6cbb9d4bbc10863fa7ac24a06d045d26a67c6c3823"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-signature/owned-process.json",
+          "bytes": 984,
+          "sha256": "c13ee5f4d691b09b4ccd0967aa79d737277fc86826acadc846d202e6c0664d32"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-no-signature/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "fc65318bd87a6b9ff1bb42515c700ce4b785780b1cbfe257f750a0e14702f580"
+        }
+      ],
+      "staticRecipeTitleAlias": {},
+      "control": {
+        "id": "skip-clock-row-signature",
+        "target": "src/incidents/incidentClockEvents.ts",
+        "old": "    if (!verifyHexDigestAny(clockEventDigest(event), event.signature, publicKeys)) {\n      throw new Error(`clock event ${event.eventId} refused: signature verification failed`);\n    }\n",
+        "new": "",
+        "discriminator": "cold edited timestamp is refused by event id after valid original signature proof",
+        "limit": "Use timestamp corruption, not the already-red station-filter case, for causal sensitivity. The independent Node verification still detects edited bytes; only loader refusal is removed.",
+        "literalFindCount": 1,
+        "sourceFrame": "src/incidents/incidentClockEvents.ts:137\u2013139",
+        "discriminatingCases": [
+          {
+            "fullName": "stored signed incident clock events cold edited timestamp is refused by event id after valid original signature proof",
+            "frame": "tests/incidentClockEvents.test.ts:227",
+            "oracle": "The original row independently verifies, the cold-copy ts edit T\u2192T+1 independently fails Node verification, and the loader must throw the event-specific signature refusal. The edited timestamp still satisfies the semantic bounds, so those guards should not mask signature-check removal."
+          }
+        ],
+        "masking": "The original-database positive assertion at228 is after the expected refusal and is masked if toThrow fails. Station-tamper and wrong-key cases may also fail; retain them but do not count the station test as a separate map-before-filter control. Independent Node verification remains intact.",
+        "preserved": "Only the loader signature-refusal if block is removed; event digests, record signing, independent test verifier, map-before-filter and semantic guards stay unchanged. This deliberately leaves an unused import; mutation execution is source-mode sensitivity, not a typecheck/build qualification.",
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/incidents/incidentClockEvents.ts",
+          "bytes": 10800,
+          "sha256": "09e05ad6c36e9048d42eebce87ef6a884aa278bbc72233b0e3fafb52b57a1f2b"
+        },
+        "anchorOccurrences": 1,
+        "patch": {
+          "path": "/private/tmp/p1-17-qualification-20261016/causal-design/skip-clock-row-signature.patch",
+          "bytes": 585,
+          "sha256": "c00b7c92b255bde4aef6d8cc115893db30e0ffb8605ae88c3265016ea5e45a85"
+        },
+        "virtualMutantBytes": 10615,
+        "virtualMutantSha256": "461a8c02bb55784c36edf13ca039ed1a23cd91e9130ba38ac22f030ac301e813",
+        "sourceApplied": false,
+        "runtime": null
+      },
+      "sensitivity": "source body assertion; compiled children unchanged controls",
+      "laterAssertionsMayBeMasked": "The original-database positive assertion at228 is after the expected refusal and is masked if toThrow fails. Station-tamper and wrong-key cases may also fail; retain them but do not count the station test as a separate map-before-filter control. Independent Node verification remains intact.",
+      "restoredSource": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/src/incidents/incidentClockEvents.ts",
+        "bytes": 10800,
+        "sha256": "09e05ad6c36e9048d42eebce87ef6a884aa278bbc72233b0e3fafb52b57a1f2b"
+      }
+    },
+    {
+      "phase": "p117-mutant-nydfs-71",
+      "counts": {
+        "numTotalTests": 68,
+        "numPassedTests": 62,
+        "numFailedTests": 6,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "command": {
+        "phase": "p117-mutant-nydfs-71",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout tests/regulatoryClocks.test.ts tests/incidentEvidencePacket.test.ts tests/mcpServer.test.ts tests/incidentClockEvents.test.ts tests/incidentClockSurfaces.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p117-mutant-nydfs-71.raw.json",
+        "exit": 1,
+        "durationMs": 5438,
+        "startedUtc": "2026-10-16T09:43:54.340889+00:00",
+        "endedUtc": "2026-10-16T09:43:59.792218+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-nydfs-71/stdout-stderr.log",
+        "head": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+        "headAfter": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+        "ownedProcess": {
+          "pid": 28531,
+          "ownedPgid": 28531,
+          "observedPgidAfterLaunch": 28531,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "--root",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+            "tests/regulatoryClocks.test.ts",
+            "tests/incidentEvidencePacket.test.ts",
+            "tests/mcpServer.test.ts",
+            "tests/incidentClockEvents.test.ts",
+            "tests/incidentClockSurfaces.test.ts",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p117-mutant-nydfs-71.raw.json"
+          ],
+          "startedUtc": "2026-10-16T09:43:54.340889+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p117-mutant-nydfs-71.raw.json",
+            "bytes": 32469,
+            "sha256": "16522524a40707f6ed9b8132f140c82824f9080db9e36139f503098cf7d1c687"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-nydfs-71/raw.json",
+            "bytes": 32469,
+            "sha256": "16522524a40707f6ed9b8132f140c82824f9080db9e36139f503098cf7d1c687"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-nydfs-71/observer.json",
+            "bytes": 52304,
+            "sha256": "13296d007f9fa56280e872e9e385db4478598936ff376e5c182eb0776314f092"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "failures": [
+        {
+          "name": "stored signed incident clock events persists a genuine signed row and verifies after closing and reopening SQLite",
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+          "failures": [
+            "AssertionError: expected 1772701200000 to be 1772704800000 // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:153:67\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:123:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:143:95\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+          ]
+        },
+        {
+          "name": "stored signed incident clock events trigger then notified 'before due'",
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+          "failures": [
+            "AssertionError: expected { \u2026(18) } to match object { status: 'SATISFIED', \u2026(2) }\n(21 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:166:60\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:123:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:160:64\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "name": "stored signed incident clock events trigger then notified 'at due'",
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+          "failures": [
+            "AssertionError: expected { \u2026(18) } to match object { status: 'SATISFIED', \u2026(2) }\n(21 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:166:60\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:123:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:160:64\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "name": "stored signed incident clock events trigger then notified 'after due'",
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+          "failures": [
+            "AssertionError: expected { \u2026(18) } to match object { status: 'SATISFIED_LATE', \u2026(2) }\n(21 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:166:60\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:123:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:160:64\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+          ]
+        },
+        {
+          "name": "stored signed incident clock events earlier genuine trigger claims may bring a deadline forward, never postpone it",
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+          "failures": [
+            "AssertionError: expected 1772704800000 to be 1772708400000 // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:212:67\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:123:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:208:96\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+          ]
+        },
+        {
+          "name": "US financial clock literals at a fixed date 'nydfs-500-17-notice' has an independent literal due-date expectation",
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+          "failures": [
+            "AssertionError: expected 1772701200000 to be 1772704800000 // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:273:57\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:123:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:270:78\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+          ]
+        }
+      ],
+      "bodyErrorNames": [
+        "AssertionError",
+        "AssertionError",
+        "AssertionError",
+        "AssertionError",
+        "AssertionError",
+        "AssertionError"
+      ],
+      "hooksPassed": true,
+      "unhandledErrors": [],
+      "rawObserverIdentitiesMatch": true,
+      "compiledChildrenUnchanged": true,
+      "surfaceRoots": [
+        "/private/tmp/p117-surface-Kb968F",
+        "/private/tmp/p117-surface-EPhRa8",
+        "/private/tmp/p117-surface-h4Hg0u"
+      ],
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-nydfs-71/raw.json",
+          "bytes": 32469,
+          "sha256": "16522524a40707f6ed9b8132f140c82824f9080db9e36139f503098cf7d1c687"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-nydfs-71/observer.json",
+          "bytes": 52304,
+          "sha256": "13296d007f9fa56280e872e9e385db4478598936ff376e5c182eb0776314f092"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-nydfs-71/stdout-stderr.log",
+          "bytes": 172628,
+          "sha256": "0e011befb6c95d699a43f966df6f18061dc0df97affcda26a2d3342d7307f67d"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-nydfs-71/command.json",
+          "bytes": 3024,
+          "sha256": "11dc1b01ceeddbb23ba1f07807190eedb9c12dac638ee79ab6691490be6244c0"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-nydfs-71/owned-process.json",
+          "bytes": 980,
+          "sha256": "c111c1e1b30b01e796f5f4a84f41994d9db48b4c143e93d1ab3015e11a224d57"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-mutant-nydfs-71/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "87655ee550def49c26ae64375542c624127ff334d4fbc92a8957f90fcd4e0617"
+        }
+      ],
+      "staticRecipeTitleAlias": {
+        "US financial clock literals at a fixed date nydfs-500-17-notice has an independent literal due-date expectation": "US financial clock literals at a fixed date 'nydfs-500-17-notice' has an independent literal due-date expectation"
+      },
+      "control": {
+        "id": "nydfs-72-to-71",
+        "target": "src/incidents/regulatoryClocksTable.ts",
+        "old": "    trigger: \"INCIDENT_DETERMINATION\",\n    deadline: { amount: 72, unit: \"hours\" },",
+        "new": "    trigger: \"INCIDENT_DETERMINATION\",\n    deadline: { amount: 71, unit: \"hours\" },",
+        "discriminator": "US table NYDFS literal due-date case and persisted signed NYDFS due72 case",
+        "limit": "Actual failure count/masking unmeasured.",
+        "literalFindCount": 1,
+        "sourceFrame": "src/incidents/regulatoryClocksTable.ts:509\u2013510",
+        "discriminatingCases": [
+          {
+            "fullName": "stored signed incident clock events persists a genuine signed row and verifies after closing and reopening SQLite",
+            "frame": "tests/incidentClockEvents.test.ts:153",
+            "oracle": "The returned NYDFS dueTs must equal literal T+72*HOUR. With this source delta the static arithmetic is T+71*HOUR, a one-hour difference. Earlier genuine-signature/persisted-event assertions precede this due-date assertion."
+          },
+          {
+            "fullName": "US financial clock literals at a fixed date nydfs-500-17-notice has an independent literal due-date expectation",
+            "frame": "tests/incidentClockEvents.test.ts:273",
+            "oracle": "The expected NYDFS value is written in the test table as T+72*HOUR, independent of the product clock table."
+          }
+        ],
+        "masking": "Additional notification/status/due-date and earlier-trigger cases may fail. Count only actual body failures. A first assertion inside a case can mask later expectations; no predicted global failure order or failure count.",
+        "preserved": "Only the INCIDENT_DETERMINATION72-hour row changes; other72-hour clocks and all guards remain unchanged.",
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/incidents/regulatoryClocksTable.ts",
+          "bytes": 35373,
+          "sha256": "3070fa3420062b58e5b3a85469e08b649b8de6a9f41b1380cee12caa2efe8ea0"
+        },
+        "anchorOccurrences": 1,
+        "patch": {
+          "path": "/private/tmp/p1-17-qualification-20261016/causal-design/nydfs-72-to-71.patch",
+          "bytes": 492,
+          "sha256": "2832f1278c208d1ea617d71ff7015465c29e8db937b045cddf28b2bd168e4a92"
+        },
+        "virtualMutantBytes": 35373,
+        "virtualMutantSha256": "f2f88428de9a4484f90d812f260c651d86a003fb47b42679866528eba6d4da65",
+        "sourceApplied": false,
+        "runtime": null
+      },
+      "sensitivity": "source body assertion; compiled children unchanged controls",
+      "laterAssertionsMayBeMasked": "Additional notification/status/due-date and earlier-trigger cases may fail. Count only actual body failures. A first assertion inside a case can mask later expectations; no predicted global failure order or failure count.",
+      "restoredSource": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/src/incidents/regulatoryClocksTable.ts",
+        "bytes": 35373,
+        "sha256": "3070fa3420062b58e5b3a85469e08b649b8de6a9f41b1380cee12caa2efe8ea0"
+      }
+    },
+    {
+      "phase": "p117-restored-created-ts",
+      "counts": {
+        "numTotalTests": 68,
+        "numPassedTests": 68,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "command": {
+        "phase": "p117-restored-created-ts",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout tests/regulatoryClocks.test.ts tests/incidentEvidencePacket.test.ts tests/mcpServer.test.ts tests/incidentClockEvents.test.ts tests/incidentClockSurfaces.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p117-restored-created-ts.raw.json",
+        "exit": 0,
+        "durationMs": 5357,
+        "startedUtc": "2026-10-16T09:46:23.078922+00:00",
+        "endedUtc": "2026-10-16T09:46:28.449413+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-created-ts/stdout-stderr.log",
+        "head": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+        "headAfter": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+        "ownedProcess": {
+          "pid": 29803,
+          "ownedPgid": 29803,
+          "observedPgidAfterLaunch": 29803,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "--root",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+            "tests/regulatoryClocks.test.ts",
+            "tests/incidentEvidencePacket.test.ts",
+            "tests/mcpServer.test.ts",
+            "tests/incidentClockEvents.test.ts",
+            "tests/incidentClockSurfaces.test.ts",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p117-restored-created-ts.raw.json"
+          ],
+          "startedUtc": "2026-10-16T09:46:23.078922+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p117-restored-created-ts.raw.json",
+            "bytes": 23631,
+            "sha256": "16a0c9556c0db6b68de87f2af517de2cb08cc3eac75b8591b960a582e0309607"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-created-ts/raw.json",
+            "bytes": 23631,
+            "sha256": "16a0c9556c0db6b68de87f2af517de2cb08cc3eac75b8591b960a582e0309607"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-created-ts/observer.json",
+            "bytes": 35105,
+            "sha256": "474c525dfd8b457158efa7c5d2aea16cca062db130d320a99a6f8a09028fc2e6"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "failures": [],
+      "bodyErrorNames": [],
+      "hooksPassed": true,
+      "unhandledErrors": [],
+      "rawObserverIdentitiesMatch": true,
+      "compiledChildrenUnchanged": true,
+      "surfaceRoots": [
+        "/private/tmp/p117-surface-9JHwuk",
+        "/private/tmp/p117-surface-A8oPd1",
+        "/private/tmp/p117-surface-hovlR7"
+      ],
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-created-ts/raw.json",
+          "bytes": 23631,
+          "sha256": "16a0c9556c0db6b68de87f2af517de2cb08cc3eac75b8591b960a582e0309607"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-created-ts/observer.json",
+          "bytes": 35105,
+          "sha256": "474c525dfd8b457158efa7c5d2aea16cca062db130d320a99a6f8a09028fc2e6"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-created-ts/stdout-stderr.log",
+          "bytes": 163570,
+          "sha256": "417d4157c17e2b72eb309470a70a92fd0ca8901b759c30e64ec999ea573fc382"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-created-ts/command.json",
+          "bytes": 3052,
+          "sha256": "ed7e11606145c72d6547c3fd26feb551e4d98e7bb4f4a6f2b5fca91d8164b204"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-created-ts/owned-process.json",
+          "bytes": 984,
+          "sha256": "72c6f0d441ed0f9beec499e9bf5eb8dc806b1ebb3eb9f533c6d1ddafaaa6d657"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-created-ts/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "f3f0ec87467a1405013c80ba5baf6b2e95bc68377db3a59f7aaff79a4467ad9d"
+        }
+      ]
+    },
+    {
+      "phase": "p117-restored-nydfs-72",
+      "counts": {
+        "numTotalTests": 68,
+        "numPassedTests": 68,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "command": {
+        "phase": "p117-restored-nydfs-72",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout tests/regulatoryClocks.test.ts tests/incidentEvidencePacket.test.ts tests/mcpServer.test.ts tests/incidentClockEvents.test.ts tests/incidentClockSurfaces.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p117-restored-nydfs-72.raw.json",
+        "exit": 0,
+        "durationMs": 5319,
+        "startedUtc": "2026-10-16T09:44:47.157520+00:00",
+        "endedUtc": "2026-10-16T09:44:52.489694+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-nydfs-72/stdout-stderr.log",
+        "head": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+        "headAfter": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+        "ownedProcess": {
+          "pid": 28712,
+          "ownedPgid": 28712,
+          "observedPgidAfterLaunch": 28712,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "--root",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+            "tests/regulatoryClocks.test.ts",
+            "tests/incidentEvidencePacket.test.ts",
+            "tests/mcpServer.test.ts",
+            "tests/incidentClockEvents.test.ts",
+            "tests/incidentClockSurfaces.test.ts",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p117-restored-nydfs-72.raw.json"
+          ],
+          "startedUtc": "2026-10-16T09:44:47.157520+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p117-restored-nydfs-72.raw.json",
+            "bytes": 23635,
+            "sha256": "38af83ac85d134810a155b3e4cec0805439bfe41e9fa74d04dcbd9c668728c12"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-nydfs-72/raw.json",
+            "bytes": 23635,
+            "sha256": "38af83ac85d134810a155b3e4cec0805439bfe41e9fa74d04dcbd9c668728c12"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-nydfs-72/observer.json",
+            "bytes": 35105,
+            "sha256": "62afa47a92b9c365d3ce2abf4cb6e2750dc1297b0bf939b3554982a054e0485a"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "failures": [],
+      "bodyErrorNames": [],
+      "hooksPassed": true,
+      "unhandledErrors": [],
+      "rawObserverIdentitiesMatch": true,
+      "compiledChildrenUnchanged": true,
+      "surfaceRoots": [
+        "/private/tmp/p117-surface-JyT2pt",
+        "/private/tmp/p117-surface-6YI0XE",
+        "/private/tmp/p117-surface-Wn73PQ"
+      ],
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-nydfs-72/raw.json",
+          "bytes": 23635,
+          "sha256": "38af83ac85d134810a155b3e4cec0805439bfe41e9fa74d04dcbd9c668728c12"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-nydfs-72/observer.json",
+          "bytes": 35105,
+          "sha256": "62afa47a92b9c365d3ce2abf4cb6e2750dc1297b0bf939b3554982a054e0485a"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-nydfs-72/stdout-stderr.log",
+          "bytes": 163567,
+          "sha256": "fb3402e3392a3d6ebd528d8d180e6532493f26199212d6cd2b47a7c238827077"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-nydfs-72/command.json",
+          "bytes": 3038,
+          "sha256": "9be842e87b614db8f87c5b90657e03c0993f90bec4ae3f5ed3b034a880e1cfa1"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-nydfs-72/owned-process.json",
+          "bytes": 982,
+          "sha256": "7281dc021b751674c83a993848ee56ccf8a42c846e995aec17d4df9fa9821903"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-nydfs-72/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "73a65c9487caa45b77251de959b56d825dfb46f2ee5cbcbfadcbf50f52a6a121"
+        }
+      ]
+    },
+    {
+      "phase": "p117-restored-signature",
+      "counts": {
+        "numTotalTests": 68,
+        "numPassedTests": 68,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "command": {
+        "phase": "p117-restored-signature",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout tests/regulatoryClocks.test.ts tests/incidentEvidencePacket.test.ts tests/mcpServer.test.ts tests/incidentClockEvents.test.ts tests/incidentClockSurfaces.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p117-restored-signature.raw.json",
+        "exit": 0,
+        "durationMs": 5456,
+        "startedUtc": "2026-10-16T09:45:32.418320+00:00",
+        "endedUtc": "2026-10-16T09:45:37.890026+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-signature/stdout-stderr.log",
+        "head": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+        "headAfter": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+        "ownedProcess": {
+          "pid": 29656,
+          "ownedPgid": 29656,
+          "observedPgidAfterLaunch": 29656,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "--root",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+            "tests/regulatoryClocks.test.ts",
+            "tests/incidentEvidencePacket.test.ts",
+            "tests/mcpServer.test.ts",
+            "tests/incidentClockEvents.test.ts",
+            "tests/incidentClockSurfaces.test.ts",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p117-restored-signature.raw.json"
+          ],
+          "startedUtc": "2026-10-16T09:45:32.418320+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p117-restored-signature.raw.json",
+            "bytes": 23634,
+            "sha256": "2f1d2109f3a2a30a1f39b1f469a18413f5d6cd3c4c5efe06ad1b877685048cfe"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-signature/raw.json",
+            "bytes": 23634,
+            "sha256": "2f1d2109f3a2a30a1f39b1f469a18413f5d6cd3c4c5efe06ad1b877685048cfe"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-signature/observer.json",
+            "bytes": 35105,
+            "sha256": "5612dac141edfe32caf2adef76628d5d199685bf35d34c3b971775ad1b79c79d"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "failures": [],
+      "bodyErrorNames": [],
+      "hooksPassed": true,
+      "unhandledErrors": [],
+      "rawObserverIdentitiesMatch": true,
+      "compiledChildrenUnchanged": true,
+      "surfaceRoots": [
+        "/private/tmp/p117-surface-hZTaJ2",
+        "/private/tmp/p117-surface-aAqoTM",
+        "/private/tmp/p117-surface-SX2dv8"
+      ],
+      "artifacts": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-signature/raw.json",
+          "bytes": 23634,
+          "sha256": "2f1d2109f3a2a30a1f39b1f469a18413f5d6cd3c4c5efe06ad1b877685048cfe"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-signature/observer.json",
+          "bytes": 35105,
+          "sha256": "5612dac141edfe32caf2adef76628d5d199685bf35d34c3b971775ad1b79c79d"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-signature/stdout-stderr.log",
+          "bytes": 163568,
+          "sha256": "ed791b950b98fa314b93969a33da08fd240b4a4bc691dd950d8bce35eaf97666"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-signature/command.json",
+          "bytes": 3045,
+          "sha256": "d42b4b0ad1049bdefe1c22155072c34769237afdd7274b4f5580ba3826e1b8cb"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-signature/owned-process.json",
+          "bytes": 983,
+          "sha256": "d73c93839956fe49603b588f94c5abb8916f4b84126a79c5c4e23be9bfa5063a"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p117-restored-signature/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "ca228a92f64a1d685efb6edd1de6f04d5ceecabda285d5aa6e24f1f5029e6557"
+        }
+      ]
+    }
+  ],
+  "preparationErrors": [
+    {
+      "action": "inspect-phase-v1 p117-mutant-nydfs-71",
+      "failure": "Static recipe omitted parameter quotes in one title; actual Vitest title has single quotes around nydfs-500-17-notice. Parser asserted before any restoration or outcome write.",
+      "actualRuntimeUnchanged": true,
+      "runtimeRerun": false,
+      "correction": "v2 exact title alias only; design and raw preserved",
+      "v1Sha256": "f8ca16a507de5727f4583c46153b656a323368de2c6df62a7dd118d834149641"
+    }
+  ],
+  "summary": [
+    {
+      "mutation": "NYDFS72to71",
+      "passed": 62,
+      "failed": 6,
+      "restoredPassed": 68
+    },
+    {
+      "mutation": "removeLoaderSignatureRefusal",
+      "passed": 65,
+      "failed": 3,
+      "restoredPassed": 68
+    },
+    {
+      "mutation": "removeCreatedTsGuard",
+      "passed": 66,
+      "failed": 2,
+      "restoredPassed": 68
+    }
+  ],
+  "limits": "Source-mode body assertion sensitivity only; compiled CLI/HTTP/MCP child builds remained unchanged. No build/typecheck of deliberate mutants. No fourth control: genuine original station regression already red before repair. Masked later assertions and extra persisted effects are not credited."
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/producer-claims/records/m2.patch",
+    "bytes": 534,
+    "sha256": "d68773502f77a12a1d7f4597034ad8052ad0f5b5269ffab08f62d5867ff180fd"
+  },
+  "dataBase64": "ZGlmZiAtLWdpdCBhL3NyYy9sZWRnZXIvbGVkZ2VyLnRzIGIvc3JjL2xlZGdlci9sZWRnZXIudHMKaW5kZXggYWExZDUzOWExLi4yZmFiOTY5NjUgMTAwNjQ0Ci0tLSBhL3NyYy9sZWRnZXIvbGVkZ2VyLnRzCisrKyBiL3NyYy9sZWRnZXIvbGVkZ2VyLnRzCkBAIC01NzcsNyArNTc3LDcgQEAgZXhwb3J0IGNsYXNzIExlZGdlciB7CiAgICAgdGhpcy5hc3NlcnRUcnVzdGVkV3JpdGVyKCk7CiAgICAgY29uc3QgcHJlcGFyZWQgPSB0aGlzLnJ1bkltbWVkaWF0ZVRyYW5zYWN0aW9uKCgpID0+IHsKICAgICAgIGNvbnN0IGlkID0gaW5wdXQuaWQgPz8gcmFuZG9tVVVJRCgpOwotICAgICAgY29uc3QgdHMgPSBpbnB1dC50cyA/PyBEYXRlLm5vdygpOworICAgICAgY29uc3QgdHMgPSBpbnB1dC50cyA9PT0gdW5kZWZpbmVkID8gRGF0ZS5ub3coKSA6IE1hdGgubWluKGlucHV0LnRzLCBEYXRlLm5vdygpKTsKICAgICAgIGNvbnN0IGNhbmRpZGF0ZSA9IHRoaXMuYnVpbGRFdmlkZW5jZUluc2VydCh7CiAgICAgICAgIGlucHV0LAogICAgICAgICBpZCwK",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

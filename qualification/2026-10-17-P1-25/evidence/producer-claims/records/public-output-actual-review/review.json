@@ -1,0 +1,309 @@
+{
+  "schema": "p125pc-explicit-public-output-independent-review/1",
+  "at": "2026-10-17T02:18:20.724125+00:00",
+  "blockers": [],
+  "result": "No blockers found in the exact 218-entry actual output allowlist and its explicit selected public files. No staging or publication approval is granted.",
+  "allowlist": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-output-allowlist.json",
+    "bytes": 340585,
+    "sha256": "923373ef519e24ee9fa25f2f0d63bf60988a52d0fb5896035ad24bf129a8ad91"
+  },
+  "actualCommand": {
+    "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-public-curation/command.json",
+    "bytes": 1292,
+    "sha256": "a478ebe75851efd0c23093ec205e7c87caf36ac18d434fe47d8781a2b69e5fc4"
+  },
+  "actualCommandLog": {
+    "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125pc-public-curation/stdout-stderr.log",
+    "bytes": 340,
+    "sha256": "ae61f79e4fe712f49788955b66fe34dac52682877c706332addae182be26fef6"
+  },
+  "actualCommandFacts": {
+    "phase": "p125pc-public-curation",
+    "exit": 0,
+    "durationMs": 157,
+    "endedUtc": "2026-10-17T02:13:06.425974+00:00",
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "processMetadataOnlyNoUniversalIsolationCredit": true
+  },
+  "actualCounts": {
+    "selectedPublicFiles": 218,
+    "roleCounts": {
+      "public-lifecycle": 42,
+      "public-certificates": 42,
+      "public-query": 52,
+      "public-response": 52,
+      "public-checkpoint": 30
+    },
+    "certificateBundles": 42,
+    "publicDerCertificatesDecoded": 84,
+    "selectedQueryResponsePairsEachWithOneOwnNaturalVerificationChild": 52,
+    "pairsByCaseAcrossActualPhases": {
+      "FIRST-GRANT": 6,
+      "HTTP500-THEN-GRANT": 6,
+      "CHECKPOINT-PENDING-GRANT": 6,
+      "CHECKPOINT-TWO-BOUND-WINDOW": 12,
+      "CHECKPOINT-EVENT-CADENCE": 12,
+      "CHECKPOINT-PERSISTED-PRODUCER-CLAIMS": 10
+    },
+    "cadenceVerified": 12,
+    "cadenceUnverified": 0,
+    "producerVerified": 10,
+    "producerUnverified": 0,
+    "canonicalCasesPerRunNotSummed": 24,
+    "labelledResourceInventoryAcrossActualPhases": {
+      "grantPublicCount": 42,
+      "checkpointPublicCount": 30,
+      "children": 272,
+      "explicitChildStreamHashCount": 544,
+      "closedSockets": 70,
+      "closedLedgerOwners": 222
+    },
+    "maximumSelectedPayloadBytes": 62226
+  },
+  "checks": {
+    "all218BytesHashesPhysicalRegularSingleLinkPinsExact": true,
+    "all218OrderedRolesAndSafeUniqueDestinationsReconstructedFromActualOutcomesAudits": true,
+    "exactSixPhaseSelectorsTestsCommandsPublicFactsAndResourceProjections": true,
+    "all52PairsOwnNamedQueryResponseNaturalChildArgvAndCwd": true,
+    "all84StrictCanonicalBase64DecodedDerBytesHashesAndCompleteSequenceEnvelopeLengths": true,
+    "eachBundleOnlyOwnNamedRootPemAndTsaPemMetadata": true,
+    "eachVerifiedGrantSignerMatchesOwnDecodedTsaDerHash": true,
+    "windowCadenceProducerProofLabelsSeparateAndExact": true,
+    "bothProducerGrantsOwnDigestQueryResponseChildAndStoredTokenMetadata": true,
+    "lastReplyBoundOnlyToLastActualVerifiedProof": true,
+    "actualM1AndM2OnlyOneProducerGrantNoLaterCoveredReaderFinalOrAcceptanceCredit": true,
+    "allSelectedPayloadsAtMost1MiB": true,
+    "noRawPemBeginEndOrPrivateKeyMarkersInSelectedPayloadsOrDecodedDER": true,
+    "noRawDefaultHomeTrustFileOrStoredTokenPublicationRole": true,
+    "allExistingPublicJsonBytesRetainedIncludingBodyFailureAndHttp500Facts": true,
+    "canonical24PerRunAndInventoryTotalsOnly": true
+  },
+  "actualPhases": [
+    {
+      "phase": "p125pc-source-combined",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      },
+      "producer": {
+        "proofCount": 2,
+        "acceptance": true,
+        "stages": [
+          "first-checkpoint",
+          "backdated-appended",
+          "postdated-appended",
+          "second-checkpoint"
+        ],
+        "coveredPresent": true,
+        "observationsPresent": true,
+        "finalPresent": true,
+        "manualClassificationRequired": false
+      },
+      "oldWindowSemanticAuditPresent": true
+    },
+    {
+      "phase": "p125pc-fresh-canonical",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      },
+      "producer": {
+        "proofCount": 2,
+        "acceptance": true,
+        "stages": [
+          "first-checkpoint",
+          "backdated-appended",
+          "postdated-appended",
+          "second-checkpoint"
+        ],
+        "coveredPresent": true,
+        "observationsPresent": true,
+        "finalPresent": true,
+        "manualClassificationRequired": false
+      },
+      "oldWindowSemanticAuditPresent": true
+    },
+    {
+      "phase": "p125pc-m1",
+      "tests": {
+        "total": 24,
+        "passed": 23,
+        "failed": 1,
+        "skipped": 0
+      },
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 44,
+        "explicitChildStreamHashCount": 88,
+        "closedSockets": 11,
+        "closedLedgerOwners": 34
+      },
+      "producer": {
+        "proofCount": 1,
+        "acceptance": false,
+        "stages": [
+          "first-checkpoint",
+          "backdated-appended"
+        ],
+        "coveredPresent": false,
+        "observationsPresent": false,
+        "finalPresent": false,
+        "manualClassificationRequired": true
+      },
+      "oldWindowSemanticAuditPresent": false
+    },
+    {
+      "phase": "p125pc-restore1",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      },
+      "producer": {
+        "proofCount": 2,
+        "acceptance": true,
+        "stages": [
+          "first-checkpoint",
+          "backdated-appended",
+          "postdated-appended",
+          "second-checkpoint"
+        ],
+        "coveredPresent": true,
+        "observationsPresent": true,
+        "finalPresent": true,
+        "manualClassificationRequired": false
+      },
+      "oldWindowSemanticAuditPresent": true
+    },
+    {
+      "phase": "p125pc-m2",
+      "tests": {
+        "total": 24,
+        "passed": 23,
+        "failed": 1,
+        "skipped": 0
+      },
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 44,
+        "explicitChildStreamHashCount": 88,
+        "closedSockets": 11,
+        "closedLedgerOwners": 36
+      },
+      "producer": {
+        "proofCount": 1,
+        "acceptance": false,
+        "stages": [
+          "first-checkpoint",
+          "backdated-appended",
+          "postdated-appended"
+        ],
+        "coveredPresent": false,
+        "observationsPresent": false,
+        "finalPresent": false,
+        "manualClassificationRequired": true
+      },
+      "oldWindowSemanticAuditPresent": false
+    },
+    {
+      "phase": "p125pc-restore2",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "actualResources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      },
+      "producer": {
+        "proofCount": 2,
+        "acceptance": true,
+        "stages": [
+          "first-checkpoint",
+          "backdated-appended",
+          "postdated-appended",
+          "second-checkpoint"
+        ],
+        "coveredPresent": true,
+        "observationsPresent": true,
+        "finalPresent": true,
+        "manualClassificationRequired": false
+      },
+      "oldWindowSemanticAuditPresent": true
+    }
+  ],
+  "errorDiagnosticsPreserved": [
+    {
+      "scope": "reviewer-only read-only checker",
+      "toolChunk": "5eb165",
+      "error": "KeyError: 'completeBody'",
+      "reason": "The older window semantic audit has no completeBody field; the check was corrected to its existing schema. No product or helper rerun."
+    },
+    {
+      "scope": "reviewer-only read-only checker",
+      "toolChunk": "7093ae",
+      "error": "TypeError: 'NoneType' object is not subscriptable",
+      "reason": "The existing M1/M2 old windowSemanticAudit values are intentionally null. Their own real public query proofs were checked without inventing window semantic audit credit. No product or helper rerun."
+    },
+    {
+      "scope": "retained root review",
+      "error": "One guessed receipt delta filename was absent; actual rg inventory resolved c39-to-producer.patch.txt and root read it completely. No source/product/evidence mutation or rerun resulted.",
+      "record": {
+        "path": "/private/tmp/p1-25-producer-qualification-20261017/root-runtime-review.json",
+        "bytes": 30212,
+        "sha256": "88b6051dab7a11566c43f22b12a1ae5f362bf2b4a39815f799f2936a0d66d214"
+      }
+    }
+  ],
+  "limits": {
+    "base64AndDerEnvelopeChecksAreNotX509OrSignatureVerification": true,
+    "noRawSourcePemRehashOrNonselectedStoredTokenPayloadRead": true,
+    "sourcePemPinBindingIsRetainedMetadataAndOwnDecodedLeafMatchesActualVerifiedGrant": true,
+    "noPrivateKeyChildStreamNativePayloadOrDirectoryTraversal": true,
+    "noHelperProductTestOpenSslCryptoOrNetworkExecution": true,
+    "noSourceIndexQaOwnershipReservationOrPriorArtifactMutation": true,
+    "noStagingPublicationOrReleaseApproval": true,
+    "noIndependentReexecutionOfAssertionsOrFullRuntimeFailureFrameAudit": true,
+    "noFullP125P101PlanOrUniversalIsolationCredit": true
+  },
+  "inputPinCount": 235
+}

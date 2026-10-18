@@ -1,0 +1,411 @@
+{
+  "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+  "node": "v22.23.3",
+  "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+  "harnessSha256": "4ec739937325ce4a0ec26b5bc0c99132d95b6fd611688e6f84ba30b3de7a25b3",
+  "evidence": "/private/tmp/p0-20-compiled-cli-y2fIAO",
+  "inputs": [
+    {
+      "path": "dist/cli.js",
+      "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+    },
+    {
+      "path": "dist/domains/domainApplyCli.js",
+      "sha256": "6658e3c22f07f473ad3ae75407df8b67628d34843fa3ebc5b8e97e2962e5e113"
+    },
+    {
+      "path": "dist/domains/industryPackAudit.js",
+      "sha256": "11f9e3ce5a288d9f4aec08f9e0369369aa413552260c091a31be50dcff3c150f"
+    },
+    {
+      "path": "dist/audit/auditApi.js",
+      "sha256": "f01f81a60536c79ebda7648906c2d1fdbfab75080a0516ca53b82e7923d05304"
+    },
+    {
+      "path": "dist/audit/binderSigner.js",
+      "sha256": "1242f865d6c2a3a14dee9d6800e8d1b671a6691b68542efcec79ee4ceec425fd"
+    },
+    {
+      "path": "dist/crypto/signing/signerVault.js",
+      "sha256": "a34222d3d003d7246fc12f15e13d1b6e404aa44dc5d61658074e3953a29b820d"
+    }
+  ],
+  "unchangedInputs": true,
+  "operatorPins": {
+    "capturedBeforeAuditSigning": true,
+    "auditorPublicKeySha256": "00c4e611528f16ac53423c976f3878fb1088fdc69ba403d304493839b24d7bd7",
+    "foreignPublicKeySha256": "b9160dd4b77c642f9c72c029e5751f2a863d25d5f2c896ac0f29a11496e9f170",
+    "independentPublicPinFile": "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/independent-auditor.pub"
+  },
+  "paidGate": {
+    "genuineLocalEd25519License": true,
+    "issuerPublicKeySha256": "565cc65c5f70fa38530f71dfea4f36a8c3a7665569fdda281da3a97510945788",
+    "privateKeyPassedToChild": false,
+    "activation": false,
+    "transportDenied": true
+  },
+  "commands": [
+    {
+      "name": "paid-gate-refusal",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--responses",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/responses.json",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/gate-refused.json",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 866,
+      "stdout": "/private/tmp/p0-20-compiled-cli-y2fIAO/paid-gate-refusal.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "/private/tmp/p0-20-compiled-cli-y2fIAO/paid-gate-refusal.stderr",
+      "stderrSha256": "dd26db6c2c5acef02566f05f8973068392d8eb7be46c44c1dff1f961b953406b",
+      "effects": "/private/tmp/p0-20-compiled-cli-y2fIAO/paid-gate-refusal.effects.json",
+      "effectsSha256": "b7ed9a06f982e4f1b4065260f00ee03729a4034d236e1bff5810df6d8e100e0a"
+    },
+    {
+      "name": "signed-text-write",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--responses",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/responses.json",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/signed.json"
+      ],
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": false,
+      "unchanged": false,
+      "checkError": null,
+      "durationMs": 749,
+      "stdout": "/private/tmp/p0-20-compiled-cli-y2fIAO/signed-text-write.stdout",
+      "stdoutSha256": "612c8c9ecdce017dbf9950c551f1c5fc32e06f3e9c3f5566867424e5ab8548fa",
+      "stderr": "/private/tmp/p0-20-compiled-cli-y2fIAO/signed-text-write.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-y2fIAO/signed-text-write.effects.json",
+      "effectsSha256": "6101596486eb27a93758ee51664ec82a300cc3ce7061c191101a6ed65ad6058f"
+    },
+    {
+      "name": "trusted-text-verify",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/signed.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/independent-auditor.pub"
+      ],
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 770,
+      "stdout": "/private/tmp/p0-20-compiled-cli-y2fIAO/trusted-text-verify.stdout",
+      "stdoutSha256": "4b312aa451d929330e14d34181d4bc49882746c6ed21f8f3469179be44b7a558",
+      "stderr": "/private/tmp/p0-20-compiled-cli-y2fIAO/trusted-text-verify.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-y2fIAO/trusted-text-verify.effects.json",
+      "effectsSha256": "9fe6aecd4b99c7e9ea7e590e96c9dbd32cfb43cd184a059d96638cf6e7699c5c"
+    },
+    {
+      "name": "trusted-json-verify",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/signed.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/independent-auditor.pub",
+        "--json"
+      ],
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 761,
+      "stdout": "/private/tmp/p0-20-compiled-cli-y2fIAO/trusted-json-verify.stdout",
+      "stdoutSha256": "731d7925e16836160013044b521d4ffe0a23f8f144edb45180a09a0f9a0abaa1",
+      "stderr": "/private/tmp/p0-20-compiled-cli-y2fIAO/trusted-json-verify.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-y2fIAO/trusted-json-verify.effects.json",
+      "effectsSha256": "9fe6aecd4b99c7e9ea7e590e96c9dbd32cfb43cd184a059d96638cf6e7699c5c"
+    },
+    {
+      "name": "unpinned-refusal",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/signed.json",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 709,
+      "stdout": "/private/tmp/p0-20-compiled-cli-y2fIAO/unpinned-refusal.stdout",
+      "stdoutSha256": "5350bbd1a9d8d2316d8858249fff2f257f6a4a6771a434cf30c924005d9bcbe5",
+      "stderr": "/private/tmp/p0-20-compiled-cli-y2fIAO/unpinned-refusal.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-y2fIAO/unpinned-refusal.effects.json",
+      "effectsSha256": "9fe6aecd4b99c7e9ea7e590e96c9dbd32cfb43cd184a059d96638cf6e7699c5c"
+    },
+    {
+      "name": "unsigned-text-write",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--responses",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/responses.json",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/unsigned.json",
+        "--no-sign"
+      ],
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": false,
+      "unchanged": false,
+      "checkError": null,
+      "durationMs": 732,
+      "stdout": "/private/tmp/p0-20-compiled-cli-y2fIAO/unsigned-text-write.stdout",
+      "stdoutSha256": "4c6b0e60f4b33da1faace3811d631d5e662a0b8974280bc380538b7765f45de1",
+      "stderr": "/private/tmp/p0-20-compiled-cli-y2fIAO/unsigned-text-write.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-y2fIAO/unsigned-text-write.effects.json",
+      "effectsSha256": "1a21e5aaa9dca87630ce6d15b49e82737595fd987fd45eb94f97b9869311f0d7"
+    },
+    {
+      "name": "unsigned-verify-refusal",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/unsigned.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/independent-auditor.pub",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 973,
+      "stdout": "/private/tmp/p0-20-compiled-cli-y2fIAO/unsigned-verify-refusal.stdout",
+      "stdoutSha256": "c7357233bdc2837439328c8e3c5c19c7fc3f8892b635d48b1fc2850a2a3dddbc",
+      "stderr": "/private/tmp/p0-20-compiled-cli-y2fIAO/unsigned-verify-refusal.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-y2fIAO/unsigned-verify-refusal.effects.json",
+      "effectsSha256": "c99483efb271547ec27ca08b99c35b908f7c8995f44113964942cf4884f4587c"
+    },
+    {
+      "name": "baseline-checksum-json",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/baseline.json",
+        "--no-sign",
+        "--json"
+      ],
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": false,
+      "unchanged": false,
+      "checkError": null,
+      "durationMs": 735,
+      "stdout": "/private/tmp/p0-20-compiled-cli-y2fIAO/baseline-checksum-json.stdout",
+      "stdoutSha256": "b3d4209349187d69af32bd7f55042914f4a307bfe5746c3063fe939e11de21bb",
+      "stderr": "/private/tmp/p0-20-compiled-cli-y2fIAO/baseline-checksum-json.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-y2fIAO/baseline-checksum-json.effects.json",
+      "effectsSha256": "48f4da595636b1cdd3ac41d7864f7f1c6e3259118cc0d01f81d9b45bfd190fc8"
+    },
+    {
+      "name": "baseline-sign-refusal",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/baseline-refused.json",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 724,
+      "stdout": "/private/tmp/p0-20-compiled-cli-y2fIAO/baseline-sign-refusal.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "/private/tmp/p0-20-compiled-cli-y2fIAO/baseline-sign-refusal.stderr",
+      "stderrSha256": "e453fb0f2a9a81147efb088e1792637498fc722945223ea9687c8a088252e8a5",
+      "effects": "/private/tmp/p0-20-compiled-cli-y2fIAO/baseline-sign-refusal.effects.json",
+      "effectsSha256": "e4ec61b50816e2884a22c6466c9706e649ccc190c064b59bc8567b4c48c3864a"
+    },
+    {
+      "name": "locked-sign-refusal",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--responses",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/responses.json",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/locked-refused.json",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 721,
+      "stdout": "/private/tmp/p0-20-compiled-cli-y2fIAO/locked-sign-refusal.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "/private/tmp/p0-20-compiled-cli-y2fIAO/locked-sign-refusal.stderr",
+      "stderrSha256": "1396c3557f68695ad1ffa597f293817d18999ab0a89ee1232fd06d32eb5b112d",
+      "effects": "/private/tmp/p0-20-compiled-cli-y2fIAO/locked-sign-refusal.effects.json",
+      "effectsSha256": "e4ec61b50816e2884a22c6466c9706e649ccc190c064b59bc8567b4c48c3864a"
+    },
+    {
+      "name": "tamper-rechecksum-refusal",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/tampered-rechecksummed.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/independent-auditor.pub",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 835,
+      "stdout": "/private/tmp/p0-20-compiled-cli-y2fIAO/tamper-rechecksum-refusal.stdout",
+      "stdoutSha256": "28c7c863fc0d1701ef435949ba34c8b07275ce2f01e1241e40b3ba0ee41d3eec",
+      "stderr": "/private/tmp/p0-20-compiled-cli-y2fIAO/tamper-rechecksum-refusal.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-y2fIAO/tamper-rechecksum-refusal.effects.json",
+      "effectsSha256": "408f6dd884426be6b82f35a808dfb9c206634799e6f4906212fa59cee893936d"
+    },
+    {
+      "name": "foreign-signer-refusal",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/foreign-signed.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/independent-auditor.pub",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "durationMs": 735,
+      "stdout": "/private/tmp/p0-20-compiled-cli-y2fIAO/foreign-signer-refusal.stdout",
+      "stdoutSha256": "c50d18ef0cf7ae56083412632a09c99e72c1a31692999bb3bc94a3067708786b",
+      "stderr": "/private/tmp/p0-20-compiled-cli-y2fIAO/foreign-signer-refusal.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-y2fIAO/foreign-signer-refusal.effects.json",
+      "effectsSha256": "c7a8f6e09c7df5f075e5d5fba434beb60fb7b6279148dc083fc619049a5fc93c"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/signed.json",
+      "sha256": "680a49eadc679a95ab32b9c58a2d9d8e0b7127f778074da3e81b1f8539e80064"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/unsigned.json",
+      "sha256": "8dbb4e98051f000e0fb3b850c586b5f4c12dc4e0c32da3ed627a69f52d287a52"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/baseline.json",
+      "sha256": "32bb4c51fc4fecc88dc0379e1a7e3b281a03278b75aff6302563786de30db218"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/tampered-rechecksummed.json",
+      "sha256": "111cdd28752f2ddef2e30d5c8e679ce99f48ac57e049d208e093dfce8f176175"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/outputs/foreign-signed.json",
+      "sha256": "08c42b206dfa7fc708fa347a1a46d8a02fa41353465a96a1eba4b82372ce34c5"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-y2fIAO/owned-state/responses.json",
+      "sha256": "1dcaadc51d4896e88a0e04c18935daad7b650673a9e3fcbf99f6491eb6b49ffc"
+    }
+  ],
+  "limits": "Actual compiled local CLI with private HOME/workspaces and genuine fixture license. No activation, live provider, authenticated HTTP, notary/HSM, whole-suite/coverage/hosted/release claim."
+}

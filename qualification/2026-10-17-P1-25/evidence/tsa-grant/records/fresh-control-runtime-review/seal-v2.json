@@ -1,0 +1,42 @@
+{
+  "schema": "p125g-independent-fresh-control-runtime-seal/1",
+  "at": "2026-10-16T23:02:09.410890+00:00",
+  "sourceCommit": "188681b32dc472983404dce19e7833cd76ee7576",
+  "blockers": [],
+  "inputPinCount": 382,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-runtime-review/review.json",
+      "bytes": 138585,
+      "sha256": "fe2cabe3d756856edef139ebe448eaac71d84cff4164230047c04064acd2a32c"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-runtime-review/README.md",
+      "bytes": 4189,
+      "sha256": "2143a3c154d73c54fedde6f2d3410523387246ddef77ce46c6d562da7b8ad14c"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-runtime-review/input-pins.json",
+      "bytes": 85545,
+      "sha256": "63026ec99465aeaf06457838663e21038d1ecb04cb02c470c7e8f62cc6d9fd75"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-runtime-review/git-read-verification.json",
+      "bytes": 3467,
+      "sha256": "4d812c7285ef9f586cb37dd63c6a2e722a0974f5d972a854a3476da7c5d2d77c"
+    }
+  ],
+  "actualSourceAndFreshCanonical19NoSkip": true,
+  "actualControlsTwoFailuresEachAndExact19GreenRestorations": true,
+  "allHoldsAndGlobalQualityRedRetained": true,
+  "readOnlyPrivateAudit": true,
+  "noMetadataPublicationOrWholeIssueCredit": true,
+  "preferredSealCorrection": {
+    "preservedFirstSeal": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-runtime-review/seal.json",
+      "bytes": 1391,
+      "sha256": "0d3b9217639fc3723c76195bd440dde4b033b3cd2e4065a5f0e6459934722f6e"
+    },
+    "scope": "Correct inputPinCount from381 to actual382. All four sealed output files, evidence and conclusions remain unchanged."
+  }
+}

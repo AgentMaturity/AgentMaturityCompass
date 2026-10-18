@@ -1,0 +1,170 @@
+{
+  "kind": "P0-20 audit CLI source-only independent review",
+  "reviewedAt": "2026-10-14T20:09:52.695894+00:00",
+  "scope": "ONLY current src/audit/auditCli.ts diff and narrow freeze/ownership boundary; related unchanged source read solely to verify flow.",
+  "result": "One actionable claim-output finding; runtime repair qualification is pending.",
+  "baseHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+  "candidate": {
+    "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/src/audit/auditCli.ts",
+    "baseSha256": "dae8d57ffdecd6726d27fa5751337727ce52d4da465cf5a76d066c67d5cc27ee",
+    "currentSha256": "4e646870a7f58245e9e517c130571e66b09ad0c89f693c1fb75be8a11b91c1a5",
+    "diffSha256": "38b3d735f5cdb82c01a45fbf9c9c7bdc43eb03e95d702389a01c4b7d11f1251a",
+    "diff": "diff --git a/src/audit/auditCli.ts b/src/audit/auditCli.ts\nindex 9a1acced0..e7a0879c1 100644\n--- a/src/audit/auditCli.ts\n+++ b/src/audit/auditCli.ts\n@@ -2,6 +2,7 @@ import { resolve } from \"node:path\";\n import YAML from \"yaml\";\n import { readUtf8 } from \"../utils/fs.js\";\n import type { TrustContext } from \"../trust/trustContext.js\";\n+import { artifactClaim, withClaimFields } from \"../cli/claimOutput.js\";\n import { exportEnterpriseAudit, type EnterpriseAuditExportFormat } from \"./enterpriseAuditExport.js\";\n import {\n   auditBinderCreateForApi,\n@@ -145,12 +146,15 @@ export function auditBinderVerifyCli(params: {\n   pubkeyPath?: string;\n   trust: TrustContext;\n }) {\n-  return auditBinderVerifyFile({\n+  const verification = auditBinderVerifyFile({\n     workspace: params.workspace,\n     file: params.file,\n     publicKeyPath: params.pubkeyPath,\n     trust: params.trust\n   });\n+  return \"audit\" in verification\n+    ? withClaimFields(verification, artifactClaim(\"audit:industry-pack\"))\n+    : verification;\n }\n \n export function auditBindersCli(workspace: string) {\n",
+    "architectureLinesBefore": 249,
+    "architectureLinesAfter": 253,
+    "cap": 800
+  },
+  "findings": [
+    {
+      "priority": 1,
+      "path": "src/audit/auditCli.ts",
+      "line": 157,
+      "title": "Internal marker suppresses strict text failure without emitting a claim label",
+      "reason": "withClaimFields sets labelled=true unconditionally. src/cli.ts industry verification branch calls finishVerify with result but no opts.claim. finishVerify JSON serializes that result, but its text branch only prints a claim if opts.claim exists. The current wrapper therefore fixes JSON fields while leaving text stdout without a Claim line and making postAction incorrectly regard it as labelled.",
+      "evidence": [
+        "src/cli/claimOutput.ts:withClaimFields",
+        "src/cli-trust-flags.ts:finishVerify",
+        "src/cli.ts industry-pack branch around17224",
+        "Original actual trusted text and JSON commands exit70, while signature/checksum/report.trusted are true."
+      ],
+      "requestedBehavior": "Emit the canonical claim line in successful industry text output, retain additive claim fields in JSON, and preserve report/verdict/issuer fields. The corrected actual text fixture must assert a real Claim line, not just the signer detail.",
+      "scopeLimit": "This review does not authorize a reserved/shared CLI edit or a generic hook bypass."
+    }
+  ],
+  "semantics": {
+    "verificationCalledOnce": true,
+    "sameArguments": true,
+    "preservesBinderBranchIdentity": true,
+    "preservesExistingVerificationFieldsBySpread": true,
+    "trustOrSignatureLogicChanged": false,
+    "claimAdapter": "Existing artifactClaim(audit:industry-pack) defaults to unverified/self_reported/not_evaluated; it does not promote signed answers.",
+    "industrySelector": "audit property is the existing branch discriminator, including unreadable industry results; report and nonzero verdict semantics remain untouched."
+  },
+  "retainedInitialRuntime": {
+    "path": "/private/tmp/p0-20-compiled-cli-20261015.json",
+    "sha256": "cb4456686fe72c5e004662cffd2a46cdd7185e7d135a0801fc8ae2da968c2046",
+    "commands": [
+      {
+        "name": "trusted-text-verify",
+        "exit": 70,
+        "expectedExit": 0,
+        "stdoutPath": "/private/tmp/p0-20-compiled-cli-kffWOd/trusted-text-verify.stdout",
+        "stderrPath": "/private/tmp/p0-20-compiled-cli-kffWOd/trusted-text-verify.stderr",
+        "stdoutHashMatches": true,
+        "stderrHashMatches": true,
+        "unchangedEffects": true
+      },
+      {
+        "name": "trusted-json-verify",
+        "exit": 70,
+        "expectedExit": 0,
+        "stdoutPath": "/private/tmp/p0-20-compiled-cli-kffWOd/trusted-json-verify.stdout",
+        "stderrPath": "/private/tmp/p0-20-compiled-cli-kffWOd/trusted-json-verify.stderr",
+        "stdoutHashMatches": true,
+        "stderrHashMatches": true,
+        "unchangedEffects": true
+      }
+    ],
+    "limit": "Original exit70 receipts retained; no new runtime or GREEN claim by this review."
+  },
+  "harness": {
+    "path": "/private/tmp/p0-20-compiled-cli-20261015.mjs",
+    "sha256": "4ec739937325ce4a0ec26b5bc0c99132d95b6fd611688e6f84ba30b3de7a25b3",
+    "sourceReview": "Corrected JSON result path uses out.audit.overall and expected fixture eligibleLevel1. Baseline uses overall.claimKind/synthetic_example. Trusted text currently checks signer detail only; add actual Claim line assertion to expose this source issue."
+  },
+  "ownership": {
+    "basis": "The current human serial qualification/fix authorization is the narrow demonstrated repair basis while preserving Claude work. No helper-none result, path absence, idleness or historical merge status provides blanket clearance.",
+    "reservations": "RESERVATIONS.md line1496 broadly reserves non-E17/non-Codex Agent-Doable items; wave1 lists auditCli under historical merged paths; latest line1588 requires telling Claude before src/cli.ts, resultCommandRegistry.ts or replParser.ts edits. This candidate edits none of those paths.",
+    "heldHead": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+    "heldAuditCliSha256": "f4f1a84bcd26d062a0ccf829f20d39b03524c6295137e553d84c8fe638e827ec",
+    "heldDifference": "P1-78 held auditCli adds cliInitiator import and initiator:cliInitiator() only to export-request. The reviewed current hunk is disjoint in verify wrapper; existing export request remains byte-equivalent to accepted base. Held initiator carrier must remain separately preserved, not overwritten/overlaid.",
+    "auditApprovalGranted": false
+  },
+  "freeze": {
+    "active": true,
+    "P020Exception": false,
+    "countsPinned": "1236 CLI command paths /1236 inventory,41packs,632questions",
+    "ordinaryRuntimeChecks": "Root must run unchanged normal freeze/architecture/parity checks after the corrected repair; source review is not their passing result.",
+    "registeredFrozenPath": "Earlier source-backed D15 preflight found no auditCli frozen indicator or manifest row. D15/helper absence is only snapshot applicability, never ownership clearance. needs-snapshot helper was not executed by this source-only review.",
+    "sourceChangesObserved": [
+      "src/audit/auditCli.ts"
+    ],
+    "protectedSourcePins": [
+      {
+        "path": "src/audit/binderSigner.ts",
+        "sha256": "b08f4f95cb172def287cbb089539939394ba26d7433d610df7a2bef4608a610d",
+        "matchesPreflight": true
+      },
+      {
+        "path": "src/audit/auditApi.ts",
+        "sha256": "371901e70b53f446f5dfd1f0abc1d8c0e9dceee231eb656a46f0f20a770b803a",
+        "matchesPreflight": true
+      },
+      {
+        "path": "src/org/orgSigner.ts",
+        "sha256": "bdaa0eca7235251e66e653a1d1dd4d7d16e383581c01a6bc14d049d95c7f75cf",
+        "matchesPreflight": true
+      },
+      {
+        "path": "src/crypto/signing/signerVault.ts",
+        "sha256": "ae59a131cbd76f813d8160356bd73f62b1830321e34153fd2fb9e92cecd3bcaa",
+        "matchesPreflight": true
+      },
+      {
+        "path": "src/cli.ts",
+        "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+        "matchesPreflight": true
+      },
+      {
+        "path": "src/cli-trust-flags.ts",
+        "sha256": "fe92104ef1561ca0d45c0b9db46c346a0fc9f77e1e11d428c22205300739a081",
+        "matchesPreflight": true
+      },
+      {
+        "path": "src/studio/studioServer.ts",
+        "sha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+        "matchesPreflight": true
+      }
+    ],
+    "guardAndManifestPins": [
+      {
+        "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+        "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+        "matchesPreflight": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/line-budgets.json",
+        "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+        "matchesPreflight": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+        "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+        "matchesPreflight": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+        "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+        "matchesPreflight": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/snapshot-plan-edit.mjs",
+        "sha256": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68",
+        "matchesPreflight": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/architecture-boundaries-check.mjs",
+        "sha256": "485eee162256218e2d51c1ada9dd4185a478a632ba86288e89438d1c2b24a067",
+        "matchesPreflight": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+        "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+        "matchesPreflight": true
+      }
+    ],
+    "archivesAndHeld": "No archive/original/manifest, held-ref or guard mutation by reviewer; manifest remains exact preflight hash."
+  },
+  "performed": "Filesystem/Git source and retained evidence reads, metadata hashing, and this mode0600 private JSON/Markdown pair only. No product runtime, CLI/test/build/install, live dist read, source edit, guard mutation or app message.",
+  "limits": "Not approval, final CLI/current whole qualification, Node24, coverage, hosted/release or Done. Existing P0-22/23/51/52 active failures and pending Sync scope remain separate."
+}

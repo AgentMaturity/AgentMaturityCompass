@@ -1,0 +1,75 @@
+{
+  "boundary": "Full private oversized certificate/result and old generation roots remain intact. Compact reviews bind hashes and paths; no splitting/truncation/repacking to claim fixture coverage. Pin manifests below bind retained originals.",
+  "references": [
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/current-cert-actual-review/pins.json",
+      "bytes": 24846,
+      "sha256": "46435b4e3d64c0f7224a3507c7cee666995e1d3491bf7ded55fc2857fba4d6a8"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/legacy-l3-cert-actual-review/pins.json",
+      "bytes": 5877,
+      "sha256": "84cf724a2dc70706302c786bdc9074d0842137747b69d53565f4df2ad78429c2"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/cli-acceptance-actual-review/pins.json",
+      "bytes": 18936,
+      "sha256": "901b15e4e7d430e9582f8d1657dc98ae3c57554957c4278c6b2f17d716b492dd"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/ownership-audit/pins.json",
+      "bytes": 12518,
+      "sha256": "596382738937cafdfb554d9bb9b3ad017efbabbfd0574c3dc7932c10651b8037"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generator-v4-static-review/pins.json",
+      "bytes": 3870,
+      "sha256": "f18932e7af249c3ea1c1e1049d517b202d84546b8855f07eb91d09bcd9933b62"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/control-phase-audit-proposal/input-pins.json",
+      "bytes": 3807,
+      "sha256": "bcca80b5255bd6c2589581fb8b01deade325119bed021cb0ddcb2e8cc3a314eb"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/source-controls.py",
+      "bytes": 3922,
+      "sha256": "e1f87475b46c114d1a4be4d41b8b5a0f37a282138b27711ccbfc22dd29d37134"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/assemble-receipt.py",
+      "bytes": 10396,
+      "sha256": "5a1a10522b1a962d67c383712194d971e583c4ca902dbfc6ab6e12eab09cab49"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/source-commit.stdout",
+      "bytes": 529,
+      "sha256": "fb9efbec29114c20defad7ef9e572c6e2671fc22aad99d49068ec43a52f21514"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/source-commit.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/root-static-adoption.json",
+      "bytes": 281204,
+      "sha256": "4b5c42f83f8f2747b80064abf00e56a877047a835af91b4592e1a1f46a3ce20b"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/ci-result.json",
+      "bytes": 1412,
+      "sha256": "87900d2d0374e7e8dad432df91b5a220470edd64ff74dc14212fd3efe5990f5b"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/build-result.json",
+      "bytes": 1429,
+      "sha256": "7ac660fb507b2c1625fb7836c444fe5d69dd7c32ccdbe07a409deded781deb6e"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/build-provenance.json",
+      "bytes": 5563,
+      "sha256": "e12b51153a755488e8880fd304566446ad31b488bfe679b368796cc034eed6c4"
+    }
+  ]
+}

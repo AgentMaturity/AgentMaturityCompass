@@ -1,0 +1,317 @@
+[
+  {
+    "name": "frozen-install",
+    "cmd": "pnpm install --frozen-lockfile",
+    "exit": 0,
+    "durationMs": 1692,
+    "startedUtc": "2026-10-14T15:39:04.781098+00:00",
+    "log": "/private/tmp/p0-22-frozen-install-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "current-build",
+    "cmd": "npm run build",
+    "exit": 0,
+    "durationMs": 31351,
+    "startedUtc": "2026-10-14T15:40:29.351949+00:00",
+    "log": "/private/tmp/p0-22-current-build-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "current-command-inventory",
+    "cmd": "node dist/cli.js commands --json",
+    "exit": 0,
+    "durationMs": 1199,
+    "startedUtc": "2026-10-14T15:41:42.613314+00:00",
+    "log": "/private/tmp/p0-22-current-command-inventory-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "current-focused",
+    "cmd": "pnpm exec vitest run tests/claims/claimEligibility.test.ts tests/claims/claimAdapters.test.ts tests/claims/claimLabels.test.ts tests/domainExampleMode.test.ts tests/selfReportedLevelCap.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/complianceReportReadability.test.ts tests/complyReportFrameworkSelection.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/current-focused.json",
+    "exit": 0,
+    "durationMs": 20438,
+    "startedUtc": "2026-10-14T15:41:42.613316+00:00",
+    "log": "/private/tmp/p0-22-current-focused-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "own-node22-sqlite-rebuild",
+    "cmd": "pnpm rebuild better-sqlite3",
+    "exit": 0,
+    "durationMs": 518,
+    "startedUtc": "2026-10-14T15:48:47.593228+00:00",
+    "log": "/private/tmp/p0-22-own-node22-sqlite-rebuild-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "registry-after-abi-repair",
+    "cmd": "pnpm exec vitest run tests/cliResultCommandRegistry.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/registry-after-abi-repair.json",
+    "exit": 0,
+    "durationMs": 3683,
+    "startedUtc": "2026-10-14T15:49:29.939445+00:00",
+    "log": "/private/tmp/p0-22-registry-after-abi-repair-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "fleet-repaired-build",
+    "cmd": "npm run build",
+    "exit": 0,
+    "durationMs": 30162,
+    "startedUtc": "2026-10-14T15:52:59.672369+00:00",
+    "log": "/private/tmp/p0-22-fleet-repaired-build-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "current-counts",
+    "cmd": "npm run check:counts",
+    "exit": 1,
+    "durationMs": 612,
+    "startedUtc": "2026-10-14T15:54:41.629186+00:00",
+    "log": "/private/tmp/p0-22-current-counts-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "fleet-repaired-freeze",
+    "cmd": "npm run check:freeze",
+    "exit": 0,
+    "durationMs": 1630,
+    "startedUtc": "2026-10-14T15:54:41.627089+00:00",
+    "log": "/private/tmp/p0-22-fleet-repaired-freeze-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "fleet-repaired-architecture",
+    "cmd": "npm run check:architecture-boundaries",
+    "exit": 0,
+    "durationMs": 2090,
+    "startedUtc": "2026-10-14T15:54:41.627144+00:00",
+    "log": "/private/tmp/p0-22-fleet-repaired-architecture-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "fleet-repaired-source-typecheck",
+    "cmd": "npm run typecheck",
+    "exit": 0,
+    "durationMs": 27227,
+    "startedUtc": "2026-10-14T15:54:41.633697+00:00",
+    "log": "/private/tmp/p0-22-fleet-repaired-source-typecheck-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "factual-counts-refresh",
+    "cmd": "node scripts/gen-counts.mjs --write",
+    "exit": 0,
+    "durationMs": 267,
+    "startedUtc": "2026-10-14T16:00:13.630853+00:00",
+    "log": "/private/tmp/p0-22-factual-counts-refresh-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "current-docs-drift",
+    "cmd": "npm run check:docs-drift",
+    "exit": 0,
+    "durationMs": 356,
+    "startedUtc": "2026-10-14T16:00:14.150556+00:00",
+    "log": "/private/tmp/p0-22-current-docs-drift-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "refreshed-counts",
+    "cmd": "npm run check:counts",
+    "exit": 0,
+    "durationMs": 412,
+    "startedUtc": "2026-10-14T16:00:14.147148+00:00",
+    "log": "/private/tmp/p0-22-refreshed-counts-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "current-source-lint",
+    "cmd": "npm run lint",
+    "exit": 0,
+    "durationMs": 4675,
+    "startedUtc": "2026-10-14T16:00:14.150557+00:00",
+    "log": "/private/tmp/p0-22-current-source-lint-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "current-test-typecheck",
+    "cmd": "npm run typecheck:tests",
+    "exit": 0,
+    "durationMs": 35637,
+    "startedUtc": "2026-10-14T16:03:30.883965+00:00",
+    "log": "/private/tmp/p0-22-current-test-typecheck-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "lab-repaired-build",
+    "cmd": "npm run build",
+    "exit": 0,
+    "durationMs": 29725,
+    "startedUtc": "2026-10-14T16:17:36.730797+00:00",
+    "log": "/private/tmp/p0-22-lab-repaired-build-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "lab-repaired-lint",
+    "cmd": "npm run lint",
+    "exit": 0,
+    "durationMs": 4060,
+    "startedUtc": "2026-10-14T16:19:33.353936+00:00",
+    "log": "/private/tmp/p0-22-lab-repaired-lint-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "lab-repaired-typecheck",
+    "cmd": "npm run typecheck",
+    "exit": 0,
+    "durationMs": 30996,
+    "startedUtc": "2026-10-14T16:19:33.356874+00:00",
+    "log": "/private/tmp/p0-22-lab-repaired-typecheck-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "lab-repaired-test-types",
+    "cmd": "npm run typecheck:tests",
+    "exit": 0,
+    "durationMs": 41019,
+    "startedUtc": "2026-10-14T16:19:33.351947+00:00",
+    "log": "/private/tmp/p0-22-lab-repaired-test-types-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "final-cli-corpus",
+    "cmd": "pnpm exec vitest run tests/cliResultCommandRegistry.test.ts tests/cliClaimLabels.e2e.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/final-cli-corpus.json",
+    "exit": 1,
+    "durationMs": 148672,
+    "startedUtc": "2026-10-14T16:19:32.079113+00:00",
+    "log": "/private/tmp/p0-22-final-cli-corpus-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "registry-keyword-omission-mutant",
+    "cmd": "pnpm exec vitest run tests/cliResultCommandRegistry.test.ts --config tmp/p0-22-qualification/mutations/registry-coverage-mutation.config.mjs --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/mutations/registry-keyword-omission.json",
+    "exit": 1,
+    "durationMs": 3535,
+    "startedUtc": "2026-10-14T16:34:40.613514+00:00",
+    "log": "/private/tmp/p0-22-registry-keyword-omission-mutant-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "final-restored-registry",
+    "cmd": "pnpm exec vitest run tests/cliResultCommandRegistry.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/mutations/final-restored-registry.json",
+    "exit": 0,
+    "durationMs": 3610,
+    "startedUtc": "2026-10-14T16:38:57.156771+00:00",
+    "log": "/private/tmp/p0-22-final-restored-registry-20261014.log",
+    "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35"
+  },
+  {
+    "name": "final-source-build",
+    "cmd": "npm run build",
+    "exit": 0,
+    "durationMs": 31168,
+    "startedUtc": "2026-10-14T16:50:16.602584+00:00",
+    "log": "/private/tmp/p0-22-final-source-build-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "final-typecheck",
+    "cmd": "npm run typecheck",
+    "exit": 0,
+    "durationMs": 33580,
+    "startedUtc": "2026-10-14T16:51:13.427386+00:00",
+    "log": "/private/tmp/p0-22-final-typecheck-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "final-test-typecheck",
+    "cmd": "npm run typecheck:tests",
+    "exit": 0,
+    "durationMs": 38764,
+    "startedUtc": "2026-10-14T16:51:47.060135+00:00",
+    "log": "/private/tmp/p0-22-final-test-typecheck-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "final-lint",
+    "cmd": "npm run lint",
+    "exit": 0,
+    "durationMs": 3060,
+    "startedUtc": "2026-10-14T16:52:25.881518+00:00",
+    "log": "/private/tmp/p0-22-final-lint-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "final-freeze",
+    "cmd": "npm run check:freeze",
+    "exit": 0,
+    "durationMs": 1285,
+    "startedUtc": "2026-10-14T16:52:28.985592+00:00",
+    "log": "/private/tmp/p0-22-final-freeze-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "final-architecture",
+    "cmd": "npm run check:architecture-boundaries",
+    "exit": 0,
+    "durationMs": 1640,
+    "startedUtc": "2026-10-14T16:52:30.319176+00:00",
+    "log": "/private/tmp/p0-22-final-architecture-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "final-counts",
+    "cmd": "npm run check:counts",
+    "exit": 0,
+    "durationMs": 344,
+    "startedUtc": "2026-10-14T16:52:32.004776+00:00",
+    "log": "/private/tmp/p0-22-final-counts-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "final-docs-drift",
+    "cmd": "npm run check:docs-drift",
+    "exit": 0,
+    "durationMs": 279,
+    "startedUtc": "2026-10-14T16:52:32.394119+00:00",
+    "log": "/private/tmp/p0-22-final-docs-drift-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "final-source-duplicates",
+    "cmd": "npm run check:duplicates",
+    "exit": 1,
+    "durationMs": 1334,
+    "startedUtc": "2026-10-14T16:52:32.718448+00:00",
+    "log": "/private/tmp/p0-22-final-source-duplicates-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "final-source-dead-code",
+    "cmd": "npm run check:dead-code",
+    "exit": 1,
+    "durationMs": 3401,
+    "startedUtc": "2026-10-14T16:52:34.099613+00:00",
+    "log": "/private/tmp/p0-22-final-source-dead-code-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "final-clean-source",
+    "cmd": "npm run check:clean-source",
+    "exit": 0,
+    "durationMs": 54100,
+    "startedUtc": "2026-10-14T16:52:37.548607+00:00",
+    "log": "/private/tmp/p0-22-final-clean-source-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "final-bounded-node22",
+    "cmd": "pnpm exec vitest run tests/cliResultCommandRegistry.test.ts tests/cliClaimLabels.e2e.test.ts tests/fleetScoring.test.ts tests/cognitionLab.test.ts tests/diagnosticReportStatus.test.ts tests/industryPackAudit.test.ts tests/transparencyReport.test.ts tests/assuranceReportProvenance.test.ts tests/executiveBrief.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/benchmarks/benchRunner.test.ts tests/complianceReportReadability.test.ts tests/compliance/complianceMatrix.test.ts tests/dataResidency.test.ts tests/claims/claimEligibility.test.ts tests/claims/claimAdapters.test.ts tests/claims/claimLabels.test.ts tests/domainExampleMode.test.ts tests/selfReportedLevelCap.test.ts tests/complyReportFrameworkSelection.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/final-bounded-node22.json",
+    "exit": 1,
+    "durationMs": 159953,
+    "startedUtc": "2026-10-14T16:51:13.391911+00:00",
+    "log": "/private/tmp/p0-22-final-bounded-node22-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  }
+]

@@ -1,0 +1,198 @@
+{
+  "schema": "p107-unchanged-baseline-review-pins/1",
+  "at": "2026-10-16T17:48:38.964550+00:00",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-regressions/command.json",
+      "bytes": 3042,
+      "sha256": "5f8e4cb32493882af8618a686cca849b5c205bd3e9c6ebaf7bb50850bd37b897"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-regressions/owned-process.json",
+      "bytes": 974,
+      "sha256": "8e52e34a7773a3f38a8f276ea177de53a3bef3b7d2faa29a5bc53f0c7e8aff68"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-regressions/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "399dba2e7564c3a044a9a5dcac643b1e6cb31c90eb93ba884999cec71eccfe7d"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-regressions/raw.json",
+      "bytes": 19928,
+      "sha256": "ba2639884d136f85c5e5b4a0db2b20f76242dc2528100b125d25e79b6738b69a"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-regressions/observer.json",
+      "bytes": 31097,
+      "sha256": "a3a5e399fb08b7ac8092433bc722b6d9819c22c0e74e4e0955607a67757e74c7"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-regressions/stdout-stderr.log",
+      "bytes": 1551,
+      "sha256": "697295cc3c1d61c3db20168b012c99c3cc122e0be082c926939f9a1cf41e8e70"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/unchanged-regressions-outcome.json",
+      "bytes": 1032,
+      "sha256": "95c58fc5ca9fc58931b03db8bc71c2f4f628dc733c0fde044e4a4b4e38f1aa89"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p107-unchanged-regressions.raw.json",
+      "bytes": 19928,
+      "sha256": "ba2639884d136f85c5e5b4a0db2b20f76242dc2528100b125d25e79b6738b69a"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-methodology-diagnostic/command.json",
+      "bytes": 3092,
+      "sha256": "8adf6fc7581a4fd4c5f57fe14dc10ad2b5ec969ecbf9a09c89cbdb86c4f6f656"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-methodology-diagnostic/owned-process.json",
+      "bytes": 968,
+      "sha256": "a2762c486dc8cfd4a88a5cae22a99f6757126e1333dc6a24ac3aa13a4e88e60b"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-methodology-diagnostic/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "c1f75a711d5566b94cde82140dad5072e4f0d6c8c196674d6efdea5cc843ef21"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-methodology-diagnostic/raw.json",
+      "bytes": 9541,
+      "sha256": "4f7464de623a05b6400f761d307d04cb43c19eef0cd2e3d15e1fb16d3a92367d"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-methodology-diagnostic/observer.json",
+      "bytes": 15319,
+      "sha256": "ac5e9fc937f28247a00f3055c3fcafa1d0351fb9f188cea6c510c890774ec6cb"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-methodology-diagnostic/stdout-stderr.log",
+      "bytes": 613,
+      "sha256": "3d1300888f62b70566b4778a9962ecc745ad3d97ce14cf99656ab9a857e7700f"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/unchanged-methodology-diagnostic-outcome.json",
+      "bytes": 1148,
+      "sha256": "56c0ff02a9a70c93bfb4c437aa6817576a468221185b30c17832fac0b18bd9cf"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p107-unchanged-methodology-diagnostic.raw.json",
+      "bytes": 9541,
+      "sha256": "4f7464de623a05b6400f761d307d04cb43c19eef0cd2e3d15e1fb16d3a92367d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/antiGaming.test.ts",
+      "bytes": 10023,
+      "sha256": "c5e70a5f43aa752951fea0986fd968dc9478d988db515a7ca7f9edd17eb9f7b0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/evidenceGatingCorrection.test.ts",
+      "bytes": 9177,
+      "sha256": "a011916db822f3cbcd46139655c9cfe180a881edb966d2c944e30c21c25cfa7d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/liveEvidenceProjection.test.ts",
+      "bytes": 13578,
+      "sha256": "55add524d7bf97f8df043f6e5a5f48d8ee004521c2137070fbdd839b9fd9bb99"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/questionBank.test.ts",
+      "bytes": 1661,
+      "sha256": "819e864bb0a79353b8fb2999fccf1aa10d4e172a42e3ec0d3fd9022d67b997bc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/spineEvidenceProjection.test.ts",
+      "bytes": 7475,
+      "sha256": "ae4e3281620d152a4772a0fa0f5957dfef00a4708bd1ab568e6a1102406d9341"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/publicMethodology.test.ts",
+      "bytes": 302816,
+      "sha256": "36db4752041de97fa101f8e0fe288fa0f9c46936ee9133623bbbf064a718fa5c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/fullDiagnostic.test.ts",
+      "bytes": 5484,
+      "sha256": "15bed1ffe67d087ef5f759ddf5a6fa7508f24b0c3509fd4f750ff3bbd8dba2e6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/quickscoreShare.test.ts",
+      "bytes": 3706,
+      "sha256": "f4396be455b91123f7686f265b8a841691344ad2e41bfc2c7a078016a00b7e36"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/traceEvidenceMapper.test.ts",
+      "bytes": 3554,
+      "sha256": "86837363e0330d4e67ad9e424b945326a6786cb251d9386d4d6a0217f93e73e3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/branch-preparation.json",
+      "bytes": 300,
+      "sha256": "5923bb45776d29cd2670b0179725c3f6323f3db5fad5339017b7fd6c7720172b"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/root-pre-admission.json",
+      "bytes": 11039,
+      "sha256": "af7af383d9b9e0d29d66dc4024056736b9d583b51286fb4de7d8c53f1ba262f4"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/unchanged-baseline-review/review.json",
+      "bytes": 15693,
+      "sha256": "8fb14b32e04884f63a0555c91d4bfe1465cc3db56df6d0097f45d9ae34fe55be"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/unchanged-baseline-review/README.md",
+      "bytes": 1955,
+      "sha256": "430118f8a0f272afc4234ec8a0a354bb919f8f2f9feee3853a571efeb0fe9e51"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/unchanged-baseline-review/identity-joins.json",
+      "bytes": 33363,
+      "sha256": "fa9f47183a5647b9fe010de1d752c4b831c48d01a47fc37b02351fe52fab17cf"
+    }
+  ]
+}

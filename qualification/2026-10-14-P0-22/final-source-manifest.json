@@ -1,0 +1,171 @@
+{
+  "base": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "files": {
+    "CONTRIBUTING.md": {
+      "sha256": "262f9a0607ffffc27c45037699484a287e1eb5c3e447eca6b3039e4dcdf95b96",
+      "lines": 485
+    },
+    "README.md": {
+      "sha256": "a0716c2a2c0f64555dfe2f91b23aca2e0f14c053abcb8b84daad65eb63b49d91",
+      "lines": 941
+    },
+    "docs/content/reddit-launch-drafts.md": {
+      "sha256": "bf756511de38a01dc6f846e5914763b2b89ccd1ef9a19976e3f8d2a48459d842",
+      "lines": 52
+    },
+    "docs/content/show-hn-draft.md": {
+      "sha256": "a22fb8736a3f2b6589254eb1055b940d08de06bef0b90c09f39bb7388efd9f3a",
+      "lines": 35
+    },
+    "docs/internal/competitive-landscape.md": {
+      "sha256": "89334fbb723e3a9741a0a07919549d40a1d65ce3bae716d791db9676ca4679e4",
+      "lines": 71
+    },
+    "docs/internal/mirofish-simulation-council.md": {
+      "sha256": "96e6fa70098b554951daf2a01242b6628684e1f55717da75c7f0a35d8688e3b2",
+      "lines": 32
+    },
+    "src/fleet/fleetScoring.ts": {
+      "sha256": "d3cd518d67098de05da446c5c9faa22eea664c4cf2e70e00ae3ef8fe8260b602",
+      "lines": 799
+    },
+    "src/lab/cognitionLab.ts": {
+      "sha256": "bac7c0f67bb68790c17de866252ac4089e173f5e59fb67fe2397530cd6d9e984",
+      "lines": 721
+    },
+    "tests/assuranceReportProvenance.test.ts": {
+      "sha256": "8554f630256d7d24ef595ab908c5d850c71833dafa8b41541c143617c799c834",
+      "lines": 186
+    },
+    "tests/benchmarks/benchRunner.test.ts": {
+      "sha256": "a7b4004ad2d1ad3e74ebb98495874b1b9fec8e519a57afed47bdc80139053bed",
+      "lines": 154
+    },
+    "tests/cognitionLab.test.ts": {
+      "sha256": "a1ec43219d2175d0bbbdd58cacf17a75d448ff758f16a2039ec0761138be7a54",
+      "lines": 577
+    },
+    "tests/compliance/complianceMatrix.test.ts": {
+      "sha256": "d960de084c1fc9de424b03dbd6bbf8cb90e65e69eb91436154c5f0b49a403e74",
+      "lines": 226
+    },
+    "tests/complianceReportReadability.test.ts": {
+      "sha256": "c6da723a87542a0c70e07d477c62d3aec332f09d27e6b0e45851ae0f1f2971da",
+      "lines": 138
+    },
+    "tests/dataResidency.test.ts": {
+      "sha256": "30ef3fa8cb20921b03965332e3d5349e9a88325311ddd6e6c87ab0168f0ce410",
+      "lines": 405
+    },
+    "tests/diagnosticReportStatus.test.ts": {
+      "sha256": "4655042f5e76b46270e22c0b72f75f03d2f938d68c9f538b179775e600ebe099",
+      "lines": 132
+    },
+    "tests/executiveBrief.test.ts": {
+      "sha256": "a8ec0c1a95328ce2d0c2fd4adb14144ed4cf0db2ec3f8978fbdd9a2f264c4f9b",
+      "lines": 166
+    },
+    "tests/fleetScoring.test.ts": {
+      "sha256": "2aa8c769ff733061ca4cf21e93945bbe2ba6062463ffcc44c42b5c4a3f20b5af",
+      "lines": 282
+    },
+    "tests/industryPackAudit.test.ts": {
+      "sha256": "beeb9caa35b55ae2543764cb77bc02506608767be77b607a67b4736c3a8784f6",
+      "lines": 147
+    },
+    "tests/noCertificationFromSelfAssessment.test.ts": {
+      "sha256": "bd0e41ec108a46bb00414ad74c20b525ae0136b123c1896e28bc058b62c3e102",
+      "lines": 155
+    },
+    "tests/transparencyReport.test.ts": {
+      "sha256": "5905d72f1f4a446c62c9ad910111a05b2789cb64350052d455a1de8b050bdd3c",
+      "lines": 331
+    },
+    "website/i18n.js": {
+      "sha256": "9fc459ff29bb1e370befcb9907e776cf4846d38af665fd2b42e4a34a724f6cef",
+      "lines": 568
+    },
+    "website/index.html": {
+      "sha256": "5853b725ff1e48de06cba910fc250ce154aaedc84b428c2dac0e554884e94862",
+      "lines": 461
+    },
+    "website/lite.html": {
+      "sha256": "59d156c0a63c362e7176455b6d9c6e5e2e06bb7e1215e356fa7b5ea9c80fd06e",
+      "lines": 195
+    },
+    "whitepaper/AMC_WHITEPAPER_v1.md": {
+      "sha256": "9cbe10ebb6445e7f99e97c265eaa9f0e6aec5cda7ceb7ad77f1d3e79140b7a76",
+      "lines": 1216
+    },
+    ".changeset/p0-22-fleet-legacy-claims.md": {
+      "sha256": "527d8e1f2feeec4ceecc28abf5a6b608204280622510d768f72ce64f8ffeec33",
+      "lines": 7
+    },
+    "tests/cliClaimLabels.e2e.test.ts": {
+      "sha256": "b97c8895ddc35398d174a42433d7dee40f75beff2ca4bfcc5fe600d43681b11e",
+      "lines": 417
+    },
+    "tests/cliResultCommandRegistry.test.ts": {
+      "sha256": "14abd483305604753d06fb83378726ef42185ae6b0abe709735d040f1bfeb956",
+      "lines": 193
+    },
+    "tests/__snapshots__/assuranceReportProvenance.test.ts.snap": {
+      "sha256": "ca097374c93e4dd4b841f6139d5f9ff0d5e112762d8604ba88ac68458000cf9e",
+      "lines": 19
+    },
+    "tests/__snapshots__/complianceReportReadability.test.ts.snap": {
+      "sha256": "91fe71d25414d03e25c87b26788bc05ac3b0dd2b6ae6648aaa0df4924be58680",
+      "lines": 9
+    },
+    "tests/__snapshots__/dataResidency.test.ts.snap": {
+      "sha256": "0d4154445e51cafe6bf498a591a107ef49e2ad79c6f3bd0a1022c39c2bc2d3f1",
+      "lines": 5
+    },
+    "tests/__snapshots__/diagnosticReportStatus.test.ts.snap": {
+      "sha256": "542f3516e01e43d1c95ebdf3f4e23cdfb26fcc69846668eb0d35ff2ead941147",
+      "lines": 7
+    },
+    "tests/__snapshots__/executiveBrief.test.ts.snap": {
+      "sha256": "1bce7bf464aff5b1c145a942c03326c33c08ede1e0c5721c8c9fe8b672bb54c1",
+      "lines": 9
+    },
+    "tests/__snapshots__/fleetScoring.test.ts.snap": {
+      "sha256": "f098fda312718787d85f8b802eede5dc425d3fbb5637c63aedab4511bb604756",
+      "lines": 31
+    },
+    "tests/__snapshots__/industryPackAudit.test.ts.snap": {
+      "sha256": "e7ffd9fd7ecb9e1cd71b1c1427f0f9b0ab3205376c389479146883e504471fd9",
+      "lines": 45
+    },
+    "tests/__snapshots__/noCertificationFromSelfAssessment.test.ts.snap": {
+      "sha256": "ca5723141f633590744c4a9fa9c3c6f93af89cfa720e236fbf23dfce58763fac",
+      "lines": 8
+    },
+    "tests/__snapshots__/transparencyReport.test.ts.snap": {
+      "sha256": "92703544cbc8217c0bed9128e213112164ab933ee7951945007e5493cdcfac9a",
+      "lines": 5
+    },
+    "tests/benchmarks/__snapshots__/benchRunner.test.ts.snap": {
+      "sha256": "6effe656d64e566325f478d05399fa99b483c6e2beb9533629052852e13ceee6",
+      "lines": 23
+    },
+    "tests/compliance/__snapshots__/complianceMatrix.test.ts.snap": {
+      "sha256": "e9f05b8846294e233a29b03cb29474a1d5664c22d656f5221a7ad94226020b22",
+      "lines": 9
+    }
+  },
+  "protectedEqualAcceptedMain": {
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+    "src/repl/replParser.ts": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+    "scripts/line-budgets.json": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+    "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "scripts/release-gate.mjs": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+    "scripts/quality/coverage-baseline.json": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da"
+  },
+  "status": "source candidate; empty-array literal contract remains unresolved by user direction",
+  "lineCountConvention": "files map uses splitlines; architecture ratchet uses split(newline), including trailing empty segment"
+}

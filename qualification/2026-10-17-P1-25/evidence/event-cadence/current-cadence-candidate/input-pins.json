@@ -1,0 +1,186 @@
+{
+  "schema": "p125-next-event-cadence-input-pins/1",
+  "at": "2026-10-17T00:25:26.230525+00:00",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-routing/routing-v2.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-routing/routing-v2.json",
+      "bytes": 11818,
+      "sha256": "9a0a1774cfcf6bf320bd56441369717178183eb6e70c232dd9f1ee70b992caed",
+      "dev": 16777231,
+      "inode": 543748167,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-routing/seal-v2.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-routing/seal-v2.json",
+      "bytes": 2242,
+      "sha256": "9f5aabc0615374b9d768feb45993989afd3130db81c47734e92e0977afdc3d36",
+      "dev": 16777231,
+      "inode": 543748168,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-routing/README.md",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-routing/README.md",
+      "bytes": 3500,
+      "sha256": "f57602646d1d6abd1af037c0d41c5cff097596a24983ea00c91d291044394284",
+      "dev": 16777231,
+      "inode": 543748122,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-routing/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-routing/input-pins.json",
+      "bytes": 7464,
+      "sha256": "c1c5ba4eaf176de378f1a7c9335f54da29d52e4bcbc6cab1a136b85e3981828c",
+      "dev": 16777231,
+      "inode": 543748121,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-checkpoint.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-checkpoint.json",
+      "bytes": 530,
+      "sha256": "fc272296ef0059e6f9c3f766a1d4c1dd6ddc9c5a8def9678672bb0317fcc38d5",
+      "dev": 16777231,
+      "inode": 543750215,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "bytes": 34549,
+      "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+      "dev": 16777231,
+      "inode": 543658576,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+      "bytes": 25255,
+      "sha256": "72cff741f404bf83e49816be2141dad55042f037bf086b165381e344d47dddf1",
+      "dev": 16777231,
+      "inode": 543658575,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+      "bytes": 2964,
+      "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca",
+      "dev": 16777231,
+      "inode": 543583997,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "bytes": 21005,
+      "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+      "dev": 16777231,
+      "inode": 542461050,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+      "bytes": 10927,
+      "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "dev": 16777231,
+      "inode": 542461053,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+      "bytes": 7037,
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "dev": 16777231,
+      "inode": 542461149,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/credentials/credentialsPaths.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/credentials/credentialsPaths.ts",
+      "bytes": 4710,
+      "sha256": "e7eab84d9be8fc7018e80c1d3831702accfa112c7582a70a2a3109694bc575c0",
+      "dev": 16777231,
+      "inode": 542459661,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/anchors/anchor.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/anchors/anchor.ts",
+      "bytes": 11596,
+      "sha256": "40ff44361f223e7e6451e8e4882963c8be115899c1ab43d752d4e8de95c21aa8",
+      "dev": 16777231,
+      "inode": 542461117,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustFixtures.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustFixtures.ts",
+      "bytes": 2312,
+      "sha256": "da8626dc36baf6756414f921450228cf780327e6dd24793a2e35c1de16fdb61d",
+      "dev": 16777231,
+      "inode": 542463301,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/clean-source-check.mjs",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/clean-source-check.mjs",
+      "bytes": 7910,
+      "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b",
+      "dev": 16777231,
+      "inode": 542458545,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/workspace.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/workspace.ts",
+      "bytes": 27587,
+      "sha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "dev": 16777231,
+      "inode": 542461302,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/config/amcConfigSignature.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/config/amcConfigSignature.ts",
+      "bytes": 2665,
+      "sha256": "4ca0ad0b0395fbc289e0df2d1d3aeaace287d9dace5183f5728db32b10c5b4fb",
+      "dev": 16777231,
+      "inode": 542459448,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/types.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/types.ts",
+      "bytes": 124482,
+      "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+      "dev": 16777231,
+      "inode": 542461161,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-25.md",
+      "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-25.md",
+      "bytes": 12911,
+      "sha256": "db346645bc6ac0b783f22bbba50cb07b36e74832507218e4a2488a6d8b68f279",
+      "dev": 16777231,
+      "inode": 473795983,
+      "nlink": 1
+    }
+  ],
+  "sourceReadBoundaries": {
+    "checkpointFixtureAndTsaHelperAndExistingTestBodies": "Full source/delta read, not execution.",
+    "checkpointTsaTrustHomeFlow": "Full checkpoint/tsaClient/trustContext/credentialsPaths functions read.",
+    "anchor.ts": "Scoped loader/defaults source plus full-file hash only.",
+    "workspace.ts": "Scoped actual config load/save/export/initialization callers plus full-file hash only.",
+    "types.ts": "Scoped time unknown type source plus full-file hash only.",
+    "spec": "Checkpoint/client/trust/fixture acceptance section read; no complete issue closure claimed."
+  },
+  "noPrivateRootsKeysUnknownStreamsRead": true
+}

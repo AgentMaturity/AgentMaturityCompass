@@ -1,0 +1,95 @@
+{
+  "phase": "p125c-unchanged-verifier",
+  "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "tests": {
+    "total": 17,
+    "passed": 17,
+    "failed": 0,
+    "skipped": 0
+  },
+  "hookTaskEntries": 1,
+  "individualHookValues": 2,
+  "orderedIdentities": [
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "verifies the granted response and returns its exact signed CMS token bytes"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a different expected digest for the unchanged genuine signed token"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a different expected nonce for the unchanged genuine signed token"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses the independently located signed-attribute corruption"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses the genuine token under a different real root with the same permitted policy"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a policy excluded by the correctly pinned real root"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a genuinely signed TSA certificate without an EKU extension"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a genuinely signed TSA certificate with noncritical timestamping EKU"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a genuinely signed TSA certificate expired at the fixed signed genTime"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses explicit rejection status before requiring a timestamp token"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a truncated copy of the genuine token"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses 65537 bytes at the token size boundary before DER parsing"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "keeps claimed time separate from the genuine attested upper bound"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "keeps an artifact without a timestamp at claimed time"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "reports an untrusted TSA as a warning while the artifact time stays claimed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "reports a broken supplied token as an artifact integrity error"
+    ]
+  ],
+  "taskErrors": [],
+  "rawObserverOrderedJoin": true,
+  "unhandledErrors": [],
+  "lateDiagnostics": [],
+  "command": {
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/time/verifyTimestamp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p125c-unchanged-verifier.raw.json",
+    "exit": 0,
+    "durationMs": 648
+  },
+  "groupAbsentByESRCH": true,
+  "signalsOtherThanZeroSent": false,
+  "publicEvidencePaths": [],
+  "reuseBoundary": "Read-only import of the pinned existing ordered raw/observer/hook/late-error audit; only the finite cohort is selected here. No test execution or evidence rewriting."
+}

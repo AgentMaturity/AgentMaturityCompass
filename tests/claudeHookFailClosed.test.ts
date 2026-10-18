@@ -2,7 +2,8 @@ import { spawn } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { createServer, type RequestListener, type Server } from "node:http";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { boundedFetchSignal, forwardDeadlineMs, HOOK_FORWARD_DEADLINE_MS, HookDeadlineError, withHookDeadline } from "../src/adapters/hookDeadline.js";
 import { installHookIntegration, type HookProvider } from "../src/adapters/hookIntegration.js";
@@ -16,7 +17,7 @@ import { defaultActionPolicy, initActionPolicy } from "../src/governor/actionPol
 import type { DiagnosticReport } from "../src/types.js";
 import { initWorkspace } from "../src/workspace.js";
 
-const cliPath = resolve(process.cwd(), "dist/cli.js");
+const cliPath = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
 const PASSPHRASE = "claude-hook-fail-closed-passphrase";
 const roots: string[] = [];
 const closers: Array<() => Promise<void>> = [];

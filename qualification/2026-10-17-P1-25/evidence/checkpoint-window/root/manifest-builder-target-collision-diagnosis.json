@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-16T23:50:54.315932+00:00",
+  "failedOperation": "Private manifest preparation, before output manifest or selection exists",
+  "cause": "Active .py copy and inert .py.source.txt copy normalize to the same artifact destination. Duplicate-destination assertion correctly refused.",
+  "correction": "Keep actual executable-source copies in a distinct code/ namespace; all copies still end .source.txt. Inert source and plaintext guard checks unchanged.",
+  "noAssemblerProductSourceIndexQaExecutionOrWrites": true,
+  "originalBuilderRetained": "build-assembly-manifest-v1.py",
+  "noGuardOrInputEvidenceWeakened": true
+}

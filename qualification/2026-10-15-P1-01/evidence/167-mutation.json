@@ -1,0 +1,7 @@
+{
+  "path": "src/contracts/v1/receipt.ts",
+  "anchorCount": 1,
+  "beforeSha256": "16c5ecce46d99e465923c7cde3eea81defc3375ccd417877b34ba4073e722e20",
+  "afterSha256": "29984f4a1d35052ee3f7df3bc8b4f937da09d6083632b4117cd2dd4eb3a6b770",
+  "scope": "Only requested/authorized/started/outcome_unknown top-level receipt branch accepts and strips unknown fields. Separate from the compile-blocked literal passthrough control."
+}

@@ -1,0 +1,271 @@
+{
+  "source": "d8e5168556aeea8e8c12cbc67848839824edbb48",
+  "counts": {
+    "numTotalTests": 822,
+    "numPassedTests": 789,
+    "numFailedTests": 33,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "numFailedTestSuites": 6,
+    "numPendingTestSuites": 0,
+    "success": false
+  },
+  "files": 24,
+  "failures": [
+    {
+      "file": "portableVerifierCliQualification.test.ts",
+      "case": "Portable CLI Industry Packs license key-compromise revocation beats a matching explicit license pin and both allow flags",
+      "failureMessages": [
+        "AssertionError: expected +0 to be 1 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:392:42\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierCliQualification.test.ts",
+      "case": "Portable CLI external-evidence profile signed revoked authority refuses even with the independent authority file",
+      "failureMessages": [
+        "AssertionError: expected +0 to be 1 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:430:42\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierCliQualification.test.ts",
+      "case": "Portable CLI detached session proof matching fingerprint cannot bypass operator revoked decision",
+      "failureMessages": [
+        "AssertionError: expected +0 to be 1 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:460:42\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'pubkey'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'pubkey'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'pubkeyPath'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'pubkeyPath'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'pubkeyPemFile'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'pubkeyPemFile'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'publicKey'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'publicKey'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'publicKeyPath'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'publicKeyPath'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'publicKeyPem'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'publicKeyPem'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'trust'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'trust'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'trustList'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'trustList'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'trustLists'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'trustLists'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'trustRoot'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'trustRoot'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'trustRoots'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'trustRoots'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'allowUnpinned'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'allowUnpinned'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'allowUnanchored'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'allowUnanchored'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'expectMonitor'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'expectMonitor'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'expectedMonitorFingerprint'=false",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "portableVerifierServerQualification.test.ts",
+      "case": "actual portable-verifier API trust admission formal refuses request field 'expectedMonitorFingerprint'=null",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts:126:29\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "rawReportSha256": "ae6e1cecde9a2da53094d563b1118899692b9ae23eae1f1543a9386bd9a4adf6",
+  "components": {
+    "portableCli": {
+      "total": 84,
+      "passed": 81,
+      "failed": 3
+    },
+    "portableLicensePure": {
+      "total": 21,
+      "passed": 21,
+      "failed": 0
+    },
+    "exportDestinations": {
+      "total": 6,
+      "passed": 6,
+      "failed": 0
+    },
+    "serverNative": {
+      "total": 97,
+      "passed": 67,
+      "failed": 30
+    }
+  },
+  "fullAcceptance": "Bounded unresolved; not Done/full CI/coverage/release. Historical P0-22 two empty arrays and P0-23 seven held failures remain active, but are not counted in this selected P0-51 corpus."
+}

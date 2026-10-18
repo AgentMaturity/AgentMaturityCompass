@@ -1,0 +1,43 @@
+{
+  "kind": "literal-mutation-compile-refusal",
+  "utc": "2026-10-15T08:35:57.370236+00:00",
+  "index": {
+    "path": "/private/tmp/p1-01-literal-control-failed-artifact-index-20261015.json",
+    "bytes": 3341530,
+    "sha256": "cf225683857de5dd6a47578dab5b8173b0f638c09bc6928e65cdbaf60c9b985d"
+  },
+  "failure": "src/actions/actionJournal.ts(202,92): error TS2339: Property fromReceiptId does not exist on type {}.",
+  "compilerExit": 2,
+  "negativeChecksExecuted": false,
+  "restorationExecuted": false,
+  "mutationKill": false,
+  "changedManifestPaths": [
+    {
+      "path": "src/contracts/v1/receipt.ts",
+      "currentSha256": "e04ba8153eb7035f7b6273875b39463863c34ec6ed0c4a13ad811354d2bd8864",
+      "originalSha256": "16c5ecce46d99e465923c7cde3eea81defc3375ccd417877b34ba4073e722e20"
+    },
+    {
+      "path": "dist/contracts/index.d.ts",
+      "currentSha256": "3b048b7808ea2d18abb179e0e75914a67876fbbdf7e8110dcf49a0be7e5e0879",
+      "originalSha256": "9ec99a93dfea586e22bb865c684a839a5e4b1724e6187a5e15f2cfcb713f49da"
+    },
+    {
+      "path": "dist/contracts/v1/receipt.d.ts",
+      "currentSha256": "f3ad039bcdeec114bc8092c1e5915c674c5750ccd8853842240950bc6f71d199",
+      "originalSha256": "5ac497c7aff4dd658a34c2aa92c7e28f0910e5172730bb40e8fefc114cb9133a"
+    },
+    {
+      "path": "dist/contracts/v1/receipt.js",
+      "currentSha256": "43613de77b45167705d23e6d83807c3259250391a3ff31bbaeb4717d19d0c4c5",
+      "originalSha256": "5312f76c1a911eed1cda044deed98ebfcf75fee1aa861fe1ef67c368fb2d4975"
+    },
+    {
+      "path": "dist/kernel/amcRuntime.js",
+      "currentSha256": "7960e3a179f94a8ed511eb24176d49da67e8e162919e71878b4cc14c514e14d1",
+      "originalSha256": "501cb8767e687f8b029ae872ab9583c115de89f4224a848bb0ca49d2a7a4d726"
+    }
+  ],
+  "sourceConsumerEditOrTypeCast": false,
+  "next": "Distinct type-correct accepting-and-stripping guard control in a new namespace; literal mutation acceptance remains open."
+}

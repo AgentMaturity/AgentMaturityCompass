@@ -1,0 +1,564 @@
+{
+  "schemaVersion": 1,
+  "reviewedAtUtc": "2026-10-14T23:03:36.122101+00:00",
+  "scope": "Independent read-only review of final P0-18 importer/seeder C receipt, retained actual results, assertions, effects, chronology, manifests and source/runtime pins. Only this private review pair is written. No product import, native load, rerun, build, install, runtime, source, fixture, archive or canonical change.",
+  "result": "no actionable findings within bounded receipt scope",
+  "findings": [],
+  "receiptPins": [
+    {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015.json",
+      "bytes": 17490,
+      "sha256": "275caa19bf9c8293d2b3db688959ad4835995d337803a88a72a4858c867771ed"
+    },
+    {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015.md",
+      "bytes": 3784,
+      "sha256": "8216349f833f4baf09898f34906c18d2a2de2da01d8604de4609a74c70212b77"
+    }
+  ],
+  "measuredSource": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+  "artifactChecks": {
+    "privateIndex": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/private-artifact-index.json",
+      "bytes": 115196,
+      "sha256": "f74a40d1b996da4f4df10593cac5eb7a78e58bef7e736dd01abfb7cf2bd61e56"
+    },
+    "entries": 388,
+    "uniquePaths": 388,
+    "allSizesAndHashesIndependentlyVerified": true,
+    "directReceiptReferencesRehashed": 36,
+    "directCountIsSeparateAndOverlapsPrivateIndex": true,
+    "appendableJournalExcluded": true,
+    "sourceKeysDatabaseBodiesReferencedOnly": true
+  },
+  "originalCorpus": {
+    "files": [
+      "tests/evalImportTrust.test.ts",
+      "tests/evalImportersInterop.test.ts",
+      "tests/dogfoodMaturityEvidence.test.ts",
+      "tests/externalEvidenceProfile.test.ts",
+      "tests/externalEvidenceExport.test.ts"
+    ],
+    "registered": 59,
+    "baselinePassed": 59,
+    "rawCorpusRunsReviewed": 13,
+    "same59CaseNamesEveryRun": true,
+    "same59TestAssertionsInputsAndFixtureRecipesVerified": true,
+    "caseNames": [
+      "dogfood maturity evidence labels every seeded event synthetic_example and SELF_REPORTED",
+      "dogfood maturity evidence refuses from an installed package even with AMC_DEV_DOGFOOD=1",
+      "dogfood maturity evidence refuses to seed without AMC_DEV_DOGFOOD=1",
+      "dogfood maturity evidence seeded evidence never raises a diagnostic level",
+      "eval import time policy a case one hour in the future is refused, naming the case",
+      "eval import time policy a case three days old is refused without --historical",
+      "eval import time policy a recent case is accepted and still written at recorded time",
+      "eval import time policy with --historical a three-day-old case is stored at recorded time and keeps its claimed time",
+      "eval import trust tier amc eval import --trust-tier OBSERVED exits 2 with the removal message and writes nothing",
+      "eval import trust tier deepeval imports SELF_REPORTED",
+      "eval import trust tier langfuse imports SELF_REPORTED",
+      "eval import trust tier langsmith imports SELF_REPORTED",
+      "eval import trust tier langwatch imports SELF_REPORTED",
+      "eval import trust tier openai imports SELF_REPORTED",
+      "eval import trust tier promptfoo imports SELF_REPORTED",
+      "eval import trust tier wandb imports SELF_REPORTED",
+      "external evidence profile a signing key cannot promote imports or self-admit",
+      "external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import",
+      "external evidence profile an internally valid unsigned import remains self-reported with unknown timing and unverified parent",
+      "external evidence profile future fields/versions and duplicate tool settlements refuse",
+      "external evidence profile governed observation requires the admitted signature and original/digest mismatches refuse",
+      "external evidence profile independent authority is scoped to producer and capture method",
+      "external evidence profile rejects corrupt calendar without accepting a trust claim",
+      "external evidence profile rejects corrupt digest without accepting a trust claim",
+      "external evidence profile rejects corrupt duration without accepting a trust claim",
+      "external evidence profile rejects corrupt id without accepting a trust claim",
+      "external evidence profile rejects corrupt parent without accepting a trust claim",
+      "external evidence profile rejects corrupt tool without accepting a trust claim",
+      "external evidence profile rejects corrupt unicode without accepting a trust claim",
+      "external evidence profile semantic identity survives a different receipt time but signatures bind the receipt time",
+      "external evidence profile the verifier never raises a producer's own lower declaration",
+      "format parsing and importer dispatch parseEvalImport dispatches LangWatch importer",
+      "format parsing and importer dispatch parseEvalImport dispatches Langfuse importer",
+      "format parsing and importer dispatch parseEvalImport dispatches W&B importer",
+      "format parsing and importer dispatch parseEvalImportFormat accepts wandb, langfuse, and langwatch",
+      "format parsing and importer dispatch parseEvalImportFormat rejects unknown formats",
+      "framework-specific eval mapping DeepEval parser adds confidence calibration evidence metadata and questions",
+      "framework-specific eval mapping DeepEval parser maps faithfulness metrics to honesty/truth questions",
+      "framework-specific eval mapping LangSmith parser maps correctness metrics to verified-outcome AMC questions",
+      "framework-specific eval mapping LangSmith parser maps jailbreak signals to OWASP prompt-injection question",
+      "framework-specific eval mapping LangWatch parser maps eval runs, guardrails, datasets, and trace metrics to AMC questions",
+      "framework-specific eval mapping Langfuse parser maps traces to AMC observability questions",
+      "framework-specific eval mapping OpenAI eval parser maps policy tests to behavioral contract questions",
+      "framework-specific eval mapping OpenAI eval parser maps truth/hallucination to honesty questions",
+      "framework-specific eval mapping Promptfoo parser maps EchoLeak/CVE context leakage signals to AMC-5.18",
+      "framework-specific eval mapping Promptfoo parser maps Garak scanner signals to AMC-5.19",
+      "framework-specific eval mapping Promptfoo parser maps model extraction risks to OWASP LLM10",
+      "framework-specific eval mapping Promptfoo parser maps prompt-injection red-team results to OWASP LLM01",
+      "framework-specific eval mapping W&B parser maps latency and cost metrics to performance AMC questions",
+      "imported evidence quality and status dashboard evalImportCoverageStatus agent filter isolates per-agent imports",
+      "imported evidence quality and status dashboard evalImportCoverageStatus reports dimension and framework coverage",
+      "imported evidence quality and status dashboard importEvalResults emits DeepEval confidence calibration metric evidence",
+      "imported evidence quality and status dashboard importEvalResults writes signed metric and failure audit evidence as SELF_REPORTED (P0-18)",
+      "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+      "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+      "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+      "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+      "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+      "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable"
+    ],
+    "privateCopiesDifferOnlyBySrcToDistImportPrefixes": true,
+    "guardWorkspacePrefixOnly": true,
+    "otherTwoGuardsAndVitestConfigByteExact": true,
+    "packageLockWorkspaceConfigByteExact": true,
+    "originalCleanupDeadlinesAndInputsUnchanged": true,
+    "notDistinctCaseSumAcrossRuns": true
+  },
+  "rawPhases": [
+    {
+      "phase": "S7-M11-baseline",
+      "raw": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/S7-M11-baseline/raw-tests.json",
+        "bytes": 20360,
+        "sha256": "0382fd687a864901414a01cebd3e7f3d84d5953c39d5f0b17d8073a36200fdd3"
+      },
+      "total": 59,
+      "passed": 59,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "success": true,
+      "failedCases": []
+    },
+    {
+      "phase": "S7-M11-mutant",
+      "raw": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/S7-M11-mutant/raw-tests.json",
+        "bytes": 21852,
+        "sha256": "d5235d23ec2a46128975858223de3027562b43fe2050da67656fccc59d99e68c"
+      },
+      "total": 59,
+      "passed": 58,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "success": false,
+      "failedCases": [
+        {
+          "name": "external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import",
+          "firstMessage": "AssertionError: expected { ok: true, errors: [], \u2026(4) } to match object { ok: false, \u2026(3) }"
+        }
+      ]
+    },
+    {
+      "phase": "S7-M11-restored",
+      "raw": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/S7-M11-restored/raw-tests.json",
+        "bytes": 20370,
+        "sha256": "d0d66888a38e1b50b53a8103389346b9b66064a6bdadf54e899979877ba5adba"
+      },
+      "total": 59,
+      "passed": 59,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "success": true,
+      "failedCases": []
+    },
+    {
+      "phase": "S7-M12-baseline",
+      "raw": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/S7-M12-baseline/raw-tests.json",
+        "bytes": 20356,
+        "sha256": "a17327a16cd55a8b99addad76e2e405742f10a8f2977db9975118af905b2ce5d"
+      },
+      "total": 59,
+      "passed": 59,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "success": true,
+      "failedCases": []
+    },
+    {
+      "phase": "S7-M12-mutant",
+      "raw": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/S7-M12-mutant/raw-tests.json",
+        "bytes": 21857,
+        "sha256": "33b2c25aa0909392b6ab87c8c4be1662c38bd0da6404e7766d204359045667bf"
+      },
+      "total": 59,
+      "passed": 58,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "success": false,
+      "failedCases": [
+        {
+          "name": "external evidence profile the verifier never raises a producer's own lower declaration",
+          "firstMessage": "AssertionError: expected { ok: true, errors: [], \u2026(4) } to match object { ok: true, \u2026(2) }"
+        }
+      ]
+    },
+    {
+      "phase": "S7-M12-restored",
+      "raw": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/S7-M12-restored/raw-tests.json",
+        "bytes": 20366,
+        "sha256": "6c90862a10da9bfb9cf3e00d6562124db277438ce53fb50ba977b32141424065"
+      },
+      "total": 59,
+      "passed": 59,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "success": true,
+      "failedCases": []
+    },
+    {
+      "phase": "eval-tier-baseline",
+      "raw": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/eval-tier-baseline/raw-tests.json",
+        "bytes": 20399,
+        "sha256": "b2c85228dfb1e0c3584e05c70441b881da061c37f96aa86ad340fe3f1284acc1"
+      },
+      "total": 59,
+      "passed": 59,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "success": true,
+      "failedCases": []
+    },
+    {
+      "phase": "eval-tier-mutant",
+      "raw": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/eval-tier-mutant/raw-tests.json",
+        "bytes": 38625,
+        "sha256": "60413f3926cd785e9eeee1dfc0728e0e90dc6f85a61b40f0b56db903b9c20993"
+      },
+      "total": 59,
+      "passed": 46,
+      "failed": 13,
+      "pending": 0,
+      "todo": 0,
+      "success": false,
+      "failedCases": [
+        {
+          "name": "eval import trust tier openai imports SELF_REPORTED",
+          "firstMessage": "Error: trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)"
+        },
+        {
+          "name": "eval import trust tier langsmith imports SELF_REPORTED",
+          "firstMessage": "Error: trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)"
+        },
+        {
+          "name": "eval import trust tier deepeval imports SELF_REPORTED",
+          "firstMessage": "Error: trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)"
+        },
+        {
+          "name": "eval import trust tier promptfoo imports SELF_REPORTED",
+          "firstMessage": "Error: trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)"
+        },
+        {
+          "name": "eval import trust tier wandb imports SELF_REPORTED",
+          "firstMessage": "Error: trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)"
+        },
+        {
+          "name": "eval import trust tier langfuse imports SELF_REPORTED",
+          "firstMessage": "Error: trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)"
+        },
+        {
+          "name": "eval import trust tier langwatch imports SELF_REPORTED",
+          "firstMessage": "Error: trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)"
+        },
+        {
+          "name": "eval import time policy with --historical a three-day-old case is stored at recorded time and keeps its claimed time",
+          "firstMessage": "Error: trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)"
+        },
+        {
+          "name": "eval import time policy a recent case is accepted and still written at recorded time",
+          "firstMessage": "Error: trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)"
+        },
+        {
+          "name": "imported evidence quality and status dashboard importEvalResults writes signed metric and failure audit evidence as SELF_REPORTED (P0-18)",
+          "firstMessage": "Error: trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)"
+        },
+        {
+          "name": "imported evidence quality and status dashboard importEvalResults emits DeepEval confidence calibration metric evidence",
+          "firstMessage": "Error: trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)"
+        },
+        {
+          "name": "imported evidence quality and status dashboard evalImportCoverageStatus reports dimension and framework coverage",
+          "firstMessage": "Error: trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)"
+        },
+        {
+          "name": "imported evidence quality and status dashboard evalImportCoverageStatus agent filter isolates per-agent imports",
+          "firstMessage": "Error: trust tier ATTESTED is not allowed for import evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)"
+        }
+      ]
+    },
+    {
+      "phase": "eval-tier-restored",
+      "raw": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/eval-tier-restored/raw-tests.json",
+        "bytes": 20390,
+        "sha256": "5ec7ad5daeb7a3abec657359321170ca2fca09ad420ee59ffc6f44635fa583e5"
+      },
+      "total": 59,
+      "passed": 59,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "success": true,
+      "failedCases": []
+    },
+    {
+      "phase": "original-five-baseline",
+      "raw": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/original-five-baseline/raw-tests.json",
+        "bytes": 20364,
+        "sha256": "e31b7e1beb72bbbe2d9c1e95c0086cf223db2e1b06f2a72f31bd539945b7bd61"
+      },
+      "total": 59,
+      "passed": 59,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "success": true,
+      "failedCases": []
+    },
+    {
+      "phase": "seeder-optin-baseline",
+      "raw": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/seeder-optin-baseline/raw-tests.json",
+        "bytes": 20376,
+        "sha256": "31422da4cde575a2ac139c1ba7f0a2744196a78fd50a74f72a7ac84489f6a5db"
+      },
+      "total": 59,
+      "passed": 59,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "success": true,
+      "failedCases": []
+    },
+    {
+      "phase": "seeder-optin-mutant",
+      "raw": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/seeder-optin-mutant/raw-tests.json",
+        "bytes": 21756,
+        "sha256": "03e05eee6973c4e03393f6ba0e71c6f7f3b5e74a252cbcb777326a694107763e"
+      },
+      "total": 59,
+      "passed": 58,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "success": false,
+      "failedCases": [
+        {
+          "name": "dogfood maturity evidence refuses to seed without AMC_DEV_DOGFOOD=1",
+          "firstMessage": "AssertionError: expected [Function] to throw an error"
+        }
+      ]
+    },
+    {
+      "phase": "seeder-optin-restored",
+      "raw": {
+        "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/phases/seeder-optin-restored/raw-tests.json",
+        "bytes": 20391,
+        "sha256": "64453009080134bc91aa6f1058432b0e336631e7ec4d2c6b72aabdac515f73dd"
+      },
+      "total": 59,
+      "passed": 59,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "success": true,
+      "failedCases": []
+    }
+  ],
+  "causalInterpretation": {
+    "eval-tier": {
+      "matrix": "59/59, 46/59, restored 59/59",
+      "failures": 13,
+      "cause": "Every failure is the existing provenance write guard: trust tier ATTESTED is not allowed for import evidence. This is a behavioral refusal after the real importer attempted the changed tier, not an import/setup failure or evidence of accepted ATTESTED rows.",
+      "noResidualSessionOrBlobNoEffectsClaim": true
+    },
+    "seeder-optin": {
+      "matrix": "59/59, 58/59, restored 59/59",
+      "cause": "Original absent-opt-in expectation fails because the actual callable stops throwing."
+    },
+    "S7-M11": {
+      "matrix": "59/59, 58/59, restored 59/59",
+      "cause": "Actual direct-JS admitted-authority import case wrongly promotes import after the private capture gate is removed. Original constructed authority fixture is preserved; this is not loaded third-party root admission."
+    },
+    "S7-M12": {
+      "matrix": "59/59, 58/59, restored 59/59",
+      "cause": "Original producer lower-declaration case fails first assertion at externalEvidenceProfile.test.ts:81. Later second branch is not independently proven killed."
+    },
+    "singlePrivateCompiledTargetEachMatrix": true,
+    "allPendingAndTodoZero": true,
+    "sameCorpusAndExactFullRestorationVerified": true
+  },
+  "operationalChecks": {
+    "total": 16,
+    "passed": 15,
+    "failed": 1,
+    "rawReport": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/operational/result.json",
+      "bytes": 35613,
+      "sha256": "eaf5e6dc700081313ec3cafa3e4fbb9b4cc04c31b0678243937b56a08cc40a69"
+    },
+    "sevenFormatAddedRows": {
+      "openai": 6,
+      "langsmith": 7,
+      "deepeval": 5,
+      "promptfoo": 5,
+      "wandb": 5,
+      "langfuse": 4,
+      "langwatch": 5
+    },
+    "eachFormatParsedOneGenuineLocalCaseAndStoredSelfReportedRows": true,
+    "actualEventIdsAndSessionBindingsMatchAddedRows": true,
+    "timestampPreflight": {
+      "validFirstCasePositivelyImportedBeforeRefusal": true,
+      "mixedOrderVerified": [
+        "valid-first",
+        "future-second / old-second"
+      ],
+      "bothRefusalsPreserveAll32NonemptyTablesAndExactWriterInventory": true,
+      "existingEvidenceRows": 42,
+      "existingSessions": 8,
+      "notGeneralCrossStoreAtomicity": true
+    },
+    "historicalAndRecent": {
+      "claimedTsStoredOnlyInMetadata": true,
+      "eventTimesWithinActualWriterIntervals": true,
+      "historicalFlagPresentOnlyForHistoricalControl": true,
+      "noTrustedSigningTimeClaim": true
+    },
+    "cli": {
+      "actualHelpHidesTrustTier": true,
+      "actualRemovedFlagExit": 2,
+      "exactWriterFilesDirectoriesLinksAndTableRowsUnchanged": true,
+      "actualCurrentLiteral": "--trust-tier was removed in 2.0.0",
+      "strictOriginalExpected": "--trust-tier was removed in 1.2.0",
+      "strictComparisonExit": 1,
+      "failureRetainedUnwaived": true
+    },
+    "seeder": {
+      "actualDefaultModulePathUsedNoInjectedPath": true,
+      "absentOptinRefusal": true,
+      "realNodeModulesModuleRefusesDespiteOptin": true,
+      "regularInstalledCompiledFilesIndependentlyRehashed": 4529,
+      "allInstalledModuleHashesEqualLiveManifest": true,
+      "writerSnapshotsUnchanged": true,
+      "copiedInstalledLayoutOnlyNotNpmInstalledAcceptance": true,
+      "originalPositiveSyntheticAndNoMaturityRiseAssertionsRetained": true
+    },
+    "childProcesses": {
+      "retainedChildResults": 39,
+      "allStartedAfterPriorChildFinished": true,
+      "actualRuntime": "v22.23.3",
+      "actualExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "initializerPublicPinsPrecedeFirstImport": true,
+      "parentNoSQLiteImportOrConnection": true
+    }
+  },
+  "effects": {
+    "readerIntervalsIndependentlyRecomputed": 23,
+    "changedIntervals": 11,
+    "allChangesOnlyCreatedEvidenceSqliteWalAndShmSidecars": true,
+    "readerDirectoryAndSymlinkInventoriesUnchanged": true,
+    "noBlanketReadLifecycleNoEffectsClaim": true,
+    "effectsSummary": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/reader-effects-summary.json",
+      "bytes": 16929,
+      "sha256": "1783585c6c6e86c3da65612ffa087b33199681757d45ada6c8dd4d86d414161d"
+    }
+  },
+  "preservation": {
+    "privateRegularInputsRehashed": 4626,
+    "liveCompiledInputsRehashed": 4529,
+    "allFinalHashesMatchBeforeAndRestoredManifests": true,
+    "eachMutantManifestChangesExactlyOneDeclaredCompiledTarget": true,
+    "sourceCheckEntries": 51,
+    "rootScopePins": 32,
+    "readinessPins": 19,
+    "uniqueSourcePaths": 39,
+    "allBeforeAfterAndCurrentProtectedPinsExact": true,
+    "nativeBeforeAfterAndCurrentBytesDeviceInodeLinksExact": true,
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 537476941,
+      "links": 1
+    },
+    "dependencyResolverLinks": 307,
+    "dependencyLinksPointToParentInstalledInputs": true,
+    "noLibraryRebuildOrInstall": true
+  },
+  "chronology": {
+    "frozenJournal": {
+      "path": "/private/tmp/p0-18-import-seeder-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 96653,
+      "sha256": "9848bf9785d4cc9cf2ebf9b23f6d9653517d38e1f4c4e8e353277b59cf76eb4c"
+    },
+    "commands": 59,
+    "allFrozenRowsEqualIndividualCommandRecords": true,
+    "executionErrors": [],
+    "initialSchemaObserver": {
+      "retainedFailure": "KeyError sourcePins",
+      "occursBeforeClosureCopyAndProductImport": true,
+      "onlyCorrection": "rootpre['sourcePins'] became rootpre['pins']",
+      "originalAndCorrectedDriversByteDiffExactlyThatReplacement": true,
+      "notProductFailureOrMutationKill": true
+    },
+    "initialTrackedCapture": {
+      "initialManifest": {
+        "path": "/private/tmp/p0-18-initial-tracked-manifest-20261015.json",
+        "bytes": 1449575,
+        "sha256": "cf8a134cfe5cae07dd8c500b8325ce50ce63ab2d5192d361f74f088ca03fcb71"
+      },
+      "existingTrackedPaths": 7738,
+      "CComparisonAtCaptureUnchanged": true,
+      "finalPreservationStartedUtc": "2026-10-14T22:55:10.979280+00:00",
+      "finalPreservationDurationMs": 1148,
+      "rootCountGenerationLaterUtc": "2026-10-14T22:56:18+00:00",
+      "laterGenerationTimeAttribution": "Root notice; no count generator rerun by reviewer.",
+      "currentInitialManifestDifferences": [
+        "CONTRIBUTING.md",
+        "README.md",
+        "docs/content/reddit-launch-drafts.md",
+        "docs/content/show-hn-draft.md",
+        "docs/internal/competitive-landscape.md",
+        "docs/internal/mirofish-simulation-council.md",
+        "website/i18n.js",
+        "website/index.html",
+        "website/lite.html",
+        "whitepaper/AMC_WHITEPAPER_v1.md"
+      ],
+      "all10CurrentChangesOnlyAuthorized1637To1638FactualCountsIncludingUrlEncodedBadge": true,
+      "currentAll7738ExactNotClaimed": true,
+      "newCryptoTestObservedSha256": "ce2e8353fd3925d41b38b1790887d921c25aa922e7795aaadfee6335b1f4c494",
+      "newCryptoQualificationNotPartOfThisReview": true
+    }
+  },
+  "reviewerObserverCorrections": [
+    "An initial broad manifest metadata display was truncated; subsequent compact traversal checked every hash without relying on that display. No input changed.",
+    "The first count-only README comparator omitted its URL-encoded badge. Including 1%2C637 to 1%2C638 confirms both changes are factual count replacements; no source/evidence correction was required."
+  ],
+  "limits": [
+    "Existing corpus and locally canned/synthetic inputs only; no issuer truth, authenticated people, genuine provider capability, legal/expert approval or independent third-party review.",
+    "Clock intervals show importer writer time and claimed metadata; no authenticated timestamp, universal time safety or cross-store transaction claim.",
+    "Node fetch/http/https/net/dns preload is verified in retained command environments; no universal network sandbox claim.",
+    "Source/private/native equality is scoped to retained pins and manifests; initial tracked7738 equality belongs to C capture before root count updates.",
+    "Strict original 1.2.0 literal stays RED; no version-policy repair, waiver or whole P0-18 acceptance.",
+    "No Node24, full suite/coverage, hosted CI, installed-package acceptance, release, G0, Done or prior crypto-lane qualification.",
+    "P0-51 failures, prior strict failures, expert holds, skips, paused reservations, held Claude source and47echo/P2-27 deferral remain unresolved.",
+    "P0-30 next routing is separate; no later-key execution or source transfer occurred."
+  ],
+  "allLiveInputReadsComplete": true
+}

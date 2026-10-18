@@ -1,0 +1,72 @@
+{
+  "schema": "p125pc-independent-inert-fresh-binding-static-review/1",
+  "at": "2026-10-17T01:56:58.321845+00:00",
+  "blockers": [],
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-preparation/bind-fresh.py.source.txt",
+    "bytes": 9352,
+    "sha256": "0ea9b25dc1a08dd53b7ae3b4d98e360e79977ed991c96b46974910def7ed45bb"
+  },
+  "preferredSeal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-preparation/seal.json",
+    "bytes": 1872,
+    "sha256": "8ee4420223ff34f48e9cf626bcfb5bc1c7397d2d14c36495ccf09f1dd5c988b4"
+  },
+  "scope": "Full inert binder, full C39 delta, all companion contracts and exact eight input metadata pins; no helper execution or fresh-process observation.",
+  "checks": {
+    "allSixSealedOutputAndEightInputBytePinsExact": true,
+    "full13555ByteC39DeltaReproducedExactly": true,
+    "gitPinVerifyFunctionsByteExactAgainstC39": true,
+    "allFourCurrentActiveHaltedMarkersRequiredAbsentBeforeBinding": true,
+    "actualSourceCheckpointSchemaFitsWithoutInventedSourceRootOrCommitAlias": true,
+    "sourceCommit": "5d4e9e8d74bef32e68090369223947691c5fea21",
+    "sourceParent": "8889784782c8f7413e1cccab579ae4b8b6f21cc1",
+    "actualSource24AndTwelveChecksIsIntegerZero": true,
+    "exactSelectionProvidesSourceRootAuthority": true,
+    "runtime175OneOwnSuccessorOther174ExactAnd12NativeMetadataUnchanged": true,
+    "oldSourceOriginalCandidatePhysicalPinsRequired": true,
+    "prior98Paths21PairsExactOrderedPlusOnlyEventHashAndSessionVerificationPairs": true,
+    "selection102Paths23Pairs204DistinctPhysicalFilesRequired": true,
+    "allSelectedPathsRelativeContainedAndPairNamesSelected": true,
+    "actualClosedCleanSourceNatural0ExactOwnedArgvKeptLineEsrchNoSignalsRequired": true,
+    "actualSourceAndFreshCommitCleanTreeAndEmptyIndexRequired": true,
+    "heldRHeadExact18RowsAndEmptyIndexRequired": true,
+    "all175RuntimePhysicalRecordsAnd12RetainedNativeIdentitiesRecheckedByExecutor": true,
+    "newFreshNativeMustMatchKnownBytesAndDifferFromAllOldNativeAndSelectedPhysicalIdentities": true,
+    "prebuildCompiledObservationHashesNotAdopted": true,
+    "exclusiveActualBindingOutputNoVitestOrUniversalIsolationCredit": true
+  },
+  "schemaFit": {
+    "sourceCheckpoint": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "bytes": 453,
+      "sha256": "6173074e96a07158d14eea016d3c0d55e1b704d564bb76aed9f159c7f92b8b6f"
+    },
+    "runtimeProtectedInputs": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 90612,
+      "sha256": "42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59"
+    },
+    "runtimeSchema": "p125pc-runtime-protected-inputs-after-one-own-test-successor/1",
+    "actualInitialField": "initial175Pinset",
+    "actualOtherField": "allOther174MustRemainExactAfterSeparateSourceAdmission",
+    "sourceRootAuthority": "Exact pinned selection sourceRoot plus own successor path, source checkpoint/runtime branch and eventual source/fresh Git HEAD checks.",
+    "compilerBoundary": "The 23 source/compiled pairs are exact selected files, compared across actual source/fresh outputs after the ordinary clean-source helper. No compiler execution or compiler sensitivity is credited by this static review."
+  },
+  "limits": [
+    "No helper import, syntax parser, compiler, product/test, native, OpenSSL, SQL, network or process probe execution. No signing root/key/private stream/native payload read.",
+    "The running clean-source command, log, process and any actual fresh root were not opened. No natural closure, fresh native identity, binding, Vitest or control result is claimed.",
+    "The twelve native records and 175 input relationships were compared as metadata here; actual current native bytes and all selected physical files remain executor rechecks.",
+    "No source/index/QA/reservation mutation or source allocation. All held decisions, freeze/quality checks, Claude preservation and F37 skip remain intact."
+  ],
+  "readClosure": {
+    "allReadAndMetadataCallsNaturalZero": true,
+    "chunks": [
+      "d0606f",
+      "d495cd",
+      "8a7770",
+      "cfbaed"
+    ],
+    "outstandingSessions": false
+  }
+}

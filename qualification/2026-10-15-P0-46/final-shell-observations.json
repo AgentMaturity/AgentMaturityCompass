@@ -1,0 +1,382 @@
+[
+  {
+    "version": "local",
+    "failStage": "none",
+    "includeActionPath": true,
+    "repository": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-CDWw9Y/source checkout",
+    "caller": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-CDWw9Y/unrelated consumer checkout",
+    "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-CDWw9Y/source checkout/amc-action",
+    "calls": [
+      {
+        "tool": "pnpm",
+        "args": [
+          "--dir",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-CDWw9Y/source checkout",
+          "install",
+          "--frozen-lockfile"
+        ],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-CDWw9Y/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-CDWw9Y/source checkout/amc-action"
+      },
+      {
+        "tool": "pnpm",
+        "args": [
+          "--dir",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-CDWw9Y/source checkout",
+          "run",
+          "build"
+        ],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-CDWw9Y/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-CDWw9Y/source checkout/amc-action"
+      },
+      {
+        "tool": "npm",
+        "args": [
+          "install",
+          "-g",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-CDWw9Y/source checkout"
+        ],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-CDWw9Y/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-CDWw9Y/source checkout/amc-action"
+      }
+    ],
+    "status": 0,
+    "signal": null,
+    "error": null,
+    "stdout": "",
+    "stderr": "",
+    "actionSha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    "scriptSha256": "b2bc5ddc3dca6880619d4248096a522a6a787a0bcf9ed5450ab0fdeaced0b4d8",
+    "runtime": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "scope": "command observers; no actual installation or build"
+  },
+  {
+    "version": "local",
+    "failStage": "install",
+    "includeActionPath": true,
+    "repository": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-quxHmJ/source checkout",
+    "caller": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-quxHmJ/unrelated consumer checkout",
+    "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-quxHmJ/source checkout/amc-action",
+    "calls": [
+      {
+        "tool": "pnpm",
+        "args": [
+          "--dir",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-quxHmJ/source checkout",
+          "install",
+          "--frozen-lockfile"
+        ],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-quxHmJ/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-quxHmJ/source checkout/amc-action"
+      }
+    ],
+    "status": 41,
+    "signal": null,
+    "error": null,
+    "stdout": "",
+    "stderr": "",
+    "actionSha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    "scriptSha256": "b2bc5ddc3dca6880619d4248096a522a6a787a0bcf9ed5450ab0fdeaced0b4d8",
+    "runtime": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "scope": "command observers; no actual installation or build"
+  },
+  {
+    "version": "local",
+    "failStage": "build",
+    "includeActionPath": true,
+    "repository": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-wrw5AU/source checkout",
+    "caller": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-wrw5AU/unrelated consumer checkout",
+    "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-wrw5AU/source checkout/amc-action",
+    "calls": [
+      {
+        "tool": "pnpm",
+        "args": [
+          "--dir",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-wrw5AU/source checkout",
+          "install",
+          "--frozen-lockfile"
+        ],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-wrw5AU/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-wrw5AU/source checkout/amc-action"
+      },
+      {
+        "tool": "pnpm",
+        "args": [
+          "--dir",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-wrw5AU/source checkout",
+          "run",
+          "build"
+        ],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-wrw5AU/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-wrw5AU/source checkout/amc-action"
+      }
+    ],
+    "status": 42,
+    "signal": null,
+    "error": null,
+    "stdout": "",
+    "stderr": "",
+    "actionSha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    "scriptSha256": "b2bc5ddc3dca6880619d4248096a522a6a787a0bcf9ed5450ab0fdeaced0b4d8",
+    "runtime": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "scope": "command observers; no actual installation or build"
+  },
+  {
+    "version": "local",
+    "failStage": "npm",
+    "includeActionPath": true,
+    "repository": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-qjaWu5/source checkout",
+    "caller": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-qjaWu5/unrelated consumer checkout",
+    "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-qjaWu5/source checkout/amc-action",
+    "calls": [
+      {
+        "tool": "pnpm",
+        "args": [
+          "--dir",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-qjaWu5/source checkout",
+          "install",
+          "--frozen-lockfile"
+        ],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-qjaWu5/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-qjaWu5/source checkout/amc-action"
+      },
+      {
+        "tool": "pnpm",
+        "args": [
+          "--dir",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-qjaWu5/source checkout",
+          "run",
+          "build"
+        ],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-qjaWu5/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-qjaWu5/source checkout/amc-action"
+      },
+      {
+        "tool": "npm",
+        "args": [
+          "install",
+          "-g",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-qjaWu5/source checkout"
+        ],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-qjaWu5/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-qjaWu5/source checkout/amc-action"
+      }
+    ],
+    "status": 43,
+    "signal": null,
+    "error": null,
+    "stdout": "",
+    "stderr": "",
+    "actionSha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    "scriptSha256": "b2bc5ddc3dca6880619d4248096a522a6a787a0bcf9ed5450ab0fdeaced0b4d8",
+    "runtime": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "scope": "command observers; no actual installation or build"
+  },
+  {
+    "version": "latest",
+    "failStage": "none",
+    "includeActionPath": true,
+    "repository": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-fyTpbu/source checkout",
+    "caller": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-fyTpbu/unrelated consumer checkout",
+    "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-fyTpbu/source checkout/amc-action",
+    "calls": [],
+    "status": 1,
+    "signal": null,
+    "error": null,
+    "stdout": "",
+    "stderr": "Unsupported AMC release input. This preview action currently verifies only 1.2.0 or local.\n",
+    "actionSha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    "scriptSha256": "c38c80db29bafaecefeb83cd2ba1d496c9d449be04c51a6c98088bdc3c32bd91",
+    "runtime": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "scope": "command observers; no actual installation or build"
+  },
+  {
+    "version": "1.2.1",
+    "failStage": "none",
+    "includeActionPath": true,
+    "repository": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-LaKX94/source checkout",
+    "caller": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-LaKX94/unrelated consumer checkout",
+    "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-LaKX94/source checkout/amc-action",
+    "calls": [],
+    "status": 1,
+    "signal": null,
+    "error": null,
+    "stdout": "",
+    "stderr": "Unsupported AMC release input. This preview action currently verifies only 1.2.0 or local.\n",
+    "actionSha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    "scriptSha256": "dc1027382c89c701c29628585d73317649a8d2410d9a544640d3da580d0579e9",
+    "runtime": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "scope": "command observers; no actual installation or build"
+  },
+  {
+    "version": "LOCAL",
+    "failStage": "none",
+    "includeActionPath": true,
+    "repository": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-ZLw45O/source checkout",
+    "caller": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-ZLw45O/unrelated consumer checkout",
+    "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-ZLw45O/source checkout/amc-action",
+    "calls": [],
+    "status": 1,
+    "signal": null,
+    "error": null,
+    "stdout": "",
+    "stderr": "Unsupported AMC release input. This preview action currently verifies only 1.2.0 or local.\n",
+    "actionSha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    "scriptSha256": "8e864c43d61dfabda79677375478868a6bc193d83f97ac4cd493933094d9b71a",
+    "runtime": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "scope": "command observers; no actual installation or build"
+  },
+  {
+    "version": "",
+    "failStage": "none",
+    "includeActionPath": true,
+    "repository": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-GH0I5k/source checkout",
+    "caller": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-GH0I5k/unrelated consumer checkout",
+    "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-GH0I5k/source checkout/amc-action",
+    "calls": [],
+    "status": 1,
+    "signal": null,
+    "error": null,
+    "stdout": "",
+    "stderr": "Unsupported AMC release input. This preview action currently verifies only 1.2.0 or local.\n",
+    "actionSha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    "scriptSha256": "1d250b05576be072931e15dbba953dfc99f242f1b1153c58b0f72142f03dbd05",
+    "runtime": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "scope": "command observers; no actual installation or build"
+  },
+  {
+    "version": "local",
+    "failStage": "none",
+    "includeActionPath": false,
+    "repository": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-wcy4ZJ/source checkout",
+    "caller": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-wcy4ZJ/unrelated consumer checkout",
+    "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-wcy4ZJ/source checkout/amc-action",
+    "calls": [],
+    "status": 1,
+    "signal": null,
+    "error": null,
+    "stdout": "",
+    "stderr": "/bin/bash: line 3: GITHUB_ACTION_PATH: unbound variable\n",
+    "actionSha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    "scriptSha256": "b2bc5ddc3dca6880619d4248096a522a6a787a0bcf9ed5450ab0fdeaced0b4d8",
+    "runtime": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "scope": "command observers; no actual installation or build"
+  },
+  {
+    "version": "1.2.0",
+    "failStage": "none",
+    "includeActionPath": true,
+    "repository": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-23T5h2/source checkout",
+    "caller": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-23T5h2/unrelated consumer checkout",
+    "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-23T5h2/source checkout/amc-action",
+    "calls": [
+      {
+        "tool": "curl",
+        "args": [
+          "-fsSL",
+          "https://agentmaturity.co/install.sh"
+        ],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-23T5h2/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-23T5h2/source checkout/amc-action"
+      },
+      {
+        "tool": "sh",
+        "args": [],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-23T5h2/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-23T5h2/source checkout/amc-action",
+        "stdinSha256": "0688ee7b79e54b22568537f40a3467539352213b123da2aec5a9415d80d8923f"
+      }
+    ],
+    "status": 0,
+    "signal": null,
+    "error": null,
+    "stdout": "",
+    "stderr": "",
+    "actionSha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    "scriptSha256": "50215dfdb1a90c0e9dc858300a5a6c5909072860114115a0ee092715375f48fa",
+    "runtime": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "scope": "command observers; no actual installation or build"
+  },
+  {
+    "version": "1.2.0",
+    "failStage": "curl",
+    "includeActionPath": true,
+    "repository": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-RU3LMN/source checkout",
+    "caller": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-RU3LMN/unrelated consumer checkout",
+    "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-RU3LMN/source checkout/amc-action",
+    "calls": [
+      {
+        "tool": "curl",
+        "args": [
+          "-fsSL",
+          "https://agentmaturity.co/install.sh"
+        ],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-RU3LMN/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-RU3LMN/source checkout/amc-action"
+      },
+      {
+        "tool": "sh",
+        "args": [],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-RU3LMN/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-RU3LMN/source checkout/amc-action",
+        "stdinSha256": "0688ee7b79e54b22568537f40a3467539352213b123da2aec5a9415d80d8923f"
+      }
+    ],
+    "status": 44,
+    "signal": null,
+    "error": null,
+    "stdout": "",
+    "stderr": "",
+    "actionSha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    "scriptSha256": "50215dfdb1a90c0e9dc858300a5a6c5909072860114115a0ee092715375f48fa",
+    "runtime": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "scope": "command observers; no actual installation or build"
+  },
+  {
+    "version": "1.2.0",
+    "failStage": "sh",
+    "includeActionPath": true,
+    "repository": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-oYUvTs/source checkout",
+    "caller": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-oYUvTs/unrelated consumer checkout",
+    "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-oYUvTs/source checkout/amc-action",
+    "calls": [
+      {
+        "tool": "curl",
+        "args": [
+          "-fsSL",
+          "https://agentmaturity.co/install.sh"
+        ],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-oYUvTs/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-oYUvTs/source checkout/amc-action"
+      },
+      {
+        "tool": "sh",
+        "args": [],
+        "cwd": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-oYUvTs/unrelated consumer checkout",
+        "actionPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-action-observer-oYUvTs/source checkout/amc-action",
+        "stdinSha256": "0688ee7b79e54b22568537f40a3467539352213b123da2aec5a9415d80d8923f"
+      }
+    ],
+    "status": 45,
+    "signal": null,
+    "error": null,
+    "stdout": "",
+    "stderr": "",
+    "actionSha256": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    "scriptSha256": "50215dfdb1a90c0e9dc858300a5a6c5909072860114115a0ee092715375f48fa",
+    "runtime": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "scope": "command observers; no actual installation or build"
+  }
+]

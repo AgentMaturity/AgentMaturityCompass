@@ -1,0 +1,309 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass
+
+ ✓ tests/complyReportFrameworkSelection.test.ts (3 tests) 1183ms
+     ✓ non-interactive no-args output lists frameworks instead of failing with a raw option error  1138ms
+ ✓ tests/transparencyReport.test.ts (15 tests) 121ms
+ ✓ tests/cognitionLab.test.ts (49 tests) 101ms
+ ✓ tests/industryPackAudit.test.ts (9 tests) 608ms
+     ✓ a real auditor signature never promotes self-assessment report claims  583ms
+ ✓ tests/diagnosticReportStatus.test.ts (7 tests) 36ms
+ ✓ tests/claims/claimEligibility.test.ts (76 tests) 25ms
+ ✓ tests/selfReportedLevelCap.test.ts (5 tests) 37ms
+stderr | tests/fleetScoring.test.ts > Fleet Scoring > evaluateFleet with single default agent
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+ ✓ tests/claims/claimLabels.test.ts (8 tests) 39ms
+ ✓ tests/claims/claimAdapters.test.ts (39 tests) 18ms
+ ✓ tests/cliResultCommandRegistry.test.ts (8 tests) 5827ms
+     ✓ installs a postAction hook in the actual CLI entrypoint without changing its inventory output  1210ms
+     ✓ fails a successful unlabelled result with exit 70 and a stderr diagnostic in strict mode  648ms
+     ✓ adds the self-reported fallback line to successful unlabelled text outside strict mode  559ms
+     ✓ leaves an existing command failure and its exit 2 unchanged  474ms
+     ✓ accepts the canonical claim printed on real stdout in strict mode  769ms
+     ✓ accepts one JSON document with claim fields and preserves its result fields in strict mode  664ms
+ ✓ tests/complianceReportReadability.test.ts (4 tests) 9ms
+ ✓ tests/assuranceReportProvenance.test.ts (8 tests) 2090ms
+     ✓ a genuine signed report contributes its scores and tier  601ms
+     ✓ a fabricated report contributes nothing, whatever it claims  425ms
+     ✓ editing one field of a signed report voids the whole report  394ms
+     ✓ an unsigned report is not scoreable evidence  345ms
+     ✓ a report outside the window is ignored quietly — absent, not fraudulent  313ms
+stderr | tests/fleetScoring.test.ts > Fleet Scoring > evaluateFleet with multiple agents detects weak links
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+ ✓ tests/dataResidency.test.ts (42 tests) 26ms
+ ✓ tests/benchmarks/benchRunner.test.ts (6 tests) 2462ms
+     ✓ returns baseline scores when no benchmarks exist  576ms
+     ✓ all category scores are within 0-100  421ms
+     ✓ compares two agents with baseline data  524ms
+     ✓ comparison with same agent results in tie  311ms
+     ✓ renders benchmark report markdown  352ms
+ ✓ tests/noCertificationFromSelfAssessment.test.ts (7 tests) 5825ms
+     ✓ MCP sector-pack and trust-score text say self-assessment and evidence standing  5756ms
+stderr | tests/fleetScoring.test.ts > Fleet Scoring > evaluateFleet emits progress, SLA metadata, and lifecycle refs per agent
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+ ✓ tests/executiveBrief.test.ts (7 tests) 3504ms
+     ✓ built CLI writes a print-ready board one-pager without vault signing  1944ms
+     ✓ blocks board-ready claims when a signed report has no evidence  1496ms
+ ✓ tests/compliance/complianceMatrix.test.ts (10 tests) 3726ms
+     ✓ generates matrix with default frameworks  621ms
+     ✓ generates matrix with specific frameworks  410ms
+     ✓ includes gap analysis sorted by severity  429ms
+     ✓ failed categories are gaps; not-evaluated categories are listed apart and earn nothing  371ms
+     ✓ sufficient evidence without an applicability decision scores nothing (P1-11)  325ms
+     ✓ renders markdown with framework table  333ms
+     ✓ renders terminal heatmap  481ms
+stderr | tests/fleetScoring.test.ts > Fleet Scoring > renderFleetScoringMarkdown produces valid markdown
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+stderr | tests/fleetScoring.test.ts > Fleet Scoring > fleet report preserves each legacy member's claim label
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+stderr | tests/fleetScoring.test.ts > Fleet Scoring > agent summary includes strongest and weakest questions
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
+
+ ✓ tests/fleetScoring.test.ts (10 tests) 6001ms
+     ✓ evaluateFleet with single default agent  931ms
+     ✓ evaluateFleet with multiple agents detects weak links  1050ms
+     ✓ evaluateFleet emits progress, SLA metadata, and lifecycle refs per agent  680ms
+     ✓ pairwise comparisons are capped by maxComparisons  811ms
+     ✓ maxComparisons 0 skips comparisons  585ms
+     ✓ renderFleetScoringMarkdown produces valid markdown  375ms
+     ✓ fleet report preserves each legacy member's claim label  475ms
+     ✓ evaluateFleet writes output file when outputPath set  328ms
+     ✓ agent summary includes strongest and weakest questions  359ms
+     ✓ fleet aggregate layer averages cover all layers  403ms
+ ✓ tests/domainExampleMode.test.ts (21 tests) 19610ms
+     ✓ amc domain assess --example is labelled and writes nothing under .amc/  3207ms
+     ✓ amc domain gaps --example is labelled and writes nothing under .amc/  2031ms
+     ✓ amc domain report --example is labelled and writes nothing under .amc/  1702ms
+     ✓ amc domain assurance --example is labelled and writes nothing under .amc/  1648ms
+     ✓ amc domain roadmap --example is labelled and writes nothing under .amc/  1625ms
+     ✓ an --output file carries the banner first and last  801ms
+     ✓ amc demo run through a gateway (the default vault mode) is labelled in text and --json  5783ms
+     ✓ amc mirofish run prints the banner first and last, and its JSON is synthetic_example  1656ms
+ ❯ tests/cliClaimLabels.e2e.test.ts (178 tests | 2 failed) 156650ms
+     ✓ lists one explicit valid-syntax recipe and named refusal scope for every registered path 5ms
+     ✓ amc fix — actual result required  924ms
+     ✓ amc improve — fixture refusal permitted: The isolated process has no TTY or survey answers.  1820ms
+     ✓ amc quickscore — actual result required  2873ms
+     ✓ amc run — actual result required  3976ms
+     ✓ amc report — actual result required  4817ms
+     ✓ amc verify all — fixture refusal permitted: The private monitor trust root is not independently pinned; optional policies do not grant anchoring.  4765ms
+     ✓ amc eval import — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4674ms
+     ✓ amc eval status — actual result required  4459ms
+     ✓ amc eval run — actual result required  4397ms
+     ✓ amc bundle export — actual result required  4468ms
+     ✓ amc bundle verify — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4406ms
+     ✓ amc bundle inspect — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4416ms
+     ✓ amc bundle diff — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4388ms
+     ✓ amc ci check — fixture refusal permitted: The signed empty-evidence run cannot meet the actual CI maturity gate.  4375ms
+     ✓ amc ci redteam — fixture refusal permitted: No live agent adapter or gaming-resistance evidence is registered.  4318ms
+     ✓ amc export grc — actual result required  4393ms
+     ✓ amc export badge — actual result required  4419ms
+     ✓ amc assurance toctou — fixture refusal permitted: No live model or assurance adapter is configured.  4392ms
+     ✓ amc assurance compound-threats — fixture refusal permitted: No live model or assurance adapter is configured.  4149ms
+     ✓ amc assurance shutdown-compliance — fixture refusal permitted: No live model or assurance adapter is configured.  4070ms
+     ✓ amc assurance advanced-threats — fixture refusal permitted: No live model or assurance adapter is configured.  3972ms
+     ✓ amc assurance run — fixture refusal permitted: No live agent adapter is registered; native transport is denied.  3965ms
+     ✓ amc assurance runs — actual result required  4042ms
+     ✓ amc assurance show — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4087ms
+     ✓ amc assurance cert-issue — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4130ms
+     ✓ amc assurance cert-verify — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4134ms
+     ✓ amc assurance scheduler run-now — fixture refusal permitted: No live model or assurance adapter is configured.  4158ms
+     ✓ amc assurance verify — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4104ms
+     ✓ amc cert generate — fixture refusal permitted: No mature evidence or qualified certification record exists.  4115ms
+     ✓ amc cert verify — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4332ms
+     ✓ amc cert inspect — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4416ms
+     ✓ amc notary attest — fixture refusal permitted: No independently initialized notary trust directory or service exists.  4400ms
+     ✓ amc notary verify-attest — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4416ms
+     ✓ amc loop run — fixture refusal permitted: No live model or assurance adapter is configured for the recurring assurance stage.  4687ms
+     ✓ amc transparency verify — actual result required  4456ms
+     ✓ amc transparency verify-bundle — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4382ms
+     ✓ amc transparency report — actual result required  4389ms
+     ✓ amc compliance report — actual result required  4392ms
+     ✓ amc compliance fleet — actual result required  4105ms
+     ✓ amc compliance diff — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4078ms
+     ✓ amc compliance matrix — actual result required  4126ms
+     ✓ amc compliance risk-classify — actual result required  4065ms
+     ✓ amc compliance roadmap — actual result required  4018ms
+     ✓ amc outcomes attest — fixture refusal permitted: The named outcome metric is absent from the signed contract.  3966ms
+     ✓ amc audit binder create — fixture refusal permitted: No auditor request, review record or complete evidence binder exists.  4067ms
+     ✓ amc audit binder verify — fixture refusal permitted: No audit binder file exists; the actual verifier must report UNREADABLE.  3999ms
+     ✓ amc audit verify — actual result required  3980ms
+     ✓ amc passport create — fixture refusal permitted: No signed Passport policy is installed in this minimal workspace.  3981ms
+     ✓ amc passport verify — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  3997ms
+     ✓ amc passport show — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  3899ms
+     ✓ amc passport badge — fixture refusal permitted: No qualified Passport exists in this private fixture.  4008ms
+     ✓ amc passport export-latest — fixture refusal permitted: No previously generated Passport exists.  4107ms
+     ✓ amc passport share — actual result required  4106ms
+     ✓ amc passport compare — fixture refusal permitted: The second named agent has no recorded run or Passport.  4271ms
+     × amc passport search — actual result required 4277ms
+     ✓ amc passport verify-token — fixture refusal permitted: No signed trust token is supplied; the empty JSON object must fail verification.  4185ms
+     ✓ amc passport translate-score — actual result required  4115ms
+     ✓ amc gate — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4111ms
+     ✓ amc certify — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  3972ms
+     ✓ amc fleet report — actual result required  4354ms
+     ✓ amc fleet score — fixture refusal permitted: The signed empty-evidence run may fail the actual fleet readiness gate.  4819ms
+     ✓ amc fleet health — actual result required  4884ms
+     ✓ amc fleet status — actual result required  4929ms
+     ✓ amc fleet overview — actual result required  4931ms
+     ✓ amc fleet slo status — actual result required  4590ms
+     ✓ amc fleet trust-report — fixture refusal permitted: The private ledger has no usable observed fleet evidence.  4618ms
+     ✓ amc agent diagnose — fixture refusal permitted: No Studio token file exists and the fixture denies network transport.  4560ms
+     ✓ amc ingest — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4547ms
+     ✓ amc attest — fixture refusal permitted: No matching ingested session exists.  4523ms
+     ✓ amc transform attest — fixture refusal permitted: No matching transformation task exists.  4534ms
+     ✓ amc transform attest-verify — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4043ms
+     ✓ amc org score — actual result required  4094ms
+     ✓ amc org community score — actual result required  4129ms
+     ✓ amc benchmark verify — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4214ms
+     ✓ amc benchmark report — actual result required  4186ms
+     ✓ amc benchmark stats — actual result required  4183ms
+     ✓ amc benchmark run — fixture refusal permitted: No live model adapter or executed benchmark receipt is registered.  4138ms
+     ✓ amc benchmark compare — fixture refusal permitted: The named secondary agent has no benchmark record.  4083ms
+     ✓ amc benchmark provider-drift — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4006ms
+     ✓ amc benchmark replay-corpus — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4002ms
+     ✓ amc lab-simulate — actual result required  4130ms
+     ✓ amc insider-risk-scores — actual result required  4145ms
+     ✓ amc attestation-export — actual result required  4236ms
+     ✓ amc residency-report — fixture refusal permitted: No signed data residency policy has been configured for this tenant.  4227ms
+     ✓ amc why-capped — actual result required  4326ms
+     ✓ amc confidence-drift — actual result required  4266ms
+     ✓ amc unknowns — actual result required  4345ms
+     ✓ amc meta-confidence — actual result required  4372ms
+     ✓ amc shield analyze-runtime — actual result required  4458ms
+     ✓ amc shield reputation — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4760ms
+     ✓ amc shield trust-pipeline — actual result required  5794ms
+     ✓ amc shield posture — actual result required  5733ms
+     ✓ amc shield analyze-mcp — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  5643ms
+     ✓ amc enforce formal-verify — actual result required  5554ms
+     ✓ amc enforce verify-certificate — fixture refusal permitted: No signed certificate is supplied; the empty JSON object must fail verification.  5096ms
+     ✓ amc watch attest — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  3978ms
+     ✓ amc product autonomy — actual result required  3945ms
+     ✓ amc domain apply — actual result required  3931ms
+     ✓ amc domain pack run — actual result required  3943ms
+     ✓ amc domain assess — actual result required  3997ms
+     ✓ amc domain gaps — actual result required  4026ms
+     ✓ amc domain report — actual result required  4044ms
+     ✓ amc domain assurance — actual result required  4060ms
+     ✓ amc domain roadmap — actual result required  4067ms
+     ✓ amc domain conformance — fixture refusal permitted: No signed active station operating profile or conformance responses exist.  4143ms
+     ✓ amc score — actual result required  4120ms
+     ✓ amc score formal-spec — actual result required  4126ms
+     ✓ amc score adversarial — actual result required  4112ms
+     ✓ amc score collect-evidence — actual result required  4078ms
+     ✓ amc score production-ready — actual result required  3979ms
+     ✓ amc score operational-independence — actual result required  3972ms
+     ✓ amc score behavioral-contract — actual result required  3905ms
+     ✓ amc score fail-secure — actual result required  3880ms
+     ✓ amc score output-integrity — actual result required  3881ms
+     ✓ amc score state-portability — actual result required  3897ms
+     ✓ amc score eu-ai-act — actual result required  3895ms
+     ✓ amc score owasp-llm — actual result required  3899ms
+     ✓ amc score regulatory-readiness — actual result required  4054ms
+     ✓ amc score self-knowledge — actual result required  4041ms
+     ✓ amc score kernel-sandbox — actual result required  4005ms
+     ✓ amc score runtime-identity — actual result required  3994ms
+     ✓ amc score calibration-gap — actual result required  3995ms
+     ✓ amc score evidence-conflict — actual result required  3828ms
+     ✓ amc score density-map — actual result required  3866ms
+     ✓ amc score evidence-ingest — actual result required  3931ms
+     ✓ amc score level-transition — actual result required  3948ms
+     ✓ amc score gaming-resistance — actual result required  3976ms
+     ✓ amc score sleeper-detection — actual result required  4045ms
+     ✓ amc score audit-depth — actual result required  4040ms
+     ✓ amc score policy-consistency — actual result required  4022ms
+     ✓ amc score autonomy-duration — actual result required  4050ms
+     ✓ amc score pause-quality — actual result required  4040ms
+     ✓ amc score task-horizon — actual result required  3992ms
+     ✓ amc score factuality — actual result required  4031ms
+     ✓ amc score alignment-index — actual result required  4013ms
+     ✓ amc score interpretability — actual result required  3999ms
+     ✓ amc score faithfulness — actual result required  3999ms
+     ✓ amc score a2a-protocol — actual result required  3999ms
+     ✓ amc score distributed-agents — actual result required  3951ms
+     ✓ amc score memory-integrity — actual result required  3940ms
+     ✓ amc score memory-depth — actual result required  3928ms
+     ✓ amc score output-attestation — actual result required  3934ms
+     ✓ amc score mutual-verification — actual result required  3918ms
+     ✓ amc score transparency-log — actual result required  3993ms
+     ✓ amc score tier — actual result required  4005ms
+     ✓ amc score industry-adjust — actual result required  4087ms
+     ✓ amc score industry-benchmark — actual result required  4074ms
+     ✓ amc score simulation-lane — actual result required  4212ms
+     ✓ amc score safety-research — actual result required  4146ms
+     ✓ amc memory assess — actual result required  4176ms
+     ✓ amc dag score — actual result required  4117ms
+     ✓ amc quickstart — fixture refusal permitted: No TTY is attached; the interactive result path must refuse instead of inventing a score.  4113ms
+     ✓ amc demo run — fixture refusal permitted: No gateway is started; the explicit owned fixture denies all network transport.  3984ms
+     ✓ amc demo prospect — actual result required  3969ms
+     ✓ amc demo share — actual result required  3916ms
+     ✓ amc observe timeline — actual result required  4117ms
+     ✓ amc import — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4086ms
+     ✓ amc strategy compare — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4065ms
+     ✓ amc lite-score — actual result required  4413ms
+     ✓ amc business kpi — actual result required  4786ms
+     ✓ amc business risk — actual result required  4949ms
+     ✓ amc business grc-export — fixture refusal permitted: This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.  4957ms
+     ✓ amc business report — actual result required  4947ms
+     ✓ amc executive brief — actual result required  4667ms
+     × amc leaderboard show — actual result required 4317ms
+     ✓ amc leaderboard export — actual result required  3896ms
+     ✓ amc leaderboard public-export — fixture refusal permitted: The private fixture has zero scored fleet agents; retain the actual default five-agent public cohort gate.  3894ms
+     ✓ amc comms-check — actual result required  3896ms
+     ✓ amc badge — actual result required  3820ms
+     ✓ amc mirofish run — actual result required  3782ms
+     ✓ amc mirofish compare — actual result required  3787ms
+     ✓ amc mirofish stress — actual result required  4053ms
+     ✓ amc session verify — fixture refusal permitted: The private monitor key is not independently pinned; local chain integrity cannot imply anchoring.  4083ms
+     ✓ domain --example emits synthetic claim fields on actual stdout  4069ms
+     ✓ domain baseline emits self-reported claim fields and eligibleLevel at most one  4071ms
+     ✓ quickscore --auto labels actual stdout without inventing independent review  4557ms
+     ✓ a real stored 1.1.1 run fixture prints the legacy self-reported boundary  4356ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/cliClaimLabels.e2e.test.ts > actual strict CLI result labels in a signed, keyless private workspace > amc passport search — actual result required
+AssertionError: passport search: successful [] has no claim fields: expected 0 to be greater than 0
+ ❯ assertClaimFields tests/cliClaimLabels.e2e.test.ts:269:72
+    267|     // Deliberate literal acceptance: every successful registered JSON…
+    268|     // [] cannot carry fields. Do not use vacuous every(), a skip or a…
+    269|     expect(value.length, `${path}: successful [] has no claim fields`)…
+       |                                                                        ^
+    270|     for (const row of value) assertClaimFields(row, path);
+    271|     return;
+ ❯ tests/cliClaimLabels.e2e.test.ts:368:65
+ ❯ withWorkspacePermit tests/cliClaimLabels.e2e.test.ts:213:16
+ ❯ tests/cliClaimLabels.e2e.test.ts:359:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/cliClaimLabels.e2e.test.ts > actual strict CLI result labels in a signed, keyless private workspace > amc leaderboard show — actual result required
+AssertionError: leaderboard show: successful [] has no claim fields: expected 0 to be greater than 0
+ ❯ assertClaimFields tests/cliClaimLabels.e2e.test.ts:269:72
+    267|     // Deliberate literal acceptance: every successful registered JSON…
+    268|     // [] cannot carry fields. Do not use vacuous every(), a skip or a…
+    269|     expect(value.length, `${path}: successful [] has no claim fields`)…
+       |                                                                        ^
+    270|     for (const row of value) assertClaimFields(row, path);
+    271|     return;
+ ❯ tests/cliClaimLabels.e2e.test.ts:368:65
+ ❯ withWorkspacePermit tests/cliClaimLabels.e2e.test.ts:213:16
+ ❯ tests/cliClaimLabels.e2e.test.ts:359:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 19 passed (20)
+      Tests  2 failed | 510 passed (512)
+   Start at  22:21:14
+   Duration  159.05s (transform 23.22s, setup 1.94s, import 36.96s, tests 207.90s, environment 2ms)
+
+JSON report written to /Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/final-bounded-node22.json

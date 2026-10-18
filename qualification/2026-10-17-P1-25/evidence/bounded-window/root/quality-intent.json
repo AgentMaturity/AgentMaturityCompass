@@ -1,0 +1,16 @@
+{
+  "baseActualReport": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/after-metadata-full.json",
+    "bytes": 247260,
+    "sha256": "3f7df6574a5bfc8ad4d7cd3d73081074a411a41463e66c8c2325727be8ccab00"
+  },
+  "baseReportIsPriorB37MetadataAtUnchangedInitialSource": true,
+  "captureHelper": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/capture-quality.mjs",
+    "bytes": 914,
+    "sha256": "f60aa7c458a3112e711f937cddf9504bef8df3c569bb188e2f7f7e2f43db314a"
+  },
+  "sourceChangeOnlyOutputDirectory": true,
+  "noAssumedFindingCountOrPass": true,
+  "globalQualityRedRemainsUnwaived": true
+}

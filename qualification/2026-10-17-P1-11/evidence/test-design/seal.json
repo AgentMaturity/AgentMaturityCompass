@@ -1,0 +1,73 @@
+{
+  "schema": "p111-decisive-unit-author-seal/1",
+  "at": "2026-10-16T19:24:09.189303+00:00",
+  "candidate": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/decisive.test.ts",
+    "bytes": 19051,
+    "sha256": "f8a19dbba9a636a3e9e0fd40063939b1ecd5130811f133307fb74a0fc6047a9b",
+    "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/decisive.test.ts",
+    "dev": 16777231,
+    "inode": 543139566,
+    "nlink": 1
+  },
+  "inputsPin": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/input-pins.json",
+    "bytes": 13264,
+    "sha256": "490b23fcf6fee3f7441f20c041cdaf7fef44081dbac7a4932ba8882f1d886f08",
+    "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/input-pins.json",
+    "dev": 16777231,
+    "inode": 543139823,
+    "nlink": 1
+  },
+  "inputCount": 31,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/decisive.test.ts",
+      "bytes": 19051,
+      "sha256": "f8a19dbba9a636a3e9e0fd40063939b1ecd5130811f133307fb74a0fc6047a9b",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/decisive.test.ts",
+      "dev": 16777231,
+      "inode": 543139566,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/README.md",
+      "bytes": 2701,
+      "sha256": "3b07e3d5d637cdeb63eb3a8b586d8ffc1cc9907b2b3e8912852448fafe57e42c",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/README.md",
+      "dev": 16777231,
+      "inode": 543139824,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/matrix.json",
+      "bytes": 5136,
+      "sha256": "a1151b50c0b48121742f8d066b5fd5024d690b6242cef80d9e0a196a341c8886",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/matrix.json",
+      "dev": 16777231,
+      "inode": 543139822,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/input-pins.json",
+      "bytes": 13264,
+      "sha256": "490b23fcf6fee3f7441f20c041cdaf7fef44081dbac7a4932ba8882f1d886f08",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/input-pins.json",
+      "dev": 16777231,
+      "inode": 543139823,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/author-review.json",
+      "bytes": 1118,
+      "sha256": "9151e5d9b9422cc66f32316185fa40a249e8e06c5ec933815f5e1c707e616908",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/author-review.json",
+      "dev": 16777231,
+      "inode": 543139825,
+      "nlink": 1
+    }
+  ],
+  "allInputOutputBytePinsRechecked": true,
+  "execution": "Unexecuted private candidate; no product, compiler, test, native, SQL, network or checkout execution/write.",
+  "blockers": []
+}

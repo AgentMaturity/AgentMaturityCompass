@@ -1,0 +1,111 @@
+{
+  "schema": "p125f-future-source-control-recipes/1",
+  "at": "2026-10-16T22:08:56.092947+00:00",
+  "operators": [
+    {
+      "id": "F1-order",
+      "target": "src/time/tsaClient.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387"
+      },
+      "before": "  for (const tsa of tsas) {\n",
+      "after": "  for (const tsa of [...tsas].reverse()) {\n",
+      "matchCountRequired": 1,
+      "beforeLine": 157,
+      "beforeSha256": "8fa0ab0470bf2904e4aef94802b7af71a8e00e465b8b495494569799cbe7b2b1",
+      "afterSha256": "b61489e4e14a6808da56669342d2efea958abd97658c867450716f27465c6b73",
+      "proposedWholeFile": {
+        "bytes": 10942,
+        "sha256": "ff81c88306ad744cdb6efa0011aef214c686733a6ef98e77993fabf0b17d7fc9"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/F1-order.patch",
+        "bytes": 483,
+        "sha256": "188026c7a797e261a231e0a1e7a4fc48b166da6e900de1a3c4ac44423d1fd02b"
+      },
+      "witness": {
+        "primaryTest": "ORDER",
+        "firstAssertionLine": 261,
+        "positiveBefore": 254,
+        "expected": "Literal actual routes must follow the configured order.",
+        "masking": "Later grant/failure/body-size assertions264\u2013268 are masked if261 fails; earlier genuine fixture or single-TSA refusal positive failures mask261.",
+        "additionalSensitiveBodies": "NO-ANCHOR may separately expose reversed failure order at239; TIMEOUT-CONTINUE may expose reversed dispatch at287. Read every actual first frame; no failed count is predicted."
+      },
+      "actualFailureCount": null,
+      "applied": false
+    },
+    {
+      "id": "F2-no-continue",
+      "target": "src/time/tsaClient.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387"
+      },
+      "before": "      failures.push(`${tsa.name}: ${error instanceof Error ? error.message : String(error)}`);\n",
+      "after": "      failures.push(`${tsa.name}: ${error instanceof Error ? error.message : String(error)}`);\n      break;\n",
+      "matchCountRequired": 1,
+      "beforeLine": 172,
+      "beforeSha256": "c877c598a5a911c3867e852605599022508895a3cfedf0f0effac8ed752cd6f2",
+      "afterSha256": "8b7c599ab4ba59e9a9dca5617fc3fd3e586ae808e75882766ba85d635c076811",
+      "proposedWholeFile": {
+        "bytes": 10940,
+        "sha256": "c8b94cc2b7ba905d380e64989bce9e4f3734e6dfc4aeb4a588f4612a86e1dc31"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/F2-no-continue.patch",
+        "bytes": 372,
+        "sha256": "acf155f0784b44bc37b6b86df4457d132519c21e02c363b6b60bb99f5fe67d15"
+      },
+      "witness": {
+        "primaryTest": "ORDER",
+        "firstAssertionLine": 261,
+        "positiveBefore": 254,
+        "expected": "After the real caught firstHTTP500, second and third finite routes must still be dispatched.",
+        "masking": "Later result assertions264\u2013268 are masked if261 fails. TIMEOUT-CONTINUE separately places next dispatch287 before exact caught-message/result assertion288.",
+        "additionalSensitiveBodies": "Actual HTTP500 and actual default-abort continuation witnesses must be classified separately; no count or typed-error expectation is predicted."
+      },
+      "actualFailureCount": null,
+      "applied": false
+    },
+    {
+      "id": "F3-unpinned-dispatch",
+      "target": "src/time/tsaClient.ts",
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387"
+      },
+      "before": "      failures.push(`${tsa.name}: none of its anchorIds (${tsa.anchorIds.join(\", \")}) is in a verified trust list`);\n      continue;\n",
+      "after": "      failures.push(`${tsa.name}: none of its anchorIds (${tsa.anchorIds.join(\", \")}) is in a verified trust list`);\n",
+      "matchCountRequired": 1,
+      "beforeLine": 160,
+      "beforeSha256": "b79717b2f3c72ebd5caed3aed0f1e336af67156701012004bb88f921165da817",
+      "afterSha256": "f7e179e6f87e6a97fc7792ef44763dd103c1ff9830f8c1d4b66df0acc83aa88d",
+      "proposedWholeFile": {
+        "bytes": 10911,
+        "sha256": "ecae1ba1428281a8ba8fe7e1e065d4cffa0e62504a113dfd70d43c745de16938"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/F3-unpinned-dispatch.patch",
+        "bytes": 426,
+        "sha256": "ee3c4fa172414abbcc4f6cc9773e6044944a34db61efcc0a6604354676bcc3d3"
+      },
+      "witness": {
+        "primaryTest": "NO-ANCHOR",
+        "firstAssertionLine": 237,
+        "positiveBefore": 231,
+        "expected": "The unmatched anchor route must have zero requests after the actual matching-anchor wire positive.",
+        "masking": "Later route238/result239\u2013241 assertions are masked if237 fails; earlier genuine-token or matching HTTP500 positive/setup failures mask237.",
+        "additionalSensitiveBodies": "Configured anchor selection only. No signed-list trust admission or F37/guard bypass credit."
+      },
+      "actualFailureCount": null,
+      "applied": false
+    }
+  ],
+  "futureProtocol": "One exact source-only operation at a time in the actual future bound owned Q, after actual same21 source/fresh canonical qualification. Read every actual failure and mask and record source/operator/outcome-hash-bound manual classification before explicit exact restore. Identical actual restored21 is separately required before the next operator.",
+  "noTimeoutEgressBaselineConfigCompiledNativeMutation": true,
+  "noPredictedFailuresOrQualificationCredit": true
+}

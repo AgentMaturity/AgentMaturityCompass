@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/event-cadence/preparation/control-preparation/STRICT-THRESHOLD.patch.txt",
+    "bytes": 688,
+    "sha256": "7e74cb2d9e141df6b3613471964e4b3a3516439f808bfb9eb810e9494a64b227"
+  },
+  "dataBase64": "LS0tIGEvc3JjL3RpbWUvY2hlY2twb2ludC50cworKysgYi9zcmMvdGltZS9jaGVja3BvaW50LnRzCkBAIC0xNzAsNyArMTcwLDcgQEAKICAgdHJ5IHsKICAgICBjb25zdCB7IG4gfSA9IGxlZGdlci5kYi5wcmVwYXJlKGBTRUxFQ1QgQ09VTlQoKikgQVMgbiBGUk9NIGV2aWRlbmNlX2V2ZW50cyBXSEVSRSBldmVudF90eXBlICE9ICd0aW1lL2NoZWNrcG9pbnQnCiAgICAgICBBTkQgcm93aWQgPiBDT0FMRVNDRSgoU0VMRUNUIHJvd2lkIEZST00gZXZpZGVuY2VfZXZlbnRzIFdIRVJFIGV2ZW50X2hhc2ggPSA/KSwgMClgKS5nZXQobGFzdD8ubGVkZ2VyLmhlYWRFdmVudEhhc2ggPz8gbnVsbCkgYXMgeyBuOiBudW1iZXIgfTsKLSAgICByZXR1cm4gbiA+IDAgJiYgKCFsYXN0IHx8IG4gPj0gY29uZmlnLmNoZWNrcG9pbnQuZXZlcnlFdmVudHMgfHwgbm93IC0gRGF0ZS5wYXJzZShsYXN0LmNsYWltZWRBdCkgPj0gY29uZmlnLmNoZWNrcG9pbnQuZXZlcnlNaW51dGVzICogNjBfMDAwKTsKKyAgICByZXR1cm4gbiA+IDAgJiYgKCFsYXN0IHx8IG4gPiBjb25maWcuY2hlY2twb2ludC5ldmVyeUV2ZW50cyB8fCBub3cgLSBEYXRlLnBhcnNlKGxhc3QuY2xhaW1lZEF0KSA+PSBjb25maWcuY2hlY2twb2ludC5ldmVyeU1pbnV0ZXMgKiA2MF8wMDApOwogICB9IGZpbmFsbHkgewogICAgIGxlZGdlci5jbG9zZSgpOwogICB9Cg==",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

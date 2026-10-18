@@ -1,0 +1,92 @@
+{
+  "code": "0fef1989aa1f928d1e111e71ab52d34d0721418c",
+  "records": [
+    {
+      "name": "live-read-helper-mutant",
+      "cmd": "pnpm exec vitest run tests/planEditsManifest.test.ts --reporter=json --outputFile=/private/tmp/p0-47-live-read-helper-mutant-20261014.json",
+      "exit": 1,
+      "durationMs": 9412,
+      "helperSha256": "543ed732957705bbc00270ba30916d02e00bcaa7e63a54047b6311db1efae004",
+      "reportSha256": "72dc371400e62df483e5acc2348b53b12e6d811c2b6c224dda178aed361cd5f1",
+      "logSha256": "b3881c3ab1882faea86f06567017478525723cc2b07a108930ff2e3857434faa",
+      "success": false,
+      "total": 16,
+      "passed": 9,
+      "failed": 7,
+      "pending": 0,
+      "failures": [
+        {
+          "name": "committed plan-edits manifest (D-15) validates: schema, sorted unique paths, archives under plan-edits/<issue>/, archive sha256, 40-hex base",
+          "message": "AssertionError: expected false to be true // Object.is equality"
+        },
+        {
+          "name": "landedSource helper returns live bytes for an unregistered path and archive bytes for a registered one",
+          "message": "AssertionError: expected 'live a\\n' to be 'landed a\\n' // Object.is equality"
+        },
+        {
+          "name": "landedSource helper normalizes ./, backslashes and absolute paths before the lookup",
+          "message": "AssertionError: ./src/a.ts: expected 'live a\\n' to be 'landed a\\n' // Object.is equality"
+        },
+        {
+          "name": "landedSource helper throws when an archive no longer matches its manifest sha256",
+          "message": "AssertionError: expected [Function] to throw an error"
+        },
+        {
+          "name": "scripts/snapshot-plan-edit.mjs archives the base bytes, not the working tree, and writes a sorted manifest the helper accepts",
+          "message": "AssertionError: expected 'a edited in the working tree\\n' to be 'a at base\\n' // Object.is equality"
+        },
+        {
+          "name": "scripts/snapshot-plan-edit.mjs archives package.json at the base, so the package-entries pin keeps reading the landed manifest",
+          "message": "AssertionError: expected '{\"name\":\"edited\",\"exports\":{\"./trust\"\u2026' to be '{\"name\":\"at-base\"}\\n' // Object.is equality"
+        },
+        {
+          "name": "scripts/snapshot-plan-edit.mjs pinned build outputs under dist/ registering a source also archives its pinned build outputs from disk",
+          "message": "AssertionError: expected 'declare a\\nexport declare const added\u2026' to be 'declare a\\n' // Object.is equality"
+        }
+      ]
+    },
+    {
+      "name": "omitted-sha-helper-mutant",
+      "cmd": "pnpm exec vitest run tests/planEditsManifest.test.ts -t 'throws when an archive no longer matches its manifest sha256' --reporter=json --outputFile=/private/tmp/p0-47-omitted-sha-helper-mutant-20261014.json",
+      "exit": 1,
+      "durationMs": 650,
+      "helperSha256": "557b94109f11d6ffccd19437e2ce2593c4588dc5b43ba0b7008b6b9a33118af7",
+      "reportSha256": "4e7e17894a888ca701dc5f41b80d5e70e4f11ff955a560113652117d7442bbe1",
+      "logSha256": "3a36044f816a9585824779778f3cc7f52dd907f417c29b590fe5e8be14c1e5b1",
+      "success": false,
+      "total": 16,
+      "passed": 0,
+      "failed": 1,
+      "pending": 15,
+      "failures": [
+        {
+          "name": "landedSource helper throws when an archive no longer matches its manifest sha256",
+          "message": "AssertionError: expected [Function] to throw an error"
+        }
+      ]
+    },
+    {
+      "name": "helper-mutants-restored",
+      "cmd": "pnpm exec vitest run tests/planEditsManifest.test.ts --reporter=json --outputFile=/private/tmp/p0-47-helper-mutants-restored-20261014.json",
+      "exit": 0,
+      "durationMs": 6207,
+      "helperSha256": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111",
+      "reportSha256": "390d201dc566a728402e714d2afd72492973080aeac26ccb1937f98cc4fd8f77",
+      "logSha256": "d6d12bd6e5a15c0ab37da012ecc83a7503953ec2054535c804cf901e86f97154",
+      "success": true,
+      "total": 16,
+      "passed": 16,
+      "failed": 0,
+      "pending": 0,
+      "failures": []
+    }
+  ],
+  "helperRestoredByteIdentically": true,
+  "helperSha256": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111",
+  "baselineParity": {
+    "total": 7113,
+    "failed": 62,
+    "qualified": false
+  },
+  "limits": "These are actual helper/script mutations against existing real filesystem fixtures. Filtered omitted-SHA case retains pending undispatched cases; no whole-suite acceptance inferred."
+}

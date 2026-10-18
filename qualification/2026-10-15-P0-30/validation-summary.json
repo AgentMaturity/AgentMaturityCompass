@@ -1,0 +1,48 @@
+{
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T04:28:15.380085+00:00",
+  "actualNormalFreeze": {
+    "phase": "final-normal-freeze",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+    "cmd": "pnpm run check:freeze",
+    "exit": 0,
+    "durationMs": 1760,
+    "startedUtc": "2026-10-15T04:19:13.096370+00:00",
+    "log": "/private/tmp/p0-30-final-normal-freeze-20261015.log",
+    "head": "58e91dcef111bf02f773dcbfd1921d428cf75e34"
+  },
+  "initialCanonicalValidation": {
+    "phase": "canonical-qualification-first",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+    "cmd": "pnpm run check:qualification",
+    "exit": 0,
+    "durationMs": 491,
+    "startedUtc": "2026-10-15T04:26:53.319379+00:00",
+    "log": "/private/tmp/p0-30-canonical-qualification-first-20261015.log",
+    "head": "58e91dcef111bf02f773dcbfd1921d428cf75e34"
+  },
+  "augmentedCanonicalValidation": {
+    "phase": "canonical-qualification-final",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+    "cmd": "pnpm run check:qualification",
+    "exit": 0,
+    "durationMs": 388,
+    "startedUtc": "2026-10-15T04:27:28.191536+00:00",
+    "log": "/private/tmp/p0-30-canonical-qualification-final-20261015.log",
+    "head": "58e91dcef111bf02f773dcbfd1921d428cf75e34"
+  },
+  "stagedScope": "Only new qualification/2026-10-15-P0-30 files; production/original test/config/guard/counters/dist unchanged.",
+  "rawArtifactWhitespace": {
+    "exit": 2,
+    "diagnostics": [
+      "qualification/2026-10-15-P0-30/evidence/54500c03c7a0-p0-30-AMC-1534-race-public-crypto-review-20261015.json:2066: new blank line at EOF.",
+      "qualification/2026-10-15-P0-30/evidence/d1c9444a1c65-p0-30-AMC-1534-race-public-crypto-review-20261015.md:25: new blank line at EOF."
+    ],
+    "disposition": "Two exact copied immutable public-crypto reviews have blank EOF lines. Their bytes and hashes are preserved; this is a raw artifact formatting finding, not a clean source pass or a freeze/quality waiver."
+  },
+  "requiredQualityPrerequisites": "Exact-source duplicate1269/dead2751 failures remain unwaived; not newly run or hidden.",
+  "limits": "Formal fullbatch/main/runner/installed/fullsuite/Node24/coverage/hosted/G0/Done remain open. Final ordinary qualification validator runs again after this metadata addition."
+}

@@ -1,4 +1,7 @@
 import { spawnSync } from "node:child_process";
+import { evaluateTrustedFixtureForTests as seamModule, ContainmentUnavailableError } from "../examples/harness-comparison/pilot/oracles/containedProbe.mjs";
+import { judgeCodingTrial as judgeModule } from "../examples/harness-comparison/codingOracle.mjs";
+import { runPiContained as runPiContainedModule } from "../examples/harness-comparison/codingPiContainer.mjs";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -12,6 +15,12 @@ import { comparisonOracleSchema } from "../src/benchmarks/harnessComparisonSchem
 type CodingFixture = { schemaVersion: string; id: string; description: string; prompt: string; files: Record<string, string> };
 const fixtures: CodingFixture[] = JSON.parse(readFileSync(resolve("examples/harness-comparison/codingCases.json"), "utf8"));
 const oracle = resolve("examples/harness-comparison/codingOracle.mjs");
+type Verdict = ReturnType<typeof comparisonOracleSchema.parse>;
+type Probe = (input: unknown) => Promise<{ rows: unknown[] | null; timedOut: boolean }>;
+const judgeCodingTrial = judgeModule as unknown as (input: { workspace: string; fixturePath: string; envelope: unknown; probe: Probe }) => Promise<unknown>;
+// Test only: the vm layer on this host, for this file's own trusted fixture solutions. The command line never uses it.
+const evaluateTrustedFixtureForTests = seamModule as unknown as Probe;
+const runPiContained = runPiContainedModule as unknown as (input: Record<string, unknown>) => Promise<unknown>;
 const directories: string[] = [];
 afterEach(() => { for (const path of directories.splice(0)) rmSync(path, { recursive: true, force: true }); });
 const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
@@ -91,49 +100,50 @@ function context(id = "coding-range-normalization", source?: string) {
     process: { exitCode: 0, signal: null as string | null, terminatedBy: null as string | null, treeExitProven: true },
     stdout: "", stderr: "", fixtureSha256: hash(fixtureBytes),
     observations: { schemaVersion: "2026-09-08", modelExecution: { modelCalled: true, source: "adapter-observation", evidenceRef: "Synthetic observation; no model was called in this test." } } };
-  function run() {
+  // Contract tests judge in process through the test-only seam; the command line itself is tested for refusal below.
+  async function run(): Promise<Verdict> {
     envelope.stdout = JSON.stringify(receipt);
-    const result = spawnSync(process.execPath, [oracle, workspace, fixturePath], {
-      input: JSON.stringify(envelope), encoding: "utf8", timeout: 10_000, maxBuffer: 512 * 1024,
-      env: { LANG: "C.UTF-8", TZ: "UTC" }
-    });
-    const diagnostic = JSON.stringify({ status: result.status, signal: result.signal, error: result.error?.message,
-      stderr: result.stderr.slice(0, 4096), stdout: result.stdout.slice(0, 2048) });
-    expect(result.error, diagnostic).toBeUndefined(); expect(result.signal, diagnostic).toBeNull(); expect(result.status, diagnostic).toBe(0);
+    return comparisonOracleSchema.parse(await judgeCodingTrial({ workspace, fixturePath, envelope, probe: evaluateTrustedFixtureForTests }));
+  }
+  function cli(args: string[]) {
+    envelope.stdout = JSON.stringify(receipt);
+    const result = spawnSync(process.execPath, [oracle, workspace, fixturePath, ...args], {
+      input: JSON.stringify(envelope), encoding: "utf8", timeout: 15_000, maxBuffer: 512 * 1024, env: { LANG: "C.UTF-8", TZ: "UTC" } });
+    expect(result.status, result.stderr).toBe(0);
     return comparisonOracleSchema.parse(JSON.parse(result.stdout));
   }
-  return { workspace, fixture, fixturePath, solution, receipt, envelope, run };
+  return { workspace, fixture, fixturePath, solution, receipt, envelope, run, cli };
 }
 
 describe("neutral coding output oracle", () => {
-  test.each(["coding-range-normalization", "coding-quoted-csv", "coding-stable-dependencies"])("accepts a working repair for %s without AMC-specific evidence", id => {
-    const result = context(id).run();
+  test.each(["coding-range-normalization", "coding-quoted-csv", "coding-stable-dependencies"])("accepts a working repair for %s without AMC-specific evidence", async id => {
+    const result = await context(id).run();
     expect(result.verdict).toBe("pass");
     expect(result.checks.filter(check => check.id.startsWith("case-")).length).toBeGreaterThan(10);
     expect(result.checks.every(check => check.passed)).toBe(true);
   }, 15_000);
 
-  test.each(["coding-range-normalization", "coding-quoted-csv", "coding-stable-dependencies"])("rejects the original buggy source for %s despite a successful target receipt", id => {
+  test.each(["coding-range-normalization", "coding-quoted-csv", "coding-stable-dependencies"])("rejects the original buggy source for %s despite a successful target receipt", async id => {
     const fixture = fixtures.find(row => row.id === id)!;
-    const result = context(id, fixture.files["repo/solution.mjs"]).run();
+    const result = await context(id, fixture.files["repo/solution.mjs"]).run();
     expect(result.verdict).toBe("fail");
     expect(result.checks.some(check => check.id.startsWith("case-") && check.passed === false)).toBe(true);
     expect(result.checks.find(check => check.id === "adapter-execution")?.passed).toBe(true);
   }, 15_000);
 
-  test("rejects a mutation even when returned ranges are correct", () => {
+  test("rejects a mutation even when returned ranges are correct", async () => {
     const source = reference["coding-range-normalization"]!.replace("return result;", "ranges.reverse(); return result;");
-    const result = context("coding-range-normalization", source).run();
+    const result = await context("coding-range-normalization", source).run();
     expect(result.checks.find(check => check.id === "case-reverse-adjacent")).toMatchObject({ passed: false, evidence: expect.stringContaining("mutated") });
   });
 
-  test("custom serialization cannot impersonate correct plain-array output", () => {
+  test("custom serialization cannot impersonate correct plain-array output", async () => {
     const source = reference["coding-range-normalization"]!.replace("return result;", "return {toJSON() { return result; }};");
-    const result = context("coding-range-normalization", source).run();
+    const result = await context("coding-range-normalization", source).run();
     expect(result.checks.find(check => check.id === "case-empty")?.passed).toBe(false);
   });
 
-  test.each(["target-exit", "target-signal", "unsettled-tree", "target-timeout", "receipt-exit", "receipt-signal", "receipt-timeout", "truncated", "error", "no-requests", "no-response", "target-identity", "fixture-identity", "fixture-pin"])("refuses missing or contradictory execution evidence: %s", kind => {
+  test.each(["target-exit", "target-signal", "unsettled-tree", "target-timeout", "receipt-exit", "receipt-signal", "receipt-timeout", "truncated", "error", "no-requests", "no-response", "target-identity", "fixture-identity", "fixture-pin"])("refuses missing or contradictory execution evidence: %s", async kind => {
     const trial = context();
     switch (kind) {
       case "target-exit": trial.envelope.process.exitCode = 7; break;
@@ -151,12 +161,12 @@ describe("neutral coding output oracle", () => {
       case "fixture-identity": trial.receipt.fixtureId = "coding-quoted-csv"; break;
       case "fixture-pin": trial.envelope.fixtureSha256 = "0".repeat(64); break;
     }
-    const result = trial.run(); expect(result.verdict).toBe("fail");
+    const result = await trial.run(); expect(result.verdict).toBe("fail");
     const cases = result.checks.filter(check => check.id.startsWith("case-"));
     expect(cases).toHaveLength(13); expect(cases.every(check => check.passed === false)).toBe(true);
   });
 
-  test.each(["file-symlink", "repo-symlink", "oversized", "missing"])("refuses an unsafe or unusable solution: %s", kind => {
+  test.each(["file-symlink", "repo-symlink", "oversized", "missing"])("refuses an unsafe or unusable solution: %s", async kind => {
     const trial = context();
     if (kind === "oversized") writeFileSync(trial.solution, " ".repeat(128 * 1024 + 1));
     else if (kind === "missing") rmSync(trial.solution);
@@ -168,7 +178,7 @@ describe("neutral coding output oracle", () => {
       const outside = join(trial.workspace, "other-repo"); mkdirSync(outside); writeFileSync(join(outside, "solution.mjs"), reference["coding-range-normalization"]!);
       symlinkSync(outside, join(trial.workspace, "repo"));
     }
-    const result = trial.run(); expect(result.verdict).toBe("fail");
+    const result = await trial.run(); expect(result.verdict).toBe("fail");
     expect(result.checks.find(check => check.id === "solution-file")?.passed).toBe(false);
   });
 
@@ -177,21 +187,57 @@ describe("neutral coding output oracle", () => {
     ["startup-throw", "throw new Error('failed');"],
     ["missing-export", "export const somethingElse = 1;"],
     ["async-output", "export async function normalizeRanges() { return []; }"]
-  ])("reports unusable module behavior: %s", (_name, source) => {
-    expect(context("coding-range-normalization", source).run().verdict).toBe("fail");
+  ])("reports unusable module behavior: %s", async (_name, source) => {
+    expect((await context("coding-range-normalization", source).run()).verdict).toBe("fail");
   });
 
-  test("refuses module imports before their filesystem effect", () => {
+  test("refuses module imports before their filesystem effect", async () => {
     const trial = context(); const marker = join(trial.workspace, "should-not-exist");
     writeFileSync(trial.solution, `import fs from 'node:fs'; fs.writeFileSync(${JSON.stringify(marker)},'bad'); export const normalizeRanges = () => [];`);
-    const result = trial.run(); expect(result.verdict).toBe("fail"); expect(existsSync(marker)).toBe(false);
+    const result = await trial.run(); expect(result.verdict).toBe("fail"); expect(existsSync(marker)).toBe(false);
     expect(result.checks.find(check => check.id === "probe-execution")?.passed).toBe(false);
   });
 
-  test("terminates a nonreturning function and keeps every planned case failed", () => {
-    const result = context("coding-range-normalization", "export function normalizeRanges() { while (true) {} }").run();
+  test("terminates a nonreturning function and keeps every planned case failed", async () => {
+    const result = await context("coding-range-normalization", "export function normalizeRanges() { while (true) {} }").run();
     expect(result.verdict).toBe("fail");
     expect(result.checks.find(check => check.id === "probe-execution")).toMatchObject({ passed: false, evidence: expect.stringContaining("deadline") });
     expect(result.checks.filter(check => check.id.startsWith("case-") && check.passed === false)).toHaveLength(13);
   }, 15_000);
 });
+
+describe("legacy coding oracle and Pi binding containment", () => {
+  const containment = { cli: join(tmpdir(), "no-such-docker-cli"), host: "unix:///nonexistent.sock", image: `sha256:${"c".repeat(64)}` };
+
+  test("the command-line oracle refuses without a container runtime, with or without settings, and evaluates nothing on the host", () => {
+    const trial = context();
+    const config = join(trial.workspace, "containment.json"); writeFileSync(config, JSON.stringify({ docker: containment }));
+    for (const result of [trial.cli([]), trial.cli([config])]) {
+      expect(result.verdict).toBe("inconclusive");
+      expect(result.checks.find(check => check.passed === null)?.evidence).toMatch(/not measured: containment unavailable/);
+    }
+  });
+
+  test("a working repair through the command line is refused, not passed, when containment is unavailable", () => {
+    expect(context().cli([]).verdict).toBe("inconclusive");
+  });
+
+  test("an adapter receipt that reports refused Pi containment is not measured, never a target failure", async () => {
+    const trial = context();
+    Object.assign(trial.receipt, { error: "not measured: containment unavailable: no container runtime", containment: { status: "unavailable", reason: "no container runtime" } });
+    const result = await trial.run();
+    expect(result.verdict).toBe("inconclusive");
+  });
+
+  test("the Pi binding refuses without a container runtime and never starts Pi on the host", async () => {
+    const root = mkdtempSync(join(tmpdir(), "amc-pi-refusal-")); directories.push(root);
+    const sentinel = join(root, "pi-ran.txt"), cli = join(root, "fake-pi.mjs");
+    writeFileSync(cli, `import { writeFileSync } from "node:fs"; writeFileSync(${JSON.stringify(sentinel)}, "ran");`);
+    for (const settings of [undefined, containment]) {
+      await expect(runPiContained({ containment: settings, cli, workspace: root, args: ["--print"], prompt: "Repair repo/solution.mjs.", env: {},
+        gatewayPort: 1, models: {}, settings: {}, timeoutMs: 10_000 })).rejects.toBeInstanceOf(ContainmentUnavailableError);
+    }
+    expect(existsSync(sentinel)).toBe(false);
+  });
+});
+

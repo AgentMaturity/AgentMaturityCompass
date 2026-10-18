@@ -1,0 +1,21 @@
+{
+  "capturedUtc": "2026-10-15T05:39:09.842057+00:00",
+  "source": "f58d88d80ab490490184354cc8665631d6999cc1",
+  "runtime": {
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "os": "Darwin 25.6.0",
+    "arch": "arm64"
+  },
+  "actualNativeFingerprint": {
+    "path": "/private/tmp/p0-21-runtime-fingerprint-20261015.log",
+    "bytes": 737,
+    "sha256": "46cb7ab921acf2c641d081efbcc470ca2783e8c0949c2def46411f657ae666a8"
+  },
+  "actualInstallLog": {
+    "path": "/private/tmp/p0-21-install-20261015.log",
+    "bytes": 2709,
+    "sha256": "7ad2d470b588af11ffe25e10872fc3434a644c8bdb1fa051a5c36a6e462ea109"
+  },
+  "attribution": "Node/version/ABI/native query were measured by the original root fingerprint process. The actual install log reports pnpm v10.33.0. Host OS/architecture are captured by root on the same host at packaging; no per-child fingerprint or new product execution is inferred."
+}

@@ -1,0 +1,9 @@
+# V4 generator: independent static code review
+
+The full 20,953-byte v4 source, embedded driver and exact patch were read. The patch matches the preserved v3 input byte for byte. No concrete code blocker was found. This review pins code SHA256 `0d756ecec2b9f95520b38ac8a54a4fe22a26843aa0df338f4ef4ac426b6ba9cb`; final adjacent author metadata was not consumed unless listed in a later addendum.
+
+The new order is correct. Each child closes before the next step. The old getter refuses non-inline rows or payload-path/blob dependencies before writing its observation and closes in `finally`. A failed getter or any remaining WAL prevents snapshot copying. The generator exclusively copies and hashes the naturally closed database before diagnostic/assurance writes. The corpus candidate points to that retained copy; `sourceAtClosure` is explicitly historical metadata and is not confused with the later-changing workspace database. No row filtering, SQL rewrite, payload-file loading, decryption, verifier override or checkpoint was added.
+
+Old/current source confirms that the selected minimal seed and operator import write inline rows and sealed sessions, and today's inline verifier hashes those bytes before returning without blob loading. Actual generation must still establish the claimed file set, hashes, closure and verifier result. The same schema and names fit the unchanged strict ten-case test; no test-body edit is required under the recorded contracts. V3's final-ledger failure and all original snapshots remain preserved.
+
+No code, parser, compiler, helper, product, native, SQL, network or test execution occurred. No checkout/index/source/test/QA file was written. Root alone materializes and runs. This review grants no future output count, pass count, compression size, genuine L3, certificate, independent provenance or complete-lifecycle credit.

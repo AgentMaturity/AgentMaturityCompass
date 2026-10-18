@@ -1,0 +1,126 @@
+{
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "canonicalPhase": "p107-fresh-canonical",
+  "totalsNotSummed": true,
+  "phases": [
+    {
+      "role": "canonical-fresh",
+      "phase": "p107-fresh-canonical",
+      "physicalTestRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+      "tests": {
+        "numTotalTests": 971,
+        "numPassedTests": 971,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "exit": 0,
+      "durationMs": 5503,
+      "publicRecords": 1,
+      "hookTaskEntries": 46,
+      "individualHookValues": 47
+    },
+    {
+      "role": "M1-red",
+      "phase": "p107-m1",
+      "physicalTestRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+      "tests": {
+        "numTotalTests": 971,
+        "numPassedTests": 968,
+        "numFailedTests": 3,
+        "numPendingTests": 0
+      },
+      "exit": 1,
+      "durationMs": 4684,
+      "publicRecords": 1,
+      "hookTaskEntries": 46,
+      "individualHookValues": 47
+    },
+    {
+      "role": "M1-restored",
+      "phase": "p107-m1-restored",
+      "physicalTestRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+      "tests": {
+        "numTotalTests": 971,
+        "numPassedTests": 971,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "exit": 0,
+      "durationMs": 4689,
+      "publicRecords": 1,
+      "hookTaskEntries": 46,
+      "individualHookValues": 47
+    },
+    {
+      "role": "M2-red",
+      "phase": "p107-m2",
+      "physicalTestRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+      "tests": {
+        "numTotalTests": 971,
+        "numPassedTests": 969,
+        "numFailedTests": 2,
+        "numPendingTests": 0
+      },
+      "exit": 1,
+      "durationMs": 4722,
+      "publicRecords": 1,
+      "hookTaskEntries": 46,
+      "individualHookValues": 47
+    },
+    {
+      "role": "M2-restored",
+      "phase": "p107-m2-restored",
+      "physicalTestRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+      "tests": {
+        "numTotalTests": 971,
+        "numPassedTests": 971,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "exit": 0,
+      "durationMs": 4664,
+      "publicRecords": 1,
+      "hookTaskEntries": 46,
+      "individualHookValues": 47
+    },
+    {
+      "role": "M3-red",
+      "phase": "p107-m3",
+      "physicalTestRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+      "tests": {
+        "numTotalTests": 971,
+        "numPassedTests": 961,
+        "numFailedTests": 10,
+        "numPendingTests": 0
+      },
+      "exit": 1,
+      "durationMs": 4709,
+      "publicRecords": 1,
+      "hookTaskEntries": 46,
+      "individualHookValues": 47
+    },
+    {
+      "role": "M3-restored",
+      "phase": "p107-m3-restored",
+      "physicalTestRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+      "tests": {
+        "numTotalTests": 971,
+        "numPassedTests": 971,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "exit": 0,
+      "durationMs": 4809,
+      "publicRecords": 1,
+      "hookTaskEntries": 46,
+      "individualHookValues": 47
+    }
+  ],
+  "qualityCounts": {
+    "duplicates": 1268,
+    "dead-code": 2724
+  },
+  "qualityWaived": false,
+  "formalDone": false,
+  "fullNpmTestRun": false
+}

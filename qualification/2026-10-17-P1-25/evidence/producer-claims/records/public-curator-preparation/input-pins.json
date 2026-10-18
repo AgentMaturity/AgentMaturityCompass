@@ -1,0 +1,67 @@
+{
+  "schema": "p125pc-inert-public-curator-input-pins/1",
+  "count": 12,
+  "files": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/prepare-public-output.py",
+      "bytes": 17505,
+      "sha256": "2b454cbdc55233c54cbf4cb9b34ed1f1c2aaeb5dcfdfe7bb094bb9d45705be14"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/prepare-public-output.py.source.txt",
+      "bytes": 17505,
+      "sha256": "2b454cbdc55233c54cbf4cb9b34ed1f1c2aaeb5dcfdfe7bb094bb9d45705be14"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/seal.json",
+      "bytes": 1853,
+      "sha256": "df68a041310a2df1f092b6d620e51cb9b4e6f1f302c106c6b62ba1ad2d49d8b9"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/phase-inputs.json",
+      "bytes": 4132,
+      "sha256": "d59c4d21c40a79ca1234bfb143b64e8eff30b21d92105b1ae6dd51e80ef1b428"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/author-review-addendum.json",
+      "bytes": 2183,
+      "sha256": "254cd6ed950914abbcc2dbfa42e421b73f8290cf401f78038f93a0ee63e6c54f"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125ec-public-curator/command.json",
+      "bytes": 1287,
+      "sha256": "bfdf066fdad5159f5fb8a5c4a2cb1f3148c852ab734448f21fb671fdeaaadab4"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/audit-public.py",
+      "bytes": 40958,
+      "sha256": "805a2c8e5c5dc48c0d9f3dae9be5ed02babed5cc5a41fd94ef6bdff619d48a80"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "bytes": 453,
+      "sha256": "6173074e96a07158d14eea016d3c0d55e1b704d564bb76aed9f159c7f92b8b6f"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-outcome.json",
+      "bytes": 7969,
+      "sha256": "6cc159f39b6256b255d459f323615b20fed9ce366df06b7c1c58f8dc7b09e045"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-public-audit.json",
+      "bytes": 235594,
+      "sha256": "850aa30e16efb39c41b1b8d53c18d1903d5cd63d568f4fbf60d81ec6d426512b"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-outcome.json",
+      "bytes": 8001,
+      "sha256": "37a6fef970bca7282fecf5593f083bd672c1831f2f0f58b7aa8dec556d91ecac"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-public-audit.json",
+      "bytes": 235614,
+      "sha256": "c057c09eed76a6730a9f5bfbf0d41c6116c71e7d531bfc7c700ef416a42a909b"
+    }
+  ],
+  "noPemKeyPrivateChildStreamOrSigningRootBodyRead": true
+}

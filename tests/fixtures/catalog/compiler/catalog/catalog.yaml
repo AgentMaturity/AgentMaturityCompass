@@ -1,0 +1,13 @@
+{
+  "id": "amc.fixture.compiler",
+  "version": "0.1.0",
+  "compilerCompat": "^1.2.0",
+  "publisher": "Synthetic compiler qualification fixture only",
+  "maintainers": [
+    {
+      "name": "synthetic-fixture-maintainer",
+      "role": "test-fixture"
+    }
+  ],
+  "licence": "MIT"
+}

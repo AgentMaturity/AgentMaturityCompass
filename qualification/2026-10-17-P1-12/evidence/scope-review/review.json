@@ -1,0 +1,91 @@
+{
+  "schema": "p112-new-branch-exact179-scope-review/1",
+  "at": "2026-10-16T19:50:53.000384+00:00",
+  "blockers": [],
+  "recommendation": "Current finite evidence supports root admission of the exact new test and qualification paths. Root still owns hosted/D15/freeze and candidate admission. This review does not allocate source, execute qualification or mark any whole issue complete.",
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "head": "85dd9d9bda246a78407bb06c9123e78c1745ea15",
+    "branch": "codex/p1-12-compiled-guard-qualification",
+    "cleanAtObservation": true,
+    "indexEmpty": true,
+    "priorP111BranchPreservedAt": "85dd9d9bda246a78407bb06c9123e78c1745ea15",
+    "boundedP111SourceCheckpoint": "a6909ac52ec7db1411696b82c4ef6c9cb61a89d2",
+    "metadataAdvancementChangesSelectedImplementationBytes": false
+  },
+  "exactProposedPaths": [
+    "tests/policy/compiledPolicyGuard.test.ts",
+    "qualification/2026-10-17-P1-12/"
+  ],
+  "ownership": {
+    "registries": 3,
+    "registeredRoots": 170,
+    "retainedFreshRoots": 9,
+    "physicalRoots": 179,
+    "membershipAdded": [],
+    "membershipRemoved": [],
+    "includesQ111Q125Q107": true,
+    "targetAbsenceChecks": 358,
+    "all179TargetStatusesExit0Empty": true,
+    "all179SelectedSourceStatusesExit0Empty": true,
+    "all12TargetHistoriesExit0Empty": true,
+    "sourceFilePresenceAndHashPairs": 2502,
+    "sourceFilePairChanges": [],
+    "meaning": "The same finite source/test/docs variants remain exact across the retained union. Absence, clean status, prior source merge or metadata advancement never releases their ownership."
+  },
+  "preservation": {
+    "heldRAndClaudePins": 36,
+    "allMatchPrior": true,
+    "heldRHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "heldRExact18StatusRowsAndFullStatusUnchanged": true,
+    "heldRIndexEmpty": true,
+    "ignoredProviderArchive": "Byte pin remains exact and git check-ignore still reports common .git/info/exclude line19 /unused-code/. No staging, unignore, force or D15 action occurred. Human-held decision remains open.",
+    "preservedMetadata": {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/preserved-metadata.json",
+      "bytes": 1027,
+      "sha256": "1f34fa5e60d942dcbe5545ae697fa167138577840e5796ab797fc45582ae4b49"
+    },
+    "existingSourceVariantsReadOnly": true
+  },
+  "reservations": {
+    "lastKnownBinding": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "exactLivePathExistenceChecks": 1,
+    "exactLivePathExists": false,
+    "currentPin": null,
+    "currentDeltasRecovered": false,
+    "pendingEntry": {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/pending-reservation-entry.md",
+      "bytes": 1645,
+      "sha256": "8024bb26c9af2319e1dbdd99830cade2815fbe24165dd8d58ae98364fdda8d1c"
+    },
+    "sharedAppendPerformed": false,
+    "broadRecoveryRecreationOrClaudeMessage": false,
+    "interpretation": "Missing shared bookkeeping is a disclosed current-delta/append limitation, not ownership release or an automatic new approval hold. Prior source reservations remain protected."
+  },
+  "scopeFit": {
+    "priorSealedRoutingReview": {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/review.json",
+      "bytes": 10189,
+      "sha256": "dd4767117dd66c42658ef10ac5ab0c6b9d5d44b1903021886407efb451d40525"
+    },
+    "prior179RefreshSeal": {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/seal.json",
+      "bytes": 1289,
+      "sha256": "e87884b5c0498b03dfdbd94451c4a06ab30d7a5edae2c1c66cd4d2f94bb0e8fc"
+    },
+    "semanticRecommendationUnchanged": "One new compiled-policy helper test and bounded qualification metadata; typed already-loaded policy/execution values are unit inputs, not cryptographic admission or whole native enforcement proof.",
+    "closedWork": "Do not reopen P1-07 strict-binding removal or requalify closed components.",
+    "futureBroaderEvidence": "Signed activation/head changes, live approval policy, native signed receipt, actual destination allow/deny, amount-threshold behavior, full integrations/docs/release remain separately unestablished."
+  },
+  "rootOwnsNext": [
+    "Complete current hosted exact-path overlap/WIP admission, excluding verified Dependabot only from WIP while retaining all their paths.",
+    "Run ordinary exact-path D15 and freeze without changing guards, deadlines or baselines.",
+    "Review the separately sealed candidate, then perform actual compiler/runtime/quality qualification. Retain actual failures before any separately admitted repair."
+  ],
+  "holds": "P1-01, full P1-25/P1-11/P1-12 acceptance, authorization/key precedence, ignored archive decisions, F37 skip and all human holds remain unchanged.",
+  "executionBoundary": "Read-only Git registry/status/log/ref/check-ignore metadata and finite source file/hash observations; private artifacts only. No source allocation/code proposal/materialization, product/runtime/compiler/native/SQL/network, hosted/D15/freeze, index/checkout/QA write, process probe or Claude message."
+}

@@ -1,0 +1,83 @@
+{
+  "sourceCandidate": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014",
+  "sourceCommit": "7d5d8335bf973900fb9a9d9d331471b1b366ef8b",
+  "preservedClaudeCommit": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+  "base": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "reusedBodies": [
+    {
+      "path": "tests/explainabilityContractParity.test.ts",
+      "candidateSha256": "c53222bdc8afa8d90496ec7f7a1696640fa4487067e342eb3175adee5408e189",
+      "claudeSha256": "c53222bdc8afa8d90496ec7f7a1696640fa4487067e342eb3175adee5408e189",
+      "candidateEqualsClaude": true,
+      "presentOnMain": true,
+      "mainSha256": "770ef3525f1dbbf4d4a387ce6057660f19972b946fe12418bbbbc6bd554642b6"
+    },
+    {
+      "path": "tests/signedArtifactVerificationParity.test.ts",
+      "candidateSha256": "b4440597565e3bd2beb4046714ab08d04ca31f1b503b785825cef7c4e73cbeb4",
+      "claudeSha256": "b4440597565e3bd2beb4046714ab08d04ca31f1b503b785825cef7c4e73cbeb4",
+      "candidateEqualsClaude": true,
+      "presentOnMain": true,
+      "mainSha256": "9641e98d4ad30fde10108a2c1283a693ccb23f79b066590af0085b233733835d"
+    },
+    {
+      "path": "unused-code/2026-10-02-native/explainability-contracts/restoration.json",
+      "candidateSha256": "cf80e00a32f0596328eedf83774be6717b7626f7c7e86a7650f5da48ee9aaaa3",
+      "claudeSha256": "cf80e00a32f0596328eedf83774be6717b7626f7c7e86a7650f5da48ee9aaaa3",
+      "candidateEqualsClaude": true,
+      "presentOnMain": true,
+      "mainSha256": "1c47c543f4029ac9c111e4438e661adf645f24aec90dbbd10db700e394c53325"
+    },
+    {
+      "path": "unused-code/2026-10-02-native/signed-artifacts/restoration-map.json",
+      "candidateSha256": "f2a93564e978d25d3d018f2cfb04aeab4467c5a334682d11d9096f02e46629cf",
+      "claudeSha256": "f2a93564e978d25d3d018f2cfb04aeab4467c5a334682d11d9096f02e46629cf",
+      "candidateEqualsClaude": true,
+      "presentOnMain": true,
+      "mainSha256": "4fec142f74c993bae21f5708fde1bbd09e9a7f7521d54be98c7bd364d70dcda6"
+    },
+    {
+      "path": "unused-code/plan-edits/P1-16/src/audit/binderArtifact.ts.landed",
+      "candidateSha256": "9b40bd627e04b45b395fba58e4318808b71c34ab40048d344088a22d635c7e46",
+      "claudeSha256": "9b40bd627e04b45b395fba58e4318808b71c34ab40048d344088a22d635c7e46",
+      "candidateEqualsClaude": true,
+      "presentOnMain": false,
+      "mainSha256": null
+    },
+    {
+      "path": "unused-code/plan-edits/P2-01/src/session/spill/spillStore.ts.landed",
+      "candidateSha256": "de1469cf447c9ccf8a22fef1ebcce716b3af7455b7127eb00ddc7cb5a7bc59e7",
+      "claudeSha256": "de1469cf447c9ccf8a22fef1ebcce716b3af7455b7127eb00ddc7cb5a7bc59e7",
+      "candidateEqualsClaude": true,
+      "presentOnMain": false,
+      "mainSha256": null
+    }
+  ],
+  "manifestRowsAdded": [
+    {
+      "path": "src/audit/binderArtifact.ts",
+      "issue": "P1-16",
+      "baseCommit": "1c1ff4b1ff3d94960aee7e130e5dba6988126d4c",
+      "archivePath": "unused-code/plan-edits/P1-16/src/audit/binderArtifact.ts.landed",
+      "sha256": "9b40bd627e04b45b395fba58e4318808b71c34ab40048d344088a22d635c7e46"
+    },
+    {
+      "path": "src/session/spill/spillStore.ts",
+      "issue": "P2-01",
+      "baseCommit": "e89f4842892c1eae4e4acf6996c7d0d31a4b229e",
+      "archivePath": "unused-code/plan-edits/P2-01/src/session/spill/spillStore.ts.landed",
+      "sha256": "de1469cf447c9ccf8a22fef1ebcce716b3af7455b7127eb00ddc7cb5a7bc59e7"
+    }
+  ],
+  "existing55RowsPreserved": true,
+  "allOriginalArchiveBytesPreserved": true,
+  "productionSourceChanges": false,
+  "authoredSourceCandidatesUntouched": true,
+  "P1_26AdapterScope": "Archived verifier compatibility adapters only. These are not literal edits to current verifiers; current P0-09 signed-root admission remains live.",
+  "authorCommits": [
+    "a52db763f74e24501f850925a8ea42da34c19dd1",
+    "ab5f12b30feec9a6e00ae7cf81342263c6fb5560",
+    "b815c82977c544120b94ff5a40e27b2ec9773d86",
+    "9e9d1b03690045a380af1aaaf14af025c0677d9b"
+  ]
+}

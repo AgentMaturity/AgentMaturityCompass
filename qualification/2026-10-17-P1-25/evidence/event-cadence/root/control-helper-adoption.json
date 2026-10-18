@@ -1,0 +1,54 @@
+{
+  "at": "2026-10-17T01:08:17.877564+00:00",
+  "activeHelper": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-control.py",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/source-control.py",
+    "bytes": 26289,
+    "sha256": "a30fa847e29155f851eca012ce4c315729285cc84b34d575cd84d17c64687853",
+    "dev": 16777231,
+    "inode": 543900281,
+    "nlink": 1
+  },
+  "inertHelper": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/source-control.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/source-control.py.source.txt",
+    "bytes": 26289,
+    "sha256": "a30fa847e29155f851eca012ce4c315729285cc84b34d575cd84d17c64687853",
+    "dev": 16777231,
+    "inode": 543898504,
+    "nlink": 1
+  },
+  "independentReview": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-helper-static-review/review.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-helper-static-review/review.json",
+    "bytes": 6496,
+    "sha256": "45db44e5f721d0218d2bab2e9c1c9d322fb22100528deacb8875a4bd8d344a16",
+    "dev": 16777231,
+    "inode": 543900183,
+    "nlink": 1
+  },
+  "independentSeal": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-helper-static-review/seal.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-helper-static-review/seal.json",
+    "bytes": 1112,
+    "sha256": "ed2098bc2d08a33db2d5cc35f5c9bd282ed9f673e59ead534dd33d10417b0605",
+    "dev": 16777231,
+    "inode": 543900185,
+    "nlink": 1
+  },
+  "rootReadFull402LinesRecipesFieldInstructions": true,
+  "actualBindings": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/control-root-bindings.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/control-root-bindings.json",
+    "bytes": 5634,
+    "sha256": "fa029df20ab16a0a79c252ebf8efb92008d83d64635558fff36f76876fde9cad",
+    "dev": 16777231,
+    "inode": 543900188,
+    "nlink": 1
+  },
+  "rootIndependentlyReviewedExactFilledManifest": true,
+  "bothActualSourceFreshAndPublicReviewsPass": true,
+  "onlyFixedFutureFreshSourceOperationsAdmitted": true,
+  "noActualControlOutcomeOrActionHashYet": true,
+  "sequentialNaturalClosureMandatory": true
+}

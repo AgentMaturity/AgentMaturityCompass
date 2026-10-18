@@ -1,0 +1,79 @@
+{
+  "schema": "p125g-control-preparation-seal/2",
+  "at": "2026-10-16T22:49:52.744643+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/ORDER.patch",
+      "bytes": 483,
+      "sha256": "188026c7a797e261a231e0a1e7a4fc48b166da6e900de1a3c4ac44423d1fd02b"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/DROP-VALID-GRANT.patch",
+      "bytes": 876,
+      "sha256": "6c6027557916fb4bc33300fd41a992eb5bd39d7082db73e3669169a08fbb09e2"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/controls.json",
+      "bytes": 3842,
+      "sha256": "72426bacdef43659fba7c4c299b1da54687b7d94cf20c60011dafe1eab0f96e5"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/source-pinset.json",
+      "bytes": 7366,
+      "sha256": "7077824c86030863e607e7d19de0d67641cbada2edbdf5b680bda8b9085d2661"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/source-control.py",
+      "bytes": 15919,
+      "sha256": "8725ba26ae7d0fb7b8a66cba763c14caddc66b07ec6426008232a3e59f046147"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/check-preservation.py",
+      "bytes": 1457,
+      "sha256": "4255f6d908e3ce5cf8eda86ef301d6c92ccefb97793a09fe8a36beba92de274c"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/source-control.py.adaptation.patch",
+      "bytes": 7720,
+      "sha256": "36a851848909d0253b419e232c061292445840f493a5244d11f4af2cde78f4bf"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/check-preservation.py.adaptation.patch",
+      "bytes": 1447,
+      "sha256": "7fafcdf71b3e01599b7c0ae81b3b35e41ceba6d53323a795d4d9be5384d29436"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/plan.json",
+      "bytes": 4385,
+      "sha256": "fb515a9f568882814a4056f8a7261b75062d4341dec424d40cf48fef7f689d53"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/README-v2.md",
+      "bytes": 3053,
+      "sha256": "dd0ceaf572a85c52e4c2d9681ce38145122139ed7826481f4aa7152f5460024b"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/author-static-review.json",
+      "bytes": 824,
+      "sha256": "fd357975f19dc51835f414f1c34c07fe885c11604cf9c0f2a43500a303f8ff5f"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/input-pins.json",
+      "bytes": 39979,
+      "sha256": "8d609b52060d4adfae03d15971579dc12ffe741c8fba4c2c3bc0464c2cd84756"
+    }
+  ],
+  "inputPinCount": 163,
+  "sourceCommit": null,
+  "freshRoot": null,
+  "executedImportedParsedOrCompiled": false,
+  "sourceIndexQaWrites": false,
+  "rootActualAdmissionRequired": true,
+  "preferred": true,
+  "priorSealPreserved": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/seal.json",
+    "bytes": 3038,
+    "sha256": "d304bee17594b93eae3a34a61412f78a61c1acc07d1fa24b1bc04ca016a6a042"
+  },
+  "delta": "Private prose only: distinguish signing-material reads from helper execution and correct spacing. All helper/recipe/plan/pin bytes unchanged."
+}

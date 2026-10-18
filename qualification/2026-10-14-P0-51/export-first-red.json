@@ -1,0 +1,279 @@
+{
+  "issue": "P0-51",
+  "scope": "Ordinary export file-link regression using exclusively fixture-created targets",
+  "status": "RED defect reproduced; no production repair",
+  "measuredSource": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+  "node": "v22.23.3",
+  "commandReceiptLog": "/private/tmp/p0-51-commands-20261014.jsonl",
+  "rawLog": "/private/tmp/p0-51-export-links-red-20261014.log",
+  "rawVitestReport": "/private/tmp/p0-51-export-links-red-jbn2qtna/vitest.json",
+  "fixtureEvidenceDirectory": "/private/tmp/p0-51-export-links-red-jbn2qtna",
+  "preflight": "/private/tmp/p0-51-readonly-preflight-20261014.json",
+  "exit": 1,
+  "counts": {
+    "numTotalTests": 3,
+    "numPassedTests": 1,
+    "numFailedTests": 2,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "numPendingTestSuites": 0
+  },
+  "assertions": [
+    {
+      "name": "transparency proof export file-link handling exports a genuine signed archive to regular caller-chosen files",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "name": "transparency proof export file-link handling refuses a linked directory without changing its fixture-owned target",
+      "status": "failed",
+      "failureMessages": [
+        "AssertionError: a file-link destination must be refused: expected null not to be null\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/transparencyProofExportContainment.test.ts:104:73\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)",
+        "AssertionError: the fixture-owned target bytes must remain untouched: expected Buffer[ 31, 139, 8, 0, 79, 193, \u2026(1480) ] to deeply equal Buffer[ 111, 119, 110, 101, 100, 32, \u2026(-67) ]\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/transparencyProofExportContainment.test.ts:105:80\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+      ]
+    },
+    {
+      "name": "transparency proof export file-link handling refuses a linked filename without changing its fixture-owned target",
+      "status": "failed",
+      "failureMessages": [
+        "AssertionError: a file-link destination must be refused: expected null not to be null\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/transparencyProofExportContainment.test.ts:104:73\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)",
+        "AssertionError: the fixture-owned target bytes must remain untouched: expected Buffer[ 31, 139, 8, 0, 79, 193, \u2026(1487) ] to deeply equal Buffer[ 111, 119, 110, 101, 100, \u2026(0) ]\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/transparencyProofExportContainment.test.ts:105:80\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "path": "src/transparency/merkleIndexStore.ts",
+      "testedSha256": "960e039cc8a458ed90f1b18e8842f4042fd7c2a620a660666416de2d9ef21508",
+      "currentSha256": "960e039cc8a458ed90f1b18e8842f4042fd7c2a620a660666416de2d9ef21508",
+      "unchangedSinceRed": true
+    },
+    {
+      "path": "src/transparency/logChain.ts",
+      "testedSha256": "0c24f07dc888e382e4388bf89c06ac355a8ce67f2f2627ae5a7c87aa4f588fff",
+      "currentSha256": "0c24f07dc888e382e4388bf89c06ac355a8ce67f2f2627ae5a7c87aa4f588fff",
+      "unchangedSinceRed": true
+    },
+    {
+      "path": "tests/helpers/trustContext.ts",
+      "testedSha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+      "currentSha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+      "unchangedSinceRed": true
+    },
+    {
+      "path": "tests/transparencyProofExportContainment.test.ts",
+      "testedSha256": "713e730ee2fb3a4dcf46a687596a0e9d80db632b0949b8ad2148b5a67fd8634a",
+      "currentSha256": "713e730ee2fb3a4dcf46a687596a0e9d80db632b0949b8ad2148b5a67fd8634a",
+      "unchangedSinceRed": true
+    }
+  ],
+  "effects": [
+    {
+      "outFile": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-F8aeBI/workspace/.amc/transparency/proofs/control.amcproof",
+      "entryHash": "2f8c81fbe43de6e6364ad96bcf035ac1b3d622aafb625f350c8e4fa11e172ba1",
+      "signedRoot": "f145cf34b842b903bb21e46e6cf8c97cb5a0d114d95f710544d7c603a2aac47c",
+      "trusted": true,
+      "sha256": "d3ee2a464355943fcd708a5d555871e82b5e10674bfab14925364b547df0232c",
+      "bytes": 1684,
+      "name": "directory-control",
+      "evidencePath": "/private/tmp/p0-51-export-links-red-jbn2qtna/directory-control-n7V6Fw/effect.json",
+      "retainedFiles": [
+        {
+          "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/directory-control-n7V6Fw/control.amcproof",
+          "bytes": 1684,
+          "sha256": "d3ee2a464355943fcd708a5d555871e82b5e10674bfab14925364b547df0232c"
+        },
+        {
+          "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/directory-control-n7V6Fw/effect.json",
+          "bytes": 433,
+          "sha256": "7647082b565ab75db8d8d80d2d5f1928424288857c849a58cbe491c0e93e04af"
+        }
+      ]
+    },
+    {
+      "outFile": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-gNxvPM/workspace/.amc/transparency/proofs/control.amcproof",
+      "entryHash": "28143bf82b6052097af8f355a03e48267c6accb4d61a9a66e42b911d0b1be40d",
+      "signedRoot": "a33a79e1e24d0e079013ac13cac164e83d5f3a61df3243ce7d6ade9b91245b6b",
+      "trusted": true,
+      "sha256": "7a66aff73bd731460dc3a18d497212bca2469e35615d2bbcf3d98eb6dd92dd01",
+      "bytes": 1689,
+      "name": "filename-control",
+      "evidencePath": "/private/tmp/p0-51-export-links-red-jbn2qtna/filename-control-lOgPLe/effect.json",
+      "retainedFiles": [
+        {
+          "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/filename-control-lOgPLe/control.amcproof",
+          "bytes": 1689,
+          "sha256": "7a66aff73bd731460dc3a18d497212bca2469e35615d2bbcf3d98eb6dd92dd01"
+        },
+        {
+          "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/filename-control-lOgPLe/effect.json",
+          "bytes": 433,
+          "sha256": "c3ef8067305fba31e94bbb5b77e70b27811b38bb20af8aa8e16f50e7c8000294"
+        }
+      ]
+    },
+    {
+      "fixtureRoot": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-F8aeBI",
+      "outFile": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-F8aeBI/workspace/.amc/transparency/proofs/linked-directory/sentinel.amcproof",
+      "sentinel": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-F8aeBI/fixture-output/sentinel.amcproof",
+      "entryHash": "2f8c81fbe43de6e6364ad96bcf035ac1b3d622aafb625f350c8e4fa11e172ba1",
+      "refusal": null,
+      "returned": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-F8aeBI/workspace/.amc/transparency/proofs/linked-directory/sentinel.amcproof",
+      "targetChanged": true,
+      "beforeSha256": "54526c14867e5a5a23c6bc335ed58d7ce168a1ce96f820419b929500e25c15b0",
+      "afterSha256": "6e33b006754585e4bec5db4d2b289b63c502ff4838ed2dc8750818b63e8178bf",
+      "beforeBytes": 32,
+      "afterBytes": 1686,
+      "beforeLink": {
+        "isLink": true,
+        "target": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-F8aeBI/fixture-output"
+      },
+      "afterLink": {
+        "isLink": true,
+        "target": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-F8aeBI/fixture-output"
+      },
+      "signedRootBefore": "77bc036bd28aef669da69e2e3f7c7a0e51f3f8111c038545f972d983b3d3452b",
+      "signedRootAfter": "77bc036bd28aef669da69e2e3f7c7a0e51f3f8111c038545f972d983b3d3452b",
+      "name": "linked-directory",
+      "evidencePath": "/private/tmp/p0-51-export-links-red-jbn2qtna/linked-directory-ID9fhH/effect.json",
+      "retainedFiles": [
+        {
+          "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/linked-directory-ID9fhH/effect.json",
+          "bytes": 1387,
+          "sha256": "5ae0a055e3931d7cec3fcef0c9da8755e65809d910ef59808b4b6fdf9e0f80da"
+        },
+        {
+          "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/linked-directory-ID9fhH/sentinel-after.bin",
+          "bytes": 1686,
+          "sha256": "6e33b006754585e4bec5db4d2b289b63c502ff4838ed2dc8750818b63e8178bf"
+        },
+        {
+          "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/linked-directory-ID9fhH/sentinel-before.bin",
+          "bytes": 32,
+          "sha256": "54526c14867e5a5a23c6bc335ed58d7ce168a1ce96f820419b929500e25c15b0"
+        }
+      ]
+    },
+    {
+      "fixtureRoot": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-gNxvPM",
+      "outFile": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-gNxvPM/workspace/.amc/transparency/proofs/linked-filename",
+      "sentinel": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-gNxvPM/fixture-output/sentinel.amcproof",
+      "entryHash": "28143bf82b6052097af8f355a03e48267c6accb4d61a9a66e42b911d0b1be40d",
+      "refusal": null,
+      "returned": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-gNxvPM/workspace/.amc/transparency/proofs/linked-filename",
+      "targetChanged": true,
+      "beforeSha256": "f1b53a523083874861cd0e4b517858c504625ad4bfd162ab1d397e21c75edf7f",
+      "afterSha256": "b7488f76b3026ad65bba62a5f180e0151b17461e097572afb34ba01f46ab0d83",
+      "beforeBytes": 31,
+      "afterBytes": 1693,
+      "beforeLink": {
+        "isLink": true,
+        "target": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-gNxvPM/fixture-output/sentinel.amcproof"
+      },
+      "afterLink": {
+        "isLink": true,
+        "target": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-gNxvPM/fixture-output/sentinel.amcproof"
+      },
+      "signedRootBefore": "315c6e3a657dfb5133a4548cfe337b2c740035981dc6c37f82928f66ace5b611",
+      "signedRootAfter": "315c6e3a657dfb5133a4548cfe337b2c740035981dc6c37f82928f66ace5b611",
+      "name": "linked-filename",
+      "evidencePath": "/private/tmp/p0-51-export-links-red-jbn2qtna/linked-filename-CGFl8y/effect.json",
+      "retainedFiles": [
+        {
+          "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/linked-filename-CGFl8y/effect.json",
+          "bytes": 1385,
+          "sha256": "0a08867b68050d794576fd0faef136ce67c6708fd337dce9ececbd57510cdff1"
+        },
+        {
+          "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/linked-filename-CGFl8y/sentinel-after.bin",
+          "bytes": 1693,
+          "sha256": "b7488f76b3026ad65bba62a5f180e0151b17461e097572afb34ba01f46ab0d83"
+        },
+        {
+          "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/linked-filename-CGFl8y/sentinel-before.bin",
+          "bytes": 31,
+          "sha256": "f1b53a523083874861cd0e4b517858c504625ad4bfd162ab1d397e21c75edf7f"
+        }
+      ]
+    },
+    {
+      "outFile": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-BDPFSd/fixture-output/regular.amcproof",
+      "entryHash": "ae5de11a83d2fedd64ae073a5f80bd5dc6af472d1d65c4ba48d2c9ed6f94d69f",
+      "signedRoot": "72905953935c00243876fb35b29446fc576ace39127f7503d338e88ff483363e",
+      "trusted": true,
+      "sha256": "3681a081a6f2a91a4c4c5700d8e8bd83a6165ccdc15ba364c603e0626fee7294",
+      "bytes": 1691,
+      "name": "regular-caller-output",
+      "evidencePath": "/private/tmp/p0-51-export-links-red-jbn2qtna/regular-caller-output-xlqNth/effect.json",
+      "retainedFiles": [
+        {
+          "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/regular-caller-output-xlqNth/control.amcproof",
+          "bytes": 1691,
+          "sha256": "3681a081a6f2a91a4c4c5700d8e8bd83a6165ccdc15ba364c603e0626fee7294"
+        },
+        {
+          "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/regular-caller-output-xlqNth/effect.json",
+          "bytes": 413,
+          "sha256": "a00ca6db29c6d453393c9e2622db4133e723fd1d9bca9bf257aabc3302751e3f"
+        }
+      ]
+    },
+    {
+      "outFile": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-proof-export-links-BDPFSd/workspace/.amc/transparency/proofs/regular.amcproof",
+      "entryHash": "ae5de11a83d2fedd64ae073a5f80bd5dc6af472d1d65c4ba48d2c9ed6f94d69f",
+      "signedRoot": "72905953935c00243876fb35b29446fc576ace39127f7503d338e88ff483363e",
+      "trusted": true,
+      "sha256": "6726b128f89cd80e86b6eddc87b34dff5257a94ef11e190f5579ab052fe6efd6",
+      "bytes": 1688,
+      "name": "regular-workspace",
+      "evidencePath": "/private/tmp/p0-51-export-links-red-jbn2qtna/regular-workspace-xmShNj/effect.json",
+      "retainedFiles": [
+        {
+          "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/regular-workspace-xmShNj/control.amcproof",
+          "bytes": 1688,
+          "sha256": "6726b128f89cd80e86b6eddc87b34dff5257a94ef11e190f5579ab052fe6efd6"
+        },
+        {
+          "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/regular-workspace-xmShNj/effect.json",
+          "bytes": 433,
+          "sha256": "35258ae77e94cefebe18cfcb061f1c47d03fd846fdd984731f1858c9d3d8eb7f"
+        }
+      ]
+    }
+  ],
+  "protections": {
+    "newTestOnly": "tests/transparencyProofExportContainment.test.ts",
+    "productionEdited": false,
+    "targetsOutsideOwnedFixture": false,
+    "externalCalls": false,
+    "otherWorktreeAccess": false,
+    "signedControlBeforeEachLink": true,
+    "operatorPinBeforeArchive": true,
+    "originalPrivateKeyFilesRetainedInReceipt": false,
+    "fixtureRootsRemovedAfterCapture": true,
+    "publicOutFileContractRegularSiblingControl": true
+  },
+  "limits": [
+    "This is local Node22/macOS export behavior only, not hosted CI, full acceptance, repaired confinement, race resistance or Windows/Linux qualification.",
+    "Both directory and filename links are static fixture-created links; no race test was performed.",
+    "Refusal assertions intentionally remain failing on this measured source. Production repair requires root review of authorized scope and restoration policy."
+  ],
+  "recordedUtc": "2026-10-14T17:53:29.421737+00:00",
+  "rawHashes": [
+    {
+      "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/input.json",
+      "bytes": 806,
+      "sha256": "e5bf790bfc42f51459e98c507468960af74ee428eb22554fdff0b4db4497dcea"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-red-jbn2qtna/vitest.json",
+      "bytes": 7277,
+      "sha256": "a21b802f72ba08835c359522c38f6f70f1d25d383b786d43fce957d3a361ac51"
+    },
+    {
+      "path": "/private/tmp/p0-51-export-links-red-20261014.log",
+      "bytes": 45463,
+      "sha256": "f40730f8319ef8b0d0fd526bc753099bb2f9719658407b81549aea4a26df736c"
+    }
+  ]
+}

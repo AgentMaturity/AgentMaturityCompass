@@ -1,0 +1,80 @@
+{
+  "at": "2026-10-16T18:10:42.999201+00:00",
+  "parent": "bf8836cd38d2879ccef11c6cfd1423edf0a96c0f",
+  "branch": "codex/p1-07-gate-qualification",
+  "reviewInputsRechecked": 99,
+  "ordinaryAddExit": 1,
+  "ordinaryAddStdout": "",
+  "ordinaryAddStderr": "The following paths are ignored by one of your .gitignore files:\ndocs/internal\nhint: Use -f if you really want to add them.\nhint: Disable this message with \"git config set advice.addIgnoredFile false\"\n",
+  "exactStagedBlobs": [
+    {
+      "path": "tests/diagnostic/levelCumulative.test.ts",
+      "bytes": 10722,
+      "sha256": "1265e5715bd3ceb3c342c44e3a65681f8d32d74dd962ede9e7f64c8227575c78"
+    },
+    {
+      "path": "tests/diagnostic/evidenceEmitterRegistry.test.ts",
+      "bytes": 10448,
+      "sha256": "01ba46f55bf1135306e8e55d9b8c41a4b106ced58aa3a9a5463557fede001061"
+    },
+    {
+      "path": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+      "bytes": 28819,
+      "sha256": "5eb353a14bdaebf8cef9d14c1dec266c0deeb239c696eb3e3ca32fc250434714"
+    },
+    {
+      "path": "README.md",
+      "bytes": 59828,
+      "sha256": "fc8e82e4cbff27fd6ac308062343e2ebf2da7978ec67905b5389105fa4fa1571"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "04ec7a6f7a8fa7df105e65122c593bd08fd24bafb2f0c54ad7edc17a8923a69c"
+    },
+    {
+      "path": "website/index.html",
+      "bytes": 43520,
+      "sha256": "44ee4804dfeefdb726e262c1beabfded1595ba1b7b0e4dfd0533941fd464bad8"
+    },
+    {
+      "path": "website/lite.html",
+      "bytes": 11197,
+      "sha256": "6fc9ccb3d7fa8e869dc162e4066e92ddf04f2653c0e4f7bbe0b2f18e8a8e24db"
+    },
+    {
+      "path": "website/i18n.js",
+      "bytes": 44169,
+      "sha256": "6c89dca1e3164179c606f610b9bf511075fdef223b8fd15d6ca8d474364897e4"
+    },
+    {
+      "path": "docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "2b71a6b832ebdbcb8bab72a5cb0ab5078dc006061a976253239eaf6d1e284e6b"
+    },
+    {
+      "path": "docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "c3fcb3921c819287f2f4b4eacf3a96b2a98aa3df7b2f12a1cbfcef6c4d3b5c62"
+    },
+    {
+      "path": "docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "46f9b94a81e6dd4fbb576bfa2424e0bc59ea08545f3aff58eee969e236a503b0"
+    },
+    {
+      "path": "docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "7e61a026c779d0fff7910b4e82b7090c304765cf34061756e1efc427305f300f"
+    },
+    {
+      "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "2895b4b277268192dfa36a1b55a4bb5426c0cfb9062a03644663fc5786da750b"
+    }
+  ],
+  "stagedWhitespaceCheckExit": 0,
+  "noForceNoVerifyIgnoreChange": true,
+  "qualityGreen": false,
+  "fullP107Done": false
+}

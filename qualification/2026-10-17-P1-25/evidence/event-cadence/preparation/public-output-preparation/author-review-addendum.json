@@ -1,0 +1,44 @@
+{
+  "schema": "p125ec-public-output-curator-author-review-addendum/1",
+  "at": "2026-10-17T01:18:21.273429+00:00",
+  "preferredPreparationSeal": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/seal.json",
+    "bytes": 1853,
+    "sha256": "df68a041310a2df1f092b6d620e51cb9b4e6f1f302c106c6b62ba1ad2d49d8b9"
+  },
+  "preferredSource": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/prepare-public-output.py.source.txt",
+    "bytes": 17505,
+    "sha256": "2b454cbdc55233c54cbf4cb9b34ed1f1c2aaeb5dcfdfe7bb094bb9d45705be14"
+  },
+  "completeBaseDelta": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/prepare-public-output-from-B38.patch.txt",
+    "bytes": 17952,
+    "sha256": "b1e4fb03cb9b806fa3fc6cfcf0408e7b7e223e5575be1b3c1742adc3841917e9"
+  },
+  "fullSourceDeltaInputsReadmeAndSealRead": true,
+  "allOriginalSealedOutputsAndInputsStillExact": true,
+  "oldWindowFullProofBlockBytesExact": {
+    "bytes": 2458,
+    "sha256": "d71cbaebfadad3579b9d82ee114c4fec26537a41ca97a15b17df0e8c1fe27b47"
+  },
+  "oldNonwindowLastReplyBranchBytesExact": {
+    "bytes": 165,
+    "sha256": "3290728a8261c9bb1124761c3478e6a5e926a4051c8b55f8038899233ae148bd"
+  },
+  "allSixActualTestsCommandsCheckpointFactsAndResourceProjectionsMatch": true,
+  "allExplicitGrantMetadataChildSocketClosuresNaturallyClosedWithoutReadingStreams": true,
+  "cadenceM1SecondCapturedPairHasObservationalUnverifiedStatusProofNullAndNoLastReplyComparison": true,
+  "cadenceM2OneActualIndependentProofRetainedWithoutMissingGrantCredit": true,
+  "allVerifiedCadenceGrantsRequireOwnNamedQueryResponseChildAndActualNamedTsaCertificateDerSha": true,
+  "noPredictedOutputInventoryOrResourceCounts": true,
+  "helperParsedImportedCompiledOrExecuted": false,
+  "productOpenSslNativeSslOrNetworkExecuted": false,
+  "pemQueryReplyKeyOrChildStreamContentsRead": false,
+  "publicOutputsMaterialized": false,
+  "sourceIndexQaPriorArtifactsOrReservationTouched": false,
+  "independentReviewStillRequired": true,
+  "rootAdoptionAndExecutionStillRequired": true,
+  "wholeIssueOrPlanCredit": false,
+  "blockers": []
+}

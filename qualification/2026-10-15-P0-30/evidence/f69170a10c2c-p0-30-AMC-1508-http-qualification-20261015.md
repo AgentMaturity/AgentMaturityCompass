@@ -1,0 +1,18 @@
+# AMC-1508 bounded OWNER-cookie HTTP qualification
+
+The byte-exact new one-case fixture passed its first genuine local HTTP baseline. The forged top-level submittedBy request received 400 and preserved both prior rows; the healthy request then received 201 and inserted exactly one portal-http-owner job. Observed row counts were 2 → 2 → 3.
+
+| Source control | Passed baseline → mutant → restored | Mutant HTTP and row observations |
+| --- | --- | --- |
+| Current M2 strict-schema reconstruction | 1 → 0 → 1 | 201 then 201; rows 2 → 3 → 4; top-level field stripped, stored principal remains portal-http-owner |
+| Separate exact historical body composite | 1 → 0 → 1 | 201 then 201; rows 2 → 3 → 4; forged job stores different-forged-owner, healthy job remains portal-http-owner |
+
+Both mutant failures are original AssertionErrors at the first forged-status contract check. Zero cases are pending/todo, and no setup, authentication, transport, timeout or cleanup error occurred. Later test assertions are masked, but the unchanged fixture collected both real HTTP responses, all three full selected table arrays and normal cleanup before asserting that status. The retained data therefore distinguishes input-contract loss from actual principal forgery rather than inferring either from a status alone. The two named prior rows remain intact in every phase.
+
+All seven processes use the actual Studio listener, real tracked LOCAL_USER OWNER cookie, current role policy/router and SQLite. No authentication callback is injected. Public fixture keys are generated and pinned in code order before signed artifacts; actual Nodecrypto verifies the users digest/signature and session payload signature, while product APIs and server apply tracked identity and role policy. These are local fixture identities and selected crypto checks, not an independent full token-policy decoder or an authenticated external person. Final public/hash records cannot replay the deleted raw credentials offline, and the phase effect file overwrites its intermediate observations rather than providing immutable temporal history.
+
+Each effect file is a fresh absolute owned path outside its disposable fixture. Runtime version, executable and ABI 127 are directly recorded by every actual test worker. Listener, product singleton, all SQLite pools and vault close normally before fixture removal; cleanup errors remain surfaced. The product singleton is explicitly primed before initialization. This measures selected portal table and lifecycle facts, not every filesystem effect or tenant/race isolation.
+
+All 7,739 source files, 4,529 compiled files and the one private case restore exactly in the 12,269-file filesystem copy. All 92 protected pins, 1,680 prior references, five author/review pins, two predecessor pins and native physical identity remain exact. Root stays clean at source 58. Normal config/guards, single-file/one-worker execution, dual reporters and the authored 45-second case/10-second request deadlines are unchanged. No compiler, build, adapter, dist mutation, permanent source/test/helper/counter/guard/dependency/Git edit or prior-packet change occurred.
+
+This is one new HTTP case repeated in seven processes, separate from the original 21-case injected-auth corpus. M1/M3/M4 are not measured here. Current strict 400 behavior remains distinct from old specification wording; no source repair or policy decision was made. No held transfer, browser/hosted/installed service, CSRF, other roles/routes, universal no-effects, full P0-30/old batch/Node24/full suite/coverage/G0/release/Done claim is made. Runtime and live reads are finished.

@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-16T23:24:06.248109+00:00",
+  "argv": [
+    "git",
+    "-C",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "switch",
+    "-c",
+    "codex/p1-25-checkpoint-qualification"
+  ],
+  "exit": 0,
+  "stdout": "",
+  "stderr": "Switched to a new branch 'codex/p1-25-checkpoint-qualification'\n",
+  "head": "3468e29027c32209a5f794b7ffea3f1565de490e",
+  "branch": "codex/p1-25-checkpoint-qualification",
+  "oldGrantBranchRetained": "codex/p1-25-grant-qualification",
+  "sourceCleanIndexEmpty": true,
+  "scope": "Preparation only; three source paths remain unallocated and unmodified."
+}

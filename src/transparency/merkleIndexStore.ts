@@ -35,6 +35,7 @@ import { buildVerifierReport, checkDigestSignature, envelopePublicKey, type Issu
 import { latestAnchorFiles, verifyBundledAnchor } from "./anchors/anchor.js";
 import { consistencyProof, rootHash } from "./rfc9162.js";
 import { fileSha256 } from "../trust/signatureCheck.js";
+import { withProofArchiveOutput } from "./proofArchiveOutput.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -225,11 +226,13 @@ export function currentTreeAlgorithm(workspace: string): MerkleAlgorithm {
     ? "amc-legacy-v1" : "rfc9162-sha256";
 }
 
-function tarCreate(sourceDir: string, outFile: string): void {
-  const out = spawnSync("tar", ["-czf", outFile, "-C", sourceDir, "."], { encoding: "utf8" });
-  if (out.status !== 0) {
-    throw new Error(`failed to create merkle proof bundle: ${(`${out.stdout ?? ""}${out.stderr ?? ""}`).trim()}`);
-  }
+function tarCreate(workspace: string, sourceDir: string, outFile: string): void {
+  withProofArchiveOutput(workspace, outFile, (fd) => {
+    const out = spawnSync("tar", ["-czf", "-", "-C", sourceDir, "."], { encoding: "utf8", stdio: ["ignore", fd, "pipe"] });
+    if (out.status !== 0) {
+      throw new Error(`failed to create merkle proof bundle: ${(out.stderr ?? "").trim()}`);
+    }
+  });
 }
 
 function tarExtract(bundleFile: string, outDir: string): void {
@@ -542,8 +545,7 @@ export function exportTransparencyProofBundle(params: {
       0o644
     );
     const outFile = resolve(params.workspace, params.outFile);
-    ensureDir(dirname(outFile));
-    tarCreate(tmp, outFile);
+    tarCreate(params.workspace, tmp, outFile);
     return {
       outFile,
       proof

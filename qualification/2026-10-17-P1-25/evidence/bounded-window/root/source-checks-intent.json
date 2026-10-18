@@ -1,0 +1,56 @@
+{
+  "at": "2026-10-17T00:07:08.915615+00:00",
+  "checks": [
+    [
+      "test-types",
+      "typecheck:tests"
+    ],
+    [
+      "source-types",
+      "typecheck"
+    ],
+    [
+      "source-lint",
+      "lint"
+    ],
+    [
+      "source-build",
+      "build"
+    ],
+    [
+      "source-counts",
+      "check:counts"
+    ],
+    [
+      "source-gates",
+      "check:gates"
+    ],
+    [
+      "source-threat-model",
+      "check:threat-model"
+    ],
+    [
+      "source-architecture",
+      "check:architecture-boundaries"
+    ],
+    [
+      "source-docs-drift",
+      "check:docs-drift"
+    ],
+    [
+      "source-freeze",
+      "check:freeze"
+    ],
+    [
+      "source-notices",
+      "check:third-party-notices"
+    ],
+    [
+      "source-qualification",
+      "check:qualification"
+    ]
+  ],
+  "serial": true,
+  "expectedZeroRequiredBeforeContinuing": true,
+  "countRegenerationNotAuthorizedWithoutActualFailure": true
+}

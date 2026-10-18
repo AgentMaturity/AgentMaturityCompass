@@ -1,0 +1,261 @@
+{
+  "sourceCommit": "aa198eaf060a656628d4f78a2822ca17ce4df3ab",
+  "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "cleanSourceExit": 0,
+  "independentGitCloneNoHardlinks": true,
+  "cleanSourceLog": "/private/tmp/p1-39-post-typecheck-20261016/command-p139-clean-source/stdout-stderr.log",
+  "headAndTrackedTreeClean": true,
+  "QComparedSInputPins": [
+    {
+      "relative": "src/agent/pipelineToolSeam.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/agent/pipelineToolSeam.ts",
+      "bytes": 7602,
+      "sha256": "09f27e8be247e024ff1e9a0856b8fc26e5fd11fb93829751a32964237f5d74ba"
+    },
+    {
+      "relative": "src/mcp/nativeMcpClient.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts",
+      "bytes": 25622,
+      "sha256": "9578406a1a188be48fe37a1237a6650502bfad65b5a18d65fd401d70fb69fd2d"
+    },
+    {
+      "relative": "src/tools/toolPipeline.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/tools/toolPipeline.ts",
+      "bytes": 32571,
+      "sha256": "1fe7a8eab3a954ff876c780c373c4fb3243abc8652561cda3af2c53fc4a755f9"
+    },
+    {
+      "relative": "src/tools/toolTypes.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/tools/toolTypes.ts",
+      "bytes": 8042,
+      "sha256": "2f9d346695b05d83f045a9ac5ad1689ddd83032a5444d088ed6665aa026c3d03"
+    },
+    {
+      "relative": "tests/mcp/mcpLegacyFallback.test.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpLegacyFallback.test.ts",
+      "bytes": 23018,
+      "sha256": "cead3c3b764d4235d252fb0ca8a3e13901f4d322fb1cd50143c29c880347b873"
+    },
+    {
+      "relative": "tests/mcp/mcp20260728.test.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts",
+      "bytes": 36604,
+      "sha256": "21b4ebc3df44cd60905f0ddf76669342933353cfda8cc47a95abffeaa31d48cb"
+    },
+    {
+      "relative": "tests/mcp/mcpOauth.test.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpOauth.test.ts",
+      "bytes": 63347,
+      "sha256": "fbd1550e7a5f0d90089ec81868477245f4ed534dfce7a9763b3d3a106b32b508"
+    },
+    {
+      "relative": "docs/NATIVE_MCP.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/docs/NATIVE_MCP.md",
+      "bytes": 17927,
+      "sha256": "664147cc5925c2619a91c5607278eb9709efc25a684b1f262c28677236d0a4fd"
+    },
+    {
+      "relative": "docs/adr/010-mcp-2026-07-28.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/docs/adr/010-mcp-2026-07-28.md",
+      "bytes": 13446,
+      "sha256": "8b8b9dc921fe7dffbf5210c46ccaeb74ffdff53aeac4e99829afe148ffae858a"
+    },
+    {
+      "relative": ".changeset/p1-39-typed-outcome-qualification.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/.changeset/p1-39-typed-outcome-qualification.md",
+      "bytes": 649,
+      "sha256": "3338e54b443d28464d7fad88973d63ae65d1ba427101912f7825e98d11827475"
+    },
+    {
+      "relative": "README.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/README.md",
+      "bytes": 59828,
+      "sha256": "7dd9acc745c61725fa6560b686830ae341eab1879e5f384776e2dabe69204cac"
+    },
+    {
+      "relative": "CONTRIBUTING.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "9762854e2cc7d9667d97dfffbe5cfd2c88474b7e66259963c98a261509d97afb"
+    },
+    {
+      "relative": "website/index.html",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/website/index.html",
+      "bytes": 43520,
+      "sha256": "772fe9b47309956215fd19aace1c636bebdea18bc1a7fc507e024645e1d78b09"
+    },
+    {
+      "relative": "website/lite.html",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/website/lite.html",
+      "bytes": 11197,
+      "sha256": "143e98e2575b5e319d845703280bc673b20b203b745251c229ebfc23e8b6082d"
+    },
+    {
+      "relative": "website/i18n.js",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "194cfc6c8b674b25021ffd2c41644675769aead44a68c255674c556ec9ed1a8f"
+    },
+    {
+      "relative": "docs/content/show-hn-draft.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "2d5c866c475e2c9b79e43599cb48f0d631822d36440783cc9a86609c1e803f29"
+    },
+    {
+      "relative": "docs/content/reddit-launch-drafts.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "b1f57c2d12748fb72260d977d962f5e2015d412e2f1416d7934d0a7a8cc99978"
+    },
+    {
+      "relative": "docs/internal/competitive-landscape.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "8dacba9d2538406d80fbc9eca06cc37c668d0e687ef9848aff323dbc5bf1ae70"
+    },
+    {
+      "relative": "docs/internal/mirofish-simulation-council.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "20812a5784444438819208bb339b7612b41c212e1f27f7522396e4d1d130e87d"
+    },
+    {
+      "relative": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "6c6907e76b3b6c074db56c14d8d2776c16c3b5eb8a19ece14ab55adf65036637"
+    },
+    {
+      "relative": "scripts/freeze-baseline.json",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "relative": "scripts/quality/coverage-baseline.json",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/scripts/quality/coverage-baseline.json",
+      "bytes": 636550,
+      "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da"
+    },
+    {
+      "relative": "scripts/source-quality.mjs",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
+      "relative": "scripts/line-budgets.json",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/scripts/line-budgets.json",
+      "bytes": 2713,
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe"
+    },
+    {
+      "relative": "vitest.config.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "relative": "tests/setup/repoWorkspaceGuard.global.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "relative": "scripts/check-freeze.mjs",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "relative": "src/mcp/oauth/discovery.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/oauth/discovery.ts",
+      "bytes": 13603,
+      "sha256": "18a60455c4b13609710bf0638f5ab316bba4d4d678bb04bca8c2fd5ba58fb4f0"
+    },
+    {
+      "relative": "src/mcp/nativeMcpHttpTransport.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpHttpTransport.ts",
+      "bytes": 41548,
+      "sha256": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b"
+    },
+    {
+      "relative": "tests/actions/authorizationRecheck.test.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/actions/authorizationRecheck.test.ts",
+      "bytes": 28977,
+      "sha256": "297e55b5dd88e7adea27c9f9c6189b78115821de5a5f56ff944f9c7dcb4bf375"
+    },
+    {
+      "relative": "src/actions/authorize.ts",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/actions/authorize.ts",
+      "bytes": 20450,
+      "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90"
+    },
+    {
+      "relative": "package.json",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "relative": "pnpm-lock.yaml",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "relative": "tsconfig.json",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+    },
+    {
+      "relative": "tsconfig.tests.json",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "relative": "dist/mcp/nativeMcpClient.js",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/dist/mcp/nativeMcpClient.js",
+      "bytes": 24246,
+      "sha256": "784b6414f9ab84f53f4e170d71b698447f7a4ee3e32a226518d704a909a5bd1f"
+    },
+    {
+      "relative": "dist/agent/pipelineToolSeam.js",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/dist/agent/pipelineToolSeam.js",
+      "bytes": 7441,
+      "sha256": "5506091f68ae2aceb135b68c034ee3b17dd8eee70be843067b63f1aafc39998a"
+    },
+    {
+      "relative": "dist/tools/toolPipeline.js",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/dist/tools/toolPipeline.js",
+      "bytes": 26934,
+      "sha256": "90dbf392d9dcf1cdc750ccd2fe1479d8bb22fb0d6012d452f7da9d71a55c62a9"
+    },
+    {
+      "relative": "dist/mcp/oauth/discovery.js",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/dist/mcp/oauth/discovery.js",
+      "bytes": 12259,
+      "sha256": "71f00f00dee270241305ebc2e3615782bbd9f6a937b142e941b9130a76c47d9d"
+    },
+    {
+      "relative": "dist/mcp/nativeMcpHttpTransport.js",
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/dist/mcp/nativeMcpHttpTransport.js",
+      "bytes": 43195,
+      "sha256": "27c58b65b26db58e3ab142d3d97611a30a742bc45ec6e4dc38b77e89201cf260"
+    }
+  ],
+  "nativeOwnedIdentity": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physical": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 542761915,
+    "nlink": 1
+  },
+  "runnerCwdRDistinctFromSourceAuthorityQ": true,
+  "controlsApplied": false
+}
