@@ -8,7 +8,9 @@
  * register without Pi running, and AMC cannot prove Pi executed the hook; it proves only that every allowed call went
  * through AMC with a signed receipt. Claims derive from registrations under the current installation: a Pi session
  * without one is not governed, its calls are denied, and nothing reads "enforced" for it. AMC cannot see a Pi session
- * in which Pi did not load the extension at all; it is reported as not governed.
+ * in which Pi did not load the extension at all; it is reported as not governed. New registrations are capped per lease
+ * and per workspace (hookIntake.ts), never per session, so churning sessions cannot reset a cap; a fault of AMC's own
+ * writer while recording a verified registration latches the workspace's hooks (hookAuditLatch.ts).
  */
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -22,6 +24,8 @@ import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
 import { verifyReceipt } from "../receipts/receipt.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { writerFault } from "./hookAuditLatch.js";
+import { admitRegistration } from "./hookIntake.js";
 import { HookControlError } from "./hookProviders.js";
 
 export const NOT_GOVERNED_NOTE = "AMC cannot see sessions where Pi did not load the extension; they are reported as not governed.";
@@ -172,7 +176,8 @@ export function piSessionRegistration(ledger: LedgerHandle, agentId: string, ses
 }
 
 /** Record (or replay) the registration of one Pi session. A different registration for a recorded session is a conflict. */
-export function registerPiSession(input: { workspace: string; authenticatedAgentId: string; rawInput: string; now?: number }): PiSessionRegistrationResult {
+export function registerPiSession(input: { workspace: string; authenticatedAgentId: string; rawInput: string; now?: number;
+  lease?: { leaseId: string } }): PiSessionRegistrationResult {
   if (Buffer.byteLength(input.rawInput, "utf8") > MAX_REGISTRATION_BYTES) throw invalid("Pi session registration is too large");
   let parsed: z.infer<typeof registrationInputSchema>;
   try {
@@ -205,17 +210,24 @@ export function registerPiSession(input: { workspace: string; authenticatedAgent
         { receipt: string; receipt_id: string; receipt_sha256: string };
       return { registered: true, idempotentReplay: true, provider: "pi", record, eventId, receipt: meta.receipt, receiptId: meta.receipt_id, receiptSha256: meta.receipt_sha256 };
     }
-    ledger.startSession({ sessionId, runtime: "pi", binaryPath: "amc-bridge-pi-registration", binarySha256: hashBinaryOrPath("amc-bridge-pi-registration", "1") });
-    const appended = ledger.appendEvidenceWithReceipt({
-      id: eventId, ts: input.now ?? Date.now(), sessionId, runtime: "pi", eventType: "audit",
-      payload: `${JSON.stringify(record, null, 2)}\n`, payloadExt: "json", inline: false,
-      meta: { trustTier: "OBSERVED", registrationSchemaVersion: 1, agentId: input.authenticatedAgentId, provider: "pi", registration: record,
-        bodySha256: bodySha256(record) },
-      receipt: { kind: "work_accepted", agentId: input.authenticatedAgentId, providerId: PROVIDER_ID, model: null, bodySha256: bodySha256(record) },
-    });
-    ledger.sealSession(sessionId);
-    return { registered: true, idempotentReplay: false, provider: "pi", record, eventId: appended.id, receipt: appended.receipt,
-      receiptId: appended.receiptId, receiptSha256: appended.receiptSha256 };
+    const now = input.now ?? Date.now();
+    admitRegistration({ workspace: input.workspace, agentId: input.authenticatedAgentId, leaseId: input.lease?.leaseId, session: eventId, provider: "Pi" }, now);
+    try {
+      ledger.startSession({ sessionId, runtime: "pi", binaryPath: "amc-bridge-pi-registration", binarySha256: hashBinaryOrPath("amc-bridge-pi-registration", "1") });
+      const appended = ledger.appendEvidenceWithReceipt({
+        id: eventId, ts: now, sessionId, runtime: "pi", eventType: "audit",
+        payload: `${JSON.stringify(record, null, 2)}\n`, payloadExt: "json", inline: false,
+        meta: { trustTier: "OBSERVED", registrationSchemaVersion: 1, agentId: input.authenticatedAgentId, provider: "pi", registration: record,
+          bodySha256: bodySha256(record) },
+        receipt: { kind: "work_accepted", agentId: input.authenticatedAgentId, providerId: PROVIDER_ID, model: null, bodySha256: bodySha256(record) },
+      });
+      ledger.sealSession(sessionId);
+      return { registered: true, idempotentReplay: false, provider: "pi", record, eventId: appended.id, receipt: appended.receipt,
+        receiptId: appended.receiptId, receiptSha256: appended.receiptSha256 };
+    } catch (error) {
+      // The registration was verified (signed installation, extension, AMC module and Pi install on disk) before AMC's writer was reached.
+      throw writerFault(error, true, "the Pi session registration");
+    }
   } finally {
     ledger.close();
   }
