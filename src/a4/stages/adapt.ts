@@ -155,7 +155,7 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
         : `From your answers, ${count("applicable")} catalog requirement(s) apply, ${count("not_applicable")} do not, and ${count("unresolved")} cannot be decided until some answers are known.`,
       practitioner: plan === null ? `Compile refused: ${facts?.compileError?.code ?? "not compiled"}.`
         : requirements.map((row) => `${row.controlId} ${row.applicability}${row.missingFacts.length > 0 ? ` (missing ${row.missingFacts.join(", ")})` : ""}; pulled in by ${row.pulledInBy.join(", ")}`).join(". "),
-      expert: plan === null ? "parseDeploymentProfile/compilePlan threw." : `compilePlan({ profile, catalog: loadCatalog(), asOf }) → ${plan.digest}, status ${plan.status}; `
+      expert: plan === null ? "parseDeploymentProfile/compilePlan threw." : `compilePlan({ profile, catalog: loadCatalog(), asOf, signedTools }) → ${plan.digest}, status ${plan.status}; `
         + requirements.map((row) => `${row.controlId}@${row.controlVersion}: ${row.reasons.join("; ")}`).join(" | ") },
     { id: "sources", sources: ["catalog/README.md", "src/compliance/regulatory"], dataStatus: "experimental",
       novice: `The catalog says: "${CATALOG_EXPERIMENTAL_NOTICE}" (D-08)`,

@@ -1,0 +1,147 @@
+{
+ "note": "Each mutation was applied alone, the named tests run with vitest -t, then the file restored from a byte copy. Run before merging int, at 88e8ad22a's sources; the two unsigned/tampered compile tests were renamed afterwards to 'tools.yaml unsigned|tampered, with delegate: ...'. M6-M9 (the independent review's three findings and the A4 Adapt wiring) were run on dbb25fb78's sources the same way. M10-M13 (the re-review's items) were run on 453bc2afe's sources the same way.",
+ "mutations": [
+  {
+   "mutation": "M1 ignore the signed tools.yaml: proposedConfigs always starts from defaultToolsConfig()",
+   "file": "src/catalog/compiler/runtimePolicy.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "with tools.yaml: its tools, its digest, and the caller's config left as it was",
+    "a narrower tools.yaml narrows the default set",
+    "the digest alone is not a weakening; a tool tools.yaml adds is",
+    "a signed tools.yaml with delegate: visible, and the plan records its digest"
+   ]
+  },
+  {
+   "mutation": "M2 drop the intersection with the plan's toolPipeline.visibleTools parameter",
+   "file": "src/catalog/compiler/runtimePolicy.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "the plan's controls still narrow: delegate stays hidden when the plan's visibleTools omit it"
+   ]
+  },
+  {
+   "mutation": "M3 compile from an unverified tools.yaml (loadToolsConfig and the raw file hash instead of loadVerifiedToolsConfigSnapshot)",
+   "file": "src/catalog/catalogCli.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "an unsigned tools.yaml with delegate: the built-in default list, byte-identical to a compile without tools.yaml",
+    "an tampered tools.yaml with delegate: the built-in default list, byte-identical to a compile without tools.yaml",
+    "an unsigned tools.yaml at compile: the activated plan keeps the default list, and delegate stays refused once it is signed"
+   ]
+  },
+  {
+   "mutation": "M4 skip the compiled-policy guard's tools.yaml digest check (toolsWhy = null)",
+   "file": "src/tools/guards/compiledPolicyGuard.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "tools.yaml changed after activation: every call refused until the plan is recompiled and reactivated"
+   ]
+  },
+  {
+   "mutation": "M5 drop the weakening rule that ignores toolPipeline.toolsConfigSha256",
+   "file": "src/catalog/compiler/sign.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "the digest alone is not a weakening; a tool tools.yaml adds is"
+   ]
+  },
+  {
+   "mutation": "M6 never flag a plan that drops the tools.yaml binding (remove ...unpinned from planWeakenings)",
+   "file": "src/catalog/compiler/sign.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "binding tools.yaml or narrowing it is not a weakening; widening it or dropping the binding is"
+   ]
+  },
+  {
+   "mutation": "M7 fall back to the default list when tools.yaml is present but does not verify (compileInputs (then verifiedSignedTools) returns {})",
+   "file": "src/catalog/signedTools.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "a tools.yaml its signature removed: the compile refuses TOOLS_CONFIG_UNVERIFIED, naming the file, the reason and the fix",
+    "a tools.yaml edited after signing: the compile refuses TOOLS_CONFIG_UNVERIFIED, naming the file, the reason and the fix",
+    "a tools.yaml signed by a key this workspace does not hold: the compile refuses TOOLS_CONFIG_UNVERIFIED, naming the file, the reason and the fix",
+    "a tools.yaml that does not verify: Understand reports TOOLS_CONFIG_UNVERIFIED, not COMPILE_FAILED"
+   ]
+  },
+  {
+   "mutation": "M8 the native-tool-identity guard reads tools.yaml itself again instead of the pass's one read",
+   "file": "src/agent/agentToolset.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "one verified read of tools.yaml per guard pass decides the plan's pin, the allowlist and the native tool identity"
+   ]
+  },
+  {
+   "mutation": "M9 A4 Adapt compiles without the verified tools.yaml (drop ...compileInputs (then verifiedSignedTools) at adaptPolicy.ts:144)",
+   "file": "src/a4/adaptPolicy.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "a tools.yaml that does not verify: Understand reports TOOLS_CONFIG_UNVERIFIED, not COMPILE_FAILED",
+    "tools.yaml changed after Propose: Understand compiles another plan digest, and the revision's tools slot reads drifted"
+   ]
+  },
+  {
+   "mutation": "M10 Review skips the tools.yaml binding check in openPlanReview",
+   "file": "src/a4/adaptPolicy.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "Review refuses TOOLS_CONFIG_CHANGED when tools.yaml was re-signed since Build; with the same bytes it opens",
+    "absent counts as a value: no tools.yaml at Build and at Review opens; one signed after Build refuses"
+   ]
+  },
+  {
+   "mutation": "M11 the tools-binding wording never applies (toolsBindingWeakened always false)",
+   "file": "src/a4/adaptPolicy.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "Build's widening refusal names tools.yaml when the weakening is the tools binding, and keeps its text otherwise",
+    "Review's refusal against the active plan names tools.yaml when the weakening is the tools binding, and keeps its text otherwise"
+   ]
+  },
+  {
+   "mutation": "M12 an unreadable tools.yaml's reason quotes the exception, with its absolute path",
+   "file": "src/toolhub/toolhubValidators.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "an unreadable tools.yaml (chmod 000): the compile refuses with its error class and no host path",
+    "tools.yaml changed after activation: every call refused until the plan is recompiled and reactivated"
+   ]
+  },
+  {
+   "mutation": "M13 Adapt compiles without the CLI's inputs (drop ...compileInputs at adaptPolicy.ts:144)",
+   "file": "src/a4/adaptPolicy.ts",
+   "test": "tests/compiledVisibleTools.test.ts",
+   "exit": 1,
+   "killed": true,
+   "failing": [
+    "the same workspace and profile give the same plan digest from amc catalog compile and from Adapt's Understand"
+   ]
+  }
+ ]
+}

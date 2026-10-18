@@ -7,6 +7,7 @@ import { z } from "zod";
 import type { SignedDigest } from "../../crypto/signing/signerTypes.js";
 import { validateStationScope } from "../../domains/stations.js";
 import { LEGACY_OPERATING_PROFILE_SCHEMA_VERSION, OPERATING_PROFILE_SCHEMA_VERSION } from "../../domains/operatingProfiles/operatingProfileTypes.js";
+import type { ToolsConfig } from "../../toolhub/toolsSchema.js";
 import type { ActionClass } from "../../types.js";
 import type { TrustContext } from "../../trust/trustContext.js";
 import type { Promotion } from "../governance/support.js";
@@ -99,12 +100,18 @@ export interface CompileInput {
   /** Operator-loaded pins at asOf, never a trust list supplied by the profile. Missing pins reject exceptions. */
   mergeExceptionTrust?: TrustContext;
   /**
+   * The workspace's signed tools.yaml, verified by the caller from one read: its parsed config and the SHA-256 of its
+   * bytes (P1-10F). The compiler reads no file. Absent, the visible tools are the built-in default list.
+   */
+  signedTools?: SignedToolsInput;
+  /**
    * P1-34: promotions effectiveSupport decided, keyed by control id, bound into the plan digest. Only these let reviewed or
    * qualified support stand; without them it compiles experimental. Deciding them reads the clock and trust state, so it
    * happens before compilePlan, which stays pure.
    */
   promotions?: Readonly<Record<string, Promotion>>;
 }
+export interface SignedToolsInput { config: ToolsConfig; sha256: string }
 
 export type Applicability = "applicable" | "not_applicable" | "unresolved";
 export interface RequirementDecision {
@@ -136,7 +143,9 @@ export interface UnsupportedControl {
 export interface ApprovalRule { requiredApprovals: number; requireDistinctUsers: boolean; rolesAllowed: string[]; ttlMinutes: number; controlIds: string[] }
 export interface EffectiveRuntimePolicy {
   toolPipeline: { visibleTools: string[]; approvalRequiredFor: ActionClass[];
-                  guards: Array<{ id: string; params: Record<string, ParamValue>; controlIds: string[] }> };
+                  guards: Array<{ id: string; params: Record<string, ParamValue>; controlIds: string[] }>;
+                  /** SHA-256 of the signed tools.yaml the visible tools came from; absent when they are the built-in defaults (P1-10F). */
+                  toolsConfigSha256?: string };
   approvals: Partial<Record<ActionClass, ApprovalRule>>;
   egress: { mode: "deny_by_default"; allowHosts: string[];
             processorAllowlist: Array<{ host: string; dataClasses: string[]; basis: string }>; controlIds: string[] };

@@ -6,7 +6,8 @@ import {
   findToolDefinition,
   hostAllowedForTool,
   loadVerifiedToolsConfigSnapshot,
-  validateToolRequest
+  validateToolRequest,
+  type VerifiedToolsConfigSnapshot
 } from "../../toolhub/toolhubValidators.js";
 import { BLOCK_CONFIDENCE, matchInjection } from "../../shield/injection/injectionMatcher.js";
 import { RUN_CODE_TOOL } from "../toolPipeline.js";
@@ -95,7 +96,8 @@ export function budgetGuard(workspace: string, sessionId?: string): ToolGuard {
  */
 export function toolhubAllowlistGuard(workspace: string,
   visibleDefinition?: (execution: ToolExecution) => ToolDefinition | undefined,
-  expectedToolsDigest?: string, argumentsFor: GovernedArguments = ownArguments): ToolGuard {
+  expectedToolsDigest?: string, argumentsFor: GovernedArguments = ownArguments,
+  readTools: () => VerifiedToolsConfigSnapshot = () => loadVerifiedToolsConfigSnapshot(workspace)): ToolGuard {
   return (execution) => {
     // The Code Mode transport is presentation infrastructure, not a
     // capability, and the allowlist has nothing useful to say about it. What
@@ -105,7 +107,7 @@ export function toolhubAllowlistGuard(workspace: string,
     // would leave code mode unable to call anything at all — the same reason
     // `restrict()` refuses to name it.
     if (execution.name === RUN_CODE_TOOL && expectedToolsDigest === undefined) return undefined;
-    const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
+    const snapshot = readTools();
     if (!snapshot.signatureValid || !snapshot.config) {
       // An unverifiable allowlist is not an empty allowlist.
       return `tools config is not verifiable: ${snapshot.reason ?? "unknown reason"}`;
@@ -158,7 +160,8 @@ export function toolhubAllowlistGuard(workspace: string,
  * allowlist, and "we could not tell where this was going" is not a reason to
  * let it go.
  */
-export function networkEgressGuard(workspace: string, argumentsFor: GovernedArguments = ownArguments): ToolGuard {
+export function networkEgressGuard(workspace: string, argumentsFor: GovernedArguments = ownArguments,
+  readTools?: () => VerifiedToolsConfigSnapshot): ToolGuard {
   workspace = resolve(workspace);
   return (execution) => {
     if (execution.actionClass !== "NETWORK_EXTERNAL") return undefined;
@@ -174,7 +177,7 @@ export function networkEgressGuard(workspace: string, argumentsFor: GovernedArgu
       return `${execution.name} was given a url that cannot be parsed: no host to check`;
     }
 
-    const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
+    const snapshot = readTools?.() ?? loadVerifiedToolsConfigSnapshot(workspace);
     if (!snapshot.signatureValid || !snapshot.config) {
       return `tools config is not verifiable: ${snapshot.reason ?? "unknown reason"}`;
     }
