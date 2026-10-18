@@ -366,12 +366,12 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc domain modules` | Show module activation map for domain | `--domain <d>`<br>`--json` | `sector modules` |
 | `amc domain pack` | Industry sector packs — 41 packs across 7 domains | - | `sector pack` |
 | `amc domain pack access` | Show Industry Packs access, licence verification and checkout availability | `--json` | `subscribe`, `sector pack access` |
-| `amc domain pack activate` | Activate Industry Packs with a licence signed by a key pinned in the AMC trust list | `--key <licenseKey>`<br>`--expires-at <isoDate>`<br>`--json` | `sector pack activate` |
+| `amc domain pack activate` | Activate Industry Packs with a licence signed by a key pinned in the AMC trust list | `--key <licenseKey>`<br>`--json` | `sector pack activate` |
 | `amc domain pack checkout` | Print the checkout link when this deployment has a checkout and licence verification configured | `--success-url <url>`<br>`--cancel-url <url>`<br>`--email <email>`<br>`--reference <id>`<br>`--json` | `sector pack checkout` |
 | `amc domain pack describe` | Show details of a specific industry sector pack | `--pack <packId>`<br>`--json` | `sector pack describe` |
 | `amc domain pack list` | List all available industry sector packs | `--station <station>`<br>`--domain <d>`<br>`--json` | `sector pack list` |
 | `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score | `--pack <packId>`<br>`--baseline`<br>`--json` | `sector pack run` |
-| `amc domain pack verify` | Verify an Industry Packs license key | `--key <licenseKey>`<br>`--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | `sector pack verify` |
+| `amc domain pack verify` | Verify an Industry Packs license key against the licence key pinned in the AMC trust list | `--key <licenseKey>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | `sector pack verify` |
 | `amc domain report` | Build full domain report and write it to a file (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--output <file>`<br>`--example`<br>`--json` | `sector report` |
 | `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector roadmap` |
 | `amc down` | Stop AMC Studio local control plane | - | - |

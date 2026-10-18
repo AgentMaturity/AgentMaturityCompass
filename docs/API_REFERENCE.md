@@ -384,7 +384,7 @@ AMC provides 1,255 public CLI command paths in the live command inventory.
 | 365 | `amc domain pack describe` | Show details of a specific industry sector pack |
 | 366 | `amc domain pack list` | List all available industry sector packs |
 | 367 | `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score |
-| 368 | `amc domain pack verify` | Verify an Industry Packs license key |
+| 368 | `amc domain pack verify` | Verify an Industry Packs license key against the licence key pinned in the AMC trust list |
 | 369 | `amc domain report` | Build full domain report and write it to a file (not evaluated without evidence) |
 | 370 | `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain (not evaluated without evidence) |
 | 371 | `amc down` | Stop AMC Studio local control plane |
@@ -4160,7 +4160,6 @@ Alias: `amc sector pack activate`
 | Option | Description |
 |--------|-------------|
 | `--key <licenseKey>` | - |
-| `--expires-at <isoDate>` | - |
 | `--json` | - |
 
 #### `amc domain pack checkout`
@@ -4214,14 +4213,13 @@ Alias: `amc sector pack run`
 
 #### `amc domain pack verify`
 
-Verify an Industry Packs license key
+Verify an Industry Packs license key against the licence key pinned in the AMC trust list
 
 Alias: `amc sector pack verify`
 
 | Option | Description |
 |--------|-------------|
 | `--key <licenseKey>` | - |
-| `--pubkey <path>` | - |
 | `--trust-list <file>` | - |
 | `--trust-root <sha256>` | - |
 | `--allow-unpinned` | - |
