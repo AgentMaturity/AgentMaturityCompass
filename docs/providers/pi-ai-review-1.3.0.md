@@ -70,7 +70,9 @@ vulnerability).
 
 AMC does not bundle or redistribute pi-ai. Operators who use a pi route install it themselves.
 `scripts/vendor/gen-third-party-notices.mjs` covers vendored code only, so `THIRD_PARTY_NOTICES` is unchanged, and
-`npm run check:third-party-notices` passes. If AMC ever bundles pi-ai (for example in the kernel bundle or a SEA
+`npm run check:third-party-notices` passes. `amc release sbom` and `amc release licenses` walk the installed
+`node_modules`, so in a workspace checkout they list pi-ai and its tree, as they already list dev dependencies.
+If AMC ever bundles pi-ai (for example in the kernel bundle or a SEA
 build), its MIT notice and those of its tree must be added first.
 
 ## Needs-Sid
