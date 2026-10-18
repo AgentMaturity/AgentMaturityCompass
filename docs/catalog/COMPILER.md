@@ -132,7 +132,7 @@ enforces (P1-12). A control whose parameters need a guard that is not registered
 `signedTools` is the workspace's signed `.amc/tools.yaml` as `{ config, sha256 }`, which the caller has verified (bytes,
 signature and schema from one read); the compiler reads no file. Without it the plan is exactly what it was before
 P1-10F. Both callers that compile against a workspace, `amc catalog compile` and A4 Adapt's Understand, get it from
-`verifiedSignedTools` (`src/catalog/signedTools.ts`): `{}` when there is no tools.yaml, and `TOOLS_CONFIG_UNVERIFIED`
+`compileInputs` (`src/catalog/compileInputs.ts`): `{}` when there is no tools.yaml, and `TOOLS_CONFIG_UNVERIFIED`
 when one is present but does not verify, never the wider default list.
 
 - `profile`: id, the SHA-256 of the canonical normalized profile, fact provenance, and the profile's
@@ -303,7 +303,8 @@ amc catalog compile --profile <file> [--previous <plan.json>] [--lock <catalog.l
 
 It reads `.amc/tools.yaml` and passes it as `signedTools` when it verifies against the workspace's auditor keys and
 parses. Without a tools.yaml it compiles with the built-in default list. An unsigned, edited, foreign-signed or invalid
-tools.yaml refuses the compile (`TOOLS_CONFIG_UNVERIFIED`, exit 1) and names the reason: re-sign it with
+tools.yaml refuses the compile (`TOOLS_CONFIG_UNVERIFIED`, exit 1) and names the reason (an unreadable file by its error
+class, such as `tools config unreadable (EACCES)`, never its path): re-sign it with
 `amc tools sign`, or remove it to compile with the default list. The output names which list was used
 (`visibleToolsSource` in `--json`). So `delegate` is visible under an
 activated plan only when the signed tools.yaml lists it and no control's `toolPipeline.visibleTools` leaves it out.
@@ -332,7 +333,7 @@ amc catalog compile --profile tests/fixtures/catalog/compiler/finance-ops-us.pro
 
 `PROFILE_INVALID`, `CATALOG_INVALID`, `UNKNOWN_PARAMETER`, `PARAMETER_TYPE`, `PARAMETER_POINT`, `STRICTNESS_MISMATCH`,
 `EXCEPTION_ON_LAYER0`, `EXCEPTION_UNKNOWN_CONTROL`, `EXCEPTION_UNKNOWN_PARAMETER`, and `TOOLS_CONFIG_UNVERIFIED` from
-`verifiedSignedTools` before compilePlan runs.
+`compileInputs` before compilePlan runs.
 
 ## Not in this step
 
