@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { z } from "zod";
-import { providerSchema } from "../bridge/hookProviders.js";
+import { refineControlMapping, providerSchema } from "../bridge/hookProviders.js";
 import {
   loadAdaptersConfig,
   verifyAdaptersConfigSignature,
@@ -118,28 +118,7 @@ const hookDecisionMetaV2Schema = receiptMetaSchema.extend({
   providerMapping: z.enum(["native", "corrective_deny", "fail_closed_deny"]),
   capabilityLossy: z.boolean(),
   rawPayloadStored: z.literal(false),
-}).passthrough().superRefine((value, ctx) => {
-  const native = value.providerMapping === "native"
-    && value.requestedDecision !== "steer"
-    && value.requestedDecision === value.decision
-    && value.effectiveOutcome === value.decision
-    && !value.capabilityLossy;
-  const corrective = value.providerMapping === "corrective_deny"
-    && value.provider === "claude-code"
-    && value.requestedDecision === "steer"
-    && value.decision === "deny"
-    && value.effectiveOutcome === "steer"
-    && !value.capabilityLossy;
-  const fallback = value.providerMapping === "fail_closed_deny"
-    && value.provider !== "claude-code"
-    && (value.requestedDecision === "ask" || value.requestedDecision === "steer")
-    && value.decision === "deny"
-    && value.effectiveOutcome === "deny"
-    && value.capabilityLossy;
-  if (!native && !corrective && !fallback) {
-    ctx.addIssue({ code: "custom", path: ["providerMapping"], message: "provider outcome mapping is inconsistent" });
-  }
-});
+}).passthrough().superRefine(refineControlMapping);
 
 const hookDecisionMetaSchema = z.union([hookDecisionMetaV2Schema, hookDecisionMetaV1Schema]);
 

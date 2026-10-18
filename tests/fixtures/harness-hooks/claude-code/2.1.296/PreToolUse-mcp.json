@@ -1,0 +1,17 @@
+{
+  "session_id": "00000000-0000-4000-8000-000000000001",
+  "transcript_path": "/__HOME__/.claude/projects/__PROJECT_SLUG__/00000000-0000-4000-8000-000000000001.jsonl",
+  "cwd": "/__PROJECT__",
+  "prompt_id": "00000000-0000-4000-9000-000000000001",
+  "permission_mode": "bypassPermissions",
+  "hook_event_name": "PreToolUse",
+  "tool_name": "mcp__amcprobe__echo",
+  "tool_input": {
+    "text": "hi from the scripted model"
+  },
+  "tool_use_id": "toolu_01AmcScriptedCall0001",
+  "mcp_server": {
+    "name": "amcprobe",
+    "source": "dynamic"
+  }
+}

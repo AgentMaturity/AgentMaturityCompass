@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-10-17
+> Auto-generated from source on 2026-10-18
 
 ## Table of Contents
 
@@ -3587,6 +3587,7 @@ Verify signed hook setup and show the latest verified provider event
 | Option | Description |
 |--------|-------------|
 | `--provider <provider>` | - |
+| `--recover-latch` | - |
 | `--json` | - |
 
 #### `amc connect hooks install`

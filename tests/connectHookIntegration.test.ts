@@ -22,12 +22,15 @@ import {
   GEMINI_CLI_HOOK_SOURCE,
   HookIntegrationError,
   amcCliScriptPath,
-  forwardProviderHookEvent,
   getHookIntegrationStatus,
   installHookIntegration,
   mapProviderHookEvent,
   removeHookIntegration
 } from "../src/adapters/hookIntegration.js";
+import { forwardProviderHookEvent } from "../src/adapters/hookForwarder.js";
+import { CLAUDE_CONTROL_STATUS_MESSAGE, CLAUDE_STATUS_MESSAGE, claudeActionId } from "../src/adapters/hookProviders/claudeCode.js";
+import { HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID } from "../src/adapters/hookProviders/installFiles.js";
+import { boundClaudeCode } from "./helpers/claudeCodeHookFixtures.js";
 import { getPublicKeyHistory } from "../src/crypto/keys.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { leasePayloadSchema } from "../src/leases/leaseSchema.js";
@@ -185,11 +188,10 @@ describe("AMC provider hook integration", () => {
     expect(isAbsolute(handler.command as string)).toBe(true);
     const handlerArgs = handler.args as string[];
     expect(isAbsolute(handlerArgs[0]!)).toBe(true);
-    expect(handlerArgs[0]).toMatch(/[\\/]dist[\\/]cli\.js$/);
+    // P1-23: the hook runs AMC's forwarder entry (no CLI bootstrap) with the same flags `connect hooks forward` takes.
+    expect(handlerArgs[0]).toMatch(/[\\/]dist[\\/]adapters[\\/]hookForwarder\.js$/);
+    expect(handler.onFailure).toBeUndefined();
     expect(handler.args).toEqual(expect.arrayContaining([
-      "connect",
-      "hooks",
-      "forward",
       "--provider",
       "claude-code",
       "--agent",
@@ -336,6 +338,50 @@ describe("AMC provider hook integration", () => {
     expect(getHookIntegrationStatus({ workspace, provider: "claude-code" }).state).toBe("installed");
   });
 
+  test("control mode adds the session hooks, reinstalls byte-identically and removes only AMC's handlers (P1-23)", () => {
+    const workspace = newWorkspace();
+    const paths = hookPaths(workspace, "claude-code");
+    const userHooks = { PostToolUse: [{ matcher: "Write", hooks: [{ type: "command", command: "npm test" }] }], Stop: [{ hooks: [{ type: "command", command: "say done" }] }] };
+    writeJson(paths.config, { hooks: userHooks });
+    const options = { workspace, provider: "claude-code" as const, agentId: "session-hooks-agent", mode: "control" as const, claudeCodeInstall: boundClaudeCode() };
+    const plan = installHookIntegration({ ...options, dryRun: true });
+    installHookIntegration(options);
+    // The dry run's `hooks` block is exactly what the install wrote (the managed-settings guide copies it unchanged).
+    const written = readJson(paths.config) as { hooks: Record<string, Array<{ hooks: Array<Record<string, unknown>> }>> };
+    for (const [event, groups] of Object.entries(plan.hooks as Record<string, Array<{ matcher: string; hooks: unknown[] }>>)) {
+      expect(written.hooks[event]).toContainEqual(groups[0]);
+    }
+
+    const config = readJson(paths.config) as { hooks: Record<string, Array<{ matcher?: string; hooks: Array<Record<string, unknown>> }>> };
+    expect(Object.keys(config.hooks).sort()).toEqual(["PostToolUse", "PostToolUseFailure", "PreToolUse", "SessionStart", "Stop", "UserPromptSubmit"]);
+    // The bridge reads these markers without loading the installer, so they are literals; they must name the integration ids.
+    expect([CLAUDE_STATUS_MESSAGE, CLAUDE_CONTROL_STATUS_MESSAGE]).toEqual([`AMC Observe [${HOOK_INTEGRATION_ID}]`, `AMC Control [${HOOK_CONTROL_INTEGRATION_ID}]`]);
+    const owned = Object.values(config.hooks).flat().flatMap((group) => group.hooks).filter((handler) => handler.statusMessage === CLAUDE_CONTROL_STATUS_MESSAGE);
+    expect(owned).toHaveLength(6);
+    // One handler per event, identical but for the event it names, which the forwarder enforces.
+    for (const [event, groups] of Object.entries(config.hooks)) {
+      for (const handler of groups.flatMap((group) => group.hooks).filter((row) => row.statusMessage === CLAUDE_CONTROL_STATUS_MESSAGE)) {
+        expect((handler.args as string[]).slice(-2), event).toEqual(["--event", event]);
+        expect(handler).toMatchObject({ type: "command", command: process.execPath, timeout: 10, onFailure: "block" });
+      }
+    }
+    for (const groups of Object.values(config.hooks)) expect(groups.every((group) => group.hooks.some((row) => row.statusMessage !== CLAUDE_CONTROL_STATUS_MESSAGE) || group.matcher === "*")).toBe(true);
+    const manifest = readJson(paths.manifest) as { handlers: Array<{ eventName: string; phase: string }>; claudeCode: Record<string, any> };
+    expect(manifest.handlers.map((row) => [row.eventName, row.phase])).toEqual([["PostToolUse", "completed"], ["PostToolUseFailure", "failed"],
+      ["PreToolUse", "requested"], ["SessionStart", "session-start"], ["Stop", "turn-end"], ["UserPromptSubmit", "prompt-submit"]]);
+    expect(manifest.claudeCode).toEqual({ forwarder: { path: (owned[0]!.args as string[])[0], sha256: sha256Hex(readFileSync((owned[0]!.args as string[])[0]!)) },
+      install: boundClaudeCode() });
+
+    const configBytes = readFileSync(paths.config);
+    const manifestBytes = readFileSync(paths.manifest);
+    expect(installHookIntegration(options).changed).toBe(false);
+    expect(readFileSync(paths.config).equals(configBytes)).toBe(true);
+    expect(readFileSync(paths.manifest).equals(manifestBytes)).toBe(true);
+
+    removeHookIntegration({ workspace, provider: "claude-code" });
+    expect(readJson(paths.config)).toEqual({ hooks: userHooks });
+  });
+
   test("reinstall migrates a signed command: amc handler and leaves foreign handlers byte-identical", () => {
     const workspace = newWorkspace();
     const paths = hookPaths(workspace, "claude-code");
@@ -356,8 +402,8 @@ describe("AMC provider hook integration", () => {
     };
     for (const groups of Object.values(config.hooks)) {
       for (const group of groups) {
-        group.hooks = group.hooks.map((handler) => String(handler.statusMessage).startsWith("AMC Control")
-          ? { ...handler, command: "amc", args: (handler.args as string[]).slice(1), timeout: 10 }
+        group.hooks = group.hooks.map(({ onFailure: _onFailure, ...handler }) => String(handler.statusMessage).startsWith("AMC Control")
+          ? { ...handler, command: "amc", args: ["connect", "hooks", "forward", ...(handler.args as string[]).slice(1)], timeout: 10 }
           : handler);
       }
     }
@@ -368,11 +414,13 @@ describe("AMC provider hook integration", () => {
     expect(legacyHandler.command).toBe("amc");
     expect((legacyHandler.args as string[])[0]).toBe("connect");
     const manifest = readJson(paths.manifest) as Record<string, any>;
-    const legacyHash = sha256Hex(canonicalize(legacyHandler));
+    // Each event's legacy handler (P1-23 handlers name their event, so each has its own digest).
+    const legacyHashFor = (event: string) => sha256Hex(canonicalize(config.hooks[event]!.flatMap((group) => group.hooks)
+      .find((handler) => String(handler.statusMessage).startsWith("AMC Control"))!));
     writeJson(paths.manifest, {
       ...manifest,
       configSha256: sha256Hex(Buffer.from(legacyText, "utf8")),
-      handlers: manifest.handlers.map((row: Record<string, unknown>) => ({ ...row, handlerSha256: legacyHash })),
+      handlers: manifest.handlers.map((row: Record<string, unknown>) => ({ ...row, handlerSha256: legacyHashFor(String(row.eventName)) })),
     });
     signFileWithAuditor(workspace, paths.manifest);
     expect(getHookIntegrationStatus({ workspace, provider: "claude-code" }).state).toBe("installed");
@@ -387,10 +435,12 @@ describe("AMC provider hook integration", () => {
     expect(JSON.stringify(after.hooks.PreToolUse![0])).toBe(foreignBefore);
     const owned = Object.values(after.hooks).flat().flatMap((group) => group.hooks)
       .filter((handler) => String(handler.statusMessage).startsWith("AMC Control"));
-    expect(owned).toHaveLength(3);
+    // Control mode: the three tool hooks plus SessionStart, Stop and UserPromptSubmit (P1-23).
+    expect(owned).toHaveLength(6);
     for (const handler of owned) {
       expect(handler.command).toBe(process.execPath);
-      expect((handler.args as string[])[0]).toMatch(/[\\/]dist[\\/]cli\.js$/);
+      expect((handler.args as string[])[0]).toMatch(/[\\/]dist[\\/]adapters[\\/]hookForwarder\.js$/);
+      expect(handler.onFailure).toBe("block");
     }
     expect(Object.values(after.hooks).flat().flatMap((group) => group.hooks)
       .filter((handler) => handler.command === "amc")).toEqual([foreign.hooks[0]]);
@@ -530,13 +580,10 @@ describe("AMC provider hook integration", () => {
       const manifest = readJson(paths.manifest) as {
         control: { providerOutcomes: string[] };
       };
-      expect(manifest.control.providerOutcomes).toEqual(
-        provider === "claude-code" ? ["allow", "deny", "ask"] : ["allow", "deny"],
-      );
+      // Control answers allow or deny only: every ask is denied, Claude Code's included (P1-23).
+      expect(manifest.control.providerOutcomes).toEqual(["allow", "deny"]);
 
-      manifest.control.providerOutcomes = provider === "claude-code"
-        ? ["allow", "deny"]
-        : ["allow", "deny", "ask"];
+      manifest.control.providerOutcomes = ["allow", "deny", "ask"];
       writeJson(paths.manifest, manifest);
       signFileWithAuditor(workspace, paths.manifest);
 
@@ -734,7 +781,8 @@ describe("AMC provider hook integration", () => {
     expect(event.hook).toBe("PreToolUse");
     expect(event.agent).toEqual(expect.objectContaining({ slug: "mapped-agent", surface: "claude-code" }));
     expect(event.session?.id).not.toBe("session-private-123");
-    expect(event.action.id).toBe("toolu_01ABC123");
+    // AMC derives the action id from the session and tool_use_id (P1-23); the raw ids are not stored.
+    expect(event.action.id).toBe(claudeActionId("session-private-123", "toolu_01ABC123"));
     expect(event.tool).toEqual(expect.objectContaining({ type: "native", name: "Bash" }));
     const serialized = JSON.stringify(event);
     expect(serialized).not.toContain("sk-secret-value");
@@ -797,10 +845,10 @@ describe("AMC provider hook integration", () => {
     });
 
     expect(completed.type).toBe("action.completed");
-    expect(completed.action).toEqual(expect.objectContaining({ id: "toolu_terminal_01", status: "success" }));
+    expect(completed.action).toEqual(expect.objectContaining({ id: claudeActionId("private-session", "toolu_terminal_01"), status: "success" }));
     expect(failed.type).toBe("action.failed");
     expect(failed.action).toEqual(expect.objectContaining({
-      id: "toolu_terminal_01",
+      id: claudeActionId("private-session", "toolu_terminal_01"),
       status: "failure",
       error: { code: "PROVIDER_TOOL_FAILURE" },
     }));

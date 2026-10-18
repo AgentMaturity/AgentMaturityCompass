@@ -1,16 +1,11 @@
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { defaultApprovalPolicy, initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
-import {
-  forwardProviderHookControl,
-  forwardProviderHookEvent,
-  getHookIntegrationStatus,
-  installHookIntegration,
-  mapProviderHookEvent,
-} from "../src/adapters/hookIntegration.js";
+import { getHookIntegrationStatus, installHookIntegration, mapProviderHookEvent } from "../src/adapters/hookIntegration.js";
+import { forwardProviderHookControl, forwardProviderHookEvent } from "../src/adapters/hookForwarder.js";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
 import { evaluateProviderHookControl, HookControlError, verifyProviderHookControlResult } from "../src/bridge/hookControl.js";
 import { renderProviderControlResponse, validateProviderControlResponse } from "../src/bridge/hookProviders.js";
@@ -26,6 +21,11 @@ import { verifyLeaseToken } from "../src/leases/leaseVerifier.js";
 import { canonicalize } from "../src/utils/json.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { inspectHookActionLifecycle } from "../src/watch/hookActionLifecycle.js";
+import { claudeActionId } from "../src/adapters/hookProviders/claudeCode.js";
+import { claudeEnvelope } from "../src/adapters/hookProviders/claudeCodePayloads.js";
+import { handleHookControlRequest } from "../src/bridge/hookControlRoute.js";
+import { getPurposeKeyHistory } from "../src/keys/signingKeys.js";
+import { boundClaudeCode } from "./helpers/claudeCodeHookFixtures.js";
 
 const roots: string[] = [];
 
@@ -107,6 +107,25 @@ async function freePort(): Promise<number> {
   return address.port;
 }
 
+/**
+ * Claude Code control decides only for a session registered under a signed Claude Code control installation (P1-23):
+ * install one bound to this process's Node (the session process the registration checks) and register `sessionId`.
+ */
+function claudeControlled(workspace: string, agentId: string, sessionId = "private-session", bridgeBase?: string): void {
+  installHookIntegration({ workspace, provider: "claude-code", agentId, mode: "control", claudeCodeInstall: boundClaudeCode(), ...(bridgeBase ? { bridgeBase } : {}) });
+  const configDir = join(workspace, ".fixture-home", ".claude");
+  mkdirSync(configDir, { recursive: true });
+  handleHookControlRequest({ workspace, authenticatedAgentId: agentId, provider: "claude-code",
+    rawInput: JSON.stringify({ hook_event_name: "SessionStart", session_id: sessionId, amc: { claudePid: process.pid, configDir } }) });
+}
+
+/** Claude Code's pinned PreToolUse payload for `fields`, in the envelope AMC's forwarder sends (raw bytes and a nonce). */
+function claudeRequest(workspace: string, fields: { tool_name: string; tool_use_id: string; tool_input: Record<string, unknown>; session_id?: string },
+  nonce = "nonce-fixture-000000000000"): string {
+  return claudeEnvelope(Buffer.from(JSON.stringify({ session_id: "private-session", transcript_path: "/private/transcript.jsonl",
+    cwd: realpathSync.native(workspace), permission_mode: "default", hook_event_name: "PreToolUse", ...fields })), nonce);
+}
+
 afterEach(() => {
   while (roots.length > 0) {
     const root = roots.pop();
@@ -116,13 +135,8 @@ afterEach(() => {
 
 describe("provider-native signed hook control", () => {
   test("renders exact pinned Claude and Gemini native response shapes", () => {
-    expect(renderProviderControlResponse("claude-code", "allow", "signed allow")).toEqual({
-      hookSpecificOutput: {
-        hookEventName: "PreToolUse",
-        permissionDecision: "allow",
-        permissionDecisionReason: "signed allow",
-      },
-    });
+    // P1-23: AMC only restricts Claude Code; its allow is the empty answer, so Claude Code's own permissions still apply.
+    expect(renderProviderControlResponse("claude-code", "allow", "signed allow")).toEqual({});
     expect(renderProviderControlResponse("claude-code", "deny", "signed deny")).toEqual({
       hookSpecificOutput: {
         hookEventName: "PreToolUse",
@@ -169,29 +183,25 @@ describe("provider-native signed hook control", () => {
     permitReadAndWrite(workspace);
     mkdirSync(join(workspace, "workspace"), { recursive: true });
     writeFileSync(join(workspace, "workspace", "public.txt"), "public fixture");
+    claudeControlled(workspace, agentId);
 
     const result = evaluateProviderHookControl({
       workspace,
       authenticatedAgentId: agentId,
       provider: "claude-code",
-      rawInput: JSON.stringify({
-        session_id: "private-session",
-        hook_event_name: "PreToolUse",
-        tool_name: "Read",
-        tool_use_id: "toolu_control_allow_01",
-        tool_input: { file_path: join(workspace, "workspace", "public.txt") },
-      }),
+      rawInput: claudeRequest(workspace, { tool_name: "Read", tool_use_id: "toolu_control_allow_01",
+        tool_input: { file_path: join(realpathSync.native(workspace), "workspace", "public.txt") } }),
     });
 
     expect(result.decision).toBe("allow");
-    expect(result.providerResponse).toEqual(expect.objectContaining({
-      hookSpecificOutput: expect.objectContaining({ permissionDecision: "allow" }),
-    }));
+    expect(result.providerResponse).toEqual({});
     expect(result.providerResponseSha256).toMatch(/^[a-f0-9]{64}$/);
     expect(result.receiptId).toBeTruthy();
-    const receipt = verifyReceipt(result.receipt, getPublicKeyHistory(workspace, "monitor"));
+    // P1-23: a Claude Code decision is a v2 action_state receipt (receipt purpose key) bound to AMC's action id.
+    const receipt = verifyReceipt(result.receipt, getPurposeKeyHistory(workspace, "receipt"));
     expect(receipt.ok).toBe(true);
-    expect(receipt.payload?.kind).toBe("guard_check");
+    expect(receipt.payload).toMatchObject({ kind: "action_state", state: "authorized", executionId: claudeActionId("private-session", "toolu_control_allow_01"),
+      idempotencyKey: "toolu_control_allow_01", enforcement: { level: "enforced", boundary: "claude-code:PreToolUse" } });
     expect(receipt.payload?.body_sha256).toBe(result.providerResponseSha256);
 
     const ledger = openLedger(workspace);
@@ -241,16 +251,14 @@ describe("provider-native signed hook control", () => {
   });
 
   test("recovers an empty unsealed control session but rejects a sealed session without a receipt", () => {
-    const actionId = "toolu_stale_control_session";
-    const rawInput = JSON.stringify({
-      hook_event_name: "PreToolUse",
-      tool_name: "Read",
-      tool_use_id: actionId,
-      tool_input: { file_path: "workspace/public.txt" },
-    });
+    const actionId = claudeActionId("private-session", "toolu_stale_control_session");
+    const rawInputFor = (workspace: string) => claudeRequest(workspace, { tool_name: "Read", tool_use_id: "toolu_stale_control_session",
+      tool_input: { file_path: join(realpathSync.native(workspace), "workspace", "public.txt") } });
 
     const recoverableWorkspace = newWorkspace();
     const agentId = "stale-session-reader";
+    claudeControlled(recoverableWorkspace, agentId);
+    const rawInput = rawInputFor(recoverableWorkspace);
     installObservedRun(recoverableWorkspace, agentId);
     permitReadAndWrite(recoverableWorkspace);
     mkdirSync(join(recoverableWorkspace, "workspace"), { recursive: true });
@@ -287,6 +295,7 @@ describe("provider-native signed hook control", () => {
     recoveredLedger.close();
 
     const sealedWorkspace = newWorkspace();
+    claudeControlled(sealedWorkspace, agentId);
     installObservedRun(sealedWorkspace, agentId);
     permitReadAndWrite(sealedWorkspace);
     mkdirSync(join(sealedWorkspace, "workspace"), { recursive: true });
@@ -305,48 +314,40 @@ describe("provider-native signed hook control", () => {
       workspace: sealedWorkspace,
       authenticatedAgentId: agentId,
       provider: "claude-code",
-      rawInput,
+      rawInput: rawInputFor(sealedWorkspace),
     })).toThrowError(expect.objectContaining<Partial<HookControlError>>({
       code: "HOOK_CONTROL_LEDGER_UNAVAILABLE",
       statusCode: 503,
     }));
   });
 
-  test("asks for Claude write approval and capability-gates the same Gemini outcome to deny", () => {
+  // P1-23: a provider-local ask is not AMC approval and AMC has no approval path for hook calls, so a write that needs
+  // approval is denied (capability-lossy) for Claude Code too; earlier versions answered Claude Code with a native ask.
+  test("denies a write that needs approval for Claude Code and Gemini CLI alike instead of a provider-local ask", () => {
     for (const provider of ["claude-code", "gemini-cli"] as const) {
       const workspace = newWorkspace();
       const agentId = `writer-${provider}`;
       installObservedRun(workspace, agentId);
       permitReadAndWrite(workspace);
+      if (provider === "claude-code") claudeControlled(workspace, agentId);
       const rawInput = provider === "claude-code"
-        ? {
-            hook_event_name: "PreToolUse",
-            tool_name: "Write",
-            tool_use_id: "toolu_control_ask_01",
-            tool_input: { file_path: join(workspace, "workspace", "output", "draft.txt"), content: "PRIVATE" },
-          }
-        : {
+        ? claudeRequest(workspace, { tool_name: "Write", tool_use_id: "toolu_control_ask_01",
+            tool_input: { file_path: join(realpathSync.native(workspace), "workspace", "output", "draft.txt"), content: "PRIVATE" } })
+        : JSON.stringify({
             hook_event_name: "BeforeTool",
             tool_name: "write_file",
             tool_input: { file_path: join(workspace, "workspace", "output", "draft.txt"), content: "PRIVATE" },
-          };
-      const result = evaluateProviderHookControl({
-        workspace,
-        authenticatedAgentId: agentId,
-        provider,
-        rawInput: JSON.stringify(rawInput),
-      });
+          });
+      const result = evaluateProviderHookControl({ workspace, authenticatedAgentId: agentId, provider, rawInput });
 
       expect(result.requestedDecision).toBe("ask");
+      expect(result).toMatchObject({ decision: "deny", effectiveOutcome: "deny", providerMapping: "fail_closed_deny", capabilityLossy: true });
       if (provider === "claude-code") {
-        expect(result.decision).toBe("ask");
-        expect(result.capabilityLossy).toBe(false);
-      } else {
-        expect(result.decision).toBe("deny");
-        expect(result.capabilityLossy).toBe(true);
+        expect(result.reason).toContain("A Claude Code ask is not AMC approval");
+        expect(result.providerResponse).toMatchObject({ hookSpecificOutput: { permissionDecision: "deny" } });
       }
       expect(JSON.stringify(result)).not.toContain("PRIVATE");
-      expect(verifyReceipt(result.receipt, getPublicKeyHistory(workspace, "monitor")).ok).toBe(true);
+      expect(verifyReceipt(result.receipt, getPurposeKeyHistory(workspace, "receipt")).ok).toBe(true);
     }
   });
 
@@ -363,20 +364,14 @@ describe("provider-native signed hook control", () => {
       ttlMinutes: 15,
     };
     initApprovalPolicy(workspace, policy);
+    claudeControlled(workspace, agentId);
 
     const result = evaluateProviderHookControl({
       workspace,
       authenticatedAgentId: agentId,
       provider: "claude-code",
-      rawInput: JSON.stringify({
-        hook_event_name: "PreToolUse",
-        tool_name: "Write",
-        tool_use_id: "toolu_quorum_01",
-        tool_input: {
-          file_path: join(workspace, "workspace", "output", "quorum.txt"),
-          content: "PRIVATE",
-        },
-      }),
+      rawInput: claudeRequest(workspace, { tool_name: "Write", tool_use_id: "toolu_quorum_01",
+        tool_input: { file_path: join(realpathSync.native(workspace), "workspace", "output", "quorum.txt"), content: "PRIVATE" } }),
     });
 
     expect(result.requestedDecision).toBe("deny");
@@ -416,24 +411,20 @@ describe("provider-native signed hook control", () => {
     mkdirSync(join(workspace, "workspace"), { recursive: true });
     writeFileSync(join(workspace, "workspace", "one.txt"), "one");
     writeFileSync(join(workspace, "workspace", "two.txt"), "two");
-    const base = {
-      session_id: "session-replay",
-      hook_event_name: "PreToolUse",
-      tool_name: "Read",
-      tool_use_id: "toolu_replay_01",
-      tool_input: { file_path: join(workspace, "workspace", "one.txt") },
-    };
+    claudeControlled(workspace, agentId, "session-replay");
+    const real = realpathSync.native(workspace);
+    const base = { session_id: "session-replay", tool_name: "Read", tool_use_id: "toolu_replay_01", tool_input: { file_path: join(real, "workspace", "one.txt") } };
     const first = evaluateProviderHookControl({
       workspace,
       authenticatedAgentId: agentId,
       provider: "claude-code",
-      rawInput: JSON.stringify(base),
+      rawInput: claudeRequest(workspace, base),
     });
     const replay = evaluateProviderHookControl({
       workspace,
       authenticatedAgentId: agentId,
       provider: "claude-code",
-      rawInput: JSON.stringify(base),
+      rawInput: claudeRequest(workspace, base),
     });
 
     expect(first.idempotentReplay).toBe(false);
@@ -445,11 +436,15 @@ describe("provider-native signed hook control", () => {
       workspace,
       authenticatedAgentId: agentId,
       provider: "claude-code",
-      rawInput: JSON.stringify({
-        ...base,
-        tool_input: { file_path: join(workspace, "workspace", "two.txt") },
-      }),
+      rawInput: claudeRequest(workspace, { ...base, tool_input: { file_path: join(real, "workspace", "two.txt") } }),
     })).toThrowError(expect.objectContaining<Partial<HookControlError>>({ code: "HOOK_CONTROL_REPLAY_CONFLICT" }));
+    // Single-use: the same call re-sent with a fresh nonce (a second request) gets no second decision.
+    expect(() => evaluateProviderHookControl({
+      workspace,
+      authenticatedAgentId: agentId,
+      provider: "claude-code",
+      rawInput: claudeRequest(workspace, base, "nonce-second-request-0000"),
+    })).toThrowError(expect.objectContaining<Partial<HookControlError>>({ code: "HOOK_CONTROL_REPLAY_CONFLICT", statusCode: 409 }));
   });
 
   test("rejects a valid signed control result replayed against a different provider request", () => {
@@ -460,18 +455,12 @@ describe("provider-native signed hook control", () => {
     mkdirSync(join(workspace, "workspace"), { recursive: true });
     writeFileSync(join(workspace, "workspace", "first.txt"), "first");
     writeFileSync(join(workspace, "workspace", "second.txt"), "second");
-    const firstRawInput = JSON.stringify({
-      hook_event_name: "PreToolUse",
-      tool_name: "Read",
-      tool_use_id: "toolu_request_binding_first",
-      tool_input: { file_path: join(workspace, "workspace", "first.txt") },
-    });
-    const secondRawInput = JSON.stringify({
-      hook_event_name: "PreToolUse",
-      tool_name: "Read",
-      tool_use_id: "toolu_request_binding_second",
-      tool_input: { file_path: join(workspace, "workspace", "second.txt") },
-    });
+    claudeControlled(workspace, agentId);
+    const real = realpathSync.native(workspace);
+    const firstRawInput = claudeRequest(workspace, { tool_name: "Read", tool_use_id: "toolu_request_binding_first",
+      tool_input: { file_path: join(real, "workspace", "first.txt") } });
+    const secondRawInput = claudeRequest(workspace, { tool_name: "Read", tool_use_id: "toolu_request_binding_second",
+      tool_input: { file_path: join(real, "workspace", "second.txt") } });
     const result = evaluateProviderHookControl({
       workspace,
       authenticatedAgentId: agentId,
@@ -513,16 +502,12 @@ describe("provider-native signed hook control", () => {
     const agentId = "fail-closed-agent";
     installObservedRun(workspace, agentId);
     permitReadAndWrite(workspace);
+    claudeControlled(workspace, agentId);
     const unknown = evaluateProviderHookControl({
       workspace,
       authenticatedAgentId: agentId,
       provider: "claude-code",
-      rawInput: JSON.stringify({
-        hook_event_name: "PreToolUse",
-        tool_name: "UnmappedDangerousTool",
-        tool_use_id: "toolu_unknown_01",
-        tool_input: { secret: "DO_NOT_RETAIN" },
-      }),
+      rawInput: claudeRequest(workspace, { tool_name: "UnmappedDangerousTool", tool_use_id: "toolu_unknown_01", tool_input: { secret: "DO_NOT_RETAIN" } }),
     });
     expect(unknown.decision).toBe("deny");
     expect(unknown.reason).toContain("not mapped to an allowed ToolHub tool");
@@ -569,7 +554,9 @@ describe("provider-native signed hook control", () => {
         agentId,
         bridgeBase,
         mode: "control",
+        claudeCodeInstall: boundClaudeCode(),
       });
+      claudeControlled(workspace, agentId, "private-bridge-session", bridgeBase);
       expect(installed.mode).toBe("control");
       expect(installed.lease.scopes).toEqual(["hook:observe", "hook:control"]);
       const status = getHookIntegrationStatus({ workspace, provider: "claude-code" });
@@ -592,21 +579,18 @@ describe("provider-native signed hook control", () => {
         agentId,
         bridgeBase,
         tokenFile,
-        rawInput: JSON.stringify({
-          session_id: "private-bridge-session",
-          hook_event_name: "PreToolUse",
-          tool_name: "Read",
-          tool_use_id: "toolu_bridge_control_01",
-          tool_input: { file_path: fixturePath },
-        }),
+        rawInput: claudeRequest(workspace, { session_id: "private-bridge-session", tool_name: "Read", tool_use_id: "toolu_bridge_control_01",
+          tool_input: { file_path: join(realpathSync.native(workspace), "workspace", "bridge.txt") } }),
+        // The envelope carries the payload bytes; the observation maps the payload itself.
+        observedInput: JSON.stringify({ session_id: "private-bridge-session", transcript_path: "/private/transcript.jsonl", cwd: realpathSync.native(workspace),
+          permission_mode: "default", hook_event_name: "PreToolUse", tool_name: "Read", tool_use_id: "toolu_bridge_control_01",
+          tool_input: { file_path: join(realpathSync.native(workspace), "workspace", "bridge.txt") } }),
       });
 
       expect(result.control.decision).toBe("allow");
-      expect(result.control.providerResponse).toEqual(expect.objectContaining({
-        hookSpecificOutput: expect.objectContaining({ permissionDecision: "allow" }),
-      }));
+      expect(result.control.providerResponse).toEqual({});
       expect(result.observation.receiptId).toBeTruthy();
-      expect(verifyReceipt(result.control.receipt, getPublicKeyHistory(workspace, "monitor")).ok).toBe(true);
+      expect(verifyReceipt(result.control.receipt, getPurposeKeyHistory(workspace, "receipt")).ok).toBe(true);
       const terminal = await forwardProviderHookEvent({
         workspace,
         provider: "claude-code",
@@ -619,7 +603,7 @@ describe("provider-native signed hook control", () => {
           hook_event_name: "PostToolUse",
           tool_name: "Read",
           tool_use_id: "toolu_bridge_control_01",
-          tool_input: { file_path: fixturePath },
+          tool_input: { file_path: join(realpathSync.native(workspace), "workspace", "bridge.txt") },
           tool_response: { content: "private result" },
         }),
       });
@@ -642,6 +626,7 @@ describe("provider-native signed hook control", () => {
       expect(events.some((event) => event.id === result.control.eventId && event.event_type === "audit")).toBe(true);
       expect(JSON.stringify(events)).not.toContain("private-bridge-session");
       expect(JSON.stringify(events)).not.toContain(fixturePath);
+      expect(JSON.stringify(events)).not.toContain(join(realpathSync.native(workspace), "workspace", "bridge.txt"));
       expect(JSON.stringify(events)).not.toContain("private result");
     } finally {
       await bridge.close();
