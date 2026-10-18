@@ -64,7 +64,7 @@ export const TECHNOLOGY_PROFILE: StationOperatingProfileData = {
     rules: sourced({ piiLeakage: true, secretExposure: true, promptInjection: true }, S.gdpr_art33, "PII and secret rules contain breaches that would start the 72-hour clock (unverified primary text).")
   },
   approvals: {
-    WRITE_HIGH: sourced(approval(1, false, ["APPROVER", "OWNER"], 60), S.amc_operating_choice, "High tier: one approval for high-impact writes."),
+    WRITE_HIGH: sourced(approval(2, true, ["APPROVER", "OWNER"], 15), S.amc_operating_choice, "The shipped default: two distinct approvers for high-impact writes. A station profile does not propose less than the default it replaces."),
     DEPLOY: sourced(approval(2, true, ["APPROVER", "OWNER"], 15), S.nist_ssdf, "SSDF release practices: two distinct approvals before deployment."),
     DATA_EXPORT: sourced(approval(2, true, ["OWNER", "AUDITOR"], 10), S.gdpr_art33, "Exports are the breach surface; owner plus auditor (unverified primary text)."),
     SECURITY: sourced(approval(2, true, ["OWNER", "AUDITOR"], 10), S.cisa_eo14028, "Security-class actions: owner plus auditor.")
