@@ -38,8 +38,8 @@
     "latencyMs": {
       "n": 200,
       "allowed": 200,
-      "p50": 1198.4,
-      "p95": 2066.5,
+      "p50": 625.5,
+      "p95": 1126,
       "measured": "spawn of the installed PreToolUse handler (node + AMC forwarder entry) to its exit: observation, control decision, ledger receipt check; loopback Bridge"
     },
     "receiptsVerified": {
@@ -53,7 +53,7 @@
       "reason": ""
     }
   },
-  "commit": "8f11b73fa144e3d58df744409e7236d0b962968a",
+  "commit": "e4f05bc970860d62254b7e0a1817a9d5a420053d",
   "claudeCode": {
     "package": "@anthropic-ai/claude-code@2.1.296",
     "integrity": "sha512-OX/k/rpcthMqnFKOWcpNcbiLsMKtAjLOpQNJHlYiDCFUznWCIwdRTyl/p9SdHVrsrzZuPMCNqZjnpakIni6upw==",
@@ -61,5 +61,5 @@
     "nativeIntegrity": "sha512-vqtx3kS3r1hNLMk+N8JMG5J4kcLHIbI3t/NSIdcFQZrRVCFA6NtcxJyn/B+Sf3GxJaFJOCEfoBQXsFo10+Oj9A==",
     "binarySha256": "c9b5341637becbd423ddffc5b254afb645682a3868cb708bbc6cc0e7bb419937"
   },
-  "environment": "local macOS arm64 (Darwin 25.6.0, macOS 26.6.2), Node v22.23.3, not CI; host load average about 17 to 21 during the run; model replies from a scripted loopback endpoint; outbound network denied by sandbox-exec"
+  "environment": "local macOS arm64 (Darwin 25.6.0, macOS 26.6.2), Node v22.23.3, not CI; host load average about 20 during the run; model replies from a scripted loopback endpoint; outbound network denied by sandbox-exec"
 }

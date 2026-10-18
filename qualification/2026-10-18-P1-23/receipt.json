@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P1-23",
   "date": "2026-10-18",
-  "commit": "8f11b73fa144e3d58df744409e7236d0b962968a",
+  "commit": "e4f05bc970860d62254b7e0a1817a9d5a420053d",
   "branch": "rtd/p1-23-claude-code-hooks",
   "node": "v22.23.3",
   "pnpm": "10.33.0",
@@ -12,24 +12,24 @@
     {
       "cmd": "AMC_CLAUDE_CODE_CONFORMANCE=1 AMC_CLAUDE_CODE_PREFIX=<prefix> AMC_CLAUDE_CODE_CONFORMANCE_OUT=<file> AMC_CLAUDE_CODE_LATENCY_N=200 npx vitest run tests/conformance/claudeCodeHooks.conformance.test.ts",
       "exit": 0,
-      "durationMs": 391160
+      "durationMs": 176410
     },
     {
-      "cmd": "npx vitest run --testTimeout=300000 tests/amc1464ProviderControlDocs.test.ts tests/amc1465AdapterCapabilityDocs.test.ts tests/amc1466HookActionLifecycleDocs.test.ts tests/amc1469ControlProjection.test.ts tests/amc1470ControlSimulation.test.ts tests/amc1471ApprovalDelivery.test.ts tests/amc1472OutcomeOnboarding.test.ts tests/amc1473SignedControlLifecycle.test.ts tests/amc1474ReusableScopeTemplates.test.ts tests/amc1475NestedConditionAuthoring.test.ts tests/amc1476ProviderSteerOutcome.test.ts tests/amc1477ObserveOnlyRollout.test.ts tests/amc1480HookHealthDiagnostics.test.ts tests/amc1482McpToolContext.test.ts tests/amc1483CompoundCommandBlastRadius.test.ts tests/amcPiExtension.test.ts tests/apiContractVerification.test.ts tests/apiRouters.test.ts tests/claudeCodeAllowFunnel.test.ts tests/claudeCodeHookSecurity.test.ts tests/claudeCodeIntake.test.ts tests/claudeCodeRecordedHooks.test.ts tests/claudeHookFailClosed.test.ts tests/claudeHookInstalledConfig.test.ts tests/cloudReferenceArchitectures.test.ts tests/connectHookIntegration.test.ts tests/controlHttpResponsesParity.test.ts tests/domainProofApiFilesystemBoundary.test.ts tests/gap0010GalileoStudioDrilldownBoundary.test.ts tests/gap0017PromptLayerStudioDrilldownBoundary.test.ts tests/gap0721PaperTrailStudioDrilldownBoundary.test.ts tests/gap0737ApoStudioDrilldownBoundary.test.ts tests/gap0748MultiAgentBargainingStudioDrilldownUnavailableBoundary.test.ts tests/gap0783AwesomeAgentEvolutionStudioDrilldownBoundary.test.ts tests/gap0822AgenticClearStudioDrilldownBoundary.test.ts tests/gap0835MachineEconomicAgencyStudioDrilldownBoundary.test.ts tests/gap0860GoOpenllmetryStudioDrilldownBoundary.test.ts tests/gap0911AresDashboardStudioDrilldownBoundary.test.ts tests/gap0918TraceMindStudioDrilldownBoundary.test.ts tests/gap0943BraintrustStudioDrilldownBoundary.test.ts tests/gap0958LaminarStudioDrilldownBoundary.test.ts tests/gap0962CometOpikStudioDrilldownBoundary.test.ts tests/gap0967RagaAiCatalystStudioDrilldownBoundary.test.ts tests/gap0979HeliconeStudioDrilldownBoundary.test.ts tests/gap3747CometOpikStudioDrilldownBoundary.test.ts tests/gap3748LangtraceTraceFailureTaxonomyBoundary.test.ts tests/hookActionLifecycle.test.ts tests/hookActionLifecycleSurfaces.test.ts tests/hookAdmission.test.ts tests/hookAuditLatch.test.ts tests/hookControl.test.ts tests/hookIntake.test.ts tests/integrationScaffold.test.ts tests/leaseRevocationFailClosed.test.ts tests/nativeScheduleLifecycle.test.ts tests/newProductModulesBatch2.test.ts tests/observeApiRoutes.test.ts tests/openapiContracts.test.ts tests/openapiWebhookSchemas.test.ts tests/piHookControl.test.ts tests/piSessionImportBoundaries.test.ts tests/piSessionRegistration.test.ts tests/providerNeutralHookIngress.test.ts tests/pythonSdk.test.ts tests/sdkConsolidationDocs.test.ts tests/studioApiAuthorization.test.ts tests/studioVaultModeLoop.test.ts tests/subagentHookInheritance.test.ts tests/utilsCoreFoundation.test.ts tests/workAcceptance.test.ts tests/claudeCodeReviewThree.test.ts tests/claudeCodeReviewFour.test.ts",
-      "exit": 1,
-      "durationMs": 662880
+      "cmd": "npx vitest run --maxWorkers=6 --testTimeout=300000 --hookTimeout=120000 tests/amc1464ProviderControlDocs.test.ts tests/amc1465AdapterCapabilityDocs.test.ts tests/amc1466HookActionLifecycleDocs.test.ts tests/amc1469ControlProjection.test.ts tests/amc1470ControlSimulation.test.ts tests/amc1471ApprovalDelivery.test.ts tests/amc1472OutcomeOnboarding.test.ts tests/amc1473SignedControlLifecycle.test.ts tests/amc1474ReusableScopeTemplates.test.ts tests/amc1475NestedConditionAuthoring.test.ts tests/amc1476ProviderSteerOutcome.test.ts tests/amc1477ObserveOnlyRollout.test.ts tests/amc1480HookHealthDiagnostics.test.ts tests/amc1482McpToolContext.test.ts tests/amc1483CompoundCommandBlastRadius.test.ts tests/amcPiExtension.test.ts tests/apiContractVerification.test.ts tests/apiRouters.test.ts tests/claudeCodeAllowFunnel.test.ts tests/claudeCodeHookSecurity.test.ts tests/claudeCodeIntake.test.ts tests/claudeCodeRecordedHooks.test.ts tests/claudeHookFailClosed.test.ts tests/claudeHookInstalledConfig.test.ts tests/cloudReferenceArchitectures.test.ts tests/connectHookIntegration.test.ts tests/controlHttpResponsesParity.test.ts tests/domainProofApiFilesystemBoundary.test.ts tests/gap0010GalileoStudioDrilldownBoundary.test.ts tests/gap0017PromptLayerStudioDrilldownBoundary.test.ts tests/gap0721PaperTrailStudioDrilldownBoundary.test.ts tests/gap0737ApoStudioDrilldownBoundary.test.ts tests/gap0748MultiAgentBargainingStudioDrilldownUnavailableBoundary.test.ts tests/gap0783AwesomeAgentEvolutionStudioDrilldownBoundary.test.ts tests/gap0822AgenticClearStudioDrilldownBoundary.test.ts tests/gap0835MachineEconomicAgencyStudioDrilldownBoundary.test.ts tests/gap0860GoOpenllmetryStudioDrilldownBoundary.test.ts tests/gap0911AresDashboardStudioDrilldownBoundary.test.ts tests/gap0918TraceMindStudioDrilldownBoundary.test.ts tests/gap0943BraintrustStudioDrilldownBoundary.test.ts tests/gap0958LaminarStudioDrilldownBoundary.test.ts tests/gap0962CometOpikStudioDrilldownBoundary.test.ts tests/gap0967RagaAiCatalystStudioDrilldownBoundary.test.ts tests/gap0979HeliconeStudioDrilldownBoundary.test.ts tests/gap3747CometOpikStudioDrilldownBoundary.test.ts tests/gap3748LangtraceTraceFailureTaxonomyBoundary.test.ts tests/hookActionLifecycle.test.ts tests/hookActionLifecycleSurfaces.test.ts tests/hookAdmission.test.ts tests/hookAuditLatch.test.ts tests/hookControl.test.ts tests/hookIntake.test.ts tests/integrationScaffold.test.ts tests/leaseRevocationFailClosed.test.ts tests/nativeScheduleLifecycle.test.ts tests/newProductModulesBatch2.test.ts tests/observeApiRoutes.test.ts tests/openapiContracts.test.ts tests/openapiWebhookSchemas.test.ts tests/piHookControl.test.ts tests/piSessionImportBoundaries.test.ts tests/piSessionRegistration.test.ts tests/providerNeutralHookIngress.test.ts tests/pythonSdk.test.ts tests/sdkConsolidationDocs.test.ts tests/studioApiAuthorization.test.ts tests/studioVaultModeLoop.test.ts tests/subagentHookInheritance.test.ts tests/utilsCoreFoundation.test.ts tests/workAcceptance.test.ts tests/claudeCodeReviewThree.test.ts tests/claudeCodeReviewFour.test.ts",
+      "exit": 0,
+      "durationMs": 230880
     }
   ],
   "tests": {
-    "total": 855,
-    "passed": 848,
-    "failed": 3,
-    "skipped": 4
+    "total": 857,
+    "passed": 857,
+    "failed": 0,
+    "skipped": 0
   },
   "artifacts": [
     {
       "path": "claude-code-conformance.json",
-      "sha256": "1aca57d1fed9945106cd7b5110ee71e9b57c96ed0cfe5d42d11a197cc28dd7c2"
+      "sha256": "7adc12dc0f1b164d798fa0407fb5eb124281a2206fc0db5330cfbbcaa1d9dd84"
     },
     {
       "path": "fixtures.json",
@@ -40,5 +40,5 @@
       "sha256": "7e7c3c97ab1d80eeffb001e55f5255e02ab3b0c1b60d60a4cb17d5a929b06ed9"
     }
   ],
-  "notes": "Local macOS arm64, not CI, host load average 17 to 21. Conformance 7/7 on Claude Code 2.1.296, 217 receipts verified with 0 failures, latency p50 1198.4 ms / p95 2066.5 ms (200 allowed calls). The focused suites exited 1 on load timing only: two 10 s beforeAll hook timeouts (tests/claudeCodeAllowFunnel.test.ts, tests/amcPiExtension.test.ts, whose tests were skipped) and P0-42's 9 s wall-clock bound in tests/claudeHookFailClosed.test.ts (9332 and 9534 ms) plus one CLI outage case exiting 1; rerun with two workers, 29/30 passed, the one left at 9253 ms against the same 9 s bound. Latency is far above the 50 ms target; latency.json holds standalone macOS and Linux arm64 runs at commit c8a9907b4. Windows not verified; Linux packages pinned, not run against Claude Code."
+  "notes": "Local macOS arm64, not CI, host load average about 20. Conformance 7/7 on Claude Code 2.1.296, 217 receipts verified with 0 failures, latency p50 625.5 ms / p95 1126 ms (200 allowed calls). Focused suites 850/850 with six workers and longer hook and test timeouts for the loaded host. Latency is far above the 50 ms target; latency.json holds standalone macOS and Linux arm64 runs at commit c8a9907b4. Windows not verified; Linux packages pinned, not run against Claude Code."
 }
